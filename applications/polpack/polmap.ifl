@@ -20,13 +20,43 @@ interface POLMAP
 
    helplib 'POLPACK_HELP:'
 
+   parameter BACK                  
+      type     NDF
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Background image'
+      default  !
+      helpkey  '*'
+   endparameter
+
+   parameter BACKTYPE
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'GREY'
+      prompt   'Display type for background image'
+      helpkey  '*'
+   endparameter
+
    parameter BADCOL
       type     _CHAR
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
       default  'CYAN'
-      prompt   'Colour with which to mark missing pixel data'
+      prompt   'Colour for missing data and background'
+      helpkey  '*'
+   endparameter
+
+   parameter CONCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'BLACK'
+      prompt   'Colour for contours'
       helpkey  '*'
    endparameter
 
@@ -50,14 +80,14 @@ interface POLMAP
       helpkey  '*'
    endparameter
 
-   parameter IN                  
+   parameter IN
       position 1
       type     NDF
       access   READ
       vpath    'PROMPT '
       ppath    'GLOBAL '
       association <->GLOBAL.DATA_ARRAY
-      prompt   'Input image'
+      prompt   'Input Stokes vectors'
       helpkey  '*'
    endparameter
 
@@ -78,6 +108,16 @@ interface POLMAP
       ppath    'DEFAULT'
       default  !
       prompt   'The name of a file in which to store all ATASK messages.'
+      helpkey  '*'
+   endparameter
+
+   parameter NCONT
+      type     '_INTEGER'
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  4
+      prompt   'Number of contours for background image'
       helpkey  '*'
    endparameter
 

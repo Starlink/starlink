@@ -63,6 +63,7 @@
       alias polimp    INSTALL_BIN/polimp
       alias polmap    INSTALL_BIN/polmap
       alias polka     INSTALL_BIN/polka
+      alias polplot   INSTALL_BIN/polplot
       alias polvec    INSTALL_BIN/polvec
 #
 #  Now do the same with alternative names.
@@ -73,6 +74,7 @@
       alias pol_polimp    INSTALL_BIN/pol_polimp
       alias pol_polmap    INSTALL_BIN/pol_polmap
       alias pol_polka     INSTALL_BIN/pol_polka
+      alias pol_polplot   INSTALL_BIN/pol_polplot
       alias pol_polvec    INSTALL_BIN/pol_polvec
 #
 #

@@ -120,7 +120,7 @@
 *        the case of circular polarisation, a value of zero is stored 
 *        if the normalised Stokes parameter V is positive, and a value
 *        of 90 is stored otherwise. A null value can be supplied if this 
-*        output image is not required.
+*        output image is not required. [!]
 *     VARIANCE = _LOGICAL (Read)
 *        TRUE if output variances are to be calculated.  This parameter
 *        is only accessed if all input NDFs contain variances, otherwise
@@ -502,8 +502,8 @@
       CALL NDF_CGET( INDF1, 'UNITS', UNITS, STATUS ) 
  
 *  Create the catalogue.
-      CALL POL1_MKCAT( 'CAT', ( INDEX( STOKES, 'V') .NE. 0 ), UNITS, 
-     :                 VAR, CI, STATUS )
+      CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
+     :                 UNITS, VAR, CI, STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN

@@ -588,7 +588,7 @@ proc ColMenu {menu label var} {
    set thismenu [menu $menu.$lvar]
 
 # Add the list of colours to the new sub-menu.
-   foreach col "red blue green cyan yellow magenta black" {
+   foreach col "red blue green cyan yellow magenta black white" {
       $thismenu add radiobutton -label $col -variable $var \
                                 -value $col -selectcolor $col \
                                 -command "SetColours $var"
@@ -2465,6 +2465,249 @@ proc GwmCanToNDF {cx cy} {
 
 }
 
+proc GwmChange {} {
+#+
+#  Name:
+#     GwmChange
+#
+#  Purpose:
+#     Change the mode of display for the background image. The kapview
+#     task is killed and re-loaded, and the display re-created. This is
+#     necessary since running KAPPA:CONTOUR followed by KAPPA:DISPLAY
+#     without first re-starting the kapview task causes an "HDS locator 
+#     invalid" message to be displayed, and the task eventually dies.
+#     Dont ask me why!!!
+#-
+   global TASK_FILE
+   kapview kill
+   LoadTask kapview $TASK_FILE(kapview)
+   GwmUpdate
+}   
+
+proc GwmClear {} {
+#+
+#  Name:
+#     GwmClear
+#
+#  Purpose:
+#     Clears the GWM window
+#
+#-
+   global GWM_DEVICE
+   global GWM_DISPLAY_DATA
+   global GWM_DISPLAY_NCONT
+
+# Erase the image display. 
+   Obey kapview gdclear "device=$GWM_DEVICE" 1
+   set GWM_DISPLAY_DATA "" 
+   set GWM_DISPLAY_NCONT 0
+}
+
+proc GwmContour {} {
+#+
+#  Name:
+#    GwmContour
+#
+#  Purpose:
+#    Display a contour map of a section of an image, and store 
+#    global values needed by GwmNDFToCan and GwmCanToNDF (which convert 
+#    between canvas coordinates and NDF pixel coordinates).
+#
+#  Arguments:
+#    None.
+#
+#  Globals:
+#    GWM_CX (Write)
+#       The X offset for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_CY (Write)
+#       The Y offset for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_DEVICE (Read)
+#       The GNS device name for the GWM canvas item.
+#    GWM_DISPLAY_DATA (Read and Write)
+#       The image section currently displayed.
+#    GWM_DISPLAY_LOCK (Read and Write)
+#       Was the scaling locked when the current display was drawn?
+#    GWM_NCONT (Read and Write)
+#       The number of requested contours.
+#    GWM_DISPLAY_NCONT (Read and Write)
+#       The number of contours in the current display.
+#    GWM_DISPLAY_PHI (Read and Write)
+#       The upper percentile used when the current display was drawn.
+#    GWM_DISPLAY_PLO (Read and Write)
+#       The lower percentile used when the current display was drawn.
+#    GWM_IMAGE (Read)
+#       The name of the image to be displayed (without any section
+#       specifier).
+#    GWM_LOCK_SCALE (Read)
+#       Should the image be displayed with the scaling implied by
+#       the supplied values of GWM_SCALO and GWM_SCAHI? Otherwise,
+#       the percentiles GWM_PLO and GWM_PHI are used to define the 
+#       scaling.
+#    GWM_MX (Write)
+#       The X scale factor for converting from canvas coordinates to 
+#       NDF pixel coordinates.
+#    GWM_MY (Write)
+#       The Y scale factor for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_PHI (Read)
+#       The requested lower percentile.
+#    GWM_PLO (Read)
+#       The requested lower percentile.
+#    GWM_SCAHI (Read and Write)
+#       The data value corresponding to white.
+#    GWM_SCALO (Read and Write)
+#       The data value corresponding to black.
+#    GWM_SECTION (Read and Write)
+#       The requested image section (eg "(10:200,23:68)" ).
+#    GWM_SIZE (Read)
+#       The size of the square GWM canvas item (in screen pixels).
+#-
+   global ATASK_OUTPUT
+   global GWM_CONCOL
+   global GWM_CONTLEVS
+   global GWM_CX
+   global GWM_CY
+   global GWM_DEVICE
+   global GWM_DISPLAY_PHI
+   global GWM_DISPLAY_NCONT
+   global GWM_DISPLAY_LOCK
+   global GWM_DISPLAY_PLO
+   global GWM_DISPLAY_DATA
+   global GWM_FORCE
+   global GWM_IMAGE
+   global GWM_LOCK_SCALE
+   global GWM_MX
+   global GWM_MY
+   global GWM_NCONT
+   global GWM_PHI
+   global GWM_PLO
+   global GWM_SCAHI
+   global GWM_SCALO
+   global GWM_SECTION
+   global GWM_SIZE
+
+#  Return immediately if there is no background image.
+   if { $GWM_IMAGE == "" } { return }
+
+# Tell the user what is happening.
+   set told [SetInfo "Contouring the image. Please wait... " 0]
+
+# Set a flag to indicate that the image has not yet been displayed.
+   set ok 0
+
+# Concatenate the image name and section specifier to get the full
+# image section specification.
+   set data "${GWM_IMAGE}${GWM_SECTION}"
+
+# If the new display would look exactly like the current display, exit
+# without further action. This is the case if the caller has forced a
+# re-display, or the image section has changed, or if the percentiles have 
+# changed and the scaling is not
+# locked, or if the scaling was previously locked and is now not locked,
+# or if the wrong number of contours is displayed.
+   if { $GWM_FORCE || $data != $GWM_DISPLAY_DATA || 
+            ( ( $GWM_PLO != $GWM_DISPLAY_PLO || $GWM_PHI != $GWM_DISPLAY_PHI ) &&
+              !$GWM_LOCK_SCALE ) || 
+            ( $GWM_NCONT != $GWM_DISPLAY_NCONT ) ||
+            ( !$GWM_LOCK_SCALE && $GWM_DISPLAY_LOCK ) } {
+
+# Clear the flag which forces re-display.
+      set GWM_FORCE 0 
+
+# If the number of contours required has changed, ensure that the scaling
+# is not locked.
+      if { $GWM_NCONT != $GWM_DISPLAY_NCONT } {
+         set GWM_LOCK_SCALE 0
+      }
+
+# If required, get a list of GWM_NCONT contour levels expressed as 
+# percentiles evenly spaced between GWM_PLO and GWM_PHI. Construct a 
+# suitable parameter string for KAPPA:HISTAT. 
+      if { !$GWM_LOCK_SCALE } {
+         set pd [expr ( $GWM_PHI - $GWM_PLO )/( $GWM_NCONT - 1 ) ]
+         set pars "percentiles=\["
+         for {set i 0} {$i < $GWM_NCONT} {incr i} {
+            append pars [expr $GWM_PLO + $i*$pd]
+            append pars ","
+         }
+         append pars "\]"
+
+# Find the data values corresponding to the required percentiles.
+         if { [Obey kappa histat "ndf=$data $pars"] } {
+
+# Get the percentile values form the screen output produced by HISTAT.
+# Note, do not use GetParam since the startcl buffer for parameter text
+# can overflow if more than 4 contour levels are used. Substitute E's for
+# D's.
+            set GWM_CONTLEVS ""
+            foreach mess $ATASK_OUTPUT {
+               if { [regexp {percentile : (.+)} $mess match val] } {
+                  regsub -nocase D $val E result
+                  if { $GWM_CONTLEVS == "" } {
+                     set GWM_CONTLEVS "\[$result"
+                  } {
+                     append GWM_CONTLEVS ",$result"
+                  }
+               }
+            }
+            append GWM_CONTLEVS "\]"
+         }
+      }
+
+# Construct a suitable parameter string for KAPPA:CONTOUR.
+      set pars "mode=free noaxes nokey concol=$GWM_CONCOL heights=$GWM_CONTLEVS"
+
+# Erase the image display. 
+      GwmClear
+
+# Display the contour map.
+      if { [Obey kapview contour "ndf=\"$data\" $pars device=$GWM_DEVICE" ] } {
+
+# Indicate that the image has been displayed.
+         set ok 1
+         set GWM_DISPLAY_NCONT $GWM_NCONT
+         set GWM_DISPLAY_DATA $data
+         set GWM_DISPLAY_PLO $GWM_PLO
+         set GWM_DISPLAY_PHI $GWM_PHI
+         set GWM_DISPLAY_LOCK $GWM_LOCK_SCALE
+
+# Note the first and last data values.
+         set vlst [split $GWM_CONTLEVS ",\[\]"]
+         set scalow [lindex $vlst 1]          
+         set scahigh [lindex $vlst [expr [llength $vlst] - 2 ] ]          
+         set GWM_SCALO [format "%.5g" $scalow]
+         set GWM_SCAHI [format "%.5g" $scahigh]
+
+# Use datapic to get the bounds of the DATA picture just created in 
+# normalised device coordinates and NDF pixels. These NDC values extend
+# from 0 to 1 on both axes.
+         Obey polpack datapic "device=$GWM_DEVICE" 1
+         regsub -nocase D [GetParam polpack datapic:result] E result
+         scan $result "' %f %f %f %f %f %f %f %f '" ncx1 ncx2 ncy1 ncy2 \
+                                                    wcx1 wcx2 wcy1 wcy2
+      
+# Calculate the offsets and scaling factors for converting from canvas
+# coordinates to NDF pixels.
+         set cx1 [expr $ncx1 * ( $GWM_SIZE - 1 )]
+         set cx2 [expr $ncx2 * ( $GWM_SIZE - 1 )]
+         set cy1 [expr $GWM_SIZE * ( 1.0 - $ncy1 )]
+         set cy2 [expr $GWM_SIZE * ( 1.0 - $ncy2 )]
+   
+         set GWM_MX [expr ( $wcx2 - $wcx1 ) / ( $cx2 - $cx1 ) ]
+         set GWM_CX [expr $wcx1 - $GWM_MX * $cx1]
+         set GWM_MY [expr ( $wcy2 - $wcy1 ) / ( $cy2 - $cy1 ) ]
+         set GWM_CY [expr $wcy1 - $GWM_MY * $cy1]
+
+      }
+   }
+
+# Cancel the informative text set earlier in this procedure.
+   if { $told } { SetInfo "" 0 }
+
+}
+
 proc GwmCreate {frmname size colours gwmname} {
 #+
 #  Name:
@@ -2550,6 +2793,9 @@ proc GwmCreate {frmname size colours gwmname} {
 #        The name of the "Delete" button.
 #     GWM_DISPLAY_DATA (Write)
 #        The image section currently displayed. Initialise to null.
+#     GWM_DISPLAY_NCONT (Write)
+#        The number of contours currently displayed. Zero for a greyscale
+#        image. Initialised to zero.
 #     GWM_DISPLAY_LOCK (Write)
 #        Was the scaling locked when the current display was drawn?
 #        Initialise to 0 (no).
@@ -2621,6 +2867,7 @@ proc GwmCreate {frmname size colours gwmname} {
    global B_FONT         
    global CB_COL 
    global GWM_BADCOL
+   global GWM_CONCOL
    global GWM_BLACK
    global GWM_CAN
    global GWM_CANCEL 
@@ -2628,6 +2875,7 @@ proc GwmCreate {frmname size colours gwmname} {
    global GWM_CURRENT_LIST 
    global GWM_DELETE 
    global GWM_DEVICE
+   global GWM_DISPLAY_NCONT
    global GWM_DISPLAY_DATA
    global GWM_DISPLAY_LOCK
    global GWM_DISPLAY_PHI
@@ -2658,11 +2906,14 @@ proc GwmCreate {frmname size colours gwmname} {
    global GWM_XHAIR_IDV
    global GWM_XHRCOL
    global GWM_ZOOM 
+   global GWM_FORCE
    global RB_FONT
 
 # Initialise some global variables.
    set GWM_BADCOL 	"cyan" 
+   set GWM_CONCOL 	"black" 
    set GWM_CURRENT_LIST ""
+   set GWM_DISPLAY_NCONT 0
    set GWM_DISPLAY_DATA ""
    set GWM_DISPLAY_LOCK 0
    set GWM_DISPLAY_PHI 	""
@@ -2670,9 +2921,9 @@ proc GwmCreate {frmname size colours gwmname} {
    set GWM_DRAWN_LIST 	""
    set GWM_LOCK_SCALE 	0
    set GWM_MODE 	0
-   set GWM_PHI 		95.0
-   set GWM_PLO 		5.0
-   set GWM_POLCOL 	"red"
+   set GWM_PHI 		95.0 
+   set GWM_PLO 		5.0 
+   set GWM_POLCOL 	"red" 
    set GWM_REDISPLAY_CANCELLED 0
    set GWM_REDISPLAY_REQUESTED 0
    set GWM_ROOTI 	""
@@ -2684,10 +2935,11 @@ proc GwmCreate {frmname size colours gwmname} {
    set GWM_VID0 	""
    set GWM_VID1 	""
    set GWM_VID2 	""
-   set GWM_XHAIR 	0
+   set GWM_XHAIR 	0 
    set GWM_XHAIR_IDH 	""
    set GWM_XHAIR_IDV 	""
-   set GWM_XHRCOL 	"yellow"
+   set GWM_XHRCOL 	"yellow" 
+   set GWM_FORCE 	0
 
 # Create a container-frame to hold everything else, with the given name.
    set f1 [frame $frmname]
@@ -2838,9 +3090,9 @@ proc GwmDisplay {} {
 #    GwmDisplay
 #
 #  Purpose:
-#    Display a section of an image, and store global values needed by 
-#    GwmNDFToCan and GwmCanToNDF (which convert between canvas 
-#    coordinates and NDF pixel coordinates).
+#    Display a greyscale representation of a section of an image, and store 
+#    global values needed by GwmNDFToCan and GwmCanToNDF (which convert 
+#    between canvas coordinates and NDF pixel coordinates).
 #
 #  Arguments:
 #    None.
@@ -2906,6 +3158,10 @@ proc GwmDisplay {} {
    global GWM_DISPLAY_LOCK
    global GWM_DISPLAY_PHI
    global GWM_DISPLAY_PLO
+   global GWM_DISPLAY_NCONT
+
+#  Return immediately if there is no background image.
+   if { $GWM_IMAGE == "" } { return }
 
 # Tell the user what is happening.
    set told [SetInfo "Displaying the image. Please wait... " 0]
@@ -2920,10 +3176,12 @@ proc GwmDisplay {} {
 # If the new display would look exactly like the current display, exit
 # without further action. This is the case if the image section has
 # changed, or if the percentiles have changed and the scaling is not
-# locked, or if the scaling was previously locked and is now not locked.
+# locked, or if the scaling was previously locked and is now not locked,
+# or if a contour map is currently displayed.
    if { $data != $GWM_DISPLAY_DATA || 
             ( ( $GWM_PLO != $GWM_DISPLAY_PLO || $GWM_PHI != $GWM_DISPLAY_PHI ) &&
               !$GWM_LOCK_SCALE ) || 
+            ( $GWM_DISPLAY_NCONT > 0 ) ||
             ( !$GWM_LOCK_SCALE && $GWM_DISPLAY_LOCK ) } {
 
 # When using KAPPA:DISPLAY, the centre has to be specified explicitly,
@@ -2966,8 +3224,7 @@ proc GwmDisplay {} {
          }
 
 # Erase the image display. 
-         Obey kapview gdclear "device=$GWM_DEVICE" 1
-         set GWM_DISPLAY_DATA "" 
+         GwmClear
 
 # Display the image section centred correctly. 
          if { [Obey kapview display "in=\"$data\" $pars badcol=0 device=$GWM_DEVICE \
@@ -3082,6 +3339,10 @@ proc GwmUpdate {} {
 #     None.
 #
 #  Globals:
+#     GWM_BACK (Read)
+#        If "CONTOUR" then the background image is shown as a contour map.
+#        If "GREY" then the background image is shown as a greyscale image.
+#        If any other value, then no background image is displayed.
 #     GWM_CURRENT_LIST (Read and Write)
 #        The name of the positions list to be displayed. Set to null
 #        if no list is to be displayed.
@@ -3091,6 +3352,7 @@ proc GwmUpdate {} {
 #        The name of the positions list currently displayed. Set to null
 #        if no list is displayed.
 #-
+   global GWM_BACK
    global GWM_CURRENT_LIST
    global GWM_DEVICE
    global GWM_DRAWN_LIST
@@ -3103,8 +3365,17 @@ proc GwmUpdate {} {
       ClearPosns $GWM_DRAWN_LIST
    }
 
-# Re-draw the image display.
-   GwmDisplay
+# Re-draw the background image.
+   if { $GWM_BACK == "CONTOUR" } {
+      GwmContour
+   } elseif { $GWM_BACK == "GREY" } {
+      GwmDisplay
+   } {
+      GwmClear
+   }
+
+# Produce the vector map.
+   VectorMap
 
 # Draw any requested positions list, and save its name.
    if { $GWM_CURRENT_LIST != "" } {
@@ -3316,12 +3587,20 @@ proc LoadOptions {} {
 #     None.
 #
 #  Globals:
+#      ATASK_NCONT (Read)
+#         The value of NCONT supplied by the A-task.
 #      ATASK_HAREA (Read)
 #         The value of HAREA supplied by the A-task.
+#      ATASK_BACK (Read)
+#         The value of GWM_BACK supplied by the A-task.
 #      ATASK_SAREA (Read)
 #         The value of SAREA supplied by the A-task.
 #      ATASK_SI (Read)
 #         A string representing the SI_LIST list.
+#      GWM_BACK (Write)
+#         The form of background image required.
+#      GWM_NCONT (Write)
+#         The number of contours to display
 #      HAREA (Write)
 #         Should the help area be displayed?
 #      SAREA (Write)
@@ -3335,6 +3614,9 @@ proc LoadOptions {} {
 #
 #-
    global ATASK_BADCOL
+   global ATASK_CONCOL
+   global ATASK_NCONT
+   global ATASK_BACK
    global ATASK_HAREA
    global ATASK_LOGFILE
    global ATASK_PHI
@@ -3343,11 +3625,14 @@ proc LoadOptions {} {
    global ATASK_SELCOL
    global ATASK_SI
    global ATASK_XHAIR
-   global ATASK_GWM_XHRCOL
+   global ATASK_XHRCOL
    global GWM_BADCOL      
+   global GWM_CONCOL      
+   global GWM_NCONT
    global CHAR_LIST
    global CHAR_STOP
    global HAREA
+   global GWM_BACK
    global LOGFILE_ID
    global PHI_REQ
    global PLO_REQ
@@ -3369,17 +3654,30 @@ proc LoadOptions {} {
    }
 
 # Do the same for the other options.
+   if { [info exists ATASK_BACK] } {
+     set GWM_BACK [string trim $ATASK_BACK]
+   } {
+     set GWM_BACK ""
+   }
+
    if { [info exists ATASK_XHAIR] } {
       set GWM_XHAIR $ATASK_XHAIR
    } {
       set GWM_XHAIR 0
    }
 
-   if { [info exists ATASK_GWM_XHRCOL] } {
-     set GWM_XHRCOL [string trim $ATASK_GWM_XHRCOL]
+   if { [info exists ATASK_NCONT] } {
+      set GWM_NCONT $ATASK_NCONT
+   } {
+      set GWM_NCONT 4
+   }
+
+   if { [info exists ATASK_XHRCOL] } {
+     set GWM_XHRCOL [string trim $ATASK_XHRCOL]
    } {
      set GWM_XHRCOL "yellow"
    }
+   SetColours GWM_XHRCOL
 
    if { [info exists ATASK_PLO] } {
      set PLO_REQ [format "%5.1f" $ATASK_PLO]
@@ -3397,6 +3695,13 @@ proc LoadOptions {} {
      set GWM_BADCOL [string trim $ATASK_BADCOL]
    } {
      set GWM_BADCOL "cyan"
+   }
+   SetColours GWM_BADCOL
+
+   if { [info exists ATASK_CONCOL] } {
+     set GWM_CONCOL [string trim $ATASK_CONCOL]
+   } {
+     set GWM_CONCOL "black"
    }
 
    if { [info exists ATASK_SELCOL] } {
@@ -4607,10 +4912,6 @@ proc Save {} {
 #        message is stored as a new element in the list.
 #     FITTYPE (Read)
 #        A textual description of the mapping to be used for the image mapping.
-#     IMAGES (Read)
-#        A list of the input images (without any section specifiers).
-#     IMSECS (Read)
-#        A list of the input image sections as supplied by the user.
 #     INTERP (Read)
 #        The interpolation method to use when resampling the input images. 
 #     MAP_RX (Write)
@@ -4669,8 +4970,6 @@ proc Save {} {
    global DBEAM
    global EFFECTS_MAPPINGS
    global FITTYPE
-   global IMAGES
-   global IMSECS
    global INTERP
    global MAPTYPE
    global MAP_RX
@@ -5185,12 +5484,16 @@ proc SaveOptions {} {
 #     None.
 #
 #  Globals:
+#      ATASK_BACK (Write)
+#         The value of GWM_BACK sent to the A-task.
 #      ATASK_HAREA (Write)
 #         The value of HAREA sent to the A-task.
 #      ATASK_SAREA (Write)
 #         The value of SAREA sent to the A-task.
 #      ATASK_SI (Write)
 #         A string representing the SI_LIST list.
+#      GWM_BACK (Read)
+#         The form of the displayed background image.
 #      HAREA (Read)
 #         Should the help area be displayed?
 #      SAREA (Read)
@@ -5204,7 +5507,10 @@ proc SaveOptions {} {
 #         in the status area.
 #
 #-
+   global ATASK_NCONT
    global ATASK_BADCOL
+   global ATASK_CONCOL
+   global ATASK_BACK
    global ATASK_HAREA
    global ATASK_PHI
    global ATASK_PLO
@@ -5212,15 +5518,18 @@ proc SaveOptions {} {
    global ATASK_SELCOL
    global ATASK_SI
    global ATASK_XHAIR
-   global ATASK_GWM_XHRCOL          
+   global ATASK_XHRCOL          
    global GWM_BADCOL
+   global GWM_CONCOL
    global CHAR_LIST
    global CHAR_STOP
+   global GWM_BACK
    global HAREA
    global PHI_REQ
    global PLO_REQ
    global SAREA
    global GWM_SELCOL            
+   global GWM_NCONT
    global SI_LIST
    global SI_VARS
    global GWM_XHAIR
@@ -5230,11 +5539,14 @@ proc SaveOptions {} {
    if { [Confirm "Save current options values?"] } {
 
 # Just take a copy of each of the current options values.
+     set ATASK_NCONT $GWM_NCONT
      set ATASK_HAREA $HAREA
+     set ATASK_BACK $GWM_BACK
      set ATASK_SAREA $SAREA
      set ATASK_SELCOL $GWM_SELCOL
      set ATASK_BADCOL $GWM_BADCOL
-     set ATASK_GWM_XHRCOL $GWM_XHRCOL
+     set ATASK_CONCOL $GWM_CONCOL
+     set ATASK_XHRCOL $GWM_XHRCOL
      set ATASK_XHAIR $GWM_XHAIR
      set ATASK_PLO $PLO_REQ
      set ATASK_PHI $PHI_REQ
@@ -5495,7 +5807,9 @@ proc SetColours {var} {
 #
 #  Globals:
 #     GWM_BADCOL (Read)
-#       The colour with which to mark missing pixel data (eg "cyan").
+#       The colour for the background (eg "cyan").
+#     GWM_CONCOL (Read)
+#       The colour for contours.
 #     GWM_CAN (Read)
 #        The name of the canvas widget holding the GWM image.
 #     GWM_DEVICE (Read)
@@ -5506,24 +5820,34 @@ proc SetColours {var} {
 #       The colour with which to mark the selected area.
 #-
    global GWM_BADCOL
+   global GWM_CONCOL
    global GWM_CAN
    global GWM_DEVICE
+   global GWM_DISPLAY_NCONT
    global GWM_POLCOL
    global GWM_SELCOL
    global GWM_XHAIR_IDV
    global GWM_XHAIR_IDH
+   global GWM_FORCE
    global GWM_XHRCOL
 
 # Change the colour of any displayed selection box.
    if { $var == "GWM_SELCOL" } {
       $GWM_CAN itemconfigure sbox -outline $GWM_SELCOL
 
+# Re-draw the contour map if its colour has changed.
+   } elseif { $var == "GWM_CONCOL" } {
+      if { $GWM_DISPLAY_NCONT > 0 } { 
+         set GWM_FORCE 1
+         GwmContour 
+      }
+
 # Re-draw the polygons if their colour has changed.
    } elseif { $var == "GWM_POLCOL" } {
       DrawPosns
 
 # Change the colour of entry zero in the KAPPA pallette. This is used
-# top mark missing pixels.
+# to mark missing pixels and the contour background. 
    } elseif { $var == "GWM_BADCOL" } {
       Obey kapview palentry "device=$GWM_DEVICE palnum=0 colour=$GWM_BADCOL" 1
 
@@ -6326,6 +6650,7 @@ proc StatusArea {on} {
    global S_BFONT
    global S_FONT
    global TOP
+   global IMAGE
 
 # Display the status area?
    if { $on } {
@@ -6378,12 +6703,6 @@ proc StatusArea {on} {
                set icol 1
             }            
          }
-
-# Reduce the required widths since the average character width used seems
-# to be overly generous, resulting in more space being used by the labels 
-# than is needed.
-         set maxwid(0) [expr int( 0.9 * $maxwid(0) )]
-         set maxwid(1) [expr int( 0.9 * $maxwid(1) )]
 
 # Now we have the column widths, create the status items...
 # Put the first item in the left column. Subsequent items swap between
@@ -7174,6 +7493,7 @@ proc Zoom {} {
    }
 }
 
+
 #-------------------------------------------------------------------
 #  The following procedures are for debugging purposes.
 
@@ -7218,3 +7538,127 @@ proc pp {a b c} {
 #    - 
 #-
 
+
+
+
+
+proc VectorMap {} {
+#+
+#  Name:
+#    VectorMap
+#
+#  Purpose:
+#    Display a vector map, and store global values needed by GwmNDFToCan 
+#    and GwmCanToNDF (which convert between canvas coordinates and NDF 
+#    pixel coordinates).
+#
+#  Arguments:
+#    None.
+#
+#  Globals:
+#    GWM_CX (Write)
+#       The X offset for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_CY (Write)
+#       The Y offset for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_DEVICE (Read)
+#       The GNS device name for the GWM canvas item.
+#    GWM_DISPLAY_VDATA (Read and Write)
+#       The vector data currently displayed.
+#    GWM_MX (Write)
+#       The X scale factor for converting from canvas coordinates to 
+#       NDF pixel coordinates.
+#    GWM_MY (Write)
+#       The Y scale factor for converting from canvas coordinates to NDF 
+#       pixel coordinates.
+#    GWM_SIZE (Read)
+#       The size of the square GWM canvas item (in screen pixels).
+#-
+   global GWM_CX
+   global GWM_CY
+   global GWM_DEVICE
+   global GWM_MX
+   global GWM_MY
+   global GWM_SIZE
+   global GWM_DISPLAY_VDATA
+   global VEC_CAT
+
+# Tell the user what is happening.
+   set told [SetInfo "Displaying the vector map. Please wait... " 0]
+
+# Create the parameter string for POLPLOT...
+   set pars "cat=$VEC_CAT colmag=p colang=theta colx=x coly=y clear=no noaxes nokey"
+
+# Display the vector map
+   if { [Obey polpack polplot "$pars device=$GWM_DEVICE" ] } {
+
+# Indicate that the image has been displayed.
+      set GWM_DISPLAY_VDATA $VEC_CAT
+
+# Use datapic to get the bounds of the DATA picture just created in 
+# normalised device coordinates and NDF pixels. These NDC values extend
+# from 0 to 1 on both axes.
+      Obey polpack datapic "device=$GWM_DEVICE" 1
+      regsub -nocase D [GetParam polpack datapic:result] E result
+      scan $result "' %f %f %f %f %f %f %f %f '" ncx1 ncx2 ncy1 ncy2 \
+                                                 wcx1 wcx2 wcy1 wcy2
+      
+# Calculate the offsets and scaling factors for converting from canvas
+# coordinates to NDF pixels.
+      set cx1 [expr $ncx1 * ( $GWM_SIZE - 1 )]
+      set cx2 [expr $ncx2 * ( $GWM_SIZE - 1 )]
+      set cy1 [expr $GWM_SIZE * ( 1.0 - $ncy1 )]
+      set cy2 [expr $GWM_SIZE * ( 1.0 - $ncy2 )]
+   
+      set GWM_MX [expr ( $wcx2 - $wcx1 ) / ( $cx2 - $cx1 ) ]
+      set GWM_CX [expr $wcx1 - $GWM_MX * $cx1]
+      set GWM_MY [expr ( $wcy2 - $wcy1 ) / ( $cy2 - $cy1 ) ]
+      set GWM_CY [expr $wcy1 - $GWM_MY * $cy1]
+   }
+
+# Cancel the informative text set earlier in this procedure.
+   if { $told } { SetInfo "" 0 }
+
+}
+
+proc MakeCat {} {
+#+
+#  Name:
+#     MakeCat
+#
+#  Purpose:
+#     Create a catalogue of polarisation vectors from a Stokes vectors cube.
+#
+#  Globals:
+#     CUBE (Read)
+#        The name of the input Stokes vector cube supplied by the A-task.
+#     VEC_CAT (Read and Write)
+#        The name of the catalogue holding polarisation vectors. This is
+#        created in the temporary ADAM_USER directory.
+#-
+   global CUBE
+   global VEC_CAT
+
+# Tell the user what is happening.
+   set told [SetInfo "Calculating polarisation vectors. Please wait... " 0]
+
+# The catalogue is created as a temporary file within the POLMAP
+# ADAM_USER directory. Get a new name.
+   set cat [UniqueFile]
+
+# Create the parameter string for POLVEC...
+   set pars "in=$CUBE cat=$cat accept"
+
+# Create the vector catalogue. If succesful, replace any old vector
+# catalogue with the new one.
+   if { [Obey polpack polvec "$pars"] } {
+      if { [info exists VEC_CAT] } {
+         catch "exec rm -f ${VEC_CAT}.*"
+      }
+      set VEC_CAT $cat
+   }
+
+# Cancel the informative text set earlier in this procedure.
+   if { $told } { SetInfo "" 0 }
+}

@@ -22,8 +22,9 @@
 *     connected to the original 3D GRID Frame by scaling and shifting
 *     axes 1 and 2 according to the values supplied in TR. Since all 
 *     the planes in the input cube are presumed to be aligned, axis 3
-*     is ignored. Finally the original GRID and PIXEL Frames are 
-*     removed from the FrameSet.
+*     is ignored. A new 2D PIXEL Frame is added to the FrameSet assuming
+*     pixel indices equals grid indices. Finally the original GRID and 
+*     PIXEL Frames are removed from the FrameSet.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -82,6 +83,7 @@
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
       INTEGER INEW               ! Index of new Frame
+      INTEGER IPIX               ! Index of old PIXEL Frame
       INTEGER INPERM( 3 )        ! O/p axis mapping to each i/p axis
       INTEGER OUTPERM( 2 )       ! I/p axis mapping to each o/p axis
       INTEGER PERM               ! Pointer to a PermMap
@@ -129,6 +131,13 @@
 
 *  Create the new 2D GRID Frame.
       FRM = AST_FRAME( 2, 'DOMAIN=GRID', STATUS ) 
+      CALL AST_SETC( FRM, 'Title', 'Data grid indices', STATUS )
+      CALL AST_SETC( FRM, 'Label(1)', 'Data grid index 1', STATUS )
+      CALL AST_SETC( FRM, 'Label(2)', 'Data grid index 2', STATUS )
+      CALL AST_SETC( FRM, 'Symbol(1)', 'g1', STATUS )
+      CALL AST_SETC( FRM, 'Symbol(2)', 'g2', STATUS )
+      CALL AST_SETC( FRM, 'Unit(1)', 'pixel', STATUS )
+      CALL AST_SETC( FRM, 'Unit(2)', 'pixel', STATUS )
 
 *  Save the indices of the Base and Current Frames.
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
@@ -147,9 +156,47 @@
       CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )      
       CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )      
 
-*  Delete the original 3D GRID Frame. The NDF_ library will automatically
-*  remove the old 3D PIXEL Frame.
-      CALL AST_REMOVEFRAME( IWCS, IBASE, STATUS ) 
+*  Delete the original 3D GRID Frame. 
+c      CALL AST_REMOVEFRAME( IWCS, IBASE, STATUS ) 
+      CALL AST_SETC( AST_GETFRAME( IWCS, IBASE, STATUS ),
+     :               'Domain', 'OLDGRID', STATUS )
+
+*  Find the index of the 3D PIXEL Frame.
+      CALL KPG1_ASFFR( IWCS, AST_FRAME( 3, ' ', STATUS ), 'PIXEL',
+     :                 IPIX, STATUS )
+
+*  Delete the original 3D PIXEL Frame. 
+c      CALL AST_REMOVEFRAME( IWCS, IPIX, STATUS ) 
+      CALL AST_SETC( AST_GETFRAME( IWCS, IPIX, STATUS ),
+     :               'Domain', 'OLDPIXEL', STATUS )
+
+*  Create a new 2D PIXEL Frame.
+      FRM = AST_FRAME( 2, 'DOMAIN=PIXEL', STATUS ) 
+      CALL AST_SETC( FRM, 'Title', 'Pixel coordinates', STATUS )
+      CALL AST_SETC( FRM, 'Label(1)', 'Pixel coordinate 1', STATUS )
+      CALL AST_SETC( FRM, 'Label(2)', 'Pixel coordinate 2', STATUS )
+      CALL AST_SETC( FRM, 'Symbol(1)', 'p1', STATUS )
+      CALL AST_SETC( FRM, 'Symbol(2)', 'p2', STATUS )
+      CALL AST_SETC( FRM, 'Unit(1)', 'pixel', STATUS )
+      CALL AST_SETC( FRM, 'Unit(2)', 'pixel', STATUS )
+
+*  Create a WinMap which shifts each axis in the 2D GRID Frame
+*  onto the 2D PIXEL Frame.
+      INA( 1 ) = 0.5D0
+      INA( 2 ) = 0.5D0
+      INB( 1 ) = 1.5D0
+      INB( 2 ) = 1.5D0
+
+      OUTA( 1 ) = 0.0D0
+      OUTA( 2 ) = 0.0D0
+      OUTB( 1 ) = 1.0D0
+      OUTB( 2 ) = 1.0D0
+
+      WIN = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS ) 
+
+*  Add the new 2D PIXEL Frame into the FrameSet, connecting it to
+*  the base (i.e. GRID) Frame using the mapping created above.
+      CALL AST_ADDFRAME( IWCS, AST__BASE, WIN, FRM, STATUS ) 
 
 *  Export the identifier for the returned FrameSets to the next higher
 *  context level. This means it will not be annulled by the following

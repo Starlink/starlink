@@ -6,11 +6,11 @@
 #
 #  Purpose:
 #     The main PolMap tcl script. This is a shell which display the 
-#     supplied image, and allows panning, zooming, etc.
+#     vector map over a greyscale or contoured background image.
 #
 #  Invocation:
 #     1) From the command line:
-#        PolMap.tcl <in> 
+#        PolMap.tcl <Stokes cube> <background image>
 #
 #     2) From the PolMap A-task. 
 #        See the A-task documentation.
@@ -48,23 +48,39 @@
 # widget (which will just ignore them). See procedure WaitFor.
    set SAFE $wait
 
-# Obtain the input image. If this script is invoked by the A-task then
-# the image name will be available in variable in_list. Otherwise,
-# it should have been supplied on the command line and will be stored 
-# in argv (a list of command line parameters). Store the full image
-# specification in global variable IMSEC. Also set a flag (ATASK)
-# indicating if the script was started from the atask or not.
-   if { ![info exists in_list] } {
+# Obtain the input Stokes vector cube. If this script is invoked by 
+# the A-task then the image name will be available in variable "cube".
+# Otherwise, it should have been supplied on the command line (it will be 
+# stored in argv - a list of command line parameters). Store the full cube
+# specification in global variable CUBE. Also set a flag (ATASK) indicating if 
+# the script was started from the atask or not.
+   if { ![info exists cube] } {
       if { $argc == 0 } {
-         puts "PolMap: No input images supplied on command line. Aborting..."
-         exit 1
+         puts "No Stokes vector cube supplied"
+         exit
       } {
-         set IMSEC [lindex "$argv" 0]
+         set CUBE [lindex "$argv" 0]
          set ATASK 0
       }
    } {
-      set IMSEC $in_list
+      set CUBE $cube
       set ATASK 1
+   }
+
+# Obtain any background image to be displayed. If this script is invoked by 
+# the A-task then the image name will be available in variable in_list. 
+# Otherwise, if an image has been supplied on the command line it will be 
+# stored in argv (a list of command line parameters). Store the full image
+# specification in global variable IMSEC (which will be blank if no
+# background image is available). 
+   if { ![info exists in_list] } {
+      if { $argc == 1 } {
+         set IMSEC ""
+      } {
+         set IMSEC [lindex "$argv" 1]
+      }
+   } {
+      set IMSEC $in_list
    }
 
 # Set the number of digits used by tcl to represent floating point values as
@@ -214,6 +230,17 @@
    }
    set env(AGI_USER) $ADAM_USER
 
+# Ensure that default plotting styles are obtained from the user's
+# existing Options DataBase file, rather than creating a new one in 
+# the temporary ADAM_USER directory.
+   if { ![info exists env(ODB_USER)] } {
+      if { $OLD_ADAM_USER == "" } {
+         set env(ODB_USER) "$env(HOME)/adam"
+      } {
+         set env(ODB_USER) $OLD_ADAM_USER
+      }
+   }
+
 # Record the process id's of any existing KAPPA processes. All new processes
 # are killed on exit, but processes active on entry are not killed.
    if { ![ catch {exec ps | grep kappa | grep -v grep | \
@@ -237,37 +264,56 @@
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
    LoadTask polpack  $POLPACK_DIR/polpack_mon
 
+# If a background image has been supplied, prepare to use it.
+   if { $IMSEC != "" } {
+
 # Save the current value of environment variable NDF_FORMATS_OUT (if any),
 # and ensure that NDF applications will create output NDFs, rather than
 # any other data format.
-   if { [info exists env(NDF_FORMATS_OUT)] } {
-      set ndf_formats_out $env(NDF_FORMATS_OUT)
-   }
-   set env(NDF_FORMATS_OUT) "."
+      if { [info exists env(NDF_FORMATS_OUT)] } {
+         set ndf_formats_out $env(NDF_FORMATS_OUT)
+      }
+      set env(NDF_FORMATS_OUT) "."
 
-# Make a copy of the supplied image, ensuring it is in NDF format.
+# Make a copy of the supplied background image, ensuring it is in NDF format.
 # The copy is stored in the temporary adam user directory.
-   set NDF_IMAGE [UniqueFile]
-   Obey ndfpack ndfcopy "in=$IMSEC out=$NDF_IMAGE" 1
+      set NDF_IMAGE [UniqueFile]
+      Obey ndfpack ndfcopy "in=$IMSEC out=$NDF_IMAGE" 1
 
 # Re-instate the original value of environment variable NDF_FORMATS_OUT 
 # (if any).
-   if { [info exists ndf_formats_out] } {
-      set env(NDF_FORMATS_OUT) $ndf_formats_out
-   }
+      if { [info exists ndf_formats_out] } {
+         set env(NDF_FORMATS_OUT) $ndf_formats_out
+      }
 
 # Extract the image name and section specifier (if any) from the supplied image
 # section string. Store the image name in global variable IMAGE.
-   GetSec $IMSEC IMAGE section
+      GetSec $IMSEC IMAGE section
 
 # Ensure we have a standard version of the section specifier expressed as 
 # ranges of pixel indices. 
-   set SECTION [PixIndSection $IMSEC]
-   set STD_IMSEC "${IMAGE}${SECTION}"
+      set SECTION [PixIndSection $IMSEC]
+      set STD_IMSEC "${IMAGE}${SECTION}"
 
 # Store the lengths of the image section and image name.
-   set maximwid [string length $IMSEC]
-   set maxrimwid [string length $IMAGE]
+      set maximwid [string length $IMSEC]
+      set maxrimwid [string length $IMAGE]
+
+# Store the state for the widgets related to the display of the
+# background image.
+      set BACKSTATE "normal"
+
+# Set null values for the above variables if no background image was
+# supplied.
+   } {
+      set NDF_IMAGE ""
+      set IMAGE ""
+      set SECTION "(1:100,1:100)"
+      set STD_IMSEC ""
+      set maximwid 0
+      set maxrimwid 0
+      set BACKSTATE "disabled"
+   }
 
 # >>>>>>>>>>>>>>>>>  SET UP THE SCREEN LAYOUT <<<<<<<<<<<<<<<<<<<<
 
@@ -402,7 +448,9 @@
    MenuHelp $filemenu "Quit        " ".  Quit the application, without saving the output images."
 
 # Add menu items to options menu.
+   $OPTSMENU add cascade -label "Background" -menu $OPTSMENU.back -state $BACKSTATE
    $OPTSMENU add cascade -label "Colours" -menu $OPTSMENU.cols
+   $OPTSMENU add cascade -label "Contours" -menu $OPTSMENU.conts -state $BACKSTATE
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add separator
    $OPTSMENU add checkbutton -label "Use Cross-hair" -variable GWM_XHAIR -selectcolor $CB_COL
@@ -411,8 +459,10 @@
    $OPTSMENU add separator
    $OPTSMENU add command -label "Save Options" -command SaveOptions 
 
+   MenuHelp $OPTSMENU "Background"      ".  Set the method use to display the background image."
    MenuHelp $OPTSMENU "Colours"         ".  Change the colours used for various parts of the display."
-   MenuHelp $OPTSMENU "Status Items..."      ".  Select which items of information to display in the status area."
+   MenuHelp $OPTSMENU "Contours"        ".  The number of contours to use when displaying the background as a contour map."
+   MenuHelp $OPTSMENU "Status Items..." ".  Select which items of information to display in the status area."
 
    MenuHelp $OPTSMENU "Use Cross-hair"  ".  Should a cross-hair be used instead of a pointer over the image display area?"
    MenuHelp $OPTSMENU "Display Help Area"    ".  Toggle the display of help information at the bottom of the main window."
@@ -420,12 +470,31 @@
 
    MenuHelp $OPTSMENU "Save Options"    ".  Save the current option values."
 
+# Add items to the "Background" sub-menu.
+   set backmenu [menu $OPTSMENU.back]
+   $backmenu add radiobutton -label "Grey-scale image" -variable GWM_BACK \
+                 -selectcolor $RB_COL -value "GREY" -command GwmUpdate
+   $backmenu add radiobutton -label "Contour map" -variable GWM_BACK \
+                 -selectcolor $RB_COL -value "CONTOUR" -command GwmUpdate
+   $backmenu add radiobutton -label "None" -variable GWM_BACK \
+                 -selectcolor $RB_COL -value "" -command GwmUpdate
+
 # Add items to the Colours sub-menu.
    set colsmenu [menu $OPTSMENU.cols]
+   ColMenu $colsmenu "Contours"          GWM_CONCOL
    ColMenu $colsmenu "Cross-hair"        GWM_XHRCOL
-   ColMenu $colsmenu "Missing Pixels"    GWM_BADCOL
+   ColMenu $colsmenu "Background"        GWM_BADCOL
    ColMenu $colsmenu "Polygon Outlines"  GWM_POLCOL
    ColMenu $colsmenu "Selection Box"     GWM_SELCOL
+
+# Add items to the "Contours" sub-menu.
+   set contsmenu [menu $OPTSMENU.conts]
+   foreach nc "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" {
+      $contsmenu add radiobutton -label "$nc" -variable GWM_NCONT \
+                 -selectcolor $RB_COL -value $nc -command GwmUpdate
+   }
+
+   SetHelp $contsmenu ".  The number of contours to use when displaying the background as a contour map."
 
 # Pack the menu buttons.
    pack $file $edit $opts -side left 
@@ -477,15 +546,15 @@
    set job 2
 # -----------------------------------------------
 
-
 # Identify all the status items which can be displayed in the status area.
-   StatusItem IMAGE        "Displayed image: "       "The name of the displayed image.\n(To change the displayed image, use the \"Images\" menu.)" $maximwid
-   StatusItem GWM_SCALO    "Black data value: "      "The data value corresponding to black in the displayed image.\n(To change the black and white values, use the \"\% black\" and \"\% not white\" widget.)" 11
-   StatusItem GWM_SECTION  "Displayed bounds: "      "The bounds of the displayed image.\n(To change the bounds of the displayed image, use the Zoom, Unzoom and Centre buttons.)" 25
-   StatusItem GWM_SCAHI    "White data value: "      "The data value corresponding to white in the displayed image.\n(To change the black and white values, use the \"\% black\" and \"\% not white\" widget.)" 11
-   StatusItem ACTION       "Current action: "        "The name of any Starlink program currently being executed." 20
-   StatusItem POINTER_PXY  "Pointer coordinates: "   "The pixel coordinates of the pointer (only displayed while the pointer is over the image)." 20
-#   StatusItem POINTER_CXY  "Canvas coordinates: "   "The pixel coordinates of the pointer (only displayed while the pointer is over the image)." 20
+   StatusItem IMAGE        "Background image: "    "The name of the background image." $maxrimwid
+   StatusItem GWM_SCALO    "Black data value: "    "The data value corresponding to black in the background image.\n(To change the black and white values, use the \"\% black\" and \"\% not white\" widget.)" 11
+   StatusItem GWM_SECTION  "Displayed bounds: "    "The bounds of the background image.\n(To change the bounds of the background image, use the Zoom, Unzoom and Centre buttons.)" 25
+   StatusItem GWM_SCAHI    "White data value: "    "The data value corresponding to white in the background image.\n(To change the black and white values, use the \"\% black\" and \"\% not white\" widget.)" 11
+   StatusItem GWM_NCONT    "No. of contours: "     "The number of contours to use when displaying the background image as a contour map." 2
+   StatusItem ACTION       "Current action: "      "The name of any Starlink program currently being executed." 20
+   StatusItem POINTER_PXY  "Pointer coordinates: " "The pixel coordinates of the pointer (only displayed while the pointer is over the image)." 20
+#   StatusItem POINTER_CXY  "Canvas coordinates: "  "The pixel coordinates of the pointer (only displayed while the pointer is over the image)." 20
 
 # Load the options supplied by the atask.
    LoadOptions
@@ -503,6 +572,10 @@
 # Create a binding which calls MenuMotionBind whenever the pointer moves
 # over any menu. This is used to determine the help information to display.
    bind Menu <Motion> {+MenuMotionBind %W %y}
+
+# Create the catalogue of polarisation catalogues from the supplied Stokes 
+# vectors.
+   MakeCat
 
 # Display the image.
    set GWM_IMAGE $NDF_IMAGE

@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_MKCAT( PARAM, CIRC, UNITS, VAR, CI, STATUS )
+      SUBROUTINE POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, CI, STATUS )
 *+
 *  Name:
 *     POL1_MKCAT
@@ -10,20 +10,22 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_MKCAT( PARAM, CIRC, UNITS, VAR, CI, STATUS )
+*     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, CI, STATUS )
 
 *  Description:
 *     This routine creates a new CAT catalogue. Columns are created for the 
-*     pixel coordinates (X and Y), Stokes parameters (I, Q and U), percentage 
-*     polarisation, polarised intensity, and polarisation angle (in
-*     degrees). Columns for the standard deviation associated with each 
-*     (except pixel coordinates) are also produced. For circular polarisation, 
-*     the Q and U columns are replaced by a single column for V. 
+*     grid coordinates (X and Y), Stokes parameters (I, Q and U), percentage  
+*     polarisation, polarised intensity, and polarisation angle (in degrees). 
+*     Columns for the standard deviation associated with each (except pixel 
+*     coordinates) are also produced. For circular polarisation, the Q and 
+*     U columns are replaced by a single column for V. 
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter through which the name of the new catalogue should
 *        be obtained.
+*     IWCS = INTEGER (Given)
+*        A FrameSet to define the names to give to the X and Y columns.
 *     CIRC = LOGICAL (Given)
 *        Set this to .TRUE. if circular polarisation is being measured.
 *     UNITS = CHARACTER * ( * ) (Given)
@@ -61,6 +63,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
+      INTEGER IWCS
       LOGICAL CIRC
       CHARACTER UNITS*(*)
       LOGICAL VAR
@@ -73,10 +76,15 @@
 
 *  Local Variables:
       INTEGER II                 ! CAT identifier for most recent part
+      INTEGER FRM                ! Pointer to Base Frame
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the Symbols, etc, used to refer to axes 1 and 2 of the Base Frame in the 
+*  supplied FrameSet.
+      FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
 
 *  Create the catalogue.
       CALL CAT_CREAT( PARAM, CI, STATUS )
@@ -84,12 +92,16 @@
 *  Create the columns...
 
 *  Pixel X coordinate.
-      CALL CAT_CNEWS( CI, 'X', CAT__TYPER, 0, 'pixels', 'F7.1', 
-     :                'X pixel coordinate', II, STATUS )
+      CALL CAT_CNEWS( CI, 'X',
+     :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(1)', STATUS ), 
+     :                'F7.1', AST_GETC( FRM, 'Label(1)', STATUS ), II, 
+     :                STATUS )
 
 *  Pixel Y coordinate.
-      CALL CAT_CNEWS( CI, 'Y', CAT__TYPER, 0, 'pixels', 'F7.1', 
-     :                'Y pixel coordinate', II, STATUS )
+      CALL CAT_CNEWS( CI, 'Y',
+     :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(2)', STATUS ), 
+     :                'F7.1', AST_GETC( FRM, 'Label(2)', STATUS ), II, 
+     :                STATUS )
 
 *  Total intensity.
       CALL CAT_CNEWS( CI, 'I', CAT__TYPER, 0, UNITS, 'G13.6', 
@@ -170,5 +182,8 @@
      :                   II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
+
+*  Annul the pointer to the Base Fame.
+      CALL AST_ANNUL( FRM, STATUS )
 
       END

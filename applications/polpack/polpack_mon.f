@@ -94,6 +94,9 @@
       ELSE IF ( NAME .EQ. 'POLKA' ) THEN
          CALL POLKA( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLPLOT' ) THEN
+         CALL POLPLOT( STATUS )
+
       ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
          CALL POLVEC( STATUS )
 

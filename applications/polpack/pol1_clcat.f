@@ -60,20 +60,25 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      EXTERNAL POL1_SINK
-
-*  Global Variables:
-      INTEGER CCI                ! Catalogue identifier passed to POL1_SINK
-      COMMON /POLSINK/ CCI      
-
 *  Local Variables:
-      INTEGER CHAN               ! Pointer to an AST Channel
+      INTEGER FRM                ! Pointer to Base Frame
 *.
 
 *  Copy the supplied FrameSet into the textual information associated
 *  with the catalogue (if supplied), and if no error has already occurred ...
       IF( STATUS .EQ. SAI__OK .AND. IWCS .NE. AST__NULL ) THEN
+
+*  Routine POL1_MKCAT creates the X and Y catalogue columns with names
+*  X and Y. Applications which access the WCS information in the
+*  catalogue use the routine KPG1_GTCTA to look for a Frame spanned by 
+*  axes with Symbol attributes equal to the catalogue column names. In
+*  order for this to succeed, we ensure that he symbols on axes 1 and 2
+*  of the Base Frame correspond to the names of the catalogue columns (i.e.
+*  "X" and "Y").
+         FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+         CALL AST_SETC( FRM, 'Symbol(1)', 'X', STATUS )
+         CALL AST_SETC( FRM, 'Symbol(2)', 'Y', STATUS )
+         CALL AST_ANNUL( FRM, STATUS )
 
 *  Add a header to the textual information.
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
@@ -87,32 +92,8 @@
      :                   'PIXEL Frame within this FrameSet.', STATUS )
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
 
-*  Create an AST Channel. AST provides the POL1_SINK function with strings
-*  to be written out, and POL1_SINK stores these strings in the textual
-*  information associated with the catalogue. POL1_SINK is attached to
-*  the end of this file.
-         CHAN = AST_CHANNEL( AST_NULL, POL1_SINK, 'FULL=-1,COMMENT=0',
-     :                       STATUS )
-
-*  Pass the catalogue identifier to POL1_SINK using the common block
-*  /POLSINK/.
-         CCI = CI 
-
-*  Write the supplied FrameSet to the Channel. If the FrameSet cannot
-*  be written (which shouldn't happen), report an error and immediately
-*  flush it so that we can carry on.
-         IF( AST_WRITE( CHAN, IWCS, STATUS ) .EQ. 0 ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'Failed to write World Coordinate '//
-     :                    'System information to the output catalogue.',
-     :                    STATUS )
-               CALL ERR_FLUSH( STATUS )
-            END IF
-         END IF
-
-*  Annul the AST Channel.
-         CALL AST_ANNUL( CHAN, STATUS )
+*  Write out the WCS information.
+         CALL KPG1_WCATW( IWCS, CI, STATUS )
 
       END IF
 
@@ -120,18 +101,3 @@
       CALL CAT_TRLSE( CI, STATUS )
 
       END
-
-
-      SUBROUTINE POL1_SINK( STATUS )
-      IMPLICIT NONE
-      INCLUDE 'SAE_PAR' 
-      INTEGER STATUS, L, CI
-      CHARACTER LINE*80
-      COMMON /POLSINK/ CI      
-
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-      CALL AST_GETLINE( LINE, L, STATUS ) 
-      CALL CAT_PUTXT( CI, 'COMMENT', LINE( : L ), STATUS )
-
-      END 

@@ -60,14 +60,18 @@ void GetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
 void GetIVar( Tcl_Interp *, const char *, int *, int * );
 void GetRVar( Tcl_Interp *, const char *, float *, int * );
 
-F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
+F77_SUBROUTINE(doplmp)( CHARACTER(CUBE), CHARACTER(IMAGE), INTEGER(DPI), 
+                       LOGICAL(HAREA),
                        LOGICAL(SAREA), CHARACTER(SI), CHARACTER(LOGFIL),
                        CHARACTER(BADCOL), CHARACTER(POLCOL), 
                        CHARACTER(SELCOL), REAL(PLO), REAL(PHI), 
                        LOGICAL(NEWCM), LOGICAL(XHAIR), CHARACTER(XHRCOL), 
-                       LOGICAL(STHLP), INTEGER(STATUS) TRAIL(IMAGE)
-                       TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
-                       TRAIL(POLCOL) TRAIL(SELCOL) TRAIL(XHRCOL) ){
+                       LOGICAL(STHLP), INTEGER(NCONT), CHARACTER(CONCOL), 
+                       CHARACTER(BACK), 
+                       INTEGER(STATUS) TRAIL(CUBE) TRAIL(IMAGE) TRAIL(SI) 
+                       TRAIL(LOGFIL) 
+                       TRAIL(BADCOL) TRAIL(POLCOL) TRAIL(SELCOL) 
+                       TRAIL(XHRCOL) TRAIL(CONCOL) TRAIL(BACK) ){
 /*
 *  Name:
 *     doplmp
@@ -85,13 +89,19 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
 *     back to the caller.
 
 *  Parameters:
+*     CUBE = CHARACTER *(*) (Given)
+*        The full specification of the cube holding input Stokes vectors. 
 *     IMAGE = CHARACTER *(*) (Given)
-*        The full specification of the input image.
+*        The full specification of the background image. This should be blank
+*        if no background image is available.
 *     DPI = INTEGER (Given)
 *        The screen dots per inch to use. If a zero or negative value
 *        is supplied, then the TK default is used.
 *     HAREA = LOGICAL (Given and Returned)
 *        Should the help area be displayed?
+*     BACK = CHARACTER * ( * ) (Given and Returned)
+*        The method for displaying the background image "CONTOUR", "GREY   "
+*        or "NONE   " (must be 7 characters long).
 *     SAREA = LOGICAL (Given and Returned)
 *        Should the status area be displayed?
 *     SI = CHARACTER * ( * ) (Given and Returned)
@@ -123,6 +133,12 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
 *     STHLP = LOGICAL (Given)
 *        Should a hyper-text browser be created automatically at start-up
 *        displaying the help system contents?
+*     NCONT = INTEGER (Given and Returned)
+*        No. of contours to use for background image.
+*     CONCOL = CHARACTER (Given and Returned)
+*        The colour with which to draw contours (if required). The 
+*        supplied variable should be long enough to receive the longest 
+*        colour name.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -140,6 +156,7 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
 
 */
 
+   GENPTR_CHARACTER(CUBE)
    GENPTR_CHARACTER(IMAGE)
    GENPTR_INTEGER(DPI)
    GENPTR_LOGICAL(HAREA)
@@ -155,6 +172,9 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
    GENPTR_LOGICAL(XHAIR)
    GENPTR_CHARACTER(XHRCOL)
    GENPTR_LOGICAL(STHLP)
+   GENPTR_INTEGER(NCONT)
+   GENPTR_CHARACTER(CONCOL)
+   GENPTR_CHARACTER(BACK)
    GENPTR_INTEGER(STATUS)
 
    Tcl_Interp *interp = NULL;
@@ -176,6 +196,9 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
 
 /* Create a TCL interpreter. */
    interp = Tcl_CreateInterp ();
+
+/* Store the name of the input Stokes vector cube in Tcl variable "cube". */
+   SetSVar( interp, "cube", CUBE, CUBE_length, STATUS );
 
 /* Store the name of the input image in Tcl variable "in_list". */
    SetSVar( interp, "in_list", IMAGE, IMAGE_length, STATUS );
@@ -202,13 +225,17 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
    SetLVar( interp, "ATASK_XHAIR", XHAIR, STATUS );
    SetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
    SetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
+   SetSVar( interp, "ATASK_BACK", BACK, BACK_length, STATUS );
    SetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
    SetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
+   SetSVar( interp, "ATASK_CONCOL", CONCOL, CONCOL_length, STATUS );
    SetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
    SetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
    SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
    SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
    SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
+   SetIVar( interp, "ATASK_NCONT", *NCONT, STATUS );
+
 
    if( LOGFIL_length > 0 ) {
       SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
@@ -300,12 +327,15 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
    GetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
    GetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
    GetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
+   GetIVar( interp, "ATASK_NCONT", NCONT, STATUS );
    GetRVar( interp, "ATASK_PLO", PLO, STATUS );
    GetRVar( interp, "ATASK_PHI", PHI, STATUS );
    GetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
+   GetSVar( interp, "ATASK_CONCOL", CONCOL, CONCOL_length, STATUS );
    GetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
    GetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
    GetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
+   GetSVar( interp, "ATASK_BACK", BACK, BACK_length, STATUS );
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
 

@@ -44,6 +44,7 @@
       echo -lfits -lkapgen -lsla `fio_link_adam` `nbs_link_adam` \
                    `gwm_link_adam` `agi_link_adam` `pda_link_adam` \
                    `grp_link_adam` `ndf_link_adam` `hlp_link` `cat_link_adam` \
+                   `ast_link_adam -mygrf` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
