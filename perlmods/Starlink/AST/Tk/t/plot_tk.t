@@ -17,10 +17,8 @@ Starlink::AST::Begin();
 
 # FITS File
 # ---------
-#my $file = File::Spec->catfile( "PGPLOT", "t", "m31.fit" );
-#my $jpeg = File::Spec->catfile( "Tk", "t", "m31.jpg" );
-my $file = File::Spec->catfile( "..", "PGPLOT", "t", "m31.fit" );
-my $jpeg = File::Spec->catfile( "t", "m31.jpg" );
+my $file = File::Spec->catfile( File::Spec->updir(), "data", "m31.fit" );
+my $jpeg = File::Spec->catfile( File::Spec->updir(), "data", "m31.jpg" );
 
 # Get FITS Header
 # ---------------
