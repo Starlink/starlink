@@ -664,6 +664,144 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
   return retval;
 }
 
+int astGScales( float *chv, float *chh ){
+  dSP;
+  SV * cb;
+  SV * external;
+  int retval;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getPlotAttr( "_gscales" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      int flags = G_ARRAY | G_EVAL;
+      ENTER;
+      SAVETMPS;
+
+      /* Always need PUSHMARK/PUTBACK even if no args */
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. Else, in this case set NOARGS flag */
+      external = Perl_getPlotAttr( "_gexternal" );
+
+      if ( external != NULL ) {
+	XPUSHs( external );
+      } else {
+	/* No arguments */
+	flags |= G_NOARGS;
+      }
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), flags);
+      retval = ReportPerlError( AST__GRFER );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 3) {
+	  astError( AST__GRFER, 
+		    "Must return 3 args from GScales callback");
+	  retval = 0;
+	} else {
+	  /* pop results off the stack */
+	  *chh = (float) POPn;
+	  *chv = (float) POPn;
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGScales");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
+}
+
+
+int astGCap( int cap, int value ) {
+  dSP;
+  SV * cb;
+  SV * external;
+  int retval;
+  int len;
+  int i;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getPlotAttr( "_gtext" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
+
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getPlotAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
+    
+      XPUSHs( sv_2mortal(newSViv(cap) ) );
+      XPUSHs( sv_2mortal(newSViv(value) ) );
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL);
+      retval = ReportPerlError( AST__GRFER );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 1) {
+	  astError( AST__GRFER, 
+		    "Returned more than 1 arg from GCap callback");
+	  retval = 0;
+	} else {
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGCap");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
+}               
+
+
 static void Report( const char *name ){
    astError( AST__GRFER, "%s: No graphics facilities are available.", name );
    astError( AST__GRFER, "Register one using eg Starlink::AST::PGPLOT "

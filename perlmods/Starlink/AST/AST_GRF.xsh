@@ -99,3 +99,172 @@ GRF__NATTR()
  OUTPUT:
   RETVAL
 
+### Capabilities
+
+int
+GRF__ESC()
+ CODE:
+#ifdef GRF__ESC
+    RETVAL = GRF__ESC;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESC not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__MJUST()
+ CODE:
+#ifdef GRF__MJUST
+    RETVAL = GRF__MJUST;
+#else
+    Perl_croak(aTHX_ "Constant GRF__MJUST not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__SCALES()
+ CODE:
+#ifdef GRF__SCALES
+    RETVAL = GRF__SCALES;
+#else
+    Perl_croak(aTHX_ "Constant GRF__SCALES not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+### Escape sequences
+
+int
+GRF__ESPER()
+ CODE:
+#ifdef GRF__ESPER
+    RETVAL = GRF__ESPER;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESPER not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESSUP()
+ CODE:
+#ifdef GRF__ESSUP
+    RETVAL = GRF__ESSUP;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESSUP not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESSUB()
+ CODE:
+#ifdef GRF__ESSUB
+    RETVAL = GRF__ESSUB;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESSUB not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESGAP()
+ CODE:
+#ifdef GRF__ESGAP
+    RETVAL = GRF__ESGAP;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESGAP not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESBAC()
+ CODE:
+#ifdef GRF__ESBAC
+    RETVAL = GRF__ESBAC;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESBAC not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESSIZ()
+ CODE:
+#ifdef GRF__ESSIZ
+    RETVAL = GRF__ESSIZ;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESSIZ not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESWID()
+ CODE:
+#ifdef GRF__ESWID
+    RETVAL = GRF__ESWID;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESWID not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESFON()
+ CODE:
+#ifdef GRF__ESFON
+    RETVAL = GRF__ESFON;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESFON not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESCOL()
+ CODE:
+#ifdef GRF__ESCOL
+    RETVAL = GRF__ESCOL;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESCOL not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESSTY()
+ CODE:
+#ifdef GRF__ESSTY
+    RETVAL = GRF__ESSTY;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESSTY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESPOP()
+ CODE:
+#ifdef GRF__ESPOP
+    RETVAL = GRF__ESPOP;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESPOP not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESPSH()
+ CODE:
+#ifdef GRF__ESPSH
+    RETVAL = GRF__ESPSH;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESPSH not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+

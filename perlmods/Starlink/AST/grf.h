@@ -53,15 +53,35 @@
 /* The number of different graphics attributes */
 #define GRF__NATTR 5
 
+/* Values identifying capabilities */
+#define GRF__ESC     0
+#define GRF__MJUST   1
+#define GRF__SCALES  2
+
+/* Values identifying types of graphics escape sequence */
+#define GRF__ESPER 1
+#define GRF__ESSUP 2
+#define GRF__ESSUB 3
+#define GRF__ESGAP 4
+#define GRF__ESBAC 5
+#define GRF__ESSIZ 6
+#define GRF__ESWID 7
+#define GRF__ESFON 8
+#define GRF__ESCOL 9
+#define GRF__ESSTY 10
+#define GRF__ESPOP 11
+#define GRF__ESPSH 12
+
 /* Function prototypes. */
 /* ==================== */
 int astGAttr( int, double, double *, int );
-int astGAxScale( float *, float * );
+int astGScales( float *, float * );
 int astGFlush( void );
 int astGLine( int, const float *, const float * );
 int astGMark( int, const float *, const float *, int );
 int astGQch( float *, float * );
 int astGText( const char *, float, float, const char *, float, float );
 int astGTxExt( const char *, float, float, const char *, float, float, float *, float * );
+int astGCap( int, int );
 
 #endif
