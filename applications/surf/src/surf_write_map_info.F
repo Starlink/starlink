@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.17  2000/07/07 03:24:34  timj
+* Fix typo in FITS comment
+*
 * Revision 1.16  2000/06/23 20:00:05  timj
 * - Add DATE and ORIGIN keywords
 * - Add HH:MM:SS to DATE-OBS field
@@ -456,7 +459,7 @@
 *     Write to the fits array
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'DATE', DATEOBS, 
-     :     'file creation data (YYYY-MM-DDThh:mm:ss UTC)', 
+     :     'file creation date (YYYY-MM-DDThh:mm:ss UTC)', 
      :     STATUS)
 
 
