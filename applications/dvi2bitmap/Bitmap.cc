@@ -26,24 +26,21 @@
 
 
 
+#include <config.h>
+
 #include <iostream>		// debug code writes to cerr
 #include <string>
-#include <assert.h>
-
-#include <config.h>
 
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstdarg>
-#include <cstdio>
-#include <cstring>
 #include <climits>		// g++ doesn't have <limits>
 #include <cmath>
+#include <cassert>
 #else
 #include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
 #include <limits.h>
 #include <math.h>
+#include <assert.h>
 #endif
 
 using STD::cout;
