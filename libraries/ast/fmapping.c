@@ -49,6 +49,112 @@
 #include "error.h"               /* Error reporting facilities */
 #include "mapping.h"             /* C interface to the Mapping class */
 
+/* ---------------- */
+#include <stdio.h>
+F77_INTEGER_FUNCTION(ast__nearest)( ) { return 0; }
+F77_INTEGER_FUNCTION(ast__linear)( ) { return 0; }
+static F77_INTEGER_TYPE (* ast_resample_METHOD)();
+
+#define MAKE_AST_RESAMPLE_METHOD(cabbrev,ctype,ftype) \
+static int ast_resample_method##cabbrev( int ndim, \
+                                         const int *lbnd, const int *ubnd, \
+                                         const ctype *in, int npoint, \
+                                         const int *offset, double *coord, \
+                                         int usebad, ctype badflag, \
+                                         ctype *out ) { \
+   DECLARE_INTEGER(STATUS); \
+   DECLARE_LOGICAL(USEBAD); \
+\
+   USEBAD = usebad ? F77_TRUE : F77_FALSE; \
+   STATUS = astStatus; \
+   return ( *ast_resample_METHOD )( INTEGER_ARG(&ndim), \
+                                    INTEGER_ARRAY_ARG(lbnd), \
+                                    INTEGER_ARRAY_ARG(ubnd), \
+                                    ftype##_ARRAY_ARG(in), \
+                                    INTEGER_ARG(&npoint), \
+                                    INTEGER_ARRAY_ARG(offset), \
+                                    DOUBLE_ARRAY_ARG(coord), \
+                                    LOGICAL_ARG(&USEBAD), \
+                                    ftype##_ARG(&badflag), \
+                                    ftype##_ARRAY_ARG(out), \
+                                    INTEGER_ARG(&STATUS) ); \
+   astSetStatus( STATUS ); \
+}
+MAKE_AST_RESAMPLE_METHOD(D,double,DOUBLE)
+MAKE_AST_RESAMPLE_METHOD(F,float,REAL)
+MAKE_AST_RESAMPLE_METHOD(I,int,INTEGER)
+MAKE_AST_RESAMPLE_METHOD(S,short int,WORD)
+MAKE_AST_RESAMPLE_METHOD(US,unsigned short int,UWORD)
+MAKE_AST_RESAMPLE_METHOD(B,signed char,BYTE)
+MAKE_AST_RESAMPLE_METHOD(UB,unsigned char,UBYTE)
+#undef MAKE_AST_RESAMPLE_METHOD
+
+#define MAKE_AST_RESAMPLE(fabbrev,FABBREV,ftype,cabbrev) \
+F77_INTEGER_FUNCTION(ast_resample##fabbrev)( INTEGER(THIS), \
+                                             INTEGER(NDIM_IN), \
+                                             INTEGER_ARRAY(LBND_IN), \
+                                             INTEGER_ARRAY(UBND_IN), \
+                                             ftype##_ARRAY(IN), \
+                                             F77_INTEGER_TYPE (* METHOD)(), \
+                                             DOUBLE(ACC), \
+                                             INTEGER(GRIDSIZE), \
+                                             LOGICAL(USEBAD), \
+                                             ftype(BADFLAG), \
+                                             INTEGER(NDIM_OUT), \
+                                             INTEGER_ARRAY(LBND_OUT), \
+                                             INTEGER_ARRAY(UBND_OUT), \
+                                             INTEGER_ARRAY(LBND), \
+                                             INTEGER_ARRAY(UBND), \
+                                             ftype##_ARRAY(OUT), \
+                                             INTEGER(STATUS) ) { \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_INTEGER(NDIM_IN) \
+   GENPTR_INTEGER_ARRAY(LBND_IN) \
+   GENPTR_INTEGER_ARRAY(UBND_IN) \
+   GENPTR_##ftype##_ARRAY(IN) \
+   GENPTR_DOUBLE(ACC) \
+   GENPTR_INTEGER(GRIDSIZE) \
+   GENPTR_LOGICAL(USEBAD) \
+   GENPTR_##ftype(BADFLAG) \
+   GENPTR_INTEGER(NDIM_OUT) \
+   GENPTR_INTEGER_ARRAY(LBND_OUT) \
+   GENPTR_INTEGER_ARRAY(UBND_OUT) \
+   GENPTR_INTEGER_ARRAY(LBND) \
+   GENPTR_INTEGER_ARRAY(UBND) \
+   GENPTR_##ftype##_ARRAY(OUT) \
+   GENPTR_INTEGER(STATUS) \
+   AstInterpolate##cabbrev method; \
+   F77_INTEGER_TYPE RESULT; \
+\
+   astAt( "AST_RESAMPLE"#FABBREV, NULL, 0 ); \
+   astWatchSTATUS( \
+      if ( METHOD == F77_EXTERNAL_NAME(ast__nearest) ) { \
+         method = (AstInterpolate##cabbrev) AST__NEAREST; \
+      } else if ( METHOD == F77_EXTERNAL_NAME(ast__linear) ) { \
+         method = (AstInterpolate##cabbrev) AST__LINEAR; \
+      } else { \
+         ast_resample_METHOD = METHOD; \
+         method = ast_resample_method##cabbrev; \
+      } \
+      RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
+                                     LBND_IN, UBND_IN, IN, \
+                                     method, *ACC, *GRIDSIZE, \
+                                     F77_ISTRUE( *USEBAD ), *BADFLAG, \
+                                     *NDIM_OUT, LBND_OUT, UBND_OUT, \
+                                     LBND, UBND, OUT ); \
+   ) \
+   return RESULT; \
+}
+MAKE_AST_RESAMPLE(d,D,DOUBLE,D)
+MAKE_AST_RESAMPLE(r,R,REAL,F)
+MAKE_AST_RESAMPLE(i,I,INTEGER,I)
+MAKE_AST_RESAMPLE(s,S,WORD,S)
+MAKE_AST_RESAMPLE(us,US,UWORD,US)
+MAKE_AST_RESAMPLE(w,W,WORD,S)
+MAKE_AST_RESAMPLE(uw,UW,UWORD,US)
+MAKE_AST_RESAMPLE(b,B,BYTE,B)
+MAKE_AST_RESAMPLE(ub,UB,UBYTE,UB)
+#undef MAKE_AST_RESAMPLE
 
 F77_SUBROUTINE(ast_invert)( INTEGER(THIS),
                             INTEGER(STATUS) ) {
@@ -93,7 +199,7 @@ F77_SUBROUTINE(ast_mapbox)( INTEGER(THIS),
    GENPTR_DOUBLE_ARRAY(XU)
    double lbnd_out;
    double ubnd_out;
-   
+
    astAt( "AST_MAPBOX", NULL, 0 );
    astWatchSTATUS(
       astMapBox( astI2P( *THIS ), LBND_IN, UBND_IN, F77_ISTRUE( *FORWARD ),

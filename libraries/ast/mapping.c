@@ -611,8 +611,7 @@ MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,float)
 
 static int ResampleSection( AstMapping *this, const double *linear_fit,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const void *in, DataType type,
-                      AstInterpolate method,
+                      const void *in, DataType type, int (* method)(),
                       int usebad, const void *badflag_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
                       const int *lbnd, const int *ubnd, void *out ) {
@@ -673,7 +672,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
          a1 = coord_in * nd1;
          g1 = coord_in * ndim_out;
-         accum[ a1 + ndim_out ] = 0.0;
+         accum[ a1 + ndim_out ] = zero[ coord_in ];
          for ( coord_out = ndim_out - 1; coord_out >= 0; coord_out-- ) {
             a2 = a1 + coord_out;
             g2 = g1 + coord_out;
@@ -763,7 +762,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
          }
 #undef CASE
                
-      } else if ( method == AST__LINEAR ) {
+      } else if ( ( method == AST__LINEAR ) ||
+                  ( method == NULL ) ) {
 
 #define CASE(name,abbrev,type) \
             case ( name ): \
@@ -791,12 +791,32 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 #undef CASE
 
       } else {
-         result = ( *method )( ndim_in, lbnd_in, ubnd_in,
-                               (double *) in,
-                               npoint, offset, ptr_in[ 0 ],
-                               usebad,
-                               *( (double *) badflag_ptr ),
-                               (double *) out );
+
+#define CASE(name,abbrev,type) \
+            case ( name ): \
+               result = ( *( (AstInterpolate##abbrev) method ) ) \
+                           ( ndim_in, lbnd_in, ubnd_in, \
+                             (type *) in, npoint, \
+                             offset, ptr_in[ 0 ], \
+                             usebad, *( (type *) badflag_ptr ), \
+                                                     (type *) out ); \
+               break;
+
+         switch ( type ) {
+            CASE(LDOUBLE,LD,long double)
+            CASE(DOUBLE,D,double)
+            CASE(FLOAT,F,float)
+            CASE(LONG,L,long int)
+            CASE(ULONG,UL,unsigned long int)
+            CASE(INT,I,int)
+            CASE(UINT,UI,unsigned int)
+            CASE(SHORT,S,short int)
+            CASE(USHORT,US,unsigned short int)
+            CASE(BYTE,B,signed char)
+            CASE(UBYTE,UB,unsigned char)
+         }
+#undef CASE
+
       }
    }
    dim = astFree( dim );
@@ -1011,7 +1031,7 @@ static double *TestIfLinear( AstMapping *this,
 static int ResampleBlock( AstMapping *this, const double *linear,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
                       const void *in, DataType type,
-                      AstInterpolate method, double acc,
+                      int (* method)(), double acc,
                       int usebad, const void *badflag_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
                       const int *lbnd, const int *ubnd, void *out ) {
@@ -1117,7 +1137,7 @@ static int ResampleBlock( AstMapping *this, const double *linear,
 #define MAKE_RESAMPLE(name,abbrev,type) \
 static int Resample##abbrev( AstMapping *this, int ndim_in, \
                              const int *lbnd_in, const int *ubnd_in, \
-                             const type *in, AstInterpolate method, double acc, \
+                             const type *in, AstInterpolate##abbrev method, double acc, int gridsize, \
                              int usebad, type badflag, int ndim_out, \
                              const int *lbnd_out, const int *ubnd_out, \
                              const int *lbnd, const int *ubnd, type *out ) { \
@@ -1140,6 +1160,7 @@ static int Resample##abbrev( AstMapping *this, int ndim_in, \
    dimx = 1; \
    for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
       dim = ubnd[ coord_out ] - lbnd[ coord_out ] + 1; \
+printf( "%d ", dim ); \
       npix *= dim; \
       if ( dim > mxdim ) { \
          mxdim = dim; \
@@ -1148,15 +1169,18 @@ static int Resample##abbrev( AstMapping *this, int ndim_in, \
    } \
     \
    toosmall = npix <= 100; \
-   toobig = mxdim > 50; \
+   toobig = mxdim > gridsize; \
  \
    linear_fit = NULL; \
    if ( toosmall ) { \
+printf( " toosmall\n" ); \
       divide = 0; \
    } else if ( toobig ) { \
+printf( " toobig\n" ); \
       divide = 1; \
    } else { \
      linear_fit = TestIfLinear( this, lbnd, ubnd, acc ); \
+printf( " %s\n", ( linear_fit ? "linear" : "non-linear" ) ); \
      divide = !linear_fit; \
    } \
    if ( astOK ) { \
@@ -1164,7 +1188,7 @@ static int Resample##abbrev( AstMapping *this, int ndim_in, \
          result += ResampleBlock( this, linear_fit, \
                                   ndim_in, lbnd_in, ubnd_in, \
                                   (void *) in, name, \
-                                  method, acc, \
+                                  (int (*)()) method, acc, \
                                   usebad, (void *) &badflag, \
                                   ndim_out, lbnd_out, ubnd_out, \
                                   lbnd, ubnd, (void *) out ); \
@@ -1179,14 +1203,14 @@ static int Resample##abbrev( AstMapping *this, int ndim_in, \
          tmp = hi[ dimx ]; \
          hi[ dimx ] = ( ubnd[ dimx ] + lbnd[ dimx ] ) / 2; \
          result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
-                             method, acc, \
+                             method, acc, gridsize, \
                              usebad, badflag, \
                              ndim_out, lbnd_out, ubnd_out, \
                              lo, hi, out ); \
          lo[ dimx ] = hi[ dimx ] + 1; \
          hi[ dimx ] = tmp; \
          result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
-                             method, acc, \
+                             method, acc, gridsize, \
                              usebad, badflag, \
                              ndim_out, lbnd_out, ubnd_out, \
                              lo, hi, out ); \
@@ -6081,15 +6105,16 @@ void astReportPoints_( AstMapping *this, int forward,
 #define MAKE_RESAMPLE_(abbrev,type) \
 int astResample##abbrev##_( AstMapping *this, int ndim_in, \
                             const int *lbnd_in, const int *ubnd_in, \
-                            const type *in, AstInterpolate method, \
-                            double acc, int usebad, type badflag, \
-                            int ndim_out, const int *lbnd_out, \
+                            const type *in, AstInterpolate##abbrev method, \
+                            double acc, int gridsize, int usebad, \
+                            type badflag, int ndim_out, const int *lbnd_out, \
                             const int *ubnd_out, const int *lbnd, \
                             const int *ubnd, type *out ) { \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,Mapping,Resample##abbrev))( this, ndim_in, \
                                                         lbnd_in, ubnd_in, in, \
-                                                        method, acc, usebad, \
+                                                        method, acc, \
+                                                        gridsize, usebad, \
                                                         badflag, ndim_out, \
                                                         lbnd_out, ubnd_out, \
                                                         lbnd, ubnd, out ); \
