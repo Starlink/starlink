@@ -115,7 +115,7 @@
 *  First handle cases where values outside a given range are to be
 *  replaced.
 *  *************************************************************** 
-     IF ( THRLO .LT. THRHI ) THEN 
+      IF ( THRLO .LT. THRHI ) THEN 
  
 *  Initialise the counters.
          NREPLO = 0
@@ -204,7 +204,7 @@
 *  Now handle cases where values inside a given range are to be
 *  replaced.
 *  *************************************************************** 
-     ELSE
+      ELSE
  
 *  Initialise the counters.
          NREPLO = 0
@@ -223,7 +223,7 @@
  
 *  Check input array value and act accordingly.
                ELSE IF ( INARR( J ) .GT. THRHI .AND.
-      :                  INARR( J ) .LT. THRLO ) THEN
+     :                   INARR( J ) .LT. THRLO ) THEN
  
 *  The input pixel value is ibetween the thresholda---set output
 *  pixel to the lowere replacement value.  Increment the count of
@@ -250,7 +250,7 @@
  
 *  Check input array value and act accordingly.
                IF ( INARR( J ) .GT. THRHI .AND.
-      :             INARR( J ) .LT. THRLO ) THEN
+     :              INARR( J ) .LT. THRLO ) THEN
  
 *  The input pixel value is ibetween the thresholda---set output
 *  pixel to the lowere replacement value.  Increment the count of
