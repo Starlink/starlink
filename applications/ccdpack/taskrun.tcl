@@ -75,6 +75,7 @@
       global TASK
       global MONOLITH
       global Bitmaps
+      global Tickerbitmap
 #.
 
 #  Check that the application is available.
@@ -93,18 +94,34 @@ this interface (probably programming error)."
       if { $window != "" } {
          set curs [ $window cget -cursor ]
          $window configure -cursor watch
-         puts "$window"
       }
 
 #  Display a window if required.
       if { $message != "" } {
-         set msgwin [ iwidgets::shell .wait -modality none ]
-         set lab [ label [ $msgwin childsite ].msg -text $message ]
-         pack $lab
+         set msgwin [ toplevel .wait ]
+         wm withdraw $msgwin
+         set frame1 [ frame $msgwin.frame1 ]
+         set frame2 [ frame $msgwin.frame2 ]
+         label $frame2.message -text $message -anchor center
+         label $frame1.animate -bitmap @$Tickerbitmap(1)
+         pack $frame1 -side right -fill both
+         pack $frame2 -side left -fill both -expand true -ipadx 15
+         pack $frame2.message -fill both -expand true
+         pack $frame1.animate -fill both -expand true
+         CCDAnimateBitmap $frame1.animate Tickerbitmap 8
+
+#  Position the window correctly.
          if { $window != "" } {
-            $msgwin center $window
+            update idletasks
+            set xpos [ expr [ winfo rootx $window ] \
+                          + [ winfo width $window ] / 2 \
+                          - [ winfo reqwidth $msgwin ] / 2 ]
+            set ypos [ expr [ winfo rooty $window ] \
+                          + [ winfo height $window ] / 2 \
+                          - [ winfo reqheight $msgwin ] / 2 ]
+            wm geometry $msgwin +$xpos+$ypos
          }
-         $msgwin activate
+         wm deiconify $msgwin
          grab $msgwin
       }
 
@@ -121,6 +138,7 @@ this interface (probably programming error)."
 #  Remove the message window if required.
       if { $message != "" } {
          grab release $msgwin
+         CCDAnimateBitmap $frame1.animate stop
          destroy $msgwin
       }
 
