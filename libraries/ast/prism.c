@@ -1401,14 +1401,19 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    recursively to give them a FrameSet containing the corresponding axes
    from the supplied Frame. */
    creg = ((AstPrism *) this_region )->region1;
-   if( creg && !astGetRegionFS( creg ) ) {
+   if( creg ) {
       nax1 = astGetNaxes( creg );
-      axes = astMalloc( sizeof( int )*(size_t) nax1 );
-      if( astOK ) for( i = 0; i < nax1; i++ ) axes[ i ] = i;
-      cfrm = astPickAxes( frm, nax1, axes, NULL );
-      astSetRegFS( creg, cfrm );
-      axes = astFree( axes );
-      cfrm = astAnnul( cfrm );
+      if( !astGetRegionFS( creg ) ) {
+         axes = astMalloc( sizeof( int )*(size_t) nax1 );
+         if( astOK ) for( i = 0; i < nax1; i++ ) axes[ i ] = i;
+         cfrm = astPickAxes( frm, nax1, axes, NULL );
+         astSetRegFS( creg, cfrm );
+         axes = astFree( axes );
+         cfrm = astAnnul( cfrm );
+      }
+
+   } else {
+      nax1 = 0;
    }
 
    creg = ((AstPrism *) this_region )->region2;
@@ -2550,8 +2555,8 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
          f1 = astGetFrame( ((AstRegion *) new)->frameset, AST__BASE );
 
          creg = new->region1;
+         nax1 = astGetNaxes( creg );
          if( !astGetRegionFS( creg ) ) {
-            nax1 = astGetNaxes( creg );
             axes = astMalloc( sizeof( int )*(size_t) nax1 );
             if( astOK ) for( i = 0; i < nax1; i++ ) axes[ i ] = i;
             cfrm = astPickAxes( f1, nax1, axes, NULL );

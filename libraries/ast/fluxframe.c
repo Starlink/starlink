@@ -1078,7 +1078,6 @@ static AstSpecFrame *GetSpecFrame( AstFluxFrame *this ) {
 
 /* Local Variables: */
    AstSpecFrame *result;           /* Pointer value to return */
-   AstSystemType sys;              /* FluxFrame System */
 
 /* Initialise. */
    result = NULL;

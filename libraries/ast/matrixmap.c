@@ -1926,9 +1926,12 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          }      
 
 /* We cannot create the require Mapping if the matrix is undefined. */
-         if( mat && astOK ) {
+         if( !mat || !astOK ) {
+            ok = 0;
+            nout = 0;
 
-/* Loop round all the rows in the matrix. */
+/* Otherwise, loop round all the rows in the matrix. */
+         } else {
             nout = 0;
             pmat = rmat;
             iel = 0;
