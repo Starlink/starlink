@@ -1,5 +1,6 @@
       SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, 
-     :                       CLOSE, LABEL, IGRP, IDS, WORK, STATUS )
+     :                       CLOSE, LABEL, IGRP, JUST, IDS, WORK, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_LSHFM
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, CLOSE, 
-*                      LABEL, IGRP, IDS, WORK, STATUS )
+*                      LABEL, IGRP, JUST, IDS, WORK, STATUS )
 
 *  Description:
 *     This routine plots the supplied positions on the currently
@@ -39,11 +40,19 @@
 *        Should positions be labelled?
 *     IGRP = INTEGER (Given)
 *        A GRP group holding the strings to use if PLOT=TEXT.
+*     JUST = CHARACTER * ( * ) (Given)
+*        A string specifying the justification to be used when displaying 
+*        the text supplied in IGRP (ignored if PLOT is not "Text"). This
+*        should be a string of two characters; the first should be "B",
+*        "C" or "T", meaning bottom, centre or top. The second should be
+*        "L", "C" or "R", meaning left, centre or right. The text is
+*        displayed so that the position supplied in POS is at the
+*        specified point within the displayed text string.
 *     IDS( NPOS ) = INTEGER (Given)
 *        Array of position identifiers.
 *     WORK( NPOS, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
-*     STATUS = INTEGER (Given)
+*     STATUS = INTEGER (Given and Returned)
 *        Global status value.
 
 *  Authors:
@@ -80,6 +89,7 @@
       LOGICAL CLOSE
       LOGICAL LABEL
       INTEGER IGRP
+      CHARACTER JUST*(*)
       INTEGER IDS( NPOS )
 
 *  Arguments Given and Returned:
@@ -159,13 +169,13 @@
 
 *  Draw the position.
          CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                    .FALSE., CLOSE, TEXT, STATUS )
+     :                    .FALSE., CLOSE, TEXT, JUST, STATUS )
 
       END DO
 
 *  Complete any polygons.
       CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                 .TRUE., CLOSE, TEXT, STATUS )
+     :                 .TRUE., CLOSE, TEXT, JUST, STATUS )
 
 *  If required, add labels.
       IF( LABEL .AND. STATUS .EQ. SAI__OK ) THEN

@@ -111,6 +111,15 @@
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list such as produced by 
 *        applications LISTMAKE, CURSOR, etc. 
+*     JUST = LITERAL (Read)
+*        A string specifying the justification to be used when displaying 
+*        text strings at the supplied positions. This parameter is 
+*        only accessed if parameter PLOT is set to "Text". The supplied
+*        string should contain two characters; the first should be "B",
+*        "C" or "T", meaning bottom, centre or top. The second should be
+*        "L", "C" or "R", meaning left, centre or right. The text is
+*        displayed so that the supplied position is at the specified 
+*        point within the displayed text string. [CC]
 *     LABEL = LOGICAL (Read)
 *        If TRUE the positions are labelled with the corresponding integer
 *        identifiers on the graphics device specified by parameter DEVICE.
@@ -186,9 +195,9 @@
 *        - "Cross" -- A combination of "Vline" and "Hline".
 *
 *        - "Text" -- A text string is used to mark each position. The string 
-*        is drawn horizontally and is centred on the specified position.
-*        The strings to use for each position are specified using parameter 
-*        STRINGS.
+*        is drawn horizontally with the justification specified by parameter 
+*        JUST.  The strings to use for each position are specified using 
+*        parameter STRINGS.
 *
 *        - "Blank" -- The graphics device is opened and the picture specified 
 *        by parameter NAME is found, but no actual graphics are drawn to mark 
@@ -329,6 +338,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER JUST*2           ! Justification for text strings
       CHARACTER PICNAM*15        ! AGI picture name.
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
@@ -418,6 +428,11 @@
             CALL ERR_ANNUL( STATUS )
             IGRP2 = GRP__NOID
          END IF
+
+*  Get the justification for the strings.
+         CALL PAR_CHOIC( 'JUST', 'CC', 'BL,CL,TL,BC,CC,TC,BR,CR,TR',
+     :                   .TRUE., JUST, STATUS )
+
       END IF
 
 *  See if positions are to be labelled on the graphics device.
@@ -710,8 +725,8 @@
 
 *  Produce the graphics.
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( IPW2 ), PLOT,
-     :                    GEO, IMARK, CLOSE, LABEL, IGRP2, %VAL( IPID ), 
-     :                    %VAL( IPW3 ), STATUS )
+     :                    GEO, IMARK, CLOSE, LABEL, IGRP2, JUST, 
+     :                    %VAL( IPID ), %VAL( IPW3 ), STATUS )
 
 *  Free work space used by KPS1_LSHPL.
  998     CONTINUE

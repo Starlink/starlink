@@ -98,6 +98,15 @@
 *        mouse prior to obtaining the first position. Note, these
 *        informational messages are not suppressed by setting parameter 
 *        QUIET to TRUE. [TRUE]
+*     JUST = LITERAL (Read)
+*        A string specifying the justification to be used when displaying 
+*        text strings at the supplied cursor positions. This parameter is 
+*        only accessed if parameter PLOT is set to "Text". The supplied
+*        string should contain two characters; the first should be "B",
+*        "C" or "T", meaning bottom, centre or top. The second should be
+*        "L", "C" or "R", meaning left, centre or right. The text is
+*        displayed so that the supplied position is at the specified 
+*        point within the displayed text string. [CC]
 *     LASTDIM = _INTEGER (Write)
 *        The number of axis values written to parameter LASTPOS.
 *     LASTPOS() = _DOUBLE (Write)
@@ -389,6 +398,8 @@
 *     28-AUG-1998 (DSB):
 *        Radical changes to use PGPLOT and AST for graphics and
 *        co-ordinate handling.
+*     14-DEC-1998 (DSB):
+*        Added parameter JUST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -436,6 +447,7 @@
       CHARACTER ATTRIB*20        ! Attribute name
       CHARACTER COMENT*256       ! Comment for the latest picture
       CHARACTER DOM*20           ! Domain of Current Frame in Plot
+      CHARACTER JUST*2           ! Justification for text strings
       CHARACTER KEYS*3           ! Keys which activate each cursor action
       CHARACTER LABEL*( SZNAM )  ! Picture label
       CHARACTER LINE*256         ! Text buffer for screen
@@ -593,6 +605,10 @@
             CALL ERR_ANNUL( STATUS )
             IGRP2 = GRP__NOID
          END IF
+
+*  Get teh justification for the strings.
+         CALL PAR_CHOIC( 'JUST', 'CC', 'BL,CL,TL,BC,CC,TC,BR,CR,TR',
+     :                   .TRUE., JUST, STATUS )
       END IF
 
 *  Abort if an error has occurred.
@@ -1094,7 +1110,8 @@
                GXY( 1 ) = DBLE( XC )
                GXY( 2 ) = DBLE( YC )
                CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, 
-     :                          GEO, .FALSE., .FALSE., TEXT, STATUS )
+     :                          GEO, .FALSE., .FALSE., TEXT, JUST, 
+     :                          STATUS )
             END IF
 
 *  Leave the loop if the maximum number of positions have been supplied.
@@ -1160,11 +1177,11 @@
                   IF( IMARK .NE. 8 ) THEN
                      CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
      :                                8, .FALSE., .FALSE., .FALSE., 
-     :                                ' ', STATUS )
+     :                                ' ', ' ', STATUS )
                   ELSE
                      CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
      :                                10, .FALSE., .FALSE., .FALSE., 
-     :                                ' ', STATUS )
+     :                                ' ', ' ', STATUS )
                   END IF
 
 *  Re-instate the original Plot attributes.
@@ -1241,7 +1258,7 @@
 
 *  Close any polygons or chains being drawn.
       CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, GEO, .TRUE.,
-     :                 CLOSE, TEXT, STATUS )
+     :                 CLOSE, TEXT, JUST, STATUS )
 
 *  Store the number of valid positions given in the output parameter
 *  NUMBER.
