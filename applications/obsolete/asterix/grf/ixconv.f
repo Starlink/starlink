@@ -41,6 +41,7 @@
 *     10 Jun 94 : V1.8-0  Imported into Asterix - cut workspace requirements
 *                         drastically. (DJA)
 *     29 Nov 94 : V1.8-1  Fixed memory corruption bug (DJA)
+*     20 Mar 95 : V1.8-2  Trap case where dataset1==2 (DJA)
 *
 *    Type Definitions :
 *
@@ -49,7 +50,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PRM_PAR'
 *
 *    Status :
@@ -63,9 +64,6 @@
 *    Local variables :
 *
       CHARACTER*132             HTXT(8)			! History text
-      CHARACTER*(DAT__SZLOC)	LOC1     		! ip data locator
-      CHARACTER*(DAT__SZLOC)	LOC2     		! ip 2 data locator
-      CHARACTER*(DAT__SZLOC)	OLOC     		! op data locator
       CHARACTER*40		XUNITS, YUNITS		! Axis units
       CHARACTER*70              XLABEL, YLABEL  	! Axis labels
 
@@ -78,9 +76,9 @@
       INTEGER			NLINES			! Amount of history
 
       INTEGER 				IDUM,M3,N3           ! Output dimensions
-      INTEGER DIMS1(DAT__MXDIM)           ! dimensions found in input array
-      INTEGER DIMS2(DAT__MXDIM)           ! dimensions found in input array
-      INTEGER ODIMS(DAT__MXDIM)           ! dimensions for output
+      INTEGER DIMS1(ADI__MXDIM)           ! dimensions found in input array
+      INTEGER DIMS2(ADI__MXDIM)           ! dimensions found in input array
+      INTEGER ODIMS(ADI__MXDIM)           ! dimensions for output
       INTEGER NDIMS1                  ! number found (should be 2)
       INTEGER NDIMS2                  ! number found (should be 2)
 
@@ -97,24 +95,26 @@
       INTEGER 			DPTR_1			! First dataset's data
       INTEGER 			DPTR_2			! Second dataset's data
       INTEGER 			IFAIL			! NAG status code
+      INTEGER			IFID1			! Input dataset 1
+      INTEGER			IFID2			! Input dataset 2
       INTEGER 			ODPTR			! Output data pointer
+      INTEGER			OFID			! Output dataset
       INTEGER 			ONDIM                  	! Output dimensionality
-      INTEGER			QDIMS(DAT__MXDIM)	! Quality dimensions
+      INTEGER			QDIMS(ADI__MXDIM)	! Quality dimensions
       INTEGER			QNDIM			! Quality dimensionality
       INTEGER 			SIZE			! Size of work arrays
 
       LOGICAL 			CYCLIC			! Cyclic mode?
       LOGICAL 			DC_RESTORE		! Restore DC level?
       LOGICAL 			OK			! General validity test
-      LOGICAL 			PRIM			! Primitive input?
       LOGICAL                   QOK1, QOK2		! Quality present?
+      LOGICAL			SAME			! Datasets are the same
 *
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'IXCONV Version 1.8-0' )
+        PARAMETER 		( VERSION = 'IXCONV Version 1.8-2' )
 *-
-
 
 *    Version announcement
       CALL MSG_PRNT( VERSION )
@@ -123,35 +123,35 @@
       CALL AST_INIT()
 
 *    Open first input dataset
-      CALL USI_ASSOCI( 'INP1', 'READ', LOC1, PRIM, STATUS )
-      CALL BDA_CHKDATA(LOC1,OK,NDIMS1,DIMS1,STATUS)
+      CALL USI_TASSOCI( 'INP1', '*', 'READ', IFID1, STATUS )
+      CALL BDI_CHKDATA(IFID1,OK,NDIMS1,DIMS1,STATUS)
       IF ( OK ) THEN
         IF ( NDIMS1 .NE. 2 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'First input is not 2-D', STATUS )
         ELSE
-          CALL BDA_MAPDATA( LOC1, 'READ', DPTR_1, STATUS )
+          CALL BDI_MAPDATA( IFID1, 'READ', DPTR_1, STATUS )
         END IF
       ELSE
         CALL ERR_REP( ' ', 'Invalid data in first dataset', STATUS )
       END IF
-      CALL BDA_CHKQUAL( LOC1, QOK1, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID1, QOK1, QNDIM, QDIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 * Open 2nd input dataset
-      CALL USI_ASSOCI('INP2','READ',LOC2,PRIM,STATUS)
-      CALL BDA_CHKDATA(LOC2,OK,NDIMS2,DIMS2,STATUS)
+      CALL USI_TASSOCI('INP2','*','READ',IFID2,STATUS)
+      CALL BDI_CHKDATA(IFID2,OK,NDIMS2,DIMS2,STATUS)
       IF (OK) THEN
         IF (NDIMS2.NE.2) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Second input is not 2-D', STATUS )
         ELSE
-          CALL BDA_MAPDATA(LOC2,'READ',DPTR_2,STATUS)
+          CALL BDI_MAPDATA(IFID2,'READ',DPTR_2,STATUS)
         END IF
       ELSE
         CALL ERR_REP( ' ', 'Invalid data in second dataset', STATUS )
       END IF
-      CALL BDA_CHKQUAL( LOC2, QOK2, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID2, QOK2, QNDIM, QDIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Warn if quality present
@@ -192,14 +192,14 @@
       N3 = ODIMS(2)
 
 *    Create new data array etc
-      CALL USI_ASSOCO( 'OUT', 'CONVOLUTION', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'CONVOLUTION', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Create data
-      CALL BDA_CREDATA(OLOC,ONDIM,ODIMS,STATUS)
+      CALL BDI_CREDATA(OFID,ONDIM,ODIMS,STATUS)
 
 *    Get input axes - if not regular assume pixels
-      CALL BDA_GETAXVAL( LOC1, 1, XBASE, XSCALE, IDUM, STATUS )
+      CALL BDI_GETAXVAL( IFID1, 1, XBASE, XSCALE, IDUM, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         XBASE = 0.5
@@ -208,10 +208,10 @@
         XUNITS = 'pixels'
         CALL MSG_PRNT( 'Unable to get X axis data, assuming pixels...' )
       ELSE
-        CALL BDA_GETAXLABEL( LOC1, 1, XLABEL, STATUS )
-        CALL BDA_GETAXUNITS( LOC1, 1, XUNITS, STATUS )
+        CALL BDI_GETAXLABEL( IFID1, 1, XLABEL, STATUS )
+        CALL BDI_GETAXUNITS( IFID1, 1, XUNITS, STATUS )
       END IF
-      CALL BDA_GETAXVAL( LOC1, 2, YBASE, YSCALE, IDUM, STATUS )
+      CALL BDI_GETAXVAL( IFID1, 2, YBASE, YSCALE, IDUM, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         YBASE = 0.5
@@ -220,33 +220,36 @@
         YUNITS = 'pixels'
         CALL MSG_PRNT( 'Unable to get Y axis data, assuming pixels...' )
       ELSE
-        CALL BDA_GETAXLABEL( LOC1, 2, YLABEL, STATUS )
-        CALL BDA_GETAXUNITS( LOC1, 2, YUNITS, STATUS )
+        CALL BDI_GETAXLABEL( IFID1, 2, YLABEL, STATUS )
+        CALL BDI_GETAXUNITS( IFID1, 2, YUNITS, STATUS )
       END IF
 
 *    Create axes
-      CALL BDA_CREAXES(OLOC,2,STATUS)
-      CALL BDA_PUTAXLABEL( OLOC, 1, 'Lag in '//XLABEL, STATUS )
-      CALL BDA_PUTAXLABEL( OLOC, 2, 'Lag in '//YLABEL, STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 1, XUNITS, STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 2, YUNITS, STATUS )
+      CALL BDI_CREAXES(OFID,2,STATUS)
+      CALL BDI_PUTAXLABEL( OFID, 1, 'Lag in '//XLABEL, STATUS )
+      CALL BDI_PUTAXLABEL( OFID, 2, 'Lag in '//YLABEL, STATUS )
+      CALL BDI_PUTAXUNITS( OFID, 1, XUNITS, STATUS )
+      CALL BDI_PUTAXUNITS( OFID, 2, YUNITS, STATUS )
       XBASE = REAL(-M3)/2.0 + 0.5
       YBASE = REAL(-N3)/2.0 + 0.5
       IF ( .NOT. CYCLIC ) THEN
         XBASE = XBASE - 0.5
         YBASE = YBASE - 0.5
       END IF
-      CALL BDA_PUTAXVAL(OLOC,1,XBASE*XSCALE,XSCALE,M3,STATUS)
-      CALL BDA_PUTAXVAL(OLOC,2,YBASE*YSCALE,YSCALE,N3,STATUS)
+      CALL BDI_PUTAXVAL(OFID,1,XBASE*XSCALE,XSCALE,M3,STATUS)
+      CALL BDI_PUTAXVAL(OFID,2,YBASE*YSCALE,YSCALE,N3,STATUS)
 
 *    Size of scratch arrays
       SIZE = M3*N3
+
+*    Are the datasets the same?
+      SAME = (DPTR_1.EQ.DPTR_2)
 
 *    Copy X to (centre of) X_Real, removing average; zero X_imaginary
       CALL DYN_MAPD( 2, ODIMS, WPTR_XR, STATUS )
       CALL IXCONV_COPY2( DIMS1(1), DIMS1(2), %VAL(DPTR_1), M3, N3,
      :                   %VAL(WPTR_XR), AVX, STATUS )
-c      CALL BDA_UNMAPDATA( LOC1, STATUS )
+c      CALL BDI_UNMAPDATA( IFID1, STATUS )
 
 *    Fill X_Imaginary array with zeroes
       CALL DYN_MAPD( 2, ODIMS, WPTR_XI, STATUS )
@@ -254,9 +257,14 @@ c      CALL BDA_UNMAPDATA( LOC1, STATUS )
 
 *    Copy Y to (centre of) Y_Real, removing average
       CALL DYN_MAPD( 2, ODIMS, WPTR_YR, STATUS )
-      CALL IXCONV_COPY2( DIMS2(1), DIMS2(2), %VAL(DPTR_2), M3, N3,
+      IF ( SAME ) THEN
+        CALL ARR_COP1D( M3*N3, %VAL(WPTR_XR), %VAL(WPTR_YR), STATUS )
+        AVY = AVX
+      ELSE
+        CALL IXCONV_COPY2( DIMS2(1), DIMS2(2), %VAL(DPTR_2), M3, N3,
      :                   %VAL(WPTR_YR), AVY, STATUS )
-      CALL BDA_UNMAPDATA( LOC2, STATUS )
+      END IF
+      CALL BDI_UNMAPDATA( IFID2, STATUS )
 
 *    Fill Y_Imaginary array with zeroes
       CALL DYN_MAPD( 2, ODIMS, WPTR_YI, STATUS )
@@ -286,14 +294,19 @@ c      CALL BDA_UNMAPDATA( LOC1, STATUS )
 
 *    Do FFT on Y array
       CALL MSG_PRNT( 'Transforming second input...' )
-      CALL C06FUF( M3, N3, %VAL(WPTR_YR), %VAL(WPTR_YI), 'S',
+      IF ( SAME ) THEN
+        CALL ARR_COP1D( M3*N3, %VAL(WPTR_XR), %VAL(WPTR_YR), STATUS )
+        CALL ARR_COP1D( M3*N3, %VAL(WPTR_XI), %VAL(WPTR_YI), STATUS )
+      ELSE
+        CALL C06FUF( M3, N3, %VAL(WPTR_YR), %VAL(WPTR_YI), 'S',
      :             %VAL(WPTR_TM), %VAL(WPTR_TN), %VAL(WPTR_S), IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-        CALL MSG_SETI( 'IFAIL', IFAIL )
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Error ^IFAIL in NAG routine C06FUF',
-     :                STATUS )
-        GOTO 99
+        IF ( IFAIL .NE. 0 ) THEN
+          CALL MSG_SETI( 'IFAIL', IFAIL )
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Error ^IFAIL in NAG routine C06FUF',
+     :                  STATUS )
+          GOTO 99
+        END IF
       END IF
 
 *    Perform convolution. We write our output into the WPTR_S array which is
@@ -351,10 +364,10 @@ c      CALL BDA_UNMAPDATA( LOC1, STATUS )
       END IF
 
 *    Map the output data array
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Bit of history here
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       HTXT(1) = 'Input 1 : {INP1}'
       HTXT(2) = 'Input 2 : {INP2}'
       IF ( CYCLIC ) THEN
@@ -369,7 +382,7 @@ c      CALL BDA_UNMAPDATA( LOC1, STATUS )
       END IF
       NLINES = 7
       CALL USI_TEXT( 3, HTXT, NLINES, STATUS )
-      CALL HIST_PTXT( OLOC, NLINES, HTXT, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, HTXT, STATUS )
 
 *    Copy the results to the output dataset. This is now a copy from double
 *    precision to single
