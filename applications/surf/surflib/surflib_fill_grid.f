@@ -71,6 +71,10 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.2  1998/05/20 19:18:36  timj
+*     Distinguish not having enough memory from not having a large
+*     enough grid.
+*
 *     Revision 1.1  1997/10/28 19:06:45  timj
 *     Initial revision
 *
@@ -180,7 +184,7 @@
 
       ELSE IF (IFAIL .EQ. 2) THEN
 
-         STATUS = SAI__ERROR
+         STATUS = SAI__WARN
          CALL ERR_REP(' ','SURFLIB_FILL_GRID: Index out of range',
      :        STATUS)
 
