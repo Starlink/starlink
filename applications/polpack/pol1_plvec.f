@@ -862,9 +862,14 @@
 *  Display the number of rows written to the catalogue.
       IF( MAKECT ) THEN
          CALL MSG_BLANK( STATUS )
-         CALL MSG_SETI( 'N', NVEC )
-         CALL MSG_OUT( 'POL1_PLVEC_1', '   ^N vectors written to '//
-     :                 'the output catalogue.', STATUS )
+         IF( NVEC .GT. 1 ) THEN 
+            CALL MSG_SETI( 'N', NVEC )
+            CALL MSG_OUT( 'POL1_PLVEC_1', '   ^N vectors written to '//
+     :                    'the output catalogue.', STATUS )
+         ELSE
+            CALL MSG_OUT( 'POL1_PLVEC_2', '   One vector written to '//
+     :                    'the output catalogue.', STATUS )
+         END IF
          CALL MSG_BLANK( STATUS )
       END IF
 

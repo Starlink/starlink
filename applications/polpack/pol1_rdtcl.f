@@ -65,19 +65,22 @@
       PARAMETER ( MXCOL = 30 )
 
 *  Local Variables:
-      CHARACTER CNAM( 30 )*(MXCOL)! Column names in Tcl file
-      CHARACTER CNAMCI( 30 )*(MXCOL)! Column names in ref catalogue
+      CHARACTER CNAM(MXCOL)*30   ! Column names in Tcl file
+      CHARACTER CNAMCI(MXCOL)*30 ! Column names in ref catalogue
+      CHARACTER DECNAM*30        ! Column names for DEC values
+      CHARACTER RANAM*30         ! Column names for RA values
       CHARACTER TEXT*(MXCOL*(VAL__SZD+3)+5)  ! A text buffer
-      CHARACTER WORDS( MXCOL )*(VAL__SZD+3) ! Words in a row of data 
+      CHARACTER WORDS(MXCOL)*(VAL__SZD+3) ! Words in a row of data 
+      INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
       INTEGER DECCOL             ! Zero based index of DEC column in Tcl file
+      INTEGER DECGID             ! Column id for DEC col
       INTEGER GI( MXCOL )        ! Column identifier in ref catalogue
       INTEGER GOTWCS             ! Non-zero if Tcl file has RA/DEC columns 
-      INTEGER L                  ! Column index in ref catalogue
       INTEGER II                 ! CAT identifier for a parameter
       INTEGER J                  ! Column index in tcl file
-      INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
       INTEGER JCOLCI( MXCOL )    ! Col no. in tcl file for eahc ref cat col
       INTEGER K                  ! Row index
+      INTEGER L                  ! Column index in ref catalogue
       INTEGER LSTAT              ! Secondary status value
       INTEGER NC                 ! Length of string
       INTEGER NCOL               ! No of columns in Tcl file
@@ -85,6 +88,7 @@
       INTEGER NROW               ! No of rows in tcl file 
       INTEGER NWRD               ! No. of words in a row of data from Tcl file 
       INTEGER RACOL              ! Zero-based index of RA column in Tcl file
+      INTEGER RAGID              ! Column id for RA col
       INTEGER START( MXCOL )     ! Word starts in a row of data from Tcl file 
       INTEGER STOP( MXCOL )      ! Word ends in a row of data from Tcl file 
       LOGICAL USEWCS             ! Add equinox/epoch parameters to output?
@@ -176,28 +180,22 @@
 
 *  If the input file contains WCS, see if we need to save the equinox and
 *  epoch in the output catalogue.
+      RAGID = -1
+      DECGID = -1
       IF( GOTWCS .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Get the ra and dec column indices in the Tcl file, convert from zero
-*  to one based.
-         CALL POL1_TCLGT( 'ra_col_', -1, TEXT, NC, STATUS )
-         CALL CHR_CTOI( TEXT, RACOL, STATUS )
-         RACOL = RACOL + 1
-
-         CALL POL1_TCLGT( 'dec_col_', -1, TEXT, NC, STATUS )
-         CALL CHR_CTOI( TEXT, DECCOL, STATUS )
-         DECCOL = DECCOL + 1
-
-*  Check that the conversions from text to integer went OK.
-         IF( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_STAT( LSTAT )
-            IF( LSTAT .EQ. SAI__OK ) THEN
-               CALL MSG_SETC( 'T', TEXT )
-               CALL ERR_REP( 'POL1_RDTCL_ERR4', 'Unable to interpret '//
-     :                       'string ''^T''.', STATUS )
+*  Get the ra and dec column indices in the Tcl file.
+         CALL POL1_COLNM( 'RA', .FALSE., RANAM, STATUS )
+         CALL POL1_COLNM( 'DEC', .FALSE., DECNAM, STATUS )
+         DO J = 1, NCOL
+            IF( CNAM( J ) .EQ. RANAM ) THEN
+               RACOL = J
+               RAGID = COLID( J )
+            ELSE IF( CNAM( J ) .EQ. DECNAM ) THEN
+               DECCOL = J
+               DECGID = COLID( J )
             END IF
-            GO TO 999
-         END IF
+         END DO
 
 *  See if the RA and DEC columns are needed in the output catalogue.
          USEWCS = .FALSE.
@@ -254,7 +252,7 @@
       END IF
 
 *  Read the row/column data into the catalogue.
-      CALL POL1_RDTDT( FILE, NCOL, COLID, CIOUT, STATUS )
+      CALL POL1_RDTDT( FILE, NCOL, COLID, RAGID, DECGID, CIOUT, STATUS )
 
 *  Arrive here if an error occurs.
  999  CONTINUE      

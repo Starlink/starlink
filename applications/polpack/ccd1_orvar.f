@@ -121,11 +121,11 @@
 *  Report an error if NSET is too big.
       IF( NSET .GT. CCD1__MXNDF ) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETI( 'N', NSET )
          CALL MSG_SETI( 'SZ', CCD1__MXNDF )
-         CALL ERR_REP( 'CCD1_ORVAR_1', 'The bin size is too big to '//
-     :                 'use the selected estimator. Only the MEAN '//
-     :                 'estimator may be used with bins containing '//
-     :                 'more than ^SZ pixels.', STATUS )
+         CALL ERR_REP( 'CCD1_ORVAR_1', 'Cannot combine ^N (>^SZ) '//
+     :                 'vectors with variances. Use the MEAN method '//
+     :                 'instead.', STATUS )
          GO TO 999
       END IF
 

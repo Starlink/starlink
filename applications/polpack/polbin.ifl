@@ -55,6 +55,15 @@ interface POLBIN
       helpkey     '*'
    endparameter
 
+   parameter      INTEGRATE
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     NO
+      prompt      'Integrate all input vectors into a single vector?'
+      helpkey     '*'
+   endparameter
+
    parameter      METHOD         
       type        'LITERAL'
       vpath       'PROMPT,CURRENT,DEFAULT'

@@ -30,6 +30,8 @@
 #include "merswrap.h"
 #include <tcl.h>
 
+#define DTOR 0.017453292519943295769
+
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
 
@@ -43,6 +45,7 @@ extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
 
 extern F77_SUBROUTINE(cat_rapnd)( INTEGER(ciout), INTEGER(status) );
 extern F77_SUBROUTINE(cat_put0r)( INTEGER(gid), REAL(val), LOGICAL(no), INTEGER(status) );
+extern F77_SUBROUTINE(cat_put0d)( INTEGER(gid), DOUBLE(dval), LOGICAL(no), INTEGER(status) );
 
 
 static Tcl_Interp *interp=NULL;
@@ -1326,8 +1329,9 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 
 
 F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
-                            INTEGER_ARRAY(COLID), INTEGER(CIOUT),
-                            INTEGER(STATUS) TRAIL(FILNAM) ){
+                            INTEGER_ARRAY(COLID), INTEGER(RAGID),
+                            INTEGER(DECGID), INTEGER(CIOUT), INTEGER(STATUS) 
+                            TRAIL(FILNAM) ){
 /*
 *  Name:
 *     POL1_TDTDT
@@ -1349,7 +1353,14 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 *     COLID( NCOL ) = INTEGER (Given)
 *        The CAT identifier for the column in which to store each Tcl
 *        column. Columns which are not required in the CAT catalogue
-*        should be assigned the value -1.
+*        should be assigned the value -1. All columns are assumed to be
+*        floating point. The precision of each is given by PREC.
+*     RAGID = INTEGER (Given)
+*        The CAT identifier for the RA column. Set to -1 if there is no
+*        RA column.
+*     DECGID = INTEGER (Given)
+*        The CAT identifier for the DEC column. Set to -1 if there is no
+*        DEC column.
 *     CIOUT = INTEGER (Returned)
 *        The CAT identifier for the output catalogue.
 *     STATUS = INTEGER (Given and Returned)
@@ -1373,6 +1384,8 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    GENPTR_CHARACTER(FILNAM)
    GENPTR_INTEGER(NCOL)
    GENPTR_INTEGER_ARRAY(COLID)
+   GENPTR_INTEGER(RAGID)
+   GENPTR_INTEGER(DECGID)
    GENPTR_INTEGER(CIOUT)
    GENPTR_INTEGER(STATUS)
 
@@ -1380,6 +1393,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    DECLARE_LOGICAL(no);
    DECLARE_INTEGER(gid);
    DECLARE_REAL(val);
+   DECLARE_DOUBLE(dval);
    char mess[255];
    char *file;
    int i, ok, n, use, nc;
@@ -1459,12 +1473,23 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
          if( *p ){
             *q = 0;
             if( numbuf[0] ) {
-               sscanf( numbuf, "%f", &val );
-
                gid = COLID[nc];
                if( gid != -1 ) {
-                  F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&val),
-                                 LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+/* Store most columns in single precision. */
+                  if( gid != *RAGID && gid != *DECGID ) {
+                     if( sscanf( numbuf, "%f", &val ) == 0 ) break;
+                     F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&val),
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+
+/* Convert RA and DEC values from hours/degs to radians as required by the 
+   CAT library, and store in double precision. */
+                  } else {
+                     if( sscanf( numbuf, "%lf", &dval ) == 0 ) break;
+                     dval *= DTOR;
+                     F77_CALL(cat_put0d)( INTEGER_ARG(&gid), DOUBLE_ARG(&dval),
+                                    LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                  }
                   if( *STATUS != SAI__OK ) break;
                }
                nc++;

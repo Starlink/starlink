@@ -44,6 +44,7 @@
 *     BOX( 2 ) = _REAL (Read)
 *        The x and y bin sizes. These values refer to the coordinate Frame 
 *        defined by columns "X" and "Y" and will usually be in units of pixels.
+*        This parameter is not accessed if parameter INTEGRATE is TRUE.
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity. The returned 
@@ -55,6 +56,10 @@
 *     IN = LITERAL (Read)
 *        The name of the input catalogue. A file type of .FIT is assumed
 *        if none is provided.
+*     INTEGRATE = LOGICAL_ (Read)
+*        If TRUE, then all the input vectors are placed in a single bin.
+*        In this case, parameter BOX is not used and the output catalogue 
+*        will contain only a single vector. [FALSE]
 *     METHOD = LITERAL (Read)
 *        The method to be used when binning Stokes parameters. This may be 
 *        set to any unique abbreviation of the following:
@@ -116,6 +121,8 @@
 *     14-MAR-2000 (DSB):
 *        Change the choice of bottom left corner of each bin so that the 
 *        origin of the (X,Y) Frame would correspond to a bin corner. 
+*     17-DEC-2000 (DSB):
+*        Added parameter INTEGRATE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -244,6 +251,7 @@
       INTEGER NYBIN              ! No. of output bins along Y axis
       LOGICAL CIRC               ! Doing circular polarimetry?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
+      LOGICAL INTGRT             ! Integrate all vectors?
       LOGICAL NULL1              ! Null value flag
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
@@ -265,7 +273,9 @@
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL U                     ! Stored U in input catalogue
       REAL X0                    ! X at bottom left of bottom left cell
+      REAL XC                    ! X at centre of input catalogue
       REAL Y0                    ! Y at bottom left of bottom left cell
+      REAL YC                    ! Y at centre of input catalogue
 *.
 
 *  Check the inherited global status.
@@ -432,7 +442,7 @@
       ELSE IF ( DEBIAS .AND. ( .NOT. VAR ) .AND. 
      :          STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLBIN_ERR3', 'Vectors will not be '/
+         CALL ERR_REP( 'POLBIN_2', 'Vectors will not be '/
      :                 /'corrected for statistical bias because no '/
      :                 /'variance values are available.', STATUS )
          CALL ERR_FLUSH( STATUS )
@@ -442,47 +452,87 @@
 *  Get the coefficients of the linear transformation from (X,Y) position
 *  to bin indices.
 *  =====================================================================
-*  Obtain the sizes of each bin.
-      CALL PAR_GDRVR( 'BOX', 2, 1.0E-6, VAL__MAXR, BOX, NVAL, STATUS )
-
-*  Duplicate the value if only a single value was given.  
-      IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
-
 *  Find the maximum and minimum X value.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPX ), NBAD, SXHI,
-     :                  SXLO, MAXPOS, MINPOS, STATUS )
+     :                     SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum Y value.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
-     :                  SYLO, MAXPOS, MINPOS, STATUS )
+     :                     SYLO, MAXPOS, MINPOS, STATUS )
+
+*  Find the coords of the centre.
+      XC = 0.5*( SXLO + SXHI )
+      YC = 0.5*( SYLO + SYHI )
+
+*  See if we are integrating all vectors into a single vector, or into a
+*  grid of vectors.
+      CALL PAR_GET0L( 'INTEGRATE', INTGRT, STATUS )
+
+*  If we are binning into a grid of boxes...
+      IF( .NOT. INTGRT ) THEN
+
+*  Obtain the sizes of each bin.
+         CALL PAR_GDRVR( 'BOX', 2, 1.0E-6, VAL__MAXR, BOX, NVAL, 
+     :                   STATUS )
+
+*  Duplicate the value if only a single value was given.  
+         IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
+
+*  Limit the box dimensions to be no bigger than the span of the data,
+*  plus 5%.
+         BOX( 1 ) = MIN( BOX( 1 ), INT( 1.05*( SXHI - SXLO ) ) )
+         BOX( 2 ) = MIN( BOX( 2 ), INT( 1.05*( SYHI - SYLO ) ) )
 
 *  Find the indices of the first and last bins on each axis. This
 *  assumes that the origin on each axis is at a bin edge.
-      IXLO = KPG1_FLOOR( SXLO / BOX( 1 ) )
-      IXHI = KPG1_CEIL( SXHI / BOX( 1 ) )
-      IYLO = KPG1_FLOOR( SYLO / BOX( 2 ) )
-      IYHI = KPG1_CEIL( SYHI / BOX( 2 ) )
+         IXLO = KPG1_FLOOR( SXLO / BOX( 1 ) )
+         IXHI = KPG1_CEIL( SXHI / BOX( 1 ) )
+         IYLO = KPG1_FLOOR( SYLO / BOX( 2 ) )
+         IYHI = KPG1_CEIL( SYHI / BOX( 2 ) )
 
 *  Find the number of bins along each axis.
-      NXBIN = IXHI - IXLO + 1
-      NYBIN = IYHI - IYLO + 1
+         NXBIN = IXHI - IXLO + 1
+         NYBIN = IYHI - IYLO + 1
 
 *  Find the total number of bins.
-      NBIN = NXBIN*NYBIN
+         NBIN = NXBIN*NYBIN
 
 *  Find the X and Y values corresponding to the bottom left corner of the 
-*  bottom left bin. AGain, this assumes that the origin on each axis is at
+*  bottom left bin. Again, this assumes that the origin on each axis is at
 *  a bin edge.
-      X0 = IXLO*BOX( 1 )
-      Y0 = IYLO*BOX( 2 )
+         X0 = IXLO*BOX( 1 )
+         Y0 = IYLO*BOX( 2 )
 
 *  Find the coefficients of the transformation. The X cell index for a
 *  position (X,Y) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
 *  index is given by INT( TR( 3 ) + TR( 4 )*Y ).
-      TR( 1 ) = 1.0 - X0/BOX( 1 )
-      TR( 2 ) = 1.0/BOX( 1 )
-      TR( 3 ) = 1.0 - Y0/BOX( 2 )
-      TR( 4 ) = 1.0/BOX( 2 )
+         TR( 1 ) = 1.0 - X0/BOX( 1 )
+         TR( 2 ) = 1.0/BOX( 1 )
+         TR( 3 ) = 1.0 - Y0/BOX( 2 )
+         TR( 4 ) = 1.0/BOX( 2 )
+
+*  Store the coefficients of the transformation from cell indices to
+*  (X,Y) coordinates at the cell centre.
+         TR2( 1 ) = X0 - 0.5*BOX( 1 )
+         TR2( 2 ) = BOX( 1 )
+         TR2( 3 ) = Y0 - 0.5*BOX( 2 )
+         TR2( 4 ) = BOX( 2 )
+
+*  If we are integrating all vectors in the catalogue, set up values which
+*  result in all vectors being placed in a single bin.
+      ELSE
+         NXBIN = 1
+         NYBIN = 1
+         NBIN = 1
+         TR( 1 ) = 1.0 
+         TR( 2 ) = 0.0
+         TR( 3 ) = 1.0 
+         TR( 4 ) = 0.0
+         TR2( 1 ) = XC
+         TR2( 2 ) = 0.0
+         TR2( 3 ) = YC
+         TR2( 4 ) = 0.0
+      END IF
 
 *  Now find the largest number of input positions inn any bin.
 *  ===========================================================
@@ -600,10 +650,17 @@
       CALL PSX_CALLOC( MXCNT, '_INTEGER', IPPNT, STATUS )
       CALL PSX_CALLOC( MXCNT, '_LOGICAL', IPUSED, STATUS )
 
-      IF( VAR ) THEN
+      IF( VAR .AND. METH .NE. 'MEAN' .AND. STATUS .EQ. SAI__OK ) THEN
          CALL PSX_CALLOC( MXCNT, '_DOUBLE', IPPP, STATUS )
          NMAT = MXCNT*( MXCNT + 1 )/2 
          CALL PSX_CALLOC( MXCNT*NMAT, '_DOUBLE', IPCOV, STATUS )
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'POLBIN_3', 'Try using METHOD=MEAN or '//
+     :                    'reducing the number of vectors', STATUS )
+         END IF
+      ELSE
+         IPPP = IPNCON
+         IPCOV = IPNCON
       END IF
 
 *  Allocate an array to hold the binned values. This array is accessed as 
@@ -730,8 +787,7 @@
 
 *  Get the reference direction for the output catalogue. This may be
 *  different to the reference direction for the input cube.
-      CALL POL1_ANGRT( IWCS, 0.5*( SXLO + SXHI ), 0.5*( SYLO + SYHI ),
-     :                 ANGRT, STATUS )
+      CALL POL1_ANGRT( IWCS, XC, YC, ANGRT, STATUS )
 
 *  Get the units string from total intensity column of the input catalogue.
       UNITS = ' '
@@ -763,13 +819,6 @@
 *  Now calculate the polarization parameters based on the binned Stokes
 *  parameters, storing them in the catalogue created above.
 *  ====================================================================
-*  Store the coefficients of the transformation from cell indices to
-*  (X,Y) coordinates at the cell centre.
-      TR2( 1 ) = X0 - 0.5*BOX( 1 )
-      TR2( 2 ) = BOX( 1 )
-      TR2( 3 ) = Y0 - 0.5*BOX( 2 )
-      TR2( 4 ) = BOX( 2 )
-
 *  Allocate work arrays.
       IF( EQMAP .NE. AST__NULL ) THEN
          CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
@@ -811,16 +860,6 @@
       CALL POL1_CLCAT( IWCS, CIOUT, STATUS )
 
 *  Release work space.
-      CALL PSX_FREE( IP, STATUS )
-      CALL PSX_FREE( IPW1, STATUS )
-      CALL PSX_FREE( IPIST, STATUS )
-      CALL PSX_FREE( IPWRK1, STATUS )
-      CALL PSX_FREE( IPWRK2, STATUS )
-      CALL PSX_FREE( IPNCON, STATUS )
-      CALL PSX_FREE( IPPNT, STATUS )
-      CALL PSX_FREE( IPUSED, STATUS )
-      CALL PSX_FREE( IPBIN, STATUS )
-
       IF( .NOT. CIRC ) THEN
          CALL PSX_FREE( IPQST, STATUS )
          CALL PSX_FREE( IPUST, STATUS )
@@ -830,8 +869,10 @@
 
       IF( VAR ) THEN
          CALL PSX_FREE( IPVIST, STATUS )
-         CALL PSX_FREE( IPPP, STATUS )
-         CALL PSX_FREE( IPCOV, STATUS )
+         IF( IPPP .NE. IPNCON ) THEN 
+            CALL PSX_FREE( IPPP, STATUS )
+            CALL PSX_FREE( IPCOV, STATUS )
+         END IF
          CALL PSX_FREE( IPVBIN, STATUS )
 
          IF( CIRC ) THEN
@@ -844,6 +885,16 @@
       ELSE
          CALL PSX_FREE( IPVAR, STATUS )
       END IF
+
+      CALL PSX_FREE( IP, STATUS )
+      CALL PSX_FREE( IPW1, STATUS )
+      CALL PSX_FREE( IPIST, STATUS )
+      CALL PSX_FREE( IPWRK1, STATUS )
+      CALL PSX_FREE( IPWRK2, STATUS )
+      CALL PSX_FREE( IPNCON, STATUS )
+      CALL PSX_FREE( IPPNT, STATUS )
+      CALL PSX_FREE( IPUSED, STATUS )
+      CALL PSX_FREE( IPBIN, STATUS )
 
 *  Release the input catalogue identifier.
       CALL CAT_TRLSE( CIIN, STATUS )

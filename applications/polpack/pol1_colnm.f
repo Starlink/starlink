@@ -120,6 +120,7 @@
       CHARACTER WORDS( 3 )*30    ! Words read from the config file
       INTEGER FD                 ! FIO identifier for open config file
       INTEGER I                  ! Loop count
+      INTEGER J                  ! Loop count
       INTEGER LINE               ! Current line number in config file
       INTEGER LSTAT              ! CHR local status value
       INTEGER NC                 ! Length of line read from config file
@@ -207,36 +208,68 @@
      :                             'configuration file ^F (should be '//
      :                             '2 or 3): ^L', STATUS )
 
-*  Check the internal name is known.
+*  See if this internal column already has an array entry.
                   ELSE
-                     DO I = 1, MXCOL         
-                        IF( WORDS( 2 ) .EQ. NAMES( I ) ) THEN 
-                           GO TO 10
+                     J = 0
+                     DO I = 1, NCOL
+                        IF( WORDS( 2 ) .EQ. NAME( I ) ) THEN 
+                           J = I
+                           GO TO 5
                         END IF
                      END DO
+ 5                   CONTINUE
 
-*  Arrive here if the internal name is not known.
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETC( 'Q', WORDS( 2 ) )
-                     CALL MSG_SETC( 'F', RCFILE )
-                     CALL MSG_SETC( 'N', RCFILE )
-                     CALL ERR_REP( 'POL1_COLNM_ERR1', 'Unknown '//
+*  If so, replace its external column name with the new value.
+                     IF( J .GT. 0 ) THEN
+                        IF( NWRD .EQ. 3 ) THEN
+                           COL( J ) = WORDS( 3 )
+                           CALL CHR_UCASE( COL( J ) )
+                        ELSE
+                           COL( J ) = ' '
+                        END IF
+      
+*  Otherwise, check the internal name is known.
+                     ELSE
+                        J = 0
+                        DO I = 1, MXCOL         
+                           IF( WORDS( 2 ) .EQ. NAMES( I ) ) THEN 
+                              J = I
+                              GO TO 10
+                           END IF
+                        END DO
+ 10                     CONTINUE
+
+*  Report an error if the internal name is not known.
+                        IF( J .EQ. 0 ) THEN 
+                           STATUS = SAI__ERROR
+                           CALL MSG_SETC( 'Q', WORDS( 2 ) )
+                           CALL MSG_SETC( 'F', RCFILE )
+                           CALL MSG_SETC( 'N', RCFILE )
+                           CALL ERR_REP( 'POL1_COLNM_ERR2', 'Unknown '//
      :                             'quantity ''^Q'' specified at line'//
      :                             ' ^N of POLPACK configuration file'//
      :                             ' ^F.', STATUS )
 
-
-*  The second word is the internal name and the third word (if any) is the
-*  external name.
- 10                  CONTINUE
-                     IF( STATUS .EQ. SAI__OK ) THEN 
-                        NCOL = NCOL + 1
-                        NAME( NCOL ) = WORDS( 2 )
-                        IF( NWRD .GT. 2 ) THEN 
-                           COL( NCOL ) = WORDS( 3 )
-                           CALL CHR_UCASE( COL( NCOL ) )
+*  Otherwise, add a new entry to the arrays.
                         ELSE
-                           COL( NCOL ) = ' '
+                           NCOL = NCOL + 1
+                           IF( NCOL .GT. MXCOL ) THEN
+                              STATUS = SAI__ERROR
+                              CALL MSG_SETI( 'N', MXCOL )
+                              CALL MSG_SETC( 'F', RCFILE )
+                              CALL ERR_REP( 'POL1_COLNM_ERR3', 'Too '//
+     :                                   'many column definitions in '//
+     :                                   'POLPACK configuration file '//
+     :                                   '''^F''.', STATUS )
+                           ELSE
+                              NAME( NCOL ) = WORDS( 2 )
+                              IF( NWRD .GT. 2 ) THEN 
+                                 COL( NCOL ) = WORDS( 3 )
+                                 CALL CHR_UCASE( COL( NCOL ) )
+                              ELSE
+                                 COL( NCOL ) = ' '
+                              END IF
+                           END IF
                         END IF
                      END IF
                   END IF
@@ -283,7 +316,7 @@
 *  Arrive here if the internal name is not known.
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'Q', INAME )
-            CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown '//
+            CALL ERR_REP( 'POL1_COLNM_ERR4', 'POL1_COLNM: Unknown '//
      :                 'quantity ''^Q'' supplied (programming error).', 
      :                 STATUS )
 
