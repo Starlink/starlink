@@ -35,7 +35,7 @@ FILES        = \
  StarArdLine.tcl StarArdList.tcl StarArdPixel.tcl StarArdPoly.tcl \
  StarArdPrim.tcl StarArdRect.tcl StarArdRotBox.tcl StarArdRow.tcl \
  StarArdTool.tcl GaiaBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
- StarEnterObject.tcl StarKeywordFile.tcl StarLabelCheck.tcl \
+ GaiaEnterObject.tcl StarKeywordFile.tcl StarLabelCheck.tcl \
  StarLabelCheckLabel.tcl StarLabelWidgetChild.tcl StarSTLFile.tcl \
  LabelButton.tcl GaiaPolUStyle.tcl GaiaPolUStats.tcl GaiaPolUSpec.tcl \
  GaiaPolUKey.tcl GaiaPolUInteg.tcl GaiaPolUHigh.tcl GaiaPolUCols.tcl \
