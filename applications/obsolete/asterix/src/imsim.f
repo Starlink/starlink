@@ -59,6 +59,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     14 Dec 94 : V1.8-1 Test to see if corrected model (DJA)
 *     28 Mar 95 : V1.8-2 New data interface (DJA)
+*     15 Nov 95 : V2.0-0 Full ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -104,6 +105,7 @@
       REAL              	MTOT                   	! Total valid data in model
       REAL              	NSNORM                 	! # source >= SNORM in AREA
       REAL              	PSIZE                  	! Pixel size - quantum of lists
+      REAL			SPARR(2)		! Spaced axis data
       REAL              	SPOS(MAXSRC*2)         	! Source positions
       REAL			TEFF			! Model exposure time
       REAL              	TOR                    	! Radian conversion factor
@@ -117,6 +119,7 @@
       INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
       INTEGER           	FFILE                  	! Index of first file
       INTEGER			FOFID			! 1st output dataset id
+      INTEGER			IDUM			!
       INTEGER           	IFILE                  	! Loop over files
       INTEGER           	ISRC                   	! Loop over sources
       INTEGER           	IWID                   	! Loop over widths
@@ -126,8 +129,6 @@
       INTEGER			MFID			! Model dataset
       INTEGER           MIPTR                  ! Model probability index ptr
       INTEGER			MPSF			! Model psf handle
-      INTEGER           MQNDIM                 ! Model quality dimensionality
-      INTEGER           	MQDIMS(ADI__MXDIM)     	! Model quality dims
       INTEGER           	MQPTR                  	! Model quality ptr
       INTEGER           	NPT                    	! # points in position lists
       INTEGER           	NBACK                  	! # background counts
@@ -165,7 +166,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 1.8-2' )
+        PARAMETER       ( VERSION = 'IMSIM Version 2.0-0' )
 *
 *    Local Data:
 *
@@ -210,14 +211,12 @@
       PDEV = (.NOT.SEED_GIVEN)
 
 *    Prompt for the background counts in field
-      CALL USI_GET0C( 'MODEL', MODEL, STATUS )
+      CALL USI_ASSOC( 'MODEL', 'BinDS', 'READ', MFID, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Try to open it
-        CALL ADI_FOPEN( MODEL, '*', 'READ', MFID, STATUS )
-
 *      Check dimensions and map
-        CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS, STATUS )
+        CALL BDI_CHK( MFID, 'Data', OK, STATUS )
+        CALL BDI_GETSHP( MFID, 2, DIMS, NDIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Check dimensionality
@@ -232,17 +231,12 @@
 
 *      Map model array
         NELM = DIMS(1)*DIMS(2)
-        CALL BDI_MAPDATA( MFID, 'READ', MDPTR, STATUS )
+        CALL BDI_MAPR( MFID, 'Data', 'READ', MDPTR, STATUS )
 
 *      Quality present?
-        CALL BDI_CHKQUAL( MFID, OK, MQNDIM, MQDIMS, STATUS )
+        CALL BDI_CHK( MFID, 'Quality', OK, STATUS )
         IF ( OK ) THEN
-          CALL BDI_MAPLQUAL( MFID, 'READ', ANYBAD, MQPTR, STATUS )
-          IF ( ANYBAD ) THEN
-            CALL MSG_OUT( ' ', 'Using model quality array...', STATUS )
-          ELSE
-            CALL BDI_UNMAPLQUAL( MFID, STATUS )
-          END IF
+          CALL BDI_MAPL( MFID, 'LogicalQuality', 'READ', MQPTR, STATUS )
         END IF
 
 *      Map memory for index
@@ -296,9 +290,15 @@
         CALL PSF_INTRO( MFID, MPSF, STATUS )
 
 *      Get axis details
-        CALL BDI_GETAXVAL( MFID, 1, XBASE, XSCALE, NVAL, STATUS )
-        CALL BDI_GETAXVAL( MFID, 2, YBASE, YSCALE, NVAL, STATUS )
-        CALL BDI_GETAXUNITS( MFID, 1, UNITS, STATUS )
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, IDUM,
+     :                     STATUS )
+        XBASE = SPARR(1)
+        XSCALE = SPARR(2)
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, IDUM,
+     :                     STATUS )
+        YBASE = SPARR(1)
+        YSCALE = SPARR(2)
+        CALL BDI_AXGET0C( MFID, 1, 'Units', UNITS, STATUS )
 
 *      Output dimensions
         ONDIM = NDIM
@@ -306,7 +306,6 @@
         ODIMS(2) = DIMS(2)
 
 *      Unmap model values
-        CALL BDI_UNMAP( MFID, STATUS )
         PSIZE = ABS(XSCALE)
         MOK = .TRUE.
 
@@ -525,21 +524,20 @@
 
 *        Commit the axis description to BDA structures
           IF ( MOK ) THEN
-            CALL BDI_COPAXES( MFID, OFID, STATUS )
+            CALL BDI_AXCOPY( MFID, 1, ' ', OFID, 1, STATUS )
+            CALL BDI_AXCOPY( MFID, 2, ' ', OFID, 1, STATUS )
           ELSE
-            CALL BDI_CREAXES( OFID, ONDIM, STATUS )
-            CALL BDI_CREAXVAL( OFID, 1, .TRUE., ODIMS(1), STATUS )
-            CALL BDI_CREAXVAL( OFID, 2, .TRUE., ODIMS(2), STATUS )
-            CALL BDI_PUTAXVAL( OFID, 1, XBASE, XSCALE, ODIMS(1),
-     :                         STATUS )
-            CALL BDI_PUTAXVAL( OFID, 2, YBASE, YSCALE, ODIMS(2),
-     :                         STATUS )
-            CALL BDI_PUTAXTEXT( OFID, 1, 'X position', UNITS, STATUS )
-            CALL BDI_PUTAXTEXT( OFID, 2, 'Y position', UNITS, STATUS )
+            SPARR(1) = XBASE
+            SPARR(2) = XSCALE
+            CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+            SPARR(1) = YBASE
+            SPARR(2) = YSCALE
+            CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
+            CALL BDI_AXPUT0C( OFID, 1, 'Label', 'X position', STATUS )
+            CALL BDI_AXPUT0C( OFID, 1, 'Units', UNITS, STATUS )
+            CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Y position', STATUS )
+            CALL BDI_AXPUT0C( OFID, 2, 'Units', UNITS, STATUS )
           END IF
-
-*        Create the data
-          CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
 
 *        Write timing
           IF ( TIMID .NE. ADI__NULLID ) THEN
@@ -554,7 +552,7 @@
           END IF
 
 *        Write data units
-          CALL BDI_PUTUNITS( OFID, 'counts', STATUS )
+          CALL BDI_PUT0C( OFID, 'Units', 'counts', STATUS )
 
 *        Associate psf if first time through
           IF ( NSRC .GT. 0 ) THEN
@@ -573,7 +571,7 @@
         END IF
 
 *      Map output data
-        CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
         CALL ARR_INIT1R( 0.0, ODIMS(1)*ODIMS(2), %VAL(ODPTR), STATUS )
 
 *      Dump counts to user
@@ -604,8 +602,7 @@
      :                  XPOS, YPOS, NOUT, STATUS )
 
 *      Always unmap data and release from BDA
-	CALL BDI_UNMAPDATA( OFID, STATUS )
-        CALL BDI_RELEASE( OFID, STATUS )
+	CALL BDI_UNMAP( OFID, 'Data', ODPTR, STATUS )
 
 *      Close if not first file
         IF ( (IFILE.GT.1) .OR. (IFILE.EQ.NFILE) ) THEN
@@ -619,7 +616,6 @@
 
 *    Free model
       IF ( MOK ) THEN
-        CALL BDI_RELEASE( MFID, STATUS )
         CALL ADI_FCLOSE( MFID, STATUS )
       END IF
 
