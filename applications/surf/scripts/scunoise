@@ -17,7 +17,7 @@
 #
 #   SCCS Data           : @(#)
 #       Module Name     : scunoise
-#       Version Number  : 1.0
+#       Version Number  : 1.5
 #       Release Number  : 1
 #       Last Updated    : 02/03/98
 #
@@ -30,6 +30,12 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.5  1998/11/20 02:12:13  timj
+#        Fix domain names. Make sure works with output of SURF REDUCE_NOISE (rpt)
+#
+#        Revision 1.5  1998/11/19 12:24:00  rpt
+#        Allow SURF noise files and accept changed domain names at JAC 
+#
 #        Revision 1.4  1998/06/17 03:51:51  timj
 #        Correct docs
 #
@@ -57,11 +63,13 @@ use vars qw/$MW $PW $OP $OM $CP $C $FONT $BW $BC $rf $mr $accept/;
 #---------------------------------------------------------------------------
 
 my ($prog, $rest) = reverse(split(/\//,"$0",2));
-my $version = "1.0";
+my $version = "1.5";
 
 my($host, $domain);
 chomp(($host,$rest) = split(/\./,`uname -n`,2));
-chomp(($domain,$rest) = split(/\./,`domainname`,2));
+chomp(($domain) = `domainname`);
+$domain =~ s/JAC\.//;
+($domain,$rest) = split(/\./,$domain,2);
 
 # Get arguments 
 ($v) && do { &ver_text; exit; };
@@ -79,6 +87,7 @@ $datadir = "'jac_default_directories'" if ($datadir eq "");
 # Scuba_prefix (obsdate)
 my ($us, $um, $uh, $md, $mo, $yy, $wd, $yd, $isdst) = gmtime(time);
 my $obsdate = $ENV{'SCUBA_PREFIX'};
+$obsdate = "" unless ($obsdate =~ /^\d{8}$/);
 
 # If no Scuba prefix, try extract from DATADIR
 if ($datadir =~ !/jac_default/ && $obsdate eq "") {
@@ -224,7 +233,7 @@ sub set_disks {
   }
 
   push(@disk,".");
-  if ($domain eq "jach") {
+  if ($domain eq "jach" || $domain eq "Hilo") {
     push(@disk,"/net/luu/scubadata/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
@@ -680,7 +689,8 @@ sub scandisk {
     while ($found == 0 && $i <= $#disk) {
 	@runlist = ();
 
-        if ($disk[$i] =~ /mwt/i && $domain eq "jach" && defined $OP) {
+        if ($disk[$i] =~ /mwt/i && ($domain eq "jach" || $domain eq "Hilo")
+				    && defined $OP) {
             $OM->delete('1.0','end');
 	    $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
             $OM->update('idletasks');
@@ -793,7 +803,8 @@ sub getfile {
 	$i = 0;
 	while ($found == 0 && $i <= $#disk) {
 
-	    if ($disk[$i] =~ /mwt/i && $domain eq "jach" && defined $OP) {
+	    if ($disk[$i] =~ /mwt/i && ($domain eq "jach" || $domain eq "Hilo")
+		&& defined $OP) {
 	      $OM->delete('1.0','end');
 	      $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
 	      $OM->update('idletasks');
@@ -875,24 +886,43 @@ sub rddata {
     # Extract the information from the file.
     @noiseentry = ();
     $i = 0;
+    $surf_header = 0;
     while ($i <= $#log) {
 
 	$line = $log[$i];
+        $surf_header = 1 if ($i == 0 && $line =~ /surf/i);
 
-	# Get the source
-	if ( $line =~ /^source/ ) {
+        if ($surf_header) {
+      	  if ( $line =~ /source/i ) {
+	    ($rest, $source) = split(/:/,"\L$line",2);
+            $source =~ s/\s+//g;
+	    $i++;
+	    next;    
+          # Get HST
+	  } elsif ($line =~ /time of observation/i) {
+	    ($rest, $hst) = split(/:/,$line,2);
+            $hst =~ s/\s+//g;
+	    $hst = substr($hst,0,8);
+	    $i++;
+	    next;
+	  }
+	} else {
+	  # Get the source
+	  if ( $line =~ /^source/ ) {
 	    $line =~ s/^\s+//;
 	    $line =~ s/\s+/ /g;
 	    ($rest, $source) = split(/ /,$line,2);
 	    $i++;
 	    next;
-	} elsif ($line =~ /^! / && substr($line,2,5) ne 'NOISE') {
+          # Get HST
+	  } elsif ($line =~ /^! / && substr($line,2,5) ne 'NOISE') {
 	    $hst = substr($line,13,8);
 	    $i++;
 	    next;
+	  }
 	}
 
-	# Skip the first header lines
+	# Skip the other header lines
 	unless ( $line =~ /^[A-I]\d/ ) {
 	    $i++;
 	    next;
