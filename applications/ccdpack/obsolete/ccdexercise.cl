@@ -293,8 +293,8 @@ begin
    print "  transformation types. It also writes the information into the"
    print "  images so that other routines may use it."
    print " "
-   register ( inlist="reduced_data?.imh", refpos=1, outformat=wcs, 
-              outdomain=ccd_reg, fittype=2 )
+   register ( inlist="reduced_data?.imh", refpos=1, outformat="wcs", 
+              outdomain="ccd_reg", fittype=2 )
 
    #  Export the registration information to an AST file.
    print " "
@@ -307,7 +307,7 @@ begin
    }
    astexp ( in="reduced_data?.imh", astfile="ccdexercise.ast", 
             idtype="fitsid", fitsid="ISEQ", outdomain="matched",
-            outtitle=INDEF, baseframe=axis )
+            outtitle=INDEF, baseframe="axis" )
 
    #  Resample the data.
    print " "
