@@ -454,12 +454,12 @@ C	  STPTIME = 1.1E6
         ODIMS(E_AX) = DIMS(E_AX)
 
 *    Copy the slice that you want into the output array
-        CALL DYN_MAPR( 1, EDIM, WPTR, STATUS )
+        CALL DYN_MAPR( 1, DIMS(E_AX), WPTR, STATUS )
         CALL DTA_COPYSLICER( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                 %VAL(IDPTR), AMIN, AMAX, ORD, ODIMS(1), ODIMS(2),
      :                 ODIMS(3), ODIMS(4), %VAL(WPTR) )
         IDPTR = WPTR
-        CALL DYN_MAPR( 1, EDIM, WPTR, STATUS )
+        CALL DYN_MAPR( 1, DIMS(E_AX), WPTR, STATUS )
         CALL DTA_COPYSLICER( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                 %VAL(IEPTR), AMIN, AMAX, ORD, ODIMS(1), ODIMS(2),
      :                 ODIMS(3), ODIMS(4), %VAL(WPTR) )
@@ -487,7 +487,7 @@ C	  STPTIME = 1.1E6
      :             'Corrections scaling factor', STATUS )
 
 *  Number of raw detector channels
-      CALL ADI2_PKEY0I( OPHA, 'SPECTRUM', 'DETCHANS', EDIM,
+      CALL ADI2_PKEY0I( OPHA, 'SPECTRUM', 'DETCHANS', DIMS(E_AX),
      :             'Total number of raw detector channels', STATUS )
 
 *  Is the spectrum corrected?
@@ -527,7 +527,7 @@ C	  STPTIME = 1.1E6
      :               STATUS )
       CALL ADI2_PKEY0I( OPHA, 'SPECTRUM', 'TLMIN1', 1,
      :              'Lowest legal channel number', STATUS )
-      CALL ADI2_PKEY0I( OPHA, 'SPECTRUM', 'TLMAX1', EDIM,
+      CALL ADI2_PKEY0I( OPHA, 'SPECTRUM', 'TLMAX1', DIMS(E_AX),
      :              'Highest legal channel number', STATUS )
       CALL ADI2_PKEY0C( OPHA, 'SPECTRUM', 'RESPFILE', OUTRSP(:OLEN),
      :             'Redistribution matrix file (RMF)', STATUS )
@@ -538,21 +538,22 @@ C	  STPTIME = 1.1E6
       CALL WCI_PUTIDS( OPHA, PIXID, PRJID, SYSID, STATUS )
       CALL DCI_PUTID( OPHA, DETID, STATUS )
       CALL TCI_PUTID( OPHA, TIMID, STATUS )
-      CALL ADI2_DEFBTB( OPHA, 'SPECTRUM', EDIM, NFIELDS, TTYPE,
+      CALL ADI2_DEFBTB( OPHA, 'SPECTRUM', DIMS(E_AX), NFIELDS, TTYPE,
      :                  TFORM, TUNIT, 0, STATUS )
 
 *  Write the spectrum
       CALL ADI2_GETLUN( OPHA, LUN, STATUS )
-      CALL FTPCLE( LUN, 1, 1, 1, EDIM, %VAL(EAPTR), STATUS )
-      CALL FTPCLE( LUN, 2, 1, 1, EDIM, %VAL(IDPTR), STATUS )
+      CALL FTPCLE( LUN, 1, 1, 1, DIMS(E_AX), %VAL(EAPTR), STATUS )
+      CALL FTPCLE( LUN, 2, 1, 1, DIMS(E_AX), %VAL(IDPTR), STATUS )
       IF ( ERROK ) THEN
-        CALL FTPCLE( LUN, ERRCOL, 1, 1, EDIM, %VAL(IEPTR), STATUS )
+        CALL FTPCLE( LUN, ERRCOL, 1, 1, DIMS(E_AX), %VAL(IEPTR),
+     :                                                  STATUS )
       END IF
 
 *  Write quality
       IF ( QUALOK ) THEN
-        DO I = 1, EDIM
-          CALL ARR_ELEM1L( IQPTR, EDIM, I, LVAL, STATUS )
+        DO I = 1, DIMS(E_AX)
+          CALL ARR_ELEM1L( IQPTR, DIMS(E_AX), I, LVAL, STATUS )
           IF ( LVAL ) THEN
             CALL FTPCLJ( LUN, QUALCOL, I, 1, 1, XSP_OK, STATUS )
           ELSE
@@ -560,7 +561,7 @@ C	  STPTIME = 1.1E6
           END IF
         END DO
       ELSE IF ( NIGNORE .GT. 0 ) THEN
-        DO I = 1, EDIM
+        DO I = 1, DIMS(E_AX)
           CALL FTPCLJ( LUN, QUALCOL, I, 1, 1, XSP_OK, STATUS )
         END DO
       END IF
