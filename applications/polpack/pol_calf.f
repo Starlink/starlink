@@ -289,7 +289,7 @@
                   CALL MSG_OUT( ' ', STRING, STATUS )
                ENDIF
             ELSE
-               CALL ERR_FLUSH( STATUS )
+               CALL ERR_ANNUL( STATUS )
             ENDIF
          ENDIF
             
@@ -361,7 +361,7 @@
                   CALL MSG_OUT( ' ', STRING, STATUS )
                ENDIF
             ELSE
-               CALL ERR_FLUSH( STATUS )
+               CALL ERR_ANNUL( STATUS )
             ENDIF
          ENDIF
       ENDDO

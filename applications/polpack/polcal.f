@@ -712,7 +712,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
       CALL NDF_XPT0C( PLANES( : UBND( 3 ) - LBND( 3 ) + 1 ), NDFOUT, 
      :                'POLPACK', 'STOKES', STATUS ) 
-      CALL DAT__ANNUL( XLOC, STATUS )         
+      CALL DAT_ANNUL( XLOC, STATUS )         
 
 * Map the output DATA array and if necessary, the VARIANCE array.
       CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, NOUT,
