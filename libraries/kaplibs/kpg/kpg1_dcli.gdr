@@ -67,7 +67,9 @@
 *        Original version.
 *     1991 June 14 (MJC):
 *        Converted to generic.
-*     {enter_changes_here}
+*     1992 March 31 (MJC):
+*        Checked for significant dimensions.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -112,6 +114,7 @@
      :  LBND( NDF__MXDIM ),    ! Lower bounds of the NDF
      :  NDIMS,                 ! Number of dimensions possessed by the
                                ! NDF
+     :  SGDIM( NDF__MXDIM ),   ! Significant dimensions of the NDF
      :  UBND( NDF__MXDIM )     ! Upper bounds of the NDF
 
       CHARACTER
@@ -127,12 +130,13 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Obtain the bounds of the NDF.  The lower bound is needed to compute
-*    the linear offset between world and data co-ordinates.  The scale
-*    only needs the number of pixels which is derived by mapping the
-*    axis.
+*    Obtain the significant dimensions and bounds of the NDF.  The
+*    lower bound is needed to compute the linear offset between world
+*    and data co-ordinates.  The scale only needs the number of pixels
+*    which is derived by mapping the axis.
 
-      CALL NDF_BOUND( NDF, NDIM, LBND, UBND, NDIMS, STATUS )
+      CALL KPG1_SGDIM( NDF, NDIM, SGDIM, STATUS )
+      CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *    Assume that the data co-ordinates are linear and all have the
 *    identity transformation, i.e. unit scale factor and zero offset.
@@ -152,7 +156,7 @@
 
 *       Map the axis centres for the dimension.
 
-         CALL NDF_AMAP( NDF, 'Centre', I, ATYPE, 'READ',
+         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), ATYPE, 'READ',
      :                  AXPNTR, AEL, STATUS )
 
 *       Find the range of the axis co-ordinates and whether or
@@ -182,7 +186,7 @@
             SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) /
      :                   NUM_ITO<T>( AEL - 1 )
             OFFSET( I ) = DALBND( I ) - SCALE( I ) *
-     :                    NUM_ITO<T>( LBND( I ) )
+     :                    ( NUM_ITO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
 
 *          Correct the lower and upper bounds data co-ordinates.
 *          Current values are for the array-element centres, whereas the
@@ -202,7 +206,7 @@
 
 *       Unmap the axis co-ordinates.
 
-         CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
+         CALL NDF_AUNMP( NDF, 'Centre', SGDIM( I ), STATUS )
 
       END DO
 
