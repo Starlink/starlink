@@ -39,7 +39,7 @@ read_gsd.f sgsdclose.f sgsdlist.f sgsdlocate.f \
 sgsdopen.f sgsdreopen.f sgsdv4data.f sgsdv4header.f \
 sgsdv51data.f sgsdv52data.f sgsdv5data.f \
 sgsdv5header.f wrfitscube.f wrfitsmap.f wrfitsspec.f write_gildas.f \
-set_datadir.f
+set_datadir.f switch_date.f
 
 
 CSOURCES = bswap.c wbswap.c
@@ -146,4 +146,4 @@ sgsdv5data.o:    STAKPAR STACKCOMM FLAGCOMM SPECX_PARS \
 sgsdv5header.o:  FLAGCOMM STACKCOMM GSD_INDEX.INC GSD_FILE.INC GSD_VAR.INC
 rd_gsd_ras.o:    FLAGCOMM STACKCOMM STAKPAR GSD_VAR.INC GSD_FILE.INC
 set_datadir.o:   SAE_PAR PSX_ERR
-
+switch_date.o:   SAE_PAR PSX_ERR

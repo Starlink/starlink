@@ -3,8 +3,10 @@
 *        Added CONVERT-VAX-FILE as COMMS(23).
 *     30 Dec 1993 (rp)
 *        Moved CONVERT-VAX-FILE to end (out of SCL block of commands)
-*     03 March 1993 (timj)
+*     03 March 2003 (timj)
 *        Add SET-DATA-DIRECTORY
+*     18 March 2003 (rpt)
+*        Add SWITCH-DATE
 C-----------------------------------------------------------------------------
 
       BLOCK DATA COMMANDS
@@ -13,7 +15,7 @@ C   Sets up values of command strings
 
       INCLUDE 'COMMAND_TABLE'
 
-      DATA NFUNC/178/
+      DATA NFUNC/179/
       DATA (COMMS(I),I=1,10) /
      &                        'IF',
      &                        'ELSEIF',
@@ -205,7 +207,8 @@ C   Sets up values of command strings
      &                        'DAS-MERGE',
      &                        'MERGE-FILES',
      &                        'SET-DATA-DIRECTORY',
-     &                         2*' '/
+     &                        'SWITCH-DATE',
+     &                         1*' '/
 
 C  Rest of symbol table
 

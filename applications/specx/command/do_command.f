@@ -77,8 +77,10 @@
 *        Add , to some FORMAT statements
 *        Additional LOGDUM argument for DASMERGE
 *        Declare EXTERNAL MERGE
-*      3 Mar 2002 (timj)
+*      3 Mar 2003 (timj)
 *        Add SET-DATA-DIRECTORY
+*     18 Mar 2003 (rpt)
+*        Add SWITCH-DATE
 C-----------------------------------------------------------------------
 
       LOGICAL FUNCTION DO_COMMAND (PROCEDURE, COMMAND, IFAIL)
@@ -356,6 +358,13 @@ C------------------
 
        ELSE IF (COMMAND.EQ.'SET-DATA-DIRECTORY') THEN
          CALL SET_DATADIR (IFAIL)
+
+C------------------
+C  SWITCH_DATE
+C------------------
+
+       ELSE IF (COMMAND.EQ.'SWITCH-DATE') THEN
+         CALL SWITCH_DATE (IFAIL)
 
 C------------------
 C  INDEX-GSD-FILES
