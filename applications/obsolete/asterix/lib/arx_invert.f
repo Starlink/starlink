@@ -135,14 +135,16 @@
 *  simple circle
         IF (NCIRC.EQ.1) THEN
           SHAPE='CIRCLE'
-          C1=INDEX(TEXT,'(')
-          C2=INDEX(TEXT(C1:),')')
+          C1=INDEX(TEXT,'(')+1
+          C2=INDEX(TEXT(C1:),')')-1
           DO IC=C1,C2
             IF (TEXT(IC:IC).EQ.',') THEN
               TEXT(IC:IC)=' '
             ENDIF
           ENDDO
-          READ(TEXT(C1+1:C2-1),*) PAR(1),PAR(2),PAR(3)
+	print *,text(c1:c2)
+        call flush(6)
+          READ(TEXT(C1:C2),*) PAR(1),PAR(2),PAR(3)
 
 	print *,par(1),par(2),par(3)
         call flush(6)
