@@ -215,6 +215,12 @@ while (($key, $value) = each %retained) {
    $scb .= "$key=$value" . '&amp;';
 }
 
+#  Set up URL of top level of browser - same as current value of $scb but
+#  may need an unused '?' removing.
+
+$scb_top = $scb;
+$scb_top =~ s/\?$//;
+
 #  Initialise index objects containing locations of functions and files.
 
 my $iname;
@@ -291,7 +297,7 @@ if ($name && $type ne 'regex') {
 }
 elsif ($name && $type eq 'regex') {
 
-#  Name has been supplied as a search term.
+#  Name has been supplied as a regular expression.
 
    regex_validate $name;
    if ($html) {
@@ -544,7 +550,7 @@ sub query_form {
    $radio{''}      = "<input type=radio name=type value=''>"
                    . "&nbsp;Either";
    $radio{'regex'} = "<input type=radio name=type value='regex'>"
-                   . "&nbsp;Search&nbsp;term";
+                   . "&nbsp;Regular&nbsp;expression";
    $radio{$type} =~ s/>/ checked>/;
 
    print "Type of item:\n";
@@ -1011,7 +1017,7 @@ sub regex_validate {
 #     Call error reporting routine.
 
       error "Invalid regular expression '$prregex'",
-         "The search term you entered is not a valid Perl 5 regular expression.
+         "The term you entered is not a valid Perl 5 regular expression.
           Perl generated the error <blockquote><code>$@</code></blockquote>\n";
    }
 
@@ -1526,6 +1532,10 @@ sub output {
             <hr><i>
             Copyright &copy; $year Central Laboratory of the Research Councils
             </i>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href=${scb}package=$package>$package</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href=$scb_top>SCB</a>
          " unless ($copyright);
          footer;
       }
