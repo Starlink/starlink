@@ -1775,8 +1775,8 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         ENDIF
 
 
-c        X_HWIDTH=NPIX(CBORDX)
-c        Y_HWIDTH=NPIX(CBORDY)
+        X_HWIDTH=NPIX(ABS(XW2-XW1))
+        Y_HWIDTH=NPIX(ABS(YW2-YW1))
 C        SRT.PHI=0.0
 C        SRT.ELAMIN=0.0
 C        SRT.ELBMIN=0.0
@@ -2027,8 +2027,8 @@ c        SRT.ELBMAX=Y_HWIDTH
 *   Select ranges to change (3-7)
       CALL USI_GET0C('RANGES',RANGES,STATUS)
 *
-*   Use default ranges if a null (!) has been entered
-      IF (STATUS .EQ. PAR__NULL) CALL ERR_ANNUL(STATUS)
+*   Use default ranges if zero or a null (!) has been entered
+      IF (RANGES.EQ.0.OR.STATUS.EQ.PAR__NULL) CALL ERR_ANNUL(STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -2471,6 +2471,9 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
                 CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
      :                                              TMAT,XW,YW,STATUS)
             ENDIF
+
+            BX_HWIDTH=NPIX(ABS(XW2-XW1))
+            BY_HWIDTH=NPIX(ABS(YW2-YW1))
 
 
         ELSE
