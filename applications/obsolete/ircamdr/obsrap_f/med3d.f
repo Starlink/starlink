@@ -284,7 +284,7 @@
 
 *      ask user if he/she wants to view data on one pixel
 	CALL PAR_GET0L( 'VIEW', VIEW, STATUS)
-	IF( VIEW .EQ. .TRUE.) THEN
+	IF( VIEW ) THEN
 
 *        get the x,y pixel position for viewing
           CALL AIF_GET0I( 'XPIX', DIMS( 1)/2, 1, DIMS( 1), XPIX, STATUS)

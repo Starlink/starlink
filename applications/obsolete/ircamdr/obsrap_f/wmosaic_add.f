@@ -137,7 +137,7 @@
 
 *          add the current input array value into the output array and
 *          update the mask value accordingly
-	    IF( OVERLAP .EQ. .TRUE.) THEN
+	    IF( OVERLAP ) THEN
               OUT( X, Y )  =  OUT( X, Y ) + IN( I, J )*WT
               MASK( X, Y )  =  MASK( X, Y ) + WT
 	    ELSE

@@ -194,7 +194,7 @@
 *                this is a valid pixel to be included, and is not the
 *                first, so just add its value to the output and increment
 *                the mask by 1
-	          IF( OVERLAP .EQ. .TRUE.) THEN
+	          IF( OVERLAP ) THEN
                     OUT( X, Y )  =  OUT( X, Y ) + IN( I, J )*WT
                     MASK( X, Y )  =  MASK( X, Y ) + WT
 	          ELSE

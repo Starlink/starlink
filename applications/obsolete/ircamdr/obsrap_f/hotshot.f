@@ -125,7 +125,7 @@
 
 *      get the X and Y search factor and sigma level 
 	CALL PAR_GET0L( 'WHOLE', WHOLE, STATUS)
-	IF( WHOLE .NE. .TRUE.) THEN
+	IF( .NOT. WHOLE ) THEN
 	  CALL PAR_GET0I( 'XCEN', IXCEN, STATUS)
 	  CALL PAR_GET0I( 'YCEN', IYCEN, STATUS)
 	  CALL PAR_GET0I( 'XSIZ', IXSZ, STATUS)
