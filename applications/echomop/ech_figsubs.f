@@ -1,3 +1,46 @@
+C   This file contains near-copies of a number of subroutines from
+C   Figaro's figaro3 monolith and the libfig and libgen libraries.  The
+C   correspondences are as follows:
+C
+C       1.  FIG_EDGES     figaro3/sdist.f
+C       2.  FIG_WGEN      figaro3/iscrunch.f
+C       3.  FIG_WGEN2     figaro3/iscrunch.f
+C       4.  FIG_REBIN     fig/fig_rebin.f
+C       5.  FIG_REBIND    fig/fig_rebind.f
+C       6.  FIG_TFORM     fig/fig_tform.f
+C       7.  FIG_TFORMD    fig/fig_tformd.f
+C       8.  FIG_WFILL     fig/fig_wfill.f
+C       9.  FIG_WFILLD    fig/fig_wfilld.f
+C       10. GEN_CENTROID  gen/gen_centroid.f
+C       11. GEN_EPOLYD    gen/gen_epolyd.f
+C       12. GEN_RANGEF    gen/gen_rangef.f
+C
+C   Routines 1-9 are not quite exact copies of the corresponding Figaro
+C   routines from Figaro's figaro3 monolith and the libfig library.
+C   Neither one of these sets is unambiguously derived from the other
+C   (though the Figaro ones have spelling typos that the Echomop ones
+C   don't), and so it looks as if they've both been slightly tweaked from
+C   some earlier source.
+C
+C   Routine 10- are exact copies of Figaro routines (as of 2004
+C   August 19), for which there were no clear kaplibs or PDA
+C   replacements.
+C
+C   10. GEN_CENTROID is not replacable by kaplibs kpg1_loctr, since
+C   that works in any number of dimensions greater than one.
+C
+C   11. GEN_EPOLYD is a very simple little routine to evaluate a
+C   polynomial.  It is not the same as pda_dpolft and pda_dp1vlu, which
+C   address the more general problem of polynomial fitting.
+C
+C   12. GEN_RANGEF is similarly simple.  kpg1_statr is an alternative,
+C   but mmuch more comprehensive, and so requires a confusing host of
+C   extra dummy variables.
+C
+C   Moving this here, and making reference to a couple of
+C   kaplibs routines (kpg1_bmedr), make echomop independent of Figaro.
+
+
 C+
       REAL FUNCTION FIG_EDGES (ARRAY,NELM,CENT,LEFT,RIGHT)
 C
@@ -60,11 +103,23 @@ C
       FIRST=(ARRAY(1)+ARRAY(2))*0.5
       LAST=(ARRAY(NELM)+ARRAY(NELM-1))*0.5
       DO I=2,NELM-1
-         WORK(1)=ARRAY(I-1)
-         WORK(2)=ARRAY(I)
-         WORK(3)=ARRAY(I+1)
-         CALL GEN_SORTF(WORK,3)
-         ARRAY(I-1)=WORK(2)
+C        Get median of three values, leaving it in array(i-1).
+C        Not pretty, but neither is calling Figaro's gen_sortf.
+         IF (ARRAY(I-1).LT.ARRAY(I)) THEN
+            IF (ARRAY(I).LT.ARRAY(I+1)) THEN
+               ARRAY(I-1)=ARRAY(I)
+            ELSE IF (ARRAY(I-1).LT.ARRAY(I+1)) THEN
+               ARRAY(I-1)=ARRAY(I+1)
+            ENDIF
+         ELSE
+            IF (ARRAY(I-1).GE.ARRAY(I+1)) THEN
+               IF (ARRAY(I).LT.ARRAY(I+1)) THEN
+                  ARRAY(I-1)=ARRAY(I+1)
+               ELSE
+                  ARRAY(I-1)=ARRAY(I)
+               ENDIF
+            ENDIF
+         ENDIF
       END DO
       DO I=NELM-1,2,-1
          ARRAY(I)=ARRAY(I-1)
@@ -175,9 +230,7 @@ C                wavelengths.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used -
-C
-C     GEN_EPOLYD (GEN_ package) Evaluate double precision polynomial
+C     Subroutines / functions used - None
 C
 C                                            KS / CIT 24th June 1984
 C     Modified:
@@ -239,9 +292,7 @@ C                 wavelengths.
 C
 C     Common variables used -  None
 C
-C     Subroutines / functions used -
-C
-C     GEN_EPOLYD (GEN_ package) Evaluate double precision polynomial
+C     Subroutines / functions used - None
 C
 C                                            KS / CIT 24th June 1984
 C     Modified:
@@ -1222,6 +1273,218 @@ C
          DO I=1,NBINR
             ARRAY(I)=DWAVEL
             DWAVEL=DWAVEL+DWINC
+         END DO
+      END IF
+C
+      END
+C+
+      SUBROUTINE GEN_CENTROID(FARRAY,NO_EL,LSIG,LCENT,
+     :                                       LSTRENGTH,STATUS)
+C
+C (local version of Figaro routine...)
+C       G E N _ C E N T R O I D
+C
+C       Locates a peak in a data array by convolution with the 
+C       derivative of a Gaussian.
+C
+C       Parameters -    (">" input, "<" output, "!" modified)
+C
+C       (>) FARRAY    (Real array FARRAY(NO_EL)) Array holding
+C                     the data to be searched for a peak.
+C       (>) NO_EL     (Integer) The number of elements in FARRAY.
+C       (>) LSIG      (Real) Measure of the expected line width -
+C                     in elements - center will be taken over a
+C                     block of data 6*LSIG elements wide.
+C       (!) LCENT     (Real) Passed as a first guess as to the
+C                     position of the line center, returned as the
+C                     determined position.  Note that the first
+C                     element of FARRAY is #1, not 0.
+C                     Note: Assumes that the integer value of the
+C                     pixel number refers to the center of the
+C                     pixel.  ie if data is all zeros except for
+C                     elements 9,10,11 which contain say, 25,50,25
+C                     counts, LCENT will return as 10.0
+C       (<) LSTRENGTH (Real) Returned as a measure of the line 
+C                     strength.  If an error occurs, LSTRENGTH
+C                     will be set to some negative number.
+C       (<) STATUS    (Integer) Returns a status code.
+C                     0 => OK
+C                     1 => Line too close to end of array.
+C                     2 => Measurement does not converge.
+C                     3 => Measurement is running away.
+C                     4 => LSIG passed with a daft value.
+C
+C       History -
+C
+C       Orginally obtained from TYB's FORTH package.
+C       Modified by KS: Error messages removed, replaced by
+C       STATUS parameter; Integer array option removed.
+C
+C       This version -             KS / CIT   17th April 1983
+C
+C       Modified:
+C
+C       28th Sep 1992  HME / UoE, Starlink.  TABs removed.
+C+
+        INTEGER STATUS
+        REAL FARRAY(NO_EL)
+        REAL LCENT,LSIG,LSTRENGTH,LAST_LCENT
+        IF(LSIG.EQ.0.)GO TO 3999
+        NO_ITER=0
+        PRECISION=0.001
+        DEN=2.*LSIG**2
+C ******************************************************
+C   EACH ITERATION STARTS HERE
+C ******************************************************
+  100   LAST_LCENT = LCENT
+        NO_ITER = NO_ITER + 1
+C ******************************************************
+C   SET 3 SIGMA LIMITS AROUND CENTER
+C ******************************************************
+        LLLIM = LCENT - 3. * LSIG
+        LULIM = LCENT + 3. * LSIG + 0.5      ! TO ROUND
+C ******************************************************
+C   CHECK TO MAKE SURE ENTIRE REGION IS WITHIN ARRAY
+C ******************************************************
+        IF (LLLIM.LT.1) GO TO 999
+        IF (LULIM.GT.NO_EL) GO TO 999
+C ******************************************************
+C   NOW CALCULATE G(X) AND G'(X)
+C ******************************************************
+        GOFX = 0.
+        GPOFX = 0.
+        DO 202 I = LLLIM,LULIM
+        T1 = FLOAT(I) - LCENT - 0.5
+        T2 = T1 + 1.
+        T3 = FARRAY(I)
+        TERM1 = EXP (-(T1**2)/DEN)
+        TERM2 = EXP (-(T2**2)/DEN)
+        GOFX = GOFX + T3 * (TERM2-TERM1)/2.
+        GPOFX = GPOFX + T3 * (T2*2./DEN*TERM2 - T1* 2./DEN*TERM1)/2.
+  202   CONTINUE
+C ******************************************************
+C   CHECK TO SEE IF IT IS RUNNING AWAY
+C ******************************************************
+        IF(GPOFX.EQ.0.)GO TO 2999
+        IF(ABS(GOFX/GPOFX).GT.1.5*LSIG) GO TO 2999
+C ******************************************************
+C   OR BOUNCING BACK AND FORTH
+C ******************************************************
+        IF (NO_ITER.GE.10) GO TO 1999
+C ******************************************************
+C   CALCULATE NEW LCENT
+C ******************************************************
+        LCENT = LCENT - GOFX/GPOFX
+C ******************************************************
+C   HAS IT CONVERGED?
+C ******************************************************
+        IF(ABS(LCENT-LAST_LCENT).LE.PRECISION) GO TO 300
+        GO TO 100
+C ******************************************************
+C   END OF ITERATION
+C ******************************************************
+  300   LSTRENGTH = GPOFX * DEN
+        STATUS=0
+        RETURN
+  999   CONTINUE
+        STATUS=1
+        LSTRENGTH = 0.
+        RETURN
+ 1999   CONTINUE
+        STATUS=2
+        LSTRENGTH = -1.
+        RETURN
+ 2999   CONTINUE
+        STATUS=3
+        LSTRENGTH = -2
+        RETURN
+ 3999   CONTINUE
+        STATUS=4
+        LSTRENGTH = -3.
+        RETURN
+        END
+C+
+      DOUBLE PRECISION FUNCTION GEN_EPOLYD(VALUE,COEFFS,NCOEFF)
+C
+C     G E N _ E P O L Y D
+C
+C     Evaluates a polynomial - this is an interim version.
+C     Ideally the VAX POLYD instruction should be used.
+C
+C     Parameters - (">" input, "<" output)
+C
+C     (>) VALUE   (Double precision) The value for which the 
+C                 polynomial is to be evaluated.
+C     (>) COEFFS  (Double precision  array COEFFS(NCOEFF)) The 
+C                 coefficients of the polynomial, with the 
+C                 constant term last.
+C     (>) NCOEFF  (Integer) The number of polynomial coefficients.
+C
+C     Returns -
+C
+C     (<) GEN_EPOLYD  (Double precision) The value of the polynomial.
+C
+C                                  KS / CIT 6th May 1983
+C     History:
+C
+C     5th  Feb 1988  (CKL/CIT) VALUE changed from REAL to DOUBLE.
+C+
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER NCOEFF
+      DOUBLE PRECISION VALUE,COEFFS(NCOEFF)
+C
+C     Local variables
+C
+      INTEGER NORD
+C
+C     Evaluate poly
+C
+      GEN_EPOLYD=0.
+      DO NORD=1,NCOEFF
+         GEN_EPOLYD=GEN_EPOLYD*VALUE+COEFFS(NORD)
+      END DO
+C
+      END
+C+
+      SUBROUTINE GEN_RANGEF(ARRAY,IST,IEN,VMAX,VMIN)
+C
+C     G E N _ R A N G E F
+C
+C     Finds the maximum and minimum values in an array.
+C
+C     Parameters -  (">" input, "<" output)
+C
+C     (>) ARRAY     (Real array ARRAY(IEN) - or more) Array
+C                   containing the values to be checked.
+C     (>) IST       (Integer) The first element of ARRAY to be
+C                   examined.
+C     (>) IEN       (Integer) The last element of ARRAY to be
+C                   examined.
+C     (<) VMAX      (Real) The maximum value of those examined.
+C     (<) VMIN      (Real) The minimum value of those examined.
+C
+C                                      KS / CIT  2nd Jan 1983
+C+
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER IST,IEN
+      REAL ARRAY(IEN),VMIN,VMAX
+C
+C     Local variables
+C
+      INTEGER I
+C
+      VMIN=ARRAY(IST)
+      VMAX=VMIN
+      IF (IST.LT.IEN) THEN
+         DO I=IST+1,IEN
+            VMIN=MIN(VMIN,ARRAY(I))
+            VMAX=MAX(VMAX,ARRAY(I))
          END DO
       END IF
 C
