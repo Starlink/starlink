@@ -53,7 +53,7 @@
 #     January 1999 (TIMJ)
 #        Add ADD_DBM and SCUSETENV
 #     08-Mar-1999 (TIMJ)
-#        Add REMIP
+#        Add REMIP. Use the STAR_PERL symbol for perl location
 #     {enter_changes_here}
 #
 #-
@@ -122,12 +122,11 @@ alias surf_skydip          ${SURF_DIR}/skydip
 
 #
 # These are the aliases for the PERL scripts.
-# May want to include a check for the existence of the NDF module
-# or ndfperl.
+# Need to use the Starlink perl distribution in /star/Perl/bin
 
-# Check for ndfperl module.
-if ( -e STAR_BIN/ndfperl ) then
-   set myperl = STAR_BIN/ndfperl
+# Check for perl module.
+if ( -e STAR_PERL ) then
+   set myperl = STAR_PERL
    alias change_nacentre  "$myperl ${SURF_DIR}/change_nacentre.pl"
    alias sculog           "$myperl ${SURF_DIR}/sculog"
    alias scuquick         "$myperl ${SURF_DIR}/scuquick"
@@ -136,6 +135,7 @@ if ( -e STAR_BIN/ndfperl ) then
    alias mapsum           "$myperl ${SURF_DIR}/mapsum"
    alias remdbm           "$myperl ${SURF_DIR}/remdbm.pl"
    alias scushift         "$myperl -s ${SURF_DIR}/scushift"
+   alias scunoise         "$myperl -s ${SURF_DIR}/scunoise"
    alias setbolwt         "$myperl ${SURF_DIR}/setbolwt.pl"
    alias skysum           "$myperl ${SURF_DIR}/skysum"
    alias obssum           "$myperl ${SURF_DIR}/sculog -summary"
@@ -148,6 +148,7 @@ if ( -e STAR_BIN/ndfperl ) then
    alias surf_pointsum    "$myperl ${SURF_DIR}/pointsum"
    alias surf_mapsum      "$myperl ${SURF_DIR}/mapsum"
    alias surf_remdbm      "$myperl ${SURF_DIR}/remdbm.pl"
+   alias surf_scunoise    "$myperl -s ${SURF_DIR}/scunoise"
    alias surf_scushift    "$myperl -s ${SURF_DIR}/scushift"
    alias surf_setbolwt    "$myperl ${SURF_DIR}/setbolwt.pl"
    alias surf_skysum      "$myperl ${SURF_DIR}/skysum"
@@ -155,32 +156,32 @@ if ( -e STAR_BIN/ndfperl ) then
    alias surf_qdraw       "$myperl -s ${SURF_DIR}/qdraw"
    alias surf_sigclip     "$myperl -s ${SURF_DIR}/sigclip" 
 else
-   alias change_nacentre  echo 'Command not available - needs ndfperl'
-   alias sculog         echo 'Command not available - needs ndfperl'
-   alias scuquick       echo 'Command not available - needs ndfperl'
-   alias photsum        echo 'Command not available - needs ndfperl'
-   alias pointsum       echo 'Command not available - needs ndfperl'
-   alias mapsum         echo 'Command not available - needs ndfperl'
-   alias remdbm         echo 'Command not available - needs ndfperl'
-   alias scushift       echo 'Command not available - needs ndfperl'
-   alias setbolwt       echo 'Command not available - needs ndfperl'
-   alias skysum         echo 'Command not available - needs ndfperl'
-   alias obssum         echo 'Command not available - needs ndfperl'
-   alias qdraw          echo 'Command not available - needs ndfperl'
-   alias sigclip        echo 'Command not available - needs ndfperl'
-   alias surf_change_nacentre  echo 'Command not available - needs ndfperl'
-   alias surf_sculog    echo 'Command not available - needs ndfperl' 
-   alias surf_scuquick  echo 'Command not available - needs ndfperl'
-   alias surf_photsum   echo 'Command not available - needs ndfperl'
-   alias surf_pointsum  echo 'Command not available - needs ndfperl'
-   alias surf_mapsum    echo 'Command not available - needs ndfperl'
-   alias surf_remdbm    echo 'Command not available - needs ndfperl'
-   alias surf_scushift  echo 'Command not available - needs ndfperl'
-   alias surf_setbolwt  echo 'Command not available - needs ndfperl'
-   alias surf_skysum    echo 'Command not available - needs ndfperl'
-   alias surf_obssum    echo 'Command not available - needs ndfperl'
-   alias surf_qdraw     echo 'Command not available - needs ndfperl'
-   alias surf_sigclip   echo 'Command not available - needs ndfperl'
+   alias change_nacentre  echo 'Command not available - needs Starlink PERL'
+   alias sculog         echo 'Command not available - needs Starlink PERL'
+   alias scuquick       echo 'Command not available - needs Starlink PERL'
+   alias photsum        echo 'Command not available - needs Starlink PERL'
+   alias pointsum       echo 'Command not available - needs Starlink PERL'
+   alias mapsum         echo 'Command not available - needs Starlink PERL'
+   alias remdbm         echo 'Command not available - needs Starlink PERL'
+   alias scushift       echo 'Command not available - needs Starlink PERL'
+   alias setbolwt       echo 'Command not available - needs Starlink PERL'
+   alias skysum         echo 'Command not available - needs Starlink PERL'
+   alias obssum         echo 'Command not available - needs Starlink PERL'
+   alias qdraw          echo 'Command not available - needs Starlink PERL'
+   alias sigclip        echo 'Command not available - needs Starlink PERL'
+   alias surf_change_nacentre  echo 'Command not available - needs Starlink PERL'
+   alias surf_sculog    echo 'Command not available - needs Starlink PERL' 
+   alias surf_scuquick  echo 'Command not available - needs Starlink PERL'
+   alias surf_photsum   echo 'Command not available - needs Starlink PERL'
+   alias surf_pointsum  echo 'Command not available - needs Starlink PERL'
+   alias surf_mapsum    echo 'Command not available - needs Starlink PERL'
+   alias surf_remdbm    echo 'Command not available - needs Starlink PERL'
+   alias surf_scushift  echo 'Command not available - needs Starlink PERL'
+   alias surf_setbolwt  echo 'Command not available - needs Starlink PERL'
+   alias surf_skysum    echo 'Command not available - needs Starlink PERL'
+   alias surf_obssum    echo 'Command not available - needs Starlink PERL'
+   alias surf_qdraw     echo 'Command not available - needs Starlink PERL'
+   alias surf_sigclip   echo 'Command not available - needs Starlink PERL'
 endif
 
 # csh scripts
@@ -199,12 +200,6 @@ alias surf_pltbol      ${SURF_DIR}/pltbol
 alias surf_rlinplot    ${SURF_DIR}/rlinplot
 alias surf_scuplot     ${SURF_DIR}/scuplot.csh
 alias surf_scusetenv   'source ${SURF_DIR}/scusetenv.csh'
-
-# Straight perl scripts
-alias scunoise         'perl -s ${SURF_DIR}/scunoise'
-alias surf_scunoise    'perl -s ${SURF_DIR}/scunoise'
-
-
 
 # Announce the availability of the SURF commands
 
