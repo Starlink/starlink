@@ -146,7 +146,12 @@ class InputByteStream {
     size_t buflen_;		/* size of buffer */
     Byte *p_;			/* current position in buffer */
     Byte *eob_;			/* end of buffer */
-    bool eof_;			/* true on end of file */
+    bool eof_;			/* true on end of file (note this is from
+                                   the client's point of view, not the class's:
+                                   if we have `preloaded' a file, the
+                                   underlying file will be closed, but there
+                                   will still be more to read from the 
+                                   stream) */
     void read_buf_(void)
 	    throw (InputByteStreamError);
     size_t certainly_read_(int fd, Byte *b, size_t len)

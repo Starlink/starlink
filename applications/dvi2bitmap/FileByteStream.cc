@@ -45,10 +45,8 @@
 #include <string.h>
 #endif
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cerr;
-using std::endl;
-#endif
+using STD::cerr;
+using STD::endl;
 
 
 /**

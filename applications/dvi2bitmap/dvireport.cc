@@ -5,14 +5,9 @@
 #include <bitset>
 #include <ctype.h>
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cout;
-using std::cerr;
-using std::endl;
-#define STD std
-#else
-#define STD
-#endif
+using STD::cout;
+using STD::cerr;
+using STD::endl;
 
 #include "DviFile.h"
 

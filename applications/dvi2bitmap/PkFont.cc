@@ -43,13 +43,11 @@
 #include <math.h>
 #endif
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cerr;
-using std::endl;
-using std::ends;
-using std::ofstream;
-using std::ios;
-#endif
+using STD::cerr;
+using STD::endl;
+using STD::ends;
+using STD::ofstream;
+using STD::ios;
 
 #include <DviError.h>
 #include <FileByteStream.h>

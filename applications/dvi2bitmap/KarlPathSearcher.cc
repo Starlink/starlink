@@ -41,9 +41,7 @@
 #include <stdlib.h>
 #endif
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cerr;
-#endif
+using STD::cerr;
 
 #include <KarlPathSearcher.h>
 #include <PkFont.h>		// for PkFont::dpiBase

@@ -32,23 +32,20 @@
 #include <time.h>
 #include <assert.h>
 
-#ifdef HAVE_CSTD_INCLUDE
+#if HAVE_CSTD_INCLUDE
+#include <cstdio>
 #include <cmath>		// for floor()
 #else
+#include <stdio.h>
 #include <math.h>		// for floor()
 #endif
 
 #include "Bitmap.h"		// for BitmapError exception class
 #include "PNGBitmap.h"
 
-#ifdef HAVE_CSTD_INCLUDE        // ie, there _is_ a <cstdio>
-using std::fopen;
-using std::fclose;
-#endif
-
-#ifdef HAVE_STD_NAMESPACE
-using std::cerr;
-#endif
+using STD::fopen;
+using STD::fclose;
+using STD::cerr;
 
 // The PNG calls below have been written to be general, rather than
 // depending on a particular colour model.  That is, it should be

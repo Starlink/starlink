@@ -43,12 +43,10 @@
 #include <sys/wait.h>
 //#include <map>
 
-#ifdef HAVE_STD_NAMESPACE
-using std::ostream;
-using std::ends;
-using std::endl;
-using std::cerr;
-#endif
+using STD::ostream;
+using STD::ends;
+using STD::endl;
+using STD::cerr;
 
 #include "Util.h"
 #include "stringstream.h"
