@@ -168,7 +168,7 @@
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'GetSel(_FileSet,_HDSfile,_INTEGER)',
      :                 FSI1_GETSEL, DID, STATUS )
-      CALL ADI_DEFMTH( 'PutSel(_FileSet,_HDSfile,_INTEGER,_)',
+      CALL ADI_DEFMTH( 'WriteSel(_FileSet,_HDSfile,_INTEGER,_)',
      :                 FSI1_PUTSEL, DID, STATUS )
       CALL ADI_DEFMTH( 'ReadRef(_FileSet,_HDSfile,_INTEGER)',
      :                 FSI1_GETREF, DID, STATUS )

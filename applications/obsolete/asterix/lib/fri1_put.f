@@ -232,7 +232,6 @@
       INTEGER			FILID			! File identifier
       INTEGER			NLEV			! Path info
 
-      LOGICAL			DER			! Object derivation ok?
       LOGICAL			THERE			! Object exists?
 *.
 
