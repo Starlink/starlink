@@ -2186,9 +2186,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  JL, JM, JU              ! Used in binary search
 *-
 
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
 *    Regular values
       IF ( REG ) THEN
         CP = INT((R-AX(1)) / WID(1) + 0.5)+1
