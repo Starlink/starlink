@@ -75,6 +75,10 @@ static char NAMESPACE[14] = "Starlink::AST";
    See function  ntypeToClass function for details of the XS to
    namespace mapping.
 
+   If var is NULL the assumption is that you are creating the object
+   before storing the AstObject. Use the setPerlAstObject() function
+   to store the AST pointer at a later date.
+
 */
 
 SV* createPerlObject( char * xsntype, AstObject * var ) {
@@ -82,19 +86,7 @@ SV* createPerlObject( char * xsntype, AstObject * var ) {
   HV * hash_object = newHV();
   SV * pval;
   SV * rv;
-
-  /* extract the pointer to an int and store it in an SV */
-  pval = newSViv( PTR2IV(var) );
-
-  /* Store that SV into a hash using the appropriate key */
-  retval = hv_store( hash_object, pntrAttrib, strlen(pntrAttrib),
-		     pval,0);
-
-  /* If the store fails, free up the SV created earlier and croak */  
-  if (retval == NULL ) {
-    SvREFCNT_dec( pval );
-    Perl_croak(aTHX_ "Error storing AstObject pointer into hash\n");
-  }
+  SV * myobject;
 
   /* Now create a reference to the hash object
      Do not increment the reference count since at the end of this
@@ -103,10 +95,34 @@ SV* createPerlObject( char * xsntype, AstObject * var ) {
 
   /* Bless the reference into a class. We translate the XS ntype
      value into an appropriate Perl namespace */
-  return sv_bless(rv, gv_stashpv( ntypeToClass(xsntype), 1));
+  myobject = sv_bless(rv, gv_stashpv( ntypeToClass(xsntype), 1));
 
+  /* Store the pointer if we were given one */
+  if (var != NULL) {
+    setPerlAstObject( myobject, var ); 
+  }
+
+  return myobject;
 }
 
+
+/*
+ * Given a perl object created by createPerlObject, store the
+ * pointer associated with an AST object in the appropriate place.
+ * Can be called by external function if you want to create a perl
+ * object (to store something else) prior to instantiating the
+ * C level AST object. */
+
+void setPerlAstObject ( SV * myobject, AstObject * var ) {
+  SV * pval;
+
+  /* extract the pointer to an int and store it in an SV */
+  pval = newSViv( PTR2IV(var) );
+
+  /* Now store it in the object */
+  setPerlObjectAttr( myobject, pntrAttrib, pval );
+
+}
 
 /* Given an AST object, return an IV containing the pointer to the
    corresponding AST struct. Must use INT2PTR to convert this
@@ -143,12 +159,21 @@ IV extractAstIntPointer( SV * arg ) {
 
    Note that "AstObjectPtr" is special-cased to "Starlink::AST"
 
+   Note also that if you supply an ntype that looks like a fully qualified
+   class already (ie it matches the root namespace) then the class is
+   returned unaffected). This allows you to use the object creation
+   code outside of a typemap entry where you are manually creating the
+   object using a constructor that supplies the correct class.
+
 */
 
 char * ntypeToClass ( char * ntype ) {
   SV * buffer;
   int len;
   char * offset;
+
+  /* Do we have Starlink::AST in the name already? */
+  if (strstr( ntype, NAMESPACE) != NULL ) return ntype;
 
   /* Easy case - we want the default namespace */
   if ( strcmp(ntype, "AstObjectPtr" ) == 0 ) {
@@ -203,6 +228,39 @@ SV* getPerlObjectAttr ( SV * myobject, char * attr ) {
     return NULL;
   } else {
     return *elem;
+  }
+}
+
+
+/* Given a Perl object created by createPerlObject, store an SV into
+ * a specific attribute. Reverse of getPerlObjectAttr.
+ *
+ * Croaks on error.
+ */
+
+void setPerlObjectAttr ( SV * myobject, char * attr, SV * value ) {
+  SV** retval;
+  HV * hash_object;
+
+  if (myobject == NULL || !SvOK(myobject) ) {
+    Perl_croak(aTHX_ "Must supply a valid SV/object to setPerlObjectAttr");
+  }
+ 
+  /* Make sure we have a reference to a hash */
+  if (SvROK(myobject) && SvTYPE(SvRV(myobject))==SVt_PVHV)
+    hash_object = (HV*)SvRV(myobject);
+  else
+    Perl_croak(aTHX_ "Ast object must be a reference to a hash");
+
+
+  /* Store that SV into a hash using the appropriate key */
+  retval = hv_store( hash_object, attr, strlen(attr),
+		     value,0);
+
+  /* If the store fails, free up the SV created earlier and croak */  
+  if (retval == NULL ) {
+    SvREFCNT_dec( value );
+    Perl_croak(aTHX_ "Error storing AstObject pointer into hash\n");
   }
 }
 

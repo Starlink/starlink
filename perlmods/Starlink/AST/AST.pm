@@ -179,16 +179,18 @@ sub new {
   # This should work for FitsChan and Channel and XmlChan
   my $class = shift;
   my %args = @_;
-
-  my %processed;
+  my ($sink, $source);
 
   # sink and source are special. All others are attributes
+
+  # Stuff the callbacks in the object [if we were paranoid we would provide
+  # methods to obtain the attribute keys]
   if (exists $args{sink} ) {
-    $processed{sink} = $args{sink};
+    $sink = $args{sink};
     delete $args{sink};
   }
   if (exists $args{source} ) {
-    $processed{source} = $args{source};
+    $source = $args{source};
     delete $args{source};
   }
 
@@ -197,11 +199,18 @@ sub new {
   for my $k (keys %args ) {
     push(@options, "$k=$args{$k}");
   }
-  $processed{options} = join(",",@options) if @options;
+  my $options = "";
+  $options = join(",",@options) if @options;
 
   # Call the underlying routine
-  $class->_new( \%processed );
+  my $self = $class->_new( defined $source, defined $sink, $options );
 
+  # Kluge - retain reference to the callback [inc ref count]
+  # Currently not used directly by the callback routine
+  $self->{_source} = $source if defined $source;
+  $self->{_sink}   = $sink if defined $sink;
+
+  return $self;
 }
 
 package Starlink::AST::FitsChan;

@@ -137,6 +137,7 @@ void astThrowException ( int status, AV* errorstack ) {
 static char *sourceWrap( const char *(*source)() ) {
   dSP;
   SV * cb;
+  SV * myobject;
   int count;
   char * line;
 
@@ -144,22 +145,31 @@ static char *sourceWrap( const char *(*source)() ) {
   if ( !astOK ) return NULL;
 
   /* Need to cast the source argument to a SV*  */
-  cb = (SV*) source;
+  myobject = (SV*) source;
+
+  cb = getPerlObjectAttr( myobject, "_source" );
+
+  if (cb == NULL) {
+    astError( AST__INTER, "Callback in channel 'source' not defined!");
+    return "";
+  }
 
   /* call the callback with the supplied line */
   ENTER;
   SAVETMPS;
 
-  count = perl_call_sv( cb, G_NOARGS | G_SCALAR | G_EVAL );
+  count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR | G_EVAL );
 
   ReportPerlError( AST__INTER );
 
   SPAGAIN ;
 
   if (astOK) {
-    if (count != 1) Perl_croak(aTHX_ "Returned more than one arg from channel source\n");
-
-    line = POPp;
+    if (count != 1) {
+      astError( AST__INTER, "Returned more than one arg from channel source");
+    } else {
+      line = POPp;
+    }
   }
 
   PUTBACK;
@@ -172,12 +182,21 @@ static char *sourceWrap( const char *(*source)() ) {
 static void sinkWrap( void (*sink)(const char *), const char *line ) {
   dSP;
   SV * cb;
+  SV * myobject;
 
   /* Return directly if ast status is set. */
   if ( !astOK ) return;
 
   /* Need to cast the sink argument to a SV*  */
-  cb = (SV*) sink;
+  myobject = (SV*) sink;
+
+  cb = getPerlObjectAttr( myobject, "_sink" );
+
+  if (cb == NULL) {
+    astError( AST__INTER, "Callback in channel 'sink' not defined!");
+    return;
+  }
+
 
   /* call the callback with the supplied line */
   ENTER;
@@ -454,147 +473,74 @@ new( class, map1, map2, series, options )
 
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::Channel
 
-# Need to add proper support for the callbacks
+# Need to add proper support for the callbacks. Currently rely on the
+# returned object to keep a reference to the callback.
 
-AstChannel *
-_new( class, hash )
+# Note that we use inheritance here so we have to switch on the basis
+# of the supplied class. Things will get difficult if people start
+# adding their own subclasses since I am only looking at substring
+# matches.
+
+SV *
+_new( class, has_source, has_sink, options )
   char * class
-  HV * hash
+  bool has_source
+  bool has_sink
+  char * options;
  PREINIT:
   SV ** value;
-  SV * sink;
-  SV * source;
-  char * options;
-  STRLEN len;
+  SV * sink = NULL;
+  SV * source = NULL;
+  AstChannel * channel;
+  AstFitsChan * fitschan;
+  AstXmlChan * xmlchan;
  CODE:
-  /* Callbacks are in source and sink keys */
-  value = hv_fetch( hash, "sink", 4, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    sink = NULL;
-  } else {
-    sink = newSVsv(*value); /* memory leak XXXXX */
+  /* create the object without a pointer */
+  RETVAL = createPerlObject( class, NULL );
+
+  /* Decide whether to register a callback with the sink/source.
+     Do this rather than always registering callback for efficiency reasons
+     and because I am not sure if the presence of a callback affects the
+     behaviour of the channel. */
+  if ( has_source || has_sink) {
+    /* Take a reference to the object but do not increment the REFCNT. We
+       Want this to be freed when the perl object disappears. */
+    /* only take one reference */
+    SV * rv = newRV_noinc( SvRV( RETVAL ));
+    if (has_source) source = rv;
+    if (has_sink) sink = rv;
   }
-  value = hv_fetch( hash, "source", 6, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    source = NULL;
-  } else {
-    source = newSVsv(*value); /* memory leak XXXXX */
-  }
-  value = hv_fetch( hash, "options", 7, 0 );
-  if ( value == NULL ) {
-    /* undef options */
-    options = "";
-  } else {
-    options = SvPV( *value, len);
-  }
-  
-  /* Need to use astChannelFor interface so that we can register
+
+  /* Need to use astChannelFor style interface so that we can register
      a fixed callback and a reference to a CV */
-  ASTCALL(
-   RETVAL = astChannelFor( (const char *(*)()) source, sourceWrap,
-                            (void (*)( const char * )) sink, sinkWrap, options );
-  )
- OUTPUT:
-  RETVAL
-
-MODULE = Starlink::AST  PACKAGE = Starlink::AST::FitsChan
-
-# Note that FitsChan inherits from Starlink::AST::Channel
-
-AstFitsChan *
-_new( class, hash )
-  char * class
-  HV * hash
- PREINIT:
-  SV ** value;
-  SV * sink;
-  SV * source;
-  char * options;
-  STRLEN len;
- CODE:
-  /* Callbacks are in source and sink keys */
-  value = hv_fetch( hash, "sink", 4, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    sink = NULL;
-  } else {
-    sink = newSVsv(*value); /* memory leak XXXXX */
-  }
-  value = hv_fetch( hash, "source", 6, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    source = NULL;
-  } else {
-    source = newSVsv(*value); /* memory leak XXXXX */
-  }
-  value = hv_fetch( hash, "options", 7, 0 );
-  if ( value == NULL ) {
-    /* undef options */
-    options = "";
-  } else {
-    options = SvPV( *value, len);
-  }
-  
-  /* Need to use astFitsChanFor interface so that we can register
-     a fixed callback and a reference to a CV */
-  ASTCALL(
-   RETVAL = astFitsChanFor( (const char *(*)()) source, sourceWrap,
-                            (void (*)( const char * )) sink, sinkWrap, options );
-  )
- OUTPUT:
-  RETVAL
-
-
-MODULE = Starlink::AST  PACKAGE = Starlink::AST::XmlChan
-
-AstXmlChan *
-_new( class, hash )
-  char * class
-  HV * hash
- PREINIT:
-  SV ** value;
-  SV * sink;
-  SV * source;
-  char * options;
-  STRLEN len;
- CODE:
-  /* Callbacks are in source and sink keys */
-  value = hv_fetch( hash, "sink", 4, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    sink = NULL;
-  } else {
-    sink = newSVsv(*value); /* memory leak XXXXX */
-  }
-  value = hv_fetch( hash, "source", 6, 0 );
-  if ( value == NULL ) {
-    /* undef callback */
-    source = NULL;
-  } else {
-    source = newSVsv(*value); /* memory leak XXXXX */
-  }
-  value = hv_fetch( hash, "options", 7, 0 );
-  if ( value == NULL ) {
-    /* undef options */
-    options = "";
-  } else {
-    options = SvPV( *value, len);
-  }
-  
-  /* Need to use astXmlChanFor interface so that we can register
-     a fixed callback and a reference to a CV */
+  if ( strstr( class, "Channel") != NULL) {
+   ASTCALL(
+    channel = astChannelFor( (const char *(*)()) source, sourceWrap,
+                             (void (*)( const char * )) sink, sinkWrap, options );
+   )
+   if (astOK) setPerlAstObject( RETVAL, (AstObject*)channel );
+  } else if (strstr( class, "FitsChan") != NULL) {
+   ASTCALL(
+    fitschan = astFitsChanFor( (const char *(*)()) source, sourceWrap,
+                             (void (*)( const char * )) sink, sinkWrap, options );
+   )
+   if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
+  } else if (strstr( class, "XmlChan") != NULL ) {
 #ifndef HASXMLCHAN   
    Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.x or greater");
 #else
-  ASTCALL(
-   RETVAL = astXmlChanFor( (const char *(*)()) source, sourceWrap,
-                            (void (*)( const char * )) sink, sinkWrap, options );
-  )
+   ASTCALL(
+    xmlchan = astXmlChanFor( (const char *(*)()) source, sourceWrap,
+                             (void (*)( const char * )) sink, sinkWrap, options );
+   )
+   if (astOK) setPerlAstObject( RETVAL, (AstObject*)xmlchan );
 #endif
+  } else {
+     Perl_croak(aTHX_ "Channel of class %s not recognized.", class );
+  }
  OUTPUT:
   RETVAL
+
 
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::GrismMap
 
