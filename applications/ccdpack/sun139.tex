@@ -6245,6 +6245,15 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [2.5]
       }
       \sstsubsection{
+         COUNTS = \_INTEGER (Write)
+      } {
+         On exit this parameter contains a list of the number of objects
+         detected in each input image. This may be useful in scripts
+         where the values can be accessed using the 
+         \xref{KAPPA (SUN/95)}{sun95}{}
+         \xref{PARGET}{sun95}{PARGET} command.
+      }
+      \sstsubsection{
          IN = LITERAL (Read)
       } {
          A list of image names which contain the data components to be
@@ -6359,6 +6368,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          intensity information) and finally the mean intensity of
          pixels in the group.
          [$*$.DAT]
+      }
+      \sstsubsection{
+         OVERRIDE = \_LOGICAL (Read)
+      } {
+         If TRUE then it is not a fatal error to detect no objects on an 
+         image. In this case the output list of positions will not be
+         written and the value in the COUNTS parameter will be set to 0.
+         [FALSE]
       }
       \sstsubsection{
          OVERSAMP = \_INTEGER (Read)
@@ -6516,11 +6533,13 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \qt{current} value is the value assigned on the last run of the
       application. If the application has not been run then the
       \qt{intrinsic} defaults, as shown in the parameter help, apply.
-      The exception to this rule is:
+      The exceptions to this rule are:
       \sstitemlist{
 
          \sstitem
-            THRESH  -- dynamic value
+            THRESH   -- dynamic value
+         \sstitem
+            OVERRIDE -- always FALSE
 
       }
       Retaining parameter values has the advantage of allowing you to
@@ -12751,8 +12770,13 @@ sizes are displayed at different scales.
 The FLATCOR application has been changed to trap divide by zero on
 Linux and OSF/1.
 
+The FINDOBJ application has been changed so that the error resulting 
+from not detecting objects on an image may be overridden.
+
 \begin{latexonly}
 
+\newpage
+This page left blank deliberately.
 \newpage
 
 

@@ -51,6 +51,11 @@
 *        mode estimates made from the histogram but decreases the
 *        accuracy.
 *        [2.5]
+*     COUNTS = _INTEGER (Write)
+*        On exit this parameter contains a list of the number of objects
+*        detected in each input image. This may be useful in scripts
+*        where the values can be accessed using the KAPPA (SUN/95) PARGET
+*        command.
 *     IN = LITERAL (Read)
 *        A list of NDF names which contain the data components to be
 *        scanned for image features.  The NDF names should be separated
@@ -131,6 +136,11 @@
 *        intensity information) and finally the mean intensity of
 *        pixels in the group.
 *        [*.DAT]
+*     OVERRIDE = _LOGICAL (Read)
+*        If TRUE then it is not a fatal error to detect no objects on an 
+*        image. In this case the output list of positions will not be
+*        written and the value in the COUNTS parameter will be set to 0.
+*        [FALSE]
 *     OVERSAMP = _INTEGER (Read)
 *        An oversampling factor which is used when forming the initial
 *        histogram (greater than 1). The oversample is estimated by
@@ -168,16 +178,6 @@
 *        gaussian fit to the data histogram will be used to estimate the
 *        background value.
 *        [TRUE]
-*     COUNTS = _INTEGER (Write)
-*        On exit this parameter contains a list of the number of objects
-*        detected in each input image. This may be useful in scripts
-*        where the values can be accessed using the KAPPA (SUN/95) PARGET
-*        command.
-*     OVERRIDE = _LOGICAL (Read)
-*        If TRUE then it is not a fatal error to detect no objects on an 
-*        image. This is case the output list of positions will not be
-*        written and the value in the COUNTS parameter will be set to 0.
-*        [FALSE]
 
 *  Examples:
 *     findobj in='*' minpix=10 outlist='*.find'
@@ -250,8 +250,9 @@
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
 *     "intrinsic" defaults, as shown in the parameter help, apply.
-*     The exception to this rule is:
-*        - THRESH  -- dynamic value
+*     The exceptions to this rule are:
+*        - THRESH   -- dynamic value
+*        - OVERRIDE -- always FALSE
 *
 *     Retaining parameter values has the advantage of allowing you to
 *     define the default behaviour of the application but does mean that

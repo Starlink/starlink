@@ -8,6 +8,9 @@
   The FLATCOR application has been changed to trap divide by zero
   on Linux and OSF/1.
 
+  The FINDOBJ application has been changed so that the error resulting 
+  from not detecting objects on an image may be overriden.
+
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 
   problems is always available at:
