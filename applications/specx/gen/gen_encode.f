@@ -5,6 +5,8 @@
 *        Unused I, J, ICH1, ICH2, LUN, READONLY, SYM_INDEX, LENGTH, ADDRESS
 *        Change error message to "-- gen_encode --" (was gen_sprint)
 *        Remove "unevuable" error message - now in GEN_EVAL_AE
+*     19 November 2002 (TIMJ):
+*        Initalise ISTAT
 *-----------------------------------------------------------------------
 
 
