@@ -25,7 +25,7 @@ libgwm_la_SOURCES = \
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-BUILT_SOURCES = GWM_ERR
+BUILT_SOURCES = GWM_ERR gwm_err.h
 
 C_ROUTINES =							  \
 	findwindow.c getwininfo.c processevent.c error.c	  \

@@ -69,19 +69,4 @@
 #define GWM_NO_OVOFFSET		25  /* No overlay offset on window	    */
 #define GWM_NO_FOREGROUND	26  /* No foreground colour property	    */
 #define GWM_NO_BACKGROUND	27  /* No background colour property	    */
-/*
-*     FORTRAN level codes.
-*
-*     These are constructed from the equation
-*     CODE = 134250498 + 65536 * <fac> + 8 * <mes>
-*     where <mes> is the message number in the range 1 to 4095
-*     and <fac> is the facility number for GWM (1512).
-*/
-
-#define GWM__ERROR       233340938  /* Undefined error condition */
-#define GWM__INOPT       233340946  /* Invalid option */
-#define GWM__NODIS       233340954  /* Unable to open display */
-#define GWM__NOWIN       233340962  /* Unable to open window */
-#define GWM__WINNF       233340970  /* Window not found */
-#define GWM__XERR        233340978  /* X error */
 
