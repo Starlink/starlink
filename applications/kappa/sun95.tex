@@ -27327,7 +27327,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF. A null (!) means use the title of the input
+         Title for the output NDF. A null (!) means use the title from the input
          NDF. {\tt [!]}
       }
       \sstsubsection{
@@ -29213,8 +29213,8 @@ plot (9k).
          alternative to {\tt "}Variance{\tt "} and causes the square root of the
          variance values to be used).  If {\tt "}Quality{\tt "} is specified,
          then the quality values are treated as numerical values (in
-         the range 0 to 255).  In cases other than {\tt "}Data{\tt "} (which is
-         always present), a missing component will be treated as having
+         the range 0 to 255).  In cases other than {\tt "}Data{\tt "}, which is
+         always present, a missing component will be treated as having
          all pixels set to the `bad{\tt '} value.  {\tt ["Data"]}
       }
       \sstsubsection{
@@ -29288,7 +29288,7 @@ plot (9k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF.  {\tt ["KAPPA - MSTATS"]}
+         Title for the output NDF.  {\tt ["KAPPA - Mstats"]}
       }
       \sstsubsection{
          TRIM = \_LOGICAL (Read)
@@ -29327,7 +29327,7 @@ plot (9k).
          output NDF will be the `union{\tt '} of the volumes of the input
          NDFs, that is a cuboid with lower bounds as low as the
          lowest pixel bound of the input NDFs in each dimension and
-         with upper bounds as high as their highest pixel bounds in
+         with upper bounds as high as the highest pixel bound in
          each dimension.
       }
       \sstexamplesubsection{
@@ -29369,7 +29369,6 @@ plot (9k).
       CCDPACK: MAKEMOS, MAKECAL, MAKEFLAT.
    }
 }
-
 \sstroutine{
    MULT
 }{

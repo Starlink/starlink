@@ -59,8 +59,8 @@
 *        alternative to "Variance" and causes the square root of the
 *        variance values to be used).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255).  In cases other than "Data" (which is 
-*        always present), a missing component will be treated as having 
+*        the range 0 to 255).  In cases other than "Data", which is 
+*        always present, a missing component will be treated as having 
 *        all pixels set to the `bad' value.  ["Data"]
 *     IN = NDF (Read)
 *        A group of input NDFs.  They may have different shapes, but 
@@ -111,7 +111,7 @@
 *        have a Data component giving the medians of the input pixels,
 *        and it will have no variance component.  ["Mean"]
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF.  ["KAPPA - MSTATS"]
+*        Title for the output NDF.  ["KAPPA - Mstats"]
 *     TRIM = _LOGICAL (Read)
 *        This parameter controls the shape of the output NDF.  
 *        If TRIM=TRUE, then the output NDF is the shape of the 
@@ -138,7 +138,7 @@
 *        output NDF will be the `union' of the volumes of the input
 *        NDFs, that is a cuboid with lower bounds as low as the
 *        lowest pixel bound of the input NDFs in each dimension and
-*        with upper bounds as high as their highest pixel bounds in
+*        with upper bounds as high as the highest pixel bound in
 *        each dimension.
 *     mstats idat* ostats comp=variance
 *        This does the same as the first example except that statistics
@@ -257,6 +257,7 @@
 *  Get the pixels from which to calculate the statistics.
          CALL KPS1_MSS( IGRP, NNDF, COMP, VERB, NGOOD, %VAL( IPDAT ),
      :                  STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See if we have found any pixels at the specified point.
          IF ( NGOOD .GT. 0 ) THEN

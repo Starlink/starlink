@@ -63,7 +63,7 @@
 *     OUT = NDF (Write)
 *        The output NDF.
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF. A null (!) mean suse the title fo the
+*        Title for the output NDF. A null (!) means use the title from the
 *        input NDF. [!]
 *     UBOUND( ) = _INTEGER (Read)
 *        An array holding the upper pixel bounds of any new axes in the
