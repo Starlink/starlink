@@ -3754,6 +3754,7 @@ c        REAL XX,XP,YP
 *  Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
+      REAL X1,X2,Y1,Y2
 *  Export :
 *  Status :
 *  Local constants :
