@@ -125,6 +125,8 @@
 #           GKS routines.
 #        gns
 #           Graphics name service.
+#        grp
+#           Group handling
 #        hlp
 #           Portable help system
 #        ndf
@@ -282,6 +284,12 @@
 #        Extend for release 1.1 of SURF
 #      3-Mar-1997 (TIMJ):
 #        Increment version to 1.1-1
+#      10-Jun-1998 (TIMJ)
+#        Prepare for release v1.2beta
+#        Update file list. Add NDFPERL_SCRIPTS variable
+#        and perform substitution of STAR_BIN for /star/bin
+#        so that the ndfperl binary can be located even
+#        on systems that dont put it in /star/bin.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -455,7 +463,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1-1
+PKG_VERS = 1.3beta
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -468,14 +476,21 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 	$(PKG_NAME)_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_sculib.tar \
 	$(PKG_NAME)_surflib.tar $(PKG_NAME)_kap.tar INSTALL
 
+#  List of perl scripts. These will be processed during install
+#  so that instances of STAR_BIN will be replaced by the necessary
+#  location so that ndfperl is picked up correctly.
+
+SCULOG = sculog
+NDFPERL_SCRIPTS = $(SCULOG) scuquick qdraw sigclip change_nacentre.pl \
+remdbm.pl scushift setbolwt.pl
+
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-SCULOG = sculog
 SCUPLOT = scuplot.csh
-PUBLIC_SCRIPTS = scuquick qdraw sigclip sdip.csh scupa.csh scushift $(SCULOG) $(SCUPLOT) 
+PUBLIC_SCRIPTS = sdip.csh scupa.csh $(SCUPLOT) scunoise
 
 # These are all incarnations of sculog. They are invoked by using
 # soft links to sculog. SCULOG uses the name of the softlink to work
@@ -526,9 +541,9 @@ KAP_INC = ctm_com ctm_par hlpcmd
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GKS_PAR MSG_PAR NDF_PAR \
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GKS_PAR GRP_PAR MSG_PAR NDF_PAR \
 	            NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PAR_PAR \
-	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC
+	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC AST_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -544,7 +559,8 @@ surf_extflat.f surf_extinction.f surf_flatfield.f surf_grid_despike.f \
 surf_read_rebin_ndf.f surf_rebin.f surf_recurse_read.f surf_reduce_switch.f \
 surf_remsky.f surf_restore.f surf_scan_rlb.f surf_scucat.f surf_scuclip.f \
 surf_scuhelp.f surf_scuover.f surf_scuphot.f surf_skydip.f surf_write_data.f \
-surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f
+surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f \
+surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f
 
 SURF_FCPP_ROUTINES = surf_write_map_info.F
 
@@ -557,7 +573,9 @@ SURFLIB_F_ROUTINES = \
 surflib_calc_gridij.f surflib_diff_despike.f surflib_fill_grid.f \
 surflib_calc_ijpos.f surflib_histogram_grid.f \
 surflib_calc_output_grid.f surflib_plot_grid.f surflib_clip_grid.f \
-surflib_stats_grid.f surflib_decode_remsky_string.f
+surflib_stats_grid.f surflib_decode_remsky_string.f \
+surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
+surflib_rem_grid.f surflib_2dft_chop.f
 
 SCULIB_FCPP_ROUTINES = sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
@@ -617,7 +635,9 @@ sculib_sub_tauz.f sculib_subare.f sculib_sumad.f sculib_tidy_line.f \
 sculib_unpack.f sculib_unpack_chopscan.f sculib_unpack_jiggle.f \
 sculib_unpack_jiggle_separates.f sculib_ut1.f sculib_wtfn_regrid.f \
 sculib_wtfn_regrid_1.f sculib_wtfn_regrid_2.f sculib_wtfn_regrid_3.f \
-sculib_scan_2_rd.f sculib_add_chop.f sculib_mulcad.f
+sculib_scan_2_rd.f sculib_add_chop.f sculib_mulcad.f \
+sculib_gauss_wtinit.f sculib_skydip_var.f \
+sculib_fix_scan_v10.f sculib_noise_mean.f
 
 
 #  List of Fortran BLOCK DATA routines.
@@ -649,10 +669,10 @@ SCULIB_C_ROUTINES = sculib_linux.c
 #  List of applications/tasks in monolith.
 
 TASKS = \
-bolrebin change_data change_flat change_pointing change_quality despike \
-despike2 extinction extract_data extract_flat flatfield intrebin rebin \
-reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover scuphot \
-skydip scuba2mem
+bolrebin calcsky  change_data change_flat change_pointing change_quality \
+despike despike2 extinction extract_data extract_flat flatfield intrebin \
+rebin reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover \
+scuphot skydip scuba2mem scumakewt reduce_noise
 
 #  Monolith routine source name.
 
@@ -687,9 +707,11 @@ DATA_FILES = calsig_450_850_photom.sdf calsig_450_850_bp2.sdf \
 
 LATEX_DOCS = sun216.tex \
 sun216_arrays.eps  sun216_logo.eps    sun216_remsky.eps \
-sun216_flow.eps    sun216_qdraw.eps   sun216_skydip.eps sun216_3c279.eps \
+sun216_qdraw.eps   sun216_skydip.eps sun216_3c279.eps \
 sun216_fitsdip.eps sun216_rawsdip.eps sun216_rawsdip2.eps \
 sun216_shift_diag.eps sun216_despikemodes.eps sun216_despike_eg.eps \
+sun216_4chops.eps sun216_flow_photom.eps sun216_flow_jig.eps \
+sun216_flow_scan.eps sun216_scansky.eps sun216_m82_remdbm.eps \
 sc10.tex \
 sc10_fig1.eps sc10_fig2.eps sc10_fig3.eps sc10_fig4.eps sc10_logo.eps \
 sc11.tex \
@@ -724,7 +746,9 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
-$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(DATA_FILES) $(STARTUP_SCRIPT)
+$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(DATA_FILES) $(STARTUP_SCRIPT) \
+$(NDFPERL_SCRIPTS)
+
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -744,6 +768,7 @@ DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 GKS_PAR:     $(STAR_INC)/gks_par;     $(LINK) $? $@
 GNS_PAR:     $(STAR_INC)/gns_par;     $(LINK) $? $@
+GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_FUNC:    $(STAR_INC)/ndf_func;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
@@ -753,10 +778,12 @@ PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
 PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
 PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;  $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
 $(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) $(MONO_SOURCE) \
+$(NDFPERL_SCRIPTS) \
 $(HELP_SOURCES) $(MONO_IFL) $(STARTUP_SCRIPT) $(ICL_SCRIPT) $(DATA_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
@@ -1169,6 +1196,7 @@ install:
                -e s#INSTALL_HELP#$(INSTALL_HELP)# \
                -e s#STARLINK#$(STARLINK)# \
                -e s#PKG_VERS#$(PKG_VERS)# \
+               -e s#STAR_BIN#$(STAR_BIN)# \
               $(STARTUP_SCRIPT) >$(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
            chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
         else :; fi
@@ -1181,6 +1209,18 @@ install:
               $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
            chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
         else :; fi
+#
+#  Install the NDFPERL scripts. The location of the NDFPERL binary
+#  is taken to be $STAR_BIN. The original file is left in place.
+	for f in $(NDFPERL_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              sed -e s#STAR_BIN#$(STAR_BIN)# \
+                $$f > $(INSTALL_BIN)/$$f ;\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+
+
 #
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
@@ -1353,6 +1393,19 @@ do_deinstall:
            else :; fi ;\
            $(MAKE) $(ICL_SCRIPT);\
         else :; fi
+#
+#  Deinstall the NDFPERL scripts.  Since it will have been edited
+#  during installation, we remove the installed copy, if present, and
+#  then ensure that the original exists
+	- for f in $(NDFPERL_SCRIPTS) ""; do \
+	  if test -n "$$f"; then \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi ;\
+           $(MAKE) $$f;\
+          else :; fi \
+         done
+
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
@@ -1596,45 +1649,209 @@ strip:
 #    end
 
 
-
-surf_chgdata.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT
-surf_chgflat.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_chgpnt.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR PAR_ERR
-surf_chgqual.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR MSG_PAR
-surf_despike.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_extflat.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_extinction.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR MSG_PAR
-surf_flatfield.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_grid_despike.o: SAE_PAR PRM_PAR PAR_ERR MSG_PAR
-surf_mon.o: SAE_PAR PAR_PAR
-surf_read_rebin_ndf.o: PRM_PAR SAE_PAR SURF_PAR DAT_PAR MSG_PAR
-surf_rebin.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR PAR_ERR PAR_PAR SURF_PAR SAE_PAR
-surf_recurse_read.o: SAE_PAR SURF_PAR DAT_PAR MSG_PAR NDF_PAR SAE_PAR SURF_PAR
-surf_reduce_switch.o: SAE_PAR DAT_PAR PRM_PAR NDF_PAR MSG_PAR SURF_PAR SAE_PAR
-surf_remsky.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR MSG_PAR
-surf_restore.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_scan_rlb.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR
-surf_scucat.o: SAE_PAR NDF_PAR MSG_PAR PRM_PAR PAR_ERR DAT_PAR SURF_PAR
-surf_scuclip.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR MSG_PAR
-surf_scuhelp.o: SAE_PAR PAR_ERR
-surf_scuover.o: DAT_PAR NDF_PAR PRM_PAR PAR_ERR PAR_PAR SURF_PAR SAE_PAR GKS_PAR MSG_PAR
-surf_scuphot.o: SAE_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SURF_PAR PAR_ERR
-surf_skydip.o: SAE_PAR DAT_PAR MSG_PAR PAR_ERR PRM_PAR SURF_PAR NDF_FUNC
-surf_scuba2mem.o: SAE_PAR DAT_PAR PRM_PAR SURF_PAR
+surf_reduce_noise.o: SAE_PAR MSG_PAR SURF_PAR DAT_PAR PRM_PAR PAR_ERR
+surf_write_map_info.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR AST_PAR
+surf_chgdata.o: DAT_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR SURF_PAR
+surf_chgflat.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_chgpnt.o: DAT_PAR MSG_PAR PAR_ERR SAE_PAR SURF_PAR
+surf_chgqual.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_despike.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_extflat.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_extinction.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_flatfield.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_grid_calcsky.o: DAT_PAR MSG_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_grid_despike.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
+surf_make_weight.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_mon.o: PAR_PAR SAE_PAR
+surf_read_rebin_ndf.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_rebin.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_recurse_read.o: DAT_PAR MSG_PAR NDF_PAR SAE_PAR SURF_PAR
+surf_reduce_switch.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_remsky.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_restore.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_scan_rlb.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scucat.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_scuclip.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuhelp.o: PAR_ERR SAE_PAR
+surf_scuover.o: DAT_PAR GKS_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuphot.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_skydip.o: DAT_PAR MSG_PAR NDF_FUNC PAR_ERR PRM_PAR SAE_PAR SURF_PAR
 surf_write_data.o: PRM_PAR SAE_PAR
-surf_write_photom.o: SAE_PAR PRM_PAR
-surf_write_photom_header.o: SAE_PAR PRM_PAR SURF_PAR
-surf_write_map_info.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR
-surflib_calc_gridij.o: SAE_PAR PRM_PAR
-surflib_calc_ijpos.o: SAE_PAR PRM_PAR
-surflib_calc_output_grid.o: SAE_PAR PRM_PAR
-surflib_clip_grid.o: SAE_PAR PRM_PAR PAR_ERR MSG_PAR
-surflib_decode_remsky_string.o: SAE_PAR PRM_PAR MSG_PAR
-surflib_diff_despike.o: SAE_PAR PRM_PAR MSG_PAR NDF_FUNC
-surflib_fill_grid.o: SAE_PAR PRM_PAR
-surflib_histogram_grid.o: SAE_PAR PRM_PAR NDF_FUNC
-surflib_plot_grid.o: SAE_PAR PRM_PAR PAR_ERR MSG_PAR
-surflib_stats_grid.o: SAE_PAR PRM_PAR
+surf_write_photom.o: PRM_PAR SAE_PAR
+surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
+sculib_noise_mean.o: SAE_PAR
+sculib_1d2_jiggle.o: SAE_PAR
+sculib_2pos_confn.o: SAE_PAR
+sculib_2pos_deconv.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_3pos_confn.o: SAE_PAR
+sculib_3pos_deconv.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_add_chop.o: PRM_PAR SAE_PAR
+sculib_add_demod_exposure.o: SAE_PAR
+sculib_addare.o: PRM_PAR SAE_PAR
+sculib_airmass.o: SAE_PAR
+sculib_analyse_photom_jiggle.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_apparent_2_mp.o: SAE_PAR
+sculib_apparent_2_tp.o: SAE_PAR
+sculib_bessj1.o: PRM_PAR SAE_PAR
+sculib_bits.o: NUM_DEC_CVT NUM_DEF_CVT
+sculib_boldecode.o: SAE_PAR
+sculib_bolname.o: SAE_PAR
+sculib_bolselect.o: PRM_PAR SAE_PAR
+sculib_calc_apparent.o: SAE_PAR
+sculib_calc_azna_offset.o: SAE_PAR
+sculib_calc_bol_coords.o: PRM_PAR SAE_PAR
+sculib_calc_flatfield.o: PRM_PAR SAE_PAR
+sculib_calc_grid.o: SAE_PAR
+sculib_calc_output_coords.o: SAE_PAR
+sculib_calc_skydip_temps.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_calc_sub_bols.o: SAE_PAR
+sculib_clip_bol.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_coadd.o: NDF_FUNC PRM_PAR
+sculib_coadd_maps.o: PRM_PAR SAE_PAR
+sculib_coadd_remove.o:
+sculib_compress_demod.o: PRM_PAR SAE_PAR
+sculib_construct_out.o: SAE_PAR
+sculib_convolve.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_copy_demod_switch.o: SAE_PAR
+sculib_copy_good.o: PRM_PAR SAE_PAR
+sculib_correct_extinction.o: SAE_PAR
+sculib_covsrt.o: SAE_PAR
+sculib_crosstalk.o: SAE_PAR
+sculib_day.o: SAE_PAR
+sculib_decode_angle.o: SAE_PAR
+sculib_decode_component.o: SAE_PAR
+sculib_decode_filter.o: SAE_PAR
+sculib_decode_rebin_line.o: PRM_PAR SAE_PAR
+sculib_decode_spec.o: PRM_PAR SAE_PAR
+sculib_div_calibrator.o: SAE_PAR
+sculib_div_calibrator_2.o: SAE_PAR
+sculib_extract_2dim_b.o: SAE_PAR
+sculib_extract_2dim_d.o: SAE_PAR
+sculib_extract_2dim_r.o: SAE_PAR
+sculib_extract_bol.o: PRM_PAR SAE_PAR
+sculib_find_switch.o: SAE_PAR
+sculib_fit_2d_gaussian.o: PRM_PAR SAE_PAR
+sculib_fit_2d_parabola.o: NDF_FUNC SAE_PAR
+sculib_fit_d2xisq_daj2.o: SAE_PAR
+sculib_fit_d2xisq_dajk.o: SAE_PAR
+sculib_fit_dxisq_daj.o: SAE_PAR
+sculib_fit_function.o: SAE_PAR
+sculib_fit_makealpha.o: SAE_PAR
+sculib_fit_makebeta.o: SAE_PAR
+sculib_fit_mult.o: SAE_PAR
+sculib_fit_plane.o: SAE_PAR
+sculib_fit_skydip.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_fix_scan_v10.o: SAE_PAR
+sculib_flatfield_data.o: SAE_PAR
+sculib_flatfield_sequence.o: PRM_PAR SAE_PAR
+sculib_free.o: PRM_PAR SAE_PAR
+sculib_gauss_wtinit.o: SAE_PAR
+sculib_gaussian_xisq.o: SAE_PAR
+sculib_gaussj.o: SAE_PAR
+sculib_gensyconfn.o: SAE_PAR
+sculib_get_bol_desc.o: SAE_PAR
+sculib_get_dem_pntr.o: SAE_PAR
+sculib_get_filename.o: SAE_PAR
+sculib_get_fits_c.o: SAE_PAR
+sculib_get_fits_d.o: PRM_PAR SAE_PAR
+sculib_get_fits_i.o: PRM_PAR SAE_PAR
+sculib_get_fits_l.o: PRM_PAR SAE_PAR
+sculib_get_fits_r.o: PRM_PAR SAE_PAR
+sculib_get_jiggle.o: SAE_PAR
+sculib_get_lst_strt.o: SAE_PAR
+sculib_get_mjd.o: SAE_PAR
+sculib_get_raster.o: SAE_PAR
+sculib_get_sub_bols.o: SAE_PAR
+sculib_get_sub_inst.o: PRM_PAR SAE_PAR
+sculib_insert_bol.o: PRM_PAR SAE_PAR
+sculib_integrate_photom_jiggle.o: SAE_PAR
+sculib_invert_matrix.o: SAE_PAR
+sculib_j_theoretical.o: SAE_PAR
+sculib_jnu.o: PRM_PAR SAE_PAR
+sculib_linear_wtinit.o: SAE_PAR
+sculib_lst.o: SAE_PAR
+sculib_malloc.o: PRM_PAR SAE_PAR
+sculib_map_allan_variance.o: SAE_PAR
+sculib_mask_data.o: PRM_PAR SAE_PAR
+sculib_mrqcof.o: SAE_PAR
+sculib_mrqmin.o: SAE_PAR
+sculib_mulcad.o: PRM_PAR SAE_PAR
+sculib_mulcar.o: PRM_PAR
+sculib_multare.o: SAE_PAR
+sculib_par_get.o: PRM_PAR SAE_PAR
+sculib_photom_bolselect.o: PRM_PAR SAE_PAR
+sculib_process_bols.o: PRM_PAR SAE_PAR
+sculib_put_fits_c.o: SAE_PAR
+sculib_put_fits_d.o: SAE_PAR
+sculib_put_fits_i.o: SAE_PAR
+sculib_read_jiggle.o: SAE_PAR
+sculib_read_numbers.o: SAE_PAR
+sculib_read_sky.o: PRM_PAR SAE_PAR
+sculib_read_tauz.o: PRM_PAR SAE_PAR
+sculib_readbols.o: SAE_PAR
+sculib_reduce_switch.o: SAE_PAR
+sculib_remove_demod_int.o: SAE_PAR
+sculib_remove_linear_baseline.o: MSG_PAR NDF_FUNC PRM_PAR SAE_PAR
+sculib_remove_opacity.o: PRM_PAR SAE_PAR
+sculib_remsky.o: MSG_PAR NDF_FUNC PRM_PAR SAE_PAR
+sculib_rewrite_fits_c.o: SAE_PAR
+sculib_rewrite_fits_i.o: SAE_PAR
+sculib_rewrite_fits_r.o: SAE_PAR
+sculib_scan_2_rd.o: SAE_PAR
+sculib_scan_apparent_tp_2_azna.o: PRM_PAR SAE_PAR
+sculib_search_datadir.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR SAE_PAR
+sculib_set_data.o: PRM_PAR SAE_PAR
+sculib_set_data_bit.o: PRM_PAR SAE_PAR
+sculib_set_data_ub.o: PRM_PAR SAE_PAR
+sculib_set_qual.o: SAE_PAR
+sculib_set_quality.o: SAE_PAR
+sculib_skydip_allan_variance.o: SAE_PAR
+sculib_skydip_bols.o: SAE_PAR
+sculib_skydip_var.o: SAE_PAR
+sculib_skydip_xisq.o: SAE_PAR
+sculib_spline_pda_idbvip.o: PRM_PAR SAE_PAR
+sculib_spline_pda_idsfft.o: PRM_PAR SAE_PAR
+sculib_spline_pda_surfit.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_spline_regrid.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_spline_regrid_1.o: PRM_PAR SAE_PAR
+sculib_split_file_spec.o: SAE_PAR
+sculib_sqrootr.o: PRM_PAR SAE_PAR
+sculib_standard_apparent.o: SAE_PAR
+sculib_statd.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_statr.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_sub_tauz.o: PRM_PAR SAE_PAR
+sculib_subare.o: PRM_PAR SAE_PAR
+sculib_sumad.o: SAE_PAR
+sculib_tidy_line.o: SAE_PAR
+sculib_unpack.o: SAE_PAR
+sculib_unpack_chopscan.o: SAE_PAR
+sculib_unpack_jiggle.o: PRM_PAR SAE_PAR
+sculib_unpack_jiggle_separates.o: NDF_FUNC PRM_PAR SAE_PAR
+sculib_ut1.o: SAE_PAR
+sculib_wtfn_regrid.o: MSG_PAR PRM_PAR SAE_PAR
+sculib_wtfn_regrid_1.o: PRM_PAR SAE_PAR
+sculib_wtfn_regrid_2.o: PRM_PAR SAE_PAR
+sculib_wtfn_regrid_3.o: PRM_PAR SAE_PAR
+sculib_bessel_wtinit.o: SAE_PAR
+sculib_skydip_temperatures.o: SAE_PAR
+surflib_2dft_chop.o: SAE_PAR
+surflib_calc_gridij.o: PRM_PAR SAE_PAR
+surflib_calc_ijpos.o: PRM_PAR SAE_PAR
+surflib_calc_output_grid.o: PRM_PAR SAE_PAR
+surflib_clip_grid.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
+surflib_construct_cube.o: PRM_PAR SAE_PAR
+surflib_decode_remsky_string.o: MSG_PAR PRM_PAR SAE_PAR
+surflib_diff_despike.o: MSG_PAR NDF_FUNC PRM_PAR SAE_PAR
+surflib_fill_grid.o: NDF_FUNC PRM_PAR SAE_PAR
+surflib_histogram_grid.o: NDF_FUNC PRM_PAR SAE_PAR
+surflib_median_regrid.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
+surflib_plot_grid.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
+surflib_rem_grid.o: PRM_PAR SAE_PAR
+surflib_rem_timeseries.o: PRM_PAR SAE_PAR
+surflib_remove_dc_from_exp.o: MSG_PAR PRM_PAR SAE_PAR
+surflib_stats_grid.o: PRM_PAR SAE_PAR
+ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
 kpg1_agatc.o: DAT_PAR SAE_PAR
@@ -1650,156 +1867,6 @@ kpg1_qcol.o: GKS_PAR SAE_PAR
 kpg1_qidat.o: GKS_PAR SAE_PAR
 kpg1_scrsz.o: SAE_PAR
 pthlpo.o: HLPCMD SAE_PAR
-sculib_1d2_jiggle.o: SAE_PAR
-sculib_2pos_confn.o: SAE_PAR
-sculib_2pos_deconv.o: SAE_PAR PRM_PAR MSG_PAR
-sculib_3pos_confn.o: SAE_PAR
-sculib_3pos_deconv.o: SAE_PAR PRM_PAR MSG_PAR
-sculib_add_demod_exposure.o: SAE_PAR
-sculib_addare.o: SAE_PAR PRM_PAR
-sculib_airmass.o: SAE_PAR
-sculib_analyse_photom_jiggle.o: SAE_PAR PRM_PAR NDF_FUNC
-sculib_apparent_2_mp.o: SAE_PAR
-sculib_apparent_2_tp.o: SAE_PAR
-sculib_bessj1.o: SAE_PAR PRM_PAR
-sculib_bits.o: NUM_DEC_CVT NUM_DEF_CVT NUM_DEC_CVT NUM_DEF_CVT
-sculib_boldecode.o: SAE_PAR
-sculib_bolname.o: SAE_PAR
-sculib_bolselect.o: SAE_PAR PRM_PAR
-sculib_calc_apparent.o: SAE_PAR
-sculib_calc_azna_offset.o: SAE_PAR
-sculib_calc_bol_coords.o: SAE_PAR PRM_PAR
-sculib_calc_flatfield.o: SAE_PAR PRM_PAR
-sculib_calc_grid.o: SAE_PAR
-sculib_calc_output_coords.o: SAE_PAR
-sculib_calc_skydip_temps.o: SAE_PAR MSG_PAR
-sculib_calc_sub_bols.o: SAE_PAR
-sculib_clip_bol.o: PRM_PAR SAE_PAR NDF_FUNC
-sculib_coadd.o: PRM_PAR NDF_FUNC
-sculib_coadd_maps.o: SAE_PAR PRM_PAR
-sculib_coadd_remove.o:
-sculib_compress_demod.o: SAE_PAR PRM_PAR
-sculib_construct_out.o: SAE_PAR
-sculib_convolve.o: SAE_PAR PRM_PAR NDF_FUNC
-sculib_copy_demod_switch.o: SAE_PAR
-sculib_copy_good.o: SAE_PAR PRM_PAR
-sculib_correct_extinction.o: SAE_PAR
-sculib_covsrt.o: SAE_PAR
-sculib_crosstalk.o: SAE_PAR
-sculib_day.o: SAE_PAR
-sculib_decode_angle.o: SAE_PAR
-sculib_decode_component.o: SAE_PAR
-sculib_decode_filter.o: SAE_PAR
-sculib_decode_rebin_line.o: SAE_PAR PRM_PAR
-sculib_decode_spec.o: SAE_PAR PRM_PAR
-sculib_div_calibrator.o: SAE_PAR
-sculib_div_calibrator_2.o: SAE_PAR
-sculib_extract_2dim_b.o: SAE_PAR
-sculib_extract_2dim_d.o: SAE_PAR
-sculib_extract_2dim_r.o: SAE_PAR
-sculib_extract_bol.o: PRM_PAR SAE_PAR
-sculib_find_switch.o: SAE_PAR
-sculib_fit_2d_gaussian.o: SAE_PAR PRM_PAR
-sculib_fit_2d_parabola.o: SAE_PAR NDF_FUNC
-sculib_fit_d2xisq_daj2.o: SAE_PAR
-sculib_fit_d2xisq_dajk.o: SAE_PAR
-sculib_fit_dxisq_daj.o: SAE_PAR
-sculib_fit_function.o: SAE_PAR
-sculib_fit_makealpha.o: SAE_PAR
-sculib_fit_makebeta.o: SAE_PAR
-sculib_fit_mult.o: SAE_PAR
-sculib_fit_plane.o: SAE_PAR
-sculib_fit_skydip.o: SAE_PAR PRM_PAR
-sculib_flatfield_data.o: SAE_PAR
-sculib_flatfield_sequence.o: SAE_PAR PRM_PAR
-sculib_free.o: SAE_PAR PRM_PAR
-sculib_gaussian_xisq.o: SAE_PAR
-sculib_gaussj.o: SAE_PAR
-sculib_gensyconfn.o: SAE_PAR
-sculib_get_bol_desc.o: SAE_PAR
-sculib_get_dem_pntr.o: SAE_PAR
-sculib_get_filename.o: SAE_PAR
-sculib_get_fits_c.o: SAE_PAR
-sculib_get_fits_d.o: SAE_PAR PRM_PAR
-sculib_get_fits_i.o: SAE_PAR PRM_PAR
-sculib_get_fits_l.o: SAE_PAR PRM_PAR
-sculib_get_fits_r.o: SAE_PAR PRM_PAR
-sculib_get_jiggle.o: SAE_PAR
-sculib_get_lst_strt.o: SAE_PAR
-sculib_get_mjd.o: SAE_PAR
-sculib_get_raster.o: SAE_PAR
-sculib_get_sub_bols.o: SAE_PAR
-sculib_get_sub_inst.o: PRM_PAR SAE_PAR
-sculib_insert_bol.o: PRM_PAR SAE_PAR
-sculib_integrate_photom_jiggle.o: SAE_PAR
-sculib_invert_matrix.o: SAE_PAR
-sculib_j_theoretical.o: SAE_PAR
-sculib_jnu.o: SAE_PAR PRM_PAR
-sculib_linear_wtinit.o: SAE_PAR
-sculib_lst.o: SAE_PAR
-sculib_malloc.o: SAE_PAR PRM_PAR
-sculib_map_allan_variance.o: SAE_PAR
-sculib_mask_data.o: SAE_PAR PRM_PAR
-sculib_mrqcof.o: SAE_PAR
-sculib_mrqmin.o: SAE_PAR
-sculib_mulcar.o: PRM_PAR
-sculib_multare.o: SAE_PAR
-sculib_par_get.o: SAE_PAR PRM_PAR SAE_PAR PRM_PAR SAE_PAR PRM_PAR SAE_PAR PRM_PAR SAE_PAR PRM_PAR
-sculib_photom_bolselect.o: SAE_PAR PRM_PAR
-sculib_process_bols.o: PRM_PAR SAE_PAR
-sculib_put_fits_c.o: SAE_PAR
-sculib_put_fits_d.o: SAE_PAR
-sculib_put_fits_i.o: SAE_PAR
-sculib_read_jiggle.o: SAE_PAR
-sculib_read_numbers.o: SAE_PAR
-sculib_read_sky.o: SAE_PAR PRM_PAR
-sculib_read_tauz.o: SAE_PAR PRM_PAR
-sculib_readbols.o: SAE_PAR
-sculib_reduce_switch.o: SAE_PAR
-sculib_remove_demod_int.o: SAE_PAR
-sculib_remove_linear_baseline.o: SAE_PAR PRM_PAR MSG_PAR NDF_FUNC
-sculib_remove_opacity.o: SAE_PAR PRM_PAR
-sculib_remsky.o: PRM_PAR SAE_PAR MSG_PAR NDF_FUNC
-sculib_rewrite_fits_c.o: SAE_PAR
-sculib_rewrite_fits_i.o: SAE_PAR
-sculib_rewrite_fits_r.o: SAE_PAR
-sculib_scan_apparent_tp_2_azna.o: PRM_PAR SAE_PAR
-sculib_search_datadir.o: DAT_PAR SAE_PAR MSG_PAR NDF_PAR PAR_ERR
-sculib_set_data.o: SAE_PAR PRM_PAR
-sculib_set_data_bit.o: SAE_PAR PRM_PAR
-sculib_set_data_ub.o: SAE_PAR PRM_PAR
-sculib_set_qual.o: SAE_PAR
-sculib_set_quality.o: SAE_PAR
-sculib_skydip_allan_variance.o: SAE_PAR
-sculib_skydip_bols.o: SAE_PAR
-sculib_skydip_xisq.o: SAE_PAR
-sculib_spline_pda_idbvip.o: SAE_PAR PRM_PAR
-sculib_spline_pda_idsfft.o: SAE_PAR PRM_PAR
-sculib_spline_pda_surfit.o: MSG_PAR SAE_PAR PRM_PAR
-sculib_spline_regrid.o: PRM_PAR SAE_PAR MSG_PAR
-sculib_spline_regrid_1.o: SAE_PAR PRM_PAR
-sculib_split_file_spec.o: SAE_PAR
-sculib_sqrootr.o: SAE_PAR PRM_PAR
-sculib_standard_apparent.o: SAE_PAR
-sculib_statr.o: PRM_PAR SAE_PAR NDF_FUNC
-sculib_sub_tauz.o: SAE_PAR PRM_PAR
-sculib_subare.o: SAE_PAR PRM_PAR
-sculib_sumad.o: SAE_PAR
-sculib_tidy_line.o: SAE_PAR
-sculib_unpack.o: SAE_PAR
-sculib_unpack_chopscan.o: SAE_PAR
-sculib_unpack_jiggle.o: SAE_PAR PRM_PAR
-sculib_unpack_jiggle_separates.o: SAE_PAR PRM_PAR NDF_FUNC
-sculib_ut1.o: SAE_PAR
-sculib_wtfn_regrid.o: PRM_PAR SAE_PAR MSG_PAR
-sculib_wtfn_regrid_1.o: SAE_PAR PRM_PAR
-sculib_wtfn_regrid_2.o: SAE_PAR PRM_PAR
-sculib_wtfn_regrid_3.o: SAE_PAR PRM_PAR
-sculib_bessel_wtinit.o: SAE_PAR
-sculib_skydip_temperatures.o: SAE_PAR
-sculib_scan_2_rd.o: SAE_PAR
-sculib_add_chop.o: SAE_PAR PRM_PAR
-sculib_mulcad.o: SAE_PAR PRM_PAR
 
 #-------------------------------------------------------------------------------
 #
