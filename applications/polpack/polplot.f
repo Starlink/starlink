@@ -44,9 +44,13 @@
 
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
-*        A rotation angle in degrees to be added to each vector
-*        orientation before plotting the vectors (see parameters
-*        COLANG and NEGATE). It should be in the range 0--360. [0.0]
+*        Specifies the orientation of the reference direction. The angles
+*        specified by parameter COLANG are assumed to be angles measured 
+*        anti-clockwise from this reference direction. The value of ANGROT 
+*        should be the anti-clockwise angle from the positive X axis to the 
+*        reference direction, in degrees. The run time default value is equal 
+*        to the value of the ANGROT parameter within the supplied catalogue, 
+*        or zero if the catalogue does not contain an ANGROT parameter. []
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
@@ -80,10 +84,10 @@
 *        The name of the catalogue column holding the orientation of each 
 *        vector. The values are considered to be in units of degrees unless 
 *        the UNITS attribute of the column has the value "Radians" (case 
-*        insensitive).  The positive X axis defines zero orientation, and 
-*        rotation from the X axis to the Y axis is considered positive. 
-*        A list of available column names is displayed if a non-existent
-*        column name is given. [ANG]
+*        insensitive).  The angles are assumed to be measured anti-clockwise 
+*        from the reference direction given by the ANGROT parameter. A list 
+*        of available column names is displayed if a non-existent column name 
+*        is given. See also parameter NEGATE. [ANG]
 *     COLMAG = LITERAL (Read)
 *        The name of the catalogue column holding the magnitude of each 
 *        vector. A list of available column names is displayed if a 
@@ -219,8 +223,9 @@
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
 *        orientation of the polarization (i.e. the values in the column
-*        specified by parameter COLANG) are negated before adding on any 
-*        value specified by parameter ANGROT. [FALSE]
+*        specified by parameter COLANG) are assumed to be measured clockwise
+*        (rather than anti-clockwise) from the reference direction given
+*        by parameter ANGROT. [FALSE]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the contours and annotated axes. 
@@ -282,10 +287,10 @@
 *        grid and vectors are drawn in green, blue and red respectively,
 *        and slightly thicker lines are used to draw the border.
 *     polplot poltab ra dec noclear angrot=23.4 frame=eq(B1950)
-*        Produces a vector map in which the reference direction for the vectors
-*        (as defined by the value zero in the column ANG) is at the
-*        position angle 23.4 degrees (measured anti-clockwise from the
-*        positive y axis) in the displayed map. The position of each vector
+*        Produces a vector map in which the reference direction for the 
+*        vectors (as defined by the value zero in the column ANG) is at 
+*        an angle of 23.4 degrees in the displayed map, measured 
+*        anti-clockwise from the positive X axis. The position of each vector
 *        is specified by columns "ra" and "dec". The annotated axes give
 *        equatorial (RA/DEC) coordinates referred to the equinox of B1950.
 *        If the vector map is displayed over an existing DATA picture, then
@@ -356,6 +361,9 @@
 *        parameter.
 *     22-MAR-1999 (DSB):
 *        Get AXES *before* MARGIN.
+*     6-APR-1999 (DSB):
+*        Change the default for ANGROT from 0.0 to the value of ANGROT in
+*        the supplied catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -406,6 +414,7 @@
       DOUBLE PRECISION UBND      ! Upper axis bound
       INTEGER CI                 ! CAT catalogue identifier
       INTEGER FRM                ! Frame pointer
+      INTEGER GANG               ! CAT identifier for ANGROT parameter
       INTEGER GI                 ! CAT column identifier
       INTEGER GIANG              ! CAT identifier for ANG column
       INTEGER GIMAG              ! CAT identifier for MAG column
@@ -839,14 +848,36 @@
 *  Obtain the vector-plot characteristics.
 *  =======================================
 
-*  Get the angle (in degrees) which is to be added to the values stored
-*  in the supplied catalogue, and convert to radians.  Do not set a dynamic 
-*  default. Constrain to 0 to 360 degrees.
-      CALL PAR_GDR0R( 'ANGROT', -1.0, 0.0, 360.0, .FALSE., ANGROT,
-     :                STATUS )
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to get a CAT identifier for the ANGROT parameter in the
+*  supplied catalogue.
+      CALL CAT_TIDNT( CI, 'ANGROT', GANG, STATUS )       
+
+*  If this failed, annul the error nad use a dynamic default of zero for
+*  parameter ANGROT.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( STATUS )
+         ANGROT = 0.0
+
+*  Otherwise, get the value of the ANGROT parameter and release the
+*  identifier.
+      ELSE
+         CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
+         CALL CAT_TRLSE( GANG, STATUS )
+      END IF
+
+*  Set the dynamic default for ANGROT.
+      CALL PAR_DEF0R( 'ANGROT', ANGROT, STATUS )
+
+*  Get the new ANGROT value. This is the anti-clockwise angle (in degrees) 
+*  from the positive X axis to the reference direction. 
+      CALL PAR_GET0R( 'ANGROT', ANGROT, STATUS )
       ANGROT = ANGROT * DTOR
 
-*  See if the angles are to be negated before being used.
+*  See if the angles are clockwise (i.e. if they are to be negated before 
+*  being used).
       CALL PAR_GET0L( 'NEGATE', NEGATE, STATUS )
 
 *  Abort if an error has occurred.

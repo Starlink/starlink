@@ -28,16 +28,16 @@
 *     VECMAG( NVEC ) = REAL (Given)
 *        The data values defining the vector magnitudes.
 *     VECORN( NVEC ) = REAL (Given)
-*        The data values defining the vector orientations.  Positive
-*        values correspond to rotation in the same sense as from the x
-*        axis to the y axis.  Zero corresponds to the x axis.  The
-*        units are defined by argument ANGFAC.
+*        The data values defining the vector orientations.  Measured
+*        from the reference direction given by ANGROT. They are
+*        anti-clockwise unless NEGATE is .TRUE. The units are defined 
+*        by argument ANGFAC.
 *     ANGFAC = REAL (Given)
 *        The factor which converts values from VECORN into units of
 *        radians.
 *     ANGROT = REAL (Given)
-*        A value (in radians) to be added on to the vector orientation
-*        angles given by VECORN.
+*        The ACW angle from the X axis to the reference directions,
+*        in radians.
 *     DSCALE = REAL (Given)
 *        A factor which converts data values in VECMAG into
 *        corresponding vector lengths in centimetres.
@@ -54,7 +54,7 @@
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
 *     NEGATE = LOGICAL (Given)
-*        Negate the supplied angles before adding on ANGROT?
+*        Are the supplied angles clockwise?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -178,13 +178,14 @@
 
 *  Calculate the vector orientation, in radians. Within POL1_VECT, the
 *  vector orientations are measured from the Y axis, but the supplied
-*  VECORN values are measured from the X axis. So subtract 90 degrees
-*  from the supplied value to make zero equivalent to the Y axis.
+*  VECORN values are measured from the reference direction. So subtract 
+*  90 degrees to make zero equivalent to the Y axis.
             IF( NEGATE ) THEN
                VECANG = -ANGFAC * VECORN( I ) + ANGROT - PIBY2
             ELSE
                VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
             END IF
+
 *  Plot the vector.      
             CALL POL1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
      :                      VECLEN, VECANG, AHSIZE, STATUS )
