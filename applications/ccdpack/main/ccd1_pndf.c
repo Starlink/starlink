@@ -9,7 +9,9 @@
 
    void *ccdMall( char *type, int size, int *status );
 
-   F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), DOUBLE_ARRAY(percnt), 
+   F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nndf),
+                              INTEGER_ARRAY(iset), INTEGER(nset), 
+                              INTEGER(namgid), DOUBLE_ARRAY(percnt), 
                               DOUBLE(zoom), INTEGER(maxcnv), 
                               INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
                               CHARACTER(mstyle), INTEGER(count), 
@@ -31,19 +33,34 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, PERCNT, ZOOM, MAXCNV, WINDIM, PRVDIM,
-*                     MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF, IPX1, 
-*                     IPY1, IPX2, IPY2, STATUS )
+*     CALL CCD1_PNDF( NDFGID, NNDF, ISET, NSET, NAMGID, PERCNT, ZOOM,
+*                     MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
+*                     NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which presents the user with a
-*     graphical method of specifying offsets between pairs of members
-*     of a group of NDFs, and returns the offsets thus obtained.
+*     graphical method of specifying offsets between pairs of Sets
+*     derived from a group of NDFs, and returns the offsets thus 
+*     obtained.
 
 *  Arguments:
 *     NDFGID = INTEGER (Given)
 *        GRP identifier of the group of NDFs which is to be presented 
 *        to the user.
+*     NNDF = INTEGER (Given)
+*        The number of entries in the NDFGID group.
+*     ISET( NNDF ) = INTEGER (Given)
+*        The number of the Set to which each NDF in the NDFGID group 
+*        belongs.  Members of the same Set (NDFs with the same value
+*        of ISET( * )) will be grouped together, and each pairing
+*        returned by this routine will be between a pair of Sets.
+*     NSET = INTEGER (Given)
+*        The number of Sets represented in ISET.
+*     NAMGID = INTEGER (Given)
+*        The GRP identifier for a group holding the Set names 
+*        corresponding to the Sets in ISET.  It should have NSET members.
+*        Members with a value of ' ', meaning no alignment Set 
+*        information is available, are permitted.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
@@ -54,7 +71,7 @@
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
 *     PRVDIM( 2 ) = INTEGER (Given and Returned)
-*        Dimensions of the preview window for each NDF used in the 
+*        Dimensions of the preview window for each Set used in the 
 *        chooser widget.
 *     MSTYLE = CHARACTER * ( * ) (Given and Returned)
 *        A string indicating how markers are to be plotted on the image.
@@ -62,8 +79,7 @@
 *        Number of pairings made by the user.
 *     NODES( 2, * ) = INTEGER (Returned)
 *        For each pairing made, this array contains the indices of the 
-*        NDFs which form the pair.  The index of the first NDF in the
-*        group pointed to by NDFGID is 1, etc.  The first COUNT pairs
+*        Sets which form the pair.  The first COUNT pairs
 *        of elements in this array are filled on return.
 *     NMAT( * ) = INTEGER (Returned)
 *        For each pairing made, the number of objects which were matched
@@ -73,12 +89,12 @@
 *        of this array are filled on return.
 *     XOFF( * ) = DOUBLE PRECISION (Returned)
 *        For each pairing I made this array contains the accurate X
-*        offset between the NDFs with indices NODES( 1, I ) and 
+*        offset between the Sets with indices NODES( 1, I ) and 
 *        NODES( 2, I ).  The first COUNT elements in this array are
 *        filled on return.
 *     YOFF( * ) = DOUBLE PRECISION (Returned)
 *        For each pairing I made this array contains the accurate Y
-*        offset between the NDFs with indices NODES( 1, I ) and 
+*        offset between the Sets with indices NODES( 1, I ) and 
 *        NODES( 2, I ).  The first COUNT elements in this array are
 *        filled on return.
 *     IPX1( * ) = INTEGER (Returned)
@@ -123,6 +139,8 @@
 *  History:
 *     6-SEP-2000 (MBT):
 *        Original version.
+*     7-MAR-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -131,34 +149,46 @@
 *-
 */
 
-/* Arguments. */
+/* Arguments Given. */
       GENPTR_INTEGER(ndfgid)
-      GENPTR_INTEGER(count)
-      GENPTR_INTEGER_ARRAY(nodes)
-      GENPTR_INTEGER_ARRAY(nmat)
+      GENPTR_INTEGER(nndf)
+      GENPTR_INTEGER_ARRAY(iset)
+      GENPTR_INTEGER(nset)
+      GENPTR_INTEGER(namgid)
       GENPTR_DOUBLE_ARRAY(percnt)
+
+/* Arguments Given and Returned. */
       GENPTR_DOUBLE(zoom)
       GENPTR_INTEGER(maxcnv)
       GENPTR_INTEGER_ARRAY(windim)
       GENPTR_INTEGER_ARRAY(prvdim)
       GENPTR_CHARACTER(mstyle)
+
+/* Arguments Returned. */
+      GENPTR_INTEGER(count)
+      GENPTR_INTEGER_ARRAY(nodes)
+      GENPTR_INTEGER_ARRAY(nmat)
       GENPTR_DOUBLE_ARRAY(xoff)
       GENPTR_DOUBLE_ARRAY(yoff)
       GENPTR_POINTER_ARRAY(ipx1)
       GENPTR_POINTER_ARRAY(ipy1)
       GENPTR_POINTER_ARRAY(ipx2)
       GENPTR_POINTER_ARRAY(ipy2)
+
+/* Global Status. */
       GENPTR_INTEGER(status)
 
 /* Local variables. */
-      int nndf;
       int i;
       int j;
+      int first;
       const int one = 1;
       ccdTcl_Interp *cinterp;
       DECLARE_CHARACTER( fndfname, GRP__SZNAM );
-      char ndfname[ GRP__SZNAM + 1 ];
+      DECLARE_CHARACTER( fsetname, GRP__SZNAM );
       char buffer[ 1024 ];
+      char ndfname[ GRP__SZNAM + 1 ];
+      char setname[ GRP__SZNAM + 1 ];
       char *cmstyle;
 
 /* Test the global status. */
@@ -167,19 +197,32 @@
 /* Initialise the Tcl interpreter. */
       cinterp = ccdTclStart( status );
 
-/* Get the number of NDFs in the group. */
-      F77_CALL(grp_grpsz)( INTEGER_ARG(ndfgid), INTEGER_ARG(&nndf),
-                           INTEGER_ARG(status) );
-
 /* Construct a list of NDF names available to the Tcl interpreter as 
-   the value of the NDFNAMES variable. */
-      for ( i = 1; i <= nndf; i++ ) {
-         F77_CALL(grp_get)( INTEGER_ARG(ndfgid), INTEGER_ARG(&i), 
-                            INTEGER_ARG(&one), CHARACTER_ARG(fndfname),
+   the value of the NDFSETS variable. */
+      for ( i = 1; i <= *nset; i++ ) {
+         ccdTclDo( cinterp, "set tmplist {}; unset tmplist", status );
+         F77_CALL(grp_get)( INTEGER_ARG(namgid), INTEGER_ARG(&i),
+                            INTEGER_ARG(&one), CHARACTER_ARG(fsetname),
                             INTEGER_ARG(status)
-                            TRAIL_ARG(fndfname) );
-         cnfImprt( fndfname, GRP__SZNAM, ndfname );
-         ccdTclAppC( cinterp, "NDFNAMES", ndfname, status );
+                            TRAIL_ARG(fsetname) );
+         cnfImprt( fsetname, GRP__SZNAM, setname );
+         first = 1;
+         for ( j = 1; j <= *nndf; j++ ) {
+            if ( iset[ j - 1 ] == i ) {
+               F77_CALL(grp_get)( INTEGER_ARG(ndfgid), INTEGER_ARG(&j), 
+                                  INTEGER_ARG(&one), CHARACTER_ARG(fndfname),
+                                  INTEGER_ARG(status)
+                                  TRAIL_ARG(fndfname) );
+               cnfImprt( fndfname, GRP__SZNAM, ndfname );
+               if ( first ) {
+                  if ( *setname == '\0' ) strcpy( setname, ndfname );
+                  ccdTclAppC( cinterp, "tmplist", setname, status );
+                  first = 0;
+               }
+               ccdTclAppC( cinterp, "tmplist", ndfname, status );
+            }
+         }
+         ccdTclDo( cinterp, "lappend NDFSETS $tmplist", status );
       }
 
 /* Set the value of other Tcl variables to be passed into the script. */
@@ -284,7 +327,7 @@
 *     A pointer to a block of memory which will hold size elements of
 *     type type.  This pointer has been registered with the CCDPACK
 *     memory allocation machinery (and a fortiori the CNF memory 
-*     allocation machinery) and so must be deallocated using CCD1_FREE.
+*     allocation machinery) and so must be deallocated using CCD1_MFREE.
 *     The pointer returned is a C pointer, and thus suitable for direct
 *     use by C code.  If it is to be used by Fortran code it must
 *     be processed with the function cnfFptr.

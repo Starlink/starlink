@@ -17,8 +17,18 @@
 #
 
 #  Public Variables (Configuration Options):
-#     ndf = ndf object
-#        The ndf object with which the widget is associated.
+#     ndf = ndf/ndfset object
+#        The ndf object or ndfset object with which the widget is 
+#        associated.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     10-NOV-2000 (MBT):
+#        Original version.
+#     14-MAR-2001 (MBT):
+#        Upgraded for use with Sets.
 
 #-
 
@@ -53,7 +63,9 @@
       public variable ndf "" {
 #-----------------------------------------------------------------------
          $omenu delete 0 end
-         if { ! [ catch { $ndf validndf } ] } {
+         if { ! [ catch { $ndf validndf } valid ] } { set hasvalid $valid }
+         if { ! [ catch { $ndf validndfset } valid ] } { set hasvalid $valid }
+         if { $hasvalid } {
             foreach domain [ $ndf frameatt domain ] {
                $omenu insert 0 $domain
             }
@@ -80,7 +92,7 @@
 #-----------------------------------------------------------------------
       public variable value "" {
 #-----------------------------------------------------------------------
-         if { $value != "" && ! [ catch { $ndf validndf } ] } {
+         if { $value != "" && $hasvalid } {
             if { [ $ndf frameatt domain $value ] != $value } {
                set value [ $ndf frameatt domain $value ]
                configure -value $value
@@ -108,6 +120,7 @@
 
       private variable omenu             ;# Path name of the optionmenu widget
       private variable omenubut          ;# Path name of menubutton component
+      private variable hasvalid 0        ;# Do we have a valid ndf/ndfset?
 
    }
 
