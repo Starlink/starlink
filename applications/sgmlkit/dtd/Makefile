@@ -3,7 +3,7 @@
 # Create a manifest by listing all the files, below here, removing
 # certain directories, CVS directories, backup files, and then
 # removing all files which are present in the file manifest-omit.
-manifest: CATALOG-override
+manifest: CATALOG-override manifest-omit
 	rm -f manifest
 	find . -type f | \
 	    sed -e 's,^\./,,' | \
