@@ -50,6 +50,7 @@
 *      9 Sep 94 : V1.5-5 another quality problem fixed (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     12 Dec 94 : V1.8-1 Uses axis bounds rather than widths (RJV)
+*     30 Jul 95 : V1.8-2 Get locators from ADI (DJA)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -71,7 +72,6 @@
       CHARACTER*(DAT__SZLOC) ILOC       ! input dataset locator
       CHARACTER*(DAT__SZLOC) OLOC       ! output dataset locator
       CHARACTER*(DAT__SZLOC) CLOC       ! clone dataset locator
-      CHARACTER*(DAT__SZTYP) TYPE       ! input dataset type
       CHARACTER*80           ITEXT(4)   ! name of input file
       CHARACTER*80           OTEXT(4)   ! name of output file
       CHARACTER*80           AXLABEL(7) ! AXIS labels
@@ -87,11 +87,10 @@
       LOGICAL REGO(DAT__MXDIM)        ! regularly spaced output data
       LOGICAL UNIF(DAT__MXDIM)        ! uniform input axis(n).width
       LOGICAL UNIFO(DAT__MXDIM)       ! uniform output axis(n).width
-      LOGICAL INPRIM                  ! Primitive input?
-      LOGICAL CPRIM
       LOGICAL EXCLUDE
       LOGICAL SEL(DAT__MXDIM)
 
+      INTEGER IFID,OFID,CFID
       INTEGER OPT
       INTEGER NAXVDIM(DAT__MXDIM)     ! # axis values (should=dims)
       INTEGER NAXWDIM(DAT__MXDIM)     ! # axis widths (should=dims)
@@ -141,15 +140,21 @@
 *    Version id :
 *
       CHARACTER*20 VERSION
-         PARAMETER (VERSION='REBIN Version 1.8-1')
+         PARAMETER (VERSION='REBIN Version 1.8-2')
 *-
       CALL MSG_PRNT (VERSION)
 
       CALL AST_INIT()
 
-* Associate input dataset
-      CALL USI_ASSOCI ('INP','READ',ILOC,INPRIM,STATUS)
+* Associate input and output datasets
+      CALL USI_TASSOC2('INP','OUT','READ',IFID,OFID,STATUS)
+      IF (STATUS .NE. SAI__OK) GOTO 9000
+
       CALL USI_NAMEI(INLINES,ITEXT,STATUS)
+
+*  Extract locators
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
 
 * Check input dataset
       CALL BDA_CHKDATA(ILOC,OK,NDIM,DIMS,STATUS)
@@ -160,13 +165,6 @@
         STATUS=SAI__ERROR
       ENDIF
 
-* Obtain type of dataset
-      CALL DAT_TYPE(ILOC,TYPE,STATUS)
-
-* create output  dataset
-      CALL USI_ASSOCO('OUT',TYPE,OLOC,STATUS)
-
-      IF (STATUS .NE. SAI__OK) GOTO 9000
 
 * get option number
       CALL USI_GET0I('OPT',OPT,STATUS)
@@ -181,7 +179,8 @@
 
 
       IF (OPT.EQ.5) THEN
-        CALL USI_ASSOCI('CLONE','READ',CLOC,CPRIM,STATUS)
+        CALL USI_TASSOCI('CLONE','*','READ',CFID,STATUS)
+        CALL ADI1_GETLOC( CFID, CLOC, STATUS )
         CALL BDA_CHKAXES(CLOC,NAX,STATUS)
         IF (NAX.EQ.NDIM.OR.(NAX.EQ.1.AND.NSEL.EQ.1)) THEN
 
@@ -413,11 +412,11 @@
       ENDIF
 
 * Copy and update history
-      CALL HIST_COPY(ILOC,OLOC,STATUS)
-      CALL HIST_ADD(OLOC,VERSION,STATUS)
-      CALL HIST_PTXT(OLOC,INLINES,ITEXT,STATUS)
-      CALL USI_NAMEO(ONLINES,OTEXT,STATUS)
-      CALL HIST_PTXT(OLOC,ONLINES,OTEXT,STATUS)
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
+      CALL HSI_PTXT( OFID, INLINES, ITEXT, STATUS )
+      CALL USI_NAMEO( ONLINES, OTEXT, STATUS )
+      CALL HSI_PTXT( OFID, ONLINES, OTEXT,STATUS )
 
 * Copy over ancillary components
       CALL BDA_COPMORE(ILOC,OLOC,STATUS)
@@ -426,9 +425,9 @@
 9000  CONTINUE
 
       CALL BDA_RELEASE(OLOC,STATUS)
-      CALL USI_ANNUL(OLOC,STATUS)
+      CALL USI_TANNUL(OFID,STATUS)
       CALL BDA_RELEASE(ILOC,STATUS)
-      CALL USI_ANNUL(ILOC,STATUS)
+      CALL USI_TANNUL( IFID,STATUS)
 
 
       CALL AST_CLOSE()
