@@ -64,11 +64,11 @@
          itk_component add markstyle {
             frame $itk_component(control).markstyle \
                -relief raised \
-               -borderwidth 3
+               -borderwidth 2
          }
          itk_component add shower {
             canvas $itk_component(markstyle).shower \
-               -height 26 \
+               -height 24 \
                -width 50 
          } {
             usual
@@ -127,9 +127,10 @@
             itk_component add $att {
                checkbutton [ $itk_component($att-lw) childsite ].cb \
                   -variable [ scope checkvars($att) ] \
-                  -command [ code $this newmarker ]
+                  -command [ code $this newmarker ] \
+                  -indicatoron 1
             }
-            pack $itk_component($att)
+            pack $itk_component($att) -expand 0 -fill none
             lappend lws $itk_component($att-lw)
             pack $itk_component($att-lw) -side top -anchor w -fill none
          }
