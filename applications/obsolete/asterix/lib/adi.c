@@ -3649,6 +3649,8 @@ void adix_name( ADIobj id, ADIlogical clang, char *buf, int blen, ADIstatus stat
     _CH_MOVE(buf,nstr->data,_MIN(nstr->len,blen));
     if ( clang && (nstr->len < blen) )
       buf[nstr->len] = 0;
+    else if ( ! clang && (blen>nstr->len) )
+      memset( buf + nstr->len, ' ', blen - nstr->len );
     }
   }
 
