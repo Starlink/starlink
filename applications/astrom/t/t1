@@ -40,13 +40,13 @@ for f in tmp1.astrom-in tmp1.rep tmp1.sum tmp1.log
 do
     echo "!!!+ $f"
     cat $f
-    echo "!!!-"
+    echo "!!!- $f"
 done
 for f in tmp1-fits*
 do
     echo "!!!+ $f"
     ./fitsdump $f
-    echo "!!!-"
+    echo "!!!- $f"
 done
 
 rm -f tmp1*
