@@ -1,0 +1,677 @@
+#!STAR_BIN/expectk 
+#+
+#  Name:
+#     xrv
+#
+#  Purpose:
+#     This is a Tcl/TK/Expect interface to RV - the radial velocity 
+#     utility supplied by Starlink.
+# 
+#  Copyright:
+#     Copyright (C) 1995 
+#
+#  Authors:
+#     CAC: C.A.Clayton (Starlink, RAL)
+#     BLY: M.J.Bly (Starlink, RAL)
+#
+#  History:
+#     02-OCT-1995 (CAC):
+#        Original version.
+#     30-OCT-1995 (CAC):
+#        Pull down menu for Equinox added
+#     31-OCT-1995 (CAC):
+#        Pull down menu for Days added
+#     10-JUN-1996 (BLY):
+#        Modified for Starlink installation requirements.
+#     14-JUN-1996 (CAC):
+#        Ported to Tk4.0. Removed dependancy on XADAM by including
+#        relevant procedures in this file.
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#-
+#
+# The following may need to be customised to work on your system.
+# --------------------------------------------------------------
+#
+# These will normally be modified by the makefile during installation.
+#   
+# define absolute path to the RV startup script
+
+  set rv INSTALL_BIN/rv
+
+#
+# Nothing below this line should need to be changed on your system
+# ----------------------------------------------------------------
+
+# Switch off logging to stdout
+
+  log_user 0
+
+############################################################################
+
+proc Entry_bindings { } {
+
+# Key movement - allow cursor keys to move input cursor left and right
+ 
+  bind Entry <Key-Left>  {Entry_movecursor %W -1}
+  bind Entry <Key-Right> {Entry_movecursor %W 1}
+}
+
+############################################################################
+
+proc Entry_movecursor {w inc} {
+       set x [expr "[$w index insert] + $inc"]
+       if {$x == -1} then {set x 0}
+       if {$x >= [$w index end]} then {set x end}
+       $w icursor $x
+}
+
+############################################################################
+
+# Define entry bindings
+
+Entry_bindings
+
+############################################################################
+
+# Create widgets : entries for user input and command buttons on a bar
+                 
+# Frame widget containing:
+ 
+# bar		bar with command buttons
+# obs 		observatories entry box
+# file		Output file entry box
+# date		date entry box
+# pos		RA & DEC positon entry box
+ 
+  frame .xrv
+  pack append .xrv \
+     [frame .xrv.bar ] {top fillx } \
+     [frame .xrv.obs ] {top fillx } \
+     [frame .xrv.file] {top fillx } \
+     [frame .xrv.date] {top fillx } \
+     [frame .xrv.pos ] {top fillx } 
+
+# Command bar buttons:
+ 
+# Observatories	.xrv.mobs 	runs procedure rv_obs  (menu of obervatories)
+# Output file   .xrv.out        runs procedure rv_browser 
+# Run		.xrv.run	runs procedure rv_run  (sends input to rv program)
+# Help		.xrv.help	runs procedure rv_help (pops up help box)
+# Exit		.xrv.exit	runs procedure rv_exit (exits program)
+ 
+  pack append .xrv.bar \
+     [button .xrv.mobs -text "Observatory (by name)" -command rv_obs \
+                          -height 2 -width 24] {left frame w padx 1m pady 1m} \
+     [button .xrv.out -text "Output file" -command rv_browser \
+                          -height 2 -width 12] {left frame w padx 1m pady 1m} \
+     [button .xrv.run -fg red -text Run -command {rv_run $rv} \
+                          -height 2 -width 8]  {left frame w padx 1m pady 1m} \
+     [button .xrv.exit -text Exit -command rv_exit  \
+                          -height 2 -width 8]  {right frame w padx 1m pady 1m} \
+     [button .xrv.help -text Help -command rv_help  \
+                          -height 2 -width 8]  {right frame w padx 1m pady 1m} 
+
+# Entry boxes:
+
+# .xrv.obs 		Observatories entry box
+
+  pack append .xrv.obs \
+     [label .xrv.obs.lobs -text \
+        "  Observatory" \
+        -width 13 -anchor w -pady 14] {left frame w} \
+     [entry .xrv.obs.obs  -width 23 -relief sunken] {left frame w fillx} \
+
+# .xrv.file		Output file entry box
+
+  pack append .xrv.file \
+     [label .xrv.file.lout -text \
+        "  Output file" \
+        -width 13 -anchor w -pady 14] {left frame w} \
+     [entry .xrv.file.out   -width 40 -relief sunken] {left frame w padx 3m} 
+
+# .xrv.date		Date entry box
+
+  pack append .xrv.date \
+     [label .xrv.date.ldate -text \
+        "  Date (Y M D)" -width 13 -anchor w -pady 14] {left frame w} \
+     [entry .xrv.date.date -width 10 -relief sunken] {left frame w fillx} \
+     [label .xrv.date.space -text " " -width 3] {left} \
+     [menubutton  .xrv.date.ldays -text " Days (n) " -menu \
+          .xrv.date.ldays.menu -relief raised -width 9 -anchor w ] \
+          {left frame w padx 2m} \
+     [entry .xrv.date.days -width 10 -relief sunken] {left frame w fillx} 
+
+# .xrv.pos		RA & DEC positon entry box
+
+  pack append .xrv.pos \
+     [label .xrv.pos.lra -text \
+      "  R.A. (h m s)" -width 13 -anchor w -pady 14] {left frame w} \
+     [entry .xrv.pos.ra    -width 10 -relief sunken] {left frame w fillx} \
+     [label .xrv.pos.ldec -text \
+      "       Dec. (d m s)" -width 15 -anchor w -pady 14] {left frame w fillx} \
+     [entry .xrv.pos.dec   -width 10 -relief sunken] {left frame w } 
+
+  pack append .xrv.pos \
+     [label .xrv.pos.space -text " " -width 3] {left} \
+     [menubutton  .xrv.pos.lepoch -text " Equinox" -menu \
+          .xrv.pos.lepoch.menu -relief raised -width 8 -anchor w ] \
+          {left frame w padx 2m} \
+     [entry .xrv.pos.epoch -width 7 -relief sunken] {left frame w padx 3m} 
+
+  menu .xrv.date.ldays.menu 
+   .xrv.date.ldays.menu add command -label 1 \
+     -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 1}
+   .xrv.date.ldays.menu add command -label 2 \
+     -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 2}
+   .xrv.date.ldays.menu add command -label 3 \
+     -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 3}
+   .xrv.date.ldays.menu add command -label 7 \
+     -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 7}
+   .xrv.date.ldays.menu add command -label 14 \
+     -command { .xrv.date.days delete 0 end; .xrv.date.days insert end 14}
+   .xrv.date.ldays.menu add command -label "Other (please specify)" \
+     -command { .xrv.date.days delete 0 end;}
+
+  menu .xrv.pos.lepoch.menu
+  .xrv.pos.lepoch.menu add command -label B1950 \
+     -command { .xrv.pos.epoch delete 0 end; .xrv.pos.epoch insert end B1950}
+  .xrv.pos.lepoch.menu add command -label J2000 \
+     -command { .xrv.pos.epoch delete 0 end; .xrv.pos.epoch insert end J2000} 
+  .xrv.pos.lepoch.menu add command -label "Other (please specify)" \
+     -command { .xrv.pos.epoch delete 0 end} 
+
+# Set titles
+
+  wm title . "xrv: Radial Component of Observer's Velocity"
+  wm iconname . "xrv"
+  pack append . .xrv {expand fill}
+
+# Set up the defaults for entry boxes
+ 
+  .xrv.obs.obs   insert end "AAT"
+  .xrv.file.out  insert end "rv.lis"
+  .xrv.date.date insert end "1985 10 21"
+  .xrv.date.days insert end "1"
+  .xrv.pos.ra    insert end "15 21 49.2"
+  .xrv.pos.dec   insert end "-54 56 57"
+  .xrv.pos.epoch insert end B1950
+
+# start the application -- communication will be via expect
+
+  global tmpfile
+  set tmpfile [pid]
+  exec touch /tmp/xrv_$tmpfile
+  spawn $rv 
+
+# Create the observatory database
+ 
+  expect ">"
+  exp_send "?\r"
+
+  expect ">"
+  exp_send "?\r"
+
+# Record the list of observatories
+
+# Stop recording list of supported observatories when end of listing 
+# is detected. Marked by the string "Observatory?" This does not
+# work well since expect buffers input.
+
+  log_file -a /tmp/xrv_$tmpfile
+
+  expect "Observatory\\?"  
+  log_file
+  exec sort /tmp/xrv_$tmpfile -o /tmp/xrv_$tmpfile >& /dev/null
+#
+# Remove the first blank line for the file
+#
+  exec tail +2l /tmp/xrv_$tmpfile > /tmp/xrv_decap_$tmpfile
+  exec rm /tmp/xrv_$tmpfile
+  exp_send "END\r"
+
+# define rv procedures
+
+############################################################################
+
+# rv_run - sends parameters to rv program
+# Triggered by "run" button on command bar
+  
+proc rv_run {rv} {
+
+# restart the application 
+
+  spawn $rv . [.xrv.file.out get]
+  expect ">"
+
+# send observatory
+ 
+  set wobs .xrv.obs.obs
+
+# The blank space before [$obs get] is vital to ensure that
+# a "-" is not sent as the first character if an Eastern Latitude
+# is requested.
+
+  set text " [$wobs get]"
+  exp_send "$text \r"
+
+# send date and days
+ 
+  set wdate .xrv.date.date
+  set wdays .xrv.date.days
+  set text "[$wdate get] [$wdays get]"
+  exp_send "$text \r"
+
+# send object position
+
+  set wra  .xrv.pos.ra
+  set wdec .xrv.pos.dec
+  set wepoch .xrv.pos.epoch
+  set text "[$wra get] [$wdec get] [$wepoch get]"
+  exp_send "$text \r"
+
+# Pop up a dialog box to tell user that you have written the file. 
+  toplevel .panel -class dialog
+  wm title .panel "Output Written"
+
+  frame .panel.top -relief raised -bd 1
+  pack .panel.top -side top -fill both
+
+  frame .panel.bot -relief raised -bd 1
+  pack .panel.bot -side bottom -fill both
+
+  message .panel.top.msg -width 5i -text "Report written to [.xrv.file.out get].\
+   	Either Exit or change parameters and re-run."
+  pack .panel.top.msg -side right -expand 1 -fill both\
+	-padx 3m -pady 3m
+
+  button .panel.bot.button -text "O K" -command {
+	destroy .panel
+	}
+  pack .panel.bot.button -side top -expand 1 -padx 3m -pady 3m -ipady 2m -ipadx 5m
+
+  grab set .panel
+  tkwait window .panel
+
+# End of rv_run
+
+}
+
+############################################################################
+
+# Creates the scrolling observatory selector
+# Triggered by "Observatory" button on command bar
+
+proc rv_obs { } {
+
+  frame .obs_scroller -relief raised -bd 1
+  pack .obs_scroller -expand 1 -fill x
+
+  label .obs_scroller.label -relief ridge -text "O b s e r v a t o r i e s" 
+  pack .obs_scroller.label -in .obs_scroller -side top -fill x
+
+  frame .obs_scroller.buttons  
+  pack .obs_scroller.buttons -in .obs_scroller -side right -fill both
+
+  button .obs_scroller.buttons.ok -text "O K" -command {
+
+# Do not copy from selection when "O K" button is pressed if an observatory 
+# has not yet been selected
+ 
+        if {[selection own] != ""} {
+  	   .xrv.obs.obs delete 0 end
+	   .xrv.obs.obs insert end [string range [selection get] 3 16]
+           }
+           destroy .obs_scroller
+	}
+
+  button .obs_scroller.buttons.cancel -text "Cancel" -command {
+	destroy .obs_scroller
+	}
+  pack .obs_scroller.buttons.ok -in .obs_scroller.buttons -side top \
+      -padx 1m -pady 1m -ipadx 7m -ipady 4m -fill both
+  pack .obs_scroller.buttons.cancel -in .obs_scroller.buttons -side bottom \
+      -padx 1m -pady 1m -ipadx 7m -ipady 4m -fill both
+
+  scrollbar .obs_scroller.scroll -command ".obs_scroller.names yview" 
+  pack .obs_scroller.scroll -in .obs_scroller -side left -fill y
+
+  listbox .obs_scroller.names  -width 65 -height 7 \
+	-font "fixed" -bd 1 -yscrollcommand ".obs_scroller.scroll set" 
+  pack .obs_scroller.names  -in .obs_scroller -side left -fill both
+
+  global tmpfile
+  set tele [open /tmp/xrv_decap_$tmpfile]
+#
+# Read in observatory names until string "Observatory?" is found
+#
+  while {[gets $tele line] >= 0 && [lsearch $line "Observatory\\?"] < 0}  {
+	.obs_scroller.names insert end [lrange $line 0 end]
+  }
+  close $tele
+  
+  bind .obs_scroller.names <Double-Button-1>  {
+	.xrv.obs.obs delete 0 end
+	.xrv.obs.obs insert end [string range [selection get] 3 16]
+        destroy .obs_scroller
+        break
+  }
+
+  grab set .obs_scroller
+  tkwait window .obs_scroller
+
+# End or rv_obs
+
+}
+
+############################################################################
+
+# Pop up a dialog box to tell user about xrv. 
+# Triggered by "Help" button on command bar
+
+proc rv_help { } {
+  toplevel .panel -class dialog
+  wm title .panel "xrv help"
+
+  frame .panel.top -relief raised -bd 1
+  pack .panel.top -side top -fill both
+
+  frame .panel.bot -relief raised -bd 1
+  pack .panel.bot -side bottom -fill both
+
+# Next comes the text for the help dialog box
+
+  message .panel.top.msg -width 3i -text \
+"
+RV written by P T Wallace.
+Tcl/Tk interface xrv written by C A Clayton.
+See Starlink User Note 78 for more details.
+
+O B S E R V A T O R Y
+Enter either an observatory identifier or the observatory longitude (West +ve) and latitude (North +ve). For example:
+
+      AAT
+or:
+      -149 03 57.9  -31 16 37
+
+Valid observatory identifiers can be browsed using the \"Observatories (by name)\" button.
+
+
+O U T P U T   F I L E
+Enter a file name or use \"Output file\" button to call up a file browser. 
+
+
+D A T E   A N D   D A Y S
+Enter the UT calendar date and the number of days.  For example:
+
+      1985 10 21     3
+
+will generate a report covering 0 hrs UT on 21st October 1985 to 0 hrs UT on 24th October 1985.
+
+
+R A ,  D E C  &  E Q U I N O X
+Enter the RA, Dec and Equinox.  For example:
+
+      08 33 39.30  -45 00 10.3  B1950
+
+
+Click on the \"Run\" button when all entry boxes are completed.
+"
+
+
+  pack .panel.top.msg -side right -expand 1 -fill both\
+        -padx 3m -pady 3m
+
+  button .panel.bot.button -text "O K" -command {
+#        set label OK
+        destroy .panel
+        }
+  pack .panel.bot.button -side top -expand 1 -padx 3m -pady 3m -ipady 2m -ipadx 5m
+
+  grab set .panel
+  tkwait window .panel
+# End of rv_help
+
+}
+
+############################################################################
+
+# Exit program
+# Triggered by "Exit" button on command bar
+
+proc rv_exit { } {
+
+  global tmpfile
+  exec rm /tmp/xrv_decap_$tmpfile
+  close
+  destroy .
+  exit
+}
+
+############################################################################
+
+# Output file browser procedure
+# Triggered by "Output file" button on caommand bar
+
+proc rv_browser { } {
+
+frame .rv -relief raised -bd 1
+pack .rv -side top -fill both
+
+frame .rv.browse -relief raised -bd 1
+pack .rv.browse -side top -fill both
+
+pack [entry .rv.browse.entry -relief sunken] -side bottom -fill x
+
+pack [frame .rv.browse.dir ] [frame .rv.browse.ndf ] -side left \
+    -expand yes -fill both
+
+pack [scrollbar .rv.browse.dir.sy -relief sunken -command \
+        {.rv.browse.dir.l yview} -orient vertical] -side right -fill y 
+
+pack [scrollbar .rv.browse.dir.sx -relief sunken -command \
+        {.rv.browse.dir.l xview} -orient horizontal] -side bottom -fill x 
+
+pack [listbox .rv.browse.dir.l -selectmode .rv.browse.dir.l\
+	-relief sunken \
+	-width 35 -height 6 \
+        -xscroll {.rv.browse.dir.sx set} \
+        -yscroll {.rv.browse.dir.sy set}] -expand yes -fill both
+
+pack [scrollbar .rv.browse.ndf.sy -relief sunken -command \
+        {.rv.browse.ndf.l yview} -orient vertical] -side right -fill y
+
+pack [scrollbar .rv.browse.ndf.sx -relief sunken -command \
+        {.rv.browse.ndf.l xview} -orient horizontal] -side bottom -fill x
+
+pack [listbox .rv.browse.ndf.l -selectmode .rv.browse.ndf.l \
+	-relief sunken \
+	-width 16 -height 6 \
+        -xscroll {.rv.browse.ndf.sx set} \
+        -yscroll {.rv.browse.ndf.sy set}] -expand yes -fill both
+
+# Pack OK and Cancel buttons
+
+frame .rv.browse.bot 
+pack .rv.browse.bot -side right -fill both
+
+button .rv.browse.bot.button_ok -text "O K" -command {
+      .xrv.file.out delete 0 end
+      .xrv.file.out insert end [selection get]  
+      destroy .rv
+      }
+
+button .rv.browse.bot.button_cancel -text "Cancel" -command {
+      destroy .rv
+      }
+
+pack .rv.browse.bot.button_ok -in .rv.browse.bot -side top \
+    -padx 1m -pady 1m -ipadx 7m -ipady 4m -fill both
+pack .rv.browse.bot.button_cancel -in .rv.browse.bot -side bottom \
+    -padx 1m -pady 1m -ipadx 7m -ipady 4m -fill both
+
+#  Bindings for panel
+
+bind .rv.browse.ndf.l <Double-Button-1> {
+      .xrv.file.out delete 0 end
+      .xrv.file.out insert end [selection get]  
+      destroy .rv
+      break
+      }
+bind .rv.browse.dir.l <Double-Button-1> BrowseSelect
+bind .rv.browse.dir.l <space> BrowseSelect
+bind .rv.browse.entry <Return> {BrowseDir [.rv.browse.entry get]}
+
+#  Install a selection handling procedure that returns the full name of
+#  the ndf.
+
+selection handle .rv.browse.ndf.l GetNdf
+
+#  Initialise the browser
+
+global browsefilter
+set browsefilter *
+BrowseDir [pwd]
+
+grab set .rv
+tkwait window .rv
+}
+
+############################################################################
+#
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+#
+#  Authors:
+#     DLT: D L Terrett (Starlink, RAL)
+#
+#  History:
+#     29-NOV-1993 (DLT):
+#        Original version.
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+proc BrowseSelect {} {
+    global curdir
+    set index [.rv.browse.dir.l curselect]
+    if { $index == 0 } {
+        set dir $curdir
+    } else {
+        if { $index == 1 } {
+           set dir [file dirname $curdir]
+        } else {
+           set dir [.rv.browse.dir.l get $index]
+        }
+    }
+    BrowseDir "$dir"
+}
+
+############################################################################
+#
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+#
+#  Authors:
+#     DLT: D L Terrett (Starlink, RAL)
+#
+#  History:
+#     29-NOV-1993 (DLT):
+#        Original version.
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+proc BrowseDir {dir} {
+
+# Convert the new directory to a full file name.
+    if {[catch {cd $dir}]} {
+        Error "Could not cd to $dir."
+	return
+    }
+    global curdir
+    set curdir [pwd]
+
+    .rv.browse.entry delete 0 end
+    .rv.browse.entry insert 0 $curdir
+
+# Save mouse binding and replace with nothing while the directory search
+# is happening as this make take some time.
+    set binding [bind .rv.browse.dir.l <ButtonRelease-1>]
+    bind .rv.browse.dir.l <ButtonRelease-1> ""
+
+# Fill directory box.
+    .rv.browse.dir.l delete 0 end
+    if {$curdir == "/"} {
+        .rv.browse.dir.l insert end /.
+    } else {
+        .rv.browse.dir.l insert end $curdir/.
+        .rv.browse.dir.l insert end $curdir/..
+    }
+    set dirlist {}
+    foreach file [glob -nocomplain $curdir/*] {
+        if {[file isdirectory $file]} {
+           set dirlist [lappend dirlist $file]
+        }
+    }
+    set dirlist [lsort $dirlist]
+    foreach file $dirlist {
+       .rv.browse.dir.l insert end $file
+    }
+
+# Fill ndf box.
+    .rv.browse.ndf.l delete 0 end
+
+    set ndflist {}
+    global browsefilter
+    foreach file [glob -nocomplain $curdir/$browsefilter] {
+       set ndflist [lappend ndflist $file]
+    }
+    set ndflist [lsort $ndflist]
+    foreach file $ndflist {
+       .rv.browse.ndf.l insert end [file tail $file]
+    }
+
+# Restore the list box bindings.
+    update idletasks
+    bind .rv.browse.dir.l <ButtonRelease-1> $binding
+
+    .rv.browse.dir.l selection set 0
+    global bd_listindex
+    set bd_listindex(.rv.browse.dir.l) 0
+}
+
+############################################################################
+#
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+#
+#  Authors:
+#     DLT: D L Terrett (Starlink, RAL)
+#
+#  History:
+#     29-NOV-1993 (DLT):
+#        Original version.
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+proc GetNdf {offset maxbytes} {
+    set index [.rv.browse.ndf.l curselect]
+    if {$index != ""} {
+        set curndf [.rv.browse.ndf.l get $index]
+
+    # If the file extension in .ndf. or .sdf then remove it.
+        if {[file extension $curndf]==".sdf" || \
+	    [file extension $curndf]==".dst"} {
+	    set curndf [file root $curndf]
+	}
+
+        set last [expr $offset+$maxbytes-1]
+        global curdir
+        string range $curdir/$curndf $offset $last
+    } else {
+        return ""
+    }
+}

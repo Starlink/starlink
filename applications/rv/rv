@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+#  To invoke the rv utility, type:
+#
+#     rv [input]  [report]
+#
+#  Either or both parameters may be defaulted, by omission
+#  or by use of the notation "", to stdin and rv.lis respectively.
+#
+#  Common invocations:
+#
+#    rv                   interactive or batch
+#
+#    rv input             input from a file
+#
+#    rv input report      files for input & report
+#
+#  P.T.Wallace   Starlink   8 December 1993
+#
+
+#  Declare interrupt handler
+      onintr end
+
+#  String to indicate defaulted terminal I/O arguments
+      set _tty = .
+
+#  Name of null device
+      set _null = /dev/null
+
+#  Copy arguments
+      set _input = $1
+      set _report = $2
+
+#  Prompts/help/errors to terminal
+      set _prompts = $_tty
+
+#  Echo to terminal if input file specified
+      if ($_input != "") then
+         set _echo = $_tty
+      else
+         set _echo = $_null
+      endif
+
+#  Resolve defaults
+      if ($_input == "") then
+         set _input = $_tty
+      endif
+      if ($_report == "") then
+         set _report = rv.lis
+      endif
+
+#  Run the job
+      rv.x $_tty $_report $_input $_prompts $_echo
+
+#  Report the output filename if appropriate
+      if ($_report != $_tty) then
+         echo "Report is in $_report"
+      endif
+
+end:
+      exit

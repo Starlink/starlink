@@ -1,0 +1,23 @@
+RV - Radial components of Observer's Velocity
+                                                        Expires: ????.??.??
+
+ v2.4-4: 8-JUL_2002
+    A typo in the header information of the RV output has been corrected:
+    the header now reads `... is +ve when the position is less than 90deg
+    from the Sun: ...'.  There was no change to the algorithm code.
+
+ v2.4-0
+    RV now has a GUI (xrv) to provide an easy-to use interface to the
+    program.  To start the GUI, type (% is the shell prompt):
+
+        % xrv
+
+    xrv uses the Tcl and Tk widget set, and requires the Expect interactive
+    program driver to drive the rv command script.
+
+    The RV program itself in unchanged, other than that it has been built
+    with the latest slalib release.
+
+    SUN/78 has been updated and a hypertext version is now available
+    (`showme sun78' or `findme rv').
+
