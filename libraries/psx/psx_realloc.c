@@ -88,6 +88,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     RFWS: R.F. Warren-Smith (Starlink, RAL)
 *     AJC: A.J. Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +105,8 @@
 *     23-JUN-2000 (AJC):
 *        Improve documentation re pointers
 *        Tidy refs to CNF routines
+*     6-DEC-2004 (TIMJ):
+*        Report allocation failure as unsigned int
 *     {enter_changes_here}
 
 *  Bugs:
@@ -225,8 +228,8 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
       sprintf( errbuf, 
-         "Failed to allocate space with realloc. %d bytes requested",
-         *size );
+         "Failed to allocate space with realloc. %u bytes requested",
+         csize );
       psx1_rep_c( "PSX_REALLOC_NOALL", errbuf, status );
    }
 
