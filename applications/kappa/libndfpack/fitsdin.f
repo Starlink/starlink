@@ -348,6 +348,8 @@
 *        statements, and READONLY in OPEN statements.
 *     11-APR-2000 (DSB):
 *        Added FITS-PC and FITS-AIPS WCS encodings.
+*     2-SEP-2004 (TIMJ):
+*        Use ONE_FIND_FILE rather than FTS internal routine.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -365,6 +367,7 @@
       INCLUDE 'FIO_ERR'        ! FIO error constants
       INCLUDE 'PAR_ERR'        ! Parameter-system error constants
       INCLUDE 'GRP_PAR'        ! GRP constants
+      INCLUDE 'ONE_ERR'        ! ONE errors
 
 *  Status:
       INTEGER  STATUS
@@ -373,16 +376,12 @@
       INTEGER
      :  CHR_LEN                ! String length less trailing blanks
 
-      INTEGER
-     :  FTS1_FINDF,            ! Routine for file finding    
-     :  FTS1_FINDE             ! Routine for closing the file search
-
-      EXTERNAL FTS1_FINDF
-      EXTERNAL FTS1_FINDE
-
       LOGICAL
-     :  FTS1_BLCAR             ! Tests whether the first card image of a
+     :  FTS1_BLCAR,            ! Tests whether the first card image of a
                                ! FITS record has a blank keyword
+     :  ONE_FIND_FILE          ! Routine for file finding
+
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Constants:
       INTEGER
@@ -497,6 +496,7 @@
      :  FMTCNV,                ! The type of the FITS data will be
                                ! converted to real in the output data
                                ! structure
+     :  FOUND,                 ! Found a file
      :  GEXTND,                ! The FITS file may contain an extension
      :  IEEE,                  ! FITS data are in IEEE floating-point
                                ! format
@@ -755,11 +755,12 @@
 
 *          Get a single file that matches this specification.
 
-            ISTAT = FTS1_FINDF( FSPEC, INFILE, CONTEXT )
+            FOUND = ONE_FIND_FILE( FSPEC, .TRUE., INFILE, CONTEXT, 
+     :           STATUS)
 
 *          Check if a file has been found.
 
-            IF ( ISTAT .EQ. 1 ) THEN
+            IF ( FOUND .AND. STATUS .EQ. SAI__OK) THEN
 
 *          Add this file into the output group.  NFILE keeps a count of
 *          the number of files in the output group.
@@ -768,9 +769,12 @@
      :                         IDUMMY, LFLAG, STATUS )
             ELSE
 
+*             Clear status if no more files
+               IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
 *             Tidy up the file system.
 
-               ISTAT = FTS1_FINDE( CONTEXT )
+               CALL ONE_FIND_FILE_END( CONTEXT, STATUS )
 
 *             Go to the next GRP expression.
 
