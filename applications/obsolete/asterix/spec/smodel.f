@@ -30,13 +30,13 @@
 *
 *    Environment parameters :
 *
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing model (existing or not)
-*     OVERRIDE=LOGICAL(R)
+*     OVER=LOGICAL(R)
 *		Overwrite existing model specification?
-*     MODEL_SPEC=LITERAL(R)
+*     SPEC=LITERAL(R)
 *		String containing specification of composite model
-*     VALUES=LITERAL(R)
+*     VALS=LITERAL(R)
 *               String containing parameter value/limits
 *     RESET=LOGICAL(R)
 *               Reset parameters and limits bcak to original values
@@ -158,10 +158,10 @@
 
 *    Create or retrieve FIT_MODEL
       RESET = .FALSE.
-      CALL USI_DEXIST('FIT_MOD','UPDATE',FLOC,STATUS)
+      CALL USI_DEXIST('MODEL','UPDATE',FLOC,STATUS)
       IF ( STATUS .EQ. PAR__ERROR ) THEN
 	CALL ERR_ANNUL(STATUS)
-	CALL USI_ASSOCO('FIT_MOD','FIT_MODEL',FLOC,STATUS)
+	CALL USI_ASSOCO('MODEL','FIT_MODEL',FLOC,STATUS)
 	SNEW=.TRUE.
 
       ELSE
@@ -203,7 +203,7 @@
 
 *   Model spec. to be overridden?
             IF ( .NOT. RESET ) THEN
-	      CALL USI_GET0L('OVERRIDE',OVER,STATUS)
+	      CALL USI_GET0L('OVER',OVER,STATUS)
 	      IF(STATUS.NE.SAI__OK) GOTO 99
             END IF
 	  ENDIF
@@ -235,7 +235,7 @@
 *    Enter new model spec.
  30   IF ( .NOT. RESET ) THEN
         CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-	CALL USI_GET0C( 'MODEL_SPEC', MODSPEC, STATUS )
+	CALL USI_GET0C( 'SPEC', MODSPEC, STATUS )
       END IF
       IF(STATUS.NE.SAI__OK) GOTO 99
 
@@ -286,7 +286,7 @@
 *        Status bad if this wasn't a good pmodel name
           IF ( STATUS .NE. SAI__OK ) THEN
 	    CALL ERR_FLUSH( STATUS )
-	    CALL USI_CANCL( 'MODEL_SPEC', STATUS )
+	    CALL USI_CANCL( 'SPEC', STATUS )
             GOTO 30
 
 *        Good pmodel syntax...
@@ -312,7 +312,7 @@
         STATUS = SAI__ERROR
 	CALL ERR_REP('BAD_SYN','Bad model syntax',STATUS)
 	CALL ERR_FLUSH(STATUS)
-	CALL USI_CANCL('MODEL_SPEC',STATUS)
+	CALL USI_CANCL('SPEC',STATUS)
 	GOTO 30					! Allow reentry of model spec
       END IF
 
@@ -388,16 +388,16 @@
           CALL MSG_PRNT( LINE )
 
 *        Get new values from user
-	  CALL USI_DEF0C('VALUES','unchanged',STATUS)
-	  CALL USI_GET0C('VALUES',STRING,STATUS)
+	  CALL USI_DEF0C('VALS','unchanged',STATUS)
+	  CALL USI_GET0C('VALS',STRING,STATUS)
 	  IF ( STATUS.EQ.PAR__ABORT)THEN
 	    GOTO 99
 	  ELSE IF(STATUS.NE.SAI__OK)THEN
 	    CALL ERR_ANNUL(STATUS)
-	    CALL USI_CANCL('VALUES',STATUS)
+	    CALL USI_CANCL('VALS',STATUS)
 	    GOTO 350						! Next parameter
 	  END IF
-	  CALL USI_CANCL( 'VALUES', STATUS )
+	  CALL USI_CANCL( 'VALS', STATUS )
 	  LS = CHR_LEN(STRING)
 	  IF(STRING.EQ.'unchanged'.OR.LS.EQ.0) GOTO 350	! Next parameter
 

@@ -170,7 +170,7 @@
       CALL USI_GET0L( 'ERRORS', DOERR, STATUS )
 
 *    Open device
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, DEVWID, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
 *    Locate book-keeping structure
       CALL SSO_CHKBOOK( SLOC, OK, NCOMP, STATUS )
@@ -454,7 +454,7 @@
  69   CALL SSO_RELEASE( SLOC, STATUS )
 
 *    Close output channel
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()

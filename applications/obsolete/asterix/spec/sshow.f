@@ -68,7 +68,7 @@
       CALL DISP_FILENAM( FLOC, 'Model', STATUS )
 
 *    Set up output channel
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, WID, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, WID, STATUS )
 
 *    Display component parameters
       CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, OCH, STATUS )
