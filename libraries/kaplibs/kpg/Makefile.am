@@ -38,7 +38,7 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
-kpg1_bloc.gdr
+kpg1_bloc.gdr kpg1_litn.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir
 
@@ -90,7 +90,7 @@ kpg1_hstlo.f kpg1_hstqb.f kpg1_reprt.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_imprg.f kpg1_incod.f kpg1_incor.f \
 kpg1_kgodr.f kpg1_lasto.f \
-kpg1_lgtrn.f kpg1_listc.f kpg1_litnd.f kpg1_litnr.f kpg1_litrd.f \
+kpg1_lgtrn.f kpg1_listc.f kpg1_litrd.f \
 kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f kpg1_loctd.f \
 kpg1_locti.f kpg1_loctr.f kpg1_loctub.f kpg1_loctuw.f kpg1_loctw.f \
 kpg1_ludcd.f kpg1_ludcr.f kpg1_lutin.f kpg1_mdetd.f \
