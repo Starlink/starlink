@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, 
      :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, 
      :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, 
-     :     B_FIT, TAUZ_FIT, STATUS)
+     :     B_FIT, TAUZ_FIT, REXISQ, STATUS)
 *+
 *  Name:
 *     SCULIB_FIT_SKYDIP
@@ -15,7 +15,8 @@
 *  Invocation:
 *     CALL SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, J_MEASURED,
 *    :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
+*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+*    :  REXISQ, STATUS)
 
 *  Description:
 *     This routine fits a sub-instrument's measurements of the sky 
@@ -96,6 +97,8 @@
 *              the result for b
 *     TAUZ_FIT                  = REAL (Returned)
 *              the fitted result for tauz
+*     REXISQ                    = REAL (Returned)
+*              the reduced chi square of the fit
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
 
@@ -115,6 +118,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.11  1998/01/12 20:32:12  timj
+*     Return the reduced chi square
+*
 *     Revision 1.10  1998/01/07 00:28:40  timj
 *     Use the CVAR variable to govern whether or not a constant variance is used.
 *
@@ -166,6 +172,7 @@
       REAL    B_FIT
       REAL    TAUZ_FIT
       REAL    ETA_TEL_FIT
+      REAL             REXISQ        ! Reduced chi square
 
 *  Status:
       INTEGER STATUS
@@ -223,7 +230,6 @@
       INTEGER          NDEG          ! Number of degrees of freedom
       REAL             NU            ! frequency
       INTEGER          QUALITY       ! quality of fit
-      REAL             REXISQ        ! Reduced chi square
       DOUBLE PRECISION SUM           ! Sum of variances
       DOUBLE PRECISION XICUT         ! when an iteration produces an
                                      ! improvement in chi-squared below
