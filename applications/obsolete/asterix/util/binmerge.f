@@ -35,6 +35,7 @@
 *    Authors :
 *     Alan McFadzean (BHVAD::ADM)
 *     Phil Andrews   (BHVAD::PLA)
+*     Richard Beard  (Birmingham RB)
 *    History :
 *
 *      2 Sep 88 : V1.0-1 Original adapted from ASTERIX routine (ADM)
@@ -43,6 +44,8 @@
 *      5 Sep 95 : V1.8-2 Partial ADI port (DJA)
 *     16 Jan 1996 V2.0-0 (DJA):
 *        Full ADI port
+*     23 Apr 1998 V2.2-1 (RB):
+*        Read the EQUINOX's correctly
 *
 *    Type Definitions :
 *
@@ -140,7 +143,7 @@
 *    Version id :
 *
       CHARACTER*24           VERSION
-         PARAMETER          (VERSION = 'BINMERGE Version 2.2-0' )
+         PARAMETER          (VERSION = 'BINMERGE Version 2.2-1' )
 *-
 
 *    Version announcement
@@ -252,7 +255,8 @@
       END IF
 
 *  Get equinox of dataset
-      CALL ADI_CGET0I( SYSID(1), EQUINOX1, STATUS )
+      call adi_print(sysid(1), status)
+      CALL ADI_CGET0I( SYSID(1), 'EQUINOX', EQUINOX1, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Obtain other inputs
@@ -349,7 +353,7 @@
             END IF
 
 *        Get equinox of dataset
-            CALL ADI_CGET0I( SYSID(DSETS), EQUINOX, STATUS )
+            CALL ADI_CGET0I( SYSID(DSETS), 'EQUINOX', EQUINOX, STATUS )
 
             IF ( EQUINOX .NE. EQUINOX1 ) THEN
               CALL MSG_PRNT
