@@ -140,6 +140,11 @@
 *     11-JAN-2002 (DSB):
 *        Added "Implementation Status" to prologue. Correct the
 *        annullment of LOC5. Changed TITLE default to null.
+*     12-JAN-2004 (DSB):
+*        Changed logic used for copying AXIS structures form input to
+*        output, because the old system did not take account of the fact
+*        that HDS locators for NDF components can become incorrect if the
+*        NDF is changed (because certain NDF calls create new HDS objects).
 *     {enter_further_changes}
 
 *  Bugs:
@@ -216,7 +221,6 @@
       LOGICAL GOTQUL           ! Does a QUALITY component exist?
       LOGICAL GOTVAR           ! Does a VARIANCE component exist?
       LOGICAL USED( NDF__MXDIM ) ! Is input array axis used in output array?
-
 *.
 
 *  Check the global status.
@@ -341,8 +345,11 @@
 *  Take a copy of the AXIS component and call it OLDAXIS.
          CALL DAT_COPY( LOC2, LOC1, 'OLDAXIS', STATUS )
 
-*  Get a locator for OLDAXIS.
-         CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
+*  Annul the other locators since the following call to NDF_SBND will
+*  create new HDS objects.
+         CALL DAT_ANNUL( LOC1, STATUS )
+         CALL DAT_ANNUL( LOC2, STATUS )
+
       END IF
 
 *  Set the output NDF bounds to the required values.  This will change
@@ -352,10 +359,21 @@
 *  We now reinstate any AXIS structures, in their new order.
       IF ( GOTAX ) THEN
 
-*  First create default axis components for each dimension of the new
+*  First erase the axis structures inherited from the input NDF, and then 
+*  create default axis components for each dimension of the new
 *  NDF.  Some of these will be overwritten with new values, but without
 *  this step the ones corresponding to new dimensions would be missing.
+         CALL NDF_RESET( INDF2, 'AXIS', STATUS )
          CALL NDF_ACRE( INDF2, STATUS )
+
+*  Now get an HDS locator to the modified NDF structure.
+         CALL NDF_LOC( INDF2, 'UPDATE', LOC1, STATUS )
+
+*  And get a locator for the default AXIS component created above.
+         CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
+
+*  Get a locator for the OLDAXIS component added above.
+         CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
 
 *  Promote the NDF locator to a primary locator so that the HDS 
 *  container file is not closed when the NDF identifier is annulled.
