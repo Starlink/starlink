@@ -144,7 +144,7 @@
         END IF
         CALL ADI_CGET0L( HDUID, 'DataChanged', CHANGED, STATUS )
         IF ( CHANGED ) THEN
-          print *,'There are uncommitted data changes in ',HNAME
+c          print *,'There are uncommitted data changes in ',HNAME
         END IF
 
 *    Release this HDU

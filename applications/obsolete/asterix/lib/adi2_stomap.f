@@ -115,7 +115,8 @@
 *  Flag HDU as changed if the mode is other than READ
       IF ( MODE .NE. 'READ' ) THEN
         CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
-        IF ( (FORM(1:1) .NE. 'K') .AND. (FORM .NE. 'X') ) THEN
+        IF ( (FORM(1:1) .NE. 'K') .AND. (FORM(1:1) .NE. 'BC') .AND.
+     :       (FORM .NE. 'X') ) THEN
           CALL ADI_CPUT0L( HDUID, 'DataChanged', .TRUE., STATUS )
         END IF
       END IF

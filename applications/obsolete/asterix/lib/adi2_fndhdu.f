@@ -132,10 +132,10 @@
       IF ( HDU .EQ. ' ' ) LHDU = 'PRIMARY'
       IF ( (UIHDU .GT. 0) .AND. (HDU.GT.' ') .AND.
      :     (HDU.NE.'PRIMARY') ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Attempted illegal index to named HDU '/
-     :              /'when file opened with specific HDU', STATUS )
-        GOTO 99
+c        STATUS = SAI__ERROR
+c        CALL ERR_REP( ' ', 'Attempted illegal index to named HDU '/
+c     :              /'when file opened with specific HDU', STATUS )
+c        GOTO 99
       END IF
 
 *  HDU already found?
