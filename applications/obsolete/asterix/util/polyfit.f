@@ -1,5 +1,5 @@
 *+  POLYFIT - Fits 1D polynomials to nD data. Can subtract fit from data too.
-      SUBROUTINE POLYFIT(STATUS)
+      SUBROUTINE POLYFIT( STATUS )
 *
 *    Description :
 *
@@ -48,6 +48,7 @@
 *                        program is either bug free or never used (DJA)
 *     30 Jun 93 : V1.7-1 Fixed by in above update (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*      5 Apr 95 : V1.8-1 Now uses new data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -56,7 +57,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -69,23 +70,23 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC            ! Input data object locator
-      CHARACTER*(DAT__SZLOC) OLOC            ! Output data object locator
       CHARACTER*80           TEXT (5)        ! History file message
 
       INTEGER                AXPTR           ! Pointers to mapped axis values
       INTEGER                BLEN            ! No. of fits to be performed
       INTEGER                DPTR            ! Pointer to input data array
       INTEGER                I, N            ! Dummy variables for loops.
-      INTEGER                LDIMS(DAT__MXDIM) ! Size of each dimension
+      INTEGER			IFID			! Input dataset id
+      INTEGER                LDIMS(ADI__MXDIM) ! Size of each dimension
       INTEGER                NBAD            ! No.of bad quality data
       INTEGER                NBPTR           ! Pointer to number of bad points array
       INTEGER                NDAT            ! Total number of data points
       INTEGER                NDEG            ! Degree of polynomial fitted
       INTEGER                NDIM            ! Dimensionality of data
       INTEGER                NVAL            ! Number of values mapped
+      INTEGER			OFID			! Input dataset id
       INTEGER                QPTR            ! Pointer to data quality
-      INTEGER                TLDIMS(DAT__MXDIM) ! Dummy size of each dimension
+      INTEGER                TLDIMS(ADI__MXDIM) ! Dummy size of each dimension
       INTEGER                TNDIM           ! Dummy dimensionality of component
       INTEGER                VPTR            ! Pointer to data variances
       INTEGER                WTPTR           ! Data weights (=1/variance**2)
@@ -104,7 +105,7 @@
 *    Version id :
 *
       CHARACTER*22           VERSION
-        PARAMETER            ( VERSION = 'POLYFIT Version 1.8-0' )
+        PARAMETER            ( VERSION = 'POLYFIT Version 1.8-1' )
 *-
 
 *    Check status.
@@ -115,7 +116,7 @@
 
 *    Initialize
       CALL AST_INIT
-      CALL ARR_INIT1I( 1, DAT__MXDIM, LDIMS, STATUS )
+      CALL ARR_INIT1I( 1, ADI__MXDIM, LDIMS, STATUS )
 
 *    Ask if detrending or polynomial fitting required:
       CALL USI_GET0L( 'FIT', POLY, STATUS )
@@ -132,18 +133,17 @@
 *    Open input
       IF ( OVERWRITE ) THEN
         CALL MSG_PRNT( 'WARNING: Overwriting input object' )
-        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
-        OLOC = ILOC
+        CALL USI_TASSOCI( 'INP', 'UPDATE', IFID, STATUS )
+        OFID = IFID
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, INPRIM,
-     :                                                    STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       END IF
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check data
-      CALL  BDA_CHKDATA (ILOC, DATOK, NDIM, LDIMS, STATUS)
+      CALL  BDI_CHKDATA (IFID, DATOK, NDIM, LDIMS, STATUS)
       IF ( .NOT. DATOK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', '! Invalid data', STATUS )
@@ -153,10 +153,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Look for independent variable - if present & correct then map it
-      CALL BDA_CHKAXVAL( ILOC, 1, OK, AXREG, NVAL, STATUS )
+      CALL BDI_CHKAXVAL( IFID, 1, OK, AXREG, NVAL, STATUS )
 
       IF ( OK ) THEN
-        CALL BDA_MAPAXVAL (ILOC, 'READ', 1, AXPTR, STATUS)
+        CALL BDI_MAPAXVAL (IFID, 'READ', 1, AXPTR, STATUS)
 
       ELSE
 
@@ -164,14 +164,14 @@
         CALL MSG_PRNT ('WARNING: Axis(1) data is invalid'/
      :                        /' - proceeding assuming regular spacing')
 
-        CALL BDA_CREAXES (OLOC, NDIM, STATUS)
+        CALL BDI_CREAXES (OFID, NDIM, STATUS)
 
         DO I = 1, NDIM
-          CALL BDA_CREAXVAL( OLOC, I, .TRUE., LDIMS(I), STATUS )
-          CALL BDA_PUTAXVAL( OLOC, I, 0.0, 1.0, LDIMS(I), STATUS )
+          CALL BDI_CREAXVAL( OFID, I, .TRUE., LDIMS(I), STATUS )
+          CALL BDI_PUTAXVAL( OFID, I, 0.0, 1.0, LDIMS(I), STATUS )
         END DO
 
-        CALL BDA_MAPAXVAL (OLOC, 'READ', 1, AXPTR, STATUS)
+        CALL BDI_MAPAXVAL (OFID, 'READ', 1, AXPTR, STATUS)
 
       END IF
 
@@ -179,34 +179,35 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map in data array
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       IF ( .NOT. INPRIM ) THEN
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
-        CALL BDA_MAPDATA( OLOC, 'UPDATE', DPTR, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
+        CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
 
       ELSE
         IF ( OVERWRITE ) THEN
-          CALL BDA_MAPDATA( ILOC, 'UPDATE', DPTR, STATUS )
+          CALL BDI_MAPDATA( IFID, 'UPDATE', DPTR, STATUS )
 
         ELSE
-          CALL HIST_COPY( ILOC, OLOC, STATUS )
-          CALL BDA_COPDATA( ILOC, OLOC, STATUS )
-          CALL BDA_MAPDATA( OLOC, 'UPDATE', DPTR, STATUS )
+          CALL HSI_COPY( IFID, OFID, STATUS )
+          CALL BDI_COPDATA( IFID, OFID, STATUS )
+          CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
 
         END IF
       END IF
 
 *    Map data variance if present & correct
-      CALL BDA_CHKVAR( ILOC, VAROK, TNDIM, TLDIMS, STATUS )
+      CALL BDI_CHKVAR( IFID, VAROK, TNDIM, TLDIMS, STATUS )
       IF ( VAROK ) THEN
-        CALL BDA_MAPVAR( ILOC, 'READ', VPTR, STATUS )
+        CALL BDI_MAPVAR( IFID, 'READ', VPTR, STATUS )
       END IF
 
 *    Check data quality - exclude any bad points from fit.
-      CALL BDA_CHKQUAL( ILOC, QUALOK, TNDIM, TLDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TLDIMS, STATUS )
       IF ( QUALOK ) THEN
-        CALL BDA_MAPLQUAL( ILOC, 'READ', BAD, QPTR, STATUS )
+        CALL BDI_MAPLQUAL( IFID, 'READ', BAD, QPTR, STATUS )
         IF ( .NOT. BAD ) THEN
-          CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+          CALL BDI_UNMAPLQUAL( IFID, STATUS )
           QUALOK = .FALSE.
         END IF
       END IF
@@ -289,7 +290,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    History file entry
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( I, TEXT, STATUS )
       CALL MSG_SETI( 'NDEG', NDEG )
       I = I + 1
@@ -301,7 +302,7 @@
         CALL MSG_MAKE( 'Polynomial of degree ^NDEG subtracted.',
      :                                              TEXT(I), N )
       END IF
-      CALL HIST_PTXT( OLOC, I, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, I, TEXT, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
@@ -327,7 +328,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDAT            ! No. of data points per fit
       INTEGER                BLEN            ! No. of fits.
@@ -419,7 +419,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDEG               ! Degree of polynomial fitted
       INTEGER                NDIM               ! Dimensionality of data
@@ -554,7 +553,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                NDEG               ! Degree of polynomial fitted
       INTEGER                NDIM               ! Dimensionality of data
@@ -765,7 +763,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -961,7 +958,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER    STATUS
 *    Import :
@@ -1051,7 +1047,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status
       INTEGER    STATUS
 *    Import :
@@ -1105,7 +1100,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                N, M
 
