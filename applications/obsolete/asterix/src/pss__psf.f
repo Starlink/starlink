@@ -155,10 +155,10 @@
           END DO
         END DO
 
-*      Preserve current width
-        LAST_FWHM = FWHM
-
       END IF
+
+*  Preserve current width
+      LAST_FWHM = FWHM
 
       END
 *+  PSS_PSF_INIT - Find a psf and map required workspace

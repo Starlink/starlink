@@ -45,7 +45,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
       INCLUDE 'USER_ERR'
@@ -500,7 +499,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'PSS_PAR'
@@ -621,10 +619,16 @@
 
       END IF
 
-*    Find significance at test widths
+*  The fact that we need this is a bug. If it is taken out then the first
+*  extension significance is not calculated correctly due to a problem
+*  with psf evaluation
+      CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, UTIL_PLOC(TSIG(0)),
+     :                                                     STATUS )
+
+*  Find significance at test widths
       DO I = 0, MAXWID
 
-*      Convolve psf
+*    Convolve psf
         CALL PSS_PSF_CONVOLVE( PSF_UDIMS(1), PSF_UDIMS(2),
      :                 %VAL(PSF_STORE), %VAL(PSF_CONWPTR),
      :                  TWID(I), %VAL(PSF_CONPTR), STATUS )
@@ -797,7 +801,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'PSS_PAR'
@@ -865,7 +868,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -935,7 +937,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -1003,6 +1004,8 @@
       IF ( FIRST ) THEN
         CALL DYN_MAPR( 1, 2*PSS__CACHELEN, FIT.PRED.PREDPTR(1), STATUS )
         CALL DYN_MAPR( 1, 2*PSS__CACHELEN, FIT.PRED.PREDPTR(2), STATUS )
+        FIT.PRED.PGDPTR(1) = FIT.PRED.PREDPTR(1)
+        FIT.PRED.PGDPTR(2) = FIT.PRED.PREDPTR(2)
         CALL DYN_MAPR( 1, 2*P__E*PSS__CACHELEN, FIT.PRED.DFDPPTR,
      :                                                   STATUS )
         FIRST = .FALSE.
@@ -1043,8 +1046,11 @@
 *    Set up pointers into cache
       FIT.DS.NDIM = 1
       FIT.DS.NDAT = NDAT
+      FIT.DS.NGDAT = NDAT
+      FIT.DS.GFLAG = .FALSE.
       FIT.DS.IDIM(1) = FIT.DS.NDAT
       FIT.DS.DPTR = UTIL_PLOC( DC_IMD(DC_LO) )
+      FIT.DS.GDPTR = FIT.DS.DPTR
 
 *    Dataset quality if present
       FIT.DS.QFLAG = BDS_QUAL_OK
@@ -1053,9 +1059,11 @@
       ELSE
         FIT.DS.QPTR = 0
       END IF
+      FIT.DS.GQPTR = FIT.DS.QPTR
 
       IF ( .NOT. CP_CASH ) THEN
         FIT.DS.VPTR = UTIL_PLOC( DC_IMBV(DC_LO) )
+        FIT.DS.GWPTR = FIT.DS.VPTR
       END IF
       FIT.DS.BPTR = UTIL_PLOC( DC_BGND(DC_LO) )
       FIT.DS.TEFF = 1.0
@@ -1069,6 +1077,7 @@
         STATID = FIT__CHISQ
       END IF
       FIT.PRED.DPTR = UTIL_PLOC( DC_MOD(DC_LO) )
+      FIT.PRED.GDPTR = FIT.PRED.DPTR
       FIT.PRED.IDIMM(1) = FIT.DS.NDAT
       FIT.PRED.NMDAT = FIT.DS.NDAT
 
@@ -1133,7 +1142,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Import :
@@ -1209,7 +1217,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -1331,7 +1338,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
 *
@@ -1673,7 +1679,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -1729,7 +1734,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
