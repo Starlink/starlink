@@ -726,6 +726,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_getnaxes)( AstFrame * );
+static int (* parent_getusedefs)( AstObject * );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -780,6 +781,7 @@ static int DumpUnc( AstRegion * );
 static int TestUnc( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetNaxes( AstFrame * );
+static int GetUseDefs( AstObject * );
 static int IsUnitFrame( AstFrame * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int Overlap( AstRegion *, AstRegion * );
@@ -3036,6 +3038,68 @@ static AstRegion *GetUnc( AstRegion *this, int ifrm ) {
    return result;
 }
 
+static int GetUseDefs( AstObject *this_object ) {
+/*
+*  Name:
+*     GetUseDefs
+
+*  Purpose:
+*     Get the value of the UseDefs attribute for a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int GetUseDefs( AstObject *this_object ) {
+
+*  Class Membership:
+*     Region member function (over-rides the protected astGetUseDefs
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the value of the UseDefs attribute for a
+*     Region. supplying a suitable default.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     - The USeDefs value.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstRegion *this;              /* Pointer to the Region structure */
+   int result;                   /* Value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the Region structure. */
+   this = (AstRegion *) this_object;
+
+/* If the UseDefs value for the Region has been set explicitly, use the
+   Get method inherited from the parent Frame class to get its value. */
+   if( astTestUseDefs( this ) ) {
+      result = (*parent_getusedefs)( this_object );
+
+/* Otherwise, supply a default value equal to the UseDefs value of the
+   encapsulated Frame. */   
+   } else {
+      fr = astGetFrame( this->frameset, AST__CURRENT );
+      result = astGetUseDefs( fr );
+      fr = astAnnul( fr );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int TestUnc( AstRegion *this ) {
 /*
 *+
@@ -3522,6 +3586,9 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    frame = (AstFrameVtab *) vtab;
 
    parent_getnaxes = frame->GetNaxes;
+
+   parent_getusedefs = object->GetUseDefs;
+   object->GetUseDefs = GetUseDefs;
 
    object->Equal = Equal;
    object->ClearAttrib = ClearAttrib;
@@ -6372,12 +6439,6 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
 *-
 */
 
-
-/* Local Variables; */
-   AstRegion *unc; 
-   AstRegion *newunc; 
-   double *cen0;
-
 /* Check the inherited status. */
    if( !astOK ) return;
 
@@ -6389,25 +6450,6 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
    if( astTestMeshSize( that ) ) astSetMeshSize( this, astGetMeshSize( that ) );
    if( astTestFillFactor( that ) ) astSetFillFactor( this, astGetFillFactor( that ) );
 
-/* If the uncertainty Region in "that" is a default, erase any uncertainty 
-   information in "this". Otherwise, simplify it (this may result in the
-   uncertainty Region being expressed in the new base Frame of the parent
-   Region. */
-   if( !astTestUnc( that ) ) {
-      astClearUnc( this );
-   } else if( astTestUnc( this ) ) {
-      unc = astGetUnc( this, AST__BASE );
-      newunc = astSimplify( unc );
-      if( newunc != unc ) {
-         cen0 = astRegCentre( newunc, NULL, NULL, 0, 0 );
-         if( cen0 ) {
-            cen0 = astFree( cen0 );
-            astSetUnc( this, newunc );
-         }
-      }
-      unc = astAnnul( unc );
-      newunc = astAnnul( newunc );
-   }     
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,
@@ -6959,7 +7001,7 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Take ac opy of the supplied Frame and ensure its ActiveUnits flag is
+/* Take a copy of the supplied Frame and ensure its ActiveUnits flag is
    set. */
    f1 = astCopy( frm );
    astSetActiveUnit( f1, 1 );
@@ -6975,7 +7017,6 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
    um = astUnitMap( astGetNaxes( f1 ), "" );
    astAddFrame( fs, AST__BASE, um, f2 );
    um = astAnnul( um );
-   f1 = astAnnul( f1 );
    f2 = astAnnul( f2 );
 
 /* Annul any existing FrameSet */
@@ -6983,6 +7024,16 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
 
 /* Use the new FrameSet */
    this->frameset = fs;
+
+/* If any uncertainty Region has a zero value for its RegionFS attribute,
+   it will currently contain a dummy FrameSet rather than the correct
+   FrameSet. The correct FrameSet has copies of the base Frame of the new
+   Region as both its current and base Frames, and these are connected by
+   a UnitMap (this is equivalent to a FrameSet containing a single Frame). */
+   if( this->unc && !astGetRegionFS( this->unc ) ) astSetRegFS( this->unc, f1 );
+
+/* Free remaining resourvces */
+   f1 = astAnnul( f1 );
 
 }
 
@@ -7080,6 +7131,7 @@ f        The global status.
          frm = astGetFrame( fs2, AST__CURRENT );
          this->unc = astMapRegion( unc, map, frm );
 
+
 /* Ensure the Region is bounded. We know that negating an unbounded
    Region will make it bounded because we know that the Region consists of 
    Circles, Boxes and/or Ellipses, all of which have this property. */
@@ -7102,9 +7154,11 @@ f        The global status.
          if( astIsAUnitMap( smap ) ) astSetRegionFS( this->unc, 0 );
 
 /* Re-centre the uncertainty Region at the first position in the PointSet
-   associated with the Region structure. */
-         ptr_reg = astGetPoints( this->points );
-         astRegCentre( this->unc, NULL, ptr_reg, 0, AST__CURRENT );
+   associated with the Region structure (if any). */
+         if( this->points ) {
+            ptr_reg = astGetPoints( this->points );
+            astRegCentre( this->unc, NULL, ptr_reg, 0, AST__CURRENT );
+         }
 
 /* Free resources */
          map2 = astAnnul( map2 );
@@ -7197,6 +7251,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    double *s2_lbnd;              /* Lower bounds of "unc" when centred at ubnd */
    double *s2_ubnd;              /* Upper bounds of "unc" when centred at ubnd */
    double *ubnd;                 /* Upper bounds of "this" bounding box */
+   double delta;                 /* Half width of test box */
    double w1;                    /* Width of "s1" bounding box */
    double w2;                    /* Width of "s2" bounding box */
    int ic;                       /* Axis index */
@@ -7294,21 +7349,40 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    describe the whole of "this" Region, and so we need to check that the 
    simplified uncertainty does not change as we move it around within "this"
    Region. To do this, we re-centre the uncertainty region at opposite
-   corners of the bounding box of "this", and then we find the bounding
-   box of the re-centred uncertainty Region. If this uncertainty bounding 
-   box changes from corner to corner, then we do not simplify the 
-   uncertainty Region. First get the base Frame bounding box of "this". */
-         naxb = astGetNin( this->frameset );
-         lbnd = astMalloc( sizeof( double )*(size_t)naxb );      
-         ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
-         astRegBaseBox( this, lbnd, ubnd );      
+   corners of a large test box, and then we find the bounding box of the 
+   re-centred uncertainty Region. If this uncertainty bounding box changes 
+   from corner to corner of the test box, then we do not simplify the 
+   uncertainty Region. If "this" is bounded, we use the bounding box of
+   "this" as the test box. Otherwise we use a box 100 times the size of the 
+   uncertainty Region. */
 
 /* Note the original base Frame centre of the simplified uncertainty Region. */
          orig_cen = astRegCentre( sunc, NULL, NULL, 0, AST__BASE );
 
-/* Re-centre it at the lower bounds of the bounding box of "this". This is
-   in the base Frame of "this" which is the same as the current Frame of 
-   "sunc". */
+/* Allocate memory to hold the bounds of the test box. */
+         naxb = astGetNin( this->frameset );
+         lbnd = astMalloc( sizeof( double )*(size_t)naxb );      
+         ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
+
+/* If possible, get the base Frame bounding box of "this" and use it as
+   the test box. */
+         if( astGetBounded( this ) ) {
+            astRegBaseBox( this, lbnd, ubnd );      
+
+/* Otherwise, store the bounds of a box which is 100 times the size of
+   the uncertainty region, centred on the current centre of the uncertainty
+   region (we know all uncertainty regions are bounded). */
+         } else {
+            astRegCurBox( sunc, lbnd, ubnd );      
+            for( ic = 0; ic < naxb; ic++ ) {
+               delta = 0.5*fabs( ubnd[ ic ] - lbnd[ ic ] );
+               lbnd[ ic ] = orig_cen[ ic ] - delta;
+               ubnd[ ic ] = orig_cen[ ic ] + delta;
+            }
+         }
+
+/* Re-centre it at the lower bounds of the test box. This is in the base Frame 
+   of "this" which is the same as the current Frame of "sunc". */
          astRegCentre( sunc, lbnd, NULL, 0, AST__CURRENT );
 
 /* Get the bounding box of the re-centred uncertainty Region, within its
@@ -7317,8 +7391,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          s1_ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
          astRegCurBox( sunc, s1_lbnd, s1_ubnd );      
 
-/* Now re-centre the uncertainty Region at the upper bounds of the bounding 
-   box of "this". */
+/* Now re-centre the uncertainty Region at the upper bounds of the test
+   box. */
          astRegCentre( sunc, ubnd, NULL, 0, AST__CURRENT );
 
 /* Get the bounding box of the re-centred uncertainty Region. */
@@ -7329,14 +7403,14 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Get a pointer to the base Frame of "this". */
          bfrm = astGetFrame( this->frameset, AST__BASE );
 
-/* The "ok" flag is initialised to indicate that the simplfiied uncertainty
+/* The "ok" flag is initialised to indicate that the simplified uncertainty
    Region should not be used. */
          ok = 0;
 
 /* Check pointers can be referenced safely */
          if( astOK ) { 
 
-/* Now indicate that the simplfiied uncertainty Region should be used. */
+/* Now indicate that the simplified uncertainty Region should be used. */
             ok = 1;
 
 /* Loop round all axes of the base Frame of "this". */
@@ -8499,10 +8573,10 @@ astMAKE_TEST(Region,Negated,( this->negated != -INT_MAX ))
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when
    undefined but yielding a default of one. */
 astMAKE_CLEAR(Region,RegionFS,regionfs,-INT_MAX)
-astMAKE_GET(Region,RegionFS,int,1,( ( this->regionfs == -INT_MAX ) ?
-                                   1 : this->regionfs ))
-astMAKE_SET(Region,RegionFS,int,regionfs,( value != 0 ))
 astMAKE_TEST(Region,RegionFS,( this->regionfs != -INT_MAX ))
+astMAKE_SET(Region,RegionFS,int,regionfs,( value != 0 ))
+astMAKE_GET(Region,RegionFS,int,1,( ( this->regionfs == -INT_MAX ) ?
+                                   1 : this->regionfs )) 
 
 /*
 *att++
@@ -9104,7 +9178,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
    if ( !astOK ) return NULL;
 
 /* If necessary, initialise the virtual function table. */
-   if ( init ) astInitRegionVtab( vtab, name );
+   if( init ) astInitRegionVtab( vtab, name );
 
 /* Note the number of axes in the supplied Frame. */
    nax = astGetNaxes( frame );
@@ -9135,6 +9209,9 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
 
 /* Initialise the Region data. */
 /* ----------------------------- */
+      new->frameset = NULL;
+      new->points = NULL;
+      new->unc = NULL;
       new->meshsize = -INT_MAX;
       new->basemesh = NULL;
       new->basegrid = NULL;
@@ -9142,6 +9219,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
       new->closed = -INT_MAX;
       new->regionfs = -INT_MAX;
       new->fillfactor = AST__BAD;
+      new->defunc = 0;
 
 /* If the supplied Frame is a Region, gets its encapsulated Frame. If a 
    FrameSet was supplied, use its current Frame, otherwise use the
@@ -9156,17 +9234,24 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
          f0 = astClone( frame );
       }    
 
-/* Form a FrameSet consisting of two copies of the supplied Frame
-   connected together by a UnitMap, and store in the Region structure. */
-      astSetRegFS( new, f0 );
-      f0 = astAnnul( f0 );
-
 /* Store a clone of the supplied PointSet pointer. */
       new->points = pset ? astClone( pset ) : NULL;
 
-/* Store any uncertainty Region. */
+/* Form a FrameSet consisting of two copies of the supplied Frame connected 
+   together by a UnitMap, and store in the Region structure. We use the
+   private SetRegFS rather than the protected astSetRegFS because this
+   initialiser may be being called from a subclass which over-rides 
+   astSetRegFS. If this were the case, then the implementation of
+   astSetRegFS provided by the subclass may access information within the
+   subclass structure which has not yet been initialised. */
+      SetRegFS( new, f0 );
+      f0 = astAnnul( f0 );
+
+/* Store any uncertainty Region. Use the private SetUnc rather than
+   astSetUnc to avoid subclass implementations using subclass data which
+   has not yet been initialised. */
       new->unc = NULL;
-      astSetUnc( new, unc );
+      SetUnc( new, unc );
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -9253,7 +9338,6 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* Local Variables: */
    AstFrame *f1;                  /* Base Frame for encapsulated FrameSet */
    AstRegion *new;                /* Pointer to the new Region */
-   AstRegion *unc;                /* Pointer to the uncertainty Region */
    int nax;                       /* No. of axes in Frame */
    int naxpt;                     /* No. of axes in per point */
 
@@ -9343,6 +9427,10 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
          naxpt = astReadInt( channel, "regaxes", 0 );
       }
 
+/* Uncertainty */
+/* ----------- */
+      new->unc = astReadObject( channel, "unc", NULL );
+
 /* FrameSet */
 /* -------- */
 /* First see if the dump contains a single Frame. If so, create a
@@ -9394,27 +9482,6 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
                    "for each point.", astGetClass( new ), nax );
       }
    
-/* Uncertainty */
-/* ----------- */
-      unc = astReadObject( channel, "unc", NULL );
-      if( unc ) {
-
-/* If the uncertainty Region has a zero value for its RegionFS attribute,
-   it will currently contain a dummy FrameSet rather than the correct
-   FrameSet. The correct FrameSet has copies of the base Frame of the new
-   Region as both its current and base Frames, and these are connected by
-   a UnitMap (this is equivalent to a FrameSet containing a single Frame). */
-         if( !astGetRegionFS( unc ) ) {
-            f1 = astGetFrame( new->frameset, AST__BASE );
-            astSetRegFS( unc, f1 );
-            f1 = astAnnul( f1 );
-         }
-
-/* Store the corrected uncertainty Region in the new Region. */
-         new->unc = NULL;
-         astSetUnc( new, unc );
-     }
-
 /* Initialise other fields which are used as caches for values derived
    from the attributes set above. */
       new->basemesh = NULL;

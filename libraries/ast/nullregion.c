@@ -99,7 +99,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *RegMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *GetUnc( AstRegion *, int );
+static AstRegion *GetDefUnc( AstRegion * );
 static int Overlap( AstRegion *, AstRegion * );
 static int OverlapX( AstRegion *, AstRegion * );
 static void Dump( AstObject *, AstChannel * );
@@ -108,57 +108,49 @@ static void RegCurBox( AstRegion *this, double *, double * );
 
 /* Member functions. */
 /* ================= */
-static AstRegion *GetUnc( AstRegion *this, int ifrm ) {
+static AstRegion *GetDefUnc( AstRegion *this ) {
 /*
+*+
 *  Name:
-*     GetUnc
+*     astGetDefUnc
 
 *  Purpose:
-*     Obtain a pointer to the uncertainty Region for a given Region.
+*     Obtain a pointer to the default uncertainty Region for a given Region.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
-*     #include "region.h"
-*     AstRegion *GetUnc( AstRegion *this, int ifrm ) 
+*     #include "nullregion.h"
+*     AstRegion *astGetDefUnc( AstRegion *this ) 
 
 *  Class Membership:
-*     NullRegion member function (over-rides the astGetUnc protected
+*     NullRegion member function (over-rides the astGetDefUnc protected
 *     method inherited from the Region class).
 
 *  Description:
 *     This function returns a pointer to a Region which represents the
-*     uncertainty associated with a position on the boundary of the given 
-*     Region. The returned Region can refer to the either the base or 
-*     the current Frame within the FrameSet encapsulated by the supplied 
-*     Region as specified by the "ifrm" parameter. If the returned Region is 
-*     re-centred at some point on the boundary of the supplied Region, then 
-*     the re-centred Region will represent the region in which the true 
-*     boundary position could be.
+*     default uncertainty associated with a position on the boundary of the 
+*     given  Region. The returned Region refers to the base Frame within the 
+*     FrameSet encapsulated by the supplied Region.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
-*     ifrm
-*        The index of a Frame within the FrameSet encapsulated by "this".
-*        The returned Region will refer to the requested Frame. It should
-*        be either AST__CURRENT or AST__BASE.
 
 *  Returned Value:
 *     A pointer to the Region. This should be annulled (using astAnnul)
 *     when no longer needed.
 
 *  Notes:
-*     - This implementation reports na error and returns NULL since a 
-*     NullRegion has no uncertainty.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
 *-
 */
-
-   astError( AST__INTER, "astGetUnc(%s): The %s class does not implement "
-             "the astGetUnc method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
-             astGetClass( this ) );
+   astError( AST__INTER, "astGetDefUnc(%s): The %s class does not define "
+             "any default uncertainties (programming error).", 
+             astGetClass( this ), astGetClass( this ) );
    return NULL;
 }
 
@@ -231,7 +223,7 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
-   region->GetUnc = GetUnc;
+   region->GetDefUnc = GetDefUnc;
    region->Overlap = Overlap;
    region->OverlapX = OverlapX;
    region->RegBaseBox = RegBaseBox;

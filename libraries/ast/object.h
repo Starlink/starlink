@@ -44,6 +44,8 @@
 *        Like ID, this is an identification string which may be used 
 *        to identify the Object. Unlike ID, Ident is transferred when an
 *        Object is copied.
+*     UseDefs (int)
+*        Should default values be used for unset attributes?
 *     Nobject (integer)
 *        This is a read-only attribute which gives the total number of
 *        Objects currently in existence in the same class as the
@@ -264,6 +266,8 @@
 *        Added astVersion function.
 *     7-FEB-2004 (DSB):
 *        Added astEscapes function.
+*     11-MAR-2005 (DSB):
+*        Added UseDefs attribute.
 *--
 */
 
@@ -1084,6 +1088,7 @@ typedef struct AstObject {
    int ref_count;                /* Number of active pointers to the Object */
    char *id;                     /* Pointer to ID string */
    char *ident;                  /* Pointer to Ident string */
+   int usedefs;                  /* Use default attribute values? */
 } AstObject;
 
 /* Virtual function table. */
@@ -1117,6 +1122,12 @@ typedef struct AstObjectVtab {
    void (* SetIdent)( AstObject *, const char * );
    void (* Show)( AstObject * );
    void (* VSet)( AstObject *, const char *, va_list );
+
+   int (* TestUseDefs)( AstObject * );
+   int (* GetUseDefs)( AstObject * );
+   void (* SetUseDefs)( AstObject *, int );
+   void (* ClearUseDefs)( AstObject * );
+
    const char *class;            /* Pointer to class name string */
    void (** delete)( AstObject * ); /* Pointer to array of destructors */
    void (** copy)( const AstObject *, AstObject * ); /* Copy constructors */
@@ -1211,6 +1222,12 @@ void astSetL_( AstObject *, const char *, long );
 void astShow_( AstObject * );
 
 #if defined(astCLASS)            /* Protected */
+
+int astTestUseDefs_( AstObject * );
+int astGetUseDefs_( AstObject * );
+void astSetUseDefs_( AstObject *, int );
+void astClearUseDefs_( AstObject * );
+
 const char *astGetAttrib_( AstObject *, const char * );
 const char *astGetClass_( const AstObject * );
 const char *astGetID_( AstObject * );
@@ -1334,6 +1351,12 @@ astINVOKE(V,astShow_(astCheckObject(this)))
 astINVOKE(V,astTest_(astCheckObject(this),attrib))
 
 #if defined(astCLASS)            /* Protected */
+
+#define astClearUseDefs(this) astINVOKE(V,astClearUseDefs_(astCheckObject(this)))
+#define astTestUseDefs(this) astINVOKE(V,astTestUseDefs_(astCheckObject(this)))
+#define astGetUseDefs(this) astINVOKE(V,astGetUseDefs_(astCheckObject(this)))
+#define astSetUseDefs(this,val) astINVOKE(V,astSetUseDefs_(astCheckObject(this),val))
+
 #define astClearAttrib(this,attrib) \
 astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib))
 #define astClearID(this) astINVOKE(V,astClearID_(astCheckObject(this)))

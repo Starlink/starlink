@@ -516,6 +516,7 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
+static int (* parent_getusedefs)( AstObject * );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -605,6 +606,7 @@ static void SetMinAxes( AstFrame *, int );
 static void SetSymbol( AstFrame *, int, const char * );
 static void SetUnit( AstFrame *, int, const char * );
 static void Overlay( AstFrame *, const int *, AstFrame * );
+static int GetUseDefs( AstObject * );
 
 static const char *GetAttrib( AstObject *, const char * );
 static int TestAttrib( AstObject *, const char * );
@@ -2775,6 +2777,76 @@ static const char *GetTitle( AstFrame *this_frame ) {
 #undef BUFF_LEN
 }
 
+static int GetUseDefs( AstObject *this_object ) {
+/*
+*  Name:
+*     GetUseDefs
+
+*  Purpose:
+*     Get a value for the UseDefs attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int GetUseDefs( AstCmpFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetUseDefs method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the UseDefs attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The UseDefs attribute value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 1;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* If an UseDefs attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestUseDefs( this ) ) {
+      result = (*parent_getusedefs)( this_object );
+
+/* Otherwise, if the UseDefs value is set in the first component Frame,
+   return it. */
+   } else if( astTestUseDefs( this->frame1 ) ){
+      result = (*parent_getusedefs)( (AstObject *) this->frame1 );
+
+/* Otherwise, if the UseDefs value is set in the second component Frame,
+   return it. */
+   } else if( astTestUseDefs( this->frame2 ) ){
+      result = (*parent_getusedefs)( (AstObject *) this->frame2 );
+
+/* Otherwise, return the default UseDefs value from the first component
+   Frame. */
+   } else {
+      result = (*parent_getusedefs)( (AstObject *) this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int GoodPerm( int ncoord_in, const int inperm[],
                      int ncoord_out, const int outperm[] ) {
 /*
@@ -2939,6 +3011,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+
+   parent_getusedefs = object->GetUseDefs;
+   object->GetUseDefs = GetUseDefs;
 
    mapping->Simplify = Simplify;
    mapping->Transform = Transform;

@@ -163,6 +163,7 @@ static void ClearAttrib( AstObject *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void SetAttrib( AstObject *, const char * );
+static void VerifyAttrs( AstDSBSpecFrame *, const char *, const char *, const char * );
 
 static double GetIF( AstDSBSpecFrame * );
 static int TestIF( AstDSBSpecFrame * );
@@ -753,6 +754,8 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
       tmap = TopoMap( this, 1, method );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
+      VerifyAttrs( this, "create a Mapping to lower sideband", 
+                   "IF DSBCentre", "astGetImagFreq" );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
 /* Create a 1D WinMap which converts f_usb to f_lsb. */
@@ -1691,6 +1694,8 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
       tmap = TopoMap( this, 1, method );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
+      VerifyAttrs( this, "create a Mapping to upper sideband", 
+                   "IF DSBCentre", "astGetImagFreq" );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
 /* Create a 1D WinMap which converts f_lsb to f_usb. */
@@ -1722,6 +1727,122 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
    return result;
 
 }
+static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp, 
+                         const char *attrs, const char *method ) {
+/*
+*  Name:
+*     VerifyAttrs
+
+*  Purpose:
+*     Verify that usable attribute values are available.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dsbspecframe.h"
+*     void VerifyAttrs( AstDSBSpecFrame *this, const char *purp, 
+*                       const char *attrs, const char *method  )
+
+*  Class Membership:
+*     DSBSpecFrame member function 
+
+*  Description:
+*     This function tests each attribute listed in "attrs". It returns
+*     without action if 1) an explicit value has been set for each attribute
+*     or 2) the UseDefs attribute of the supplied DSBSpecFrame is non-zero.
+*
+*     If UseDefs is zero (indicating that default values should not be
+*     used for attributes), and any of the named attributes does not have
+*     an explicitly set value, then an error is reported.
+
+*  Parameters:
+*     this
+*        Pointer to the DSBSpecFrame. 
+*     purp
+*        Pointer to a text string containing a message which will be
+*        included in any error report. This shouldindicate the purpose
+*        for which the attribute value is required. 
+*     attrs
+*        A string holding a space separated list of attribute names.
+*     method
+*        A string holding the name of the calling method for use in error
+*        messages.
+
+*/
+
+/* Local Variables: */
+   const char *a;
+   const char *desc;
+   const char *p;
+   int len;
+   int set;
+   int state;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* If the DSBSpecFrame has a non-zero value for its UseDefs attribute, then
+   all attributes are assumed to have usable values, since the defaults 
+   will be used if no explicit value has been set. So we only need to do
+   any checks if UseDefs is zero. */
+   if( !astGetUseDefs( this ) ) {   
+
+/* Loop round the "attrs" string identifying the start and length of each
+   non-blank word in the string. */
+      state = 0;
+      p = attrs;
+      while( 1 ) {
+         if( state == 0 ) {
+            if( !isspace( *p ) ) {
+               a = p;
+               len = 1;
+               state = 1;
+            }
+         } else {
+            if( isspace( *p ) || !*p ) {
+   
+/* The end of a word has just been reached. Compare it to each known
+   attribute value. Get a flag indicating if the attribute has a set
+   value, and a string describing the attribute.*/
+               if( len > 0 ) {
+
+                  if( !strncmp( "DSBCentre", a, len ) ) {
+                     set = astTestDSBCentre( this );
+                     desc = "central position of interest";
+
+                  } else if( !strncmp( "IF", a, len ) ) {
+                     set = astTestIF( this );
+                     desc = "intermediate frequency";
+
+                  } else {
+                     astError( AST__INTER, "VerifyAttrs(DSBSpecFrame): "
+                               "Unknown attribute name \"%.*s\" supplied (AST "
+                               "internal programming error).", len, a );
+                  }
+
+/* If the attribute does not have a set value, report an error. */
+                  if( !set && astOK ) {
+                     astError( AST__NOVAL, "%s(%s): Cannot %s.", method,
+                               astGetClass( this ), purp );
+                     astError( AST__NOVAL, "No value has been set for "
+                               "the AST \"%.*s\" attribute (%s).", len, a,
+                               desc );
+                  }
+
+/* Continue the word search algorithm. */
+               }
+               len = 0;
+               state = 0;
+            } else {
+               len++;
+            }
+         }
+         if( !*(p++) ) break;
+      }
+   }
+}
+
 
 /* Functions which access class attributes. */
 /* ---------------------------------------- */

@@ -1734,11 +1734,6 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    component Region. */
    ps1b = astRegTransform( reg1, ps1, 0, NULL, NULL );
    unc1 = astGetUnc( reg1, AST__BASE );
-
-if( !astIsARegion( unc1 ) ) {
-   printf("Bang\n");
-}
-
    astRegPins( reg1, ps1b, unc1, &mask1 );
 
 /* Also determine which of the points are on or in theboundary by using

@@ -719,6 +719,7 @@ static int integrity_lost = 0;   /* Current Frame modified? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static void (* parent_clear)( AstObject *, const char * );
+static int (* parent_getusedefs)( AstObject * );
 static void (* parent_vset)( AstObject *, const char *, va_list );
 
 /* Prototypes for Private Member Functions. */
@@ -871,6 +872,8 @@ static double GetEpoch( AstFrame * );
 static int TestEpoch( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void SetEpoch( AstFrame *, double );
+
+static int GetUseDefs( AstObject * );
 
 static AstSystemType GetSystem( AstFrame * );
 static int TestSystem( AstFrame * );
@@ -4385,6 +4388,68 @@ static int GetTranInverse( AstMapping *this_mapping ) {
    return result;
 }
 
+static int GetUseDefs( AstObject *this_object ) {
+/*
+*  Name:
+*     GetUseDefs
+
+*  Purpose:
+*     Get the value of the UseDefs attribute for a FrameSet.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int GetUseDefs( AstObject *this_object ) {
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astGetUseDefs
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the value of the UseDefs attribute for a FrameSet, 
+*     supplying a suitable default.
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+
+*  Returned Value:
+*     - The USeDefs value.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   int result;                   /* Value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_object;
+
+/* If the UseDefs value for the FrameSet has been set explicitly, use the
+   Get method inherited from the parent Frame class to get its value> */
+   if( astTestUseDefs( this ) ) {
+      result = (*parent_getusedefs)( this_object );
+
+/* Otherwise, supply a default value equal to the UseDefs value of the
+   current Frame. */   
+   } else {
+      fr = astGetFrame( this, AST__CURRENT );
+      result = astGetUseDefs( fr );
+      fr = astAnnul( fr );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 /*
 *+
@@ -4465,8 +4530,12 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 
    parent_clear = object->Clear;
    object->Clear = Clear;
+
    parent_vset = object->VSet;
    object->VSet = VSet;
+
+   parent_getusedefs = object->GetUseDefs;
+   object->GetUseDefs = GetUseDefs;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -4477,6 +4546,8 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    object->GetAttrib = GetAttrib;
    object->SetAttrib = SetAttrib;
    object->TestAttrib = TestAttrib;
+
+   object->GetUseDefs = GetUseDefs;
 
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;

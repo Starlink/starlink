@@ -107,6 +107,8 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_overlap)( AstRegion *, AstRegion * );
 static double *(* parent_regcentre)( AstRegion *this, double *, double **, int, int );
+static void (* parent_setregfs)( AstRegion *, AstFrame * );
+static void (* parent_setunc)( AstRegion *, AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -132,6 +134,8 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int );
+static void SetRegFS( AstRegion *, AstFrame * );
+static void SetUnc( AstRegion *, AstRegion * );
 
 /* Member functions. */
 /* ================= */
@@ -451,9 +455,8 @@ static void Cache( AstInterval *this ){
 
 /* The Interval structure contains a pointer to an equivalent Box
    structure. This Box structure is created below if the Interval is
-   equivalent to a Box. Initialise the pointer now to indicate that the
-   Interval is not equivalent to a Box. */
-   this->box = NULL;
+   equivalent to a Box. Annul any previous box. */
+   if( this->box ) this->box = astAnnul( this->box );
 
 /* Get the number of axes in the base Frame of the FrameSet encapsulated
    by the parent Region structure. */
@@ -469,7 +472,7 @@ static void Cache( AstInterval *this ){
    ubnd = astMalloc( sizeof( double )*(size_t)nc );
 
 /* Check these pointers can be used safely. */
-   if( astOK ) {
+   if( ubnd ) {
 
 /* See if the Interval is effectively a (possibly negated) Box. Assume it
    is to begin with.  */
@@ -545,6 +548,8 @@ static void Cache( AstInterval *this ){
       }
 
 /* Store the axis limits in the Interval structure. */
+      if( this->lbnd ) astFree( this->lbnd );
+      if( this->ubnd ) astFree( this->ubnd );
       this->lbnd = lbnd;
       this->ubnd = ubnd;
 
@@ -879,7 +884,6 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
             unc_reg = astAnnul( unc_reg );
             unc_this = astAnnul( unc_this );
             punc = astAnnul( punc );
-
          } else {
             unc = NULL;
          }
@@ -1045,6 +1049,12 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
 
    parent_regcentre = region->RegCentre;
    region->RegCentre = RegCentre;
+
+   parent_setregfs = region->SetRegFS;
+   region->SetRegFS = SetRegFS;
+
+   parent_setunc = region->SetUnc;
+   region->SetUnc = SetUnc;
 
    region->GetBounded = GetBounded;
    region->GetDefUnc = GetDefUnc;
@@ -1532,7 +1542,7 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
       astError( AST__INTER, "astRegBaseBox(%s): The %s given is "
                 "unbounded and therefore no bounding box can be "
                 "found (internal AST programming error).", 
-                astGetClass( this ) );
+                astGetClass( this ), astGetClass( this ) );
    }
 }
 
@@ -1780,6 +1790,102 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+/*
+*  Name:
+*     SetRegFS
+
+*  Purpose:
+*     Stores a new FrameSet in a Region
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+
+*  Class Membership:
+*     Interval method (over-rides the astSetRegFS method inherited from
+*     the Region class).
+
+*  Description:
+*     This function creates a new FrameSet and stores it in the supplied
+*     Region. The new FrameSet contains two copies of the supplied
+*     Frame, connected by a UnitMap.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     frm
+*        The Frame to use.
+
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent method to store the FrameSet in the parent Region
+   structure. */
+   (* parent_setregfs)( this_region, frm );
+
+/* Re-create the cached intermediate information. This takes account of
+   any change to the Frame represented by this Interval. */
+   Cache( (AstInterval *) this_region );
+}
+
+static void SetUnc( AstRegion *this, AstRegion *unc ){
+/*
+*  Name:
+*     SetUnc
+
+*  Purpose:
+*     Store uncertainty information in a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     void SetUnc( AstRegion *this, AstRegion *unc )
+
+*  Class Membership:
+*     Interval method (over-rides the astSetUnc method inherited from the 
+*     Region class).
+
+*  Description:
+*     Each Region (of any class) can have an "uncertainty" which specifies 
+*     the uncertainties associated with the boundary of the Region. This
+*     information is supplied in the form of a second Region. The uncertainty 
+*     in any point on the boundary of a Region is found by shifting the 
+*     associated "uncertainty" Region so that it is centred at the boundary 
+*     point being considered. The area covered by the shifted uncertainty 
+*     Region then represents the uncertainty in the boundary position. 
+*     The uncertainty is assumed to be the same for all points.
+*
+*     The uncertainty is usually specified when the Region is created, but
+*     this function allows it to be changed at any time. 
+
+*  Parameters:
+*     this
+*        Pointer to the Region which is to be assigned a new uncertainty.
+*     unc
+*        Pointer to the new uncertainty Region. This must be either a Box, 
+*        a Circle or an Ellipse. A deep copy of the supplied Region will be 
+*        taken, so subsequent changes to the uncertainty Region using the 
+*        supplied pointer will have no effect on the Region "this".
+*/
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Invoke the astSetUnc method inherited from the parent Region class. */
+   (*parent_setunc)( this, unc );
+
+/* Re-calculate Cached information */
+   Cache( (AstInterval *) this );
+}
+
 static AstMapping *Simplify( AstMapping *this_mapping ) {
 /*
 *  Name:
@@ -1885,202 +1991,203 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
       new = (AstRegion *) (*parent_simplify)( this_mapping );
+      if( new ) {
 
 /* Note if any simplification took place. This is assumed to be the case
    if the pointer returned by the above call is different to the supplied
    pointer. */
-      simpler = ( new != this );
-
+         simpler = ( new != this );
+   
 /* If the Mapping from base to current Frame is not a UnitMap, we attempt
    to simplify the Interval by re-defining it within its current Frame. */
-      map = astGetMapping( new->frameset, AST__BASE, AST__CURRENT );
-      if( !astIsAUnitMap( map ) ){
-
+         map = astGetMapping( new->frameset, AST__BASE, AST__CURRENT );
+         if( !astIsAUnitMap( map ) ){
+   
 /* Take a copy of the Interval bounds (defined in the base Frame of the
    Intervals FrameSet) and replace any missing limits with arbitrary
    non-BAD values. This will give us a complete set of bounds defining a
    box within the base Frame of the Interval. */
-         ptr = astGetPoints( new->points );
-         nc = astGetNcoord( new->points );
-   
-         lbnd = astMalloc( sizeof( double )*(size_t) nc );
-         ubnd = astMalloc( sizeof( double )*(size_t) nc );
-   
-         if( astOK ) {
-            for( ic = 0; ic < nc; ic++ ) {
-               lbnd[ ic ] = ptr[ ic ][ 0 ];
-               ubnd[ ic ] = ptr[ ic ][ 1 ];
-   
+            ptr = astGetPoints( new->points );
+            nc = astGetNcoord( new->points );
+      
+            lbnd = astMalloc( sizeof( double )*(size_t) nc );
+            ubnd = astMalloc( sizeof( double )*(size_t) nc );
+      
+            if( astOK ) {
+               for( ic = 0; ic < nc; ic++ ) {
+                  lbnd[ ic ] = ptr[ ic ][ 0 ];
+                  ubnd[ ic ] = ptr[ ic ][ 1 ];
+      
 /* Ensure we have a good upper bound for this axis. */
-               if( ubnd[ ic ] == AST__BAD ) {
-                  if( lbnd[ ic ] == AST__BAD ) {
-                     ubnd[ ic ] = 1.0;
-   
-                  } else if( lbnd[ ic ] > 0.0 ) {
-                     ubnd[ ic ] = lbnd[ ic ]*1.01;
-   
-                  } else if( lbnd[ ic ] < 0.0 ) {
-                     ubnd[ ic ] = lbnd[ ic ]*0.99;
-                  
-                  } else {
-                     ubnd[ ic ] = 1.0;
+                  if( ubnd[ ic ] == AST__BAD ) {
+                     if( lbnd[ ic ] == AST__BAD ) {
+                        ubnd[ ic ] = 1.0;
+      
+                     } else if( lbnd[ ic ] > 0.0 ) {
+                        ubnd[ ic ] = lbnd[ ic ]*1.01;
+      
+                     } else if( lbnd[ ic ] < 0.0 ) {
+                        ubnd[ ic ] = lbnd[ ic ]*0.99;
+                     
+                     } else {
+                        ubnd[ ic ] = 1.0;
+                     }
                   }
-               }
-   
+      
 /* Ensure we have a good lower bound for this axis. */
-               if( lbnd[ ic ] == AST__BAD ) {
-                  if( ubnd[ ic ] > 0.0 ) {
-                     lbnd[ ic ] = ubnd[ ic ]*0.99;
-   
-                  } else if( ubnd[ ic ] < 0.0 ) {
-                     lbnd[ ic ] = ubnd[ ic ]*1.01;
-                  
-                  } else {
-                     lbnd[ ic ] = 1.0;
+                  if( lbnd[ ic ] == AST__BAD ) {
+                     if( ubnd[ ic ] > 0.0 ) {
+                        lbnd[ ic ] = ubnd[ ic ]*0.99;
+      
+                     } else if( ubnd[ ic ] < 0.0 ) {
+                        lbnd[ ic ] = ubnd[ ic ]*1.01;
+                     
+                     } else {
+                        lbnd[ ic ] = 1.0;
+                     }
                   }
                }
             }
-         }
-
+   
 /* Transform the box corners found above into the current frame and then back
    into the base Frame, and ensure that the box encloses both the original
    and the new bounds. PermMaps with fewer outputs than inputs can cause the 
    resulting base Frame positions to differ significantly from the original. */
-         psetb =astPointSet( 2, nc,"" );
-         ptrb =astGetPoints( psetb );
-         if( astOK ) {
-            for( ic = 0; ic < nc; ic++ ) {
-               ptrb[ ic ][ 0 ] = lbnd[ ic ];
-               ptrb[ ic ][ 1 ] = ubnd[ ic ];
-            }
-         }
-         psetc = astTransform( map, psetb, 1, NULL );
-         astTransform( map, psetc, 0, psetb );
-         if( astOK ) {
-            for( ic = 0; ic < nc; ic++ ) {
-               lb = ptrb[ ic ][ 0 ];
-               if( lb != AST__BAD ) {
-                  if( lb < lbnd[ ic ] ) lbnd[ ic ] = lb;
-                  if( lb > ubnd[ ic ] ) ubnd[ ic ] = lb;
-               }
-               ub = ptrb[ ic ][ 1 ];
-               if( ub != AST__BAD ) {
-                  if( ub < lbnd[ ic ] ) lbnd[ ic ] = ub;
-                  if( ub > ubnd[ ic ] ) ubnd[ ic ] = ub;
+            psetb =astPointSet( 2, nc,"" );
+            ptrb =astGetPoints( psetb );
+            if( astOK ) {
+               for( ic = 0; ic < nc; ic++ ) {
+                  ptrb[ ic ][ 0 ] = lbnd[ ic ];
+                  ptrb[ ic ][ 1 ] = ubnd[ ic ];
                }
             }
-         }
-         psetb = astAnnul( psetb );
-         psetc = astAnnul( psetc );
-
+            psetc = astTransform( map, psetb, 1, NULL );
+            astTransform( map, psetc, 0, psetb );
+            if( astOK ) {
+               for( ic = 0; ic < nc; ic++ ) {
+                  lb = ptrb[ ic ][ 0 ];
+                  if( lb != AST__BAD ) {
+                     if( lb < lbnd[ ic ] ) lbnd[ ic ] = lb;
+                     if( lb > ubnd[ ic ] ) ubnd[ ic ] = lb;
+                  }
+                  ub = ptrb[ ic ][ 1 ];
+                  if( ub != AST__BAD ) {
+                     if( ub < lbnd[ ic ] ) lbnd[ ic ] = ub;
+                     if( ub > ubnd[ ic ] ) ubnd[ ic ] = ub;
+                  }
+               }
+            }
+            psetb = astAnnul( psetb );
+            psetc = astAnnul( psetc );
+   
 /* Limit this box to not exceed the limits imposed by the Interval.*/
-         for( ic = 0; ic < nc; ic++ ) {
-            lb = this_interval->lbnd[ ic ] ;
-            ub = this_interval->ubnd[ ic ] ;
-            if( lb <= ub ) {
-               if( lbnd[ ic ] < lb ) {
-                  lbnd[ ic ] = lb;
-               } else if( lbnd[ ic ] > ub ) {
-                  lbnd[ ic ] = ub;
-               }
-               if( ubnd[ ic ] < lb ) {
-                  ubnd[ ic ] = lb;
-               } else if( ubnd[ ic ] > ub ) {
-                  ubnd[ ic ] = ub;
-               }
-            } else {
-               lwid = lb - lbnd[ ic ];
-               uwid = ubnd[ ic ] - ub;
-               if( lwid > uwid ) {
-                 if( lbnd[ ic ] > lb ) lbnd[ ic ] = lb;
-                 if( ubnd[ ic ] > lb ) ubnd[ ic ] = lb;
-               } else {
-                 if( lbnd[ ic ] < ub ) lbnd[ ic ] = ub;
-                 if( ubnd[ ic ] < ub ) ubnd[ ic ] = ub;
-               }
-            }
-
-/* Ensure the bounds are not equal */
-            if( lbnd[ ic ] == 0.0 && ubnd[ ic ] == 0.0 ) {
-               ubnd[ ic ] = 1.0;
-
-            } else if( EQUAL( lbnd[ ic ], ubnd[ ic ] ) ) {
-               ubnd[ ic ] = MAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
-            }
-         }
-   
-/* Create a new Box representing the box found above. */
-         bfrm = astGetFrame( new->frameset, AST__BASE );
-         unc = astTestUnc( new ) ? astGetUnc( new, AST__BASE ) : NULL;
-         box = astBox( bfrm, 1, lbnd, ubnd, unc, "" );
-         if( unc ) unc = astAnnul( unc );
-   
-/* Modify this Box so that it has the same current Frame as this
-   Interval. */
-         cfrm = astGetFrame( new->frameset, AST__CURRENT );
-         box2 = astMapRegion( box, map, cfrm );
-   
-/* Try simplifying the Box. */
-         sreg = (AstRegion *) astSimplify( box2 );
-   
-/* Only proceed if the Box was simplified */
-         if( sreg != (AstRegion *) box2 ) {
-
-/* If the simplified Box is a NullRegion return it. */
-            if( astIsANullRegion( sreg ) ) {
-               astAnnul( new );
-               new = astClone( sreg );
-               simpler = 1;
-              
-/* If the simplified Box is a Box or an Interval... */
-            } else if( astIsABox( sreg ) || astIsAInterval( sreg ) ) {
-   
-/* Get the bounds of the simplified Box. We assume that the base and
-   current Frames in the simplified Box are the same. */
-               snc = astGetNin( sreg->frameset );
-               slbnd = astMalloc( sizeof( double )*(size_t)snc );
-               subnd = astMalloc( sizeof( double )*(size_t)snc );
-               if(  astIsAInterval( sreg ) ) {
-                  sptr = astGetPoints( sreg->points );
-                  if( astOK ) {
-                     for( ic = 0; ic < snc; ic++ ) {
-                        slbnd[ ic ] = sptr[ ic ][ 0 ];
-                        subnd[ ic ] = sptr[ ic ][ 1 ];
-                     }
+            for( ic = 0; ic < nc; ic++ ) {
+               lb = this_interval->lbnd[ ic ] ;
+               ub = this_interval->ubnd[ ic ] ;
+               if( lb <= ub ) {
+                  if( lbnd[ ic ] < lb ) {
+                     lbnd[ ic ] = lb;
+                  } else if( lbnd[ ic ] > ub ) {
+                     lbnd[ ic ] = ub;
+                  }
+                  if( ubnd[ ic ] < lb ) {
+                     ubnd[ ic ] = lb;
+                  } else if( ubnd[ ic ] > ub ) {
+                     ubnd[ ic ] = ub;
                   }
                } else {
-                  astRegBaseBox( sreg, slbnd, subnd );
+                  lwid = lb - lbnd[ ic ];
+                  uwid = ubnd[ ic ] - ub;
+                  if( lwid > uwid ) {
+                    if( lbnd[ ic ] > lb ) lbnd[ ic ] = lb;
+                    if( ubnd[ ic ] > lb ) ubnd[ ic ] = lb;
+                  } else {
+                    if( lbnd[ ic ] < ub ) lbnd[ ic ] = ub;
+                    if( ubnd[ ic ] < ub ) ubnd[ ic ] = ub;
+                  }
                }
+   
+/* Ensure the bounds are not equal */
+               if( lbnd[ ic ] == 0.0 && ubnd[ ic ] == 0.0 ) {
+                  ubnd[ ic ] = 1.0;
+   
+               } else if( EQUAL( lbnd[ ic ], ubnd[ ic ] ) ) {
+                  ubnd[ ic ] = MAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
+               }
+            }
       
+/* Create a new Box representing the box found above. */
+            bfrm = astGetFrame( new->frameset, AST__BASE );
+            unc = astTestUnc( new ) ? astGetUnc( new, AST__BASE ) : NULL;
+            box = astBox( bfrm, 1, lbnd, ubnd, unc, "" );
+            if( unc ) unc = astAnnul( unc );
+      
+/* Modify this Box so that it has the same current Frame as this
+      Interval. */
+            cfrm = astGetFrame( new->frameset, AST__CURRENT );
+            box2 = astMapRegion( box, map, cfrm );
+      
+/* Try simplifying the Box. */
+            sreg = (AstRegion *) astSimplify( box2 );
+      
+/* Only proceed if the Box was simplified */
+            if( sreg != (AstRegion *) box2 ) {
+   
+/* If the simplified Box is a NullRegion return it. */
+               if( astIsANullRegion( sreg ) ) {
+                  astAnnul( new );
+                  new = astClone( sreg );
+                  simpler = 1;
+                 
+/* If the simplified Box is a Box or an Interval... */
+               } else if( astIsABox( sreg ) || astIsAInterval( sreg ) ) {
+      
+/* Get the bounds of the simplified Box. We assume that the base and
+   current Frames in the simplified Box are the same. */
+                  snc = astGetNin( sreg->frameset );
+                  slbnd = astMalloc( sizeof( double )*(size_t)snc );
+                  subnd = astMalloc( sizeof( double )*(size_t)snc );
+                  if(  astIsAInterval( sreg ) ) {
+                     sptr = astGetPoints( sreg->points );
+                     if( astOK ) {
+                        for( ic = 0; ic < snc; ic++ ) {
+                           slbnd[ ic ] = sptr[ ic ][ 0 ];
+                           subnd[ ic ] = sptr[ ic ][ 1 ];
+                        }
+                     }
+                  } else {
+                     astRegBaseBox( sreg, slbnd, subnd );
+                  }
+         
 /* Now create a PointSet containing one point for each axis in the
-   current (or equivalently, base ) Frame of the simplified Box, plus an
-   extra point. */
-               pset2 = astPointSet( snc + 1, snc, "" );
-               ptr2 = astGetPoints( pset2 );
-      
+      current (or equivalently, base ) Frame of the simplified Box, plus an
+      extra point. */
+                  pset2 = astPointSet( snc + 1, snc, "" );
+                  ptr2 = astGetPoints( pset2 );
+         
 /* Put the lower bounds of the simplified Box into the first point in
    this PointSet. The remaining points are displaced from this first point
    along each axis in turn. The length of each displacement is determined
    by the length of the box on the axis. */
-               if( astOK ) {
-                  for( ic = 0; ic < snc; ic++ ) {
-                     for( jc = 0; jc < snc + 1; jc++ ) {
-                        ptr2[ ic ][ jc ] = slbnd[ ic ];
+                  if( astOK ) {
+                     for( ic = 0; ic < snc; ic++ ) {
+                        for( jc = 0; jc < snc + 1; jc++ ) {
+                           ptr2[ ic ][ jc ] = slbnd[ ic ];
+                        }
+                        ptr2[ ic ][ ic + 1 ] = subnd[ ic ];
                      }
-                     ptr2[ ic ][ ic + 1 ] = subnd[ ic ];
                   }
-               }
-      
+         
 /* Transform this PointSet into the base Frame of this Interval using the
-   inverse of the base->current Mapping. */
-               pset3 = astTransform( map, pset2, 0, NULL );
-               ptr3 = astGetPoints( pset3 );
-               if( astOK ) {
-      
+      inverse of the base->current Mapping. */
+                  pset3 = astTransform( map, pset2, 0, NULL );
+                  ptr3 = astGetPoints( pset3 );
+                  if( astOK ) {
+         
 /* Now consider each axis of the Interval's current Frame (i.e. each base 
-   Frame axis in the simplified Box). */
-                  for( ic = 0; ic < snc; ic++ ) {
-      
+      Frame axis in the simplified Box). */
+                     for( ic = 0; ic < snc; ic++ ) {
+         
 /* Given that the Box simplified succesfully, we know that there is a one
    to one connection between the axes of the base and current Frame in this
    Interval, but we do not yet know which base Frame axis corresponds to
@@ -2091,17 +2198,17 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    axis they are parallel to. We look for the largest base Frame axis 
    increment (this allows small non-zero displacements to occur on the 
    other axes due to rounding errors). */
-                     maxd = -DBL_MAX;
-                     bax = -1;
-                     for( jc = 0; jc < nc; jc++ ) {
-                        d = astAxDistance( bfrm, jc + 1, ptr3[ jc ][ 0 ],
-                                           ptr3[ jc ][ ic + 1 ] );
-                        if( d != AST__BAD && d > maxd ) {
-                           maxd = d;
-                           bax = jc;
+                        maxd = -DBL_MAX;
+                        bax = -1;
+                        for( jc = 0; jc < nc; jc++ ) {
+                           d = astAxDistance( bfrm, jc + 1, ptr3[ jc ][ 0 ],
+                                              ptr3[ jc ][ ic + 1 ] );
+                           if( d != AST__BAD && d > maxd ) {
+                              maxd = d;
+                              bax = jc;
+                           }
                         }
-                     }
-      
+         
 /* If the largest base Frame axis increment is zero, it must mean that
    the current Frame axis is not present in the base Frame. The only
    plausable cause of this is if the base->current Mapping contains a
@@ -2109,83 +2216,84 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    have a fixed value (any other Mapping arrangement would have prevented 
    the Box from simplifying). Therefore, set upper and lower limits for
    this axis to the same value. */
-                     if( maxd <= 0.0 ) {
-                        slbnd[ ic ] = 0.5*( slbnd[ ic ] + subnd[ ic ] );
-                        subnd[ ic ] = slbnd[ ic ];
-      
+                        if( maxd <= 0.0 ) {
+                           slbnd[ ic ] = 0.5*( slbnd[ ic ] + subnd[ ic ] );
+                           subnd[ ic ] = slbnd[ ic ];
+         
 /* If we have found a base Frame axis which corresponds to the current
    Frame axis "ic", then look to see which limits are specified for the
    base Frame axis, and transfer missing limits to the current Frame. */
-                     } else {
-                        if( ptr[ bax ][ 0 ] == AST__BAD ) slbnd[ ic ] = AST__BAD;
-                        if( ptr[ bax ][ 1 ] == AST__BAD ) subnd[ ic ] = AST__BAD;
-      
+                        } else {
+                           if( ptr[ bax ][ 0 ] == AST__BAD ) slbnd[ ic ] = AST__BAD;
+                           if( ptr[ bax ][ 1 ] == AST__BAD ) subnd[ ic ] = AST__BAD;
+         
 /* If the original limits were equal, ensure the new limits are equal
    (the code above modified the upper limit to ensure it was different to
    the lower limit). */
-                        if( ptr[ bax ][ 1 ] == ptr[ bax ][ 0 ] ) {
-                           subnd[ ic ] = slbnd[ ic ];
-      
+                           if( ptr[ bax ][ 1 ] == ptr[ bax ][ 0 ] ) {
+                              subnd[ ic ] = slbnd[ ic ];
+         
 /* If the original interval was an inclusion (ubnd > lbnd), ensure the new 
    interval is also an inclusion by swapping the limits if required. */
-                        } else if( ptr[ bax ][ 1 ] > ptr[ bax ][ 0 ] ) {
-                           if( subnd[ ic ] < slbnd[ ic ] ) {
-                              tmp = subnd[ ic ];
-                              subnd[ ic ] = slbnd[ ic ];
-                              slbnd[ ic ] = tmp;
-                           }
-      
+                           } else if( ptr[ bax ][ 1 ] > ptr[ bax ][ 0 ] ) {
+                              if( subnd[ ic ] < slbnd[ ic ] ) {
+                                 tmp = subnd[ ic ];
+                                 subnd[ ic ] = slbnd[ ic ];
+                                 slbnd[ ic ] = tmp;
+                              }
+         
 /* If the original interval was an exclusion (ubnd < lbnd), ensure the new 
    interval is also an exlusion by swapping the limits if required. */
-                        } else if( ptr[ bax ][ 1 ] < ptr[ bax ][ 0 ] ) {
-                           if( subnd[ ic ] > slbnd[ ic ] ) {
-                              tmp = subnd[ ic ];
-                              subnd[ ic ] = slbnd[ ic ];
-                              slbnd[ ic ] = tmp;
-                           }
-                        } 
-                     }            
-                  }
-      
+                           } else if( ptr[ bax ][ 1 ] < ptr[ bax ][ 0 ] ) {
+                              if( subnd[ ic ] > slbnd[ ic ] ) {
+                                 tmp = subnd[ ic ];
+                                 subnd[ ic ] = slbnd[ ic ];
+                                 slbnd[ ic ] = tmp;
+                              }
+                           } 
+                        }            
+                     }
+         
 /* Create the simplified Interval from the current Frame limits found
    above, and use it in place of the original. */
-                  unc = astTestUnc( new ) ? astGetUnc( new, AST__CURRENT ) : NULL;
-                  astAnnul( new );
-                  new = (AstRegion *) astInterval( cfrm, slbnd, subnd, unc, "" );
-                  if( unc ) unc = astAnnul( unc );
-                  simpler = 1;
+                     unc = astTestUnc( new ) ? astGetUnc( new, AST__CURRENT ) : NULL;
+                     astAnnul( new );
+                     new = (AstRegion *) astInterval( cfrm, slbnd, subnd, unc, "" );
+                     if( unc ) unc = astAnnul( unc );
+                     simpler = 1;
+                  }
+         
+/* Free resources */
+                  pset2 = astAnnul( pset2 );
+                  pset3 = astAnnul( pset3 );
+                  slbnd = astFree( slbnd );
+                  subnd = astFree( subnd );
                }
+            }
+   
+/* Free resources */
+            bfrm = astAnnul( bfrm );
+            cfrm = astAnnul( cfrm );
+            box = astAnnul( box );
+            box2 = astAnnul( box2 );
+            sreg = astAnnul( sreg );
+      
+         }
       
 /* Free resources */
-               pset2 = astAnnul( pset2 );
-               pset3 = astAnnul( pset3 );
-               slbnd = astFree( slbnd );
-               subnd = astFree( subnd );
-            }
-         }
-
-/* Free resources */
-         bfrm = astAnnul( bfrm );
-         cfrm = astAnnul( cfrm );
-         box = astAnnul( box );
-         box2 = astAnnul( box2 );
-         sreg = astAnnul( sreg );
-   
-      }
-   
-/* Free resources */
-      map = astAnnul( map );
-   
+         map = astAnnul( map );
+      
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
    Otherwise, return a clone of the supplied pointer. */
-      if( simpler ){
-         astRegOverlay( new, this );
-         result = (AstMapping *) new;
-   
-      } else {
-         new = astAnnul( new );
-         result = astClone( this );
+         if( simpler ){
+            astRegOverlay( new, this );
+            result = (AstMapping *) new;
+      
+         } else {
+            new = astAnnul( new );
+            result = astClone( this );
+         }
       }
    }
 
@@ -3104,7 +3212,7 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
    if ( !astOK ) return NULL;
 
 /* If necessary, initialise the virtual function table. */
-   if ( init ) astInitIntervalVtab( vtab, name );
+   if ( init ) astInitIntervalVtab( &class_vtab, name );
 
 /* Initialise. */
    new = NULL;
@@ -3143,7 +3251,10 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
 /* ----------------------------- */
          new->lbnd = NULL;
          new->ubnd = NULL;
+         new->box = NULL;
 
+/* Cache useful information about the Interval within the INterval
+   structure. */
          Cache( new );
 
 /* If an error occurred, clean up by deleting the new Interval. */
@@ -3282,6 +3393,7 @@ AstInterval *astLoadInterval_( void *mem, size_t size, AstIntervalVtab *vtab,
 /* ---------------------------- */
       new->lbnd = NULL;
       new->ubnd = NULL;
+      new->box = NULL;
 
 /* Cache intermediate results in the Interval structure */
       Cache( new );

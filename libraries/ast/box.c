@@ -1560,10 +1560,15 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 /* ... and change the coords in the parent Region structure. */
             for( ic = 0; ic < ncb; ic++ ) {
-               delta = bc[ ic ] - rptr[ ic ][ 0 ];
-               rptr[ ic ][ 0 ] += delta;
-               rptr[ ic ][ 1 ] += delta;
+               if( bc[ ic ] != AST__BAD && rptr[ ic ][ 0 ] != AST__BAD ) {
+                  delta = bc[ ic ] - rptr[ ic ][ 0 ];
+                  rptr[ ic ][ 0 ] += delta;
+                  rptr[ ic ][ 1 ] += delta;
+               }
             }
+
+/* Free resources */
+            bc = astFree( bc );
 
 /* If the centre position was supplied in the base Frame, use the
    supplied "cen" or "ptr" pointer directly to change the coords in the 
@@ -1586,6 +1591,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
       }
    }
+
 
 /* Return the result. */
    return result;

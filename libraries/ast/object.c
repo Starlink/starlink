@@ -27,6 +27,7 @@
 *     - Ident: Permanent Object identification string.
 *     - Nobject: Number of Objects in class
 *     - RefCount: Count of active Object pointers
+*     - UseDefs: Allow use of default values for Object attributes?
 
 *  Functions:
 c     The following functions may be applied to all Objects:
@@ -123,6 +124,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added astEqual
 *     27-JAN-2005 (DSB):
 *        Correct use of ->ident pointers, and added further DEBUG blocks.
+*     11-MAR-2005 (DSB):
+*        Added attribute UseDefs.
 *class--
 */
 
@@ -160,6 +163,7 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 /* Module Variables. */
 /* ================= */
@@ -193,6 +197,12 @@ static void SetID( AstObject *, const char * );
 static void SetIdent( AstObject *, const char * );
 static void Show( AstObject * );
 static void VSet( AstObject *, const char *, va_list );
+
+static int GetUseDefs( AstObject * );
+static int TestUseDefs( AstObject * );
+static void ClearUseDefs( AstObject * );
+static void SetUseDefs( AstObject *, int );
+
 
 /* Member functions. */
 /* ================= */
@@ -438,6 +448,11 @@ static void ClearAttrib( AstObject *this, const char *attrib ) {
 /* ------ */
    } else if ( !strcmp( attrib, "ident" ) ) {
       astClearIdent( this );
+
+/* UseDefs. */
+/* -------- */
+   } else if ( !strcmp( attrib, "usedefs" ) ) {
+      astClearUseDefs( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -787,6 +802,7 @@ static void Dump( AstObject *this, AstChannel *channel ) {
    const char *sval;             /* Pointer to string value */
    int helpful;                  /* Helpful to show value even if not set? */
    int idump;                    /* Loop counter for dump functions */
+   int ival;                     /* Attribute value */
    int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
@@ -835,6 +851,14 @@ static void Dump( AstObject *this, AstChannel *channel ) {
    helpful = ( sval && *sval );
    astWriteString( channel, "Ident", set, helpful, sval,
                    "Permanent Object identification string" );
+
+/* UseDefs */
+/* ------- */
+   set = TestUseDefs( this );
+   ival = set ? GetUseDefs( this ) : astGetUseDefs( this );
+   astWriteInt( channel, "UseDfs", set, 0, ival,
+                ival ? "Default attribute values can be used" :
+                       "Default values cannot be used" );
 
 /* RefCnt. */
 /* ------- */
@@ -1095,6 +1119,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib ) {
    const char *result;           /* Pointer value to return */
    int nobject;                  /* Nobject attribute value */
    int ref_count;                /* RefCount attribute value */
+   int usedefs;                  /* UseDefs attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -1119,9 +1144,18 @@ static const char *GetAttrib( AstObject *this, const char *attrib ) {
       result = astGetID( this );
 
 /* Ident. */
-/* --- */
+/* ------ */
    } else if ( !strcmp( attrib, "ident" ) ) {
       result = astGetIdent( this );
+
+/* UseDefs */
+/* ------- */
+   } else if ( !strcmp( attrib, "usedefs" ) ) {
+      usedefs = astGetUseDefs( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", usedefs );
+         result = buff;
+      }
 
 /* Nobject. */
 /* -------- */
@@ -1753,6 +1787,7 @@ static void SetAttrib( AstObject *this, const char *setting ) {
 
 /* Local Variables: */
    int id;                       /* Offset of ID string */
+   int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
 
@@ -1779,6 +1814,13 @@ static void SetAttrib( AstObject *this, const char *setting ) {
    } else if ( nc = 0, ( 0 == astSscanf( setting, "ident=%n%*[^\n]%n", &id, &nc ) )
                 && ( nc >= len ) ) {
       astSetIdent( this, setting + id );
+
+/* UseDefs */
+/* ------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( setting, "usedefs= %d %n", &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetUseDefs( this, ival );
 
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class and use this to report an error
@@ -2416,6 +2458,11 @@ static int TestAttrib( AstObject *this, const char *attrib ) {
    } else if ( !strcmp( attrib, "ident" ) ) {
       result = astTestIdent( this );
 
+/* UseDefs */
+/* ------- */
+   } else if ( !strcmp( attrib, "usedefs" ) ) {
+      result = astTestUseDefs( this );
+
 /* Test if the attribute string matches any of the read-only
    attributes of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "class" ) ||
@@ -2781,6 +2828,86 @@ astMAKE_TEST(Object,Ident,( this->ident != NULL ))
 /*
 *att++
 *  Name:
+*     UseDefs
+
+*  Purpose:
+*     Use default values for unspecified attributes?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute specifies whether default values should be used
+*     internally for object attributes which have not been assigned a 
+*     value explicitly. If a non-zero value (the default) is supplied for 
+*     UseDefs, then default values will be used for attributes which have 
+*     not explicitly been assigned a value. If zero is supplied for UseDefs, 
+*     then an error will be reported if an attribute for which no explicit 
+*     value has been supplied is needed internally within AST. 
+*
+*     Many attributes (including the UseDefs attribute itself) are unaffected 
+*     by the setting of the UseDefs attribute, and default values will always 
+*     be used without error for such attributes. The "Applicability:" section 
+*     below lists the attributes which are affected by the setting of UseDefs.
+
+*     Note, UseDefs only affects access to attributes internally within
+*     AST. The public accessor functions such as 
+c     astGetC
+f     AST_GETC
+*     is unaffected by the UseDefs attribute - default values will always
+*     be returned if no value has been set. Application code should use the
+c     astTest
+f     AST_TEST
+*     function if required to determine if a value has been set for an
+*     attribute.
+
+*  Applicability:
+*     Object
+*        All Objects have this attribute, but ignore its setting except
+*        as described below for individual classes.
+*     FrameSet
+*        The default value of UseDefs for a FrameSet is redefined to be
+*        the UseDefs value of its current Frame.
+*     CmpFrame
+*        The default value of UseDefs for a CmpFrame is redefined to be
+*        the UseDefs value of its first component Frame, if set. If the
+*        first component Frame does not have a set UseDefs value, then 
+*        the second component Frame is used. If neither Frame has a set
+*        UseDefs value, then a default value of 1 is used.
+*     Region
+*        The default value of UseDefs for a Region is redefined to be
+*        the UseDefs value of its encapsulated Frame.
+*     Frame
+*        If UseDefs is zero, an error is reported when aligning Frames if the 
+*        Epoch attribute is required but has not been assigned a value 
+*        explicitly.
+*     SkyFrame
+*        If UseDefs is zero, an error is reported when aligning SkyFrames 
+*        if any of the following attributes are required but have not been 
+*        assigned a value explicitly: Epoch, Equinox.
+*     SpecFrame
+*        If UseDefs is zero, an error is reported when aligning SpecFrames 
+*        if any of the following attributes are required but have not been 
+*        assigned a value explicitly: Epoch, RefRA, RefDec, GeoLon, GeoLat, 
+*        RestFreq, SourceVel, StdOfRest.
+*     DSBSpecFrame
+*        If UseDefs is zero, an error is reported when aligning DSBSpecFrames 
+*        or when accessing the ImagFreq attribute if any of the following 
+*        attributes are required but have not been assigned a value explicitly:
+*        Epoch, DSBCentre, IF.
+*att--
+*/
+astMAKE_CLEAR(Object,UseDefs,usedefs,INT_MAX)
+astMAKE_GET(Object,UseDefs,int,1,((this->usedefs!=INT_MAX)?this->usedefs:1))
+astMAKE_SET(Object,UseDefs,int,usedefs,(this->usedefs=(value)?1:0))
+astMAKE_TEST(Object,UseDefs,(this->usedefs!=INT_MAX))
+
+/*
+*att++
+*  Name:
 *     Nobject
 
 *  Purpose:
@@ -3053,6 +3180,11 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->TestIdent = TestIdent;
    vtab->VSet = VSet;
 
+   vtab->TestUseDefs = TestUseDefs;
+   vtab->SetUseDefs = SetUseDefs;
+   vtab->ClearUseDefs = ClearUseDefs;
+   vtab->GetUseDefs = GetUseDefs;
+
 /* Store the pointer to the class name. */
    vtab->class = name;
 
@@ -3190,6 +3322,9 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          new->id = NULL;
          new->ident = NULL;
 
+/* Use default values for unspecified attributes. */
+         new->usedefs = INT_MAX;
+
 /* Increment the count of active Objects in the virtual function table. */
          new->vtab->nobject++;
       }
@@ -3314,6 +3449,7 @@ AstObject *astLoadObject_( void *mem, size_t size,
    initialise the appropriate instance variable(s) for this class. */
       new->id = astReadString( channel, "id", NULL );
       new->ident = astReadString( channel, "ident", NULL );
+      new->usedefs = astReadInt( channel, "usedfs", INT_MAX );
 
 /* We simply read the values for the read-only attributes (just in
    case they've been un-commented in the external representation) and

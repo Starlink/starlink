@@ -136,6 +136,7 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 
 /* C header files. */
 /* --------------- */
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -209,8 +210,7 @@ static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetRefPos( AstSpecFrame *, AstSkyFrame *, double, double );
 static void SetUnit( AstFrame *, int, const char * );
-
-
+static void VerifyAttrs( AstSpecFrame *, const char *, const char *, const char * );
 
 static AstSystemType GetSystem( AstFrame * );
 static void SetSystem( AstFrame *, AstSystemType );
@@ -568,6 +568,8 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
    if ( !astOK ) return ret;
 
 /* Get the value of the SourceVel attribute. */
+   VerifyAttrs( this, "convert source velocity to a new standard of rest", 
+                "SourceVel", "astMatch" );
    ret = astGetSourceVel( this );
 
 /* Get the rest frame to which value refers. */
@@ -576,6 +578,11 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
 /* If necessary, convert to the requested rest frame. */
    if( sor != new ) {
       specmap = astSpecMap( 1, 0, "" );
+
+/* Verify that usable value is available for the RestFreq attribute. An 
+   error is reported if not. */
+      VerifyAttrs( this, "convert source velocity to a new standard of rest", 
+                   "RestFreq", "astMatch" );
 
 /* Add a conversion from velocity to frequency since SorConvert converts
    frequencies. */
@@ -1560,7 +1567,6 @@ static const char *GetTitle( AstFrame *this_frame ) {
    AstSystemType system;         /* Code identifying type of coordinates */
    const char *sor_string;       /* Pointer to SOR description */
    const char *result;           /* Pointer to result string */
-   double epoch;                 /* Value of Epoch attribute */
    double rf;                    /* Rest frequency */
    int nc;                       /* No. of characters added */
    int pos;                      /* Buffer position to enter text */
@@ -1583,7 +1589,6 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Otherwise, we will generate a default Title string. Obtain the values of the
    SpecFrame's attributes that determine what this string will be. */
    } else {
-      epoch = astGetEpoch( this );
       system = astGetSystem( this );
       sor = astGetStdOfRest( this );
       sor_string = StdOfRestString( sor );
@@ -1607,7 +1612,8 @@ static const char *GetTitle( AstFrame *this_frame ) {
          }
 
 /* Append the rest frequency if relevant. */
-         if( !ABS_SYSTEM(system) && rf != AST__BAD ) {
+         if( !ABS_SYSTEM(system) && ( astTestRestFreq( this ) ||
+                                      astGetUseDefs( this ) ) ) {
             pos += sprintf( buff+pos, ", rest frequency = %g GHz", rf*1.0E-9 );
          }
       }
@@ -1996,6 +2002,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    const char *uerr;             /* Erroneous units */
    const char *ures;             /* Results units */
    const char *utarg;            /* Target units */
+   const char *vmess;            /* Text for use in error messages */
    double args[ MAX_ARGS ];      /* Conversion argument array */
    double rest_freq;             /* Rest frequency (Hz) */
    double result_svel;           /* Source velocity in result frame */
@@ -2009,6 +2016,13 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Initialise the returned values. */
    match = 1;
    *map = NULL;
+
+/* Define text for error messages.*/
+   vmess = "convert between spectral systems";
+
+/* Verify that values for the standard of rest are available. */
+   VerifyAttrs( target, vmess, "StdOfRest", "astMatch" );
+   VerifyAttrs( result, vmess, "StdOfRest", "astMatch" );
 
 /* The supported spectral coordinate systems fall into two groups;
    "relative", and "absolute". The relative systems define each axis
@@ -2093,6 +2107,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    velocity, and then to frequency using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else {
+            VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
+
             if ( system == AST__VRADIO ) {
                TRANSFORM_0( "VRTOVL" )
    
@@ -2106,16 +2122,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "BTTOVL" )
             }
 
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "VLTOFR", rest_freq )
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            TRANSFORM_1( "VLTOFR", rest_freq )
          }
       }
 
@@ -2135,16 +2142,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Now if the alignment system is apparent radial velocity, convert from  
    frequency to relativisitic velocity. */
       if( align_sys == AST__VREL ) {
-         if( rest_freq != AST__BAD ) {
-            TRANSFORM_1( "FRTOVL", rest_freq )
-         } else {
-            match = 0;
-            if( astOK && report ) {
-               astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                         "between spectral systems because the rest "
-                         "frequency (attribute RestFreq) is undefined." );
-            }
-         }
+         VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
+         TRANSFORM_1( "FRTOVL", rest_freq )
       }
 
 /* If the target's standard of rest is the same as the alignment standard
@@ -2172,6 +2171,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    velocity, and then to frequency using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else if( system != AST__FREQ ) {
+            VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
+
             if ( system == AST__VRADIO ) {
                TRANSFORM_0( "VRTOVL" )
    
@@ -2185,17 +2186,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "BTTOVL" )
             }
 
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "VLTOFR", rest_freq )
-
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            TRANSFORM_1( "VLTOFR", rest_freq )
          }
 
 /* If the alignment system is apparent radial velocity, convert to apparent radial
@@ -2220,6 +2211,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    and then to apparent radial velocity using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else if( system != AST__VREL ) {
+            VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
+
             if ( system == AST__ENERGY ) {
                TRANSFORM_0( "ENTOFR" )
    
@@ -2233,16 +2226,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "AWTOFR" )
             }
 
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "FRTOVL", rest_freq )
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            TRANSFORM_1( "FRTOVL", rest_freq )
          }
       }
    }
@@ -2265,16 +2249,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* SpecMap will only apply doppler shifts to frequency values. So first
    convert to frequency unless the alignment system is already frequency. */
       if( align_sys == AST__VREL ) {
-         if( rest_freq != AST__BAD ) {
-            TRANSFORM_1( "VLTOFR", rest_freq )
-         } else {
-            match = 0;
-            if( astOK && report ) {
-               astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                         "between spectral systems because the rest "
-                         "frequency (attribute RestFreq) is undefined." );
-            }
-         }
+         VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
+         TRANSFORM_1( "VLTOFR", rest_freq )
       }
 
 /* Now convert frequency in the alignment standard of rest to frequency in
@@ -2310,17 +2286,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    velocity from frequency using the rest frequency. Report an error if the 
    rest frequency is undefined. */
          } else {
-
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "FRTOVL", rest_freq )
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
+            TRANSFORM_1( "FRTOVL", rest_freq )
 
 /* Now convert from apparent radial velocity to the required result system. */
             if ( system == AST__VRADIO ) {
@@ -2363,17 +2330,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    velocity using the rest frequency. Report an error if the rest frequency 
    is undefined. */
          } else if( system != AST__FREQ ) {
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "FRTOVL", rest_freq )
-
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
+            TRANSFORM_1( "FRTOVL", rest_freq )
 
 /* Then convert from apparent radial velocity to the required result system. */
             if ( system == AST__VRADIO ) {
@@ -2411,17 +2369,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    using the rest frequency. Report an error if the rest frequency is 
    undefined. */
          } else if( system != AST__VREL ) {
-
-            if( rest_freq != AST__BAD ) {
-               TRANSFORM_1( "VLTOFR", rest_freq )
-            } else {
-               match = 0;
-               if( astOK && report ) {
-                  astError( AST__NORSF, "astMatch(SpecFrame): Cannot convert "
-                            "between spectral systems because the rest "
-                            "frequency (attribute RestFreq) is undefined." );
-               }
-            }
+            VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
+            TRANSFORM_1( "VLTOFR", rest_freq )
 
 /* Now convert from frequency to the required result system. */
             if ( system == AST__ENERGY ) {
@@ -3583,6 +3532,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 #define MAX_ARGS 5               /* Max arguments for an SpecMap conversion */
 
 /* Local Variables: */
+   const char *vmess;            /* Text for use in error messages */
    double args[ MAX_ARGS ];      /* Conversion argument array */
    double dec;                   /* DEC of source (radians, FK5 J2000) */
    double epoch;                 /* Epoch of observation (MJD) */
@@ -3596,6 +3546,9 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* A string for use in error messages. */
+   vmess = "convert between different standards of rest";
 
 /* Define local macros as shorthand for adding spectral coordinate
    conversions to the SpecMap.  Each macro simply stores details of
@@ -3621,6 +3574,10 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
         args[ 4 ] = arg4; \
         astSpecAdd( specmap, cvt, args );
 
+/* Verify that usable values are available for RefRA and RefDec attributes. 
+   An error is reported if not. */
+   VerifyAttrs( this, vmess, "RefRA RefDec", "astMatch" );
+
 /* Get the reference RA and DEC. Return zero if either is bad. */
    ra = astGetRefRA( this );
    dec = astGetRefDec( this );
@@ -3636,12 +3593,15 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 
 /* Convert from the "from" frame to heliographic. */
       if( from == AST__TPSOR ) {
+         VerifyAttrs( this, vmess, "GeoLon GeoLat Epoch", "astMatch" );
          TRANSFORM_5( "TPF2HL", lon, lat, epoch, ra, dec )
    
       } else if( from == AST__GESOR ) {
+         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "GEF2HL", epoch, ra, dec )
 
       } else if( from == AST__BYSOR ) {
+         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "BYF2HL", epoch, ra, dec )
 
       } else if( from == AST__LKSOR ) {
@@ -3662,12 +3622,15 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
    
 /* Now go from heliocentric to the "to" frame. */  
       if( to == AST__TPSOR ) {
+         VerifyAttrs( this, vmess, "GeoLon GeoLat Epoch", "astMatch" );
          TRANSFORM_5( "HLF2TP", lon, lat, epoch, ra, dec )
    
       } else if( to == AST__GESOR ) {
+         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "HLF2GE", epoch, ra, dec )
 
       } else if( to == AST__BYSOR ) {
+         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "HLF2BY", epoch, ra, dec )
 
       } else if( to == AST__LKSOR ) {
@@ -4139,6 +4102,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* If no template was supplied, align in the System and StdOfRest of the
    target. */
       } else {
+         VerifyAttrs( target, "convert between different spectral systems", 
+                   "StdOfRest", "astMatch" );
          align_sys = astGetSystem( target );
          align_sor = astGetStdOfRest( target );
          align_svel = ConvertSourceVel( target, AST__HLSOR );
@@ -4751,6 +4716,146 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 
 /* Return the result. */
    return result;
+}
+
+static void VerifyAttrs( AstSpecFrame *this, const char *purp, 
+                         const char *attrs, const char *method ) {
+/*
+*  Name:
+*     VerifyAttrs
+
+*  Purpose:
+*     Verify that usable attribute values are available.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     void VerifyAttrs( AstSpecFrame *this, const char *purp, 
+*                       const char *attrs, const char *method  )
+
+*  Class Membership:
+*     SpecFrame member function 
+
+*  Description:
+*     This function tests each attribute listed in "attrs". It returns
+*     without action if 1) an explicit value has been set for each attribute
+*     or 2) the UseDefs attribute of the supplied SpecFrame is non-zero.
+*
+*     If UseDefs is zero (indicating that default values should not be
+*     used for attributes), and any of the named attributes does not have
+*     an explicitly set value, then an error is reported.
+
+*  Parameters:
+*     this
+*        Pointer to the SpecFrame. 
+*     purp
+*        Pointer to a text string containing a message which will be
+*        included in any error report. This shouldindicate the purpose
+*        for which the attribute value is required. 
+*     attrs
+*        A string holding a space separated list of attribute names.
+*     method
+*        A string holding the name of the calling method for use in error
+*        messages.
+
+*/
+
+/* Local Variables: */
+   const char *a;
+   const char *desc;
+   const char *p;
+   int len;
+   int set;
+   int state;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* If the SpecFrame has a non-zero value for its UseDefs attribute, then
+   all attributes are assumed to have usable values, since the defaults 
+   will be used if no explicit value has been set. So we only need to do
+   any checks if UseDefs is zero. */
+   if( !astGetUseDefs( this ) ) {   
+
+/* Loop round the "attrs" string identifying the start and length of each
+   non-blank word in the string. */
+      state = 0;
+      p = attrs;
+      while( 1 ) {
+         if( state == 0 ) {
+            if( !isspace( *p ) ) {
+               a = p;
+               len = 1;
+               state = 1;
+            }
+         } else {
+            if( isspace( *p ) || !*p ) {
+   
+/* The end of a word has just been reached. Compare it to each known
+   attribute value. Get a flag indicating if the attribute has a set
+   value, and a string describing the attribute.*/
+               if( len > 0 ) {
+
+                  if( !strncmp( "GeoLat", a, len ) ) {
+                     set = astTestGeoLat( this );
+                     desc = "observatory latitude";
+
+                  } else if( !strncmp( "GeoLon", a, len ) ) {
+                     set = astTestGeoLon( this );
+                     desc = "observatory longitude";
+
+                  } else if( !strncmp( "RefRA", a, len ) ) {
+                     set = astTestRefRA( this );
+                     desc = "source RA";
+
+                  } else if( !strncmp( "RefDec", a, len ) ) {
+                     set = astTestRefDec( this );
+                     desc = "source Dec";
+
+                  } else if( !strncmp( "RestFreq", a, len ) ) {
+                     set = astTestRestFreq( this );
+                     desc = "rest frequency";
+
+                  } else if( !strncmp( "SourceVel", a, len ) ) {
+                     set = astTestSourceVel( this );
+                     desc = "source velocity";
+
+                  } else if( !strncmp( "StdOfRest", a, len ) ) {
+                     set = astTestStdOfRest( this );
+                     desc = "spectral standard of rest";
+
+                  } else if( !strncmp( "Epoch", a, len ) ) {
+                     set = astTestEpoch( this );
+                     desc = "epoch of observation";
+
+                  } else {
+                     astError( AST__INTER, "VerifyAttrs(SpecFrame): "
+                               "Unknown attribute name \"%.*s\" supplied (AST "
+                               "internal programming error).", len, a );
+                  }
+
+/* If the attribute does not have a set value, report an error. */
+                  if( !set && astOK ) {
+                     astError( AST__NOVAL, "%s(%s): Cannot %s.", method,
+                               astGetClass( this ), purp );
+                     astError( AST__NOVAL, "No value has been set for "
+                               "the AST \"%.*s\" attribute (%s).", len, a,
+                               desc );
+                  }
+
+/* Continue the word search algorithm. */
+               }
+               len = 0;
+               state = 0;
+            } else {
+               len++;
+            }
+         }
+         if( !*(p++) ) break;
+      }
+   }
 }
 
 /* Functions which access class attributes. */

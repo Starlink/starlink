@@ -58,6 +58,7 @@ NOFTS           <required FITS keywords missing>
 NOMEM           <unable to allocate memory>
 NOPTS           <number of output points too small>
 NOWRT           <attribute is read-only>
+NOVAL           <attribute has no default value>
 NPTIN           <number of points invalid>
 OBJIN           <Object invalid>
 OPT             <invalid Plot option>
