@@ -71,50 +71,35 @@ else if ($dname == 'JAC.Hilo') then
   # find the semester name
 
   # Start by splitting the YYYYMMDD string into bits
-  set yy   = `echo $utdate | cut -c3-4`
-  set mm   = `echo $utdate | cut -c5-6`
-  set dd   = `echo $utdate | cut -c7-8`
+  set yy = `echo $utdate | cut -c3-4`
+  set prev_yy = `expr $utdate - 10000 | cut -c3-4`
+  set mmdd = `echo $utdate | cut -c5-8`
 
   # Need to put the month in the correct semester
   # Note that 199?0201 is in the previous semester
   # Same for 199?0801
-
-  if ($mm == '01') then
-    # This is January so belongs to previous year    
-    # Check for year=00 special case
-    if ($yy == '00') then
-      set yy = 99
-    else 
-      set yy = `expr $yy - 1`
-    endif
-    set sem = "m${yy}b"
-
-
-  else if ($mm == '02' && $dd == '01') then
-    # First day of feb is in previous semester
-    # check for OO special case
-    if ($yy == '00') then
-      set yy = 99
-    else
-      set yy = `expr $yy - 1`
-    endif
-    set sem = "m${yy}b"
-  else if ($mm < 8) then
+  # The semester changes on UT Feb 2 and Aug 2:
+  if ( $mmdd > 201 && $mmdd < 802 ) then
     set sem = "m${yy}a"
-  else if ($mm == '08' && $dd == '01') then
-    set sem = "m${yy}a"
+  else if ( $mmdd < 202 ) then
+    set sem = "m${prev_yy}b"
   else
-    set sem = "m${yy}b"
+   set sem = "m${yy}b"
   endif
+
+  unset yy
+  unset prev_yy
+  unset mmdd
 
   # Now set the directory
   setenv DATADIR /scuba/${sem}/$utdate
+
+  unset sem
 
 else
   echo This routine does not know where data is stored outside of JCMT or the JAC
   echo Not setting DATADIR
 endif
-
 
 # Finally set ORAC_DATA_IN to be the same as DATADIR
 # Assuming DATADIR has been set
@@ -129,6 +114,8 @@ endif
 # clean up
 unset mydate
 unset utdate
+unset dname
+
 
 exit
 
@@ -184,6 +171,9 @@ exit
 
 *  History:
 *    $Log$
+*    Revision 1.6  2001/02/01 02:02:28  timj
+*    Fix problem with 20010105 becoming semester m0b rather than m00b
+*
 *    Revision 1.5  2000/02/04 03:16:58  timj
 *    Fix 00 problem with semester calculation
 *
