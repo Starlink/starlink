@@ -19,8 +19,10 @@
 #				# of some other program loaded in a plugin.
 #    my $tempfn = shift;	# Temporary filename prefix
 #
-# The catalogues are arrays of hashes with fields {id}, {x} and {y} at
-# least.
+# The catalogues are hash references with entries {catalogue},
+# containing an array of hashes with fields {id}, {x} and {y} at
+# least; and {provenance}, containing a string which reports where it
+# came from.
 #
 # Return an array containing the two catalogues, in the same order as
 # the corresponding input files, plus a flag (1=ok, 0=error)
@@ -53,20 +55,23 @@ sub match_positions_match ($$$$$) {
 
   DOMATCH: {
 
+        my @cat1cat = @{$cat1->{catalogue}};
+        my @cat2cat = @{$cat2->{catalogue}};
+
         # Check the input catalogues have the right form
-        (defined($cat1->[0]->{x})
-         && defined($cat1->[0]->{y})
-         && defined($cat1->[0]->{id})
-         && defined($cat1->[0]->{mag}))
+        (defined($cat1cat[0]->{x})
+         && defined($cat1cat[0]->{y})
+         && defined($cat1cat[0]->{id})
+         && defined($cat1cat[0]->{mag}))
           || do {
               wmessage ('warning',
                         "$myname: cat1 does not have required fields");
               $successfulmatch = 0;
               last DOMATCH; };
-        (defined($cat2->[0]->{x})
-         && defined($cat2->[0]->{y})
-         && defined($cat2->[0]->{id})
-         && defined($cat2->[0]->{mag}))
+        (defined($cat2cat[0]->{x})
+         && defined($cat2cat[0]->{y})
+         && defined($cat2cat[0]->{id})
+         && defined($cat2cat[0]->{mag}))
           || do {
               wmessage ('warning',
                         "$myname: cat2 does not have required fields");
@@ -91,9 +96,11 @@ sub match_positions_match ($$$$$) {
               $successfulmatch = 0;
               last DOMATCH; };
         my $idnum = 0;
-        foreach my $r (@$cat1) {
-            printf CAT ("%5d  %12.2f  %12.2f  %f\n",
-                        $idnum++, $r->{x}, $r->{y}, $r->{mag});
+        printf CAT ("# Provenance: %s\n# Cols: my-id x y mag orig-id\n",
+                    $cat1->{provenance});
+        foreach my $r (@cat1cat) {
+            printf CAT ("%5d  %12.2f  %12.2f  %f  %d\n",
+                        $idnum++, $r->{x}, $r->{y}, $r->{mag}, $r->{id});
         }
         close (CAT);
         open (CAT, ">$cat2file")
@@ -102,12 +109,25 @@ sub match_positions_match ($$$$$) {
                         "$myname: can't open file $cat2file to write");
               $successfulmatch = 0;
               last DOMATCH; };
+        printf CAT ("# Provenance: %s\n# Cols: my-id x y mag orig-id\n",
+                    $cat2->{provenance});
         $idnum = 0;
-        foreach my $r (@$cat2) {
-            printf CAT ("%5d  %12.2f  %12.2f  %f\n",
-                        $idnum++, $r->{x}, $r->{y}, $r->{mag});
+        foreach my $r (@cat2cat) {
+            printf CAT ("%5d  %12.2f  %12.2f  %f  %d\n",
+                        $idnum++, $r->{x}, $r->{y}, $r->{mag}, $r->{id});
         }
         close (CAT);
+
+        # Set the number of objects to match.  The default is 20, but
+        # since the magnitude order produced by Extractor's FLUX_ISO
+        # output isn't necessarily the same as that from the
+        # catalogue, we can end up with the top nobj objects having
+        # too few matches.  The `match' documentation warns that
+        # the algorithm scales as nobj**6, so we can't go wild, here.
+        my $nobj = 40;
+        if (defined($matchopts->{looseness})) {
+            $nobj *= $matchopts->{looseness};
+        }
 
         # Let's go: build the command and arguments
         my @matchargs = ($matchprog,
@@ -115,6 +135,7 @@ sub match_positions_match ($$$$$) {
                          $cat2file, '1', '2', '3',
                          'id1=0', 'id2=0',
                          "outfile=$matchoutstem",
+                         "nobj=$nobj",
                          "linear", # if this changes, also change analysis below
                         );
         if ($verbose) {
@@ -127,7 +148,7 @@ sub match_positions_match ($$$$$) {
 
         my $matchretref = run_command_pipe(@matchargs);
         defined($matchretref) || do {
-            wmessage('warning', "Match program ".$matchargs[0]." failed");
+            #wmessage('warning', "Match program ".$matchargs[0]." failed");
             $successfulmatch = 0;
             last DOMATCH; };
 
@@ -176,19 +197,15 @@ sub match_positions_match ($$$$$) {
             my @transcpts
               = decompose_transform ($vals{a}, $vals{b}, $vals{c},
                                      $vals{d}, $vals{e}, $vals{f});
-            printf STDERR ("decompose_transform: xz=%f yz=%f sx=%f, sy=%f perp=%f orient=%f\n",
+            printf STDERR ("decompose_transform: xz=%f yz=%f sx=%f, sy=%f perp=%f orient=%f (scale=%f)\n",
                            $transcpts[0],
                            $transcpts[1],
                            $transcpts[2],
                            $transcpts[3],
                            $transcpts[4],
-                           $transcpts[5])
+                           $transcpts[5],
+                           sqrt(abs($transcpts[2]*$transcpts[3])))
               if $verbose;
-            wmessage ('info',
-                      sprintf ("%s: transform scale %.1g, non-perpendicularity %.0f",
-                               $myname,
-                               sqrt(abs($transcpts[2]*$transcpts[3])),
-                               $transcpts[4]));
             # Check the coefficients: the non-perpendicularity
             # should be `small'.  How small is small?  I'm not
             # sure, but if it's more than 10 degrees, we should
@@ -260,10 +277,10 @@ sub match_positions_match ($$$$$) {
 
         # The IDs were set up to be the array indexes of the input
         # arrays. Thus we construct the output arrays by assembling
-        # $cat1->[$res1[i]] for i in (0..$#res1)
+        # $cat1cat[$res1[i]] for i in (0..$#res1)
         for (my $i=0; $i<=$#res1; $i++) {
-            push (@rescat1, $cat1->[$res1[$i]]);
-            push (@rescat2, $cat2->[$res2[$i]]);
+            push (@rescat1, $cat1cat[$res1[$i]]);
+            push (@rescat2, $cat2cat[$res2[$i]]);
         }
     }
 
