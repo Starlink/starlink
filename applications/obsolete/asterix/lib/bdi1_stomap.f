@@ -1,5 +1,5 @@
       SUBROUTINE BDI1_STOMAP( PSID, ISDYN, LOC, FPTR, PTR, TYPE,
-     :                        MODE, STATUS )
+     :                        NELM, MODE, STATUS )
 *+
 *  Name:
 *     BDI1_STOMAP
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_STOMAP( PSID, ISDYN, LOC, FPTR, PTR, TYPE, MODE, STATUS )
+*     CALL BDI1_STOMAP( PSID, ISDYN, LOC, FPTR, PTR, TYPE, NELM, MODE, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -29,6 +29,8 @@
 *        Address of item mapped memory
 *     TYPE = CHARACTER*(*) (given)
 *        Data access type
+*     NELM = INTEGER (given)
+*        Number of elements mapped
 *     MODE = CHARACTER*(*) (given)
 *        Memory access mode
 *     STATUS = INTEGER (given and returned)
@@ -117,6 +119,7 @@
       CALL ADI_CNEWV0C( PSID, 'Locator', LOC, STATUS )
       CALL ADI_CNEWV0I( PSID, 'FilePtr', FPTR, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
+      CALL ADI_CNEWV0I( PSID, Nelm', NELM, STATUS )
       CALL ADI_CNEWV0L( PSID, 'Dynamic', ISDYN, STATUS )
       CALL ADI_CPUT0C( PSID, 'Type', TYPE(:CHR_LEN(TYPE)), STATUS )
       CALL ADI_CPUT0C( PSID, 'Mode', MODE(:CHR_LEN(MODE)), STATUS )
