@@ -43,7 +43,7 @@ DIR_GEN_ROUTINES = con_iaffx.gdir con_oaffx.gdir con_prsax.gdir \
  con_trndx.gdir con_thrsx.gdir
 
 ##  Double, real, logical and integer.
-DRLI_GEN_ROUTINES = con_fillx.gdrli con_fkeyx.gdrli con_gkeyx.gdrli
+DRLI_GEN_ROUTINES = con_fkeyx.gdrli con_gkeyx.gdrli
 
 ##  All numeric types.
 N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_ofufx.gn con_oudax.gn
@@ -103,7 +103,7 @@ GENERIC=@GENERIC@
 
 .gd.f:
 	$(LN_S) $< $(<:.gd=.gen)
-	$(GENERIC) -t i $(<:.gd=.gen)
+	$(GENERIC) -t d $(<:.gd=.gen)
 	$(RM) $(<:.gd=.gen)
 
 ##  The Fortran intermediary files should be cleaned away sometime.
