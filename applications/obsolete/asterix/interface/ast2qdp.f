@@ -140,14 +140,11 @@
       INTEGER			WIDTH			! Width of output file
 
       LOGICAL                   AOK                	! Axis data valid?
-      LOGICAL                   ANYBAD             	! Any bad points?
       LOGICAL                   AWOK               	! Axis widths valid?
       LOGICAL                   DOK                	! Data valid?
       LOGICAL                   LSET, HSET         	! Range bounds set?
       LOGICAL                   OK                 	! General validity?
       LOGICAL                   QOK                	! Quality ok?
-      LOGICAL                   REG                	! Axis regular?
-      LOGICAL                   REGWID             	! Axis widths regular?
       LOGICAL                   VOK                	! Variance ok?
       LOGICAL                   PRIM               	! Input primitive?
       LOGICAL                   SET,SIZ_SET            	! Size set?
