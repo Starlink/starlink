@@ -517,7 +517,7 @@ purpose of flat-fielding is to ensure that there are no spatial
 variations in the sensitivity of the detector. This is normally achieved
 by taking images of a photometrically flat surface such as the inside of
 the observatory dome, or the twilight sky\footnote{In the near infra-red
-flatfields are normally taken on the night sky which at these wavelengths
+flat-fields are normally taken on the night sky which at these wavelengths
 is bright enough to give a good signal to noise ratio.}. Since the
 brightness of this surface is constant, any variations in the recorded
 image (the ``flat-field'' image) must be due to variations in the
@@ -665,6 +665,7 @@ Figure~\ref{fig:dataflow}.
   \begin{figure}[htpb]
   \begin{center}
   \includegraphics[scale=0.7]{sun223_figures/dataflow.eps}
+  \vspace{4mm}
   \caption{The main steps in the production of a polarization map.}
   \label{fig:dataflow}
   \end{center}
@@ -725,7 +726,7 @@ Note that the \text{\%} represents the C-shell prompt and should not be typed.
 The first command initialise the commands required to use the CONVERT
 package. The second command converts all FITS files with a file type of
 \verb+.fit+ within the current directory, into equivalent NDFs with the
-same file names, but a file typ of \verb+.sdf+\footnote{The double quotes
+same file names, but a file type of \verb+.sdf+\footnote{The double quotes
 are needed to prevent the asterisks being expanded by the shell. The
 expansion of these file templates is performed internally, within
 fits2ndf.}. The \verb+.sdf+ files can then be given as inputs to
@@ -747,7 +748,7 @@ package using the single command:
 If you adopt this approach, you may still see references to ``NDFs''
 appearing on the screen. There is usually no significance in the use of
 the term ``NDF'' in this context (unless there are indications to the
-contrary), and you should undertand these as referring to your own
+contrary), and you should understand these as referring to your own
 non-NDF data files.
 
 \end{enumerate}
@@ -858,7 +859,7 @@ If your data is supplied in the form of a set of FITS files, then the
 \verb+HWPANG+ value would simply be obtained from the primary header. If your
 data is supplied in the form of a set of NDF structures, then the value
 would be read from the FITS extension in the NDF structure (which should
-have been created by the data aquisition system). For other data formats,
+have been created by the data acquisition system). For other data formats,
 the origin of the keyword value depends on how the data conversion is
 performed. \xref{SUN/55}{sun55}{} contains details of how FITS keywords
 are created from foreign data files.
@@ -881,7 +882,7 @@ data values the keyword can take. For instance:
 converts the value of the FITS keyword \verb+ROTA+ from radians to
 degrees, and assign the result to the item ANGROT in the POLPACK extension.
 The first line informs POLIMP that the keyword \verb+ROTA+ should be
-treaed as a single precision floating point value. The recognized data
+treated as a single precision floating point value. The recognized data
 types are:
 
 \begin{myquote}
@@ -946,7 +947,7 @@ processing as would be available if the individual applications were
 called ``by hand''. If you hit a problem which POLKA cannot handle, then
 you may need to adopt this alternative approach.
 
-The POLKA command activates a standard Starlink A-task which aquires
+The POLKA command activates a standard Starlink A-task which acquires
 parameter values using the normal methods employed by most Starlink
 applications. The A-task then activates a script written in a language
 called Tk/Tcl which performs the processing. This script requires you
@@ -971,6 +972,7 @@ this phase.
   \begin{figure}[htpb]
   \begin{center}
   \includegraphics[scale=0.9]{sun223_figures/polka.eps}
+  \vspace{4mm}
   \caption{The Graphical User Interface presented by POLKA.}
   \label{fig:polka}
   \end{center}
@@ -1006,7 +1008,7 @@ calibrated and imported. The list may be supplied in several forms
 (described \hyperref{here}{in section}{}{SEC:GRPEXP}).
 \item [MODE]	- Indicates what sort of polarization you are measuring. It 
 can be ``CIRCULAR'' or ``LINEAR''.
-\item [OUT\_E]	- A list of the output images to recieve the extracted,
+\item [OUT\_E]	- A list of the output images to receive the extracted,
 aligned, sky-subtracted $E$ ray images. If a null value (!) is supplied, 
 these images are not saved.
 \item [OUT\_O]	- This is like OUT\_E, but refers to the $O$ ray images
@@ -1067,7 +1069,7 @@ polarization, in degrees.
 \end{description}
 \end{myquote}
 
-For cicular polarimetry, the Q and U columns are replaced by a single V
+For circular polarimetry, the Q and U columns are replaced by a single V
 column. If variance information is available (see
 \hyperref{here}{section}{}{SEC:CCDPACK}) then columns are also produced
 holding the standard deviations associated with each of the above
@@ -1166,7 +1168,7 @@ display device (both are set to an X windows display in this example):
 \end{verbatim}
 \end{myquote}
 
-\item \label{STEP:PICDEF} Create a ``picture'' to contain a greyscale display of the total
+\item \label{STEP:PICDEF} Create a ``picture'' to contain a grey-scale display of the total
 intensity. A picture is an area of the screen in which subsequent graphics
 will appear. The one we create here is centred on the screen and occupies
 three quarters of its height and width. This leaves a border available
@@ -1222,7 +1224,7 @@ intensity image, then omit steps \ref{STEP:PICDEF} and
 POLPLOT command line in step \ref{STEP:POLPLOT}.
 
 \item If you want the vectors overlaid on a contour map instead of a
-greyscale image, replace step \ref{STEP:DISPLAY} with:
+grey-scale image, replace step \ref{STEP:DISPLAY} with:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1362,10 +1364,10 @@ GUI is available from the {\em Help} menu within the GUI.
 
 \section{Running from the C-shell}
 When using POLPACK from the C-shell (or any other shell) care needs to be
-taken with some special characters. Wildcard characters \text{*,?,[a-z]},
+taken with some special characters. Wild-card characters \text{*,?,[a-z]},
 quoted strings \text{""} and vector braces \text{[ ]} must be protected
 by using either the escape character {\small \verb+\+} or by single
-quotes (wildcard characters must be protected as these are expanded
+quotes (wild-card characters must be protected as these are expanded
 internally by POLPACK, rather than by the shell).
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
@@ -1403,10 +1405,10 @@ instance if the objects are the names of data files, then wild-card characters
 are allowed in the supplied values (see \hyperref{here}{section}{}{SEC:NDF}) 
 
 \subsection{\label{SEC:IND}Indirection}
-It is sometimes convenient to store the strings specifing the objects to
+It is sometimes convenient to store the strings specifying the objects to
 be used within a text file. The name of the text file can then be given
 in response to a prompt for a group expression, rather than giving a long
-list of explicit values. This is done by preceeding the name of the text
+list of explicit values. This is done by preceding the name of the text
 file with an up-arrow (``\verb+^+'') character. For instance, the group
 expression ``\^{}\verb+style.dat+'' would result in the file
 \verb+style.dat+ being opened and the strings read from the file. Each
@@ -1513,7 +1515,7 @@ at the end) ask the user for more data files''.
 \end{verbatim}
 \end{myquote}
 \vspace{-3mm}
-This means ``Use all accessable data files in the current directory''. 
+This means ``Use all accessible data files in the current directory''. 
 
 \begin{myquote}
 \begin{verbatim}
@@ -1538,7 +1540,7 @@ This means ``Read the names of data files from the text file
 \end{verbatim}
 \end{myquote}
 \vspace{-3mm}
-This means ``Use all accessable data files contained in the directory 
+This means ``Use all accessible data files contained in the directory 
 \verb+../data+''.
 
 \item If an application asks for a group of output data files, the following 
