@@ -19,6 +19,7 @@
 *
 *     ?? ??? ?? : Original (RJV)
 *     16 Aug 93 : Fixed bugs handling HH MM.M type input (DJA)
+*     22 May 96 : Strip out extra blanks before parsing (RJV)
 *
 *    Type Definitions :
 *
@@ -42,6 +43,7 @@
 *    Local variables :
       CHARACTER*20 RAS,DECS
       INTEGER LRA,LDEC
+      INTEGER I
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -59,6 +61,28 @@
 * get used lengths of strings
         LRA=CHR_LEN(RAS)
         LDEC=CHR_LEN(DECS)
+
+*  strip out extra blanks
+        I=1
+        DO WHILE (I.LT.LRA)
+          IF (RAS(I:I).EQ.' ') THEN
+            DO WHILE (RAS(I+1:I+1).EQ.' ')
+              RAS(I+1:)=RAS(I+2:)
+              LRA=LRA-1
+            ENDDO
+          ENDIF
+          I=I+1
+        ENDDO
+        I=1
+        DO WHILE (I.LT.LDEC)
+          IF (DECS(I:I).EQ.' ') THEN
+            DO WHILE (DECS(I+1:I+1).EQ.' ')
+              DECS(I+1:)=DECS(I+2:)
+              LDEC=LDEC-1
+            ENDDO
+          ENDIF
+          I=I+1
+        ENDDO
 
 *  RA
 
