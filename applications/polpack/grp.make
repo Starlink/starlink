@@ -5,6 +5,12 @@
 #
 #           Fri Jul 18 14:17:30 BST 1997
 
+
+#  The POLSTACK application is a stand-alone application requested by the
+#  JACH for analysing SCUBA data. It is not part of the package.
+POLSTACK = pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
+polstack.ifl make_polstack
+
 #  .eps files holding figures used in sun223
 FIGS = grids.eps dataflow.eps optical.eps extract.eps polext.eps \
 polka.eps map2.eps gaia1.eps gaia2.eps gaia3.eps effan.eps \
