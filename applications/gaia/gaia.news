@@ -1,21 +1,66 @@
-1 GAIA update
+1 New version of GAIA
 
-  Sextractor photometry apertures fixed (ignored size)
-  Sextractor photometry scale ranges, allowed to be outside of range
+  A new release of GAIA (v2.3) is now available. This release includes
+  two new toolboxes and many other enhancements.
 
-  New method for transferring astrometry between images.
+  The new toolboxes are:
+  
+     -  Contouring
 
-  New skycat goodies...
+     -  Optimal photometry
 
-  Measure band now works when image is scrolled and zoomed.
+  The contouring toolbox allows the overlay of contours from different
+  images, possibly aligned using sky coordinates (naturally it also
+  allows you to contour the displayed image). It also provides control
+  of the colour and line thickness of each contour. 
 
+  The optimal photometry toolbox provides facilities similar to the
+  aperture photometry toolbox, both of which are based on the PHOTOM
+  program AUTOPHOTOM (see SUN/45).
 
+  The version of Skycat that GAIA is based on is now 2.4. This has
+  improved catalogue facilities, an image "history" mechanism, main
+  window geometry history, web proxy server dialog (this removes need to
+  set the http_proxy environment variable, see the "Proxies..."  item
+  under the "Options" menu in a catalogue window), histogram
+  equalization, HTTP password support and many less significant changes.
+  
+  Other changes to GAIA include:  
 
+    - The image panel now has quick selections for colour tables and 
+      intensity maps, as well as data cuts.
 
+    - The Sextractor toolbox is updated to work with version 2.0.19.
+      This supports the new parameters:
+         o BACK_TYPE, BACK_VALUE and THRESH_TYPE.
 
+    - Sextractor bug fixes:
+        o Photometry aperture now use the given size.
+        o The messages window now only shows one copy of the output
+          from Sextractor, not two. 
+        o The ranges of scales in the photometry section are now
+          allowed to be outside of the initial range. 
 
+    - A new method for transferring astrometry between images has been
+      added to the "Fit to star positions..." toolbox. This works by
+      selecting positions on the reference image and then selecting the
+      same positions on the target image.
 
+    - The aperture photometry toolbox has been considerably
+      reworked. Fixed apertures are now re-sizable (but keep all the
+      same size) and the general layout is changed. Measurements can
+      be saved and appended to a named file. You can now also change
+      the aperture colours.
 
+    - The measure band now works when image is scrolled and zoomed.
+
+    - The "pick" toolbox can now save/append its results to a file.
+
+    - Many others too numerous to mention.
+   
+  Internally there have been many changes to GAIA, one consequence of
+  which is that most of the keyboard shortcuts are changed. Most
+  notably the interactive slice is now bound to <control-a>.
 
   To try out GAIA for yourself type the following command:
 
@@ -26,9 +71,11 @@
       cl> gaia
       cl> gaiadisp [image_file]
 
+  from CL.
+
   If you have any comments about GAIA then mail me at:
 
       P.W.Draper@durham.ac.uk.
 
-  Peter Draper 30th November 1998.
+  Peter Draper 23th June 1999.
 

@@ -1,30 +1,65 @@
 \documentclass[twoside,11pt]{article}
-\usepackage{graphicx}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
+
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {214.4}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {214.5}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {30 November 1998}
+\newcommand{\stardocdate}      {23 June 1999}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.2}
+\newcommand{\stardocversion}   {2.3}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
 tool. It provides the usual facilities of image display tools, plus
-more astronomically useful ones such as aperture photometry, source
-detection, arbitrary region analysis, celestial coordinate readout,
-calibration and modification, grid overlays, blink comparison, defect
-patching and the ability to query on-line (WWW) catalogues.}
+more astronomically useful ones such as aperture \& optimal photometry,
+contouring, source detection, arbitrary region analysis, celestial
+coordinate readout, calibration and modification, grid overlays, blink
+comparison, defect patching and the ability to query on-line (WWW)
+catalogues.}
 
 % ? End of document identification
-
 % -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
@@ -53,9 +88,9 @@ patching and the ability to query on-line (WWW) catalogues.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -90,7 +125,6 @@ patching and the ability to query on-line (WWW) catalogues.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -101,30 +135,28 @@ patching and the ability to query on-line (WWW) catalogues.}
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -137,10 +169,10 @@ patching and the ability to query on-line (WWW) catalogues.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\mytt}[1]{{\tt{#1}}}
-
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -152,7 +184,7 @@ patching and the ability to query on-line (WWW) catalogues.}
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -164,14 +196,16 @@ patching and the ability to query on-line (WWW) catalogues.}
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Large\bf  \stardoctitle \\ [2.5ex]}
+   {\Large\textbf{\stardoctitle \\ [2.5ex]}}
    \vspace{5mm}
+% ? Add picture here if required for the LaTeX version.
    \includegraphics[totalheight=5in]{sun214fig.ps}
+% ? End of picture
    \end{center}
 
 % ? Heading for abstract if used.
    \begin{center}
-      {\Large\bf Abstract}
+      {\Large\textbf{Abstract}}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -191,9 +225,8 @@ patching and the ability to query on-line (WWW) catalogues.}
    \htmladdimg{sun214.gif}
    \end{center}
 % ? End of picture
-
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -203,10 +236,10 @@ patching and the ability to query on-line (WWW) catalogues.}
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents.
 %  ================================
@@ -217,7 +250,6 @@ patching and the ability to query on-line (WWW) catalogues.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -234,29 +266,31 @@ patching and the ability to query on-line (WWW) catalogues.}
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
+% ? Main text
+
 \section{Introduction\xlabel{introduction}\label{introduction}}
 
 GAIA is an image display tool (c.f. SAOimage), but with the additional
 capability of being extendable to integrate other programs.  At
 present extensions are provided that cover the astronomically
-interesting areas of aperture photometry, automatic source detection,
-arbitrary region analysis, celestial coordinate readout, calibration
-and modification, grid overlays, blink comparison, image defect
-patching and the ability to connect to resources available in on-line
-(WWW) catalogues and archives.
+interesting areas of aperture \& optimal photometry, automatic source
+detection, contouring, arbitrary region analysis, celestial coordinate
+readout, calibration and modification, grid overlays, blink
+comparison, image defect patching and the ability to connect to
+resources available in on-line (WWW) catalogues and archives.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -283,9 +317,9 @@ invocation:
 \end{quote}
 You can also write to a specific window using the clone number:
 \begin{quote}
-\mytt{\% gaiadisp image\_name 1}
+\mytt{\% gaiadisp image\_name 2}
 \end{quote}
-This displays into the window with title ``GAIA/SkyCat (1)''. If
+This displays into the window with title \mytt{GAIA::SkyCat (2)}. If
 this window doesn't exist it will be created.
 
 \section{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
@@ -303,7 +337,7 @@ has two arguments, the name of the image to display and the plane
 if you wanted to display the default IRAF test image you'd use a
 command like:
 \begin{quote}
-\mytt{cl> gaiadisp dev\$pix.imh 0}
+\mytt{cl> gaiadisp dev\$pix.imh 1}
 \end{quote}
 This will either display into an existing GAIA or start up a new
 instance. Note that GAIA is not an IRAF image display and will
@@ -352,14 +386,14 @@ GAIA provides the following normal ``image display tool'' features:
 GAIA provides the following features, which are specifically aimed at
 astronomical work with images:
 \begin{itemize}
-\item Aperture photometry. A highly interactive environment for
-  controlling the positions, sizes and orientations of circular
+\item Aperture \& optimal photometry. A highly interactive environment
+  for controlling the positions, sizes and orientations of circular
   and elliptical apertures. The sky estimates can be made from
   annuli of these apertures or from related sky apertures. The
   measurements can be in either instrumental magnitudes or
   mean counts (based on the PHOTOM (\xref{SUN/45}{sun45}{})
   program \xref{AUTOPHOTOM}{sun45}{AUTOPHOTOM})
-  
+
 \item Automatic source detection. This feature provides the ability to
   automatically detect and parameterise all the objects on an
   image. These objects are then identified by displaying ellipses over
@@ -381,6 +415,11 @@ astronomical work with images:
   extraction of arbitrary shaped parts of your images as well
   defining ARD regions for other programs to use.
 
+\item Contouring. This allows the contouring of the displayed image,
+ or the overlay of contours derived from other images. The images are
+ aligned using sky coordinates, if available. Control over individual
+ line colours and thicknesses is provided.
+
 \item Blink comparison. All the displayed images can be animated
   (as quickly as your hardware/CPU combination allow), or
   you can cycle through them by hand.
@@ -391,10 +430,10 @@ astronomical work with images:
   current RA and Dec is provided.
 
 \item Astrometric calibration. You can either fit a new
-  astrometric calibration to your image (using on-line catalogues for
-  reference positions), define a new one using known information
-  (such the image scale and a reference point), copy one from another
-  image and finally tweak one to make it fit better.
+  astrometric calibration to your image (using on-line catalogues or
+  images for reference positions), define a new one using known
+  information (such the image scale and a reference point), copy one
+  from another image and finally tweak one to make it fit better.
 
 \item Astrometric grid overlay. If you can read out sky coordinates
   then you can also plot a grid overlay with labelled
@@ -491,9 +530,9 @@ just to make clear where they should be placed.
 Other formats that can be read by GAIA (with a performance penalty)
 are those supported by the CURSA (\xref{SUN/190}{sun190}{}) package
 (i.e. FITS-tables and STL format) and the ``ASCII\_HEAD'' format of
-the SExtractor/EXTRACTOR package.
+the SExtractor/EXTRACTOR package (\xref{SUN/226}{sun226}{}).
 
-The format that is used to open a catalogue, is determined by the file 
+The format that is used to open a catalogue, is determined by the file
 extension:
 \begin{itemize}
 \item \textbf{FITS tables}, accepted file types: \texttt{.FIT .fit .FITS .fits .GSC .gsc}
@@ -512,6 +551,7 @@ contained the following sort of information:
 \begin{quote}
 \begin{verbatim}
 # File created by: pdraper on June 15, 1998 at 10:24:04
+id_col: 0
 x_col: 1
 y_col: 2
 symbol: {ID LENGTH ANGLE} {line {} {} {$ANGLE+27.0} {} {}} {{$LENGTH*0.1} {}}
@@ -534,8 +574,8 @@ with the column values set to a variable with the same name as the
 column for each line in the table).
 
 Creating such a symbol parameter is best done by using the special
-``Set Plot Symbols...'' window, available under the local catalogue
-menu ``Options''. Using this window you can plot multiple symbols per
+\mytt{Set Plot Symbols...} window, available under the local catalogue
+menu \mytt{Options}. Using this window you can plot multiple symbols per
 object, specify which column to use as labels, change the graphic
 colour {\em etc.}. Now if you look in the file
 \mytt{\~{}/.skycat/skycat.cfg} after setting up your options a suitable
@@ -546,6 +586,15 @@ To find out more about tab tables and how to configure plot symbols
 you should consult the ESO document
 \htmladdnormallinkfoot{``Astronomical Catalog Library''.}
 {http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
+
+\textbf{FITS tables:} much of the above also applies to FITS tables
+that GAIA will read, i.e. FITS keywords with the names \mytt{X\_COL},
+\mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
+correctly. Special parameter names that are longer than 8 characters
+(such as \mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols}
+and \mytt{copyright}) should be truncated. Long symbol expressions can
+span more than one card by using the names: \mytt{SYMBOL1} through
+\mytt{SYMBOL9}.
 
 \subsection{\xlabel{image_formats}Image formats}
 
@@ -628,51 +677,20 @@ are:
 \end{quote}
 These define the upper and lower limits for zooming the main
 image. These are normally set to \mytt{20} and \mytt{-6}
-respectively. Note that the maximum possible zoom in the main window
-is limited to 32767 divided by the maximum of the image width or
-height.
+respectively.
 
 \subsection{\xlabel{proxy_servers}Proxy servers}
 Access to the World Wide Web may be restricted (by a firewall or maybe
 just site policy), so that it is only available through a ``web
 cache'' or proxy server. If you are in this situation you'll need to
-configure GAIA so that its remote catalogue access will work. To do
-this you need to define an environment variable \mytt{http\_proxy} to
-let GAIA know that it is to use the proxy server, rather than attempt
-to access sites directly. The format of this variable is:
-\begin{quote}
-\begin{verbatim}
-http://webcachemachine.domain:port/
-\end{verbatim}
-\end{quote}
-So for instance if your proxy server is called
-\mytt{wwwcache.dur.ac.uk} and it listens on port \mytt{8080} and you
-use the C-shell (or some variant). You would need to do:
-\begin{quote}
-\begin{verbatim}
-setenv http_proxy "http://webcache.dur.ac.uk:8080/"
-\end{verbatim}
-\end{quote}
-before starting up GAIA (your \mytt{.login} would be an ideal place to
-do this).
+configure GAIA so that its remote catalogue access will work.
 
-It is also possible to stop the proxy server being used for specific
-domains (say for instance if one of the catalogue servers used by GAIA
-was available to you locally). This is controlled by the variable
-\mytt{http\_noproxy}. The format of this variable is:
-\begin{quote}
-\begin{verbatim}
-domain1,domain2,domain3...
-\end{verbatim}
-\end{quote}
-So for instance if you had local access to the main ESO server --
-\mytt{archive.eso.org} -- you might like to set this variable to:
-\begin{quote}
-\begin{verbatim}
-setenv http_noproxy "eso.org"
-\end{verbatim}
-\end{quote}
+To do this, start up GAIA, select the \mytt{Data-Servers} menu and
+choose any remote catalogue. Now in the catalogue window select the
+\mytt{Options} menu and choose the \mytt{Proxies...} item.
 
+Now fill in the two fields (consult your system adminstrator if you're
+unclear what to enter here) and press \mytt{OK}.
 
 \section{\xlabel{gaia_demonstration}GAIA demonstration}
 Rather than just absorbing the rather dry descriptions above, you can
@@ -747,9 +765,9 @@ have been added to the graphics menu.
 GAIA has been updated to add in some new features and fix a number of
 bugs.
 \begin{itemize}
-    \item The version of SkyCat that GAIA uses has been upgraded to 
+    \item The version of SkyCat that GAIA uses has been upgraded to
       2.0.7. This enhances the web catalogue interface to allow
-      the selection of more than one site (LEDAS is now also available 
+      the selection of more than one site (LEDAS is now also available
       by default) and to give full control of the marker colour,
       shapes and sizes.
 
@@ -763,10 +781,10 @@ bugs.
 
     \item Colour depths greater than 8 are now supported. Note that using
       this facility will result in a considerable slow down of the
-      interface and is not extensively tested on SUNs and Alphas 
+      interface and is not extensively tested on SUNs and Alphas
       (since I do not have access to these).
 
-    \item GAIA now supports catalogue access using proxy servers (uses 
+    \item GAIA now supports catalogue access using proxy servers (uses
       the {\tt http\_proxy} environment variable).
 
     \item The gaiadisp command now works if you use ``xhost'' (cl users
@@ -779,7 +797,7 @@ bugs.
       This problem resulted from the changing the fonts to speed up
       the starting time on SUNs.
 
-    \item The problem with the "fixed" font not being recognised when 
+    \item The problem with the "fixed" font not being recognised when
       printing a gridded image is now fixed.
 
     \item Arrow head printing now uses the correct colour.
@@ -791,7 +809,7 @@ bugs.
       when capturing astrometry grids) has been modified to retain
       the aspect ratio of the visible image area.
 
-    \item Printing of zoomed images is now much more efficient. Files 
+    \item Printing of zoomed images is now much more efficient. Files
       should now be much smaller and produced more quickly.
 
     \item It is now possible to patch columns and rows.
@@ -801,20 +819,20 @@ bugs.
     \item Aperture photometry has been modified to move the cursor along
       with the aperture when using arrow keys for fine adjustments.
 
-    \item Aperture photometry now allows an exposure time to be used. This 
+    \item Aperture photometry now allows an exposure time to be used. This
       can be a simple constant or read from a FITS keyword.
 
     \item Axis normalisation is now correct when FITS positions of the
       RA/Dec axes are swapped (this mainly effects HST archive previews).
 
-    \item White in the grid plotting and image colour tables is now pure. 
+    \item White in the grid plotting and image colour tables is now pure.
 
     \item Grid overlays can now be drawn just for the part of the image
       that is displayed. This works especially well for zoomed images.
 
-    \item Regions extracted using the regions toolbox now retain the 
+    \item Regions extracted using the regions toolbox now retain the
       astrometry information (you can use this feature to extract
-      rectangular regions of your image and draw sky coordinate grids 
+      rectangular regions of your image and draw sky coordinate grids
       over them).
 
     \item Facilities for flipping astrometry reference positions
@@ -833,7 +851,7 @@ bugs.
       coordinates as well as the data value.
 
 \end{itemize}
-\subsection{This release - 2.2}
+\subsection{Release - 2.2}
 
 The main change in this release is that GAIA has been updated to
 include a new toolbox for controlling the EXTRACTOR/SExtractor
@@ -862,7 +880,7 @@ Other minor changes in this release include:
   and an arrow cluster for controlling the mobile image position.
 
 \item The rotation limits in the "Type in known calibration..."
-  toolbox have been extended to -180 to +180 degrees 
+  toolbox have been extended to -180 to +180 degrees
   (was 0 to 180).
 
 \item On-line help for the catalogue window has been added.
@@ -873,6 +891,71 @@ Other minor changes in this release include:
 \item  Plotting catalogues with many thousands of entries has been
   considerably speeded up.
 \end{itemize}
+
+\subsection{This release - 2.3}
+  This release includes two new toolboxes and many other enhancements.
+
+  The new toolboxes are:
+  \begin{itemize}
+     \item Contouring
+     \item Optimal photometry
+  \end{itemize}
+
+  The contouring toolbox allows the overlay of contours from different
+  images, possibly aligned using sky coordinates (naturally it also
+  allows you to contour the displayed image). It also provides control
+  of the colour and line thickness of each contour.
+
+  The optimal photometry toolbox provides facilities similar to the
+  aperture photometry toolbox, both of which are based on the PHOTOM
+  program AUTOPHOTOM (see \xref{SUN/45}{sun45}{}).
+
+  The version of Skycat that GAIA is based on is now 2.4. This has
+  improved catalogue facilities, an image "history" mechanism, main
+  window geometry history, web proxy server dialog, histogram
+  equalization, HTTP password support and many less significant changes.
+
+  Other changes to GAIA include:
+  \begin{itemize}
+    \item The image panel now has quick selections for colour tables and
+      intensity maps, as well as data cuts.
+
+    \item The Sextractor toolbox is updated to work with version 2.0.19.
+      This supports the new parameters:
+        \begin{itemize}
+           \item \mytt{BACK\_TYPE}, \mytt{BACK\_VALUE} and \mytt{THRESH\_TYPE}.
+        \end{itemize} 
+
+    \item Sextractor bug fixes:
+        \begin{itemize}
+          \item Photometry aperture now use the given size.
+          \item The messages window now only shows one copy of
+                the output from Sextractor, not two.
+          \item The ranges of scales in the photometry section are
+                now allowed to be outside of the initial range.
+        \end{itemize}
+
+    \item A new method for transferring astrometry between images has been
+      added to the \mytt{Fit to star positions...} toolbox. This works by
+      selecting positions on the reference image and then selecting the
+      same positions on the target image.
+
+    \item The aperture photometry toolbox has been considerably
+      reworked. Fixed apertures are now re-sizable (but keep all the
+      same size) and the general layout is changed. Measurements can
+      be saved and appended to a named file. You can now also change
+      the aperture colours.
+
+    \item The measure band now works when image is scrolled and zoomed.
+
+    \item The \mytt{Pick} toolbox can now save/append its results to a file.
+
+    \item Many others too numerous to mention.
+\end{itemize}
+
+Internally there have been many changes to GAIA, one consequence of
+which is that most of the keyboard shortcuts are changed. Most
+notably the interactive slice is now bound to \mytt{<control-a>}.
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 
@@ -889,4 +972,5 @@ and scripts developed by the Tcl community. Thanks are also due to the
 many people who helped test out GAIA and iron out minor and major
 problems (in particular Tim Jenness, Tim Gledhill and Nigel Metcalfe).
 
+% ? End of main text
 \end{document}
