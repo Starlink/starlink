@@ -182,137 +182,198 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
                           double *xl, double *xu ) {
 
-   const int maxiter = 50000;
-   const int miniter = 5;
-   double *x;
-   double acc;
-   double new_max;
-   double new_min;
-   double random;
-   int coord;
-   int done_l;
-   int done_u;
-   int iter;
-   int nsame_l;
-   int nsame_u;
-   long int seed = 77665544;
-   int nfound_l;
-   int nfound_u;
-   int ncall = 0;
-   int ncoord = mapdata->nin;
- 
-   nsame_l = nsame_u = 0;
-   nfound_l = nfound_u = 0;
-   done_l = done_u = 0;
-   x = astMalloc( mapdata->nin * sizeof( double ) );
-   for ( iter = 0; iter < maxiter; iter++ ) {
+/* Local Constants: */
+   const int maxiter = 50000;    /* Maximum number of iterations */
+   const int minsame = 5;        /* Minimum no. consistent extrema required */
 
+/* Local Variables: */
+   double *x;                    /* Pointer to array of cordinates */
+   double acc;                   /* Convergence accuracy for finding maximum */
+   double new_max;               /* Value of new local maximum */
+   double new_min;               /* Value of new local minimum */
+   double random;                /* Pseudo-random number */
+   int coord;                    /* Loop counter for coordinates */
+   int done_max;                 /* Satisfactory global maximum found? */
+   int done_min;                 /* Satisfactory global minimum found? */
+   int iter;                     /* Loop counter for iterations */
+   int ncall;                    /* Number of Mapping function calls (junk) */
+   int ncoord;                   /* Number of coordinates in search space */
+   int nmax;                     /* Number of local maxima found */
+   int nmin;                     /* Number of local minima found */
+   int nsame_max;                /* Number of equivalent local maxima found */
+   int nsame_min;                /* Number of equivalent local minima found */
+   long int seed = 1776655449;   /* Arbitrary pseudo-random number seed */
+
+/* Check the global error status */
+   if ( !astOK ) return;
+
+/* Initialise. */
+   done_max = 0;
+   done_min = 0;
+   ncall = 0;
+   nmax = 0;
+   nmin = 0;
+   nsame_max = 0;
+   nsame_min = 0;
+
+/* Extract the number of input coordinates for the Mapping function
+   and allocate workspace to hold coordinates. */
+   ncoord = mapdata->nin;
+   x = astMalloc( sizeof( double ) * (size_t) ncoord );
+
+/* Loop to inspect the Mapping function at up to "maxiter" positions
+   in order to estimate the global minimum and maximum. */
+   for ( iter = 0; astOK && ( iter < maxiter ); iter++ ) {
+
+/* Determine search accuracy. */
+/* ========================== */
+/* Decide the accuracy to which local extrema should be found. The
+   intention here is to optimise performance, especially where one
+   extremum lies near zero and so could potentially be found to
+   unnecessarily high precision. If we make a mis-assumption (the code
+   below is not fool-proof), we will slow things down for this
+   iteration, but the error will be corrected in future iterations
+   once better estimates are available. */
+
+/* If we have no current estimate of either global extremum, we assume
+   the values we eventually obtain will be of order unity and required
+   to machine precision. */
       acc = DBL_EPSILON;
+
+/* If we already have an estimate of both global extrema, we set the
+   accuracy so that the difference between them will be known to
+   machine precision. */
       if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
          acc = fabs( *ubnd - *lbnd ) * DBL_EPSILON;
+
+/* If we have an estimate of only one global extremum, we assume that
+   the difference between the two global extrema will eventually be of
+   the same order as the estimate we currently have, so long as this
+   is not less than unity. */
+      } else if ( *lbnd != AST__BAD ) {
+         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * DBL_EPSILON;
+      } else if ( *ubnd != AST__BAD ) {
+         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * DBL_EPSILON;
       }
 
-      if ( !done_l ) {
-         for ( coord = 0; coord < mapdata->nin; coord++ ) {
+/* Search for a new local minimum. */
+/* =============================== */
+/* If we are still searching for the global minimum, then generate a
+   set of starting coordinates from which to find a new local
+   minimum. */
+      if ( !done_min ) {
 
-/* On the first iteration, start searching for a local minimum at the
-   position where the best estimate of the lower bound (if any) has
-   previously been found. */
-            if ( !iter && ( *lbnd != AST__BAD ) ) {
+/* On the first iteration, start searching at the position where the
+   best estimate of the global minimum (if any) has previously been
+   found. */
+         if ( !iter && ( *lbnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
                x[ coord ] = xl[ coord ];
+            }
 
-/* Otherwise, if no estimate of the lower bound has been found, then
+/* Otherwise, if no estimate of the global minimum is available, then
    start searching at the position where the best estimate of the
-   upper bound (if any) has been found. This may be a long way from a
-   local minimum, but at least it will yield a non-bad value for the
-   Mapping function, so some sort of estimate of the lower bound will
-   be obtained. This is important in cases where finding the "active"
-   (i.e. non-bad) region of the function is the main problem. Note
-   that this condition can only occur once, since the lower bound will
-   have an estimate on the next iteration. */
-            } else if ( ( *lbnd == AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+   global maximum (if any) has been found. This may be a long way from
+   a local minimum, but at least it will yield a non-bad value for the
+   Mapping function, so some sort of estimate of the global minimum
+   will be obtained. This is important in cases where finding the
+   "active" (i.e. non-bad) region of the function is the main
+   problem. Note that this condition can only occur once, since the
+   global minimum will have an estimate on the next iteration. */
+         } else if ( ( *lbnd == AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
                x[ coord ] = xu[ coord ];
+            }
 
-/* Having exhausted the above possibilities for finding a new local
-   minimum, generate pseudo-random starting positions which are
-   uniformly distributed throughout the search volume. */
-            } else {
+/* Having exhausted the above possibilities, generate pseudo-random
+   starting positions which are uniformly distributed throughout the
+   search volume. */
+         } else {
+            for ( coord = 0; coord < ncoord; coord++ ) {
                random = Random( &seed );
                x[ coord ] = mapdata->ubnd[ coord ] * random +
-                              mapdata->lbnd[ coord ] * ( 1.0 - random );
+                            mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
          }
 
 /* Evaluate the Mapping function at the new starting position. Do not
-   search for a minimum unless the returned value is non-bad, but loop
-   until a non-bad value is found. This allows us to search rapidly
-   for the active regions of the function, even if there are
-   relatively few of these. */
+   search for a local minimum unless the returned value is non-bad,
+   but loop until a non-bad value is found. This allows us to search
+   rapidly to locate the active regions of the function, even if there
+   are relatively few of these. */
          new_min = MapFunction( mapdata, x, &ncall );
          if ( new_min != AST__BAD ) {
             printf( "X minimising (iter=%d) starting at:\n", iter );
-            for ( coord = 0; coord < mapdata->nin; coord ++ ) {
+            for ( coord = 0; coord < ncoord; coord ++ ) {
                printf( "%g ", x[ coord ] );
             }
             printf( "\n" );
 
 /* Indicate that the Mapping function should be negated (because we
-   want a minimum) and then search for a local maximum in this negated
-   function. If the result is non-bad (as it should always be, barring
-   an error), then negate it to obtain the value of the local minimum
-   found. */
+   want a local minimum) and then search for a local maximum in this
+   negated function. If the result is non-bad (as it should always be,
+   barring an error), then negate it to obtain the value of the local
+   minimum found. */
             mapdata->negate = 1;
             new_min = LocalMaximum( mapdata, acc, 0.01, x );
             if ( new_min != AST__BAD ) {
                new_min = -new_min;
                printf( "minimum %.20g found at ", new_min );
-               for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               for ( coord = 0; coord < ncoord; coord++ ) {
                   printf( "%.20g ", x[ coord ] );
                }
                printf( "\n\n" );
 
 /* Count the number of times we successfully locate a local minimum
-   (ignoring the fact they might all be the same). */
-               nfound_l++;
+   (ignoring the fact they might all be the same one). */
+               nmin++;
 
-/* If this is the first estimate of the minimum, then set the count of
-   identical minima to one. Store the minimum value and its position. */
-               if ( *lbnd == AST__BAD ) {
-                  nsame_l = 1;
-                  *lbnd = new_min;
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     xl[ coord ] = x[ coord ];
-                  }
-
-/* Otherwise, if this minimum is lower than the previous estimate,
-   then re-initialise the count of identical minima to one if the
-   difference exceeds the accuracy with which minima are found
-   (i.e. we have found a significantly different minimum). Otherwise,
-   increment this coune (i.e. if we have found the same minimum but
-   with slightly improved accuracy). Store the new minimum and its
+/* Update the global minimum. */
+/* ========================== */
+/* If this is the first estimate of the global minimum, then set to
+   one the count of the number of consecutive iteratiions where this
+   estimate remains unchanged. Store the minimum value and its
    position. */
-               } else if ( new_min < *lbnd ) {
-                  nsame_l = ( ( *lbnd - new_min ) > acc ) ? 1 : nsame_l + 1;
+               if ( *lbnd == AST__BAD ) {
+                  nsame_min = 1;
                   *lbnd = new_min;
                   for ( coord = 0; coord < ncoord; coord++ ) {
                      xl[ coord ] = x[ coord ];
                   }
 
-/* If the latest minimum is no improvement on previous estimates, then
-   increment the count of identical minima but do not save the new
-   one. */
+/* Otherwise, test if this local minimum is lower than the previous
+   estimate of the global minimum. If so, then reset the count of
+   unchanged estimates of the global mimimum to one if the difference
+   exceeds the accuracy with which the minimum was found (i.e. if we
+   have found a significantly different minimum). Otherwise, just
+   increment this count (because we have found the same minimum but by
+   chance with slightly improved accuracy). Store the new minimum and
+   its position. */
+               } else if ( new_min < *lbnd ) {
+                  nsame_min = ( ( *lbnd - new_min ) > acc ) ? 1 :
+                                                              nsame_min + 1;
+                  *lbnd = new_min;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = x[ coord ];
+                  }
+
+/* If the latest local minimum is no improvement on previous estimates
+   of the global minimum, then increment the count of unchanged
+   estimates of the global mimimum, but do not save the new one. */
                } else {
-                  nsame_l++;
+                  nsame_min++;
                }
-               printf( "nfound_l, nsame_l = %d %d\n", nfound_l, nsame_l );
+               printf( "nmin, nsame_min = %d %d\n", nmin, nsame_min );
             }
          }
       }
 
+/* Search for a new local maximum. */
+/* =============================== */
 /* Now repeat all of the above to find a new local maximum which estimates
    the upper bound. */
-      if ( !done_u ) {
-         for ( coord = 0; coord < mapdata->nin; coord++ ) {
+      if ( !done_max ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
             if ( !iter && ( *ubnd != AST__BAD ) ) {
                x[ coord ] = xu[ coord ];
             } else if ( ( *ubnd == AST__BAD ) && ( *lbnd != AST__BAD ) ) {
@@ -320,13 +381,13 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
             } else {
                random = Random( &seed );
                x[ coord ] = mapdata->ubnd[ coord ] * random +
-                              mapdata->lbnd[ coord ] * ( 1.0 - random );
+               mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
          }
          new_max = MapFunction( mapdata, x, &ncall );
          if ( new_max != AST__BAD ) {
             printf( "X maximising (iter=%d) starting at:\n", iter );
-            for ( coord = 0; coord < mapdata->nin; coord ++ ) {
+            for ( coord = 0; coord < ncoord; coord ++ ) {
                printf( "%g ", x[ coord ] );
             }
             printf( "\n" );
@@ -334,73 +395,98 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
             new_max = LocalMaximum( mapdata, acc, 0.01, x );
             if ( new_max != AST__BAD ) {
                printf( "maximum %.20g found at ", new_max );
-               for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               for ( coord = 0; coord < ncoord; coord++ ) {
                   printf( "%.20g ", x[ coord ] );
                }
                printf( "\n\n" );
-               nfound_u++;
+               nmax++;
                if ( *ubnd == AST__BAD ) {
-                  nsame_u = 1;
+                  nsame_max = 1;
                   *ubnd = new_max;
                   for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x[ coord ];
                } else if ( new_max > *ubnd ) {
-                  nsame_u = ( ( new_max - *ubnd ) > acc ) ? 1 : nsame_u + 1;
+                  nsame_max = ( ( new_max - *ubnd ) > acc ) ? 1 : nsame_max + 1;
                   *ubnd = new_max;
                   for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = x[ coord ];
                } else {
-                  nsame_u++;
+                  nsame_max++;
                }
-               printf( "nfound_u, nsame_u = %d %d\n", nfound_u, nsame_u );
+               printf( "nmax, nsame_max = %d %d\n", nmax, nsame_max );
             }
          }
       }
 
-      if ( ( nsame_l >= miniter ) &&
-           ( nsame_l >= ( 0.3 * nfound_l + 0.5 ) ) ) done_l = 1;
-      if ( ( nsame_u >= miniter ) &&
-           ( nsame_u >= ( 0.3 * nfound_u + 0.5 ) ) ) done_u = 1;
-      if ( done_l && done_u ) break;
+      if ( ( nsame_min >= minsame ) &&
+          ( nsame_min >= ( 0.3 * nmin + 0.5 ) ) ) done_min = 1;
+      if ( ( nsame_max >= minsame ) &&
+          ( nsame_max >= ( 0.3 * nmax + 0.5 ) ) ) done_max = 1;
+      if ( done_min && done_max ) break;
    }
-#if 1
-   mapdata->negate = 1;
-   *lbnd = LocalMaximum( mapdata, 0.0, DBL_EPSILON * 10.0, xl );
-   if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
-   mapdata->negate = 0;
-   *ubnd = LocalMaximum( mapdata, 0.0, DBL_EPSILON * 10.0, xu );
-#endif
-   printf( "best limit(l) = %g at %.20g %.20g\n", *lbnd, xl[0], xl[1] );
-   printf( "best limit(u) = %g at %.20g %.20g\n", *ubnd, xu[0], xu[1] );
    x = astFree( x );
+#if 1
+   if ( astOK ) {
+      if ( *lbnd != AST__BAD ) {
+         mapdata->negate = 1;
+         *lbnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xl );
+         if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
+      }
+      if ( *ubnd != AST__BAD ) {
+         mapdata->negate = 0;
+         *ubnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xu );
+      }
+      if ( !astOK || ( *lbnd == AST__BAD ) ) {
+         *lbnd = AST__BAD;
+         for ( coord = 0; coord < ncoord; coord++ ) xl[ coord ] = AST__BAD;
+      }
+      if ( !astOK || ( *ubnd == AST__BAD ) ) {
+         *ubnd = AST__BAD;
+         for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = AST__BAD;
+      }
+#endif
+      printf( "best limit(l) = %g at %.20g %.20g\n", *lbnd, xl[0], xl[1] );
+      printf( "best limit(u) = %g at %.20g %.20g\n", *ubnd, xu[0], xu[1] );
+   }
 }
 void astBoxBound( AstMapping *this,
                   const double lbnd_in[], const double ubnd_in[],
-                  int coord_out, double lbnd_out[], double ubnd_out[] ) {
+                  int coord_out, double *lbnd_out, double *ubnd_out,
+                  double xl[], double xu[] ) {
 
    MapData mapdata;
-   double x_l[ 10 ];
-   double x_u[ 10 ];
+   double *x_l;
+   double *x_u;
+   int ncoord;
+   int coord;
+   
+   ncoord = astGetNin( this );
 
    mapdata.mapping = this;
-   mapdata.nin = astGetNin( this );
+   mapdata.nin = ncoord;
    mapdata.nout = astGetNout( this );
    mapdata.coord = coord_out;
    mapdata.forward = 1;
    mapdata.lbnd = lbnd_in;
    mapdata.ubnd = ubnd_in;
-   mapdata.pset_in = astPointSet( 1, mapdata.nin, "" );
+   mapdata.pset_in = astPointSet( 1, ncoord, "" );
    mapdata.pset_out = astPointSet( 1, mapdata.nout, "" );
    mapdata.ptr_in = astGetPoints( mapdata.pset_in );
    mapdata.ptr_out = astGetPoints( mapdata.pset_out );
 
-   *lbnd_out = *ubnd_out = AST__BAD;
-#if 1
-   SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
-#endif
-#if 1
-   GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
-#endif
+   x_l = astMalloc( sizeof( double ) * (size_t) ncoord );
+   x_u = astMalloc( sizeof( double ) * (size_t) ncoord );
+   if ( astOK ) {
+      *lbnd_out = *ubnd_out = AST__BAD;
+      for ( coord = 0; coord < ncoord; coord++ ) {
+         x_l[ coord ] = x_u[ coord ] = AST__BAD;
+      }
+      SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+      GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+   }
+   mapdata.pset_in = astAnnul( mapdata.pset_in );
+   mapdata.pset_out = astAnnul( mapdata.pset_out );
+   x_l = astFree( x_l );
+   x_u = astFree( x_u );
 }
-
 
 /*************************************/
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
@@ -1172,7 +1258,7 @@ printf("ncall = %d\n", ncall );
          }
 
 /* Otherwise, decrement the initial step size for the next iteration. */
-         fract /= 100.0;
+         fract /= 1000.0;
       }
    }
    
