@@ -51,3 +51,33 @@ BUILT_SOURCES = $(DYNSCRIPTS) $(IFL_FILES)
 # Generate IFL files
 $(IFL_FILES) $(DYNSCRIPTS): surf.ifd
 	$(IFD2STAR) surf
+
+# sculog aliases
+SCULOG_ALIASES = photsum mapsum pointsum skysum
+
+# scuplot
+SCUPLOT_ALIASES = dspbol pltbol rlinplot
+
+# On install, the summary routines need to be created as soft links
+# to sculog: photsum, mapsum, pointsum, skysum
+# Also dspbol pltbol and rlinplot
+install-exec-local:
+	cd $(DESTDIR)$(bindir); \
+	for f in $(SCULOG_ALIASES) ""; do \
+	  rm -f $$f; \
+	  if test -n "$$f"; then \
+	    $(LN_S) sculog $$f; \
+	    if test -n "$$MANIFEST_FD"; then \
+	      echo "$(DESTDIR)$(bindir)/$$f" >&$${MANIFEST_FD-0}; \
+	    else :; fi; \
+	  else :; fi; \
+	done; \
+	for f in $(SCUPLOT_ALIASES) ""; do \
+	  rm -f $$f; \
+	  if test -n "$$f"; then \
+	    $(LN_S) scuplot.csh $$f; \
+	    if test -n "$$MANIFEST_FD"; then \
+	      echo "$(DESTDIR)$(bindir)/$$f" >&$${MANIFEST_FD-0}; \
+	    else :; fi; \
+	  else :; fi; \
+	done;
