@@ -33,6 +33,7 @@
 *     16 Aug 93 : V1.7-0 Use new graphics routines and POI_INIT (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     15 Feb 95 : V1.8-1 Use BDI and WCI for coord stuff (DJA)
+*      4 Oct 95 : V2.0-0 Full ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -53,67 +54,62 @@
 *
       DOUBLE PRECISION		EQUPOS(2)		! Source RA,DEC
 
+      REAL			AXLO(2), AXHI(2)	! Axis limits
       REAL			AXPOS(2)       		! Axis position
-      REAL                  XBASE, XSCALE             ! X axis values
-      REAL                  XC, YC                    ! Image coordinates
-      REAL                  YBASE, YSCALE             ! Y axis values
-      REAL                  XLO, XHI, YLO, YHI        ! Image boundaries
+      REAL                  	XC, YC                  ! Image coordinates
 
-      INTEGER               BOLD                      ! Symbol boldness
-      INTEGER               EPTR                      ! Error data
+      INTEGER			APTR			! Axis data
+      INTEGER               	BOLD                    ! Symbol boldness
+      INTEGER			DIMS(2)			! Graph dimensions
+      INTEGER               	EPTR                    ! Error data
       INTEGER			GID			! Graph to anotate
+      INTEGER			IAX			! Loop over axes
       INTEGER			IFID			! Input dataset
-      INTEGER               INDF                      ! Loop over selected graph
-      INTEGER               IMARK                     ! Note number on graph
-      INTEGER               ISRC                      ! Loop over objects
-      INTEGER               NDAT, NLEV
-      INTEGER               NDFS(GMD__MXNDF)          ! Selected graphs
-      INTEGER               NMARK                     ! # notes in graph
-      INTEGER               NNDF                      ! # graphs in multi-plot
-      INTEGER               NREJ                      ! # sources not plotted
-      INTEGER               NSEL                      ! # of selected graphs
-      INTEGER               NSRC                      ! # of sources in SID
-      INTEGER               RPTR, DPTR                ! Celestial pos ptr's
+      INTEGER               	INDF                    ! Loop over selected graph
+      INTEGER               	IMARK                   ! Note number on graph
+      INTEGER               	ISRC                    ! Loop over objects
+      INTEGER               	NDAT, NLEV, NDIM
+      INTEGER               	NDFS(GMD__MXNDF)        ! Selected graphs
+      INTEGER               	NMARK                   ! # notes in graph
+      INTEGER               	NNDF                    ! # graphs in multi-plot
+      INTEGER               	NREJ                    ! # sources not plotted
+      INTEGER               	NSEL                    ! # of selected graphs
+      INTEGER               	NSRC                    ! # of sources in SID
+      INTEGER               	RPTR, DPTR              ! Celestial pos ptr's
       INTEGER			PIXID, PRJID, SYSID	! WCS info
       INTEGER 			SID			! SSDS identifier
-      INTEGER               SYMBOL                    ! Marker symbol to use
-      INTEGER               XDIM, YDIM                ! Axis dimensions
+      INTEGER               	SYMBOL                  ! Marker symbol to use
 
-      LOGICAL               SSET, BSET                ! Plot attributes set
-      LOGICAL               ERR_OK                    ! Positional errors there?
-      LOGICAL               INPRIM                    ! Input primitive?
-      LOGICAL               IS_SET                    ! Is the SSDS a set?
-      LOGICAL               MULTI                     ! Input is a multi-graph?
-      LOGICAL               OK                        ! Validity test
+      LOGICAL               	SSET, BSET              ! Plot attributes set
+      LOGICAL               	ERR_OK                  ! Positional errors there?
+      LOGICAL               	IS_SET                  ! Is the SSDS a set?
+      LOGICAL               	MULTI                   ! Input is multi-graph?
+      LOGICAL               	OK                      ! Validity test
 *
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSANOT Version 1.8-1' )
+        PARAMETER           ( VERSION = 'SSANOT Version 2.0-0' )
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Get Asterix going
+*  Get Asterix going
       CALL AST_INIT()
 
-*    Get input graphics object from user
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      IF ( INPRIM .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Cannot anotate primitive dataset', STATUS )
-      END IF
+*  Get input graphics object from user
+      CALL USI_ASSOC( 'INP', 'MultiGraph|BinDS', 'UPDATE', IFID,
+     :                STATUS )
 
-*    Get source list
+*  Get source list
       CALL SSI_ASSOCI( 'LIST', 'READ', SID, IS_SET, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check for POSIT structure, otherwise nothing much to report
+*  Get number of sources in source list
       CALL SSI_GETNSRC( SID, NSRC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( NSRC .EQ. 0 ) THEN
@@ -124,7 +120,7 @@
         GOTO 99
       END IF
 
-*    Is this a multi-graph dataset?
+*  Is this a multi-graph dataset?
       CALL GMI_QMULT( IFID, MULTI, STATUS )
       IF ( MULTI ) THEN
         CALL GMI_QNDF( IFID, NNDF, STATUS )
@@ -139,17 +135,17 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map lists for positions
+*  Map lists for positions
       CALL SSI_MAPFLD( SID, 'RA', '_DOUBLE', 'READ', RPTR, STATUS )
       CALL SSI_MAPFLD( SID, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
 
-*    Use errors?
+*  Use errors?
       CALL USI_GET0L( 'ERROR', ERR_OK, STATUS )
 
-*    Get pos error data
+*  Get pos error data
       IF ( ERR_OK ) THEN
 
-*      Check error
+*    Check error
         CALL SSI_CHKFLD( SID, 'ERRORS', ERR_OK, STATUS )
         IF ( ERR_OK ) THEN
           CALL SSI_MAPFLD( SID, 'ERRORS', '_REAL', 'READ', EPTR,
@@ -158,13 +154,13 @@
 
       ELSE
 
-*      Set these up so that SSANOT_INT can declare the error array easily
+*    Set these up so that SSANOT_INT can declare the error array easily
         NDAT = 1
         NLEV = 1
 
       END IF
 
-*    Get plotting attributes
+*  Get plotting attributes
       CALL USI_GET0I( 'SYMBOL', SYMBOL, STATUS )
       SSET = ( STATUS .EQ. SAI__OK )
       IF ( STATUS .EQ. PAR__NULL) THEN
@@ -178,67 +174,66 @@
         CALL ERR_ANNUL( STATUS )
       END IF
 
-*    Cache current GCB if present
+*  Cache current GCB if present
       CALL GCB_LCONNECT(STATUS)
 
-*    For each NDF to be anotated
+*  For each NDF to be anotated
       DO INDF = 1, NSEL
 
-*      Locate NDF to mark
+*    Locate NDF to mark
         IF ( MULTI ) THEN
           CALL GMI_LOCNDF( IFID, NDFS(INDF), GID, STATUS )
         ELSE
           CALL ADI_CLONE( IFID, GID, STATUS )
         END IF
 
-*      Load graphics control from file
+*    Load graphics control from file
         CALL GCB_FLOAD( GID, STATUS )
 
-*      Any notes there?
+*    Any notes there?
         CALL GCB_GETI( 'MARKER_N', OK, NMARK, STATUS )
         IF ( .NOT. OK ) NMARK = 0
 
-*      Get pointing information
+*    Get pointing information
         CALL WCI_GETIDS( GID, PIXID, PRJID, SYSID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Get axis values for dataset, then units
-        CALL BDI_GETAXVAL( GID, 1, XBASE, XSCALE, XDIM, STATUS )
-        CALL BDI_GETAXVAL( GID, 2, YBASE, YSCALE, YDIM, STATUS )
+*    Get axis values for dataset
+        CALL BDI_GETSHP( GID, 2, DIMS, NDIM, STATUS )
+        DO IAX = 1, 2
+          CALL BDI_AXMAPR( GID, 1, 'Data', 'READ', APTR, STATUS )
+          CALL ARR_ELEM1R( APTR, DIMS(IAX), 1, AXLO(IAX), STATUS )
+          CALL ARR_ELEM1R( APTR, DIMS(IAX), DIMS(IAX), AXHI(IAX),
+     :                     STATUS )
+        END DO
 
-*      Work out image boundaries
-        XLO = MIN( XBASE, XBASE+(XDIM-1)*XSCALE )
-        XHI = MAX( XBASE, XBASE+(XDIM-1)*XSCALE )
-        YLO = MIN( YBASE, YBASE+(YDIM-1)*YSCALE )
-        YHI = MAX( YBASE, YBASE+(YDIM-1)*YSCALE )
-
-*      For each source
+*    For each source
         NREJ = 0
         DO ISRC = 1, NSRC
 
-*        Dataset note number
+*      Dataset note number
           IMARK = NMARK + ISRC
 
-*        Get its position
+*      Get its position
           CALL ARR_ELEM1D( RPTR, NSRC, ISRC, EQUPOS(1), STATUS )
           CALL ARR_ELEM1D( DPTR, NSRC, ISRC, EQUPOS(2), STATUS )
           EQUPOS(1) = EQUPOS(1) * MATH__DDTOR
           EQUPOS(2) = EQUPOS(2) * MATH__DDTOR
 
-*        Convert to image coords in axis units
+*      Convert to image coords in axis units
           CALL WCI_CNS2A( EQUPOS, PIXID, PRJID, AXPOS, STATUS )
           XC = AXPOS(1)
           YC = AXPOS(2)
 
-*        Skip if outside image
-          IF ( ( XC .LT. XLO ) .OR. ( XC .GT. XHI ) .OR.
-     :         ( YC .LT. YLO ) .OR. ( YC .GT. YHI ) ) THEN
+*      Skip if outside image
+          IF ( ( XC .LT. AXLO(1) ) .OR. ( XC .GT. AXHI(1) ) .OR.
+     :         ( YC .LT. AXLO(2) ) .OR. ( YC .GT. AXHI(2) ) ) THEN
 
             NREJ = NREJ + 1
 
           ELSE
 
-*          Anotate dataset
+*        Anotate dataset
             CALL GCB_SET1R( 'MARKER_X', IMARK, 1, XC, STATUS )
             CALL GCB_SET1R( 'MARKER_Y', IMARK, 1, YC, STATUS )
             IF ( SSET ) THEN
@@ -253,28 +248,27 @@
 
         END DO
 
-*      Write number of markers
+*    Write number of markers
         CALL GCB_SETI( 'MARKER_N', IMARK, STATUS )
 
-*      Save GCB to file
+*    Save GCB to file
         CALL GCB_FSAVE( GID, STATUS )
         CALL GCB_DETACH( STATUS )
-        CALL BDI_RELEASE( GID, STATUS )
         CALL ADI_ERASE( GID, STATUS )
 
       END DO
 
-*    Report unplotted sources
+*  Report unplotted sources
       IF ( NREJ .GT. 0 ) THEN
         CALL MSG_SETI( 'NR', NREJ )
         CALL MSG_PRNT( '^NR objects fell outside the image bounds' )
       END IF
 
-*    Release files
-      CALL USI_ANNUL( 'LIST', STATUS )
-      CALL USI_ANNUL( 'INP', STATUS )
+*  Release files
+      CALL USI_CANCL( 'LIST', STATUS )
+      CALL USI_CANCL( 'INP', STATUS )
 
-*    Shutdown sub-systems
+*  Shutdown sub-systems
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 

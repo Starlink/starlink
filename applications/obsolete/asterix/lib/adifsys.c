@@ -100,7 +100,7 @@ ADIobj adix_setlnk( ADIobj id, ADIobj lid, char *clist, int clen,
   rval = adix_execi( DnameSetLink, 2, args, status );
 
 /* Did the SetLink method return an alternative left hand data object? */
-  if ( _valid_q(rval) ) {
+  if ( _valid_q(rval) && _ok(status) ) {
 
 /* The alternative supplied must be be derived from our original l.h.s */
 /* or must be present in the supplied list of class names */
@@ -120,6 +120,13 @@ ADIobj adix_setlnk( ADIobj id, ADIobj lid, char *clist, int clen,
       rval = ADI__nullid;
       }
     }
+
+/* No method errors result in a retry */
+  else if ( *status == ADI__NOMTH ) {
+    *status = ADI__RETRY;
+    rval = id;
+    }
+
   else
     rval = id;
 
