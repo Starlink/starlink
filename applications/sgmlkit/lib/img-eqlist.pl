@@ -46,10 +46,10 @@ $eqcount = '001';
 
 %eqtypes = ( 'start-inline' => '$',
 	     'end-inline' => '$',
-	     'start-equation' => '\[',
-	     'end-equation' => '\]',
-	     'start-eqnarray' => '\begin{eqnarray*}',
-	     'end-eqnarray' => '\end{eqnarray*}',
+	     'start-equation' => '\begin{equation}',
+	     'end-equation' => '\end{equation}',
+	     'start-eqnarray' => '\begin{eqnarray}',
+	     'end-eqnarray' => '\end{eqnarray}',
 	     );
 
 open (EQIN, "$infile")
@@ -60,8 +60,33 @@ open (LATEXOUT, ">$filenameroot.imgeq.tex")
     || die "Can't open $filenameroot.imgeq.tex to write";
 
 print LATEXOUT <<'EOT';
-\documentclass{minimal}
+\documentclass[fleqn]{article}
 \pagestyle{empty}
+\mathindent=2cm
+\makeatletter
+\newif\if@SetEqnNum\@SetEqnNumfalse
+\def\SetEqnNum#1{\global\def\Eqn@Number{#1}\global\@SetEqnNumtrue}
+%\def\@eqnnum{{\normalfont \normalcolor (\Eqn@Number)}}
+% leqno:
+\def\@eqnnum{\if@SetEqnNum 
+    \hb@xt@.01\p@{}%
+    \rlap{\normalfont\normalcolor
+      \hskip -\displaywidth(\Eqn@Number)}
+    \global\@SetEqnNumfalse
+  \else
+    \relax
+  \fi}
+%\def\equation{$$}
+%\def\endequation{\if@SetEqnNum\eqno \hbox{\@eqnnum}\global\@SetEqnNumfalse\fi 
+%    $$\@ignoretrue}
+\def\@@eqncr{\let\reserved@a\relax
+    \ifcase\@eqcnt \def\reserved@a{& & &}\or \def\reserved@a{& &}%
+     \or \def\reserved@a{&}\else
+       \let\reserved@a\@empty
+       \@latex@error{Too many columns in eqnarray environment}\@ehc\fi
+     \reserved@a \if@SetEqnNum\@eqnnum\global\@SetEqnNumfalse\fi
+     \global\@eqcnt\z@\cr}
+\makeatother
 \begin{document}
 EOT
 
@@ -84,14 +109,19 @@ while (defined($line = <EQIN>)) {
 	} else {
 	    $eqn =~ s/\s+$//s;
 	    print LATEXOUT $eqtypes{'start-'.$eqtype} .
-		$eqn . $eqtypes{'end-'.$eqtype} . "\n\\special{dvi2bitmap outputfile $outfilename}\n\\newpage\n";
+		$eqn . $eqtypes{'end-'.$eqtype} .
+		    "\n\\special{dvi2bitmap outputfile $outfilename}\n\\newpage\n";
 	    print SGMLOUT "<img-eq label='$label' sysid='$outfilename'>\n";
 	    $checklist{$checksum} = $outfilename;
 	    $eqcount++;
 	}
 	$eqn = '';
+    } elsif ($line =~ /^%%eqno/) {
+	chop ($line);
+	($dummy,$eqno) = split (/ /, $line);
+	$eqn .= "\\SetEqnNum{$eqno}";
     } else {
-	$eqn .= $line;
+	$eqn .= $line unless ($line =~ /^\s*$/);
     }
 }
 print LATEXOUT "\\end{document}\n";
