@@ -114,6 +114,7 @@
       CHARACTER*(DAT__SZLOC)	ACLOC			! ARRAY component
       CHARACTER*(DAT__SZTYP)	ATYPE			! Actual array type
       CHARACTER*(DAT__SZTYP)	HTYPE			! HDS style type name
+      CHARACTER*3		MMODE			! Mapping mode
       CHARACTER*(DAT__SZLOC)	SLOC			! Locator to save
       CHARACTER*10		VARNT			! Array variant name
 
@@ -123,7 +124,6 @@
       INTEGER			FPTR			! Mapped file object
       INTEGER			NDIM			! Array dimensionality
 
-      LOGICAL			ISDYN			! Mapping is dynamic?
       LOGICAL			PRIM			! Object is primitive?
 *.
 
@@ -131,7 +131,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Defaults
-      ISDYN = MAPDYN
+      MMODE = 'loc'
       FPTR = 0
       SLOC = DAT__NOLOC
 
@@ -233,7 +233,7 @@
           CALL ARR_REG1T( HTYPE, BASE, SCALE, NELM, %VAL(PTR), STATUS )
 
 *      Data is dynamic
-          ISDYN = .TRUE.
+          MMODE = 'dyn'
 
 *      Clone a copy of the locator for mapping
           CALL DAT_CLONE( LOC, SLOC, STATUS )
@@ -249,8 +249,8 @@
       END IF
 
 *  Store details in private store
-      CALL BDI1_STOMAP( PSID, ISDYN, SLOC, FPTR, PTR, TYPE,
-     :                  NELM, MODE, STATUS )
+      CALL BDI1_STOMAP( PSID, MMODE, SLOC, FPTR, PTR, NELM, 0, TYPE,
+     :                  MODE, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_ARYMAP', STATUS )

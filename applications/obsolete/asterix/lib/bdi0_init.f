@@ -162,17 +162,17 @@
      :       'FileItemUnmap(_,_HDSfile,_CHAR,_INTEGER)',
      :                   BDI1_UNMAP, DID, STATUS )
 
-        CALL ADI_DEFFUN(
-     :       'FileItemMap(_BinDS,_HDSfile,"Error",_CHAR,_CHAR)',
-     :                   BDI1_MAPERR, DID, STATUS )
+c        CALL ADI_DEFFUN(
+c     :       'FileItemMap(_BinDS,_HDSfile,"Error",_CHAR,_CHAR)',
+c     :                   BDI1_MAPERR, DID, STATUS )
 
-        CALL ADI_DEFFUN(
-     :    'FileItemMap(_BinDS,_HDSfile,"LogicalQuality",_CHAR,_CHAR)',
-     :                   BDI1_MAPLQ, DID, STATUS )
+c        CALL ADI_DEFFUN(
+c     :    'FileItemMap(_BinDS,_HDSfile,"LogicalQuality",_CHAR,_CHAR)',
+c     :                   BDI1_MAPLQ, DID, STATUS )
 
-        CALL ADI_DEFFUN(
-     :    'FileItemMap(_BinDS,_HDSfile,"MaskedQuality",_CHAR,_CHAR)',
-     :                   BDI1_MAPMQ, DID, STATUS )
+c        CALL ADI_DEFFUN(
+c     :    'FileItemMap(_BinDS,_HDSfile,"MaskedQuality",_CHAR,_CHAR)',
+c     :                   BDI1_MAPMQ, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemPut(_,_HDSfile,_CHAR,_)',

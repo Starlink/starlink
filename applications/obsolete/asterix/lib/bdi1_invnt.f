@@ -108,6 +108,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
+      INCLUDE 'QUAL_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
@@ -130,13 +131,12 @@
       CHARACTER*(DAT__SZLOC)	QLOC			! Quality array
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
 
-      CHARACTER*20		ITEM
-      CHARACTER*6		MODE
-      CHARACTER*7		TYPE
-
+      INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
       INTEGER			WPTR			! Workspace
+
+      BYTE			MASK			! Quality mask
 *.
 
 *  Check inherited global status.
@@ -209,10 +209,10 @@
           END IF
 
 *      Map the quality array
-          CALL DAT_MAPV( QLOC, '_UBYTE', 'READ', QPTR, NELM, STATUS )
+          CALL DAT_MAPV( QLOC, '_UBYTE', 'READ', PTR, NELM, STATUS )
 
 *      Copy bytes into workspace (which is 4 times bigger)
-          CALL ARR_COP1B( NELM, %VAL(QPTR), %VAL(WPTR), STATUS )
+          CALL ARR_COP1B( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *      Logical AND with the mask
           CALL BIT_AND1UB( NELM, %VAL(WPTR), MASK, STATUS )
