@@ -1,0 +1,16 @@
+version.dat
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+libtool
+pongo_mon
+pongohelp.shl
+*.lo
+*.ifc
+.libs
+starconf.status
+

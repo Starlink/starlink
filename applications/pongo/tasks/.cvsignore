@@ -1,0 +1,8 @@
+Makefile.in
+Makefile
+*.la
+*.lo
+*.ifc
+.libs
+starconf.status
+
