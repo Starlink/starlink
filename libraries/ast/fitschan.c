@@ -603,6 +603,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        In AIPSPPFromStore only get projection parameters values if there
 *        are some celestialaxes. Also allow CROTA to describe rotation of
 *        non-celestial axes (same for AIPSFromSTore).
+*     4-OCT-2004 (DSB):
+*        Correct rounding of CRPIX in AddVersion to avoid integer overflow.
 *class--
 */
 
@@ -1666,7 +1668,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
          crpix = GetItem( &(store->crpix), 0, iax, s, NULL, method, class );
          if( crpix != AST__BAD ) {   
             SetItem( &(store->crpix), 0, iax, s, 
-                     ((int)( crpix*1.0E6 + 0.5 ))*1.0E-6);
+                     floor( crpix*1.0E6 + 0.5 )*1.0E-6);
          }
       }
    }
@@ -24113,7 +24115,8 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
 
 /* Use SplitMap to get the required Mapings from the FrameSet. */
                tmap2 = astGetMapping( tfs, AST__BASE, AST__CURRENT );
-               SplitMap( tmap2, 0, 0, 1, &tmap1, map2, map3 );
+               SplitMap( tmap2, astGetInvert( tmap2 ), 0, 1, &tmap1, map2, 
+                         map3 );
                tmap1 = astAnnul( tmap1 );
                tmap2 = astAnnul( tmap2 );
                
