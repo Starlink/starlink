@@ -84,4 +84,14 @@ interface POLSTACK
       helpkey  '*'
    endparameter
 
+   parameter TWOPI
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Bin analysis angles in range 0 to 360 degrees?'
+      default  FALSE
+      helpkey  '*'
+   endparameter
+
 endinterface

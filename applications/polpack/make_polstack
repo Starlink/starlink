@@ -5,12 +5,12 @@ prm_dev
 hds_dev
 ndf_dev
 
-f77 -c pol1_stkim.f
-f77 -c pol1_stknm.f
-f77 -c pol1_stksm.f
-f77 -c pol1_srtim.f
+f77 -c -g pol1_stkim.f
+f77 -c -g pol1_stknm.f
+f77 -c -g pol1_stksm.f
+f77 -c -g pol1_srtim.f
 
-alink polstack.f pol1_stkim.o pol1_stknm.o pol1_stksm.o pol1_srtim.o \
+alink -xdbx polstack.f pol1_stkim.o pol1_stknm.o pol1_stksm.o pol1_srtim.o \
       -L$INSTALL/lib -L$INSTALL/polpack -L/star/sources/kappa -lpolpack -lndg \
       -lkapgen -lira -lfits `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
       `cat_link_adam`

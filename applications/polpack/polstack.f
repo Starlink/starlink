@@ -39,10 +39,10 @@
 *     bin extends from analysis angle 0.0 (i.e. the output reference
 *     direction) to the value given by BIN. The second bin extends from BIN 
 *     to 2*BIN, etc. The number of bins used is chosen so that they cover a 
-*     range of 0 to 180 degrees (if the last bin extends beyond 180 degrees 
-*     it is not used). Input images with analysis angles outside the range 0 
-*     to 180 are mapped into the range 0 to 180 degrees by subtracting (or 
-*     adding) a multiple of 180 degrees.
+*     range of 0 to 180 degrees (but see parameter TWOPI). If the last bin 
+*     extends beyond 180 degrees it is not used. Input images with analysis 
+*     angles outside the range 0 to 180 are mapped into the range 0 to 180 
+*     degrees by subtracting (or adding) a multiple of 180 degrees.
 *
 *     An output image is produced for each bin containing more than the
 *     minimum required number of images specified by parameter MININ. The
@@ -95,6 +95,12 @@
 *        plane is stored in the Axis structure for axis 3. No POLPACK
 *        extension is created. The stack is not created if a null (!) 
 *        value is supplied. [!]
+*     TWOPI = _LOGICAL (Read)
+*        If TRUE, then the range of analysis angles covered by the bins
+*        is 0 to 360 degrees, instead of 0 to 180 degrees. If this option
+*        is selected, analysis angles outside the range 0 to 360 degrees 
+*        are folded back into the range by adddition or subtraction of a 
+*        multiple of 360 degrees. [FALSE]
 
 *  Notes:
 *     -  Any transmission (T) or efficiency (EPS) values in the POLPACK
@@ -123,6 +129,8 @@
 *  History:
 *     25-MAY-1999 (DSB):
 *        Original version.
+*     26-MAY-1999 (DSB):
+*        Added TWOPI parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -160,8 +168,10 @@
       INTEGER TLEN               ! Length of formated integer
       INTEGER UBND( 3 )          ! Upper pixel bounds for output stack
       LOGICAL QUIET              ! Suppress screen output?
+      LOGICAL TWOPI              ! Bin over range 0 to 360 degrees?
       REAL ANGRT                 ! ACW angle from +ve X to o/p ref. direction
       REAL BIN                   ! Bin size
+      REAL RANGE                 ! Range of binning, in degrees
 *.
 
 *  Check inherited global status.
@@ -196,9 +206,17 @@
 *  Get the minimum number of input images for an output image.
       CALL PAR_GDR0I( 'MININ', 3, 1, NNDF, .FALSE., MININ, STATUS )
 
+*  See if the binning range is 0 to 180, or 0 to 360.
+      CALL PAR_GET0L( 'TWOPI', TWOPI, STATUS )
+      IF( TWOPI ) THEN
+         RANGE = 360.0
+      ELSE
+         RANGE = 180.0
+      END IF
+
 *  Get the bin size.
       CALL PAR_GET0R( 'BIN', BIN, STATUS )
-      BIN = MAX( 1.0, MIN( 180.0, ABS( BIN ) ) )
+      BIN = MAX( 1.0, MIN( RANGE, ABS( BIN ) ) )
       IF( .NOT. QUIET ) THEN
          CALL MSG_SETR( 'BIN', BIN )
          CALL MSG_OUT( ' ', '  Using bin size ^BIN degrees',
@@ -206,7 +224,7 @@
       END IF
 
 *  Store number of bins.
-      NBIN = INT( 180.0/BIN )
+      NBIN = INT( RANGE / BIN )
 
 *  Allocate an array in which to store a list of the input NDFs
 *  contributing to each output NDF, plus output pixel bounds.
@@ -218,7 +236,7 @@
 
 *  Fill this array, and find the number of output NDFs required and the
 *  output reference direction.
-      CALL POL1_SRTIM( MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, 
+      CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, 
      :                 %VAL( IPW1 ), NOUT, %VAL( IPPHI), LBND, UBND,
      :                 STATUS )
 

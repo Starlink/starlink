@@ -1,5 +1,6 @@
-      SUBROUTINE POL1_SRTIM( MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, WORK, 
-     :                       NOUT, PHI, LBND, UBND, STATUS )
+      SUBROUTINE POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, BIN, 
+     :                       ANGRT, WORK, NOUT, PHI, LBND, UBND, 
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_SRTIM
@@ -12,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SRTIM( MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, WORK, NOUT, 
-*                      PHI, LBND, UBND, STATUS )
+*     CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, 
+*                      WORK, NOUT, PHI, LBND, UBND, STATUS )
 
 *  Description:
 *     This routine identifies the analysis angle bin to which each 
@@ -21,6 +22,9 @@
 *     include in each output NDF.
 
 *  Arguments:
+*     RANGE = REAL (Given)
+*        The upper limit of the binning range. Should be either 180.0 or
+*        360.0.
 *     MININ = INTEGER (Given)
 *        The minimum number of input NDFs required to produce an output
 *        NDF.
@@ -66,6 +70,8 @@
 *  History:
 *     25-MAY-1999 (DSB):
 *        Original version.
+*     26-MAY-1999 (DSB):
+*        Added RANGE argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +88,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
+      REAL RANGE
       INTEGER MININ
       INTEGER IGRP1
       INTEGER NNDF
@@ -221,9 +228,9 @@
             IF( RAY .EQ. 'E' ) PHI( I ) = PHI( I ) + 90.0
          END IF           
 
-*  Map the analysis angle into the range 0 to 180.
-         PHI( I ) = PHI( I ) - 180.0*INT( PHI( I )/180.0 )
-         IF( PHI( I ) .LT. 0.0 ) PHI( I ) = PHI( I ) + 180.0
+*  Map the analysis angle into the range 0 to RANGE.
+         PHI( I ) = PHI( I ) - RANGE*INT( PHI( I )/RANGE )
+         IF( PHI( I ) .LT. 0.0 ) PHI( I ) = PHI( I ) + RANGE 
 
 *  Find the index of the bin which encompasses this analysis angle.
          IBIN = 1 + INT( PHI( I ) / BIN )
