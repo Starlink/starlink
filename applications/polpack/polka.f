@@ -734,7 +734,7 @@
       IF( POL ) THEN
          CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
          CALL CHR_UCASE( MODE )
-         CALL PAR_PUT0C( 'MODE', MODE, STATUS )
+         CALL PAR_PUT0C( 'PMODE', MODE, STATUS )
       END IF
 
 *  Delete the groups.
