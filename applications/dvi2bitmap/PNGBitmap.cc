@@ -6,6 +6,12 @@
 
 // $Id$
 
+// TO DO: Support transparency.  That might involve using an alpha
+// channel rather than simply setting a transparent pixel (which looks
+// wrong when combined with some smoothing).  That in turn might
+// require using a greyscale palette, which might make things more
+// complicated still.  Sigh....
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
