@@ -614,7 +614,7 @@ f     - Title: The Plot title drawn using AST_GRID
 *  Parameters:
 *     attr
 *        The name of the attribute to be cleared, as it appears in the function
-*        name (e.g. Label in "astClearLabelAt").
+*        name (e.g. LabelAt in "astClearLabelAt").
 *     component
 *        The name of the class structure component that holds the attribute
 *        value.
@@ -799,7 +799,7 @@ type astGet##attr##_( AstPlot *this, int axis ) { \
 *  Parameters:
 *      attr
 *         The name of the attribute to be set, as it appears in the function
-*         name (e.g. Label in "astSetLabelAt").
+*         name (e.g. LabelAt in "astSetLabelAt").
 *      type
 *         The C type of the attribute.
 *      component
@@ -888,7 +888,7 @@ void astSet##attr##_( AstPlot *this, int axis, type value ) { \
 *  Parameters:
 *      attr
 *         The name of the attribute to be tested, as it appears in the function
-*         name (e.g. Label in "astTestLabelAt").
+*         name (e.g. LabelAt in "astTestLabelAt").
 *      assign
 *         An expression that evaluates to 0 or 1, to be used as the returned
 *         value. This can use the string "axis" to represent the zero-based
