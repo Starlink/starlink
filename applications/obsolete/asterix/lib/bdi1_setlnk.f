@@ -206,8 +206,14 @@
               DO I = 1, NDIM
                 CALL DAT_CELL( AXLOC, 1, I, AXCLOC, STATUS )
                 CALL DAT_FIND( AXCLOC, 'DATA_ARRAY', AXDLOC, STATUS )
-                CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP,
-     :                            STATUS )
+                IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP,
+     :                              STATUS )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                    CALL ERR_ANNUL( STATUS )
+                    DIMS(I) = 1
+                  END IF
+                END IF
                 CALL DAT_ANNUL( AXDLOC, STATUS )
                 CALL DAT_ANNUL( AXCLOC, STATUS )
               END DO
