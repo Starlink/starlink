@@ -44,6 +44,8 @@
 #           SUN Sparcstations running SunOS (4.x)
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
+#        ix86_Linux
+#           Intel work stations running RedHat Linux
 #
 #     This script will exit without action if the SYSTEM environment
 #     variable is not defined. A warning will be issued if it is
@@ -155,6 +157,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     PDRAPER: P.W. Draper (Starlink, Durham University)
 #     HME: Horst Meyerdierks (UoE, Starlink)
+#     TIMJ: Tim Jenness (JAC, Hilo)
 #     {enter_new_authors_here}
 
 #  History:
@@ -168,6 +171,8 @@
 #        Added the ALINK environment variable.
 #     29-JUN-1994 (HME):
 #        Added the TAR_ADD environment variable.
+#     15-Dec-1999 (TIMJ):
+#        Added Linux
 #     {enter_changes_here}
 
 #  Bugs:
@@ -256,6 +261,23 @@
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
                TAR_ADD='tar -rvhf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+               CC='gcc'
+               CFLAGS='-I$(STAR_INC) -O'
+               FC='g77'
+               FFLAGS='-fno-second-underscore -O'
+               LINK='ln -s'
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 

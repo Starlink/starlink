@@ -1,0 +1,6 @@
+1999-12-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* gsd2_ix86_Linux.h: Added
+
+	* mk: Add ix86_Linux
+
