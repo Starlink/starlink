@@ -57,7 +57,7 @@ dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).  Check if we've got sstream; if not, hope we have the
 dnl   older strstream.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sstream strstream)
+AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sys/wait.h signal.h sstream strstream)
 AC_HEADER_STAT
 
 dnl   Checks for library functions
