@@ -162,6 +162,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Fixed unterminated comment causing problems in CombineMaps.
 *     6-APR-1998 (RFWS):
 *        Fixed another unterminated comment in CombineMaps.
+*     27-MAY-1998 (RFWS):
+*        Fixed bug: failure to record new invert flag value after
+*        simplifying a CmpMap in TidyNodes.
 *class--
 */
 
@@ -6366,7 +6369,7 @@ static void TidyNodes( AstFrameSet *this ) {
 
 /* Install the new compound Mapping and its Invert flag. */
                this->map[ next - 1 ] = newmap;
-               this->invert[ next - 1 ] = 0;
+               this->invert[ next - 1 ] = astGetInvert( newmap );
 
 /* Transfer the "link" value from the removed node to the one which
    takes its place. */
