@@ -241,18 +241,6 @@
 *       scroll. The C key performs a quick re-centre, cancelling any
 *       zoom and scroll. The Q key aborts the routine.
 *
-*     - Display restrictions.
-*
-*        PAIRNDF will only work on PseudoColor X displays; this means
-*        that it cannot be used on the displays of most newer Linux 
-*        machines as normally configured.  If an attempt is made to
-*        do so, then the warning:
-*
-*           !! Window has unsupported visual type
-*
-*        will be emitted; attempting to proceed may result in a core
-*        dump.
-*
 *     - NDF extension items. 
 *
 *       On exit the CURRENT_LIST items in the CCDPACK extensions
@@ -304,6 +292,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -319,6 +308,8 @@
 *        Increased centroid control parameters to scale with 
 *        image size. Large images generally have their initial centroids
 *        badly positioned.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -437,7 +428,7 @@
       INTEGER NX                ! Number of smalls images in X
       INTEGER NY                ! Number of smalls images in Y
       INTEGER OFFS( CCD1__MXNDF+ 1 ) ! Offsets into extended lists
-      INTEGER OUTGRP            ! Output IRH group identifier
+      INTEGER OUTGRP            ! Output group identifier
       INTEGER PENS( 1 )         ! Number of pens in display
       INTEGER RIGHT             ! Index of right-hand image
       INTEGER SPAN              ! Length of marking cross span
@@ -662,7 +653,7 @@
       XLARGE = 0
       YLARGE = 0
       DO 2 I = 1, NNDF
-         CALL IRG_NDFEX( NDFGR, I, NDFID1, STATUS )
+         CALL NDG_NDFAS( NDFGR, I, 'READ', NDFID1, STATUS )
 
 *  Get its bounds.
          CALL NDF_BOUND( NDFID1, 2, LBND( 1, I ), UBND1, NVAL, STATUS )
@@ -778,7 +769,7 @@
 *  Access this NDF, then resample it and rescale it. Map in its data
 *  component. Determine the data range to display. Resample it and
 *  rescale it. Get its name.  First get the NDF identifier.
-               CALL IRG_NDFEX( NDFGR, NDISP, NDFID1, STATUS )
+               CALL NDG_NDFAS( NDFGR, NDISP, 'READ', NDFID1, STATUS )
   
 *  Determine the data type of the data component.
                CALL NDF_TYPE( NDFID1, 'Data', ITYPE1, STATUS )
@@ -994,14 +985,14 @@
      :                         STATUS )
 
 *  Access the real NDF data for centroiding. First the left.
-               CALL IRG_NDFEX( NDFGR, LEFT, NDFID1, STATUS )
+               CALL NDG_NDFAS( NDFGR, LEFT, 'READ', NDFID1, STATUS )
                CALL NDF_TYPE( NDFID1, 'Data', ITYPE1, STATUS )
                CALL NDF_MAP( NDFID1, 'Data', ITYPE1, 'READ',
      :                       IPDAT1, EL, STATUS )
                CALL NDF_BAD( NDFID1, 'Data', .FALSE., BAD, STATUS )
 
 *  Now the right.
-               CALL IRG_NDFEX( NDFGR, RIGHT, NDFID2, STATUS )
+               CALL NDG_NDFAS( NDFGR, RIGHT, 'READ', NDFID2, STATUS )
                CALL NDF_TYPE( NDFID2, 'Data', ITYPE2, STATUS )
                CALL NDF_MAP( NDFID2, 'Data', ITYPE2, 'READ',
      :                       IPDAT2, EL, STATUS )
@@ -1241,7 +1232,7 @@
 *  to them.
       DO 12 I = 1, NNDF
          IF ( NOUT( I ) .GT. 0 ) THEN 
-            CALL IRH_GET( OUTGRP, I, 1, FNAME, STATUS )
+            CALL GRP_GET( OUTGRP, I, 1, FNAME, STATUS )
             CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO( I ),
      :                     STATUS )
             CALL CCD1_FIOHD( FDO( I ), 'Output from PAIRNDF', STATUS )
@@ -1251,7 +1242,7 @@
             CALL FIO_CLOSE( FDO( I ), STATUS )
 
 *  Store the names of the positions lists in the NDF extensions
-            CALL IRG_NDFEX( NDFGR, I, NDFID1, STATUS )
+            CALL NDG_NDFAS( NDFGR, I, 'UPDATE', NDFID1, STATUS )
             CALL CCG1_STO0C( NDFID1, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Close the NDF.
@@ -1285,8 +1276,9 @@
       CALL CCD1_MFREE( -1, STATUS )
       CALL CCD1_FRTMP( -1, STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( NDFGR, STATUS )
+      CALL GRP_DELET( OUTGRP, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

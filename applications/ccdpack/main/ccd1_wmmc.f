@@ -31,13 +31,13 @@
 *     should match some of the frame types in FTYPES.
 *
 *     The FTYPES argument is an array which contains the frame types
-*     of each of the NDFs (IRG group GID) and the filter type (if
+*     of each of the NDFs (GRP group GID) and the filter type (if
 *     appropriate). The filter types (FILT) is only used when the TYPE
 *     is FLAT. This extracts only the flatfields with the correct filter
 *     type. If the IRFLAT parameter is TRUE then suitable TARGET frames 
 *     will be used if no FLATs are located.
 *
-*     GID is an IRG group identifier (for all the FTYPES entries), the
+*     GID is a GRP group identifier (for all the FTYPES entries), the
 *     names of NDFs are extracted from this and written into a
 *     temporary file which is read using indirection.
 *
@@ -78,7 +78,7 @@
 *        The frame and filter types of the input NDFs. (1,*) are the
 *        frame types, (2,*) are the filters (if used).
 *     GID = INTEGER (Given)
-*        IRG group identifier. This group contains the names of the
+*        GRP group identifier. This group contains the names of the
 *        NDFs.
 *     IRFLAT = LOGICAL (Given)
 *        Whether or not TARGET frames may be used to flatfield.  This 
@@ -105,6 +105,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,8 @@
 *        Now flags frames by setting VALID false for those selected.
 *     10-NOV-1995 (PDRAPER):
 *        Added IRFLAT for IR data reductiions.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,8 +132,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_PAR'          ! FIO parameters
-      INCLUDE 'IRH_PAR'          ! IRH parameters
       INCLUDE 'MSG_PAR'          ! Message system parameters
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       LOGICAL LIST
@@ -164,8 +167,10 @@
                                  ! blanks
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       CHARACTER * ( MSG__SZMSG ) MESS ! Output buffer
+      CHARACTER COMC             ! GRP comment character
+      CHARACTER INDC             ! GRP indirection character
       INTEGER FDTMP              ! Temporary file descriptor
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position within string
@@ -210,6 +215,10 @@
          TEMP = ' '
          CALL CCD1_TMPNM( PROG, TEMP( 2: ), STATUS )
 
+*  Get required GRP control characters.
+         CALL GRP_GETCC( GID, 'COMMENT', COMC, STATUS )
+         CALL GRP_GETCC( GID, 'INDIRECTION', INDC, STATUS )
+
 *  Open the file.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          OPEN = .FALSE.
@@ -217,7 +226,7 @@
      :                    STATUS )
          IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
          MESS = ' '
-         MESS = IRH__COMC // ' List of names used by '
+         MESS = COMC // ' List of names used by '
      :          // PROG( :CHR_LEN( PROG ) )
          CALL FIO_WRITE( FDTMP, MESS( :CHR_LEN( MESS ) ), STATUS )
 
@@ -225,7 +234,7 @@
 *  element and write these into the file.
          DO 1 I = 1, NFRMS
             NDFNAM = ' '
-            CALL IRH_GET( GID, PTEMP( I ), 1, NDFNAM, STATUS )
+            CALL GRP_GET( GID, PTEMP( I ), 1, NDFNAM, STATUS )
             IAT = CHR_LEN( NDFNAM )
             CALL FIO_WRITE( FDTMP, NDFNAM( :IAT ), STATUS )
 
@@ -251,7 +260,7 @@
          LCONT = CHR_LEN( CONTIN )
 
 *  Now add the input file specifier.
-         TEMP( 1: 1 ) = IRH__INDC
+         TEMP( 1: 1 ) = INDC
          IAT = 3
          MESS = ' '
          CALL CCD1_ADKEY( 'IN', TEMP, USEPRO, PROTEC, MESS, IAT,

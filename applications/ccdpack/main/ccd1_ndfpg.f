@@ -13,7 +13,7 @@
 *     CALL CCD1_NDFPG( NAME, GIDIN, NVALS, GIDOUT, STATUS )
 
 *  Description:
-*     The routine calls the IRG package routine IRG_CREAT to create
+*     The routine calls the NDG package routine NDG_CREAT to create
 *     a group of output NDF names. The group GIDIN is used as a
 *     modification group on which to base the output names. I.e.
 *     *_tmp means that all the output NDFs are to have the same names as
@@ -26,7 +26,7 @@
 *        The name of the ADAM parameter to be used for accessing the
 *        input data string.
 *     GIDIN = INTEGER (Given)
-*        The IRG group identifier of the NDFs to be used as modification
+*        The NDG group identifier of the NDFs to be used as modification
 *        elements for the output group.
 *     NVALS = INTEGER (Given)
 *        The number of NDF names required for the output group (same as
@@ -38,11 +38,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-JUL-1991 (PDRAPER):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -55,9 +58,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRG_FAC'          ! IRG and IRH system status constants
       INCLUDE 'PAR_ERR'          ! Parmeter system error codes
       INCLUDE 'FIO_ERR'          ! FIO system status values
+      INCLUDE 'GRP_PAR'          ! Standard GRP system constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -79,6 +83,7 @@
       INTEGER NTRY               ! Number of attempts to get prompt
                                  ! right quit after 10, probably batch
                                  ! job in error.
+      INTEGER ONNDF              ! Number of NDFs at last iteration
 
 *.
 
@@ -86,13 +91,14 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the names of the output NDFs.
-      GIDOUT = IRH__NOID
+      GIDOUT = GRP__NOID
+      NNDF = 0
       NTRY = 0
  1    CONTINUE
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRG_CREAT( NAME, GIDIN, '-', GIDOUT, NNDF, ADDED, TERM,
-     :                   STATUS )
+         ONNDF = NNDF
+         CALL NDG_CREAT( NAME, GIDIN, GIDOUT, NNDF, TERM, STATUS )
+         ADDED = NNDF - ONNDF
 
 *  Get out if a given a par_abort. Also quit after an unreasonble
 *  number of attempts.
@@ -119,8 +125,9 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GIDOUT, STATUS )
-             GIDOUT = IRH__NOID
+             CALL GRP_DELET( GIDOUT, STATUS )
+             GIDOUT = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -132,8 +139,9 @@
      :                     'NDF names - try again', STATUS )
 
 *  and try again.
-             CALL IRH_ANNUL( GIDOUT, STATUS )
-             GIDOUT = IRH__NOID
+             CALL GRP_DELET( GIDOUT, STATUS )
+             GIDOUT = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -144,19 +152,17 @@
             CALL PAR_CANCL( NAME, STATUS )
             AGAIN = .TRUE.
 
-*  Status may have been set by IRG for a good reason.. check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
-     :   THEN
+*  Status may have been set by NDG for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
 
 *  Issue the error.
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL IRH_ANNUL( GIDOUT, STATUS )
-            GIDOUT = IRH__NOID
+            CALL GRP_DELET( GIDOUT, STATUS )
+            GIDOUT = GRP__NOID
+            NNDF = 0
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )
@@ -164,7 +170,7 @@
 *  Try to trap a special case of ' ' string return. This should leave
 *  added unmodified. This will be taken as a request to exit. The normal
 *  stop entry request from an blank line will be `!' .
-         ELSE IF ( ( ADDED .EQ. -1 ) .AND. ( .NOT. TERM ) ) THEN
+         ELSE IF ( ( ADDED .EQ. 0 ) .AND. ( .NOT. TERM ) ) THEN
             AGAIN = .FALSE.
 
 *  If status is set to par__null then reset status, note that this is

@@ -60,7 +60,7 @@
 *        The frame and filter types of the input NDFs. (1,*) are the
 *        frame types, (2,*) are the filters.
 *     GIDIN = INTEGER (Given)
-*        IRG identifier of the input group of NDF names. On exit the
+*        GRP identifier of the input group of NDF names. On exit the
 *        group is modified so that the names of the NDFs output from
 *        the call produced by this routine are present instead of
 *        original input names.
@@ -82,6 +82,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +95,8 @@
 *     16-APR-1997 (PDRAPER):
 *        Changed to accomodate foreign file formats and slices. 
 *        Note this now uses IRG1_ routines!
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,8 +110,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message system parameters
-      INCLUDE 'IRH_PAR'          ! IRH parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       LOGICAL LIST
@@ -141,9 +144,11 @@
 
 *  Local Variables:
       CHARACTER * ( MSG__SZMSG ) MESS ! Output buffer
-      CHARACTER * ( IRH__SZNAM ) NDFNAM ! Name of NDF
-      CHARACTER * ( IRH__SZNAM ) OUT ! Output NDFs specification
-      CHARACTER * ( IRH__SZNAM ) TMPNAM ! Temorary name
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) OUT ! Output NDFs specification
+      CHARACTER * ( GRP__SZNAM ) TMPNAM ! Temorary name
+      CHARACTER COMC            ! GRP comment character
+      CHARACTER INDC            ! GRP indirection character
       INTEGER START             ! Position in string
       INTEGER IAT               ! Position in string
       INTEGER I                 ! Loop variable
@@ -205,13 +210,17 @@
          CALL CCD1_OPFIO( TEMP( 2: ), 'WRITE', 'LIST', 0, FDTMP,
      :                    STATUS )
          IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
-         MESS = IRH__COMC // ' List of names used by ' // PROG
+         MESS = COMC // ' List of names used by ' // PROG
          CALL FIO_WRITE( FDTMP, MESS( :CHR_LEN( MESS ) ), STATUS )
+
+*  Get required GRP control characters.
+         CALL GRP_GETCC( GIDIN, 'COMMENT', COMC, STATUS )
+         CALL GRP_GETCC( GIDIN, 'INDIRECTION', INDC, STATUS )
 
 *  Now extract the name of the NDFs and write these into the file.
          DO 3 I = 1, NFRAME
             NDFNAM = ' '
-            CALL IRH_GET( GIDIN, POINT( I ), 1, NDFNAM, STATUS )
+            CALL GRP_GET( GIDIN, POINT( I ), 1, NDFNAM, STATUS )
 
 *  List the names of the NDFs using the logging system if requested
             IAT = CHR_LEN( NDFNAM )
@@ -228,9 +237,9 @@
 *  modify the name so that the trailing componeny comes before
 *  the extension (this happens when using foreign formats).
             TMPNAM = ' '
-            CALL IRG1_SLICE( NDFNAM( :IAT ), TMPNAM, START, STATUS )
+            CALL CCD1_SLICE( NDFNAM( :IAT ), TMPNAM, START, STATUS )
             TMPNAM = ' '
-            CALL IRG1_FSPEC( NDFNAM( :START ), ' ', 'TYPE', TMPNAM, 
+            CALL CCD1_FSPEC( NDFNAM( :START ), ' ', 'TYPE', TMPNAM, 
      :                       STATUS )
             IF ( TMPNAM .NE. ' ' ) THEN 
                START = INDEX( NDFNAM( :START ), 
@@ -239,7 +248,7 @@
             TMPNAM = ' '
             CALL CCD1_INSER( TRAIL( :CHR_LEN( TRAIL ) ), NDFNAM( :IAT ), 
      :                       START, TMPNAM, STATUS )
-            CALL IRH_PUT( GIDIN, 1, TMPNAM, POINT( I ), STATUS )
+            CALL GRP_PUT( GIDIN, 1, TMPNAM, POINT( I ), STATUS )
  3       CONTINUE
 
 *  Close the temporary file.
@@ -255,7 +264,7 @@
 *  Now the input and output file specifiers.
          IAT = 3
          MESS = ' '
-         TEMP( 1: 1 ) = IRH__INDC
+         TEMP( 1: 1 ) = INDC
          CALL CCD1_ADKEY( 'IN', TEMP, USEPRO, PROTEC, MESS, IAT,
      :                    STATUS )
          TEMP( 1: 1 ) = ' '

@@ -16,28 +16,28 @@
 *                     STATUS)
 
 *  Description:
-*     This routine intercepts an IRH group from the user and interprets
+*     This routine intercepts a GRP group from the user and interprets
 *     its contents as a list of NDF names together with its frame type,
 *     filter type, dark time and pre-flash exposure. Filters are
 *     relevant to target and flatfields, exposures to darks or
 *     flashes. A null (!)  character for any of the final three fields
 *     is accepted and will mean that they are ignored. The input from
-*     the user is an IRH group with all these five fields present for
+*     the user is a GRP group with all these five fields present for
 *     each NDF (hence this is really intended for use from a procedure
 *     were constructing such a list is not tedious). The outputs are an
-*     IRG group of NDFs, an IRH group of their frame types and a group
+*     NDG group of NDFs, a GRP group of their frame types and a group
 *     containing the filters a group containing the dark times and a
 *     group containing the flash times.
 
 *  Arguments:
 *     PROMPT = CHARACTER * ( * ) (Given)
-*        The prompt to use when getting the IRH group from the user.
+*        The prompt to use when getting the GRP group from the user.
 *     NDFS = INTEGER (Returned)
-*        An IRG group identifier for the NDFs.
+*        An NDG group identifier for the NDFs.
 *     NNDF = INTEGER (Returned)
 *        The number of NDFs given.
 *     FTYPES = INTEGER (Returned)
-*        An IRH identifier with a list of the NDF frame types.
+*        A GRP identifier with a list of the NDF frame types.
 *     FILT = INTEGER (Returned)
 *        Group of the NDF filter types. ! indicates none.
 *     DARK = INTEGER (Returned)
@@ -49,6 +49,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Original version.
 *     24-MAY-1994 (PDRAPER):
 *        Added dark and pre-flash arguments.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,8 +73,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       INCLUDE 'FIO_ERR'          ! FIO system error codes.
-      INCLUDE 'IRG_FAC'          ! IRG and IRH facility errors and parameters
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) PROMPT
@@ -88,7 +92,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER IDH1               ! Dummy IRH group
       INTEGER IDH2               ! Group of given names
       INTEGER NTRY               ! Number of tries
       INTEGER INDEX              ! Loop index
@@ -97,33 +100,33 @@
       LOGICAL AGAIN              ! Loop again or not.
       INTEGER ADDED              ! How many values have been added
       INTEGER NRET               ! Number of values returned
-      CHARACTER * ( IRH__SZNAM ) CURSTR ! Item read from group
+      CHARACTER * ( GRP__SZNAM ) CURSTR ! Item read from group
       
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access a number of character strings using IRH. These should
+*  Access a number of character strings using GRP. These should
 *  represent the NDF the frame type and the associated factor.
       NTRY = 0
-      IDH1 = IRH__NOID
-      CALL IRH_NEW( 'CCD1_PRINT:INPUT', IDH2, STATUS )
+      NRET = 0
+      CALL GRP_NEW( 'CCD1_PRINT:INPUT', IDH2, STATUS )
       RENEW = .FALSE.
  3    CONTINUE                   ! Start of DO UNTIL
 
 *  Create a new group to associate names with if this isn't the first
 *  time and a problem has occurred.
          IF ( RENEW ) THEN
-            CALL IRH_ANNUL( IDH2, STATUS )
-            CALL IRH_NEW( 'CCD1_PRINT:INPUT', IDH2, STATUS )
+            CALL GRP_DELET( IDH2, STATUS )
+            ADDED = -1
+            CALL GRP_NEW( 'CCD1_PRINT:INPUT', IDH2, STATUS )
             RENEW = .FALSE.
          END IF
 
 *  Get the user return.
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRH_GROUP( PROMPT, IDH1, IDH2, '-', NRET, ADDED, TERM,
+         CALL GRP_GROUP( PROMPT, GRP__NOID, IDH2, NRET, ADDED, TERM, 
      :                   STATUS )
 
 *  Get out if a null return has been given or a PAR__ABORT. Also quit
@@ -152,7 +155,6 @@
 
 *  Reset everything ready for next attempt.
             RENEW = .TRUE.
-            IDH1 = IRH__NOID
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( PROMPT, STATUS )
@@ -164,7 +166,6 @@
 
 *  Reset everything ready for next attempt.
             RENEW = .TRUE.
-            IDH1 = IRH__NOID
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( PROMPT, STATUS )
@@ -175,19 +176,15 @@
             AGAIN = .TRUE.
             CALL PAR_CANCL( PROMPT, STATUS )
 
-*  Status may have been set by IRH for a good reason. Check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
-     :   THEN
+*  Status may have been set by NDG for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
 
 *  Issue the error.
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
             RENEW = .TRUE.
-            IDH1 = IRH__NOID
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( PROMPT, STATUS )
@@ -214,7 +211,6 @@
 
 *  Reset everything ready for next attempt.
             RENEW = .TRUE.
-            IDH1 = IRH__NOID
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( PROMPT, STATUS )
@@ -228,59 +224,49 @@
 *  NDF types are entered into their own group as is the final field.
 
 *  Create a group consisting of only the NDF names.
-      CALL IRH_NEW( 'CCD1_PRINT:NDFS', NDFS, STATUS )
+      CALL GRP_NEW( 'CCD1_PRINT:NDFS', NDFS, STATUS )
       NNDF = 0 
       DO 4 INDEX = 1, NRET, 5
 
 *  Get the NDF name string.
-         CALL IRH_GET( IDH2, INDEX, 1, CURSTR, STATUS )
+         CALL GRP_GET( IDH2, INDEX, 1, CURSTR, STATUS )
 
 *  Enter this into the group.
-         CALL IRH_PUT( NDFS, 1, CURSTR, 0, STATUS )
+         CALL GRP_PUT( NDFS, 1, CURSTR, 0, STATUS )
          NNDF = NNDF + 1
  4    CONTINUE
 
-*  Now try to import this as an NDF group.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
-         CALL IRG_GIN( NDFS, .FALSE., 'UPDATE', STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-
-*  Error importing the NDFs, add a further error message.
-            CALL ERR_REP( 'CCD_PRIN2', 'NDF does not exist', STATUS )
-         END IF
-      END IF
-
 *  Now create a group for the NDF frame types.
-      CALL IRH_NEW( 'CCD1_PRIN:FTYPES', FTYPES, STATUS )
+      CALL GRP_NEW( 'CCD1_PRIN:FTYPES', FTYPES, STATUS )
 
 *  And extract the frame types.
       DO 5 INDEX = 2, NRET, 5
-         CALL IRH_GET( IDH2, INDEX, 1, CURSTR, STATUS )
+         CALL GRP_GET( IDH2, INDEX, 1, CURSTR, STATUS )
          CALL CHR_UCASE( CURSTR )
          CALL CHR_LDBLK( CURSTR )
-         CALL IRH_PUT( FTYPES, 1, CURSTR, 0, STATUS )
+         CALL GRP_PUT( FTYPES, 1, CURSTR, 0, STATUS )
  5    CONTINUE
 
 *  Extract the filter types.
-      CALL IRH_NEW( 'CCD1_PRIN:FILT', FILT, STATUS )
+      CALL GRP_NEW( 'CCD1_PRIN:FILT', FILT, STATUS )
       DO 6 INDEX = 3, NRET, 5
-         CALL IRH_GET( IDH2, INDEX, 1, CURSTR, STATUS )
+         CALL GRP_GET( IDH2, INDEX, 1, CURSTR, STATUS )
          CALL CHR_LDBLK( CURSTR )
-         CALL IRH_PUT( FILT, 1, CURSTR, 0, STATUS )
+         CALL GRP_PUT( FILT, 1, CURSTR, 0, STATUS )
  6    CONTINUE
 
 *  Extract the dark times.
-      CALL IRH_NEW( 'CCD1_PRIN:DARK', DARK, STATUS )
+      CALL GRP_NEW( 'CCD1_PRIN:DARK', DARK, STATUS )
       DO 7 INDEX = 4, NRET, 5
-         CALL IRH_GET( IDH2, INDEX, 1, CURSTR, STATUS )
-         CALL IRH_PUT( DARK, 1, CURSTR, 0, STATUS )
+         CALL GRP_GET( IDH2, INDEX, 1, CURSTR, STATUS )
+         CALL GRP_PUT( DARK, 1, CURSTR, 0, STATUS )
  7    CONTINUE
 
 *  Extract the pre-flash times.
-      CALL IRH_NEW( 'CCD1_PRIN:FLASH', FLASH, STATUS )
+      CALL GRP_NEW( 'CCD1_PRIN:FLASH', FLASH, STATUS )
       DO 8 INDEX = 5, NRET, 5
-         CALL IRH_GET( IDH2, INDEX, 1, CURSTR, STATUS )
-         CALL IRH_PUT( FLASH, 1, CURSTR, 0, STATUS )
+         CALL GRP_GET( IDH2, INDEX, 1, CURSTR, STATUS )
+         CALL GRP_PUT( FLASH, 1, CURSTR, 0, STATUS )
  8    CONTINUE
 
 *  Exit with error label.

@@ -17,7 +17,7 @@
 *                       ZEROED, ZEROCK, STATUS )
 
 *  Description:
-*     The routine access all the NDFs in the IRG group GID. It then
+*     The routine access all the NDFs in the GRP group GID. It then
 *     extracts all the frame types and filters and writes them to a
 *     list pointed to by FTYPES. If NDFs have no CCDPACK extension or
 *     frame type a warning is issued and this NDF is flagged in VALID.
@@ -29,7 +29,7 @@
 
 *  Arguments:
 *     GID = INTEGER (Given)
-*        IRG group identifier for all input NDFs.
+*        GRP group identifier for all input NDFs.
 *     NNDF = INTEGER (Given)
 *        Number of entries in input group
 *     FTYPES( 2, NNDF ) = CHARACTER * ( * ) (Returned)
@@ -73,6 +73,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +96,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC argument from IRG_NDFEX call. Added DAT_ANNUL
 *        for LOCCMP that was dangling.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,7 +207,7 @@ C     :             'MASTER_BIAS' /
          VALID( I ) = .TRUE.
 
 *  Get the NDF.
-         CALL IRG_NDFEX( GID, I, NDFID, STATUS )
+         CALL NDG_NDFAS( GID, I, 'READ', NDFID, STATUS )
 
 *  Look for the CCDPACK extension.
          CALL NDF_XSTAT( NDFID, 'CCDPACK', THERE, STATUS )

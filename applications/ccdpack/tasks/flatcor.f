@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*     This routine applies a flat field correction to a series of images.
-*     If any of the input data have been flagged as saturated using a
-*     saturation value (instead of being marked as BAD) then the
-*     saturation values may be protected from modification.
+*    This routine applies a flat field correction to a series of images.
+*    If any of the input data have been flagged as saturated using a
+*    saturation value (instead of being marked as BAD) then the
+*    saturation values may be protected from modification.
 
 *  Usage:
 *     flatcor in out flat
@@ -210,6 +210,8 @@
 *        Removed top-level locator controls (foreign data access upgrade).
 *     23-FEB-1999 (MBT):
 *        Modified to propagate WCS component.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -236,6 +238,7 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
+      CHARACTER * ( 6 ) ACCESS   ! Access mode for NDFs
       CHARACTER * ( CCD1__NMLEN ) DFILT ! Filter type of data 
       CHARACTER * ( CCD1__NMLEN ) FILTER ! Filter type of flatfield
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Input data type.
@@ -293,13 +296,16 @@
       CALL PAR_GET0L( 'KEEPIN', DELETE, STATUS )
       DELETE = .NOT. DELETE
 
-*  Access an IRG group containing a list of NDF names.
-      CALL NDF_BEGIN
-      IF ( DELETE ) THEN 
-         CALL CCD1_NDFGR( 'IN', 'UPDATE', GIDIN, NNDF, STATUS )
+*  Set access mode for NDFs.
+      IF ( DELETE ) THEN
+         ACCESS = 'UPDATE'
       ELSE
-         CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
+         ACCESS = 'READ'
       END IF
+
+*  Access an NDG group containing a list of NDF names.
+      CALL NDF_BEGIN
+      CALL CCD1_NDFGR( 'IN', ACCESS, GIDIN, NNDF, STATUS )
 
 *  Ask for a flatfield NDF. Check for its variance also.
       CALL CCD1_NDFAC( 'FLAT', 'READ', 1, 1, IVAL, IDFLT, STATUS )
@@ -339,7 +345,7 @@
       DO 99999 INDEX = 1, NNDF
 
 *  Get the input NDF identifier
-         CALL IRG_NDFEX( GIDIN, INDEX, IDIN, STATUS )
+         CALL NDG_NDFAS( GIDIN, INDEX, ACCESS, IDIN, STATUS )
 
 *  Check for presence of a variance component.
          CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
@@ -477,8 +483,8 @@
 *  Get a name for the output NDF. Propagate everything except the Data.
 *  If the variance is only available for the input NDF then it is
 *  propagated unchanged as a best estimate.
-         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 
-     :                   'Axis,Quality,Variance,WCS', IDOUT, STATUS )
+         CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT,
+     :                   INDEX, IDOUT, STATUS )
 
 *  Make sure that output data is in the intended type.
          CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
@@ -575,8 +581,9 @@
 *  Release calibration frame.
       CALL NDF_END( STATUS )
 
-*  Close down IRH
-      CALL IRH_CLOSE( STATUS )
+*  Release group identifiers.
+      CALL GRP_DELET( GIDIN, STATUS )
+      CALL GRP_DELET( GIDOUT, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -24,7 +24,7 @@
 *     a new temporary NDF is created in which the mask data is entered.
 *     If lower and upper bounds are given then any created NDFs will be
 *     of this size. If lower and upper bounds are not given, then the
-*     routine will use the IRG group identifier to check the size of the
+*     routine will use the NDG group identifier to check the size of the
 *     first NDF in the group. This will be used for the upper and lower
 *     limits and the type of the output mask.  Finally the name of the
 *     MASK file and its type (ARD or NDF) are returned in the string
@@ -54,12 +54,12 @@
 *        VAL__BADI if not to be used. On exit the upper bounds of the
 *        mask NDF.
 *     GID = INTEGER (Given)
-*        IRG group identifier for NDFs whose data the mask is to be
+*        NDG group identifier for NDFs whose data the mask is to be
 *        applied to. If necessary the first member of the group is used
 *        to define the size of the output mask data.
 *     ITYPE = CHARACTER * ( * ) (Given and Returned)
 *        The type of the output MASK data. If this is given as ' ' then
-*        the type of the NDF given as the first member of the IRG group
+*        the type of the NDF given as the first member of the NDG group
 *        GID will be used and returned.
 *     ID = INTEGER (Returned)
 *        NDF identifier of the mask data array.
@@ -71,6 +71,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC from IRG_NDFEX call and all associated code,
 *        including common block for controlling open files.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,7 +164,7 @@
          IF ( LBND( 1 ) .EQ. VAL__BADI .OR. ITYPE .EQ. ' ' ) THEN
 
 *  Need to derive some bounds and/or a mask type.
-            CALL IRG_NDFEX( GID, 1, IDSIZE, STATUS )
+            CALL NDG_NDFAS( GID, 1, 'READ', IDSIZE, STATUS )
 
 *  Get the required data.
             IF ( LBND( 1 ) .EQ. VAL__BADI ) THEN

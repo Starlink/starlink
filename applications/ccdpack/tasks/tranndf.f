@@ -273,6 +273,8 @@
 *        Renamed some KPG1_* routines and propogated changes
 *     4-NOV-1999 (MBT):
 *        Modified some of the warnings.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -435,7 +437,7 @@
 *  Start a new AST context
       CALL AST_BEGIN( STATUS )
 
-*  Get the IRG group identifier for the NDFs.
+*  Get the group identifier for the NDFs.
       CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
 
 *  And get the names of the corresponding output NDFs.
@@ -539,7 +541,7 @@
       DO 99999 INDEX = 1, NNDF
 
 *  Get the identifier of the input NDF.
-         CALL IRG_NDFEX( GIDIN, INDEX, IDIN, STATUS )
+         CALL NDG_NDFAS( GIDIN, INDEX, 'READ', IDIN, STATUS )
 
 *  Write out name of this NDF. And which loop this is.
          CALL CCD1_MSG( ' ',  ' ', STATUS )
@@ -896,7 +898,7 @@
 
 *  Create the output NDF.
 *  ======================
-         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 'Axis,Units', IDOUT,
+         CALL NDG_NDFPR( IDIN, 'Axis,Units', GIDOUT, INDEX, IDOUT, 
      :                   STATUS )
 
 *  Tell user the name of the output NDF.
@@ -1587,8 +1589,9 @@
 *  Tidy the NDF context.
       CALL NDF_END( STATUS )
 
-*  Close down IRH/IRG.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( GIDIN, STATUS )
+      CALL GRP_DELET( GIDOUT, STATUS )
 
   999 CONTINUE
 *  If an error occurred, then report a contextual message.

@@ -5,7 +5,7 @@
 *     CCD1_GTLIG
 
 *  Purpose:
-*     Gets an IRH group of validated (formatted) file names.
+*     Gets a GRP group of validated (formatted) file names.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,7 +15,7 @@
 *                      FIOGR, NDFGR, STATUS )
 
 *  Description:
-*     This routine creates an IRH group of filenames. The files are
+*     This routine creates a GRP group of filenames. The files are
 *     tested for existence before entry into the group. The names of
 *     the files may be accessed in two different (exclusive) fashions.
 *     If the NDFS argument is set true then it is assumed that the
@@ -25,11 +25,11 @@
 *
 *         ndf_name.more.ccdpack.ITEM
 *
-*     If NDFS is true then an IRH group identifier is also returned
+*     If NDFS is true then a GRP group identifier is also returned
 *     for a group containing the NDF names (NDFGR).
 *     
 *     If NDFS is false then it is assumed that the names accessed
-*     through the ADAM parameters PARNAM using IRH are just the exact
+*     through the ADAM parameters PARNAM using GRP are just the exact
 *     names of the files.  All files are then opened using FIO_OPEN to
 *     test for their existence. 
 *
@@ -37,13 +37,13 @@
 *     an error is reported and status is set.  If NDFs is true and the
 *     CCDPACK extension exists, but no ITEM is in it, then a message is
 *     printed and status is not set.  In this case the list in question
-*     is not added to the IRH group.
+*     is not added to the GRP group.
 
 *  Arguments:
 *     NDFS = LOGICAL (Given)
 *        Whether the names of the files to be opened are stored with the
 *        extensions of NDFs are not. It true the input names are
-*        expanded into an IRG group.
+*        expanded into an NDG group.
 *     ITEM = CHARACTER * ( * ) (Given)
 *        Only used if NDFS is true. The name of the extension item
 *        with contains the file name.
@@ -57,20 +57,18 @@
 *     NOPEN = INTEGER (Returned)
 *        The number of files which were opened.
 *     FIOGR = INTEGER (Returned)
-*        An IRH group identifier for the names of the files which have
+*        A GRP group identifier for the names of the files which have
 *        opened. This group is intended for use as a modification group.
 *     NDFGR = INTEGER (Returned)
-*        A IRG group identifier for the names of the NDFs from which
-*        the filenames were obtained. This group has UPDATE access
-*        so that the extension item may be updated.
+*        An NDG group identifier for the names of the NDFs from which
+*        the filenames were obtained.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
 *     before exit. 
-*     -  The calling routine must annul the group identifiers
-*     and close IRH before exit.
+*     -  The calling routine must annul the group identifiers before exit.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -91,6 +89,8 @@
 *     26-APR-1999 (MBT):
 *        Modified so that failing to find ITEM in the CCDPACK extension
 *        is no longer fatal.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,8 +104,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
-      INCLUDE 'IRG_FAC'          ! IRG/IRH constants
       INCLUDE 'USER_ERR'         ! Private error codes
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       LOGICAL NDFS
@@ -123,12 +123,12 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) FNAME ! Filename
-      CHARACTER * ( IRH__SZNAM ) NNAME ! NDF name
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
+      CHARACTER * ( GRP__SZNAM ) NNAME ! NDF name
       INTEGER FD                 ! FIO file descriptor
       INTEGER I                  ! Loop variable
-      INTEGER INGRP              ! Dummy IRH identifier
-      INTEGER NDF1GR             ! IRG identifier for group of all PARNAM NDFs
+      INTEGER INGRP              ! Dummy GRP identifier
+      INTEGER NDF1GR             ! GRP identifier for group of all PARNAM NDFs
       INTEGER NDFID              ! NDF identfier
       INTEGER NRET               ! Number of names in group
       LOGICAL OK                 ! Flag showing extension ok
@@ -149,7 +149,7 @@
       ELSE
 
 *  Not a list of NDFs, just get a group of names.
-         INGRP = IRH__NOID
+         INGRP = GRP__NOID
          CALL CCD1_STRGR( PARNAM, INGRP, MINOPN, MAXOPN, FIOGR, NRET,
      :                    STATUS )
          CALL MSG_SETI( 'NOPEN', NRET )
@@ -171,16 +171,16 @@
 *  Initialise number of names successfully entered in the group.
          NOPEN = 0
 
-*  Create IRH groups to contain the name strings.
-         CALL IRH_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
-         CALL IRH_NEW( 'CCDPACK:NDFLIST', NDFGR, STATUS )
+*  Create GRP groups to contain the name strings.
+         CALL GRP_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
+         CALL GRP_NEW( 'CCDPACK:NDFLIST', NDFGR, STATUS )
 
 *  Open each NDF in turn and locate the required name.
          DO 2 I = 1, NRET
-            CALL IRG_NDFEX( NDF1GR, I, NDFID, STATUS )
+            CALL NDG_NDFAS( NDF1GR, I, 'UPDATE', NDFID, STATUS )
 
 *  Get the NDF name and file name.
-            CALL IRH_GET( NDF1GR, I, 1, NNAME, STATUS )
+            CALL GRP_GET( NDF1GR, I, 1, NNAME, STATUS )
             CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )  
             IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -199,8 +199,8 @@
 
 *  Enter the file name and the NDF name into the new groups, appending 
 *  to the end (0).
-               CALL IRH_PUT( FIOGR, 1, FNAME, 0, STATUS )
-               CALL IRH_PUT( NDFGR, 1, NNAME, 0, STATUS )
+               CALL GRP_PUT( FIOGR, 1, FNAME, 0, STATUS )
+               CALL GRP_PUT( NDFGR, 1, NNAME, 0, STATUS )
                NOPEN = NOPEN + 1
             END IF
 
@@ -210,11 +210,8 @@
  2       CONTINUE
 
 *  Annul the original NDF group identifier, since it is no longer required.
-         CALL IRH_ANNUL( NDF1GR, STATUS )
+         CALL GRP_DELET( NDF1GR, STATUS )
 
-*  Import the returned NDF group identifier from the IRH to the IRG system.
-         CALL IRG_GIN( NDFGR, .FALSE., 'UPDATE', STATUS )
-         
       ELSE
 
 *  If position lists are given directly, the number to consider must be 
@@ -226,7 +223,7 @@
 *  list of formatted files. Try to open them one by one, stop if one
 *  does not exist.
       DO 3 I = 1, NOPEN
-         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
 
 *  Try to open the file.
          CALL FIO_OPEN( FNAME, 'READ', 'LIST', 0, FD, STATUS )

@@ -50,7 +50,7 @@
 *     DEPTH = INTEGER (Given)
 *        IDI packing depth.
 *     NDFGR = INTEGER (Given)
-*        An IRG group of NDF names. These NDFs should be displayed in
+*        An NDG group of NDF names. These NDFs should be displayed in
 *        the palette region.
 *     NNDF = INTEGER (Given)
 *        The number of NDFs in the input group.
@@ -125,6 +125,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -135,6 +136,8 @@
 *        speed up processing when displaying.
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC argument from IRG_NDFEX call.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -477,7 +480,7 @@
 *  Access this NDF, then resample it and rescale it. Map in its data
 *  component. Determine the data range to display. Resample it and
 *  rescale it. Get its name.  First get the NDF identifier.
-                     CALL IRG_NDFEX( NDFGR, I, NDFID, STATUS )
+                     CALL NDG_NDFAS( NDFGR, I, 'READ', NDFID, STATUS )
                   
 *  Determine the data type of the data component.
                      CALL NDF_TYPE( NDFID, 'Data', ITYPE, STATUS )

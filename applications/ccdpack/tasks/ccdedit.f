@@ -411,6 +411,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -420,6 +421,8 @@
 *        Removed AIF calls.
 *     3-MAR-1997 (PDRAPER):
 *        Sorted locator changes related to foreign data access.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -500,7 +503,7 @@
       CALL CCD1_MSG( ' ', '    Input NDFs:', STATUS )
       CALL CCD1_MSG( ' ', '    -----------', STATUS )
       DO 6 I = 1, NNDF
-         CALL IRH_GET( NDFGRP, I, 1, FNAME, STATUS )
+         CALL GRP_GET( NDFGRP, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', I )
          CALL CCD1_MSG( ' ', '  ^FNAME', STATUS )
@@ -531,7 +534,7 @@
 
 *  Whoops, try again. Annul the current group. See how many attempts
 *  we've had and then maybe try again.
-               CALL IRH_ANNUL( FIOGRP, STATUS )
+               CALL GRP_DELET( FIOGRP, STATUS )
                IF ( NTRY .LE. 10 ) THEN 
                   CALL MSG_SETI( 'NNDF', NNDF )
                   CALL MSG_OUT( ' ',
@@ -557,11 +560,11 @@
          DO 2 I = 1, NNDF
 
 *  Access NDF.
-            CALL IRG_NDFEX( NDFGRP, I, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
 
 *  Get the position list name.
             IF ( NLIST .NE. 1 .OR. I .EQ. 1 ) THEN
-               CALL IRH_GET( FIOGRP, I, 1, FNAME, STATUS )
+               CALL GRP_GET( FIOGRP, I, 1, FNAME, STATUS )
             END IF
 
 *  Write the name into the NDF extension.
@@ -600,7 +603,7 @@
          DO 3 I = 1, NNDF
 
 *  Access NDF.
-            CALL IRG_NDFEX( NDFGRP, I, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -756,7 +759,7 @@
          DO 5 I = 1, NNDF
 
 *  Access NDF.
-            CALL IRG_NDFEX( NDFGRP, I, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -838,7 +841,7 @@
          DO 10 I = 1, NNDF
 
 *  Access NDF.
-            CALL IRG_NDFEX( NDFGRP, I, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -883,9 +886,9 @@
 *  End the NDF context of this application.
       CALL NDF_END( STATUS )
 
-*  Release the IRH/IRG groups.
-      CALL IRH_ANNUL( NDFGRP, STATUS )
-      IF ( HAVFIO ) CALL IRH_ANNUL( FIOGRP, STATUS )
+*  Release the groups.
+      CALL GRP_DELET( NDFGRP, STATUS )
+      IF ( HAVFIO ) CALL GRP_DELET( FIOGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

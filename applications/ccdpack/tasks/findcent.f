@@ -260,6 +260,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -273,6 +274,8 @@
 *        Removed top-level locator control (foreign data access upgrades).
 *     1-MAR-1999 (PDRAPER):
 *        Added autoscale parameter.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -385,7 +388,7 @@
          CALL CCD1_MSG( ' ', '    Input NDF names  ', STATUS )
          CALL CCD1_MSG( ' ', '    ---------------', STATUS )
          DO 1 I = 1, NNDF
-            CALL IRH_GET( NDFGR, I, 1, NDFNAM, STATUS )
+            CALL GRP_GET( NDFGR, I, 1, NDFNAM, STATUS )
             CALL MSG_SETC( 'NDFNAM', NDFNAM )
             CALL MSG_SETI( 'N', I )
             CALL CCD1_MSG( ' ', '  ^N) ^NDFNAM', STATUS )
@@ -480,7 +483,7 @@
       DO 2 I = 1, NNDF
 
 *  Access the NDF associated with this position list.
-         CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS ) 
+         CALL NDG_NDFAS( NDFGR, I, ACCESS, IDIN, STATUS ) 
       
 *  Write informational message about it.
          CALL CCD1_MSG( ' ',  ' ', STATUS )
@@ -507,7 +510,7 @@
          CALL NDF_MAP( IDIN, 'Data', TYPE, 'READ', IPIN, EL, STATUS )
 
 *  Get the name of the position list from the group and open the file.
-         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
 
 *  Determine the number of fields per input record.
@@ -580,7 +583,7 @@
          END IF
 
 *  Get the name of the output list of positions and open it.
-         CALL IRH_GET( FIOGRO, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, STATUS )
 
 *  Write the output results.
@@ -591,7 +594,7 @@
      :                    STATUS ) 
                                    
 *  Write the report about this loop. The input positions.
-         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FDIN', FNAME )
          CALL CCD1_MSG( ' ',       
      : '  Associated positions list: ^FDIN', STATUS )
@@ -602,7 +605,7 @@
      : '  Number of input positions: ^NREC', STATUS )
                                     
 *  Output parameters: Name of output position list.
-         CALL IRH_GET( FIOGRO, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FDOUT', FNAME )
          CALL CCD1_MSG( ' ',        
      : '  Output positions list: ^FDOUT',
@@ -666,8 +669,10 @@
 *  Abort label, cleanup after this.
  99   CONTINUE
 
-*  Close IRH/IRG
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( NDFGR, STATUS )
+      CALL GRP_DELET( FIOGR, STATUS )
+      CALL GRP_DELET( FIOGRO, STATUS )
 
 *  Free any allocated dynamic memory.
       CALL CCD1_MFREE( -1, STATUS )

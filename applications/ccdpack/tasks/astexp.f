@@ -335,6 +335,8 @@
 *        Original version.
 *     19-MAR-1999 (MBT):
 *        Added the BASEFRAME parameter and tidied up a bit.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -537,7 +539,7 @@
 
 *  Loop over NDFs
       DO 1 I = 1, NNDF
-         CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
+         CALL NDG_NDFAS( INGRP, I, 'READ', INDF, STATUS )
 
 *  Output name of NDF.
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -696,8 +698,9 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( IDGRP, STATUS )
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

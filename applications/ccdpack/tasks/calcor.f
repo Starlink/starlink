@@ -269,6 +269,8 @@
 *        Modified to use foreign data access IRG.
 *     23-FEB-1999 (MBT):
 *        Modified to propagate WCS component.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -284,7 +286,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'NDF_PAR'          ! NDF string sizes
-      INCLUDE 'IRG_FAC'          ! IRG facility status constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -295,9 +297,10 @@
 
 *  Local Variables:
       CHARACTER * ( CCD1__NMLEN ) FTYPE ! Expected frame type
-      CHARACTER * ( IRH__SZNAM ) CVAL  ! String to hold the EXPOSURE factors expressed as a string
+      CHARACTER * ( GRP__SZNAM ) CVAL  ! String to hold the EXPOSURE factors expressed as a string
       CHARACTER * ( NDF__SZTYP ) CTYPE ! Calibration data type
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Current data type
+      CHARACTER * ( 6 ) ACCESS   ! Access mode for NDFs
       DOUBLE PRECISION EXPOSE    ! Exposure factor (dark or flash).
       DOUBLE PRECISION SATVAL    ! Saturation value
       INTEGER EL                 ! Number of elements in input array components
@@ -361,18 +364,20 @@
       CALL PAR_CHOIC( 'TYPE', 'NONE', 'NONE,DARK,FLASH', .TRUE., FTYPE,
      :                STATUS )
 
+*  Set the access mode for the NDFs.
+      IF ( DELETE ) THEN
+         ACCESS = 'UPDATE'
+      ELSE
+         ACCESS = 'READ'
+      END IF
+
 *  Access a group of NDF and exposure factors, which require processing.
 *  If asked look for these values in the extensions of the input NDFs.
 *  Do not allow this if the frame type is unknown.
       CALL NDF_BEGIN
       IF ( FTYPE .EQ. 'NONE' ) USEEXT = .FALSE.
-      IF ( DELETE ) THEN
-         CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', 'UPDATE', 'EXPOSE',
-     :                    GIDIN, FACGID, NNDF, STATUS )
-      ELSE
-         CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', 'READ', 'EXPOSE',
-     :                    GIDIN, FACGID, NNDF, STATUS )
-      END IF
+      CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', ACCESS, 'EXPOSE', GIDIN,
+     :                 FACGID, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Ask for a calibration NDF. Check for its variance also.
@@ -405,7 +410,7 @@
       DO 99999 INDEX = 1, NNDF
 
 *  Get the input NDF identifier
-         CALL IRG_NDFEX( GIDIN, INDEX, IDIN, STATUS )
+         CALL NDG_NDFAS( GIDIN, INDEX, ACCESS, IDIN, STATUS )
 
 *  Write out name of this NDF.
          CALL CCD1_MSG( ' ',  ' ', STATUS )
@@ -425,7 +430,7 @@
          CALL CCD1_CKCCL( IDIN, STATUS )
 
 *  And the associated exposure factor.
-         CALL IRH_GET( FACGID, INDEX, 1, CVAL, STATUS )
+         CALL GRP_GET( FACGID, INDEX, 1, CVAL, STATUS )
          CALL CHR_CTOD( CVAL, EXPOSE, STATUS )
 
 *  Check for presence of a variance component.
@@ -530,8 +535,8 @@
 
 *  Get the output NDF. Propagate everything except the Data.
 *  The variance will be unchanged if the calibration frame has none.
-         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 
-     :                   'Axis,Quality,Variance,WCS', IDOUT, STATUS )
+         CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT, 
+     :                   INDEX, IDOUT, STATUS )
 
 *  Make sure that data is in the intended output form
          CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
@@ -638,8 +643,10 @@
 *  Release calibration frame.
       CALL NDF_END( STATUS )
 
-*  Close IRH
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( GIDIN, STATUS )
+      CALL GRP_DELET( GIDOUT, STATUS )
+      CALL GRP_DELET( FACGID, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

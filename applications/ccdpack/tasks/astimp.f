@@ -249,6 +249,8 @@
 *  History:
 *     05-MAR-1999 (MBT):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -310,7 +312,7 @@
       INTEGER IFGRP              ! GRP identifier for frameset group
       INTEGER INDF               ! NDF identifier
       INTEGER INDXS( MXFSET )    ! Index values for ID type of INDEX
-      INTEGER INGRP              ! IRG identifier for NDF group
+      INTEGER INGRP              ! Group identifier for NDF group
       INTEGER IPFITS             ! Pointer to FITS card array
       INTEGER IWCS               ! AST pointer to WCS component of NDF
       INTEGER IX                 ! Index into frameset group
@@ -507,7 +509,7 @@
       
 *  Loop over NDFs
       DO 12 I = 1, NNDF
-         CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
+         CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
 
 *  Output name of NDF.
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -690,11 +692,9 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
-
-*  Delete frameset group.
+*  Release group resources.
       CALL GRP_DELET( IFGRP, STATUS )
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

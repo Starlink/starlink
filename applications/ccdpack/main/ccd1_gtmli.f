@@ -16,7 +16,7 @@
 
 *  Description:
 *     This routine opens a series of formatted files. The names of the
-*     files are accessed as a list through the IRH system (which allows
+*     files are accessed as a list through the GRP system (which allows
 *     indirection of the names, and wildcards based on the input
 *     modification group MGRP), using the parameter PARNAM. The files
 *     are opened one by one using FIO_OPEN. File names which fail to
@@ -27,9 +27,9 @@
 *        The ADAM parameter name via which the list of file names is to
 *        be accessed.
 *     MGRP = INTEGER (Given)
-*        The IRH group identifier of a list of names which will be used
+*        The GRP group identifier of a list of names which will be used
 *        as a modification group for the file names. If this is set to
-*        IRH__NOID on entry then no modification group is used.
+*        GRP__NOID on entry then no modification group is used.
 *     MINOPN = INTEGER (Given)
 *        The minimum number of files which need to be opened.
 *     MAXOPN = INTEGER (Given)
@@ -40,17 +40,18 @@
 *     FDS( MAXOPN ) = INTEGER (Returned)
 *        FIO file system descriptors to the opened files.
 *     GID = INTEGER (Returned)
-*        The IRH identifier of the group of filenames.
+*        The GRP identifier of the group of filenames.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  The calling routine must close all the files which are opened
 *     before exit. 
-*     -  The calling routine must annul the IRH group before exit.
+*     -  The calling routine must annul the GRP group before exit.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Added minimum number of input files option.
 *     25-JAN-1993 (PDRAPER):
 *        Changed to use a modification group.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,7 +75,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRG_FAC'          ! IRG/IRH constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       CHARACTER * ( * ) PARNAM
@@ -89,7 +92,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( GRP__SZNAM ) FNAME ! Filename 
       INTEGER NRET
       INTEGER I
       INTEGER FD
@@ -120,7 +123,7 @@
 *  Extract a name from the group.
          NOPEN = 0
          DO 1 I = 1, NRET
-            CALL IRH_GET( GID, I, 1, FNAME, STATUS )
+            CALL GRP_GET( GID, I, 1, FNAME, STATUS )
 
 *  Try to open the file.
             CALL FIO_OPEN( FNAME, 'READ', 'LIST', 0, FD, STATUS )

@@ -61,183 +61,183 @@
 *     schedule in script stype debias=? execute=? interp=? spacesave=?
 
 *  ADAM Parameters:
-*     DARKEXT = LITERAL (Read)
-*        The extension which added to the names of any NDFs processed by
-*        CALCOR when performing dark count correction. This makes the
-*        parameter
+*    DARKEXT = LITERAL (Read)
+*       The extension which added to the names of any NDFs processed by
+*       CALCOR when performing dark count correction. This makes the
+*       parameter
 *
-*           OUT=*"darkext"
+*          OUT=*"darkext"
 *
-*        form the names of the NDFs output from CALCOR.
-*        [-dk]
-*     DEBIAS = _INTEGER (Read)
-*        The form of debiassing that should be used. This is an integer
-*        which represents one of the following:
-*           1 = produce a master and offset to bias strips (master bias
-*               is zeroed)
-*           2 = produce a master and do not offset to strips (in this
-*               case the master bias is not zeroed)
-*           3 = use interpolation between bias strip(s)
-*           4 = subtract a constant as bias.
+*       form the names of the NDFs output from CALCOR.
+*       [-dk]
+*    DEBIAS = _INTEGER (Read)
+*       The form of debiassing that should be used. This is an integer
+*       which represents one of the following:
+*          1 = produce a master and offset to bias strips (master bias
+*              is zeroed)
+*          2 = produce a master and do not offset to strips (in this
+*              case the master bias is not zeroed)
+*          3 = use interpolation between bias strip(s)
+*          4 = subtract a constant as bias.
 *
-*        Using the information about the frame types which are available
-*        and the presence or not of bias strips etc. a list of the
-*        possible debiassing options is shown, before this parameter is
-*        accessed. Any of the above methods can be selected regardless
-*        of this advice, but the reduction may then fail unless action is
-*        taken (such as adapting the output script).
+*       Using the information about the frame types which are available
+*       and the presence or not of bias strips etc. a list of the
+*       possible debiassing options is shown, before this parameter is
+*       accessed. Any of the above methods can be selected regardless
+*       of this advice, but the reduction may then fail unless action is
+*       taken (such as adapting the output script).
 *
-*        If the interpolation option is selected then the method is
-*        determined by the INTERP parameter.
-*     DEBIASEXT = LITERAL (Read)
-*        The extension which added to the names of any NDFs processed by
-*        DEBIAS. This makes the parameter
+*       If the interpolation option is selected then the method is
+*       determined by the INTERP parameter.
+*    DEBIASEXT = LITERAL (Read)
+*       The extension which added to the names of any NDFs processed by
+*       DEBIAS. This makes the parameter
 *
-*           OUT=*"debiasext"
+*          OUT=*"debiasext"
 *
-*        form the names of the NDFs output from DEBIAS.
-*        [-db]
-*     EXECUTE = _LOGICAL (Read)
-*        Whether to execute the output command script immediately or not.
-*        If the option to execute is chosen then a background
-*        process is started which performs the actual execution.
-*        Do not execute the procedure using this method if your system
-*        supports a queuing system which should be used instead (if you
-*        expect the reduction to take some time). This option does not
-*        work for ICL scripts at this time.
-*        [FALSE]
-*     EXELOGFILE = LITERAL (Read)
-*        If the reduction is started immediately then the output will be
-*        redirected to this file.
-*        [SCHEDULE.LOG]
-*     FLASHEXT = LITERAL (Read)
-*        The extension which added to the names of any NDFs processed by
-*        CALCOR when performing pre-flash correction. This makes the
-*        parameter
+*       form the names of the NDFs output from DEBIAS.
+*       [-db]
+*    EXECUTE = _LOGICAL (Read)
+*       Whether to execute the output command script immediately or not.
+*       If the option to execute is chosen then a background
+*       process is started which performs the actual execution.
+*       Do not execute the procedure using this method if your system
+*       supports a queuing system which should be used instead (if you
+*       expect the reduction to take some time). This option does not
+*       work for ICL scripts at this time.
+*       [FALSE]
+*    EXELOGFILE = LITERAL (Read)
+*       If the reduction is started immediately then the output will be
+*       redirected to this file.
+*       [SCHEDULE.LOG]
+*    FLASHEXT = LITERAL (Read)
+*       The extension which added to the names of any NDFs processed by
+*       CALCOR when performing pre-flash correction. This makes the
+*       parameter
 *
-*           OUT=*"flashext"
+*          OUT=*"flashext"
 *
-*        form the names of the NDFs output from CALCOR.
-*        [-dk]
-*     FLATEXT = LITERAL (Read)
-*        The extension which added to the names of any NDFs processed by
-*        FLATCOR. This makes the parameter
+*       form the names of the NDFs output from CALCOR.
+*       [-dk]
+*    FLATEXT = LITERAL (Read)
+*       The extension which added to the names of any NDFs processed by
+*       FLATCOR. This makes the parameter
 *
-*           OUT=*"flatext"
+*          OUT=*"flatext"
 *
-*        form the names of the NDFs output from FLATCOR.
-*        [-flt]
-*     IN = LITERAL (Read)
-*        A list of the names of the NDFs which contain the data to be
-*        reduced. All NDFs must already have the correct "frame type"
-*        information (extension item FTYPE) entered into their CCDPACK
-*        extensions. Together with any other relevant information (such
-*        as filter type, position of the bias strips, useful area etc.,
-*        see IMPORT and/or PRESENT).
+*       form the names of the NDFs output from FLATCOR.
+*       [-flt]
+*    IN = LITERAL (Read)
+*       A list of the names of the NDFs which contain the data to be
+*       reduced. All NDFs must already have the correct "frame type"
+*       information (extension item FTYPE) entered into their CCDPACK
+*       extensions. Together with any other relevant information (such
+*       as filter type, position of the bias strips, useful area etc.,
+*       see IMPORT and/or PRESENT).
 *
-*        The NDF names should be separated by commas and may include
-*        wildcards.
-*     INTERP = _INTEGER (Read)
-*        If the interpolation method is chosen using the DEBIAS parameter
-*        then this parameter controls how the interpolation should be
-*        performed. The possible returns are:
+*       The NDF names should be separated by commas and may include
+*       wildcards.
+*    INTERP = _INTEGER (Read)
+*       If the interpolation method is chosen using the DEBIAS parameter
+*       then this parameter controls how the interpolation should be
+*       performed. The possible returns are:
 *
-*           1 = fit a constant for each row/column
-*           2 = fit a single value for whole NDF
-*           3 = fit a line to each row/column
-*           4 = fit a plane to whole NDF
+*          1 = fit a constant for each row/column
+*          2 = fit a single value for whole NDF
+*          3 = fit a line to each row/column
+*          4 = fit a plane to whole NDF
 *
-*        The possible options given the input information about the
-*        presence of bias strips are shown before the value of this
-*        parameter is accessed.
-*     IRFLATS = _LOGICAL (Read)
-*        This parameter allows input frames of type TARGET to be also
-*        used as flatfields. This is designed for use when no real
-*        flatfields exist. IR data is often calibrated in this way, and
-*        less commonly optical data. In both these cases it is asummed
-*        that the objects are moved on the sky sufficiently, between
-*        exposures, so that taking the median of a stack of frames
-*        results in the rejection of any object data (leaving the
-*        equivalent of a map of a blank piece of sky).
+*       The possible options given the input information about the
+*       presence of bias strips are shown before the value of this
+*       parameter is accessed.
+*    IRFLATS = _LOGICAL (Read)
+*       This parameter allows input frames of type TARGET to be also
+*       used as flatfields. This is designed for use when no real
+*       flatfields exist. IR data is often calibrated in this way, and
+*       less commonly optical data. In both these cases it is asummed
+*       that the objects are moved on the sky sufficiently, between
+*       exposures, so that taking the median of a stack of frames
+*       results in the rejection of any object data (leaving the
+*       equivalent of a map of a blank piece of sky).
 *
-*        TARGET frames will only be used to create flatfields, if no 
-*        flatfields (of the correct colour) are present in the input list.
-*        [FALSE]
-*     LOGFILE = FILENAME (Read)
-*         Name of the CCDPACK logfile.  If a null (!) value is given for
-*        this parameter then no logfile will be written, regardless of
-*        the value of the LOGTO parameter.
+*       TARGET frames will only be used to create flatfields, if no 
+*       flatfields (of the correct colour) are present in the input list.
+*       [FALSE]
+*    LOGFILE = FILENAME (Read)
+*       Name of the CCDPACK logfile.  If a null (!) value is given for
+*       this parameter then no logfile will be written, regardless of
+*       the value of the LOGTO parameter.
 *
-*        If the logging system has been initialised using CCDSETUP,
-*        then the value specified there will be used. Otherwise, the
-*        default is "CCDPACK.LOG".
-*        [CCDPACK.LOG]
-*     LOGTO = LITERAL (Read)
-*        Every CCDPACK application has the ability to log its output
-*        for future reference as well as for display on the terminal.
-*        This parameter controls this process, and may be set to any
-*        unique abbreviation of the following:
-*           -  TERMINAL  -- Send output to the terminal only
-*           -  LOGFILE   -- Send output to the logfile only (see the
-*                           LOGFILE parameter)
-*           -  BOTH      -- Send output to both the terminal and the
-*                           logfile
-*           -  NEITHER   -- Produce no output at all
-*        If the logging system has been initialised using CCDSETUP
-*        then the value specified there will be used. Otherwise, the
-*        default is "BOTH".
-*        [BOTH]
-*     MASTERBIAS = LITERAL (Read)
-*        The name which will be given to a master bias NDF if one is
-*        created.
-*        [MASTER_BIAS]
-*     MASTERDARK = LITERAL (Read)
-*        The name which will be given to a master dark NDF if one is
-*        created.
-*        [MASTER_DARK]
-*     MASTERFLASH = LITERAL (Read)
-*        The name which will be given to a master flash NDF if one is
-*        created.
-*        [MASTER_FLASH]
-*     MASTERFLAT = LITERAL (Read)
-*        The prefix of the name which will be given to any master flat
-*        NDFs which are created. The filter name will be appended to
-*        this.
-*        [MASTER_FLAT]
-*     SCRIPT = LITERAL (Read)
-*        The name of the output file which will contain the CCDPACK
-*        commands which need to be executed to perform the reduction. The
-*        nature of this script is controlled by the STYPE parameter. The
-*        default name is dynamically set to be SCHEDULE with a type set
-*        by the choice of STYPE. The extension of the script name should
-*        always be the same as STYPE.
-*        [schedule."stype"]
-*     SPACESAVE = LITERAL (Read)
-*        This parameter controls if any disk space management should be
-*        used or not. It can take one of the values, "NONE", "SOME" or
-*        "LOTS".
+*       If the logging system has been initialised using CCDSETUP,
+*       then the value specified there will be used. Otherwise, the
+*       default is "CCDPACK.LOG".
+*       [CCDPACK.LOG]
+*    LOGTO = LITERAL (Read)
+*       Every CCDPACK application has the ability to log its output
+*       for future reference as well as for display on the terminal.
+*       This parameter controls this process, and may be set to any
+*       unique abbreviation of the following:
+*          -  TERMINAL  -- Send output to the terminal only
+*          -  LOGFILE   -- Send output to the logfile only (see the
+*                          LOGFILE parameter)
+*          -  BOTH      -- Send output to both the terminal and the
+*                          logfile
+*          -  NEITHER   -- Produce no output at all
+*       If the logging system has been initialised using CCDSETUP
+*       then the value specified there will be used. Otherwise, the
+*       default is "BOTH".
+*       [BOTH]
+*    MASTERBIAS = LITERAL (Read)
+*       The name which will be given to a master bias NDF if one is
+*       created.
+*       [MASTER_BIAS]
+*    MASTERDARK = LITERAL (Read)
+*       The name which will be given to a master dark NDF if one is
+*       created.
+*       [MASTER_DARK]
+*    MASTERFLASH = LITERAL (Read)
+*       The name which will be given to a master flash NDF if one is
+*       created.
+*       [MASTER_FLASH]
+*    MASTERFLAT = LITERAL (Read)
+*       The prefix of the name which will be given to any master flat
+*       NDFs which are created. The filter name will be appended to
+*       this.
+*       [MASTER_FLAT]
+*    SCRIPT = LITERAL (Read)
+*       The name of the output file which will contain the CCDPACK
+*       commands which need to be executed to perform the reduction. The
+*       nature of this script is controlled by the STYPE parameter. The
+*       default name is dynamically set to be SCHEDULE with a type set
+*       by the choice of STYPE. The extension of the script name should
+*       always be the same as STYPE.
+*       [schedule."stype"]
+*    SPACESAVE = LITERAL (Read)
+*       This parameter controls if any disk space management should be
+*       used or not. It can take one of the values, "NONE", "SOME" or
+*       "LOTS".
 *
-*           "NONE" indicates that no NDFs should be deleted.
-*           "SOME" indicates that all intermediate NDFs should be
-*                  deleted. This occurs after they are processed.
-*           "LOTS" indicates that all processed NDFs should be deleted.
-*                  In this case all intermediary NDFs and the original
-*                  NDFs are deleted when processed.
+*          "NONE" indicates that no NDFs should be deleted.
+*          "SOME" indicates that all intermediate NDFs should be
+*                 deleted. This occurs after they are processed.
+*          "LOTS" indicates that all processed NDFs should be deleted.
+*                 In this case all intermediary NDFs and the original
+*                 NDFs are deleted when processed.
 *
-*        Intermediary NDFs are deleted by the CCDPACK applications when
-*        they are finished processing then. So for instance in the case
-*        of FLATCOR each NDF is deleted in turn, so the additional disk
-*        space required is one NDF. Using "SOME" preserves the original
-*        NDFs. Calibration masters are never deleted.
-*        [NONE]
-*     STYPE = LITERAL (Read)
-*        The type of CCDPACK command procedure to be produced. This
-*        should be one of "CSH" or "ICL". Once a type has been
-*        chosen the output script (parameter SCRIPT) can only be
-*        executed using the selected interpreter. Note that if you
-*        choose ICL then the resultant script cannot be executed
-*        immediately, you must activate this yourself.
-*        [CSH]
+*       Intermediary NDFs are deleted by the CCDPACK applications when
+*       they are finished processing then. So for instance in the case
+*       of FLATCOR each NDF is deleted in turn, so the additional disk
+*       space required is one NDF. Using "SOME" preserves the original
+*       NDFs. Calibration masters are never deleted.
+*       [NONE]
+*    STYPE = LITERAL (Read)
+*       The type of CCDPACK command procedure to be produced. This
+*       should be one of "CSH" or "ICL". Once a type has been
+*       chosen the output script (parameter SCRIPT) can only be
+*       executed using the selected interpreter. Note that if you
+*       choose ICL then the resultant script cannot be executed
+*       immediately, you must activate this yourself.
+*       [CSH]
 
 *  Examples:
 *     schedule '*' ccdreduce csh debias=1
@@ -266,6 +266,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -284,6 +285,8 @@
 *     13-NOV-1995 (PDRAPER):
 *        Added ability to use targets as possible flatfields to better
 *        support IR data reductions.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -298,6 +301,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       INCLUDE 'FIO_PAR'          ! FIO constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -319,7 +323,8 @@
       DOUBLE PRECISION DRKTIM( CCD1__MXINS ) ! NDF dark times
       DOUBLE PRECISION FLSTIM( CCD1__MXINS ) ! NDF dark times
       INTEGER DEBTYP             ! The type of debiassing to be performed
-      INTEGER GIDIN              ! Input NDF group identifier
+      INTEGER GIDIN              ! Input NDF GRP group identifier
+      INTEGER GIDOWN             ! GRP identifier for owning group
       INTEGER INTERP             ! Interpolation method
       INTEGER NBOUND             ! Minimum number of bounds values in NDFs
       INTEGER NFILS              ! Number of FILTER types
@@ -366,6 +371,15 @@
 
 *  Access the input name list.
       CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
+
+*  Because of the way in which this group is manipulated by the rest of
+*  this task, it ought to be treated as a simple GRP group, without the
+*  supplemental information it has acquired from NDG_ASSOC as part of
+*  an NDG group.  We thus cut loose all the supplemental information 
+*  leaving an unowned group containing only full file specifications.
+      CALL GRP_OWN( GIDIN, GIDOWN, STATUS )
+      CALL GRP_SOWN( GIDIN, GRP__NOID, STATUS )
+      IF ( GIDOWN .NE. GRP__NOID ) CALL GRP_DELET( GIDOWN, STATUS )
 
 *  Create a list of the NDF frame and filter types. The presence of
 *  extension items which are concerned with the type of DEBIASsing are
@@ -613,8 +627,8 @@
 *  Close the script file.
       IF ( SCROPN ) CALL FIO_CLOSE( SCRFD, STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( GIDIN, STATUS )
 
 *  Close NDF.
       CALL NDF_END( STATUS )

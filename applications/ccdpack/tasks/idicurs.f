@@ -165,18 +165,6 @@
 *       quick re-centre, cancelling any zoom and scroll. The Q key
 *       is used to exit from the routine.
 *
-*     - Display restrictions.
-*
-*        IDICURS will only work on PseudoColor X displays; this means
-*        that it cannot be used on the displays of most newer Linux 
-*        machines as normally configured.  If an attempt is made to
-*        do so, then the warning:
-*
-*           !! Window has unsupported visual type
-*
-*        will be emitted; attempting to proceed may result in a core
-*        dump.
-*
 *     - NDF extension items. 
 *
 *       On exit the CURRENT_LIST items in the CCDPACK extensions
@@ -224,9 +212,8 @@
 *        Updated for CCDPACK 2.0.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator controls (foreign data access upgrade).
-*     19-MAY-2000 (MBT):
-*        Added a call to IDI_ASSOC to ensure that no attempt is made to
-*        use an unsupported visual.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -350,13 +337,6 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
-
-*  Do a dummy open of IDI.  This is a hack to enable IDI to spot whether
-*  we are running on an unsupported visual - AGI_ASSOC does not make 
-*  this check.
-      CALL IDI_ASSOC( 'DEVICE', 'READ', BASEID, STATUS )
-      CALL IDI_ANNUL( BASEID, STATUS )
-      IF ( STATUS .NE. IDI__OK ) GOTO 99
                      
 *  Open AGI, IDI and the device.
       CALL AGI_ASSOC( 'DEVICE', 'READ', BASEID, STATUS )
@@ -928,7 +908,7 @@ C         END IF
          DO 34 I = 1, NNDF
 
 *  Access the NDFs and update their extensions.
-            CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGR, I, 'UPDATE', IDIN, STATUS )
             CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Close the NDFs.
@@ -939,8 +919,8 @@ C         END IF
 *  Exit on error label.
  99   CONTINUE
 
-*  Close IRH.
-      IF ( GOTNDF ) CALL IRH_ANNUL( NDFGR, STATUS )
+*  Release group resources.
+      IF ( GOTNDF ) CALL GRP_DELET( NDFGR, STATUS )
 
 *  Report any IDI errors.
       IF ( ISTAT .NE. IDI__OK ) THEN

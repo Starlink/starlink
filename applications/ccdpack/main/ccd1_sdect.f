@@ -39,11 +39,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     3-JUN-1997 (PDRAPER):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -218,7 +221,7 @@
             DO 5 I = 1, N
                CALL MSG_SETI( 'N', I )
                CALL GRP_GET( NAMGRP, I, 1, BUF, STATUS )
-               CALL IRG1_FSPEC( BUF, ' ', 'NAME', FILE, STATUS )
+               CALL CCD1_FSPEC( BUF, ' ', 'NAME', FILE, STATUS )
                CALL MSG_SETC( 'NAME', FILE )
                CALL GRP_GET( COMGRP, I, 1, BUF, STATUS )
                CALL MSG_SETC( 'COMMENT', BUF )
@@ -281,5 +284,11 @@
         END IF
       END IF
  99   CONTINUE
+
+*  Release group resources.
+      CALL GRP_DELET( NAMGRP, STATUS )
+      CALL GRP_DELET( TYPGRP, STATUS )
+      CALL GRP_DELET( COMGRP, STATUS )
+
       END
 * $Id$

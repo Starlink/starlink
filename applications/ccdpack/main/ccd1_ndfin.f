@@ -4,7 +4,7 @@
 *     CCD1_NDFIN
 
 *  Purpose:
-*     To access a group of NDFs using IRG.
+*     To access a group of NDFs using NDG.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,7 +19,7 @@
 *     actual number of NDFs is returned as NNDF.
 
 *  Notes:
-*     - The IRH group ID returned should be annulled (using IRH_ANNUL)
+*     - the GID identifier should be annulled (by calling GRP_DELET)
 *     after use of the group has finished.
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *        The access mode required for the NDFs: 'READ', 'UPDATE' or
 *        'WRITE'.
 *     GID = INTEGER (Returned)
-*        IRG identifier for the group of NDF names.
+*        NDG identifier for the group of NDF names.
 *     NNDF = INTEGER (Returned)
 *        The number of NDF identifiers returned from user.
 *     STATUS = INTEGER (Given and Returned)
@@ -41,6 +41,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *        Original Version.
 *     3-JUN-1992 (RFWS):
 *        Renamed and added an access mode argument.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,10 +63,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRG_FAC'          ! IRH and IRG system parameters
-                                 ! (IRH__NOID) IRG error codes etc.
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
       INCLUDE 'FIO_ERR'          ! FIO system status codes
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       CHARACTER NAME * ( * )
@@ -84,22 +87,24 @@
       INTEGER NTRY               ! Number of attempts to get prompt
                                  ! right quit after 10, probably batch
                                  ! job in error.
+      INTEGER ONNDF              ! Number of NDFs at last iteration
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access the NDF names through IRG. Set GID to no previous entries.
+*  Access the NDF names through NDG. Set GID to no previous entries.
 *  Set the termination character to '-' if this is added to any lines
 *  of data then a continuation line is used.
-      GID = IRH__NOID
+      GID = GRP__NOID
+      NNDF = 0
       NTRY = 0
  1    CONTINUE                   ! start of repeat until loop
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRG_GROUP( NAME, '-', MODE, GID, NNDF, ADDED, TERM,
-     :                   STATUS )
+         ONNDF = NNDF
+         CALL NDG_ASSOC( NAME, .TRUE., GID, NNDF, TERM, STATUS )
+         ADDED = NNDF - ONNDF
 
 *  Get out if a given a par_abort. Also quit after an unreasonble 
 *  number of attempts. 
@@ -124,19 +129,17 @@
             CALL PAR_CANCL( NAME, STATUS )
             AGAIN = .TRUE. 
 
-*  Status may have been set by IRG for a good reason.. check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
-     :   THEN 
+*  Status may have been set by NDG for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
 
 *  Issue the error.
              CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -144,7 +147,7 @@
 *  Try to trap a special case of ' ' string return. This should leave
 *  added unmodified. This will be taken as a request to exit. The normal
 *  stop entry request from an blank line will be `!' .
-         ELSE IF ( ( ADDED .EQ. -1 ) .AND. ( .NOT. TERM ) ) THEN
+         ELSE IF ( ( ADDED .EQ. 0 ) .AND. ( .NOT. TERM ) ) THEN
             AGAIN = .FALSE.
 
          ELSE IF ( NNDF .LT. 1 ) THEN
@@ -156,8 +159,9 @@
      :                          ' try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )

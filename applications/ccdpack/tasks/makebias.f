@@ -308,6 +308,8 @@
 *        Added fastmed combination method.
 *     13-FEB-1999 (MBT):
 *        Modified to propagate WCS component.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -740,9 +742,6 @@
 *  CCD1_START initialises).
       CALL CCD1_FRTMP( -1, STATUS )
       CALL CCD1_MFREE( -1, STATUS )
-
-*  Close down IRH system.
-      CALL IRH_CLOSE( STATUS )
 
 *  Restore the HDS input mapping mode.
       CALL HDS_TUNE( 'MAP', MAPINT, STATUS )

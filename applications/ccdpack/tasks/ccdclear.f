@@ -110,6 +110,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -123,6 +124,8 @@
 *     17-AUG-1995 (PDRAPER):
 *        Increased size of NAME buffer to DAT__SZNAM. This removes the
 *        possibility of comparing non-existent elements.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,7 +140,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'DAT_ERR'          ! HDS and DAT error codes
-      INCLUDE 'IRH_PAR'          ! IRH parameters
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -202,7 +205,7 @@
       IF ( BYNAME ) THEN
 
 *  Need a list of names.
-         CALL CCD1_STRGR( 'NAMES', IRH__NOID, 1, MAXNAM, NAMGRP,
+         CALL CCD1_STRGR( 'NAMES', GRP__NOID, 1, MAXNAM, NAMGRP,
      :                    NNAMES, STATUS )
 
 *  Clear the deletion flags.
@@ -217,7 +220,7 @@
          DO 3 I = 1, NNAMES
 
 *  Get the name from the list.
-            CALL IRH_GET( NAMGRP, I, 1, NAME, STATUS )
+            CALL GRP_GET( NAMGRP, I, 1, NAME, STATUS )
             CALL CHR_UCASE( NAME )
 
 *  Set the maximum number of characters matched and the match this
@@ -386,8 +389,8 @@
 *  Close down section
 99    CONTINUE
 
-*  Release the IRH group of names.
-      IF ( BYNAME ) CALL IRH_ANNUL( NAMGRP, STATUS )
+*  Release the GRP group of names.
+      IF ( BYNAME ) CALL GRP_DELET( NAMGRP, STATUS )
 
 *  Close the globals file.
       IF ( OPEN ) CALL HDS_CLOSE( LOC, STATUS )

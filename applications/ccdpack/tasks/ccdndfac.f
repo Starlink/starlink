@@ -107,6 +107,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -115,6 +116,8 @@
 *     5-JUN-1997 (PDRAPER):
 *        Added PAR_CANCL for IN parameter. This is to force reprompt
 *        when used in I task mode.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -141,7 +144,7 @@
 *  Local Variables:
       CHARACTER * ( MSG__SZMSG ) NAME ! Name of NDF
       INTEGER FD                 ! Output file descriptor
-      INTEGER GID                ! IRG groups of NDF names
+      INTEGER GID                ! NDG groups of NDF names
       INTEGER I                  ! Loop variable
       INTEGER NNDF               ! Number of NDFs in input group
       INTEGER MAXNDF             ! Maximum number of NDFs
@@ -192,7 +195,7 @@
 *  file and to the user if requred.
          DO 1 I = 1, NNDF
             NAME = ' '
-            CALL IRH_GET( GID, I, 1, NAME, STATUS )
+            CALL GRP_GET( GID, I, 1, NAME, STATUS )
 
 *  Now write out the name.
             CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
@@ -216,8 +219,8 @@
 *  Release any NDF resources.
       CALL NDF_END( STATUS )
 
-*  Annul any resources used by IRH.
-      CALL IRH_ANNUL( GID, STATUS )
+*  Annul group resources.
+      CALL GRP_DELET( GID, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

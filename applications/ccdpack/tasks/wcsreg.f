@@ -204,6 +204,8 @@
 *  History:
 *     13-APR-1999 (MBT):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *-
@@ -284,7 +286,7 @@
       CALL CCD1_MSG( ' ', '    NDFs with graph node indices', STATUS )
       CALL CCD1_MSG( ' ', '    ----------------------------', STATUS )
       DO 6 I = 1, NNDF
-         CALL IRH_GET( INGRP, I, 1, FNAME, STATUS )
+         CALL GRP_GET( INGRP, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', I )
          CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -320,7 +322,7 @@
 
 *  Read in the NDF identifier and WCS component for each NDF.
       DO 3 I = 1, NNDF
-         CALL IRG_NDFEX( INGRP, I, INDF( I ), STATUS )
+         CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF( I ), STATUS )
          CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
  3    CONTINUE
 
@@ -421,7 +423,7 @@
 
 *  Output the name of the NDF being considered.
          CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL IRH_GET( INGRP, I, 1, FNAME, STATUS )
+         CALL GRP_GET( INGRP, I, 1, FNAME, STATUS )
          CALL MSG_SETI( 'I', I )
          CALL MSG_SETC( 'NDF', FNAME )
          CALL CCD1_MSG( ' ', '  ^I) ^NDF:', STATUS )
@@ -489,8 +491,8 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )
@@ -505,4 +507,4 @@
       CALL CCD1_END( STATUS )
       
       END
-* Id: astimp.ifl,v 1.3 1999/04/07 15:27:42 mbt Exp $
+* $Id$

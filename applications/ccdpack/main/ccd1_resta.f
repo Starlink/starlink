@@ -38,7 +38,7 @@
 *     NNDF = INTEGER (Given)
 *        Number of input NDFs.
 *     GIDIN = INTEGER (Given)
-*        IRG identifier to the group of input NDFs that the information
+*        GRP identifier to the group of input NDFs that the information
 *        has been derived from.
 *     ORIG( NNDF ) = CHARACTER * ( * ) (Given)
 *        The names of the "original" NDFs which started a processing
@@ -59,6 +59,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +68,8 @@
 *     23-AUG-1994 (PDRAPER):
 *        Modified to use ranks as a test for precedence in the
 *        processing chain.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,7 +82,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRH_PAR'          ! IRH constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       INTEGER NNDF
@@ -98,7 +101,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER IRANK              ! Rank of I'th NDf
@@ -176,7 +179,7 @@
 
 *  Don't process this again. Get the NDF name and continue.
                   VALID( KEEP ) = .FALSE.
-                  CALL IRH_GET( GIDIN, KEEP, 1, NDFNAM, STATUS )
+                  CALL GRP_GET( GIDIN, KEEP, 1, NDFNAM, STATUS )
                   CALL MSG_SETC( 'NDFNAM', NDFNAM )
                   CALL CCD1_MSG( ' ', '  NDF: ^NDFNAM has already '//
      :'been flatfielded, no further processing will be performed',

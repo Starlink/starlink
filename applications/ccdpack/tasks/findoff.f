@@ -434,6 +434,8 @@
 *     1-NOV-1999 (MBT):
 *        Modified so that output is in units appropriate to current 
 *        coordinate frame.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -483,7 +485,7 @@
       INTEGER COUNT             ! Dummy loop counter
       INTEGER FDIN              ! Input FIO descriptor
       INTEGER FDOUT             ! Output FIO descriptor
-      INTEGER FIOGR             ! Input IRH group identifier
+      INTEGER FIOGR             ! Input group identifier
       INTEGER FRMS( CCD1__MXLIS ) ! AST pointers to Current coordinate frames
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in CHR_ string
@@ -529,7 +531,7 @@
       INTEGER MAPS( CCD1__MXLIS ) ! AST pointers to PIXEL->Current mappings
       INTEGER MAP1              ! Unsimplified mapping
       INTEGER MINMAT            ! Minimum number of positions for match
-      INTEGER NDFGR             ! Input NDF IRG group
+      INTEGER NDFGR             ! Input NDF group
       INTEGER NDIM              ! Number of dimensions in NDF
       INTEGER NEDGES            ! Number of edges in graph
       INTEGER NEWED             ! Number of edges in spanning graph
@@ -546,7 +548,7 @@
       INTEGER NUMI2             ! Number of list 2 points in list 1 box
       INTEGER NVAL( CCD1__MXLIS ) ! Number of values per-record
       INTEGER OFFS( CCD1__MXLIS + 1 ) ! Offsets into extended lists
-      INTEGER OUTGRP            ! Output IRH group identifier
+      INTEGER OUTGRP            ! Output group identifier
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER UBND( 2 )         ! Upper pixel-index bounds of NDF
       INTEGER IWCS              ! AST pointer to WCS component
@@ -665,7 +667,7 @@
             IF ( USEWCS ) THEN
 
 *  Get pointer to WCS frameset.
-               CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+               CALL NDG_NDFAS( NDFGR, I, 'READ', IDIN, STATUS )
                CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
 
 *  Get Current domain of frameset, and check against previous one.
@@ -747,7 +749,7 @@
             END IF
 
 *  Write message about NDF name and domain.
-            CALL IRH_GET( NDFGR, I, 1, FNAME, STATUS )
+            CALL GRP_GET( NDFGR, I, 1, FNAME, STATUS )
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'N', I )
             CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
@@ -769,7 +771,7 @@
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
       DO 6 I = 1, NOPEN
-         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', I )
          CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -857,7 +859,7 @@
       DO 2 I = 1, NOPEN 
 
 *  Open the input files and test the number of entries.
-         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
          CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL( I ), 
      :                    STATUS )
@@ -1346,7 +1348,7 @@
       IF ( .NOT. OK .AND. NDFS ) THEN
          DO 13 I = 1, NOPEN
             IF ( .NOT. PAIRED( I ) ) THEN
-               CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+               CALL NDG_NDFAS( NDFGR, I, 'UPDATE', IDIN, STATUS )
                CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT, STATUS )
                CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
                CALL CCD1_MSG( ' ', 
@@ -1468,7 +1470,7 @@
 *  to them.
       DO I = 1, NOPEN
          IF ( NOUT( I ) .GT. 0 ) THEN 
-            CALL IRH_GET( OUTGRP, I, 1, FNAME, STATUS )
+            CALL GRP_GET( OUTGRP, I, 1, FNAME, STATUS )
             CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
      :                       STATUS )
             CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
@@ -1484,7 +1486,7 @@
 *  If the names of the positions lists were accessed using NDF extension
 *  information then update the extension.
             IF ( NDFS ) THEN 
-               CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+               CALL NDG_NDFAS( NDFGR, I, 'UPDATE', IDIN, STATUS )
                CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Close the NDF.
@@ -1515,10 +1517,10 @@
 *  Abort on error label.
  99   CONTINUE
 
-*  Close IRH
-      CALL IRH_ANNUL( FIOGR, STATUS )
-      IF ( NDFS ) CALL IRH_ANNUL( NDFGR, STATUS )
-      CALL IRH_CLOSE( STATUS )
+*  Annul group identifiers.
+      CALL GRP_DELET( FIOGR, STATUS )
+      CALL GRP_DELET( OUTGRP, STATUS )
+      IF ( NDFS ) CALL GRP_DELET( NDFGR, STATUS )
 
 *  Close AST.
       CALL AST_END( STATUS )

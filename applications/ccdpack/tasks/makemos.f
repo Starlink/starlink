@@ -696,6 +696,8 @@
 *        Added WRITESZ and CORRECT parameters and associated chaanges
 *     31-JAN-2000 (MBT):
 *        Removed WRITESZ.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -876,7 +878,7 @@
 *  Loop to obtain an identifier for each NDF.
       NVAR = 0
       DO 3 I = 1, NIN
-         CALL IRG_NDFEX( INGRP, I, NDF( I ), STATUS )
+         CALL NDG_NDFAS( INGRP, I, ACMODE, NDF( I ), STATUS )
 
 *  Obtain the NDF bounds.
          CALL NDF_BOUND( NDF( I ), NDF__MXDIM, LBND( 1, I ),
@@ -1676,7 +1678,7 @@
       CALL NDF_END( STATUS )
 
 *  Annul the input NDF group.
-      CALL IRH_ANNUL( INGRP, STATUS )
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

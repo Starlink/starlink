@@ -5,7 +5,7 @@
 *     CCD1_LNAMM
 
 *  Purpose:
-*     Lists the contents of an IRH group to a file via an ADAM
+*     Lists the contents of a GRP group to a file via an ADAM
 *     parameter. Empty files are not recorded.
 
 *  Language:
@@ -16,7 +16,7 @@
 *                      COMMEN, STATUS )
 
 *  Description:
-*     This routine writes the names of the elements in the input IRH
+*     This routine writes the names of the elements in the input GRP
 *     group into a text file. An integer array is also given which
 *     indicates whether the associated name should be written. Array
 *     elements with value 0 are not written.
@@ -38,7 +38,7 @@
 *        A title for the first line of the file. This must contain the
 *        character # first (i.e. '#  then the actual comment').
 *     GRPID = INTEGER (Given)
-*        The IRH identifier of the group.
+*        The GRP identifier of the group.
 *     VALID( INDXHI ) = INTEGER (Given)
 *        Array of integer values indicating whether the associated name
 *        should be added to the output file or not. If the value
@@ -51,6 +51,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        Original version. Based on CCD1_LNAM, just added integer array
 *        which really indicates the number of detections associated with
 *        the name
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,8 +73,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRH_PAR'          ! IRH parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Arguments Given:
       CHARACTER *  ( * ) PARAM
@@ -90,7 +93,7 @@
       INTEGER CHR_LEN            ! Length of string
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) NAME ! Buffer for name
+      CHARACTER * ( GRP__SZNAM ) NAME ! Buffer for name
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer for file name
       INTEGER I                  ! Loop variable
       INTEGER FD                 ! File descriptor
@@ -103,7 +106,7 @@
 
 *  Open the file via the named adam parameter.
       OPEN = .FALSE.
-      CALL CCD1_ASFIO( PARAM, 'WRITE', 'LIST', IRH__SZNAM, FD, OPEN,
+      CALL CCD1_ASFIO( PARAM, 'WRITE', 'LIST', GRP__SZNAM, FD, OPEN,
      :                 STATUS )
 
 *  Write the title
@@ -114,7 +117,7 @@
       DO 1 I = INDXLO, INDXHI
          IF ( VALID( I ) .NE. 0 ) THEN 
             NAME = ' '
-            CALL IRH_GET( GRPID, I, 1, NAME, STATUS )
+            CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
 
 *  Now write out the name.
             CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )

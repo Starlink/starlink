@@ -237,6 +237,8 @@
 *        Added SHOW mode.
 *     13-NOV-1999 (MBT):
 *        Added MathMaps.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *-
@@ -247,8 +249,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      INCLUDE 'IRH_PAR'          ! Standard IRH constants
       INCLUDE 'PAR_ERR'          ! PAR system error constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -269,7 +271,7 @@
       CHARACTER * ( 80 ) BUFFER  ! Buffer for line output
       CHARACTER * ( 16 ) MAPTYP  ! Type of mapping to use
       CHARACTER * ( 16 ) MODE    ! Action to perform
-      CHARACTER * ( IRH__SZNAM ) NAME ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) NAME ! Name of NDF
       CHARACTER * ( AST__SZCHR ) DMTARG ! Domain of target frame
       CHARACTER * ( AST__SZCHR ) DMRMV ! Domain to remove
       CHARACTER * ( AST__SZCHR ) DOMAIN ! Domain of new frame
@@ -286,7 +288,7 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER INDF               ! NDF identifier
-      INTEGER INGRP              ! IRG identifier for NDF group
+      INTEGER INGRP              ! Group identifier for NDF group
       INTEGER IWCS               ! AST pointer to WCS component
       INTEGER JTARG              ! Index of target frame
       INTEGER JCUR               ! Index of Current frame in unedited WCS comp
@@ -353,7 +355,6 @@
          CALL MSG_SETC( 'BUFFER', BUFFER )
          CALL CCD1_MSG( ' ', '    ^BUFFER', STATUS )
       END IF
-         
 
 *  Get ready to loop over NDFs.
       MODIF = ' '
@@ -363,12 +364,12 @@
       DO 1 I = 1, NNDF
 
 *  Get NDF and WCS component.
-         CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
+         CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
          CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
 *  Log to user.
          CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL IRH_GET( INGRP, I, 1, NAME, STATUS )
+         CALL GRP_GET( INGRP, I, 1, NAME, STATUS )
          CALL MSG_SETC( 'NDF', NAME )
          CALL CCD1_MSG( ' ', '^NDF:', STATUS )
 
@@ -615,8 +616,8 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
 
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

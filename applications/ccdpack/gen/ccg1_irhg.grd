@@ -5,7 +5,7 @@
 *     CCD1_IRHG<T>
 
 *  Purpose:
-*     To get an IRH group of type <COMM> from a single prompt.
+*     To get a GRP group of type <COMM> from a single prompt.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,8 +15,8 @@
 *                        STATUS)
 
 *  Description:
-*     The routine uses the IRH system to access a list of strings which
-*     are values of the given type. The returns from IRH are converted
+*     The routine uses the GRP system to access a list of strings which
+*     are values of the given type. The returns from GRP are converted
 *     to the type to check that the values are valid. The number of
 *     values is retricted to lie within the bounds MINVAL to MAXVAL.
 *     Additional facility -- ONEOK: If one value is returned and ONEOK
@@ -24,7 +24,7 @@
 *     the possible group (up to MAXVAL).
 
 *  Notes:
-*     - the routine uses the CCDPACK IRH continuation character '-'
+*     - the routine uses the default GRP flag character '-' for continuation
 *     to force reprompting.
 
 *  Arguments:
@@ -40,13 +40,14 @@
 *        for all returns up to MAXVAL.
 *     NRET = INTEGER (Returned)
 *        The actual number of returned values.
-*     GID = INTEGER (Given)
-*        The IRH group identifier pointing to the validated strings.
+*     GID = INTEGER (Returned)
+*        The GRP group identifier pointing to the validated strings.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        Original Version.
 *     27-NOV-1991 (PDRAPER):
 *        Added ONEOK.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,10 +71,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
-      INCLUDE 'IRG_FAC'          ! IRG and IRH facility errors and
-                                 ! parameters
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
       INCLUDE 'FIO_ERR'          ! FIO system error codes.
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       INTEGER MAXVAL
@@ -87,14 +89,12 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER CURSTR * ( IRH__SZNAM ) ! String to hold one of the
+      CHARACTER CURSTR * ( GRP__SZNAM ) ! String to hold one of the
                                         ! associated factors expressed
                                         ! as a string
-      INTEGER INDEX              ! Current index into IRH group
+      INTEGER INDEX              ! Current index into GRP group
       INTEGER NTRY               ! Number of attempts to get string
-      INTEGER IDH1               ! IRH identifier for modification group
-                                 ! (none)
-      INTEGER ADDED              ! Dummy
+      INTEGER ADDED              ! Number of strings added this iteration
       LOGICAL TERM               ! Set if the continuation character
                                  ! is set
       LOGICAL AGAIN              ! Controls the looping for new values
@@ -105,18 +105,17 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access a number of character strings using IRH. These should
+*  Access a number of character strings using GRP. These should
 *  represent the associated factor. Insist on a number of values within
 *  the range. Then try to decode the strings as <COMM> values. Reprompt
 *  on failure.
       NTRY = 0
-      IDH1 = IRH__NOID
 
 *  Set flag controlling return of one value.
       FILL = .FALSE.
 
 *  Create a new group to associate names with
-      CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+      CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
  3    CONTINUE                      ! Return here if error converting
                                     ! strings into <COMM> values.
 
@@ -125,7 +124,7 @@
 
          TERM = .FALSE.
          ADDED = -1
-         CALL IRH_GROUP( FACNAM, IDH1, GID, '-', NRET, ADDED, TERM,
+         CALL GRP_GROUP( FACNAM, GRP__NOID, GID, NRET, ADDED, TERM,
      :                   STATUS )
 
 *  Get out if a null return has been given or a par_abort. Also quit
@@ -153,9 +152,8 @@
      :                       '^MAXVAL - try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL IRH_ANNUL( GID, STATUS )
-            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
-            IDH1 = IRH__NOID
+            CALL GRP_DELET( GID, STATUS )
+            CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( FACNAM, STATUS )
@@ -172,9 +170,8 @@
      :      '- try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL IRH_ANNUL( GID, STATUS )
-            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
-            IDH1 = IRH__NOID
+            CALL GRP_DELET( GID, STATUS )
+            CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( FACNAM, STATUS )
@@ -185,20 +182,17 @@
             AGAIN = .TRUE.
             CALL PAR_CANCL( FACNAM, STATUS )
 
-*  Status may have been set by IRH for a good reason.. check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
+*  Status may have been set by GRP for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
      :   THEN
 
 *  Issue the error.
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL IRH_ANNUL( GID, STATUS )
-            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
-            IDH1 = IRH__NOID
+            CALL GRP_DELET( GID, STATUS )
+            CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( FACNAM, STATUS )
@@ -222,13 +216,14 @@
          DO 4 INDEX = 1, NRET
 
 *  Get the string
-            CALL IRH_GET( GID, INDEX, 1, CURSTR, STATUS )
+            CALL GRP_GET( GID, INDEX, 1, CURSTR, STATUS )
 
 *  Try to convert the string.
             CALL CHR_CTO<T>( CURSTR, FACTOR, STATUS )
 
 *  See if translation occurred successfully.
             IF ( STATUS .EQ. SAI__ERROR ) THEN
+               CALL GRP_DELET( GID, STATUS )
                CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.
@@ -236,7 +231,7 @@
                CALL MSG_OUT( ' ',
      :         '  Cannot convert ^IRH_STR - try again.', STATUS )
                CALL PAR_CANCL( FACNAM, STATUS )
-               CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+               CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
                AGAIN = .TRUE.
                NTRY = NTRY + 1
                NRET = 0
@@ -247,13 +242,14 @@
 
 *  Need to use this one value to fill out group - try to translate it
 *  first.
-         CALL IRH_GET( GID, 1, 1, CURSTR, STATUS )
+         CALL GRP_GET( GID, 1, 1, CURSTR, STATUS )
 
 *  Try to convert the string.
          CALL CHR_CTO<T>( CURSTR, FACTOR, STATUS )
 
 *  See if translation occurred successfully.
          IF ( STATUS .EQ. SAI__ERROR ) THEN
+            CALL GRP_DELET( GID, STATUS )
             CALL ERR_ANNUL( STATUS )
 
 *  Bad value try again.
@@ -262,7 +258,7 @@
      :      '  Cannot convert string ^IRH_STR into numeric value - '//
      :      'try again.', STATUS )
             CALL PAR_CANCL( FACNAM, STATUS )
-            CALL IRH_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
+            CALL GRP_NEW( 'CCD1_IRHG<T>:FACTS', GID, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             NRET = 0
@@ -271,7 +267,7 @@
 
 *  Fill group with this string.
          DO 5 INDEX = 2, MAXVAL
-            CALL IRH_PUT( GID, 1, CURSTR, 0, STATUS )
+            CALL GRP_PUT( GID, 1, CURSTR, 0, STATUS )
  5       CONTINUE
       END IF
 

@@ -393,6 +393,8 @@
 *        Changed to use CCD1_MKTMP to create temporary workspace
 *     05-NOV-1999 (AA):
 *        Minor cosmetic changes to output
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -613,7 +615,7 @@
          DZERO( I ) = 0.0D0         
 
 *  Get group identifier         
-         CALL IRG_NDFEX( INGRP, I, NDF( I ), STATUS )
+         CALL NDG_NDFAS( INGRP, I, ACMODE, NDF( I ), STATUS )
 
 *  Test to see whether the NDF contains variance information and count
 *  the number which do.
@@ -1399,8 +1401,7 @@
       CALL NDF_END( STATUS )
 
 *  Annul the input NDF group.
-      CALL IRH_ANNUL( INGRP, STATUS )
-      CALL IRH_CLOSE( STATUS )
+      CALL GRP_DELET( INGRP, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

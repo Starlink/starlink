@@ -5,7 +5,7 @@
 *     CCD1_NDFAC
 
 *  Purpose:
-*     To access a group of NDFs using IRG.
+*     To access a group of NDFs using NDG.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,7 +21,7 @@
 *     The actual number of NDFs is returned is NNDF.
 
 *  Notes:
-*     - the routine uses the CCDPACK IRH continuation character '-'
+*     - the routine uses the CCDPACK NDG continuation character '-'
 *     to force reprompting. At present an internal maximum number of
 *     NDFs is set, this is the value CCD1__MXNDF.
 
@@ -45,6 +45,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Removed all code dealing with top-level locators. HDS can now
 *        perform this task for itself. This is part of the changes to 
 *        IRG to allow foreign data access.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,11 +76,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
-      INCLUDE 'IRG_FAC'          ! IRH and IRG system parameters
-                                 ! (IRH__NOID) IRG error codes etc.
+      INCLUDE 'GRP_PAR'          ! GRP system constants
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
       INCLUDE 'FIO_ERR'          ! FIO system error codes
       INCLUDE 'CCD1_PAR'         ! CCDPACK system constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       CHARACTER NAME * ( * )
@@ -94,9 +97,10 @@
 
 *  Local Variables:
       INTEGER ADDED              ! Number of NDFs added this loop.
-      INTEGER GID                ! IRG group identifier
+      INTEGER GID                ! NDG group identifier
       INTEGER INDEX              ! Current index into NDF group
       INTEGER NTRY               ! Number of attempts to get prompt right quit after 10, probably batch job in error.
+      INTEGER ONNDF              ! Value of NNDF from previous iteration
       LOGICAL AGAIN              ! Controls looping for NDf names
       LOGICAL TERM               ! Returned true if a termination character is issued.
 
@@ -105,16 +109,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access the NDF names through IRG. Set GID to no previous entries.
-*  Set the termination character to '-' if this is added to any lines
-*  of data then a continuation line is used.
-      GID = IRH__NOID
+*  Access the NDF names through NDG. Set GID to no previous entries.
+      GID = GRP__NOID
+      NNDF = 0
       NTRY = 0
  1    CONTINUE                   ! start of repeat until loop
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRG_GROUP( NAME, '-', ACCESS, GID, NNDF, ADDED, TERM,
-     :                   STATUS )
+         ONNDF = NNDF
+         CALL NDG_ASSOC( NAME, .TRUE., GID, NNDF, TERM, STATUS )
+         ADDED = NNDF - ONNDF
 
 *  Get out if a given a par_abort. Also quit after an unreasonble
 *  number of attempts.
@@ -145,8 +148,9 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -157,19 +161,17 @@
             CALL PAR_CANCL( NAME, STATUS )
             AGAIN = .TRUE.
 
-*  Status may have been set by IRG for a good reason.. check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
-     :   THEN
+*  Status may have been set by NDG for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
 
 *  Issue the error.
              CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -177,7 +179,7 @@
 *  Try to trap a special case of ' ' string return. This should leave
 *  added unmodified. This will be taken as a request to exit. The normal
 *  stop entry request from an blank line will be `!' .
-         ELSE IF ( ( ADDED .EQ. -1 ) .AND. ( .NOT. TERM  ) ) THEN
+         ELSE IF ( ( ADDED .EQ. 0 ) .AND. ( .NOT. TERM ) ) THEN
             AGAIN = .FALSE.
 
          ELSE IF ( NNDF .LT. MINVAL ) THEN
@@ -191,8 +193,9 @@
      :                     STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -209,7 +212,7 @@
 *  them in the common block for later annulment (these are primary).
       IF ( STATUS .EQ. SAI__OK ) THEN
          DO 2 INDEX = 1, NNDF
-            CALL IRG_NDFEX( GID, INDEX, STACK( INDEX ), STATUS )
+            CALL NDG_NDFAS( GID, INDEX, ACCESS, STACK( INDEX ), STATUS )
  2       CONTINUE
 
 *  Write out how many NDFs we've got.
@@ -226,5 +229,10 @@
          END IF
       END IF
 
- 99   END
+ 99   CONTINUE
+
+*  Release group resources.
+      CALL GRP_DELET( GID, STATUS )
+
+      END
 * $Id$

@@ -226,6 +226,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -239,6 +240,8 @@
 *        Added the concatenate option for character import.
 *     29-JUL-1998 (PDRAPER):
 *        Added missing CCD1_END call.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -354,7 +357,7 @@
       DO 100 INDEX = 1, NNDF
 
 *  Get the input NDF identifier
-         CALL IRG_NDFEX( GIDIN, INDEX, IDIN, STATUS )
+         CALL NDG_NDFAS( GIDIN, INDEX, 'UPDATE', IDIN, STATUS )
 
 *  Write out name of this NDF.
          CALL CCD1_MSG( ' ',  ' ', STATUS )
@@ -443,6 +446,7 @@
       CALL CCD1_MFREE( -1, STATUS )
 
 *  Free GRP groups.
+      CALL GRP_DELET( GIDIN, STATUS )
       CALL GRP_DELET( FITGRP( 1 ), STATUS )
       CALL GRP_DELET( FITGRP( 2 ), STATUS )
       CALL GRP_DELET( DESGRP( 1 ), STATUS )
@@ -454,9 +458,6 @@
 
 *  Release calibration frame.
       CALL NDF_END( STATUS )
-
-*  Close IRH
-      CALL IRH_CLOSE( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

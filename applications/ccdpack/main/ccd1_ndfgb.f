@@ -15,8 +15,8 @@
 *                      FACGID, NNDF, STATUS )
 
 *  Description:
-*     The routine accesses an IRG group of NDF names, via the ADAM
-*     parameter name NDFNAM. The number of NDFs in the IRG group is
+*     The routine accesses an NDG group of NDF names, via the ADAM
+*     parameter name NDFNAM. The number of NDFs in the NDG group is
 *     NNDF. After the NDF names have been accessed an attempt is made
 *     to get associated "exposure" factors. These may be looked for in
 *     the NDF extensions if the USEEXT argument is TRUE, otherwise the
@@ -46,9 +46,9 @@
 *     FACNAM = CHARACTER * ( * ) (Given)
 *        The associated factor name.
 *     NDFGID = INTEGER (Returned)
-*        The IRG group identifier for the input NDFs.
+*        The NDG group identifier for the input NDFs.
 *     FACGID = INTEGER (Returned)
-*        The IRH group identifier for the string representation of the
+*        The GRP group identifier for the string representation of the
 *        associated parameters.
 *     NNDF = INTEGER (Returned)
 *        The number of NDF identifiers returned from user.
@@ -57,6 +57,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,13 +72,14 @@
 *        Added ACCESS argument.
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC argument from IRG_NDFEX call.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -128,13 +130,13 @@
          ALLOK = .TRUE.
          IF ( USEEXT ) THEN
 
-*  Create an IRH group to contain the values.
-            CALL IRH_NEW( 'CCD1_NDFGB:FACTS', FACGID, STATUS )
+*  Create a GRP group to contain the values.
+            CALL GRP_NEW( 'CCD1_NDFGB:FACTS', FACGID, STATUS )
 
 *  Loop reading the values from the NDF extensions. Need to get NDF
 *  identifiers for these.
             DO 1 I = 1, NNDF
-               CALL IRG_NDFEX( NDFGID, I, NDFID, STATUS )
+               CALL NDG_NDFAS( NDFGID, I, 'READ', NDFID, STATUS )
                CALL CCG1_FCH1D( NDFID, 'TIMES', CNAME, 1,
      :                          FACTOR, OK, STATUS )
                ALLOK = ALLOK .AND. OK
@@ -142,7 +144,7 @@
 
 *  Enter value into group.
                   CALL CHR_DTOC( FACTOR, CFACT, NCHAR )
-                  CALL IRH_PUT( FACGID, 1, CFACT( 1 : NCHAR ), 0,
+                  CALL GRP_PUT( FACGID, 1, CFACT( 1 : NCHAR ), 0,
      :                          STATUS )
                END IF
 
@@ -162,7 +164,7 @@
      : STATUS )
 
 *  Delete the group in preparation for the creation of a new one.
-            CALL IRH_ANNUL( FACGID, STATUS )
+            CALL GRP_DELET( FACGID, STATUS )
 
 *  Set USEEXT to false to indicate this.
             USEEXT = .FALSE.

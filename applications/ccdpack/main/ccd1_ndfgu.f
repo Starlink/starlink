@@ -4,7 +4,7 @@
 *     CCD1_NDFGU
 
 *  Purpose:
-*     To access a group of NDFs for UPDATE using IRG.
+*     To access a group of NDFs for UPDATE using NDG.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,12 +20,12 @@
 *     The NDFs are set access for UPDATE.
 
 *  Notes:
-*     - the IRH system should be closed (by calling IRH_CLOSE ) after
-*     use of the GID group has finished.
+*     - the GID identifier should be annulled (by calling GRP_DELET)
+*     after use of the group has finished.
 
 *  Arguments:
 *     GID = INTEGER (Returned)
-*        IRG identifier for the group of NDF names.
+*        NDG identifier for the group of NDF names.
 *     NNDF = INTEGER (Returned)
 *        The number of NDF identifiers returned from user (less than
 *        MAXNDF)
@@ -40,12 +40,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-JUL-1992 (PDRAPER):
 *        Changed to have a lower limit and access the group for
 *        update. Based on CCD1_NDFGL.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,9 +61,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRG_FAC'          ! IRH and IRG system parameters
-                                 ! (IRH__NOID) IRG error codes etc.
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       INTEGER MINNDF
@@ -75,7 +78,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER ADDED              ! Number of NDFs added this loop.
       LOGICAL TERM               ! Returned true if a termination
                                  ! character is issued.
       LOGICAL AGAIN              ! Controls looping for NDf names
@@ -88,14 +90,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access the NDF names through IRG. Set GID to no previous entries.
+*  Access the NDF names through NDG. Set GID to no previous entries.
 *  Set the termination character to '-' if this is added to any lines
 *  of data then a continuation line is used.
-      GID = IRH__NOID
+      GID = GRP__NOID
       NTRY = 0
  1    CONTINUE                   ! start of repeat until loop
-         CALL IRG_GROUP( NAME, '-', 'UPDATE', GID, NNDF, ADDED, TERM,
-     :                   STATUS )
+         CALL NDG_ASSOC( NAME, .TRUE., GID, NNDF, TERM, STATUS )
 
 *  Get out if a null return has been given or a par_abort. Also quit
 *  after an unreasonble number of attempts.
@@ -123,8 +124,8 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -134,8 +135,8 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -153,15 +154,15 @@
      :                     STATUS )
              AGAIN = .TRUE.
 
-*  Status may have been set by IRG for a good reason.. check for this
+*  Status may have been set by NDG for a good reason.. check for this
 *  and reprompt.
-         ELSE IF ( STATUS .EQ. IRG__BADFN ) THEN
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
             CALL PAR_CANCL( NAME, STATUS )
             AGAIN =.TRUE.
 
 *  Reset everything and try again.
-            CALL IRH_ANNUL( GID, STATUS )
-            GID = IRH__NOID
+            CALL GRP_DELET( GID, STATUS )
+            GID = GRP__NOID
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )
          END IF

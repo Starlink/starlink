@@ -29,11 +29,11 @@
 
 *  Arguments:
 *     SIMPLE = LOGICAL (Given)
-*        If true then the input NDFs are specified within one IRG group.
+*        If true then the input NDFs are specified within one NDG group.
 *        Otherwise the NDFs are separated into data type related
 *        groups.
 *     MENTRY = LOGICAL (Given)
-*        True if the input NDF types are given in the IRH group FTYPES
+*        True if the input NDF types are given in the GRP group FTYPES
 *        and any filter types or exposures in FILFAC. Also assumes
 *        SIMPLE is TRUE.
 *     MODIFY = LOGICAL (Given)
@@ -44,20 +44,20 @@
 *     NTYPES = INTEGER (Given)
 *        The number of input NDF types.
 *     GID( NTYPES ) = INTEGER (Given)
-*        IRH group identifiers for input NDF groups.
+*        NDG group identifiers for input NDF groups.
 *     FTYPES = INTEGER (Given)
-*        If MENTRY is TRUE then this IRH group contains the frame types
+*        If MENTRY is TRUE then this GRP group contains the frame types
 *        of the input NDFS -- also assumes SIMPLE is TRUE.
 *     FILT = INTEGER (Given)
-*        If MENTRY and SIMPLE are TRUE then this IRH group contains any
+*        If MENTRY and SIMPLE are TRUE then this GRP group contains any
 *        filter types for the NDFs. The special symbol ! indicates a
 *        null entry and is not used.
 *     DARK = INTEGER (Given)
-*        If MENTRY and SIMPLE are TRUE then this IRH group contains any
+*        If MENTRY and SIMPLE are TRUE then this GRP group contains any
 *        dark times for the NDFs. The special symbol ! indicates a
 *        null entry and is not used.
 *     FLASH = INTEGER (Given)
-*        If MENTRY and SIMPLE are TRUE then this IRH group contains any
+*        If MENTRY and SIMPLE are TRUE then this GRP group contains any
 *        pre-flash times for the NDFs. The special symbol ! indicates a
 *        null entry and is not used.
 *     ADDDRK = LOGICAL (Given)
@@ -80,7 +80,7 @@
 *     true.
 *          If SIMPLE then
 *            NNDF( 1 ) should contain the total number of input NDFs.
-*            GID( 1 ) should contain the IRH group identifier for the
+*            GID( 1 ) should contain the GRP group identifier for the
 *                     above
 *             If MENTRY then
 *                FTYPES is a group of the input NDF types. FILT, DARK and
@@ -101,6 +101,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,6 +127,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC argument from IRG_NDFEX call. Added call to 
 *        release dangling LOCTMP.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -246,7 +249,7 @@
             DO 2 I = 1, NNDF( J )
 
 *  Get the NDF.
-               CALL IRG_NDFEX( GID( J ), I, NDFID, STATUS )
+               CALL NDG_NDFAS( GID( J ), I, 'UPDATE', NDFID, STATUS )
 
 *  Inform user that this NDF is being processed log this information to
 *  the log file.
@@ -304,7 +307,7 @@
 *  No frame type so has a value been given in the FTYPES list?
                      OK = .TRUE.
                      IF ( MENTRY ) THEN
-                        CALL IRH_GET( FTYPES, I, 1, FTYPE, STATUS )
+                        CALL GRP_GET( FTYPES, I, 1, FTYPE, STATUS )
 
 *  Check the type against the list of those possible.
                         OK = CCD1_MATCH( FTYPE, FLIST, NTYPES, STATUS )
@@ -354,7 +357,7 @@
 *  modify existing values so has a value been given in the FTYPES list?
                         OK = .FALSE.
                         IF ( MENTRY ) THEN
-                           CALL IRH_GET( FTYPES, I, 1, FTYPE, STATUS )
+                           CALL GRP_GET( FTYPES, I, 1, FTYPE, STATUS )
 
 *  Check the type against the list of those possible.
                            OK = CCD1_MATCH( FTYPE, FLIST, NTYPES,
@@ -416,7 +419,7 @@
 
 *  Has one already been given?
                      IF ( SIMPLE .AND. MENTRY ) THEN
-                        CALL IRH_GET( FILT, I, 1, BUFFER, STATUS )
+                        CALL GRP_GET( FILT, I, 1, BUFFER, STATUS )
                         IF ( BUFFER( 1: 1 ) .EQ. '!' ) BUFFER = 'NONE'
                      ELSE
 
@@ -484,10 +487,10 @@
 *  Check that a value hasn't already been given.
                      IF ( SIMPLE .AND. MENTRY ) THEN
 
-*  Extract value from IRH group and enter if allowed.
+*  Extract value from GRP group and enter if allowed.
                         IF ( MODIFY ) THEN
                            FRMEXT = .FALSE.
-                           CALL IRH_GET( DARK, I, 1, BUFFER, STATUS )
+                           CALL GRP_GET( DARK, I, 1, BUFFER, STATUS )
                            IF ( BUFFER( 1: 1 ) .NE. '!' ) THEN
                               CALL CHR_CTOD( BUFFER, DVAL, STATUS )
                               CALL CMP_MOD( LOCTMP, 'DARK', '_DOUBLE',
@@ -542,10 +545,10 @@
 *  Check that a value hasn't already been given.
                      IF ( SIMPLE .AND. MENTRY ) THEN
 
-*  Extract value from IRH group.
+*  Extract value from GRP group.
                         IF ( MODIFY ) THEN
                            FRMEXT = .FALSE.
-                           CALL IRH_GET( FLASH, I, 1, BUFFER, STATUS )
+                           CALL GRP_GET( FLASH, I, 1, BUFFER, STATUS )
                            IF ( BUFFER( 1: 1 ) .NE. '!' ) THEN
                               CALL CHR_CTOD( BUFFER, DVAL, STATUS )
                               CALL CMP_MOD( LOCTMP, 'FLASH', '_DOUBLE',
@@ -607,10 +610,10 @@
                      IF ( SIMPLE .AND. MENTRY ) THEN
 
 *  If value can be found as the darktime! This is just an aid for
-*  writing scripts. Extract value from IRH group and enter if allowed.
+*  writing scripts. Extract value from GRP group and enter if allowed.
                         IF ( MODIFY ) THEN
                            FRMEXT = .FALSE.
-                           CALL IRH_GET( DARK, I, 1, BUFFER, STATUS )
+                           CALL GRP_GET( DARK, I, 1, BUFFER, STATUS )
                            IF ( BUFFER( 1: 1 ) .NE. '!' ) THEN
 
 *  Have a value and can modify the extension, so do so.

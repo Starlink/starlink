@@ -15,22 +15,22 @@
 *                      STATUS )
 
 *  Description:
-*     The routine uses the IRH system to access a list of strings.
+*     The routine uses the GRP system to access a list of strings.
 *     The returns may be based on previous group of names (so that
 *     global substitions and modifications to the names can be made).
 *     The number of returns is required to be in the range MINVAL to
 *     MAXVAL.
 
 *  Notes:
-*     - the routine uses the CCDPACK IRH continuation character '-'
-*     to force reprompting.
+*     - the routine uses the default GRP flag character '-' for 
+*     continuation to force reprompting.
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name which is used to assess the input group
 *        of names.
 *     INGRP = INTEGER (Given)
-*        The IRH group identifier for the input group on which
+*        The GRP group identifier for the input group on which
 *        modifications etc. may be performed to form the output group.
 *     MINVAL = INTEGER (Given)
 *        The minimum number of values which can be returned.
@@ -40,17 +40,20 @@
 *     NRET = INTEGER (Returned)
 *        The actual number of returned values.
 *     OUTGRP = INTEGER (Given)
-*        The IRH group identifier pointing to the strings.
+*        The GRP group identifier pointing to the strings.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-NOV-1992 (PDRAPER):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,7 +89,7 @@
 
 *  Local Variables:
       INTEGER NTRY               ! Number of attempts to get string
-      INTEGER ADDED              ! Dummy
+      INTEGER ADDED              ! Number of strings added this iteration
       LOGICAL TERM               ! Set if the continuation character
                                  ! is set
       LOGICAL AGAIN              ! Controls the looping for new values
@@ -95,19 +98,20 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Access a number of character strings using IRH. Reprompt on failure
+*  Access a number of character strings using GRP. Reprompt on failure
 *  caused by insufficient returns, too many returns etc. or when a
 *  reprompt is forced.
       NTRY = 0
 
 *  Create a new group to associate names with
-      CALL IRH_NEW( 'CCDPACK:STRGS', OUTGRP, STATUS )
+      CALL GRP_NEW( 'CCDPACK:STRGS', OUTGRP, STATUS )
+      NRET = 0
+      ADDED = -1
  3    CONTINUE                      ! Return here on re-try.
 
 *  Get the user return.
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRH_GROUP( NAME, INGRP, OUTGRP, '-', NRET, ADDED, TERM,
+         CALL GRP_GROUP( NAME, INGRP, OUTGRP, NRET, ADDED, TERM, 
      :                   STATUS )
 
 *  Get out if a null return has been given or a PAR__ABORT. Also quit
@@ -135,8 +139,9 @@
      :                       '^MAXVAL - try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL IRH_ANNUL( OUTGRP, STATUS )
-            CALL IRH_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
+            CALL GRP_DELET( OUTGRP, STATUS )
+            NRET = 0
+            CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )
@@ -149,8 +154,9 @@
      :      '- try again', STATUS )
 
 *  Reset everything ready for next attempt.
-            CALL IRH_ANNUL( OUTGRP, STATUS )
-            CALL IRH_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
+            CALL GRP_DELET( OUTGRP, STATUS )
+            CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
+            NRET = 0
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )
@@ -161,16 +167,17 @@
             AGAIN = .TRUE.
             CALL PAR_CANCL( NAME, STATUS )
 
-*  Status may have been set by IRH for a good reason.. check for this
-*  and reprompt. (Note FIO system errors are not captured by IRH).
+*  Status may have been set by GRP for a good reason.. check for this
+*  and reprompt. (Note FIO system errors are not captured by GRP).
          ELSE IF ( FIO_TEST( 'OPEN error', STATUS ) ) THEN
 
 *  Issue the error.
             CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-            CALL IRH_ANNUL( OUTGRP, STATUS )
-            CALL IRH_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
+            CALL GRP_DELET( OUTGRP, STATUS )
+            CALL GRP_NEW( 'CCDPACK:STRINGS', OUTGRP, STATUS )
+            NRET = 0
             AGAIN = .TRUE.
             NTRY = NTRY + 1
             CALL PAR_CANCL( NAME, STATUS )

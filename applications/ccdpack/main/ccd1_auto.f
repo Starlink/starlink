@@ -42,7 +42,7 @@
 *     FD = INTEGER (Given)
 *        FIO file descriptor for output script.
 *     GIDIN = INTEGER (Given)
-*        IRG input group identifier.
+*        GRP input group identifier.
 *     NNDF = INTEGER (Given)
 *        Number of input NDFs.
 *     VALID( NNDF ) = LOGICAL (Given)
@@ -145,6 +145,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -182,6 +183,8 @@
 *     19-JUN-1997 (PDRAPER):
 *        PROTEC now correctly defined as an array of size 2 
 *        (stopped working on Linux).
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,8 +198,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
-      INCLUDE 'IRG_FAC'          ! IRG/IRH constants
       INCLUDE 'MSG_PAR'          ! Message system constants
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Arguments Given:
       CHARACTER * ( * ) STYPE
@@ -256,11 +259,11 @@
       CHARACTER * ( 20 ) SAY    ! Write to user command
       CHARACTER * ( 21 ) DEL    ! File deletion command
       CHARACTER * ( 3 ) CONTIN  ! Continuation string
-      CHARACTER * ( IRH__SZNAM ) TEMP ! Name of temporary file.
-      CHARACTER * ( IRH__SZNAM ) MBIAS ! Name of existing master bias
-      CHARACTER * ( IRH__SZNAM ) MDARK ! Name of existing master bias
-      CHARACTER * ( IRH__SZNAM ) MFLASH ! Name of existing master bias
-      CHARACTER * ( IRH__SZNAM ) MFLAT ! Name of existing master bias
+      CHARACTER * ( GRP__SZNAM ) TEMP ! Name of temporary file.
+      CHARACTER * ( GRP__SZNAM ) MBIAS ! Name of existing master bias
+      CHARACTER * ( GRP__SZNAM ) MDARK ! Name of existing master bias
+      CHARACTER * ( GRP__SZNAM ) MFLASH ! Name of existing master bias
+      CHARACTER * ( GRP__SZNAM ) MFLAT ! Name of existing master bias
       CHARACTER * ( MSG__SZMSG ) MESS ! Message buffer
       INTEGER I                 ! Loop variable
       INTEGER LCONT             ! Used length of continuation string
@@ -295,7 +298,7 @@
          IF ( NMAST .GT. 0 ) THEN
 
 *  Ok found it (again) record its name.
-            CALL IRH_GET( GIDIN, PTEMP1( 1 ), 1, MBIAS, STATUS )
+            CALL GRP_GET( GIDIN, PTEMP1( 1 ), 1, MBIAS, STATUS )
 
 *  Flag all the frame with a type of master bias as no longer valid.
             DO 1 I = 1, NMAST
@@ -482,7 +485,7 @@
          IF ( NMAST .GT. 0 ) THEN
 
 *  Ok found it (again) record its name.
-            CALL IRH_GET( GIDIN, PTEMP1( 1 ), 1, MDARK, STATUS )
+            CALL GRP_GET( GIDIN, PTEMP1( 1 ), 1, MDARK, STATUS )
 
 *  Flag all the frame with a type of master dark as no longer valid.
             DO 2 I = 1, NMAST
@@ -601,7 +604,7 @@
          IF ( NMAST .GT. 0 ) THEN
 
 *  Ok found it (again) record its name.
-            CALL IRH_GET( GIDIN, PTEMP1( 1 ), 1, MFLASH, STATUS )
+            CALL GRP_GET( GIDIN, PTEMP1( 1 ), 1, MFLASH, STATUS )
 
 *  Flag all the frame with a type of master flash as no longer valid.
             DO 3 I = 1, NMAST
@@ -737,7 +740,7 @@
 *  If more than one master flat exists then report the selection of the
 *  first.
                CALL CCD1_MSG( ' ', ' ', STATUS )
-               CALL IRH_GET( GIDIN, PTEMP1( 1 ), 1, MFLAT, STATUS )
+               CALL GRP_GET( GIDIN, PTEMP1( 1 ), 1, MFLAT, STATUS )
                CALL MSG_SETC( 'MFLAT', MFLAT )
                CALL MSG_SETC( 'FILTER', FILNMS( J ) )
                CALL CCD1_MSG( ' ',

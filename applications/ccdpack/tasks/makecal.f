@@ -274,6 +274,8 @@
 *        Added FASTMED combination option.
 *     23-FEB-1999 (MBT):
 *        Modified to propagate WCS component.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -662,9 +664,6 @@
 *  CCD1_START initialises).
       CALL CCD1_FRTMP( -1, STATUS )
       CALL CCD1_MFREE( -1, STATUS )
-
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

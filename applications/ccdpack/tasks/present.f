@@ -438,6 +438,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -453,6 +454,8 @@
 *     13-NOV-1995 (PDRAPER):
 *        Added ability to present MASTERS, so that spectral FFs can be
 *        imported (and others).
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -465,9 +468,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'IRG_FAC'         ! IRG/IRH constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
       INCLUDE 'PAR_ERR'         ! Parameter system error codes.
+      INCLUDE 'GRP_PAR'         ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -486,12 +489,12 @@
      :            IMFLAS = 9 )
       
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) NAME ! Name of input NDF
+      CHARACTER * ( GRP__SZNAM ) NAME ! Name of input NDF
       INTEGER DARK              ! Filter names if MULTI
       INTEGER FILT              ! Filter names if MULTI
       INTEGER FLASH             ! Filter names if MULTI
       INTEGER FTYPES            ! Group of input frame types
-      INTEGER GID( NTYPES )     ! Input IRH group identifiers.
+      INTEGER GID( NTYPES )     ! Input group identifiers.
       INTEGER I                 ! Loop variable
       INTEGER J                 ! Loop variable
       INTEGER FD                ! Output namelist
@@ -518,12 +521,12 @@
 *  Set number of NDFs counters.
       DO 1 I = 1, NTYPES
          NNDF( I ) = 0
-         GID( I ) = IRH__NOID
+         GID( I ) = GRP__NOID
  1    CONTINUE
-      FTYPES = IRH__NOID
-      FILT = IRH__NOID
-      DARK = IRH__NOID
-      FLASH = IRH__NOID
+      FTYPES = GRP__NOID
+      FILT = GRP__NOID
+      DARK = GRP__NOID
+      FLASH = GRP__NOID
 
 *  Access a list of NDF names, or access a series of names for the
 *  different data types.
@@ -684,7 +687,7 @@
 
 *  Write an output list of the NDF names for other applications to use.
       IF ( STATUS .EQ. SAI__OK ) THEN 
-         CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', IRH__SZNAM, FD,
+         CALL CCD1_ASFIO( 'NAMELIST', 'WRITE', 'LIST', GRP__SZNAM, FD,
      :                    OPEN, STATUS )
          IF ( STATUS .EQ. SAI__OK .AND. OPEN ) THEN 
 
@@ -697,7 +700,7 @@
                IF ( NNDF( I ) .GT. 0 ) THEN 
                   DO 3 J = 1, NNDF( I )
                      NAME = ' '
-                     CALL IRH_GET( GID( I ), J, 1, NAME, STATUS )
+                     CALL GRP_GET( GID( I ), J, 1, NAME, STATUS )
                      CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), 
      :                               STATUS)
  3                CONTINUE
@@ -710,8 +713,14 @@
 *  Exit with error statement label. Perform orderly closedown.
  99   CONTINUE
 
-*  Close IRG/IRH and release groups.
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      DO 4 I = 1, NTYPES
+         CALL GRP_DELET( GID( I ), STATUS )
+ 4    CONTINUE
+      CALL GRP_DELET( FTYPES, STATUS )
+      CALL GRP_DELET( FILT, STATUS )
+      CALL GRP_DELET( DARK, STATUS )
+      CALL GRP_DELET( FLASH, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

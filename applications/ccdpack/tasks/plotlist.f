@@ -203,6 +203,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -212,6 +213,8 @@
 *        Updated for CCDPACK version 2.0.
 *     29-JUL-1998 (PDRAPER):
 *        Added missing CCD1_END call.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -282,7 +285,7 @@
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
       DO 6 INDEX = 1, NOPEN
-         CALL IRH_GET( FIOGR, INDEX, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, INDEX, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', INDEX )
          CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -298,7 +301,7 @@
          CALL CCD1_MSG( ' ', '    Associated NDFs:', STATUS )
          CALL CCD1_MSG( ' ', '    ----------------', STATUS )
          DO 7 INDEX = 1, NOPEN
-            CALL IRH_GET( NDFGR, INDEX, 1, FNAME, STATUS )
+            CALL GRP_GET( NDFGR, INDEX, 1, FNAME, STATUS )
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'N', INDEX )
             CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -343,7 +346,7 @@
       DO 9999 INDEX = 1, NOPEN 
 
 *  Get the name of the input list and open the file.
-         CALL IRH_GET( FIOGR, INDEX, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGR, INDEX, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
 
 *  Report error message if open failed.
@@ -438,9 +441,9 @@
 *  Close the graphics device.
       CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
 
-*  Annul IRH group.
-      CALL IRH_ANNUL( FIOGR, STATUS )
-      IF ( NDFS ) CALL IRH_ANNUL( NDFGR, STATUS )
+*  Relase group resources.
+      CALL GRP_DELET( FIOGR, STATUS )
+      IF ( NDFS ) CALL GRP_DELET( NDFGR, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

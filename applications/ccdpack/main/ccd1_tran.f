@@ -21,7 +21,6 @@
 *     directly from MAKEMOS, which calculates the SCALE and ZERo point 
 *     corrections for the input frames. The transformed frames are then
 *     deleted.
-*  Notes
 
 *  Arguments:
 *     NDF( CCD1__MXNDF + 1 ) = INTEGER (Given)
@@ -60,6 +59,8 @@
 *        Original version based on TRANNDF and MAKEMOS code.
 *     9-NOV-1999 (MBT):
 *        Modified warnings.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -411,8 +412,8 @@
 
 *  Create the output NDF.
 *  ======================
-         CALL IRG_NDFPR( OUTGRP, I, NDF( I ), 'Axis,Units', OUT( I ),
-     :                   STATUS )  
+         CALL NDG_NDFPR( NDF( I ), 'Axis,Units', OUTGRP, I, OUT( I ),
+     :                   STATUS )
             
 *  Tell user the name of the output NDF.
          CALL NDF_MSG( 'TMPNDF', OUT( I ) )
@@ -975,7 +976,7 @@
 
 *  Jump to here on error
 940   CONTINUE
-      CALL IRH_ANNUL( OUTGRP, STATUS )
+      CALL GRP_DELET( OUTGRP, STATUS )
       
 *  Time at the bar please...      
 999   END

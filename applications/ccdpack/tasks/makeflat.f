@@ -281,6 +281,8 @@
 *        generation of output variances from the spread in the data stack.
 *     23-FEB-1999 (MBT):
 *        Modified to propagate WCS component.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -782,9 +784,6 @@
 *  after CCD1_START).
       CALL CCD1_FRTMP( -1, STATUS )
       CALL CCD1_MFREE( -1, STATUS )
-
-*  Close IRH.
-      CALL IRH_CLOSE( STATUS )
 
 *  If an error occurred, then report a contextual message. Logging it if
 *  required.

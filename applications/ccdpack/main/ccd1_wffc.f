@@ -56,7 +56,7 @@
 *        The frame and filter types of the input NDFs. (1,*) are the
 *        frame types, (2,*) are the filters.
 *     GIDIN = INTEGER (Given)
-*        IRG identifier of the input group of NDF names. On exit the
+*        GRP identifier of the input group of NDF names. On exit the
 *        names of any target frames are modified to be the names of the
 *        NDFs output from FLATCOR.
 *     NNDF = INTEGER (Given)
@@ -77,6 +77,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        Original version.
 *     31-JAN-1994 (PDRAPER):
 *        Changed to modify the IRG group of NDF names.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,8 +100,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message system parameters
-      INCLUDE 'IRH_PAR'          ! IRH parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       LOGICAL LIST
@@ -131,8 +134,10 @@
 
 *  Local Variables:
       CHARACTER * ( MSG__SZMSG ) MESS ! Output buffer
-      CHARACTER * ( IRH__SZNAM ) NDFNAM ! Name of NDF
-      CHARACTER * ( IRH__SZNAM ) OUT ! Output NDFs specification
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) OUT ! Output NDFs specification
+      CHARACTER COMC             ! GRP comment character
+      CHARACTER INDC             ! GRP indirection character
       INTEGER IAT                ! Position in string
       INTEGER I                  ! Loop variable
       INTEGER FDTMP              ! Temporary file FIO descriptor
@@ -161,20 +166,24 @@
 *  Get a name for the indirection file.
          CALL CCD1_TMPNM( 'flatcor', TEMP( 2: ), STATUS )
 
+*  Get required GRP control characters.
+         CALL GRP_GETCC( GIDIN, 'COMMENT', COMC, STATUS )
+         CALL GRP_GETCC( GIDIN, 'INDIRECTION', INDC, STATUS )
+
 *  Open the file.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          OPEN = .FALSE.
          CALL CCD1_OPFIO( TEMP( 2: ), 'WRITE', 'LIST', 0, FDTMP,
      :                    STATUS )
          IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
-         MESS = IRH__COMC // ' List of names used by flatcor (filter '
+         MESS = COMC // ' List of names used by flatcor (filter '
      :          //FILT( :CHR_LEN( FILT ) )//')'
          CALL FIO_WRITE( FDTMP, MESS( :CHR_LEN( MESS ) ), STATUS )
 
 *  Now extract the name of the NDFs and write these into the file.
          DO 3 I = 1, NFRAME
             NDFNAM = ' '
-            CALL IRH_GET( GIDIN, POINT( I ), 1, NDFNAM, STATUS )
+            CALL GRP_GET( GIDIN, POINT( I ), 1, NDFNAM, STATUS )
             IAT = CHR_LEN( NDFNAM )
             CALL FIO_WRITE( FDTMP, NDFNAM( :IAT ), STATUS )
 
@@ -186,7 +195,7 @@
 
 *  Modify the NDF group names to those of the output NDFs.
             CALL CHR_APPND( TRAIL, NDFNAM, IAT )
-            CALL IRH_PUT( GIDIN, 1, NDFNAM( :IAT ), POINT( I ), STATUS )
+            CALL GRP_PUT( GIDIN, 1, NDFNAM( :IAT ), POINT( I ), STATUS )
  3       CONTINUE
 
 *  Close the temporary file.
@@ -200,7 +209,7 @@
          LCONT = CHR_LEN( CONTIN )
 
 *  Now the input and output file specifiers.
-         TEMP( 1: 1 ) = IRH__INDC
+         TEMP( 1: 1 ) = INDC
          IAT = 3
          MESS = ' '
          CALL CCD1_ADKEY( 'IN', TEMP, USEPRO, PROTEC, MESS, IAT,

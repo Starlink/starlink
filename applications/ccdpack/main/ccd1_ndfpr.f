@@ -4,7 +4,7 @@
 *     CCD1_NDFPR
 
 *  Purpose:
-*     To propagate an NDF using the IRG system.
+*     To propagate an NDF using the NDG system.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,16 +15,11 @@
 *  Description:
 *     The routine creates a new NDF propagating the components as
 *     specified in clist (see SUN/33 for description of clist). The
-*     output NDF name is obtained through the IRG system. This is done
-*     to keep a uniformity of interface, between all NDF commands specs
+*     output NDF name is obtained through the NDG system. This is done
+*     to keep a uniformity of interface, between all NDG commands specs
 *     and prompts (i.e. can be enclosed in quotes, read from a file
-*     etc.). The propagation actually occurs using the IRG_NDFPR
+*     etc.). The propagation actually occurs using the NDG_NDFPR
 *     routine.
-
-*  Notes:
-*     - the routine uses the CCDPACK IRH continuation character '-'
-*     to force reprompting. Although in this case this will not be of
-*     any immediate use.
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
@@ -40,6 +35,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +44,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator code (no longer used as HDS closes
 *        files correctly).
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *     {note_new_bugs_here}
@@ -59,11 +57,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRG_FAC'          ! IRH and IRG system parameters
-                                 ! (IRH__NOID) IRG error codes etc.
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
       INCLUDE 'FIO_ERR'          ! FIO system error codes
       INCLUDE 'CCD1_PAR'         ! CCDPACK system constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'NDG_ERR'          ! NDG system error codes
 
 *  Arguments Given:
       CHARACTER NAME * ( * )
@@ -77,7 +75,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER GID                ! IRG group identifier
+      INTEGER GID                ! Group identifier
       INTEGER ADDED              ! Number of NDFs added this loop.
       LOGICAL TERM               ! Returned true if a termination
                                  ! character is issued.
@@ -86,6 +84,7 @@
                                  ! right quit after 10, probably batch
                                  ! job in error.
       INTEGER NNDF               ! Number of NDFs returned.
+      INTEGER ONNDF              ! Number of NDFs at last iteration
 *.
 
 *  Check inherited global status.
@@ -94,13 +93,14 @@
 *  Access the NDF name through IRG. Set GID to no previous entries.
 *  Set the termination character to '-' if this is added to any lines
 *  of data it will be stripped and ignored.
-      GID = IRH__NOID
+      GID = GRP__NOID
+      NNDF = 0
       NTRY = 0
  1    CONTINUE                   ! start of repeat until loop
          TERM = .FALSE.
-         ADDED = -1
-         CALL IRG_CREAT( NAME, IRH__NOID, '-', GID, NNDF, ADDED, TERM,
-     :                   STATUS )
+         ONNDF = NNDF
+         CALL NDG_CREAT( NAME, GRP__NOID, GID, NNDF, TERM, STATUS )
+         ADDED = NNDF - ONNDF
 
 *  Get out if a given a par_abort. Also quit after an unreasonble
 *  number of attempts.
@@ -127,8 +127,9 @@
      :                     'NDF names - try again', STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -138,19 +139,17 @@
             CALL PAR_CANCL( NAME, STATUS )
             AGAIN = .TRUE.
 
-*  Status may have been set by IRG for a good reason. Check for this
-*  and reprompt. (Note FIO system filename and file not found errors
-*  these are not captured by IRG).
-         ELSE IF ( STATUS .EQ. IRG__BADFN .OR. STATUS .EQ. IRG__NOFIL
-     :        .OR. STATUS .EQ. FIO__NAMER .OR. STATUS .EQ. FIO__FILNF )
-     :   THEN
+*  Status may have been set by NDG for a good reason.. check for this
+*  and reprompt.
+         ELSE IF ( STATUS .EQ. NDG__NOFIL ) THEN
 
 *  Issue the error.
              CALL ERR_FLUSH( STATUS )
 
 *  Reset everything and try again.
-             CALL IRH_ANNUL( GID, STATUS )
-             GID = IRH__NOID
+             CALL GRP_DELET( GID, STATUS )
+             GID = GRP__NOID
+             NNDF = 0
              AGAIN = .TRUE.
              NTRY = NTRY + 1
              CALL PAR_CANCL( NAME, STATUS )
@@ -158,7 +157,7 @@
 *  Try to trap a special case of ' ' string return. This should leave
 *  added unmodified. This will be taken as a request to exit. The normal
 *  stop entry request from an blank line will be `!' .
-         ELSE IF ( ( ADDED .EQ. -1 ) .AND. ( .NOT. TERM ) ) THEN
+         ELSE IF ( ( ADDED .EQ. 0 ) .AND. ( .NOT. TERM ) ) THEN
             AGAIN = .FALSE.
 
 *  only tested if the checks for number of NDFs etc. have been passed.
@@ -170,8 +169,13 @@
 
 *  If we've got a valid list then get the NDF identifier.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL IRG_NDFPR( GID, 1, NDFIN, CLIST, NDFOUT, STATUS )
+         CALL NDG_NDFPR( NDFIN, CLIST, GID, 1, NDFOUT, STATUS )
       END IF
 
- 99   END
+ 99   CONTINUE
+
+*  Release group resources.
+      CALL GRP_DELET( GID, STATUS )
+
+      END
 * $Id$

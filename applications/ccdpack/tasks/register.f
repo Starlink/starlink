@@ -445,6 +445,8 @@
 *        WCS components as MathMaps.
 *     15-NOV-1999 (MBT):
 *        Removed the possibility to write results as TRANSFORM structures.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -500,7 +502,7 @@
       DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
       INTEGER FDIN              ! FIO file descriptors
       INTEGER FDREFO            ! Output reference set descriptor
-      INTEGER FIOGR             ! IRH group of input list names
+      INTEGER FIOGR             ! Group of input list names
       INTEGER FRMS( CCD1__MXLIS ) ! AST pointers to Current coordinate frames
       INTEGER FRREG             ! AST pointer to frame in OUTDM domain
       INTEGER I                 ! Loop variable
@@ -536,7 +538,7 @@
       INTEGER MAP1              ! Temporary AST mapping
       INTEGER MAXIN             ! Maximum number of input lists
       INTEGER MININ             ! Minimum number of input lists
-      INTEGER NDFGR             ! IRG group of input NDF names
+      INTEGER NDFGR             ! Group of input NDF names
       INTEGER NNDF              ! Number of NDFs accessed
       INTEGER NOPEN             ! Number of input lists opened
       INTEGER NOUT
@@ -646,7 +648,7 @@
             IF ( USEWCS ) THEN
 
 *  Get pointer to WCS frameset.
-               CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
+               CALL NDG_NDFAS( NDFGR, I, 'READ', ID, STATUS )
                CALL CCD1_GTWCS( ID, IWCS, STATUS )
                CALL NDF_ANNUL( ID, STATUS )
 
@@ -672,7 +674,7 @@
             END IF
 
 *  Write message about NDF name and domain.
-            CALL IRH_GET( NDFGR, I, 1, FNAME, STATUS )
+            CALL GRP_GET( NDFGR, I, 1, FNAME, STATUS )
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'N', I )
             CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
@@ -698,7 +700,7 @@
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
       DO 6 I = 1, NOPEN
-         CALL IRH_GET( FIOGR, I, 1, FNAME( I ), STATUS )
+         CALL GRP_GET( FIOGR, I, 1, FNAME( I ), STATUS )
          CALL MSG_SETC( 'FNAME', FNAME( I ) )
          IF ( I .EQ. IPREF ) THEN
             CALL CCD1_MSG( ' ', '  ^FNAME (reference)', STATUS )
@@ -1263,7 +1265,7 @@
 *  If we are putting frames into each NDF, open the right one here and
 *  get its frameset identifier.
          IF ( PLACE .EQ. 'EACH' ) THEN
-            CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
+            CALL NDG_NDFAS( NDFGR, I, 'UPDATE', ID, STATUS )
             CALL CCD1_GTWCS( ID, IWCS, STATUS )
          END IF
 
@@ -1333,8 +1335,9 @@
 *  Release all remaining workspace.
       CALL CCD1_MFREE( -1, STATUS )
 
-*  Close IRH (and IRG).
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      IF ( PLACE .EQ. 'EACH' ) CALL GRP_DELET( NDFGR, STATUS )
+      CALL GRP_DELET( FIOGR, STATUS )
 
 *  End AST context.
       CALL AST_END( STATUS )

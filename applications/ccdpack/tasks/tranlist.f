@@ -425,6 +425,8 @@
 *        upgrade) and added DAT_ANNULs for LOCTR.
 *     1-APR-1999 (MBT):
 *        Added new TRTYPE of WCS.
+*     29-JUN-2000 (MBT):
+*        Replaced use of IRH/IRG with GRP/NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -534,7 +536,7 @@
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
       DO 6 I = 1, NOPEN
-         CALL IRH_GET( FIOGRP, I, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGRP, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', I )
          CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -550,7 +552,7 @@
          CALL CCD1_MSG( ' ', '    Associated NDFs:', STATUS )
          CALL CCD1_MSG( ' ', '    ----------------', STATUS )
          DO 7 I = 1, NOPEN
-            CALL IRH_GET( NDFGRP, I, 1, FNAME, STATUS )
+            CALL GRP_GET( NDFGRP, I, 1, FNAME, STATUS )
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'N', I )
             CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
@@ -708,7 +710,7 @@
       DO 3 INDEX = 1, NOPEN
 
 *  Get the name of the input list and open the file.
-         CALL IRH_GET( FIOGRP, INDEX, 1, FNAME, STATUS )
+         CALL GRP_GET( FIOGRP, INDEX, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
 
 *  Report error message if open failed.
@@ -752,7 +754,7 @@
 
 *  If inputs are associated with NDFs then access the NDFs.
          IF ( NDFS ) THEN
-            CALL IRG_NDFEX( NDFGRP, INDEX, IDIN, STATUS )
+            CALL NDG_NDFAS( NDFGRP, INDEX, 'UPDATE', IDIN, STATUS )
          END IF
 
 *  Transformation section...............................................
@@ -889,7 +891,7 @@
          END IF
 
 *  Open a results file.
-         CALL IRH_GET( OUTGRP, INDEX, 1, FNAME, STATUS )
+         CALL GRP_GET( OUTGRP, INDEX, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, STATUS )
 
 *  Report error message if open failed.
@@ -947,10 +949,11 @@
 *  Error label - clean up after this.
  99   CONTINUE
 
-*  Close IRH and IRG release any memory still accessed.
-      CALL IRH_ANNUL( FIOGRP, STATUS )
-      IF ( NDFS ) CALL IRH_ANNUL( ndfgrp, STATUS )
-      CALL IRH_CLOSE( STATUS )
+*  Release group resources.
+      CALL GRP_DELET( FIOGRP, STATUS )
+      IF ( NDFS ) CALL GRP_DELET( NDFGRP, STATUS )
+
+*  Free any memory still accessed.
       CALL CCD1_MFREE( -1, STATUS )
 
 *  Close TRANSFORM.
