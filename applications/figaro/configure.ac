@@ -30,7 +30,7 @@ STAR_CHECK_PROGS(hlib)
 
 dnl    We have a SUN document, so we should probably tell people it's there.
 STAR_LATEX_DOCUMENTATION(sun86)
-STAR_DOC_FILES(sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech3.eps sun86_ech4.eps sun86_ech5.eps sun86_hard.eps sun86_icont.eps sun86_igrey.eps sun86_imag2.eps sun86_imag3.eps sun86_imag.eps sun86_spec2.eps sun86_spec.eps)
+STAR_DOCS_FILES(sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech3.eps sun86_ech4.eps sun86_ech5.eps sun86_hard.eps sun86_icont.eps sun86_igrey.eps sun86_imag2.eps sun86_imag3.eps sun86_imag.eps sun86_spec2.eps sun86_spec.eps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
