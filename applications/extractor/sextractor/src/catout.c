@@ -12,7 +12,8 @@
 *
 *	Last modify:	11/08/98
 *                       24/11/98: PWD, change ASCII_SKYCAT to output
-*                                 real column names.
+*                                 real column names. Stop skycattail
+*                                 from being written after file is closed.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -424,12 +425,12 @@ void	endcat()
       break;
 
     case ASCII_SKYCAT:
+      fprintf(ascfile, skycattail); /*PWD: modification here*/
       if (!prefs.pipe_flag)
         fclose(ascfile);
       objtab->key = NULL;
       objtab->nkey = 0;
       free_tab(objtab);
-      fprintf(ascfile, skycattail);
       break;
 
     case FITS_LDAC:
