@@ -713,6 +713,7 @@ D	    print *,'ldim,udim :',ldim,udim
 *        Map vignetting array
               CALL BDI_MAPDATA( VFID(N), 'READ', OBDAT(N).VIGPTR,
      :                          STATUS )
+	      CALL MSG_PRNT('Loaded associated vignetting array')
 
             END IF
 
