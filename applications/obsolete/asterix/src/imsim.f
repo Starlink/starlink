@@ -89,7 +89,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*80      	MODEL                  	! Background model file
       CHARACTER*80      	OROOT                  	! Output dataset root
       CHARACTER*132     	ONAME                  	! Output file name
       CHARACTER*40      	UNITS                  	! Model X axis units
@@ -119,7 +118,6 @@
       INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
       INTEGER           	FFILE                  	! Index of first file
       INTEGER			FOFID			! 1st output dataset id
-      INTEGER			IDUM			!
       INTEGER           	IFILE                  	! Loop over files
       INTEGER           	ISRC                   	! Loop over sources
       INTEGER           	IWID                   	! Loop over widths
@@ -290,11 +288,11 @@
         CALL PSF_INTRO( MFID, MPSF, STATUS )
 
 *      Get axis details
-        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, IDUM,
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, NVAL,
      :                     STATUS )
         XBASE = SPARR(1)
         XSCALE = SPARR(2)
-        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, IDUM,
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, NVAL,
      :                     STATUS )
         YBASE = SPARR(1)
         YSCALE = SPARR(2)
