@@ -187,6 +187,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.10  2000/08/24 03:18:23  timj
+*     Add more informative error message if all input data are bad
+*
 *     Revision 1.9  1999/08/19 21:18:13  timj
 *     Remove debug print statements.
 *     Fix memory leak when using a MODEL.
@@ -502,6 +505,16 @@
      :                 'The model covers a smaller area than the data',
      :                 STATUS)
                END IF
+            END IF
+
+*     Check that NMAX is reasonable
+            IF (STATUS .EQ. SAI__OK .AND. NMAX .LE. 0) THEN
+               CALL MSG_SETI('N', NMAX)
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ','SURF_GRID_CALCSKY: No data points'//
+     :              ' in grid (NMAX=^N). Is all data bad?',
+     :              STATUS)
+
             END IF
 
 *     Calculate the offset in the position array based on file number
