@@ -81,7 +81,8 @@
 *     14-SEP-1998 (DSB):
 *        Changed to report the first 3 bad header cards.
 *     9-DEC-1998 (DSB):
-*        Included FITS-IRAF encoding.
+*        Included FITS-IRAF encoding. Re-wrote final error messages to
+*        make them appropriate for use from KPG1_GTWCS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -201,9 +202,10 @@
   999 CONTINUE
       IF( STATUS .NE. SAI__OK )THEN
          CALL ERR_REP( 'FTS1_FTWCS_ERR1', 'Error importing World '//
-     :                 'Coordinate information.', STATUS )
-         CALL ERR_REP( 'FTS1_FTWCS_ERR2', 'The output NDF will not '//
-     :                 'contain any WCS information.', STATUS )
+     :                 'Coordinate information from a FITS header.', 
+     :                 STATUS )
+         CALL ERR_REP( 'FTS1_FTWCS_ERR2', 'No WCS information will be'//
+     :                 'available.', STATUS )
 
 *  A useful conversion may still be possible even if the WCS
 *  information cannot be imported. So if an error occurred, flush it.
