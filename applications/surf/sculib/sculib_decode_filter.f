@@ -132,8 +132,8 @@
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SHORT', SHORT)
-            CALL ERR_REP ('SCULIB_DECODE_FILTER: bad filter ^SHORT '//
-     :        'in front of short-wave array', STATUS)
+            CALL ERR_REP (' ','SCULIB_DECODE_FILTER: bad filter '//
+     :        '^SHORT in front of short-wave array', STATUS)
          END IF
 
 
@@ -179,8 +179,8 @@
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC ('LONG', LONG)
-            CALL ERR_REP ('SCULIB_DECODE_FILTER: bad filter ^LONG '//
-     :        'in front of long-wave array', STATUS)
+            CALL ERR_REP (' ','SCULIB_DECODE_FILTER: bad filter '//
+     :           '^LONG in front of long-wave array', STATUS)
          END IF
 
       END IF
