@@ -1,4 +1,6 @@
 #+
+# @edited_input@
+#
 #  Name:
 #     echomop.sh
 #
@@ -30,9 +32,6 @@
 #        Converted to sh script from csh.
 #     {enter_changes_here}
 #
-#   RCS ID
-#     $Id$
-#
 #-
 #.
 #  Announce name now, version etc. below.
@@ -42,8 +41,8 @@ echo " ----------- Initialising for ECHOMOP ------------"
 #
 #Set environment variables for ECHOMOP.
 #
-ECHOMOP_BASE=INSTALL_BIN;			export ECHOMOP_BASE
-ECHOMOP_EXEC=INSTALL_BIN;			export ECHOMOP_EXEC
+ECHOMOP_BASE=@bindir@;			export ECHOMOP_BASE
+ECHOMOP_EXEC=@bindir@;			export ECHOMOP_EXEC
 ECHOMOP_HELP=${ECHOMOP_BASE}/echomop;		export ECHOMOP_HELP
 ECHOMOP_DEMO=${ECHOMOP_BASE}/demo;		export ECHOMOP_DEMO
 ECHOMOP_DATA=${ECHOMOP_BASE}/data;		export ECHOMOP_DATA
@@ -61,7 +60,7 @@ echmenu () { ${ECHOMOP_EXEC}/echmenu; }
 #  I don't understand what this command is for -- it can only be used if 
 #  ECHOMOP has already been set up...
 #echomopsetup () { "source ${ECHOMOP_EXEC}/echomop.csh"; }
-echomopsetup () { echo "ECHOMOP version PKG_VERS is already set up"; }
+echomopsetup () { echo "ECHOMOP version @PACKAGE_VERSION@ is already set up"; }
 
 #
 #  Define functions for each application (the posix shell has aliases,
@@ -154,7 +153,7 @@ ECHWWW () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
 # Show that the ECHOMOP commands are now available.
 #
 echo "              Echelle data reduction"
-echo "          Version PKG_VERS  13th June 1997"
+echo "          Version @PACKAGE_VERSION@"
 echo " "
 echo "          Type" \"echhelp echomop\" for help
 echo "    or" \"echhelp news\" for news on changes
