@@ -637,8 +637,8 @@
       IF( STATUS .EQ. AST__BADUN ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL AST_ANNUL( FR2, STATUS )
-         FR2 = AST_FRAME( 1, "", STATUS ) 
-         WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+         FR2 = AST_FRAME( 1, ' ', STATUS ) 
+         WWWANT = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
 
 *  If the data units can be used with one of the flux systems supported by 
 *  the AST FluxFrame class...
@@ -655,12 +655,12 @@
 *  This has the advantage that it supports automatic scaling of the Y
 *  axis into other flux systems.
          IF( AST_ISASPECFRAME( FR1, STATUS ) ) THEN
-            WWWANT = AST_SPECFLUXFRAME( FR1, FR2, "", STATUS )
+            WWWANT = AST_SPECFLUXFRAME( FR1, FR2, ' ', STATUS )
 
 *  If the X axis Frame is not a SpecFrame, create a CmpFrame combining
 *  the axes.
          ELSE
-            WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+            WWWANT = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
          END IF
 
       END IF
@@ -741,7 +741,7 @@
       FR2 = AST_PICKAXES( WWWANT, 1, AXES, TMAP, STATUS ) 
 
 *  Combine them.
-      UNIFRM = AST_CMPFRAME( FR1, FR2, "", STATUS )
+      UNIFRM = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
       CALL AST_ANNUL( FR1, STATUS )
       CALL AST_ANNUL( FR2, STATUS )
 
