@@ -21,6 +21,9 @@
 #        Add MSG_FILTER
 #     1997 July 18 (TimJ)
 #        Change IN to be _CHAR
+#     1997 Nov 21 (TimJ)
+#        Fix prompt string for 'IN' so that it no longer asks for an
+#	 extinction correction.
 #-
 
    INTERFACE SKYDIP
@@ -72,7 +75,7 @@
 
       PARAMETER   SUB_INSTRUMENT
          POSITION 2
-         PROMPT   'Name of sub-instrument to be extinction corrected'
+         PROMPT   'Name of sub-instrument to be analysed'
          TYPE     '_CHAR'
 #         IN       'LONG', 'SHORT', 'P2000', 'P1300', 'P1100'
   	 HELPKEY '*'
