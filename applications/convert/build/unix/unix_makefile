@@ -510,7 +510,7 @@ con_bitpx.f con_btypc.f \
 con_cd2ir.f con_cd2iw.f \
 con_chvai.f con_chvar.f con_chvaw.f \
 con_ci2dr.f con_ci2dw.f \
-con_cnlim.f con_dst2n.f \
+con_cnlim.f con_d2nft.f con_dst2n.f \
 con_ffrmt.f con_fill.f con_filld.f con_fitax.f con_ftype.f \
 con_gexch.f \
 con_ghelp.f con_ghlpi.f \
@@ -1512,7 +1512,8 @@ con_chvaw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ci2dr.o:       SAE_PAR
 con_ci2dw.o:       SAE_PAR
 con_cnlim.o:       SAE_PAR PRM_PAR
-con_dst2n.o:       SAE_PAR DTACODES DYNAMIC_MEMORY NUM_DEC_CVT NUM_DEF_CVT
+con_d2nft.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_dst2n.o:       SAE_PAR DTACODES DYNAMIC_MEMORY
 con_ffrmt.o:       SAE_PAR
 con_fill.o:        SAE_PAR
 con_filld.o:       SAE_PAR
@@ -1577,7 +1578,7 @@ iraf2ndf.o:        SAE_PAR DAT_PAR DAT_ERR NDF_PAR PSX_ERR CMP_ERR MSG_PAR PRM_P
 ircam2ndf.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 ndf2ascii.o:       SAE_PAR NDF_PAR DAT_PAR PRM_PAR
 ndf2dst.o:         SAE_PAR FIO_PAR NDF_PAR
-ndf2fits:          SAE_PAR DAT_PAR DAT_ERR PAR_ERR NDF_PAR MSG_PAR GRP_PAR
+ndf2fits.o:        SAE_PAR DAT_PAR DAT_ERR PAR_ERR NDF_PAR MSG_PAR GRP_PAR
 ndf2gasp.o:        SAE_PAR MSG_PAR NDF_PAR NDF_ERR PAR_ERR PRM_PAR
 ndf2iraf.o:        SAE_PAR DAT_PAR MSG_PAR NDF_PAR PAR_ERR NDF_ERR PRM_PAR
 ndf2iraf.o:        NUM_DEC_CVT NUM_DEF_CVT
