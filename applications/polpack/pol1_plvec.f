@@ -1,7 +1,7 @@
-      SUBROUTINE POL1_PLVEC( NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
-     :                       DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, 
-     :                       AI, AP, AT, AIP, AIV, APV, ATV, AIPV, 
-     :                       STATUS )
+      SUBROUTINE POL1_PLVEC( LBND, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+     :                       STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, 
+     :                       MAKEIP, MAKECT, CI, AI, AP, AT, AIP, AIV, 
+     :                       APV, ATV, AIPV, STATUS )
 *+
 *  Name:
 *     POL1_PLVEC
@@ -13,15 +13,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL POL1_PLVEC( NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, DEBIAS, 
-*                       VAR, MAKEI, MAKEP, MAKET, MAKEIP, AI, AP, AT, 
-*                       AIP, AIV, APV, ATV, AIPV, STATUS )
+*      CALL POL1_PLVEC( LBND, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
+*                       DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
+*                       CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
 *     requested) variances for each pixel.
 
 *  Arguments:
+*     LBND( 2 ) = INTEGER (Given)
+*        The lower pixel bounds on the first two axes.
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in STOKE and VSTOKE.
 *     NROW = INTEGER (Given)
@@ -53,6 +55,10 @@
 *        It is .TRUE. if a polarisation angle output array is required.
 *     MAKEIP = LOGICAL (Given)
 *        It is .TRUE. if a polarised intensity output array is required.
+*     MAKECT = LOGICAL (Given)
+*        It is .TRUE. if a catalogue containing everything is required.
+*     CI = INTEGER (Given)
+*        A CAT catalogue identifier. Only used if MAKECT is .TRUE.
 *     AI( NPIX, NROW ) = REAL (Returned)
 *        An array holding total intensity values.
 *     AP( NPIX, NROW ) = REAL (Returned)
@@ -94,6 +100,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Arguments Given:
+      INTEGER LBND( 2 )
       INTEGER NPIX
       INTEGER NROW 
       INTEGER NPLANE
@@ -106,6 +113,8 @@
       LOGICAL MAKEP
       LOGICAL MAKET
       LOGICAL MAKEIP
+      LOGICAL MAKECT
+      INTEGER CI
 
 *  Arguments Returned:
       REAL AI( NPIX, NROW )
@@ -158,6 +167,12 @@
       REAL VUIN                  ! Input U variance
       REAL VV                    ! Variance on normalised V Stokes par.
       REAL VVIN                  ! Input V variance
+
+*  CAT identifiers for catalogue columns.
+      INTEGER XCAT, YCAT, ICAT, PCAT, THCAT, PICAT, VCAT, QCAT, UCAT,
+     :        DICAT, DPCAT, DTHCAT, DPICAT, DVCAT, DQCAT, DUCAT
+
+
 *.
 
 *  Check the inherited global status.
@@ -195,6 +210,40 @@
          CALL ERR_REP( ' ', 'An incomplete set of Stokes parameters '//
      :                 'has been supplied.', STATUS )
          GO TO 999
+      END IF
+
+*  If a catalogue is being produced, get CAT identifiers for the required
+*  columns.
+      IF( MAKECT ) THEN
+         CALL CAT_TIDNT( CI, 'X', XCAT, STATUS )
+         CALL CAT_TIDNT( CI, 'Y', YCAT, STATUS )
+         CALL CAT_TIDNT( CI, 'I', ICAT, STATUS )
+         CALL CAT_TIDNT( CI, 'P', PCAT, STATUS )
+         CALL CAT_TIDNT( CI, 'THETA', THCAT, STATUS )
+         CALL CAT_TIDNT( CI, 'PI', PICAT, STATUS )
+
+         IF( CIRC ) THEN
+            CALL CAT_TIDNT( CI, 'V', VCAT, STATUS )
+         ELSE
+            CALL CAT_TIDNT( CI, 'Q', QCAT, STATUS )
+            CALL CAT_TIDNT( CI, 'U', UCAT, STATUS )
+         END IF
+
+         IF( VAR ) THEN
+            CALL CAT_TIDNT( CI, 'DI', DICAT, STATUS )
+            CALL CAT_TIDNT( CI, 'DP', DPCAT, STATUS )
+            CALL CAT_TIDNT( CI, 'DTHETA', DTHCAT, STATUS )
+            CALL CAT_TIDNT( CI, 'DPI', DPICAT, STATUS )
+
+            IF( CIRC ) THEN
+               CALL CAT_TIDNT( CI, 'DV', DVCAT, STATUS )
+            ELSE
+               CALL CAT_TIDNT( CI, 'DQ', DQCAT, STATUS )
+               CALL CAT_TIDNT( CI, 'DU', DUCAT, STATUS )
+            END IF
+
+         END IF
+
       END IF
 
 *  First deal with plane polarisation cases...
@@ -351,7 +400,90 @@
                   IF ( MAKET ) ATV( PIX, ROW ) = VT
                   IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
                END IF
+
+*  Append a row to the catalogue if required, and if some of the values
+*  are not bad.
+               IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
+     :                            QIN .NE. VAL__BADR .OR. 
+     :                            UIN .NE. VAL__BADR .OR. 
+     :                            P .NE. VAL__BADR .OR. 
+     :                            T .NE. VAL__BADR .OR. 
+     :                            IP .NE. VAL__BADR ) ) THEN
+
+*  Store values for all the catalogue columns in the current row buffer.
+                  CALL CAT_PUT0R( XCAT, REAL( PIX - LBND( 1 ) ) + 0.5,
+     :                            .FALSE., STATUS )
+                  CALL CAT_PUT0R( YCAT, REAL( ROW - LBND( 2 ) ) + 0.5,
+     :                            .FALSE., STATUS )
+                  CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
+     :                            STATUS )
+                  CALL CAT_PUT0R( UCAT, UIN, ( UIN .EQ. VAL__BADR ),
+     :                            STATUS )
+                  CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( THCAT,  T, ( T .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
+     :                            STATUS )
+
+                  IF( VAR ) THEN
+                     IF( VI .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DICAT, SQRT( MAX( 0.0, VI ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DICAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VQIN .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DQCAT, SQRT( MAX( 0.0, VQIN ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DQCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VUIN .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DUCAT, SQRT( MAX( 0.0, VUIN ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DUCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+
+                     IF( VP .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DPCAT, SQRT( MAX( 0.0, VP ) ), 
+     :                             .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VT .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DTHCAT, SQRT( MAX( 0.0, VT ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DTHCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VIP .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DPICAT, SQRT( MAX( 0.0, VIP ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                  END IF
+
+*  Append the current row buffer to the catalogue.
+                  CALL CAT_RAPND( CI, STATUS )
    
+               END IF
             END DO
          END DO
 
@@ -480,6 +612,78 @@
                   IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
                END IF
    
+*  Append a row to the catalogue if required, and if some of the values
+*  are not bad.
+               IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
+     :                            VIN .NE. VAL__BADR .OR. 
+     :                            P .NE. VAL__BADR .OR. 
+     :                            T .NE. VAL__BADR .OR. 
+     :                            IP .NE. VAL__BADR ) ) THEN
+
+*  Store values for all the catalogue columns in the current row buffer.
+                  CALL CAT_PUT0R( XCAT, REAL( PIX - LBND( 1 ) ) + 0.5,
+     :                            .FALSE., STATUS )
+                  CALL CAT_PUT0R( YCAT, REAL( ROW - LBND( 2 ) ) + 0.5,
+     :                            .FALSE., STATUS )
+                  CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( THCAT,  T, ( T .EQ. VAL__BADR ), 
+     :                            STATUS )
+                  CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
+     :                            STATUS )
+
+                  IF( VAR ) THEN
+                     IF( VI .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DICAT, SQRT( MAX( 0.0, VI ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DICAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VVIN .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DVCAT, SQRT( MAX( 0.0, VVIN ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DVCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VP .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DPCAT, SQRT( MAX( 0.0, VP ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VT .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DTHCAT, SQRT( MAX( 0.0, VT ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DTHCAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                     IF( VIP .NE. VAL__BADR ) THEN
+                        CALL CAT_PUT0R( DPICAT, SQRT( MAX( 0.0, VIP ) ), 
+     :                                  .FALSE., STATUS )
+                     ELSE
+                        CALL CAT_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+     :                                  STATUS )
+                     END IF
+
+                  END IF
+
+*  Append the current row buffer to the catalogue.
+                  CALL CAT_RAPND( CI, STATUS )
+   
+               END IF
+
             END DO
          END DO
 

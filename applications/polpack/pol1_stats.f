@@ -1,44 +1,42 @@
-      subroutine pol1_stats( title, nel, data, status )
-      implicit none
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      character title*(*)
-      integer nel, status, i, n
-      real data( nel ), sum1, sum2, mx, mn, mean, val
+      SUBROUTINE POL1_STATS( TITLE, NEL, DATA, STATUS )
+      IMPLICIT NONE
 
-      if( status .ne. sai__ok ) return
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 
-      sum1 = 0
-      sum2 = 0
-      mx = val__minr
-      mn = val__maxr
-      n = 0
+      INTEGER NEL, STATUS, N, I
+      REAL DATA( NEL ), SUM, SUM2, MX, MN, VAL, MEAN
+      CHARACTER TITLE*(*)
 
-      do i = 1, nel
-         val = data( i ) 
-         if( val .ne. val__badr ) then
-            n = n + 1
-            sum1 = sum1 + val
-            sum2 = sum2 + val*val
-            mx = max( mx, val )
-            mn = min( mn, val )
-         end if
-      end do
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-      call msg_out( ' ', title, status )
-      if( n .ne. 0 ) then
-         mean = sum1/n
-         call msg_setr( 'm', mean )
-         call msg_out( ' ', '   Mean  : ^m', status )
-         call msg_setr( 'm', sqrt( max( 0.0, sum2/n - mean*mean ) ) )
-         call msg_out( ' ', '   Sigma : ^m', status )
-         call msg_setr( 'm', mx )
-         call msg_out( ' ', '   Max   : ^m', status )
-         call msg_setr( 'm', mn )
-         call msg_out( ' ', '   Min   : ^m', status )
-      end if
+      SUM = 0.0
+      SUM2 = 0.0
+      N = 0
+      MX = VAL__MINR
+      MN = VAL__MAXR      
 
-      call msg_seti( 'm', n )
-      call msg_out( ' ',    '   Ngood : ^m', status )
+      DO I = 1, NEL
+         VAL = DATA( I )
+         IF( VAL .NE. VAL__BADR ) THEN
+            SUM = SUM + VAL
+            SUM2 = SUM2 + VAL*VAL
+            N = N + 1
+            MX = MAX( MX, VAL )
+            MN = MIN( MN, VAL )
+         END IF
+      END DO
 
-      end
+      WRITE(*,*) TITLE
+      IF( N .GT. 0 ) THEN
+         MEAN = SUM/N
+         WRITE(*,*) '   Mean  : ',MEAN
+         WRITE(*,*) '   Sigma : ',SQRT( MAX( 0.0, SUM2/N - MEAN*MEAN ) )
+         WRITE(*,*) '   Max   : ',MX
+         WRITE(*,*) '   Min   : ',MN
+         WRITE(*,*) '   NGood : ',N
+      ELSE
+         WRITE(*,*) '   NGood : 0'
+      END IF
+
+      END

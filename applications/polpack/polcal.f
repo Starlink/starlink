@@ -123,6 +123,7 @@
       INTEGER PSET( 8, MAXSET )  ! List of validated images sorted
                                  ! into polarisation states.
       INTEGER NPAIR              ! number of polarimetric pairs
+      INTEGER INDFT              ! Temporary NDF identifier
       INTEGER IVAL_L, IVAL_R
       INTEGER NI, NQ, NU         ! number of possible estimates of I, Q
                                  ! and U
@@ -151,7 +152,8 @@
       INTEGER IPVIEST, IPVQEST, IPVUEST
                                  ! workspace for variances on estimates
                                  ! of I, Q and U
-
+      INTEGER IWCS               ! Identifier for the WCS information
+       
       REAL WPLATE( MAXIN )       ! Waveplate positions of images 
       REAL TOLS, TOLZ            ! tolerances for image intercomparisons
       REAL SKYSUP                ! sky supression factor
@@ -634,6 +636,17 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          CALL PSX_FREE( IPVZEST, STATUS )
       ENDIF
       
+*  Get an AST identifier for the FrameSet held in the WCS component 
+*  of the first input NDF. This will be propagated to the output NDF.
+*  First create a 3D super-set from the input 2D image. This needs
+*  to be done because the WCS information will be stored with the 3D 
+*  output NDF and so needs to have a 3D base Frame. Then get the WCS info
+*  from this 3D NDF.
+      LBND( 3 ) = 1
+      UBND( 3 ) = 1
+      CALL NDF_SECT( NDFVAL( 1 ), 3, LBND, UBND, INDFT, STATUS ) 
+      CALL NDF_GTWCS( INDFT, IWCS, STATUS )
+
 *  At this point we can release the input images since we now have
 *  versions corrected with the efficiency factors. Do this by ending the
 *  current NDF context.
@@ -705,6 +718,13 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 
 *  Set the LABEL component for the output.
       CALL NDF_CPUT( LABEL, NDFOUT, 'LABEL', STATUS )
+
+*  Store world coordinate information in the output NDF. All the input 
+*  NDFs are assumed to be aligned with each other, and with the output 
+*  NDF. So just copy the WCS component from the first input NDF to the 
+*  output NDF, and then annul the AST identifier.
+      CALL NDF_PTWCS( IWCS, NDFOUT, STATUS )
+      CALL AST_ANNUL( IWCS, STATUS )
 
 *  Create a POLPACK extension containing a character array identifying the
 *  quantities stored in each plane of the DATA array.
@@ -796,5 +816,11 @@ c      CALL DAT_ANNUL( TSPLOC, STATUS )
       
 *  End the NDF context.
       CALL NDF_END( STATUS )
+
+*  If an error occurred, then report a contextual message.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'POLCAL_ERROR', 'POLCAL: Error producing '//
+     :                 'Stokes parameters.', STATUS )
+      END IF
 
       END

@@ -1306,6 +1306,7 @@ interface SEGMENT
    endparameter
 
 endinterface
+
 #+
 #  Name:
 #     POLVEC.IFL
@@ -1328,6 +1329,23 @@ interface POLVEC
 
    helplib 'POLPACK_HELP:'
 
+   parameter      BOX            # Bin size
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Bin size'
+      helpkey     '*'
+   endparameter
+
+   parameter      CAT
+      position    2
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Output catalogue'
+      helpkey     '*'
+   endparameter
+
    parameter      DEBIAS         # Remove statistical bias?
       type        _LOGICAL
       vpath       'DEFAULT'
@@ -1338,9 +1356,12 @@ interface POLVEC
    endparameter
 
    parameter      I              # Total intensity
-      position    2
+      position    3
       type        NDF
       access      WRITE
+      vpath       default
+      ppath       default
+      default     !
       prompt      'Total intensity '
       helpkey     '*'
    endparameter
@@ -1356,25 +1377,52 @@ interface POLVEC
    endparameter
 
    parameter      IP             # Polarised intensity 
-      position    5
+      position    6
       type        NDF
       access      WRITE
+      vpath       default
+      ppath       default
+      default     !
       prompt      'Polarised intensity'
       helpkey     '*'
    endparameter
 
+   parameter      METHOD         # Combination mode
+      type        'LITERAL'
+      vpath       'PROMPT,CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT '
+      default     'MEDIAN'
+      prompt      'Binning method'
+      helpkey     '*'
+   endparameter
+
    parameter      P              # Percentage polarisation
-      position    3
+      position    4
       type        NDF
       access      WRITE
+      vpath       default
+      ppath       default
+      default     !
       prompt      'Percentage polarisation'
       helpkey     '*'
    endparameter
 
+   parameter      SIGMAS         # Number of sigmas for clipping SIGMA
+      type        _REAL
+      vpath       'PROMPT,CURRENT,DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     4.0
+      prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
    parameter      THETA          # Polarisation angle
-      position    4
+      position    5
       type        NDF
       access      WRITE
+      vpath       default
+      ppath       default
+      default     !
       prompt      'Polarisation angle'
       helpkey     '*'
    endparameter
@@ -1385,6 +1433,15 @@ interface POLVEC
       ppath       'DEFAULT'
       default     YES
       prompt      'Are variance values to be generated?'
+      helpkey     '*'
+   endparameter
+
+   parameter      WLIM           # Weight limit for good output pixels
+      type        '_REAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     0.0
+      prompt      'Min. fraction of good input values per bin'
       helpkey     '*'
    endparameter
 

@@ -62,6 +62,12 @@
 *        Interface remains the same except limit on NSET is now
 *        CCD1__MXNDF (needed extra workspace and this is the easiest
 *        place to create it).
+*     24-FEB-1997 (PDRAPER):
+*        Removed unnecessary EXP1 and EXP2 estimates
+*     28-JAN-1998 (PDRAPER):
+*        Added check for normal scores with a population of 2. 
+*        The second score isn't calculated as it is the negative
+*        of the first score.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,8 +103,6 @@
 *  Local Variables:
       DOUBLE PRECISION MATRIX( CCD1__MXNDF, CCD1__MXNDF ) ! Workspace
       DOUBLE PRECISION SUMSQ    ! Sum of squares
-      DOUBLE PRECISION EXP1     ! Smallest expectation value
-      DOUBLE PRECISION EXP2     ! Second smallest expectation value
       DOUBLE PRECISION V11      ! Value of extreme variance (1,1)
       INTEGER I, J, K, L        ! Loop variables
       INTEGER IFAIL             ! Local status return
@@ -120,15 +124,7 @@
 *  Get the expected values of the normal order statistics.
             N2 = I/2
             CALL PDA_NSCOR( PP, I, N2, IFAIL )
-
-            EXP1 = PP( 1 )
-            IF ( I .EQ. 2 ) THEN
-               EXP2 = -EXP1
-            ELSE IF ( I .EQ. 3 ) THEN 
-               EXP2 = 0.0D0
-            ELSE
-               EXP2 = PP( 2 )
-            END IF
+            IF ( N2 .EQ. 1 ) PP( 2 ) = -PP( 1 )
 
 *  Form sum of squares of the expected values of the normal order
 *  statistics
@@ -155,4 +151,4 @@
          END IF
  1    CONTINUE
       END
-* @(#)ccd1_orvar.f	2.2     9/9/96     2
+* $Id$

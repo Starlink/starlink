@@ -117,7 +117,8 @@
 *     11-SEP-1997 (TMG):
 *        Original version.
 *     16-JAN-1998 (DSB):
-*        Declaration of RE changed from REAL to DOUBLE PRECISION.
+*        Declaration of RE, SENSL, SENSR, SENS2L and SENS2R changed from REAL 
+*        to DOUBLE PRECISION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -185,12 +186,12 @@
                                  ! in image intercomparisons
       REAL E                     ! local estimate of E 
       REAL MAXDE                 ! max change in E
-      DOUBLE PRECISION SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
       REAL EMED, ZMED            ! median scale factor and zero shift
       
       LOGICAL GETS, GETZ, BAD    ! logical flags
       LOGICAL CONVERGED          ! convergence flag
       
+      DOUBLE PRECISION SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
       DOUBLE PRECISION RE        ! local estimate of 1/E
       DOUBLE PRECISION SCALE, DSCALE ! scale factor and standard error
       DOUBLE PRECISION ZERO, DZERO   ! zero shift and standard error
@@ -442,11 +443,9 @@
                IPAIR = IPAIR + 1
                SENSL = 1.0D0 / DBLE( EEST( IPAIR ) )
                SENSR = SENSL / DBLE( F )
-
                CALL CCG1_CMLTR( BAD, NEL,
      :              %VAL( IPDIN( 2 * IPOS - 1, ISET ) ), SENSL,
      :              %VAL( IPDOU( 2 * IPOS - 1, ISET ) ), NERR, STATUS )
-
                CALL CCG1_CMLTR( BAD, NEL,
      :              %VAL( IPDIN( 2 * IPOS, ISET ) ), SENSR,
      :              %VAL( IPDOU( 2 * IPOS, ISET ) ), NERR, STATUS )

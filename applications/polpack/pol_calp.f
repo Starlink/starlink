@@ -135,7 +135,7 @@
                                  ! workspace pointers
       LOGICAL BAD                ! bad pixel flag
       
-      
+      integer ii      
 *.
 
 * Check inherited global status.
@@ -150,6 +150,7 @@
       NI = 0
       NQ = 0
       NU = 0
+
       DO ISET = 1, NSET
 
 * Estimates of I and Q can be obtained from the first waveplate
@@ -159,19 +160,23 @@
          IF ( NSTATE( 1 ) .GE. ISET ) THEN
             NI = NI + 1
             NQ = NQ + 1
+
             CALL VEC_SUBR( BAD, NEL, %VAL( IPDCOR( 1, ISET ) ),
      :           %VAL( IPDCOR( 2, ISET ) ), QEST( 1, NQ ), IERR, NERR,
      :           STATUS )
             CALL VEC_ADDR( BAD, NEL, %VAL( IPDCOR( 1, ISET ) ),
      :           %VAL( IPDCOR( 2, ISET ) ), IEST( 1, NI ), IERR, NERR,
      :           STATUS )
+
             IF ( VAR ) THEN
                CALL VEC_ADDR( BAD, NEL, %VAL( IPVCOR( 1, ISET ) ),
      :              %VAL( IPVCOR( 2, ISET ) ), VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
      :              IERR, NERR, STATUS )
+
             ENDIF
+
          ENDIF
 
 * Estimates of I and Q can be obtained from the second waveplate
@@ -187,6 +192,7 @@
             CALL VEC_ADDR( BAD, NEL, %VAL( IPDCOR( 4, ISET ) ),
      :           %VAL( IPDCOR( 3, ISET ) ), IEST( 1, NI ), IERR, NERR,
      :           STATUS )
+
             IF ( VAR ) THEN
                CALL VEC_ADDR( BAD, NEL, %VAL( IPVCOR( 4, ISET ) ),
      :              %VAL( IPVCOR( 3, ISET ) ), VIEST( 1, NI ), IERR,
@@ -194,6 +200,7 @@
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
      :              IERR, NERR, STATUS )
             ENDIF
+
          ENDIF
 
 * Estimates of I and U can be obtained from the third waveplate
@@ -210,6 +217,7 @@
             CALL VEC_ADDR( BAD, NEL, %VAL( IPDCOR( 5, ISET ) ),
      :           %VAL( IPDCOR( 6, ISET ) ), IEST( 1, NI ), IERR,
      :           NERR, STATUS )
+
             IF ( VAR ) THEN
                CALL VEC_ADDR( BAD, NEL, %VAL( IPVCOR( 5, ISET ) ),
      :              %VAL( IPVCOR( 6, ISET ) ), VIEST( 1, NI ), IERR,
@@ -258,26 +266,50 @@
       CALL PSX_CALLOC( NI, '_INTEGER', IPWRK4, STATUS )
       CALL PSX_CALLOC( NI, '_LOGICAL', IPWRK5, STATUS )
 
-* Initialise the variances and covariances of the order statistics
-* from n to 1, assuming an initially normal distribution.
-      CALL CCD1_ORVAR( NI, NMAT, %VAL( IPWRK3 ), %VAL( IPCOV ), STATUS )
-
 * The method for forming the median stokes parameter images depends on
 * whether we require variance information. If variances are required
 * then use the variances on the estimates of the stokes parameters as
 * weights when forming the median. Also calculate the variances on the
 * output median images.
       IF ( VAR ) THEN
+
+* Initialise the variances and covariances of the order statistics
+* from NI to 1, assuming an initially normal distribution.
+         CALL CCD1_ORVAR( NI, NMAT, %VAL( IPWRK3 ), %VAL( IPCOV ), 
+     :                    STATUS )
+
+*  Get the median total intensity data, and variances.
          CALL CCG1_MDR1R( IEST, NEL, NI, VIEST, 1, %VAL( IPCOV ), NMAT,
      :        OUT( 1, 1 ), VOUT( 1, 1 ), %VAL( IPWRK1 ), %VAL( IPWRK2 ),
      :        %VAL( IPWRK3 ), %VAL( IPWRK4 ), %VAL( IPWRK5 ), STATUS )
+
+*  Now do Q.
          IF ( NQ .GT. 0 ) THEN
+
+* Initialise the variances and covariances of the order statistics
+* from NQ to 1, assuming an initially normal distribution.
+            NMAT = NQ * ( NQ + 1 ) / 2
+            CALL CCD1_ORVAR( NQ, NMAT, %VAL( IPWRK3 ), %VAL( IPCOV ), 
+     :                       STATUS )
+
+*  Get the median Q data, and variances.
             CALL CCG1_MDR1R( QEST, NEL, NQ, VQEST, 1, %VAL( IPCOV ),
      :           NMAT, OUT( 1, 2 ), VOUT( 1, 2 ), %VAL( IPWRK1 ),
      :           %VAL( IPWRK2 ), %VAL( IPWRK3 ), %VAL( IPWRK4 ),
      :           %VAL( IPWRK5 ), STATUS )
+
          ENDIF
+
+*  Now do U.
          IF ( NU .GT. 0 ) THEN
+
+* Initialise the variances and covariances of the order statistics
+* from NU to 1, assuming an initially normal distribution.
+            NMAT = NU * ( NU + 1 ) / 2
+            CALL CCD1_ORVAR( NU, NMAT, %VAL( IPWRK3 ), %VAL( IPCOV ), 
+     :                       STATUS )
+
+*  Get the median U data, and variances.
             CALL CCG1_MDR1R( UEST, NEL, NU, VUEST, 1, %VAL( IPCOV ),
      :           NMAT, OUT( 1, 3 ), VOUT( 1, 3 ), %VAL( IPWRK1 ),
      :           %VAL( IPWRK2 ), %VAL( IPWRK3 ), %VAL( IPWRK4 ),

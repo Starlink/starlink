@@ -401,7 +401,7 @@ I_SUB2 = hlpcmd ccd1_par ccd1_memcm
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR AST_PAR \
 PAR_PAR PRM_PAR FIO_ERR FIO_PAR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
-NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR
+NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR CAT_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -424,7 +424,9 @@ ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
 ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
 pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
-polvec.f pol1_plvec.f pol1_prwcs.f ccd1_orvar.f pol1_stats.f
+polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stats.f pol1_stk.f \
+pol1_stbin.f pol1_cm1rr.f pol1_cm3rr.f ccg1_mer1r.f ccg1_mer3r.f \
+ccg1_scr1r.f ccg1_scr3r.f ccg1_clipr.f pol1_mkcat.f pol1_clcat.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -541,33 +543,32 @@ CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM
 HLPCMD:    hlpcmd;                $(LINK) $? $@
 CCD1_PAR:  ccd1_par;              $(LINK) $? $@
 CCD1_MEMCM:  ccd1_memcm;          $(LINK) $? $@
-
 NDG_ERR:   ndg_err;               $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
-GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
-PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
- 
+
+AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
+CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
+CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
+FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
+FIO_PAR:   $(STAR_INC)/fio_par;   $(LINK) $? $@
+GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
-AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
-CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
-TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
-FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
-FIO_PAR:   $(STAR_INC)/fio_par;   $(LINK) $? $@
+NUM_CMN:   $(STAR_INC)/num_cmn;   $(LINK) $? $@
+NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
+NUM_DEC_R:      $(STAR_INC)/num_dec_R;     $(LINK) $? $@
+NUM_DEF_CVT:    $(STAR_INC)/num_def_cvt;  $(LINK) $? $@
+NUM_DEF_R:      $(STAR_INC)/num_def_R;     $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
-SUBPAR_PAR: $(STAR_INC)/subpar_par; $(LINK) $? $@
+PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
-NUM_CMN:   $(STAR_INC)/num_cmn;   $(LINK) $? $@
-NUM_DEF_CVT:    $(STAR_INC)/num_def_cvt;  $(LINK) $? $@
-NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
-NUM_DEC_R:      $(STAR_INC)/num_dec_R;     $(LINK) $? $@
-NUM_DEF_R:      $(STAR_INC)/num_def_R;     $(LINK) $? $@
+TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -1560,17 +1561,47 @@ wrndf.o:	PAR_ERR
 wrndf.o:	MSG_PAR     
 wrndf.o:	GRP_PAR     
 wrndf.o:	NDG_ERR     
-polvec.f:	SAE_PAR
-polvec.f:	PAR_ERR
-polvec.f:	NDF_PAR
-pol1_plvec.f:	SAE_PAR
-pol1_plvec.f:	PRM_PAR
-pol1_prwcs.f:	SAE_PAR
-pol1_prwcs.f:	NDF_PAR
-polpack_mon.o: SAE_PAR PAR_PAR
-pol1_stats.f:	SAE_PAR
-pol1_stats.f:	PRM_PAR
-
+polvec.o:	SAE_PAR
+polvec.o:	PAR_ERR
+polvec.o:	NDF_PAR
+pol1_mkcat.o:	SAE_PAR
+pol1_mkcat.o:	CAT_PAR
+pol1_clcat.o:	SAE_PAR
+pol1_clcat.o:	AST_PAR
+pol1_plvec.o:	SAE_PAR
+pol1_plvec.o:	PRM_PAR
+pol1_gtwcs.o:	SAE_PAR
+pol1_gtwcs.o:	NDF_PAR
+pol1_gtwcs.o:	AST_PAR
+polpack_mon.o:	SAE_PAR PAR_PAR
+pol1_stats.o:	SAE_PAR
+pol1_stats.o:	PRM_PAR
+pol1_stbin.o:	SAE_PAR
+pol1_stk.o:	SAE_PAR
+pol1_cm1rr.o:	SAE_PAR
+pol1_cm3rr.o:	SAE_PAR
+ccg1_mer3r.o:	SAE_PAR
+ccg1_mer3r.o:	PRM_PAR
+ccg1_mer3r.o:	NUM_CMN
+ccg1_mer3r.o:	NUM_DEC_CVT
+ccg1_mer3r.o:	NUM_DEF_CVT
+ccg1_mer1r.o:	SAE_PAR
+ccg1_mer1r.o:	PRM_PAR
+ccg1_mer1r.o:	NUM_CMN
+ccg1_mer1r.o:	NUM_DEC_CVT
+ccg1_mer1r.o:	NUM_DEF_CVT
+ccg1_scr3r.o:	SAE_PAR
+ccg1_scr3r.o:	PRM_PAR
+ccg1_scr3r.o:	NUM_CMN
+ccg1_scr3r.o:	NUM_DEC_CVT
+ccg1_scr3r.o:	NUM_DEF_CVT
+ccg1_scr1r.o:	SAE_PAR
+ccg1_scr1r.o:	PRM_PAR
+ccg1_scr1r.o:	NUM_CMN
+ccg1_scr1r.o:	NUM_DEC_CVT
+ccg1_scr1r.o:	NUM_DEF_CVT
+ccg1_clipr.o:	SAE_PAR
+ccg1_clipr.o:	PRM_PAR
 #-------------------------------------------------------------------------------
 #
 #  End of makefile.
