@@ -107,7 +107,7 @@
       INTEGER			NELM			! Number of elements
       INTEGER			VPTR			! Mapped data
 
-      BTYE			VALUE			! Intermediate value
+      BYTE			VALUE			! Intermediate value
 
       LOGICAL			THERE			! Object exists?
 *.
