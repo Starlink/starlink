@@ -146,7 +146,7 @@
         CALL ADI_CPUT0C( ID, '.HDU_'//STR(:NDIG), HDU, STATUS )
 
 *    Ensure previous HDU's data areas are defined
-        CALL ADI2_CHKPRV( FID, NHDU-1, STATUS )
+        CALL ADI2_CHKPRV( FID, NHDU-1, .FALSE., STATUS )
 
 *    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )

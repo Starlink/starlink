@@ -114,6 +114,7 @@
 *  Local Variables:
 
       INTEGER			FSTAT			! FITSIO status
+      INTEGER			HID			! HDU identifier
       INTEGER			LUN			! Logical unit
       INTEGER			NKEY			! Number of keywords
 *.
