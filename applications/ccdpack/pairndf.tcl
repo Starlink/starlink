@@ -239,8 +239,8 @@
 #  them here than at time of use.
 
 #  Construct a dialog box for abnormal exit of the chooser.
-      set confirmtext "Not enough images have been paired\n"
-      append confirmtext "to register them all.\n"
+      set confirmtext "Not all of the images have been paired;\n"
+      append confirmtext "If you exit now only a subset will be registered.\n"
       append confirmtext "Do you really wish to exit?"
       set quitdialog [ iwidgets::messagedialog $chooser.qd \
                           -modality application \
@@ -248,7 +248,7 @@
                           -master $chooser \
                           -title "PAIRNDF: Confirm exit" \
                           -text $confirmtext ]
-      $quitdialog buttonconfigure Cancel -text "Abort PAIRNDF"
+      $quitdialog buttonconfigure Cancel -text "Finish pairing"
       $quitdialog buttonconfigure OK -text "Continue"
       $quitdialog hide Help
 
