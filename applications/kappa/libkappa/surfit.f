@@ -190,6 +190,8 @@
 *        Original NDF version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     3-FEB-2000 (DSB):
+*        Replace AIF_FLNAM calls with NDF_MSG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -700,8 +702,10 @@
 *  file.
          NC = 0
          BUFFER = ' '
-         CALL AIF_FLNAM( 'IN', DATNAM, STATUS )
-         NCI = CHR_LEN( DATNAM )
+
+         CALL NDF_MSG( 'NDF', NDFI )
+         CALL MSG_LOAD( ' ', '^NDF', DATNAM, NCI, STATUS )
+
          CALL CHR_PUTC( 'Input IMAGE is ', BUFFER, NC )
          CALL CHR_PUTC( DATNAM( :NCI ), BUFFER, NC )
          CALL CHR_PUTC( '.', BUFFER, NC )
@@ -711,8 +715,10 @@
 *  file.
          NC = 0
          BUFFER = ' '
-         CALL AIF_FLNAM( 'OUT', DATNAM, STATUS )
-         NCI = CHR_LEN( DATNAM )
+
+         CALL NDF_MSG( 'NDF', NDFO )
+         CALL MSG_LOAD( ' ', '^NDF', DATNAM, NCI, STATUS )
+
          CALL CHR_PUTC( 'Output IMAGE is ', BUFFER, NC )
          CALL CHR_PUTC( DATNAM( :NCI ), BUFFER, NC )
          CALL CHR_PUTC( '.', BUFFER, NC )
