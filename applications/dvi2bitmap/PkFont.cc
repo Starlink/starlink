@@ -115,9 +115,29 @@ bool PkFont::makeMissingFonts_ = false;
 
 
 /**
- * Represents a font.
+ * Represents a PK font.
+ *
+ * <p>The constructor arguments are those read from the DVI file font
+ * declaration, after a <code>fnt_def</code> opcode, except for
+ * <code>fontmag</code>, which is the overall DVI magnification
+ * factor, and includes the file and command-line magnification
+ * adjustments.  For more details, see the definition of the font
+ * declaration in section `A.4 Font defintions' of the DVI standard,
+ * and the use of these factors in method {@link #magnification}.
+ *
+ * @param fontmag the scale factor (1.0 = no magnification) by which
+ * the font is to be magnified as it is read from the PK file
+ *
+ * @param c the font checksum expected
+ *
+ * @param s fixed-point scale factor applied to the character widths
+ * in the font
+ *
+ * @param d the fixed-point `design size' of the font
+ *
+ * @param name the name of the font
  */
-PkFont::PkFont(unsigned int dvimag,
+PkFont::PkFont(double fontmag,
 	       unsigned int c,
 	       unsigned int s,
 	       unsigned int d,
@@ -127,7 +147,7 @@ PkFont::PkFont(unsigned int dvimag,
     font_header_.c = c;
     font_header_.s = s;
     font_header_.d = d;
-    dvimag_ = dvimag;
+    fontmag_ = fontmag;
     path_ = "";
     name_ = name;
 
@@ -813,12 +833,12 @@ void PkFont::read_font (InputByteStream& pkf)
  */
 double PkFont::magnification() const
 {
-    double rval = ((double)font_header_.s * (double)dvimag_)
-	/ ((double)font_header_.d * 1000.0);
+    double rval = ((double)font_header_.s * fontmag_)
+	/ (double)font_header_.d;
     if (verbosity_ > normal)
 	cerr << "PkFont::magnification: "
 	     << font_header_.s << '/' << font_header_.d
-	     << " *" << dvimag_ << "/1000 = " << rval << endl;
+	     << " *" << fontmag_ << " = " << rval << endl;
     return rval;
 }
 
