@@ -93,14 +93,6 @@ sub new {
 
     defined($catname) || return undef;
 
-    #print STDERR "Moggy::new\n";
-    #print STDERR "\tcatname="
-    #  . (defined ($catname) ? $catname : "<undef>") . "\n";
-    #print STDERR "\tconfname="
-    #  . (defined ($confname) ? $confname : "<undef>") . "\n";
-    #print STDERR "\tmoggycmd="
-    #  . (defined ($moggycmd) ? $moggycmd : "<undef>") . "\n";
-
     # Instance variables relevant to the catalogue.  These have
     # get/set methods with the same names.
     $self->{CATNAME} = $catname;
@@ -131,7 +123,7 @@ sub new {
     $self->{SLAVEMESSAGE} = undef;
     $self->{MOGGYVERSION} = undef;
     # `Globals'
-    $self->{_MOGGYCMD} = (defined($moggycmd) ? $moggycmd : \$MoggyCommand);
+    $self->{_MOGGYCMD} = (defined($moggycmd) ? $moggycmd : $MoggyCommand);
     $self->{_MOGGYPMVERSION} = \$MoggyRCSId;
 
     bless ($self, $class);
@@ -377,17 +369,6 @@ sub astinformation ($;$\@) {
 		return undef;
 	    }
 
-	    my $i;
-	    print STDERR "astinformation: sending\n";
-	    for ($i=0; $i<3; $i++) {
-		print STDERR "  $astarray[$i]\n";
-	    }
-	    print STDERR "  [...]\n";
-	    for ($i=$#astarray-3; $i<=$#astarray; $i++) {
-		print STDERR "  $astarray[$i]\n";
-	    }
-	    print STDERR "!!!\n";
-
 	    $self->send_input_to_slave_ (@astarray);
 
 	    unless ($self->status_ok()) {
@@ -471,7 +452,6 @@ sub astconvert ($$$$) {
     my $RDR = $self->{SLAVEREADER};
     my $line = <$RDR>;
     my @vals = split (' ', $line);
-    print STDERR "astconvert: vals=<@vals>\n";
     # Check that there are precisely two values in the line.
     defined($vals[1]) || do {
 	carp "Moggy::astconvert: unexpected response from moggy <$line>";
@@ -701,12 +681,10 @@ sub start_slave_ ($) {
     $self->{SLAVEREADER} = gensym(); # get anonymous reference to a typeglob
     $self->{SLAVEWRITER} = gensym(); # ditto
 
-    my $cmd = ${$self->{_MOGGYCMD}};
-    #print STDERR "start_slave_ : cmd = $cmd\n";
+    my $cmd = $self->{_MOGGYCMD};
     $self->{MOGGYPID} = open2($self->{SLAVEREADER},
 			      $self->{SLAVEWRITER},
-			      ${$self->{_MOGGYCMD}});
-    #print STDERR "start_slave_ : pid = $self->{MOGGYPID}\n";
+			      $self->{_MOGGYCMD});
 }
 
 sub stop_slave_ ($) {
@@ -717,7 +695,6 @@ sub stop_slave_ ($) {
 	close ($self->{SLAVEWRITER});
 	$self->{MOGGYPID} = 0;
     }
-    #print STDERR "stop_slave_\n";
 }
 
 # Send a one-line command to the slave, and receive a one-line string
@@ -742,12 +719,6 @@ sub send_command_to_slave_ ($;@) {
     defined ($cmd)     || return undef;
     $self->status_ok() || return undef;
 
-    #TEST
-    #$self->{SLAVESTATUS} = '5--';
-    #$self->{SLAVEMESSAGE} = 'testing...';
-    #$self->{FAILEDCOMMAND} = 'all of them!';
-    #return 'testing, testing, 1, 2, 3';
-
     # Start the slave if it's not already running.
     $self->{MOGGYPID} || $self->start_slave_ ();
 
@@ -758,13 +729,19 @@ sub send_command_to_slave_ ($;@) {
 	print $WTR "$cmd\r\n";
 	my $responseline = <$RDR>;
 
-	$responseline =~ s/\s*$//;
-	#print STDERR "send_command_to_slave_: read $responseline\n";
-	($self->{SLAVESTATUS}, $self->{SLAVEMESSAGE})
-	  = ($responseline =~ /^\s*(\w*)\s*(.*)/);
-	#print STDERR "read_slave_status_: <".$self->{SLAVESTATUS}.">  <".$self->{SLAVEMESSAGE}.">\n";
+	if (defined ($responseline)) {
+	    # Trim trailing whitespace
+	    $responseline =~ s/\s*$//;
+	    ($self->{SLAVESTATUS}, $self->{SLAVEMESSAGE})
+	      = ($responseline =~ /^\s*(\w*)\s*(.*)/);
 
-	$self->status_ok() || ($self->{FAILEDCOMMAND} = $cmd);
+	    $self->status_ok() || ($self->{FAILEDCOMMAND} = $cmd);
+	} else {
+	    $self->{SLAVESTATUS} = "5--"; # pseudo-return-code
+                                          # indicating internal error.
+	    $self->{SLAVEMESSAGE} = '<no response from moggy>';
+	    $self->{FAILEDCOMMAND} = $cmd;
+	}
     } else {
 	# Slave didn't start up properly
 	$self->{SLAVESTATUS} = "5--"; # so status_ok() returns false
@@ -799,34 +776,33 @@ sub send_input_to_slave_ ($;\@) {
     # Start the slave if it's not already running.
     $self->{MOGGYPID} || $self->start_slave_ ();
 
-    print STDERR "send_input_to_slave_: $#strings elements...\n";
-
     if ($self->{MOGGYPID}) {
 	my $WTR = $self->{SLAVEWRITER};
 	my $RDR = $self->{SLAVEREADER};
 	my $line;
 
-#open (SL, ">slavelog") || die "Can't open slavelog to write";
-my $i=0;
+	# Send the @strings array to the slave, a line at a time
 	foreach $line (@strings) {
-	    $i++;
-	    if (($i < 4) || ($i >= $#strings-4)) {
-		print STDERR "slave_: <$line>\n";
-		$i++;
-	    }
 	    print $WTR "$line\r\n";
 	}
 	print $WTR ".\r\n";
-	print STDERR "slave_: !!FINISHED!!\n";
+
+	# ... and get a single line response
 	my $responseline = <$RDR>;
 
-	$responseline =~ s/\s*$//;
-	#print STDERR "send_command_to_slave_: read $responseline\n";
-	($self->{SLAVESTATUS}, $self->{SLAVEMESSAGE})
-	  = ($responseline =~ /^\s*(\w*)\s*(.*)/);
-	#print STDERR "read_slave_status_: <".$self->{SLAVESTATUS}.">  <".$self->{SLAVEMESSAGE}.">\n";
+	if (defined($responseline)) {
+	    # Trim trailing whitespace
+	    $responseline =~ s/\s*$//;
+	    ($self->{SLAVESTATUS}, $self->{SLAVEMESSAGE})
+	      = ($responseline =~ /^\s*(\w*)\s*(.*)/);
 
-	$self->status_ok() || ($self->{FAILEDCOMMAND} = '<input>');
+	    $self->status_ok() || ($self->{FAILEDCOMMAND} = '<input>');
+	} else {
+	    $self->{SLAVESTATUS} = "5--"; # pseudo-return-code
+                                          # indicating internal error.
+	    $self->{SLAVEMESSAGE} = '<no response from moggy>';
+	    $self->{FAILEDCOMMAND} = $cmd;
+	}
     } else {
 	# Slave didn't start up properly
 	$self->{SLAVESTATUS} = "5--"; # so status_ok() returns false
@@ -836,22 +812,6 @@ my $i=0;
 
     return $self->{SLAVEMESSAGE};
 }
-
-## Read the status line which is sent as the response to each
-## command. If status_ok is false, then the recent call to
-## `send_command_to_slave_' will have done nothing, so there is no
-## status to read, so return undef.
-#sub read_slave_status_ {
-#    my $self = shift;
-#
-#    $self->status_ok() || return undef;
-#
-#    my $tmp = <$RDR>;
-#    #print STDERR "read_slave_status_: got $tmp\n";
-#    $tmp =~ s/[\n\r]*$//;
-#    ($self->{SLAVESTATUS},$self->{SLAVEMESSAGE}) = ($tmp =~ /^ *(\w*)\s*(.*)/);
-#    return $self->{SLAVEMESSAGE};
-#}
 
 #+
 # <routinename>status_ok
@@ -949,7 +909,6 @@ sub failed_command ($) {
 
 sub DESTROY {
     my $self = shift;
-    #print STDERR "In DESTROY\n";
     $self->stop_slave_ ();
 }
 
