@@ -119,9 +119,9 @@ sub error;
 
 #  Set up scratch directory.
 
-$tmpdir = "/local/junk/scb/index";
+$tmpdir = $scbindex_tmpdir;
 rmrf $tmpdir;
-system "mkdir -p $tmpdir" and error "Couldn't create $tmpdir: $?\n";
+system ("mkdir", "-p", $tmpdir) and error "Failed to create $tmpdir: $!\n";
 
 #  Set up signal handler.  Note this is not entirely safe since tidyup
 #  does non-trivial work and so (probably) calls some non-reentrant 
@@ -253,13 +253,31 @@ sub index_pack {
    my $pack_file = shift;
    $package = shift;
 
+#  Locate package: if it is a single filename (i.e. not a path) and doesn't
+#  exist in the current directory, look for it in $srcdir.  If it doesn't
+#  exist anywhere, generate an error.
+
+   if (!-e $pack_file) {
+      if (index ('/',$pack_file) == -1 && -e "$srcdir/$pack_file") {
+         $pack_file = "$srcdir/$pack_file";
+      }
+      else {
+         error "Package '$pack_file' not found\n";
+      }
+   }
+
 #  Get name of package.
 
    $pack_file =~ m%^(.*/)?([^.]+)(\.tar.*)?%;
    my ($dir, $tarext) = ($1, $3);
    $package ||= $2;
    print "\nPACKAGE: $package\n";
-   $file_index->put("$package#", $pack_file);
+
+#  Get fully qualified pathname of package location and store in file index.
+
+   my $fqpack_file = $pack_file;
+   $fqpack_file =~ s%^(?!/)% cwd . '/' %e;
+   $file_index->put("$package#", $fqpack_file);
 
 #  If any records for this package already exist in the function index, 
 #  or file index, delete them.
