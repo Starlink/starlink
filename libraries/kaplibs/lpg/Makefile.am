@@ -11,7 +11,7 @@ liblpg_la_SOURCES = \
 PRIVATE_INCLUDES = LPG_COM LPG_CONST
 BLOCK_DATA_FILES = lpg1_init.f
 
-C_ROUTINES = lpg1_rm.c lpg1_sleep.c lpg1_tmpnm.c
+C_ROUTINES = lpg1_sleep.c lpg1_tmpnm.c
 
 F_ROUTINES = \
 lpg1_addtm.f lpg1_ptpar.f lpg1_tidy.f lpg1_tmpcp.f lpg_again.f \

@@ -38,11 +38,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     12-OCT-2004 (TIMJ):
+*        Use PSX_REMOVE rather than CTG1_RM
 *     {enter_changes_here}
 
 *  Bugs:
@@ -168,7 +171,11 @@
          CALL CHR_APPND( '_values', PATH, NC )
 
 *  Attempt to delete any existing file with this path.
-         CALL LPG1_RM( PATH( : NC ), STATUS )
+*  Do not worry if there is no file to delete
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL PSX_REMOVE( PATH( : NC ), STATUS )
+            IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL( STATUS )
+         END IF
 
 *  Create a comment for the file.
          COMM = ' '
