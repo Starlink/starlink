@@ -71,7 +71,8 @@
 *        tasks concerned with registration know about this name 
 *        and will use those coordinates on the assumption that they
 *        constitute a correct registration of images if they are
-*        present.
+*        present.  The newly added coordinate system will become
+*        the Current coordinate system of the image.
 *
 *        The file named by this parameter will normally have been
 *        written by the ASTEXP program, saving a known correct 
@@ -911,14 +912,14 @@
       LINE( 2: ) = 'Set name'
       LINE( 12: ) = 'Set index'
       LINE( 24: ) = 'NDF name'
-      IF ( ADDWCS .OR. MODE .EQ. 'SPLIT' ) THEN
+      IF ( ADDWCS .OR. ASTFL .OR. MODE .EQ. 'SPLIT' ) THEN
          LINE( 60: ) = 'CCD_SET domain'
       END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
       LINE( 2: ) = '--------'
       LINE( 12: ) = '---------'
       LINE( 24: ) = '--------'
-      IF ( ADDWCS .OR. MODE .EQ. 'SPLIT' ) THEN
+      IF ( ADDWCS .OR. ASTFL .OR. MODE .EQ. 'SPLIT' ) THEN
          LINE( 60: ) = '--------------'
       END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
@@ -1010,6 +1011,10 @@
                      CALL CCD1_ADFRM( IWCS, FSMAT, 'CCD_SET', 0D0,
      :                                FITRTS( I ), NCARD, IPFITS,
      :                                STATUS )
+
+*  Set the new frame to be the Current one.
+                     JSET = AST_GETI( IWCS, 'Nframe', STATUS )
+                     CALL AST_SETI( IWCS, 'Current', JSET, STATUS )
 
 *  Write the modified WCS component back to the NDF.
                      CALL NDF_PTWCS( IWCS, INDF, STATUS )
