@@ -63,10 +63,28 @@ INTERFACE SERROR
       HELP 'Only these parameters will have errors evaluated'
    ENDPARAMETER
 
+   PARAMETER MCTRL
+      TYPE 'CHAR'
+      DEFAULT !
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Minimisation control file'
+      HELP 'Name of minimisation control file, or ! for defaults'
+   ENDPARAMETER
+
    PARAMETER MINS
       TYPE '_REAL'
       VPATH 'CURRENT,DEFAULT'
       DEFAULT 20
+   ENDPARAMETER
+
+   PARAMETER NUP
+      TYPE '_INTEGER'
+      DEFAULT 3
+      VPATH 'DEFAULT'
+      PPATH 'DEFAULT'
+      PROMPT 'Update interval'
+      HELP 'Number of its. between update of model file (and diagnostic o/p)'
    ENDPARAMETER
 
    PARAMETER OP
