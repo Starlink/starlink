@@ -5508,6 +5508,7 @@ U java/source/diva/src/main/uk/ac/starlink/diva/images/width6.gif
 U java/source/diva/src/main/uk/ac/starlink/diva/images/xrange.gif
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/interp
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/AkimaSplineInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/BasicInterpolatorFactory.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/HermiteSplineInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/InterpolatedCurveIterator.java
@@ -8376,6 +8377,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/plot/GrfFigure.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/MouseMotionTracker.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotControl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotControlList.java
+U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotInterpolatorFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotScaleChangedEvent.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotScaledListener.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/Pointer.java
@@ -8459,6 +8461,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FuzzyBoolean.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianGenerator.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/JPEGUtilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFilter.java
@@ -8482,6 +8485,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/TreeviewAccess.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtGenerator.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/WaveletFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/deploy.wsdd
 cvs checkout: Updating java/source/splat/src/script
@@ -8545,6 +8549,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/ConcatStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
@@ -8581,6 +8586,7 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
+U java/source/table/src/main/uk/ac/starlink/table/formats/AsciiTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/HTMLTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/LatexTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextStarTable.java
@@ -8828,10 +8834,12 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnList.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ConcatWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/InverseRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELUtils.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/LoadQueryWindow.java
@@ -8907,6 +8915,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/concat4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
@@ -8914,6 +8923,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/hide1.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/invert3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/match1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif

@@ -339,10 +339,10 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JTreePane.java:229: warning - Tag @see: can't find setComponentAt in diva.gui.toolbox.JTreePane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: warning - Tag @see: malformed: "GraphModel, GraphPane"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
@@ -369,6 +369,16 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1210,25 +1220,37 @@ javadocs:
   [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Used when figure is changed (i.e.<!"
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:484: warning - Tag @link: reference not found: orderVertices
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:484: warning - Tag @link: reference not found: setInterpolator
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:557: warning - Tag @link: reference not found: applySortIndex
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/uk/ac/starlink/diva/geom/InterpolatedCurve2D.html...
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: orderVertices
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: setInterpolator
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:565: warning - Tag @link: reference not found: applySortIndex
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:29: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:43: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java:25: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java:39: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:31: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:45: warning - Tag @link: reference not found: interpolate
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/uk/ac/starlink/diva/interp/Interpolator.html...
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:28: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:42: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:165: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:190: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:175: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java:200: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/LinearInterp.java:23: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/LinearInterp.java:37: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/PolynomialInterp.java:24: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/PolynomialInterp.java:38: warning - Tag @link: reference not found: interpolate
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/stylesheet.css...
-  [javadoc] 493 warnings
+  [javadoc] 497 warnings
      [echo] Executing HELP target: javadocs
 
 prepare:
@@ -1585,9 +1607,9 @@ javadocs:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:37: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:37: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:37: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:38: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:38: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:38: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
   [javadoc] 5 warnings
      [echo] Executing NDTools target: javadocs
@@ -2782,4 +2804,4 @@ javadocs:
   [javadoc] 206 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 10 seconds
+Total time: 3 minutes 57 seconds

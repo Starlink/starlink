@@ -304,7 +304,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 852 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 853 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing HELP target: javadoc-sources
 
@@ -346,7 +346,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 91 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 93 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -402,7 +402,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 155 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 158 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -412,7 +412,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 57 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 59 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
@@ -433,11 +433,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1928 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1944 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 18 seconds
+Total time: 1 minute 38 seconds

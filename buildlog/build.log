@@ -83,7 +83,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/classes
-    [javac] Compiling 652 source files to /apps/cvsbuild/java/source/diva/build/classes
+    [javac] Compiling 653 source files to /apps/cvsbuild/java/source/diva/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 19 files to /apps/cvsbuild/java/source/diva/build/classes
@@ -176,7 +176,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 89 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 91 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -307,7 +307,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 157 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 160 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 67 files to /apps/cvsbuild/java/source/splat/build/classes
@@ -374,8 +374,8 @@ build_demo:
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
-    [javac] Compiling 57 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 42 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 59 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 44 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
@@ -457,4 +457,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 42 seconds
+Total time: 2 minutes 16 seconds

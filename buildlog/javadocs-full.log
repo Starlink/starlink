@@ -39,7 +39,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 852 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 853 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing HELP target: javadoc-sources
 
@@ -79,7 +79,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 91 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 93 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -135,7 +135,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 155 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 158 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -145,7 +145,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 57 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 59 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
@@ -507,6 +507,16 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1091,6 +1101,23 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LineRecognizer.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeLengthStrokeFilter.java:20: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeTimeStrokeFilter.java:18: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/PanRecognizer.java:25: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/PanZoomInterpreter.java:29: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/RemoveDupPtsStrokeFilter.java:19: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/RetypingRecognizer.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/SceneTranslator.java:21: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ScribbleRecognizer.java:32: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/SketchTransducer.java:20: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TableTransducer.java:22: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextAnnotations.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextBlock.java:19: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextData.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextLine.java:19: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/LLRSceneMetric.html...
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
@@ -1106,29 +1133,12 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/ModedIncrRecognizer.html...
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g. zooming).  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeLengthStrokeFilter.java:20: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeTimeStrokeFilter.java:18: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/PanRecognizer.java:25: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/PanZoomInterpreter.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/RemoveDupPtsStrokeFilter.java:19: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/RetypingRecognizer.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/SceneTranslator.java:21: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ScribbleRecognizer.java:32: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/SketchTransducer.java:20: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TableTransducer.java:22: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextAnnotations.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextBlock.java:19: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextData.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TextLine.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/TrainingToMatlab.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ZoomRecognizer.java:35: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/features/FeatureExtractor.java:19: warning - @rating is an unknown tag.
@@ -1524,24 +1534,36 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:39: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:31: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:45: warning - Tag @link: reference not found: interpolate
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/interp/Interpolator.html...
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:28: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:42: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:165: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:190: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:175: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:200: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:23: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:37: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:24: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:38: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:484: warning - Tag @link: reference not found: orderVertices
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:484: warning - Tag @link: reference not found: setInterpolator
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:557: warning - Tag @link: reference not found: applySortIndex
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/geom/InterpolatedCurve2D.html...
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: orderVertices
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: setInterpolator
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:565: warning - Tag @link: reference not found: applySortIndex
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:254: warning - Tag @see: reference not found: ColumnTable.getColumn.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/FitsDate.java:39: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 578 warnings
+  [javadoc] 582 warnings
 
 BUILD SUCCESSFUL
 Total time: 1 minute 43 seconds
