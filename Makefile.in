@@ -44,25 +44,19 @@ ALL_TARGETS = \
 # which are defined in the Makefile.dependencies which is included below.
 
 
+
 SUBDIRS = @subdirs@
 @SET_MAKE@
-
-RECURSIVE_TARGETS = clean maintainer-clean
-
+LN_S=@LN_S@
 
 # Java support: need a java runtime
 JAVA=@JAVA@
 
+RECURSIVE_TARGETS = clean maintainer-clean
+
 
 
 all: $(ALL_TARGETS)
-
-### FIXME: this depends on the xt jar being handy; either check this in or,
-### better, write a 10-line Java application under buildsupport to replace it,
-### using the XSLT support (JAXP) present in Java 1.4+.
-##Makefile.dependencies: componentset.xml
-##	$(JAVA) com.jclark.xsl.sax.Driver \
-##		$< buildsupport/starconf/make-dependencies.xslt $@
 
 # The Makefile dependencies are built using a Java program.  This
 # isn't installed (it should be -- see the comments in
@@ -94,7 +88,7 @@ Makefile.dependencies: componentset.xml
 	    :; \
 	fi
 
-componentset.xml:
+componentset.xml: componentinfo.dtd
 	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
 	echo '<componentset>' >>$@
 #	cat `find . -name component.xml` | sed -e '/^<?/d' -e '/^<!/d' >>$@
@@ -102,12 +96,23 @@ componentset.xml:
 		sed -e '/^<?/d' -e '/^<!/d' >>$@
 	echo '</componentset>' >>$@
 
+componentinfo.dtd:
+	$(LN_S) `starconf --show buildsupportdata`/componentinfo.dtd componentinfo.dtd
+
 # Makefile.dependencies expresses all the dependencies between components.
 # It expects the current file to define variable MANIFEST to be the directory
 # which holds the manifest files, typically /star/manifests
 #
 # This include file also contains the TARGET buildsupport
 include Makefile.dependencies
+
+$(MANIFEST)/starconf: buildsupport/starconf/install-sh
+
+buildsupport/starconf/install-sh: $(MANIFEST)/automake $(MANIFEST)/autoconf
+	cd buildsupport/starconf && \
+	    aclocal && \
+	    automake --add-missing && \
+	    autoconf
 
 $(RECURSIVE_TARGETS):
 	for d in $(SUBDIRS); do \
