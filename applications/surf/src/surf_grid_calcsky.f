@@ -4,7 +4,7 @@
      :     BADBIT, STATUS )
 *+
 *  Name:
-*     SURF_GRID_CALCSKY
+*     CALCSKY
 
 *  Purpose:
 *     Calculate sky contribution from median image
@@ -13,35 +13,33 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SURF_GRID_DESPIKE ( TSKNAME, N_FILES, N_PTS, N_POS, N_BOLS, 
+*     CALL SURF_GRID_CALCSKY ( TSKNAME, N_FILES, N_PTS, N_POS, N_BOLS, 
 *    :     WAVELENGTH, DIAMETER, BOX_SIZE, BOL_RA_PTR, BOL_DEC_PTR, DATA_PTR, 
-*    :     QUALITY_PTR, NX, NY, ICEN, JCEN, NSPIKES,
+*    :     QUALITY_PTR, SKY_PTR, SKY_ERR,
 *    :     BADBIT, STATUS ) 
 
 *  Description:
-*     For each data point this routine places it into a bin in the 
-*     output grid depending on the position of the data point on the sky.
-*     The position in the input data array is stored.
-*     This is done in two stages:
+*     This routine calculates the sky contribution by attempting
+*     to remove the source from the input data stream. The source
+*     signal can either be calculated by this routine or by reading
+*     in a model of the source from a file.
 *
-*     1) Find the size of the output grid from the maximum extent of
-*        the input data.
-*     2) Loop through data. Find I,J coordinate of each point in the 
-*        output grid.
-*     3) Find out maximum number of points for an I,J position.
-*     4) Put data onto grid in array (I,J,N) [REALS]. 
-*        We also need to store positions of these data.
-*        We can either do it by storing the file number, bolometer and
-*        position (time) index OR we can just store some index in a merged
-*        data array that goes from 1..TOT_PTS. 
-*         First method is easy but memory hungry. Second method is 
-*         more efficient but does need some reconstruction to work
-*         out where the point was in the original data.
-*       Use the second method.
-*   
-*     Once the data is gridded, it is first displayed and then
-*     despiked. Currently despiking is done on a simple sigma clipping
-*     basis for each bin.
+*     When calculating the source structure internally a similar
+*     method to that used by DESPIKE is employed. The input data
+*     are placed into bins of size one quarter beamwidth. The median
+*     of each bin is calculated and this is treated as the source 
+*     model (cf. REBIN_METHOD=MEDIAN in REBIN).
+*     
+*     Once the source model is available, it is removed from
+*     all of the input data. The source-removed data are then analysed
+*     with the sky emission derived from the mean of the signal across
+*     the array for all the sample times.
+*     
+*     Since the sky signal is expected to vary on timesales of the
+*     order of one second, an option is included for smoothing the
+*     sky signal. This is especially useful for scan map data where
+*     samples are taken at 7.8~Hz. 
+*     
 
 
 *  Arguments:
@@ -68,16 +66,10 @@
 *       Pointers to actual data arrays
 *     QUALITY_PTR( N_FILES ) = INTEGER (Given)
 *       Pointer to quality arrays
-*     NX = INTEGER (Returned)
-*       Number of points in grid (X)
-*     NY = INTEGER (Returned)
-*       Number of points in grid (Y)
-*     ICEN = INTEGER (Returned)
-*       Reference pixel (X)
-*     JCEN = INTEGER (Returned)
-*       Reference pixel (Y)
-*     NSPIKES ( N_FILES ) = INTEGER (Returned)
-*       Number of spikes detected (and removed) in each file
+*     SKY_PTR ( N_FILES ) = INTEGER (Pointer Given, data returned)
+*       Storage space for the sky signal
+*     SKY_ERR ( N_FILES ) = INTEGER (Pointer Given, data returned)
+*       Storage space for the error on sky signal
 *     BADBIT ( N_FILES ) = BYTE (Given)
 *       Bad bit mask for identifying bad pixels from quality
 *     STATUS = INTEGER (Given & Returned)
@@ -87,46 +79,79 @@
 *     BOXSZ = INTEGER (Given)
 *       Size of smoothing box in seconds. This is used to smooth
 *       the time series. Default is 2.0 seconds.
-*     DMODE = CHAR (Given)
-*       Determines nearest neighbour. Only useful when SMODE is
-*       set to HANN. Allowed values are:
-*         SPIRAL  - A Spiral outwards from the reference pixel
-*         XLINEAR - unfold each X strip in turn for each Y
-*         YLINEAR - unfold each Y strip in turn for each X
-*         DIAG1   - diagonal strips starting at position (1,1)
-*         DIAG2   - diagonal strips starting at positions (nx,1)
+*     IN = CHAR (Read)
+*        The name of the input file to be processed. This parameter is 
+*        requested repeatedly until a NULL value (!) is supplied. 
+*        LOOP must be TRUE. IN can include a SCUBA section.
+*        Like the REF parameter this parameter accepts a text file.
+*     LOOP = LOGICAL (Read)
+*        Task will ask for multiple input files if true. Only REF is read
+*        if noloop.
 *     MODEL = NDF (Read)
 *       NDF containing the model of the source. The size of the
 *       input image must (currently) match the default size of the
 *       image that would be generated by REBIN with the current input
-*       files.
+*       files. The coordinate frame of this image must match that
+*       specified in OUT_COORDS.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Allowed values are QUIET, NORM and
+*         VERBOSE. Default is NORM.
 *     NOSRC = NDF (Write)
 *       File to store source removed data. This can be used to
 *       check the source removal. Note that this output file can
 *       not be used directly by SURF for further processing since 
 *       the header is incomplete. No file is written by default.
-*     NSIGMA = REAL (Given)
-*       Number of sigma used in clipping
-*     SMODE = CHAR (Given)
-*       Mode used for smoothing the clipping envelope.
-*       Available modes are:
-*         NONE  - No smoothing (this is not dependent on the DMODE)
-*         HANN  - Hanning smoothing
-*       All modes except 'NONE' depend on the unwrapping mode (given
-*       by parameter DMODE) since this determines which pixels are adjacent
-*       to a given bin.
-*     XRANGE = INTEGER (Given)
-*       X Range of plot
+*     OUT_COORDS = CHAR (Read)
+*        The coordinate system to be used for the model determination.
+*        Available coordinate systems are:
+*        - AZ:  Azimuth/elevation offsets 
+*        - NA:  Nasmyth offsets
+*        - PL:  RA/Dec Offsets from moving centre (eg Planets)
+*        - RB:  RA/Dec (B1950)
+*        - RJ:  RA/Dec (J2000)
+*        - RD:  RA/Dec (epoch of observation)
+*        - GA:  Galactic coordinates (J2000)
+*
+*        For RD current epoch is taken from the first input file.
+*     REF = CHAR (Given)
+*        The name of the first NDF to be processed. The name may also be the
+*        name of an ASCII text file containing NDF and parameter values.
+*        REF can include a SCUBA section. See REBIN for more information
+*        on the format of the ASCII input file.
+*     SHIFT_DX = REAL (Read)
+*        The pointing shift (in X) to be applied that would bring the
+*        maps in line. This is a shift in the output coordinte frame.
+*     SHIFT_DY = REAL (Read)
+*        The pointing shift (in Y) to be applied that would bring the
+*        maps in line. This is a shift in the output coordinate frame.
+*     WEIGHT = REAL (Read)
+*       This parameter does nothing in CALCSKY. It must be present
+*       when using text file input. Any value is allowed.
 
 *  Notes:
-*     For SMODE=NONE, DMODE is only requested if a plot is required.
+*     - The model itself is only an approximation
+*       to the data (since the data points can fall anywhere within
+*       a given cell) so some source signal will remain after source
+*       subtraction.
+*     - If a model is supplied externally (via MODEL parameter) the
+*       cell size of the model is used for the source subtraction.
+*     - The sky signal is stored in an NDF extension (.MORE.REDS.SKY).
+*       The file must be processed by REMSKY to actually remove the
+*       sky contribution.
+
 
 *  Authors:
 *     Tim Jenness (timj@jach.hawaii.edu)
 
+*  Related Applications:
+*     SURF: REMSKY
+
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.2  1998/06/16 04:41:29  timj
+*     Add documentation
+*
 *     Revision 1.1  1998/06/10 04:01:36  timj
 *     Initial revision
 *
