@@ -29,7 +29,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Need to go into sub directories
 AC_CONFIG_SUBDIRS([src sys drivers fonts cpg pgdispd ])
