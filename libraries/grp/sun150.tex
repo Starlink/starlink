@@ -9,11 +9,11 @@
 \newcommand{\stardocsource}    {sun150.5}
 \newcommand{\stardocnumber}    {150.5}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {27th August 1999}
+\newcommand{\stardocdate}      {13th July 2001}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
-\newcommand{\stardocversion}   {Version 3.0}
+\newcommand{\stardocversion}   {Version 3.0-3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -740,7 +740,7 @@ names held in case insensitive groups are performed without reference to case.
 
 Applications can maintain information about many independent groups
 simultaneously. The maximum number of simultaneously active groups is currently
-set to 100 and is given by the symbolic constant GRP\_\_MAXG. There is no
+set to 500 and is given by the symbolic constant GRP\_\_MAXG. There is no
 limit on the number of names that a single group can contain (other than those
 imposed by system quotas).
 
@@ -3560,24 +3560,13 @@ Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
 
-\section{Changes and New Features in V1.1}
-The following changes have occurred in the GRP\_ system since version 1.0:
-\begin{enumerate}
-\item A new routine \htmlref{GRP\_HEAD}{GRP_HEAD} has been introduced to simplify the task of
-finding the head of an owner-slave chain.
-\item Routines \htmlref{GRP\_GROUP}{GRP_GROUP} and \htmlref{GRP\_GRPEX}{GRP_GRPEX}
-\begin{itemize}
-\item Argument FLAG is now returned false if an error occurs.
-\item If an error occurs, then argument SIZE is returned equal to the supplied
-size of the group identified by argument IGRP2. If the group has zero size on
-entry then argument SIZE is returned equal to one.
-\end{itemize}
-\end{enumerate}
-
 \section{Changes and New Features in V3.0}
 The following changes have occurred in the GRP\_ system since version 2.0:
 
 \begin{enumerate}
+
+\item The maximum number of groups which can be active at any one time
+has been increased from 100 to 500.
 
 \item An escape control character can now be defined which allows other
 control characters within a group expression to be treated literally 
@@ -3600,6 +3589,20 @@ within modification elements, has been made available for use with any form
 of element. See section \ref{SEC:GREXP}.
 \item Null names (i.e. names with zero length) are now accepted and treated as
 blank names.
+\end{enumerate}
+
+\section{Changes and New Features in V1.1}
+The following changes have occurred in the GRP\_ system since version 1.0:
+\begin{enumerate}
+\item A new routine \htmlref{GRP\_HEAD}{GRP_HEAD} has been introduced to simplify the task of
+finding the head of an owner-slave chain.
+\item Routines \htmlref{GRP\_GROUP}{GRP_GROUP} and \htmlref{GRP\_GRPEX}{GRP_GRPEX}
+\begin{itemize}
+\item Argument FLAG is now returned false if an error occurs.
+\item If an error occurs, then argument SIZE is returned equal to the supplied
+size of the group identified by argument IGRP2. If the group has zero size on
+entry then argument SIZE is returned equal to one.
+\end{itemize}
 \end{enumerate}
 
 \end{document}

@@ -1,12 +1,9 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.0-2) of the GRP library is now available. It includes
-fixes for the following bugs
+A new release (V3.0-3) of the GRP library is now available. It includes
+the following changes:
 
- - GRP_FIND sometimes indicated that a matching string has been found 
- beyond the end of the group.
-
- - The last line of an indirection file was sometimes not read correctly 
- if the line was terminated by an end-of-file rather than a newline.
+ - The maximum number of groups which can be active at any one time has
+ been increased from 100 to 500.
 

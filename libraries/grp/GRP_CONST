@@ -58,7 +58,7 @@
 *  The size of the common arrays. This is the limit on the number of
 *  groups which can be used by an application at once.
       INTEGER GRP__MAXG
-      PARAMETER ( GRP__MAXG = 100 )
+      PARAMETER ( GRP__MAXG = 500 )
 
 *  Upper limit on fortran logical unit numbers.
       INTEGER GRP__MAXUN
