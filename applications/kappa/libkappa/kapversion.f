@@ -137,8 +137,8 @@
       
 *  Add a context error if the file could not be opened.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'KAPVERSION_ERR2', 'Failed to read the package '//
-     :                 'version string from the file '//
+         CALL ERR_REP( 'KAPVERSION_ERR2', 'Failed to read the package'//
+     :                 ' version string from the file '//
      :                 '$$KAPPA_DIR/version.dat', STATUS )
          GO TO 999
       END IF
@@ -176,8 +176,8 @@
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'V', VCOMP )
-            CALL ERR_REP( 'KAPVERSION_ERR4', 'The version string ''^V'','//
-     :                    ' supplied for parameter COMPARE is '//
+            CALL ERR_REP( 'KAPVERSION_ERR4', 'The version string '//
+     :                    '''^V'', supplied for parameter COMPARE is '//
      :                    'illegal.', STATUS )
             GO TO 999
          END IF
@@ -231,8 +231,8 @@
 
 *  Add a context report if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'KAPVERSION_ERR', 'KAPVERSION: Failed to check the'//
-     :                 ' package version number.',  STATUS )
+         CALL ERR_REP( 'KAPVERSION_ERR', 'KAPVERSION: Failed to check'//
+     :                 ' the package version number.',  STATUS )
       END IF
 
       END
