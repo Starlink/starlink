@@ -60,7 +60,7 @@ foreach $e (@elements) {
     @parents = $dtd->get_parents ($e);
     print "<dtdparents>\n";
     foreach $pe (@parents) {
-	print "<dtdelemref id='e.", lc($pe), "'>\n";
+	print "<dtdelemref id='e.", lc($pe), "' />\n";
     }
     print "</dtdparents>\n";
 
@@ -72,7 +72,7 @@ foreach $e (@elements) {
 	    if (SGML::DTD->is_elem_keyword($ce)) {
 		print "$ce\n";
 	    } else {
-		print "<dtdelemref id='e.$ce'>\n";
+		print "<dtdelemref id='e.$ce' />\n";
 	    }
 	} else {
 	    print " $ce ";
