@@ -30,14 +30,9 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIO_ERR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
-*
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -46,50 +41,51 @@
 *
 *    Status :
 *
-      INTEGER                  STATUS                  ! Run-time error
+      INTEGER                   STATUS                  ! Run-time error
 *
 *    Export :
 *
-      LOGICAL                  GOT_FLUX                ! Read fluxes?
+      LOGICAL                   GOT_FLUX                ! Read fluxes?
 *
 *    Functions :
 *
-      INTEGER                  CHR_LEN
-      LOGICAL                  PSS_IN_SLICE
-      LOGICAL                  CHR_SIMLR
+      INTEGER                   CHR_LEN
+      LOGICAL                   PSS_IN_SLICE
+      LOGICAL                   CHR_SIMLR
 *
 *    Local variables :
 *
-      CHARACTER*132            FULLNAME                ! Full file spec
-      CHARACTER*80             PLIST                   ! Ascii file
-      CHARACTER*20             RAS, DECS               ! User supplied RA/DEC
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SSDS locator
-      CHARACTER*80             TREC                    ! Record from text file
+      CHARACTER*132             FULLNAME                ! Full file spec
+      CHARACTER*80              PLIST                   ! Ascii file
+      CHARACTER*20              RAS, DECS               ! User supplied RA/DEC
+      CHARACTER*80              TREC                    ! Record from text file
 
-      DOUBLE PRECISION         RA,DEC                  ! Position from file
+      DOUBLE PRECISION		EQUPOS(2)		! Position for WCI
+      DOUBLE PRECISION          RA,DEC                  ! Position from file
 
-      REAL                     FLUX                    ! Source flux
+      REAL                      FLUX                    ! Source flux
 
-      INTEGER                  DPTR, RPTR              ! Ptrs to mapped RA,DEC
-      INTEGER                  FD                      ! FIO file handle
-      INTEGER                  FPTR                    ! Ptr to flux field
-      INTEGER                  IC                      ! Character index
-      INTEGER                  ISRC                    ! Loop over mapped posns
-      INTEGER                  JSRC                    ! Source list slot
-      INTEGER                  LINE                    ! Ascii line counter
-      INTEGER                  NSRC                    ! # sources read in
-      INTEGER                  PLEN                    ! Length of PLIST
-      INTEGER                  RA_B, RA_E, DEC_B       ! Character pointers
-      INTEGER                  DEC_E, FLX_B, FLX_E     !
+      INTEGER                   DPTR, RPTR              ! Ptrs to mapped RA,DEC
+      INTEGER                   FD                      ! FIO file handle
+      INTEGER                   FPTR                    ! Ptr to flux field
+      INTEGER                   IC                      ! Character index
+      INTEGER                   ISRC                    ! Loop over mapped posns
+      INTEGER                   JSRC                    ! Source list slot
+      INTEGER                   LINE                    ! Ascii line counter
+      INTEGER                   NSRC                    ! # sources read in
+      INTEGER                   PLEN                    ! Length of PLIST
+      INTEGER                   RA_B, RA_E, DEC_B       ! Character pointers
+      INTEGER                   DEC_E, FLX_B, FLX_E     !
+      INTEGER			SID			! Input SSDS dataset
 
-      LOGICAL                  ALREADY_OPEN            ! Already opened?
-      LOGICAL                  FTHERE                  ! Flux field exists?
-      LOGICAL                  SDF_THERE               ! File is SSDS?
-      LOGICAL                  TERMINAL                ! Input from terminal?
-      LOGICAL                  THERE                   ! File exists?
-      LOGICAL                  TXT_THERE               ! File is ascii?
-      LOGICAL                  USEFLUX                 ! Use flux if present?
-      LOGICAL                  XDEC                    ! X axis descreasing?
+      LOGICAL                   ALREADY_OPEN            ! Already opened?
+      LOGICAL                   FTHERE                  ! Flux field exists?
+      LOGICAL                   SSDS_THERE              ! File is SSDS?
+      LOGICAL                   TERMINAL                ! Input from terminal?
+      LOGICAL                   THERE                   ! File exists?
+      LOGICAL                   TXT_THERE               ! File is ascii?
+      LOGICAL                   USEFLUX                 ! Use flux if present?
+      LOGICAL                   XDEC                    ! X axis descreasing?
 *-
 
 *    Check status
@@ -101,7 +97,7 @@
 
 *    Initialise
       GOT_FLUX = .FALSE.
-      SDF_THERE = .FALSE.
+      SSDS_THERE = .FALSE.
       TXT_THERE = .FALSE.
       LI_NSRC = 0
       IF ( PLIST(1:1) .EQ. '@' ) PLIST = PLIST(2:)
@@ -120,16 +116,16 @@
           IC = INDEX( FULLNAME, ';' )
           IF ( IC .EQ. 0 ) IC = CHR_LEN(FULLNAME)+1
           IF ( CHR_SIMLR(FULLNAME(IC-3:IC-1),'sdf') ) THEN
-            SDF_THERE = .TRUE.
+            SSDS_THERE = .TRUE.
           ELSE
             TXT_THERE = .TRUE.
           END IF
         ELSE
 
 *        Try to open as HDS file
-          CALL HDS_OPEN( PLIST(:PLEN), 'READ', SLOC, STATUS )
+          CALL ADI_FOPEN( PLIST(:PLEN), '*', 'READ', SID, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
-            SDF_THERE = .TRUE.
+            SSDS_THERE = .TRUE.
             ALREADY_OPEN = .TRUE.
 
 *        Try for text file
@@ -150,7 +146,7 @@
         END IF
 
 *      Inform user
-        IF ( .NOT. ( SDF_THERE .OR. TXT_THERE ) ) THEN
+        IF ( .NOT. ( SSDS_THERE .OR. TXT_THERE ) ) THEN
           CALL MSG_SETC( 'LIST', PLIST )
           IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -165,10 +161,10 @@
       XDEC = ( AX_DR(1) .LT. 0.0 )
 
 *    Switch on file type
-      IF ( SDF_THERE ) THEN
+      IF ( SSDS_THERE ) THEN
 
 *      Associate into SSO system
-        CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+        CALL SSI_GETNSRC( SID, NSRC, STATUS )
 
 *      Abort if empty
         IF ( ( NSRC .EQ. 0 ) .AND. ( STATUS .EQ. SAI__OK ) ) THEN
@@ -178,11 +174,11 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map lists
-        CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ', RPTR, STATUS )
-        CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
+        CALL SSI_MAPFLD( SID, 'RA', '_DOUBLE', 'READ', RPTR, STATUS )
+        CALL SSI_MAPFLD( SID, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
 
 *      Flux there?
-        CALL SSO_CHKFLD( SLOC, 'FLUX', FTHERE, STATUS )
+        CALL SSI_CHKFLD( SID, 'FLUX', FTHERE, STATUS )
         IF ( FTHERE ) THEN
 
 *        Does user want to use it?
@@ -191,7 +187,7 @@
           GOT_FLUX = USEFLUX
 
 *        Map the flux field
-          CALL SSO_MAPFLD( SLOC, 'FLUX', '_REAL', 'READ', FPTR, STATUS )
+          CALL SSI_MAPFLD( SID, 'FLUX', '_REAL', 'READ', FPTR, STATUS )
 
         END IF
 
@@ -215,10 +211,10 @@
         END DO
 
 *      Free mapped objects
-        CALL SSO_RELEASE( SLOC, STATUS )
+        CALL SSI_RELEASE( SID, STATUS )
 
 *      Close results file
-        CALL HDS_CLOSE( SLOC, STATUS )
+        CALL AIO_FCLOSE( SID, STATUS )
 
       ELSE IF ( TERMINAL ) THEN
 
@@ -346,14 +342,19 @@
         DO ISRC = 1, LI_NSRC
           JSRC = LI_ID(ISRC)
 
-*        Convert coordinates to image coordinates
-          CALL CONV_EQU2XY( S_RA(JSRC), S_DEC(JSRC), XDEC,
-     :                        GE_POINT.CTOS, S_CP(1,JSRC),
-     :                               S_CP(2,JSRC), STATUS )
-
 *        Convert RA/DEC to radians
           S_RA(JSRC) = S_RA(JSRC) * DTOR
           S_DEC(JSRC) = S_DEC(JSRC) * DTOR
+
+*        Convert coordinates to image coordinates in axis units
+          EQUPOS(1) = S_RA(JSRC)
+          EQUPOS(2) = S_DEC(JSRC)
+          CALL WCI_CNS2A( EQUPOS, GE_PIXID, GE_PRJID, S_CP(1,JSRC),
+     :                    STATUS )
+
+*        Convert axis units to radians
+          S_CP(1,JSRC) = S_CP(1,JSRC) * AX_TOR(1)
+          S_CP(2,JSRC) = S_CP(2,JSRC) * AX_TOR(2)
 
 *        In the slice
           S_SIG(JSRC) = -1.0
@@ -368,7 +369,7 @@
         END DO
 
 *      Output message
-        IF ( SDF_THERE ) THEN
+        IF ( SSSDS_THERE ) THEN
           CALL MSG_SETC( 'SRC', 'SSDS' )
         ELSE IF ( TXT_THERE ) THEN
           CALL MSG_SETC( 'SRC', 'text file' )
