@@ -40,10 +40,10 @@ GENERIC=@GENERIC@
 	$(GENERIC) -t dirw $(<:.gdirw=.gen)
 	$(RM) $(<:.gdirw=.gen)
 
-.cdilr.f:
-	$(LN_S) $< $(<:.cdilr=.gen)
-	$(GENERIC) -t cdirw $(<:.cdilr=.gen)
-	$(RM) $(<:.cdilr=.gen)
+.gcdilr.f:
+	$(LN_S) $< $(<:.gcdilr=.gen)
+	$(GENERIC) -t cdirw $(<:.gcdilr=.gen)
+	$(RM) $(<:.gcdilr=.gen)
 
 
 ##  The Fortran intermediary files should be cleaned away sometime.
