@@ -28,6 +28,9 @@ dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [ast grp ndf par fio kaplibs sae shl])
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
+dnl    Need prohlp to create help.
+STAR_CHECK_PROGS(prohlp, sst)
+
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
 
@@ -38,9 +41,6 @@ STAR_CHECK_PROGS(perl)
 
 dnl    Need a version of Tk wish for astshow script.
 STAR_CHECK_PROGS(wish)
-
-dnl    Need prohlp to create help.
-STAR_CHECK_PROGS(prohlp, sst)
 
 dnl    Configure files.
 AC_CONFIG_FILES([Makefile component.xml astshow.tcl atools.ifd])
