@@ -1,39 +1,34 @@
-      SUBROUTINE CCD1_FRDM( FSET, DMN, IX, STATUS )
+      SUBROUTINE CCD1_FRDM( FSET, DMN, JFRM, STATUS )
 *+
 *  Name:
 *     CCD1_FRDM
 
 *  Purpose:
-*     Get index of AST frame in framset given domain name.
+*     Get index of frame with given Domain.
 
 *  Language:
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_FRDM( FSET, DMN, IX, STATUS )
+*     CALL CCD1_FRDM( FSET, DMN, JFRM, STATUS )
 
 *  Description:
 *     Given a domain list, this routine searches a frameset for a frame
-*     whose domain matches the list.  It returns the index of the 
-*     frame within the frameset, and as a side-effect sets the Current
-*     frame of the frameset to the found one.  If no domain of the
-*     given name exists in the frameset, an index of zero is returned.
-*     The routine assumes two-dimensional frames.
-*
-*     This routine is basically a wrapper for a suitable call of
-*     AST_FINDFRAME.
+*     with the given domain.  It returns the index of the frame within
+*     frame within the frameset.  If no domain of the given name 
+*     exists in the frameset, an index of AST__NOFRAME is returned.
+*     If there is more than one frame of the given index it finds the
+*     one with the highest index.
 
 *  Arguments:
 *     FSET = INTEGER (Given)
 *        AST pointer to the frameset.
 *     DMN = CHARACTER * ( * ) (Given)
-*        Name of the domain list to be searched for (see documentation of
-*        the AST_FINDFRAME routine for the syntax and semantics of this 
-*        list).
-*     IX = INTEGER (Returned)
+*        Name of the domain to be located.  Case and whitespace are
+*        ignored.
+*     JFRM = INTEGER (Returned)
 *        Index of the frame within the frameset.  If no matching frame
-*        can be found, a value of 0 (which is not a valid frame index)
-*        is returned.
+*        can be found, a value of AST__NOFRAME is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -45,8 +40,11 @@
 *     {enter_new_authors_here}
 
 *  History:
-*    08-MAR-1999 (MBT):
+*     08-MAR-1999 (MBT):
 *        Original version.
+*     09-JAN-2001 (MBT):
+*        Recoded in a much more sensible way (not using AST_FINDFRAME).
+*        No longer changes the Current frame of the frameset.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -66,35 +64,48 @@
       CHARACTER * ( * ) DMN
       
 *  Arguments Returned:
-      INTEGER IX
+      INTEGER JFRM
       
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER FR2                 ! Two dimensional dummy frame
-      INTEGER FRAME               ! Selected frame in frameset
+      INTEGER FRM                ! Selected frame in frameset
+      INTEGER I                  ! Loop variable
+      INTEGER NFRM               ! Number of frames in frameset
+      CHARACTER * ( AST__SZCHR ) NORDMN ! Normalised match domain
       
 *.
 
-*  Set failed value of return value.
-      IX = 0
+*  Initialise return value.
+      JFRM = AST__NOFRAME
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Set up dummy two-dimensional frame for use in AST_FINDFRAME.
-      FR2 = AST_FRAME( 2, ' ', STATUS )
+*  Start new AST context.
+      CALL AST_BEGIN( STATUS )
 
-*  Get frame and index.
-      FRAME = AST_FINDFRAME( FSET, FR2, DMN, STATUS )
-      IF ( FRAME .NE. AST__NULL ) THEN
-         IX = AST_GETI( FSET, 'Current', STATUS )
-         CALL AST_ANNUL( FRAME, STATUS )
-      END IF
+*  Normalise the given domain by removing all blanks and folding case.
+      NORDMN = DMN
+      CALL CHR_RMBLK( NORDMN )
+      CALL CHR_UCASE( NORDMN )
 
-*  Tidy up and exit.
-      CALL AST_ANNUL( FR2, STATUS ) 
+*  Get the number of frames in the frameset.
+      NFRM = AST_GETI( FSET, 'Nframe', STATUS )
+
+*  Loop over frames looking for a matching one.
+      DO I = NFRM, 1, -1
+         FRM = AST_GETFRAME( FSET, I, STATUS )
+         IF ( NORDMN .EQ. AST_GETC( FRM, 'Domain', STATUS ) ) THEN
+            JFRM = I
+            GO TO 1
+         END IF
+      END DO
+ 1    CONTINUE
+
+*  Exit AST status.
+      CALL AST_END( STATUS )
 
       END
 * $Id$
