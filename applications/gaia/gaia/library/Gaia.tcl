@@ -884,9 +884,9 @@ itcl::class gaia::Gaia {
 
       #  If name is "" then create a new name.
       if { $name == "" } {
-	 set name "$prefix_[expr $clone_+1]"
+	 set name "$prefix_[expr $clone_cnt_+1]"
 	 while { [winfo exists $name] } {
-	    set name "$prefix_[expr $clone_+1]"
+	    set name "$prefix_[incr $clone_cnt_]"
 	 }
       }
 
@@ -909,7 +909,7 @@ itcl::class gaia::Gaia {
 	    #  clone doesn't try to have same name.
 	    $name configure -number $number
 	    $name.image update_title
-	    set clone_cnt_ [max $clone_cnt_ $number]
+	    catch {set clone_cnt_ [max $clone_cnt_ $number]}
 	 }
       }
       return $name
@@ -928,7 +928,7 @@ itcl::class gaia::Gaia {
 
       #  And create the new clone.
       after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"]
-      return $prefix_[expr $clone_+1]
+      return $prefix_[expr $clone_cnt_+1]
    }
 
    #  Standard clone method. Make a new main window, named either the
@@ -943,7 +943,7 @@ itcl::class gaia::Gaia {
       #  Use the -noop option to avoid reloading the main image (part
       #  of $argv list).
       after 0 [code util::TopLevelWidget::start gaia::Gaia "-noop" "$gaia_usage"]
-      return $prefix_[expr $clone_+1]
+      return $prefix_[expr $clone_cnt_+1]
    }
 
    #  Replace the existing image in the default args lists.
