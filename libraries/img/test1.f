@@ -8,6 +8,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -26,7 +27,7 @@
       WRITE(*,*)'NX, NY, IPTR', NX, NY, IPTR
 
       IF (STATUS .EQ. SAI__OK)
-     : CALL SUMIT( NX, NY, %VAL( IPTR ), STATUS )
+     : CALL SUMIT( NX, NY, %VAL( CNF_PVAL( IPTR ) ), STATUS )
 
       CALL IMG_OUT( 'IN', 'OUT', IPTR2, STATUS )
 

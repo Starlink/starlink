@@ -20,6 +20,7 @@
 *     The PAR routines are described in SUN/114.
 
 *-
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL
 
 *  Local Variables:
       INTEGER XSHIFT, YSHIFT
@@ -39,12 +40,13 @@
       CALL PAR_GDR0I( 'YSHIFT', 3, -NY + 1, NY, .TRUE., YSHIFT, ISTAT )
 
 *  Shift the input data and place result in the temporary image.
-      CALL DOSHFT( %VAL( IPIN ), NX, NY, XSHIFT, YSHIFT,
-     :             %VAL( IPTEMP ), ISTAT )
+      CALL DOSHFT( %VAL( CNF_PVAL( IPIN ) ), NX, NY, XSHIFT, YSHIFT,
+     :             %VAL( CNF_PVAL( IPTEMP ) ), ISTAT )
 
 *  Take the difference between the input data and the shifted data
 *  putting the result in the output image.
-      CALL DODIFF( %VAL( IPIN ), %VAL( IPTEMP ), NX, NY, %VAL( IPOUT ),
+      CALL DODIFF( %VAL( CNF_PVAL( IPIN ) ), %VAL( CNF_PVAL( IPTEMP ) ), 
+     :             NX, NY, %VAL( CNF_PVAL( IPOUT ) ),
      :             ISTAT )
 
 *  Free all the images (this deletes the temporary image).

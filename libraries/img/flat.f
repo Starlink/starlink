@@ -11,14 +11,14 @@
 *     and fills it with ones.
 
 *-
-
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL
 *.
 
 *  Create a new image.
       CALL IMG_NEW( 'OUT', 416, 578, IP, ISTAT )
 
 *  Set all its elements to the value 1.0.
-      CALL DOFILL( %VAL( IP ), 416, 578, ISTAT )
+      CALL DOFILL( %VAL( CNF_PVAL( IP ) ), 416, 578, ISTAT )
 
 *  Free the new image.
       CALL IMG_FREE( 'OUT', ISTAT )

@@ -12,12 +12,14 @@
 *     terminal.
 
 *-
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL
+
 
 *  Access an input image.
       CALL IMG_IN( 'IN', NX, NY, IP, ISTAT )
 
 *  Derive the mean and write it out.
-      CALL DOSTAT( %VAL( IP ), NX, NY, ISTAT )
+      CALL DOSTAT( %VAL( CNF_PVAL( IP ) ), NX, NY, ISTAT )
 
 *  Free the input image.
       CALL IMG_FREE( 'IN', ISTAT )

@@ -18,6 +18,7 @@
 *     The PAR routines are described in SUN/114.
 
 *-
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL
 
 *  Access an existing image.
       CALL IMG_IN( 'IN', NX, NY, IPIN, ISTAT )
@@ -29,7 +30,7 @@
       CALL PAR_GET0R( 'CONSTANT', VALUE, ISTAT )
 
 *  And do the work.
-      CALL DOADD( %VAL( IPOUT ), NX, NY, VALUE, ISTAT )
+      CALL DOADD( %VAL( CNF_PVAL( IPOUT ) ), NX, NY, VALUE, ISTAT )
 
 *  Free the input and output images.
       CALL IMG_FREE( '*', ISTAT )

@@ -59,6 +59,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
       INCLUDE 'IMG_ERR'          ! IMG_ error codes
 
 *  Status:
@@ -86,7 +87,7 @@
       CALL IMG_NEW( 'IMAGE', NX, NY, PNTR( 1 ), STATUS )
 
 *  Initialise the array.
-      CALL SETUP( NX * NY, %VAL( PNTR( 1 ) ), STATUS )
+      CALL SETUP( NX * NY, %VAL( CNF_PVAL(PNTR( 1 )) ), STATUS )
 
 *  Free the image.
       CALL IMG_FREE( 'IMAGE', STATUS )
@@ -95,7 +96,7 @@
       CALL IMG_INI( 'IMAGE', NX, NY, PNTR( 1 ), STATUS )
 
 *  Sum the data elements.
-      CALL SUM( NX * NY, %VAL( PNTR( 1 ) ), ISUM, STATUS )
+      CALL SUM( NX * NY, %VAL( CNF_PVAL(PNTR( 1 ) )), ISUM, STATUS )
 
 *   Release the image.
       CALL IMG_FREE( 'IMAGE', STATUS )
