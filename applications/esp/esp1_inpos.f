@@ -108,8 +108,15 @@
 *   previously operating within ESP.
       IF (BC(1).LT.XMIN.OR.BC(1).GT.XMAX.OR.
      :    BC(2).LT.YMIN.OR.BC(2).GT.YMAX) THEN
-         CALL MSG_OUT(' ','Given coordinates are outside the NDF.',
-     :                STATUS)
+         CALL MSG_SETR ('X', BC(1))
+         CALL MSG_SETR ('Y', BC(2))
+         CALL MSG_SETR ('XMIN', XMIN)
+         CALL MSG_SETR ('XMAX', XMAX)
+         CALL MSG_SETR ('YMIN', YMIN)
+         CALL MSG_SETR ('YMAX', YMAX)
+         CALL MSG_OUT(' ','inpos: coords (^X,^Y)'//
+     :        ' outside NDF (^XMIN,^YMIN)..(^XMAX,^YMAX).',
+     :        STATUS)
          CALL PAR_CANCL('ORIGIN',STATUS)
          GO TO 10
       END IF

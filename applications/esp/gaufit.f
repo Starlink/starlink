@@ -464,6 +464,19 @@
          CALL MSG_OUT(' ',
      :                'No sources were defined. Aborting!',STATUS)
          GOTO 9999
+      ELSE
+*      Echo the input coordinates, to reassure the user
+         CALL MSG_BLANK(STATUS)
+         CALL MSG_OUT(' ','Read source positions:',STATUS)
+         CALL MSG_OUT(' ','  Source     X      Y   Radius-limit',
+     :        STATUS)
+         DO I=1,NSOUR
+            CALL MSG_FMTI('I','I2',I)
+            CALL MSG_FMTR('XCO','F6.1',XCO(I,1))
+            CALL MSG_FMTR('YCO','F6.1',YCO(I,1))
+            CALL MSG_FMTR('RL','F6.1',RLIM(I))
+            CALL MSG_OUT(' ','    ^I    ^XCO ^YCO ^RL',STATUS)
+         END DO
       END IF
 
 *   Look at the command line value for PSIZE.
@@ -1067,37 +1080,35 @@
 
 *            Get extra values in line (hints).
 
-*            Look at those words found.
+*            Look at all the remaining words which were found.
                FAIL=.FALSE.
-               IF (FAILN.EQ.0) THEN
-                  DO 20 J=3,6-FAILN  
+               DO J=3,6-FAILN  
                 
-*                  Start an new error context.
-                     CALL ERR_MARK                        
+*               Start an new error context.
+                  CALL ERR_MARK                        
 
-*                  Examine word.
-                     STRING=BUFFER(INDEX(1,J):INDEX(2,J))
-                     CALL CHR_CTOR(STRING,VALUE(J),STATUS)
+*               Examine word.
+                  STRING=BUFFER(INDEX(1,J):INDEX(2,J))
+                  CALL CHR_CTOR(STRING,VALUE(J),STATUS)
 
-*                  Display the cause of any problem.
-                     IF (STATUS.NE.SAI__OK) THEN
-                        FAIL=.TRUE.
-                        CALL ERR_ANNUL(STATUS)
-                        IF (J.EQ.3) CALL MSG_OUT(' ',
-     :                     'Angle not a number.',STATUS)      
-                        IF (J.EQ.4) CALL MSG_OUT(' ',
-     :                     'Sa not a number.',STATUS)      
-                        IF (J.EQ.5) CALL MSG_OUT(' ',
-     :                     'Sb not a number.',STATUS)      
-                        IF (J.EQ.6) CALL MSG_OUT(' ',
-     :                     'Peak not a number.',STATUS)      
-                     END IF
+*               Display the cause of any problem.
+                  IF (STATUS.NE.SAI__OK) THEN
+                     FAIL=.TRUE.
+                     CALL ERR_ANNUL(STATUS)
+                     IF (J.EQ.3) CALL MSG_OUT(' ',
+     :                    'Angle not a number.',STATUS)      
+                     IF (J.EQ.4) CALL MSG_OUT(' ',
+     :                    'Sa not a number.',STATUS)      
+                     IF (J.EQ.5) CALL MSG_OUT(' ',
+     :                    'Sb not a number.',STATUS)      
+                     IF (J.EQ.6) CALL MSG_OUT(' ',
+     :                    'Peak not a number.',STATUS)      
+                  END IF
 
-*                  End error context.
-                     CALL ERR_RLSE
+*               End error context.
+                  CALL ERR_RLSE
 
- 20               CONTINUE
-               END IF
+               END DO
 
 *            Assign the values to the arrays and increment the
 *            counter.
@@ -1342,15 +1353,28 @@
       IF (.NOT.FWHM) PSIZE = -PSIZE
 
 *   Obtain the co-ordinates of the sources required.
-      CALL GAU1_FILER(FIOID,NDF1,NSOUR,XCO,YCO,RLIM,HINT,fwhm,STATUS)
+      CALL GAU1_FILER(FIOID,NDF1,NSOUR,XCO,YCO,RLIM,HINT,FWHM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-    
+
 *   Abort if the number of sources is zero.
       IF (NSOUR.EQ.0) THEN
          CALL MSG_BLANK(STATUS)
          CALL MSG_OUT(' ','No viable data points were found!',STATUS)
          CALL MSG_BLANK(STATUS)
          GOTO 9999
+      ELSE
+*      Echo the input coordinates, to reassure the user
+         CALL MSG_BLANK(STATUS)
+         CALL MSG_OUT(' ','Read source positions:',STATUS)
+         CALL MSG_OUT(' ','  Source     X      Y   Radius-limit',
+     :        STATUS)
+         DO I=1,NSOUR
+            CALL MSG_FMTI('I','I2',I)
+            CALL MSG_FMTR('XCO','F6.1',XCO(I,1))
+            CALL MSG_FMTR('YCO','F6.1',YCO(I,1))
+            CALL MSG_FMTR('RL','F6.1',RLIM(I))
+            CALL MSG_OUT(' ','    ^I    ^XCO ^YCO ^RL',STATUS)
+         END DO
       END IF
       
 *   Indicate that the maximum number of sources has been reached.
@@ -3525,6 +3549,11 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
       CALL MSG_BLANK(STATUS)
       CALL MSG_OUT(' ','First estimates of source data',STATUS)
       CALL MSG_BLANK(STATUS)
+      
+**   Debugging
+*      open (50,file='debuggaufit')
+*      write (50,'("gau1_guess: nsour=",i2," xmax=",i10," ymax=",i10)') 
+*     :     nsour,xmax,ymax
 
 *   For each source in turn get an average value for peak etc.
       DO 10 I=1,NSOUR
@@ -3557,12 +3586,17 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
                X=NINT(XCO(I,1)+REAL(DIST)*GX)
                Y=NINT(YCO(I,1)+REAL(DIST)*GY)
 
+**            Debugging
+*               write (50,220) x,y,r,dist
+* 220           format('gau1_guess: x=',g10.2,' y=',g10.2,' r=',g10.2,
+*     :              ' dist=',i4)
+
 *            Check that the pixel is within the image.
                IF ((X.GE.1).AND.(X.LE.XMAX).AND.(Y.GE.1)
      :            .AND.(Y.LE.YMAX)) THEN
                 
 *               Get the pixel address.
-                  ADD=(Y-1)*XMAX+X               
+                  ADD=(NINT(Y)-1)*XMAX+NINT(X)
 
 *               Get the pixel value.
                   VALUE=ARRAY2(ADD)
@@ -3618,6 +3652,10 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
                                  
 *               The angle.
                   SOL(NFOUND,5)=REAL(ANG)
+
+**               Debugging
+*                  write (50,230)nfound,(sol(nfound,k),k=1,5)
+* 230              format('gau1_guess: sol(',i2,'):',5g10.2)
 
                END IF
 

@@ -148,8 +148,15 @@
 *   previously operating within ESP.
       IF (X2.LT.XMIN.OR.X2.GT.XMAX.OR.Y2.LT.YMIN.OR.Y2.GT.YMAX) THEN
          STATUS=SAI__ERROR
-         CALL ERR_REP(' ','Given coordinates are outside the NDF.',
-     :                STATUS)
+         CALL MSG_SETR ('X', X2)
+         CALL MSG_SETR ('Y', Y2)
+         CALL MSG_SETR ('XMIN', XMIN)
+         CALL MSG_SETR ('XMAX', XMAX)
+         CALL MSG_SETR ('YMIN', YMIN)
+         CALL MSG_SETR ('YMAX', YMAX)
+         CALL ERR_REP(' ','s2pr: coords (^X,^Y)'//
+     :        ' outside NDF (^XMIN,^YMIN)..(^XMAX,^YMAX).',
+     :        STATUS)
          GO TO 99
       END IF
 
