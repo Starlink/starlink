@@ -144,6 +144,10 @@
 
 *  History:
 *     $Id$
+*     $Log$
+*     Revision 1.35  2005/03/18 06:26:32  timj
+*     + Initialise some variables
+*
 *     1-AUG-1995: original version.
 *     {enter_further_changes_here}
 
@@ -364,6 +368,12 @@
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+*  Variable initialisation
+      IN_RA1_PTR = 0
+      IN_RA2_PTR = 0
+      IN_DEC1_PTR = 0
+      IN_DEC2_PTR = 0
 
 *  start up the NDF system and read in the demodulated data file
 
