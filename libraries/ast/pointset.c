@@ -37,6 +37,8 @@
 *        - Do not write out AST__BAD axis values in the Dump function.
 *        - Override astEqual method.
 *        - Add protected PointAccuracy attribute.
+*     7-JAN-2005 (DSB):
+*        Added astAppendPoints.
 */
 
 /* Module Macros. */
@@ -454,6 +456,7 @@ static int Equal( AstObject *, AstObject * );
 static int GetNcoord( const AstPointSet * );
 static int GetNpoint( const AstPointSet * );
 static int TestAttrib( AstObject *, const char * );
+static AstPointSet *AppendPoints( AstPointSet *, AstPointSet * );
 static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -471,6 +474,103 @@ static void SetPointAccuracy( AstPointSet *, int, double );
 
 /* Member functions. */
 /* ================= */
+static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
+/*
+*+
+*  Name:
+*     astAppendPoints
+
+*  Purpose:
+*     Append one PointSet to another.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     AstPointSet *astAppendPoints( AstPointSet *this, AstPointSet *that ) 
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function creates a new PointSet containing all the points in
+*     "this" followed by all the points in "that".
+
+*  Parameters:
+*     this
+*        Pointer to the first PointSet.
+*     that
+*        Pointer to the second PointSet.
+
+*  Returned Value:
+*     Pointer to the new PointSet.
+
+*  Notes:
+*     - Axis accuracies are copied from "this".
+*     - The Ncoord attribute of the two PointSets must match.
+*     - NULL will be returned if an error has already occurred, or if this
+*     function should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstPointSet *result;
+   double **ptr;
+   double **ptr1;
+   double **ptr2;
+   int ic;
+   int n1;
+   int n2;
+   int ncoord; 
+   size_t nb2;
+   size_t nb1;
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check the two PointSets have the same Ncoord value. */
+   ncoord = astGetNcoord( this );
+   if( ncoord != astGetNcoord( that ) ) {
+      astError( AST__NPTIN, "astAppendPoints(%s): Number of coordinates "
+                "per point differ in the two supplied PointSets.",
+                astGetClass( this ) );
+
+/* Calculate the new size for the PointSet. */
+   } else {
+      n1 = astGetNpoint( this );
+      n2 = astGetNpoint( that );
+
+/* Create the new PointSet and get pointers to its data. */
+      result = astPointSet( n1 + n2, ncoord, "" );
+      ptr1 = astGetPoints( this );
+      ptr2 = astGetPoints( that );
+      ptr = astGetPoints( result );
+      if( astOK ) {
+
+/* Copy the axis values for each coordinate in turn. */
+         nb1 = sizeof( double )*(size_t) n1;
+         nb2 = sizeof( double )*(size_t) n2;
+         for( ic = 0; ic < ncoord; ic++ ) {
+            memcpy( ptr[ ic ], ptr1[ ic ], nb1 );
+            memcpy( ptr[ ic ] + n1, ptr2[ ic ], nb2 );
+         }
+
+/* Copy any axis accuracies from "this". */
+         result->acc = astStore( NULL, this->acc, sizeof( double )*(size_t) ncoord );
+      }
+   }
+
+/* Annul the result if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
 static void CheckPerm( AstPointSet *this, const int *perm, const char *method ) {
 /*
 *+
@@ -1167,6 +1267,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->AppendPoints = AppendPoints;
    vtab->GetNcoord = GetNcoord;
    vtab->GetNpoint = GetNpoint;
    vtab->GetPoints = GetPoints;
@@ -2552,4 +2653,8 @@ void astSetSubPoints_( AstPointSet *point1, int point, int coord,
                        AstPointSet *point2) {
    if ( !astOK ) return;
    (**astMEMBER(point1,PointSet,SetSubPoints))( point1, point, coord, point2 );
+}
+AstPointSet *astAppendPoints_( AstPointSet *this, AstPointSet *that ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,PointSet,AppendPoints))( this, that );
 }

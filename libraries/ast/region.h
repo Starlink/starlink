@@ -73,6 +73,7 @@ typedef struct AstRegion {
    int meshsize;              /* No. of points on boundary mesh */
    int defunc;                /* Is "unc" set to a default value? */
    AstPointSet *basemesh;     /* Base frame mesh covering the boundary */
+   AstPointSet *basegrid;     /* Base frame grid covering the boundary */
 } AstRegion;
 
 /* Virtual function table. */
@@ -106,6 +107,7 @@ typedef struct AstRegionVtab {
    int (* RegPins)( AstRegion *, AstPointSet *, AstRegion *, int **);
    AstPointSet *(* RegMesh)( AstRegion * );
    AstPointSet *(* RegBaseMesh)( AstRegion * );
+   AstPointSet *(* RegBaseGrid)( AstRegion * );
    AstPointSet *(* BndBaseMesh)( AstRegion *, double *, double * );
    AstRegion *(* GetUnc)( AstRegion *, int );
    AstRegion *(* GetDefUnc)( AstRegion * );
@@ -212,6 +214,7 @@ int astTestUnc_( AstRegion * );
 int astRegPins_( AstRegion *, AstPointSet *, AstRegion *, int **);
 AstPointSet *astRegMesh_( AstRegion * );
 AstPointSet *astRegBaseMesh_( AstRegion * );
+AstPointSet *astRegBaseGrid_( AstRegion * );
 AstPointSet *astBndBaseMesh_( AstRegion *, double *, double * );
 AstRegion *astGetUnc_( AstRegion *, int );
 AstRegion *astGetDefUnc_( AstRegion * );
@@ -333,6 +336,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astOverlapX(that,this) astINVOKE(V,astOverlapX_(astCheckRegion(that),astCheckRegion(this)))
 #define astRegBaseBox(this,lbnd,ubnd) astINVOKE(V,astRegBaseBox_(astCheckRegion(this),lbnd,ubnd))
 #define astRegBaseMesh(this) astINVOKE(O,astRegBaseMesh_(astCheckRegion(this)))
+#define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this)))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd))
 #define astRegCentre(this,cen,ptr,index,ifrm) astINVOKE(V,astRegCentre_(astCheckRegion(this),cen,ptr,index,ifrm))
 #define astRegCurBox(this,lbnd,ubnd) astINVOKE(V,astRegCurBox_(astCheckRegion(this),lbnd,ubnd))

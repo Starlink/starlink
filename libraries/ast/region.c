@@ -751,6 +751,7 @@ static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
 static AstFrame *RegFrame( AstRegion *this );
 static AstMapping *RegMapping( AstRegion *this );
 static AstMapping *Simplify( AstMapping * );
+static AstPointSet *RegBaseGrid( AstRegion * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
 static AstPointSet *RegMesh( AstRegion * );
@@ -780,6 +781,7 @@ static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFram
 static int Overlap( AstRegion *, AstRegion * );
 static int OverlapX( AstRegion *, AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
+static int ResetCache( AstRegion *, int );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
@@ -802,7 +804,6 @@ static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static void SetRegFS( AstRegion *, AstFrame * );
 
 static int GetBounded( AstRegion * );
-static int DumpUnc( AstRegion * );
 static AstRegion *GetDefUnc( AstRegion * );
 
 static AstRegion *GetUnc( AstRegion *, int );
@@ -3383,6 +3384,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->OverlapX = OverlapX;
    vtab->Negate = Negate;
    vtab->BndBaseMesh = BndBaseMesh;
+   vtab->RegBaseGrid = RegBaseGrid;
    vtab->RegBaseMesh = RegBaseMesh;
    vtab->RegBaseBox = RegBaseBox;
    vtab->RegCentre = RegCentre;
@@ -5239,6 +5241,163 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
              astGetClass( this ) );
 }
 
+static AstPointSet *RegBaseGrid( AstRegion *this ){
+/*
+*+
+*  Name:
+*     astRegBaseGrid
+
+*  Purpose:
+*     Return a PointSet containing points spread through the volume of a 
+*     Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstPointSet *astRegBaseGrid( AstRegion *this )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns a PointSet containing a set of points spread
+*     through the volume of the Region. The points refer to the base Frame of
+*     the encapsulated FrameSet.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     Pointer to the PointSet. If the Region is unbounded, a NULL pointer
+*     will be returned.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstBox *box;
+   AstFrame *frmb;
+   AstPointSet *ps1;
+   AstPointSet *ps2;
+   AstPointSet *result;
+   double **ptr2;
+   double **ptr;
+   double *lbnd;
+   double *ubnd;
+   int good;
+   int ic;
+   int ip;
+   int ipr;
+   int naxb;
+   int npnt2;
+
+/* Initialise */
+   result= NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return NULL;
+
+/* If the Region structure contains a pointer to a PointSet holding 
+   positions spread over the volume of the Region in the base Frame, 
+   return it. */
+   if( this->basegrid ) {
+      result = astClone( this->basegrid );
+
+/* Otherwise, check the Region is bounded. */
+   } else if( astGetBounded( this ) ) {
+
+/* Get the base Frame bounding box. */
+      naxb = astGetNin( this->frameset );
+      lbnd = astMalloc( sizeof( double )*(size_t)naxb );      
+      ubnd = astMalloc( sizeof( double )*(size_t)naxb );      
+      astRegBaseBox( this, lbnd, ubnd );      
+
+/* Create a Box covering this bounding box. */
+      frmb = astGetFrame( this->frameset, AST__BASE );
+      box = astBox( frmb, 1, lbnd, ubnd, NULL, "" );
+
+/* Copy the MeshSize attribute to the new Box since this will be used by
+   the invocation of astRegBaseGrid below. */
+      astSetMeshSize( box, astGetMeshSize( this ) );
+
+/* Invoke the Box astRegGrid method. Note, the Box class overrides this  
+   implementation of astRegBaseGrid and does not (must not) invoke this
+   implementation, in order to avoid an infinite loop. */
+      ps1 = astRegBaseGrid( box );
+
+/* Some of the points in the above bounding box will fall outside the
+   supplied Region. Use the Region as a Mapping to determine which they
+   are. */
+      ps2 = astTransform( this, ps1, 1, NULL );
+
+/* We now create a PointSet which is a copy of "ps2" but with all the bad
+   points (i.e. the points in the bounding box grid which are not inside 
+   the supplied Region) removed. Create a result PointSet which is the same 
+   size as "ps2", then copy just the good points from "ps2" to the result 
+   PointSet, keeping a record of the number of points copied. */
+      ptr2 = astGetPoints( ps2 );
+      npnt2 = astGetNpoint( ps2 );
+      result = astPointSet( npnt2, naxb, "" );
+      ptr = astGetPoints( result );
+      if( astOK ) {
+
+/* Initialise the index of the next point to be stored in "result". */
+         ipr = 0;
+
+/* Loop round all points in "ps2" */
+         for( ip = 0; ip < npnt2; ip++ ) {
+
+/* Copy each axis value for this point from "ps2" to "result". If a bad
+   axis value is encountered, flag that the point is bad and break out of
+   the axis loop. */
+            good = 1;
+            for( ic = 0; ic < naxb; ic++ ) {
+               if( ptr2[ ic ][ ip ] == AST__BAD ) {
+                  good = 0;
+                  break;
+               } else {
+                  ptr[ ic ][ ipr ] = ptr2[ ic ][ ip ];
+               }
+            }
+
+/* If the current point has no bad axis values, increment the index of
+   the next point to be stored in "result". */
+            if( good ) ipr++;
+         }      
+
+/* Truncate the "result" PointSet to exclude any unused space at the end
+   of the axis values arrays. */
+         astSetNpoint( result, ipr );
+      }
+
+/* Free resources */
+      lbnd = astFree( lbnd );
+      ubnd = astFree( ubnd );
+      frmb = astAnnul( frmb );
+      box = astAnnul( box );
+      ps1 = astAnnul( ps1 );
+      ps2 = astAnnul( ps2 );
+      frmb = astAnnul( frmb );
+      frmb = astAnnul( frmb );
+
+/* Cache the new grid for future use. */
+      if( astOK ) this->basegrid = astClone( result );
+
+   }
+
+/* Annul the result if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result */
+   return result;
+}
+
 static AstPointSet *RegBaseMesh( AstRegion *this ){
 /*
 *+
@@ -5751,6 +5910,47 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
    fr = astAnnul( fr );
 
 }
+
+static int ResetCache( AstRegion *this, int flag ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int ResetCache( AstRegion *this, int flag )
+
+*  Class Membership:
+*     Region member function 
+
+*  Description:
+*     This function clears selected items of cached information from the
+*     supplied Region structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     flag
+*        A bit mask indicating what is to be cleared:
+*          bit 0 = basemesh
+*          bit 1 = basegrid
+
+*  Returned Value:
+*     Zero is always returned.
+
+*/
+   if( !astOK ) return 0;
+   if( ( flag & 1 ) && this->basemesh ) this->basemesh = astAnnul( this->basemesh );
+   if( ( flag & 2 ) && this->basegrid ) this->basegrid = astAnnul( this->basegrid );
+   return 0;
+}
+
 
 static void Resolve( AstFrame *this_frame, const double point1[],
                      const double point2[], const double point3[],
@@ -7644,10 +7844,10 @@ f     AST_NEGATE routine.
 
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when
    undefined but yielding a default of zero. */
-astMAKE_CLEAR(Region,Negated,negated,-INT_MAX)
+astMAKE_CLEAR(Region,Negated,negated,(ResetCache(this,2),-INT_MAX))
 astMAKE_GET(Region,Negated,int,0,( ( this->negated == -INT_MAX ) ?
                                    0 : this->negated ))
-astMAKE_SET(Region,Negated,int,negated,( value != 0 ))
+astMAKE_SET(Region,Negated,int,negated,(ResetCache(this,2),( value != 0 )))
 astMAKE_TEST(Region,Negated,( this->negated != -INT_MAX ))
 
 /*
@@ -7752,6 +7952,9 @@ astMAKE_TEST(Region,RegionFS,( this->regionfs != -INT_MAX ))
 *     CmpRegion
 *        The default FillFactor for a CmpRegion is the FillFactor of its
 *        first component Region.
+*     Stc
+*        The default FillFactor for an Stc is the FillFactor of its
+*        encapsulated Region.
 *att--
 */
 
@@ -7799,17 +8002,16 @@ astMAKE_SET(Region,FillFactor,double,fillfactor,((value<0.0||value>1.0)?(
 *     CmpRegion
 *        The default MeshSize for a CmpRegion is the MeshSize of its
 *        first component Region.
+*     Stc
+*        The default MeshSize for an Stc is the MeshSize of its
+*        encapsulated Region.
 *att--
 */
 /* If the value of MeshSize is set or cleared, annul the PointSet used to
    cache a mesh of base Frame boundary points. This will force a new
    PointSet to be created next time it is needed. See function RegMesh. */
-astMAKE_CLEAR(Region,MeshSize,meshsize,(
-                 (this->basemesh)?(this->basemesh=astAnnul(this->basemesh)):0,
-                 -INT_MAX))
-astMAKE_SET(Region,MeshSize,int,meshsize,(
-                 (this->basemesh)?(this->basemesh=astAnnul(this->basemesh)):0,
-                 ( value > 5 ? value : 5 )))
+astMAKE_CLEAR(Region,MeshSize,meshsize,(ResetCache(this,3),-INT_MAX))
+astMAKE_SET(Region,MeshSize,int,meshsize,(ResetCache(this,3),( value > 5 ? value : 5 )))
 astMAKE_TEST(Region,MeshSize,( this->meshsize != -INT_MAX ))
 astMAKE_GET(Region,MeshSize,int,0,( ( this->meshsize == -INT_MAX)?((astGetNaxes(this)==1)?2:((astGetNaxes(this)==2)?200:2000)): this->meshsize ))
 
@@ -7847,14 +8049,17 @@ astMAKE_GET(Region,MeshSize,int,0,( ( this->meshsize == -INT_MAX)?((astGetNaxes(
 *     CmpRegion
 *        The default Closed value for a CmpRegion is the Closed value of its
 *        first component Region.
+*     Stc
+*        The default Closed value for an Stc is the Closed value of its
+*        encapsulated Region.
 *att--
 */
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when
    undefined but yielding a default of 1. */
-astMAKE_CLEAR(Region,Closed,closed,-INT_MAX)
+astMAKE_CLEAR(Region,Closed,closed,(ResetCache(this,2),-INT_MAX))
 astMAKE_GET(Region,Closed,int,1,( ( this->closed == -INT_MAX ) ?
                                    1 : this->closed ))
-astMAKE_SET(Region,Closed,int,closed,( value != 0 ))
+astMAKE_SET(Region,Closed,int,closed,(ResetCache(this,2),( value != 0 )))
 astMAKE_TEST(Region,Closed,( this->closed != -INT_MAX ))
 
 /* Access to attributes of the encapsulated Frame. */
@@ -7993,6 +8198,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 /* For safety, first clear any references to the input memory from
    the output Region. */
    out->basemesh = NULL;
+   out->basegrid = NULL;
    out->frameset = NULL;
    out->points = NULL;
    out->unc = NULL;
@@ -8001,6 +8207,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->frameset = astCopy( in->frameset );
    if( in->points ) out->points = astCopy( in->points );
    if( in->basemesh ) out->basemesh = astCopy( in->basemesh );
+   if( in->basegrid ) out->basegrid = astCopy( in->basegrid );
    if( in->unc ) out->unc = astCopy( in->unc );
 }
 
@@ -8043,6 +8250,7 @@ static void Delete( AstObject *obj ) {
    this->frameset = astAnnul( this->frameset );
    if( this->points ) this->points = astAnnul( this->points );
    if( this->basemesh ) this->basemesh = astAnnul( this->basemesh );
+   if( this->basegrid ) this->basegrid = astAnnul( this->basegrid );
    if( this->unc ) this->unc = astAnnul( this->unc );
 }
 
@@ -8326,6 +8534,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
 /* ----------------------------- */
       new->meshsize = -INT_MAX;
       new->basemesh = NULL;
+      new->basegrid = NULL;
       new->negated = -INT_MAX;
       new->closed = -INT_MAX;
       new->regionfs = -INT_MAX;
@@ -8594,6 +8803,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* Initialise other fields which are used as caches for values derived
    from the attributes set above. */
       new->basemesh = NULL;
+      new->basegrid = NULL;
 
 /* If an error occurred, clean up by deleting the new Region. */
       if ( !astOK ) new = astDelete( new );
@@ -8710,6 +8920,10 @@ void astSetRegFS_( AstRegion *this, AstFrame *frm ){
 AstPointSet *astRegBaseMesh_( AstRegion *this ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegBaseMesh))( this );
+}
+AstPointSet *astRegBaseGrid_( AstRegion *this ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,RegBaseGrid))( this );
 }
 AstPointSet *astBndBaseMesh_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return NULL;

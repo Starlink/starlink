@@ -97,6 +97,7 @@ AstBox *astBoxId_( void *, int, const double[], const double[], void *, const ch
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstMapping *Simplify( AstMapping * );
+static AstPointSet *RegBaseGrid( AstRegion * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstBox *BestBox( AstPointSet *, AstRegion * );
@@ -183,6 +184,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   region->RegBaseGrid = RegBaseGrid;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
    region->RegPins = RegPins;
@@ -495,6 +497,10 @@ static void Cache( AstBox *this ){
         this->extent = extent;
         this->centre = centre;
       }
+
+/* Initialise a factor used to shrink the Box temporarily. */
+      this->shrink = 1.0;
+
    }
 
    if( !astOK ) extent = astFree( extent );
@@ -693,7 +699,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    size of the box on each axis.*/
    for( i = 0; i < nc; i++ ) {
       axcen = this->centre[ i ];
-      axlen = this->extent[ i ];
+      axlen = this->extent[ i ]*this->shrink;
 
 /* Not sure whether the next two lines should not in fact be:
       lbnd[ i ] = astAxDistance( frame, i + 1, axcen, -axlen );
@@ -704,6 +710,192 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
       lbnd[ i ] = axcen - axlen;
       ubnd[ i ] = axcen + axlen;
    }
+}
+
+static AstPointSet *RegBaseGrid( AstRegion *this ){
+/*
+*  Name:
+*     RegBaseGrid
+
+*  Purpose:
+*     Return a PointSet containing points spread through the volume of a 
+*     Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     AstPointSet *RegBaseGrid( AstRegion *this )
+
+*  Class Membership:
+*     Box member function (over-rides the astRegBaseGrid protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function returns a PointSet containing a set of points spread
+*     through the volume of the supplied Box. The points refer to the base 
+*     Frame of the encapsulated FrameSet.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     Pointer to the PointSet. If the Region is unbounded, a NULL pointer
+*     will be returned.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *frm;                 /* Base Frame in encapsulated FrameSet */
+   AstPointSet *newps;            /* New results PointSet */
+   AstPointSet *ps;               /* New boundary mesh */
+   AstPointSet *result;           /* Returned pointer */
+   double **ptr;                  /* Pointers to data */
+   double *ax;                    /* Pointer to next first axis value */
+   double *lbnd;                  /* Pointer to array of lower bounds of box */
+   double *ubnd;                  /* Pointer to array of lower bounds of box */
+   double dx;                     /* Increment along first axis of 2D box */
+   double shrink0;                /* Original shrink factor */
+   int i;                         /* Loop count */
+   int ii;                        /* Loop count */
+   int ik;                        /* Next value to add to "is" */
+   int ip;                        /* Index of next point */
+   int is;                        /* Sum of first "m-1" integers raised to power of (naxes-1) */
+   int k1;                        /* Intermediate constant */
+   int m;                         /* No. of times to invoke astRegBaseMesh */
+   int naxes;                     /* No. of axes in base Frame */
+   int np;                        /* Original MeshSize value */
+   int npp;                       /* Current MeshSize value */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return NULL;
+
+/* If the Region structure contains a pointer to a PointSet holding 
+   a previously created grid, return it. */
+   if( this->basegrid ) {
+      result = astClone( this->basegrid );
+
+/* Otherwise, create a new one, but only if the Box is bounded. */
+   } else if( astGetBounded( this ) ) {
+
+/* Get the base Frame in the Region's FrameSet. */
+      frm = astGetFrame( this->frameset, AST__BASE );
+
+/* Get the number of axes in the base Frame */
+      naxes = astGetNaxes( frm );
+
+/* Get the bounds of the Region in the base Frame. */
+      lbnd = astMalloc( sizeof( double )*(size_t) naxes );
+      ubnd = astMalloc( sizeof( double )*(size_t) naxes );
+      astRegBaseBox( this, lbnd, ubnd );
+
+/* Get the number of points which would be used to create a boundary
+   mesh. We use the same number to determine the number of points in the
+   grid. */
+      np = astGetMeshSize( this );
+
+/* First deal with the simple case of 1-D boxes. Store "np" axis values
+   evenly spaced between lbnd and ubnd. */
+      if( naxes == 1 ) {
+         result = astPointSet( np, 1, "" );
+         ptr = astGetPoints( result );
+         if( astOK ) {
+            ax = ptr[ 0 ];
+            dx = ( ubnd[ 0 ] - lbnd[ 0 ] )/( np - 1 );
+            for( ip = 0; ip < np; ip++ ) *(ax++) = lbnd[ 0 ] + ip*dx;
+         }
+
+/* Now deal with boxes with more than 1 axis. The algorithm uses the
+   astRegBaseMesh method to create a boundary mesh covering the box. 
+   The box is then shrunk slightly and a new boundary mesh created, which
+   is appended to the first mesh. This process of shrinking the box and
+   appending the new boundary mesh is continued until the box has zero 
+   size. The final mesh represents the required volume grid like a series
+   of "onion skins". We reduce the MeshSize attribute each time prior to 
+   calling the astRegBaseMesh method in order to retain a roughly constant 
+   density of points throughout the final grid, and so that the final number 
+   of points in the grid is close to "np". */
+      } else {
+
+/* First find the number of times ("m") the astRegBaseMesh method should be
+   called. This is calculated on the basis of the MeshSize value ("np")
+   and the number of axes in the Region. */
+         k1 = naxes;
+         for( ii = 0; ii < naxes; ii++ ) k1 *= 2;
+   
+         is = 1;
+         for( m = 2; m < 100; m++ ) {
+            if( is*k1 >= np ) {
+               m--;
+               break;
+            }
+            ik = m;
+            for( ii = 2; ii < naxes; ii++ ) ik *= m;
+            is += ik;
+         }
+
+/* Save the original shrink factor. */
+         shrink0 = ((AstBox *) this)->shrink;
+
+/* Loop round invoking the astRegBaseMesh method. */
+         for( i = 1; i <= m; i++ ) {
+
+/* Shrink the Box temporarily. */
+            ((AstBox *) this)->shrink = (shrink0*i)/m;
+
+/* Set the new MeshSize. */
+            npp = k1;
+            for( ii = 1; ii < naxes; ii++ ) npp *= i;
+            astSetMeshSize( this, npp );
+
+/* Invoke the astRegBaseMesh method to create a new boundary mesh. */
+            ps = astRegBaseMesh( this );
+
+/* If this is the first PointSet created, use it as the returned
+   PointSet. Otherwise, append this PointSet to the results PointSet. */
+            if( !result ) {
+               result = astClone( ps );
+            } else {
+               newps = astAppendPoints( result, ps );
+               astAnnul( result );
+               result = newps;
+            }
+
+/* Free resources. */
+            ps = astAnnul( ps ); 
+         }
+
+/* Unshrink the Box. */
+         ((AstBox *) this)->shrink = shrink0;
+
+/* Reinstate the original MeshSize. */
+         astSetMeshSize( this, np );
+
+      }
+
+/* Same the returned pointer in the Region structure so that it does not
+   need to be created again next time this function is called. */
+      if( astOK && result ) this->basegrid = astClone( result );
+
+/* Free resources. */
+      frm = astAnnul( frm );
+      lbnd = astFree( lbnd );
+      ubnd = astFree( ubnd );
+   }
+
+/* Annul the result if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result */
+   return result;
 }
 
 static AstPointSet *RegBaseMesh( AstRegion *this ){
@@ -936,6 +1128,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
                np = 0;
                for( iedge = 0; iedge < 4; iedge++ ) {
                   np_edge[ iedge ] = (int) ( edge_len[ iedge ]*ppd );
+                  if( np_edge[ iedge ] == 0 ) np_edge[ iedge ] = 1;
                   np += np_edge[ iedge ];
                }
 
@@ -1349,8 +1542,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    found above, and the other of which is smaller than "this" by the widths 
    found above. */
       for( i = 0; i < nc; i++ ) {
-         large[ i ] = this->centre[ i ]  + this->extent[ i ] + wid[ i ];
-         small[ i ] = this->extent[ i ] - wid[ i ];
+         large[ i ] = this->centre[ i ]  + this->extent[ i ]*this->shrink + wid[ i ];
+         small[ i ] = this->extent[ i ]*this->shrink - wid[ i ];
          if( small[ i ] < 0.0 ) small[ i ] = 0.0;
          small[ i ] += this->centre[ i ];
       }
@@ -1602,8 +1795,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* If this output is fed the value of an input, then the output limits
    are equal to the corresponding input limits. */
             } else {
-               lbnd[ ic ] = newbox->centre[ feed ] - newbox->extent[ feed ];
-               ubnd[ ic ] = newbox->centre[ feed ] + newbox->extent[ feed ];
+               lbnd[ ic ] = newbox->centre[ feed ] - newbox->extent[ feed ]*newbox->shrink;
+               ubnd[ ic ] = newbox->centre[ feed ] + newbox->extent[ feed ]*newbox->shrink;
             }
 
 /* If either bound is missing we will produce an Interval rather than a
@@ -1632,8 +1825,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    instead of a Box. */
             if( feed < 0 ) {
                k = constants[ (-feed) - 1 ];
-               lb = newbox->centre[ ic ] - newbox->extent[ ic ];
-               ub = newbox->centre[ ic ] + newbox->extent[ ic ];
+               lb = newbox->centre[ ic ] - newbox->extent[ ic ]*newbox->shrink;
+               ub = newbox->centre[ ic ] + newbox->extent[ ic ]*newbox->shrink;
 
                if( closed == neg ) {
                   isNull = ( k <= lb || k >= ub );
@@ -1952,7 +2145,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Ensure the extents are at least half the width of the uncertainty bounding 
    box. */
          for ( coord = 0; coord < ncoord_tmp; coord++ ) {
-            extent[ coord ] = box->extent[ coord ];
+            extent[ coord ] = box->extent[ coord ]*box->shrink;
             wid = 0.5*( ubnd_unc[ coord ] - lbnd_unc[ coord ] );
             if( extent[ coord ] < wid ) extent[ coord ] = wid;
          }
@@ -1966,7 +2159,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    without modification. */
       } else {
          for ( coord = 0; coord < ncoord_tmp; coord++ ) {
-            extent[ coord ] = box->extent[ coord ];
+            extent[ coord ] = box->extent[ coord ]*box->shrink;
          }
       }
    }

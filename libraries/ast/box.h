@@ -75,6 +75,7 @@ typedef struct AstBox {
 /* Attributes specific to objects in this class. */
    double *extent;               /* Axis half-widths */
    double *centre;               /* Box centre coords */
+   double shrink;                /* Temporary shrink factor */
 
 } AstBox;
 

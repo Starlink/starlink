@@ -59,6 +59,8 @@
 
 *  New Methods Defined:
 *     Public:
+*        astAppendPoints
+*           Append one PointSet to another.
 *        astGetPoints
 *           Get a pointer to the coordinate values associated with a PointSet.
 *        astPermPoints
@@ -373,6 +375,7 @@ typedef struct AstPointSetVtab {
    void (* SetPoints)( AstPointSet *, double ** );
    void (* SetNpoint)( AstPointSet *, int );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet * );
+   AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet * );
 
    double (* GetPointAccuracy)( AstPointSet *, int );
    int (* TestPointAccuracy)( AstPointSet *, int );
@@ -417,6 +420,7 @@ void astPermPoints_( AstPointSet *, int, const int[] );
 void astSetPoints_( AstPointSet *, double ** );
 void astSetNpoint_( AstPointSet *, int );
 void astSetSubPoints_( AstPointSet *, int, int, AstPointSet * );
+AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet * );
 
 # if defined(astCLASS)           /* Protected */
 int astGetNcoord_( const AstPointSet * );
@@ -484,6 +488,8 @@ astINVOKE(V,astSetPoints_(astCheckPointSet(this),ptr))
 astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np))
 #define astSetSubPoints(point1,point,coord,point2) \
 astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointSet(point2)))
+#define astAppendPoints(this,that) \
+astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that)))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetNpoint(this) \
