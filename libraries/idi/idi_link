@@ -1,0 +1,49 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     idi_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against standalone IDI.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use IDI in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `idi_link` program.f
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-JUL-1995 (DLT):
+#        Original version created from template.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lidi `gwm_link` `gns_link` `cnf_link` `starX_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

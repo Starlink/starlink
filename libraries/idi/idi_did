@@ -1,0 +1,45 @@
+************************************
+*+
+*  Name:
+*     IDI_DID
+*
+*  Purpose:
+*     Common block for display identifiers at FORTRAN interface level.
+*
+*  Description:
+*     As each device driver uses its own assignment for display
+*     identifiers, the top-level FORTRAN interface needs another
+*     layer of identifiers to ensure that they are unique.
+*
+*  Authors:
+*     NE: Nick Eaton (Durham University)
+*
+*  History:
+*     10-DEC-1990 (NE):
+*        Original version.
+*-
+
+*  Global constants:
+
+*   Define the integer identifiers for all the supported devices
+      INTEGER D_IKON, D_XWIN
+      PARAMETER ( D_IKON = 3200 )
+      PARAMETER ( D_XWIN = 3800 )
+
+*   Define the maximum number of devices available
+      INTEGER NUMIDS
+      PARAMETER ( NUMIDS = 8 )
+
+*  Global variables:
+
+*   Array storage for the device types.
+      INTEGER DTYPE( NUMIDS )
+
+*   Array storage for the display identifiers returned from the
+*   seperate device drivers
+      INTEGER DEVID( NUMIDS )
+
+      COMMON / IDI_DID / DTYPE, DEVID
+
+      SAVE / IDI_DID /
+*.

@@ -1,0 +1,112 @@
+*+
+*  Name:
+*     IDI_PAR
+*
+*  Purpose:
+*     Define public global constants for IDI.
+*
+*  Language:
+*     Starlink Fortran 77
+*
+*  Type of Module:
+*     Global constants include file.
+*
+*  Description:
+*    This file contains the External Global Constants for IDI.
+*
+*  Authors:
+*     NE: Nick Eaton (Durham University)
+*     {enter_new_authors_here}
+*
+*  History:
+*     27-JUN-1989 (NE):
+*        Original version.
+*     10-MAY-1991 (NE):
+*        Added capability names and IMAXCP.
+*     26-MAR-1992 (NE):
+*        Added IMAXEL and added IDI__ parameter definitions
+*     29-JUN-1992 (NE):
+*        Added INLUTC
+*     {enter_changes_here}
+*-
+
+*   Global Constants :
+
+*   Maximum number of triggers on any supported device
+      INTEGER IMAXTR, IDI__MAXTR
+      PARAMETER ( IMAXTR = 64 )
+      PARAMETER ( IDI__MAXTR = IMAXTR )
+
+*   Maximum number of capabilities on any supported device.
+*   This is the maximum of the number of memories, the number
+*   of cursors or the number of ROIs on any device.
+      INTEGER IMAXCP, IDI__MAXCP
+      PARAMETER ( IMAXCP = 2 )
+      PARAMETER ( IDI__MAXCP = IMAXCP )
+
+*   Maximum length of error message string for any IDI error.
+      INTEGER IMAXEL, IDI__MAXEL
+      PARAMETER ( IMAXEL = 64 )
+      PARAMETER ( IDI__MAXEL = IMAXEL )
+
+*   Capability mnemonics
+      INTEGER     IIMPLE
+      PARAMETER ( IIMPLE = 1 )
+
+      INTEGER     INCON,      ICONS,      ISIZED,      IDISDE
+      PARAMETER ( INCON = 10, ICONS = 11, ISIZED = 12, IDISDE = 13 )
+
+      INTEGER     ILUTDE,      INLUT,      INITT,      IZOOMR
+      PARAMETER ( ILUTDE = 14, INLUT = 15, INITT = 16, IZOOMR = 17 )
+
+      INTEGER     INLUTC
+      PARAMETER ( INLUTC = 18 )
+
+      INTEGER     IMEMVI,      IMEMS,      IMEMDE,      ILUTBI
+      PARAMETER ( IMEMVI = 20, IMEMS = 21, IMEMDE = 22, ILUTBI = 23 )
+
+      INTEGER     IDISBI,      IITTBI
+      PARAMETER ( IDISBI = 24, IITTBI = 25 )
+
+      INTEGER     ITWMDX,      ITWMDY,      ITWSIX,      ITWSIY
+      PARAMETER ( ITWMDX = 30, ITWMDY = 31, ITWSIX = 32, ITWSIY = 33 )
+
+      INTEGER     ITWOFX,      ITWOFY,      ITWDE
+      PARAMETER ( ITWOFX = 34, ITWOFY = 35, ITWDE = 36 )
+
+      INTEGER     INCUR,      IACUSH,      INCUSH,      ICURBI
+      PARAMETER ( INCUR = 40, IACUSH = 41, INCUSH = 42, ICURBI = 43 )
+
+      INTEGER     ICURSH,      ICURCO,      ICURVI
+      PARAMETER ( ICURSH = 44, ICURCO = 45, ICURVI = 46 )
+
+      INTEGER     INLOC,      INREVL,      INIEVL,      INLEVL
+      PARAMETER ( INLOC = 50, INREVL = 51, INIEVL = 52, INLEVL = 53 )
+
+      INTEGER     INCEVL,      INTRIG
+      PARAMETER ( INCEVL = 54, INTRIG = 55 )
+
+      INTEGER     ISROI,      INROI,      IROIBI,      IROICO
+      PARAMETER ( ISROI = 60, INROI = 61, IROIBI = 62, IROICO = 63 )
+
+      INTEGER     IROIVI
+      PARAMETER ( IROIVI = 64 )
+
+      INTEGER     ISBLI,      RBLIP
+      PARAMETER ( ISBLI = 70, RBLIP = 71 )
+
+      INTEGER     IBLIIT,      IBLIDT,      IBLIST
+      PARAMETER ( IBLIIT = 77, IBLIDT = 78, IBLIST = 79 )
+
+      INTEGER     ISSS,      ISSOFX,      ISSOFY,      ISSXY
+      PARAMETER ( ISSS = 80, ISSOFX = 81, ISSOFY = 82, ISSXY = 83 )
+
+      INTEGER     ISSSON
+      PARAMETER ( ISSSON = 84 )
+
+      INTEGER     ISBAR,      IBARVI
+      PARAMETER ( ISBAR = 90, IBARVI = 91 )
+
+      INTEGER     ISSNAP,       ISESC,       ISDIAG,       ISDYNC
+      PARAMETER ( ISSNAP = 100, ISESC = 101, ISDIAG = 102, ISDYNC = 103)
+

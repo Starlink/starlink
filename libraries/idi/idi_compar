@@ -1,0 +1,23 @@
+*.......................................................................
+*   Common block for storing ADAM parameter things
+
+*   Maximum number of parameters
+      INTEGER MAXPAR
+      PARAMETER ( MAXPAR = 8 )
+
+*   Reference counter
+      INTEGER PTREF
+
+*   Array storage for free elements
+      LOGICAL PTFREE( MAXPAR )
+
+*   Array storage for display identifiers
+      INTEGER PTDIDS( MAXPAR )
+
+*   Array storage for parameter names
+      CHARACTER * ( PAR__SZNAM ) PTNAME( MAXPAR )
+
+      COMMON / IDI_COMPAR / PTREF, PTFREE, PTDIDS, PTNAME
+
+      SAVE / IDI_COMPAR /
+

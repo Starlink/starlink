@@ -1,0 +1,44 @@
+IKON                                                               3200
+  Number of configurations                                10       1
+  Physical size of display                                12       1024
+  Physical size of display                                12       780
+  Display depth ( number of bits in DAC )                 13       8
+  Maximum depth of VLUTs                                  14       8
+  Number of VLUTs                                         15       2
+  Number of ITTs per image memory                         16       1
+  Zoom range                                              17       0
+  Zoom range                                              17       15
+  Number of available device cursors                      40       1
+  Array of cursor shapes                                  41       1
+  Number of cursor shapes                                 42       8
+  Number of locators                                      50       1
+  Number of real evaluators                               51       0
+  Number of integer evaluators                            52       0
+  Number of logical evaluators ( switches )               53       0
+  Number of character evaluators                          54       0
+  Number of triggers                                      55       3
+  ROI implemented ( logical )                             60       T
+  Number of device ROIs                                   61       1
+  Blink implemented ( logical )                           70       T
+  Split screen implemented ( logical )                    80       F
+  Intensity bar implemented ( logical )                   90       F
+  Snapshot implemented ( logical )                        100      T
+  Escape function implemented ( logical )                 101      F
+  Diagnostic routine implemented ( logical )              102      F
+  Dynamic configuration implemented ( logical )           103      F
+  Configuration number                                             1
+    Number of memories                                             2
+    List of memories in currently selected configuration  21       0
+    List of memories in currently selected configuration  21       1
+    Depth of memories ( in bits )                         22       8
+    Depth of memories ( in bits )                         22       8
+    Maximum dimensions of transfer window in x            30       1024
+    Maximum dimensions of transfer window in x            30       1024
+    Maximum dimensions of transfer window in y            31       1024
+    Maximum dimensions of transfer window in y            31       1024
+    ITT depth                                                      0
+    ITT depth                                                      0
+    Blink period for each memory ( sec )                  71       1.0
+    Blink period for each memory ( sec )                  71       1.0
+    Memory type                                                    7
+    Memory type                                                    7

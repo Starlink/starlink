@@ -1,0 +1,220 @@
+DESCR = Xworkstation
+N_DISPLAY = 1
+MAX_X_DIM = 1024
+MAX_Y_DIM = 864
+X_DIM = 780
+Y_DIM = 512
+DEPTH = 8
+N_LUT = 2
+LUT_DEPTH = 256 256
+N_CURSORS = 1
+CURS_SHAPES = 1
+N_ROI = 1
+ZOOM_RANGE = -32  32
+TW_X_MAX = 1024
+TW_Y_MAX = 864
+N_INTERACTIONS = 32
+BLINK = 0
+SPLIT_SCREEN = 0
+INT_BAR = 1
+SNAP_SHOT = 1
+ESCAPE = 0
+DIAGNOSTIC = 0
+N_CONF = 1
+DYNAMIC = 1
+MAX_CONF = 4
+N_MEM = 2
+N_ITT = 1
+MEM_X_SIZE = 780 780
+MEM_Y_SIZE = 512 512
+MEM_DEPTH  = 8 8
+MEM_TYPE   = 7 7
+N_INTERACTORS = 2
+INT_DEV = MOUSE KEYB
+N_LOC = 1 1
+LOC_DESCR = Move_Mouse   Use_Keyboard_Arrows
+LOC_X_MIN =    0    0
+LOC_X_MAX = 1024 1024
+LOC_Y_MIN =   0   0
+LOC_Y_MAX = 864 864
+LOC_LEFT_LS  = 0 XK_Left
+LOC_LEFT_HS  = 0 301
+LOC_RIGHT_LS = 0 XK_Right
+LOC_RIGHT_HS = 0 302
+LOC_UP_LS    = 0 XK_Up
+LOC_UP_HS    = 0 300
+LOC_DOWN_LS  = 0 XK_Down
+LOC_DOWN_HS  = 0 303
+LOC_HS_FACT   = 1  10
+N_EVL = 0 5
+EVL_DESCR = Keyb_L&R_Arrows Keyb_L&R_shifted_Arrows  Keyboard_value Keyboard_value Keyboard_value
+EVL_TYPE =  3 3 2 1 4
+EVL_DEF =  XK_Left XK_Right 301 302 0 0 0 0 0 0
+EVL_MIN =  -1 -5 0 0 0
+EVL_MAX =   1  5 0 0 0
+N_TRG = 3 52
+TRG_DESCR = Press_Mouse_left  /
+            Press_Mouse_middle/
+            Press_Mouse_right /
+            Press_Keyb_up     /
+            Press_Keyb_up_u   /
+            Press_Keyb_left   /
+            Press_Keyb_left_u /
+            Press_Keyb_right  /
+            Press_Keyb_right_u/
+            Press_Keyb_down   /
+            Press_Keyb_down_u /
+            Press_Keyb_exit   /
+            Press_Keyb_sp     /
+            Press_Keyb_cr     /
+            Press_Keyb_a      /
+            Press_Keyb_b      /
+            Press_Keyb_c      /
+            Press_Keyb_d      /
+            Press_Keyb_e      /
+            Press_Keyb_f      /
+            Press_Keyb_g      /
+            Press_Keyb_h      /
+            Press_Keyb_i      /
+            Press_Keyb_j      /
+            Press_Keyb_k      /
+            Press_Keyb_l      /
+            Press_Keyb_m      /
+            Press_Keyb_n      /
+            Press_Keyb_o      /
+            Press_Keyb_p      /
+            Press_Keyb_q      /
+            Press_Keyb_r      /
+            Press_Keyb_s      /
+            Press_Keyb_t      /
+            Press_Keyb_u      /
+            Press_Keyb_v      /
+            Press_Keyb_w      /
+            Press_Keyb_x      /
+            Press_Keyb_y      /
+            Press_Keyb_z      /
+            Press_Keyb_0      /
+            Press_Keyb_1      /
+            Press_Keyb_2      /
+            Press_Keyb_3      /
+            Press_Keyb_4      /
+            Press_Keyb_5      /
+            Press_Keyb_6      /
+            Press_Keyb_7      /
+            Press_Keyb_8      /
+            Press_Keyb_9      /
+            Press_Keyb_.      /
+            Press_Keyb_+      /
+            Press_Keyb_-      /
+            Press_Key_shift_l /
+            Press_Key_shift_r
+TRG_TYPE  = BUTT        /
+            BUTT        /
+            BUTT        /
+            XK_Up       /
+            KEY         /
+            XK_Left     /
+            KEY         /
+            XK_Right    /
+            KEY         /
+            XK_Down     /
+            KEY         /
+            XK_KP_F4    /
+            XK_space    /
+            XK_Return   /
+            XK_a        /
+            XK_b        /
+            XK_c        /
+            XK_d        /
+            XK_e        /
+            XK_f        /
+            XK_g        /
+            XK_h        /
+            XK_i        /
+            XK_j        /
+            XK_k        /
+            XK_l        /
+            XK_m        /
+            XK_n        /
+            XK_o        /
+            XK_p        /
+            XK_q        /
+            XK_r        /
+            XK_s        /
+            XK_t        /
+            XK_u        /
+            XK_v        /
+            XK_w        /
+            XK_x        /
+            XK_y        /
+            XK_z        /
+            XK_0        /
+            XK_1        /
+            XK_2        /
+            XK_3        /
+            XK_4        /
+            XK_5        /
+            XK_6        /
+            XK_7        /
+            XK_8        /
+            XK_9        /
+            XK_period   /
+            XK_plus     /
+            XK_minus    /
+            XK_Shift_L  /
+            XK_Shift_R
+TRG_DEF   = 1           /
+            2           /  
+            3           /
+           -1           /
+          300           /
+           -1           /
+          301           /
+           -1           /  
+          302           /
+           -1           /   
+          303           /
+           -1           /
+           -1           / 
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           /
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           / 
+           -1           /
+           -1           /
+           -1           

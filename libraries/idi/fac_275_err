@@ -1,0 +1,76 @@
+FACILITY IDI
+301,COOVF,No more room in common block storage
+302,DEVNM,Problem translating or obtaining device name
+303,ERROR,Undefined error
+304,INCID,Cursor number invalid
+305,INCON,Configuration number invalid
+306,INDID,Display identifier invalid
+307,INITT,Intensity transformation table number invalid
+308,INLUT,Look-up table number invalid
+309,INMID,Memory identifier invalid
+310,INRID,ROI identifier invalid
+311,IOERR,Error writing to, or reading from device
+312,NOCAP,No capability of that number
+313,NOEVA,No such evaluator
+314,NOINT,No such interactor
+315,NOOBJ,No such object
+316,NOREC,Error recovering characteristics
+317,NOROI,No ROI available
+318,NOTIM,Not implemented
+319,RANGE,Parameter outside permissible range
+320,TWOVF,Transfer window overflow
+321,WDTER,Problem with workstation description file
+322,DISWNDERR,Virtual Device Manager error
+323,NOAVAILDEV,No virtual device available
+324,DEVNOTOP,Device not opened
+325,NODYNCONF,Device not dynamically configurable
+326,DEVNAMERR,Device name error
+327,DEVCAPTRUNC,Device capability truncated
+328,MAXCONFN,Too many configurations
+329,EXTBMNOTFND,External bitmap not found
+330,MEMALLERR,Memory allocation error
+331,DCTFILERR,Error in DCT file
+332,DYNCONFEN,Dynamic configuration already enabled
+333,DYNCONFNOTEN,Dynamic configuration not enabled
+334,ILLCONFID,Illegal configuraton id
+335,MEMNOTFREE,Memory not free
+336,ILLMEMID,Illegal memory id
+337,MEMNOTALL,Memory not allocated
+338,MAXMEM,Out of memory locators
+339,TWTOOBIG,Transfer window too big
+340,IMGTOOBIG,Image too big
+341,LITIDERR,Lookup table identifier invalid
+342,LUTLENERR,Lookup table length error
+343,LUTNOTDEF,Lookup table not defined
+344,ITTIDERR,ITT identifier invalid
+345,ITTLENERR,ITT length invalid
+346,CURNOTDEF,Cursor not defined
+347,ROINOTDEF,ROI not defined
+348,MAXROI,Too many ROIs
+349,ILLCURID,Illegal cursor id
+350,ILLTRIGGER,Illegal trigger id
+351,ILLINTTYPE,Illegal interaction type
+352,ILLINTOBJ,Illegal interaction object
+353,ILLINTOPER,Illegal interaction operation
+354,IDINOSUPP,IDI not supported
+355,DCTFILWARN,Missing keyword in DCT file
+356,DEPTHERR,Memory depth value
+357,MEMTYPERR,Memory type error
+358,MAXMEMLST,Internal memory exhausted
+359,LUTNOTFREE,Current LUT not free
+360,CURNOTFREE,Cursor not free
+361,CURNOTVIS,Cursor not visible
+362,ROINOTVIS,ROI not visible
+363,INTNOTALL,Interaction invalid
+364,MAXNOINT,Too many interactions
+365,INTNOEN,Interaction not enabled
+366,FONTNOTDEF,Text font not defined
+367,VD_MAXWIND,Max number of interactions
+368,VD_KWTYPERR,Display window type error
+369,VD_FILKWNOTCR,Display window file not created
+370,VD_WINOTOPN,Requested display window not created
+371,VD_FILKWERR,Display window file read/update error
+372,VD_DEVNULL,Environment device name not defined
+373,VD_SAVNOTALL,SAVE operation not allowed for A
+374,VD_XCONNERR,Error connecting to X-server
+375,VD_UNSUPVT,Window has unsupported visual type

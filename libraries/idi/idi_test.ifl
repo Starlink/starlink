@@ -1,0 +1,20 @@
+interface IDI_TEST
+   parameter IN
+      position 1
+      type 'NDF'
+      keyword 'IN'
+      access 'READ'
+      vpath 'PROMPT'
+      prompt 'NDF file containing image '
+      default /star/bin/kappa/comwest
+   endparameter
+   parameter DEVICE
+      position 2
+      ptype  'DEVICE'
+      keyword 'DEVICE'
+      access 'READ'
+      vpath 'PROMPT'
+      default xwindows
+      prompt 'Display device '
+   endparameter
+endinterface

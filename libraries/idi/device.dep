@@ -1,0 +1,45 @@
+/***********************************************************************
+*                                                                      *
+*   file DEVICE.DEP                                                    *
+*                                                                      *
+*   IDI  Device dependent section                                      *
+*                                                                      *
+*                                                                      *
+************************************************************************
+*   Author : 881026  P. Santin  - Trieste Astronomical Observatory     *
+*   Update : 910508  N.Eaton  - Durham University                      *
+*            Added font names.                                         *
+*   Update : 920122  D.L.Terrett - Add default path for data files     *
+*   Update : 920921  N.Eaton  - Added LOCX_SLIP and LOCY_SLIP          *
+***********************************************************************/
+
+/* Keyboard dependency - Alphanumeric definitions */
+
+# define NUM_MIN             0
+# define NUM_MAX           250
+# define ALNUM_MIN           0
+# define ALNUM_MAX         250
+# define KEYB_CR           189
+
+# define DEVLEN              6      /* Device name max length */
+# define WINDLEN             3      /* Window name max length */
+
+# define KWRECLEN           70      /* Window file record length */
+
+# define MOUSE_LEFT          1
+# define MOUSE_MIDDLE        2
+# define MOUSE_RIGHT         3
+
+/* Font names */
+
+#define smallname "-ADOBE-Helvetica-Medium-R-Normal--*-100-*-*-P-*"
+#define normalname "-ADOBE-Helvetica-Medium-R-Normal--*-180-*-*-P-*"
+#define largename "-ADOBE-Helvetica-Medium-R-Normal--*-240-*-*-P-*"
+#define vlargename "-ADOBE-Helvetica-Medium-R-Normal--*-240-*-*-P-*"
+
+/* Maximum locator shift between events */
+
+#define LOCX_SLIP           20
+#define LOCY_SLIP           20
+
+/**********************************************************************/

@@ -1,0 +1,8 @@
+1 IDI library - update release
+                                                   Expires: ????.??.??
+
+ IDI v1.4-4 is now available.
+
+ An error in the link script idi_link_adam which caused libidi.{a,so} and
+ libidi_adam.{a,so} to be searched in the wrong order has been fixed.
+
