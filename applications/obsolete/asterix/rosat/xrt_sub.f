@@ -676,7 +676,7 @@
       REAL RP1,RP2                ! Radii to interpolate between
       INTEGER ELP,FLP             ! Fraction loop and Energy loop variables
 *    Local data :
-      INCLUDE 'XRTLIB(INC_GETPSF_DATA)'   ! Includes the data values for
+      INCLUDE 'INC_GETPSF_DATA'   ! Includes the data values for
 *                                 ! ENERGY,FRAC,TELRAD and DETRAD
 *                                 ! and the constants MAXENG and MAXFRAC
 *-
@@ -809,7 +809,7 @@ C         ENDIF
       INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			IFID	      		! Input file id
 *    Import-Export :
@@ -1020,7 +1020,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       CHARACTER*(DAT__SZLOC) SLOC       ! Locator to SORT box
 *    Import-Export :
@@ -1124,7 +1124,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       CHARACTER*(DAT__SZLOC)SLOC       ! Locator to SORT box
 *    Import-Export :
@@ -1682,7 +1682,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -1787,7 +1787,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD
       INTEGER NEFF                        ! No. of off-axis angle arrays
@@ -1897,7 +1897,7 @@ D          WRITE(1,*)HEAD.OFFAX
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD
       INTEGER NX,NY                       ! Image dimensions
@@ -2206,7 +2206,7 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER RDIM                        ! Number of radial bins in file
       INTEGER RLP                         ! Radial bin wanted
@@ -2530,7 +2530,7 @@ D          WRITE(1,*)HEAD.OFFAX
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 * Import :
       LOGICAL DISP                    ! Display observation info ?
@@ -3323,7 +3323,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :

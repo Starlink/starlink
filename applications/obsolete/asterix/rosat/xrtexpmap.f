@@ -60,7 +60,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *
 *    Status :

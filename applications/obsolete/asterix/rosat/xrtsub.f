@@ -73,7 +73,7 @@
 *    Global variables :
 *    Structure definitions :
 
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *
       RECORD /CORR/ SHEAD, BHEAD                  ! Contains auxiliary info.
 *                                                 ! for source and bckgnd files
@@ -662,7 +662,7 @@
 *    Global constants :
       INCLUDE 'QUAL_PAR'
 *    Structure definition :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /CORR/ SHEAD                 ! Header structure for source data
@@ -780,7 +780,7 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ SHEAD                  ! Header info for source file
       RECORD /CORR/ BHEAD                  ! Header info for bckgnd file
@@ -1148,7 +1148,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ SHEAD                    ! Header of source file
 *
@@ -1317,7 +1317,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *    Global parameters :
       INCLUDE 'QUAL_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ SHEAD, BHEAD             ! Header stuff
       INTEGER XDIM,YDIM,TDIM,EDIM            ! Dimensions of background array
@@ -1487,7 +1487,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			IFID			! Input file id
       CHARACTER*(*) MODE		 ! Access mode
@@ -1818,7 +1818,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			IFID			! Input file id
 *    Export :
@@ -1905,7 +1905,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ SHEAD                  ! Header info for source file
       RECORD /CORR/ BHEAD                  ! Header info for bckgnd file
@@ -2008,7 +2008,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *    Global constants :
       INCLUDE 'QUAL_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ BHEAD                     ! Background header info.
       INTEGER NX,NY,NT,NE,NR                  ! Data dimensions
@@ -2125,7 +2125,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER RDIM                        ! Number of radial bins in file
       INTEGER RLP                         ! Radial bin wanted
@@ -2225,7 +2225,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
       INCLUDE 'INC_XRTHEAD'                ! Gives the MAXRAN constant
 *    Import :
       INTEGER			FID			! File identifier
@@ -2810,7 +2810,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			SFID			! Source file id
       RECORD /CORR/ SHEAD                 ! Header info for source file
@@ -3245,7 +3245,7 @@ D      WRITE(*,*) SHEAD.OFFAX
 *    Global variables :
       INCLUDE 'QUAL_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD                ! Header structure
       LOGICAL LQUAL                     ! Is quality available ?
