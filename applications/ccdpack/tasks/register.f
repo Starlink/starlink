@@ -1016,7 +1016,8 @@
 *  Now remove any previously existing frames in the OUTDM domain;
 *  the output frameset should contain only one, to prevent confusion
 *  (note CCD1_DMPRG updates JREG if necessary).
-                     CALL CCD1_DMPRG( IWCS, OUTDM, JREG, STATUS )
+                     CALL CCD1_DMPRG( IWCS, OUTDM, .TRUE., JREG, 
+     :                                STATUS )
 
 *  Finally ensure that the registration domain is the Current one.
                      CALL AST_SETI( IWCS, 'Current', JREG, STATUS )

@@ -559,7 +559,7 @@
 
 *  Purge the WCS component of any frames in the same domain as the one
 *  which we're going to add.
-            CALL CCD1_DMPRG( IWCS, DMCUR, 0, STATUS )
+            CALL CCD1_DMPRG( IWCS, DMCUR, .TRUE., 0, STATUS )
 
 *  Set the Current frame of the WCS component to the one which is the
 *  Base frame of the import frameset.

@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_DMPRG( FSET, DOMAIN, JKEEP, STATUS )
+      SUBROUTINE CCD1_DMPRG( FSET, DOMAIN, REPORT, JKEEP, STATUS )
 *+
 *  Name:
 *     CCD1_DMPRG
@@ -10,13 +10,14 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_DMPRG( FSET, DOMAIN, JKEEP, STATUS )
+*     CALL CCD1_DMPRG( FSET, DOMAIN, REPORT, JKEEP, STATUS )
 
 *  Description:
 *     This routine removes all frames from a frameset which have the
 *     domain name supplied.  Optionally, the index of one domain to
 *     exempt from this process may be supplied.  For each domain 
-*     removed, a message is logged through the CCD logging system.
+*     removed, a message may be logged through the CCDPACK logging 
+*     system.
 
 *  Arguments:
 *     FSET = INTEGER (Given)
@@ -26,6 +27,10 @@
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        Name of the domain to purge.  Spaces and case-sensitivity are
 *        ignored.
+*     REPORT = LOGICAL (Given)
+*        If REPORT is set .TRUE. then for each domain removed, a message
+*        is logged through the CCDPACK logging system.  Otherwise 
+*        operation is silent.
 *     JKEEP = INTEGER (Given and Returned)
 *        Any frame with this index will not be deleted, even if it has
 *        a Domain of DOMAIN.  On exit, this value will refer to the same
@@ -48,6 +53,8 @@
 *  History:
 *     16-APR-1999 (MBT):
 *        Original version.
+*     21-SEP-1999 (MBT):
+*        Added REPORT argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,6 +72,7 @@
 *  Arguments Given:
       INTEGER FSET
       CHARACTER * ( * ) DOMAIN
+      LOGICAL REPORT
       INTEGER JKEEP
       
 *  Status:
@@ -100,7 +108,8 @@
             IF ( AST_GETC( FRM, 'Domain', STATUS ) .EQ. DMN1 ) THEN
                CALL AST_REMOVEFRAME( FSET, J, STATUS )
                CALL MSG_SETC( 'DMN', DMN1 )
-               CALL CCD1_MSG( ' ', 
+               IF ( REPORT )
+     :            CALL CCD1_MSG( ' ', 
      :         '      Removing existing frame in domain ^DMN', STATUS )
                IF ( J .LT. JKEEP ) JKEEP = JKEEP - 1
             END IF

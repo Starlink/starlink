@@ -445,7 +445,7 @@
          END IF
 
 *  Purge the frameset of any pre-existing frames in the output domain.
-         CALL CCD1_DMPRG( WCSOUT, OUTDM, JNEW, STATUS )
+         CALL CCD1_DMPRG( WCSOUT, OUTDM, .TRUE., JNEW, STATUS )
 
 *  Write out the modified WCS frameset to the NDF.
          CALL NDF_PTWCS( WCSOUT, INDF( I ), STATUS )

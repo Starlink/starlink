@@ -339,7 +339,7 @@
 *  First try to remove it as a domain name.  This leaves the Current 
 *  frame intact where possible.
                CALL PAR_GET0C( 'FRAME', DMRMV, STATUS )
-               CALL CCD1_DMPRG( IWCS, DMRMV, 0, STATUS )
+               CALL CCD1_DMPRG( IWCS, DMRMV, .TRUE., 0, STATUS )
 
 *  If this has reduced the number of frames then it has succeeded.
                IF ( AST_GETI( IWCS, 'Nframe', STATUS ) .LT. NFRAME ) 
@@ -408,7 +408,7 @@
 
 *  Remove any previously existing frames in the same domain.
                JNEW = AST_GETI( IWCS, 'Current', STATUS )
-               CALL CCD1_DMPRG( IWCS, DOMAIN, JNEW, STATUS )
+               CALL CCD1_DMPRG( IWCS, DOMAIN, .TRUE., JNEW, STATUS )
 
             END IF
 
