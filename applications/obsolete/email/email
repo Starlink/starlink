@@ -1,0 +1,185 @@
+
+#  This is a Bourne shell script.  In order to be POSIX-compliant, the
+#  first line must be blank.
+#+
+#  Name:
+#     email
+#
+#  Description:
+#     Search various text files containing alphabetical listings of
+#     electronic mail adresses for astronomers and astronomical sites 
+#     both local and worldwide. 
+#
+#  Usage:
+#        % email [-h|-help] <keyword< keyword>>
+#
+#  Parameters:
+#     The following optional parameters are suported:
+#
+#     -h | -help
+#         These options provide a very brief help message.
+#
+#     <keyword< keyword>>
+#         The optional keyword(s) can be any search string (e.g. a name 
+#         or a place) or a list of keywords (separated by spaces).  An
+#         attempt is  made to match the string(s) in all the text files 
+#         in the following list:
+#
+#             $emaildocs/astroplaces.lis    - astronomical places list
+#             $admindir/unixnames           - starlink unixnames list
+#             $emaildocs/astropersons.lis  - world astronomers list
+#
+#     If no parameter is specified on the command line, then a syntax
+#     message is displayed.
+#
+#   Authors:
+#      CRB: Chris Benn (RGO)
+#      ACF: Adrian Fish (Starlink, UCL)
+#      PWH: Phil Hill (St Andrews)
+#      BLY: Martin Bly (Starlink, RAL)
+#
+#   History:
+#      01-JAN-1988 (CRB):
+#         Original version for VAX/VMS.
+#      15-OCT-1991 (ACF):
+#         Starlink version .
+#      25-NOV-1992 (PWH):
+#         Unix version (C shell).
+#      25-MAR-1994 (BLY):
+#         v1.0 - Unix version in Bourne Shell to speed it up.
+#      25-FEB-1995 (BLY):
+#         v1.1 - Modified search to use Starlink unixnames file, not local
+#                usernames.lis file
+#      16-JUN-1995 (BLY):
+#         v1.2 - New command line processing.
+#                Modified titles for searching.
+#                Echo version number if valid search.
+#                May 1995 RGO lists.
+#      27-JUN-1995 (BLY):
+#         v1.3 - Revised to handle new unixname file format.
+#                Thanks for telling me Mike!
+#      22-JUN-1999 (BLY):
+#         v1.3-2 - RGO -> ex-RGO.  New lists available.
+#      09-DEC-1999 (BLY):
+#         v1.4 - Modified astropersons.lis handling to fail gracefully
+#                when astropersons.lis is missing since it is not part
+#                of the distribution from this release.  Do the same
+#                for astroplaces.lis too for completeness.
+#              - Various additional cosmetic modifications.
+#-
+#
+
+#  Define directories containing the information files.
+emaildocs=INSTALL_ETC
+admindir=INSTALL_ADMIN
+
+#  Define paths/names of files to be searched.
+places=${emaildocs}/astroplaces.lis
+starnames=${admindir}/unixnames
+worldnames=${emaildocs}/astropersons.lis
+
+#  Check for command line arguments.
+if [ "${1}" = "" ]; then
+   echo "Usage: email <keyword< keyword< ...>>>"
+   exit 
+fi
+
+#  Interpret command line and act according to flags.
+while :; do
+   case "${1}" in
+
+#  Help flags.
+     -h | -help)
+        echo 
+        echo "To search for names with an apostrophy in (such as O'Brien),"
+        echo "you should enclose the name in double quotes."
+        echo 
+        exit
+        break
+        ;;
+
+#  Invalid flag.
+     -*)
+        echo >&2 "email: unknown flag \""${1}"\" given"
+        exit 1
+        break
+        ;;
+
+#  Default - pass argument to search.
+     *)
+        break
+        ;;
+    esac
+done
+
+#  Announce version.
+echo 'email address searcher vPKG_VERS'
+
+#  Search list of observatories.
+if [ -f ${places} ]; then
+   echo 'Searching the ex-RGO directory of observatories...'
+   echo 
+   for x do \
+      grep -i ${x} ${places} ;\
+   done
+   echo
+else
+   echo 'The ex-RGO directory of observatories is not available.'
+   echo
+fi
+
+#  Search Starlink Users list
+if [ -f ${starnames} ]; then 
+   echo 'Searching the directory of Starlink Users...'
+   echo
+   echo "    Starlink User's Email addresses found in this list are likely"
+   echo '    to be more up-to-date than those found in the world search.'
+   echo
+   for x do \
+      grep -i ${x} ${starnames} | awk \
+      '{
+         site = substr($0,44,6)
+         last = substr($0,1,24)
+         split(last,lname," ")
+         first = substr($0,25,19)
+         split(first,fname," ")
+         email = substr($0,50,length($0)-50)
+         email = substr(email,1,index(email," "))
+         firstname = fname[1]
+         if (fname[2] != ""){firstname = firstname " " fname[2]}
+         if (fname[3] != ""){firstname = firstname " " fname[3]}
+         lastname = lname[1]
+         if (lname[2] != ""){lastname = lastname " " lname[2]}
+         if (lname[3] != ""){lastname = lastname " " lname[3]}
+         if (lname[4] != ""){lastname = lastname " " lname[4]}
+         fullname = lastname ", " firstname
+         i = length(fullname)
+         while ( i <= 32 ) {
+            fullname = fullname " "
+            i++
+         }
+         record = site fullname email
+         print record
+      }' - ;\
+   done
+   echo 
+else
+   echo 'The list of Starlink Users is not available.'
+   echo
+fi
+
+#  Search worldwide list of Astronomers.
+
+if [ -f ${worldnames} ]; then
+   echo 'Searching the ex-RGO world directory of astronomers...'
+   echo
+   for x do \
+      grep -i ${x} ${worldnames} ;\
+   done
+else
+   echo 'The ex-RGO world directory of astronomers is not available.'
+   echo
+fi
+#
+exit
+#.

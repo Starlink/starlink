@@ -1,0 +1,451 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {182.7}
+\newcommand{\stardocauthors}   {M. J. Bly \\G. R. Mellor}
+\newcommand{\stardocdate}      {18th February 2000}
+\newcommand{\stardoctitle}     {EMAIL --- Email address searching}
+\newcommand{\stardocversion}   {v1.4}
+% \newcommand{\stardocmanual}    {[manual-type]}
+\newcommand{\stardocabstract}  {
+One of the most common activities on networked computers is the sending
+and receiving of personal electronic mail (email).  Starlink nodes are
+connected to the worldwide Internet network.  This document describes
+how to find email addresses to communicate with other astronomers
+and astronomy groups in the UK and the rest of the world.
+}
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+%  {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+%     \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+% \begin{latexonly}
+% \newpage
+% \end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+\vspace*{\fill}
+\stardoccopyright
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{\xlabel{introduction}Introduction}
+\label{introduction}
+
+In a manner similar to ordinary mail, all electronic mail (email)
+requires both a name to identify the recipient and address for the
+recipient -- a \textit{username} and \textit{sitename}.  Together these
+are referred to as an \textbf{\textit{email address}} or a
+\textbf{\textit{mailbox}}.
+
+There are a large number of people (everyone on the internet!) who have
+an \textbf{\textit{email address}} so if you want to contact someone by
+email it can be tricky finding out where to send the message unless you
+already know their email address.
+
+The Starlink EMAIL utility provides an easy method of searching for 
+an astronomers email address.
+
+\textit{Please note that the information files that the email utility
+uses are not distributed to non-Starlink sites and do not form part of
+Starlink's CD distributions from EMAIL v1.4 (Spring 2000).}
+
+\section{\xlabel{finding_email_addresses}Finding email addresses}
+\label{finding_email_addresses}
+
+There are a number of resources that can help you find someone's email 
+address, particularly of members of the astronomy community in the UK and 
+abroad.  
+
+\subsection{\xlabel{starlink_user_lists}Starlink user lists}
+Starlink software installations at UK sites have a copy of the two lists
+of users registered at the Starlink sites.  The files are:
+
+\begin{itemize}
+
+\item \texttt{unixnames} -- a list of Starlink users giving a location
+code and email address for each.  Location codes are used to associate
+a postal address with a user.
+
+\item \texttt{usernames} -- a list of the usernames Starlink users.
+
+\end{itemize}
+
+These files are found in \texttt{/star/admin} on Starlink systems and
+are distributed by Starlink only to UK sites to help prevent abuse of
+the lists.  The most useful is \texttt{unixnames} because you can
+examine it to find an individual email address.
+
+\subsection{\xlabel{starlink_sites}Starlink sites}
+\label{starlink_sites}
+
+Starlink maintains a database of contact details for the Starlink
+sites.  Access to the data is available via the
+\htmladdnormallink{Starlink WWW
+server}{http://www.starlink.rl.ac.uk/project.html}
+\latex{(\texttt{http://www.starlink.rl.ac.uk/project.html})}.
+Select the \textbf{\textit{sites}} link for a list of sites then select
+the site you're interested in.
+
+Since the pages are created dynamically the information is as
+up-to-date as that in the database, which is actively maintained by
+Starlink.
+
+\subsection{\xlabel{world_directory_of_astronomers}World directory of
+Astronomers} \label{world_directory_of_astronomers}
+
+Chris Benn of La Palma and Ralph Martin of the Royal Greenwich
+Observatory produced an email directory of astronomers world-wide
+(\texttt{astropersons.lis}) together with contact details and addresses
+of their astronomical institutes (\texttt{astroplaces.lis} and
+\texttt{astropostal.lis}).  These files are distributed to UK Starlink 
+sites and are found on Starlink systems in the
+directory \texttt{/star/etc/email}.
+
+Since the closure of the RGO the files are maintained by the
+Starlink Project at RAL.  A \htmladdnormallink{WWW interface is
+available}{http://www.starlink.rl.ac.uk/astrolist/astrosearch.html}
+\latex{(\texttt{http://www.starlink.rl.ac.uk/astrolist/astrosearch.html})}
+which provides search facilities and the ability for astronomers to
+provide an update for their entry.  The latest versions of the files are
+distributed monthly to UK Starlink sites.
+
+\subsection{\xlabel{other_resources}Other resources}
+\label{other_resources}
+
+The National Information Services and Systems (NISS) service at the 
+University of Bath provides access to a large number of information 
+services and databases.  These include links to all higher and further
+education institutes and research sites which can be used to find general
+contact email addresses.  NISS can be accessed at
+\htmladdnormallink{\texttt{http://www.niss.ac.uk}}{http://www.niss.ac.uk}.
+
+The ``Whole Internet User's Guide and Catalog'' by Ed Krol contains
+much valuable information regarding the Internet, email and addresses.
+
+\subsection{\xlabel{cant_find_an_email_address}Can't find an email address?}
+\label{cant_find_an_email_address}
+
+If you cannot find an email address using the above resources, you have a 
+problem -- there is no reliable way to find an email address for a user
+on a remote machine.  Often usernames and email addresses are quite different.
+
+One solution is to try emaling the \texttt{postmaster} username at a site.
+This is a special username created at many sites to handle misdirected and 
+failed email and is used by system managers to monitor the status of their 
+email systems.  It can sometimes be worth attempting to mail this account for
+information about a user.
+
+\section{\xlabel{using_the_email_search_tool}Using the EMAIL search tool}
+\label{using_the_email_search_tool}
+
+The Starlink EMAIL utility is a simple tool for finding email addresses in 
+the Starlink user lists and the ex-RGO world list of astronomers.
+
+The \texttt{email} command invokes the search tool -- you just give it a 
+name to search for.  For example if you wanted the email address of 
+David Rawlinson at RAL:
+
+\begin{quote}
+\begin{small}
+\begin{verbatim}
+% email rawlinson
+email address searcher v1.4
+Searching the ex-RGO directory of observatories...
+
+
+Searching the directory of Starlink Users...
+
+    Starlink User's Email addresses found in this list are likely
+    to be more up-to-date than those found in the world search.
+
+PRO   Rawlinson, David                 djr@star.rl.ac.uk 
+
+Searching the ex-RGO world directory of astronomers...
+
+Rawlinson, David       RALproj  I djr@star.rl.ac.uk                         97
+
+%
+\end{verbatim} 
+\end{small}
+\end{quote}
+
+Note that you get two `hits'.  The first is on the Starlink \texttt{unixnames}
+list and the second is on the ex-RGO world astronomers list.  
+
+For Starlink registered users, the email address from \texttt{unixnames}
+is likely to be more up-to-date because the username lists are actively
+maintained by the Starlink Project.  Although Starlink maintains it, the 
+ex-RGO list relies on users to provide updates for their own entries.
+The number beside each `hit' on the ex-RGO world list shows which year
+the entry was last updated.
+
+% ? End of main text
+\end{document}
+
