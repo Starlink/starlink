@@ -5,7 +5,7 @@ dnl    Initialisation: package name and version number
 dnl    Note that for GKS the RAL version number if 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
-AC_INIT(par, 1.37-1, ussc@star.rl.ac.uk)
+AC_INIT(gks, 1.37-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -46,7 +46,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([include base])
+AC_CONFIG_SUBDIRS([include base data ])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
