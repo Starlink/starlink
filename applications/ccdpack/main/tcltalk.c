@@ -48,6 +48,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 #include "tcl.h"
 #include "sae_par.h"
 #include "tcltalk.h"
@@ -227,6 +228,7 @@
       int ifd = cinterp->upfd[ 0 ];
       int ofd = cinterp->downfd[ 1 ];
       int tclrtn;
+      void (*handler)(int);
       char *c;
       static char retbuf[ BUFLENG ];
       DECLARE_CHARACTER( fmsg, MSG__SZMSG );
@@ -236,8 +238,15 @@
       if ( *status != SAI__OK ) return;
 
 /* Write the text of the command to execute to the downward pipe, so that
-   the child process can execute it. */
-      write( ofd, cmd, strlen( cmd ) + 1 );
+   the child process can execute it.  We ignore a SIGPIPE but check for
+   an I/O error, so that the program deals gracefully with a broken pipe. */
+      handler = signal( SIGPIPE, SIG_IGN );
+      if ( write( ofd, cmd, strlen( cmd ) + 1 ) < 0 ) {
+         *status = SAI__ERROR;
+         msgSetc( "ERROR", strerror( errno ) );
+         errRep( "CCD_TCL_WRITE", "^ERROR", status );
+      }
+      signal( SIGPIPE, handler );
 
 /* Loop until we get a return status which indicates the command has 
    completed (i.e. not one which just requires output through the ADAM
@@ -250,6 +259,7 @@
 
 /* Read the result of the evaluation from the upward pipe. */
          c = retbuf - 1;
+         *retbuf = '\0';
          do {
             if ( ++c >= retbuf + BUFLENG ) {
                *status = SAI__ERROR;
@@ -265,6 +275,7 @@
    read again) but I don't think that it is a very likely eventuality. */
             if ( bytes != 1 ) {
                strcpy( c, "\n   Tcl communications error\n" );
+               c += strlen( c );
                tclrtn = -1;
             }
          } while ( *c != '\0' );
@@ -345,15 +356,28 @@
 /* Local variables. */
       int ifd = cinterp->upfd[ 0 ];
       int ofd = cinterp->downfd[ 1 ];
+      void (*handler)(int);
 
 /* Write an 'exit' command to the Tcl interpreter.  This should cause it
    to shut down in an orderly fashion and, in particular, it will allow
-   the Adam Message System to tidy up in whatever arcane way it sees fit. */
-      write( ofd, "exit", strlen( "exit" ) + 1 );
+   the Adam Message System to tidy up in whatever arcane way it sees fit.
+   We ignore SIGPIPE but check for an I/O error, so that the program 
+   copes gracefully in the case that the pipe is broken. */
+      handler = signal( SIGPIPE, SIG_IGN );
+      if ( write( ofd, "exit", strlen( "exit" ) + 1 ) < 0 ) {
+         if ( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+         }
+         msgSetc( "ERROR", strerror( errno ) );
+         errRep( "CCD_TCL_PIPE", "^ERROR", status );
+      }
 
 /* Close the pipe communication file descriptors. */
       close( ofd );
       close( ifd );
+
+/* Restore SIGPIPE handling. */
+      signal( SIGPIPE, handler );
 
 /* Finally free the memory associated with the interpreter structure itself. */
       free( cinterp );
