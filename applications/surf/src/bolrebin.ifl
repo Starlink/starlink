@@ -46,6 +46,8 @@
 #        Correct prompt for LONG_OUT
 #     1998 Dec 10 (TIMJ)
 #        Rename USEGRD to GUARD
+#     1999 May 7 (TIMJ)
+#        Add TRIM
 #     {enter_further_changes_here}
 
 #-
@@ -222,6 +224,14 @@
          TYPE '_INTEGER'
          PROMPT 'Number of pixels in output map (NX,NY)'
          HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER TRIM
+        TYPE     '_REAL'
+        PROMPT   'Size of region to trim from map edge (arcsec)'
+	VPATH 'DEFAULT'
+	DEFAULT 0.0
+	HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE

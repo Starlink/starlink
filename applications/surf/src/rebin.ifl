@@ -53,6 +53,8 @@
 #        Correct prompt for LONG_OUT
 #     1998 Dec 10 (TIMJ)
 #        Rename USEGRD to GUARD
+#     1999 May 7 (TIMJ)
+#        Add TRIM
 #     {enter_further_changes_here}
 
 #-
@@ -229,6 +231,14 @@
          PROMPT 'Store the times array'
          VPATH 'DEFAULT'
          HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER TRIM
+        TYPE     '_REAL'
+        PROMPT   'Size of region to trim from map edge (arcsec)'
+	VPATH 'DEFAULT'
+	DEFAULT 0.0
+	HELPKEY  '*'
       ENDPARAMETER
 
 
