@@ -290,7 +290,7 @@
 #  time, if they result in requiring a GWM canvas which exceeds the 
 #  requested maximum dimensions.
             set shrink 0
-            while { 1 } {
+            while { 1 && $enlarge <= 0 } {
                set z [ zoominc $zoom $shrink ]
 
 #  Set the initial offset.  The images should be adjacent to each other 
