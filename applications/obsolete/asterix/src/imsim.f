@@ -279,8 +279,8 @@
             END IF
           ELSE
             TEFF = 1.0
-            CALL MSG_PRNT( 'Model is not corrected, assuming an '//
-     :                                             /'of 1 second' )
+            CALL MSG_PRNT( 'Model is not corrected, assuming an '/
+     :                                            /'of 1 second' )
           END IF
         ELSE
           CALL ERR_ANNUL( STATUS )
