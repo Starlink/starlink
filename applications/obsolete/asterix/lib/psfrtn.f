@@ -508,11 +508,11 @@
       CALL MSG_PRNT( ' ')
 
 *    Define the default mask
-      CALL PAR_DEF0C( 'MASK', 'GAUSSIAN', STATUS )
+      CALL USI_DEF0C( 'MASK', 'GAUSSIAN', STATUS )
 
 *    Get user's choice
-      CALL PAR_GET0C( 'MASK', CHOICE, STATUS )
-      CALL PAR_CANCL( 'MASK', STATUS )
+      CALL USI_GET0C( 'MASK', CHOICE, STATUS )
+      CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Identify spatial axes
@@ -547,10 +547,10 @@
 
 *      We need a width for the gaussian
         PROMPT = 'Gaussian FWHM in '//UNITS(:CHR_LEN(UNITS))
-        CALL PAR_PROMT( 'AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
-        CALL PAR_DEF0R( 'AUX', ABS(X_DR/X_TOR), STATUS )
-        CALL PAR_GET0R( 'AUX', GWIDTH, STATUS )
-        CALL PAR_CANCL( 'AUX', STATUS )
+        CALL USI_PROMT( 'AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
+        CALL USI_DEF0R( 'AUX', ABS(X_DR/X_TOR), STATUS )
+        CALL USI_GET0R( 'AUX', GWIDTH, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Convert it to radians
@@ -561,12 +561,12 @@
 
         AN_KIND(SLOT(1)) = ANAL_KING
 
-        CALL PAR_PROMT( 'AUX', 'King core radius (in '/
+        CALL USI_PROMT( 'AUX', 'King core radius (in '/
      :           /UNITS(:CHR_LEN(UNITS))//') and index', STATUS )
 
 
- 39     CALL PAR_GET0C( 'AUX', FTPAR, STATUS )
-        CALL PAR_CANCL( 'AUX', STATUS )
+ 39     CALL USI_GET0C( 'AUX', FTPAR, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           GOTO 99
         ELSE
@@ -602,9 +602,9 @@
 
 *      Get width of tophat
         PROMPT = 'Tophat full width in '//UNITS(:CHR_LEN(UNITS))
-        CALL PAR_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
-        CALL PAR_GET0R( 'AUX', GWIDTH, STATUS )
-        CALL PAR_CANCL( 'AUX', STATUS )
+        CALL USI_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
+        CALL USI_GET0R( 'AUX', GWIDTH, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
         AN_PW(SLOT(1),1) = GWIDTH*X_TOR
@@ -616,9 +616,9 @@
 *      Get width of tophat
         PROMPT = 'Triangle zero-point full width in '//UNITS
      :                                        (:CHR_LEN(UNITS))
-        CALL PAR_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
-        CALL PAR_GET0R( 'AUX', GWIDTH, STATUS )
-        CALL PAR_CANCL( 'AUX', STATUS )
+        CALL USI_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
+        CALL USI_GET0R( 'AUX', GWIDTH, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
         AN_PW(SLOT(1),1) = GWIDTH*X_TOR
@@ -633,9 +633,9 @@
 
 *      Get zero response and full-width of flat-top
         PROMPT = 'FWZR and FWHM in '//UNITS(:CHR_LEN(UNITS))//' eg. 6,4'
-        CALL PAR_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
- 49     CALL PAR_GET0C( 'AUX', FTPAR, STATUS )
-        CALL PAR_CANCL( 'AUX', STATUS )
+        CALL USI_PROMT('AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
+ 49     CALL USI_GET0C( 'AUX', FTPAR, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           GOTO 99
         ELSE
@@ -1566,7 +1566,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_ASCA_CMN'
 *
 *    Import :
@@ -1695,7 +1694,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
 *
@@ -1726,9 +1724,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       SLOT = PSLOT(1)
 
 *    Get mask name
-      CALL PAR_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
-      CALL PAR_DEF0C( 'MASK', 'SIS', STATUS )
- 10   CALL PAR_GET0C( 'MASK', MASK, STATUS )
+      CALL USI_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
+      CALL USI_DEF0C( 'MASK', 'SIS', STATUS )
+ 10   CALL USI_GET0C( 'MASK', MASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Validate choice
@@ -1750,8 +1748,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *    Get a mean photon energy
       IF ( (AS_INSTR(SLOT).EQ.'GIS') .AND. .NOT. AS_PHA_DEF(SLOT) ) THEN
-        CALL PAR_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
-        CALL PAR_GET0R( 'AUX', AS_ENERGY(SLOT), STATUS )
+        CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
+        CALL USI_GET0R( 'AUX', AS_ENERGY(SLOT), STATUS )
       END IF
 
 *    Tidy up
@@ -2048,7 +2046,6 @@ C         CALL CAL_CLOSE( IGNORE )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
@@ -2185,11 +2182,11 @@ C         CALL CAL_CLOSE( IGNORE )
         END IF
 
 *      Get filter from user if none supplied
-        CALL PAR_PROMT( 'AUX', 'Enter filter id (P1,P2,UV,OP'/
+        CALL USI_PROMT( 'AUX', 'Enter filter id (P1,P2,UV,OP'/
      :                             /'Q,S1A/B,S2A/B)', STATUS )
         DO WHILE ( .NOT. FILTER_OK )
- 20       CALL PAR_GET0C( 'AUX', CID, STATUS )
-          CALL PAR_CANCL( 'AUX', STATUS )
+ 20       CALL USI_GET0C( 'AUX', CID, STATUS )
+          CALL USI_CANCL( 'AUX', STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 69
           CALFN = CAL_FILT_S2N( CID(:CHR_LEN(CID)) )
           IF ( ( CALFN .GE. 1 ) .AND. ( CALFN .LE. 8) ) THEN
@@ -2547,7 +2544,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RADIAL_CMN'
 *
@@ -2588,10 +2584,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get user's choice of table
-      CALL PAR_PROMT( 'MASK', 'Dataset containing radial profile',
+      CALL USI_PROMT( 'MASK', 'Dataset containing radial profile',
      :                                                    STATUS )
-      CALL PAR_GET0C( 'MASK', TNAME, STATUS )
-      CALL PAR_CANCL( 'MASK', STATUS )
+      CALL USI_GET0C( 'MASK', TNAME, STATUS )
+      CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Try to open file
@@ -3022,7 +3018,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_RESPFILE_CMN'
 *
 *    Import :
@@ -3167,7 +3162,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RESPFILE_CMN'
 *
@@ -3231,11 +3225,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ERR_ANNUL( STATUS )
 
 *      Get response name by prompting
-        CALL PAR_PROMT( 'MASK', 'Name of Asterix spatial response file',
+        CALL USI_PROMT( 'MASK', 'Name of Asterix spatial response file',
      :                  STATUS )
         CALL USI_ASSOCI( 'MASK', 'READ', SLOC, INPRIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
-        CALL PAR_CANCL( 'MASK', STATUS )
+        CALL USI_CANCL( 'MASK', STATUS )
         IN_DATASET = .FALSE.
 
       END IF
@@ -3332,10 +3326,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL BDA_GETAXUNITS( SLOC, RF_NDIM(PSLOT), EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
-        CALL PAR_PROMT( 'AUX', TEXT(:TLEN), STATUS )
+        CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
 
 *      Get user respomse
-        CALL PAR_GET0R( 'AUX', ENERGY, STATUS )
+        CALL USI_GET0R( 'AUX', ENERGY, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Validate
@@ -3687,7 +3681,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
 *
@@ -3728,10 +3721,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get user's choice of table
-      CALL PAR_PROMT( 'MASK', 'Name of a 2D dataset containing psf',
+      CALL USI_PROMT( 'MASK', 'Name of a 2D dataset containing psf',
      :                                                      STATUS )
-      CALL PAR_GET0C( 'MASK', TNAME, STATUS )
-      CALL PAR_CANCL( 'MASK', STATUS )
+      CALL USI_GET0C( 'MASK', TNAME, STATUS )
+      CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Try to open file
@@ -3893,7 +3886,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
 *
@@ -4026,7 +4018,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
 *
@@ -4141,7 +4132,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
@@ -4276,10 +4266,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
          END IF
 
 *       Get filter from user if none supplied
-         CALL PAR_PROMT( 'AUX', 'Enter filter id (S1A/B,S2A/B)',STATUS )
+         CALL USI_PROMT( 'AUX', 'Enter filter id (S1A/B,S2A/B)',STATUS )
          DO WHILE ( .NOT. FILTER_OK )
- 20         CALL PAR_GET0C( 'AUX', CID, STATUS )
-            CALL PAR_CANCL( 'AUX', STATUS )
+ 20         CALL USI_GET0C( 'AUX', CID, STATUS )
+            CALL USI_CANCL( 'AUX', STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 69
             CALFN = CAL_FILT_S2N( CID(:CHR_LEN(CID)) )
             IF ( ( CALFN .GE. 1 ) .AND. ( CALFN .LE. 8) ) THEN
@@ -5250,7 +5240,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_XRT_PSPC_CMN'
 *
@@ -5286,11 +5275,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       SLOT = PSLOT(1)
 
 *    Get mask name
-      CALL PAR_PROMT( 'MASK',
+      CALL USI_PROMT( 'MASK',
      :                'PSPC psf option (LIST for descriptions)',
      :                STATUS )
-      CALL PAR_DEF0C( 'MASK', 'VARPROFILE', STATUS )
- 10   CALL PAR_GET0C( 'MASK', MASK, STATUS )
+      CALL USI_DEF0C( 'MASK', 'VARPROFILE', STATUS )
+ 10   CALL USI_GET0C( 'MASK', MASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Validate choice
@@ -5304,7 +5293,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL MSG_PRNT( '  ONAXIS_2      - 2 component on-axis fit,'/
      :                                               /' not fn(E)' )
         CALL MSG_PRNT( ' ' )
-        CALL PAR_CANCL( 'MASK', STATUS )
+        CALL USI_CANCL( 'MASK', STATUS )
         GOTO 10
 
       ELSE IF ( STR_ABBREV(MASK,'VARGAUSS') ) THEN
@@ -5386,8 +5375,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Get a mean photon energy
       IF ( (RX_OPTION(SLOT) .NE. PSF_PSPC__ONAX2)
      :      .AND. .NOT. RX_PHA_DEF(SLOT) ) THEN
-        CALL PAR_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
-        CALL PAR_GET0R( 'AUX', RX_ENERGY(SLOT), STATUS )
+        CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
+        CALL USI_GET0R( 'AUX', RX_ENERGY(SLOT), STATUS )
       END IF
 
 *    Tidy up
