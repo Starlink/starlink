@@ -801,7 +801,7 @@ sub send_input_to_slave_ ($;\@) {
 	    $self->{SLAVESTATUS} = "5--"; # pseudo-return-code
                                           # indicating internal error.
 	    $self->{SLAVEMESSAGE} = '<no response from moggy>';
-	    $self->{FAILEDCOMMAND} = $cmd;
+	    $self->{FAILEDCOMMAND} = '<input>';
 	}
     } else {
 	# Slave didn't start up properly
