@@ -528,6 +528,7 @@ given in <ref id=table.entities>.
 <row><entry><code>&amp;endash;</code><entry>&endash<entry>en dash
 <row><entry><code>&amp;percent;</code><entry>&percent<entry>percent sign
 <row><entry><code>&amp;deg;</code><entry>&deg<entry>degrees symbol
+<row><entry><code>&emp;underscore;</code><entry>&underscore<entry>underscore
 <row><entry><code>&amp;latex;</code><entry>&latex<entry>&latex logo
 <row><entry><code>&amp;tex;</code><entry>&tex<entry>&tex logo
 </row>
