@@ -218,6 +218,9 @@
 *        Added missing CCD1_END call.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     9-JAN-2001 (MBT):
+*        Modified to use AST and AGI properly.  This allows it to interact
+*        with the AGI graphics database much more intelligently.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -232,6 +235,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'AST_PAR'          ! Standard AST constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -245,21 +249,25 @@
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list 
       INTEGER CI1                ! Minimum allowed colour index
       INTEGER CI2                ! Maximum allowed colour index
-      INTEGER DUMMY( 1 )         ! Dummy value
       INTEGER FDIN               ! FIO system file descriptor
       INTEGER FIOGR              ! Input FIO identifiers
+      INTEGER FRM                ! AST identifier for a frame
+      INTEGER FSET               ! AST identifier for a frameset
       INTEGER INDEX              ! Loop variable
+      INTEGER INDF               ! NDF identifier
       INTEGER IPDAT              ! Pointer to input data
       INTEGER IPEN               ! Pen number
       INTEGER IPID               ! Pointer to data identifiers
-      INTEGER IPX                ! Pointer to X positions
-      INTEGER IPY                ! Pointer to Y positions
+      INTEGER JCURF              ! Frame index of Current frame of Frameset
+      INTEGER JCURP              ! Frame index of Current frame of Plot
+      INTEGER JPIXF              ! Frame index of Pixel frame of Frameset
       INTEGER MTYPE              ! Marker type 
       INTEGER NDFGR              ! Input NDF group identifier
       INTEGER NOPEN              ! Number of input lists
       INTEGER NREC               ! Number of input data records
       INTEGER NVAL               ! Number of values in input data
       INTEGER PICID              ! AGI picture identifier
+      INTEGER PLOT               ! AST identifier for Plot object
       INTEGER THICK              ! Marker pen width
       LOGICAL CLEAR              ! True if device is to be cleared
       LOGICAL NDFS               ! True if position list names in NDFs
@@ -273,6 +281,12 @@
 
 *  Startup CCDPACK.
       CALL CCD1_START( 'PLOTLIST', STATUS )
+
+*  Begin a new AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Begin a new NDF context.
+      CALL NDF_BEGIN
 
 *  Find the source of the position list names. Are they associated with
 *  NDFs or is an explicit lists of names to be given?
@@ -315,7 +329,8 @@
       CLEAR = .FALSE.
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
-*  Open the graphics device.
+*  Open the graphics device, setting the current AGI picture to the
+*  last DATA frame.
       IF( CLEAR ) THEN
          CALL AGP_ASSOC( 'DEVICE', 'WRITE', 'DATA', .FALSE., PICID,
      :                    STATUS )
@@ -323,13 +338,14 @@
          CALL AGP_ASSOC( 'DEVICE', 'UPDATE', 'DATA', .FALSE., PICID,
      :                    STATUS )
       END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Get the marker size.
       CALL PAR_GET0R( 'MSIZE', MSIZE, STATUS )
       MSIZE = ABS( MSIZE )
       CALL PGSCH( MSIZE )
 
-*  Get the market type.
+*  Get the marker type.
       CALL PAR_GET0I( 'MTYPE', MTYPE, STATUS )
 
 *  Get the marker colour.
@@ -345,7 +361,17 @@
       THICK = MAX( 1, MIN( THICK, 21 ) )
       CALL PGSLW( THICK )
 
-*  Now loop opening each position list then plotting it's positions.
+*  If we are not using NDFs construct a default AST Plot object aligned
+*  with the current AGI picture to do the plotting into.  Its Current 
+*  frame will be in the PIXEL domain.
+      IF ( .NOT. NDFS ) THEN
+         FRM = AST_FRAME( 2, 'Domain=PIXEL', STATUS )
+         FSET = AST_FRAMESET( FRM, ' ', STATUS )
+         CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
+         CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+      END IF
+
+*  Now loop opening each position list then plotting its positions.
       DO 9999 INDEX = 1, NOPEN 
 
 *  Get the name of the input list and open the file.
@@ -373,6 +399,34 @@
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
 
+*  If we are using NDFs construct an AST Plot object from the WCS 
+*  component of the NDF.
+         IF ( NDFS ) THEN
+
+*  Get the NDF identifier.
+            CALL NDG_NDFAS( NDFGR, INDEX, 'READ', INDF, STATUS )
+
+*  Get the WCS component of the NDF.
+            CALL CCD1_GTWCS( INDF, FSET, STATUS )
+
+*  Record the frame indices of the Current and Pixel domains.
+            CALL CCD1_FRDM( FSET, 'PIXEL', JPIXF, STATUS )
+            JCURF = AST_GETI( FSET, 'Current', STATUS )
+
+*  Construct a Plot object aligned with the current AGI picture.
+            CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
+
+*  Now set the Current frame of the Plot to the frame which was in the
+*  PIXEL domain of the NDF.  Although the frame indices of PLOT will
+*  be different from those of FSET, we can use the fact that the 
+*  Current frame is the same, and the relative positions are the same.
+            JCURP = AST_GETI( PLOT, 'Current', STATUS ) + JPIXF - JCURF
+            CALL AST_SETI( PLOT, 'Current', JCURP, STATUS )
+
+*  Apply default and user-selected style settings to the plot.
+            CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+         END IF
+
 *  Find out how many entries it has.
          CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
 
@@ -390,7 +444,7 @@
          END IF
 
 *  If MTYPE is less then zero then use any identifiers as the marker.
-*  Otherwise will not use identifiers
+*  Otherwise we will not use identifiers
          IF ( XYONLY ) THEN
             MTYPE = MAX( 0, MIN( 31, ABS( MTYPE ) ) )
          ELSE
@@ -399,32 +453,11 @@
             END IF
          END IF
 
-*  If mapping fails then NREC etc are not set. Abort before embarrassing
-*  array size errors.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Split off the useful bits.
-         CALL CCD1_MALL( NREC, '_DOUBLE', IPX, STATUS )
-         CALL CCD1_MALL( NREC, '_DOUBLE', IPY, STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC, NVAL, 1, %VAL( IPX ),
-     :                    STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC, NVAL, 2, %VAL( IPY ),
-     :                    STATUS )
-
 *  Draw the points.
-         IF ( STATUS .EQ. SAI__OK ) THEN 
-            IF ( MTYPE .GE. 0 ) THEN 
-               CALL CCD1_DRAWP( %VAL( IPX ), %VAL( IPY ), NREC, MTYPE,
-     :                          DUMMY, STATUS )
-            ELSE
-               CALL CCD1_DRAWP( %VAL( IPX ), %VAL( IPY ), NREC, MTYPE,
-     :                          %VAL( IPID ), STATUS )
-            END IF
-         END IF
+         CALL CCD1_DRAWA( PLOT, %VAL( IPID ), %VAL( IPDAT ), NREC, NVAL,
+     :                    MTYPE, STATUS )
 
 *  Free memory used on this pass.
-         CALL CCD1_MFREE( IPX, STATUS )
-         CALL CCD1_MFREE( IPY, STATUS )
          CALL CCD1_MFREE( IPID, STATUS )
          CALL CCD1_MFREE( IPDAT, STATUS )
 
@@ -447,6 +480,12 @@
 *  Relase group resources.
       CALL CCD1_GRDEL( FIOGR, STATUS )
       CALL CCD1_GRDEL( NDFGR, STATUS )
+
+*  Exit the NDF context.
+      CALL NDF_END( STATUS )
+
+*  Exit the AST context.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
