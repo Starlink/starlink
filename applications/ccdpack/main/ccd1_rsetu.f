@@ -4,7 +4,7 @@
      :                       DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
      :                       GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
      :                       PRESER, GOTGEN, GENVAR, GOTNAM, NDFS,
-     :                       STATUS )
+     :                       GOTSET, USESET, STATUS )
 
 *+
 *  Name:
@@ -22,7 +22,8 @@
 *                       BOUNDS, NBOUND, GOTDIR, DIRECT, GOTDEF,
 *                       DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
 *                       GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
-*                       PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, STATUS )
+*                       PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, 
+*                       GOTSET, USESET, STATUS )
 
 *  Description:
 *     The routine writes out the global parameters as set up by
@@ -99,11 +100,17 @@
 *        Set true if INLIST prompts mode is specified.
 *     NDFS = LOGICAL (Given)
 *        Flag indicating whether INLIST prompts expect NDF names or not.
+*     GOTSET = LOGICAL (Given)
+*        Set true if USESET flag is set.
+*     USESET = LOGICAL (Given)
+*        Flag indicating whether CCDPACK Set header info is used when
+*        available.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -115,6 +122,8 @@
 *        Added saturated pixel stuff.
 *     17-MAR-1995 (PDRAPER):
 *        Now write deferred charge as DBLE value.
+*     26-MAR-2001 (MBT):
+*        Added USESET value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,12 +166,14 @@
       LOGICAL GOTNOI
       LOGICAL GOTPRE
       LOGICAL GOTSAT
+      LOGICAL GOTSET
       LOGICAL GOTSPR
       LOGICAL GOTSVL
       LOGICAL NDFS
       LOGICAL PRESER
       LOGICAL SATUR
       LOGICAL SETSAT
+      LOGICAL USESET
 
 *.
 
@@ -306,6 +317,18 @@
          ELSE
             CALL CCD1_MSG( ' ',
      :      '  Position list names will be accessed directly', STATUS )
+         END IF
+      END IF
+
+*  Will CCDPACK Set headers be used.
+      IF ( GOTSET ) THEN
+         IF ( USESET ) THEN
+            CALL CCD1_MSG( ' ',
+     :'  CCDPACK Set header information will be used where available',
+     :      STATUS )
+         ELSE
+            CALL CCD1_MSG( ' ',
+     :'  CCDPACK Set header information will be ignored', STATUS )
          END IF
       END IF
 

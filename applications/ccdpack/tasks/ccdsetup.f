@@ -53,7 +53,7 @@
 *  Usage:
 *     ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
 *              direction=? deferred=? extent=? preserve=? genvar=?
-*              ndfnames=?
+*              ndfnames=? useset=?
 
 *  ADAM Parameters:
 *     ADC = _DOUBLE (Read and Write)
@@ -238,6 +238,29 @@
 *        when restoring the program parameters. Restoration files are
 *        described in the notes section.
 *        [CCDPACK_SETUP.DAT]
+*     USESET = _LOGICAL (Read)
+*        This parameter determines whether CCDPACK Set header information
+*        will be used when it is available.  Most of the CCDPACK 
+*        reduction and registration programs will look for Set header
+*        information in the .MORE.CCDPACK extension of the NDFs they
+*        are processing, and if one exists it will be used to modify
+*        the way the processing is done: broadly speaking, reduction 
+*        programs will group corresponding members of different Sets
+*        together before processing, and registration programs will
+*        make use of a CCD_SET frame for alignment between members
+*        of the same Set.
+*
+*        This header information will only be present if it has been
+*        added (to the NDF itself or to one earlier in the reduction 
+*        chain from which it was produced) by running the MAKESET
+*        program.  If it is not present, the programs will behave
+*        as if USESET was false anyway, so it is normally quite safe
+*        for USESET to be TRUE.  However, in some cases (especially
+*        if intermediate files are stored in foreign, i.e. non-NDF 
+*        data formats) it may be more efficient to set this parameter
+*        false.  You should also set it false if you wanted CCDPACK 
+*        programs to ignore existing Set information for some reason.
+*        [TRUE]
 
 *  Notes:
 *     - Pixel indices. The bounds supplied to DEBIAS should be given as
@@ -296,6 +319,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -315,6 +339,8 @@
 *     7-JUL-1997 (PDRAPER):
 *        Modified to output a NULL symbol message according to 
 *        environment (INDEF for IRAF).
+*     26-MAR-2001 (MBT):
+*        Added USESET parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -377,6 +403,7 @@
       LOGICAL GOTNOI             ! " "
       LOGICAL GOTPRE             ! " "
       LOGICAL GOTSAT             ! " "
+      LOGICAL GOTSET             ! " "
       LOGICAL GOTSPR             ! " "
       LOGICAL GOTSVL             ! " "
       LOGICAL ISARD              ! True when MASK file is a ASCII file
@@ -388,6 +415,7 @@
       LOGICAL SAVE               ! Whether or not CCD parameters are saved.
       LOGICAL SETSAT             ! True if saturated pixels are to be set to the saturation value (not BAD)
       LOGICAL SOPEN              ! Save file opened
+      LOGICAL USESET             ! Whether to use Set info
 
 *.
 
@@ -644,6 +672,15 @@
          GOTNAM = .TRUE.
       END IF
 
+*  Will we seek CCDPACK Set headers?
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GOTSET = .FALSE.
+      ELSE
+         GOTSET = .TRUE.
+      END IF
+
 *  Report setup as of now.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_MSG( ' ', '  Listing of the current '//
@@ -655,7 +692,7 @@
      :                 BOUNDS, NBOUND, GOTDIR, DIRECT, GOTDEF, DEFER,
      :                 GOTMSK, MSKNAM, GOTSAT, SATUR, GOTSPR, SETSAT,
      :                 GOTSVL, SATVAL, GOTPRE, PRESER, GOTGEN, GENVAR,
-     :                 GOTNAM, NDFS, STATUS )
+     :                 GOTNAM, NDFS, GOTSET, USESET, STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Find out if the user wants to save the setup for future restorations.
@@ -672,7 +709,8 @@
      :                   GOTBDS, BOUNDS, NBOUND, GOTDIR, DIRECT,
      :                   GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
      :                   GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
-     :                   PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, STATUS )
+     :                   PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, 
+     :                   GOTSET, USESET, STATUS )
 
 *  Where the set up is saved to.
          CALL CCD1_MSG( ' ', ' ', STATUS )

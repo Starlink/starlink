@@ -66,7 +66,7 @@
 *
 *           ADC, BIAS, BOUNDS, CAL, DEFERRED, DIRECTION, EXTENT, FLAT,
 *           GENVAR, MASK, NDFNAMES, PRESERVE, RNOISE, SATURATE,
-*           SATURATION, SETSAT
+*           SATURATION, SETSAT, USESET
 *
 *        These correspond to the parameter names used in CCDSETUP (and
 *        in the other applications which access these parameters).
@@ -126,6 +126,8 @@
 *        possibility of comparing non-existent elements.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     26-MAR-2001 (MBT):
+*        Added USESET parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,7 +153,7 @@
 
 *  Local Constants:
       INTEGER MAXNAM             ! The number of parameter names
-      PARAMETER ( MAXNAM = 18 )
+      PARAMETER ( MAXNAM = 19 )
 
 *  Local Variables:
       CHARACTER * ( 80 ) FILE    ! Name of global file
@@ -181,13 +183,14 @@
 *  Local Data:
       DATA ONAMES / 'ADC', 'BOUNDS', 'RNOISE', 'MASK', 'DIRECTION',
      :              'DEFERRED', 'EXTENT', 'PRESERVE', 'GENVAR',
-     :              'NDFNAMES', 'LOGTO', 'LOGFILE', 'FLAT', 'BIAS',
-     :              'CAL', 'SATURATE', 'SATURATION', 'SETSAT'  /
+     :              'NDFNAMES', 'USESET', 'LOGTO', 'LOGFILE', 'FLAT',
+     :              'BIAS', 'CAL', 'SATURATE', 'SATURATION', 'SETSAT' /
       DATA ANAMES / 'CCDPACK_ADC', 'CCDPACK_BOUNDS', 'CCDPACK_RNOISE',
      :              'CCDPACK_MASK', 'CCDPACK_DIRECT', 'CCDPACK_DEFER',
      :              'CCDPACK_EXTENT', 'CCDPACK_PRESER',
-     :              'CCDPACK_GENVAR', 'CCDPACK_NDFNAM',
-     :              'CCDPACK_LOGTO', 'CCDPACK_LOGFILE', 'CCDPACK_FLAT',
+     :              'CCDPACK_GENVAR', 'CCDPACK_NDFNAM', 
+     :              'CCDPACK_USESET', 'CCDPACK_LOGTO',
+     :              'CCDPACK_LOGFILE', 'CCDPACK_FLAT',
      :              'CCDPACK_BIAS', 'CCDPACK_CAL', 'CCDPACK_SATUR',
      :              'CCDPACK_SATVAL', 'CCDPACK_SETSAT' /
 

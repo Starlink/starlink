@@ -4,7 +4,7 @@
      :                      GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT,
      :                      SATUR, GOTSPR, SETSAT, GOTSVL, SATVAL,
      :                      GOTPRE, PRESER, GOTGEN, GENVAR, GOTNAM,
-     :                      NDFS, STATUS )
+     :                      NDFS, GOTSET, USESET, STATUS )
 
 *+
 *  Name:
@@ -22,7 +22,8 @@
 *                         GOTBDS, BOUNDS, NBOUND, GOTDIR, DIRECT,
 *                         GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
 *                         GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
-*                         PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, STATUS )
+*                         PRESER, GOTGEN, GENVAR, GOTNAM, NDFS,
+*                         GOTSET, USESET, STATUS )
 
 *  Description:
 *     The routine writes out parameters as set up by CCDSETUP. The
@@ -103,6 +104,10 @@
 *        Whether a value for the NDFNAMES parameter has been given.
 *     NDFS = LOGICAL (Given)
 *        Whether position lists are to be associated with NDFs or not.
+*     GOTSET = LOGICAL (Given)
+*        Whether a value for the USESET parameter has been given.
+*     USESET = LOGICAL (Given)
+*        Whether available CCDPACK Set header information will be used.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -118,6 +123,8 @@
 *     28-APR-1997 (PDRAPER):
 *        Fixed bounds output to not just repeat first bound twice
 *        when only two bounds are given.
+*     26-MAR-2001 (MBT):
+*        Added USESET paraemeter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,12 +173,14 @@
       LOGICAL GOTNOI
       LOGICAL GOTPRE
       LOGICAL GOTSAT
+      LOGICAL GOTSET
       LOGICAL GOTSPR
       LOGICAL GOTSVL
       LOGICAL NDFS
       LOGICAL PRESER
       LOGICAL SATUR
       LOGICAL SETSAT
+      LOGICAL USESET
 
 *  Local variables:
       INTEGER IAT                ! Length of/position in string
@@ -351,7 +360,16 @@
          CALL FIO_WRITE( FD, BUFFER( :IAT ), STATUS )
       END IF
 
-*  Were the logfile information will be written.
+*  Will CCDPACK Set header information be used.
+      IF ( GOTSET ) THEN
+         CALL MSG_SETL( 'SAVE_USESET', USESET )
+         CALL MSG_LOAD( ' ', ' USESET = ^SAVE_USESET'//
+     :   '  ! CCDPACK Set header information used',
+     :   BUFFER, IAT, STATUS )
+         CALL FIO_WRITE( FD, BUFFER( :IAT ), STATUS )
+      END IF
+
+*  Where the logfile information will be written.
       IF ( GOTLG2 ) THEN
          CALL MSG_SETC( 'SAVE_LOGTO', LOGTO )
          CALL MSG_LOAD( ' ' ,
@@ -368,7 +386,6 @@
      :   BUFFER, IAT, STATUS )
          CALL FIO_WRITE( FD, BUFFER( :IAT ), STATUS )
       END IF
-
 
       END
 * $Id$

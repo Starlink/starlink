@@ -21,6 +21,8 @@
 #     	 Added saturation extensions.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     26-MAR-2001 (MBT):
+#        Added USESET.
 #     {enter_further_changes_here}
 
 #-
@@ -207,6 +209,16 @@
             ppath GLOBAL DEFAULT
             default !
             association <-global.ccdpack_ndfnam
+          }
+
+         parameter useset {
+                           # Whether to use Set headers if available
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default !
+            association <-global.ccdpack_useset
           }
  
          parameter saturate {

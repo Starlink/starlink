@@ -30,6 +30,8 @@
 #     	 Added saturation stuff.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     26-MAR-2001 (MBT):
+#        Added USESET.
 #     {enter_further_changes_here}
 
 #-
@@ -213,6 +215,18 @@
             default TRUE
             prompt {Associate position lists with NDF names}
             association <->global.ccdpack_ndfnam
+            helpkey *
+          }
+
+         parameter useset {
+                           # Whether to use Set headers
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default TRUE
+            prompt "Use CCDPACK Set headers if available[ccd_global]"
+            association <->global.ccdpack_useset
             helpkey *
           }
 

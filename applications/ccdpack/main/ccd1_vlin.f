@@ -52,6 +52,7 @@
 *         SATURATE
 *         SATURATION
 *         SETSAT
+*         USESET
 *     as appropriate. These parameters should be set up so that they
 *     use the dynamic defaults setup.
 *
@@ -63,6 +64,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +74,8 @@
 *        Added latest options.
 *     28-JAN-1994 (PDRAPER):
 *        Added saturation options
+*     26-MAR-2001 (MBT):
+*        Added USESET option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -467,6 +471,34 @@
 
 *  Write out the value.
          CALL PAR_DEF0L( 'NDFNAMES', LVALUE, STATUS )
+
+*=======================================================================
+*  USESET
+*  See if Set header information is to be used if available.
+      ELSE IF ( LINE( 1 : 6 ) .EQ. 'USESET' ) THEN
+
+*  Extract value.
+         CALL CCD1_NXWRD( LINE, 7, FIRST, LAST, NOTFND, STATUS )
+         IF ( NOTFND ) THEN
+
+*  Must be an error.. report this and exit.
+            STATUS = SAI__ERROR
+            STATE = '  Invalid USESET statement. Missing value'
+            GO TO 99
+         END IF
+
+*  Try to convert the value.
+         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Must be an error.. report this and exit.
+
+            STATE = '  Invalid USESET statement. Bad value'
+            GO TO 99
+         END IF
+
+*  Write out the value.
+         CALL PAR_DEF0L( 'USESET', LVALUE, STATUS )
 
 *=======================================================================
 *  LOGTO

@@ -137,12 +137,14 @@
       LOGICAL GOTONE             ! True when have at least one value
       LOGICAL GOTPRE             ! " "
       LOGICAL GOTSAT             ! " "
+      LOGICAL GOTSET             ! " "
       LOGICAL GOTSPR             ! " "
       LOGICAL GOTSVL             ! " "
       LOGICAL NDFS               ! INLIST prompts are NDFs
       LOGICAL PRESER             ! Whether to preserve data types.
       LOGICAL SATUR              ! Look for saturated pixels
       LOGICAL SETSAT             ! Set saturated pixels to saturation value
+      LOGICAL USESET             ! Whether to use available Set header info
 *.
 
 *  Check inherited global status.
@@ -319,6 +321,16 @@
          GOTNAM = .TRUE.
       END IF
 
+*  Will Set header information be used?
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GOTSET = .FALSE.
+      ELSE
+         GOTONE = .TRUE.
+         GOTSET = .TRUE.
+      END IF
+
 *  What are the names of the GLOBAL calibration frames?  These are 
 *  stored in ADAM_PARNAME structures by NDG, so we have to go through
 *  SUBPAR to retrieve them.
@@ -368,8 +380,8 @@
      :                   GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT,
      :                   SATUR, GOTSPR, SETSAT, GOTSVL, SATVAL,
      :                   GOTPRE, PRESER, GOTGEN, GENVAR, GOTNAM,
-     :                   NDFS, GOTFLA, FLAT, GOTBIA, BIAS,
-     :                   GOTCAL, CAL, STATUS )
+     :                   NDFS, GOTSET, USESET, GOTFLA, FLAT,
+     :                   GOTBIA, BIAS, GOTCAL, CAL, STATUS )
       END IF
 
       IF ( .NOT. GOTONE ) THEN 

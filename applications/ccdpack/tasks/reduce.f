@@ -109,11 +109,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     3-JUN-1997 (PDRAPER):
 *        Original version.
+*     26-MAR-2001 (MBT):
+*        Added references to USESET parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -358,6 +361,7 @@ C         CALL SLV_OBEYW( CCDRES, 'ccdclear', CMD, ' ', STATUS )
          CALL CCD1_SETPA( 'DEFERRED', '!', STATUS )
          CALL CCD1_SETPA( 'SATURATION', '!', STATUS )
          CALL CCD1_SETPA( 'NDFNAMES', '!', STATUS )
+         CALL CCD1_SETPA( 'USESET', '!', STATUS )
          CALL CCD1_SETPA( 'RESTORE', 'FALSE', STATUS )
          CALL CCD1_SETPA( 'SAVE', 'FALSE', STATUS )
          CALL CCDSETUP( STATUS )
@@ -365,7 +369,7 @@ C         CMD = ' extent=! direction=! bounds=! adc=! rnoise=! '//
 C     : 'deferred=! saturation=! ndfnames=! restore=false save=false'
 C         CALL SLV_OBEYW( CCDRES, 'ccdsetup', CMD,
 C     :'MASK<MASK,PRESERVE<PRESERVE,GENVAR<GENVAR,NDFNAMES<NDFNAMES,'//
-C     :'SETSAT<SETSAT', STATUS )
+C     :'USESET<USESET,SETSAT<SETSAT', STATUS )
       ELSE
 
 *  No table available so need to use a setup file or get all values from
@@ -382,6 +386,7 @@ C     :'SETSAT<SETSAT', STATUS )
 *  Run CCDSETUP directly (no parameter exchange for none strings yet).
 *  Note RESTORE and RESTOREFILE are shared and will be set already!
             CALL CCD1_SETPA( 'NDFNAMES', '!', STATUS )
+            CALL CCD1_SETPA( 'USESET', '!', STATUS )
             CALL CCDSETUP( STATUS )
 C            CMD =
 C     :'restore=true ndfnames=! reset accept restorefile='//FILNAM
@@ -465,6 +470,7 @@ C            CALL SLV_OBEYW( CCDRES, 'ccdclear', CMD, ' ', STATUS )
 *  Run CCDSETUP directly (no parameter exchange for none strings yet).
 *  Note RESTORE and RESTOREFILE are shared and will be set already!
             CALL CCD1_SETPA( 'NDFNAMES', '!', STATUS )
+            CALL CCD1_SETPA( 'USESET', '!', STATUS )
             CALL CCD1_SETPA( 'RESTORE', 'FALSE', STATUS )
             IF ( EXTENT .NE. ' ' ) THEN
                CALL CCD1_SETPA( 'EXTENT', EXTENT, STATUS )

@@ -4,8 +4,8 @@
      :                      GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT,
      :                      SATUR, GOTSPR, SETSAT, GOTSVL, SATVAL,
      :                      GOTPRE, PRESER, GOTGEN, GENVAR, GOTNAM,
-     :                      NDFS, GOTFLA, FLAT, GOTBIA, BIAS,
-     :                      GOTCAL, CAL, STATUS )
+     :                      NDFS, GOTSET, USESET, GOTFLA, FLAT, GOTBIA,
+     :                      BIAS, GOTCAL, CAL, STATUS )
 
 *+
 *  Name:
@@ -24,7 +24,7 @@
 *                     GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT,
 *                     SATUR, GOTSPR, SETSAT, GOTSVL, SATVAL,
 *                     GOTPRE, PRESER, GOTGEN, GENVAR, GOTNAM,
-*                     NDFS, GOTFLA, FLAT, GOTBIA, BIAS,
+*                     NDFS, GOTSET, USESET, GOTFLA, FLAT, GOTBIA, BIAS,
 *                     GOTCAL, CAL, STATUS )
 
 *  Description:
@@ -102,6 +102,10 @@
 *        Set true if INLIST prompts mode is specified.
 *     NDFS = LOGICAL (Given)
 *        Flag indicating whether INLIST prompts expect NDF names or not.
+*     GOTSET = LOGICAL (Given)
+*        Set true if USESET is specified.
+*     USESET = LOGICAL (Given)
+*        Flag indicating whether to use Set header info if available.
 *     GOTFLA = LOGICAL (Given)
 *        Set true if a global flatfield name exists.
 *     FLAT = CHARACTER * ( * ) (Given)
@@ -119,6 +123,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +137,8 @@
 *        Added saturation extensions.
 *     17-MAR-1995 (PDRAPER):
 *        Now writes deferred charge as DBLE value.
+*     26-MAR-2001 (MBT):
+*        Added USESET parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,12 +187,14 @@
       LOGICAL GOTNOI
       LOGICAL GOTPRE
       LOGICAL GOTSAT
+      LOGICAL GOTSET
       LOGICAL GOTSPR
       LOGICAL GOTSVL
       LOGICAL NDFS
       LOGICAL PRESER
       LOGICAL SATUR
       LOGICAL SETSAT
+      LOGICAL USESET
 
 *.
 
@@ -350,6 +359,19 @@
          ELSE
             CALL CCD1_MSG( ' ',
      :      '  Position list names will be accessed directly', STATUS )
+         END IF
+      END IF
+
+*  Will we use Set header info.
+      IF ( GOTSET ) THEN
+         IF ( USESET ) THEN
+            CALL CCD1_MSG( ' ',
+     :'  CCDPACK Set header information will be used if available',
+     :      STATUS )
+         ELSE
+            CALL CCD1_MSG( ' ',
+     :'  CCDPACK Set header information will be ignored',
+     :      STATUS )
          END IF
       END IF
 
