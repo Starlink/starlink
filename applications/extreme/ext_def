@@ -13,10 +13,11 @@
 *
 *  Description:
 *     This file contains the definitions for statement functions to be
-*     used with the EXTREME package.  It currently contains the definition
-*     of the function EXT_ITOL which converts an INTEGER value to a long
-*     integer value, where a long integer is the type declared as 
-*     INTEGER * 8 in the original (pre-built) source code of a package.
+*     used with the EXTREME package.  It currently contains the 
+*     definition of the function EXT_ITOX which converts an INTEGER 
+*     value to an extended integer value, where an extended integer is 
+*     the type declared as INTEGER * 8 in the original (pre-built) 
+*     source code of a package.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -27,6 +28,6 @@
 *-
 
 *  Definition of statement function.
-      EXT_ITOL( EXT_ARGL ) = EXT_ARGL
+      EXT_ITOX( EXT_ARGI ) = EXT_ARGI
 
 * $Id$

@@ -15,9 +15,9 @@
 *     This file contains the declarations for statement functions and
 *     their arguments to be used with the EXTREME package. 
 *     It currently contains declarations required for the function 
-*     EXT_ITOL which converts an INTEGER value to a long integer value, 
-*     where a long integer is the type declared as INTEGER * 8 in the 
-*     original (pre-built) source code of a package.
+*     EXT_ITOX which converts an INTEGER value to an extended integer
+*     value, where an extended integer is the type declared as 
+*     INTEGER * 8 in the original (pre-built) source code of a package.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -28,9 +28,9 @@
 *-
 
 *  Declaration of statement function.
-      INTEGER * 8 EXT_ITOL
+      INTEGER * 8 EXT_ITOX
 
 *  Declaration of statement function dummy arguments.
-      INTEGER     EXT_ARGL
+      INTEGER     EXT_ARGI
 
 * $Id$
