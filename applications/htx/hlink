@@ -254,10 +254,11 @@
 
 #  Add an "htx.log" file to each document directory and record details of the
 #  current linking operation.
+      username=`logname 2>/dev/null || who am i | awk '{print $1}'`
       for dir in ${linkdirs}; do
          log="${dir}/htx.log"
          echo >"${log}" \
-"# Hypertext documents in this directory were last linked by user `whoami` using"
+"# Hypertext documents in this directory were last linked by user $username using"
          echo >>"${log}" \
 "# the \"${HTX_SCRIPT}\" command on `date`. The following local"
          echo >>"${log}" \
