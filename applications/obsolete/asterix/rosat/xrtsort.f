@@ -266,12 +266,12 @@
       ENDIF
 *
 *   Put SORT box into output files
-      CALL XRTSORT_WRISORT(SID, VERSION, SRT, STATUS)
+c      CALL XRTSORT_WRISORT(SID, VERSION, SRT, STATUS)
 *
 
 *   Background sort box
       IF (SRT.BCKGND) THEN
-         CALL XRTSORT_WRISORT(BID, VERSION,  BSRT, STATUS)
+c         CALL XRTSORT_WRISORT(BID, VERSION,  BSRT, STATUS)
       ENDIF
 
 *   History
