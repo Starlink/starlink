@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.31  1999/02/27 04:37:25  timj
+*     Add REMIP
+*
 *     Revision 1.30  1999/01/12 02:51:01  timj
 *     Add ADD_DBM
 *
@@ -236,6 +239,10 @@ c
       ELSE IF (NAME .EQ. 'REDUCE_NOISE') THEN
 
          CALL SURF_REDUCE_NOISE (STATUS)
+
+      ELSE IF (NAME .EQ. 'REMIP') THEN
+         
+         CALL SURF_REMIP ( STATUS )
 
       ELSE IF (NAME .EQ. 'REMSKY') THEN
 
