@@ -1,0 +1,129 @@
+      action wcsedit {
+#+
+#  Name:
+#     wcsedit.ifd
+
+#  Type of Module:
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-MAR-1999 (MBT):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {NDFs with WCS components to be modified}
+            helpkey *
+          }
+
+          parameter mode {
+             position 2 
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT DEFAULT
+             prompt {Action to perform (CURRENT,ADD,REMOVE)}
+             default CURRENT
+             helpkey *
+          }
+
+          parameter frame {
+             position 3
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT DEFAULT
+             prompt {Basis frame in WCS component}
+             helpkey *
+          }
+
+          parameter epoch {
+             type _DOUBLE
+             access READ
+             vpath PROMPT
+             ppath DYNAMIC CURRENT
+             prompt {Epoch of basis frame}
+             dynamic yes
+             helpkey *
+          }
+
+          parameter coeffs {
+             type _DOUBLE
+             access READ
+             vpath PROMPT
+             ppath CURRENT
+             prompt {Coefficients to define mapping}
+             size *
+             helpkey *
+          }
+
+          parameter domain {
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT
+             prompt {Name of new domain}
+             helpkey *
+          }
+
+          parameter maptype {
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT DEFAULT
+             prompt {Type of mapping (UNIT,LINEAR,PINCUSHION)}
+             default UNIT
+             helpkey *
+          }
+
+          parameter modified {
+             type LITERAL
+             access WRITE
+             vpath DEFAULT
+             default { }
+             outputpar
+             helpkey *
+          }
+             
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+      }
+# $Id$
