@@ -331,7 +331,7 @@
          CALL NDF_NEW( ITYPE, NDIM, LBND, UBND, PLACE, NDFT, STATUS )
 
 *  Map the temporary NDF.
-         CALL NDF_MAP( NDF, 'Data', ITYPE, 'WRITE', PNTRT, EL, STATUS )
+         CALL NDF_MAP( NDFT, 'Data', ITYPE, 'WRITE', PNTRT, EL, STATUS )
 
 *  Call the appropriate routine to copy the data array from the original
 *  to the temporary NDF, and substitute the bad values.
