@@ -128,7 +128,7 @@
       IF ( (STATUS .EQ. SAI__OK) .AND. (EXPOK.OR.EFFOK) ) THEN
 
 *    The new object
-        CALL ADI_NEW0( 'Timing', OARG, STATUS )
+        CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
 
 *    Write its member values
         IF ( EXPOK ) THEN
