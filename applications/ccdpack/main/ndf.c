@@ -693,13 +693,12 @@
       nndf = objc - 2;
 
 /* Allocate the data structure to hold the client data. */
-      ndfset = (Ndfset *) malloc( sizeof( Ndfset ) );
+      ndfset = malloc( sizeof( Ndfset ) );
       ndfset->plotarray = malloc( sizeof( Plotarray ) );
       ndfset->content.ndfs = malloc( nndf * sizeof( Ndf * ) );
       if ( tclmemok( interp, ndfset ) != TCL_OK ||
-           tclmemok( interp, ndfset->name ) != TCL_OK ||
-           tclmemok( interp, ndfset->content.ndfs ) != TCL_OK ||
-           tclmemok( interp, ndfset->plotarray ) != TCL_OK ) {
+           tclmemok( interp, ndfset->plotarray ) != TCL_OK ||
+           tclmemok( interp, ndfset->content.ndfs ) != TCL_OK ) {
          return TCL_ERROR;
       }
 
@@ -719,6 +718,9 @@
          nleng = strlen( ndfsetname );
       }
       ndfset->name = malloc( nleng );
+      if ( tclmemok( interp, ndfset->name ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
       strcpy( ndfset->name, ndfsetname );
 
 /* Set the ndfset's WCS frameset, arbitrarily, to that of the first of
