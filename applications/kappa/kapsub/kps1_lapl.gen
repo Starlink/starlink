@@ -1,0 +1,347 @@
+      SUBROUTINE KPS1_LAPL<T>( VAR, BAD, DIM1, DIM2, IN, N, OUT, NBAD,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS1_LAPL<T>
+
+*  Purpose:
+*     Subtracts Laplacian of input 2-d image to form output
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_LAPL<T>( VAR, BAD, DIM1, DIM2, IN, N, OUT, NBAD, STATUS )
+
+*  Description:
+*     This routine subtracts N times the Laplacian of the input
+*     array from that array to create the output array. This can be
+*     thought of as a convolution by
+*  
+*                             -N   -N   -N
+*                             -N   +8N  -N
+*                             -N   -N   -N
+*
+*     where N is the integer number N. The convolution acts as
+*     a unidirectional edge detector, and for a flat areas in the 
+*     input array, the convolution sums to zero. 
+
+*  Arguments:
+*     VAR = LOGICAL (Given)
+*        Supply as .TRUE., if the input and output arrays hold variance
+*        values, in which case the weights are squared.
+*     BAD = LOGICAL (Given)
+*        Supply as .TRUE., if the input may contain bad pixels.
+*     DIM1 = INTEGER (Given)
+*         The first dimension of the 2-d arrays.
+*     DIM2 = INTEGER (Given)
+*         The second dimension of the 2-d arrays.
+*     IN( DIM1, DIM2 ) = <TYPE> (Given)
+*         The input array
+*     N = INTEGER (Given)
+*         The number of times the Laplacian is subtracted
+*     OUT( DIM1, DIM2 ) = <TYPE> (Returned)
+*         The output compressed data array
+*     NBAD = INTEGER (Returned)
+*         The number of bad pixels in the returned OUT array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-NOV-2001 (DSB):
+*        Original version. A modified form of LAPLSB by Mark McCaughrean
+*        and Malcolm Currie.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
+
+*  Arguments Given:
+      LOGICAL VAR
+      LOGICAL BAD
+      INTEGER DIM1
+      INTEGER DIM2
+      <TYPE> IN( DIM1, DIM2 )      
+      INTEGER N
+
+*  Arguments Returned:
+      <TYPE> OUT( DIM1, DIM2 )      
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*    Local constants :
+      INTEGER BOX                ! Neighbourhood box size
+      PARAMETER ( BOX  =  3 )
+
+      INTEGER HBOX               ! Half box size
+      PARAMETER ( HBOX = BOX/2 )
+
+*  Local Variables:
+      <TYPE> SUM                 ! Integration sum
+      INTEGER CENWHT             ! Normalisation weighting of central pixel
+      INTEGER I                  ! General counter variable
+      INTEGER II                 ! General counter variable
+      INTEGER IL                 ! Left extent of the mask
+      INTEGER IR                 ! Right extent of the mask
+      INTEGER J                  ! General counter variable
+      INTEGER JB                 ! Bottom extent of the mask
+      INTEGER JJ                 ! General counter variable
+      INTEGER JT                 ! Top extent of the mask
+      INTEGER MASK( -HBOX:HBOX, -HBOX:HBOX ) ! Running mask
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+*.
+
+*  Initialize
+      NBAD = 0
+
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Do the convolution, including checks for bad pixels.
+*  ====================================================
+      IF( BAD ) THEN 
+
+*  Perform the Laplacian convolution - loop round all lines
+         DO  JJ  =  1 , DIM2
+
+*  Define top and bottom mask positions
+            JT = MIN( DIM2, JJ + HBOX ) - JJ
+            JB = MAX( 1, JJ - HBOX ) - JJ
+
+*  Loop round all pixels in current line
+            DO  II  =  1, DIM1
+
+*  Define left and right mask positions
+               IR = MIN( DIM1, II + HBOX ) - II
+               IL = MAX( 1, II - HBOX ) - II
+
+               CENWHT  =  0
+
+*  Special case for first column - need to assign initial mask values
+               IF ( II .EQ. 1 ) THEN
+
+*  For all mask positions
+                  DO  J = JB, JT
+                     DO  I = IL, IR
+
+*  Test for invalid pixels
+                        IF ( IN( II+I, JJ+J ) .EQ. VAL__BAD<T> ) THEN
+                           MASK( I, J )  =  0
+                        ELSE
+                           MASK( I, J )  =  -N
+                        END IF
+
+*  Sum central weights less central pixel
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           CENWHT  =  CENWHT - MASK( I, J )
+                        END IF
+                     END DO
+                  END DO
+               ELSE
+
+*  Slide mask one column
+                  DO  J = JB, JT
+                     DO  I = IL, MAX( IR-1, 0 )
+                        MASK( I, J ) = MASK( I+1, J )
+
+*  Sum central weights less central pixel
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           CENWHT  =  CENWHT - MASK( I, J )
+                        END IF
+                     END DO
+                  END DO
+
+*  Read in next right-hand pixel, if there is one to be read, i.e. not at 
+*  right-hand edge
+                  IF ( II + HBOX .LE. DIM1 ) THEN
+
+*  Set mask in all of its lines and revise central weight
+                     DO  J  = JB, JT
+                        IF ( IN( IR+II, J+JJ ) .EQ. VAL__BAD<T> ) THEN
+                           MASK( IR, J )  =  0
+                        ELSE
+                           MASK( IR, J )  =  -N
+                           CENWHT  =  CENWHT - MASK( IR, J )
+                        END IF
+                     END DO
+                  END IF
+
+*  End of first-column condition
+               END IF
+
+*  Central pixel must be valid
+               IF ( IN( II, JJ ) .EQ. VAL__BAD<T> .OR.
+     :              CENWHT .EQ. 0 ) THEN
+
+*  Surrounding pixels are invalid
+                  OUT( II, JJ )  =  VAL__BAD<T>
+                  NBAD = NBAD + 1
+
+               ELSE
+
+*  Compute approximation to the Laplacian, squaring the weights if
+*  processing variances.
+                  SUM =  0.0
+                  IF( VAR ) THEN 
+	   
+                     DO  J = JB, JT
+                        DO  I = IL, IR
+                           IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                              SUM  =  SUM + IN( II+I, JJ+J ) * 
+     :                                NUM_ITO<T>( MASK( I, J )**2 )
+                           ELSE
+
+*  Use central weighting equals minus sum weights of neighbouring pixels
+                              SUM =  SUM + IN( II, JJ ) * 
+     :                                     NUM_ITO<T>( CENWHT**2 )
+                           END IF
+                        END DO
+                     END DO
+          
+                  ELSE
+          
+                     DO  J = JB, JT
+                        DO  I = IL, IR
+                           IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                              SUM  =  SUM + IN( II+I, JJ+J ) * 
+     :                                NUM_ITO<T>( MASK( I, J ) )
+                           ELSE
+                              SUM =  SUM + IN( II, JJ ) * 
+     :                                     NUM_ITO<T>( CENWHT )
+                           END IF
+                        END DO
+                     END DO
+          
+                  END IF
+          
+                  OUT( II, JJ )  =  SUM 
+
+               END IF
+                     
+            END DO
+         END DO
+
+*  Do the convolution, assuming no bad pixels.
+*  ===========================================
+      ELSE
+
+*  Perform the Laplacian convolution - loop round all lines
+         DO  JJ  =  1 , DIM2
+
+*  Define top and bottom mask positions
+            JT = MIN( DIM2, JJ + HBOX ) - JJ
+            JB = MAX( 1, JJ - HBOX ) - JJ
+
+*  Loop round all pixels in current line
+            DO  II  =  1, DIM1
+
+*  Define left and right mask positions
+               IR = MIN( DIM1, II + HBOX ) - II
+               IL = MAX( 1, II - HBOX ) - II
+
+               CENWHT  =  0
+
+*  Special case for first column - need to assign initial mask values
+               IF ( II .EQ. 1 ) THEN
+
+*  For all mask positions
+                  DO  J = JB, JT
+                     DO  I = IL, IR
+
+                        MASK( I, J )  =  -N
+
+*  Sum central weights less central pixel
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           CENWHT  =  CENWHT + N
+                        END IF
+                     END DO
+                  END DO
+               ELSE
+
+*  Slide mask one column
+                  DO  J = JB, JT
+                     DO  I = IL, MAX( IR-1, 0 )
+                        MASK( I, J ) = MASK( I+1, J )
+
+*  Sum central weights less central pixel
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           CENWHT  =  CENWHT - MASK( I, J )
+                        END IF
+                     END DO
+                  END DO
+
+*  Read in next right-hand pixel, if there is one to be read, i.e. not at 
+*  right-hand edge
+                  IF ( II + HBOX .LE. DIM1 ) THEN
+
+*  Set mask in all of its lines and revise central weight
+                     DO  J  = JB, JT
+                        MASK( IR, J )  =  -N
+                        CENWHT  =  CENWHT + N
+                     END DO
+                  END IF
+
+*  End of first-column condition
+               END IF
+
+*  Compute approximation to the Laplacian, squaring the weights if
+*  processing variances.
+               SUM =  0.0
+               IF( VAR ) THEN 
+	   
+                  DO  J = JB, JT
+                     DO  I = IL, IR
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           SUM  =  SUM + IN( II+I, JJ+J ) * 
+     :                             NUM_ITO<T>( MASK( I, J )**2 )
+                        ELSE
+
+*  Use central weighting equals minus sum weights of neighbouring pixels
+                           SUM =  SUM + IN( II, JJ ) * 
+     :                                  NUM_ITO<T>( CENWHT**2 )
+                        END IF
+                     END DO
+                  END DO
+       
+               ELSE
+       
+                  DO  J = JB, JT
+                     DO  I = IL, IR
+                        IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
+                           SUM  =  SUM + IN( II+I, JJ+J ) * 
+     :                             NUM_ITO<T>( MASK( I, J ) )
+                        ELSE
+                           SUM =  SUM + IN( II, JJ ) * 
+     :                                  NUM_ITO<T>( CENWHT )
+                        END IF
+                     END DO
+                  END DO
+       
+               END IF
+       
+               OUT( II, JJ )  =  SUM 
+
+            END DO
+         END DO
+
+      END IF
+
+      END
