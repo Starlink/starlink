@@ -596,6 +596,8 @@ given in <ref id=table.entities/>.
 <row><entry><code>&amp;deg;</code><entry>&deg<entry>degrees symbol
 <row><entry><code>&amp;tilde;</code><entry>&tilde<entry>tilde
 <row><entry><code>&amp;underscore;</code><entry>&underscore<entry>underscore
+<row><entry><code>&amp;backslash;</code><entry>&backslash<entry>backslash
+<row><entry><code>&amp;verticalbar;</code><entry>&verticalbar<entry>vertical bar
 <row><entry><code>&amp;dot;</code><entry>&dot<entry>non-sentence-ending period
 <row><entry><code>&amp;latex;</code><entry>&latex<entry>&latex logo
 <row><entry><code>&amp;tex;</code><entry>&tex<entry>&tex logo
@@ -610,7 +612,8 @@ are `short references' declared for them: you can type `<code/_>'
 instead of <code/&amp;underscore;> (unsurprisingly), `<code/&ddash>' for
 a punctuation dash (this is currently set to <code/&amp;endash;>, but
 could conceivably change to <code/&amp;emdash;> if we make a
-typographic decision on that score), and `<code/&tilde>' instead of
+typographic decision on that score), `<code/&quot>' instead of
+<code/&amp;quot;> and `<code/&tilde>' instead of
 <code/&amp;nbsp;>.  These short references work within paragraphs, but
 not within maths or verbatim elements within them.
 
