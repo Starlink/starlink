@@ -32,7 +32,7 @@ if test -f "libimfort.a"; then
   rm libimfort.a
 fi
 STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a], 
-        [_pc_linux_gnu _sun_solaris _dec_osf NONE])
+        [_pc_linux_gnu _sun_solaris _dec_osf _mips NONE])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
