@@ -192,7 +192,7 @@
 
       INTEGER			NCOMP			! No object components
       INTEGER 			NPAR			! No of parameters in pmodel
-      INTEGER 			I,J,N
+      INTEGER 			J,N
 
       LOGICAL			FROZEN			! Frozen in menu file
       LOGICAL			SKIP			! Skip next line read?

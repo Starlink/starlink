@@ -52,7 +52,6 @@
 *    Local constants :
 *    Local variables :
         REAL OSIZE             ! (regular) bin size
-        REAL DPOS              ! current donor bin position
         REAL IBOT              ! donor bin lower boundary
         REAL ITOP              ! donor bin upper boundary
         REAL ISIZE             ! donor bin size
@@ -64,8 +63,7 @@
         INTEGER OIXL           ! lower receptor bin index
         INTEGER OIXH           ! upper receptor bin index
         INTEGER I,J            ! loop indices
-*    Local data :
-*-----------------------------------------------------------------
+*-
 
 * Status check
         IF(STATUS.NE.SAI__OK) RETURN
@@ -151,18 +149,18 @@
 * Set status bad if output array range is not fully covered by input
         IF(OLBOUND(1).LT.IBOUND(1)) THEN
            IF(OMAX.LE.IBOUND(INBIN+1)) THEN
+              STATUS=USER__001
               CALL ERR_REP('BAD_BOT','Output range not covered at '//
      :        'bottom',STATUS)
-              STATUS=USER__001
            ELSE
+              STATUS=USER__003
               CALL ERR_REP('BAD_BOTH','Output range no covered at '//
      :        'bottom or top',STATUS)
-              STATUS=USER__003
            ENDIF
         ELSE IF(OMAX.GT.IBOUND(INBIN+1)) THEN
+           STATUS=USER__002
            CALL ERR_REP('BAD_TOP','Output range not covered at top'
      :     ,STATUS)
-           STATUS=USER__002
         ENDIF
 
 * Exit

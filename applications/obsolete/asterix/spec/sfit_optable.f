@@ -52,7 +52,7 @@
 *
       CHARACTER*27          OPSTRING      ! Parameter state
       CHARACTER*79          OTXT          ! Output text buffer
-      CHARACTER*10          PFMT	  ! Format to use for printing
+      CHARACTER*12          PFMT	  ! Format to use for printing
 
       INTEGER               J		  ! Parameter index
       INTEGER               NC		  ! Model component number
@@ -77,9 +77,8 @@
       DO J = 1, NPAR
 
 *      Format to use for value printing
-        IF ( (INDEX(MODEL.PARNAME(J),'RA').GT.0) .OR.
-     :       (INDEX(MODEL.PARNAME(J),'DEC').GT.0) ) THEN
-          PFMT = '2X,F8.4,2X'
+        IF ( MODEL.FORMAT(J) .GT. ' ' ) THEN
+          PFMT = MODEL.FORMAT(J)
         ELSE
           PFMT = '1PG12.5'
         END IF
