@@ -26,14 +26,22 @@ access to AMS.
 
 The AMS library routines are:
 
-ams_astint() ams_astmsg() ams_exit() ams_extint() ams_getreply() ams_init()
-ams_path() ams_plookup() ams_receive() ams_reply() ams_send()
+ ams_astint() ams_astmsg() ams_exit() ams_extint() ams_getreply()
+ ams_init() ams_path() ams_plookup() ams_receive() ams_reply()
+ ams_send()
 
 The wrapper routines are:
 
-adam_getreply() adam_receive() adam_reply() adam_send() adam_start()
-adam_path() adam_exit() adam_strtocont() adam_strtostatus()
-adam_appendstatus()
+ adam_getreply() adam_receive() adam_reply() adam_send() adam_start()
+ adam_path() adam_exit() adam_strtocont() adam_strtostatus()
+ adam_appendstatus()
+
+Note that the C interface is retained except that it is not necessary
+to specify the values of C<message_name_s> or C<message_value_s>
+since these are set by perl to a suitable size to receive
+the message. Routines affected are
+
+ ams_getreply() ams_recieve()
 
 =head1 Function Descriptions
 
@@ -117,7 +125,7 @@ bootstrap Starlink::ADAM $VERSION;
 
 =item adam_exit()
 
-Exit the adam messaging system.
+Exit the adam messaging system. This simply calls C<ams_exit()>.
 
 =cut 
 
@@ -313,7 +321,7 @@ sub adam_getreply {
   $status = &SAI__OK;
 
   # Run the ams command
-  ams_getreply($timeout, $path, $messid, &MSG_NAME_LEN, &MSG_VAL_LEN,
+  ams_getreply($timeout, $path, $messid,
 	      $inmsg_status, $inmsg_context, $inmsg_name, $inmsg_length,
 	      $inmsg_value, $status);
 
@@ -384,7 +392,7 @@ sub adam_receive {
   $status = &SAI__OK;
 
   # Receive an adam message
-  ams_receive(&MESSYS__INFINITE, &MSG_NAME_LEN, &MSG_VAL_LEN,
+  ams_receive(&MESSYS__INFINITE,
 	     $inmsg_status, $inmsg_context, $inmsg_name, $inmsg_length,
 	     $inmsg_value, $path, $messid, $status);
 
