@@ -1198,6 +1198,7 @@
                                "\n    bbox frame",
                                "\n    bounds", 
                                "\n    destroy",
+                               "\n    display device loval hival frame options",
                                "\n    fitshead ?key? ...",
                                "\n    frameatt attname ?frame?",
                                "\n    mapped ?setmap?",
