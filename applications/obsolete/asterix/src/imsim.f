@@ -624,6 +624,9 @@
         CALL USI_ANNUL( 'MODEL', STATUS )
       END IF
 
+*    History
+      CALL HSI_ADD( OFID, VERSION, STATUS )
+
 *    Tidy up
  99   CALL PSF_CLOSE( STATUS )
       CALL AST_CLOSE()
