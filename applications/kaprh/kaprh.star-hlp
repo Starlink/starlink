@@ -2765,6 +2765,75 @@ MJC: Malcolm J. Currie (STARLINK)
               output array. So output pixels can be averaged or 
               summed'
   default     YES
+1 OVCLEAR
+Clears an image-display overlay.
+
+Usage:
+
+   ovclear [device] [current]
+
+Description:
+
+   This application clears an overlay device, but without purging
+   the graphics-database entries for the device.  Optionally, only
+   the current picture is cleared.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CURRENT
+CURRENT = _LOGICAL (Read)
+   If TRUE, then only the current picture is cleared. [FALSE]
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The graphics device to be cleared.  It must be in GNS classes
+   IMAGE_OVERLAY or WINDOW_OVERLAY. [Current image-display-overlay
+   device]
+2 Examples
+ovclear
+   Clears the current image-overlay device.
+
+ovclear current
+   Clears the current picture on the current image-overlay device.
+
+ovclear xoverlay
+   Clears the xoverlay device.
+2 Related_Applications
+   KAPPA: GDCLEAR, OVSET.
+2 Authors
+MJC: Malcolm J. Currie  (STARLINK)
+2 History
+ 1992 November 30 (MJC):
+    Original version.
+1 OVSET
+Selects a current image-display overlay.
+
+Usage:
+
+   ovset device
+
+Description:
+
+   This application selects a current image-display overlay. This
+   device will be used for all applications requiring an
+   image-display overlay until changed explicitly.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The image-display overlay to become the current image-display
+   overlay device.  The device must be in GNS categories
+   IMAGE_OVERLAY or WINDOW_OVERLAY.
+2 Examples
+ovset xov
+   Makes the xov device the current image-display overlay.
+2 Authors
+MJC: Malcolm J. Currie  (STARLINK)
+2 History
+ 1991 June 27 (MJC):
+    Original version.
+
+ 1992 June 16 (MJC):
+    Made to work with WINDOW_OVERLAY class.  The restriction on the
+    number of colour indices has therefore been been relaxed.
 1 QUILT
     Generates a mosaic from equally sized 2-d data arrays,
     optionally specified from an ASCII file
