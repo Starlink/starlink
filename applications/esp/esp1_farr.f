@@ -99,7 +99,6 @@
       character *(80) buffer    ! Character string input from file
       integer nchar             ! number of characters read into buffer
       integer row, col, i       ! loop counters
-      integer j
       integer indexs(maxcol)    ! start and end of a word in the buffer
       integer indexe(maxcol)
       character*80 words(maxcol)! list of words obtained from file

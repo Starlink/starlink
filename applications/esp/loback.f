@@ -2828,13 +2828,9 @@
       CHARACTER *(80) LINE            ! FIO line output length
       CHARACTER *(MSG__SZMSG) NAME    ! NDF name
       CHARACTER *(80) TEXT            ! Temporary storage
-      CHARACTER *(80) XSTR            ! X co-ordinate string
-      CHARACTER *(80) YSTR            ! Y co-ordinate string
       INTEGER I                       ! Temporary variable
       INTEGER J                       ! Temporary variable
       INTEGER NCHAR                   ! Length of output string
-      INTEGER XLEN                    ! Length of formatted X co-ordinate
-      INTEGER YLEN                    ! Length of formatted Y co-ordinate
 
 *.
 

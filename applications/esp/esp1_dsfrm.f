@@ -72,11 +72,9 @@
       DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
       INTEGER CFRM               ! Frame to be described
       INTEGER FRMNAX             ! Frame dimensionality
-      INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Current length of a string
       INTEGER IAXIS              ! Loop counter for axes
       INTEGER IBASE              ! Index of Base Frame in FrameSet
-      INTEGER ICURR              ! Index of Current Frame in FrameSet
       INTEGER IGRID              ! Index of GRID Frame in FrameSet
       INTEGER NDIM               ! Number of dimensions
       LOGICAL GOTFS              ! Was a FrameSet supplied?

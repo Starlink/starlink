@@ -144,7 +144,6 @@
                                       ! calculation of mode
       integer point1(10)              ! Pointer to NDF array to be used
       integer sfact                   ! Gaussian filter radius requested
-      integer temp                    ! Temporary storage
       integer type                    ! Value indicating whether the final
                                       ! estimate for mode given is to be from:
                                       ! 0 - get best available

@@ -61,7 +61,6 @@
       INTEGER STATUS
 
 *  Local variables:
-      INTEGER I                       ! Loop index
       INTEGER IPERM(2)                ! Indices for PermMap
       INTEGER IWCS                    ! AST pointer to WCS component of NDF
       INTEGER JGRID                   ! Index of GRID-domain frame in frameset
@@ -80,10 +79,8 @@
       DOUBLE PRECISION ARCSEC         ! Size of an arcsecond in radians
       DOUBLE PRECISION CENX           ! X position of NDF centre in Sky coords
       DOUBLE PRECISION CENY           ! Y position of NDF centre in Sky coords
-      DOUBLE PRECISION DISTX          ! X dimension of transformed box in radian
       DOUBLE PRECISION DISTY          ! Y dimension of transformed box in radian
       DOUBLE PRECISION PI             ! Pi
-      DOUBLE PRECISION SHAPE          ! Aspect ratio of transformed box
       DOUBLE PRECISION TRANX(2)       ! X coords of transformed points
       DOUBLE PRECISION TRANY(2)       ! Y coords of transformed points
       DOUBLE PRECISION UNITX(2)       ! X coords of untransformed points

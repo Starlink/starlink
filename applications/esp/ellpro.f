@@ -4405,7 +4405,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:      
-      CHARACTER *(256) STRINP(2)      ! String array for character input
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL ANGCON                  ! Position angle convention
@@ -4443,7 +4442,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       REAL FRACT                      ! Fraction of the ellipse points that
                                       ! must be available for the profile 
                                       ! at a given radius to be kept
-      REAL INP(2)                     ! Value input by the user
       REAL LIM1                       ! Maximum permitted count increase factor
       REAL LIM2                       ! Lower limit on ellipse count
       REAL LIM3                       ! Radius value beyond which the

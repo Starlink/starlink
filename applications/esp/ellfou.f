@@ -4245,7 +4245,6 @@
 
 *  Local Variables:      
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
-      CHARACTER *(256) STRINP(2)      ! String array for character input
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL ANGCON                  ! Position angle convention
       LOGICAL AUTOL                   ! Is an estimate of the galaxy centre
@@ -4276,7 +4275,6 @@
       REAL BACK                       ! Background count value
       REAL FINE                       ! Determines how closely spaced the
                                       ! chosen radii values are
-      REAL INP(2)                     ! Value input by the user
       REAL LIM1                       ! Maximum permitted count increase factor
       REAL LIM2                       ! Lower limit on ellipse count
       REAL PSIZE                      ! Size of the image pixels in arc sec

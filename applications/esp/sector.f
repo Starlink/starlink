@@ -51,6 +51,8 @@
 *            [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
  
 *  ADAM Parameters:
+*     ABOBEL = _REAL (Write)
+*        Central brightness of the object relative to sky.
 *     AGAIN = _LOGICAL(Read)
 *        Should another profile be attempted?
 *     ANGWID = _REAL (Read)
@@ -93,6 +95,8 @@
 *        It should be regarded as an `internal' parameter, and may disappear
 *        or change without notice.  If present, the value of this parameter
 *        overrides any value specified by the ORIGIN parameter.
+*     OCOUNT = _REAL (Write)
+*        Count value for the object centre chosen.
 *     OUT = _CHAR (Read)
 *        File name for the output text file containing the 
 *        profile data.
@@ -120,11 +124,19 @@
 *        original image?
 *     SIGMA = _REAL (Read)
 *        The standard deviation of the background value. Units counts. 
+*     SLENE = _REAL (Write)
+*        The scale length of the object (elliptical model).
+*     SLENS = _REAL (Write)
+*        The scale length of the object (spiral model).
 *     SURF = _LOGICAL (Read)
 *        Are the pixel values to be expressed as surface brightness. 
 *        If true then the output is surface brightness, otherwise the
 *        display shows brightness in terms of sigma above sky. 
 *        i.e. (I-Back)/SIGMA
+*     XCO = _REAL (Write)
+*        The X co-ordinate of the object the user chose.
+*     YCO = _REAL (Write)
+*        The Y co-ordinate of the object the user chose.
 *     ZEROP = _REAL (Read)
 *        Zero point of the scale for surface brightness plots. Units 
 *        magnitudes per square arc second.

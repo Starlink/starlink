@@ -52,8 +52,6 @@
       INTEGER STATUS
 
 *  Local variables:
-      DOUBLE PRECISION XC             ! X coord in Current frame
-      DOUBLE PRECISION YC             ! Y coord in Current frame
       INTEGER FRAME                   ! AST pointer to Current frame
 
 *.

@@ -99,17 +99,13 @@
 *  Local Variables:
       CHARACTER ATT*10           ! AST attribute name
       CHARACTER DOM*30           ! Domain of current frame
-      CHARACTER DPOS*255         ! Default position string
       CHARACTER FMT*100          ! List of axis format strings
       CHARACTER LAB( NDF__MXDIM )*30 ! Axis labels
       CHARACTER NEXT*1           ! Next character to be read
-      CHARACTER OLDFMT( NDF__MXDIM )*100 ! Original Format strings
       CHARACTER POS*255          ! Position string
       CHARACTER SYM( NDF__MXDIM )*10 ! Axis symbols
-      DOUBLE PRECISION TEST      ! Result of unformatting default string
       INTEGER BASFRM             ! Pointer to the Base Frame
       INTEGER CURFRM             ! Pointer to the Current Frame
-      INTEGER DIGS               ! Frame Digits value to be used
       INTEGER F                  ! Index of first non-blank character
       INTEGER FIAT               ! No. of characters in string FMT
       INTEGER I                  ! Axis index
@@ -121,7 +117,6 @@
       INTEGER NBAXES             ! No. of axes in base Frame
       INTEGER NC                 ! No. of characters read from string
       INTEGER NCAXES             ! No. of axes in current Frame
-      INTEGER OLDDIG             ! Original Frame Digits value
       LOGICAL GOOD               ! Is position good?
       LOGICAL LOOP               ! Get a new parameter value?
       LOGICAL SYMOK              ! Are all axis symbols non-blank?

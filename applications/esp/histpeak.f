@@ -49,6 +49,8 @@
 *     HISTPEAK IN USE SFACT DEVICE [ARDFIL] 
 
 *  ADAM Parameters:
+*     ADEV = _DOUBLE (Write)
+*        The absolute deviation of the pixel values distribution
 *     ARDFIL = _CHAR (Read)
 *        The name of the ARD file containing a description of
 *        the parts of the image to be ignored.
@@ -92,6 +94,8 @@
 *     MODES = _DOUBLE (Write)
 *        The modal value of the smoothed histogram calculated
 *        when using only pixels from the parts of the image requested.
+*     NUMBER = _DOUBLE (Write)
+*        The number of pixels actually used.
 *     PEAKV = _DOUBLE (Write)
 *        The peak number of pixels found with a given count value
 *        in the unsmoothed count versus occurence histogram.
@@ -129,7 +133,9 @@
 *        selected. 
 *           USE='W' All the image pixels are used.
 *           USE='A' The image pixels are defined using an ARD file 
-
+*     VARI = _DOUBLE (Write)
+*        Variance of the pixel values distribution.
+*
 *  Examples:
 *     histpeak in=galaxy sfact=3 use=w device=ikon1
 *        
