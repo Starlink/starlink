@@ -35,11 +35,14 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 	(process-matching-children 'caption)))
 
 (element caption
-  (let ((caption-details (get-caption-details (parent (current-node)))))
+  (let ((caption-details (get-caption-details (parent (current-node))))
+	;; optional argument of caption command mustn't be more than
+	;; a para.
+	(firstpara (node-list-first (children (current-node)))))
     (make command name: "caption"
-	  parameters: '("?")	;empty [] to suppress LOF entry
+	  parameters: (list (string-append "?" (data firstpara)))
 	  (literal (string-append (car caption-details) ": "))
-	  (process-matching-children 'caption))))
+	  (process-children))))
 
 (element figurecontent
   (let* ((image-ents (attribute-string (normalize "image")
@@ -138,14 +141,6 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
       (literal "[ ")
       (process-children)
       (literal " ]"))))
-
-(element note
-  (make command name: "footnote"
-	(process-children)))
-;; do nothing with the notecontents element -- the NOTE element produces
-;; footnotes rather than endnotes
-(element notecontents
-  (empty-sosofo))
 
 (element draftnote
   (make command name: "textbf"
