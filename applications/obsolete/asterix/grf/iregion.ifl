@@ -49,6 +49,21 @@ interface IREGION
     prompt 'Y width'
     help 'Vertical width of box in axis units'
   endparameter
+  parameter ANGLE
+    type '_REAL'
+    prompt 'Angle to x-axis'
+    help 'Anticlockwise'
+  endparameter
+  parameter LENGTH
+    type '_REAL'
+    prompt 'Length of slice'
+    help 'In world (axis) units'
+  endparameter
+  parameter WIDTH
+    type '_REAL'
+    prompt 'Width of slice'
+    help 'In world (axis) units'
+  endparameter
   parameter LEV
     type '_REAL'
     prompt 'Reference level'
