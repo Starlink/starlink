@@ -157,6 +157,7 @@
 *  Initialise the indentation and last flag.
       SINDEN = MAX( 0, INDENT - STEP )
       LAST = .FALSE.
+      PRIM = .FALSE.
 
 *  Find the length of the output line buffer.
       LNSIZE = CHR_SIZE( LINE )
