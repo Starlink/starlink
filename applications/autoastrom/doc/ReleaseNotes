@@ -1,5 +1,22 @@
 <!-- $Id$ -->
 
+<subsect id="release-0.5-11" export="export">
+  <subhead>
+    <title>Versions 0.5-9, 0.5-10, 0.5-11</title>
+  </subhead>
+
+  <p>Assorted bugfixes.  Configuration and building should now be more
+    stable.  Modifications for GAIA toolbox.</p>
+
+  <p>I expect this to be the last 0.5 release.  Starting with the next
+    release, the build process should be a lot more sane, and I hope
+    therefore more robust.</p>
+
+  <p>There is only one tiny change between 0.5-10 and 0.5-11, which
+    affects only some marginal conversions between decimal and
+    sexagesimal coordinates.</p>
+</subsect>
+
 <subsect id="release-0.5.8" export="export">
   <subhead><title>Version 0.5-8</title></subhead>
 
