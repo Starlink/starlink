@@ -102,17 +102,19 @@ sgmlexamples: $(EXAMPLES:=.sgml)
 
 # Tar up the current directory, folding in the version number stored
 # in file ../VERSION
-sc13-examples.tar: configure
+sc13-examples.tar: sc13.$(VERSION)-examples.tar
+	ln -s $< $@
+
+sc13.$(VERSION)-examples.tar: configure
 	rm -f $@
-	DIRNAME=sc13.$(VERSION)-examples; \
+	DIRNAME=$(@:.tar=); \
 		if test -d $$DIRNAME; then rm $$DIRNAME/*; else mkdir $$DIRNAME; fi; \
 		ln ../VERSION $$DIRNAME/VERSION; \
 		for f in Makefile.in configure $(EXAMPLES) gausssine.dat; \
 			do ln $$f $$DIRNAME/$$f; \
 		done; \
 		sed s/%%VERSION%%/$(VERSION)/ README.in >$$DIRNAME/README; \
-		tar cf $$DIRNAME.tar $$DIRNAME; \
-		ln $$DIRNAME.tar $@; \
+		tar cf $@ $$DIRNAME; \
 		rm -Rf $$DIRNAME
 
 %.gz: %
@@ -127,6 +129,7 @@ tidy:
 
 clean: tidy
 	rm -f *.o $(EXECS) $(EXAMPLES:=.sgml)
+	rm -f sc13-examples.tar sc13.$(VERSION)-examples.tar
 
 distclean: clean
 	rm -f Makefile bytesex.h config.cache config.log config.status
