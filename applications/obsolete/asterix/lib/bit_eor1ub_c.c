@@ -1,34 +1,98 @@
-/*+
- *  Name:
- *     bit_eor1ub_c.c
- *
- *  Purpose:
- *     Returns the bit-wise EXCLUSIVE OR of every element of the unsigned byte
- *     array ARRAY with value MASK.
- *
- *  Language:
- *
- *     Starlink ANSI C
- *
- *  Invokation :
- *
- *     CALL BIT_EOR1UB( N, ARRAY, MASK, STATUS )
- *
- *  Description:
- *
- *  Authors:
- *
- *     David J. Allan (ROSAT,University of Birmingham)
- *
- *  History:
- *
- *     24-Feb-1994 (DJA):
- *        Original version.
- *- */
+/*
+*+
+*  Name:
+*     BIT_EOR1UB
 
-#include "sae_par.h"			/* Starlink standard constants */
-#include "f77.h"			/* Fortran <-> C interfacing */
+*  Purpose:
+*     Returns the bit-wise EOR of array of UNSIGNED BYTE with mask value
 
+*  Language:
+*     Starlink ANSI C
+
+*  Invocation:
+*     CALL BIT_EOR1UB( N, ARRAY, MASK, STATUS )
+
+*  Description:
+*     Provides portable bit-wise EOR of unsigned bytes with a mask.
+
+*  Arguments:
+*     N = INTEGER (given)
+*        Number of values to mask
+*     ARRAY = BYTE[] (given and returned)
+*        The array to masked
+*     MASK = BYTE (given)
+*        The mask value
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  {machine}-specific features used:
+*     {routine_machine_specifics}...
+
+*  References:
+*     bit Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bit.html
+
+*  Keywords:
+*     package:bit, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     24 Feb 1994 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/*
+ *  Include files
+ */
+#include "sae_par.h"
+#include "f77.h"
+
+/*
+ *  Body of code
+ */
 
 F77_SUBROUTINE(bit_eor1ub)( INTEGER(n), UBYTE_ARRAY(array),
                             UBYTE(mask), INTEGER(status) )
@@ -40,6 +104,7 @@ F77_SUBROUTINE(bit_eor1ub)( INTEGER(n), UBYTE_ARRAY(array),
 
   int		i;			/* Loop over array */
 
+/* Check inherited global status on entry */
   if ( *status != SAI__OK )
     return;
 
