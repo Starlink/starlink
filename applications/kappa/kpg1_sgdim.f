@@ -24,7 +24,7 @@
 *        The NDF identifier.
 *     NDIM = INTEGER (Given)
 *        The desired number of dimensions.
-*     DIMV( NDF__MXDIM ) = INTEGER (Returned)
+*     DIMV( NDIM ) = INTEGER (Returned)
 *        The significant dimensions i.e. the ones that are greater than
 *        one.
 *     STATUS = INTEGER (Given and Returned)
@@ -35,6 +35,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,9 @@
 *        Original version.
 *     1992 April 16 (MJC):
 *        Added NDF token to the error reports.
+*     15-JUN-1998 (DSB):
+*        Modified to avoid addressing DIMV outside the range [1-NDIM].
+*        Converted to modern style layout.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,77 +61,65 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
-      INTEGER
-     :  NDF,
-     :  NDIM
+      INTEGER NDF
+      INTEGER NDIM
 
 *  Arguments Returned:
-      INTEGER
-     :  DIMV( NDF__MXDIM )
+      INTEGER DIMV( NDIM )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER
-     :  ACTDIM,                  ! Actual number of dimensions in the
-                                 ! NDF
-     :  DIM( NDF__MXDIM ),       ! The NDF dimensions
-     :  I,                       ! Loop counter
-     :  SIGDIM                   ! Number of signifcant dimensions
+      INTEGER ACTDIM             ! Actual number of dimensions in the NDF
+      INTEGER DIM( NDF__MXDIM )  ! The NDF dimensions
+      INTEGER I                  ! Loop counter
+      INTEGER SIGDIM             ! Number of signifcant dimensions
 
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Find the number of dimensions.
-
+*  Find the number of dimensions.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIM, ACTDIM, STATUS )
 
-*    Initialise counter.
-
+*  Initialise counter.
       SIGDIM = 0
 
-*    Initialise the significant dimensions.
-
-      DO I = 1, ACTDIM
+*  Initialise the significant dimensions.
+      DO I = 1, NDIM
          DIMV( I ) = 0
       END DO
 
-*    Loop for each dimension.
-
+*  Loop for each dimension.
       DO I = 1, ACTDIM
 
-*       Is the dimension significant?
-
+*  Is the dimension significant?
          IF ( DIM( I ) .GT. 1 ) THEN
 
-*          Yes, so add it to the total.
-
+*  Yes, so add it to the total.
             SIGDIM = SIGDIM + 1
 
-*          Record the dimension.
+*  Record the dimension if it is within range.
+           IF( SIGDIM .LE. NDIM ) DIMV( SIGDIM ) = I
 
-            DIMV( SIGDIM ) = I
          END IF
+
       END DO
 
-*    Look for error conditions.
-*    ==========================
+*  Look for error conditions.
+*  ==========================
 
-*    Must have at least one significant dimension.
-
+*  Must have at least one significant dimension.
       IF ( SIGDIM .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', NDF )
          CALL ERR_REP( 'KPG1_SGDIM_NOSIG',
      :     'All dimensions are one in the NDF ^NDF.', STATUS )
 
-*    The effective dimensionality of the NDF must equal the prescribed
-*    number.
-
+*  The effective dimensionality of the NDF must equal the prescribed
+*  number.
       ELSE IF ( SIGDIM .NE. NDIM ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', NDF )
