@@ -851,7 +851,7 @@ do_test:
 #  The test proper is to build a small index in a temporary directory from
 #  a small source archive supplied with this package, and to extract files
 #  from that index. 
-	$(PERL5) -e 'require 5;' && \
+	$(PERL5) -e 'require 5;'
 	SCB_INDEX=/usr/tmp/scb_test && \
         SCB_BROWSER_TMP=$$SCB_INDEX/browser_tmp && \
         SCB_INDEXER_TMP=$$SCB_INDEX/indexer_tmp && \
@@ -859,16 +859,18 @@ do_test:
         echo SCB_INDEX: $$SCB_INDEX && \
         rm -rf $$SCB_INDEX && \
         mkdir $$SCB_INDEX $$SCB_BROWSER_TMP $$SCB_INDEXER_TMP && \
-        echo "scbindex.pl:  Indexing scb_test.tar" && \
+        echo "scbindex.pl:  Building test index of scb_test.tar" && \
         echo " " && \
         $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
         echo " " && \
-        echo "scb.pl:  Extracting fortran file" && \
+        echo "scb.pl:  Extracting test files" && \
         echo " " && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw_  type=func >/dev/null && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw   type=func >/dev/null && \
         $(INSTALL_BIN)/scb.pl -html -exact Makefile type=file >/dev/null && \
-        echo "Test successful"; echo " " && \
+        echo " " && \
+        echo "  **  Test successful  ** " && \
+        echo " " 
 	SCB_INDEX=/usr/tmp/scb_test; rm -rf $$SCB_INDEX
 #
 #  Note the test has been run.
