@@ -123,7 +123,7 @@ by the "figurecontent" element.
 <codebody>
 (define (make-manifest #!optional (nd (current-node)))
   (if (and %latex-manifest% (not suppress-manifest))
-      (let ((element-list (list (normalize "figurecontent")))
+      (let ((element-list (list (normalize "figure")))
 	    (rde (document-element nd)))
 	(make entity system-id: %latex-manifest%
 	      (make fi
@@ -142,14 +142,20 @@ by the "figurecontent" element.
   (default 
     (empty-sosofo))
 
+  ;; The selection here should match the processing in slmisc.dsl
+  (element figure
+    (let* ((kids (children (current-node)))
+	   (content (get-best-figurecontent
+		     (select-elements kids (normalize "figurecontent"))
+		     '("EPS"))))
+      (if content
+	  (process-node-list content)
+	  (empty-sosofo))))
   (element figurecontent
-    (let* ((image-ents (attribute-string (normalize "image")
-					 (current-node)))
-	   (best-ent (and image-ents
-			  (get-sysid-by-notation image-ents
-						 '("EPS")))))
-      (if best-ent
-	  (make fi data: (string-append best-ent "
+    (let* ((image-ent (attribute-string (normalize "image")
+					(current-node))))
+      (if image-ent
+	  (make fi data: (string-append (entity-system-id image-ent) "
 "))
 	  (empty-sosofo)))))
 
