@@ -574,7 +574,7 @@ RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
 
 BUILT_FILES = \
  $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) \
- $(IRAF_SCRIPTS) $(IRAF_HELP) $helpdb.mip
+ $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -716,6 +716,7 @@ $(GAIA_FILES): .gaia.built
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./gaia; \
+	$(TAR_OUT) ../gaia.htx_tar ;\
         sed -e s#@PKG_VERS@#$(PKG_VERS)# VERSION.in >$ VERSION ;\
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
