@@ -5,25 +5,36 @@
    Converts NDFs into FITS files
 }{
    \sstdescription{
-      This application converts one or more NDF files into files in the
-      FITS format.  It uses the IMAGE extension to store VARIANCE and
-      QUALITY, and binary tables to store NDF extensions, except for
-      the FITS extension, which may be merged into the output FITS
-      file's headers.
+      This application converts one or more NDF datasets into
+      FITS-format files.  NDF2FITS stores any variance and quality
+      information in IMAGE extensions (`sub-files') within the FITS
+      file; and it uses binary tables to hold any NDF-extension data
+      present, except for the FITS-airlock extension, which may be
+      merged into the output FITS file's headers.
+
+      You can select which NDF array components to export to the FITS
+      file, and choose the data type of the data and variance arrays.
+      You can control whether or not to propagate extensions and
+      history information.
    }
    \sstusage{
       ndf2fits in out [comp] [bitpix] [origin]
    }
    \sstparameters{
       \sstsubsection{
-         BITPIX = GROUP (Read)
+         BITPIX = LITERAL (Read)
       }{
          The FITS bits-per-pixel (BITPIX) value for each conversion.
-         This specifies the data type of the output FITS file.
-         Permitted values are: 8 for unsigned byte, 16 for signed word,
-         32 for integer, $-$32 for real, $-$64 for double precision.  0
+         This specifies the data type of the output FITS file.  Permitted
+         values are: {\tt 8} for unsigned byte, {\tt 16} for signed word,
+         {\tt 32} for integer, {\tt -32} for real, {\tt -64} for double
+         precision.  There are two other special values.  BITPIX={\tt 0}
          will cause the output file to have the data type equivalent to
-         that of the input NDF.
+         that of the input NDF.  BITPIX={\tt -1} requests that the
+         output file has the data type corresponding to the value of the
+         BITPIX keyword in the NDF's FITS extension.  If the extension
+         or BITPIX keyword is absent, the output file takes the data
+         type of the input array.
 
          BITPIX values must be enclosed in double quotes and may be a list 
          of comma-separated values to be applied to each conversion in turn.
@@ -39,7 +50,7 @@
          {\tt [0]}
       }
       \sstsubsection{
-         COMP = GROUP (Read)
+         COMP = LITERAL (Read)
       }{
          The list of array components to attempt to transfer to each
          FITS file.  The acceptable values are {\tt "D"} for the main data
@@ -67,14 +78,13 @@
          line is desired.  {\tt ["A"]}
       }
       \sstsubsection{
-         IN = GROUP (Read)
+         IN = LITERAL (Read)
       }{
          The names of the NDFs to be converted into FITS format.  It
          may be a list of NDF names or direction specifications
          separated by commas and enclosed in double quotes.  
          NDF names may include the regular
-         expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} {\it etc.})
-         on UNIX systems.
+         expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} {\it etc.}).
          Indirection may occur through text files (nested up to seven
          deep).  The indirection character is {\tt "$\wedge$"}.  If extra prompt
          lines are required, append the continuation character {\tt "-"} to
@@ -82,12 +92,12 @@
          with the character \hash.
       }
       \sstsubsection{
-         OUT = GROUP (Write)
+         OUT = LITERAL (Write)
       }{
          The names for the output FITS files.  These may be enclosed in double
          quotes and specified as a list of comma-separated names, OR, using 
          modification elements to specify output filenames based on the input
-         NDF filenames. Indirection may be used if required. 
+         NDF filenames.  Indirection may be used if required. 
 
          The simplest modification element is the asterisk {\tt "$*$"}, which
          means call the output FITS files the same name (without any directory
@@ -125,6 +135,14 @@
          NDF components.  See the Notes for details of the merger.
          {\tt [TRUE]}
       }
+      \sstsubsection{
+         PROHIS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, any NDF history records are written to the primary
+         FITS header as HISTORY cards.  These follow the mandatory
+         headers and any merged FITS-extension headers (see parameter
+         PROFITS). {\tt [TRUE]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -146,17 +164,18 @@
          that follow the primary header and data unit.
       }
       \sstexamplesubsection{
-         ndf2fits horse logo.fit
+         ndf2fits horse logo.fit noprohis
       }{
          This converts the NDF called horse to the FITS file called
          {\tt logo.fit}.  The data type of the FITS primary data array matches
          that of the NDF's data array.  The FITS extension in the NDF
          is merged into the FITS header of {\tt logo.fit}.  Should horse
          contain variance and quality arrays, these are written in IMAGE
-         extensions.
+         extensions.  Any history information in the NDF is not relayed
+         to the FITS file.
       }
       \sstexamplesubsection{
-         ndf2fits "data/a$*$z" "$*$" comp=v noprofits bitpix="-32"
+         ndf2fits "data/a$*$z" $*$ comp=v noprofits bitpix=-32
       }{
          This converts the NDFs with names beginning with {\tt "a"} and ending
          in {\tt "z"} in the directory called {\tt data} into FITS files of the
@@ -176,9 +195,10 @@
          FITS header of the corresponding FITS file.
       }
    }
+   \newpage
    \sstnotes{
       The rules for the conversion are as follows:
-      \sstitemlist{
+      \ssthitemlist{
 
          \sstitem
          The NDF main data array becomes the primary data array of the
@@ -209,7 +229,7 @@
          Here are details of the processing of standard items from the
          NDF into the FITS header, listed by FITS keyword.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             SIMPLE, EXTEND, PCOUNT, GCOUNT -- all take their default
@@ -227,7 +247,7 @@
               are non-linear, all FITS axis information is lost.
 
             \sstitem
-            OBJECT, LABEL, BUNITS -- the values held in the NDF's title,
+            OBJECT, LABEL, BUNIT -- the values held in the NDF's title,
               label, and units components respectively are used if
               they are defined; otherwise any values found in the FITS
               extension are used (provided parameter PROFITS is {\tt TRUE}).
@@ -238,12 +258,31 @@
               extension.
 
             \sstitem
-            EXTNAME -- is the component name of the object from the COMP
-              argument.
+            EXTNAME --- is the array-component name when the EXTNAME
+              appears in the primary header or an IMAGE extension.  In a
+              binary-table derived from an NDF extension, EXTNAME is the
+              path of the extension within the NDF, the path separator
+              being the usual dot.  The path includes the indices to
+              elements of any array structures present; the indices are in
+              a comma-separated list within parentheses.
 
             \sstitem
-            HDUCLAS1, HDUCLAS{\em{n}} -- {\tt "NDF"} and the value of COMP
-              respectively.
+            EXTLEVEL --- is the level in the hierarchical structure of the
+              extensions.  Thus a top-level extension has value 1,
+              sub-components of this extension have value 2 and so on.
+
+            \sstitem
+            EXTTYPE --- is the data type of the NDF extension used to
+              create a binary table.
+
+            \sstitem
+            EXTSHAPE --- is the shape of the NDF extension used to
+            create a binary table.  It is a comma-separated list of the
+            dimensions, and is 0 when the extension is not an array.
+
+            \sstitem
+            HDUCLAS1, HDUCLAS{\em{n}} -- {\tt "NDF"} and the
+              array-component name respectively.
 
             \sstitem
             LBOUND{\em{n}} -- is the pixel origin for the $n^{\rm th}$ dimension
@@ -265,8 +304,97 @@
               present in the array; this is for the same efficiency reasons
               as before.  The END card terminates the FITS header.
 
+           \sstitem
+              HISTORY -- HISTORY headers are propagated from the FITS
+              extension when PROFITS is {\tt TRUE}, and from the NDF
+              history component when PROHIS is {\tt TRUE}.
+
          }
+
+         \sstitem
+         Extension information may be transferred to the FITS file when
+         PROEXTS is {\tt TRUE}.  The whole hierarchy of extensions is propagated
+         in order.  This includes substructures, and arrays of extensions
+         and substructures.  However, at present, any extension structure
+         containing only substructures is not propagated itself (as
+         zero-column tables are not permitted), although its
+         substructures may be converted.
+ 
+         Each extension or substructure creates a one-row binary table,
+         where the columns of the table correspond to the primitive
+         (non-structure) components.  The name of each column is the
+         component name.  The column order is the same as the component
+         order.  The shapes of multi-dimensional arrays are recorded using
+         the TDIM$n$ keyword, where $n$ is the column number.  The HEASARCH
+         convention for specifying the width of character arrays (keyword
+         TFORM$n$='$r$A$w$', where $r$ is the total number of characters in the
+         column and $w$ is the width of an element) is used.  The EXTNAME,
+         EXTTYPE, EXTSHAPE and EXTLEVEL keywords (see above) are written
+         to the binary-table header.
+
       }
+   }
+   \sstdiytopic{
+      Special Formats
+   }{
+      In the general case, NDF extensions (excluding the FITS extension)
+      may be converted to one-row binary tables in the FITS file when
+      parameter PROEXTS is {\tt TRUE}.  This preserves the information, but it
+      may not be accessible to the recipient's FITS reader.  Therefore,
+      in some cases it is desirable to understand the meanings of
+      certain NDF extensions, and create standard FITS products for
+      compatibility.
+
+      At present only one product is supported, but others may be added
+      as required.
+
+      \sstitemlist{
+
+         \sstitem
+         AAO 2dF
+
+         Standard processing is used except for the 2dF FIBRES extension
+         and its constituent structures.  The NDF may be restored from the
+         created FITS file using FITS2NDF.  The FIBRES extension converts
+         to the second binary table in the FITS file (the NDF\_CLASS
+         extension appears in the first).
+
+         To propagate the OBJECT substructure NDF2FITS creates a binary
+         table of constant width (210 bytes) with one row per fibre.  The
+         total number of rows is obtained from component NUM\_FIBRES.  If a
+         possible OBJECT component is missing from the NDF, a null column
+         is written for that component.  The columns inherit the data
+         types of the OBJECT structure's components.  Column meanings and
+         units are assigned based upon information in the reference given
+         below.
+
+         The FIELD structure components are converted into additional
+         keywords of the same name in the binary-table header, with the
+         exception that components with names longer than 8 characters
+         have abbreviated keywords: UNALLOC$xxx$ become UNAL-$xxx$ ($xxx$=OBJ,
+         GUI, or SKY), CONFIGMJD becomes CONFMJD, and $x$SWITCHOFF become
+         $x$SWTCHOF ($x$=X or Y).  If any FIELD component is missing it is
+         ignored.
+
+         Keywords for the extension level, name, and type appear in the
+         binary-table header.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \begin{refs}
+      \item Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+      \item NASA Office of Standards and Technology, 1994, {\it A User's Guide
+       for the Flexible Image Transport System (FITS)}, version 3.1.
+      \item NASA Office of Standards and Technology, 1995, {\it Definition of
+       the Flexible Image Transport System (FITS)}, version 1.1.
+      \end{refs}
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \CONVERT: FITS2NDF; \KAPPA: FITSDIN, FITSIN.
    }
    \sstimplementationstatus{
       \sstitemlist{

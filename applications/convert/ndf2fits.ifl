@@ -14,7 +14,9 @@
 #  History:
 #     1994 June 26 (MJC):
 #	 Original version.
-#     {enter_changes_here}
+#     1997 January 13 (MJC):
+#     	 Added PROHIS.  Changed from GROUP types back to LITERAL.
+#     {enter_further_changes_here}
 
 #-
 
@@ -24,7 +26,7 @@ interface NDF2FITS
 
    parameter      BITPIX         # No. of bits per pixel
       position    4
-      type        'GROUP'
+      type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'CURRENT,DYNAMIC'
       prompt      'Number of bits per pixel'
@@ -35,7 +37,7 @@ interface NDF2FITS
 
    parameter      COMP           # Data, quality or variance?
       position    3
-      type        'GROUP'
+      type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'DEFAULT,CURRENT,DYNAMIC'
       prompt      'Array components to copy to the FITS file(s)'
@@ -87,6 +89,14 @@ interface NDF2FITS
    parameter      PROFITS        # Propagate the NDF's FITS extension
       type        '_LOGICAL'
       prompt      'Merge the FITS extension of the NDF in the FITS header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROHIS         # Propagate the NDF's HISTORY information
+      type        '_LOGICAL'
+      prompt      'Relay any NDF history information to the FITS header?'
       vpath       'DEFAULT'
       default     TRUE
       helpkey     '*'
