@@ -28,6 +28,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     DLT:  D.L.Terrett (Starlink, RAL)
+#     BRADC: Brad Cavanagh (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -36,6 +37,8 @@
 #     25-AUG-2000 (BLY):
 #        Swapped order of IDI libraries from -lidi -lidi_adam to
 #           -lidi_adam -lidi.
+#     30-SEP-2004 (BRADC):
+#         ADAM IDI library now standalone and does not require libidi
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -43,7 +46,7 @@
 
 #-
 
-      echo -lidi_adam -lidi `gwm_link_adam` `gns_link_adam` `cnf_link_adam` \
+      echo -lidi_adam `gwm_link_adam` `gns_link_adam` `cnf_link_adam` \
                             `starX_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
