@@ -62,6 +62,8 @@
 *        Original version.
 *     1997 January 10 (MJC):
 *        Replaced NAG calls.
+*     7-JUL-1999 (DSB):
+*        Set seed using KPG1_PSEED instead of PDA_RNSED.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,8 +114,6 @@
       DOUBLE PRECISION LOLIM     ! Lower limit of output data range
       INTEGER NRETRY             ! Total number of re-tries
       INTEGER NTRY               ! No. of re-tries for current pixel
-      INTEGER SEED               ! Random-number seed
-      INTEGER TICKS              ! Clock ticks to randomize initial seed
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
@@ -157,9 +157,7 @@
 
 *  Initialise the random number generator seed to a non-repeatable
 *  value.
-      CALL PSX_TIME( TICKS, STATUS )
-      SEED = ( TICKS / 4 ) * 4 + 1
-      CALL PDA_RNSED( SEED )
+      CALL KPG1_PSEED( STATUS )
 
 *  To avoid testing two floating-point values for equality, they are
 *  tested to be different by less than a small fraction of the value to

@@ -47,6 +47,8 @@
 *        Original version.
 *     1997 January 10 (MJC):
 *        Replaced NAG calls.  Used commenting modern style.
+*     7-JUL-1999 (DSB):
+*        Set seed using KPG1_PSEED instead of PDA_RNSED.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,9 +81,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop counter
-      INTEGER SEED               ! Random-number seed
       REAL SIGMA                 ! Standard deviation
-      INTEGER TICKS              ! Clock ticks to randomize initial seed
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -94,9 +94,7 @@
 
 *  Initialise the random number generator seed to a non-repeatable
 *  value.
-      CALL PSX_TIME( TICKS, STATUS )
-      SEED = ( TICKS / 4 ) * 4 + 1
-      CALL PDA_RNSED( SEED )
+      CALL KPG1_PSEED( STATUS )
 
 *  There are two processing loops depending on whether there might be
 *  bad values present.
