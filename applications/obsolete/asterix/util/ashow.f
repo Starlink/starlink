@@ -814,13 +814,14 @@
       CHARACTER*132		LINK			! Link value
 
       INTEGER			I			! Loop over links
+      INTEGER			L			! Length of an LNAMS
 
       LOGICAL			OK			! Link is present
 
 *  Local Data:
       DATA			LNAMS/'BGND', 'VIGN'/
       DATA			LDESC/'Background dataset',
-     :                                'Vignetting factors dataset'/
+     :                                'Vignetting factors'/
 *.
 
 *  Check inherited global status.
@@ -835,8 +836,10 @@
       DO I = 1, NLINK
 
 *    Link is present
-        CALL FRI_CHK( IFID, LNAMS(I)(:CHR_LEN(LNAMS(I))), OK, STATUS )
+        L = CHR_LEN( LNAMS(I) )
+        CALL FRI_CHK( IFID, LNAMS(I)(:L), OK, STATUS )
         IF ( OK ) THEN
+          CALL FRI_CHK( IFID, LNAMS(I)(:L),  LINK, STATUS )
           CALL ASHOW_VAL( LINK, LDESC(I), ' ', OCH, STATUS )
         ELSE
           CALL ASHOW_VAL( '* not set *', LDESC(I), ' ', OCH, STATUS )
