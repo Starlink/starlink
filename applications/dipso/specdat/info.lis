@@ -1,0 +1,94 @@
+
+ SPECDAT
+
+ This is a repository for files containing Stellar Atmosphere Models,
+ which can be accessed by DIPSO [SUN 50], for example.
+
+ The principal grid consists of Kurucz model atmospheres for a solar
+ composition calculated by using ATLAS9 (Kurucz 1991, 'Precision Photometry:
+ Astrophysics of the Galaxy', eds Davis Philip, Upgren & Janes, L Davis Press,
+ Schenectady), and was obtained through CCP7.
+
+ Further grids consist of many models calculated by A.E. Lynas-Gray, with 
+ contributions from other astronomers at UCL.  One grid contains all models
+ contained in Kurucz's 1979 paper (ApJ Sup 40, 1), using ATLAS6, together with 
+ others calculated on a largely ad hoc basis at UCL. The Kurucz ATLAS6 models 
+ may differ very slightly from the published models, as they were recalculated
+ with a code in which several bugs were corrected, and with more
+ stringent convergence criteria than Kurucz used. The low metallicity grid
+ ("SMC" mixture) was published by Howarth & Lynas-Gray (1989, MNRAS 240, 513).
+
+ Examples of how each model should be read into DIPSO are shown for each
+ grid, assuming that astrophysical fluxes are required.
+
+ ATLAS9  models:
+ ===============
+
+ F(Teff).(LogG*10)   ---  Files containing Kurucz (ATLAS9) plane-parallel
+                          model fluxes with normal abundances.The files are
+                          UNFORMATTED. Data are tabulated as wavelength
+                          and astrophysical flux.   
+
+                          > ATLASRD  [Teff  [log g]]
+
+
+ ATLAS6  models:
+ ===============
+
+ K(Teff).(LogG*100)  ---  Files containing Kurucz (ATLAS6) plane-parallel
+                          model fluxes with normal abundances.The files are
+                          UNFORMATTED. Data are tabulated as wavelength
+                          and astrophysical flux.  
+
+                          > SP0RD  SPECDAT:F<Teff>.<log g*10>
+                          > YMULT 3.14159265
+
+                 on UNIX machines the syntax is
+                          > SP0RD  $SPECDAT/F<Teff>.<log g*10> 
+
+ KLO(Teff).(LogG*100)  -  As above, but metal abundances are solar/30.
+
+                          > SP0RD  SPECDAT:KLO<Teff>.<log g*100>
+
+                 on UNIX machines the syntax is
+                          > SP0RD  $SPECDAT/KLO<Teff>.<log g*100>
+
+ S(Teff).G(LogG*10)  ---  As above, but 0.1*solar metals ("SMC"),
+                          and `real' (not astrohpysical) fluxes.
+
+                          > SP0RD  SPECDAT:S<Teff>.<log g*100>
+                          > YMULT 3.14159265
+
+                 on UNIX machines the syntax is
+                          > SP0RD  $SPECDAT/S<Teff>.<log g*100>
+
+ Other  models:
+ =============
+
+ KHMEXT(model).DAT : ---  Extended model atmospheres of Kunasz,Hummer
+                          and Mihalas.Files are in FREE FIELD FORMAT.
+                          Data is tabulated as wavelength and LOG FLUX
+                          (calc. relative to F(5556).
+
+                          > SP2RD  SPECDAT:KHMEXT<model>
+
+                 on UNIX machines the syntax is
+                          > SP2RD  $SPECDAT/KHMEXT<model>
+
+
+ MLTE(temp/100).(logG) -  Mihalas plane-parallel models.Tabulated as for
+                          extended models.FREE FIELD
+
+                          > SP2RD  SPECDAT:MLTE<Teff/100>.<log g>
+
+                 on UNIX machines the syntax is
+                          > SP2RD  $SPECDAT/MLTE<Teff/100>.<log g>
+
+
+ MNLT(temp/100).(logG) -  Mihalas plane-parallel NON-LTE models.Tabulated
+                          as above.FREE FIELD
+
+                          > SP2RD  SPECDAT:MNLT<Teff/100>.<log g>
+
+                 on UNIX machines the syntax is
+                          > SP2RD  $SPECDAT/MNLT<Teff/100>.<log g>
