@@ -205,9 +205,9 @@
          CALL NDF_SBND( NAX, LBND, UBND, INDFO, STATUS )
 
 *  Map the DATA and VARIANCE arrays.
-         CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
+         CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE/ZERO', IPDOUT, EL, 
      :                 STATUS )
-         CALL NDF_MAP( INDFO, 'VARIANCE', '_REAL', 'WRITE', IPVOUT, 
+         CALL NDF_MAP( INDFO, 'VARIANCE', '_REAL', 'WRITE/ZERO', IPVOUT, 
      :                 EL, STATUS )
 
 *  Allocate an work array to hold the number of good input pixels
