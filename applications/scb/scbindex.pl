@@ -141,6 +141,10 @@ use FortranTag;
 use CTag;
 use Directory;
 
+#  Debugging
+
+$srcdir = "/local/star/src/from-ussc";
+
 #  Declarations.
 
 sub index_list;
@@ -152,8 +156,8 @@ sub index_f;
 sub index_c;
 sub index_h;
 sub index_gen;
+sub index_files;
 sub indexinc_dir;
-sub indexinc_list;
 sub write_entry;
 sub uniq;
 
@@ -166,6 +170,7 @@ system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 #  Initialise index object containing locations of all modules.
 
 $func_index = Directory->new($func_indexfile, O_CREAT | O_RDWR);
+$file_index = Directory->new($file_indexfile, O_CREAT | O_RDWR);
 
 #  If task file exists, read values from it into @tasks.
 
@@ -177,15 +182,17 @@ if (open TASKS, "$taskfile") {
    }
 }
 
-#  Index packages.
+#  Index packages named on command line.
 
 if (@ARGV) {
    foreach $package_file (@ARGV) {
       index_pack $package_file;
    }
 }
+
+#  Or index all packages under $srcdir, and include files under $incdir.
 else {
-   $func_index->put('SOURCE#', $srcdir);
+   indexinc_dir "INCLUDE#", $incdir;
    foreach $package_file (glob "$srcdir/*") {
       index_pack $package_file;
    }
@@ -193,9 +200,6 @@ else {
 
 #  Index files from include directory.
 
-if (@ARGV == 0) {
-   indexinc_dir "INCLUDE#", $incdir;
-}
 
 $verbose = 0;
 
@@ -265,13 +269,17 @@ sub index_pack {
    my ($dir, $tarext);
    ($dir, $package, $tarext) = ($1, $2, $3);
    print "PACKAGE: $package\n";
-   $func_index->put("$package#", $pack_file);
+   $file_index->put("$package#", $pack_file);
 
-#  If any records for this package already exist in the index, delete them.
+#  If any records for this package already exist in the function index, 
+#  or file index, delete them.
 
    my ($key, $value);
    while (($key, $value) = $func_index->each($package)) {
       $func_index->delete($key, $package);
+   }
+   while (($key, $value) = $file_index->each($package)) {
+      $file_index->delete($key, $package);
    }
 
 #  If any tasks exist for this package delete them.
@@ -384,10 +392,14 @@ sub index_tar {
 
 #  Unpack tar file.
 
-   print "*** Unpacking $tarfile  ***\n" if ($verbose);
+   print "*** Unpacking $tarfile ***\n" if ($verbose);
    my @files = tarxf $tarfile;
 
-#  Pass list of files to indexing routine.
+#  Pass list of files to file indexing routine.
+
+   index_files $path, @files;
+
+#  Pass list of files to function indexing routine.
 
    index_list $path, @files;
    
@@ -395,6 +407,27 @@ sub index_tar {
 
    unlink @files;
    popd;
+}
+
+
+########################################################################
+sub index_files {
+
+#  Get parameters.
+
+   my ($path, @files) = @_;
+
+   my ($file, $dir, $name, $location);
+   foreach $file (@files) {
+      $file =~ m%^(.*/)?([^/]+)%;
+      ($dir, $name) = ($1, $2);
+      $location = "$path$file";
+      $file_index->put($name, $location);
+
+#  Optionally log entry to stdout.
+
+      printf "%-20s =>  %s\n", $name, $location if ($verbose);
+   }
 }
 
 
@@ -424,9 +457,6 @@ sub index_source {
       %tag = parsetag $1;
       if (($tag{'Start'} eq 'a') && $tag{'name'}) {
          write_entry $tag{'name'}, $path;
-      }
-      elsif (($tag{'Start'} eq 'a') && ($tag{'href'} =~ /^INCLUDE-(.*)/)) {
-         $include = uc $1;
       }
    }
 
@@ -559,10 +589,6 @@ sub index_h {
    my $include = $file;
    $include =~ s%^.*/%%;
 
-#  Write to index.
-
-   write_entry "INCLUDE-$include", $path;
-
 #  Index source (e.g. for #defines).
 
    index_source $path, $file, 'h';
@@ -579,31 +605,12 @@ sub indexinc_dir {
    my $path = shift;      #  Logical pathname of directory to be indexed.
    my $dir = shift;       #  Directory to be indexed.
 
+   $file_index->put("INCLUDE#", $incdir);
    pushd $dir;
-   indexinc_list $path, <*>;
+   index_files $path, glob "*";
    popd;
 }
 
-########################################################################
-sub indexinc_list {
-
-#  Examine and index a list of include files.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of current directory.
-   my @files = @_;        #  Files in current directory to be indexed.
-
-   foreach $file (@files) {
-      if ($file =~ /\.h$/) {              #  C type header file.
-         write_entry "INCLUDE-$file", "$path$file";
-      }
-      elsif ($file !~ /\./) {             #  Fortran type header file.
-         write_entry "INCLUDE-" . uc ($file), "$path$file";
-      }
-   }
-}
-   
 
 ########################################################################
 sub write_entry {
@@ -626,9 +633,8 @@ sub write_entry {
 
 #  Optionally log entry to stdout.
 
-   if ($verbose) {
-      printf "%-20s =>  %s\n", $name, $location;
-   }
+   printf "%-20s =>  %s\n", $name, $location if ($verbose);
+   
 }
 
 
