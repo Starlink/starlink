@@ -335,11 +335,13 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
      conversion stage, so is more efficient.  The documentation has
      been improved .
 
-  o  IRAF2NDF --  This has undergone a major upgrade with support for
-     axis propagation from eleven variants, control of the
+  o  IRAF2NDF --  This has undergone a major upgrade with support
+     for axis propagation from eleven variants, control of the
      creation of NDF HISTORY records and FITS extension from the
-     headers in the file.  The documentation has been corrected and
-     improved.
+     headers in the file.  The pixel origin is transferred from
+     LBOUNDn headers.  The NDF label and units are created from
+     OBJECT and BUNIT headers.  The documentation has been
+     corrected and improved.
 
   o  NDF2ASCII --  Reduced the maximum record length to 512 bytes.
      The default RECLEN is 132.
@@ -375,6 +377,8 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
      IRAF file.  Header duplication is prevented.  The documentation
      has been corrected and improved.  Parameter FILLBAD defaults to
      0.  IRAF filenames are no longer converted to lowercase.
+     The pixel origin is transferred from LBOUNDn headers.  The NDF
+     label and units are progagated to OBJECT and BUNIT headers. 
 
   o  TIFF2NDF --  Removed KAPPA dependency.  It uses one less
      conversion stage, so is more efficient.  It is now available for
