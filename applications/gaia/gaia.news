@@ -69,7 +69,6 @@
   Shared memory segments that leak should now be better behaved
   (Solaris default setup).
 
-
   The blink toolbox has been substantially upgraded. New features are
   alignment to NDF origins or FITS CRPIX values, much better behaviour
   when comparing images of different dimensions, better performance
@@ -117,3 +116,9 @@
   projections are simple linear mappings (this remains the default),
   ignoring the possibility of spherical rotations. Refer to the CarLin
   attribute of the AST (SUN/211) library for more about this change.
+
+  AST 3.2 changes. Super-script and sub-script, font and colour 
+  changes within a string. Fonts drawn as overlay grid can now be
+  scaled with image. Better matching of postscript font size to displayed
+  size. Long term memory leak cured (when drawing overlays).
+
