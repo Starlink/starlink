@@ -20,13 +20,12 @@
 *     the MORE.AST_PLOT component of the AGI picture (i.e. TRANSFORM
 *     components are not handled).
 *
-*     Whether or not alignment is requested, the returned Plot will be
-*     written to the MORE component of the current AGI picture.
-*
 *     The Base (graphics) frame in the returned plot
 *     corresponds to millimetres from the bottom left corner of the
-*     plotting surface.  The Current frame is inherited from the
-*     supplied frameset.
+*     plotting surface.  A new BASEPIC and CURPIC frame will also
+*     be added unless they are already present.  The Current frame
+*     of the returned Plot will be inherited from the supplied 
+*     Frameset.
 
 *  Arguments:
 *     FSET = INTEGER (Given)
@@ -63,7 +62,8 @@
 
 *  History:
 *     5-JAN-2001 (MBT):
-*        Original version.
+*        Original version.  Written with reference to KAPPA/CONTOUR;
+*        see especially KPG1_GDGET.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,18 +91,24 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      REAL BX( 4 )               ! Bounds of plotting area
       REAL GBOX( 4 )             ! Plotting window bounding box
       REAL RBBOX( 4 )            ! Base frame bounding box (real)
-      INTEGER DIM( DAT__MXDIM )  ! Shape of array
+      INTEGER BPIC               ! BASEPIC Frame
+      INTEGER CPIC               ! CURPIC Frame
       INTEGER CHAN               ! AST identifier for Channel
       INTEGER CNV                ! AST identifier for alignment frameset
+      INTEGER DIM( DAT__MXDIM )  ! Shape of array
       INTEGER IAT                ! Position in string
       INTEGER JBASF              ! Base frame index in FSET
       INTEGER JBASP              ! Base frame index in PLOT
       INTEGER JCURF              ! Current frame index in FSET
+      INTEGER JCURP              ! Current frame index in PLOT
+      INTEGER JFRM               ! Frame index
       INTEGER MAP                ! AST identifier for alignment mapping
       INTEGER MATFRM             ! AST identifier for alignment frame
       INTEGER NDIM               ! Number of dimensions
+      INTEGER WMAP               ! GRAPHICS->BASEPIC/CURPIC WinMap
       LOGICAL THERE              ! Is HDS component present?
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS Data type
       CHARACTER * ( DAT__SZLOC ) APLOC ! .MORE.AST_PLOT component locator
@@ -112,7 +118,11 @@
       CHARACTER * ( AST__SZCHR ) DMNLST ! List of alignment domains
       CHARACTER * ( AST__SZCHR ) MATDMN ! Domain in which alignment occurred
       DOUBLE PRECISION BBOX( 4 ) ! Base frame bounding box (double precision)
-      
+      DOUBLE PRECISION INA( 2 )  ! Corner A in GRAPHICS co-ords
+      DOUBLE PRECISION INB( 2 )  ! Corner B in GRAPHICS co-ords
+      DOUBLE PRECISION OUTA( 2 ) ! Corner A in BASEPIC or CURPIC co-ords
+      DOUBLE PRECISION OUTB( 2 ) ! Corner B in BASEPIC or CURPIC co-ords
+
 *.
 
 *  Initialise returned value.
@@ -233,7 +243,7 @@
             CALL CCD1_MSG( ' ', '   Alignment with picture occurred'
      :                     // ' in domain ^DMN.', STATUS )
 
-*  Otherwise, ensure that the error status is set write a context-
+*  Otherwise, ensure that the error status is set and write a context-
 *  sensitive error message.
          ELSE
             IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
@@ -247,6 +257,119 @@
       ELSE
          PLOT = AST_PLOT( FSET, GBOX, BBOX, ' ', STATUS )
       END IF
+
+*  Store the Current frame since it may be disturbed by the subsequent
+*  calls.
+      JCURP = AST_GETI( PLOT, 'Current', STATUS )
+
+*  Add a Frame representing AGI world co-ordinates in the BASE picture.
+*  This picture has equal scales on both axes, and the shorter axis
+*  has a length of 1.0. This Frame is given the Domain BASEPIC.
+*  ====================================================================
+
+*  See if the Plot already contains a BASEPIC Frame.
+      CALL CCD1_FRDM( PLOT, 'BASEPIC', JFRM, STATUS )
+
+*  If not, add one to the plot now.
+      IF ( JFRM .EQ. AST__NOFRAME ) THEN
+
+*  Get the bounds of the entire view surface in millimetres.
+         CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  Store these as the GRAPHICS co-ordinates.
+         INA( 1 ) = DBLE( BX( 1 ) )
+         INA( 2 ) = DBLE( BX( 2 ) )
+         INB( 1 ) = DBLE( BX( 3 ) )
+         INB( 2 ) = DBLE( BX( 4 ) )
+
+*  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
+*  co-ordinates normalised so that the shorter axis has length 1.0).
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                        ABS( BX( 4 ) - BX( 2 ) ) )
+            OUTB( 2 ) = 1.0D0
+         ELSE
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = 1.0D0
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                        ABS( BX( 3 ) - BX( 1 ) ) )
+         END IF
+
+*  Create a WinMap which scales millimetres into BASE_WORLD co-ordinates.
+         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Create the BASEPIC Frame.
+         BPIC = AST_FRAME( 2, 'DOMAIN=BASEPIC,TITLE=Normalised world '//
+     :                     'co-ordinates in the AGI BASE picture.,'//
+     :                     'Symbol(1)=X,Symbol(2)=Y,'//
+     :                     'Label(1)=Horizontal offset,'//
+     :                     'Label(2)=Vertical offset,'//
+     :                     'Format(1)=%.3f,Format(2)=%.3f',
+     :                     STATUS )
+
+*  Add the BASEPIC Frame into the Plot.
+         CALL AST_ADDFRAME( PLOT, AST__BASE, WMAP, BPIC, STATUS )
+      END IF
+
+*  Add a Frame representing a normalised co-ordinate system in the current
+*  picture. This Frame has equals scales on both axes, and the shorter axis
+*  has a length of 1.0. This Frame is given the Domain CURPIC.
+*  ====================================================================
+
+*  See if the Plot already contains a CURPIC Frame.
+      CALL CCD1_FRDM( PLOT, 'CURPIC', JFRM, STATUS )
+
+*  If not, add one into the Plot now.
+      IF ( JFRM .EQ. AST__NOFRAME ) THEN
+
+*  Get the bounds of the current window (in millimetres).
+         CALL PGQWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  Store these as the GRAPHICS co-ordinates.
+         INA( 1 ) = DBLE( BX( 1 ) )
+         INA( 2 ) = DBLE( BX( 2 ) )
+         INB( 1 ) = DBLE( BX( 3 ) )
+         INB( 2 ) = DBLE( BX( 4 ) )
+
+*  We now find the bounds of the current window in CURPIC co-ordinates (i.e.
+*  co-ordinates normalised so that the shorter axis has length 1.0).
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                        ABS( BX( 4 ) - BX( 2 ) ) )
+            OUTB( 2 ) = 1.0D0
+         ELSE
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = 1.0D0
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                        ABS( BX( 3 ) - BX( 1 ) ) )
+         END IF
+
+*  Create a WinMap which scales millimetres into CURPIC co-ordinates.
+         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Create the CURPIC Frame.
+         CPIC = AST_FRAME( 2, 'DOMAIN=CURPIC,TITLE=Normalised world '//
+     :                     'co-ordinates in the current AGI picture.,'//
+     :                     'Symbol(1)=X,Symbol(2)=Y,'//
+     :                     'Label(1)=Horizontal offset,'//
+     :                     'Label(2)=Vertical offset,'//
+     :                     'Format(1)=%.3f,Format(2)=%.3f',
+     :                     STATUS )
+
+*  Add the CURPIC Frame into the Plot.
+         CALL AST_ADDFRAME( PLOT, AST__BASE, WMAP, CPIC, STATUS )
+      END IF
+
+*  Restore the correct Current frame of the Plot.
+      CALL AST_SETI( PLOT, 'Current', JCURP, STATUS )
 
 *  Export the Plot so that it is not annulled by the looming AST_END
 *  call.
