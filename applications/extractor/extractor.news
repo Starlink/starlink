@@ -1,6 +1,6 @@
 1 Update to EXTRACTOR
 
- This is a minor release to EXTRACTOR, just adding two new parameters:
+ This is a minor release of EXTRACTOR, just adding two new parameters:
  X_PIXEL and Y_PIXEL. These output NDF pixel coordinates.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
