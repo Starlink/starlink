@@ -41,6 +41,8 @@
 	CHARACTER*20 TICK_INOUT
 	CHARACTER*20 NUMBER_TYPE
 
+	COSDELTA = 0.0
+
 *     get the number type from interface
 
 	CALL PAR_GET0C( 'NUMBER_TYPE', NUMBER_TYPE, STATUS)

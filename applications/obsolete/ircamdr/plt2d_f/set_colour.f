@@ -57,6 +57,8 @@
 
 * =====================================================================
 
+	PEN_COLOUR = 0
+
 * test if colour device or not
 	IF(  DEVICE_NAME .EQ. 'T5688' .OR.
      :	     DEVICE_NAME .EQ. 'ARGS' .OR.

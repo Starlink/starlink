@@ -78,6 +78,9 @@
 	  RETURN
 	END IF
 
+	PCOL = 0
+	RCI = 0.0
+
 * get direction of colour table from parameter system
 	CALL PAR_GET0C( 'CT_DIRECTION', CT_DIRECTION, STATUS)
 	IF( STATUS. NE. SAI__OK) THEN
