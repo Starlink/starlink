@@ -18,9 +18,11 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  20/03/98  Created
+ * Peter W. Draper 07/04/05  Added __x86_64
  */
 
-#if defined(i386) || defined(__i386__) || defined(__alpha) || \
+#if defined(i386) || defined(__i386__) || defined(__x86_64) || \
+     defined(__alpha) || \
      defined(vax) || defined(__vax__) || (defined(mips) && defined(MIPSEL))
 
 // byte swapping needed, make copies of existing classes, but with swapping disabled
