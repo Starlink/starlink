@@ -127,6 +127,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added System "J2000"
 *     27-JAN-2005 (DSB):
 *        Fix memory leaks in astLoadSkyFrame_ and Match.
+*     7-APR-2005 (DSB):
+*        Allow SkyRefIs to be set to "Ignored".
 *class--
 */
 
@@ -145,8 +147,10 @@ f     The SkyFrame class does not define any new routines beyond those
 #define BAD_REF 0
 #define POLE_REF 1
 #define ORIGIN_REF 2
+#define IGNORED_REF 3
 #define POLE_STRING "Pole"
 #define ORIGIN_STRING "Origin"
+#define IGNORED_STRING "Ignored"
 
 /*
 *
@@ -1566,6 +1570,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       if ( astOK ) {
          if( ival == POLE_REF ){
             result = POLE_STRING;
+         } else if( ival == IGNORED_REF ){
+            result = IGNORED_STRING;
          } else {
             result = ORIGIN_STRING;
          }
@@ -2304,7 +2310,8 @@ static const char *GetLabel( AstFrame *this, int axis ) {
          }
 
 /* If the SkyRef attribute has a set value, append " offset" to the label. */
-         if( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) {
+         if( astGetSkyRefIs( this ) != IGNORED_REF && 
+             ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) ) {
             sprintf( buff, "%s offset", result );
             result = buff;
          }
@@ -2614,8 +2621,10 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
 		      (int) system );
          }
 
-/* If the SkyRef attribute had a set value, prepend "D" to the Symbol. */
-         if( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ){
+/* If the SkyRef attribute had a set value, prepend "D" (for "delta") to the 
+   Symbol. */
+         if( astGetSkyRefIs( this ) != IGNORED_REF && 
+             ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) ) {
             sprintf( buff, "D%s", result );
             result = buff;
          }
@@ -2825,8 +2834,9 @@ static const char *GetTitle( AstFrame *this_frame ) {
       system = astGetSystem( this );
 
 /* See if an offset coordinate system is being used.*/
-      offset = astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 );
-
+      offset = ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) )
+               && ( astGetSkyRefIs( this ) != IGNORED_REF );
+      
 /* Use this to determine if the word "coordinates" or "offsets" should be
    used.*/
       word = offset ? "offsets" : "coordinates";
@@ -5171,8 +5181,8 @@ static AstMapping *OffsetMap( AstSkyFrame *this ){
 
 /* Return a UnitMap if the offset coordinate system is not defined, or if
    the AlignOffset attribute has a non-zero value. */
-   if( astGetAlignOffset( this ) || ( !astTestSkyRef( this, 0 ) && 
-                                      !astTestSkyRef( this, 1 ) ) ) {
+   if( astGetAlignOffset( this ) || astGetSkyRefIs( this ) == IGNORED_REF || 
+       ( !astTestSkyRef( this, 0 ) && !astTestSkyRef( this, 1 ) ) ) {
       result = (AstMapping *) astUnitMap( 2, "" );
 
 /* Otherwise... */
@@ -6342,6 +6352,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
       } else if( astChrMatch( setting + offset, ORIGIN_STRING ) ) {
          astSetSkyRefIs( this, ORIGIN_REF );
+
+      } else if( astChrMatch( setting + offset, IGNORED_STRING ) ) {
+         astSetSkyRefIs( this, IGNORED_REF );
 
       } else if( astOK ) {
          astError( AST__OPT, "astSet(%s): option '%s' is unknown in '%s'.",
@@ -8200,8 +8213,8 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 *     SkyRefP attributes are used. These three attributes together allow
 *     a SkyFrame to represent offsets relative to some specified origin
 *     or pole within the coordinate system specified by the System attribute, 
-*     rather than absolute axis values. SkyRefIs can take either of the 
-*     case-insensitive values "Origin" or "Pole". 
+*     rather than absolute axis values. SkyRefIs can take one of the 
+*     case-insensitive values "Origin", "Pole" or "Ignored". 
 *
 *     If SkyRefIs is set to "Origin" (the default), then the coordinate system
 *     represented by the SkyFrame is modified to put the origin of longitude
@@ -8210,6 +8223,10 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 *     If SkyRefIs is set to "Pole", then the coordinate system represented 
 *     by the SkyFrame is modified to put the north pole at the position 
 *     specified by the SkyRef attribute. 
+*
+*     If SkyRefIs is set to "Ignored", then any value set for the SkyRef
+*     attribute is ignored, and the SkyFrame represents the coordinate
+*     system specified by the System attribute directly without any rotation.
 
 *  Applicability:
 *     SkyFrame
@@ -8573,6 +8590,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    if( ival == POLE_REF ) {
       astWriteString( channel, "SRefIs", set, 0, POLE_STRING,
                       "Rotated to put pole at ref. pos." );
+
+   } else if( ival == IGNORED_REF ) {
+      astWriteString( channel, "SRefIs", set, 0, IGNORED_STRING,
+                      "Not rotated (ref. pos. is ignored)" );
 
    } else {
       astWriteString( channel, "SRefIs", set, 0, ORIGIN_STRING,
@@ -8952,6 +8973,8 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
             new->skyrefis = POLE_REF;
          } else if( astChrMatch( sval, ORIGIN_STRING ) ) {
             new->skyrefis = ORIGIN_REF;
+         } else if( astChrMatch( sval, IGNORED_STRING ) ) {
+            new->skyrefis = IGNORED_REF;
          } else if( !astChrMatch( sval, " " ) && astOK ){
 	    astError( AST__INTER, "astRead(SkyFrame): Corrupt SkyFrame contains "
 		      "invalid SkyRefIs attribute value (%d).", sval );
