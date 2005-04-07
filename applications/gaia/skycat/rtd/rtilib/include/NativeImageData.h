@@ -22,10 +22,12 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  20/03/98  Created
  * Peter W. Draper 30/05/01  Added double support.
+ *                 07/04/04  Added __x86_64
  */
 
-#if defined(i386) || defined(__i386__) || defined(__alpha) || \
-     defined(vax) || defined(__vax__) || (defined(mips) && defined(MIPSEL))
+#if defined(i386) || defined(__i386__) || defined(__x86_64) || \
+    defined(__alpha) || \
+    defined(vax) || defined(__vax__) || (defined(mips) && defined(MIPSEL))
 
 // watch out for #include guards...
 #ifndef _ShortImageData_h_
