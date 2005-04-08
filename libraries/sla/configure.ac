@@ -67,6 +67,6 @@ dnl    There are neither build nor use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun67)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml vers.f veri.f)
 
 AC_OUTPUT
