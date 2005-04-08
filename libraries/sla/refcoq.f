@@ -1,4 +1,4 @@
-      SUBROUTINE sla_REFCOQ (TDK, PMB, RH, WL, REFA, REFB)
+      SUBROUTINE sla_REFCOQ ( TDK, PMB, RH, WL, REFA, REFB )
 *+
 *     - - - - - - -
 *      R E F C O Q
@@ -13,7 +13,7 @@
 *  zenith distance.
 *
 *  Given:
-*    TDK      d      ambient temperature at the observer (deg K)
+*    TDK      d      ambient temperature at the observer (K)
 *    PMB      d      pressure at the observer (millibar)
 *    RH       d      relative humidity at the observer (range 0-1)
 *    WL       d      effective wavelength of the source (micrometre)
@@ -48,7 +48,7 @@
 *
 *     The model was tested using the following range of conditions:
 *
-*       lapse rates 0.0055, 0.0065, 0.0075 deg/metre
+*       lapse rates 0.0055, 0.0065, 0.0075 K/metre
 *       latitudes 0, 25, 50, 75 degrees
 *       heights 0, 2500, 5000 metres ASL
 *       pressures mean for height -10% to +5% in steps of 5%
@@ -67,11 +67,11 @@
 *
 *     For this particular set of conditions:
 *
-*       lapse rate 0.0065 degK/metre
+*       lapse rate 0.0065 K/metre
 *       latitude 50 degrees
 *       sea level
 *       pressure 1005 mB
-*       temperature 280.15 degK
+*       temperature 280.15 K
 *       humidity 80%
 *       wavelength 5740 Angstroms
 *
@@ -156,9 +156,9 @@
 *
 *     Stone, Ronald C., P.A.S.P. 108 1051-1058, 1996.
 *
-*  P.T.Wallace   Starlink   23 May 2002
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -209,7 +209,7 @@
 *  Refractive index minus 1 at the observer.
       IF (OPTIC) THEN
          WLSQ = W*W
-         GAMMA = ((77.532D-6+(4.391D-7+3.57D-9/WLSQ)/WLSQ)*P
+         GAMMA = ((77.53484D-6+(4.39108D-7+3.666D-9/WLSQ)/WLSQ)*P
      :                                                 -11.2684D-6*PW)/T
       ELSE
          GAMMA = (77.6890D-6*P-(6.3938D-6-0.375463D0/T)*PW)/T

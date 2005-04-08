@@ -19,12 +19,11 @@
 *                       0 = OK
 *                      -1 = unacceptable date (before 4701BC March 1)
 *
-*  The algorithm is derived from that of Hatcher 1984
-*  (QJRAS 25, 53-55).
+*  The algorithm is adapted from Hatcher 1984 (QJRAS 25, 53-55).
 *
-*  P.T.Wallace   Starlink   27 April 1998
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -55,28 +54,27 @@
       INTEGER JD,N4,ND10
 
 
-
-*  Check if date is acceptable
-      IF (DJM.LE.-2395520D0.OR.DJM.GE.1D9) THEN
-         J=-1
+*  Check if date is acceptable.
+      IF ( DJM.LE.-2395520D0 .OR. DJM.GE.1D9 ) THEN
+         J = -1
       ELSE
-         J=0
+         J = 0
 
-*     Separate day and fraction
-         F=MOD(DJM,1D0)
-         IF (F.LT.0D0) F=F+1D0
-         D=ANINT(DJM-F)
+*     Separate day and fraction.
+         F = MOD(DJM,1D0)
+         IF (F.LT.0D0) F = F+1D0
+         D = ANINT(DJM-F)
 
-*     Express day in Gregorian calendar
-         JD=NINT(D)+2400001
+*     Express day in Gregorian calendar.
+         JD = NINT(D)+2400001
 
-         N4=4*(JD+((6*((4*JD-17918)/146097))/4+1)/2-37)
-         ND10=10*(MOD(N4-237,1461)/4)+5
+         N4 = 4*(JD+((6*((4*JD-17918)/146097))/4+1)/2-37)
+         ND10 = 10*(MOD(N4-237,1461)/4)+5
 
-         IY=N4/1461-4712
-         IM=MOD(ND10/306+2,12)+1
-         ID=MOD(ND10,306)/10+1
-         FD=F
+         IY = N4/1461-4712
+         IM = MOD(ND10/306+2,12)+1
+         ID = MOD(ND10,306)/10+1
+         FD = F
 
          J=0
 

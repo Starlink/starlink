@@ -1,5 +1,5 @@
-      SUBROUTINE sla_AOPPA (DATE, DUT, ELONGM, PHIM, HM,
-     :                      XP, YP, TDK, PMB, RH, WL, TLR, AOPRMS)
+      SUBROUTINE sla_AOPPA ( DATE, DUT, ELONGM, PHIM, HM,
+     :                       XP, YP, TDK, PMB, RH, WL, TLR, AOPRMS )
 *+
 *     - - - - - -
 *      A O P P A
@@ -16,11 +16,11 @@
 *     HM     d      observer's height above sea level (metres)
 *     XP     d      polar motion x-coordinate (radians)
 *     YP     d      polar motion y-coordinate (radians)
-*     TDK    d      local ambient temperature (DegK; std=273.15D0)
+*     TDK    d      local ambient temperature (K; std=273.15D0)
 *     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
 *     RH     d      local relative humidity (in the range 0D0-1D0)
 *     WL     d      effective wavelength (micron, e.g. 0.55D0)
-*     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+*     TLR    d      tropospheric lapse rate (K/metre, e.g. 0.0065D0)
 *
 *  Returned:
 *     AOPRMS d(14)  star-independent apparent-to-observed parameters:
@@ -81,17 +81,17 @@
 *
 *             HM ~ -29.3D0*TSL*LOG(P/1013.25D0).
 *
-*       where TSL is the approximate sea-level air temperature in
-*       deg K (see Astrophysical Quantities, C.W.Allen, 3rd edition,
+*       where TSL is the approximate sea-level air temperature in K
+*       (see Astrophysical Quantities, C.W.Allen, 3rd edition,
 *       section 52).  Similarly, if the pressure P is not known,
 *       it can be estimated from the height of the observing
-*       station, HM as follows:
+*       station, HM, as follows:
 *
 *             P ~ 1013.25D0*EXP(-HM/(29.3D0*TSL)).
 *
-*       Note, however, that the refraction is proportional to the
-*       pressure and that an accurate P value is important for
-*       precise work.
+*       Note, however, that the refraction is nearly proportional to the
+*       pressure and that an accurate P value is important for precise
+*       work.
 *
 *   7)  Repeated, computationally-expensive, calls to sla_AOPPA for
 *       times that are very close together can be avoided by calling
@@ -102,9 +102,9 @@
 *
 *  Called:  sla_GEOC, sla_REFCO, sla_EQEQX, sla_AOPPAT
 *
-*  P.T.Wallace   Starlink   24 October 2003
+*  Last revision:   29 December 2004
 *
-*  Copyright (C) 2003 P.T.Wallace and CCLRC
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

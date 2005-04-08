@@ -18,12 +18,11 @@
 *
 *  To comply with the ANSI Fortran 77 standard, A, B and C must
 *  be different arrays.  However, the routine is coded so as to
-*  work properly on the VAX and many other systems even if this
-*  rule is violated.
+*  work properly on many platforms even if this rule is violated.
 *
-*  P.T.Wallace   Starlink   5 April 1990
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

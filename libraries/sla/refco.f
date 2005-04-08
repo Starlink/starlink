@@ -1,5 +1,5 @@
-      SUBROUTINE sla_REFCO (HM, TDK, PMB, RH, WL, PHI, TLR, EPS,
-     :                      REFA, REFB)
+      SUBROUTINE sla_REFCO ( HM, TDK, PMB, RH, WL, PHI, TLR, EPS,
+     :                       REFA, REFB )
 *+
 *     - - - - - -
 *      R E F C O
@@ -14,12 +14,12 @@
 *
 *  Given:
 *    HM      d     height of the observer above sea level (metre)
-*    TDK     d     ambient temperature at the observer (deg K)
+*    TDK     d     ambient temperature at the observer (K)
 *    PMB     d     pressure at the observer (millibar)
 *    RH      d     relative humidity at the observer (range 0-1)
 *    WL      d     effective wavelength of the source (micrometre)
 *    PHI     d     latitude of the observer (radian, astronomical)
-*    TLR     d     temperature lapse rate in the troposphere (degK/metre)
+*    TLR     d     temperature lapse rate in the troposphere (K/metre)
 *    EPS     d     precision required to terminate iteration (radian)
 *
 *  Returned:
@@ -42,9 +42,9 @@
 *     for ZD < 80 deg, 0.01 arcsec accuracy for ZD < 60 deg, and
 *     0.001 arcsec accuracy for ZD < 45 deg.
 *
-*  P.T.Wallace   Starlink   3 June 1997
+*  P.T.Wallace   Starlink   22 May 2004
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright (C) 2004 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

@@ -27,11 +27,11 @@
 *     JSTAT    i       status:
 *                          +102 = warning, distant epoch
 *                          +101 = warning, large timespan ( > 100 years)
-*                      +1 to +8 = coincident with major planet (Note 5)
+*                     +1 to +10 = coincident with major planet (Note 5)
 *                             0 = OK
 *                            -1 = numerical error
 *
-*  Called:  sla_EPJ, sla_PLANET, sla_PV2UE, sla_UE2PV, sla_EVP,
+*  Called:  sla_EPJ, sla_PLANET, sla_PV2UE, sla_UE2PV, sla_EPV,
 *           sla_PREC, sla_DMOON, sla_DMXV
 *
 *  Notes:
@@ -132,8 +132,8 @@
 *     interprets a suspiciously small value (0.001 AU) as an attempt to
 *     apply the routine to the planet concerned.  If this condition is
 *     detected, the contribution from that planet is ignored, and the
-*     status is set to the planet number (Mercury=1,...,Neptune=8) as a
-*     warning.
+*     status is set to the planet number (1-10 = Mercury, Venus, EMB,
+*     Mars, Jupiter, Saturn, Uranus, Neptune, Earth, Moon) as a warning.
 *
 *  References:
 *
@@ -142,9 +142,9 @@
 *
 *     2  Everhart, E. & Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
 *
-*  P.T.Wallace   Starlink   9 December 2002
+*  Last revision:   27 December 2004
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -519,7 +519,7 @@
                IF (NP.EQ.9) THEN
 
 *              Earth: position.
-                  CALL sla_EVP(T,2000D0,VB,PB,VH,PE)
+                  CALL sla_EPV(T,PE,VH,PB,VB)
                   DO I=1,3
                      RHO(I) = PE(I)
                   END DO

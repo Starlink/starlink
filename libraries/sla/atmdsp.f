@@ -7,7 +7,7 @@
 *  Apply atmospheric-dispersion adjustments to refraction coefficients.
 *
 *  Given:
-*     TDK       d       ambient temperature, degrees K
+*     TDK       d       ambient temperature, K
 *     PMB       d       ambient pressure, millibars
 *     RH        d       ambient relative humidity, 0-1
 *     WL1       d       reference wavelength, micrometre (0.4D0 recommended)
@@ -65,9 +65,9 @@
 *     the B coefficient almost in the same ratio (see R.M.Green,
 *     "Spherical Astronomy", Cambridge University Press, 1985).
 *
-*  P.T.Wallace   Starlink   1 April 2002
+*  Last revision   26 December 2004
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

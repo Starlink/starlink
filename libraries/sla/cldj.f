@@ -19,12 +19,11 @@
 *
 *  The year must be -4699 (i.e. 4700BC) or later.
 *
-*  The algorithm is derived from that of Hatcher 1984
-*  (QJRAS 25, 53-55).
+*  The algorithm is adapted from Hatcher 1984 (QJRAS 25, 53-55).
 *
-*  P.T.Wallace   Starlink   11 March 1998
+*  Last revision:   27 July 2004
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -56,36 +55,36 @@
 
 
 
-*  Preset status
-      J=0
+*  Preset status.
+      J = 0
 
-*  Validate year
-      IF (IY.LT.-4699) THEN
-         J=1
+*  Validate year.
+      IF ( IY .LT. -4699 ) THEN
+         J = 1
       ELSE
 
-*     Validate month
-         IF (IM.GE.1.AND.IM.LE.12) THEN
+*     Validate month.
+         IF ( IM.GE.1 .AND. IM.LE.12 ) THEN
 
-*        Allow for leap year
-            IF (MOD(IY,4).EQ.0) THEN
-               MTAB(2)=29
+*        Allow for leap year.
+            IF ( MOD(IY,4) .EQ. 0 ) THEN
+               MTAB(2) = 29
             ELSE
-               MTAB(2)=28
+               MTAB(2) = 28
             END IF
-            IF (MOD(IY,100).EQ.0.AND.MOD(IY,400).NE.0)
-     :         MTAB(2)=28
+            IF ( MOD(IY,100).EQ.0 .AND. MOD(IY,400).NE.0 )
+     :         MTAB(2) = 28
 
-*        Validate day
-            IF (ID.LT.1.OR.ID.GT.MTAB(IM)) J=3
+*        Validate day.
+            IF ( ID.LT.1 .OR. ID.GT.MTAB(IM) ) J=3
 
-*        Modified Julian Date
-            DJM=DBLE((1461*(IY-(12-IM)/10+4712))/4
-     :               +(306*MOD(IM+9,12)+5)/10
-     :               -(3*((IY-(12-IM)/10+4900)/100))/4
-     :               +ID-2399904)
+*        Modified Julian Date.
+            DJM = DBLE ( ( 1461 * ( IY - (12-IM)/10 + 4712 ) ) / 4
+     :               + ( 306 * MOD ( IM+9, 12 ) + 5 ) / 10
+     :               - ( 3 * ( ( IY - (12-IM)/10 + 4900 ) / 100 ) ) / 4
+     :               + ID - 2399904 )
 
-*        Bad month
+*        Bad month.
          ELSE
             J=2
          END IF

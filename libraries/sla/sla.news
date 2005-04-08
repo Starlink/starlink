@@ -1,13 +1,22 @@
-#     3-JAN-2003 (PTW):
-#        New routine: sla_PLANTU
-#        Miscellaneous improvements.
-#        Revised document:  SUN/67.60.
-#        Package version number changed to 2.4-11.
+#     8-APR-2005 (PTW):
+#        New routine - sla_EPV - plus miscellaneous improvements.
+#        Revised document:  SUN/67.68.
+#        Package version number changed to 2.5-1.
 
 
-SLALIB_Version_2.4-12                                 Expiry 31 March 2004
+SLALIB_Version_2.5.1                                  Expiry 31 March 2006
 
-* SLALIB now released under the GNU GPL license.
+* An additional Earth position/velocity routine, sla_EPV, has been
+  added.  It is bigger and slower than sla_EVP but much more accurate.
+  Position accuracy is a few km;  velocity accuracy is a few mm/s.
+  The sla_PERTUE and sla_PLANTU routines now call this routine in
+  order to deliver better predictions for near-Earth objects.
+
+SLALIB_Version_2.4-14                              Expiry 31 December 2005
+
+* Cosmetic changes to about 20% of the routines.
+
+* Updated optical refraction model in REFCOQ and REFRO.
 
 SLALIB_Version_2.4-11                                 Expiry 31 March 2004
 
@@ -39,11 +48,10 @@ The latest releases of SLALIB include the following changes:
   fixing the body, and osculation) and also some notes dealing with JPL
   and MPC elements.  Additionally, a table has been added to SUN/67
   showing how to use the JPL and MPC elements.
-
    
  P.T.Wallace
- 19 May 2003
+ 8 April 2005
 
- ptw@star.rl.ac.uk
- +44-1235-44-5372
+ ptw@tpsoft.demon.co.uk
+ +44-1235-531198
 --------------------------------------------------------------------------

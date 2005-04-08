@@ -4,8 +4,7 @@
 *      I N V F
 *     - - - - -
 *
-*  Invert a linear model of the type produced by the
-*  sla_FITXY routine.
+*  Invert a linear model of the type produced by the sla_FITXY routine.
 *
 *  Given:
 *     FWDS    d(6)      model coefficients
@@ -49,14 +48,13 @@
 *
 *  To comply with the ANSI Fortran standard, FWDS and BKWDS must
 *  not be the same array, even though the routine is coded to
-*  work on the VAX and most other computers even if this rule
-*  is violated.
+*  work on many platforms even if this rule is violated.
 *
 *  See also sla_FITXY, sla_PXY, sla_XY2XY, sla_DCMPF
 *
-*  P.T.Wallace   Starlink   11 April 1990
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

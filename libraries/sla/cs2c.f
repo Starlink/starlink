@@ -8,20 +8,19 @@
 *
 *  Given:
 *     A,B      real      spherical coordinates in radians
-*                        (RA,Dec), (Long,Lat) etc
+*                           (RA,Dec), (long,lat) etc.
 *
 *  Returned:
 *     V        real(3)   x,y,z unit vector
 *
-*  The spherical coordinates are longitude (+ve anticlockwise
-*  looking from the +ve latitude pole) and latitude.  The
-*  Cartesian coordinates are right handed, with the x axis
-*  at zero longitude and latitude, and the z axis at the
-*  +ve latitude pole.
+*  The spherical coordinates are longitude (+ve anticlockwise looking
+*  from the +ve latitude pole) and latitude.  The Cartesian coordinates
+*  are right handed, with the x axis at zero longitude and latitude, and
+*  the z axis at the +ve latitude pole.
 *
-*  P.T.Wallace   Starlink   October 1984
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -49,10 +48,10 @@
 
 
 
-      COSB=COS(B)
+      COSB = COS(B)
 
-      V(1)=COS(A)*COSB
-      V(2)=SIN(A)*COSB
-      V(3)=SIN(B)
+      V(1) = COS(A)*COSB
+      V(2) = SIN(A)*COSB
+      V(3) = SIN(B)
 
       END

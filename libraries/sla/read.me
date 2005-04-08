@@ -1,6 +1,6 @@
 READ.ME
 
-Revision date 4 September 2000                     SLALIB Version 2.4-5
+Revision date 8 April 2005                         SLALIB Version 2.5-1
 
 -----------------------------------------------------------------------
 
@@ -19,6 +19,25 @@ FILES IN THE ORIGINAL SOURCE DIRECTORY (UNIX)
    make_file         Unix make file
    mk                C-shell script to run make
    sun67.tex         document
+
+-----------------------------------------------------------------------
+
+    Copyright (C) 1995-2005 Rutherford Appleton Laboratory
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 
 -----------------------------------------------------------------------
 
@@ -405,6 +424,12 @@ at the end):
 *  The sla_UNPCD routine used to be approximate but now is rigorous.
 
 *  The four VLTs and Gemini South have been added to sla_OBS.
+
+*  An additional Earth position/velocity routine, sla_EPV, has been
+   added.  It is bigger and slower than sla_EVP but much more accurate.
+   Position accuracy is a few km;  velocity accuracy is a few mm/s.
+   The sla_PERTUE and sla_PLANTU routines now call this routine in
+   order to deliver better predictions for near-Earth objects.
 
 -----------------------------------------------------------------------
 

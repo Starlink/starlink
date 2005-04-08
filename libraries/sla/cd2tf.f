@@ -22,11 +22,11 @@
 *
 *     2)  The largest useful value for NDP is determined by the size of
 *         DAYS, the format of REAL floating-point numbers on the target
-*         machine, and the risk of overflowing IHMSF(4).  For example,
-*         on the VAX, for DAYS up to 1.0, the available floating-point
-*         precision corresponds roughly to NDP=3.  This is well below
-*         the ultimate limit of NDP=9 set by the capacity of the 32-bit
-*         integer IHMSF(4).
+*         machine, and the risk of overflowing IHMSF(4).  On some
+*         architectures, for DAYS up to 1.0, the available floating-
+*         point precision corresponds roughly to NDP=3.  This is well
+*         below the ultimate limit of NDP=9 set by the capacity of a
+*         typical 32-bit IHMSF(4).
 *
 *     3)  The absolute value of DAYS may exceed 1.0.  In cases where it
 *         does not, it is up to the caller to test for and handle the
@@ -35,9 +35,9 @@
 *
 *  Called:  sla_DD2TF
 *
-*  P.T.Wallace   Starlink   12 December 1993
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

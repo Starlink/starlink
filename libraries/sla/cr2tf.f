@@ -21,11 +21,11 @@
 *
 *  2)  The largest useful value for NDP is determined by the size of
 *      ANGLE, the format of REAL floating-point numbers on the target
-*      machine, and the risk of overflowing IHMSF(4).  For example,
-*      on the VAX, for ANGLE up to 2pi, the available floating-point
+*      machine, and the risk of overflowing IHMSF(4).  On some
+*      architectures, for ANGLE up to 2pi, the available floating-point
 *      precision corresponds roughly to NDP=3.  This is well below
-*      the ultimate limit of NDP=9 set by the capacity of the 32-bit
-*      integer IHMSF(4).
+*      the ultimate limit of NDP=9 set by the capacity of a typical
+*      32-bit IHMSF(4).
 *
 *  3)  The absolute value of ANGLE may exceed 2pi.  In cases where it
 *      does not, it is up to the caller to test for and handle the
@@ -34,9 +34,9 @@
 *
 *  Called:  sla_CD2TF
 *
-*  P.T.Wallace   Starlink   18 March 1999
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

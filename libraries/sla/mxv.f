@@ -17,9 +17,13 @@
 *  Returned:
 *     VB       real(3)      result vector
 *
-*  P.T.Wallace   Starlink   March 1986
+*  To comply with the ANSI Fortran 77 standard, VA and VB must be
+*  different arrays.  However, the routine is coded so as to work
+*  properly on many platforms even if this rule is violated.
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Last revision:   26 December 2004
+*
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

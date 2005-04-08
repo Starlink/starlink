@@ -1,12 +1,12 @@
-      SUBROUTINE sla_OAP (TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
-     :                    HM, XP, YP, TDK, PMB, RH, WL, TLR,
-     :                    RAP, DAP)
+      SUBROUTINE sla_OAP ( TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
+     :                     HM, XP, YP, TDK, PMB, RH, WL, TLR,
+     :                     RAP, DAP )
 *+
 *     - - - -
 *      O A P
 *     - - - -
 *
-*  Observed to apparent place
+*  Observed to apparent place.
 *
 *  Given:
 *     TYPE   c*(*)  type of coordinates - 'R', 'H' or 'A' (see below)
@@ -19,11 +19,11 @@
 *     HM     d      observer's height above sea level (metres)
 *     XP     d      polar motion x-coordinate (radians)
 *     YP     d      polar motion y-coordinate (radians)
-*     TDK    d      local ambient temperature (DegK; std=273.15D0)
+*     TDK    d      local ambient temperature (K; std=273.15D0)
 *     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
 *     RH     d      local relative humidity (in the range 0D0-1D0)
 *     WL     d      effective wavelength (micron, e.g. 0.55D0)
-*     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+*     TLR    d      tropospheric lapse rate (K/metre, e.g. 0.0065D0)
 *
 *  Returned:
 *     RAP    d      geocentric apparent right ascension
@@ -32,11 +32,11 @@
 *  Notes:
 *
 *  1)  Only the first character of the TYPE argument is significant.
-*      'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
-*      Ascension and Declination;  'H' or 'h' indicates that they are
-*      Hour Angle (West +ve) and Declination;  anything else ('A' or
-*      'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
-*      (North zero, East is 90 deg) and zenith distance.  (Zenith
+*      'R' or 'r' indicates that OBS1 and OBS2 are the observed right
+*      ascension and declination;  'H' or 'h' indicates that they are
+*      hour angle (west +ve) and declination;  anything else ('A' or
+*      'a' is recommended) indicates that OBS1 and OBS2 are azimuth
+*      (north zero, east 90 deg) and zenith distance.  (Zenith
 *      distance is used rather than elevation in order to reflect the
 *      fact that no allowance is made for depression of the horizon.)
 *
@@ -90,21 +90,24 @@
 *      properties which would need to be accounted for at the
 *      appropriate point in the sequence.
 *
-*  7)  The star-independent apparent-to-observed-place parameters
-*      in AOPRMS may be computed by means of the sla_AOPPA routine.
-*      If nothing has changed significantly except the time, the
-*      sla_AOPPAT routine may be used to perform the requisite
-*      partial recomputation of AOPRMS.
+*  7)  This routine takes time to execute, due mainly to the rigorous
+*      integration used to evaluate the refraction.  For processing
+*      multiple stars for one location and time, call sla_AOPPA once
+*      followed by one call per star to sla_OAPQK.  Where a range of
+*      times within a limited period of a few hours is involved, and the
+*      highest precision is not required, call sla_AOPPA once, followed
+*      by a call to sla_AOPPAT each time the time changes, followed by
+*      one call per star to sla_OAPQK.
 *
-*  8)  The DATE argument is UTC expressed as an MJD.  This is,
-*      strictly speaking, wrong, because of leap seconds.  However,
-*      as long as the delta UT and the UTC are consistent there
-*      are no difficulties, except during a leap second.  In this
-*      case, the start of the 61st second of the final minute should
-*      begin a new MJD day and the old pre-leap delta UT should
-*      continue to be used.  As the 61st second completes, the MJD
-*      should revert to the start of the day as, simultaneously,
-*      the delta UTC changes by one second to its post-leap new value.
+*  8)  The DATE argument is UTC expressed as an MJD.  This is, strictly
+*      speaking, wrong, because of leap seconds.  However, as long as
+*      the delta UT and the UTC are consistent there are no
+*      difficulties, except during a leap second.  In this case, the
+*      start of the 61st second of the final minute should begin a new
+*      MJD day and the old pre-leap delta UT should continue to be used.
+*      As the 61st second completes, the MJD should revert to the start
+*      of the day as, simultaneously, the delta UTC changes by one
+*      second to its post-leap new value.
 *
 *  9)  The delta UT (UT1-UTC) is tabulated in IERS circulars and
 *      elsewhere.  It increases by exactly one second at the end of
@@ -133,27 +136,27 @@
 *
 *             HM ~ -29.3D0*TSL*LOG(P/1013.25D0).
 *
-*      where TSL is the approximate sea-level air temperature in
-*      deg K (see Astrophysical Quantities, C.W.Allen, 3rd edition,
+*      where TSL is the approximate sea-level air temperature in K
+*      (see Astrophysical Quantities, C.W.Allen, 3rd edition,
 *      section 52).  Similarly, if the pressure P is not known,
 *      it can be estimated from the height of the observing
-*      station, HM as follows:
+*      station, HM, as follows:
 *
 *             P ~ 1013.25D0*EXP(-HM/(29.3D0*TSL)).
 *
-*      Note, however, that the refraction is proportional to the
-*      pressure and that an accurate P value is important for
-*      precise work.
+*      Note, however, that the refraction is nearly proportional to the
+*      pressure and that an accurate P value is important for precise
+*      work.
 *
-*  13) The azimuths etc used by the present routine are with respect
+*  13) The azimuths etc. used by the present routine are with respect
 *      to the celestial pole.  Corrections from the terrestrial pole
 *      can be computed using sla_POLMO.
 *
 *  Called:  sla_AOPPA, sla_OAPQK
 *
-*  P.T.Wallace   Starlink   23 May 2002
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 2002 P.T.Wallace and CCLRC
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

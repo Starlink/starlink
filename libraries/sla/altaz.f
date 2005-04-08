@@ -49,8 +49,8 @@
 *
 *  2)  Azimuth is returned in the range 0-2pi;  north is zero,
 *      and east is +pi/2.  Elevation and parallactic angle are
-*      returned in the range +/-pi.  Position angle is +ve
-*      for a star west of the meridian and is the angle NP-star-zenith.
+*      returned in the range +/-pi.  Parallactic angle is +ve for
+*      a star west of the meridian and is the angle NP-star-zenith.
 *
 *  3)  The latitude is geodetic as opposed to geocentric.  The
 *      hour angle and declination are topocentric.  Refraction and
@@ -67,9 +67,9 @@
 *      as sine and cosine of latitude, and (for tracking a star)
 *      sine and cosine of declination.
 *
-*  P.T.Wallace   Starlink   3 May 2000
+*  This revision:  29 October 2004
 *
-*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

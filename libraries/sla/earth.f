@@ -30,11 +30,12 @@
 *       13/5 E-5 AU = 19200/7600 km in position
 *       47/26 E-10 AU/s = 0.0070/0.0039 km/s in speed
 *
-*  4  More precise results are obtainable with the routine sla_EVP.
+*  4  More accurate results are obtainable with the routines sla_EVP
+*     and sla_EPV.
 *
-*  P.T.Wallace   Starlink   23 November 1994
+*  Last revision:   5 April 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

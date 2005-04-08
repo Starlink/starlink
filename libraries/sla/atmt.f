@@ -12,7 +12,7 @@
 *
 *  Given:
 *    R0      d    height of observer from centre of the Earth (metre)
-*    T0      d    temperature at the observer (deg K)
+*    T0      d    temperature at the observer (K)
 *    ALPHA   d    alpha          )
 *    GAMM2   d    gamma minus 2  ) see HMNAO paper
 *    DELM2   d    delta minus 2  )
@@ -25,15 +25,15 @@
 *    R       d    current distance from the centre of the Earth (metre)
 *
 *  Returned:
-*    T       d    temperature at R (deg K)
+*    T       d    temperature at R (K)
 *    DN      d    refractive index at R
 *    RDNDR   d    R * rate the refractive index is changing at R
 *
 *  Note that in the optical case C5 and C6 are zero.
 *
-*  P.T.Wallace   Starlink   30 May 1997
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

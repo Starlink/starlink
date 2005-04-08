@@ -20,43 +20,41 @@
 *
 *  Returned (all 3D Cartesian vectors):
 *
-*     DVB,DPB       barycentric velocity, position
-*
-*     DVH,DPH       heliocentric velocity, position
-*
-*  (Units are AU/s for velocity and AU for position)
+*     DVB,DPB       barycentric velocity, position (AU/s, AU)
+*     DVH,DPH       heliocentric velocity, position (AU/s, AU)
 *
 *  Called:  sla_EPJ, sla_PREC
 *
-*  Accuracy:
+*  Notes:
 *
-*     The maximum deviations from the JPL DE96 ephemeris are as
-*     follows:
+*  1  This routine is accurate enough for many purposes but faster and
+*     more compact than the sla_EPV routine.  The maximum deviations
+*     from the JPL DE96 ephemeris are as follows:
 *
-*     barycentric velocity         0.42  m/s
-*     barycentric position         6900  km
+*       barycentric velocity         0.42  m/s
+*       barycentric position         6900  km
 *
-*     heliocentric velocity        0.42  m/s
-*     heliocentric position        1600  km
+*       heliocentric velocity        0.42  m/s
+*       heliocentric position        1600  km
 *
-*  This routine is adapted from the BARVEL and BARCOR
-*  subroutines of P.Stumpff, which are described in
-*  Astron. Astrophys. Suppl. Ser. 41, 1-8 (1980).  Most of the
-*  changes are merely cosmetic and do not affect the results at
-*  all.  However, some adjustments have been made so as to give
-*  results that refer to the new (IAU 1976 'FK5') equinox
-*  and precession, although the differences these changes make
-*  relative to the results from Stumpff's original 'FK4' version
-*  are smaller than the inherent accuracy of the algorithm.  One
-*  minor shortcoming in the original routines that has NOT been
-*  corrected is that better numerical accuracy could be achieved
-*  if the various polynomial evaluations were nested.  Note also
-*  that one of Stumpff's precession constants differs by 0.001 arcsec
-*  from the value given in the Explanatory Supplement to the A.E.
+*  2  The routine is adapted from the BARVEL and BARCOR subroutines of
+*     Stumpff (1980).  Most of the changes are merely cosmetic and do
+*     not affect the results at all.  However, some adjustments have
+*     been made so as to give results that refer to the IAU 1976 'FK5'
+*     equinox and precession, although the differences these changes
+*     make relative to the results from Stumpff's original 'FK4' version
+*     are smaller than the inherent accuracy of the algorithm.  One
+*     minor shortcoming in the original routines that has NOT been
+*     corrected is that better numerical accuracy could be achieved if
+*     the various polynomial evaluations were nested.
 *
-*  P.T.Wallace   Starlink   21 March 1999
+*  Reference:
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*    Stumpff, P., Astron.Astrophys.Suppl.Ser. 41, 1-8 (1980).
+*
+*  Last revision:   7 April 2005
+*
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

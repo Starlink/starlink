@@ -38,13 +38,13 @@
 *     correct value and is never in error by more than 0.007 km/s.
 *     The error in light time correction is about 0.03s at worst,
 *     but is usually better than 0.01s. For applications requiring
-*     higher accuracy, see the sla_EVP routine.
+*     higher accuracy, see the sla_EVP and sla_EPV routines.
 *
 *  Called:  sla_EARTH, sla_CS2C, sla_VDV
 *
-*  P.T.Wallace   Starlink   24 November 1994
+*  Last revision:   5 April 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

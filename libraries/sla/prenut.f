@@ -4,7 +4,7 @@
 *      P R E N U T
 *     - - - - - - -
 *
-*  Form the matrix of precession and nutation (IAU1976/1980/FK5)
+*  Form the matrix of precession and nutation (SF2001)
 *  (double precision)
 *
 *  Given:
@@ -23,7 +23,7 @@
 *
 *  2)  The matrix is in the sense   V(true)  =  RMATPN * V(mean)
 *
-*  P.T.Wallace   Starlink   8 May 2000
+*  P.T.Wallace   Starlink   22 January 2005
 *
 *  Copyright (C) 2000 Rutherford Appleton Laboratory
 *

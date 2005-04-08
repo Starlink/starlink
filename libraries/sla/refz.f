@@ -33,28 +33,36 @@
 *     is, of course, far worse than this - see the documentation for
 *     sla_REFCO for more information.
 *
-*  2  At ZD 83 degrees, the rapidly-worsening A tan Z + B tan**3 Z
-*     model is abandoned and an empirical formula takes over.  Over a
-*     wide range of observer heights and corresponding temperatures and
-*     pressures, the following levels of accuracy (arcsec) are
-*     typically achieved, relative to numerical integration through a
-*     model atmosphere:
+*  2  At ZD 83 degrees, the rapidly-worsening A tan Z + B tan^3 Z
+*     model is abandoned and an empirical formula takes over.  For
+*     optical/IR wavelengths, over a wide range of observer heights and
+*     corresponding temperatures and pressures, the following levels of
+*     accuracy (arcsec, worst case) are achieved, relative to numerical
+*     integration through a model atmosphere:
 *
 *              ZR    error
 *
-*              80      0.4
-*              81      0.8
-*              82      1.5
-*              83      3.2
-*              84      4.9
-*              85      5.8
-*              86      6.1
-*              87      7.1
-*              88     10
-*              89     20
-*              90     40
-*              91    100         } relevant only to
-*              92    200         } high-elevation sites
+*              80      0.7
+*              81      1.3
+*              82      2.4
+*              83      4.7
+*              84      6.2
+*              85      6.4
+*              86      8
+*              87     10
+*              88     15
+*              89     30
+*              90     60
+*              91    150         } relevant only to
+*              92    400         } high-elevation sites
+*
+*     For radio wavelengths the errors are typically 50% larger than
+*     the optical figures and by ZD 85 deg are twice as bad, worsening
+*     rapidly below that.  To maintain 1 arcsec accuracy down to ZD=85
+*     at the Green Bank site, Condon (2004) has suggested amplifying
+*     the amount of refraction predicted by sla_REFZ below 10.8 deg
+*     elevation by the factor (1+0.00195*(10.8-E_t)), where E_t is the
+*     unrefracted elevation in degrees.
 *
 *     The high-ZD model is scaled to match the normal model at the
 *     transition point;  there is no glitch.
@@ -66,9 +74,14 @@
 *     Cartesian Az/El coordinates, and with the emphasis on speed
 *     rather than numerical accuracy.
 *
-*  P.T.Wallace   Starlink   19 September 1995
+*  Reference:
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*     Condon,J.J., Refraction Corrections for the GBT, PTCS/PN/35.2,
+*     NRAO Green Bank, 2004.
+*
+*  P.T.Wallace   Starlink   9 April 2004
+*
+*  Copyright (C) 2004 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

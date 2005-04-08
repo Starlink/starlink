@@ -32,13 +32,13 @@
 *  Notes:
 *
 *  1)  Only the first character of the TYPE argument is significant.
-*      'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
-*      Ascension and Declination;  'H' or 'h' indicates that they are
-*      Hour Angle (West +ve) and Declination;  anything else ('A' or
-*      'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
-*      (North zero, East is 90 deg) and zenith distance.  (Zenith
-*      distance is used rather than elevation in order to reflect the
-*      fact that no allowance is made for depression of the horizon.)
+*      'R' or 'r' indicates that OBS1 and OBS2 are the observed right
+*      ascension and declination;  'H' or 'h' indicates that they are
+*      hour angle (west +ve) and declination;  anything else ('A' or
+*      'a' is recommended) indicates that OBS1 and OBS2 are azimuth
+*      (north zero, east 90 deg) and zenith distance.  (Zenith distance
+*      is used rather than elevation in order to reflect the fact that
+*      no allowance is made for depression of the horizon.)
 *
 *  2)  The accuracy of the result is limited by the corrections for
 *      refraction.  Providing the meteorological parameters are
@@ -102,9 +102,9 @@
 *
 *  Called:  sla_DCS2C, sla_DCC2S, sla_REFRO, sla_DRANRM
 *
-*  P.T.Wallace   Starlink   23 June 1997
+*  Last revision:   29 December 2004
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -212,7 +212,7 @@
 
 *     Fast algorithm using two constant model
          TZ = SZ/ZAEO
-         DREF = AOPRMS(11)*TZ+AOPRMS(12)*TZ*TZ*TZ
+         DREF = (AOPRMS(11)+AOPRMS(12)*TZ*TZ)*TZ
 
       ELSE
 

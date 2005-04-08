@@ -1,5 +1,5 @@
-      SUBROUTINE sla_REFRO (ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
-     :                      EPS, REF)
+      SUBROUTINE sla_REFRO ( ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
+     :                       EPS, REF )
 *+
 *     - - - - - -
 *      R E F R O
@@ -10,7 +10,7 @@
 *  Given:
 *    ZOBS    d  observed zenith distance of the source (radian)
 *    HM      d  height of the observer above sea level (metre)
-*    TDK     d  ambient temperature at the observer (deg K)
+*    TDK     d  ambient temperature at the observer (K)
 *    PMB     d  pressure at the observer (millibar)
 *    RH      d  relative humidity at the observer (range 0-1)
 *    WL      d  effective wavelength of the source (micrometre)
@@ -71,17 +71,11 @@
 *        and Spatial Information Systems, University of New South
 *        Wales, Sydney, Australia.
 *
-*     .  Various small changes have been made to gain speed.
+*     .  The optical refractivity for dry air is from Resolution 3 of
+*        the International Association of Geodesy adopted at the XXIIth
+*        General Assembly in Birmingham, UK, 1999.
 *
-*     None of the changes significantly affects the optical/IR results
-*     with respect to the algorithm given in the 1992 Explanatory
-*     Supplement.  For example, at 70 deg zenith distance the present
-*     routine agrees with the ES algorithm to better than 0.05 arcsec
-*     for any reasonable combination of parameters.  However, the
-*     improved water-vapour expressions do make a significant difference
-*     in the radio band, at 70 deg zenith distance reaching almost
-*     4 arcsec for a hot, humid, low-altitude site during a period of
-*     low pressure.
+*     .  Various small changes have been made to gain speed.
 *
 *  5  The radio refraction is chosen by specifying WL > 100 micrometres.
 *     Because the algorithm takes no account of the ionosphere, the
@@ -122,9 +116,9 @@
 *
 *  Called:  sla_DRANGE, sla__ATMT, sla__ATMS
 *
-*  P.T.Wallace   Starlink   28 May 2002
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -212,7 +206,7 @@
       WLSQ = WLOK*WLOK
       GB = 9.784D0*(1D0-0.0026D0*COS(PHI+PHI)-0.00000028D0*HMOK)
       IF (OPTIC) THEN
-         A = (287.604D0+(1.6288D0+0.0136D0/WLSQ)/WLSQ)
+         A = (287.6155D0+(1.62887D0+0.01360D0/WLSQ)/WLSQ)
      :                                              *273.15D-6/1013.25D0
       ELSE
          A = 77.6890D-6

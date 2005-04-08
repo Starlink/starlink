@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(sla, 2.4-12, ussc@star.rl.ac.uk)
+AC_INIT(sla, 2.5-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -49,7 +49,6 @@ STAR_PLATFORM_SOURCES([random.F gresid.F wait.f],
 
 if cmp -s random.F random.Fdefault; then
     # The unix version, to be configured
-    #AC_LANG_PUSH([Fortran])
     found_random=false
     AC_CHECK_FUNCS([rand random], [found_random=true])
     if $found_random; then
@@ -57,7 +56,6 @@ if cmp -s random.F random.Fdefault; then
     else
         AC_LIBOBJ([rtl_random])
     fi
-    #AC_LANG_POP([Fortran])
 fi
 
 STAR_CNF_COMPATIBLE_SYMBOLS

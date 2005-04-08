@@ -36,7 +36,7 @@
 *  Returned (status flag):
 *     JSTAT   i    status: +102 = warning, distant epoch
 *                          +101 = warning, large timespan ( > 100 years)
-*                      +1 to +8 = coincident with major planet (Note 6)
+*                     +1 to +10 = coincident with planet (Note 6)
 *                             0 = OK
 *                            -1 = illegal JFORM
 *                            -2 = illegal E0
@@ -100,7 +100,8 @@
 *     suspiciously small value (0.001 AU) as an attempt to apply it to
 *     the planet concerned.  If this condition is detected, the
 *     contribution from that planet is ignored, and the status is set to
-*     the planet number (Mercury=1,...,Neptune=8) as a warning.
+*     the planet number (1-10 = Mercury, Venus, EMB, Mars, Jupiter,
+*     Saturn, Uranus, Neptune, Earth, Moon) as a warning.
 *
 *  Reference:
 *
@@ -109,9 +110,9 @@
 *
 *  Called:  sla_EL2UE, sla_PERTUE, sla_UE2EL
 *
-*  P.T.Wallace   Starlink   27 June 2002
+*  This revision:   19 June 2004
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright (C) 2004 P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

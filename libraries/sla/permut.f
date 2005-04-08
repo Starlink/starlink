@@ -8,10 +8,11 @@
 *
 *  Given:
 *     N         i      number of items:  there will be N! permutations
+*
+*  Given and returned:
 *     ISTATE    i(N)   state, ISTATE(1)=-1 to initialize
 *
 *  Returned:
-*     ISTATE    i(N)   state, updated ready for next time
 *     IORDER    i(N)   next permutation of numbers 1,2,...,N
 *     J         i      status: -1 = illegal N (zero or less is illegal)
 *                               0 = OK
@@ -40,9 +41,9 @@
 *  3) If the "finished" (J=1) status is ignored, the routine continues
 *     to deliver permutations, the pattern repeating every N! calls.
 *
-*  P.T.Wallace   Starlink   25 August 1999
+*  Last revision:   19 February 2005
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

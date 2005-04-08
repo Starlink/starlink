@@ -4,7 +4,7 @@
 *      D C C 2 S
 *     - - - - - -
 *
-*  Direction cosines to spherical coordinates (double precision)
+*  Cartesian to spherical coordinates (double precision)
 *
 *  Given:
 *     V     d(3)   x,y,z vector
@@ -12,18 +12,17 @@
 *  Returned:
 *     A,B   d      spherical coordinates in radians
 *
-*  The spherical coordinates are longitude (+ve anticlockwise
-*  looking from the +ve latitude pole) and latitude.  The
-*  Cartesian coordinates are right handed, with the x axis
-*  at zero longitude and latitude, and the z axis at the
-*  +ve latitude pole.
+*  The spherical coordinates are longitude (+ve anticlockwise looking
+*  from the +ve latitude pole) and latitude.  The Cartesian coordinates
+*  are right handed, with the x axis at zero longitude and latitude, and
+*  the z axis at the +ve latitude pole.
 *
-*  If V is null, zero A and B are returned.
-*  At either pole, zero A is returned.
+*  If V is null, zero A and B are returned.  At either pole, zero A is
+*  returned.
 *
-*  P.T.Wallace   Starlink   July 1989
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

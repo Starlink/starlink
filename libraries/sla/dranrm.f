@@ -9,12 +9,11 @@
 *  Given:
 *     ANGLE     dp      the angle in radians
 *
-*  The result is ANGLE expressed in the range 0-2 pi (double
-*  precision).
+*  The result is ANGLE expressed in the range 0-2 pi.
 *
-*  P.T.Wallace   Starlink   23 November 1995
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -42,7 +41,7 @@
       PARAMETER (D2PI=6.283185307179586476925286766559D0)
 
 
-      sla_DRANRM=MOD(ANGLE,D2PI)
-      IF (sla_DRANRM.LT.0D0) sla_DRANRM=sla_DRANRM+D2PI
+      sla_DRANRM = MOD(ANGLE,D2PI)
+      IF (sla_DRANRM.LT.0D0) sla_DRANRM = sla_DRANRM+D2PI
 
       END
