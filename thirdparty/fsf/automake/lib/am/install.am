@@ -63,14 +63,18 @@ if %?INSTALLMANIFEST%
 # another manifest.
 ## Pass the SHELL variable as /bin/sh, to ensure that the
 ## install-manifest target is executed using that shell.  That target
-## requires that file descriptor 5 is inherited, open, by the submake,
-## and /bin/ksh carefully closes all fd > 2 when invoking children.
+## requires that file descriptor $MANIFEST_FD is inherited, open, by the
+## submake, and /bin/ksh carefully closes all fd > 2 when invoking children.
 ## The configure script presumably rejected /bin/sh for a reason, but
 ## as of autoconf 2.57 at least, it was because it didn't support
 ## $LINENO, which we don't care about.  I've only seen that happen on
 ## Tru64 (v5.1 at least), and that was only a problem when using a
 ## non-default make, since the default one on Tru64 ignores $(SHELL)
 ## and uses /bin/sh for everything.
+##
+## We have to guess that the manifest_fd we choose below isn't used for
+## anything else by any other relevant application.  We seemed to have
+## some problems with fd 5 on Solaris; the use of 10 instead is superstition.
 install: %maybe_BUILT_SOURCES% all-am
 	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
 	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
@@ -81,15 +85,15 @@ install: %maybe_BUILT_SOURCES% all-am
 .PHONY: install-manifest
 install-manifest:
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 10>$$MF &&\
 	  MF_INST_OK=:; \
-	  echo "<?xml version='1.0'?>" >&5 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "<files>" >&5; \
-?!POSS_SUPPRESS_INSTALL?	  echo "<files>" >&5; \
-	  MANIFEST_FD=5; export MANIFEST_FD; \
+	  echo "<?xml version='1.0'?>" >&10 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&10 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&10 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&10 ; \
+?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "<files>" >&10; \
+?!POSS_SUPPRESS_INSTALL?	  echo "<files>" >&10; \
+	  MANIFEST_FD=10; export MANIFEST_FD; \
 ## If this is a standard package, then it's easy -- just use the
 ## MANIFEST_FD variable in the environment.
 ?STANDARDMANIFEST?	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) || MF_INST_OK=false; \
@@ -114,7 +118,7 @@ install-manifest:
 ?!STANDARDMANIFEST?	    (cd $$STG && find . ! -type d | \
 ?!STANDARDMANIFEST?	      sed "s,^\.,$$DESTDIR," | \
 ?!STANDARDMANIFEST?	      while read f; do \
-?!STANDARDMANIFEST?	        echo $$f >&5; \
+?!STANDARDMANIFEST?	        echo $$f >&10; \
 ?!STANDARDMANIFEST?	        test -f $$f && chmod 666 $$f && rm -f $$f; \
 ## The following null command appears to be necessary.  The /bin/sh on
 ## Solaris (SunOS 5.9) appears to get very upset if it isn't there.
@@ -127,10 +131,10 @@ install-manifest:
 ?!STANDARDMANIFEST?	    else echo "NOTE: no files installed">&2; fi; \
 ?!STANDARDMANIFEST?	  fi; \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "</files>" >&5; \
-?!POSS_SUPPRESS_INSTALL?	  echo "</files>" >&5; \
-	  echo "</manifest>" >&5; \
-	  exec 5>&-; \
+?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "</files>">&10; \
+?!POSS_SUPPRESS_INSTALL?	  echo "</files>" >&10; \
+	  echo "</manifest>" >&10; \
+	  exec 10>&-; \
 	  if $$MF_INST_OK; then \
 	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
 	  else \
