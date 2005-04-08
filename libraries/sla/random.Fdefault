@@ -48,9 +48,9 @@
 
       REAL SEED
 
-#if defined(HAVE_RAND)
+#if HAVE_RAND
       REAL RAND
-#elif defined(HAVE_RANDOM)
+#elif HAVE_RANDOM
       REAL RANDOM
 #else
  error "Can't find random-number function"
@@ -78,9 +78,9 @@
       END IF
 
 *  Next pseudo-random number
-#if defined(HAVE_RAND)
+#if HAVE_RAND
       sla_RANDOM=RAND(0)
-#elif defined(HAVE_RANDOM)
+#elif HAVE_RANDOM
       sla_RANDOM=RANDOM(ISEED)
 #endif
 

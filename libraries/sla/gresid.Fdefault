@@ -51,9 +51,9 @@
       REAL X,Y,R,W,GNEXT,G
       LOGICAL FTF,FIRST
 
-#if defined(HAVE_RAND)
+#if HAVE_RAND
       REAL RAND
-#elif defined(HAVE_RANDOM)
+#elif HAVE_RANDOM
       REAL RANDOM
 #else
  error "Can't find random-number function"
@@ -65,7 +65,7 @@
 
 
 *  First time through, initialise the random-number generator
-#ifdef HAVE_RAND
+#if HAVE_RAND
       IF (FTF) THEN
          X = RAND(123456789)
          FTF = .FALSE.
@@ -80,10 +80,10 @@
          DO WHILE (R.GE.1.0)
 
 *        Generate two random numbers in range +/- 1
-#if defined(HAVE_RAND)
+#if HAVE_RAND
             X = 2.0*RAND(0)-1.0
             Y = 2.0*RAND(0)-1.0
-#elif defined(HAVE_RANDOM)
+#elif HAVE_RANDOM
             X = 2.0*RAN(ISEED)-1.0
             Y = 2.0*RAN(ISEED)-1.0
 #endif
