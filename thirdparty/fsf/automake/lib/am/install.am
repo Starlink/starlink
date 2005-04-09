@@ -74,7 +74,8 @@ if %?INSTALLMANIFEST%
 ##
 ## We have to guess that the manifest_fd we choose below isn't used for
 ## anything else by any other relevant application.  We seemed to have
-## some problems with fd 5 on Solaris; the use of 10 instead is superstition.
+## some problems with fd 5 on Solaris; the use of 9 instead is superstition.
+## /bin/sh demands that descriptors be a single digit.
 install: %maybe_BUILT_SOURCES% all-am
 	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
 	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
@@ -85,15 +86,15 @@ install: %maybe_BUILT_SOURCES% all-am
 .PHONY: install-manifest
 install-manifest:
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 10>$$MF &&\
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 9>$$MF &&\
 	  MF_INST_OK=:; \
-	  echo "<?xml version='1.0'?>" >&10 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&10 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&10 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&10 ; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "<files>" >&10; \
-?!POSS_SUPPRESS_INSTALL?	  echo "<files>" >&10; \
-	  MANIFEST_FD=10; export MANIFEST_FD; \
+	  echo "<?xml version='1.0'?>" >&9 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&9 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&9 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&9 ; \
+?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "<files>" >&9; \
+?!POSS_SUPPRESS_INSTALL?	  echo "<files>" >&9; \
+	  MANIFEST_FD=9; export MANIFEST_FD; \
 ## If this is a standard package, then it's easy -- just use the
 ## MANIFEST_FD variable in the environment.
 ?STANDARDMANIFEST?	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) || MF_INST_OK=false; \
@@ -118,7 +119,7 @@ install-manifest:
 ?!STANDARDMANIFEST?	    (cd $$STG && find . ! -type d | \
 ?!STANDARDMANIFEST?	      sed "s,^\.,$$DESTDIR," | \
 ?!STANDARDMANIFEST?	      while read f; do \
-?!STANDARDMANIFEST?	        echo $$f >&10; \
+?!STANDARDMANIFEST?	        echo $$f >&9; \
 ?!STANDARDMANIFEST?	        test -f $$f && chmod 666 $$f && rm -f $$f; \
 ## The following null command appears to be necessary.  The /bin/sh on
 ## Solaris (SunOS 5.9) appears to get very upset if it isn't there.
@@ -131,10 +132,10 @@ install-manifest:
 ?!STANDARDMANIFEST?	    else echo "NOTE: no files installed">&2; fi; \
 ?!STANDARDMANIFEST?	  fi; \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "</files>">&10; \
-?!POSS_SUPPRESS_INSTALL?	  echo "</files>" >&10; \
-	  echo "</manifest>" >&10; \
-	  exec 10>&-; \
+?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "</files>">&9; \
+?!POSS_SUPPRESS_INSTALL?	  echo "</files>" >&9; \
+	  echo "</manifest>" >&9; \
+	  exec 9>&-; \
 	  if $$MF_INST_OK; then \
 	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
 	  else \
