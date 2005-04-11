@@ -55,9 +55,7 @@ install-%DIR%PROGRAMS: $(%DIR%_PROGRAMS)
 ?LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
 ?!LIBTOOL?	   echo " $(INSTALL_PROGRAM_ENV) $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 ?!LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
-	    if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	  else :; fi; \
 	done
 endif %?INSTALL%

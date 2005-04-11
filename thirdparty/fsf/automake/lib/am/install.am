@@ -55,29 +55,24 @@ install-data: install-data-am
 uninstall: uninstall-am
 endif !%?SUBDIRS%
 
+# Set to : to emit manifest lines, too
+# (don't actually do this here -- it's done within install-manifest below).
+MANIFEST=false
+
 if %?INSTALLMANIFEST%
-# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
-# invoke the install-manifest target, otherwise, do the real install
-# rule.  This means that if this is being invoked from within an
-# install-manifest rule further up the process tree, we don't create
-# another manifest.
-## Pass the SHELL variable as /bin/sh, to ensure that the
-## install-manifest target is executed using that shell.  That target
-## requires that file descriptor $MANIFEST_FD is inherited, open, by the
-## submake, and /bin/ksh carefully closes all fd > 2 when invoking children.
-## The configure script presumably rejected /bin/sh for a reason, but
-## as of autoconf 2.57 at least, it was because it didn't support
-## $LINENO, which we don't care about.  I've only seen that happen on
-## Tru64 (v5.1 at least), and that was only a problem when using a
-## non-default make, since the default one on Tru64 ignores $(SHELL)
-## and uses /bin/sh for everything.
-##
-## We have to guess that the manifest_fd we choose below isn't used for
-## anything else by any other relevant application.  We seemed to have
-## some problems with fd 5 on Solaris; the use of 9 instead is superstition.
-## /bin/sh demands that descriptors be a single digit.
+# If STAR_MANIFEST_DIR is defined and the MANIFEST variable has the
+# (default) string value 'false', then invoke the install-manifest
+# target, otherwise, do the real install rule.  This means that if
+# this is being invoked from within an install-manifest rule further
+# up the process tree, we don't create another manifest, which would
+# stomp on the original.
+#
+# Any Makefile which does special installations should check the
+# $(MANIFEST) variable, which will be ':' or 'false', and if it is
+# true, emit a line to stdout, consisting of the string 'MANIFEST:'
+# followed by the full path of the file being installed.
 install: %maybe_BUILT_SOURCES% all-am
-	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
+	if test -n "$(STAR_MANIFEST_DIR)" -a $(MANIFEST) = false; then \
 	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
 	else \
 	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
@@ -86,18 +81,14 @@ install: %maybe_BUILT_SOURCES% all-am
 .PHONY: install-manifest
 install-manifest:
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 9>$$MF &&\
-	  MF_INST_OK=:; \
-	  echo "<?xml version='1.0'?>" >&9 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&9 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&9 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&9 ; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "<files>" >&9; \
-?!POSS_SUPPRESS_INSTALL?	  echo "<files>" >&9; \
-	  MANIFEST_FD=9; export MANIFEST_FD; \
-## If this is a standard package, then it's easy -- just use the
-## MANIFEST_FD variable in the environment.
-?STANDARDMANIFEST?	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) || MF_INST_OK=false; \
+	MFX=$${TMPDIR-/tmp}/manifest-$$$$-1; rm -f $$MFX; MF_INST_OK=:; \
+## If this is a standard package, then it's easy.
+## If POSS_SUPPRESS_INSTALL is true, then this install will presumably do
+## very little, but we still let it run in case there is something useful
+## it can do.
+?STANDARDMANIFEST?	  { $(MAKE) $(AM_MAKEFLAGS) MANIFEST=: $(REAL_INSTALL) \
+?STANDARDMANIFEST?	    || MF_INST_OK=false; } \
+?STANDARDMANIFEST?	    | tee $$MFX | grep -v '^MANIFEST:' || :; \
 ## Otherwise, install the component to a staging area, using the
 ## STAR_MANIFEST_INSTALL_COMMAND defined in the Makefile.am, here available
 ## in MANIFESTMAKEINSTALL.
@@ -119,29 +110,43 @@ install-manifest:
 ?!STANDARDMANIFEST?	    (cd $$STG && find . ! -type d | \
 ?!STANDARDMANIFEST?	      sed "s,^\.,$$DESTDIR," | \
 ?!STANDARDMANIFEST?	      while read f; do \
-?!STANDARDMANIFEST?	        echo $$f >&9; \
+?!STANDARDMANIFEST?	        echo MANIFEST:$$f; \
 ?!STANDARDMANIFEST?	        test -f $$f && chmod 666 $$f && rm -f $$f; \
 ## The following null command appears to be necessary.  The /bin/sh on
 ## Solaris (SunOS 5.9) appears to get very upset if it isn't there.
 ## I haven't a clue why!
 ?!STANDARDMANIFEST?	        :; \
-?!STANDARDMANIFEST?	      done ); \
+?!STANDARDMANIFEST?	      done ) >$$MFX; \
 ?!STANDARDMANIFEST?	    if test -d "$$STG$(prefix)"; then \
 ?!STANDARDMANIFEST?	      echo "(cd $$STG$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
 ?!STANDARDMANIFEST?	      (realdest=`cd $$DESTDIR$(prefix) && pwd`; cd $$STG$(prefix) && $(CP_RECURSIVE) . $$realdest ) || MF_INST_OK=false; \
 ?!STANDARDMANIFEST?	    else echo "NOTE: no files installed">&2; fi; \
 ?!STANDARDMANIFEST?	  fi; \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
-?POSS_SUPPRESS_INSTALL?	  test -f STAR_SUPPRESS_BUILD || echo "</files>">&9; \
-?!POSS_SUPPRESS_INSTALL?	  echo "</files>" >&9; \
-	  echo "</manifest>" >&9; \
-	  exec 9>&-; \
+## Now make the actual manifest file, if everything went well above
 	  if $$MF_INST_OK; then \
+	    MF=$${TMPDIR-/tmp}/manifest-$$$$-2; rm -f $$MF; \
+	    ( echo "<?xml version='1.0'?>"; \
+	      echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"; \
+	      echo "<manifest component='$(PACKAGE)'>"; \
+	      echo "<version>$(PACKAGE_VERSION)</version>"; \
+## Avoid writing the <files> start- and end-tags if STAR_SUPPRESS_BUILD
+## is present.  But extract the MANIFEST: lines from that file nonetheless:
+## these will contain the <note> element which the install-am target put
+## there.  If there is other material in that file, that's because some
+## other part of the makefile messed up: not our problem right now.
+?POSS_SUPPRESS_INSTALL?	      test -f STAR_SUPPRESS_BUILD || \
+	      echo "<files>"; \
+	      sed -n 's/^MANIFEST://p;' $$MFX; \
+?POSS_SUPPRESS_INSTALL?	      test -f STAR_SUPPRESS_BUILD || \
+	      echo "</files>"; \
+	      echo "</manifest>"; \
+	    ) >$$MF; \
 	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
 	  else \
 	    echo "Installation of component $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE) failed" >&2; \
 	  fi; \
-	  rm -f $$MF; \
+	  rm -f $$MFX $$MF; \
 ## Propagate the exit status to the calling make, and thence to the user
 	  $$MF_INST_OK
 
@@ -154,25 +159,20 @@ endif !%?INSTALLMANIFEST%
 install-am: all-am
 if %?POSS_SUPPRESS_INSTALL%
 	@if test -f STAR_SUPPRESS_BUILD; then \
-	  echo "<notes><p>This manifest file is a placeholder, as this component cannot be built.</p>" >&5; \
-	  echo "<p>" >&5; \
-	  sed 's/^ */    /' STAR_SUPPRESS_BUILD >&5; \
-	  echo "</p></notes>" >&5; \
+	  if $(MANIFEST); then \
+	    echo "MANIFEST:<notes><p>This manifest file is a placeholder, as this component cannot be built.</p>"; \
+	    echo "MANIFEST:<p>"; \
+	    sed 's/^ */MANIFEST:/' STAR_SUPPRESS_BUILD; \
+	    echo "MANIFEST:</p></notes>"; \
+	  else \
+	    echo "Installation suppressed" >&2; \
+	  fi; \
 	else \
 	  $(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am; \
 	fi
 else !%?POSS_SUPPRESS_INSTALL%
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 endif !%?POSS_SUPPRESS_INSTALL%
-## ## Starlink: install a stamp file, just in case install-manifest isn't run
-## 	rm -f stamp-starlink-install
-## 	echo "component=\"$(PACKAGE)\"" >stamp-starlink-install
-## 	echo "version=\"$(PACKAGE_VERSION)\"" >>stamp-starlink-install
-## 	echo "date=\"`date`\"" >>stamp-starlink-install
-## 	$(mkdir_p) $(STAR_MANIFEST_DIR)
-## 	$(INSTALL_DATA) stamp-starlink-install \
-## 	    $(STAR_MANIFEST_DIR)/stamp-`echo $(PACKAGE) | sed 's/[^A-Za-z0-9.-]/_/g'`
-## 	rm -f stamp-starlink-install
 
 .PHONY: installcheck
 ?SUBDIRS?installcheck: installcheck-recursive

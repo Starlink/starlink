@@ -59,9 +59,7 @@ install-man%SECTION%: $(man%SECTION%_MANS) $(man_MANS)
 	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
 	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man%SECTION%dir)/$$inst"; \
 	  $(INSTALL_DATA) $$file $(DESTDIR)$(man%SECTION%dir)/$$inst; \
-	  if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(man%SECTION%dir)/$$inst" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(man%SECTION%dir)/$$inst" || :; \
 	done
 
 

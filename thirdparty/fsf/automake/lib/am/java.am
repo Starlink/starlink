@@ -51,9 +51,7 @@ install-%DIR%JAVA: class%DIR%.stamp
 	for p in *.class; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(%NDIR%dir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(%NDIR%dir)/$$p; \
-	  if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$p" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$p" || :; \
 	done
 endif %?INSTALL%
 

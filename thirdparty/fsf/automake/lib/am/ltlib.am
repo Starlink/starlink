@@ -54,18 +54,18 @@ install-%DIR%LTLIBRARIES: $(%DIR%_LTLIBRARIES)
 ## at one point, so presumably it is to some extent.  I think we can 
 ## guarantee that the $p are all .la files -- so fail noisily if this isn't
 ## the case.
-	    if test -n "$$MANIFEST_FD"; then \
-	      echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
+	    if $(MANIFEST); then \
+	      echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	      expr $$p : '.*\.la$$' >/dev/null || \
 		{ echo "Installing non-la file $$p!"; exit 1; }; \
 	      (. ./$$p; \
 		if test -n "$$library_names"; then \
 		  for l in $$library_names; do \
-		    echo "$$libdir/$$l" >&$${MANIFEST_FD-0}; \
+		    echo "MANIFEST:$$libdir/$$l"; \
 		  done; \
 		fi; \
 		if test -n "$$old_library"; then \
-		  echo "$$libdir/$$old_library" >&$${MANIFEST_FD-0}; \
+		  echo "MANIFEST:$$libdir/$$old_library"; \
 		else :; fi; \
               ); \
 	    else :; fi; \

@@ -51,20 +51,20 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 ?!BASE?	  esac; \
 	  if expr "x$$p" : 'x.*\.htx_tar$$' >/dev/null; then \
 	    if test -n "$(PAX)"; then \
-	      if test -z "$$MANIFEST_FD"; then \
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r); \
-	      else \
+	      if $(MANIFEST); then \
 ## pax -v writes the archive contents to stderr, but it _also_ sends chatter
 ## there.  This is a bit mad, but there's nothing we can do about it, so remove
 ## lines with 'pax:' in the hope that this matches all and only the chatter.
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r -v 2>&1) | sed 's+^+$(stardocsdir)/+;/pax:/d' >&$${MANIFEST_FD-0}; \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r -v 2>&1) | sed '/pax:/d;s+^+MANIFEST:$(stardocsdir)/+'; \
+	      else \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r); \
 	      fi; \
 	    elif test -n "$(TAR)"; then \
-	      if test -z "$$MANIFEST_FD"; then \
+	      if $(MANIFEST); then \
 ## Is xBpf standard enough?
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpf -); \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpvf -) | sed 's+^+MANIFEST:$(stardocsdir)/+'; \
 	      else \
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpvf -) | sed 's+^+$(stardocsdir)/+' >&$${MANIFEST_FD-0}; \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpf -); \
 	      fi; \
 	    else \
 	      echo "Neither tar nor pax!!!" >&2; \
@@ -73,9 +73,7 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 	  else \
 	    echo " $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	    if test -n "$$MANIFEST_FD"; then \
-	      echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	  fi; \
 	done
 endif %?INSTALL%

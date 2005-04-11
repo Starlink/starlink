@@ -58,9 +58,7 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 ?LIBTOOL?	   $(INSTALL_MONOLITH_ENV) $(LIBTOOL) --mode=install $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
 ?!LIBTOOL?	   echo " $(INSTALL_MONOLITH_ENV) $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 ?!LIBTOOL?	   $(INSTALL_MONOLITH_ENV) $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
-	    if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	  else :; fi; \
 	done
 ## Now install each of the IFC files into the %DIR% directory, but as
@@ -83,9 +81,7 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 ?!BASE?	  esac; \
 	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	  if test -n "$$MANIFEST_FD"; then \
-	  	echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	done
 ## Finally, make links for each of the task:monolith pairs in variable
 ## TASK_MONOLITH_PAIRS
@@ -95,9 +91,7 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 	    rm -f $$task; \
 	    echo $(LN_S) $$monolith $$task; \
 	    $(LN_S) $$monolith $$task; \
-	    if test -n "$$MANIFEST_FD"; then \
-	      echo "$(DESTDIR)$(%NDIR%dir)/$$task" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$task" || :; \
 	  done
 endif %?INSTALL%
 

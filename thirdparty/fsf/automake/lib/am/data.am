@@ -47,9 +47,7 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 ?!BASE?	  esac; \
 	  echo " $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	  $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	  if test -n "$$MANIFEST_FD"; then \
-	  	echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	done
 endif %?INSTALL%
 

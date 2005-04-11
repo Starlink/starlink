@@ -59,9 +59,10 @@ DATA = $(dist_perllib_DATA) $(nodist_perllib_DATA)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
-	$(EXTRA_DIST) 
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 REAL_INSTALL = install-recursive
+# Set to : to emit manifest lines, too
+MANIFEST = false
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 APIVERSION = @APIVERSION@
@@ -205,9 +206,7 @@ install-dist_perllibDATA: $(dist_perllib_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(dist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f"; \
 	  $(dist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f; \
-	  if test -n "$$MANIFEST_FD"; then \
-	  	echo "$(DESTDIR)$(perllibdir)/$$f" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(perllibdir)/$$f" || :; \
 	done
 
 uninstall-dist_perllibDATA:
@@ -225,9 +224,7 @@ install-nodist_perllibDATA: $(nodist_perllib_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(nodist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f"; \
 	  $(nodist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f; \
-	  if test -n "$$MANIFEST_FD"; then \
-	  	echo "$(DESTDIR)$(perllibdir)/$$f" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(perllibdir)/$$f" || :; \
 	done
 
 uninstall-nodist_perllibDATA:
@@ -404,33 +401,47 @@ install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
 
-# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
-# invoke the install-manifest target, otherwise, do the real install
-# rule.  This means that if this is being invoked from within an
-# install-manifest rule further up the process tree, we don't create
-# another manifest.
+# If STAR_MANIFEST_DIR is defined and the MANIFEST variable has the
+# (default) string value 'false', then invoke the install-manifest
+# target, otherwise, do the real install rule.  This means that if
+# this is being invoked from within an install-manifest rule further
+# up the process tree, we don't create another manifest, which would
+# stomp on the original.
+#
+# Any Makefile which does special installations should check the
+# $(MANIFEST) variable, which will be ':' or 'false', and if it is
+# true, emit a line to stdout, consisting of the string 'MANIFEST:'
+# followed by the full path of the file being installed.
 install:  all-am
-	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
-	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
+	if test -n "$(STAR_MANIFEST_DIR)" -a $(MANIFEST) = false; then \
+	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
 	else \
 	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
 	fi
 
 install-manifest:
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
-	  echo "<?xml version='1.0'?>" >&5 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
-	  echo "<files>" >&5 ; \
-	  MANIFEST_FD=5; export MANIFEST_FD; \
-	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
-	  echo "</files>"                                       >&5; \
-	  echo "</manifest>"                                    >&5; \
-	  exec 5>&-; \
-	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
-	  rm -f $$MF
+	MFX=$${TMPDIR-/tmp}/manifest-$$$$-1; rm -f $$MFX; MF_INST_OK=:; \
+	  { $(MAKE) $(AM_MAKEFLAGS) MANIFEST=: $(REAL_INSTALL) \
+	    || MF_INST_OK=false; } \
+	    | tee $$MFX | grep -v '^MANIFEST:' || :; \
+	  if $$MF_INST_OK; then \
+	    MF=$${TMPDIR-/tmp}/manifest-$$$$-2; rm -f $$MF; \
+	    ( echo "<?xml version='1.0'?>"; \
+	      echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"; \
+	      echo "<manifest component='$(PACKAGE)'>"; \
+	      echo "<version>$(PACKAGE_VERSION)</version>"; \
+	      echo "<files>"; \
+	      sed -n 's/^MANIFEST://p;' $$MFX; \
+	      echo "</files>"; \
+	      echo "</manifest>"; \
+	    ) >$$MF; \
+	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	  else \
+	    echo "Installation of component $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE) failed" >&2; \
+	  fi; \
+	  rm -f $$MFX $$MF; \
+	  $$MF_INST_OK
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -452,9 +463,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-rm -f make.log
-	-rm -f configure.log
 	-rm -f starconf.status
+	-rm -f configure.log
+	-rm -f make.log
 clean: clean-recursive
 
 clean-am: clean-generic mostlyclean-am

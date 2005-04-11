@@ -149,9 +149,7 @@ install-info-am: $(INFO_DEPS)
 	      relfile=`echo "$$ifile" | sed 's|^.*/||'`; \
 	      echo " $(INSTALL_DATA) $$ifile $(DESTDIR)$(infodir)/$$relfile"; \
 	      $(INSTALL_DATA) $$ifile $(DESTDIR)$(infodir)/$$relfile; \
-	      if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(infodir)/$$relfile" >&$${MANIFEST_FD-0}; \
-	      else :; fi; \
+	      $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(infodir)/$$relfile" || :; \
 	    else : ; fi; \
 	  done; \
 	done

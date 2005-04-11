@@ -72,18 +72,14 @@ install-%DIR%LISP: $(%DIR%_LISP) $(ELCFILES)
 ?!BASE?	      $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
 ?!BASE?	      *) f=$$p;; \
 ?!BASE?	    esac; \
-	    if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	    echo " $(%DIR%LISP_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%LISP_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
 ## Only install .elc file if it exists.
 	    if test -f $${p}c; then \
 	      echo " $(%DIR%LISP_INSTALL) $${p}c $(DESTDIR)$(%NDIR%dir)/$${f}c"; \
 	      $(%DIR%LISP_INSTALL) $${p}c $(DESTDIR)$(%NDIR%dir)/$${f}c; \
-	      if test -n "$$MANIFEST_FD"; then \
-                echo "$(DESTDIR)$(%NDIR%dir)/$${f}c" >&$${MANIFEST_FD-0}; \
-	      else :; fi; \
+              $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$${f}c" || :; \
 	    else : ; fi; \
 	  done; \
 	else : ; fi
