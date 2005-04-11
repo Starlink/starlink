@@ -15,6 +15,9 @@ endif
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+# Distribute the CNF_PAR.F file so that the tar distribution builds
+EXTRA_DIST = CNF_PAR.F
+
 C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfCreim.c cnfCrela.c \
     cnfExpch.c cnfExpla.c cnfExpn.c cnfExprt.c cnfExprta.c cnfExprtap.c \
