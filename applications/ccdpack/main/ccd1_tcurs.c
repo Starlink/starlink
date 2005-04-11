@@ -6,10 +6,9 @@
 #include "tcl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "tcltalk.h"
-
-#define BUFLENG 200
-
+#include "ccdaux.h"
 
    F77_SUBROUTINE(ccd1_tcurs)( CHARACTER_ARRAY(ndfnms), INTEGER(nndf), 
                                CHARACTER(sname), CHARACTER(domain), 
@@ -113,6 +112,7 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -120,6 +120,8 @@
 *        Original version.
 *     9-APR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     11-APR-2005 (TIMJ):
+*        Fix compiler warnings by including string.h and ccdaux.h
 *     {enter_changes_here}
 
 *  Bugs:
@@ -158,7 +160,7 @@
 
 /* Local variables. */
       ccdTcl_Interp *cinterp;
-      char buffer[ BUFLENG ];
+      char buffer[ CCDAUX_BUFLENG ];
       char cmstyle[ GRP__SZNAM + 1 ];
       char cdomain[ GRP__SZNAM + 1 ];
       char csname[ GRP__SZNAM + 1 ];

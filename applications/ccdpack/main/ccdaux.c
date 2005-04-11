@@ -1,6 +1,7 @@
 #include "cnf.h"
 #include "dat_par.h"
 #include "sae_par.h"
+#include "ccdaux.h"
 
    void *ccdMall( char *type, int size, int *status ) {
 /*
