@@ -8,6 +8,10 @@ ftag_SOURCES = ftag-y.y tag.c tag.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+EXTRA_DIST = Scb.pm.in YyTag.pm.in scb.csh.in scb.pl.in scbindex.pl.in \
+             scbcp.pl.in dbmcat.pl.in ctag-l.c ftag-l.l mime.types \
+             scb_test.tar size_test.sh test_frame.c StarIndex.pm
+
 supportdir = $(bindir)
 support_DATA = mime.types
 
@@ -20,7 +24,13 @@ TESTS = scb_test.sh size_test.sh
 check_DATA = scb_test.tar
 
 scb_test.tar:
-	tar cf $@ \
+	tar xf $@ \
+                  test/Makefile \
+                  test/scb_c_test.c \
+                  test/scb_f_test.f \
+                  test/scb_locase.c
+dist-hook:
+	tar cf scb_test.tar \
                   test/Makefile \
                   test/scb_c_test.c \
                   test/scb_f_test.f \
