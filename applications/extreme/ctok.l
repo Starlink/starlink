@@ -39,6 +39,8 @@
 *-
 */
 
+#include <stdlib.h>
+
 void count();
 void ccomm();
 void cpluspluscomm();

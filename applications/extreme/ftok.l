@@ -50,6 +50,8 @@
 *-
 */
 
+#include <stdlib.h>
+
 void count();
 void munch();
 
