@@ -7,6 +7,9 @@ bin_SCRIPTS = ifd2iraf ifd2star ifd2irafifl ifl2ifd ifd_irafhlpgen \
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+EXTRA_DIST = ifd2star.in ifd2iraf.in ifd_front.tcl tester.sh \
+             testc.ifd test.ifl testc.ifl testc.cl
+
 ## Test script.
 
 TESTS = tester.sh
