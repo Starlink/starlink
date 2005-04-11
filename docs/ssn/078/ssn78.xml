@@ -4958,96 +4958,89 @@ M Makefile.dependencies
             <dd><p>That counts as `weird' for the purposes of this
               discussion.  See the next item.</p></dd>
 
-            <dt>I want to do weird things at install time.  How?</dt> 
-            <dd>
-              <p>Automake provides a couple of escape hatches for
-                installing extra material.  These are the
-                <code>install-exec-local</code> and
-                <code>install-data-local</code> targets for installing
-                platform-dependent and -independent files.  The
-                associated rules are run at install time, and can do
-                anything, the similar <code>install-exec-hook</code>
-                and <code>install-data-hook</code> targets are run
-                after all other install targets, and can do
-                post-installation cleanup and the like.  See section
-                <webref url="&automakehtml;/Install.html" >What Gets
-                  Installed</webref> in the automake manual for
-                details.</p>
+<dt>I want to do weird things at install time.  How?</dt> 
+<dd>
+<p>Automake provides a couple of escape hatches for
+installing extra material.  These are the
+<code>install-exec-local</code> and
+<code>install-data-local</code> targets for installing
+platform-dependent and -independent files.  The
+associated rules are run at install time, and can do
+anything, the similar <code>install-exec-hook</code>
+and <code>install-data-hook</code> targets are run
+after all other install targets, and can do
+post-installation cleanup and the like.  See section
+<webref url="&automakehtml;/Install.html" >What Gets
+Installed</webref> in the automake manual for
+details.</p>
 
-              <p>For example, the <code>dtask</code> component
-                installs a special object file in the library
-                directory.  This isn't a program, or script, or
-                library, and so isn't naturally handled by any other
-                automake mechanism.  The <code>Makefile.am</code>
-                there includes the following:
+<p>For example, the <code>dtask</code> component
+installs a special object file in the library
+directory.  This isn't a program, or script, or
+library, and so isn't naturally handled by any other
+automake mechanism.  The <code>Makefile.am</code>
+there includes the following:
 <verbatim>
 dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
         $(mkdir_p) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
-	if test -n "$$MANIFEST_FD"; then \
-	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$${MANIFEST_FD-0}; \
-	fi
+        $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.o" || :
 </verbatim>
-                This first creates the library directory if necessary.
-                The rules then use the <code>$(INSTALL_PROGRAM)</code>
-                command to install the object file in the library
-                directory (you'd use <code>$(INSTALL_DATA)</code>
-                command for a data
-                target)<index>installation!MANIFEST_FD</index><index>manifests!special
-                installation targets</index>.  The installation
-                location is <code>$(libdir)</code>, which is a
-                location which includes the <code>$(prefix)</code>
-                variable, so that this install rule behaves as other
-                such rules do.  Also, it prefixes the installation
-                location with <code>$(DESTDIR)</code>: this is usually
-                the empty string, but it can be set to something else
-                to perform a staged installation.  Finally, the
-                location of the installed file is written to the
-                file-descriptor in the environment variable
-                <code>$MANIFEST_FD</code>, <em>if</em> that variable
-                is non-empty (note that the ampersand in the
-                redirection operator must syntactically be followed by
-                a number, and the given reference to the environment
-                variable ensures this).  This is a Starlink extension,
-                and is how the manifest file is built up.</p>
+This first creates the library directory if necessary.  The rules then
+use the <code>$(INSTALL_PROGRAM)</code> command to install the object
+file in the library directory (you'd use <code>$(INSTALL_DATA)</code>
+command for a data target)<index
+seealso="manifests">installation!manifest</index><index>manifests!special
+installation targets</index>.  The installation location is
+<code>$(libdir)</code>, which is a location which includes the
+<code>$(prefix)</code> variable, so that this install rule behaves as
+other such rules do.  Also, it prefixes the installation location with
+<code>$(DESTDIR)</code>: this is usually the empty string, but it can
+be set to something else to perform a staged installation.  Finally,
+if the <code>$(MANIFEST)</code> variable evaluates to true, then we
+echo the echo the name of installed file to <code>stdout</code>
+prefixed by the string <code>MANIFEST:</code>; note that the command
+ends with `<code>|| :</code>', which ensures that this composite command
+succeeds even if <code>$(MANIFEST)</code> evaluates to <code>false</code>.
+This is a Starlink extension, and is how the manifest file is built up.</p>
 
-              <p>Yes, this is a fuss, but it's the consequence of
-                using the <code>install-xxx-local</code> back door.
-                Each of these features is important if this hand-made
-                install rule is to behave the same way as the
-                automatically-generated rules.  This technique is also
-                inherently precarious, since if there were ever some
-                reason to modify the installation conventions (for
-                example to modify the way the manifests were built
-                up), then each such back-door would have to be
-                adjusted by hand.  That is, don't use this mechanism
-                unless you really have to.</p>
+<p>Yes, this is a fuss, but it's the consequence of
+using the <code>install-xxx-local</code> back door.
+Each of these features is important if this hand-made
+install rule is to behave the same way as the
+automatically-generated rules.  This technique is also
+inherently precarious, since if there were ever some
+reason to modify the installation conventions (for
+example to modify the way the manifests were built
+up), then each such back-door would have to be
+adjusted by hand.  That is, don't use this mechanism
+unless you really have to.</p>
 
-              <p>In particular, you often need to create links in this
-                situation<index>symbolic links!installing</index>.  To 
-                do that portably (symbolic links are not required by
-                POSIX, and so the autoconf macros are able to emulate
-                them if necessary), put the <code>AC_PROG_LN_S</code> macro in
-                your <code>configure.ac</code>, and use the
-                <code>$(LN_S)</code> macro in your
-                <code>Makefile.am</code>.  Note that the autoconf
-                manual <webref url="&autoconfhtml;/autoconf_40.html"
-                  >notes</webref> that this macro does not in
-                principle support a path in the second argument; thus
-                do not write
-                <code>$(LN_S) /target/TARGET
-                  /link/LINK</code>, but instead
+<p>In particular, you often need to create links in this
+situation<index>symbolic links!installing</index>.  To 
+do that portably (symbolic links are not required by
+POSIX, and so the autoconf macros are able to emulate
+them if necessary), put the <code>AC_PROG_LN_S</code> macro in
+your <code>configure.ac</code>, and use the
+<code>$(LN_S)</code> macro in your
+<code>Makefile.am</code>.  Note that the autoconf
+manual <webref url="&autoconfhtml;/autoconf_40.html"
+>notes</webref> that this macro does not in
+principle support a path in the second argument; thus
+do not write
+<code>$(LN_S) /target/TARGET
+/link/LINK</code>, but instead
 <verbatim>
 cd $(DESTDIR)/link; rm -f LINK; $(LN_S) $(DESTDIR)/target/TARGET LINK
 </verbatim>
-                The option <code>rm -f</code> is portable.  Note that
-                we have included the important <code>$(DESTDIR)</code>
-                variable here, and that the <code>/link</code> and
-                <code>/target</code> locations here should probably be
-                one or other of the <code>$(???dir)</code> variables
-                instead.</p>
-            </dd>
+The option <code>rm -f</code> is portable.  Note that
+we have included the important <code>$(DESTDIR)</code>
+variable here, and that the <code>/link</code> and
+<code>/target</code> locations here should probably be
+one or other of the <code>$(???dir)</code> variables
+instead.</p>
+</dd>
 
           </dl>
         </p>
@@ -6841,6 +6834,11 @@ STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
             but install no files, except a manifest without a
             <code>&lt;files&gt;</code> element.</p>
 
+          <p>If you do any special installation work in your
+            <code>Makefile.am</code>, remember to check for the
+            existence of this stamp file, and make sure that you do
+            not actually install anything if the file is present.</p>
+
           <p>The difference between this and the standard
             <code>AC_FATAL</code> macro is that the latter is for an
             error in the configuration script -- either a logic error
@@ -7117,10 +7115,10 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
             <li>
               <p>All of the installation rules have been modified to recognise
-                the presence of the <code>MANIFEST_FD</code> environment
-                variable, and if it is present, to write the path to the
-                installed file to the file descriptor named in the
-                variable.  The modified <code>install</code>
+                the presence of the <code>MANIFEST</code> makefile
+                variable, and if it is set true, to include the path to the
+                installed file in the output of the command.
+                The modified <code>install</code>
                 target manages this variable.  The makefile `install'
                 target has been modified to create and install such
                 manifests by default.</p>
