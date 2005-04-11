@@ -4,7 +4,7 @@ bin_SCRIPTS = hlib hlp_link hlp_link_adam
 
 bin_PROGRAMS = lsthlp crehlp
 
-EXTRA_DIST = hlib hlp_link hlp_link_adam
+EXTRA_DIST = hlib hlp_link hlp_link_adam demo.hlp
 
 TESTS = tsthlp
 check_PROGRAMS = tsthlp
