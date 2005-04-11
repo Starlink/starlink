@@ -43,72 +43,60 @@
     <docnumber>78</docnumber>
     <history>
       <version number="0" date="26-Feb-2004" author="nxg">
-        <px>Initial draft release: $Revision$</px>
+        <px>Initial draft release: (up to revision 1.96)</px>
       </version>
+<version number="1" date="11-Apr-2005" author="nxg">
+<px>First properly public release (revision 1.97)</px>
+</version>
+<!--
+<distribution string="Version 1 snapshots" date="11-Apr-2005" author="nxg">
+<px>This is a post-version-1 snapshot: $Revision$</px>
+</distribution>
+-->
     </history>
+<copyright>
+<p>Copyright 2004-5, Council for the Central Laboratory of the
+Research Councils</p>
+</copyright>
   </docinfo>
 
-  <docbody>
-    <abstract>
-      <px>An introduction to the Starlink build system.  At present, this
-        document covers only the configuration and build aspects of
-        the system, but it should expand to cover tagging, branching,
-        and other source maintenance patterns as well.</px>
+<docbody>
 
-      <px><strong>This is a draft document, in more-or-less constant
-          flux.</strong></px>
-      <px><tabular>
-          <tgroup cols="1">
-            <tbody>
-              <row>
-                <entry>$Revision$</entry>
-              </row>
-              <row>
-                <entry>$Date$</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </tabular>
-      </px>
+<abstract>
+<px>An introduction to the Starlink build system.  At present, this
+document covers only the configuration and build aspects of
+the system, but it should expand to cover tagging, branching,
+and other source maintenance patterns as well.</px>
 
-      <px>See <span
-          media="print"><url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml</url></span><span media='screen'><webref url="http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml">the repository</webref></span> for 
-        changes and its current status.</px>
+</abstract>
 
-    </abstract>
+<sect id="intro" export="export">
+<subhead>
+<title>Introduction</title>
+</subhead>
 
-    <sect id="intro" export="export">
-      <subhead>
-        <title>Introduction</title>
-      </subhead>
+<p>The Starlink build system consists of
+<ul>
 
-      <p><strong>This is a draft document</strong></p>
+<li><p>the Starlink CVS repository;</p></li>
 
-      <p>The Starlink build system consists of
-        <ul>
-          <li>
-            <p>the Starlink CVS repository;</p>
-          </li>
-          <li>
-            <p>build tools, consisting of modified versions of the GNU
-              autotools <code>autoconf</code> <code>automake</code>
-              and <code>libtool</code>;</p>
-          </li>
-          <li>
-            <p>configuration and bootstrap code, consisting of the
-              <code>starconf</code> system and the scripts at the top
-              level of the Starlink source tree; and</p>
-          </li>
-          <li>
-            <p>the conventions for branching and tagging which are at
-              present only documented in the wiki, on the pages
-              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/BranchingPolicy</url>
-              and
-              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>
-              (you will currently need a wiki account to see these pages).</p>
-          </li>
-        </ul>
-      </p>
+<li><p>build tools, consisting of modified versions of the GNU
+autotools <code>autoconf</code> <code>automake</code> and
+<code>libtool</code>;</p></li>
+
+<li><p>configuration and bootstrap code, consisting of the
+<code>starconf</code> system and the scripts at the top level of the
+Starlink source tree; and</p></li> 
+
+<li><p>the conventions for branching and tagging which are at present
+only documented in the wiki, on the pages
+<url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/BranchingPolicy</url>
+and
+<url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>
+(you will currently need a wiki account to see these pages).</p></li>
+
+</ul>
+</p>
 
       <p>The repository is on the machine
         <code>cvs.starlink.ac.uk</code> -- see
@@ -170,11 +158,11 @@
         and has clearly expressed dependencies between packages.  It
         is an absolute requirement that the build process for users
         must consist of no more than
-        <verbatim>
+<verbatim>
 % ./configure
 % make
 % make install
-        </verbatim>
+</verbatim>
         with the usual options available for <code>./configure</code>
         and the usual relocations available for GNU-style makefiles.
         This document does not discuss building from a distribution
@@ -565,7 +553,7 @@
           <p>For example, you might have a version header
             file<index>version numbers</index>
             <code>version.h.in</code>, containing the line
-            <verbatim>
+<verbatim>
 const char version[] = "@PACKAGE_VERSION@";
 </verbatim>
             The configure variable <code>PACKAGE_VERSION</code> is one of those
@@ -590,7 +578,7 @@ const char version[] = "@PACKAGE_VERSION@";
             example of this at the top level of the Starlink build
             tree.  A typical <code>Makefile.in</code> might include
             lines like
-            <verbatim>
+<verbatim>
 LN_S = @LN_S@
 CC = @CC@
 myfile.o: myfile.c
@@ -618,7 +606,7 @@ myfile.o: myfile.c
             preprocessor <code>#define</code> statements.  For
             example, if you included in your <code>configure.ac</code>
             file the lines
-            <verbatim>
+<verbatim>
 AC_CHECK_HEADERS([sys/wait.h])
 AC_CHECK_FUNCS([strchr])
 </verbatim>
@@ -628,7 +616,7 @@ AC_CHECK_FUNCS([strchr])
             <code>strchr</code> function was available in the C
             library.  If so, the resulting <code>config.h</code> file
             would include the lines
-            <verbatim>
+<verbatim>
 #define HAVE_SYS_WAIT_H 1
 #define HAVE_STRCHR 1
 </verbatim>
@@ -640,12 +628,12 @@ AC_CHECK_FUNCS([strchr])
             configuration in a slightly different way.</p>
 
           <p>After including this file into your source code with 
-            <verbatim>
+<verbatim>
 #include &lt;config.h&gt;
 </verbatim>
             you can adjust the compiled code with suitable
             <code>#if</code> preprocessor conditionals, such as
-            <verbatim>
+<verbatim>
 #if HAVE_SYS_WAIT_H
 #include &lt;sys/wait.h&gt;
 #endif
@@ -678,7 +666,7 @@ AC_CHECK_FUNCS([strchr])
           <p>An illustrative
             <code>configure.ac</code><index>configure.ac!example</index>
             might look like this (with line numbers inserted):
-            <verbatim>
+<verbatim>
 1   AC_INIT(mypack, 1.2, ussc@star.rl.ac.uk)
 2   AC_CONFIG_SRCDIR(src.c)
 3   STAR_DEFAULTS
@@ -735,7 +723,7 @@ AC_CHECK_FUNCS([strchr])
             variable <code>PERL</code> the full path to it.  The most
             common way of using this would be for the file
             <code>myscript.pl.in</code> to start off with the line
-            <verbatim>
+<verbatim>
 #! @PERL@ -w
 </verbatim>
             so that the script ends up with the correct full path.
@@ -828,7 +816,7 @@ AC_CHECK_FUNCS([strchr])
             output files by making shell variables into substitution
             variables, and the way you do that is by calling
             <code>AC_SUBST</code> on them.  Thus, after
-            <verbatim>
+<verbatim>
 wibble=''
 ... # lots of clever scripting
 AC_SUBST(wibble)
@@ -864,10 +852,10 @@ AC_SUBST(wibble)
               which won't make it into the <code>./configure</code>
               file, you should prefix them with the m4 <em>macro</em>
               <code>dnl</code>, as in
-              <verbatim>
-                dnl   This is a comment
-                AC_INIT(...)
-              </verbatim>
+<verbatim>
+dnl   This is a comment
+AC_INIT(...)
+</verbatim>
               There's no harm in including <code>#</code>-style
               comments in your <code>configure.ac</code> file and
               allowing these to be passed through to the output file,
@@ -1099,7 +1087,7 @@ BUILT_SOURCES = PAR_ERR par_err.h
             <code>Makefile.am</code> for the <code>sst</code>
             application (this is a non-distributed application for
             building documentation).
-            <verbatim>
+<verbatim>
 ## Process this file with automake to produce Makefile.in
 
 bin_SCRIPTS = start
@@ -1253,7 +1241,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             makefile installs a file containing the information it has
             determined about the build machine's floating point model,
             and this is declared there as follows:
-            <verbatim>
+<verbatim>
 noinst_PROGRAMS = hds_machine
 starhelp_DATA = hds_machine.txt
 
@@ -1429,12 +1417,12 @@ this is always safe.</p>
             the Sun C++ compiler specifically (while on a Sun,
             obviously), you would put <code>/opt/SUNWspro/bin</code>
             in your path, and set the <code>CXX</code> variable:
-            <verbatim>
+<verbatim>
 % export CXX=CC   # best avoided
 % ./configure
 </verbatim>
             or
-            <verbatim>
+<verbatim>
 % env CXX=CC ./configure   # best avoided
 </verbatim>
             where the latter is probably preferable, inasmuch as it
@@ -1442,7 +1430,7 @@ this is always safe.</p>
             that it can make a difference unexpectedly.</p>
 
           <p>Better than either of these is
-            <verbatim>
+<verbatim>
 % ./configure CXX=CC
 </verbatim>
             This doesn't set <code>CXX</code> as an environment
@@ -1596,7 +1584,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           script<index>starconf.status</index>.  You will do this 
           firstly to query important locations, such as the location
           of the starconf templates:
-          <verbatim>
+<verbatim>
 % ./starconf.status --show buildsupportdata
 /export3/sun/buildsupport/share
 </verbatim>
@@ -2056,7 +2044,7 @@ libprm_a_la_LDFLAGS = -version-info $(libprm_a_la_version_info)
 </verbatim>
           and then the corresponding section from
           <code>configure.ac</code>:
-          <verbatim>
+<verbatim>
 AC_INIT(prm, 1.3-1, ussc@star.rl.ac.uk)
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
@@ -2257,7 +2245,7 @@ AC_SUBST(libprm_a_la_version_info, 1:0:0)
           objecting.  In this case, you should use the second optional
           argument to <code>AC_PROG_FC</code> to specify Fortran 77 as
           the required dialect:
-          <verbatim>
+<verbatim>
 AC_PROG_FC([], 77)
 </verbatim>
           See <ref id="macro-ac-prog-fc"/> for full details.</p>
@@ -2298,13 +2286,13 @@ AC_PROG_FC([], 77)
         <p>For example, you might have in your
           <code>configure.ac</code> file the
           lines<index>autoconf!macros!AC_FC_OPEN_SPECIFIERS</index>
-          <verbatim>
+<verbatim>
 AC_PROG_FC
 AC_PROG_FPP
 AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
 </verbatim>
           and have in your <code>my_io.F</code> the lines
-          <verbatim>
+<verbatim>
 #include &lt;config.h&gt;
       SUBROUTINE MYIO(...)
 
@@ -2461,7 +2449,7 @@ doubt, copy the <code>.F.f:</code> rule in one of the generated
           <p>You make a tag with the <kbd>cvs tag</kbd> command, while
             you are in a directory with a part of the repository checked
             out:
-            <verbatim>
+<verbatim>
 cvs tag &lt;tag-name&gt;
 </verbatim>
             This applies the tag to the repository versions indicated by
@@ -2509,7 +2497,7 @@ cvs tag &lt;tag-name&gt;
               checkout .</kbd> would not be the right thing, since it would
             check out the top level and everything underneath it.
             A better set of commands would be
-            <verbatim>
+<verbatim>
 cvs -d username@cvs.starlink.ac.uk:/cvs co -l .
 cvs -d username@cvs.starlink.ac.uk:/cvs co buildsupport
 cvs -d username@cvs.starlink.ac.uk:/cvs co thirdparty/fsf
@@ -2523,7 +2511,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co thirdparty/fsf
           <p>If you want to check out just the
             <code>applications</code> directory, but none of its
             children, use
-            <verbatim>
+<verbatim>
 cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
 </verbatim>
             while in the top-level directory.  Don't do <kbd>... co -l
@@ -2545,7 +2533,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
         been checked out of the CVS repository.  It does <em>not</em>
         apply to building a distribution tarball: that process is
         nothing more than the usual:
-        <verbatim>
+<verbatim>
 % ./configure
 % make
 % make install
@@ -2678,7 +2666,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
         <p>The complete procedure for a full build is as shown
           below, for an installation into the notional directory
           <code>/local/star</code>; explanations follow.
-          <verbatim>
+<verbatim>
 1% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout .
 2% unset STARLINK INSTALL
 3% export STARCONF_DEFAULT_STARLINK=/local/star
@@ -2841,7 +2829,7 @@ autoconf (GNU Autoconf) 2.59
         <p>The component directories are organised so that you can
           build a component from a CVS checkout by moving to the
           component's directory and giving the sequence of commands:
-          <verbatim>
+<verbatim>
 % ./bootstrap
 % ./configure
 % make
@@ -3062,7 +3050,7 @@ bin_MONOLITHS = foo
           you have the required components checked out (see <ref
             id="tool-cvs-recursion"/>), then go to the
           top of the tree and give the command
-          <verbatim>
+<verbatim>
 % ./bootstrap --buildsupport
 </verbatim>
           This builds and installs the `buildsupport' tools -- namely
@@ -3364,7 +3352,7 @@ chmod +x foo
         <p>What edits should you make?</p>
 
         <p>The adam <code>Makefile.am</code> file looks as follows:
-          <verbatim>
+<verbatim>
 bin_SCRIPTS = adam_link_adam
 lib_LTLIBRARIES = libadam_adam.la
 libadam_adam_la_SOURCES = $(PUBLIC_INCLUDES) $(F_ROUTINES)
@@ -3381,7 +3369,7 @@ F_ROUTINES = \
           <code>makefile</code>.</p>
 
         <p>The adam <code>configure.ac</code> looks like this:
-          <verbatim>
+<verbatim>
 AC_INIT(adam, 3.0, ussc@star.rl.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -3427,10 +3415,11 @@ AC_OUTPUT
           start.  For link dependencies, grepping for
           <code>CALL</code> lines is useful for Fortran, and grepping
           for
-          <verbatim>
+<verbatim>
 = *\([A-Za-z][A-Za-z]*__*[A-Za-z][A-Za-z]*\) *(.*
-</verbatim> will probably be handy.  In fact, the script
-          <verbatim>
+</verbatim>
+will probably be handy.  In fact, the script
+<verbatim>
 #! /bin/sh -
 sed -n \
         -e 's/^ *\(INCLUDE\|include\) *'\(.*\)'.*/_ \2/p' \
@@ -3866,7 +3855,7 @@ buildsupport tools.</p>
           component is installed.</p>
 
         <p>You can set up tests as follows.
-          <verbatim>
+<verbatim>
 TESTS = test1 test2
 check_PROGRAMS = test1 test2
 
@@ -3909,7 +3898,7 @@ test2_SOURCES = test2.c
           is problematic, since Fortran has no standardised way of
           controlling the exit code.  Many Fortran compilers will let
           you use the <code>exit</code> intrinsic:
-          <verbatim>
+<verbatim>
 rval = 1
 call exit(rval)
 </verbatim>
@@ -3918,7 +3907,7 @@ call exit(rval)
           platforms, but if this worries you, then write the test code
           as a function which returns a non-zero integer value on
           error, and wrap it in a dummy C program:
-          <verbatim>
+<verbatim>
 test1_SOURCES = test1.f test1_wrap.c
 test1_wrap.c:
 	echo "int main() { exit (test1_()); }" >test1_wrap.c
@@ -7193,5 +7182,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 </ssn>
 
 <!-- Local Variables: -->
+<!-- sgml-indent-data: nil -->
+<!-- sgml-indent-step: 0 -->
 <!-- outline-regexp: " *<\\(sub\\)*sect" -->
 <!-- End: -->
