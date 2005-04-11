@@ -48,10 +48,9 @@ BUILT_SOURCES = $(include_MESSAGES)
 # Build and install this, taking care to include it in the manifest file, too.
 dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
+	$(mkdir_p) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
-	if test -n "$$MANIFEST_FD"; then \
-	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$${MANIFEST_FD-0}; \
-	fi
+	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.o" || :
 
 # Files alink.in and ilink.in depend on the values of the $(prefix)
 # variable, and so must be substituted at `make' time, rather than

@@ -75,7 +75,7 @@ install-exec-local:
 	        rm -f $$f; \
 		echo @LN_S@ $$pathback/$$f $$f; \
 		@LN_S@ $$pathback/$$f $$f; \
-		test -n "$$MANIFEST_FD" && echo $$thisdir/$$f >&$${MANIFEST_FD-0}; \
+		$(MANIFEST) && echo MANIFEST:$$thisdir/$$f || :; \
 	      done; \
 	    fi ); \
 	fi; true

@@ -48,6 +48,4 @@ install-exec-local:
 	rm -f fgeneric; \
 	echo $(LN_S) generic fgeneric; \
 	$(LN_S) generic fgeneric; \
-	if test -n "$$MANIFEST_FD"; then \
-	   echo "$(DESTDIR)$(bindir)/fgeneric" >&$${MANIFEST_FD-0}; \
-	else :; fi;
+	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/fgeneric" || :

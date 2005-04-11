@@ -68,14 +68,15 @@ libltdlc_la_OBJECTS = $(am_libltdlc_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp =
 am__depfiles_maybe =
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) \
+	$(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libltdl_la_SOURCES) $(libltdlc_la_SOURCES)
 DIST_SOURCES = $(libltdl_la_SOURCES) $(libltdlc_la_SOURCES)
 am__include_HEADERS_DIST = ltdl.h
@@ -96,6 +97,8 @@ GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 REAL_INSTALL = install-am
+# Set to : to emit manifest lines, too
+MANIFEST = false
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -277,18 +280,18 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	    f="`echo $$p | sed -e 's|^.*/||'`"; \
 	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f"; \
 	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f; \
-	    if test -n "$$MANIFEST_FD"; then \
-	      echo "$(DESTDIR)$(libdir)/$$f" >&$${MANIFEST_FD-0}; \
+	    if $(MANIFEST); then \
+	      echo "MANIFEST:$(DESTDIR)$(libdir)/$$f"; \
 	      expr $$p : '.*\.la$$' >/dev/null || \
 		{ echo "Installing non-la file $$p!"; exit 1; }; \
 	      (. ./$$p; \
 		if test -n "$$library_names"; then \
 		  for l in $$library_names; do \
-		    echo "$$libdir/$$l" >&$${MANIFEST_FD-0}; \
+		    echo "MANIFEST:$$libdir/$$l"; \
 		  done; \
 		fi; \
 		if test -n "$$old_library"; then \
-		  echo "$$libdir/$$old_library" >&$${MANIFEST_FD-0}; \
+		  echo "MANIFEST:$$libdir/$$old_library"; \
 		else :; fi; \
               ); \
 	    else :; fi; \
@@ -357,9 +360,7 @@ install-includeHEADERS: $(include_HEADERS)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f"; \
 	  $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f; \
-	  if test -n "$$MANIFEST_FD"; then \
-	  	echo "$(DESTDIR)$(includedir)/$$f" >&$${MANIFEST_FD-0}; \
-	  else :; fi; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(includedir)/$$f" || :; \
 	done
 
 uninstall-includeHEADERS:
@@ -574,8 +575,8 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -f make.log
-	-rm -f configure.log
 	-rm -f starconf.status
+	-rm -f configure.log
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -663,13 +664,13 @@ local-install-files: $(DISTFILES)
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
 	    cp -r $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file; \
-	    if test -n "$$MANIFEST_FD"; then \
-	      (cd $$d/$$file; /bin/ls -R . | awk '/^ *$$/{next};BEGIN{p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'"};{if (sub(/:$$/,"")) p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'/"$$0; else printf "%s/%s\n", p, $$0;}' >&$${MANIFEST_FD-0}); \
+	    if $(MANIFEST); then \
+	      (cd $$d/$$file; /bin/ls -R . | awk '/^ *$$/{next};BEGIN{p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'"};{if (sub(/:$$/,"")) p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'/"$$0; else printf "MANIFEST:%s/%s\n", p, $$0;}'); \
 	    fi; \
 	  else \
 	    test -f $(DESTDIR)$(datadir)/libtool/libltdl/$$file \
 	    || cp $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
-	    test -n "$$MANIFEST_FD" && echo $(DESTDIR)$(datadir)/libtool/libltdl/$$file >&$${MANIFEST_FD-0} || :; \
+	    $(MANIFEST) && echo MANIFEST:$(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
 	  fi; \
 	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -34,7 +34,7 @@ libtool: $(LIBTOOL_DEPS)
 ## This allows us to install libltdl without using ln and without creating
 ## a world writeable directory.
 ## FIXME:  Remove this rule once automake can do this properly by itself.
-## Starlink: add a trace of the installed files to MANIFEST_FD.
+## Starlink: add a trace of the installed files to MANIFEST.
 local-install-files: $(DISTFILES)
 	-rm -rf $(DESTDIR)$(datadir)/libtool/libltdl
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/libtool/libltdl
@@ -45,12 +45,12 @@ local-install-files: $(DISTFILES)
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
 	    cp -r $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file; \
-	    if test -n "$$MANIFEST_FD"; then \
-	      (cd $$d/$$file; /bin/ls -R . | awk '/^ *$$/{next};BEGIN{p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'"};{if (sub(/:$$/,"")) p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'/"$$0; else printf "%s/%s\n", p, $$0;}' >&$${MANIFEST_FD-0}); \
+	    if $(MANIFEST); then \
+	      (cd $$d/$$file; /bin/ls -R . | awk '/^ *$$/{next};BEGIN{p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'"};{if (sub(/:$$/,"")) p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'/"$$0; else printf "MANIFEST:%s/%s\n", p, $$0;}'); \
 	    fi; \
 	  else \
 	    test -f $(DESTDIR)$(datadir)/libtool/libltdl/$$file \
 	    || cp $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
-	    test -n "$$MANIFEST_FD" && echo $(DESTDIR)$(datadir)/libtool/libltdl/$$file >&$${MANIFEST_FD-0} || :; \
+	    $(MANIFEST) && echo MANIFEST:$(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
 	  fi; \
 	done

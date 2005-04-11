@@ -172,7 +172,5 @@ install-exec-local:
 	   rm -f $$t; \
 	   echo $(LN_S) gaiaMon $$t; \
 	   $(LN_S) gaiaMon $$t; \
-	   if test -n "$$MANIFEST_FD"; then \
-	      echo "$(DESTDIR)$(bindir)/$$t" >&$${MANIFEST_FD-0}; \
-	   else :; fi; \
+	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || :
 	done

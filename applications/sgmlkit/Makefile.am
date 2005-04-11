@@ -27,16 +27,18 @@ stardocs_DATA = @STAR_XML_DOCUMENTATION@
 install-data-local: dtd/manifest
 	$(mkdir_p) $(DESTDIR)$(pkglibdir)
 	if test -n "$(PAX)"; then \
+	  if $(MANIFEST); then \
 	    $(PAX) -r -w -v $(DESTDIR)$(pkglibdir) \
-		<dtd/manifest \
-		2>&$${MANIFEST_FD-2}; \
+		<dtd/manifest 2>&1 | sed 's/^/MANIFEST:/'; \
+	  else \
+	    $(PAX) -r -w $(DESTDIR)$(pkglibdir) \
+		<dtd/manifest; \
+	  fi; \
 	else \
 	    cat dtd/manifest | while read f; do \
 	        $(INSTALL_DATA) $$f $(DESTDIR)$(pkglibdir)/$$f; \
 	    done; \
-	    if test -n "$(MANIFEST_FD)"; then \
-	        sed 's+^+$(DESTDIR)$(pkglibdir)/+' dtd/manifest >&$(MANIFEST_FD); \
-	    fi; \
+	    $(MANIFEST) && sed 's+^+MANIFEST:$(DESTDIR)$(pkglibdir)/+' dtd/manifest || :; \
 	fi
 
 ## inclusion of dtd/manifest here ensures that this is built before dist
