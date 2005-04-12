@@ -28,3 +28,6 @@ coco: coco.in
 	 $(srcdir)/coco.in > coco.tmp
 	mv coco.tmp coco
 	chmod +x coco
+
+EXTRA_DIST = coco.news
+
