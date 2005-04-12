@@ -3480,7 +3480,7 @@ sub handle_man_pages
 sub handle_data
 {
     # Starlink extension:
-    my @stardirs = qw( stardocs staretc starhelp starexamples );
+    my @stardirs = qw( stardocs staretc starexamples starhelp starnews );
     $special_rules_file{stardocs_DATA} = 'starlink_stardocs';
     if (defined $starlink_seen_features{'per-package-dirs'})
       {
