@@ -30,3 +30,6 @@ xrv: xrv.in
 	 $(srcdir)/xrv.in > xrv.tmp
 	mv xrv.tmp xrv
 	chmod +x xrv
+
+EXTRA_DIST = rv.news
+
