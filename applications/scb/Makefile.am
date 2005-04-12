@@ -9,28 +9,28 @@ ftag_SOURCES = ftag-y.y tag.c tag.h
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 EXTRA_DIST = Scb.pm.in YyTag.pm.in scb.csh.in scb.pl.in scbindex.pl.in \
-             scbcp.pl.in dbmcat.pl.in ctag-l.c ftag-l.l mime.types \
-             scb_test.tar size_test.sh test_frame.c StarIndex.pm
+             scbcp.pl.in dbmcat.pl.in ctag-l.c ftag-l.l test_frame.c \
+             StarIndex.pm
 
 supportdir = $(bindir)
-support_DATA = mime.types
+dist_support_DATA = mime.types
 
 AM_YFLAGS = -d
 
 BUILT_SOURCES = Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl dbmcat.pl \
                 ctag-y.h ftag-y.h ctag-l.c ftag-l.c
 
+# Run these scripts as a test
 TESTS = scb_test.sh size_test.sh
-check_DATA = scb_test.tar
+
+# Define and distribute the test scripts 
+dist_check_SCRIPTS = scb_test.sh size_test.sh
+
+# Define and distribute the test data
+dist_check_DATA = scb_test.tar
 
 scb_test.tar:
-	tar xf $@ \
-                  test/Makefile \
-                  test/scb_c_test.c \
-                  test/scb_f_test.f \
-                  test/scb_locase.c
-dist-hook:
-	tar cf scb_test.tar \
+	tar cf $@ \
                   test/Makefile \
                   test/scb_c_test.c \
                   test/scb_f_test.f \
