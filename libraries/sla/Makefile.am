@@ -46,3 +46,9 @@ F_ROUTINES = addet.f afin.f airmas.f altaz.f amp.f ampqk.f aop.f	\
     supgal.f svd.f svdcov.f svdsol.f tp2s.f tp2v.f tps2c.f tpv2c.f	\
     ue2el.f ue2pv.f unpcd.f v2tp.f vdv.f veri.f vers.f vn.f vxv.f	\
     wait.f xy2xy.f zd.f
+
+TESTS = sla_test
+check_PROGRAMS = sla_test
+
+sla_test_SOURCES = sla_test.f
+sla_test_LDADD = libsla.la
