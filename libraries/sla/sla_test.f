@@ -40,6 +40,7 @@
       IMPLICIT NONE
 
       LOGICAL STATUS
+      INTEGER EXITSTATUS
 
 
 *  Preset the status to success.
@@ -129,9 +130,19 @@
       CALL T_VECMAT ( STATUS )
       CALL T_ZD ( STATUS )
 
-*  Report any errors.
-      IF ( .NOT. STATUS ) WRITE (*,'(1X,''SLALIB validation failed!'')')
-      IF ( STATUS ) WRITE (*,'(1X,''SLALIB validation OK!'')')
+*  Report any errors and set up an appropriate exit status.
+*  Set the EXITSTATUS to 0 on success, 1 on any error -- Unix-style.
+*  The EXIT intrinsic is non-standard but common (which is portable enough
+*  for a regression test).
+      IF ( STATUS ) THEN
+         WRITE (*,'(1X,''SLALIB validation OK !'')')
+         EXITSTATUS = 0
+      ELSE
+         WRITE (*,'(1X,''SLALIB validation failed !'')')
+         EXITSTATUS = 1
+      ENDIF
+
+      CALL EXIT(EXITSTATUS)
 
       END
 
