@@ -192,10 +192,11 @@ _poss_STAR_RESTFP_FIX
 # by _STAR_EXTRADIR_COMMON).  There should be an entry here for each of
 # Starlink's special installation locations.
 AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl     documentation
-AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl     other help files
 AC_SUBST([staretcdir],      ['${prefix}/etc'])dnl
 AC_SUBST([starexamplesdir], ['${prefix}/examples'])dnl
 AC_SUBST([starfacsdir],     ['${prefix}/help'])dnl     facilities files
+AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl     other help files
+AC_SUBST([starnewsdir],     ['${prefix}/news'])dnl
 
 # Certain directories are affected by the $_star_per_package_dir variable;
 # if it's true, then add the $PACKAGE_NAME to the directory.
