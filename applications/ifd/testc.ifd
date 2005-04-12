@@ -2,8 +2,9 @@ package test {
    executable test {
 # ADAM Interface file
 # Created automatically from test.ifd using ifd2star
-# Mon Feb 17 15:07:37 GMT 1997
+# Tue Apr 12 12:37:52 BST 2005
       action test1 {
+ 
          parameter a {
             position 1
             type NDF
@@ -14,6 +15,7 @@ package test {
             association <->GLOBAL.SPECTRUM
             helpkey *
           }
+ 
          parameter b {
             position 2
             type _REAL
@@ -24,6 +26,7 @@ package test {
           }
       }
       action test2 {
+ 
          parameter a {
             position 1
             type NDF

@@ -1,6 +1,6 @@
 # IRAF package initialisation script for the  ADAM test package
 # Created automatically from test.ifd using ifd2iraf
-# 18Feb97
+# 12Apr05
 
 package test
 

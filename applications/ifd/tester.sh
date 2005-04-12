@@ -38,17 +38,17 @@ diff test.ifl testc.ifl >>testdif
 diff test.cl testc.cl >>testdif
 
 #  Diff and test output.
-if test `cat testdif | wc -l` -ne 12
+if test `cat testdif | wc -l` -ne 8
 then
    echo "Created files differ from control files in other than date."
    cat testdif
    echo "Note check target only works *after* installation"
    rm -f testdif
-   rm -f test.ifd test.cl test.icl test.csh test.par test.tcl
+   #rm -f test.ifd test.cl test.icl test.csh test.par test.tcl
    rm -f test1.ifl test2.ifl test1.par test2.par
    exit 1
 else
    rm -f testdif
-   rm -f test.ifd test.cl test.icl test.csh test.par test.tcl
+   #rm -f test.ifd test.cl test.icl test.csh test.par test.tcl
    rm -f test1.ifl test2.ifl test1.par test2.par
 fi
