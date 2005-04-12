@@ -12,6 +12,9 @@ PRIVATE_SCR =  allfind browse creindex depends docfind dockey gettitle \
 homepage htxpath moveddocs msgover multised newdocs newindex oldindex reffind \
 relink resolve settrap showhtml stdfile urlgen wrfiles
 
+EXTRA_DIST = creindex.sed.in edhead.sed.in edtail.sed.in gethead.sed.in \
+             gettitle.sed.in htxpath.in
+
 #  List of private sed scripts (N.B. these contain comments which MUST be
 #  removed before use).
 
@@ -24,13 +27,13 @@ SUFFIXES = .sed.in .sed
 	@SED@ -e '/^#/d' \
               -e '/^[  ]*$$/d' $< > $*.sed
 
-bin_SCRIPTS = $(PUBLIC_SCR)
+dist_bin_SCRIPTS = $(PUBLIC_SCR)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 htxsupportdir = $(bindir)/htx-scripts
-htxsupport_SCRIPTS = $(PRIVATE_SCR)
-htxsupport_DATA = $(PRIVATE_SED_SCR)
+dist_htxsupport_SCRIPTS = $(PRIVATE_SCR)
+dist_htxsupport_DATA = $(PRIVATE_SED_SCR)
 
 htxpath: $(srcdir)/htxpath.in Makefile
 	rm -f htxpath htxpath.tmp
@@ -42,4 +45,9 @@ htxpath: $(srcdir)/htxpath.in Makefile
               
 
 BUILT_SOURCES = $(PRIVATE_SED_SCR) htxpath
+
+# Files to be removed when make clean is run
+
+CLEANFILES = $(PRIVATE_SED_SCR) htxpath
+
 
