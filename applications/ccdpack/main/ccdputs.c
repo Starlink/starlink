@@ -51,16 +51,20 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     21-SEP-2000 (MBT):
 *        Original version.
+*     11-APR-2005 (TIMJ):
+*        Fix compiler warnings
 
 *-
 */
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "sae_par.h"
 #include "tcl.h"
 #include "cnf.h"
@@ -78,7 +82,6 @@
       int mleng;                    /* Length of the message argument */
       int nflag;                    /* Number of flag arguments */
       int nleng;                    /* Length of the name argument */
-      int status[ 1 ];              /* The starlink inherited status */
       int stype;                    /* The type of message to be sent. */
       char *flag;                   /* Text of flag argument */
       char *msg;                    /* Text of the message argument */

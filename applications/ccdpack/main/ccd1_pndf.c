@@ -4,6 +4,7 @@
 #include "mers.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "tcltalk.h"
 #include "ccdaux.h"
 #include "grp_par.h"
@@ -143,6 +144,7 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -150,6 +152,8 @@
 *        Original version.
 *     7-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     11-APR-2005 (TIMJ):
+*        Fix compiler warning by including string.h
 *     {enter_changes_here}
 
 *  Bugs:
