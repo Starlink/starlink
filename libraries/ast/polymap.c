@@ -38,6 +38,10 @@ f     The PolyMap class does not define any new routines beyond those
 *  History:
 *     27-SEP-2003 (DSB):
 *        Original version.
+*     13-APR-2005 (DSB):
+*        Changed the keys used by the Dump/astLoadPolyMap functions. They
+*        used to exceed 8 characters and consequently caused problems for 
+*        FitsChans. 
 *class--
 */
 
@@ -1003,6 +1007,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    char comm[ 100 ];             /* Buffer for comment string */
    int i;                        /* Loop index */
+   int iv;                       /* Vectorised keyword index */
    int j;                        /* Loop index */
    int k;                        /* Loop index */
    int nin;                      /* No. of input coords */
@@ -1041,10 +1046,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       }
 
 /* Store the coefficient values used by the forward transformation. */
+      iv = 0;
       for( i = 0; i < nout; i++ ){
          for( j = 0; j < this->ncoeff_f[ i ]; j++ ){
             if( (this->coeff_f)[ i ][ j ] != AST__BAD ) {
-               (void) sprintf( buff, "CF%d_%d", i + 1, j + 1 );
+               (void) sprintf( buff, "CF%d", ++iv );
                (void) sprintf( comm, "Coeff %d of forward polynomial %d", j + 1, i + 1 );
                astWriteDouble( channel, buff, 1, 1, (this->coeff_f)[ i ][ j ], comm );
             }
@@ -1053,11 +1059,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Store the input axis powers associated with each coefficient of the forward 
    transformation. */
+      iv = 0;
       for( i = 0; i < nout; i++ ){
          for( j = 0; j < this->ncoeff_f[ i ]; j++ ){
             for( k = 0; k < nin; k++ ){
                if( (this->power_f)[ i ][ j ][ k ] > 0 ) {
-                  (void) sprintf( buff, "PF%d_%d_%d", i + 1, j + 1, k + 1 );
+                  (void) sprintf( buff, "PF%d", ++iv );
                   (void) sprintf( comm, "Power of i/p %d for coeff %d of fwd poly %d", k + 1, j + 1, i + 1 );
                   astWriteDouble( channel, buff, 1, 1, (this->power_f)[ i ][ j ][ k ], comm );
                }
@@ -1086,10 +1093,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       }
 
 /* Store the coefficient values used by the inverse transformation. */
+      iv = 0;
       for( i = 0; i < nin; i++ ){
          for( j = 0; j < this->ncoeff_i[ i ]; j++ ){
             if( (this->coeff_i)[ i ][ j ] != AST__BAD ) {
-               (void) sprintf( buff, "CI%d_%d", i + 1, j + 1 );
+               (void) sprintf( buff, "CI%d", ++iv );
                (void) sprintf( comm, "Coeff %d of inverse polynomial %d", j + 1, i + 1 );
                astWriteDouble( channel, buff, 1, 1, (this->coeff_i)[ i ][ j ], comm );
             }
@@ -1098,11 +1106,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Store the output axis powers associated with each coefficient of the inverse 
    transformation. */
+      iv = 0;
       for( i = 0; i < nin; i++ ){
          for( j = 0; j < this->ncoeff_i[ i ]; j++ ){
             for( k = 0; k < nout; k++ ){
                if( (this->power_i)[ i ][ j ][ k ] > 0 ) {
-                  (void) sprintf( buff, "PI%d_%d_%d", i + 1, j + 1, k + 1 );
+                  (void) sprintf( buff, "PI%d", ++iv );
                   (void) sprintf( comm, "Power of o/p %d for coeff %d of inv poly %d", k + 1, j + 1, i + 1 );
                   astWriteDouble( channel, buff, 1, 1, (this->power_i)[ i ][ j ][ k ], comm );
                }
@@ -1769,6 +1778,7 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
    AstPolyMap *new;              /* Pointer to the new PolyMap */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    int i;                        /* Loop index */
+   int iv;                       /* Vectorised keyword index */
    int j;                        /* Loop index */
    int k;                        /* Loop index */
    int nin;                      /* No. of input coords */
@@ -1843,21 +1853,30 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
             if( (new->ncoeff_f)[ i ] == INT_MAX ) undef = 1;
          }
 
-/* Get the coefficient values used by the forward transformation. */
+/* Get the coefficient values used by the forward transformation. This
+   uses new style vectorised key names if available. Otherwise it uses
+   old style indexed names (which were superceded by vectorised names
+   because they are shorter and so work better with FitsChans). */
+         iv = 0;
          for( i = 0; i < nout && !undef; i++ ){
 
             (new->coeff_f)[ i ] = astMalloc( sizeof( double )*
                                            (size_t) new->ncoeff_f[ i ] );
             if( astOK ) {
                for( j = 0; j < new->ncoeff_f[ i ]; j++ ){
-                  (void) sprintf( buff, "cf%d_%d", i + 1, j + 1 );
+                  (void) sprintf( buff, "cf%d", ++iv );
                   (new->coeff_f)[ i ][ j ] = astReadDouble( channel, buff, AST__BAD );
+                  if( (new->coeff_f)[ i ][ j ] == AST__BAD ) {
+                     (void) sprintf( buff, "cf%d_%d", i + 1, j + 1 );
+                     (new->coeff_f)[ i ][ j ] = astReadDouble( channel, buff, AST__BAD );
+                  }
                }
             }
          }
 
 /* Get the input axis powers associated with each coefficient of the forward 
    transformation. */
+         iv = 0;
          for( i = 0; i < nout && !undef; i++ ){
             (new->power_f)[ i ] = astMalloc( sizeof( int * )*
                                              (size_t) new->ncoeff_f[ i ] );
@@ -1866,8 +1885,12 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
                   (new->power_f)[ i ][ j ] = astMalloc( sizeof( int )* (size_t) nin );
                   if( astOK ) {
                      for( k = 0; k < nin; k++ ){
-                        (void) sprintf( buff, "pf%d_%d_%d", i + 1, j + 1, k + 1 );
+                        (void) sprintf( buff, "pf%d", ++iv );
                         (new->power_f)[ i ][ j ][ k ] = astReadInt( channel, buff, 0 );
+                        if( (new->power_f)[ i ][ j ][ k ] == 0 ) {
+                           (void) sprintf( buff, "pf%d_%d_%d", i + 1, j + 1, k + 1 );
+                           (new->power_f)[ i ][ j ][ k ] = astReadInt( channel, buff, 0 );
+                        }
                      }
                   }
                }
@@ -1912,20 +1935,26 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
          }
 
 /* Get the coefficient values used by the inverse transformation. */
+         iv = 0;
          for( i = 0; i < nin && !undef; i++ ){
 
             (new->coeff_i)[ i ] = astMalloc( sizeof( double )*
                                            (size_t) new->ncoeff_i[ i ] );
             if( astOK ) {
                for( j = 0; j < new->ncoeff_i[ i ]; j++ ){
-                  (void) sprintf( buff, "ci%d_%d", i + 1, j + 1 );
+                  (void) sprintf( buff, "ci%d", ++iv );
                   (new->coeff_i)[ i ][ j ] = astReadDouble( channel, buff, AST__BAD );
+                  if( (new->coeff_i)[ i ][ j ] == AST__BAD ) {
+                     (void) sprintf( buff, "ci%d_%d", i + 1, j + 1 );
+                     (new->coeff_i)[ i ][ j ] = astReadDouble( channel, buff, AST__BAD );
+                  }
                }
             }
          }
 
 /* Get the output axis powers associated with each coefficient of the inverse 
    transformation. */
+         iv = 0;
          for( i = 0; i < nin && !undef; i++ ){
             (new->power_i)[ i ] = astMalloc( sizeof( int * )*
                                              (size_t) new->ncoeff_i[ i ] );
@@ -1934,8 +1963,12 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
                   (new->power_i)[ i ][ j ] = astMalloc( sizeof( int )* (size_t) nout );
                   if( astOK ) {
                      for( k = 0; k < nout; k++ ){
-                        (void) sprintf( buff, "pi%d_%d_%d", i + 1, j + 1, k + 1 );
+                        (void) sprintf( buff, "pi%d", ++iv );
                         (new->power_i)[ i ][ j ][ k ] = astReadInt( channel, buff, 0 );
+                        if( (new->power_i)[ i ][ j ][ k ] == 0 ) {
+                           (void) sprintf( buff, "pi%d_%d_%d", i + 1, j + 1, k + 1 );
+                           (new->power_i)[ i ][ j ][ k ] = astReadInt( channel, buff, 0 );
+                        }
                      }
                   }
                }
