@@ -372,7 +372,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
    evaluated twice - this is unlikely to matter, but is there a better way?) */
 
 #define astRegTransform(this,in,forward,out,frm) \
-astINVOKE(O,astRegTransform_(astCheckRegion(this),astCheckPointSet(in),forward,(out)?astCheckPointSet(out):NULL,frm))
+astINVOKE(O,astRegTransform_(astCheckRegion(this),in?astCheckPointSet(in):NULL,forward,(out)?astCheckPointSet(out):NULL,frm))
 
 #define astClearNegated(this) astINVOKE(V,astClearNegated_(astCheckRegion(this)))
 #define astGetNegated(this) astINVOKE(V,astGetNegated_(astCheckRegion(this)))

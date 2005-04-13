@@ -91,6 +91,7 @@ static void (* parent_setclosed)( AstRegion *, int );
 static void (* parent_clearnegated)( AstRegion * );
 static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_setunc)( AstRegion *, AstRegion * );
+static void (* parent_setregfs)( AstRegion *, AstFrame * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -120,6 +121,7 @@ static void RegBaseBox( AstRegion *this, double *, double * );
 static void SetClosed( AstRegion *, int );
 static void SetNegated( AstRegion *, int );
 static void SetUnc( AstRegion *, AstRegion * );
+static void SetRegFS( AstRegion *, AstFrame * );
 
 /* Member functions. */
 /* ================= */
@@ -296,6 +298,9 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
    parent_clearclosed = region->ClearClosed;
    region->ClearClosed = ClearClosed;
 
+   parent_setregfs = region->SetRegFS;
+   region->SetRegFS = SetRegFS;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    region->RegBaseGrid = RegBaseGrid;
@@ -355,6 +360,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
 /* Local Variables: */
    AstBox *result; 
    double **ptr;
+   double *axval;
    double *blbnd;
    double *bubnd;
    double *lbnd;
@@ -368,6 +374,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    double limu;
    double mxl;
    double mxu;
+   double org;
    double sxl2;
    double sxl;
    double sxu2;
@@ -403,8 +410,10 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    blbnd = astMalloc( sizeof( double )*(size_t) nc );
    bubnd = astMalloc( sizeof( double )*(size_t) nc );
 
+   axval = astMalloc( sizeof( double )*(size_t) np );
+
 /* Check pointers can be used safely */
-   if( bubnd ) {
+   if( axval ) {
 
 /* Get the bounding box of the uncertainty region. */
       astGetRegionBounds( unc, lbnd, ubnd ); 
@@ -413,11 +422,13 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
       for( ic = 0; ic < nc; ic++ ) {
 
 /* Find the upper and lower limits of the supplied mesh on this axis. */
+         org = ptr[ ic ][ 0 ];
          lb = 0.0;
          ub = 0.0;
          p = ptr[ ic ] + 1;
-         p0 = p[ -1 ];
+         p0 = org;
          d = 0.0;
+         axval[ 0 ] = org;
          for( ip = 1; ip < np; ip++, p++ ) {
             dinc = astAxDistance( frm, ic + 1, p0, *p );        
             if( dinc != AST__BAD ) {   
@@ -425,12 +436,13 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
                if( d < lb ) lb = d;
                if( d > ub ) ub = d;
             }
+            axval[ ip ] = org + d;
             p0 = *p;
          }
 
 /* Now convert these relative offsets to actual axis values. */
-         lb += ptr[ ic ][ 0 ];
-         ub += ptr[ ic ][ 0 ];
+         lb += org;
+         ub += org;
 
 /* Now scan the list of axis values again, looking for values which are
    "close to" either lower or upper bound. These will be the points which
@@ -452,14 +464,14 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
          sxu2 = 0.0;
          nxu = 0;
 
-         p = ptr[ ic ];
+         p = axval;
          for( ip = 0; ip < np; ip++, p++ ) {
             if( *p != AST__BAD ) {
-               if( fabs( astAxDistance( frm, ic + 1, *p, lb ) ) <= lim ) {
+               if( fabs( *p - lb ) <= lim ) {
                   sxl += *p;
                   sxl2 += (*p)*(*p);
                   nxl++;
-               } else if( fabs( astAxDistance( frm, ic + 1, *p, ub ) ) <= lim ) {
+               } else if( fabs( *p - ub ) <= lim ) {
                   sxu += *p;
                   sxu2 += (*p)*(*p);
                   nxu++;
@@ -501,13 +513,13 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
          sxu = 0.0;
          nxu = 0;
 
-         p = ptr[ ic ];
+         p = axval;
          for( ip = 0; ip < np; ip++, p++ ) {
             if( *p != AST__BAD ) {
-               if( fabs( astAxDistance( frm, ic + 1, *p, lb ) ) <= liml ) {
+               if( fabs( *p - mxl ) <= liml ) {
                   sxl += *p;
                   nxl++;
-               } else if( fabs( astAxDistance( frm, ic + 1, *p, ub ) ) <= limu ) {
+               } else if( fabs( *p - mxu ) <= limu ) {
                   sxu += *p;
                   nxu++;
                }
@@ -541,6 +553,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    ubnd = astFree( ubnd );
    blbnd = astFree( blbnd );
    bubnd = astFree( bubnd );
+   axval = astFree( axval );
 
 /* Return NULL if anything went wrong. */
    if( !astOK ) result = astAnnul( result );
@@ -1940,6 +1953,50 @@ static void SetNegated( AstRegion *this, int value ){
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
    if( value != old ) ((AstBox *)this)->stale = 1;
+}
+
+static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+/*
+*  Name:
+*     SetRegFS
+
+*  Purpose:
+*     Stores a new FrameSet in a Region
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+
+*  Class Membership:
+*     Box method (over-rides the astSetRegFS method inherited from
+*     the Region class).
+
+*  Description:
+*     This function creates a new FrameSet and stores it in the supplied
+*     Region. The new FrameSet contains two copies of the supplied
+*     Frame, connected by a UnitMap.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     frm
+*        The Frame to use.
+
+*/
+
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent method to store the FrameSet in the parent Region
+   structure. */
+   (* parent_setregfs)( this_region, frm );
+
+/* Indicate that we need to re-calculate the cached information in the Box. */
+   ((AstBox *)this_region)->stale = 1;
 }
 
 static double SetShrink( AstBox *this, double shrink ){

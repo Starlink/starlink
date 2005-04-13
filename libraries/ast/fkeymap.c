@@ -483,8 +483,9 @@ F77_LOGICAL_FUNCTION(ast_mapget1a)( INTEGER(THIS),
       key = astString( KEY, KEY_length );
       RESULT = astMapGet1A( astI2P( *THIS ), key, *MXVAL, NVAL, values ) ? F77_TRUE : F77_FALSE;
       astFree( key );
-
-      for( i = 0; i < *NVAL; i++ ) VALUE[ i ] = astP2I( values[ i ] );
+      if( astOK ) {
+         for( i = 0; i < *NVAL; i++ ) VALUE[ i ] = astP2I( values[ i ] );
+      }
       astFree( values );
 
    )
@@ -520,31 +521,31 @@ F77_LOGICAL_FUNCTION(ast_mapget1c)( INTEGER(THIS),
       astFree( key );
 
 /* Loop round each string value returned in the array */
-      c = values;
-      d = VALUE;
-      for( i = 0; i < *NVAL; i++ ) {
+      if( astOK ) {
+         c = values;
+         d = VALUE;
+         for( i = 0; i < *NVAL; i++ ) {
 
 /* Loop round each of character in the "i"th element of the returned
    array. Copy characters from the work array until a terminating null is
    found. Replace this null by a space and replace all subsequent
    characters by spaces up to the end of the returned array element. */
-         term = 0;
-         for( j = 0; j < VALUE_length; j++, d++, c++ ) {
-            if( term ) {
-               *d = ' ';
-            } else if( (*d = *c) == 0 ) {
-               *d = ' ';
-               term = 1;
-            } 
-         }
+            term = 0;
+            for( j = 0; j < VALUE_length; j++, d++, c++ ) {
+               if( term ) {
+                  *d = ' ';
+               } else if( (*d = *c) == 0 ) {
+                  *d = ' ';
+                  term = 1;
+               } 
+            }
 
 /* Skip over the extra character at the end of each element in the work 
    array. */
-         c++;
-
+            c++;
+         }
       }
       astFree( values );
-
    )
    return RESULT;
 }

@@ -91,6 +91,7 @@ F77_INTEGER_FUNCTION(ast_convert)( INTEGER(FROM),
       namelist = astString( NAMELIST, NAMELIST_length );
       RESULT = astP2I( astConvert( astI2P( *FROM ), astI2P( *TO ),
                                    namelist ) );
+      namelist = astFree( namelist );
    )
    return RESULT;
 }

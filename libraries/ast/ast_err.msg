@@ -143,4 +143,9 @@ BADOC           <Invalid parameters for offset sky coordinate system>
 MPGER           <error getting a named value from a KeyMap>
 MPIND           <invalid integer index supplied for a KeyMap entry>
 
+! New codes introduced for V3.6
+REGCN           <region cannot be re-centred>
+
+
+
 .END

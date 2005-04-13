@@ -6126,7 +6126,7 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
 *        Supply a NULL value for this in order to use "ptr" and "index" to 
 *        specify the new centre.
 *     ptr
-*        Pointer to an array of points, one for each axis in the Region.
+*        Pointer to an array of pointers, one for each axis in the Region.
 *        Each pointer locates an array of axis values. This is the format
 *        returned by the PointSet method astGetPoints. Only used if "cen"
 *        is NULL.
@@ -6521,24 +6521,26 @@ c        Pointer to an
 f        An 
 *        array in which to return the lower axis bounds covered by the Region.
 *        It should have at least as many elements as there are axes in the 
-*        Region.
+*        Region. If an axis has no lower limit, the returned value will
+*        be the largest possible negative value.
 c     ubnd
 f     UBND() = DOUBLE PRECISION (Returned)
 c        Pointer to an 
 f        An 
 *        array in which to return the upper axis bounds covered by the Region.
 *        It should have at least as many elements as there are axes in the 
-*        Region.
+*        Region. If an axis has no upper limit, the returned value will
+*        be the largest possible positive value.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
 *    - The value of the Negated attribute is ignored (i.e. it is assumed that 
 *    the Region has not been negated).
-*    - If the Region is unbounded (i.e. of infinite extent in any direction)
-*    then the lower limits are returned set to the most negative floating
-*    point value, and the upper limits are returned set to the most
-*    positive floating point value,
+*    - If an axis has no extent on an axis then the lower limit will be
+*    returned larger than the upper limit. Note, this is different to an
+*    axis which has a constant value (in which case both lower and upper 
+*    limit will be returned set to the constant value).
 
 *--
 */
@@ -8476,7 +8478,9 @@ static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
 *     this
 *        Pointer to the Region.
 *     in
-*        Pointer to the PointSet holding the input coordinate data.
+*        Pointer to the PointSet holding the input coordinate data. If
+*        NULL then the "points" PointSet within the supplied Region
+*        ("this") is used.
 *     forward
 *        A non-zero value indicates that the forward coordinate transformation
 *        (from base to current) should be applied, while a zero value requests 
@@ -8528,6 +8532,9 @@ static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* If no input PointSet was provided, use the PointSet in the Region. */
+   if( !in ) in = this->points;
 
 /* Get the simplified Mapping from base to current Frame. */
    smap = RegMapping( this );

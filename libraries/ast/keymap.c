@@ -338,6 +338,11 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
+
 /* Initialise. */
    result = 0;
 
@@ -497,8 +502,17 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    one.) */
    if( out_type == AST__STRINGTYPE && astOK && result && cvalue ) {
       result = strlen( cvalue );
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
       strings[ istr ] = astStore( strings[ istr ], cvalue, 
                                   (size_t) ( result + 1 ) );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to

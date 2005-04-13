@@ -95,6 +95,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
+static void (* parent_setregfs)( AstRegion *, AstFrame * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -115,6 +116,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static void SetRegFS( AstRegion *, AstFrame * );
 
 /* Member functions. */
 /* ================= */
@@ -473,6 +475,9 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
+   parent_setregfs = region->SetRegFS;
+   region->SetRegFS = SetRegFS;
+
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
@@ -501,7 +506,7 @@ static void Cache( AstEllipse *this ){
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     void Cache( AstRegion *this )
+*     void Cache( AstEllipse *this )
 
 *  Class Membership:
 *     Ellipse member function 
@@ -1243,6 +1248,50 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Return the result. */
    return result;
+}
+
+static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+/*
+*  Name:
+*     SetRegFS
+
+*  Purpose:
+*     Stores a new FrameSet in a Region
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ellipse.h"
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+
+*  Class Membership:
+*     Ellipse method (over-rides the astSetRegFS method inherited from
+*     the Region class).
+
+*  Description:
+*     This function creates a new FrameSet and stores it in the supplied
+*     Region. The new FrameSet contains two copies of the supplied
+*     Frame, connected by a UnitMap.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     frm
+*        The Frame to use.
+
+*/
+
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent method to store the FrameSet in the parent Region
+   structure. */
+   (* parent_setregfs)( this_region, frm );
+
+/* Re-calculate cached information. */
+   Cache( (AstEllipse *) this_region );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {

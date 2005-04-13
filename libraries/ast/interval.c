@@ -106,7 +106,6 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_overlap)( AstRegion *, AstRegion * );
-static double *(* parent_regcentre)( AstRegion *this, double *, double **, int, int );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
 static void (* parent_setunc)( AstRegion *, AstRegion * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
@@ -1068,9 +1067,6 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
    parent_overlap = region->Overlap;
    region->Overlap = Overlap;
 
-   parent_regcentre = region->RegCentre;
-   region->RegCentre = RegCentre;
-
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
@@ -1080,6 +1076,7 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
    parent_regsetattrib = region->RegSetAttrib;
    region->RegSetAttrib = RegSetAttrib;
 
+   region->RegCentre = RegCentre;
    region->GetBounded = GetBounded;
    region->GetDefUnc = GetDefUnc;
    region->RegPins = RegPins;
@@ -1699,29 +1696,74 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 */
 
 /* Local Variables: */
-   AstBox *box;                  /* The equivalent Box */
-   double *result;               /* Returned pointer */
+   AstInterval *this;  /* Pointer to Interval structure */
+   AstBox *box;        /* Pointer to equivalent Box structure */
+   double **bptr;      /* Data pointers for Region PointSet */
+   double *cen0;       /* Pointer to original centre values */
+   double *cen1;       /* Pointer to new centre values */
+   double *off;        /* Pointer to array of offset values */
+   double *result;     /* Returned pointer */
+   int i;              /* Coordinate index */
+   int nax;            /* Number of axes */
 
 /* Initialise */
    result = NULL;
 
-/* Check the global error status. */
+/* Check the local error status. */
    if ( !astOK ) return result;
 
-/* If the Interval is effectively a Box, invoke the astRegCentre
-   function on the equivalent Box. A pointer to the equivalent Box will
-   be stored in the Interval structure. */
+/* Get a pointer to the Interval structure. */
+   this = (AstInterval *) this_region;
+
+/* The Interval can only be re-centred if it is effectively a Box. */
    box = Cache( (AstInterval *) this_region );
    if( box ) {
-      result = astRegCentre( box, cen, ptr, index, ifrm );
 
-/* If the Interval is not equivalent to a Box, invoke the astRegCentre
-   function inherited from the parent Region class. */
+/* If the centre is being changed... */
+      if( cen || ptr ) {
+
+/* Get the original baseFrame centre of the equivalent box. */
+         cen0 = astRegCentre( box, NULL, NULL, 0, AST__BASE );
+
+/* Set the new centre in the equivalent box. */
+         astRegCentre( box, cen, ptr, index, ifrm );
+
+/* Get the new base Frame centre of the equivalent box. */
+         cen1 = astRegCentre( box, NULL, NULL, 0, AST__BASE );
+
+/* Find the offsets from old to new centre. */
+         nax = astGetNin( this_region->frameset );
+         off = astMalloc( sizeof(double)*(size_t)nax );
+         if( off ) {
+            for( i = 0; i < nax; i++ ) off[ i ] = cen1[ i ] - cen0[ i ];
+
+/* Move the limits in the Interval structure by these offsets. */
+            bptr = astGetPoints( this_region->points );
+            if( bptr ) {
+               for( i = 0; i < nax; i++ ) {
+                  bptr[ i ][ 0 ] += off[ i ];
+                  bptr[ i ][ 1 ] += off[ i ];
+               }
+            }
+            off = astFree( off );
+         }
+         cen0 = astFree( cen0 );
+         cen1 = astFree( cen1 );
+
+/* If the centre is not being changed, just invoke the method on the
+   equivalent box. */
+      } else {
+         result = astRegCentre( box, NULL, NULL, 0, AST__BASE );
+      }
+
+/* If the Interval is not equivalent to a Box, report an error */
    } else {
-      result = (*parent_regcentre)( this_region, cen, ptr, index, ifrm );
+      astError( AST__REGCN, "astRegCentre(%s): The supplied %s is not a "
+                "closed Interval and so cannot be re-centred.",
+                astGetClass( this ), astGetClass( this ) );
    }
 
-/* Return the result */
+/* Return the result. */
    return result;
 }
 
@@ -3308,7 +3350,6 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
    AstInterval *new;         /* Pointer to new Interval */
    AstPointSet *pset;        /* PointSet to pass to Region initialiser */
    double **ptr;             /* Pointer to coords data in pset */
-   int isNull;               /* Were no axis limits supplied? */
    int i;                    /* Axis index */
    int nc;                   /* No. of axes */
 
@@ -3330,19 +3371,11 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
    ptr = astGetPoints( pset );
    if( astOK ) {
 
-/* Check we have at least one axis limit and copy the limits into the
-   PointSet.  */
-      isNull = 1;
+/* Copy the limits into the PointSet.  */
       for( i = 0; i < nc; i++ ) {
-         if( lbnd[ i ] != AST__BAD || ubnd[ i ] != AST__BAD ) isNull = 0;
          ptr[ i ][ 0 ] = lbnd[ i ];
          ptr[ i ][ 1 ] = ubnd[ i ];
       }
-
-/* Report an error if no limits were supplied. */
-      if( isNull ) astError( AST__BADIN, "astInitInterval(%s): No axis "
-                             "limits were supplied for the new Interval "
-                             "region.", name );
 
 /* Initialise a Region structure (the parent class) as the first component
    within the Interval structure, allocating memory if necessary. */
