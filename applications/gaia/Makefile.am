@@ -172,5 +172,5 @@ install-exec-local:
 	   rm -f $$t; \
 	   echo $(LN_S) gaiaMon $$t; \
 	   $(LN_S) gaiaMon $$t; \
-	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || :
+	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || : ;\
 	done
