@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.19}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {18th March 2005}
+\newcommand{\stardocdate}      {13th April 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -20748,6 +20748,13 @@ Format syntax of a simple Frame.
 
 \item The Plot class has a new attribute called Clip which controls the
 clipping performed by AST at the plot boundary.
+
+\item The keys used to label components of the PolyMap structure when a
+PolyMap is written out through a Channel have been changed. The new keys
+are shorter than the old keys and so can written succesfully to a FitsChan.
+The new PolyMap class always writes new styles keys but can read either
+old or new style keys. Consequently, PolyMap dumps written by this
+version of AST cannot be read by older versions of AST.
 
 \end{enumerate}
 

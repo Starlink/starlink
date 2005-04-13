@@ -24,7 +24,8 @@ simple Frame.
 - The Plot class has a new attribute called Clip which controls the
 clipping performed by AST at the plot boundary.
 
-
+- The PolyMap class has been modified to allow a PolyMap to be written
+succesfully to a FitsChan using Native encoding. 
 
 
 Main Changes in Version 3.5
