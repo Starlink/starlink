@@ -94,7 +94,11 @@ install-manifest:
 ## If POSS_SUPPRESS_INSTALL is true, then this install will presumably do
 ## very little, but we still let it run in case there is something useful
 ## it can do.
-?STANDARDMANIFEST?	  { $(MAKE) $(AM_MAKEFLAGS) MANIFEST=: $(REAL_INSTALL) \
+## Omit $(AM_MAKEFLAGS) here, since it contains MANIFEST=false (see above):
+## some makes (Tru64 is the culprit) violate POSIX by not allowing multiple
+## variable settings on the command line -- make should respect the last
+## one; Tru64 make respects only the first.
+?STANDARDMANIFEST?	  { $(MAKE) MANIFEST=: $(REAL_INSTALL) \
 ?STANDARDMANIFEST?	    || MF_INST_OK=false; } \
 ?STANDARDMANIFEST?	    | tee $$MFX | grep -v '^MANIFEST:' || :; \
 ## Otherwise, install the component to a staging area, using the
