@@ -48,11 +48,9 @@
 <version number="1" date="11-Apr-2005" author="nxg">
 <px>First properly public release (revision 1.97)</px>
 </version>
-<!--
-<distribution string="Version 1 snapshots" date="11-Apr-2005" author="nxg">
+<distribution string="v1.snapshot" date="11-Apr-2005" author="nxg">
 <px>This is a post-version-1 snapshot: $Revision$</px>
 </distribution>
--->
     </history>
 <copyright>
 <p>Copyright 2004-5, Council for the Central Laboratory of the
@@ -3539,7 +3537,8 @@ XML-valid instance of this, as defined by
 <code>&lt;component&gt;</code> at the root level.</p>
 
 <p>2. A Makefile which implements most/all of the GNU standard
-targets.  I think we actually use `all' (default), `install', `check'
+targets<index>make targets</index>.
+I think we actually use `all' (default), `install', `check'
 and `dist' as part of the build system, and I've mentioned `clean',
 `distclean', and `maintainer-clean' elsewhere in this document.  The GNU coding
 standards add `uninstall', `install-strip', `mostlyclean', `TAGS',
@@ -5566,6 +5565,27 @@ AC_LANG_POP([Fortran])
             compiler has <code>%VAL</code>, it presumably has
             <code>%LOC</code> also.</p>
         </subsect>
+
+<subsect id="macro-ac-fc-literal-backslash" export="export"
+indexkey="autoconf!macros!AC_FC_LITERAL_BACKSLASH">
+<subhead>
+<title>AC_FC_LITERAL_BACKSLASH</title>
+</subhead>
+
+<p><strong>AC_FC_LITERAL_BACKSLASH</strong></p>
+
+<p>Check whether the compiler regards the backslash character as an
+escape character.  The Standard doesn't say anything about this, but
+many Unix Fortran compilers interpret <code>'\n'</code>, for example,
+as a newline, and <code>'\\'</code> as a single backslash.</p>
+
+<p>This macro tests the behaviour of the currently selected compiler,
+and defines <code>FC_LITERAL_BACKSLASH</code> to 1 if backslashes are
+treated literally -- that is if <code>'\\'</code> is interpreted as a
+<em>pair</em> of backslashes and thus that <code>'\n'</code> is
+interpreted as a pair of characters rather than a newline.</p>
+
+</subsect>
 
         <subsect id="macro-ac-fc-open-specifiers" export="export"
           indexkey="autoconf!macros!AC_FC_OPEN_SPECIFIERS">
