@@ -1829,10 +1829,13 @@ AC_DEFUN([AC_FC_LITERAL_BACKSLASH],
     AC_CACHE_CHECK([whether ${FC} interprets backslashes literally],
         ac_cv_fc_literal_backslash,
        [AC_LANG_PUSH([Fortran])
+## Four backslashes here -- this is expanded by the shell in writing
+## the text to the file.  We want to end up with TEST\\TEST in the source.
         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
-      write(*,'("TEST\\TEST")')
+      write(*,'("TEST\\\\TEST")')
 ])],
-           [if grep 'TEST\\\\TEST' conftest.$ac_objext >/dev/null; then
+## 'strings' is portable, yes?
+           [if strings conftest.$ac_objext | grep 'TEST\\\\TEST' >/dev/null; then
                 ac_cv_fc_literal_backslash=yes
             else
                 ac_cv_fc_literal_backslash=no
