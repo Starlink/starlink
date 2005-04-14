@@ -167,12 +167,6 @@ STAR_FCFLAGS=
 STAR_FFLAGS=
 STAR_LDFLAGS=
 if test -n "$STARLINK"; then
-    if test "$STARLINK" != "per_dir_PREFIX"; then
-        STAR_CPPFLAGS="$STAR_CPPFLAGS -I[]per_dir_PREFIX/include"
-        STAR_FCFLAGS="$STAR_FCFLAGS -I[]per_dir_PREFIX/include"
-        STAR_FFLAGS="$STAR_FFLAGS -I[]per_dir_PREFIX/include"
-        LIBS="$LIBS -L[]per_dir_PREFIX/lib"
-    fi
     STAR_CPPFLAGS="$STAR_CPPFLAGS -I$STARLINK/include"
     STAR_FCFLAGS="$STAR_FCFLAGS -I$STARLINK/include"
     STAR_FFLAGS="$STAR_FFLAGS -I$STARLINK/include"
