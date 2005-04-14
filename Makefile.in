@@ -1,10 +1,10 @@
 # Process this file with autoconf to generate the Makefile
 # @configure_input@
 
-# MANIFEST and prefix must match the value defaulted in starconf.
+# MANIFESTS and prefix must match the value defaulted in starconf.
 # FIXME: tie these together, and link with starconf values.
 prefix=@prefix@
-MANIFEST=$(prefix)/manifests
+MANIFESTS=$(prefix)/manifests
 
 # Keep the following in alphabetical order.  We don't actually _have_ to
 # include everything here, just enough to imply all the others that we
@@ -18,81 +18,81 @@ MANIFEST=$(prefix)/manifests
 #         dependency order.
 #     Obsolete components
 ALL_TARGETS = \
-	$(MANIFEST)/agi \
-	$(MANIFEST)/ard \
-	$(MANIFEST)/ast \
-	$(MANIFEST)/astrom \
-	$(MANIFEST)/atools \
-	$(MANIFEST)/cat \
-	$(MANIFEST)/ccdpack \
-	$(MANIFEST)/chr \
-	$(MANIFEST)/cnf \
-	$(MANIFEST)/coco \
-	$(MANIFEST)/convert \
-	$(MANIFEST)/datacube \
-	$(MANIFEST)/daophot \
-	$(MANIFEST)/dipso \
-	$(MANIFEST)/docfind \
-	$(MANIFEST)/echomop \
-	$(MANIFEST)/echwind \
-	$(MANIFEST)/ems \
-	$(MANIFEST)/esp \
-	$(MANIFEST)/extractor \
-	$(MANIFEST)/extreme \
-	$(MANIFEST)/figaro \
-	$(MANIFEST)/findcoords \
-	$(MANIFEST)/fio \
-	$(MANIFEST)/gaia \
-	$(MANIFEST)/gks \
-	$(MANIFEST)/gns \
-	$(MANIFEST)/graphpar \
-	$(MANIFEST)/grp \
-	$(MANIFEST)/gsd \
-	$(MANIFEST)/gwm \
-	$(MANIFEST)/hds \
-	$(MANIFEST)/hdstools \
-	$(MANIFEST)/hdstrace \
-	$(MANIFEST)/hlp \
-	$(MANIFEST)/htx \
-	$(MANIFEST)/icl \
-	$(MANIFEST)/idi \
-	$(MANIFEST)/img \
-	$(MANIFEST)/info \
-	$(MANIFEST)/init \
-	$(MANIFEST)/itcl \
-	$(MANIFEST)/jpl \
-	$(MANIFEST)/kappa \
-	$(MANIFEST)/kaprh \
-	$(MANIFEST)/mag \
-	$(MANIFEST)/mers \
-	$(MANIFEST)/messgen \
-	$(MANIFEST)/nbs \
-	$(MANIFEST)/ndf \
-	$(MANIFEST)/ndg \
-	$(MANIFEST)/news \
-	$(MANIFEST)/one \
-	$(MANIFEST)/par \
-	$(MANIFEST)/pda \
-	$(MANIFEST)/pgp \
-	$(MANIFEST)/photom \
-	$(MANIFEST)/pisa \
-	$(MANIFEST)/polpack \
-	$(MANIFEST)/prm \
-	$(MANIFEST)/psmerge \
-	$(MANIFEST)/psx \
-	$(MANIFEST)/ref \
-	$(MANIFEST)/rv \
-	$(MANIFEST)/sae \
-	$(MANIFEST)/scb \
-	$(MANIFEST)/sgs \
-	$(MANIFEST)/shl \
-	$(MANIFEST)/sla \
-	$(MANIFEST)/spt \
-	$(MANIFEST)/sst \
-	$(MANIFEST)/tcl \
-	$(MANIFEST)/tk \
-	$(MANIFEST)/trn \
-	$(MANIFEST)/xdisplay
+	$(MANIFESTS)/agi \
+	$(MANIFESTS)/ard \
+	$(MANIFESTS)/ast \
+	$(MANIFESTS)/astrom \
+	$(MANIFESTS)/atools \
+	$(MANIFESTS)/cat \
+	$(MANIFESTS)/ccdpack \
+	$(MANIFESTS)/chr \
+	$(MANIFESTS)/cnf \
+	$(MANIFESTS)/coco \
+	$(MANIFESTS)/convert \
+	$(MANIFESTS)/datacube \
+	$(MANIFESTS)/daophot \
+	$(MANIFESTS)/dipso \
+	$(MANIFESTS)/docfind \
+	$(MANIFESTS)/echomop \
+	$(MANIFESTS)/echwind \
+	$(MANIFESTS)/ems \
+	$(MANIFESTS)/esp \
+	$(MANIFESTS)/extractor \
+	$(MANIFESTS)/extreme \
+	$(MANIFESTS)/figaro \
+	$(MANIFESTS)/findcoords \
+	$(MANIFESTS)/fio \
+	$(MANIFESTS)/gaia \
+	$(MANIFESTS)/gks \
+	$(MANIFESTS)/gns \
+	$(MANIFESTS)/graphpar \
+	$(MANIFESTS)/grp \
+	$(MANIFESTS)/gsd \
+	$(MANIFESTS)/gwm \
+	$(MANIFESTS)/hds \
+	$(MANIFESTS)/hdstools \
+	$(MANIFESTS)/hdstrace \
+	$(MANIFESTS)/hlp \
+	$(MANIFESTS)/htx \
+	$(MANIFESTS)/icl \
+	$(MANIFESTS)/idi \
+	$(MANIFESTS)/img \
+	$(MANIFESTS)/info \
+	$(MANIFESTS)/init \
+	$(MANIFESTS)/itcl \
+	$(MANIFESTS)/jpl \
+	$(MANIFESTS)/kappa \
+	$(MANIFESTS)/kaprh \
+	$(MANIFESTS)/mag \
+	$(MANIFESTS)/mers \
+	$(MANIFESTS)/messgen \
+	$(MANIFESTS)/nbs \
+	$(MANIFESTS)/ndf \
+	$(MANIFESTS)/ndg \
+	$(MANIFESTS)/news \
+	$(MANIFESTS)/one \
+	$(MANIFESTS)/par \
+	$(MANIFESTS)/pda \
+	$(MANIFESTS)/pgp \
+	$(MANIFESTS)/photom \
+	$(MANIFESTS)/pisa \
+	$(MANIFESTS)/polpack \
+	$(MANIFESTS)/prm \
+	$(MANIFESTS)/psmerge \
+	$(MANIFESTS)/psx \
+	$(MANIFESTS)/ref \
+	$(MANIFESTS)/rv \
+	$(MANIFESTS)/sae \
+	$(MANIFESTS)/scb \
+	$(MANIFESTS)/sgs \
+	$(MANIFESTS)/shl \
+	$(MANIFESTS)/sla \
+	$(MANIFESTS)/spt \
+	$(MANIFESTS)/sst \
+	$(MANIFESTS)/tcl \
+	$(MANIFESTS)/tk \
+	$(MANIFESTS)/trn \
+	$(MANIFESTS)/xdisplay
 
 # The other important target is `buildsupport', the dependencies of
 # which are defined in the Makefile.dependencies which is included below.
@@ -230,7 +230,7 @@ componentinfo.dtd:
 	$(LN_S) `starconf --show buildsupportdata`/componentinfo.dtd componentinfo.dtd
 
 # Makefile.dependencies expresses all the dependencies between components.
-# It expects the current file to define variable MANIFEST to be the directory
+# It expects the current file to define variable MANIFESTS to be the directory
 # which holds the manifest files, typically /star/manifests
 #
 # This include file also contains the TARGET buildsupport
@@ -238,16 +238,16 @@ include Makefile.dependencies
 
 # Add extra dependencies on starconf, to ensure that ./configure and
 # install-sh are present before we attempt to configure it.
-$(MANIFEST)/starconf: buildsupport/starconf/configure
+$(MANIFESTS)/starconf: buildsupport/starconf/configure
 
-buildsupport/starconf/configure: $(MANIFEST)/automake $(MANIFEST)/autoconf
+buildsupport/starconf/configure: $(MANIFESTS)/automake $(MANIFESTS)/autoconf
 	cd buildsupport/starconf && autoreconf --install --symlink
 
 # Disable `make install' from this directory
 install install-manifest:
 	@ echo "To install a component, go to its directory and type"
 	@ echo "  'make install' there.  Or delete its manifest from"
-	@ echo "  $(MANIFEST), and make $(MANIFEST)/<component-name>".
+	@ echo "  $(MANIFESTS), and make $(MANIFESTS)/<component-name>".
 	@ echo "To install the whole tree, type 'make world'."
 
 clean: clean-recursive
