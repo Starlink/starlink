@@ -19,27 +19,6 @@ endif
 
 include_MESSAGES = CHR_ERR
 PRIVATE_INCLUDES = CHR_SYS
-PUBLIC_INCLUDES = CHR_PAR
-
-# Distribute the CHR_PAR.F file so that the tar distribution builds
-EXTRA_DIST = CHR_PAR.F
-
-# CHR_PAR.F requires defintions from config.h.
-# The following deals with case-insensitive filesystems, on which
-# CHR_PAR.f and CHR_PAR.F would be the same file.  FPP_OUTPUT is
-# either "" (in which case the preprocessor writes to CHR_PAR.f, and
-# the filesystem is presumably case-sensitive) or ">$@".
-CHR_PAR.processed: CHR_PAR.F
-	rm -f CHR_PAR.processed
-	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) CHR_PAR.F $(FPP_OUTPUT)
-	test -f CHR_PAR.processed || mv CHR_PAR.f CHR_PAR.processed
-CHR_PAR: CHR_PAR.processed
-	rm -f CHR_PAR CHR_PAR.tmp
-	echo "* Generated from CHR_PAR.F by Makefile.am" >CHR_PAR.tmp
-	grep '^ .*[^ ]' CHR_PAR.processed >>CHR_PAR.tmp \
-	    && mv CHR_PAR.tmp CHR_PAR
-
-CLEANFILES = CHR_PAR CHR_PAR.processed CHR_PAR.tmp
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
