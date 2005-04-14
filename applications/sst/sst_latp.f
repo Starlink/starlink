@@ -46,7 +46,7 @@
 *     5-DEC-1994 (PDRAPER):
 *        Added double \ for UNIX port.
 *     14-APR-2005 (PDRAPER):
-*        Converted to use CHR_PAR to define the backslash character.
+*        Converted to use pre-defined backslash character.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,7 +59,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
 *  Global Variables:
@@ -127,7 +126,7 @@
             IF ( ( SCB_LINE( I )( F : F ) .EQ. '-' ) ) THEN
                IF ( .NOT. ITEMS ) THEN
                   ITEMS = .TRUE.
-                  CALL SST_PUT( IND, CHR__BKSLH // 'sstitemlist{', 
+                  CALL SST_PUT( IND, SST__BKSLH // 'sstitemlist{', 
      :                          STATUS )
                   PREVBL = .FALSE.
                   IND = IND + 3
@@ -137,7 +136,7 @@
                IF ( .NOT. PREVBL ) THEN
                   CALL SST_PUT( 0, ' ', STATUS )
                END IF
-               CALL SST_PUT( IND, CHR__BKSLH // 'sstitem', STATUS )
+               CALL SST_PUT( IND, SST__BKSLH // 'sstitem', STATUS )
 
 *  Note where to start the line so as to skip the '-'.
                F = F + 1

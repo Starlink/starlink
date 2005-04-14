@@ -40,7 +40,7 @@
 *     6-DEC-1994 (PDRAPER):
 *        Original version. Converted from RFWS's SST_TRLAT.
 *     14-APR-2005 (PDRAPER):
-*        Converted to use CHR_PAR to define the backslash character.
+*        Converted to use pre-defined backslash character.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -53,7 +53,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
 *  Global Variables:
@@ -108,11 +107,11 @@
 *  level 1 heading with the routine name (latex2html will produce one
 *  from the subsection command).
       IF ( LATEX ) THEN
-         BUF = CHR__BKSLH // 'subsection{'//
+         BUF = SST__BKSLH // 'subsection{'//
      :         SCB_LINE( FIRST )( SCB_FC( FIRST ) : SCB_LC( FIRST ) )//
      :         '}'
          CALL SST_PUT( 0, BUF, STATUS )
-         CALL SST_PUT( 0, CHR__BKSLH // 'begin{rawhtml}', STATUS )
+         CALL SST_PUT( 0, SST__BKSLH // 'begin{rawhtml}', STATUS )
       ELSE
          BUF = '<H1>'//
      :         SCB_LINE( FIRST )( SCB_FC( FIRST ) : SCB_LC( FIRST ) )//
@@ -437,7 +436,7 @@
 
 *  End output.
       IF ( LATEX ) THEN
-         CALL SST_PUT( 0, CHR__BKSLH // 'end{rawhtml}', STATUS )
+         CALL SST_PUT( 0, SST__BKSLH // 'end{rawhtml}', STATUS )
       END IF
       CALL SST_PUT( 0, '<P>', STATUS )
 

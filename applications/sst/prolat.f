@@ -161,7 +161,7 @@
 *        Changed OPEN statements to FIO_OPEN, should be more portable.
 *        Added double \ for UNIX port.
 *     14-APR-2005 (PDRAPER):
-*        Converted to use CHR_PAR to define the backslash character.
+*        Converted to use pre-defined backslash character.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -174,7 +174,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'FIO_PAR'          ! FIO_ public constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
@@ -340,7 +339,7 @@
             IF ( SCB_NLINE .GT. 0 ) THEN
 
 *  Start a new page for each prologue if required.
-               IF ( PAGE ) CALL SST_PUT( 0, CHR__BKSLH // 'newpage', 
+               IF ( PAGE ) CALL SST_PUT( 0, SST__BKSLH // 'newpage', 
      :                                   STATUS )
 
 *  Translate each prologue into part of the output Latex document and
@@ -388,7 +387,7 @@
 2     CONTINUE
 
 *  If producing a full document, then end it.
-      IF ( DOC ) CALL SST_PUT( 0, CHR__BKSLH // 'end{document}', 
+      IF ( DOC ) CALL SST_PUT( 0, SST__BKSLH // 'end{document}', 
      :                         STATUS )
 
 *  Arrive here when all the input files have been processed, or earlier

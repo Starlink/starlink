@@ -1,3 +1,5 @@
+#include <config.h>
+
 *+
 *  Name:
 *     SST_PAR
@@ -18,11 +20,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     8-AUG-1990 (RFWS):
 *        Original version.
+*     14-APR-2005 (PWD):
+*        Add parameterization of printable backslash. Made preprocessable.
 *     {enter_changes_here}
 
 *-
@@ -36,6 +41,14 @@
 *  Maximum number of lines in the internal source code buffer.
       INTEGER SST__MXLIN
       PARAMETER ( SST__MXLIN = 5000 )
+
+*  Character that prints a backslash.
+      CHARACTER * ( 1 ) SST__BKSLH
+#if FC_LITERAL_BACKSLASH
+      PARAMETER ( SST__BKSLH = '\' )
+#else
+      PARAMETER ( SST__BKSLH = '\\' )
+#endif
 
 *.
 * @(#)sst_par   1.1   94/12/05 11:38:25   96/07/05 10:28:45
