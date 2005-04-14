@@ -54,8 +54,6 @@
 *        Changed to use maths symbols instead of \verb.
 *     10-DEC-1991 (RFWS):
 *        Escape "&" character correctly (previously omitted).
-*     5-DEC-1994 (PDRAPER):
-*        Added double \\ to get working on UNIX.
 *     6-DEC-1994 (PDRAPER):
 *        Converted for use by html (from LaTeX).
 *     {enter_further_changes_here}

@@ -60,6 +60,8 @@
 *        Escape "&" character correctly (previously omitted).
 *     5-DEC-1994 (PDRAPER):
 *        Added double \\ to get working on UNIX.
+*     14-APR-2005 (PDRAPER):
+*        Converted to use CHR_PAR to define the backslash character.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,6 +74,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
 *  Arguments Given:
@@ -122,7 +125,7 @@
      :             ( CH .EQ. '_' ) .OR.
      :             ( CH .EQ. '{' ) .OR.
      :             ( CH .EQ. '}' ) ) THEN
-            BUF( II + 1 : II + 2 ) = '\\' // CH
+            BUF( II + 1 : II + 2 ) = CHR__BKSLH // CH
             II = II + 2
 
 *  Detect those requiring maths mode.
@@ -137,20 +140,21 @@
 *  Detect those requiring {\tt} text.
          ELSE IF ( ( CH .EQ. '''' ) .OR.
      :             ( CH .EQ. '"' ) ) THEN
-            BUF( II + 1 : II + 7 ) = '{\\tt ' // CH // '}'
+            BUF( II + 1 : II + 7 ) = 
+     :         '{' // CHR__BKSLH // 'tt ' // CH // '}'
             II = II + 7
 
 *  Detect those needing special maths symbols.
          ELSE IF ( CH .EQ. '^' ) THEN
-            BUF( II + 1 : II + 8 ) = '$\\wedge$'
+            BUF( II + 1 : II + 8 ) = '$' // CHR__BKSLH //'wedge$'
             II = II + 8
 
          ELSE IF ( CH .EQ. '~' ) THEN
-            BUF( II + 1 : II + 6 ) = '$\\sim$'
+            BUF( II + 1 : II + 6 ) = '$' // CHR__BKSLH //'sim$'
             II = II + 6
 
-         ELSE IF ( CH .EQ. '\\' ) THEN
-            BUF( II + 1 : II + 12 ) = '$\\backslash$'
+         ELSE IF ( CH .EQ. CHR__BKSLH ) THEN
+            BUF( II + 1 : II + 12 ) = '$'// CHR__BKSLH //'backslash$'
             II = II + 12
 
 *  Use others literally.

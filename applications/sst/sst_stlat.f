@@ -39,8 +39,6 @@
 *        Added Latex command to produce a centred underscore.
 *     28-SEP-1990 (RFWS):
 *        Added calls to ERR_MARK and ERR_RLSE.
-*     5-DEC-1994 (PDRAPER):
-*        Added double \\ for UNIX port.
 *     7-JUL-1996 (PDRAPER):
 *        Fixed to use external file for document start information.
 *     {enter_further_changes_here}

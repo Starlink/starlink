@@ -46,6 +46,8 @@
 *        Original, derived from the SST_PUTS routine.
 *     5-DEC-1994 (PDRAPER):
 *        Added double \ for UNIX port.
+*     14-APR-2005 (PDRAPER):
+*        Converted to use CHR_PAR to define the backslash character.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,6 +60,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
 *  Global Variables:
@@ -110,7 +113,8 @@
          IF ( NULL .OR. ( F .LE. L ) ) THEN
 
 *  Output the header.
-            CALL SST_PUT( INDENT, '\\sstsubsection{', STATUS )
+            CALL SST_PUT( INDENT, CHR__BKSLH // 'sstsubsection{', 
+     :                    STATUS )
             CALL SST_LAT( INDENT + INC,
      :                    SCB_LINE( HEADER )( SCB_FC( HEADER ) :
      :                                        SCB_LC( HEADER ) ),

@@ -48,6 +48,8 @@
 *        Added support for an A-task "Usage" section.
 *     5-DEC-1994 (PDRAPER):
 *        Added double \ for UNIX port.
+*     14-APR-2005 (PDRAPER):
+*        Made double \ sensitive to the compiler capabilities.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,6 +62,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CHR_PAR'          ! CHR constants
       INCLUDE 'SST_PAR'          ! SST_ constants
 
 *  Global Variables:
@@ -109,7 +112,7 @@
 
 *  Begin the Latex routine description environment and output the name
 *  of the routine.
-      CALL SST_PUT( 0, '\\sstroutine{', STATUS )
+      CALL SST_PUT( 0, CHR__BKSLH // 'sstroutine{', STATUS )
       CALL SST_LAT( 3, SCB_LINE( FIRST )( SCB_FC( FIRST ) :
      :                                    SCB_LC( FIRST ) ),
      :              STATUS )
@@ -159,7 +162,7 @@
       END IF
 
 *  Output the body of the description section in paragraph mode.
-      CALL SST_PUT( 3, '\\sstdescription{', STATUS )
+      CALL SST_PUT( 3, CHR__BKSLH // 'sstdescription{', STATUS )
       CALL SST_LATP( 6, FIRST, LAST, STATUS )
       CALL SST_PUT( 3, '}', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -175,7 +178,7 @@
 *  If a usage section was found, then output the body of the section in
 *  paragraph mode.
          IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-            CALL SST_PUT( 3, '\\sstusage{', STATUS )
+            CALL SST_PUT( 3, CHR__BKSLH // 'sstusage{', STATUS )
             CALL SST_LATP( 6, FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '}', STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -200,7 +203,7 @@
          END IF
 
 *  Output the body of the invocation description in paragraph mode.
-         CALL SST_PUT( 3, '\\sstinvocation{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstinvocation{', STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -222,11 +225,11 @@
 *  Otherwise, output the body of the section in subsection mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
          IF ( ATASK ) THEN
-            CALL SST_PUT( 3, '\\sstparameters{', STATUS )
+            CALL SST_PUT( 3, CHR__BKSLH // 'sstparameters{', STATUS )
             CALL SST_LATS( 6, 3, .TRUE., FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '}', STATUS )
          ELSE
-            CALL SST_PUT( 3, '\\sstarguments{', STATUS )
+            CALL SST_PUT( 3, CHR__BKSLH // 'sstarguments{', STATUS )
             CALL SST_LATS( 6, 3, .TRUE., FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '}', STATUS )
          END IF
@@ -244,7 +247,7 @@
 *  If no "Applicability" section was found, then skip it.  Otherwise,
 *  output the body of the section in subsection mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, '\\sstapplicability{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstapplicability{', STATUS )
          CALL SST_LATS( 6, 3, .TRUE., FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
       END IF
@@ -262,7 +265,7 @@
 *  If no returned value section was found, then skip it. Otherwise,
 *  output the body of the section in subsection mode.
          IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-            CALL SST_PUT( 3, '\\sstreturnedvalue{', STATUS )
+            CALL SST_PUT( 3, CHR__BKSLH // 'sstreturnedvalue{', STATUS )
             CALL SST_LATS( 6, 3, .TRUE., FIRST, LAST, STATUS )
             CALL SST_PUT( 3, '}', STATUS )
          END IF
@@ -280,7 +283,7 @@
 *  body of the section in subsection mode (using the special examples
 *  format).
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, '\\sstexamples{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstexamples{', STATUS )
          CALL SST_LATEX( 6, 3, .TRUE., FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
       END IF
@@ -296,7 +299,7 @@
 *  If no notes section was found, then skip it. Otherwise, output the
 *  body of the section in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, '\\sstnotes{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstnotes{', STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
       END IF
@@ -344,7 +347,7 @@
 
 *  Output the heading, followed by the body of the section in paragraph
 *  mode.
-         CALL SST_PUT( 3, '\\sstdiytopic{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstdiytopic{', STATUS )
          CALL SST_LAT( 6, TOPIC( : NC ), STATUS )
          CALL SST_PUT( 3, '}{', STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
@@ -362,7 +365,8 @@
 *  If no implementation status section was found, then skip it.
 *  Otherwise, output the section body in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, '\\sstimplementationstatus{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstimplementationstatus{', 
+     :                 STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
       END IF
@@ -378,7 +382,7 @@
 *  If no bugs section was found, then skip it. Otherwise, output the
 *  section body in paragraph mode.
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
-         CALL SST_PUT( 3, '\\sstbugs{', STATUS )
+         CALL SST_PUT( 3, CHR__BKSLH // 'sstbugs{', STATUS )
          CALL SST_LATP( 6, FIRST, LAST, STATUS )
          CALL SST_PUT( 3, '}', STATUS )
       END IF

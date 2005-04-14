@@ -30,12 +30,9 @@ AC_CHECK_FUNCS(memcpy)
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-dnl    Includes: fio, par, sae; 
-dnl    links to: chr, mers, fio, psx, task ...
-dnl STAR_DECLARE_DEPENDENCIES([build], [chr fio mers par psx sae hdspar dtask hds hlp])
-STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae])
-STAR_DECLARE_DEPENDENCIES(build, [pcs], use)
-dnl    No use dependencies
+STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae],
+                          [link])
+STAR_DECLARE_DEPENDENCIES([build], [pcs], [use])
 
 STAR_LATEX_DOCUMENTATION(sun110)
 
