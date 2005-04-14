@@ -7,7 +7,7 @@ dryrun=false
 need_gnu_m4=false
 buildsupport_prefix=
 
-USAGE="Usage: $0 [--buildsupport[=inst-dir] | --dry-run | -n | --help]"
+USAGE="Usage: $0 [--buildsupport | --buildsupport-prefix=inst-dir | --dry-run | -n | --help]"
 
 while test $# -gt 0
 do
@@ -17,9 +17,8 @@ do
         buildsupportonly=:
         ;;
 
-    --buildsupport=*)
-        buildsupportonly=:
-        buildsupport_prefix=`expr x$1 : 'x--buildsupport=\(.*\)'`
+    --buildsupport-prefix=*)
+        buildsupport_prefix=`expr x$1 : 'x--buildsupport-prefix=\(.*\)'`
         ;;
 
     --dry-run|-n)
@@ -40,9 +39,14 @@ Available options:
                             nothing else.  Deletes any preexisting
                             buildsupport manifest files, to force all of
                             these tools to be rebuilt.
-    --buildsupport=<X>  As --buildsupport, except that the tools are
-                            installed in directory X.  Defaults to
-                            $STARCONF_DEFAULT_PREFIX/buildsupport.
+    --buildsupport-prefix=<X>
+                        The buildsupport tools should be installed or found
+                            under directory X, rather than the default
+                            $STARCONF_DEFAULT_PREFIX/buildsupport.  You
+                            must add X/bin to your PATH.  This only specifies
+                            the directory: if you wish the bootstrap to stop
+                            after installing the tools, then specify
+                            --bootstrap as well.
     -n, --dry-run       Show the installation locations which the
                             script works out, but don't actually do anything.
     --help              Show this help.
@@ -183,7 +187,7 @@ test -f componentinfo.dtd ||
 # installation adds convenience links from there to some of its
 # applications in $BUILDSUPPORT_PREFIX/bin.
 test -d $STARCONF_DEFAULT_PREFIX/bin || \
-    echorun mkdir -p $STARCONF_DEFAULT_PREFIX/bin
+    mkdir -p $STARCONF_DEFAULT_PREFIX/bin 2>/dev/null
 
 # We make a temporary makefile from Makefile.in.  This can be used,
 # unconfigured, below.
@@ -221,10 +225,10 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
     if $buildsupportonly; then
         echo "Cleaning buildsupport:"
         echo "    make -f $tempmakefile \\"
-        echo "        MANIFEST=$STAR_MANIFEST_DIR \\"
+        echo "        MANIFESTS=$STAR_MANIFEST_DIR \\"
         echo "        clean-buildsupport"
         make -f $tempmakefile \
-            MANIFEST=$STAR_MANIFEST_DIR \
+            MANIFESTS=$STAR_MANIFEST_DIR \
             clean-buildsupport || {
                 echo "Can't clean buildsupport">&2
                 exit 1
@@ -235,19 +239,19 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
         echo "Building GNU m4:"
         echorun make -f $tempmakefile \
             prefix=$BUILDSUPPORT_PREFIX \
-            MANIFEST=$STAR_MANIFEST_DIR \
+            MANIFESTS=$STAR_MANIFEST_DIR \
             $STAR_MANIFEST_DIR/m4
     fi
 
     echo "Bootstrapping buildsupport:"
     echo "    make -f $tempmakefile \\"
     echo "        prefix=$BUILDSUPPORT_PREFIX \\"
-    echo "        MANIFEST=$STAR_MANIFEST_DIR \\"
+    echo "        MANIFESTS=$STAR_MANIFEST_DIR \\"
     echo "        buildsupport"
 
     make -f $tempmakefile \
         prefix=$BUILDSUPPORT_PREFIX \
-        MANIFEST=$STAR_MANIFEST_DIR \
+        MANIFESTS=$STAR_MANIFEST_DIR \
         buildsupport
 
 ) || { echo "Failed to make buildsupport">&2; exit 1; }
