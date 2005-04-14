@@ -279,7 +279,7 @@
       IF ( THERE ) THEN
          CALL NDF_CGET( NDF(1), 'TITLE', CCOMP, STATUS )
          CALL CHR_CLEAN( CCOMP )
-         IF ( CCOMP .NE. '') THEN
+         IF ( CCOMP .NE. ' ' ) THEN
             CALL NDF_CPUT( CCOMP(:CHR_LEN(CCOMP)), NDF(2), 'TITLE',
      :         STATUS )
          END IF
@@ -288,7 +288,7 @@
       IF ( THERE ) THEN
          CALL NDF_CGET( NDF(1), 'LABEL', CCOMP, STATUS )
          CALL CHR_CLEAN( CCOMP )
-         IF ( CCOMP .NE. '') THEN
+         IF ( CCOMP .NE. ' ' ) THEN
             CALL NDF_CPUT( CCOMP(:CHR_LEN(CCOMP)), NDF(2), 'LABEL',
      :         STATUS )
          END IF
@@ -297,7 +297,7 @@
       IF ( THERE ) THEN
          CALL NDF_CGET( NDF(1), 'UNITS', CCOMP, STATUS )
          CALL CHR_CLEAN( CCOMP )
-         IF ( CCOMP .NE. '') THEN
+         IF ( CCOMP .NE. ' ' ) THEN
             CALL NDF_CPUT( CCOMP(:CHR_LEN(CCOMP)), NDF(2), 'UNITS',
      :         STATUS )
          END IF
