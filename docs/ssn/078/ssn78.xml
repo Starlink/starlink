@@ -35,28 +35,38 @@
 <?PSGML nofill verbatim ?>
 
 <ssn>
-  <docinfo>
-    <title>The Starlink Build System</title>
-    <authorlist>
-      <author id="nxg">Norman Gray</author>
-    </authorlist>
-    <docnumber>78</docnumber>
-    <history>
-      <version number="0" date="26-Feb-2004" author="nxg">
-        <px>Initial draft release: (up to revision 1.96)</px>
-      </version>
+<docinfo>
+
+<title>The Starlink Build System</title>
+
+<authorlist>
+<author id="nxg">Norman Gray</author>
+</authorlist>
+
+<docnumber>78</docnumber>
+
+<history>
+<version number="0" date="26-Feb-2004" author="nxg">
+<px>Initial draft release: (up to revision 1.96)</px>
+</version>
+
 <version number="1" date="11-Apr-2005" author="nxg">
 <px>First properly public release (revision 1.97)</px>
 </version>
+
 <distribution string="v1.snapshot" date="11-Apr-2005" author="nxg">
-<px>This is a post-version-1 snapshot: $Revision$</px>
+<px>This is a post-version-1 snapshot:
+$Revision$,
+$Date$</px>
 </distribution>
-    </history>
+</history>
+
 <copyright>
 <p>Copyright 2004-5, Council for the Central Laboratory of the
 Research Councils</p>
 </copyright>
-  </docinfo>
+
+</docinfo>
 
 <docbody>
 
@@ -3768,48 +3778,129 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
         <p>This is admittedly a rather crude technique, but it is a
           lot less fragile than the more elegant alternatives.</p>
 
-        <subsubsect id="rolldistribution" indexkey="distribution">
-          <subhead>
-            <title>Making a distribution</title>
-          </subhead>
+<subsubsect id="rolldistribution" indexkey="distribution">
+<subhead>
+<title>Making a distribution</title>
+</subhead>
 
-          <p>In general, the details of making distributions are
-            outside the (current) scope of this document.  However
-            there is one error we can usefully mention.</p>
+<p>In general, the details of making distributions are
+outside the (current) scope of this document.  However
+there is one aspect we can usefully mention, since it interacts with
+the buildsupport tools which configure the distribution.</p>
 
-          <p>Normally, when you <code>./bootstrap</code> a directory,
-            it arranges to install it by default in a location
-            governed by starconf (see <ref id="starconf"/> for
-            details).  Since this default is a location on your local
-            machine, it might not be appropriate for a distribution
-            tarball.  In that case, you will probably want to ensure
-            that the built distribution will install into
-            <code>/star</code> (or <code>/usr/local</code> perhaps).
-            There are two ways you can do this.</p>
+<p>Normally, when you <code>./bootstrap</code> a directory,
+it arranges to install it by default in a location
+governed by starconf (see <ref id="starconf"/> for
+details).  Since this default is a location on your local
+machine, it might not be appropriate for a distribution
+tarball.  In that case, you will probably want to ensure
+that the built distribution will install into
+<code>/star</code> (or <code>/usr/local</code> perhaps).
+There are multiple ways you can do this.</p>
 
-          <p>The more robust way is to create a special set of
-            buildsupport tools which have the desired directory as
-            their default prefix.  Say you want the distribution to
-            install by default 
-            in <code>/star</code>, but have these special buildsupport
-            tools installed in <code>/local-star/makedist</code> (for
-            example) .  Do that as follows:
+<subsubsubsect id="rolldistribution-tree">
+<subhead><title>A distribution from the complete tree</title></subhead>
+
+<p>If you are doing this for a complete tree, with the intention of
+building all the software and rolling distribution tarballs with the
+result, then the procedure you should use is as follows.
+<ol>
+<li><p>Check out the repository as usual.</p></li>
+
+<li><p>Identify the directory you want to be the default installation
+location for the distributed components, and the directory in which
+the distributed tarball will find other tools.  These will typically
+be the same, but if you are distributing a development or updated
+version, you might want the default prefix to be <code>/stardev</code>
+but the default Starlink directory to remain <code>/star</code>.  Set
+these as the <code>STARCONF_*</code> defaults.
 <verbatim>
-% STARCONF_DEFAULT_PREFIX=/star ./bootstrap --buildsupport=/local-star/makedist
+% export STARCONF_DEFAULT_PREFIX=/star
+% export STARCONF_DEFAULT_STARLINK=/star
 </verbatim>
-            (or use <kbd>env ...</kbd> on csh-type shells; you would
-            typically specify <code>STARCONF_DEFAULT_STARLINK</code> here,
-            too).<index>bootstrapping!buildsupport</index>.</p>
+If this directory really is just <code>/star</code> then these
+settings could in principle be omitted and the variables simply left
+unset, since <code>/star</code> is the default for both, but declaring
+them explicitly avoids ambiguity.  The directory mentioned here need
+not exist or be writable.</p></li>
 
-          <p>At this point, you can check out the appropriate version
-            of your software (probably via a CVS export of a
-            particular tag), put this
-            <code>/local-star/makedist/bin</code> in your path
-            (rehashing if you are using csh), and call
-            <kbd>./bootstrap; ./configure; make dist</kbd> as
-            usual.  The command <kbd>./configure --help</kbd> will
-            show you the default prefix for this
-            <code>./configure</code> script.</p>
+<li><p>Identify a directory tree to hold the products as you build
+them; I'll use <code>/tmp/star</code> as an example.  Since this
+directory will receive the the buildsupport tools, and other tools
+built during the build, it will need to be included in your PATH.
+<verbatim>
+% PATH=/tmp/star:$PATH
+</verbatim></p></li>
+
+<li><p>Bootstrap the tree, creating as you do so a set of buildsupport
+tools which are put in this working tree.  If you do not add this
+option then the bootstrap will attempt to install the buildsupport
+tools in <code>/star</code>.
+<verbatim>
+% ./bootstrap --buildsupport-prefix=/tmp/star
+</verbatim></p></li>
+
+<li><p>Configure the tree, here overriding the <code>STARCONF_*</code>
+defaults.
+<verbatim>
+% ./configure -C --prefix=/tmp/star --with-starlink=/tmp/star
+</verbatim>
+This will install the components into <code>/tmp/star</code>, with
+later components using tools installed there earlier, but with the
+<code>./configure</code> scripts within those components
+written so that they will still install in <code>/star</code> by
+default.</p></li>
+
+<li><p>Then build the tree as usual.
+<verbatim>
+% make world
+</verbatim>
+The manifests will end up in <code>/tmp/star/manifests</code>.</p></li>
+
+</ol>
+</p>
+
+<p>After this process has completed, if you go to a built component
+and make a tarball using <kbd>make
+dist</kbd>, then this tarball will install in <code>/star</code> by
+default, which you can check using <kbd>./configure --help</kbd>.</p>
+
+</subsubsubsect>
+
+<subsubsubsect id="rolldistribution-single">
+<subhead><title>Distributing a single component</title></subhead>
+
+<p>If, on the other hand, you wish to create a distribution tarball of
+a single component, then you do not have to reconfigure the entire
+tree to do so (fortunately).</p>
+
+<p>The more robust way is to create a special set of
+buildsupport tools which have the desired directory as
+their default prefix.  Say you want the distribution to
+install by default 
+in <code>/star</code>, but have these special buildsupport
+tools installed in <code>/local-star/makedist</code> (for
+example) .  Do that as follows:
+<verbatim>
+% STARCONF_DEFAULT_PREFIX=/star ./bootstrap --buildsupport \
+    --buildsupport-prefix=/local-star/makedist
+</verbatim>
+(or use <kbd>env ...</kbd> on csh-type shells; you would
+typically specify <code>STARCONF_DEFAULT_STARLINK</code> here,
+too).<index>bootstrapping!buildsupport</index>.  Setting the two
+<code>STARCONF_*</code> variables is actually redundant, here, since
+both have <code>/star</code> as their default, but it does no harm and
+can make things usefully explicit.</p>
+
+<p>At this point, you can check out the appropriate version
+of your software (probably via a CVS export of a
+particular tag), put this
+<code>/local-star/makedist/bin</code> in your path
+(rehashing if you are using csh), and call
+<kbd>./bootstrap; ./configure; make dist</kbd> as
+usual.  The command <kbd>./configure --help</kbd> will
+show you the default prefix for this
+<code>./configure</code> script.</p>
 
 <p>An alternative way is to use the
 <code>acinclude.m4</code><index>acinclude.m4</index> method described
@@ -3819,12 +3910,12 @@ When you run <code>./bootstrap</code> after that, the given prefix
 will be used instead of the prefix baked into the installed
 buildsupport tools.</p>
 
-          <p>That is, to create a distribution of component
-            <code>foo</code>, located in <code>libraries/foo</code> in
-            the repository, you should <em>tag</em> the source set
-            with a suitable release tag, such as
-            <code>foo-1-2-3</code>, and then, in a temporary
-            directory, do the following:
+<p>That is, to create a distribution of component
+<code>foo</code>, located in <code>libraries/foo</code> in
+the repository, you should <em>tag</em> the source set
+with a suitable release tag, such as
+<code>foo-1-2-3</code>, and then, in a temporary
+directory, do the following:
 <verbatim>
 % cvs -d <em>???</em> export -r foo-1-2-3 libraries/foo
 % cd libraries/foo
@@ -3833,10 +3924,10 @@ buildsupport tools.</p>
 % ./configure
 % make dist
 </verbatim>
-            This will leave a tarball such as
-            <code>foo-1.2-3.tar.gz</code> in the current directory.</p>
-
-        </subsubsect>
+This will leave a tarball such as
+<code>foo-1.2-3.tar.gz</code> in the current directory.</p>
+</subsubsubsect>
+</subsubsect>
 
       </subsect>
 
