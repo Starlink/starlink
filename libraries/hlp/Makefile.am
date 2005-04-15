@@ -3,7 +3,7 @@
 bin_PROGRAMS = lsthlp crehlp
 dist_bin_SCRIPTS = hlib hlp_link hlp_link_adam
 
-EXTRA_DIST = demo.hlp
+EXTRA_DIST = demo.hlp read.me
 
 TESTS = tsthlp
 check_PROGRAMS = tsthlp
@@ -65,3 +65,7 @@ demo.shl: demo.hlp crehlp
 	mv fort.2 demo.shl
 
 tsthlp_DEPENDENCIES = demo.shl
+
+dist_starnews_DATA = hlp.news
+
+
