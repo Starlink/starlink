@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([SST_PAR.F])
+AC_CONFIG_SRCDIR([SST_PAR])
 
 dnl    Include defaults for Starlink configurations
 dnl    Option `per-package-dirs' means that executables and help files
@@ -29,9 +29,6 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_FUNCS(memcpy)
 
 STAR_MONOLITHS
-
-dnl    Test for backslash handling
-AC_FC_LITERAL_BACKSLASH
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae],
