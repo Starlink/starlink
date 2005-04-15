@@ -73,3 +73,9 @@ star2html: Makefile $(srcdir)/star2html.in
 	    $(srcdir)/star2html.in >star2html.tmp
 	chmod +x star2html.tmp
 	mv star2html.tmp star2html
+
+CLEANFILES = latex2html star2html xlabel
+
+dist_starnews_DATA = star2html.news
+
+
