@@ -5666,15 +5666,31 @@ indexkey="autoconf!macros!AC_FC_LITERAL_BACKSLASH">
 <p><strong>AC_FC_LITERAL_BACKSLASH</strong></p>
 
 <p>Check whether the compiler regards the backslash character as an
-escape character.  The Standard doesn't say anything about this, but
+escape character.  The backslash is not in the Fortran character set,
+so ISO-1539 does not specify how this is to be interpreted, but
 many Unix Fortran compilers interpret <code>'\n'</code>, for example,
-as a newline, and <code>'\\'</code> as a single backslash.</p>
+as a newline, and <code>'\\'</code> as a single backslash.  Many
+Unix compilers have switches which allow you to choose between these
+two modes.</p>
 
 <p>This macro tests the behaviour of the currently selected compiler,
 and defines <code>FC_LITERAL_BACKSLASH</code> to 1 if backslashes are
 treated literally -- that is if <code>'\\'</code> is interpreted as a
 <em>pair</em> of backslashes and thus that <code>'\n'</code> is
 interpreted as a pair of characters rather than a newline.</p>
+
+<p>Note that, if you simply want to have a character constant which
+contains a single backslash, then the following initialisation will do
+that for you without any need for this macro (thanks to Peter Draper).
+<verbatim>
+*  Printable backslash: some compilers need '\\' to get '\', which
+*  isn't a problem as Fortran will truncate the string '\\' to '\'
+*  on the occasions when that isn't needed.
+      CHARACTER * ( 1 ) CCD1__BKSLH
+      PARAMETER ( CCD1__BKSLH = '\\' )
+</verbatim>
+Fortran is required to truncate the initialising string without error,
+as noted in ISO-1539 sections 5.2.9 and 7.5.1.</p>
 
 </subsect>
 
