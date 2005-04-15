@@ -74,6 +74,7 @@
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,8 @@
 *        Original version.
 *     2-MAR-2001 (DSB):
 *        Add arguments NDIM and GA.
+*     15-APR-2005 (PWD):
+*        Parameterize use of backslash to improve portability
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,6 +98,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'CAT_PAR'          ! CAT__ constants
+
+*  Local Constants:
+      CHARACTER CONTIN*1         ! The Tcl line continuation character
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( CONTIN = '\\' )    
 
 *  Arguments Given:
       INTEGER CI
@@ -235,7 +245,7 @@
       CALL FIO_UNIT( FD, UNIT, STATUS )
 
 *  Write out the initial part of the Tcl assignment statement.
-      WRITE( UNIT, * ) 'set data_ { \\'
+      WRITE( UNIT, * ) 'set data_ { '//CONTIN
 
 *  Initialise the PIXEL Frame bound box for the catalogue.
       LBND( 1 ) = VAL__MAXR
@@ -364,8 +374,8 @@
                
 *  Write out the values, appending a backslash at the end of each line to
 *  tell tcl to ignore the line break.
-               WRITE( UNIT, * ) '{', X, Y, ' \\'
-               WRITE( UNIT, * ) RA, DEC, ' \\'
+               WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
+               WRITE( UNIT, * ) RA, DEC, ' '//CONTIN
                DO J = 1, NCOL - 4, 4
                   DO K = 0, MIN( 3, NCOL - 4 - J )
                      IF( J + K + 4 .EQ. IDCOL ) THEN
@@ -380,10 +390,10 @@
                         WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
                      END IF
                   END DO
-                  WRITE( UNIT, * ) ' \\'
+                  WRITE( UNIT, * ) ' '//CONTIN
 
                END DO
-               WRITE( UNIT, * ) '} \\'
+               WRITE( UNIT, * ) '} '//CONTIN
 
 *  Update the pixel bounding box.
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
@@ -439,7 +449,7 @@
 
 *  Write out the values, appending a backslash at the end of each line to
 *  tell tcl to ignore the line break.
-               WRITE( UNIT, * ) '{', X, Y, ' \\'
+               WRITE( UNIT, * ) '{', X, Y, ' '//CONTIN
                DO J = 1, NCOL - 2, 4
                   DO K = 0, MIN( 3, NCOL - 2 - J )
                      IF( J + K + 2 .EQ. IDCOL ) THEN
@@ -454,9 +464,9 @@
                         WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
                      END IF
                   END DO
-                  WRITE( UNIT, * ) ' \\'
+                  WRITE( UNIT, * ) ' '//CONTIN
                END DO
-               WRITE( UNIT, * ) '} \\'
+               WRITE( UNIT, * ) '} '//CONTIN
 
                IF( X .LT. LBND( 1 ) ) LBND( 1 ) = X
                IF( Y .LT. LBND( 2 ) ) LBND( 2 ) = Y

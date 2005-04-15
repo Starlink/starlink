@@ -87,6 +87,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -98,6 +99,8 @@
 *        Added zcunit_ and zaunit_,
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     15-APR-2005 (PWD):
+*        Parameterize use of backslashes to improve portability.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,6 +117,13 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
       INCLUDE 'CAT_ERR'          ! CAT_ error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Local Constants:
+      CHARACTER CONTIN*1         ! The Tcl line continuation character
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( CONTIN = '\\' )    
 
 *  Status:
       INTEGER STATUS
@@ -616,20 +626,20 @@
       END IF
 
 *  Write a list of the column headings out to the text file.
-      CALL FIO_WRITE( FD, 'set headings_ { \\', STATUS )
+      CALL FIO_WRITE( FD, 'set headings_ { '//CONTIN, STATUS )
 
       DO ICOL = 1, NCOL
          TEXT = '   '
          IAT = 3
          CALL CHR_APPND( HEAD( ICOL ), TEXT, IAT )
-         CALL CHR_APPND( ' \\', TEXT, IAT )
+         CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
       CALL FIO_WRITE( FD, ' }', STATUS )
 
 *  Write a list of the quantities stored in each column out to the text file.
-      CALL FIO_WRITE( FD, 'set uses_ { \\', STATUS )
+      CALL FIO_WRITE( FD, 'set uses_ { '//CONTIN, STATUS )
 
       DO ICOL = 1, NCOL
          TEXT = '   '
@@ -640,14 +650,14 @@
          ELSE
             CALL CHR_APPND( '""', TEXT, IAT )
          END IF
-         CALL CHR_APPND( ' \\', TEXT, IAT )
+         CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
       CALL FIO_WRITE( FD, ' }', STATUS )
 
 *  Write a list of the heading formats out to the text file.
-      CALL FIO_WRITE( FD, 'set hfmts_ { \\', STATUS )
+      CALL FIO_WRITE( FD, 'set hfmts_ { '//CONTIN, STATUS )
 
       DO ICOL = 1, NCOL
          TEXT = '   '
@@ -659,14 +669,14 @@
          ELSE 
             CALL CHR_APPND( HFMT, TEXT, IAT )
          END IF
-         CALL CHR_APPND( ' \\', TEXT, IAT )
+         CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
       CALL FIO_WRITE( FD, '}', STATUS )
 
 *  Write a list of the column formats out to the text file.
-      CALL FIO_WRITE( FD, 'set fmts_ { \\', STATUS )
+      CALL FIO_WRITE( FD, 'set fmts_ { '//CONTIN, STATUS )
 
       DO ICOL = 1, NCOL
          TEXT = '   '
@@ -686,7 +696,7 @@
          ELSE 
             CALL CHR_APPND( FMT, TEXT, IAT )
          END IF
-         CALL CHR_APPND( ' \\', TEXT, IAT )
+         CALL CHR_APPND( ' '//CONTIN, TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
 
