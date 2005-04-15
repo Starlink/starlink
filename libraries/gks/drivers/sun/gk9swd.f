@@ -273,6 +273,10 @@
       INTEGER   ICHUNK
       PARAMETER(ICHUNK = 1024)
 
+*     Backslash character, doubled for UNIX compilers.
+      CHARACTER*1 BS
+      PARAMETER( BS = '\\' )
+
 *     Arrays holding lists of PETs supported by this workstation
       INTEGER ILCPET(6), ISKPET(4), IVLPET(3), ICHPET(6)
 
@@ -509,7 +513,7 @@
       DO 101, I = 1, NID
         IOS = FPUTC(KCID(KWKIX) + 1, GKAN1(IDAT(I)))
   101 CONTINUE
-      IOS = FPUTC(KCID(KWKIX) + 1, '\n')
+      IOS = FPUTC(KCID(KWKIX) + 1, BS//'n')
       CALL FLUSH(KCID(KWKIX) + 1)
       GOTO 9999
 
