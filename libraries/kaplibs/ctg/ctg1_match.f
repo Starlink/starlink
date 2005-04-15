@@ -30,11 +30,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     15-APR-2005 (PWD):
+*        Parameterise backslash use for better portability.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -49,6 +52,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG private constants.
+
+*  Local Constants:
+      CHARACTER ESC*(1)          ! Single backslash
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( ESC = '\\' )    
 
 *  Arguments Given:
       CHARACTER TEMPLT*(*)
@@ -83,13 +93,13 @@
 *  CHR_WILD wild cards in the template, and translate the native wild-cards 
 *  into CHR_WILD wild-cards.
       IF( CTG__WILD1 .NE. '%' ) THEN
-         CALL CTG1_SUBST( TEMPLT, '%', '\\%', .TRUE., TEXT, NSUB, 
+         CALL CTG1_SUBST( TEMPLT, '%', ESC//'%', .TRUE., TEXT, NSUB, 
      :                    STATUS )
          CALL CHR_TRCHR( CTG__WILD1, '%', TEXT, STATUS )
       END IF
 
       IF( CTG__WILD2 .NE. '*' ) THEN
-         CALL CTG1_SUBST( TEXT, '*', '\\*', .TRUE., TEXT2, NSUB, 
+         CALL CTG1_SUBST( TEXT, '*', ESC//'*', .TRUE., TEXT2, NSUB, 
      :                    STATUS )
          TEXT = TEXT2
          CALL CHR_TRCHR( CTG__WILD2, '*', TEXT, STATUS )

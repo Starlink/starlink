@@ -59,6 +59,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +67,8 @@
 *        Original version.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     15-APR-2005 (PWD):
+*        Parameterize backslash use for improved portability.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +84,13 @@
       INCLUDE 'CTG_CONST'        ! CTG constants.
       INCLUDE 'CTG_ERR'          ! CTG error constants.
       INCLUDE 'GRP_PAR'          ! GRP constants.
+
+*  Local Constants:
+      CHARACTER ESC*1            ! Single backslash
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( ESC = '\\' )    
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
@@ -131,7 +141,7 @@
       IF( CTG__UCASE ) CALL GRP_SETCS( IGRP2, .FALSE., STATUS )
 
 *  Ensure the group uses "\" as its escape character.
-      CALL GRP_SETCC( IGRP2, 'ESC', '\\', STATUS )
+      CALL GRP_SETCC( IGRP2, 'ESC', ESC, STATUS )
 
 *  Append the names to the end of the group.
       IF( GRPEXP .NE. ' ' ) THEN
