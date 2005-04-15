@@ -121,6 +121,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +133,8 @@
 *        Improved prologue.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     15-APR-2005 (PWD):
+*        Now uses NDG__BKSLH to improve portability
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -200,7 +203,7 @@
       IF( NDG__UCASE ) CALL GRP_SETCS( IGRP2, .FALSE., STATUS )
 
 *  Ensure the group uses "\" as its escape character.
-      CALL GRP_SETCC( IGRP2, 'ESC', '\\', STATUS )
+      CALL GRP_SETCC( IGRP2, 'ESC', NDG__BKSLH, STATUS )
 
 *  Append the names to the end of the group.
       IF( GRPEXP .NE. ' ' ) THEN

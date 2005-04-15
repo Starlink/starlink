@@ -30,11 +30,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-SEP-1999 (DSB):
 *        Original version.
+*     15-APR-2005 (PWD):
+*        Now uses NDG__BKSLH to improve portability
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,14 +86,14 @@
 *  CHR_WILD wild cards in the template, and translate the native wild-cards 
 *  into CHR_WILD wild-cards.
       IF( NDG__WILD1 .NE. '%' ) THEN
-         CALL NDG1_SUBST( TEMPLT, '%', '\\%', .TRUE., TEXT, NSUB, 
-     :                    STATUS )
+         CALL NDG1_SUBST( TEMPLT, '%', NDG__BKSLH//'%', .TRUE., TEXT, 
+     :                    NSUB, STATUS )
          CALL CHR_TRCHR( NDG__WILD1, '%', TEXT, STATUS )
       END IF
 
       IF( NDG__WILD2 .NE. '*' ) THEN
-         CALL NDG1_SUBST( TEXT, '*', '\\*', .TRUE., TEXT2, NSUB, 
-     :                    STATUS )
+         CALL NDG1_SUBST( TEXT, '*', NDG__BKSLH//'*', .TRUE., TEXT2, 
+     :                    NSUB, STATUS )
          TEXT = TEXT2
          CALL CHR_TRCHR( NDG__WILD2, '*', TEXT, STATUS )
       END IF

@@ -6,6 +6,7 @@
       CHARACTER NDG__WILD1*1  ! Single-character wildcard.
       CHARACTER NDG__WILD2*1  ! Multi-character wildcard.
       CHARACTER NDG__STRUC*9  ! HDS type for structures created by NDG
+      CHARACTER NDG__BKSLH*1  ! A single backslash, '\\' works for UNIX
 
       PARAMETER (
      :            NDG__NDFTP = '.sdf',
@@ -13,4 +14,5 @@
      :            NDG__UCASE = .false.,
      :            NDG__WILD1 = '?',
      :            NDG__WILD2 = '*',
-     :            NDG__STRUC = 'STRUCTURE' )
+     :            NDG__STRUC = 'STRUCTURE',
+     :            NDG__BKSLH = '\\' )
