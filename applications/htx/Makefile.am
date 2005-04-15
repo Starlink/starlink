@@ -50,4 +50,6 @@ BUILT_SOURCES = $(PRIVATE_SED_SCR) htxpath
 
 CLEANFILES = $(PRIVATE_SED_SCR) htxpath
 
+dist_starnews_DATA = htx.news
+
 
