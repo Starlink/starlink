@@ -4,6 +4,10 @@ bin_PROGRAMS = astrom
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+dist_pkgdata_DATA = read.me 
+
+EXTRA_DIST = NOTES astrom-changes.txt 
+
 # Include a dummy C file, so that automake knows that C sources are
 # involved (in -lcfitsio), and can modify the link accordingly.
 # Hmmm, this isn't terribly pretty.
@@ -24,3 +28,5 @@ F_ROUTINES = \
 BLOCK_DATA_FILES = params.f
 
 PRIVATE_INCLUDES = params.inc
+
+dist_starnews_DATA = astrom.news
