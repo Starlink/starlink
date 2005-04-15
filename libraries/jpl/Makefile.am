@@ -3,7 +3,7 @@
 lib_LTLIBRARIES = libjpl.la
 
 # Starlink link scripts
-bin_SCRIPTS = jpl_link jpl_link_adam
+dist_bin_SCRIPTS = jpl_link jpl_link_adam
 
 # JPL helper programs
 bin_PROGRAMS = jplpleph jplstate jplconst jplstate shorteph
@@ -64,5 +64,13 @@ check_PROGRAMS = testeph
 
 testeph_SOURCES = testeph.f
 testeph_LDADD = libjpl.la
+
+dist_starnews_DATA = jpl.news
+
+EXTRA_DATA = ephtap.dat testephinput.dat
+
+dist_pkgdata_DATA = read.me
+
+CLEANFILES = jpleph.dat
 
 
