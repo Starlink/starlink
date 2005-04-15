@@ -18,3 +18,5 @@ starx_test_SOURCES = starx_test.c
 starx_test_DEPENDENCIES = starX_link
 starx_test_LDADD = `$(srcdir)/starX_link`
 
+dist_starnews_DATA = starX.news
+

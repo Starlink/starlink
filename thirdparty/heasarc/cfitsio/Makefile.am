@@ -19,7 +19,7 @@ EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
 
 # Put examples in dist_pkgdata
 dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
- Licence.txt cfitsio.news
+ Licence.txt
 
 # Extra documentation for stardocs (not converted to hypertext).
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
@@ -56,3 +56,7 @@ check:
 	make testprog; \
 	./testprog > tmp.out 2>&1; \
 	diff testprog.out tmp.out)
+
+dist_starnews_DATA = cfitsio.news
+
+
