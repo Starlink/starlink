@@ -4,4 +4,4 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 dist_bin_SCRIPTS = xdisplay
 
-dist_pkgdata_DATA = xdisplay.news
+dist_starnews_DATA = xdisplay.news
