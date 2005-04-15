@@ -31,5 +31,13 @@ xrv: xrv.in
 	mv xrv.tmp xrv
 	chmod +x xrv
 
-EXTRA_DIST = rv.news
+dist_starnews_DATA = rv.news
+
+EXTRA_DIST = rv xrv.in
+
+CLEANFILES = xrv
+
+dist_pkgdata_DATA = read.me
+
+
 
