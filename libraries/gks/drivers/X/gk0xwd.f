@@ -186,6 +186,10 @@
       INTEGER   MXFAHS,      MXLNTY,     MXPMTY
       PARAMETER(MXFAHS = -1, MXLNTY = 5, MXPMTY = 5)
 
+*        Backslash character, doubled for UNIX compilers.
+      CHARACTER*1 BS
+      PARAMETER( BS = '\\' )
+
 *     Local variables
       INTEGER I, IOFF, IOS, N
       INTEGER IPREC(KFNTMX)
@@ -387,7 +391,7 @@
       DO 101, I = 1, NID
         IOS = FPUTC(KCID(KWKIX) + 1, GKAN1(IDAT(I)))
   101 CONTINUE
-      IOS = FPUTC(KCID(KWKIX) + 1, '\n')
+      IOS = FPUTC(KCID(KWKIX) + 1, BS\\'n')
       CALL FLUSH(KCID(KWKIX) + 1)
       GOTO 9999
 
