@@ -32,3 +32,5 @@ coco: coco.in
 EXTRA_DIST = coco.in
 
 dist_starnews_DATA = coco.news
+
+CLEANFILES = coco
