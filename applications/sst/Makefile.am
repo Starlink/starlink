@@ -29,17 +29,6 @@ SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
 PRIVATE_INCLUDES = SST_PAR SST_SCB
 
 
-# SST_PAR.F requires defintions from config.h.
-SST_PAR.processed: SST_PAR.F
-	rm -f SST_PAR.processed
-	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) SST_PAR.F $(FPP_OUTPUT)
-	test -f SST_PAR.processed || mv SST_PAR.f SST_PAR.processed
-SST_PAR: SST_PAR.processed
-	rm -f SST_PAR SST_PAR.tmp
-	echo "* Generated from SST_PAR.F by Makefile.am" >SST_PAR.tmp
-	grep '^ .*[^ ]' SST_PAR.processed >>SST_PAR.tmp \
-		&& mv SST_PAR.tmp SST_PAR
-
 # We (oddly) want these data files to go into the same directory as the 
 # binaries.  Since we have STAR_DEFAULTS(per-package-dirs) in configure.ac, 
 # however, we are allowed to use bin_DATA (don't ask).
@@ -56,8 +45,4 @@ start: start.in
 	    $(srcdir)/start.in >start.tmp
 	mv start.tmp start
 
-EXTRA_DIST = start.in $(bin_DATA) SST_PAR.F
-
-CLEANFILES = SST_PAR SST_PAR.processed SST_PAR.tmp
-
-BUILT_SOURCES = SST_PAR
+EXTRA_DIST = start.in $(bin_DATA)
