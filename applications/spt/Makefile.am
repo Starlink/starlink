@@ -5,5 +5,5 @@ pkgdata_DATA = spt.news
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-EXTRA_DIST = spt.news
+dist_starnews_DATA = spt.news
 
