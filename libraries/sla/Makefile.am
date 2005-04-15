@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = sla_link sla_link_adam
-dist_pkgdata_DATA = SLA_CONDITIONS
+dist_pkgdata_DATA = SLA_CONDITIONS read.me
+
+EXTRA_DIST = Notes
 
 lib_LTLIBRARIES = libsla.la
 
@@ -52,3 +54,11 @@ check_PROGRAMS = sla_test
 
 sla_test_SOURCES = sla_test.f
 sla_test_LDADD = libsla.la
+
+dist_starnews_DATA = sla.news
+
+DISTCLEANFILES = gresid.F random.F wait.f
+
+
+
+
