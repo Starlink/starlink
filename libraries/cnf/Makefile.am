@@ -67,4 +67,6 @@ f_calls_c_LDADD = libcnf.la
 c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f
 c_calls_f_LDADD = libcnf.la @FCLIBS@
 
+dist_starnews_DATA = cnf.news
+
 
