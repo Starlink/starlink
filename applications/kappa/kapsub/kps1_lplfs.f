@@ -122,6 +122,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +147,8 @@
 *        X axis is described by a SpecFrame.
 *     2-MAR-2005 (DSB):
 *        Correct logic for checkign for AST__BADUN errors.
+*     15-APR-2005 (PWD):
+*        Parameterize use of backslashes to improve portability.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,6 +164,13 @@
       INCLUDE 'AST_PAR'          ! AST constants 
       INCLUDE 'AST_ERR'          ! AST error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Local Constants:
+      CHARACTER BCKSLH*1         ! A single backslash
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( BCKSLH = '\\' )    
 
 *  Arguments Given:
       INTEGER INDF
@@ -677,7 +687,7 @@
       IF( YMAP .EQ. 'VALUELOG' ) THEN
          TEXT = ' '
          IAT = 0
-         CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
+         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
          CALL CHR_APPND( LAB, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )

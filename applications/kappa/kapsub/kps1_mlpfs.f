@@ -57,11 +57,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-AUG-1999 (DSB):
 *        Original version.
+*     15-APR-2005 (PWD):
+*        Parameterize use of backslashes to improve portability.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,6 +78,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
+
+*  Local Constants:
+      CHARACTER BCKSLH*1         ! A single backslash
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( BCKSLH = '\\' )    
 
 *  Arguments Given:
       INTEGER LUTMAP
@@ -162,7 +172,7 @@
       IF( YLOG ) THEN
          TEXT = ' '
          IAT = 0
-         CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
+         CALL CHR_APPND( 'Log'//BCKSLH//'d10'//BCKSLH//'u(', TEXT, IAT )
          CALL CHR_APPND( LAB, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
