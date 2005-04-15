@@ -44,6 +44,8 @@
 *        Added symbolic constant CCD1__MXSI.
 *     17-AUG-2004 (MBT):
 *        Increased some of the limits (CCD1__MXNDF, CCD1__MXLIS)
+*     15-APR-2005 (PDRAPER):
+*        Added CCD1__BKSLH to parameterise the printing of backslashes.
 *     {enter_further_changes_here}
 
 *  Bugs:

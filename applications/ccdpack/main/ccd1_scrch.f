@@ -103,6 +103,8 @@
 *        Original version.
 *     20-OCT-1995 (PDRAPER):
 *        Added DEL.
+*     15-APR-2005 (PDRAPER):
+*        Parameterized printing of backslashes for increased portability.
 *     {enter_changes_here}
 
 *  Bugs:
