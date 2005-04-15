@@ -109,4 +109,8 @@
       CHARACTER * ( 32 ) VERS
       PARAMETER ( VERS = '(CCDPACK version @PACKAGE_VERSION@)' )
 
+*  Printable backslash
+      CHARACTER * ( 1 ) CCD1__BKSLH
+      PARAMETER ( CCD1__BKSLH = @BACKSLASH@ )
+
 * $Id$

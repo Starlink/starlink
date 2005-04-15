@@ -40,10 +40,10 @@
 *         USEPRO = .TRUE.
 *         PROTEC(1) = ''''           ! a single '
 *         PROTEC(2) = ''''           ! a single '
-*         CONTIN = '\\'              ! a single \
+*         CONTIN = ' \'              ! a single \
 *         QUOTE  = '"'
 *         SAY    = 'echo'
-*         DEL    = '\\rm'
+*         DEL    = '\rm'
 *
 *     DCL:
 *         COMMEN = '$!'
@@ -115,6 +115,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
 
 *  Arguments Given:
       CHARACTER * ( * ) STYPE
@@ -149,13 +150,13 @@
          USEPRO = .TRUE.
          PROTEC( 1 ) = ''''
          PROTEC( 2 ) = ''''
-         CALL CHR_COPY( ' \\', .FALSE., CONTIN, LSTAT )
+         CALL CHR_COPY( ' ' // CCD1__BKSLH, .FALSE., CONTIN, LSTAT )
          QUOTE ='"'
          IF ( LSTAT .EQ. 0 ) THEN
             CALL CHR_COPY( 'echo ', .FALSE., SAY, LSTAT )
          END IF
          IF ( LSTAT .EQ. 0 ) THEN
-            CALL CHR_COPY( '\\rm ', .FALSE., DEL, LSTAT )
+            CALL CHR_COPY( CCD1__BKSLH // 'rm ', .FALSE., DEL, LSTAT )
          ENDIF
 
       ELSE IF ( STYPE .EQ. 'dcl' ) THEN
@@ -189,7 +190,7 @@
             CALL CHR_COPY( 'print ', .FALSE., SAY, LSTAT )
          END IF
          IF ( LSTAT .EQ. 0 ) THEN
-            CALL CHR_COPY( '\\rm ', .FALSE., DEL, LSTAT )
+            CALL CHR_COPY( CCD1__BKSLH // 'rm ', .FALSE., DEL, LSTAT )
          ENDIF
       ELSE
          STATUS = SAI__ERROR

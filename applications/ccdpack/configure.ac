@@ -51,6 +51,14 @@ else
 fi
 AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 
+# Check how to print a backslash. This can be '\\' or '\'.
+AC_FC_LITERAL_BACKSLASH
+if test $ac_cv_fc_literal_backslash = yes; then
+AC_SUBST([BACKSLASH],[\'\\\'])
+else
+AC_SUBST([BACKSLASH],[\'\\\\\'])
+fi
+
 # Note that the starlink Tcl, Tk and ITcl are required, since we need
 # some somewhat-private include files.  I'm not sure how respectable
 # this is, but it seems unavoidable for what we want to do (for instance,
