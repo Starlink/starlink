@@ -23,9 +23,6 @@ BUILT_SOURCES = Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl dbmcat.pl \
 # Run these scripts as a test
 TESTS = scb_test.sh size_test.sh
 
-# Define and distribute the test scripts 
-dist_check_SCRIPTS = scb_test.sh size_test.sh
-
 # Define and distribute the test data
 dist_check_DATA = scb_test.tar
 
@@ -97,3 +94,10 @@ dbmcat.pl: Makefile $(srcdir)/dbmcat.pl.in
 # be my guest.
 noinst_LIBRARIES = libdummy.a
 libdummy_a_SOURCES = dummy-l.l
+
+
+CLEANFILES = dbmcat.pl Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl
+
+dist_starnews_DATA = scb.news
+
+
