@@ -371,6 +371,15 @@
 *  One and two characters from string
       CHARACTER C*1,C2*2
 
+*  A single backslash, regardless of compiler behaviour.
+      CHARACTER BS*1
+      PARAMETER ( BS = '\\' )
+
+*  The value '\KRLQ', using our single backslash (UNIX compilers
+*  typically need '\\KRLQ', which is not as portable).
+      CHARACTER KRLQ*(5)
+      PARAMETER ( KRLQ = BS//'KRLQ' )
+
 *  Distance along monospaced string in plotter units
       REAL ALONGP
 
@@ -431,7 +440,7 @@
      :                        'NPRUN','OPRUO','PPRUP','QPRUQ'/
       DATA (CHTAB(I),I=49,64)/'RPRUR','SPRUS','TPRUT','UPRUU',
      :                        'VPRUV','WPRUW','XPRUX','YPRUY',
-     :                        'ZPRUZ','[PRL(','\\KRLQ',']PRL)',
+     :                        'ZPRUZ','[PRL(', KRLQ,  ']PRL)',
      :                        '^KGL*','`PGL6','aPRLA','bPRLB'/
       DATA (CHTAB(I),I=65,80)/'cPRLC','dPRLD','ePRLE','fPRLF',
      :                        'gPRLG','hPRLH','iPRLI','jPRLJ',
