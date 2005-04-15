@@ -40,3 +40,10 @@ cshrc:  Makefile $(srcdir)/cshrc.in
 
 .hlp.shl:
 	@HLIB@ $<
+
+CLEANFILES = adam_packages.shl cshrc login
+
+dist_starnews_DATA = init.news
+
+
+
