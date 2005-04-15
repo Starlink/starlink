@@ -23,6 +23,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -34,6 +35,8 @@
 *     27-AUG-1999 (DSB):
 *        Corrected calls from MSG_SETC to MSG_SETI. Added testing of
 *        escape characters.
+*     15-APR-2005 (PWD):
+*        Parameterize backslash uses to improve portability
 *     {enter_changes_here}
 
 *  Bugs:
@@ -47,6 +50,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants.
+
+*  Local Constants:
+      CHARACTER * ( 1 ) ESC
+      PARAMETER ( ESC = '\\' )   ! To keep UNIX compilers happy, will be
+                                 ! '/' regardless
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -75,7 +83,7 @@
       CALL GRP_SETCC( IGRP, 'IND', '+', STATUS )
 
 *  Set the escape character to "\".
-      CALL GRP_SETCC( IGRP, 'ESC', '\\', STATUS )
+      CALL GRP_SETCC( IGRP, 'ESC', ESC, STATUS )
 
 *  Obtain a list of names and put them in the group just created. Append 
 *  the letter B to them using a kernel.
@@ -95,7 +103,7 @@
       CALL GRP_GET( IGRP, 2, 1, NAME, STATUS )
 
 *  Report an error if the name is not "TWO\|B".
-      IF( STATUS .EQ. SAI__OK .AND. NAME .NE. 'TWO\\|B' ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. NAME .NE. 'TWO'//ESC//'|B' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'NAME', NAME )
          CALL ERR_REP( 'GRP_TEST_ERR2',
