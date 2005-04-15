@@ -37,11 +37,16 @@
       character*(*) param
       integer ind, chr_index
       character*10 tmpp
+      character*1 bss
+      character*2 bsn
       character dynamic_chars
       include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
+      data bss/'\\'/
+
 
 *
+      bsn = bss//'n'
       get_parnum = 0
 
       tmpp = param
@@ -52,7 +57,8 @@
         get_parnum = 0
         call dsa_wruser('Error, parameter "')
         call dsa_wruser(param)
-        call dsa_wruser('" not found\n')
+        call dsa_wruser('" not found')
+        call dsa_wruser(bsn)
       else
         get_parnum = ind/10 + 1
       end if
