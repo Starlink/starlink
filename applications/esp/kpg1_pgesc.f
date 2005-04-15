@@ -25,11 +25,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     29-SEP-1998 (DSB):
 *        Original version.
+*     15-APR-2005 (PWD):
+*        Parameterise the PGPLOT escape character for better portability.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -42,6 +45,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Local Constants:
+      CHARACTER ESC*1            ! The PGPLOT escape character
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( ESC = '\\' )    
 
 *  Arguments Given and Returned:
       CHARACTER TEXT*(*)
@@ -57,6 +67,7 @@
       INTEGER IR                 ! Index of next character to be read
       INTEGER IW                 ! Index of next character to be written
       INTEGER TLEN               ! Significant length of supplied string
+
 *.
 
 *  Check the inherited status. 
@@ -80,7 +91,7 @@
 *  If it is not an escape character, store the read character in the
 *  returned string, and increment the index of the next character to be
 *  written.
-         IF( C .NE. '\\' ) THEN
+         IF( C .NE. ESC ) THEN
             TEXT( IW : IW ) = C
             IW = IW + 1
 *  If it is an escape character, do not store it in the string, but
