@@ -36,3 +36,8 @@ ifd2star: Makefile $(srcdir)/ifd2star.in
 	chmod +x ifd2star.tmp
 	mv ifd2star.tmp ifd2star
 
+CLEANFILES = ifd2star ifd2iraf
+
+dist_starnews_DATA = ifd.news
+
+
