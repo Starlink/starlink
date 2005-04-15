@@ -18,11 +18,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     8-AUG-1990 (RFWS):
 *        Original version.
+*     14-APR-2005 (PWD):
+*        Add parameterization of printable backslash.
 *     {enter_changes_here}
 
 *-
@@ -37,5 +40,10 @@
       INTEGER SST__MXLIN
       PARAMETER ( SST__MXLIN = 5000 )
 
+*  Printable backslash: some compilers need '\\' to get '\', which
+*  isn't a problem as Fortran will truncate the string '\\' to '\' 
+*  on the occasions when that isn't needed.
+      CHARACTER * ( 1 ) SST__BKSLH
+      PARAMETER ( SST__BKSLH = '\\' )
 *.
 * @(#)sst_par   1.1   94/12/05 11:38:25   96/07/05 10:28:45
