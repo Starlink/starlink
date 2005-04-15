@@ -29,5 +29,6 @@ coco: coco.in
 	mv coco.tmp coco
 	chmod +x coco
 
-EXTRA_DIST = coco.news
+EXTRA_DIST = coco.in
 
+dist_starnews_DATA = coco.news
