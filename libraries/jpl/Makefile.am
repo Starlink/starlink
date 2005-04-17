@@ -67,7 +67,7 @@ testeph_LDADD = libjpl.la
 
 dist_starnews_DATA = jpl.news
 
-EXTRA_DATA = ephtap.dat testephinput.dat
+EXTRA_DIST = ephtap.dat testephinput.dat
 
 dist_pkgdata_DATA = read.me
 
