@@ -7,7 +7,15 @@
 FPP_INC_IN = gkmc.par.F
 FPP_INC_OUT = $(FPP_INC_IN:.F=)
 
-noinst_INCLUDES = $(FPP_INC_OUT)
+noinst_INCLUDES = $(FPP_INC_OUT) \
+                  check.inc gkerr.cmn gkops.cmn gkdt.par gkwca.cmn gkwkd.cmn \
+                  gkssl.par gksl.cmn gkhp.par gkio.par gkstk.cmn gkwke.par \
+                  gkcss.par gkcss.cmn gkfls.cmn gkcca.cmn gkhp.cmn gkfls.par \
+                  gkwcb.cmn gkwsl.cmn gkwdt.cmn gkinp.par gkwdt.par gkfab.cmn \
+                  gkplb.cmn gkpmb.cmn gkdir.par gaspct.par gktxb.cmn gkerr.par \
+                  gksl.par gkpid.par gkpca.par gkpc.cmn gwksgl.par gkpca.cmn \
+                  gkwpc.par gkcon.cmn gkxfd.cmn gkxca.cmn gkio.cmn gkxio.cmn \
+                  gkdt.cmn gksnam.par gkdd.cmn gkcgn.cmn gkcgm.cmn
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 

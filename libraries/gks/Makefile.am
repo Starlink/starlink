@@ -2,7 +2,7 @@
 
 SUBDIRS = include base data call drivers
 
-bin_SCRIPTS = gks_link gks1_link_adam
+dist_bin_SCRIPTS = gks_link gks1_link_adam
 
 lib_LTLIBRARIES = libgks.la
 
@@ -23,3 +23,9 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
 include_MESSAGES = GKS_ERR
 
 BUILT_SOURCES = GKS_ERR
+
+CLEANFILES = GKS_ERR fac_240_err
+
+EXTRA_DIST = gks_err.msg
+
+

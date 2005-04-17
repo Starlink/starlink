@@ -20,4 +20,8 @@ gks.emf-$(RLSE): gksemf gksemf.dat
 	./gksemf
 	mv gks.emf $@
 
+CLEANFILES = gks.emf-$(RLSE)
+
+EXTRA_DIST = gksemf.dat
+
 

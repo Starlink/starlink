@@ -18,7 +18,7 @@ noinst_PROGRAMS = gkswdt
 
 # The create_wdt script could be removed if we simply edited gkswdt
 # such that it didn't ask any questions.
-noinst_SCRIPTS = create_wdt
+dist_noinst_SCRIPTS = create_wdt
 
 staretc_DATA = gks.wdt-$(RLSE)
 
@@ -48,4 +48,13 @@ gks.wdt-$(RLSE): gkswdt create_wdt
 ## 	cat $(WDTS) > gkswdt.dat
 ## 	./create_wdt
 ## 	mv gks.wdt gks.wdt-$(RLSE)
+
+EXTRA_DIST = $(WDTS)
+
+noinst_INCLUDES = wdtbuf.cmn wdtbuf.par wdtenm.par wdtwkd.cmn \
+                  wdterr.par wdtwrk.cmn wdtfls.cmn wdterr.cmn
+
+CLEANFILES = gks.wdt-$(RLSE) gkswdt.lst gkswdt.dat cdrive.inc
+
+
 
