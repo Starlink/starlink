@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = gns_link gns_link_adam
+dist_bin_SCRIPTS = gns_link gns_link_adam
 
 lib_LTLIBRARIES = libgns.la
 
@@ -71,3 +71,13 @@ gnsrun_gks_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_li
 
 gns_test_SOURCES = gns_test.f
 gns_test_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_link`
+
+CLEANFILES = gns_ididevices gns_gksdevices
+
+dist_starnews_DATA = gns.news
+
+EXTRA_DIST = gns_idinames ididevices.txt gns_gksnames gksdevices.txt
+
+
+
+
