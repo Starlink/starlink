@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = gsd_link gsd_link_adam
+dist_bin_SCRIPTS = gsd_link gsd_link_adam
 bin_PROGRAMS = gsd_print
 
 gsd_print_SOURCES = gsd_print.c
@@ -34,3 +34,13 @@ gsd_test_SOURCES = gsd_test.f
 gsd_test_LDADD = libgsd.la `cnf_link` -lm
 gsd2_testcp_SOURCES = gsd2_testcp.c
 gsd2_testcp_LDADD = libgsd.la `cnf_link` -lm
+
+dist_starnews_DATA = gsd.news
+
+dist_pkgdata_DATA = GSD_CONDITIONS
+
+DISTCLEANFILES = stamp-h1
+
+EXTRA_DIST = gsd2_copya.out gsd2_nativx.out obs_cbe_0043.gsd write_test_array.for
+
+
