@@ -207,3 +207,6 @@ prm_test_LDADD = libprm.la libprm_a.la
 EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.F) \
 	$(PRIVATE_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES:=.F)
 
+dist_starnews_DATA = prm.news
+
+
