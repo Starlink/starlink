@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ref_link ref_link_adam
+dist_bin_SCRIPTS = ref_link ref_link_adam
 
 lib_LTLIBRARIES = libref.la
 
@@ -30,4 +30,8 @@ check_PROGRAMS = ref_test
 ref_test_SOURCES = ref_test.f
 # LDADD is the expansion of ref_link, with -lref replaced by libref.la
 ref_test_LDADD = libref.la `hds_link` `ems_link`
+
+dist_starnews_DATA = ref.news
+
+
 
