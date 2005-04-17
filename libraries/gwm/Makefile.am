@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = gwm_link gwm_link_adam
+dist_bin_SCRIPTS = gwm_link gwm_link_adam
 
 bin_PROGRAMS = xmake xdestroy gwmXrefresh
 
@@ -55,3 +55,8 @@ check_PROGRAMS = gwm_test
 
 gwm_test_SOURCES = gwm_test.f
 gwm_test_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 `ems_link` `cnf_link`
+
+dist_starnews_DATA = gwm.news
+
+
+
