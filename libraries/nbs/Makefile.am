@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = nbs_link nbs_link_adam
+dist_bin_SCRIPTS = nbs_link nbs_link_adam
 
 bin_PROGRAMS = nbtrace
 
@@ -62,3 +62,11 @@ words_SOURCES = words.c
 exercise_LDADD = `$(srcdir)/nbs_link`
 time_LDADD = `$(srcdir)/nbs_link`
 words_LDADD = `$(srcdir)/nbs_link`
+
+CLEANFILES = exercise.lis
+
+dist_starnews_DATA = nbs.news
+
+
+
+
