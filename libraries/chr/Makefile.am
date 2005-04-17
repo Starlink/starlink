@@ -66,3 +66,8 @@ check_PROGRAMS = chr_test
 
 chr_test_SOURCES = chr_test.f $(TEST_ROUTINES)
 chr_test_LDADD = libchr.la
+
+dist_starnews_DATA = chr.news
+
+
+
