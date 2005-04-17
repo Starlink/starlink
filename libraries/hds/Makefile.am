@@ -125,3 +125,10 @@ hds_machine.txt: hds_machine$(EXEEXT)
 	./hds_machine >>$@
 
 BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h
+
+CLEANFILES = DAT_PAR dat_par.h hds_machine.txt
+
+dist_starnews_DATA = hds.news
+
+
+
