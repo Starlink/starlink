@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = one_link one_link_adam
-pkgdata_DATA = one.news
+dist_bin_SCRIPTS = one_link one_link_adam
+dist_starnews_DATA = one.news
 
 lib_LTLIBRARIES = libone.la
 
@@ -25,3 +25,11 @@ check_PROGRAMS = one_test
 
 one_test_SOURCES = one_test.f
 one_test_LDADD = libone.la `$(srcdir)/one_link` `err_link`
+
+EXTRA_DIST = one_err.msg
+
+CLEANFILES = fac_1522_err one_err.h ONE_ERR
+
+dist_pkgdata_DATA = ONE_CONDITIONS
+
+ 
