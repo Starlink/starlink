@@ -99,4 +99,6 @@ test_time_LDADD = `$(srcdir)/psx_link`
 test_uname_SOURCES = test_uname.f
 test_uname_LDADD = `$(srcdir)/psx_link`
 
+dist_starnews_DATA = psx.news
+
 
