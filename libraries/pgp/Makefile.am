@@ -1,9 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = examples
+
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 
-bin_SCRIPTS = pgp_link grfont.dat rgb.txt
+dist_bin_SCRIPTS = pgp_link grfont.dat rgb.txt
 
 lib_LTLIBRARIES = libpgp.la
 
@@ -73,4 +75,13 @@ check_PROGRAMS = pgp_test
 
 pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = libpgp.la `$(srcdir)/pgp_link`
+
+EXTRA_DIST = pgp_err.msg
+
+noinst_INCLUDES = pgplot.inc grecom.inc
+
+CLEANFILES = PGP_ERR
+
+dist_starnews_DATA = pgp.news
+
 
