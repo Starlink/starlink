@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ary_link ary_link_adam
+dist_bin_SCRIPTS = ary_link ary_link_adam
 
 # Note that "classic" has a libary and libary_adam but they
 # are identical. Since everyone goes through the _link scripts
@@ -79,4 +79,6 @@ check_PROGRAMS = ary_test
 ary_test_SOURCES = ary_test.f
 # LDADD is the expansion of ary_link, with -lary replaced by libary.la
 ary_test_LDADD = libary.la `hds_link` `err_link` `chr_link` `prm_link`
+
+dist_starnews_DATA = ary.news
 
