@@ -30,7 +30,6 @@ make_prm_par_LDADD = -lm
 include_HEADERS = $(NORMAL_INCLUDES) $(PLATFORM_INCLUDES)
 include_MESSAGES = PRM_ERR
 noinst_MESSAGES = prm_err.h
-dist_pkgdata_DATA = prm.news
 
 # The common block should not be installed since it will not
 # work with shared libraries. The correct API should be used instead
