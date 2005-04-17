@@ -13,7 +13,7 @@ lib_LTLIBRARIES = libncar.la \
 		  libncar_conras.la \
 		  libncar_conpms.la
 
-bin_SCRIPTS = ncar_link ncar_link_adam
+dist_bin_SCRIPTS = ncar_link ncar_link_adam
 
 libncar_la_SOURCES = $(F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
 
@@ -105,3 +105,13 @@ pwritx.dat: pcrbin
 	./pcrbin
 	mv -f fort.7 pwritx.dat
 	- rm -f fort.*
+
+noinst_INCLUDES = $(PRIVATE_INCLUDES)
+
+DIST_SUBDIRS = data
+
+CLEANFILES = pwritx.dat ezmap.dat
+
+dist_starnews_DATA = ncar.news
+
+
