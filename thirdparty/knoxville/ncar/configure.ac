@@ -43,7 +43,9 @@ STAR_LATEX_DOCUMENTATION(sun88)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 
-AC_CONFIG_FILES(Makefile component.xml)
+dnl    We recurse into subdirectories -- see SUBDIRS in Makefile.am
+AC_CONFIG_FILES([Makefile component.xml
+    data/Makefile examples/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

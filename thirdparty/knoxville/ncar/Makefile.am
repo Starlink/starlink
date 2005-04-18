@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = examples data
+
 LN_S=@LN_S@
 
 # Build the actual libraries
@@ -107,8 +109,6 @@ pwritx.dat: pcrbin
 	- rm -f fort.*
 
 noinst_INCLUDES = $(PRIVATE_INCLUDES)
-
-DIST_SUBDIRS = data
 
 CLEANFILES = pwritx.dat ezmap.dat
 
