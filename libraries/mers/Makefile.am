@@ -98,3 +98,8 @@ err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link`
 #err_test_TASKS =
 #err_test_SOURCES = err_test.c
 #err_test_LDADD = liberr_adam.la `psx_link_adam` `chr_link_adam` `cnf_link_adam`
+
+dist_starnews_DATA = mers.news
+
+
+
