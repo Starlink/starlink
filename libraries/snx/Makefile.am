@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = snx_link snx_link_adam
+dist_bin_SCRIPTS = snx_link snx_link_adam
 
 lib_LTLIBRARIES = libsnx.la libsnx_agchnlz.la libsnx_agpwritx.la
 
@@ -22,7 +22,13 @@ snx_aglab.f snx_agsav.f snx_agwv.f snx_ezrxy.f snx_wrtst.f
 
 TESTS = snx_test.sh
 check_PROGRAMS = snx_test
-check_SCRIPTS = snx_test.sh
+dist_check_SCRIPTS = snx_test.sh
 
 snx_test_SOURCES = snx_test.F
 snx_test_LDADD = libsnx.la `sgs_link` `ncar_link` 
+
+EXTRA_DIST = snx_test.con snx_test.dat 
+
+dist_starnews_DATA = snx.news
+
+
