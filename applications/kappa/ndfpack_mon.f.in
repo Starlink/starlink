@@ -51,6 +51,8 @@
 *        Added multiple invocation of applications using LPG looping.
 *     16-MAR-2004 (DSB):
 *        Added call to LPG_REPLA.
+*     2005 April 15 (MJC):
+*        Added FITSEXIST, now a spearate A-task.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,6 +151,10 @@
 *  Reads a FITS disk file composed of simple, group or table files.
          ELSE IF ( NAME .EQ. 'FITSDIN' ) THEN
             CALL FITSDIN ( STATUS )
+
+*  Inquires whether or not a keyword exists in a FITS extension.
+         ELSE IF ( NAME .EQ. 'FITSEXIST' ) THEN
+            CALL FITSEXIST ( STATUS )
 
 *  Exports NDF-extension information into an NDF FITS extension.
          ELSE IF ( NAME .EQ. 'FITSEXP' ) THEN
