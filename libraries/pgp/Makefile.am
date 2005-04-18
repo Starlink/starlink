@@ -76,12 +76,12 @@ check_PROGRAMS = pgp_test
 pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = libpgp.la `$(srcdir)/pgp_link`
 
-EXTRA_DIST = pgp_err.msg
+EXTRA_DIST = pgp_err.msg pgplot.inc grecom.inc grfont.txt pack.f PGP_ERR_ext
 
 noinst_INCLUDES = pgplot.inc grecom.inc
 
-CLEANFILES = PGP_ERR
+CLEANFILES = PGP_ERR pack grfont.dat 
 
 dist_starnews_DATA = pgp.news
 
-
+dist_pkgdata_DATA = copyright.notice
