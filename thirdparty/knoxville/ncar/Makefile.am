@@ -114,4 +114,6 @@ CLEANFILES = pwritx.dat ezmap.dat
 
 dist_starnews_DATA = ncar.news
 
+EXTRA_DIST = ncar.h
+
 
