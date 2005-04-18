@@ -1,0 +1,9 @@
+#!/bin/sh 
+
+rm -f TESTEPHINPUT -f JPLEPH
+@LN_S@ testephinput.dat TESTEPHINPUT
+@LN_S@ jpleph.dat JPLEPH
+./testeph
+rm -f TESTEPHINPUT JPLEPH
+
+exit

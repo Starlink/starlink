@@ -36,6 +36,7 @@ dnl STAR_DECLARE_DEPENDENCIES([link],  [ ])
 dnl  Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun87)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([runtesteph], [chmod 755 runtesteph])
 
 AC_OUTPUT

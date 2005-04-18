@@ -59,8 +59,9 @@ jpleph.dat: ephdsk
 
 # Testing
 
-TESTS = testeph
+TESTS = runtesteph
 check_PROGRAMS = testeph
+check_SCRIPTS = runtesteph
 
 testeph_SOURCES = testeph.f
 testeph_LDADD = libjpl.la
