@@ -49,10 +49,8 @@ gks.wdt-$(RLSE): gkswdt create_wdt
 ## 	./create_wdt
 ## 	mv gks.wdt gks.wdt-$(RLSE)
 
-EXTRA_DIST = $(WDTS)
-
-noinst_INCLUDES = wdtbuf.cmn wdtbuf.par wdtenm.par wdtwkd.cmn \
-                  wdterr.par wdtwrk.cmn wdtfls.cmn wdterr.cmn
+EXTRA_DIST = $(WDTS) wdtbuf.cmn wdtbuf.par wdtenm.par wdtwkd.cmn \
+             wdterr.par wdtwrk.cmn wdtfls.cmn wdterr.cmn
 
 CLEANFILES = gks.wdt-$(RLSE) gkswdt.lst gkswdt.dat cdrive.inc
 

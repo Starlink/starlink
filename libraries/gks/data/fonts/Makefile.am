@@ -57,8 +57,7 @@ gks.dbs-$(RLSE): gksdbs create_dbs hershey.dat
 
 CLEANFILES = gks.dbs-$(RLSE) fort.10
 
-EXTRA_DIST = hershey.dat $(FONTS)
+EXTRA_DIST = hershey.dat $(FONTS) params.cmn
 
-noinst_INCLUDES = params.cmn
 
 

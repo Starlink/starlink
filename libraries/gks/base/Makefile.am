@@ -93,7 +93,7 @@ FPP_ROUTINES = gkdate.F gkdfop.F gkiobi.F gkiobo.F \
 
 C_ROUTINES = gktset.c gkgtsp.c gkiosb.c
 
-noinst_HEADERS = f77_type.h gkerr.h gkdt.h gkwca.h
+dist_noinst_HEADERS = f77_type.h gkerr.h gkdt.h gkwca.h
 
 
 
