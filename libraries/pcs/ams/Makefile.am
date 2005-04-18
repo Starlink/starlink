@@ -33,3 +33,7 @@ amsmastertest: amsmaster amsslave
 	echo "./amsslave&" >>$@
 	echo "./amsmaster" >>$@
 	chmod 755 amsmastertest
+
+CLEANFILES = amsmastertest
+
+

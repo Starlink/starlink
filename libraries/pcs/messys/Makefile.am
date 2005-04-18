@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = messys_link_adam
+dist_bin_SCRIPTS = messys_link_adam
 lib_LTLIBRARIES = libmessys_adam.la
 
 libmessys_adam_la_SOURCES = \
@@ -19,3 +19,5 @@ PUBLIC_INCLUDES = \
 
 
 BUILT_SOURCES = $(include_MESSAGES)
+
+EXTRA_DIST = messys_err.msg

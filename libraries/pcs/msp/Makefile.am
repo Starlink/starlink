@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = msp_link msp_link_adam
+dist_bin_SCRIPTS = msp_link msp_link_adam
 
 lib_LTLIBRARIES = libmsp.la
 
@@ -21,3 +21,5 @@ PUBLIC_INCLUDES = msp.h msp_par.h
 PRIVATE_INCLUDES = msp_static.h 
 
 BUILT_SOURCES = $(include_MESSAGES)
+
+EXTRA_DIST = msp_err.msg 

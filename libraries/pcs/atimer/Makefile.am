@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = atimer_link atimer_link_adam
+dist_bin_SCRIPTS = atimer_link atimer_link_adam
 
 lib_LTLIBRARIES = libatimer.la
 
@@ -20,3 +20,5 @@ PUBLIC_INCLUDES = atimer.h atimer_par.h
 PRIVATE_INCLUDES = atimer_static.h 
 
 BUILT_SOURCES = $(include_MESSAGES)
+
+EXTRA_DIST = atimer_err.msg

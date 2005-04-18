@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = task_link_adam
+dist_bin_SCRIPTS = task_link_adam
 
 lib_LTLIBRARIES = libtask_adam.la
 
@@ -99,3 +99,5 @@ F_ROUTINES = tsk_add_msinf.f \
              tsk_valnr.f
 
 BUILT_SOURCES = $(include_MESSAGES)
+
+EXTRA_DIST = task_err.msg 

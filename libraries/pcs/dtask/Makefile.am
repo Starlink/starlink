@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = alink ilink dtask_link_adam dtask_libtool
+dist_bin_SCRIPTS = alink ilink dtask_link_adam dtask_libtool
 
 lib_LTLIBRARIES = libdtask_adam.la
 
@@ -16,7 +16,7 @@ AM_FCFLAGS = -I../subpar -I../messys -I../adam
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 
-staretc_DATA = dtask_main.txt
+dist_staretc_DATA = dtask_main.txt
 
 PUBLIC_INCLUDES = DTASK_PAR
 
@@ -39,7 +39,9 @@ C_ROUTINES = \
 
 CLEANFILES = alink ilink dtask_libtool
 
-EXTRA_DIST = alink.in ilink.in
+EXTRA_DIST = alink.in ilink.in $(PRIVATE_INCLUDES) dtask_err.msg \
+             act_err.msg ailink.in.m4 dtask_main.f
+
 MAINTAINERCLEANFILES =  alink.in ilink.in
 
 BUILT_SOURCES = $(include_MESSAGES)

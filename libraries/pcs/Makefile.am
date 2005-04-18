@@ -39,3 +39,6 @@ libsubpar_adam_la_SOURCES = dummy_routine.f
 libsubpar_adam_la_LIBADD = \
 	subpar/libsubpar_convenience.la \
 	parsecon/libparsecon_convenience.la
+
+dist_starnews_DATA = pcs.news
+
