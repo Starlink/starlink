@@ -35,7 +35,7 @@
 #if HAVE_INTRINSIC_GETENV || HAVE_GETENV
       CALL GETENV('GKS_DIR', TRANS)
 #else
- error 'Do not know how to get enironment variables'
+ error 'Do not know how to get environment variables'
 #endif
       IF (LNBLNK(TRANS).EQ.0) THEN
          TRANS = '/star/etc'
