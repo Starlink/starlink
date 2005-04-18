@@ -418,6 +418,42 @@ package kappa {
 
       }
 
+      action fitsexist {
+         alias {fitsexi(st)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter exists {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default FALSE
+            prompt {Object to store result of existence test}
+            helpkey *
+          }
+
+         parameter keyword {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Keyword whose existence is to be determined}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to test for the presence of the FITS keyword}
+            helpkey *
+          }
+
+      }
+
       action fitsexp {
 
          helplib {$KAPPA_HELP}
@@ -15717,15 +15753,6 @@ iraf! {
          taskinherit out
          taskinherit title
          taskparam base=natural
-      }
-   }
-
-   command fitsexist {
-      task fitsmod {
-         taskinherit ndf
-         taskinherit keyword
-         taskparam edit=exist
-         taskparam mode=interface
       }
    }
 
