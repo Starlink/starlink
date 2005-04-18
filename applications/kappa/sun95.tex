@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.31}
 \newcommand{\stardocnumber}    {95.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {23rd March 2005}
+\newcommand{\stardocdate}      {2005 April 15}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.4-2}
+\newcommand{\stardocversion}   {1.4-3}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -365,7 +365,7 @@
 %        Corrected banner width.
 %     2-DEC-1998 (DSB):
 %        Added sstattributetype (copied from sun210.tex).
-%     2004 August 6 (DSB):
+%     2004 August 6 (MJC):
 %        Added sstattribute.
 %     {enter_further_changes_here}
 
@@ -20921,10 +20921,8 @@ KAPPA: \htmlref{FITSMOD}{FITSMOD},
    Inquires whether or not a keyword exists in a FITS extension
 }{
    \sstdescription{
-      This application reports whether or not a keyword exists in an \NDFref{NDF's}
-      \htmlref{FITS extension}{se:fitsairlock}.
-
-      It is a synonym for {\tt fitsmod edit=exist mode=interface}.
+      This application reports whether or not a keyword exists in the
+      \htmlref{FITS extension}{se:fitsairlock} of an \NDFref{NDF} file.
    }
    \sstusage{
       fitsexist ndf keyword
@@ -20956,7 +20954,14 @@ KAPPA: \htmlref{FITSMOD}{FITSMOD},
       \sstsubsection{
          NDF = NDF (Read)
       }{
-         The NDF containing the FITS keyword.
+         The NDF to be tested for the presence of the FITS keyword.
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         EXISTS = \_LOGICAL (Write)
+      }{
+        The result of the final existence test.
       }
    }
    \sstexamples{
@@ -21919,11 +21924,10 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          {\tt "Exist"} commands.
 
          Both KEYWORD and POSITION keywords may have an occurrence
-         specified in brackets {\tt []} following the name (the value
-         of KEYWORD should then appear in quotes).  This enables editing of
-         a keyword that is not the first occurrence of that keyword, or
-         locate a edited keyword not at the first occurrence of the
-         positional keyword.  Note that it is not normal to have
+         specified in brackets {\tt []} following the name. This enables 
+         editing of a keyword that is not the first occurrence of that 
+         keyword, or locate a edited keyword not at the first occurrence 
+         of the positional keyword.  Note that it is not normal to have
          multiple occurrences of a keyword in a FITS header, unless it
          is blank, COMMENT or HISTORY.  Any text between the brackets
          other than a positive integer is interpreted as the first
@@ -22046,7 +22050,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          extension of the NDF called dro42.
       }
       \sstexamplesubsection{
-         fitsmod ndf=dro42 edit=d keyword="airmass[2]"
+         fitsmod ndf=dro42 edit=d keyword=airmass[2]
       }{
          This deletes the second occurrence of keyword AIRMASS, if it
          exists, in the FITS extension of the NDF called dro42.
@@ -48453,12 +48457,12 @@ applying a mask to each block of output pixels.
 
 \item The \htmlref{WCSALIGN}{WCSALIGN} application now has a facility for
 aligning the input NDFs in-situ if possible (that is, if the alignment
-Mapping is a simple shift of origin). The new parameters are INSITU and
+Mapping is a simple shift of origin).  The new parameters are INSITU and
 ABORT.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.4-2\label{se:changes}}
+\section{Release Notes---V1.4-2}
 
 \begin{itemize}
 
@@ -48469,8 +48473,20 @@ the new output parameters FLBND and FUBND.
 
 \item The \htmlref{BLOCK}{BLOCK} application can now smooth 3-d NDFs, in
 the sense that it will smooth all the 2-d planes within a 3-d NDF
-independently, using the same 2-dimensional box. The smoothing plane can
+independently, using the same 2-dimensional box.  The smoothing plane can
 be parallel to any face of the cube.
+
+\section{\xlabel{se_changes}Release Notes---V1.4-3\label{se:changes}}
+
+\begin{itemize}
+
+\item \htmlref{FITSEXIST}{FITSEXIST} is now a self-contained
+application.  It needs only read access to an NDF, unlike the former
+version that was an alias to \htmlref{FITSMOD}{FITSMOD}.  It should be
+faster too.
+
+\end{itemize}
+
 
 \end{itemize}
 
