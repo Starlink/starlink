@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = sgs_link
+dist_bin_SCRIPTS = sgs_link
 
 lib_LTLIBRARIES = libsgs.la
 
@@ -55,4 +55,6 @@ sgsx1_LDADD = libsgs.la `gns_link` `gks_link` `ems_link` `chr_link`
 
 sgsx2_SOURCES = sgsx2.f
 sgsx2_LDADD = libsgs.la `gns_link` `gks_link` `ems_link` `chr_link`
+
+dist_starnews_DATA = sgs.news
 
