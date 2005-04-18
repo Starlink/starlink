@@ -271,8 +271,10 @@
      :                  STATUS )
 
 *  Check units for special significance, radians or degrees are assumed
-*  to be possible sky coordinates.
-         IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN
+*  to be possible sky coordinates. WFCAM has Radians, so make case insensitive.
+         CALL CHR_LCASE( UNITS )
+         CALL CHR_LDBLK( UNITS )
+         IF ( UNITS( :7 ) .EQ. 'radians' ) THEN
 
 *  Not degrees.
             AREDEG = .FALSE.
@@ -281,7 +283,7 @@
 *  {HOURS} or the name is some variation of RA/Ra/r.a./Rightxxx, then
 *  assume RA, otherwise it is a DEC. Note we need both of these to have
 *  a valid match.
-            IF ( UNITS( 8: ) .EQ. '{HOURS}' ) THEN
+            IF ( UNITS( 8: ) .EQ. '{hours}' ) THEN
                IF ( RACOL .EQ. -1 ) RACOL = I - 1
             ELSE
                LNAME = NAME
