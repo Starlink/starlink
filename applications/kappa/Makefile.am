@@ -85,7 +85,7 @@ misc/blank.bit
 
 #  Help files for command aliases, scripts, etc.
 
-HELP_FILES = help/fitsedit.hlp help/fitsexist.hlp help/fitshead.hlp \
+HELP_FILES = help/fitsedit.hlp help/fitshead.hlp \
 help/fitsval.hlp help/fitswrite.hlp help/lutbgyrw.hlp help/lutcol.hlp \
 help/lutcold.hlp help/lutcont.hlp help/lutfc.hlp help/lutgrey.hlp \
 help/lutheat.hlp help/lutikon.hlp help/lutneg.hlp help/lutramps.hlp \
@@ -112,11 +112,11 @@ lutview lutedit mlinplot paldef palentry palread palsave piccur picdef \
 picempty picentire picin piclabel piclist picsel pictrans picvis       \
 scatter vecplot
 
-NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexp fitsimp  \
-fitsin fitslist fitsmod fitstext hiscom hislist hisset native ndfcopy \
-ndftrace setaxis setbad setbb setbound setext setlabel setnorm	      \
-setorigin setsky settitle settype setunits setvar wcsadd wcsattrib    \
-wcscopy wcsframe wcsremove wcsshow chain reshape showqual setqual     \
+NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexist fitsexp \
+fitsimp fitsin fitslist fitsmod fitstext hiscom hislist hisset native  \
+ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel setnorm \
+setorigin setsky settitle settype setunits setvar wcsadd wcsattrib     \
+wcscopy wcsframe wcsremove wcsshow chain reshape showqual setqual      \
 remqual qualtobad
 
 
