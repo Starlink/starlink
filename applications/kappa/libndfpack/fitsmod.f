@@ -101,11 +101,10 @@
 *        commands.
 *
 *        Both KEYWORD and POSITION keywords may have an occurrence
-*        specified in brackets [] following the name (the value of
-*        KEYWORD should then appear in quotes).  This enables editing of
-*        a keyword that is not the first occurrence of that keyword, or
-*        locate a edited keyword not at the first occurrence of the
-*        positional keyword.  Note that it is not normal to have
+*        specified in brackets [] following the name.  This enables
+*        editing of a keyword that is not the first occurrence of that
+*        keyword, or locate a edited keyword not at the first occurrence
+*        of the positional keyword.  Note that it is not normal to have
 *        multiple occurrences of a keyword in a FITS header, unless it
 *        is blank, COMMENT or HISTORY.  Any text between the brackets
 *        other than a positive integer is interpreted as the first
@@ -183,7 +182,7 @@
 *     fitsmod dro42 airmass dele
 *        This deletes the keyword AIRMASS, if it exists, in the FITS
 *        extension of the NDF called dro42.
-*     fitsmod ndf=dro42 edit=d keyword="airmass[2]"
+*     fitsmod ndf=dro42 edit=d keyword=airmass[2]
 *        This deletes the second occurrence of keyword AIRMASS, if it
 *        exists, in the FITS extension of the NDF called dro42.
 *     fitsmod @100 airmass w 1.456 "Airmass at mid-observation"
