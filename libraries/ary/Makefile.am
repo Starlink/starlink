@@ -82,3 +82,7 @@ ary_test_LDADD = libary.la `hds_link` `err_link` `chr_link` `prm_link`
 
 dist_starnews_DATA = ary.news
 
+EXTRA_DIST = ary_err.msg
+
+CLEANFILES = ARY_ERR
+

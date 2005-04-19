@@ -59,4 +59,9 @@ gwm_test_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 `ems_link` `cnf_link`
 dist_starnews_DATA = gwm.news
 
 
+EXTRA_DIST = gwm_err.msg
+
+CLEANFILES = GWM_ERR
+
+
 
