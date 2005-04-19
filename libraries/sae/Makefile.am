@@ -11,3 +11,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 noinst_MESSAGES = SAI_ERR
 # The facility code within sae_err.msg is SAI, not the default.
 SAI_ERR_SOURCES = sae_err.msg
+
+EXTRA_DIST = sae_err.msg
+
+CLEANFILES = SAI_ERR
+
