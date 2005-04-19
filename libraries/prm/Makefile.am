@@ -204,8 +204,11 @@ prm_test_LDADD = libprm.la libprm_a.la
 
 # Files for distribution that are not picked up elsewhere.
 EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.F) \
-	$(PRIVATE_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES:=.F)
+	$(PRIVATE_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES:=.F) \
+        prm_err.msg
 
 dist_starnews_DATA = prm.news
+
+CLEANFILES = PRM_ERR
 
 
