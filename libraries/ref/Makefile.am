@@ -35,7 +35,8 @@ dist_starnews_DATA = ref.news
 
 EXTRA_DIST = ref_err.msg
 
-CLEANFIES = ref_err.msg
+CLEANFIES = REF_ERR
+
 
 
 
