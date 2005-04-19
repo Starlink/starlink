@@ -101,4 +101,6 @@ test_uname_LDADD = `$(srcdir)/psx_link`
 
 dist_starnews_DATA = psx.news
 
+EXTRA_DIST = psx_err.msg
 
+CLEANFILES = PSX_ERR

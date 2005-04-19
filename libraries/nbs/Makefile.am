@@ -63,9 +63,11 @@ exercise_LDADD = `$(srcdir)/nbs_link`
 time_LDADD = `$(srcdir)/nbs_link`
 words_LDADD = `$(srcdir)/nbs_link`
 
-CLEANFILES = exercise.lis
+CLEANFILES = exercise.lis NBS_ERR
 
 dist_starnews_DATA = nbs.news
+
+EXTRA_DIST = nbs_err.msg
 
 
 

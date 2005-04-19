@@ -72,11 +72,12 @@ gnsrun_gks_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_li
 gns_test_SOURCES = gns_test.f
 gns_test_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_link`
 
-CLEANFILES = gns_ididevices gns_gksdevices
+CLEANFILES = gns_ididevices gns_gksdevices GNS_ERR
 
 dist_starnews_DATA = gns.news
 
-EXTRA_DIST = gns_idinames ididevices.txt gns_gksnames gksdevices.txt
+EXTRA_DIST = gns_idinames ididevices.txt gns_gksnames gksdevices.txt gns_err.msg
+
 
 
 
