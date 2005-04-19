@@ -33,5 +33,9 @@ ref_test_LDADD = libref.la `hds_link` `ems_link`
 
 dist_starnews_DATA = ref.news
 
+EXTRA_DIST = ref_err.msg
+
+CLEANFIES = ref_err.msg
+
 
 
