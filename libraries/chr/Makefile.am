@@ -69,5 +69,11 @@ chr_test_LDADD = libchr.la
 
 dist_starnews_DATA = chr.news
 
+EXTRA_DIST = chr_err.msg
+
+CLEANFILES = CHR_ERR
+
+
+
 
 

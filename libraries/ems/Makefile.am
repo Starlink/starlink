@@ -76,3 +76,7 @@ test_iostat_LDADD = libemsf.la libems.la `cnf_link`
 ems_test_SOURCES = ems_test.c
 ems_test_LDADD = libemsf.la libems.la `cnf_link`
 
+EXTRA_DIST = ems_err.msg
+
+CLEANFILES = EMS_ERR
+
