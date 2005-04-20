@@ -74,6 +74,8 @@ typedef struct AstRegion {
    int defunc;                /* Is "unc" set to a default value? */
    AstPointSet *basemesh;     /* Base frame mesh covering the boundary */
    AstPointSet *basegrid;     /* Base frame grid covering the boundary */
+   int adaptive;              /* Does the Region adapt to coord sys changes? */
+   int nomap;                 /* Ignore the Region's FrameSet? */
 } AstRegion;
 
 /* Virtual function table. */
@@ -96,10 +98,12 @@ typedef struct AstRegionVtab {
    AstFrame *(* GetRegionFrame)( AstRegion * );
    AstFrame *(* RegFrame)( AstRegion * );
    AstPointSet *(* RegTransform)( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
+   AstPointSet *(* BTransform)( AstRegion *, AstPointSet *, int, AstPointSet * );
    void (* Negate)( AstRegion * );
    void (* RegBaseBox)( AstRegion *, double *, double * );
    void (* RegBaseBox2)( AstRegion *, double *, double * );
    void (* RegSetAttrib)( AstRegion *, const char *, char ** );
+   void (* RegClearAttrib)( AstRegion *, const char *, char ** );
    void (* GetRegionBounds)( AstRegion *, double *, double * );
    void (* GetRegionBounds2)( AstRegion *, double *, double * );
    void (* ClearUnc)( AstRegion * );
@@ -117,6 +121,7 @@ typedef struct AstRegionVtab {
    AstRegion *(* GetUncFrm)( AstRegion *, int );
    AstRegion *(* GetUnc)( AstRegion *, int );
    AstRegion *(* GetDefUnc)( AstRegion * );
+   void (* ResetCache)( AstRegion * );
    void (* SetUnc)( AstRegion *, AstRegion * );
    void (* SetRegFS)( AstRegion *, AstFrame * );
    double *(* RegCentre)( AstRegion *, double *, double **, int, int );
@@ -159,6 +164,11 @@ typedef struct AstRegionVtab {
    int (* TestFillFactor)( AstRegion * );
    void (* ClearFillFactor)( AstRegion * );
    void (* SetFillFactor)( AstRegion *, double );
+
+   int (* GetAdaptive)( AstRegion * );
+   int (* TestAdaptive)( AstRegion * );
+   void (* ClearAdaptive)( AstRegion * );
+   void (* SetAdaptive)( AstRegion *, int );
 
 } AstRegionVtab;
 #endif
@@ -213,9 +223,11 @@ void astGetRegionBounds2_( AstRegion *, double *, double * );
 AstRegion *astMapRegion_( AstRegion *, AstMapping *, AstFrame * );
 AstFrame *astRegFrame_( AstRegion * );
 AstPointSet *astRegTransform_( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
+AstPointSet *astBTransform_( AstRegion *, AstPointSet *, int, AstPointSet * );
 void astRegBaseBox_( AstRegion *, double *, double * );
 void astRegBaseBox2_( AstRegion *, double *, double * );
 void astRegSetAttrib_( AstRegion *, const char *, char ** );
+void astRegClearAttrib_( AstRegion *, const char *, char ** );
 void astClearUnc_( AstRegion * );
 void astRegOverlay_( AstRegion *, AstRegion * );
 int astDumpUnc_( AstRegion * );
@@ -234,6 +246,7 @@ int astOverlapX_( AstRegion *, AstRegion * );
 void astSetRegFS_( AstRegion *, AstFrame * );
 double *astRegCentre_( AstRegion *, double *, double **, int, int );
 double *astRegTranPoint_( AstRegion *, double *, int, int );
+void astResetCache_( AstRegion * );
 
 int astGetNegated_( AstRegion * );
 int astTestNegated_( AstRegion * );
@@ -259,6 +272,11 @@ double astGetFillFactor_( AstRegion * );
 int astTestFillFactor_( AstRegion * );
 void astClearFillFactor_( AstRegion * );
 void astSetFillFactor_( AstRegion *, double );
+
+int astGetAdaptive_( AstRegion * );
+int astTestAdaptive_( AstRegion * );
+void astClearAdaptive_( AstRegion * );
+void astSetAdaptive_( AstRegion *, int );
 
 #else   /* Public only */
 AstRegion *astMapRegionId_( AstRegion *, AstMapping *, AstFrame * );
@@ -352,6 +370,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegBaseBox(this,lbnd,ubnd) astINVOKE(V,astRegBaseBox_(astCheckRegion(this),lbnd,ubnd))
 #define astRegBaseBox2(this,lbnd,ubnd) astINVOKE(V,astRegBaseBox2_(astCheckRegion(this),lbnd,ubnd))
 #define astRegSetAttrib(this,setting,bset) astINVOKE(V,astRegSetAttrib_(astCheckRegion(this),setting,bset))
+#define astRegClearAttrib(this,setting,batt) astINVOKE(V,astRegClearAttrib_(astCheckRegion(this),setting,batt))
 #define astRegBaseMesh(this) astINVOKE(O,astRegBaseMesh_(astCheckRegion(this)))
 #define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this)))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd))
@@ -365,7 +384,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegTranPoint astRegTranPoint_
 #define astSetRegFS(this,frm) astINVOKE(V,astSetRegFS_(astCheckRegion(this),astCheckFrame(frm)))
 #define astTestUnc(this) astINVOKE(V,astTestUnc_(astCheckRegion(this)))
-
+#define astResetCache(this) astINVOKE(V,astResetCache_(astCheckRegion(this)))
 
 /* Since a NULL PointSet pointer is acceptable for "out", we must omit the 
    argument checking in that case. (But unfortunately, "out" then gets 
@@ -374,10 +393,18 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegTransform(this,in,forward,out,frm) \
 astINVOKE(O,astRegTransform_(astCheckRegion(this),in?astCheckPointSet(in):NULL,forward,(out)?astCheckPointSet(out):NULL,frm))
 
+#define astBTransform(this,in,forward,out) \
+astINVOKE(O,astBTransform_(astCheckRegion(this),in?astCheckPointSet(in):NULL,forward,(out)?astCheckPointSet(out):NULL))
+
 #define astClearNegated(this) astINVOKE(V,astClearNegated_(astCheckRegion(this)))
 #define astGetNegated(this) astINVOKE(V,astGetNegated_(astCheckRegion(this)))
 #define astSetNegated(this,negated) astINVOKE(V,astSetNegated_(astCheckRegion(this),negated))
 #define astTestNegated(this) astINVOKE(V,astTestNegated_(astCheckRegion(this)))
+
+#define astClearAdaptive(this) astINVOKE(V,astClearAdaptive_(astCheckRegion(this)))
+#define astGetAdaptive(this) astINVOKE(V,astGetAdaptive_(astCheckRegion(this)))
+#define astSetAdaptive(this,adaptive) astINVOKE(V,astSetAdaptive_(astCheckRegion(this),adaptive))
+#define astTestAdaptive(this) astINVOKE(V,astTestAdaptive_(astCheckRegion(this)))
 
 #define astClearRegionFS(this) astINVOKE(V,astClearRegionFS_(astCheckRegion(this)))
 #define astGetRegionFS(this) astINVOKE(V,astGetRegionFS_(astCheckRegion(this)))

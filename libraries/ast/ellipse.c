@@ -96,6 +96,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
+static void (* parent_resetcache)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -117,6 +118,7 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static void ResetCache( AstRegion *this );
 
 /* Member functions. */
 /* ================= */
@@ -478,6 +480,9 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
+
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
@@ -539,99 +544,106 @@ static void Cache( AstEllipse *this ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Do Nothing if the cached information is up to date. */
+   if( this->stale ) {
+
 /* Get a pointer to the base Frame. */
-   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
-
+      frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+   
 /* Allocate memory. */
-   centre = (double *) astMalloc( sizeof( double )*2 );   
-   point1 = (double *) astMalloc( sizeof( double )*2 );   
-   point2 = (double *) astMalloc( sizeof( double )*2 );   
-   point3 = (double *) astMalloc( sizeof( double )*2 );   
-
+      centre = (double *) astMalloc( sizeof( double )*2 );   
+      point1 = (double *) astMalloc( sizeof( double )*2 );   
+      point2 = (double *) astMalloc( sizeof( double )*2 );   
+      point3 = (double *) astMalloc( sizeof( double )*2 );   
+   
 /* Get pointers to the coordinate data in the parent Region structure. */
-   ptr = astGetPoints( ((AstRegion *) this)->points );
-
+      ptr = astGetPoints( ((AstRegion *) this)->points );
+   
 /* Check pointers can be used safely. */
-   if( astOK ) {
-
+      if( astOK ) {
+   
 /* Copy the points in to the allocated memory. */
-      for( i = 0; i < 2; i++ ) {
-         centre[ i ] = ptr[ i ][ 0 ];
-         point1[ i ] = ptr[ i ][ 1 ];
-         point2[ i ] = ptr[ i ][ 2 ];
-      }
-
+         for( i = 0; i < 2; i++ ) {
+            centre[ i ] = ptr[ i ][ 0 ];
+            point1[ i ] = ptr[ i ][ 1 ];
+            point2[ i ] = ptr[ i ][ 2 ];
+         }
+   
 /* Get the geodesic distance between the centre and point 1 (the end of
    the primary axis of the ellipse). This is the half length of the
    primary axis of the ellipse (the axis which joins the centre position to 
    point 1). */
-      a = astDistance( frm, centre, point1 );      
-      if( astOK && ( a == 0.0 || a == AST__BAD ) ) {
-         astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                   "imply a zero-width ellipse.", astGetClass( this ) );
-      }
-
+         a = astDistance( frm, centre, point1 );      
+         if( astOK && ( a == 0.0 || a == AST__BAD ) ) {
+            astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
+                      "imply a zero-width ellipse.", astGetClass( this ) );
+         }
+   
 /* Find the point (point3) on the primary axis which is closest to point 2, 
    and thus get the geodesic offsets (resolved parallel and perpendicular to
    the primary axis) between the centre and point 2. */
-      astResolve( frm, centre, point1, point2, point3, &x, &y );
-
+         astResolve( frm, centre, point1, point2, point3, &x, &y );
+   
 /* Find the half-length of the secondary ellipse axis. */
-      if( astOK ) {
-         b = a*a - x*x;
-         if( b > 0.0 ) {
-            b = a*y/sqrt( b );
-            if( b == 0.0 ) {
+         if( astOK ) {
+            b = a*a - x*x;
+            if( b > 0.0 ) {
+               b = a*y/sqrt( b );
+               if( b == 0.0 ) {
+                  astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
+                            "imply a zero-width ellipse.", astGetClass( this ) );
+               }
+            } else {
                astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                         "imply a zero-width ellipse.", astGetClass( this ) );
+                         "do not determine an ellipse.", astGetClass( this ) );
             }
+   
          } else {
-            astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                      "do not determine an ellipse.", astGetClass( this ) );
+            b = a;
          }
-
-      } else {
-         b = a;
-      }
-
+   
 /* Find the angle from the positive direction of the second axis to the
    primary ellipse axis. */
-      point3[ 0 ] = centre[ 0 ];
-      point3[ 1 ] = centre[ 1 ] + fabs( 0.1*a );
-      angle = astAngle( frm, point3, centre, point1 );
-
+         point3[ 0 ] = centre[ 0 ];
+         point3[ 1 ] = centre[ 1 ] + fabs( 0.1*a );
+         angle = astAngle( frm, point3, centre, point1 );
+   
 /* Store useful things in the Ellipse structure. */
-      if( astOK ) {
-        astFree( this->centre );
-        this->centre = centre;
-        centre = NULL;
-
-        astFree( this->point1 );
-        this->point1 = point1;
-        point1 = NULL;
-
-        this->a = a;
-        this->b = b;
-        this->angle = angle;
+         if( astOK ) {
+           astFree( this->centre );
+           this->centre = centre;
+           centre = NULL;
+   
+           astFree( this->point1 );
+           this->point1 = point1;
+           point1 = NULL;
+   
+           this->a = a;
+           this->b = b;
+           this->angle = angle;
+         }
       }
-   }
-
+   
 /* Initialise the bounding box. This is set properly when the astRegBaseMesh
    function is called. These variables should not be used unless the
    "basemesh" component of the parent Region structure is set to a non-null
    value. */
-   this->lbx = -DBL_MAX;
-   this->ubx = DBL_MAX;
-   this->lby = -DBL_MAX;
-   this->uby = DBL_MAX;
-
+      this->lbx = -DBL_MAX;
+      this->ubx = DBL_MAX;
+      this->lby = -DBL_MAX;
+      this->uby = DBL_MAX;
+   
 /* Free resources */
-   frm = astAnnul( frm );
-   if( centre ) centre = astFree( centre );
-   if( point1 ) point1 = astFree( point1 );
-   point2 = astFree( point2 );
-   point3 = astFree( point3 );
+      frm = astAnnul( frm );
+      if( centre ) centre = astFree( centre );
+      if( point1 ) point1 = astFree( point1 );
+      point2 = astFree( point2 );
+      point3 = astFree( point3 );
 
+/* Indicate cached information is up to date. */
+      this->stale = 0;
+
+   }
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
@@ -782,6 +794,9 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 
 /* Get a pointer to the Ellipse structure. */
       this = (AstEllipse *) this_region;
+
+/* Ensure cached information is available. */
+      Cache( this );
 
 /* Get a pointer to the base Frame in the encapsulated FrameSet. */
       frm = astGetFrame( this_region->frameset, AST__BASE );
@@ -967,6 +982,9 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    pointer. */
    } else {
 
+/* Ensure cached information is available. */
+      Cache( this );
+
 /* Get a pointer to the axis values stored in the Region structure. */
       rptr = astGetPoints( this_region->points );
 
@@ -1150,6 +1168,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
       l2 = 0.0;
    }
 
+/* Ensure cached information is available. */
+   Cache( this );
+
 /* The required border width is half of the total diagonal of the two bounding 
    boxes. */   
    if( astOK ) {
@@ -1250,6 +1271,39 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void ResetCache( AstRegion *this ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ellipse.h"
+*     void ResetCache( AstRegion *this )
+
+*  Class Membership:
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function clears cached information from the supplied Region 
+*     structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+   if( this ) {
+      ( (AstEllipse *) this )->stale = 1;
+      (*parent_resetcache)( this );
+   }
+}
+
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 /*
 *  Name:
@@ -1290,8 +1344,9 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    structure. */
    (* parent_setregfs)( this_region, frm );
 
-/* Re-calculate cached information. */
-   Cache( (AstEllipse *) this_region );
+/* Indicate that cached information will need to be re-calculated before
+   it is next used. */
+   astResetCache( this_region );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {
@@ -1547,6 +1602,9 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
    result = (*parent_transform)( this_mapping, in, forward, out );
+
+/* Ensure cached information is available. */
+   Cache( this );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -2272,7 +2330,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
 
 /* Initialise the Ellipse data. */
 /* ------------------------ */
-         Cache( new );
+         new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Ellipse. */
          if ( !astOK ) new = astDelete( new );
@@ -2413,8 +2471,9 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
 /* There are no values to read. */
 /* ---------------------------- */
 
-/* Cache intermediate results in the Ellipse structure */
-      Cache( new );
+/* Indicate that no cache intermediate results are yet available in the 
+   Ellipse structure */
+      new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Ellipse. */
       if ( !astOK ) new = astDelete( new );

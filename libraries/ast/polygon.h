@@ -78,6 +78,7 @@ typedef struct AstPolygon {
    double lbnd[2];            /* Lower axis limits of bounding box */
    double ubnd[2];            /* Upper axis limits of bounding box */
    AstLineDef **edges;        /* Cached description of edges */
+   int stale;                 /* Is cached information stale? */
 } AstPolygon;
 
 /* Virtual function table. */

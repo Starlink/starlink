@@ -92,7 +92,8 @@ static void (* parent_clearnegated)( AstRegion * );
 static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_setunc)( AstRegion *, AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
-
+static void (* parent_resetcache)( AstRegion * );
+ 
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -122,6 +123,7 @@ static void SetClosed( AstRegion *, int );
 static void SetNegated( AstRegion *, int );
 static void SetUnc( AstRegion *, AstRegion * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static void ResetCache( AstRegion *this );
 
 /* Member functions. */
 /* ================= */
@@ -167,7 +169,7 @@ static void ClearClosed( AstRegion *this ){
 
 /* If the new value is not the same as the old value, inidcatethat we
    need to re-calculate the cached information in the Box. */
-   if( astGetClosed( this ) != old ) ((AstBox *)this)->stale = 1;
+   if( astGetClosed( this ) != old ) astResetCache( this );
 }
 
 static void ClearNegated( AstRegion *this ){
@@ -211,9 +213,8 @@ static void ClearNegated( AstRegion *this ){
 
 /* If the new value is not the same as the old value, inidcatethat we
    need to re-calculate the cached information in the Box. */
-   if( astGetNegated( this ) != old ) ((AstBox *)this)->stale = 1;
+   if( astGetNegated( this ) != old ) astResetCache( this );
 }
-
 void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 /*
 *+
@@ -300,6 +301,9 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
+
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1599,7 +1603,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
          }
 
 /* Indicate the cached info in the Box structure is out of date. */
-         this->stale = 1;
+         astResetCache( this );
 
 /* Any base Frame mesh or grid is now no good, so annul it. */
          if( this_region->basemesh ) this_region->basemesh = astAnnul( this_region->basemesh );
@@ -1863,6 +1867,39 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void ResetCache( AstRegion *this ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void ResetCache( AstRegion *this )
+
+*  Class Membership:
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function clears cached information from the supplied Region 
+*     structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+   if( this ) {
+      ((AstBox *) this )->stale = 1;
+      (*parent_resetcache)( this );
+   }
+}
+
 static void SetClosed( AstRegion *this, int value ){
 /*
 *  Name:
@@ -1906,7 +1943,7 @@ static void SetClosed( AstRegion *this, int value ){
 
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
-   if( value != old ) ((AstBox *)this)->stale = 1;
+   if( value != old ) astResetCache( this );
 }
 
 static void SetNegated( AstRegion *this, int value ){
@@ -1952,7 +1989,7 @@ static void SetNegated( AstRegion *this, int value ){
 
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
-   if( value != old ) ((AstBox *)this)->stale = 1;
+   if( value != old ) astResetCache( this );
 }
 
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
@@ -1996,7 +2033,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    (* parent_setregfs)( this_region, frm );
 
 /* Indicate that we need to re-calculate the cached information in the Box. */
-   ((AstBox *)this_region)->stale = 1;
+   astResetCache( this_region );
 }
 
 static double SetShrink( AstBox *this, double shrink ){
@@ -2048,7 +2085,7 @@ static double SetShrink( AstBox *this, double shrink ){
 
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
-   if( result != shrink ) this->stale = 1;
+   if( result != shrink ) astResetCache( this );
 
 /* Return the original value */
    return result;
@@ -2103,7 +2140,7 @@ static void SetUnc( AstRegion *this, AstRegion *unc ){
    (*parent_setunc)( this, unc );
 
 /* Indicate that we need to re-calculate the cached information in the Box. */
-   ((AstBox *)this)->stale = 1;
+   astResetCache( this );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {

@@ -108,7 +108,7 @@ static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_overlap)( AstRegion *, AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
 static void (* parent_setunc)( AstRegion *, AstRegion * );
-static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
+static void (* parent_resetcache)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -119,24 +119,24 @@ AstInterval *astIntervalId_( void *, const double[], const double[], void *, con
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstBox *Cache( AstInterval * );
 static AstInterval *MergeInterval( AstInterval *, AstRegion * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetDefUnc( AstRegion * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int );
 static int GetBounded( AstRegion * );
 static int Overlap( AstRegion *, AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static AstBox *Cache( AstInterval * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
+static void ResetCache( AstRegion *this );
 static void SetRegFS( AstRegion *, AstFrame * );
 static void SetUnc( AstRegion *, AstRegion * );
-static void RegSetAttrib( AstRegion *, const char *, char ** );
 
 /* Member functions. */
 /* ================= */
@@ -1070,11 +1070,11 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
+
    parent_setunc = region->SetUnc;
    region->SetUnc = SetUnc;
-
-   parent_regsetattrib = region->RegSetAttrib;
-   region->RegSetAttrib = RegSetAttrib;
 
    region->RegCentre = RegCentre;
    region->GetBounded = GetBounded;
@@ -1853,77 +1853,37 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static void RegSetAttrib( AstRegion *this_region, const char *setting, 
-                          char **base_setting ) {
+static void ResetCache( AstRegion *this ){
 /*
 *  Name:
-*     RegSetAttrib
+*     ResetCache
 
 *  Purpose:
-*     Set an attribute value for a Region.
+*     Clear cached information within the supplied Region.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "interval.h"
-*     void RegSetAttrib( AstRegion *this, const char *setting, 
-*                        char **base_setting )
+*     void ResetCache( AstRegion *this )
 
 *  Class Membership:
-*     Interval method (over-rides the astRegSetAttrib method inherited from
-*     the Region class).
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
 
 *  Description:
-*     This function assigns an attribute value to both the base and
-*     current Frame in the FrameSet encapsulated within a Region, without
-*     remapping either Frame. 
-*
-*     No error is reported if the attribute is not recognised by the base 
-*     Frame.
+*     This function clears cached information from the supplied Region 
+*     structure.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
-*     setting
-*        Pointer to a null terminated attribute setting string. NOTE, IT 
-*        SHOULD BE ENTIRELY LOWER CASE. The supplied string will be 
-*        interpreted using the public interpretation implemented by
-*        astSetAttrib. This can be different to the interpretation of the 
-*        protected accessor functions. For instance, the public
-*        interpretation of an unqualified floating point value for the 
-*        Epoch attribute is to interpet the value as a gregorian year,
-*        but the protected interpretation is to interpret the value as an 
-*        MJD.
-*     base_setting
-*        Address of a location at which to return a pointer to the null 
-*        terminated attribute setting string which was applied to the
-*        base Frame of the encapsulated FrameSet. This may differ from
-*        the supplied setting if the supplied setting contains an axis 
-*        index and the current->base Mapping in the FrameSet produces an
-*        axis permutation. The returned pointer should be freed using
-*        astFree when no longer needed. A NULL pointer may be supplied in 
-*        which case no pointer is returned.
-
 */
-
-/* Local Variables: */
-   AstInterval *this; 
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Get a pointer to the Interval structure. */
-   this = (AstInterval *) this_region;
-
-/* Use the RegSetAttrib method inherited from the parent class to apply the 
-   setting to the current and base Frames in the FrameSet encapsulated by the 
-   parent Region structure. */
-   (*parent_regsetattrib)( this_region, setting, base_setting );
-
-/* Indicate that the cached intermediate information is now stale and
-   should be recreated when next needed. */
-   this->stale = 1;
+   if( this ) {
+      ( (AstInterval *) this )->stale = 1;
+      (*parent_resetcache)( this );
+   }
 }
 
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
@@ -1968,7 +1928,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 /* Indicate that the cached intermediate information is now stale and
    should be recreated when next needed. */
-   ( (AstInterval *) this_region )->stale = 1;
+   astResetCache( this_region );
 }
 
 static void SetUnc( AstRegion *this, AstRegion *unc ){
@@ -2021,7 +1981,7 @@ static void SetUnc( AstRegion *this, AstRegion *unc ){
 
 /* Indicate that the cached intermediate information is now stale and
    should be recreated when next needed. */
-   ( (AstInterval *) this )->stale = 1;
+   astResetCache( this );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {

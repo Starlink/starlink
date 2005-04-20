@@ -83,6 +83,7 @@ f     AST_SIMPLIFY routine
 *     In addition to those attributes common to all Frames, every
 *     Region also has the following attributes:
 *
+*     - Adaptive: Should the area adapt to changes in the coordinate system?
 *     - Negated: Has the original region been negated?
 *     - Closed: Should the boundary be considered to be inside the region?
 *     - MeshSize: Number of points used to create a mesh covering the Region
@@ -764,6 +765,7 @@ static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
 static AstPointSet *RegGrid( AstRegion * );
 static AstPointSet *RegMesh( AstRegion * );
+static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet * );
 static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 static AstPointSet *GetSubMesh( int *, AstPointSet * );
@@ -793,7 +795,7 @@ static int Overlap( AstRegion *, AstRegion * );
 static int OverlapX( AstRegion *, AstRegion * );
 static int RegDummyFS( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static int ResetCache( AstRegion *, int );
+static void ResetCache( AstRegion * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
@@ -821,6 +823,7 @@ static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
 static int LineContains( AstFrame *, AstLineDef *, int, double * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
+static void RegClearAttrib( AstRegion *, const char *, char ** );
 
 static int GetBounded( AstRegion * );
 static AstRegion *GetDefUnc( AstRegion * );
@@ -954,6 +957,11 @@ static int GetRegionFS( AstRegion * );
 static int TestRegionFS( AstRegion * );
 static void ClearRegionFS( AstRegion * );
 static void SetRegionFS( AstRegion *, int );
+
+static int GetAdaptive( AstRegion * );
+static int TestAdaptive( AstRegion * );
+static void ClearAdaptive( AstRegion * );
+static void SetAdaptive( AstRegion *, int );
 
 
 /* Member functions. */
@@ -1470,6 +1478,81 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    return result;
 }
 
+static AstPointSet *BTransform( AstRegion *this, AstPointSet *in,
+                                int forward, AstPointSet *out ) {
+/*
+*
+*  Name:
+*     astBTransform
+
+*  Purpose:
+*     Use a Region to transform a set of points in the base Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "circle.h"
+*     AstPointSet *astBTransform( AstRegion *this, AstPointSet *in,
+                                  int forward, AstPointSet *out )
+
+*  Class Membership:
+*     Region member function 
+
+*  Description:
+*     This function takes a Region and a set of points within the base
+*     Frame of the Region, and transforms the points by setting axis values 
+*     to AST__BAD for all points which are outside the region. Points inside
+*     the region are copied unchanged from input to output.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     in
+*        Pointer to the PointSet holding the input coordinate data.
+*     forward
+*        A non-zero value indicates that the forward coordinate transformation
+*        should be applied, while a zero value requests the inverse
+*        transformation.
+*     out
+*        Pointer to a PointSet which will hold the transformed (output)
+*        coordinate values. A NULL value may also be given, in which case a
+*        new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet.
+
+*  Notes:
+*     -  This is identical to the astTransform method for a Region except
+*     that the supplied and returned points refer to the base Frame of
+*     the Region, rather than the current Frame.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   int old;                      /* Origial value of "nomap" flag */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Save the current value of the "nomap" flag for this Region,and then
+   set it. Doing this tells the RegMapping function (called by
+   astRegTransform) to assume a unit map connects base and current Frame. */
+   old = this->nomap;
+   this->nomap = 1;
+
+/* Invoke the usual astTransform method. The above setting of the "nomap"
+   flag will cause the astTransform method to treat the base Frame as the
+   current Frame. */
+   result = astTransform( this, in, forward, out );
+
+/* Reset the "nomap" flag. */
+   this->nomap = old;
+
+/* Return a pointer to the output PointSet. */
+   return result;
+}
+
 static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method ) {
 /*
 *  Name:
@@ -1608,6 +1691,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "meshsize" ) ) {
       astClearMeshSize( this );
 
+/* Adaptive */
+/* -------- */
+   } else if ( !strcmp( attrib, "adaptive" ) ) {
+      astClearAdaptive( this );
+
+
 /* We now check for atttributes of superclasses which apply to the Region
    as a whole. We do not want to pass these on to the encapsulated FrameSet. */
 
@@ -1650,13 +1739,24 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Pass unrecognised attributes on to the Region's encapsulated FrameSet for
    further interpretation. Do not pass on FrameSet attributes since we
    pretend to the outside world that the encapsulated FrameSet is actually a
-   Frame. Use the public astClear method rather than the protected
-   astClearAttrib method so that the current Frame in the encapsulated
-   FrameSet will be re-mapped if the attribute changes require it. */
+   Frame. */
    } else if ( strcmp( attrib, "base" ) &&
                strcmp( attrib, "current" ) &&
                strcmp( attrib, "nframe" ) ) {
-      astClear( this->frameset, attrib );
+
+/* If the Region is to adapt to coordinate system chanmges, use the public 
+   astClear method so that the current Frame in the encapsulated FrameSet will 
+   be re-mapped if the attribute changes require it. */
+      if( astGetAdaptive( this ) ) {
+         astClear( this->frameset, attrib );
+      
+/* If the Region is not to adapt to coordinate system chanmges, use the 
+   astRegSetAttrib method which assigns the attribute setting to both
+   current and base Frames in the FrameSet without causing any remapping to
+   be performed. */
+      } else {
+         astRegClearAttrib( this, attrib, NULL );
+      }
    }
 }
 
@@ -1702,7 +1802,7 @@ static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to ){
 /* Check the global error status. */
    if( !astOK ) return NULL;
 
-/* Note the indicesof the base Frames in the FrameSets. */
+/* Note the indices of the base Frames in the FrameSets. */
    to_base = astGetBase( to );
    from_base = astGetBase( from );
 
@@ -2501,6 +2601,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ------ */
    } else if ( !strcmp( attrib, "closed" ) ) {
       ival = astGetClosed( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* Adaptive */
+/* -------- */
+   } else if ( !strcmp( attrib, "adaptive" ) ) {
+      ival = astGetAdaptive( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -3350,14 +3459,23 @@ static AstMapping *RegMapping( AstRegion *this ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* If the "nomap" flag is set in the Region structure, re return a
+   UnitMap. */
+   if( this->nomap ) { 
+      result = (AstMapping *) astUnitMap( astGetNin( this->frameset ), "" );
+
+/* Otherwise use the Mapping from the Region's FrameSet. */
+   } else {
+
 /* Get the Mapping */
-   map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
+      map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
 
 /* Simplify it. */
-   result = astSimplify( map );
+      result = astSimplify( map );
 
 /* Annul the pointer to the unsimplified Mapping */
-   map = astAnnul( map );
+      map = astAnnul( map );
+   }
 
 /* Return the required pointer. */
    return result;
@@ -3650,11 +3768,17 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->SetMeshSize = SetMeshSize;
    vtab->TestMeshSize = TestMeshSize;
 
+   vtab->ClearAdaptive = ClearAdaptive;
+   vtab->GetAdaptive = GetAdaptive;
+   vtab->SetAdaptive = SetAdaptive;
+   vtab->TestAdaptive = TestAdaptive;
+
    vtab->ClearFillFactor = ClearFillFactor;
    vtab->GetFillFactor = GetFillFactor;
    vtab->SetFillFactor = SetFillFactor;
    vtab->TestFillFactor = TestFillFactor;
 
+   vtab->ResetCache = ResetCache;
    vtab->DumpUnc = DumpUnc;
    vtab->GetBounded = GetBounded;
    vtab->TestUnc = TestUnc;
@@ -3672,6 +3796,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegCentre = RegCentre;
    vtab->RegGrid = RegGrid;
    vtab->RegMesh = RegMesh;
+   vtab->RegClearAttrib = RegClearAttrib;
    vtab->RegSetAttrib = RegSetAttrib;
    vtab->GetDefUnc = GetDefUnc;
    vtab->GetUncFrm = GetUncFrm;
@@ -3684,6 +3809,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegDummyFS = RegDummyFS;
    vtab->RegPins = RegPins;
    vtab->RegTransform = RegTransform;
+   vtab->BTransform = BTransform;
    vtab->SetRegFS = SetRegFS;
    vtab->MaskB = MaskB;
    vtab->MaskD = MaskD;
@@ -5972,10 +6098,11 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
    implementation, in order to avoid an infinite loop. */
       ps1 = astRegBaseGrid( box );
 
-/* Some of the points in the above bounding box will fall outside the
-   supplied Region. Use the Region as a Mapping to determine which they
-   are. */
-      ps2 = astTransform( this, ps1, 1, NULL );
+/* Some of the base Frame points in the above bounding box will fall outside 
+   the supplied Region. Use the Region as a Mapping to determine which they
+   are. Since the points are base Frame points, use astBTransform rather
+   than astTransform. */
+      ps2 = astBTransform( this, ps1, 1, NULL );
 
 /* We now create a PointSet which is a copy of "ps2" but with all the bad
    points (i.e. the points in the bounding box grid which are not inside 
@@ -6178,6 +6305,154 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
    return NULL;
 }
 
+static void RegClearAttrib( AstRegion *this, const char *attrib, 
+                            char **base_attrib ) {
+/*
+*  Name:
+*     astRegClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     void astRegClearAttrib( AstRegion *this, const char *attrib, 
+*                             char **base_attrib ) 
+
+*  Class Membership:
+*     Region virtual function 
+
+*  Description:
+*     This function clears the value of a named attribute in both the base 
+*     and current Frame in the FrameSet encapsulated within a Region, without
+*     remapping either Frame. 
+*
+*     No error is reported if the attribute is not recognised by the base 
+*     Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     attrib
+*        Pointer to a null terminated string holding the attribute name.
+*        NOTE, IT SHOULD BE ENTIRELY LOWER CASE. 
+*     base_attrib
+*        Address of a location at which to return a pointer to the null 
+*        terminated string holding the attribute name which was cleared in 
+*        the base Frame of the encapsulated FrameSet. This may differ from
+*        the supplied attribute if the supplied attribute contains an axis 
+*        index and the current->base Mapping in the FrameSet produces an
+*        axis permutation. The returned pointer should be freed using
+*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        which case no pointer is returned.
+
+*/
+
+/* Local Variables: */
+   AstFrame *frm;
+   AstMapping *junkmap;
+   AstMapping *map;
+   AstRegion *unc;
+   char *battrib;
+   char buf1[ 100 ];
+   int *outs;          
+   int axis;
+   int baxis;
+   int len;
+   int nc;
+   int rep;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear the attribute in the current Frame in the encapsulated FrameSet.
+   Use the protected astClearAttrib method which does not cause the Frame
+   to be remapped within the FrameSet. */
+   frm = astGetFrame( this->frameset, AST__CURRENT );
+   astClearAttrib( frm, attrib );
+   frm = astAnnul( frm );
+   
+/* Indicate that we should use the supplied attribute name  with the base Frame. */
+   battrib = NULL;
+
+/* If the attribute name contains an axis number, we need to create a new
+   attribute name which refers to the corresponding base Frame axis
+   (since the base<->current Mapping may permute the axes). First parse the 
+   supplied attribute name to locate any axis index. */
+   len = strlen( attrib );
+   if( nc = 0, ( 2 == astSscanf( attrib, "%[^(](%d) %n", buf1, &axis, 
+                                 &nc ) ) && ( nc >= len ) ) {
+
+/* If found, convert the axis index from one-based to zero-based. */
+      axis--;
+
+/* See if the specified current Frame axis is connected to one and only
+   one base Frame axis. If so, get the index of the base Frame axis. */
+      map = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+      outs = astMapSplit( map, 1, &axis, &junkmap );
+      if( junkmap && astGetNout( junkmap ) == 1 ) {
+         baxis = outs[ 0 ]; 
+
+/* If the base Frame axis index is different to the current Frame axis
+   index, create a new attribute name string using the base Frame axis index. */
+         if( baxis != axis ) {
+            battrib = astMalloc( strlen( attrib ) + 10 );
+            if( battrib ) sprintf( battrib, "%s(%d)", buf1, baxis + 1 );
+         }
+
+/* If there is no one base Frame axis which corresponds to the supplied
+   current Frame axis, report an error. */
+      } else if( astOK ) {
+         astError( AST__INTER, "astRegClearAttrib(%s): Unable to clear "
+                   "attribute \"%s\" in the base Frame of the %s",
+                   astGetClass( this ), attrib, astGetClass( this ) );
+         astError( AST__INTER, "There is no base Frame axis corresponding "
+                   "to current Frame axis %d\n", axis + 1 );
+      }
+
+/* Free resources */
+      outs = astFree( outs );
+      if( junkmap ) junkmap = astAnnul( junkmap );
+      map = astAnnul( map );
+   }
+
+/* Clear the appropriate attribute name in the base Frame. This time ensure 
+   that any error caused by the attribute name is annulled. Also clear it in
+   any uncertainty Region (the current Frame of the uncertainty Region is 
+   assumed to be equivalent to the base Frame of the parent Region). */
+   frm = astGetFrame( this->frameset, AST__BASE );
+   if( frm ) {
+      rep = astReporting( 0 );
+      astClearAttrib( frm, battrib ? battrib : attrib );
+      if( astTestUnc( this ) ) {
+         unc = astGetUncFrm( this, AST__BASE );
+         astRegClearAttrib( unc, battrib ? battrib : attrib, NULL );
+         unc = astAnnul( unc );
+      }
+      if( astStatus == AST__BADAT ) astClearStatus;
+      astReporting( rep );
+   }
+   frm = astAnnul( frm );
+
+/* If required return the modified base Frame attribute name. Otherwise, 
+   free it. */
+   if( base_attrib ) {
+      if( battrib ) {
+         *base_attrib = battrib;
+      } else {
+         *base_attrib = astStore( NULL, attrib, strlen( attrib ) + 1 );
+      }
+   } else {
+      battrib = astFree( battrib );
+   }      
+
+/* Since the base Frame has been changed, any cached information calculated
+   on the basis of the base Frame properties may no longer be up to date. */
+   astResetCache( this );   
+}
 
 static AstPointSet *RegGrid( AstRegion *this ){
 /*
@@ -6736,6 +7011,7 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
    this->negated = that->negated;
    this->closed = that->closed;
    this->regionfs = that->regionfs;
+   this->adaptive = that->adaptive;
 
    if( astTestMeshSize( that ) ) astSetMeshSize( this, astGetMeshSize( that ) );
    if( astTestFillFactor( that ) ) astSetFillFactor( this, astGetFillFactor( that ) );
@@ -6900,6 +7176,9 @@ static void RegSetAttrib( AstRegion *this, const char *setting,
       bsetting = astFree( bsetting );
    }      
 
+/* Since the base Frame has been changed, any cached information calculated
+   on the basis of the base Frame properties may no longer be up to date. */
+   astResetCache( this );   
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,
@@ -6963,44 +7242,38 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 
 }
 
-static int ResetCache( AstRegion *this, int flag ){
+static void ResetCache( AstRegion *this ){
 /*
+*+
 *  Name:
-*     ResetCache
+*     astResetCache
 
 *  Purpose:
 *     Clear cached information within the supplied Region.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "region.h"
-*     int ResetCache( AstRegion *this, int flag )
+*     void astResetCache( AstRegion *this )
 
 *  Class Membership:
-*     Region member function 
+*     Region virtual function 
 
 *  Description:
-*     This function clears selected items of cached information from the
-*     supplied Region structure.
+*     This function clears cached information from the supplied Region 
+*     structure.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
-*     flag
-*        A bit mask indicating what is to be cleared:
-*          bit 0 = basemesh
-*          bit 1 = basegrid
-
-*  Returned Value:
-*     Zero is always returned.
-
+*-
 */
-   if( !astOK ) return 0;
-   if( ( flag & 1 ) && this->basemesh ) this->basemesh = astAnnul( this->basemesh );
-   if( ( flag & 2 ) && this->basegrid ) this->basegrid = astAnnul( this->basegrid );
-   return 0;
+   if( this ) {
+      if( this->basemesh ) this->basemesh = astAnnul( this->basemesh );
+      if( this->basegrid ) this->basegrid = astAnnul( this->basegrid );
+   }
 }
 
 
@@ -7283,6 +7556,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
           && ( nc >= len ) ) {
       astSetMeshSize( this, ival );
 
+/* Adaptive */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "adaptive= %d %n", &ival, &nc ) )
+          && ( nc >= len ) ) {
+      astSetAdaptive( this, ival );
+
 /* Now do attributes inherited from parent classes. We do these here to
    avoid the settings being passed on to the encapsulated FrameSet below. */
 
@@ -7339,13 +7619,24 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Pass unrecognised attributes on to the Region's encapsulated FrameSet for
    further interpretation. Do not pass on FrameSet attributes since we
    pretend to the outside world that the encapsulated FrameSet is actually a
-   Frame. Use the public astSet method rather than the protected
-   astSetAttrib method so that the current Frame int he encapsulated
-   FrameSet will be re-mapped if the attribute changes require it. */
+   Frame. */
    } else if ( !MATCH( "base" ) &&
                !MATCH( "current" ) &&
                !MATCH( "nframe" ) ) {
-      astSet( this->frameset, setting );
+
+/* If the Region is to adapt to coordinate system chanmges, use the public 
+   astSet method so that the current Frame in the encapsulated FrameSet will 
+   be re-mapped if the attribute changes require it. */
+      if( astGetAdaptive( this ) ) {
+         astSet( this->frameset, setting );
+
+/* If the Region is not to adapt to coordinate system chanmges, use the 
+   astRegSetAttrib method which assigns the attribute setting to both
+   current and base Frames in the FrameSet without causing any remapping to
+   be performed. */
+      } else {
+         astRegSetAttrib( this, setting, NULL );
+      }
    }
 
 /* Undefine macros local to this function. */
@@ -8255,6 +8546,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "meshsize" ) ) {
       result = astTestMeshSize( this );
 
+/* Adaptive */
+/* -------- */
+   } else if ( !strcmp( attrib, "adaptive" ) ) {
+      result = astTestAdaptive( this );
+
 /* Now do attributes inherited from parent classes. This is so that the
    attribute test will not be passed on to the encpasulated FrameSet below. */
 
@@ -8908,6 +9204,79 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 /*
 *att++
 *  Name:
+*     Adaptive
+
+*  Purpose:
+*     Should the area adapt to changes in the coordinate system?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     The coordinate system represented by a Region may be changed by
+*     assigning new values to attributes such as System, Unit, etc.
+*     For instance, a Region representing an area on the sky in ICRS 
+*     coordinates may have its System attribute changed so that it
+*     represents (say) Galactic coordinates instead of ICRS. This
+*     attribute controls what happens when the coordinate system
+*     represented by a Region is changed in this way.
+*
+*     If Adaptive is non-zero (the default), then area represented by the
+*     Region adapts to the new coordinate system. That is, the numerical 
+*     values which define the area represented by the Region are changed 
+*     by mapping them from the old coordinate system into the new coordinate 
+*     system. Thus the Region continues to represent the same physical
+*     area.
+*
+*     If Adaptive is zero, then area represented by the Region does not adapt
+*     to the new coordinate system. That is, the numerical values which
+*     define the area represented by the Region are left unchanged. Thus 
+*     the physical area represented by the Region will usually change.
+*
+*     As an example, consider a Region describe a range of wavelength from
+*     2000 Angstrom to 4000 Angstrom. If the Unit attribute for the Region 
+*     is changed from Angstrom to "nm" (nanometre), what happens depends
+*     on the setting of Adaptive. If Adaptive is non-zero, the Mapping
+*     from the old to the new coordinate system is found. In this case it
+*     is a simple scaling by a factor of 0.1 (since 1 Angstrom is 0.1 nm).
+*     This Mapping is then used to modify the numerical values within the
+*     Region, changing 2000 to 200 and 4000 to 400. Thus the modified
+*     region represents 200 nm to 400 nm, the same physical space as 
+*     the original 2000 Angstrom to 4000 Angstrom. However, if Adaptive 
+*     had been zero, then the numerical values would not have been changed,
+*     resulting in the final Region representing 2000 nm to 4000 nm.
+*
+*     Setting Adaptive to zero can be necessary if you want correct
+*     inaccurate attribute settings in an existing Region. For instance,
+*     when creating a Region you may not know what Epoch value to use, so
+*     you would leave Epoch unset resulting in some default value being used.
+*     If at some later point in the application, the correct Epoch value
+*     is determined, you could assign the correct value to the Epoch
+*     attribute. However, you would first need to set Adaptive temporarily 
+*     to zero, because otherwise the area represented by the Region would
+*     be Mapped from the spurious default Epoch to the new correct Epoch,
+*     which is not what is required.
+
+*  Applicability:
+*     Region
+*        All Regions have this attribute.
+*att--
+*/
+
+/* This is a boolean value (0 or 1) with a value of -INT_MAX when
+   undefined but yielding a default of 1. */
+astMAKE_CLEAR(Region,Adaptive,adaptive,-INT_MAX)
+astMAKE_GET(Region,Adaptive,int,1,( ( this->adaptive == -INT_MAX ) ?
+                                   1 : this->adaptive ))
+astMAKE_SET(Region,Adaptive,int,adaptive,( value != 0 ))
+astMAKE_TEST(Region,Adaptive,( this->adaptive != -INT_MAX ))
+
+/*
+*att++
+*  Name:
 *     Negated
 
 *  Purpose:
@@ -8943,10 +9312,10 @@ f     AST_NEGATE routine.
 
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when
    undefined but yielding a default of zero. */
-astMAKE_CLEAR(Region,Negated,negated,(ResetCache(this,2),-INT_MAX))
+astMAKE_CLEAR(Region,Negated,negated,(astResetCache(this),-INT_MAX))
 astMAKE_GET(Region,Negated,int,0,( ( this->negated == -INT_MAX ) ?
                                    0 : this->negated ))
-astMAKE_SET(Region,Negated,int,negated,(ResetCache(this,2),( value != 0 )))
+astMAKE_SET(Region,Negated,int,negated,(astResetCache(this),( value != 0 )))
 astMAKE_TEST(Region,Negated,( this->negated != -INT_MAX ))
 
 /*
@@ -9120,8 +9489,8 @@ astMAKE_SET(Region,FillFactor,double,fillfactor,((value<0.0||value>1.0)?(
 /* If the value of MeshSize is set or cleared, annul the PointSet used to
    cache a mesh of base Frame boundary points. This will force a new
    PointSet to be created next time it is needed. See function RegMesh. */
-astMAKE_CLEAR(Region,MeshSize,meshsize,(ResetCache(this,3),-INT_MAX))
-astMAKE_SET(Region,MeshSize,int,meshsize,(ResetCache(this,3),( value > 5 ? value : 5 )))
+astMAKE_CLEAR(Region,MeshSize,meshsize,(astResetCache(this),-INT_MAX))
+astMAKE_SET(Region,MeshSize,int,meshsize,(astResetCache(this),( value > 5 ? value : 5 )))
 astMAKE_TEST(Region,MeshSize,( this->meshsize != -INT_MAX ))
 astMAKE_GET(Region,MeshSize,int,0,( ( this->meshsize == -INT_MAX)?((astGetNaxes(this)==1)?2:((astGetNaxes(this)==2)?200:2000)): this->meshsize ))
 
@@ -9166,10 +9535,10 @@ astMAKE_GET(Region,MeshSize,int,0,( ( this->meshsize == -INT_MAX)?((astGetNaxes(
 */
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when
    undefined but yielding a default of 1. */
-astMAKE_CLEAR(Region,Closed,closed,(ResetCache(this,2),-INT_MAX))
+astMAKE_CLEAR(Region,Closed,closed,(astResetCache(this),-INT_MAX))
 astMAKE_GET(Region,Closed,int,1,( ( this->closed == -INT_MAX ) ?
                                    1 : this->closed ))
-astMAKE_SET(Region,Closed,int,closed,(ResetCache(this,2),( value != 0 )))
+astMAKE_SET(Region,Closed,int,closed,(astResetCache(this),( value != 0 )))
 astMAKE_TEST(Region,Closed,( this->closed != -INT_MAX ))
 
 /* Access to attributes of the encapsulated Frame. */
@@ -9454,6 +9823,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteInt( channel, "Closed", set, 0, ival,
                 ival ? "Boundary is inside" : "Boundary is outside" );
 
+/* Adaptive */
+/* -------- */
+   set = TestAdaptive( this );
+   ival = set ? GetAdaptive( this ) : astGetAdaptive( this );
+   astWriteInt( channel, "Adapt", (ival != 0), 0, ival,
+                ival ? "Region adapts to coord sys changes" : "Region does not adapt to coord sys changes" );
+
 /* FrameSet */
 /* -------- */
 
@@ -9665,6 +10041,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
       new->points = NULL;
       new->unc = NULL;
       new->meshsize = -INT_MAX;
+      new->adaptive = -INT_MAX;
       new->basemesh = NULL;
       new->basegrid = NULL;
       new->negated = -INT_MAX;
@@ -9672,6 +10049,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
       new->regionfs = -INT_MAX;
       new->fillfactor = AST__BAD;
       new->defunc = 0;
+      new->nomap = 0;
 
 /* If the supplied Frame is a Region, gets its encapsulated Frame. If a 
    FrameSet was supplied, use its current Frame, otherwise use the
@@ -9857,6 +10235,11 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
       new->closed = astReadInt( channel, "closed", -INT_MAX );
       if ( TestClosed( new ) ) SetClosed( new, new->closed );
 
+/* Adaptive */
+/* -------- */
+      new->adaptive = astReadInt( channel, "adapt", -INT_MAX );
+      if ( TestAdaptive( new ) ) SetAdaptive( new, new->adaptive );
+
 /* Points */
 /* ------ */
       new->points = astReadObject( channel, "points", NULL );
@@ -9888,6 +10271,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* First see if the dump contains a single Frame. If so, create a
    FrameSet from it and a copy of itself, using a UnitMap to connect the
    two. */
+      new->nomap = 0;
       new->frameset = NULL;
       f1 = astReadObject( channel, "frm", NULL );
       if( f1 ) {
@@ -9962,6 +10346,10 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+void astRegClearAttrib_( AstRegion *this, const char *attrib, char **base_attrib ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,RegClearAttrib))( this, attrib, base_attrib );
+}
 void astRegSetAttrib_( AstRegion *this, const char *setting, char **base_setting ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Region,RegSetAttrib))( this, setting, base_setting );
@@ -9989,6 +10377,11 @@ int astOverlapX_( AstRegion *that, AstRegion *this ){
 AstFrame *astRegFrame_( AstRegion *this ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegFrame))( this );
+}
+AstPointSet *astBTransform_( AstRegion *this, AstPointSet *in,
+                             int forward, AstPointSet *out ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,BTransform))( this, in, forward, out );
 }
 AstPointSet *astRegTransform_( AstRegion *this, AstPointSet *in,
                                int forward, AstPointSet *out,
@@ -10029,6 +10422,10 @@ void astRegBaseBox_( AstRegion *this, double *lbnd, double *ubnd ){
 void astRegBaseBox2_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,RegBaseBox2))( this, lbnd, ubnd );
+}
+void astResetCache_( AstRegion *this ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,ResetCache))( this );
 }
 void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;

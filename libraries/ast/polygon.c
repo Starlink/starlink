@@ -121,6 +121,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
+static void (* parent_resetcache)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -141,6 +142,7 @@ static void Cache( AstPolygon * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static void ResetCache( AstRegion *this );
 
 /* Member functions. */
 /* ================= */
@@ -185,50 +187,58 @@ static void Cache( AstPolygon *this ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Do Nothing if the cached information is up to date. */
+   if( this->stale ) {
+
 /* Get a pointer to the base Frame. */
-   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
-
+      frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+   
 /* Get the number of vertices. */
-   nv = astGetNpoint( ((AstRegion *) this)->points );
-
+      nv = astGetNpoint( ((AstRegion *) this)->points );
+   
 /* Get pointers to the coordinate data in the parent Region structure. */
-   ptr = astGetPoints( ((AstRegion *) this)->points );
-
+      ptr = astGetPoints( ((AstRegion *) this)->points );
+   
 /* Free any existing edge information in the Polygon structure. */
-   if( this->edges ) {
-      for( i = 0; i < nv; i++ ) {
-         this->edges[ i ] = astFree( this->edges[ i ] );
-      }
-
+      if( this->edges ) {
+         for( i = 0; i < nv; i++ ) {
+            this->edges[ i ] = astFree( this->edges[ i ] );
+         }
+   
 /* Allocate memory to store new edge information if necessary. */
-   } else {
-      this->edges = astMalloc( sizeof( AstLineDef *)*(size_t) nv );
-   }
-
+      } else {
+         this->edges = astMalloc( sizeof( AstLineDef *)*(size_t) nv );
+      }
+   
 /* Check pointers can be used safely. */
-   if( this->edges ) {
-
+      if( this->edges ) {
+   
 /* Create and store a description of each edge. */
-      start[ 0 ] = ptr[ 0 ][ nv - 1];
-      start[ 1 ] = ptr[ 1 ][ nv - 1];
-      for( i = 0; i < nv; i++ ) {
-         end[ 0 ] = ptr[ 0 ][ i ];
-         end[ 1 ] = ptr[ 1 ][ i ];
-         this->edges[ i ] = astLineDef( frm, start, end );
-         start[ 0 ] = end[ 0 ];
-         start[ 1 ] = end[ 1 ];
-      }     
-
+         start[ 0 ] = ptr[ 0 ][ nv - 1];
+         start[ 1 ] = ptr[ 1 ][ nv - 1];
+         for( i = 0; i < nv; i++ ) {
+            end[ 0 ] = ptr[ 0 ][ i ];
+            end[ 1 ] = ptr[ 1 ][ i ];
+            this->edges[ i ] = astLineDef( frm, start, end );
+            start[ 0 ] = end[ 0 ];
+            start[ 1 ] = end[ 1 ];
+         }     
+   
 /* Find a point which is just inside the Polygon. This is 1.0E-6 of the
    length of the first edge away from the mid point of the first edge 
    (on the inside). We assume that no other edge will be closer than 
    this to the mid point of the first edge. */
-      d = this->edges[0]->length;
-      astLineOffset( frm,this->edges[0], 0.5*d, 1.0E-6*d, this->in );
-   }
-
+         d = this->edges[0]->length;
+         astLineOffset( frm,this->edges[0], 0.5*d, 1.0E-6*d, this->in );
+      }
+   
 /* Free resources */
-   frm = astAnnul( frm );
+      frm = astAnnul( frm );
+
+/* Indicate cached information is up to date. */
+      this->stale = 0;
+
+   }
 }
 
 void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name ) {
@@ -302,6 +312,9 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name ) {
 
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
+
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
 
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
@@ -911,6 +924,40 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void ResetCache( AstRegion *this ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void ResetCache( AstRegion *this )
+
+*  Class Membership:
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function clears cached information from the supplied Region 
+*     structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+   if( this ) {
+      ( (AstPolygon *) this )->stale = 1;
+      ( (AstPolygon *) this )->lbnd[ 0 ] = AST__BAD;
+      (*parent_resetcache)( this );
+   }
+}
+
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 /*
 *  Name:
@@ -951,8 +998,8 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    structure. */
    (* parent_setregfs)( this_region, frm );
 
-/* Re-calculate cached information. */
-   Cache( (AstPolygon *) this_region );
+/* Indicate cached information eeds re-calculating. */
+   astResetCache( this_region );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {
@@ -1261,6 +1308,9 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    the Polygon boundary. Initialially it is unknown. */
          } else {
 
+/* Ensure cached information is available.*/
+            Cache( this );
+
 /* Create a definition of the line from a point which is inside the
    polygon to the supplied point. This is a structure which includes
    cached intermediate information which can be used to speed up
@@ -1397,8 +1447,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    the output Polygon. */
    out->edges = NULL;
 
-/* Set up the intermediate data in the copy */
-   Cache( out );
+/* Indicate cached information needs nre-calculating. */
+   astResetCache( (AstPolygon *) out );
 }
 
 
@@ -1949,7 +1999,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->lbnd[ 1 ] = AST__BAD;
          new->ubnd[ 1 ] = AST__BAD;
          new->edges = NULL;
-         Cache( new );
+         new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Polygon. */
          if ( !astOK ) new = astDelete( new );
@@ -2094,7 +2144,7 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->lbnd[ 1 ] = AST__BAD;
       new->ubnd[ 1 ] = AST__BAD;
       new->edges = NULL;
-      Cache( new );
+      new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Polygon. */
       if ( !astOK ) new = astDelete( new );

@@ -82,6 +82,7 @@ typedef struct AstEllipse {
    double ubx;                   /* Upper y limit of mesh bounding box */
    double lby;                   /* Lower x limit of mesh bounding box */
    double uby;                   /* Upper y limit of mesh bounding box */
+   int stale;                    /* Is cached information stale? */
 
 } AstEllipse;
 

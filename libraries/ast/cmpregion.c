@@ -125,6 +125,7 @@ static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_clearmeshsize)( AstRegion * );
 static double (*parent_getfillfactor)( AstRegion * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
+static void (*parent_regclearattrib)( AstRegion *, const char *, char ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -152,6 +153,7 @@ static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstCmpRegion *, AstRegion **, AstRegion **, int *, int *, int *);
 static void RegBaseBox( AstRegion *, double *, double * );
 static void RegBaseBox2( AstRegion *, double *, double * );
+static void RegClearAttrib( AstRegion *, const char *, char ** );
 static void RegSetAttrib( AstRegion *, const char *, char ** );
 static void SetRegFS( AstRegion *, AstFrame * );
 static void SetClosed( AstRegion *, int );
@@ -940,6 +942,9 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
 
    parent_regsetattrib = region->RegSetAttrib;
    region->RegSetAttrib = RegSetAttrib;
+
+   parent_regclearattrib = region->RegClearAttrib;
+   region->RegClearAttrib = RegClearAttrib;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1889,6 +1894,89 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
       *base_setting = bset;
    } else {
       bset = astFree( bset );
+   }
+}
+
+static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
+                            char **base_attrib ) {
+/*
+*  Name:
+*     RegClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     void RegClearAttrib( AstRegion *this, const char *attrib, 
+*                          char **base_attrib ) 
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astRegClearAttrib method 
+*     inherited from the Region class).
+
+*  Description:
+*     This function clears the value of a named attribute in both the base 
+*     and current Frame in the FrameSet encapsulated within a Region, without
+*     remapping either Frame. 
+*
+*     No error is reported if the attribute is not recognised by the base 
+*     Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     attrib
+*        Pointer to a null terminated string holding the attribute name.
+*        NOTE, IT SHOULD BE ENTIRELY LOWER CASE. 
+*     base_attrib
+*        Address of a location at which to return a pointer to the null 
+*        terminated string holding the attribute name which was cleared in 
+*        the base Frame of the encapsulated FrameSet. This may differ from
+*        the supplied attribute if the supplied attribute contains an axis 
+*        index and the current->base Mapping in the FrameSet produces an
+*        axis permutation. The returned pointer should be freed using
+*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        which case no pointer is returned.
+
+*/
+
+/* Local Variables: */
+   AstCmpRegion *this; 
+   char *batt;
+   int rep;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the CmpRegion structure. */
+   this = (AstCmpRegion *) this_region;
+
+/* Use the RegClearAttrib method inherited from the parent class to clear the 
+   attribute in the current and base Frames in the FrameSet encapsulated by 
+   the parent Region structure. */
+   (*parent_regclearattrib)( this_region, attrib, &batt );
+
+/* Now clear the base Frame attribute to the component Regions (the current 
+   Frame within the component Regions is equivalent to the base Frame in the
+   parent Region structure). Annul any "attribute unknown" error that results 
+   from attempting to do this. */
+   if( astOK ) {
+      rep = astReporting( 0 );
+      astRegClearAttrib( this->region1, batt, NULL );
+      astRegClearAttrib( this->region2, batt, NULL );
+      if( astStatus == AST__BADAT ) astClearStatus;
+      astReporting( rep );
+   }
+
+/* If required, return the base Frame attribute name, otherwise free it. */
+   if( base_attrib ) {
+      *base_attrib = batt;
+   } else {
+      batt = astFree( batt );
    }
 }
 

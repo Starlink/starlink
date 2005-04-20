@@ -111,6 +111,7 @@ static void (* parent_clearmeshsize)( AstRegion * );
 static double (*parent_getfillfactor)( AstRegion * );
 static int (* parent_overlap)( AstRegion *, AstRegion * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
+static void (*parent_regclearattrib)( AstRegion *, const char *, char ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -140,6 +141,7 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int * );
 static void RegBaseBox( AstRegion *, double *, double * );
+static void RegClearAttrib( AstRegion *, const char *, char ** );
 static void RegSetAttrib( AstRegion *, const char *, char ** );
 static void SetClosed( AstRegion *, int );
 static void SetMeshSize( AstRegion *, int );
@@ -857,6 +859,9 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
 
    parent_regsetattrib = region->RegSetAttrib;
    region->RegSetAttrib = RegSetAttrib;
+
+   parent_regclearattrib = region->RegClearAttrib;
+   region->RegClearAttrib = RegClearAttrib;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1852,6 +1857,129 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Return the result. */
    return result;
+}
+
+static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
+                            char **base_attrib ) {
+/*
+*  Name:
+*     RegClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     void RegClearAttrib( AstRegion *this, const char *attrib, 
+*                          char **base_attrib ) 
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astRegClearAttrib method 
+*     inherited from the Region class).
+
+*  Description:
+*     This function clears the value of a named attribute in both the base 
+*     and current Frame in the FrameSet encapsulated within a Region, without
+*     remapping either Frame. 
+*
+*     No error is reported if the attribute is not recognised by the base 
+*     Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     attrib
+*        Pointer to a null terminated string holding the attribute name.
+*        NOTE, IT SHOULD BE ENTIRELY LOWER CASE. 
+*     base_attrib
+*        Address of a location at which to return a pointer to the null 
+*        terminated string holding the attribute name which was cleared in 
+*        the base Frame of the encapsulated FrameSet. This may differ from
+*        the supplied attribute if the supplied attribute contains an axis 
+*        index and the current->base Mapping in the FrameSet produces an
+*        axis permutation. The returned pointer should be freed using
+*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        which case no pointer is returned.
+
+*/
+
+/* Local Variables: */
+   AstPrism *this; 
+   AstRegion *creg;
+   char *batt;
+   char buf1[ 100 ];
+   char buf2[ 255 ];
+   int axis;
+   int len;
+   int nax1;
+   int nc;
+   int rep;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the Prism structure. */
+   this = (AstPrism *) this_region;
+
+/* Use the RegClearAttrib method inherited from the parent class to clear the 
+   attribute in the current and base Frames in the FrameSet encapsulated by 
+   the parent Region structure. */
+   (*parent_regclearattrib)( this_region, attrib, &batt );
+
+/* We now propagate the setting down to the component Regions. The current 
+   Frames in the component Regions together form a CmpFrame which is 
+   equivalent to the base Frame in the parent FrameSet. Switch off error 
+   reporting whilst we apply the setting to the component Regions. */
+   rep = astReporting( 0 );
+
+/* If the setting which was applied to the base Frame of the parent FrameSet
+   is qualified by an axis index, modify the axis index to refer to component 
+   Region which defines the axis. First parse the base Frame attribute setting 
+   to locate any axis index. */
+   len = strlen( batt );
+   if( nc = 0, ( 2 == astSscanf( batt, "%[^(](%d) %n", buf1, &axis, 
+                                 &nc ) ) && ( nc >= len ) ) {
+
+/* If found, convert the axis index from one-based to zero-based. */
+      axis--;
+
+/* Get a pointer to the component Region containing the specified axis, and
+   create a new setting with the same attribute name but with the axis index
+   appropriate to the component Region which defines the axis. */
+      nax1 = astGetNaxes( this->region1 );
+      if( axis < nax1 ) {
+         creg = this->region1;
+      } else {
+         creg = this->region2;
+         axis -= nax1;
+      }
+      sprintf( buf2, "%s(%d)", buf1, axis + 1 );
+
+/* Apply the setting to the relevant component Region. */
+      astRegClearAttrib( creg, buf2, NULL );
+
+/* If the setting is not qualified by an axis index, apply it to both
+   component Regions. */
+   } else {
+      astRegClearAttrib( this->region1, batt, NULL );
+      astRegClearAttrib( this->region2, batt, NULL );
+   }
+
+/* Annul the error if the attribute was not recognised by the component
+   Regions. Then switch error reporting back on. */
+   if( astStatus == AST__BADAT ) astClearStatus;
+   astReporting( rep );
+
+/* If required, return the base Frame setting string. Otherwise free it. */
+   if( base_attrib ) {
+      *base_attrib = batt;
+   } else {
+      batt = astFree( batt );
+   }
+
 }
 
 static void RegSetAttrib( AstRegion *this_region, const char *setting, 

@@ -75,6 +75,7 @@ typedef struct AstCircle {
 /* Attributes specific to objects in this class. */
    double *centre;               /* Circle centre coords */
    double radius;                /* Circle radius */
+   int stale;                    /* Is Cached information stale? */
 
 } AstCircle;
 

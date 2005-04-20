@@ -95,6 +95,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
+static void (* parent_resetcache)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -116,6 +117,7 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static void ResetCache( AstRegion *this );
 
 /* Member functions. */
 /* ================= */
@@ -307,6 +309,9 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name ) {
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
+
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
@@ -363,44 +368,50 @@ static void Cache( AstCircle *this ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Do Nothing if the cached information is up to date. */
+   if( this->stale ) {
+
 /* Get a pointer to the base Frame and the number of base axes. */
-   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
-   nc = astGetNaxes( frm );
+      frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+      nc = astGetNaxes( frm );
 
 /* Allocate memory to store two positions in the base Frame. */
-   centre = (double *) astMalloc( sizeof( double )*(size_t) nc );   
-   circum = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+      centre = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+      circum = (double *) astMalloc( sizeof( double )*(size_t) nc );   
 
 /* Get pointers to the coordinate data in the parent Region structure. */
-   pset = ( (AstRegion *) this)->points;
-   ptr = astGetPoints( pset );
+      pset = ( (AstRegion *) this)->points;
+      ptr = astGetPoints( pset );
 
 /* Check pointers can be used safely. */
-   if( astOK ) {
+      if( ptr ) {
 
 /* Copy the two points in to the allocated memory. */
-      for( i = 0; i < nc; i++ ) {
-         centre[ i ] = ptr[ i ][ 0 ];
-         circum[ i ] = ptr[ i ][ 1 ];
-      }
+         for( i = 0; i < nc; i++ ) {
+            centre[ i ] = ptr[ i ][ 0 ];
+            circum[ i ] = ptr[ i ][ 1 ];
+         }
 
 /* Store the geodesic distance between these two points as the radius. */
-      this->radius = astDistance( frm, centre, circum );      
+         this->radius = astDistance( frm, centre, circum );      
 
 /* Store the pointer to the centre coords array in the Circle structure. */
-      if( astOK ) {
-        astFree( this->centre );
-        this->centre = centre;
-        centre = NULL;
+         if( astOK ) {
+           astFree( this->centre );
+           this->centre = centre;
+           centre = NULL;
+         }
       }
 
-   }
-
 /* Free resources */
-   frm = astAnnul( frm );
-   if( centre ) centre = astFree( centre );
-   circum = astFree( circum );
+      frm = astAnnul( frm );
+      if( centre ) centre = astFree( centre );
+      circum = astFree( circum );
 
+/* Indicate cached information is up to date. */
+      this->stale = 0;
+
+   }
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
@@ -459,6 +470,9 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 /* Get the number of base Frame axes. */
    nc = astGetNin( this_region->frameset );
+
+/* Ensure cached information is available. */
+   Cache( this );
 
 /* Do each base Frame axis. */
    for( i = 0; i < nc; i++ ) {
@@ -557,6 +571,9 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 
 /* Get the requested number of points to put on the mesh. */
       np = astGetMeshSize( this );
+
+/* Ensure cached information is available. */
+      Cache( (AstCircle *) this );
 
 /* First deal with 1-D "circles" (where we ignore MeshSize). */
       if( naxes == 1 ) {
@@ -733,6 +750,9 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Get the number of axis values per point in the base and current Frames. */
    ncb = astGetNin( this_region->frameset );
    ncc = astGetNout( this_region->frameset );
+
+/* Ensure cached information is available. */
+   Cache( this );
 
 /* If the centre coords are to be returned, return either a copy of the 
    base Frame centre coords, or transform the base Frame centre coords
@@ -937,6 +957,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
       l2 = 0.0;
    }
 
+/* Ensure cached information is available. */
+   Cache( this );
+
 /* The required border width is half of the total diagonal of the two bounding 
    boxes. */   
    if( astOK ) {
@@ -1035,6 +1058,39 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void ResetCache( AstRegion *this ){
+/*
+*  Name:
+*     ResetCache
+
+*  Purpose:
+*     Clear cached information within the supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "circle.h"
+*     void ResetCache( AstRegion *this )
+
+*  Class Membership:
+*     Region member function (overrides the astResetCache method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function clears cached information from the supplied Region 
+*     structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+   if( this ) {
+      ( (AstCircle *) this )->stale = 1;
+      (*parent_resetcache)( this );
+   }
+}
+
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 /*
 *  Name:
@@ -1076,7 +1132,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    (* parent_setregfs)( this_region, frm );
 
 /* Re-calculate cached information. */
-   Cache( (AstCircle *) this_region );
+   astResetCache( this_region );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {
@@ -1365,6 +1421,9 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* Perform coordinate arithmetic. */
 /* ------------------------------ */
    if ( astOK ) {
+
+/* Ensure cached information is available. */
+      Cache( this );
 
 /* Loop round each point */
       for ( point = 0; point < npoint; point++ ) {
@@ -2004,6 +2063,7 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
 
 /* Initialise the Circle data. */
 /* ------------------------ */
+         new->stale = 1;
          new->centre = NULL;
          Cache( new );
 
@@ -2145,6 +2205,7 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 
 /* Cache intermediate results in the Circle structure */
       new->centre = NULL;
+      new->stale = 1;
       Cache( new );
 
 /* If an error occurred, clean up by deleting the new Circle. */

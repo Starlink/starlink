@@ -786,7 +786,7 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
             result = 0;
          }
 
-/* For gepcentric, barycentric and heliocentric rest frames, the epochs must 
+/* For geocentric, barycentric and heliocentric rest frames, the epochs must 
    be the same */
       } else if( sor == AST__GESOR || sor == AST__BYSOR || sor == AST__HLSOR ){
          if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
