@@ -78,6 +78,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     4-OCT-2004 (DSB):
 *        Modify astMapList to return flag indicating presence of inverted
 *        CmpMaps in supplied Mapping.
+*     20-APR-2005 (DSB):
+*        Modify MapMerge so that it will attempt to merge the first
+*        and second CmpMaps in a list of series CmpMaps.
 *class--
 */
 
@@ -948,15 +951,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    neighbouring CmpMap with which it might merge. We use the previous
    Mapping, if suitable, since this will normally also have been fully
    simplified on its own. Check if a previous Mapping exists. */
-         if ( astOK && ( where > 0 ) ) {
+         if ( astOK && *nmap > 1 ) {
 
-/* Obtain the indices of the two potential Mappings to be merged. */
-            imap1 = where - 1;
-            imap2 = where;
+/* Obtain the indices of the two potential Mappings to be merged. imap1
+   is the first Mapping, imap2 is the second. imapc is the CmpMap, imapn is
+   the neighbouring Mapping. */
+            if( where == 0 ) {
+               imap1 = 0;
+               imap2 = 1;
+            } else {
+               imap1 = where - 1;
+               imap2 = where;
+            }
 
-/* Obtain the Class string of the first (previous) Mapping and
-   determine if it is a CmpMap. */
-            class = astGetClass( ( *map_list )[ imap1 ] );
+/* Obtain the Class string of the neighbouring Mapping and determine if it 
+   is a CmpMap. */
+            class = astGetClass( ( *map_list )[ (where>0)?where-1:1 ] );
             if ( astOK && !strcmp( class, "CmpMap" ) ) {
 
 /* If suitable, obtain pointers to the two CmpMaps. */
