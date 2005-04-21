@@ -1,40 +1,34 @@
-/*
-*  Important Note:
-*     This file is a copy of the "slalib.h" include file provided by
-*     the C version of SLALIB. The FORTRAN version of this library is
-*     described in Starlink User Note 67,
-*     http://star-www.rl.ac.uk/cgi-bin/htxserver/sun67.htx/). The C
-*     version is not distributed as standard by Starlink, but is
-*     available on request from the author.
-*
-*     This file is provided for use on systems where the C version of
-*     SLALIB is not installed. On systems where it is installed, the
-*     proper "slalib.h" file should be located and used during the
-*     build. However, since only a stable subset of the C interface is
-*     actually used, the use of this file instead of the proper one
-*     should not cause any problems.
-*
-*     Note that if the FORTRAN version of SLALIB is used instead of
-*     the C version, then this file is still required. This is because
-*     it defines the calling interface used within the C code of the
-*     AST library.  In this case, the functions defined in "sla.c" are
-*     used to interface to the FORTRAN SLALIB routines.
-*/
 #ifndef SLALIBHDEF
 #define SLALIBHDEF
-#include <math.h>
-
 /*
-**  - - - - - - - - -
-**   s l a l i b . h
-**  - - - - - - - - -
+**  Author:
+**    Patrick Wallace  (ptw@tpsoft.demon.co.uk)
 **
-**  Prototype function declarations for slalib library.
+**  License:
+**    This program is free software; you can redistribute it and/or modify
+**    it under the terms of the GNU General Public License as published by
+**    the Free Software Foundation; either version 2 of the License, or
+**    (at your option) any later version.
 **
-**  Last revision:   28 March 1996
+**    This program is distributed in the hope that it will be useful,
+**    but WITHOUT ANY WARRANTY; without even the implied warranty of
+**    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**    GNU General Public License for more details.
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**    You should have received a copy of the GNU General Public License
+**    along with this program; if not, write to the Free Software 
+**    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  
+**    USA.
+**
+**  Last revision:   10 December 2002
+**
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <math.h>
 
 void slaAddet ( double rm, double dm, double eq, double *rc, double *dc );
 
@@ -93,6 +87,8 @@ void slaCd2tf ( int ndp, float days, char *sign, int ihmsf[4] );
 void slaCldj ( int iy, int im, int id, double *djm, int *j );
 
 void slaClyd ( int iy, int im, int id, int *ny, int *nd, int *jstat );
+
+void slaCombn ( int nsel, int ncand, int list[], int *j );
 
 void slaCr2af ( int ndp, float angle, char *sign, int idmsf[4] );
 
@@ -158,6 +154,8 @@ void slaDmxm ( double a[3][3], double b[3][3], double c[3][3] );
 
 void slaDmxv ( double dm[3][3], double va[3], double vb[3] );
 
+double slaDpav ( double v1[3], double v2[3] );
+
 void slaDr2af ( int ndp, double angle, char *sign, int idmsf[4] );
 
 void slaDr2tf ( int ndp, double angle, char *sign, int ihmsf[4] );
@@ -173,6 +171,8 @@ void slaDs2tp ( double ra, double dec, double raz, double decz,
                 double *xi, double *eta, int *j );
 
 double slaDsep ( double a1, double b1, double a2, double b2 );
+
+double slaDsepv ( double v1[3], double v2[3] );
 
 double slaDt ( double epoch );
 
@@ -215,6 +215,10 @@ void slaEcor ( float rm, float dm, int iy, int id, float fd,
 
 void slaEg50 ( double dr, double dd, double *dl, double *db );
 
+void slaEl2ue ( double date, int jform, double epoch, double orbinc,
+                double anode, double perih, double aorq, double e,
+                double aorl, double dm, double u[], int *jstat );
+
 double slaEpb ( double date );
 
 double slaEpb2d ( double epb );
@@ -256,15 +260,15 @@ void slaFk524 ( double r2000, double d2000, double dr2000,
                 double *r1950, double *d1950, double *dr1950,
                 double *dd1950, double *p1950, double *v1950 );
 
+void slaFk52h ( double r5, double d5, double dr5, double dd5,
+                double *dr, double *dh, double *drh, double *ddh );
+
 void slaFk54z ( double r2000, double d2000, double bepoch,
                 double *r1950, double *d1950,
                 double *dr1950, double *dd1950 );
 
-void slaFk5hz ( double r5, double d5, double jepoch,
+void slaFk5hz ( double r5, double d5, double epoch,
                 double *rh, double *dh );
-
-void slaHfk5z ( double rh, double dh, double jepoch,
-                double *r5, double *d5, double *dr5, double *dd5 );
 
 void slaFlotin ( char *string, int *nstrt, float *reslt, int *jflag );
 
@@ -280,11 +284,17 @@ double slaGmst ( double ut1 );
 
 double slaGmsta ( double date, double ut1 );
 
-float slaGresid ( float s );
-
 void slaH2e ( float az, float el, float phi, float *ha, float *dec );
 
+void slaH2fk5 ( double dr, double dh, double drh, double ddh,
+                double *r5, double *d5, double *dr5, double *dd5 );
+
+void slaHfk5z ( double rh, double dh, double epoch,
+                double *r5, double *d5, double *dr5, double *dd5 );
+
 void slaImxv ( float rm[3][3], float va[3], float vb[3] );
+
+void slaInt2in ( char *string, int *nstrt, int *ireslt, int *jflag );
 
 void slaIntin ( char *string, int *nstrt, long *ireslt, int *jflag );
 
@@ -317,8 +327,7 @@ void slaNut ( double date, double rmatn[3][3] );
 
 void slaNutc ( double date, double *dpsi, double *deps, double *eps0 );
 
-void slaNutm ( double dpsi, double deps, double eps0,
-               double rmatn[3][3] );
+void slaNutc80 ( double date, double *dpsi, double *deps, double *eps0 );
 
 void slaOap ( char *type, double ob1, double ob2, double date,
               double dut, double elongm, double phim, double hm,
@@ -333,6 +342,8 @@ void slaObs ( int n, char *c, char *name, double *w, double *p, double *h );
 
 double slaPa ( double ha, double dec, double phi );
 
+double slaPav ( float v1[3], float v2[3] );
+
 void slaPcd ( double disco, double *x, double *y );
 
 void slaPda2h ( double p, double d, double a,
@@ -341,7 +352,30 @@ void slaPda2h ( double p, double d, double a,
 void slaPdq2h ( double p, double d, double q,
                 double *h1, int *j1, double *h2, int *j2 );
 
+void slaPermut ( int n, int istate[], int iorder[], int *j );
+
+void slaPertel (int jform, double date0, double date1,
+                double epoch0, double orbi0, double anode0,
+                double perih0, double aorq0, double e0, double am0,
+                double *epoch1, double *orbi1, double *anode1,
+                double *perih1, double *aorq1, double *e1, double *am1,
+                int *jstat );
+
+void slaPertue ( double date, double u[], int *jstat );
+
+void slaPlanel ( double date, int jform, double epoch, double orbinc,
+                 double anode, double perih, double aorq,  double e,
+                 double aorl, double dm, double pv[6], int *jstat );
+
 void slaPlanet ( double date, int np, double pv[6], int *j );
+
+void slaPlante ( double date, double elong, double phi, int jform,
+                 double epoch, double orbinc, double anode, double perih,
+                 double aorq, double e, double aorl, double dm,
+                 double *ra, double *dec, double *r, int *jstat );
+
+void slaPlantu ( double date, double elong, double phi, double u[],
+                 double *ra, double *dec, double *r, int *jstat );
 
 void slaPm ( double r0, double d0, double pr, double pd,
              double px, double rv, double ep0, double ep1,
@@ -361,13 +395,19 @@ void slaPreces ( char sys[3], double ep0, double ep1,
 
 void slaPrenut ( double epoch, double date, double rmatpn[3][3] );
 
+void slaPv2el ( double pv[], double date, double pmass, int jformr,
+                int *jform, double *epoch, double *orbinc,
+                double *anode, double *perih, double *aorq, double *e,
+                double *aorl, double *dm, int *jstat );
+
+void slaPv2ue ( double pv[], double date, double pmass,
+                double u[], int *jstat );
+
 void slaPvobs ( double p, double h, double stl, double pv[6] );
 
 void slaPxy ( int np, double xye[][2], double xym[][2],
               double coeffs[6],
               double xyp[][2], double *xrms, double *yrms, double *rrms );
-
-float slaRandom ( float seed );
 
 float slaRange ( float angle );
 
@@ -380,6 +420,9 @@ void slaRdplan ( double date, int np, double elong, double phi,
 
 void slaRefco ( double hm, double tdk, double pmb, double rh,
                 double wl, double phi, double tlr, double eps,
+                double *refa, double *refb );
+
+void slaRefcoq ( double tdk, double pmb, double rh, double wl,
                 double *refa, double *refb );
 
 void slaRefro ( double zobs, double hm, double tdk, double pmb,
@@ -404,6 +447,8 @@ void slaS2tp ( float ra, float dec, float raz, float decz,
                float *xi, float *eta, int *j );
 
 float slaSep ( float a1, float b1, float a2, float b2 );
+
+float slaSepv ( float v1[3], float v2[3] );
 
 void slaSmat ( int n, float *a, float *y, float *d, int *jf, int *iw );
 
@@ -435,6 +480,13 @@ void slaTps2c ( float xi, float eta, float ra, float dec,
 void slaTpv2c ( float xi, float eta, float v[3],
                 float v01[3], float v02[3], int *n );
 
+void slaUe2el ( double u[], int jformr,
+                int *jform, double *epoch, double *orbinc,
+                double *anode, double *perih, double *aorq, double *e,
+                double *aorl, double *dm, int *jstat );
+
+void slaUe2pv ( double date, double u[], double pv[], int *jstat );
+
 void slaUnpcd ( double disco, double *x, double *y );
 
 void slaV2tp ( float v[3], float v0[3], float *xi, float *eta, int *j );
@@ -445,11 +497,13 @@ void slaVn ( float v[3], float uv[3], float *vm );
 
 void slaVxv ( float va[3], float vb[3], float vc[3] );
 
-void slaWait ( float delay );
-
 void slaXy2xy ( double x1, double y1, double coeffs[6],
                 double *x2, double *y2 );
 
 double slaZd ( double ha, double dec, double phi );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
