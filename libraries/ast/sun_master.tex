@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.19}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {13th April 2005}
+\newcommand{\stardocdate}      {21st April 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -804,8 +804,11 @@ are described here:
 \item {\bf{Minimum Software Dependencies.}}
 The AST library depends on as little other software as possible. Only
 the widely-available SLALIB positional astronomy library
-(\xref{SUN/67}{sun67}{}) is required. Even here, you have the choice
-of using either the Fortran or the C version.
+(\xref{SUN/67}{sun67}{}) is required. Even here, the minimal required
+slalib code is included with the AST distribution, and is built as part
+of building the AST library. Alternatively, you have the choice of
+linking against an external, full version of SLALIB; either the Fortran 
+version available from Starlink or the C version available from tpoint.
 
 \item {\bf{Environment Independence.}}
 AST is designed so that it can operate in a variety of ``programming
@@ -20755,6 +20758,16 @@ are shorter than the old keys and so can written succesfully to a FitsChan.
 The new PolyMap class always writes new styles keys but can read either
 old or new style keys. Consequently, PolyMap dumps written by this
 version of AST cannot be read by older versions of AST.
+
+\item A mimimal cut down subset of the C version of SLALIB is now
+included with the AST distribution and built as part of building AST.
+This means that it is no longer necessary to have SLALIB installed
+separately at your site. The SLALIB code included with AST is distrubuted
+under the GPL. The default behaviour of the ast\_link script is now to
+link with this internal slalib subset. However, the ``-csla'' option can
+still be used to force linking with an external full C SLALIB library.
+A new option ``-fsla'' has been introduced which forces linking with the
+external full Fortran SLALIB library.
 
 \end{enumerate}
 

@@ -27,6 +27,16 @@ clipping performed by AST at the plot boundary.
 - The PolyMap class has been modified to allow a PolyMap to be written
 succesfully to a FitsChan using Native encoding. 
 
+- A mimimal cut down subset of the C version of SLALIB is now included
+with the AST distribution and built as part of building AST. This means
+that it is no longer necessary to have SLALIB installed separately at
+your site. The SLALIB code included with AST is distrubuted under the
+GPL. The default behaviour of the ast_link script is now to link with
+this internal slalib subset. However, the ``-csla'' option can still be
+used to force linking with an external full C SLALIB library. A new
+option ``-fsla'' has been introduced which forces linking with the
+external full Fortran SLALIB library.
+
 
 Main Changes in Version 3.5
 ---------------------------

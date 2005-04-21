@@ -175,6 +175,7 @@ GRP_C_INCLUDE_FILES = \
     loader.h \
     skyaxis.h \
     slalib.h \
+    slamac.h \
     wcsmath.h \
     wcstrig.h \
     xmlchan.h
@@ -229,6 +230,12 @@ WCSLIB_FILES = \
     wcsmath.h \
     wcstrig.h
 
+PAL_FILES = \
+    COPYING.LIB \
+    pal.c \
+    slalib.h \
+    slamac.h
+
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
@@ -256,6 +263,7 @@ lib_LTLIBRARIES = \
     libast_grf_3.2.la \
     libast_pgplot.la \
     libast_slalib.la \
+    libast_pal.la \
     libast_wcslib.la
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -274,6 +282,7 @@ libast_grf_2.0_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_3.2_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_slalib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
@@ -310,6 +319,9 @@ libast_slalib_la_SOURCES = sla.c
 
 #  Modules adapted from the wcslib library.
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
+
+#  Modules supplied by tpoint.
+libast_pal_la_SOURCES = pal.c
 
 # The following files are built by the targets in this makefile.
 MAINTAINERCLEANFILES = version.h builddocs addversion \

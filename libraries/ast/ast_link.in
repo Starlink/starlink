@@ -29,13 +29,15 @@
 #     The following switches may optionally be given to this command to
 #     modify its behaviour:
 #
+#
 #     - ``-csla'': Requests that the program be linked so that it uses the
-#     C implementation of the SLALIB positional astronomy library. By default,
-#     the Fortran implementation is used (Starlink User Note SUN/67). Note
-#     that both implementations of SLALIB use the same name (``libsla.a'') for
-#     their library, so you must ensure that the directories searched to
-#     resolve library references will result in the correct version of this
-#     file (Fortran or C) being located.
+#     full C implementation of the SLALIB positional astronomy library 
+#     available from tpoint (www.tpsoft.demon.co.uk). See the "SLALIB"
+#     section below.
+#
+#     - ``-fsla'': Requests that the program be linked so that it uses the
+#     Starlink Fortran implementation of the SLALIB library (Starlink User 
+#     Note SUN/67). See the "SLALIB" section below.
 #
 #     - ``-ems'': Requests that the program be linked so that error messages
 #     produced by the AST library are delivered via the Starlink EMS (Error
@@ -89,6 +91,39 @@
 #     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
+#  SLALIB:
+#     AST applications must be linked against the SLALIB library since AST 
+#     uses SLALIB for its low-level astrometric conversions. SLALIB is 
+#     available in at least three forms, all written by Pat Wallace: 
+#
+#     - a Fortran 77 implementation is available from the UK Starlink project
+#     (www.starlink.ac.uk) and is distributed under GPL; 
+#
+#     - a proprietary C implementation is available from the author or from 
+#     tpoint (www.tpsoft.demon.co.uk);
+#
+#     - a cut down subset of the C version including only the functions 
+#     needed by the AST library is included within the AST distribution and 
+#     is built as part of the process of building AST. This version is 
+#     distributed under GPL, and is thus compatible with the AST license.
+#
+#     By default, this script will link applications using the built-in cut
+#     down SLALIB subset. This means that SLALIB need not exist anywhere else 
+#     on the building system. However, the "-fsla" and "-csla" options can be 
+#     used to force linking with one of the other two versions of SLALIB.
+#     Note that both the Fortran and full C implementations of SLALIB use the 
+#     same name (``libsla.a'') for their library, so you must ensure that the 
+#     directories searched to resolve library references will result in the 
+#     correct version of this file (Fortran or C) being located (the internal 
+#     cut down version of SLALIB uses a different library name). Note, the 
+#     Fortran version of SLALIB includes a script called sla_link which should 
+#     be available on the current PATH if the Fortran version is to be used. 
+#     If this script cannot be found, then no options to link with SLALIB 
+#     will be included and consequently errors will probably be reported by 
+#     the compiler because of unresolved references to the SLALIB routines 
+#     used by AST. If the ``-fsla'' option is not used, then the sla_link 
+#     script is not needed.
+
 #  Examples:
 #c     cc display.c -L/star/lib `ast_link -pgplot` -o display
 #c        Compiles and links a C program called ``display'' which uses
@@ -96,8 +131,9 @@
 #c     cc import.c -L/star/lib `ast_link -csla` -o import
 #c        Compiles and links a C program called ``import'' which does
 #c        not produce any graphical output. The ``-csla'' flag indicates that
-#c        the C version of SLALIB should be used by AST (to avoid conflict
-#c        with the main program which may already be calling this version).
+#c        the full C proprietary version of SLALIB should be used by AST (to 
+#c        avoid conflict with the main program which may already be calling 
+#c        this version).
 #c     cc plotit.c -L. -L/star/lib `ast_link -grf` -lgrf -o plotit
 #c        Compiles and links a C program ``plotit''. The ``-grf''
 #c        switch indicates that graphical output will be delivered through
@@ -118,8 +154,9 @@
 #f     f77 import.f -L/star/lib `ast_link -csla` -o import
 #f        Compiles and links a Fortran program called ``import'' which does
 #f        not produce any graphical output. The ``-csla'' flag indicates that
-#f        the C version of SLALIB should be used by AST (this should be avoided
-#f        if the main program already calls the Fortran version).
+#f        the full proprietary C version of SLALIB should be used by AST (this 
+#f        should be avoided if the main program already calls the Fortran 
+#f        version).
 #f     f77 plotit.f -L. -L/star/lib `ast_link -grf` -lgrf -o plotit
 #f        Compiles and links a Fortran program ``plotit''. The ``-grf''
 #f        switch indicates that graphical output will be delivered through
@@ -162,6 +199,8 @@
 #        Added switches to support older grf implementations.
 #     24-AUG-2004 (DSB):
 #        Removed f77='y' from -ems case.
+#     21-APR-2005 (DSB):
+#        Added "-fsla" option.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -199,6 +238,11 @@
 #  -csla - Requests C version of SLALIB.
          -csla)
             sla='c'
+            shift;;
+
+#  -fsla - Requests Starlink Fortran version of SLALIB.
+         -fsla)
+            sla='f'
             shift;;
 
 #  -ems - Requests error reporting through EMS.
@@ -264,14 +308,17 @@
 #  --------------------------------------
       case "${sla}" in
 
-#  The C version of SLALIB has no link script, so simply specify the library
-#  itself.
+#  The full proprietary C version of SLALIB has no link script, so simply 
+#  specify the library itself.
       c) args="${args} -lsla";;
 
-#  Otherwise, link with the AST SLALIB interface and the Fortran library via
+#  For Fortran, link with the AST SLALIB interface and the Fortran library via
 #  the SLALIB link script (if found).
-      *) args="${args} -last_slalib `\`find sla_link\``"
+      f) args="${args} -last_slalib `\`find sla_link\``"
          f77='y';;
+
+#  Otherwise, link with the internal GPLed cut down C version of SLALIB.
+      *) args="${args} -last_pal";;
       esac
 
 #  Generate arguments for linking the graphics system.
