@@ -29,7 +29,16 @@ AC_FC_LIBRARY_LDFLAGS
 
 dnl    Check for OS features we would like
 AC_FUNC_VFORK
-AC_FUNC_MMAP
+
+dnl    The AC_FUNC_MMAP test is broken under Cygwin.
+case "$host" in
+    *cygwin*)
+       AC_CHECK_FUNCS(mmap)
+    ;;
+    *)
+       AC_FUNC_MMAP
+    ;;
+esac
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
