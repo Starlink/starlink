@@ -157,7 +157,7 @@ c         IF( PGBEG( 0, '?', 1, 1 ) .EQ. 1 ) THEN
             GBOX(4) = GBOX(4) - 0.05*RANGE
 
             ASP = REAL( PBOX(4) - PBOX(2) )/REAL( PBOX(3) - PBOX(1) )
-            IF( ASP < 0.05 .OR. ASP .GT. 20 ) ASP = 1.0
+            IF( ASP .LT. 0.05 .OR. ASP .GT. 20 ) ASP = 1.0
 
             IF( ASP .GT. 1.0 ) THEN
                DELTA = 0.5*( ( GBOX(3) - GBOX(1) ) -

@@ -3533,12 +3533,12 @@ C
 
       f2 = ast_specframe( 'System=Wavelen,Unit=Angstrom', status )
       lbnd( 1 ) = 5000.0
-      ubnd( 1 ) = AST__BAD;
+      ubnd( 1 ) = AST__BAD
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r3 = ast_prism( r1, r2, ' ', status )
 
       lbnd( 1 ) = 6000.0
-      ubnd( 1 ) = AST__BAD;
+      ubnd( 1 ) = AST__BAD
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
 
@@ -3548,7 +3548,7 @@ C
      :                                                    'Prism 12' )
 
       ubnd( 1 ) = 6000.0
-      lbnd( 1 ) = AST__BAD;
+      lbnd( 1 ) = AST__BAD
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
 
@@ -3556,7 +3556,7 @@ C
      :                                                    'Prism 13' )
 
       ubnd( 1 ) = 5000.0
-      lbnd( 1 ) = AST__BAD;
+      lbnd( 1 ) = AST__BAD
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
       call ast_setc( r4, 'system(3)', 'freq', status )

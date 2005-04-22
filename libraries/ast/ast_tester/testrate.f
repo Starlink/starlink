@@ -13,7 +13,7 @@
       at(1) = 10.0D0
       at(2) = 1.2D6
 
-/* UnitMap */
+*  UnitMap 
       m = ast_unitmap( 2, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -25,7 +25,7 @@
       r = ast_rate( m, at, 1, 1, status )
       if( r .ne. 1.0D0 ) call stopit( 202, r, status )
 
-/* ZoomMap */
+*  ZoomMap 
       m = ast_zoommap( 2, 2.0D0, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -37,7 +37,7 @@
       r = ast_rate( m, at, 1, 1, status )
       if( r .ne. 0.5D0 ) call stopit( 402, r, status )
 
-/* MatrixMap */
+*  MatrixMap 
       m = ast_matrixmap( 2, 2, 2, mat, ' ', status )
 
       r = ast_rate( m, at, 1, 1, status )
@@ -102,7 +102,7 @@
      :                                                   status )
 
 
-/* ShiftMap */
+*  ShiftMap 
       mat(1) = -1.2D0
       mat(2) = 1.2D0
       m = ast_shiftmap( 2, mat, ' ', status )
@@ -117,7 +117,7 @@
       if( r .ne. 1.0D0 ) call stopit( 23, r, status )
 
 
-/* WinMap */
+*  WinMap 
       a1( 1 ) = 0.0D0
       a1( 2 ) = 0.0D0
       a2( 1 ) = 1.0D0
@@ -153,7 +153,7 @@
 
 
 
-/* PermMap */
+*  PermMap 
       outp(1)=2
       outp(2)=1
       inp(1)=1
@@ -186,7 +186,7 @@
       r = ast_rate( m, at, 1, 2, status )
       if( r .ne. 0.0D0 ) call stopit( 44, r, status )
 
-/* TranMap */
+*  TranMap 
       a1( 1 ) = 0.0D0
       a1( 2 ) = 0.0D0
       a2( 1 ) = 1.0D0
@@ -231,7 +231,7 @@
      :                                                   status )
 
 
-/* CmpMap */
+*  CmpMap 
       mat(1) = -1.0D0
       mat(2) = 1.0D0
       c1 = ast_shiftmap( 2, mat, ' ', status )

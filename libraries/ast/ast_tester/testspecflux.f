@@ -49,7 +49,7 @@
 
       ff2 = ast_Fluxframe( 123.1D0, sf, 'System=flxdnw', status )
 
-/* Note incorrect unit "Angstroms" should now be OK */
+*  Note incorrect unit "Angstroms" should now be OK 
       if( ast_getc( ff2, 'unit', status ) .ne. 'W/m^2/Angstrom' )
      :    call stopit( status, 'Error 6B' )
       if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' ) 

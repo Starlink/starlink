@@ -386,8 +386,8 @@ c  Read vector entries as vectors.
 
       call checkDump( map2, 'checkDump 1 ', status )
          
-      call ast_Annul( map, status  );
-      call ast_Annul( map2, status  );
+      call ast_Annul( map, status  )
+      call ast_Annul( map2, status  )
 
 
       map = ast_keymap( ' ', status )
