@@ -138,6 +138,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        since CmpMap has trouble calculating it.
 *     17-DEC-2004 (DSB):
 *        Added astMapSplit
+*     22-APR-2005 (DSB):
+*        Modified SpecialBounds to handle cases where some irrelevant
+*        output always produces bad values (e.g. a PermMap may do this).
 *class--
 */
 
@@ -353,7 +356,7 @@ static void Sinc( double, const double [], int, double * );
 static void SincCos( double, const double [], int, double * );
 static void SincGauss( double, const double [], int, double * );
 static void SincSinc( double, const double [], int, double * );
-static void SpecialBounds( const MapData *, double *, double *, double [], double [] );
+static int SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
 static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
@@ -6349,6 +6352,7 @@ static void MapBox( AstMapping *this,
    int coord;                    /* Loop counter for coordinates. */
    int nin;                      /* Effective number of input coordinates */
    int nout;                     /* Effective number of output coordinates */
+   int refine;                   /* Can bounds be refined? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6423,11 +6427,15 @@ static void MapBox( AstMapping *this,
 /* First examine a set of special input points to obtain an initial
    estimate of the required output bounds. Do this only so long as the
    number of points involved is not excessive. */
-         if ( nin <= 12 ) SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+         if ( nin <= 12 ) {
+            refine = SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+         } else {
+            refine = 1;
+         }
 
 /* Then attempt to refine this estimate using a global search
    algorithm. */
-         GlobalBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+         if( refine ) GlobalBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
 
 /* If an error occurred, generate a contextual error message. */
          if ( !astOK ) {
@@ -11035,8 +11043,8 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;   
 }
 
-static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
-                           double xl[], double xu[] ) {
+static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
+                          double xl[], double xu[] ) {
 /*
 *  Name:
 *     SpecialBounds
@@ -11049,8 +11057,8 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
-*                         double xl[], double xu[] );
+*     int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
+*                        double xl[], double xu[] );
 
 *  Class Membership:
 *     Mapping member function.
@@ -11099,6 +11107,10 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *        necessarily unique) input point at which the upper output
 *        bound is reached. This array is not altered if an improved
 *        estimate of the upper bound cannot be found.
+
+*  Returned:
+*     A flag indicating if the returned values can be refined.
+
 */
 
 /* Local Variables: */
@@ -11106,7 +11118,11 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    AstPointSet *pset_out;        /* PointSet for output coordinates */
    double **ptr_in;              /* Pointer to input coordinates */
    double **ptr_out;             /* Pointer to output coordinates */
+   double *sxl;                  /* Secondary xl values */
+   double *sxu;                  /* Secondary xu values */
    double f;                     /* Output coordinate value */
+   double slbnd;                 /* Secondary lbnd value */
+   double subnd;                 /* Secondary lbnd value */
    int *limit;                   /* Workspace for lower/upper limit flags */
    int bad;                      /* Output coordinate bad? */
    int coord;                    /* Loop counter for coordinates */
@@ -11116,7 +11132,11 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    int npoint;                   /* Number of points */
    int origin;                   /* Origin lies within bounds? */
    int point;                    /* Loop counter for points */
-   
+   int result;                   /* Returned flag */
+
+/* Initialise */
+   result = 1;
+
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
    pset_out = NULL;
@@ -11142,6 +11162,14 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
       }
    }
    if ( origin ) npoint++;
+
+/* Initialise secondary bounds to be the supplied primary bounds */
+   slbnd = *lbnd;
+   subnd = *ubnd;
+
+/* Create workspace for ssecondary xl xu values */
+   sxl = astMalloc( sizeof(double)*(size_t) ncoord );
+   sxu = astMalloc( sizeof(double)*(size_t) ncoord );
 
 /* Create a PointSet to hold the coordinates and obtain a pointer to
    its coordinate values. Also allocate workspace for calculating the
@@ -11245,8 +11273,8 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 
 /* If so, we ignore the point. Otherwise, extract the required
    coordinate. */
+            f = ptr_out[ mapdata->coord ][ point ];
             if ( !bad ) {
-               f = ptr_out[ mapdata->coord ][ point ];
 
 /* Use this to update the lower and upper bounds we are seeking. If
    either bound is updated, also store the coordinates of the
@@ -11263,15 +11291,53 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
                      xu[ coord ] = ptr_in[ coord ][ point ];
                   }
                }
+
+/* If this point has a bad coord value, it may still be useful if the
+   required coord value is not bad. In this case, extract the required
+   coordinate. */
+            } else if ( f != AST__BAD ) {
+
+/* Use this to update secondary lower and upper bounds we are seeking.
+   These will be returned if no primary values are found via the previous
+   code block. */
+               if ( ( slbnd == AST__BAD ) || ( f < slbnd ) ) {
+                  slbnd = f;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     sxl[ coord ] = ptr_in[ coord ][ point ];
+                  }
+               }
+               if ( ( subnd == AST__BAD ) || ( f > subnd ) ) {
+                  subnd = f;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     sxu[ coord ] = ptr_in[ coord ][ point ];
+                  }
+               }
             }
+         }
+
+/* If no primary values could be found, use secondary values. */
+         if( *lbnd == AST__BAD && *ubnd == AST__BAD ) {
+            *lbnd = slbnd;
+            *ubnd = subnd;
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               xu[ coord ] = sxu[ coord ];
+               xl[ coord ] = sxl[ coord ];
+            }
+            result = ( slbnd == AST__BAD || subnd == AST__BAD );
          }
       }
    }
+
+/* Free workspace */
+   sxl = astFree( sxl );
+   sxu = astFree( sxu );
 
 /* Annul the temporary PointSets and free the workspace. */
    pset_in = astAnnul( pset_in );
    pset_out = astAnnul( pset_out );
    limit = astFree( limit );
+
+   return result;
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
