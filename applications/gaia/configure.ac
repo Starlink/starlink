@@ -33,7 +33,7 @@ STAR_INITIALISE_FORTRAN
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
-                          [ard ast cat generic fio img pcs pda sae], link)
+                          [ard ast cat generic fio img pcs pda sae sla], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need to add AUTOASTROM to this when available.
