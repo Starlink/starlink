@@ -18,7 +18,8 @@
 #
 #     This script assumes the gnu g77 compiler is available. If this is not 
 #     the case, do a global edit of g77 to whatever fortran 77 compiler you 
-#     have available.
+#     have available (you will probably also need to change the compiler 
+#     flags).
 
 #  Options:
 #     -nd : Suppresses display of test plots.
@@ -67,11 +68,13 @@ regression >& regression.out
 diff -c regression.out regression.current > regression.diff
 
 if( $status != 0 ) then
-   echo "\nRegression output has changed"
+   echo ""
+   echo "Regression output has changed"
    echo "See file $PWD/regression.diff"
 else
    rm -f regression.out regression.diff >& /dev/null
-   echo "\nRegression output has NOT changed"
+   echo ""
+   echo "Regression output has NOT changed"
 endif
 
 # Run the other test progs
@@ -83,9 +86,12 @@ rm $prog
 end
 
 # Make new plots.
-echo "\nGenerating new plots...\n"
+echo ""
+echo "Generating new plots..."
+echo ""
 if( $1 == "-nd" ) then
-echo "   (but not displaying them because the -nd option was supplied)\n"
+echo "   (but not displaying them because the -nd option was supplied)"
+echo ""
 endif
 
 rm *-new.ps  >& /dev/null
@@ -118,7 +124,11 @@ foreach n (*.head)
    set psfile = "${bn}-new.ps"
    plotter $n "$attr1" "$attr2" a.ps $box
 
-   $STARLINK/bin/psmerge -t300x300 -r90 a.ps > $psfile
+   if( -e $STARLINK/bin/psmerge ) then
+      $STARLINK/bin/psmerge -t300x300 -r90 a.ps > $psfile
+   else
+      cp a.ps $psfile
+   endif
 
    if( $1 != "-nd" ) then
       gv $psfile -landscape -scale 2
@@ -130,7 +140,9 @@ rm -f a.ps
 
 
 # Make new fits headers 
-echo "\nDoing WCS conversion tests...\n"
+echo ""
+echo "Doing WCS conversion tests..."
+echo ""
 
 set ok = 1
 foreach n ( "timj ast fits-wcs cdmatrix=1" \
@@ -173,7 +185,9 @@ foreach n ( "timj ast fits-wcs cdmatrix=1" \
 end
 
 if( $ok == 1 ) then
-   echo "   All WCS conversion tests passed\n\n"
+   echo "   All WCS conversion tests passed"
+   echo ""
+   echo ""
 endif
 
 rm -f regression plotter wcsconverter testxmlchan 
