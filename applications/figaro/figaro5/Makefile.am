@@ -28,4 +28,4 @@ figaro5_LDADD = $(LDADD) \
 ../par/libfigpar.la \
 ../gen/libfiggen.la \
 ../ich/libfigich.la \
-`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
+`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `sla_link` `fio_link_adam`
