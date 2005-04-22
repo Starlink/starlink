@@ -99,7 +99,7 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  Define sets of ADAM libraries we need to link against. Note that
 #  ast_link and ndf_link must be carefully managed to avoid picking up
 #  default AST libraries for errors and graphics.
-AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
+AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf -fsla` `sla_link`
 ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` `ams_link_adam` `ndf_link`  -lpda
 
 #  Name of single binaries
