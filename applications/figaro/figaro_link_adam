@@ -25,6 +25,7 @@
 #     hme: Horst Meyerdierks (UoE, Starlink)
 #     acc: Anne Charles (RAL)
 #     acd: Clive Davenhall (UoE, Starlink)
+#     MJC: Malcolm J. Currie (Starlink)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -40,7 +41,9 @@
 #        Add libraries for SPECDRE, which is being merged with FIGARO.
 #     11 Nov 1998 (acd):
 #        Added FLA library.
-#     {enter_changes_here}
+#     2005 April 22 (MJC):
+#        Added SLALIB.
+#     {enter_further_changes_here}
 #-
 #.
 
@@ -50,10 +53,10 @@
          libfig.a libfda.a libjty.a libfit.a libtio.a \
          libgen.a libgkd.a libpar.a libich.a \
          -lpda `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
-         `fio_link_adam`
+         `sla_link_adam` `fio_link_adam` 
 #      echo libapplic.a libappstl.a libappsub.a \
 #         libfig.a libdsa.a libjty.a libdta.a libfit.a libtio.a \
 #         libgen.a libgkd.a libpar.a libich.a \
-#         -lpda `agi_link_adam` `ndf_link_adam` `fio_link_adam`
+#         -lpda `agi_link_adam` `ndf_link_adam` `sla_link_adam` `fio_link_adam`
 
 #  End of script.

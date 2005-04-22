@@ -35,6 +35,7 @@
 #     hme: Horst Meyerdierks (UoE, Starlink)
 #     mjcl: Martin Clayton (Starlink, UCL)
 #     acd: Clive Davenhall (UoE, Starlink)
+#     MJC: Malcolm J. Currie (Starlink)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -57,17 +58,19 @@
 #        as FDA and that one has to make a choice.
 #     11 Nov 1998 (acd):
 #        Added FLA library.
-#     {enter_changes_here}
+#     2005 April 22 (MJC):
+#        Added SLALIB.
+#     {enter_further_changes_here}
 #
 #-
 #.
 
    echo -lfig -lfda -ljty -lfit -lfla -ltio -lgen -lgkd -lpar -lich \
-      `agi_link_adam` `ndf_link_adam` `fio_link_adam` \
+      `agi_link_adam` `ndf_link_adam` `sla_link_adam` `fio_link_adam` \
       | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #   echo -lfig -ldsa -ljty -ldta -lfit -ltio -lgen -lgkd -lpar -lich \
-#      `agi_link_adam` `ndf_link_adam` `fio_link_adam` \
+#      `agi_link_adam` `ndf_link_adam` `sla_link_adam` `fio_link_adam` \
 #      | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
