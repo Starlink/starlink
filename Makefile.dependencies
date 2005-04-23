@@ -622,6 +622,7 @@ $(MANIFESTS)/figaro: \
 		$(MANIFESTS)/ref \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/trn
