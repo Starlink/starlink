@@ -156,7 +156,7 @@ $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
 	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) \
-	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)
 
 # initFortran lives in the parent directory
