@@ -10,7 +10,7 @@ dist_data_DATA = sun.tex ssn.tex sgp.tex sg.tex sc.tex sst.tex
 
 # Don't define a l2h_DATA variable here -- we'll install the l2h files
 # `by hand' below.
-l2hdir=$(datadir)/star2html-l2hsys
+l2hdir=$(DESTDIR)$(datadir)/star2html-l2hsys
 
 # Distribute the l2h directory and all the .in scripts.
 EXTRA_DIST = l2h_source.tar star2html.in latex2html.in xlabel.in
