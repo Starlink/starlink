@@ -6,16 +6,16 @@
       status = sai__ok
 
 
-      call generalChecks( status )
-      call checkPrism( status )
+      call checkBox( status )
       call checkInterval( status )
       call checkPolygon( status )
-      call checkBox( status )
-      call checkPointList( status )
+      call checkNullRegion( status )
+      call checkPrism( status )
+      call generalChecks( status )
       call checkCircle( status )
       call checkEllipse( status )
-      call checkNullRegion( status )
       call checkCmpRegion( status ) 
+      call checkPointList( status )
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All Region tests passed'
@@ -954,7 +954,7 @@
       include 'AST_PAR'
       include 'PRM_PAR'
 
-      integer status, box1, frm1, i, fc, fs, map1, perm(3), frm2,
+      integer status, box1, frm1, i, fc, fs, map1, perm(3), frm2, box3,
      :                box2, frm3, map2, res, j, bfrm, cfrm, reg1, map
       double precision p1(3), p2(3), v2, xin(9), yin(9), xout(9), 
      :                 yout(9),in(4,3),out(4,3),matrix(9)
@@ -1007,18 +1007,58 @@
       perm(2)=1
       call ast_permaxes( box1, perm, status )
 
+      box3 = ast_copy( box1, status )
+
       yin(1) = 2.82175432250852 
       xin(1) = -0.0269096590283195
       yin(2) = 2.70798275154741 
       xin(2) = 0.2467384819891
 
       call ast_tran2( box1, 2, xin, yin, .true., xout, yout, status )
+
+      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-6 ) 
+     :       call stopit( status, 'error 1' )
+      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-7 ) 
+     :       call stopit( status, 'error 2' )
+      if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 3' )
+      if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4' )
+
+
+      if( .not. ast_getl( box3, 'Adaptive', status ) )
+     :      call stopit( status, 'error 4a' )
+
+      call ast_setl( box3, 'Adaptive', .false., status )
+      call ast_setc( box3, 'system', 'icrs', status )
+
+      yin(1) = 2.82175432250852 
+      xin(1) = -0.0269096590283195
+      yin(2) = 2.70798275154741 
+      xin(2) = 0.2467384819891
+
+      call ast_tran2( box3, 2, xin, yin, .true., xout, yout, status )
+
       if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 ) 
      :       call stopit( status, 'error 1' )
       if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 ) 
      :       call stopit( status, 'error 2' )
-      if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 3' )
-      if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4' )
+      if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 4b' )
+      if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4c' )
+
+      call ast_clear( box3, 'system', status )
+
+      yin(1) = 2.82175432250852 
+      xin(1) = -0.0269096590283195
+      yin(2) = 2.70798275154741 
+      xin(2) = 0.2467384819891
+
+      call ast_tran2( box3, 2, xin, yin, .true., xout, yout, status )
+
+      if( abs( yout(1)-2.82175422 ) .gt. 1.0E-8 ) 
+     :       call stopit( status, 'error 1' )
+      if( abs( xout(1)+0.0269096587 ) .gt. 1.0E-8 ) 
+     :       call stopit( status, 'error 2' )
+      if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 4d' )
+      if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4e' )
 
       box2 = ast_simplify( box1, status )
 
@@ -1267,7 +1307,7 @@
      :       call stopit( status, 'error H1' )
       if( abs( out(1,2)-2997924.5 ) .gt. 1.0E-1 ) 
      :       call stopit( status, 'error H2' )
-      if( abs( out(1,3)-2.82175422 ) .gt. 1.0E-8 ) 
+      if( abs( out(1,3)-2.82175422 ) .gt. 1.0E-6 ) 
      :       call stopit( status, 'error H3' )
 
       if( out(2,1) .ne. ast__bad ) call stopit( status, 'error H4' )
@@ -1278,7 +1318,7 @@
       if( abs( out(3,1)+0.0269096587 ) .gt. 1.0E-8 ) 
      :       call stopit( status, 'error H7' )
       if( out(3,2) .ne. ast__bad ) call stopit( status, 'error H8' )
-      if( abs( out(3,3)-2.82175422 ) .gt. 1.0E-8 ) 
+      if( abs( out(3,3)-2.82175422 ) .gt. 1.0E-6 ) 
      :       call stopit( status, 'error H9' )
 
       if( out(4,1) .ne. ast__bad ) call stopit( status, 'error H10' )
@@ -2482,10 +2522,10 @@ C
       call ast_clear( cir1, 'Closed', status ) 
       call ast_clear( cir2, 'Closed', status )
            
-      p1( 1 ) = 2.000003
+      p1( 1 ) = 2.000004
       p1( 2 ) = 0.0
       p1( 3 ) = 0.0
-      p2( 1 ) = 2.000003
+      p2( 1 ) = 2.000004
       p2( 2 ) = 1.0
       p2( 3 ) = 0.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
