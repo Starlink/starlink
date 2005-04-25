@@ -130,7 +130,7 @@
 *        so that there are no gaps between adjacent bins.  Smaller values 
 *        will result in gaps appearing between adjacent bins.  The supplied 
 *        value must be small enough to ensure that adjacent bins do not 
-*        overlap. [!]
+*        overlap. The supplied value must be at least 1.0. [!]
 *     XC = _REAL (Read)
 *        The x pixel co-ordinate of the centre of the ellipse, and the
 *        vertex of the sectors.
