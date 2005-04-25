@@ -785,6 +785,9 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *     with the global status set, or if it should fail for any reason.
 */
 
+/* Local constants: */
+#define SMALL sqrt(DBL_MIN)
+
 /* Local Variables: */
    AstPointSet *that;         /* Pointer to the second PointSet structure */
    AstPointSet *this;         /* Pointer to the first PointSet structure */
@@ -890,16 +893,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
                         if( acc_this == AST__BAD ) {
                            acc1 = fabs(*p_this)*DBL_EPSILON;
-                           if( acc1 < DBL_MIN ) acc1 = DBL_MIN;
-                           acc1 *= 1.0E8;
+                           if( acc1 < SMALL ) acc1 = SMALL;
+                           acc1 *= 1.0E3;
                         } else {
                            acc1 = acc_this;
                         }
 
                         if( acc_that == AST__BAD ) {
                            acc2 = fabs(*p_that)*DBL_EPSILON;
-                           if( acc2 < DBL_MIN ) acc2 = DBL_MIN;
-                           acc2 *= 1.0E8;
+                           if( acc2 < SMALL ) acc2 = SMALL;
+                           acc2 *= 1.0E3;
                         } else {
                            acc2 = acc_that;
                         }
@@ -926,6 +929,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Return the result, */
    return result;
+#undef SMALL
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {

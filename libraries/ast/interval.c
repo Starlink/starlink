@@ -59,7 +59,7 @@ f     The Interval class does not define any new routines beyond those
 /* Macro to check for equality of floating point values. We cannot
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+#define EQUAL(aa,bb) (((aa)==(bb))?1:(((aa)==AST__BAD||(bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -2260,8 +2260,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                   }
          
 /* Now create a PointSet containing one point for each axis in the
-      current (or equivalently, base ) Frame of the simplified Box, plus an
-      extra point. */
+   current (or equivalently, base ) Frame of the simplified Box, plus an
+   extra point. */
                   pset2 = astPointSet( snc + 1, snc, "" );
                   ptr2 = astGetPoints( pset2 );
          
@@ -2279,13 +2279,13 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                   }
          
 /* Transform this PointSet into the base Frame of this Interval using the
-      inverse of the base->current Mapping. */
+   inverse of the base->current Mapping. */
                   pset3 = astTransform( map, pset2, 0, NULL );
                   ptr3 = astGetPoints( pset3 );
                   if( astOK ) {
          
 /* Now consider each axis of the Interval's current Frame (i.e. each base 
-      Frame axis in the simplified Box). */
+   Frame axis in the simplified Box). */
                      for( ic = 0; ic < snc; ic++ ) {
          
 /* Given that the Box simplified succesfully, we know that there is a one
@@ -2317,7 +2317,12 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    the Box from simplifying). Therefore, set upper and lower limits for
    this axis to the same value. */
                         if( maxd <= 0.0 ) {
-                           slbnd[ ic ] = 0.5*( slbnd[ ic ] + subnd[ ic ] );
+                           if( slbnd[ ic ] == AST__BAD || 
+                               subnd[ ic ] == AST__BAD ) {
+                              slbnd[ ic ] = AST__BAD;
+                           } else {
+                              slbnd[ ic ] = 0.5*( slbnd[ ic ] + subnd[ ic ] );
+                           }
                            subnd[ ic ] = slbnd[ ic ];
          
 /* If we have found a base Frame axis which corresponds to the current
