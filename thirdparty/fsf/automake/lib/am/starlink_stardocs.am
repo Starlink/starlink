@@ -55,14 +55,14 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 ## pax -v writes the archive contents to stderr, but it _also_ sends chatter
 ## there.  This is a bit mad, but there's nothing we can do about it, so remove
 ## lines with 'pax:' in the hope that this matches all and only the chatter.
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r -v 2>&1) | sed '/pax:/d;s+^+MANIFEST:$(stardocsdir)/+'; \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r -v 2>&1) | sed '/pax:/d;s+^+MANIFEST:$(DESTDIR)$(stardocsdir)/+'; \
 	      else \
 	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r); \
 	      fi; \
 	    elif test -n "$(TAR)"; then \
 	      if $(MANIFEST); then \
 ## Is xBpf standard enough?
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpvf -) | sed 's+^+MANIFEST:$(stardocsdir)/+'; \
+	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpvf -) | sed 's+^+MANIFEST:$(DESTDIR)$(stardocsdir)/+'; \
 	      else \
 	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(TAR) xBpf -); \
 	      fi; \
