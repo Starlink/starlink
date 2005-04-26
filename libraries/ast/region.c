@@ -1463,7 +1463,7 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
       nc = astGetNin( this->frameset );
       result = astPointSet( 1, nc, "" );
       ptr = astGetPoints( result );
-      if( astOK ) {
+      if( ptr ) {
          for( ic = 0; ic < nc; ic++ ) ptr[ ic ][ 0 ] = AST__BAD;
       }
    }
@@ -8830,7 +8830,15 @@ static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
    if ( !astOK ) return NULL;
 
 /* If no input PointSet was provided, use the PointSet in the Region. */
-   if( !in ) in = this->points;
+   if( !in ) {
+      if( this->points ) {
+         in = this->points;
+      } else {
+         astError( AST__INTER, "astRegTransform(%s): No PointSet supplied "
+                   "and the supplied %s has no PointSet (internal AST "
+                   "programming error)", astGetClass( this ),astGetClass( this ) );
+      }
+   }
 
 /* Get the simplified Mapping from base to current Frame. */
    smap = RegMapping( this );

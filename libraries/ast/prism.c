@@ -60,6 +60,11 @@ f     The Prism class does not define any new routines beyond those
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
+/* Macro to check for equality of floating point values. We cannot
+   compare bad values directory because of the danger of floating point
+   exceptions, so bad values are dealt with explicitly. */
+#define EQUAL(aa,bb) (((aa)==(bb))?1:(((aa)==AST__BAD||(bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -75,6 +80,7 @@ f     The Prism class does not define any new routines beyond those
 #include "cmpframe.h"            /* Compound Frames */
 #include "unitmap.h"             /* Unit Mappings */
 #include "interval.h"            /* Axis intervals */
+#include "pointlist.h"           /* Points within Frames */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -2235,6 +2241,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 */
 
 /* Local Variables: */
+   AstFrame *bfrm;               /* Base Frame */
    AstFrame *cfrm;               /* Current Frame */
    AstFrame *newfrm1;            /* Current Frame axes for reg1 */
    AstFrame *newfrm2;            /* Current Frame axes for reg2 */
@@ -2243,31 +2250,48 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstMapping *nmap1;            /* Reg1->current Mapping */
    AstMapping *nmap2;            /* Reg2->current Mapping */
    AstMapping *result;           /* Result pointer to return */
-   AstPrism *new;                /* New Prism */
+   AstPointList *newpl;          /* New PointList */
+   AstPointList *ps1;            /* PointList PointSet */
    AstPrism *cpr;                /* Component Prism */
+   AstPrism *new;                /* New Prism */
    AstRegion *new2;              /* New Interval or Box */
+   AstRegion *newpl2;            /* Remapped new PointList */
    AstRegion *newreg1;           /* Reg1 mapped into current Frame */
    AstRegion *newreg2;           /* Reg2 mapped into current Frame */
    AstRegion *reg1;              /* First component Region */
    AstRegion *reg2;              /* Second component Region */
+   AstRegion *reg;               /* This Region */
    AstRegion *snewreg1;          /* Simplified newreg1 */
    AstRegion *snewreg2;          /* Simplified newreg2 */
+   AstRegion *unc;               /* Uncertainty Region */
+   double **ptr1;                /* PointList axis values */
+   double *lbnd;                 /* Lower bounds of Interval subregion */
+   double *p1;                   /* Pointer to next old axis value */
+   double *p;                    /* Pointer to next new axis value */
+   double *points;               /* Work space holding PointList axis values */
+   double *ubnd;                 /* Upper bounds of Interval subregion */
    int *axin;                    /* Indices of Mapping inputs to use */
    int *axout1;                  /* Indices of cfrm axes corresponding to reg1 */
    int *axout2;                  /* Indices of cfrm axes corresponding to reg2 */
    int *perm;                    /* Axis permutation array */
    int i;                        /* Loop count */
+   int j;                        /* Loop count */
    int nax1;                     /* Number of axes in first component Region */
    int nax2;                     /* Number of axes in second component Region */
    int naxout1;                  /* Number of current axes for reg1 */
    int naxout2;                  /* Number of current axes for reg2 */
    int neg;                      /* Negated flag for supplied Prism */
+   int np;                       /* Number of points in PointList */
+   int ok;                       /* Can PointList and Interval be combined? */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Get a pointer to the Region structure */
+   reg = (AstRegion *) this_mapping;
 
 /* Get the component Regions, and the Negated flag for the Prism. */
    GetRegions( (AstPrism *) this_mapping, &reg1, &reg2, &neg );
@@ -2279,9 +2303,87 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* The above Regions describe areas within the base Frame of the FrameSet 
    encapsulated by the parent Region structure. Get the current Frame in
    this FrameSet and the base->current Mapping. */
-   fs = ((AstRegion *) this_mapping)->frameset;
+   fs = reg->frameset;
    cfrm = astGetFrame( fs, AST__CURRENT );
    bcmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+
+/* Special Case: If the extruded region is a PointList and the extrusion
+   Region is a non-negated, closed, Interval with zero length on every axis 
+   (i.e. a point), then the two Regions can be combined into a single
+   PointList. Check the Region classes are right. */
+   if( astIsAPointList( reg1 ) && astIsAInterval( reg2 ) ) {
+
+/* Check the Negated and Closed values are right. */
+      if( astGetClosed( reg2 ) && !astGetNegated( reg2 ) && 
+          astGetClosed( reg1 ) && !astGetNegated( reg1 ) ) {
+
+/* Get the bounds of the Interval in its current Frame */
+         lbnd = astMalloc( sizeof( double )*(size_t) nax2 );
+         ubnd = astMalloc( sizeof( double )*(size_t) nax2 );
+         if( ubnd ) {
+            astGetRegionBounds( reg2, lbnd, ubnd );
+
+/* See if the bounds cover a single value. */
+            ok = 1;
+            for( i = 0; i < nax2; i++ ) {
+               if( !EQUAL( lbnd[i], ubnd[i] ) ) {
+                  ok = 0;
+                  break;
+               }
+            }
+
+/* If so, get the axis values from the PointList in its current Frame,
+   and allocate workspace for a PointList with the same number of points
+   but with the extra axes inherited form the Interval. */
+            if( ok ) {
+               ps1 = astRegTransform( reg1, NULL, 1, NULL, NULL );
+               ptr1 = astGetPoints( ps1 );
+               np = astGetNpoint( ps1 );
+               points = astMalloc( sizeof( double )*(size_t)( np*( nax1 + nax2 ) ) );
+               if( points ) {
+
+/* Copy the axis values form the old PointList to the first nax1 axes of
+   the new PointList. */
+                  p = points;
+                  for( i = 0; i < nax1; i++) {
+                     p1 = ptr1[ i ];
+                     for( j = 0; j < np; j++ ) *(p++) = *(p1++);
+                  }
+
+/* Fill up the remaining nax2 axes of the new PointList by copying the 
+   axis values covered by the Interval. */
+                  for( i = 0; i < nax2; i++) {
+                     for( j = 0; j < np; j++ ) *(p++) = lbnd[ i ];
+                  }
+
+/* We create a new PointList within the base Frame of "this" prism, using
+   the base Frame uncertainty from "this" (if set). */
+                  bfrm = astGetFrame( fs, AST__BASE );
+                  unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
+                  newpl = astPointList( bfrm, np, nax1 + nax2, np, points, 
+                                        unc, "" );
+
+/* Finally map it into the current Frame of "this" and simplify it. */
+                  newpl2 = astMapRegion( newpl, bcmap, cfrm );
+                  result = astSimplify( newpl2 );
+
+/* Free resources */
+                  newpl = astAnnul( newpl );
+                  newpl2 = astAnnul( newpl2 );
+                  if( unc ) unc = astAnnul( unc );
+                  bfrm = astAnnul( bfrm );
+                  points = astFree( points );                  
+               }
+               ps1 = astAnnul( ps1 );
+            }
+         }
+         ubnd = astFree( ubnd );
+         lbnd = astFree( lbnd );
+      }
+   }
+
+/* If the special case above produced a result, skip the rest */
+   if( !result ) {
 
 /* Use astMapSplit to see if the axes of the first component Region correspond
    to a distinct set of axes within the current Frame. If this is the case, 
@@ -2289,130 +2391,132 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    component Region into the corresponding current Frame axes. Also returned 
    is a list of the axes within the current Frame which correspnd to the
    axes of the first component Region. */
-   nmap1 = NULL;
-   axout1 = NULL;
-   axin = astMalloc( sizeof( int )*(size_t)nax1 );
-   if( astOK ) {
-      for( i = 0; i < nax1; i++ ) axin[ i ] = i;
-      axout1 = astMapSplit( bcmap, nax1, axin, &nmap1 );
-      axin = astFree( axin );
-   }
-
+      nmap1 = NULL;
+      axout1 = NULL;
+      axin = astMalloc( sizeof( int )*(size_t)nax1 );
+      if( astOK ) {
+         for( i = 0; i < nax1; i++ ) axin[ i ] = i;
+         axout1 = astMapSplit( bcmap, nax1, axin, &nmap1 );
+         axin = astFree( axin );
+      }
+   
 /* Do the same for the second component. */
-   nmap2 = NULL;
-   axout2 = NULL;
-   axin = astMalloc( sizeof( int )*(size_t)nax2 );
-   if( astOK ) {
-      for( i = 0; i < nax2; i++ ) axin[ i ] = i + nax1;
-      axout2 = astMapSplit( bcmap, nax2, axin, &nmap2 );
-      axin = astFree( axin );
-   }
-
+      nmap2 = NULL;
+      axout2 = NULL;
+      axin = astMalloc( sizeof( int )*(size_t)nax2 );
+      if( astOK ) {
+         for( i = 0; i < nax2; i++ ) axin[ i ] = i + nax1;
+         axout2 = astMapSplit( bcmap, nax2, axin, &nmap2 );
+         axin = astFree( axin );
+      }
+   
 /* Assume for the moment that the component Regions cannot be simplified.
    In this case we will use a clone of the supplied Prism. */
-   new = astClone( this_mapping );
-
+      new = astClone( this_mapping );
+   
 /* If each component Region corresponds to a distinct subspace within the
    current Frame, then we can try to express each component Region within
    the current Frame. */
-   if( nmap1 && nmap2 ) {
-
+      if( nmap1 && nmap2 ) {
+   
 /* Create a Frame representing the subspace of the current Frame which
-   corresponds to the axes of the first component Region. */
-      naxout1 = astGetNout( nmap1 );
-      newfrm1 = astPickAxes( cfrm, naxout1, axout1, NULL );
-
+      corresponds to the axes of the first component Region. */
+         naxout1 = astGetNout( nmap1 );
+         newfrm1 = astPickAxes( cfrm, naxout1, axout1, NULL );
+   
 /* Remap the first component Region so that it represents an area in this
    subspace. */
-      newreg1 = astMapRegion( reg1, nmap1, newfrm1 );
-
+         newreg1 = astMapRegion( reg1, nmap1, newfrm1 );
+   
 /* Attempt to simplify the remapped Region. */
-      snewreg1 = astSimplify( newreg1 );      
-
+         snewreg1 = astSimplify( newreg1 );      
+   
 /* Do the same for the second component Region. */
-      naxout2 = astGetNout( nmap2 );
-      newfrm2 = astPickAxes( cfrm, naxout2, axout2, NULL );
-      newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
-      snewreg2 = astSimplify( newreg2 );      
-
+         naxout2 = astGetNout( nmap2 );
+         newfrm2 = astPickAxes( cfrm, naxout2, axout2, NULL );
+         newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
+         snewreg2 = astSimplify( newreg2 );      
+   
 /* If the simplified second component is no longer an Interval or Box, revert 
    to the original Interval. */
-      if( !astIsAInterval( snewreg2 ) && !astIsABox( snewreg2 ) ) {
-         astAnnul( snewreg2 );
-         snewreg2 = astClone( newreg2 );
-      }
-
+         if( !astIsAInterval( snewreg2 ) && !astIsABox( snewreg2 ) ) {
+            astAnnul( snewreg2 );
+            snewreg2 = astClone( newreg2 );
+         }
+   
 /* If either component Region was simplified, create a new Prism from the 
    simplified Regions. */
-      if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
-         astAnnul( new );
-         new = astPrism( snewreg1, snewreg2, "" );
-
+         if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
+            astAnnul( new );
+            new = astPrism( snewreg1, snewreg2, "" );
+   
 /* Ensure the new Prism has the same Negated attribute as the original. */
-         if( neg ) astNegate( new );
-
+            if( neg ) astNegate( new );
+   
 /* Ensure that the new Prism has the same axis order as the original
    current Frame. */
-         perm = astMalloc( sizeof( int )*(size_t) ( naxout1 + naxout2 ) );
-         if( astOK ) {
-            for( i = 0; i < naxout1; i++ ) perm[ i ] = axout1[ i ];
-            for( ; i < naxout1 + naxout2; i++ ) perm[ i ] = axout2[ i - naxout1 ];
-            astPermAxes( new, perm );
-            perm = astFree( perm );
+            perm = astMalloc( sizeof( int )*(size_t) ( naxout1 + naxout2 ) );
+            if( astOK ) {
+               for( i = 0; i < naxout1; i++ ) perm[ i ] = axout1[ i ];
+               for( ; i < naxout1 + naxout2; i++ ) perm[ i ] = axout2[ i - naxout1 ];
+               astPermAxes( new, perm );
+               perm = astFree( perm );
+            }
          }
-      }
-
+   
 /* Free resources. */
-      newfrm1 = astAnnul( newfrm1 );
-      newfrm2 = astAnnul( newfrm2 );
-      newreg1 = astAnnul( newreg1 );
-      newreg2 = astAnnul( newreg2 );
-      snewreg1 = astAnnul( snewreg1 );
-      snewreg2 = astAnnul( snewreg2 );
-   }
-
+         newfrm1 = astAnnul( newfrm1 );
+         newfrm2 = astAnnul( newfrm2 );
+         newreg1 = astAnnul( newreg1 );
+         newreg2 = astAnnul( newreg2 );
+         snewreg1 = astAnnul( snewreg1 );
+         snewreg2 = astAnnul( snewreg2 );
+      }
+   
 /* The second component Region in the Prism is known to be an Interval. 
    If the first component Region is also an Interval, a Box, or a NullRegion 
    we can replace the Prism by a single Interval defined within a CmpFrame.
    Attempt to do this. If succesful, attempt to simplify the new Region
    and use it in place of the original. */
-   if( new ) {
-      new2 = astMergeInterval( new->region2, new->region1 );
-      if( new2 ) {
-         astAnnul( new );
-         new = astSimplify( new2 );
-         new2 = astAnnul( new2 );
-
-/* If not succesful, see if the first component Region is a Prism. If so
-   we can merge the two extrusion Regions into a single Interval. */
-      } else if( astIsAPrism( new->region1 ) ) {
-         cpr = ( AstPrism *) ( new->region1 );
-         newreg1 = cpr->region1;
-         newreg2 = astMergeInterval( new->region2, cpr->region2 );
-         if( newreg2 ) {
-            new2 = (AstRegion *) astPrism( newreg1, newreg2, "" );
+      if( new ) {
+         new2 = astMergeInterval( new->region2, new->region1 );
+         if( new2 ) {
             astAnnul( new );
             new = astSimplify( new2 );
             new2 = astAnnul( new2 );
-         }
-         newreg2 = astAnnul( newreg2 );
-      }      
-   }
-
+   
+/* If not succesful, see if the first component Region is a Prism. If so
+   we can merge the two extrusion Regions into a single Interval. */
+         } else if( astIsAPrism( new->region1 ) ) {
+            cpr = ( AstPrism *) ( new->region1 );
+            newreg1 = cpr->region1;
+            newreg2 = astMergeInterval( new->region2, cpr->region2 );
+            if( newreg2 ) {
+               new2 = (AstRegion *) astPrism( newreg1, newreg2, "" );
+               astAnnul( new );
+               new = astSimplify( new2 );
+               new2 = astAnnul( new2 );
+            }
+            newreg2 = astAnnul( newreg2 );
+         }      
+      }
+   
 /* Now invoke the parent Simplify method inherited from the Region class. 
    This will simplify the encapsulated FrameSet and uncertainty Region. */
-   result = (*parent_simplify)( (AstMapping *) new );
-
+      result = (*parent_simplify)( (AstMapping *) new );
+   
 /* Free resources. */
+      new = astAnnul( new );
+      if( axout1 ) axout1 = astFree( axout1 );
+      if( axout2 ) axout2 = astFree( axout2 );
+      if( nmap1 ) nmap1 = astAnnul( nmap1 );
+      if( nmap2 ) nmap2 = astAnnul( nmap2 );
+   }
+
    reg1 = astAnnul( reg1 );
    reg2 = astAnnul( reg2 );
-   new = astAnnul( new );
    cfrm = astAnnul( cfrm );
    bcmap = astAnnul( bcmap );
-   if( axout1 ) axout1 = astFree( axout1 );
-   if( axout2 ) axout2 = astFree( axout2 );
-   if( nmap1 ) nmap1 = astAnnul( nmap1 );
-   if( nmap2 ) nmap2 = astAnnul( nmap2 );
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.

@@ -1817,6 +1817,45 @@ const char *astXmlGetName_( AstXmlObject *this ){
    return result;
 }
 
+int astXmlGetNattr_( AstXmlElement *this ){
+/*
+*+
+*  Name:
+*     astXmlGetNattr
+
+*  Purpose:
+*     Return the number of attributes held by an element.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "xml.h"
+*     int astXmlGetNattr( AstXmlElement *this )
+
+*  Description:
+*     This function returns the number of  attributes held by an element.
+
+*  Parameters:
+*     this
+*        The pointer to the XmlElement.
+
+*  Returned Value:
+*     The number of  attributes held by the supplied element.
+
+*  Notes:
+*     - Zero is returned if an error has already occurred, or if this
+*     function should fail for any reason.
+*-
+*/
+
+/* Check the global error status. */
+   if( !astOK ) return 0;
+
+/* Return the result. */
+   return ( this->attrs ) ? this->nattr : 0;
+}
+
 int astXmlGetNitem_( AstXmlElement *this ){
 /*
 *+

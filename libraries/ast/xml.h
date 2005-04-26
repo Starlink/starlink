@@ -267,6 +267,7 @@ const char *astXmlGetURI_( AstXmlObject * );
 const char *astXmlGetValue_( AstXmlObject *, int );
 const char *astXmlShow_( AstXmlObject * );
 int astXmlCheckType_( void *, long int );
+int astXmlGetNattr_( AstXmlElement *);
 int astXmlGetNitem_( AstXmlElement *);
 void *astXmlAnnulTree_( AstXmlObject * );
 void *astXmlAnnul_( AstXmlObject * );
@@ -326,6 +327,7 @@ int astXmlTrace_( int );
 #define astXmlGetName(this) astXmlGetName_(astXmlCheckObject(this,0))
 #define astXmlGetValue(this,report) astXmlGetValue_(astXmlCheckObject(this,0),report)
 #define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name)
+#define astXmlGetNattr(this) astXmlGetNattr_(astXmlCheckElement(this,0))
 #define astXmlGetNitem(this) astXmlGetNitem_(astXmlCheckElement(this,0))
 #define astXmlGetItem(this,item) astXmlGetItem_(astXmlCheckElement(this,0),item)
 #define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name)
