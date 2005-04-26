@@ -170,7 +170,7 @@ $(DEMO_TCL): normallib tclAppInit.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
 	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o -o $(DEMO_TCL) \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
-	       $(ADDLIBS) $(ADAM_LIBS) \
+	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
