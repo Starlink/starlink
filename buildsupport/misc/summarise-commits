@@ -2,18 +2,19 @@
 
 use Getopt::Std;
 use Net::SMTP;
+use Time::Local;
 
 use strict;
 
 # Config:
 # Number of days in the reporting interval
-my $interval = 2;
+my $interval = -2;              # default, two days back
 # URL where cvsweb lives 
 my $cvswebhome = 'http://cvsweb.starlink.ac.uk/cvsweb.cgi';
 # Where the results will be reported to be
 my $reporturl = 'http://cvs.starlink.ac.uk/~nxg/summarise-commits.html';
 # Where a report will be mailed to; undef suppresses this
-my $reportmail;
+my $reportmail = undef;
 # ...from
 my $reportfrom = 'ussc@star.rl.ac.uk';
 # ...via mail host
@@ -247,36 +248,114 @@ sub escape_html($);
     }
 }
 
+# DateTime handles simple dates
+{
+    package DateTime;
+
+    # DateTime::read(xxx) returns an object representing the given time.
+    # The argument is an ISO date in the form yyyy-mm-dd, 
+    # or yyyy-mm-ddThh:mm or hh:mm.
+    #
+    # Silently return undef if the date is unparseable
+    sub parse($) {
+        my $datestring = shift;
+        my ($year, $month, $day, $hour, $min);
+        my $self = {};
+        if (($year, $month, $day)
+            = ($datestring =~ m{^(\d\d\d\d)-(\d\d)-(\d\d)$})) {
+            $self->{secs} = Time::Local::timelocal(0,0,0, $day, $month-1, $year-1900);
+        } elsif (($year, $month, $day, $hour, $min)
+                 = ($datestring =~ m{^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d)})) {
+            $self->{secs} = Time::Local::timelocal(0, $min, $hour,
+                                                   $day, $month-1, $year-1900);
+        } elsif (($hour, $min) =
+                 ($datestring =~ m{^(\d\d):(\d\d)})) {
+            my @v = localtime(time());
+            $self->{secs} = Time::Local::timelocal(0, $min, $hour,
+                                                   $v[3], $v[4], $v[5]);
+        } else {
+            return undef;
+        }
+        return bless $self, "DateTime";
+    }
+
+    # return a DateTime representing 'now'
+    sub now() {
+        my $self = {};
+        $self->{secs} = time();
+        return bless $self, "DateTime";
+    }
+
+    # Return the given time in the format CVS requires
+    sub cvsdate() {
+        my $self = shift;
+        my @v = localtime($self->{secs});
+        return sprintf("%04d-%02d-%02d %02d:%02d",
+                       $v[5]+1900, $v[4]+1, $v[3], $v[2], $v[1]);
+    }
+
+    # Return another DateTime object representing a copy of this one
+    sub copy() {
+        my $self = shift;
+        my $newone = {};
+        $newone->{secs} = $self->{secs};
+        return bless $newone, "DateTime";
+    }
+
+    # Change the represented time the given number of secondsinto the future
+    # (may be negative)
+    sub delta(\$) {
+        my $self = shift;
+        my $offset = shift;
+        $self->{secs} += $offset;
+    }
+}
+
 # ======================================================================
 
 my $startdate;
 my $enddate;
 
-
 my %myopts;
-getopts('c:f:hi:m:o:', \%myopts);
+getopts('c:f:hm:o:', \%myopts);
 
 while ($#ARGV >= 0) {
-    if (!defined($startdate)) {
-        $startdate = $ARGV[0];
-        next;
+    if (defined($startdate)) {
+        $enddate =  DateTime::parse($ARGV[0]);
+        if ($enddate) {
+            # parsed as date -- nothing more to do
+        } elsif ($ARGV[0] =~ m{^([+-]?\d+)$}) {
+            $interval = 0 + $1; # coerce into a number
+            $enddate = $startdate->copy;
+            if ($interval > 0) {
+                # this delta specifies the enddate, relative to the start
+                $enddate->delta($interval * 86400);
+            } else {
+                # interval negative -- specifies startdate
+                $startdate->delta($interval * 86400);
+            }
+        } elsif ($ARGV[0] eq 'now') {
+            $enddate = DateTime::now();
+        } else {
+            die "Unparseable second arg: $ARGV[0]\n";
+        }
+    } elsif ($ARGV[0] eq 'now') {
+        $startdate = DateTime::now();
+    } else {
+        $startdate = DateTime::parse($ARGV[0]);
+        if (!$startdate) {
+            die "Unparseable date: $ARGV[0]\n";
+        }
     }
-    if (!defined($enddate)) {
-        $enddate = $ARGV[0];
-        next;
-    }
-    Usage();
 } continue {
     shift @ARGV;
 }
 
 $checkoutdir = $myopts{c} if defined $myopts{c};
 $reportfrom = $myopts{f}  if defined $myopts{f};
-$interval = $myopts{i}    if defined $myopts{i};
 $reportmail = $myopts{m}  if defined $myopts{m};
 
 Usage() if $myopts{h};
-
 
 if (defined $myopts{o}) {
     open(HTML, ">$myopts{o}") 
@@ -288,30 +367,6 @@ if (defined $myopts{o}) {
 
 
 
-unless (defined($startdate) && defined($enddate)) {
-
-    # We could make the time handling more sophisticated using Date::Manip,
-    # but that's not necessary right now.
-
-    my $timenow = time();
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
-
-    unless (defined $enddate) {
-        ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
-            = localtime($timenow);
-        $enddate = sprintf("%04d-%02d-%02d %02d:%02d",
-                           $year+1900, $mon+1, $mday, $hour, $min);
-    }
-    unless (defined $startdate) {
-        ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
-            = localtime($timenow-$interval*24*3600);
-        
-        $startdate = sprintf("%04d-%02d-%02d %02d:%02d",
-                             $year+1900, $mon+1, $mday, $hour, $min);
-    }
-}
-
-
 chdir ($checkoutdir) if defined $checkoutdir;
 unless (-d "CVS") {
     print STDERR "This script must be run in a checkout directory\n";
@@ -320,7 +375,8 @@ unless (-d "CVS") {
 
 # Read in the list of commit info
 my $cvslogcmd = sprintf("cvs -q log -N -S -d '%s<%s'",
-                        $startdate, $enddate);
+                        $startdate->cvsdate, $enddate->cvsdate);
+
 open(COMMITS, "$cvslogcmd |") || die "Can't read commit info";
 my $cvslog = CVSLog::read(*COMMITS);
 close(COMMITS);
@@ -526,10 +582,13 @@ sub escape_html ($) {
 
 sub Usage() {
     printf STDERR <<"EOD";
-Usage: $0 [options] [startdate [enddate]]
+Usage: $0 [options] date delta
+       $0 [options] startdate enddate
+
 Arguments:
-    startdate, enddate: start and end of interval, format 'yyyy-mm-dd hh:mm'
-    or other CVS-style time specs.
+    startdate, enddate: reference dates for interval:
+               format yyyy-mm-dd, yyyy-mm-ddThh:mm, hh:mm or the string 'now'
+    delta:     number of days for period, can be either '-n' or '+n'
 
 Options:
     -c path         path to a current checkout
@@ -537,14 +596,26 @@ Options:
     -f sender-addr  sender of report (only if -m is present)
                     (default: $reportfrom)
     -h              show this help
-    -i n            if neither argument is present, specify period n days
-                    before present (default: $interval)
     -m recipient    send report mail message to recipient
-                    (default: $reportmail)
+EOD
+    printf STDERR "                    (default: "
+        . ($reportmail ? $reportmail : "not sent") . ")\n";
+    printf STDERR <<"EOD";
     -o file         where to place the report file (default: stdout)
+
 Environment:
     MAILHOST        SMTP server to use to send report mail message
                     (default: $mailhost)
+
+Examples:
+    $0 2005-01-01T12:00 now
+        commits from midday 2005-01-01 to present
+    $0 2005-01-01 +2
+        from 2005-01-01 to 2005-01-03
+    $0 now -2
+        commits from two days ago to present
+    $0 00:00 -5
+        from five days before last midnight
 EOD
     exit 1;
 }
