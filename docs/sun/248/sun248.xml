@@ -1,0 +1,487 @@
+<?xml version="1.0"?>
+<!DOCTYPE sun PUBLIC
+              "-//Starlink//DTD Starlink SUN 0.7 (XML)//EN"
+              "dtd/ssn-xml-0.7.dtd">
+<!-- $Revision$ -->
+
+<sun>
+<docinfo>
+<title>Building Starlink Software</title>
+<authorlist>
+<author webpage="http://www.astro.gla.ac.uk/users/norman/"
+  affiliation="Starlink/University of Glasgow" role="author" id="ng"
+  >Norman Gray</author>
+<author affiliation="Starlink, Rutherford Appleton Laboratory" id="ser"
+  >Steve Rankin</author>
+<author affiliation="Starlink/University of Durham" id="pwd"
+  >Peter Draper</author>
+</authorlist>
+<docnumber>248</docnumber>
+<history>
+<version number="0" date="29-Apr-2005" author="ng">
+<px>Draft release: $Revision$</px>
+</version>
+</history>
+</docinfo>
+
+<docbody>
+<abstract>
+<px>This document contains instructions on how to build the Starlink
+software from source.  It contains a few platform-specific notes, and
+a comparison with the old 'mk-based' build system.  This document is
+deliberately terse, since we have invested effort in making the
+processes involved as easy as possible.</px>
+
+<px>This is at present a draft document, and so you should expect it
+to change relatively frequently.</px>
+
+<px><tabular>
+<tgroup cols="1">
+  <tbody>
+  <row><entry>$Revision$</entry></row>
+  <row><entry>$Date$</entry></row>
+  </tbody>
+</tgroup>
+</tabular>
+</px>
+</abstract>
+
+
+
+<sect id="intro" export="export">
+<subhead>
+<title>Introduction</title>
+</subhead>
+
+<p>Starlink distributes its software products in a variety of ways.</p>
+
+<p>The project makes periodic binary releases.  These are made every
+six months in principle, though the intervals are usually somewhat
+longer in fact.  The set of platforms we target is not fixed, but in the
+latest release the list was Linux RHEL3, RH9 and Debian3.0, and Sparc
+8/9, with a beta release for Mac OS X.  For fuller details, see the
+`Software' link on the <webref url="http://www.starlink.ac.uk"
+>Starlink home page</webref>.</p>
+
+<p>All the software in such a release is also available as source
+tarballs, and some components of the software set make interim source
+releases, also as source tarballs.  This document is about how to
+build, and once built how to link against, these distributed source
+tarballs.  It is a short document, since it is our intention that
+building and installing our software should be as simple as
+<verbatim>
+% ./configure; make; make install
+</verbatim>
+exactly as for the majority of open-source software available now.
+Execpt where some technicality prevents it, all the Starlink libraries
+are installed as both static and shared libraries, and there should be
+no surprises in linking agsinst them.  The only difference from the
+standard behaviour is that the default installation prefix for our
+software is in either <code>/star</code> or <code>/stardev</code> (the
+latter for interim releases or beta software), rather than
+<code>/usr/local</code>.  You can confirm this with <kbd>./configure
+--help</kbd>.
+</p>
+
+<p>The software should build without problems, as we have invested
+considerable effort in making it portable across platforms and
+compilers.  As with any other very large software system, however, we
+are aware of some wrinkles, and these are discussed in the
+platform-specific notes in <ref id="platform"/> below.  If you find
+any other problems, or have other comments on the build system, please
+do get in touch with the project, through the general contact address
+<webref url="mailto:ussc@star.rl.ac.uk"
+><code>ussc@star.rl.ac.uk</code></webref>.</p>
+
+<p>You may be used to Starlink's earlier build system, based on
+<code>./mk</code> scripts.  This is now obsolete, and a migration path
+is outlined in <ref id="mk-migration"/> below</p>
+
+<subsect id="starcvs" export="export">
+<subhead>
+<title>The Starlink CVS repository</title>
+</subhead>
+
+<p>All of Starlink's source code is kept in a CVS repository, which is
+publicly available.  The Starlink build system consists of
+<ul>
+<li>
+<p>the Starlink CVS repository;</p>
+</li>
+
+<li>
+<p>build tools, consisting of modified versions of the GNU
+autotools <code>autoconf</code> <code>automake</code>
+and <code>libtool</code>;</p>
+</li>
+
+<li>
+<p>configuration and bootstrap code, consisting of the
+<code>starconf</code> system and the scripts at the top
+level of the Starlink source tree.</p>
+</li>
+
+</ul>
+</p>
+
+<p>The repository is on the machine <code>cvs.starlink.ac.uk</code>.  See
+<url>http://www.starlink.ac.uk/Download/getcvs.html</url> for details
+of checking out the software and building the system.</p>
+
+<p>The <code>getcvs.html</code> web page above says that, after
+checking the source tree out of CVS, you should read the
+<code>README</code> at the top of the tree.  There are
+platform-specific notes about this in <ref id="platform"/> below.</p>
+
+<p>The build system as a whole is described in considerable detail in
+<docxref doc="SSN/78">SSN/78</docxref>.  This is a large document, but
+you probably don't have to read it, if what you want to do with the
+Starlink applications and libraries is to build them from distributed
+source tarballs, use the applications, and link against the libraries
+from your own programs.  You will only need to read SSN/78 if you wish
+to
+<ol>
+<li>
+<p>build from the up-to-the-minute versions in the CVS repository
+(though even in that case, you are probably better with the
+up-to-the-day versions available in the nightly build tarballs);</p>
+</li>
+<li>
+<p>work on the CVS sources themselves, since you are welcome to play
+with the versions of the sources available as an anonymous CVS
+checkout; or</p>
+</li>
+
+<li>
+<p>you wish to add further components to the Starlink CVS repository,
+though in this case you should probably talk to the project first, to
+coordinate your efforts with others.</p>
+</li>
+</ol>
+</p>
+</subsect>
+
+</sect>
+
+<sect id="platform" export="export">
+<subhead>
+<title>Platform-specific notes</title>
+</subhead>
+
+<p>To build the software set, you should follow the
+<code>README</code> at the top level of the checked-out tree.  You can
+examine the current version of this file, and its history, at
+<url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/README</url>.</p>
+
+<subsect id="platform-osx" export="export">
+<subhead>
+<title>Building on OS X</title>
+</subhead>
+
+<p>You need a Fortran compiler: although the system compiler on OS X
+is GCC, Apple don't include g77 in their distribution.</p>
+
+<p>You can get a g77 package from either DarwinPorts or
+Fink. Darwinports is (in Norman's experience) rather more fiddly to
+set up than Fink, but it is possibly to be preferred, since it has a
+certain amount of Apple support and contributions from Apple
+employees; it appears to be more deliberately aligned with the GCC
+version in the OS X distribution; and there are suggestions that Apple
+may at some point `bless' it, and make it more easily integrated with
+a standard OS X setup.</p>
+
+<p>Once you've installed one of the g77 packages, and put the appropriate binary directory in your PATH, you should be ready to go.</p>
+
+<p>If you want to build and install the documentation then you should
+install TeX on Mac OS X (get the <code>gwTeX</code> distribution
+(good) from <url>http://www.rna.nl/tex.html</url>; there are other
+notes about TeX on OS X at
+<url>http://www.esm.psu.edu/mac-tex/</url>). Otherwise use:
+<verbatim>
+% ./configure -C --disable-shared --without-stardocs
+</verbatim>
+You might also have to install ghostscript from Darwinports or Fink.</p>
+
+<p>You should also install the Apple X11 distribution and also the
+X11-SDK, this should be included on your Mac OS X distribution media,
+but not installed by default. Do not use the Darwinports or Fink
+X11.</p>
+
+<p>If you want to build STARJAVA, then you will need to install the Java
+Advanced imaging and 3D support from Apple.</p>
+
+</subsect>
+
+<subsect id="platform-tru64" export="export">
+<subhead>
+<title>Building on Tru64</title>
+</subhead>
+
+<p>The configure script will choose a Fortran 95 compiler before it
+settles for a Fortran 77 one. Some of the code requires a Fortran 77
+compiler (at least at present, possibly indefinitely), and so if you
+have more than one Fortran compiler installed, you'll have to force
+the build system with a command like:
+<verbatim>
+% ./configure FC=f77 [other arguments]
+</verbatim>
+where the Tru64 Fortran 77 compiler is called <code>f77</code>. You
+can give the path to the compiler also, if the f77 you want isn't the
+first one in your <code>PATH</code>.</p>
+
+<p>The Tru64 C and C++ compilers should work fine: if you have more
+than one compiler installed, you can force them with the configure
+arguments <code>CC=cc</code> and <code>CXX=cxx</code>, but this
+shouldn't be necessary.</p>
+
+</subsect>
+
+
+<subsect id="platform-solaris" export="export">
+<subhead>
+<title>Building on Solaris</title>
+</subhead>
+
+<p>The configure script will choose a Fortran 95 compiler before it
+settles for a Fortran 77 one. Some of the code requires a Fortran 77
+compiler, which means that, if you have more than one Fortran compiler
+installed, you'll have to force the build system with a command like:
+<verbatim>
+% ./configure FC=f77 F77=f77 FPPFLAGS='-P -fixed' [other arguments]
+</verbatim>
+where the Solaris Fortran 77 compiler is called <code>f77</code>,. You
+can give the path to the compiler also, if the f77 you want isn't the
+first one in your <code>PATH</code>. </p>
+
+<p>This dependence on a Fortran 77 compiler is true at present, and
+may be the case indefinitely; at least part of the problem is libtool,
+which appears not to understand f95 on Solaris, so this problem might
+go away with a libtool update.  As libtool doesn't understand the
+<code>FC</code> flag, the <code>F77</code> variable has to be set to
+match the <code>FC</code> one.</p>
+
+<p>The Solaris C and C++ compilers should work fine: if you have more
+than one compiler installed, you can force the choice with the
+configure arguments <code>CC=cc</code> and <code>CXX=CC</code>, but
+this shouldn't be necessary. The system works with gcc and g++ on
+Solaris, too, and these compilers can be selected using the same
+mechanism.</p>
+
+</subsect>
+
+<subsect id="platform-cygwin" export="export">
+<subhead>
+<title>Building on Cygwin</title>
+</subhead>
+
+<p>The configure script fails to identify how to preprocess Fortran,
+so it necessary to set environment variables with a command like:
+<verbatim>
+% ./configure FPP=g77 FPPFLAGS='-E' [other arguments]
+</verbatim>
+</p>
+
+</subsect>
+
+<subsect id="platform-x86" export="export">
+<subhead>
+<title>Building on x86</title>
+</subhead>
+
+<p>There are no known problems building on x86 boxes.</p>
+
+<p>Whoopee, and all that.</p>
+</subsect>
+
+<subsect id="platform-x86-64" export="export">
+<subhead>
+<title>Building on 64-bit x86</title>
+</subhead>
+
+<p>The only known problem on x86_64 is a distribution-specific one (I
+think). On RHEL, the tetex 1.* package installs the kpathsea library
+as a static library alone, and not a shared one. This produces an
+error message when compiling the <code>dvi2bitmap</code> component,
+resembling:
+<verbatim>
+ld: ./libkpathsea.a(tex-file.o): relocation R_X86_64_32 can not be used when making a shared object; recompile with -fPIC
+./libkpathsea.a: could not read symbols: Bad value
+</verbatim>
+</p>
+
+<p>To address this, you can either configure <code>dvi2bitmap</code>
+using <code>--without-kpathsea</code> at some loss in functionality,
+or else recompile the kpathsea library yourself. The sources are
+available at <webref url="http://www.tug.org/ftp/tex/web2c.tar.gz"
+>TUG</webref> -- you need to rebuild only the kpathsea part of this
+distribution: to do that:
+<ol>
+<li><p>Unpack the distribution, and go to the <code>web2c-x.x.x</code>
+directory</p></li>
+
+<li><p>Configure using <code>./configure --enable-shared --datadir=XXX
+--prefix=PREFIX</code>, where <code>XXX</code> is the location
+of teTeX on your local machine (probably <code>/usr/share</code> on
+RHEL) and <code>PREFIX</code> is where you would like the newly-built
+library to be installed.</p></li>
+
+<li><p>cd to the kpathsea directory, and delete the lines in the
+Makefile that refer to (unwritable) <code>$(web2cdir)</code></p></li>
+
+<li><p><code>make; make install</code> to install in
+ <code>PREFIX</code>.</p></li>
+</ol>
+The installation directory <code>PREFIX</code> will have to be in your
+<code>LD_LIBRARY_PATH</code> when you re-configure
+<code>dvi2bitmap</code>.</p>
+
+</subsect>
+</sect>
+
+<sect id="mk-migration" export="export">
+<subhead>
+<title>Migration from a ./mk based build system</title>
+</subhead>
+
+<p>The Starlink code set is now built using the standard (or at least,
+conventional) autoconf system, so that you configure the system before
+building using the command <code>./configure</code>. See the sections above
+for more discussion.</p>
+
+<p>This is rather different from the old Starlink system, which used a
+mk script, which set up a number of environment variables to
+platform-specific values and then invoked make on your behalf. The
+<code>mk</code> script consisted of a switch which set appropriate
+values for each of the platforms which the project supported (plus
+sometimes a few other contributed ones). The configure-based system
+should be more portable, and work on a broader range of platforms
+without such platform-specific customisation.</p>
+
+<p>If you have previously built software using the mk-based system, you
+will see little difference in the new system, beyond the difference in
+procedure described above.</p>
+
+<p>If, on the other hand, you have previously developed using the
+mk-based system, there will be a few more changes:
+<ol>
+<li><p>mk scripts will no longer work</p></li>
+
+<li><p>The <code>INSTALL</code> and <code>SYSTEM</code> environment
+variables have disappeared.</p></li>
+
+<li><p>The <code>xxx_dev</code> scripts have disappeared.</p></li>
+
+<li><p>The system now uses shared libraries extensively, and you might
+have to indicate where these are.</p></li> 
+</ol>
+</p>
+
+<p>If you are simply linking against Starlink libraries, you probably
+don't have to care about any of this, and the only difference is that
+you now have shared libraries and centrally located include files to
+make your job easier.  Most of the libraries in the distribution are
+built using <code>libtool</code>, and the libtool <code>.la</code>
+`library files' are installed.</p>
+
+<p>If you are planning to work on applications in the CVS repository,
+you should probably take a look at <docxref
+doc="SUN/78">SUN/78</docxref>, and might want to introduce yourself on
+the Starlink developers mailing list, at
+<url>http://www.jiscmail.ac.uk/lists/stardev.html</url>.</p>
+
+<subsect id="mk-mk" export="export">
+<subhead>
+<title>mk scripts</title>
+</subhead>
+
+<p>mk scripts are now obsolete.  If you have made or modified a
+<code>mk</code> script of your own, you might possibly need to rework
+things to fit in with the new system. SUN/78 describes the new build
+system in detail, along with introductions to the autotools and
+pointers to fuller documentation.</p>
+</subsect>
+
+<subsect id="mk-install" export="export">
+<subhead>
+<title>The INSTALL and SYSTEM variables</title>
+</subhead>
+
+<p>The <code>INSTALL</code> and <code>SYSTEM</code> variables have
+disappeared.</p>
+
+<p>The <code>SYSTEM</code> variable used to specify the system on
+which the software was being built, and the <code>mk</code> script
+switched on this value to make its settings, making the assumption
+that the platform reliably implied the compilers being used. This is
+now redundant, since the autoconf-based system makes its decision, not
+on the basis of what platform it discovers it is running on, but on
+the basis of the tools and capabilities it dynamically discovers. This
+variable is now simply ignored.</p>
+
+<p>The <code>INSTALL</code> variable used to specify the installation
+location. This role is now performed by the <code>--prefix...=</code>
+option to the <code>./configure</code> script. This script will,
+however, look at the <code>INSTALL</code> variable and, if it is set,
+expect it to name a program to use instead of the standard
+<code>/usr/bin/install</code> program, to install the software after
+building.  You should almost certainly <em>not</em> have this variable
+defined, and if it is defined by accident, to anything other than an
+installation program, the buildsystem will probably fail messily.</p>
+
+<p>See the top level <code>README</code> file for further details about
+environment variables which affect the build.</p>
+</subsect>
+
+<subsect id="mk-dev" export="export">
+<subhead>
+<title>The xxx_dev scripts, and include files</title>
+</subhead>
+
+<p>The <code>xxx_dev</code> scripts and include files have changed.</p>
+
+<p>In the <code>mk</code> system, the <code>xxx_dev</code> scripts had
+to be used to make soft links to the (Fortran) include files necessary
+for working with a library.  In the new system, all such include files
+are installed in a standard place, such as /star/include.  All the
+Fortran compilers that we are aware of have a <code>-I</code> option
+to indicate where such include files are to be found.</p>
+
+<p>Note that the Fortran include files are now consistently upper-case.</p>
+
+</subsect>
+
+<subsect id="mk-shared" export="export">
+<subhead>
+<title>Shared libraries</title>
+</subhead>
+
+<p>With only one or two exceptions, all the Starlink libraries are
+built and installed as shared libraries, as well as static ones. You
+might, therefore, have to do something special to link against
+these. On many Unixes, the environment variable <code>LD_LIBRARY_PATH</code>
+specifies a list of directories which are searched for shared
+libraries, in addition to a set of system defaults. The analogue on
+Mac OS X is <code>DYLD_LIBRARY_PATH</code>.</p>
+
+<p>The build system uses <webref
+url="http://directory.fsf.org/libtool.html" >libtool</webref>
+extensively, and it installs its `libtool library files',
+<code>wibble.la</code>, in the library directory alongside the more
+usual static <code>.a</code> and dynamic <code>.so</code> files (as
+appropriate for your platform).  If you also use libtool, you can
+usefully link against these <code>.la</code> files yourself.</p>
+
+<p>See your system's <code>ld</code> man page for more details than
+you can shake a stick at.</p>
+
+</subsect>
+</sect>
+
+</docbody>
+
+</sun>
+
+<!-- Local Variables: -->
+<!-- sgml-indent-data: nil -->
+<!-- sgml-indent-step: 0 -->
+<!-- End: -->
