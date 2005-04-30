@@ -1688,6 +1688,12 @@ $(MANIFESTS)/starx: \
 	cd applications/starx \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sun248: \
+		$(MANIFESTS)/dvi2bitmap \
+		$(MANIFESTS)/sgmlkit
+	cd docs/sun/248 \
+	  && $(MAKE_CPT)
+
 # Component tcl is a configure dependency, so is configurable in place.
 $(MANIFESTS)/tcl:
 	cd thirdparty/tclsys/tcl \
