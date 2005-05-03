@@ -45,7 +45,7 @@ GAIA_LIB_FILES =  \
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
- gaia_swish$(EXEEXT) gaia_stcl$(EXEEXT) gaiaMon$(EXEEXT)
+ gaia_swish$(EXEEXT) gaia_stcl$(EXEEXT) gaiaMon$(EXEEXT) imcopy$(EXEEXT)
 
 GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc tab2cat.ifc \
                  asc2tab.ifc tab2asc.ifc

@@ -1,5 +1,10 @@
 1 Starlink GAIA major update
 
+  Add changes to display in-line compressed images (such as RICE).
+  These are converted into temporary files on the fly and can be 
+  used with all other tasks within GAIA.
+  
+
   Stop problems with foreign-file conversion deleting the input files
   and re-opening creating a new copy.
 

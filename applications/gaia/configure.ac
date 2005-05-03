@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gaia, 2.8-2, gaia@star.rl.ac.uk)
+AC_INIT(gaia, 2.9-0, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -33,12 +33,11 @@ STAR_INITIALISE_FORTRAN
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
-                          [ard ast cat generic fio img pcs pda sae sla], link)
+     [ard ast cat cfitsio generic fio img pcs pda sae sla], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need to add AUTOASTROM to this when available.
 STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom polpack])
-
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
