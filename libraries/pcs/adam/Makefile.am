@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = adam_link_adam
+dist_bin_SCRIPTS = adam_link_adam
 
 lib_LTLIBRARIES = libadam_adam.la
 

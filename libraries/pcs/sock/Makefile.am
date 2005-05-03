@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = sock_link sock_link_adam
+dist_bin_SCRIPTS = sock_link sock_link_adam
 
 lib_LTLIBRARIES = libsock.la
 
