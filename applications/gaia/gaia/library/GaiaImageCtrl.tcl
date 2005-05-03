@@ -103,6 +103,10 @@ itcl::class gaia::GaiaImageCtrl {
    #  accept an exit without prompting (this is what all the catches
    #  achieve).
    destructor {
+      #  The FITS chooser needs to release any temporary files used for
+      #  storing in-line compressed images.
+      gaia::GaiaHduChooser::release_temporary_files
+
       if { ![catch {wm withdraw $top_}] } {
          catch {maybe_delete_}
       }
@@ -115,6 +119,7 @@ itcl::class gaia::GaiaImageCtrl {
       if { $namer_ != {} } {
 	 catch {delete object $namer_}
       }
+
    }
 
    #  This method is called from the base class (TopLevelWidget) after all
