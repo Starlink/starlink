@@ -83,6 +83,12 @@ itcl::class gaia::GaiaHduChooser {
       #  Get name of FITS file.
       set file [$image_ cget -file]
       
+      #  May be an image masquerading as a table. Check for that.
+      if { "$name" == "COMPRESSED_IMAGE" } {
+         error_dialog "No support for in-line compressed images"
+         return
+      }
+
       #  Construct CURSA name.
       incr hdu -1
       if { $hdu > 0 } { 
