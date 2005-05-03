@@ -116,9 +116,13 @@ STAR_INC = @STARLINK@/include
 COMPIFL  = @STARLINK@/bin/compifl
 #  Define sets of ADAM libraries we need to link against. Note that
 #  ast_link and ndf_link must be carefully managed to avoid picking up
-#  default AST libraries for errors and graphics.
+#  default AST libraries for errors, graphics and SLA. We also use AST to 
+#  define what extra libraries are needed to link against Fortran.
 AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf -fsla` `sla_link`
 ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` `ams_link_adam` `ndf_link`  -lpda
+
+#  Libraries needed to link the "imcopy" program.
+CFITSIO_LIBS = -L$(STAR_LIB) `cfitsio_link`
 
 #  Main wish interpreter for GAIA.
 DEMO_WISH = bin/gaia_wish
@@ -139,6 +143,9 @@ IFL_FILES = src/ardstat.ifl src/asc2tab.ifl src/autocrop.ifl \
             src/cat2tab.ifl src/tab2asc.ifl src/tab2cat.ifl
 IFC_FILES = $(IFL_FILES:.ifl=)
 
+#  The "imcopy" program used to convert in-line compressed images.
+IMCOPY = bin/imcopy$(EXEEXT)
+
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 
 CC_SWITCHES  = $(DEFINES) $(INCLUDES) $(CFLAGS)
@@ -154,7 +161,7 @@ RM           = rm -f
 LN           = ln -s
 
 # ------------------------------------------------------------------------
-all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
+all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON) $(IMCOPY)
 
 #  Link wish. 
 $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
@@ -196,6 +203,10 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	    );\
 	done
 
+$(IMCOPY): imcopy.c
+	@echo "linking \"$(IMCOPY)\"..."
+	$(LTLINK) $(CC_SWITCHES)  imcopy.c -o $(IMCOPY) $(CFITSIO_LIBS)
+
 # initFortran.c includes ../config.h
 initFortran.o: initFortran.c
 	$(CC) -c $(CC_SWITCHES) -I.. initFortran.c
@@ -220,6 +231,8 @@ install-bin:
 	chmod 0755 $(DEMO_TCL)
 	$(INSTALL) $(DEMO_TCL) $(BINDIR)
 	$(INSTALL) $(GAIAMON) $(BINDIR)
+	chmod 0755 $(IMCOPY)
+	$(INSTALL) $(IMCOPY) $(BINDIR)
 	for f in gaiaMon $(GAIA_TASKS) ""; do \
 	   if test -f bin/"$${f}.ifc"; then \
 	      $(INSTALL_DATA) bin/"$${f}.ifc" $(BINDIR)/; \
@@ -252,7 +265,8 @@ install-bitmaps:
 install: install-top install-library install-bin install-colormaps install-bitmaps
 
 clean:
-	$(RM) $(OBJECTS) $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON) $(GAIAMON).ifc \
+	$(RM) $(OBJECTS) $(DEMO_WISH) $(DEMO_TCL) $(IMCOPY) $(GAIAMON) \
+	      $(GAIAMON).ifc \
 	      $(IFC_FILES) $(TASK_LINKS) $(TASK_LINKS:=.ifc)
 	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
 
