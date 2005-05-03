@@ -7,10 +7,10 @@ application.
 
 =head1 SYNOPSIS
 
-use Starlink::Astrom;
+  use Starlink::Astrom;
 
-my $astrom = new Starlink::Astrom( catalog => $catalog );
-my $frameset = $astrom->solve;
+  my $astrom = new Starlink::Astrom( catalog => $catalog );
+  my $frameset = $astrom->solve;
 
 =head1 DESCRIPTION
 
@@ -21,9 +21,11 @@ application.
 
 use Carp;
 use strict;
-use File::Spec;
-use File::Temp qw/ tempfile /;
+
 use File::Basename;
+use File::Copy;
+use File::Spec;
+use File::Temp qw/ tempdir tempfile /;
 
 use Starlink::AST;
 use Astro::Catalog;
@@ -50,6 +52,21 @@ The constructor accepts one mandatory named parameter defining
 the catalogue that will be used to generate an astrometric solution.
 This parameter must be an C<Astro::Catalog> object.
 
+The following optional arguments are allowed:
+
+=item keepfits - If set, keep the resulting FITS-WCS file as named
+by this option. [undef]
+
+=item keeptemps - If set to true, keep all temporary files used
+for processing. This includes all output files. [0]
+
+=item tempdir - If set, use the named directory as the location
+for all temporary files. If the directory does not exist, it will
+be created. [undef]
+
+=item verbose - If set to true, print diagnostic messages during
+processing. [0]
+
 The constructor returns an C<Starlink::Astrom> object.
 
 =cut
@@ -67,16 +84,14 @@ sub new {
     croak "Must supply an Astro::Catalog object to Starlink::Astrom constructor";
   }
 
-  my $catalog = $args{'catalog'};
-
   # Create the object.
   my $astrom = {};
-
-  # Set up the catalogue.
-  $astrom->{CATALOG} = $catalog;
-
-  # Bless and return.
   bless( $astrom, $class );
+
+  # Configure the object.
+  $astrom->_configure( \%args );
+
+  # Return.
   return $astrom;
 
 }
@@ -109,6 +124,101 @@ sub catalog {
     }
   }
   return $self->{CATALOG};
+}
+
+=item B<keepfits>
+
+Retrieve or set the filename for the calculated FITS-WCS file.
+
+  my $keepfits = $astrom->keepfits;
+  $astrom->keepfits( 'wcs.fits' );
+
+If undefined (which is the default), then no FITS-WCS file will be
+saved after processing. If defined, then the FITS-WCS file will have
+the name given as this value. Using the above example, the FITS-WCS file
+will be saved as 'wcs.fits' in the current working directory.
+
+Only the FITS-WCS file for the highest order fit will be kept. To
+keep the other FITS-WCS files, set the C<keepfits> value to true.
+
+=cut
+
+sub keepfits {
+  my $self = shift;
+  if( @_ ) {
+    my $keepfits = shift;
+    $self->{KEEPFITS} = $keepfits;
+  }
+  return $self->{KEEPFITS};
+}
+
+=item B<keeptemps>
+
+Whether or not to keep temporary files after processing is completed.
+
+  my $keeptemps = $auto->keeptemps;
+  $auto->keeptemps( 1 );
+
+Temporary files are created in a temporary directory that is reported
+during execution. The location of this temporary directory can be
+controlled using the C<tempdir> method.
+
+This parameter defaults to false, so all temporary files are deleted
+after processing.
+
+=cut
+
+sub keeptemps {
+  my $self = shift;
+  if( @_ ) {
+    my $keeptemps = shift;
+    $self->{KEEPTEMPS} = $keeptemps;
+  }
+  return $self->{KEEPTEMPS};
+}
+
+=item B<temp>
+
+Retrieve or set the directory to be used for temporary files.
+
+  my $temp = $auto->temp;
+  $auto->temp( '/tmp' );
+
+If undef (which is the default), a temporary directory will be
+created using C<File::Temp>.
+
+=cut
+
+sub temp {
+  my $self = shift;
+  if( @_ ) {
+    my $temp = shift;
+    $self->{TEMP} = $temp;
+  }
+  if( ! defined( $self->{TEMP} ) ) {
+    $self->{TEMP} = tempdir();
+  }
+  return $self->{TEMP};
+}
+
+=item B<verbose>
+
+Retrieve or set the verbosity level.
+
+  my $verbose = $auto->verbose;
+  $auto->verbose( 1 );
+
+If set to true, then much output will be output to STD_ERR. Defaults to false.
+
+=cut
+
+sub verbose {
+  my $self = shift;
+  if( @_ ) {
+    my $verbose = shift;
+    $self->{VERBOSE} = $verbose;
+  }
+  return $self->{VERBOSE};
 }
 
 =back
@@ -162,27 +272,27 @@ sub solve {
     croak "Could not find astrom.x binary";
   }
 
-  print "astrom.x binary is in $astrom_bin\n" if $DEBUG;
+  print "astrom.x binary is in $astrom_bin\n" if ( $DEBUG || $self->verbose );
 
   # We need a temporary file for the astrom input file.
-  ( undef, my $astrom_input ) = tempfile();
+  ( undef, my $astrom_input ) = tempfile( DIR => $self->temp );
 
   # Write the catalog to the temporary file.
   $catalog->write_catalog( Format => 'Astrom', File => $astrom_input );
-  print "ASTROM input catalog is in $astrom_input\n" if $DEBUG;
+  print "ASTROM input catalog is in $astrom_input\n" if ( $DEBUG || $self->verbose );
 
   # We need a base filename for the FITS files. ASTROM will automatically
   # append NN.fits, where NN is the fit number.
-  ( undef, my $output_fitsbase ) = tempfile();
-  print "ASTROM FITS file base name is $output_fitsbase\n" if $DEBUG;
+  ( undef, my $output_fitsbase ) = tempfile( DIR => $self->temp );
+  print "ASTROM FITS file base name is $output_fitsbase\n" if ( $DEBUG || $self->verbose );
 
   # And we need temporary files to hold the report, the summary, and the log.
-  ( undef, my $output_report ) = tempfile();
-  ( undef, my $output_summary ) = tempfile();
-  ( undef, my $output_log ) = tempfile();
-  print "ASTROM output report file is in $output_report\n" if $DEBUG;
-  print "ASTROM output summary file is in $output_summary\n" if $DEBUG;
-  print "ASTROM output log file is in $output_log\n" if $DEBUG;
+  ( undef, my $output_report ) = tempfile( DIR => $self->temp );
+  ( undef, my $output_summary ) = tempfile( DIR => $self->temp );
+  ( undef, my $output_log ) = tempfile( DIR => $self->temp );
+  print "ASTROM output report file is in $output_report\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM output summary file is in $output_summary\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM output log file is in $output_log\n" if ( $DEBUG || $self->verbose );
 
 
   # Now we are good to go. Set up the parameter list for ASTROM.
@@ -218,16 +328,56 @@ sub solve {
   my $cfitsio = new Astro::FITS::Header::CFITSIO( File => $highest );
   my $wcs = $cfitsio->get_wcs;
 
-  # Remove all of the temporary files, unless debugging is turned on.
-  unlink $astrom_input unless $DEBUG;
-  unlink $output_report unless $DEBUG;
-  unlink $output_summary unless $DEBUG;
-  unlink $output_log unless $DEBUG;
-  unlink <$output_fitsbase*> unless $DEBUG;
+  # If requested, save this file in the current working directory.
+  if( defined( $self->keepfits ) ) {
+    my $fitsfile = $self->keepfits;
+    copy( $highest, $fitsfile ) or croak "Could not copy FITS-WCS file from $highest to $fitsfile: $!";
+    print "FITS-WCS file stored in $fitsfile\n" if ( $DEBUG || $self->verbose );
+  }
+
+  # Remove all of the temporary files, unless debugging is turned on or
+  # temporary files have been requested to be kept.
+  unlink $astrom_input unless ( $DEBUG || $self->keeptemps );
+  unlink $output_report unless ( $DEBUG || $self->keeptemps );
+  unlink $output_summary unless ( $DEBUG || $self->keeptemps );
+  unlink $output_log unless ( $DEBUG || $self->keeptemps );
+  unlink <$output_fitsbase*> unless ( $DEBUG || $self->keeptemps );
 
   # And return the Starlink::AST::FrameSet object.
   return $wcs;
 }
+
+=back
+
+=head2 Private Methods
+
+The following methods are private and are not exported.
+
+=over 4
+
+=item B<_configure>
+
+Configures the object.
+
+  $auto->_configure( $args );
+
+Takes one argument, a hash reference. The hash contains key/value pairs
+that correspond to the various accessor methods of this module.
+
+=cut
+
+sub _configure {
+  my $self = shift;
+  my $args = shift;
+
+  foreach my $key ( keys %$args ) {
+    if( $self->can( $key ) ) {
+      $self->$key( $args->{$key} );
+    }
+  }
+}
+
+=back
 
 =head1 CVS VERSION
 
