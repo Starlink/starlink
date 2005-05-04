@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = par_link_adam
+dist_bin_SCRIPTS = par_link_adam
 
 lib_LTLIBRARIES = libpar_adam.la
 libpar_adam_la_SOURCES = \
@@ -62,3 +62,10 @@ check_MONOLITHS = par_test
 par_test_SOURCES = par_test.f
 # no variable par_test_TASKS -- par_test is an ATASK
 par_test_LDADD = libpar_adam.la `err_link_adam` `subpar_link_adam` `chr_link_adam`
+
+CLEANFILES = par_test par_test.ifc
+
+EXTRA_DIST = par_err.msg
+
+
+DISTCLEANFILES = fac_190_err PAR_ERR par_err.h
