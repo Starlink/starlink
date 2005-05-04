@@ -889,10 +889,10 @@ AC_DEFUN([STAR_CHECK_PROGS],
                       AC_PATH_PROG(star_prog,
                                    ProgramName,
                                    ProgramName,
-                                   [$default_bindir:]m4_ifval([$2],
-                                                              [$default_bindir/$2:],
-                                   )[$STARLINK/bin:]m4_ifval([$2],
+                                   [$STARLINK/bin:]m4_ifval([$2],
                                                               [$STARLINK/bin/$2:],
+                                   )[$default_bindir:]m4_ifval([$2],
+                                                              [$default_bindir/$2:],
                                    )[$PATH])
 ##                      if test -z "$star_prog"; then
 ##                          if test -x $STARLINK/bin/starconf-finder; then
