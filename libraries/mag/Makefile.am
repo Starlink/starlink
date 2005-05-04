@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = mag_link mag_link_adam create_tape_dev
+dist_bin_SCRIPTS = mag_link mag_link_adam create_tape_dev
 
 bin_MONOLITHS = tapecreate
 
@@ -73,3 +73,9 @@ mag_test_LDADD = `$(srcdir)/mag_link_adam`
 # no variable magtest_TASKS -- magtest is an ATASK
 magtest_SOURCES = magtest.f
 magtest_LDADD = `$(srcdir)/mag_link_adam` `prm_link`
+
+dist_starnews_DATA = mag.news
+
+EXTRA_DIST = mag_err.msg
+
+
