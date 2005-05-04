@@ -205,7 +205,8 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 
 $(IMCOPY): imcopy.c
 	@echo "linking \"$(IMCOPY)\"..."
-	$(LTLINK) $(CC_SWITCHES)  imcopy.c -o $(IMCOPY) $(CFITSIO_LIBS)
+	$(LTLINK) $(CC_SWITCHES)  imcopy.c -o $(IMCOPY) \
+	   $(CFITSIO_LIBS) $(EXTRA_LIBS)
 
 # initFortran.c includes ../config.h
 initFortran.o: initFortran.c
