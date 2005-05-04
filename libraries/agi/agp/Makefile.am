@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
-bin_SCRIPTS = agp_link agp_link_adam
+dist_bin_SCRIPTS = agp_link agp_link_adam
 
 # Need to use include files from parent
 AM_FCFLAGS = -I..
@@ -48,3 +48,10 @@ agp1_trans.lo: AGP_CONST AGP_COM
 agp_aspec.lo: AGP_CONST AGP_COM
 agp_curag.lo: AGP_CONST AGP_COM
 agp1_gdlst.lo: AGP_CONST AGP_COM
+
+
+EXTRA_DIST = make_agp_files pgnames.txt
+
+
+CLEANFILES = agp1_init.f AGP_COM AGP_CONST
+

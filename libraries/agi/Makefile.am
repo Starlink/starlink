@@ -3,7 +3,7 @@
 SUBDIRS = agp
 
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
-bin_SCRIPTS = agi_link agi_link_adam
+dist_bin_SCRIPTS = agi_link agi_link_adam
 
 include_HEADERS = AGI_PAR
 include_MESSAGES = AGI_ERR
@@ -84,3 +84,9 @@ check_PROGRAMS = agi_test
 
 agi_test_SOURCES = agi_test.F
 agi_test_LDADD = libagi.la `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link`
+
+
+CLEANFILES = AGI_ERR fac_1501_err
+
+
+
