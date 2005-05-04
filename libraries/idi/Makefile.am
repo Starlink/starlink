@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = idi_link idi_link_adam
+dist_bin_SCRIPTS = idi_link idi_link_adam
 
 lib_LTLIBRARIES = libidi.la libidi_adam.la
 
@@ -70,4 +70,9 @@ idi_test_SOURCES = idi_test.f
 idi_test_LDADD = libidi_adam.la `ndf_link_adam` `gwm_link_adam` \
 `gns_link_adam` `cnf_link_adam` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
+dist_starnews_DATA = idi.news
+
+EXTRA_DIST = xworks.dct
+
+CLEANFILES = xworks.dat idi_test.ifc 
 
