@@ -18,3 +18,7 @@ PUBLIC_INCLUDES = sock.h
 
 BUILT_SOURCES = $(include_MESSAGES)
 
+CLEANFILES = fac_390_err sock_err.h
+
+EXTRA_DIST = sock_err.msg
+
