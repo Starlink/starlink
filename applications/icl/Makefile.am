@@ -92,3 +92,9 @@ LEX_SOURCE = lex.l
 #  List program source
 PROGRAM_SOURCE = icl_io.c
 
+EXTRA_DIST = $(PRIVATE_INCLUDES)
+
+dist_starnews_DATA = icl.news
+
+dist_pkgdata_DATA = ICL_CONDITIONS
+
