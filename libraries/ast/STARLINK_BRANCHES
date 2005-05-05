@@ -26,6 +26,12 @@ there's no point in multiplying our merging problems unnecessarily.
 The changes done on that previous branch were merged onto this branch,
 mostly with a patch file, but by hand where there were already conflicts.
 
+By 2005-05-04T16:00, the HEAD had again diverged significantly from
+the original branch point, so Norman merged the HEAD differences from
+the branch point onto the branch:
+
+    cvs update -j bp-DEV-nxg-20050314-ast-timeframe -j HEAD
+
 DEV-dsb-20041123-ast-stc
 ------------------------
 
