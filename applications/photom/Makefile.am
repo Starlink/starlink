@@ -29,3 +29,11 @@ testphotom: testphotom.in
 	chmod 0755 testphotom	
 
 SUBDIRS = subs tasks help
+
+EXTRA_DIST = testphotom.in $(DATA_FILES)
+
+dist_starnews_DATA = photom.news
+
+CLEANFILES = testphotom version.dat autophotom.ifc photgrey.ifc \
+             photopt.ifc photom.ifc photom_mon photom_mon.ifc photom_mon.ifl
+
