@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 lib_LTLIBRARIES = libfio.la libfio_adam.la
-bin_SCRIPTS = fio_link fio_link_adam
+dist_bin_SCRIPTS = fio_link fio_link_adam
 noinst_PROGRAMS = make-errno-err
 
 libfio_la_SOURCES = \
@@ -110,5 +110,18 @@ check_MONOLITHS = fiotest
 # no variable fiotest_TASKS -- fiotest is an ATASK
 fiotest_SOURCES = fiotest.f
 fiotest_LDADD = `$(srcdir)/fio_link_adam`
+
+dist_starnews_DATA = fio.news
+
+EXTRA_DIST = sun_iosdef_sun_solaris sun_iosdef_sun fio1_serr.f_apple_darwin \
+             fio1_serr.f_dec_osf fio1_serr.fdefault fio1_serr.f_linux_gnu \
+             fio1_serr.fmips fio1_serr.f_pc_cygwin fio1_serr.f_pc_linux \
+             fio1_serr.f_sun fio1_serr.f_sun_solaris fio1_serr.fvax \
+             FIOGO_CMN FIO_SYS FIOFIL_CMN FIOUNT_CMN FIOGOPA_CMN FIOPAR_SYS \
+             FIOPA_CMN 
+
+
+CLEANFILES = CREATEFILE.DAT NEWFILE.DAT fiotest fiotest.ifc
+
 
 
