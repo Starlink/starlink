@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = shl_link shl_link_adam
+dist_bin_SCRIPTS = shl_link shl_link_adam
 
 bin_PROGRAMS = browsehlp
 include_HEADERS = shl.h
@@ -62,4 +62,9 @@ test_pager_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link`
 # need to compile the test help file
 demo.shl: demo.hlp
 	@HLIB@ demo.hlp
+
+EXTRA_DIST = $(PRIVATE_INCLUDES) demo.hlp
+
+CLEANFILES = testhelp demo.shl testhelp.ifc
+
 
