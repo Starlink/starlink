@@ -46,3 +46,6 @@ start: start.in
 	mv start.tmp start
 
 EXTRA_DIST = start.in $(bin_DATA)
+
+CLEANFILES = forstats.ifc procvt.ifc prohlp.ifc prohtml.ifc prolat.ifc \
+             propak.ifc sst_mon start version.dat sst_mon.ifc sst_mon.ifl
