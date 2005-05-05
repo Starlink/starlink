@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = trn_link trn_link_adam
+dist_bin_SCRIPTS = trn_link trn_link_adam
 
 lib_LTLIBRARIES = libtrn.la
 
@@ -48,3 +48,4 @@ trn_test_SOURCES = trn_test.f
 # LDADD is the expansion of ref_link, with -lref replaced by libref.la
 trn_test_LDADD = libtrn.la `hds_link` `err_link` `chr_link` `prm_link`
 
+dist_starnews_DATA = trn.news
