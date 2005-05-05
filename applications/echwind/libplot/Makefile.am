@@ -10,3 +10,5 @@ plot_text.f plot_wrdet.f
 
 
 INCLUDE_FILES = det_common
+
+EXTRA_DIST = $(INCLUDE_FILES)

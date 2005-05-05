@@ -4,6 +4,8 @@ SUBDIRS = libmodel libplot libetc
 
 bin_SCRIPTS = echwind.csh
 
+dist_noinst_SCRIPTS = echwind_link
+
 bin_PROGRAMS = echwind
 echwind_SOURCES = echwind.f
 echwind_LDADD = libmodel/libmodel.la libplot/libplot.la libetc/libetc.la \
@@ -16,6 +18,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 mydatadir = $(bindir)
 mydata_DATA = balmer.dat detectors.dat echwind.ifl lines.dat spectrographs.dat
 
+PRIVATE_INCLUDES = echwind_par echwind_orders echwind_mmpix echwind_dets \
+                   echwind_lines 
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
@@ -29,3 +33,7 @@ echwind.csh: echwind.csh.in
 	$(edit) \
 	    $(srcdir)/echwind.csh.in > echwind.csh.tmp
 	mv echwind.csh.tmp echwind.csh
+
+EXTRA_DIST =  $(PRIVATE_INCLUDES) echwind.csh.in balmer.dat \
+              detectors.dat echwind.ifl lines.dat spectrographs.dat
+              

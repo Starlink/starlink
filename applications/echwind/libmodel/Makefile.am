@@ -10,3 +10,5 @@ ech_prismpos.f ech_refindex.f ech_slitangle.f ech_wavecen.f	 \
 ech_wcentral.f ech_xdispfs.f
 
 INCLUDE_FILES = ech_common ech_params
+
+EXTRA_DIST = $(INCLUDE_FILES)
