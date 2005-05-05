@@ -140,7 +140,7 @@ STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf psx mers chr])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml cpg/Makefile fonts/Makefile pgdispd/Makefile src/Makefile sys/Makefile drivers/Makefile drivers/xathena/Makefile drivers/xtk/Makefile drivers/xmotif/Makefile])
+AC_CONFIG_FILES([Makefile component.xml cpg/Makefile fonts/Makefile pgdispd/Makefile src/Makefile sys/Makefile examples/Makefile drivers/Makefile drivers/xathena/Makefile drivers/xtk/Makefile drivers/xmotif/Makefile])
 AC_CONFIG_FILES(pgplot_link, [chmod +x pgplot_link])
 AC_CONFIG_FILES(pgplot_link_adam, [chmod +x pgplot_link_adam])
 

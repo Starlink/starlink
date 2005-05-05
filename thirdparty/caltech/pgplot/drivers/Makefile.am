@@ -53,3 +53,5 @@ txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f gwmdriv.c
 
 AM_CFLAGS = -DPG_PPU
 
+CLEANFILES = star_grexec.f grexec.f
+

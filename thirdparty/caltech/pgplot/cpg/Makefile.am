@@ -33,3 +33,6 @@ cpgdemo_SOURCES = $(DEMO_ROUTINES)
 DEMO_ROUTINES = cpgdemo.c
 cpgdemo_LDADD = libcpgplot.la ../libpgplot.la $(PGXLIBS) $(PGPNGLIBS) @FCLIBS@ 
 
+CLEANFILES = $(C_WRAPPERS) $(PUBLIC_INCLUDES) pgbind_prototypes
+
+

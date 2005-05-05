@@ -13,3 +13,5 @@ dist_noinst_DATA = grfont.txt
 grfont.dat: grfont.txt pgpack.f
 	-rm -f grfont.dat
 	./pgpack <grfont.txt
+
+CLEANFILES = grfont.dat
