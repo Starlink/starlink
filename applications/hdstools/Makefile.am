@@ -39,9 +39,13 @@ CSRC = aio_appfco_c.c aio_crefco_c.c aio_frefco_c.c \
 
 BLOCK_DATA_FILES = aio_blk.f
 
+PUBLIC_INCLUDES = ADI_PAR AIO_PAR aio.h
+
+PRIVATE_INCLUDES = AIO_CMN
+
 
 ##  The on-line help.
-HELP_SOURCES = hdstools.hlp
+HELP_SOURCES = hdstools.hlp hdstools_master.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -66,7 +70,7 @@ hdstools.csh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
 	@IFD2STAR@ hdstools
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(HELP_SOURCES)
+EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) htest.in
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
@@ -83,3 +87,16 @@ htest: htest.in
 	$(srcdir)/htest.in >htest.tmp
 	mv htest.tmp htest
 	chmod 0755 htest
+
+CLEANFILES = hdstools.hlp htest hdstools.shl hdelete.ifc hdir.ifc \
+             hdisplay.ifc hfill.ifc hget.ifc hhelp.ifc hmodify.ifc \
+             hread.ifc hrename.ifc hreset.ifc hreshape.ifc hretype.ifc \
+             htab.ifc hwrite.ifc version.dat hcopy.ifc hcreate.ifc \
+             hdstools_mon dtask_applic.lo hdstools_mon.ifc hcopy.ifl \
+             hcreate.ifl hdelete.ifl hdir.ifl hdisplay.ifl \
+             hdstools.csh hdstools.icl hdstools_mon.ifl hdstools.sh \
+             hfill.ifl hget.ifl hhelp.ifl hmodify.ifl hread.ifl \
+             hrename.ifl hreset.ifl hreshape.ifl hretype.ifl htab.ifl \
+             hwrite.ifl
+
+dist_starnews_DATA = hdstools.news
