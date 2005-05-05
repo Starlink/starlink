@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 lib_LTLIBRARIES = libard.la libard_adam.la
-bin_SCRIPTS = ard_link ard_link_adam
+dist_bin_SCRIPTS = ard_link ard_link_adam
 
 libard_la_SOURCES = \
         $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
@@ -59,4 +59,6 @@ STANDALONE_F_ROUTINES =
 ADAM_F_ROUTINES = ard_group.f
 
 BLOCKDATA = ard1_init.f
+
+dist_starnews_DATA = ard.news
 

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ndg_link ndg_link_adam
+dist_bin_SCRIPTS = ndg_link ndg_link_adam
 lib_LTLIBRARIES = libndg.la libndg_adam.la
 
 libndg_la_SOURCES = \
@@ -41,3 +41,9 @@ TESTS = test1
 check_PROGRAMS = test1
 test1_SOURCES = ndg_test.f
 test1_LDADD = libndg.la `$(srcdir)/ndg_link`
+
+dist_starnews_DATA = ndg.news
+
+CLEANFILES = TOM.sdf DICK.sdf HARRY.sdf 
+
+

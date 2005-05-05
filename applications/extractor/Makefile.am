@@ -35,7 +35,8 @@ sex_SOURCES =
 BUILT_SOURCES = libextractor.a libfits.a sex$(EXEEXT) extractor.ifl
 
 #  Data for share/extractor. Currently this is any misc docs (news file) 
-dist_pkgdata_DATA = extractor.news
+#dist_pkgdata_DATA = extractor.news
+dist_starnews_DATA = extractor.news
 
 #  Configuration information (in this case the SExtractor config
 #  directory, keep this upto date).
@@ -103,10 +104,10 @@ extractor.ifl: extract/src/extractor.ifl
 	@COMPIFL@ $<
 
 ## Clean up extra generated files.
-MAINTAINERCLEANFILES = extractor.icl extractor.ifl extractor.ifc
+MAINTAINERCLEANFILES = extractor.ifl
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = extract sextractor extractor.csh extractor.news
+EXTRA_DIST = extract sextractor extractor.csh extractor.csh.in
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the CVS trace.
@@ -127,3 +128,5 @@ extractor.csh: extractor.csh.in
 	$(edit) $(srcdir)/extractor.csh.in > extractor.csh.tmp
 	mv extractor.csh.tmp extractor.csh
 
+CLEANFILES = extractor.csh version.dat extractor extractor.ifc \
+             extractor.icl
