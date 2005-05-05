@@ -31,7 +31,7 @@ $(DO_FILTERS): do-xxx
 $(CMP_FILTERS): cmp-xxx
 	cp cmp-xxx $@
 
-ssn73.tex: ssn73-pre.tex mkdoc
+ssn73.tex: ssn73-pre.tex
 	$(srcdir)/mkdoc 
 
 EXTRA_DIST = ssn73-pre.tex extreme_test.sh
