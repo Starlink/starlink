@@ -326,7 +326,7 @@ libast_pal_la_SOURCES = pal.c
 # The following files are built by the targets in this makefile.
 MAINTAINERCLEANFILES = version.h builddocs addversion \
 	ast.h $(DOCUMENTATION_PRODUCTS)
-CLEANFILES = AST_PAR
+CLEANFILES = AST_PAR ast.h
 
 # Special cases start here
 
