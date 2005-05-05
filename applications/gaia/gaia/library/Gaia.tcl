@@ -79,6 +79,8 @@
 #        Added support for the new tabbed interface.
 #     13-OCT-2004 (PWD):
 #        Added cube display toolbox and associated changes.
+#     05-MAY-2005 (PWD):
+#        Added RICE compression changes.
 #     {enter_changes_here}
 
 #-
@@ -91,7 +93,7 @@ set about_skycat ""
 set about_gaia "
 Starlink GAIA version $gaia_version
 
-Copyright (C) 1997-2004 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2005 Central Laboratory of the Research Councils (U.K.)
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
