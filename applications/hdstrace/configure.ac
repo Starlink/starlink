@@ -29,6 +29,9 @@ dnl    links to: chr, mers, fio, psx, task.
 STAR_DECLARE_DEPENDENCIES([build], [fio generic prm par sae hds], [link])
 dnl    No use dependencies
 
+dnl    Need "hlib" command to build the help library.
+STAR_CHECK_PROGS(hlib)
+
 STAR_LATEX_DOCUMENTATION(sun102)
 
 AC_CONFIG_FILES([Makefile component.xml tra/Makefile])

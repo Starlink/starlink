@@ -15,3 +15,5 @@ G_ROUTINES = tra_putx.gen
 GFLAGS = n
 .gen.f:
 	$(FGENERIC)  -t $(GFLAGS) $<
+
+EXTRA_DIST = tra_putx.gen
