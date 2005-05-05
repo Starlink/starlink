@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ndf_link ndf_link_adam
+dist_bin_SCRIPTS = ndf_link ndf_link_adam
 
 lib_LTLIBRARIES = libndf.la libndf_adam.la
 
@@ -39,7 +39,7 @@ PUBLIC_INCLUDES = ndf.h NDF_PAR NDF_FUNC_DEC NDF_FUNC_DEF NDF_FUNC
 
 # Include files that are only needed for the build
 PRIVATE_INCLUDES = NDF_ACB NDF_CONST NDF_DCB NDF_ELB NDF_FCB NDF_PCB \
-	NDF_TCB ndf1.h
+	NDF_TCB NDF_TMP ndf1.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -150,3 +150,6 @@ ndf_ftest_SOURCES = ndf_ftest.f
 ndf_ctest_LDADD = libndf.la `$(srcdir)/ndf_link`
 ndf_ftest_LDADD = libndf.la `$(srcdir)/ndf_link`
 
+dist_starnews_DATA = ndf.news
+
+EXTRA_DIST = $(PRIVATE_INCLUDES) 
