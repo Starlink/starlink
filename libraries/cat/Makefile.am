@@ -108,3 +108,8 @@ check-local:
 	   echo "*** TEST files DIFFER";\
 	fi
 	@rm -r testcat.TXT
+
+EXTRA_DIST = $(PRIVATE_INCLUDES)
+
+dist_starnews_DATA = cat.news
+
