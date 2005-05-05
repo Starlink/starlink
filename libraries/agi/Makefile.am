@@ -88,5 +88,7 @@ agi_test_LDADD = libagi.la `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link
 
 CLEANFILES = AGI_ERR fac_1501_err
 
+EXTRA_DIST = agi_err.msg
+
 
 
