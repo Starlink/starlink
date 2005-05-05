@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 lib_LTLIBRARIES = libgrp.la libgrp_adam.la
-bin_SCRIPTS = grp_link grp_link_adam
+dist_bin_SCRIPTS = grp_link grp_link_adam
 
 libgrp_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
@@ -53,4 +53,6 @@ ADAM_F_ROUTINES = grp_group.f grp_list.f grp1_gtfil.f
 #  List of Fortran BLOCK DATA routines.
 BLOCKDATA = grp1_init.f
 
+dist_starnews_DATA = grp.news
 
+EXTRA_DIST = GRP_CONST GRP_COM grp_test.dat
