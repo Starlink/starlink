@@ -152,3 +152,8 @@ check_MONOLITHS = img_test
 img_test_SOURCES = img_test.f libimg_adam.la
 # no variable img_test_TASKS -- img_test is an ATASK
 img_test_LDADD = $(LDADD) `$(srcdir)/img_link_adam`
+
+dist_starnews_DATA = img.news
+
+CLEANFILES = img_test img_test.ifc
+
