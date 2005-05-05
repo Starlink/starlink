@@ -1,8 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = datacube.csh datacube.icl \
-  compare.csh  compare_x.csh  multistack.csh ripper.csh  step.csh \
-  passband.csh squash.csh velmap.csh peakmap.csh stacker.csh
+bin_SCRIPTS = datacube.csh datacube.icl
+
+dist_bin_SCRIPTS = compare.csh compare_x.csh datacube_link_adam \
+                   multistack.csh passband.csh peakmap.csh \
+                   ripper.csh squash.csh stacker.csh step.csh \
+                   velmap.csh
 
 bin_MONOLITHS = datacube_mon
 
@@ -14,7 +17,10 @@ datacube_mon_TASKS = copyaxis getbound putaxis
 datacube_mon_LDADD = \
    tasks/libdatacube_tasks.la subs/libdatacube_subs.la  `ndf_link_adam`
 
-dist_pkgdata_DATA = datacube.news
+dist_starnews_DATA = datacube.news
 dist_noinst_HEADERS = include/CUB1_PAR
 
 SUBDIRS = demo help subs tasks sc16 sun237
+            
+CLEANFILES = version.dat getbound.ifc putaxis.ifc copyaxis.ifc \
+             datacube_mon datacube_mon.ifc datacube_mon.ifl

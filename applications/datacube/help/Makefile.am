@@ -15,3 +15,7 @@ starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 #  Rule for building the help library from the help source.
 .hlp.shl:
 	@HLIB@ $<
+
+EXTRA_DIST = $(HELP_SOURCES)
+
+CLEANFILES = datacube.shl datacube_help version.dat datacube_help.ifc

@@ -23,3 +23,7 @@ datacube_test.csh: datacube_demo.csh.in
 	$(srcdir)/datacube_demo.csh.in > datacube_test.csh.tmp
 	mv datacube_test.csh.tmp datacube_test.csh
 	chmod 0755 datacube_test.csh
+
+CLEANFILES = datacube_test.csh version.dat
+
+EXTRA_DIST = $(DATA_FILES)
