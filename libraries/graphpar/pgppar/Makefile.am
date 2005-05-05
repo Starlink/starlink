@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = pgp_link_adam
+dist_bin_SCRIPTS = pgp_link_adam
 
 lib_LTLIBRARIES = libpgppar_adam.la
 
@@ -30,3 +30,7 @@ pgp_test_LDADD = $(LDADD) `$(srcdir)/pgp_link_adam` `par_link_adam` -lpthread
 
 pgppar_test_SOURCES = pgppar_test.f
 pgppar_test_LDADD = libpgppar_adam.la `$(srcdir)/pgp_link_adam` `par_link_adam`
+
+CLEANFILES = pgp_test pgp_test.ifc
+
+

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = sgs_link_adam
+dist_bin_SCRIPTS = sgs_link_adam
 
 lib_LTLIBRARIES = libsgspar_adam.la
 
@@ -36,3 +36,7 @@ sgs_test_LDADD = $(LDADD) `$(srcdir)/sgs_link_adam` `par_link_adam` -lpthread
 
 sgspar_test_SOURCES = sgspar_test.f
 sgspar_test_LDADD = libsgspar_adam.la `$(srcdir)/sgs_link_adam` `par_link_adam`
+
+CLEANFILES = sgs_test sgs_test.ifc
+
+

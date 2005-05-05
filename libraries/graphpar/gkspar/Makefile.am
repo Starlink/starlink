@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = gks_link_adam gks1_link_adam
+dist_bin_SCRIPTS = gks_link_adam gks1_link_adam
 
 lib_LTLIBRARIES = libgkspar_adam.la
 
@@ -34,3 +34,8 @@ gks_test_LDADD = $(LDADD) `$(srcdir)/gks_link_adam` `par_link_adam` -lpthread
 
 gkspar_test_SOURCES = gkspar_test.f
 gkspar_test_LDADD = libgkspar_adam.la `$(srcdir)/gks_link_adam` `par_link_adam` `err_link_adam`
+
+
+CLEANFILES = gks_test gks_test.ifc
+
+
