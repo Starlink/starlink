@@ -7021,35 +7021,35 @@ STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
           </p>
         </subsect>
 
-        <subsect id="variable-starxxxdata" export="export"
-          indexkey="starconf!variables!starxxx_DATA">
-          <subhead>
-            <title>starxxx_DATA -- special installation directories</title>
-          </subhead>
+<subsect id="variable-starxxxdata" export="export"
+indexkey="starconf!variables!starxxx_DATA">
+<subhead>
+<title>starxxx_DATA -- special installation directories</title>
+</subhead>
 
-          <p>There are several makefile variables which help you
-            install files in special
-            directories<index>documentation</index><index>directories!special</index>.
-            These are the variables <code>stardocs_DATA</code>,
-            <code>staretc_DATA</code>, <code>starexamples_DATA</code>
-            and <code>starhelp_DATA</code>.  In the
-            <code>Makefile.am</code> the variable has as value a list
-            of files to be installed as data in the corresponding
-            place.</p>
+<p>There are several makefile variables which help you install files
+in special directories<index>directories!special</index>.  These are
+the variables <code>stardocs_DATA</code><index>documentation</index>,
+<code>staretc_DATA</code>, <code>starexamples_DATA</code>,
+<code>starhelp_DATA</code><index>help files</index> and
+<code>starnews_DATA</code><index>news files</index> (there is also
+<code>starfacs_DATA</code>, for facility files, but this is handled
+for you, and you should not need to refer to this explicitly).  In the
+<code>Makefile.am</code> the variable has as value a list of files to
+be installed as data in the corresponding place.</p>
 
-          <p>The list of documentation files is not necessarily known
-            in advance, since the macro <ref
-              id="macro-latex-documentation"
-            >STAR_LATEX_DOCUMENTATION</ref> has a default list of
-            targets it will generate.  You can give the value of the
-            <code>stardocs_DATA</code> as a substitution variable:
+<p>The list of documentation files is not necessarily known
+in advance, since the macro <ref id="macro-latex-documentation"
+>STAR_LATEX_DOCUMENTATION</ref> has a default list of
+targets it will generate.  You can give the value of the
+<code>stardocs_DATA</code> as a substitution variable:
 <verbatim>
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 </verbatim>
-            (plus any other documentation files you require).  See
-            <ref id="autoconfing-docs" /> for more discussion.</p>
+(plus any other documentation files you require).  See
+<ref id="autoconfing-docs" /> for more discussion.</p>
 
-        </subsect>
+</subsect>
 
         <subsect id="macro-obsolete" export="export">
           <subhead>
