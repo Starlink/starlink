@@ -37,3 +37,4 @@ echwind.csh: echwind.csh.in
 EXTRA_DIST =  $(PRIVATE_INCLUDES) echwind.csh.in balmer.dat \
               detectors.dat echwind.ifl lines.dat spectrographs.dat
               
+dist_starnews_DATA = echwind.news
