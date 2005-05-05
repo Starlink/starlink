@@ -76,6 +76,8 @@ magtest_LDADD = `$(srcdir)/mag_link_adam` `prm_link`
 
 dist_starnews_DATA = mag.news
 
-EXTRA_DIST = mag_err.msg
+EXTRA_DIST = mag_err.msg mio_err.msg
 
+CLEANFILES = magtest fac_340_err magtest.ifc tapecreate \
+             tapecreate.ifc MIO_ERR mio_err.h
 
