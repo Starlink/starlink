@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
                   datatype = TSHORT;
                   break;
               case LONG_IMG:
-                  datatype = TLONG;
+                  datatype = TINT;
                   break;
               case FLOAT_IMG:
                   datatype = TFLOAT;
