@@ -381,7 +381,7 @@ install-exec-hook: libast.la
 	for f in `ls libast.*`; do \
 	   ff=`echo $$f | sed -e 's/libast/libast_pass2/'`; \
 	   if test -f "$$ff"; then rm "$$ff"; fi; \
-	   $(LN_S) $(DESTDIR)$(libdir)/$$f $$ff; \
+	   $(LN_S) $$f $$ff; \
 	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$ff" || :; \
 	done; \
 	if test -f "libast.la"; then \
