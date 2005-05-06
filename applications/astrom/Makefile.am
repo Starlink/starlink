@@ -4,7 +4,10 @@ bin_PROGRAMS = astrom
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-dist_pkgdata_DATA = read.me 
+dist_pkgdata_DATA = read.me astrom.dat $(PLATFORM_FILES)
+
+PLATFORM_FILES = astrom.f_alpha_OSF1 astrom.f_mips \
+                 astrom.f_sun4_Solaris 
 
 EXTRA_DIST = NOTES astrom-changes.txt 
 
