@@ -4,6 +4,8 @@ SUBDIRS = kapsub
 
 bin_SCRIPTS = $(DYNSCRIPTS) version.dat
 
+dist_noinst_SCRIPTS = kaprh_link_adam
+
 LOCAL_LINK = kapsub/libkapsub.la `$(srcdir)/kaprh_link_adam`
 
 bin_MONOLITHS = kaprh_mon 
@@ -65,6 +67,8 @@ starhelp_DATA = kaprh.shl
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+HELP_SOURCES = kaprh_master.hlp
+
 .hlp.shl:
 	@HLIB@ $<
 
@@ -75,3 +79,20 @@ kaprh.hlp: $(KAPRH_F_ROUTINES) kaprh_master.hlp
 	@PROHLP@ in=all.f out=all.hlp single=no
 	cat kaprh_master.hlp all.hlp > kaprh.hlp
 	-rm -f all.hlp all.f
+
+dist_starnews_DATA = kaprh.news
+
+EXTRA_DIST = $(HELP_SOURCES) 
+
+MISC_FILES = kaprh.shl kaprh.hlp kaprh_mon version.dat kaprh.csh \
+kaprh.icl kaprh.sh
+
+IFC_FILES = contover.ifc crelut.ifc greyplot.ifc idclear.ifc idinvisible.ifc \
+idpazo.ifc idset.ifc idstate.ifc inspect.ifc krhhelp.ifc \
+lutflip.ifc luthilite.ifc lutrot.ifc luttweak.ifc \
+mosaic.ifc ovclear.ifc ovset.ifc quilt.ifc snapshot.ifc \
+traninvert.ifc tranjoin.ifc tranmake.ifc transformer.ifc \
+trantrace.ifc turbocont.ifc kaprh_mon.ifc
+
+CLEANFILES = $(IFL_FILES) $(MISC_FILES) $(IFC_FILES)
+             
