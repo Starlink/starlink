@@ -2,6 +2,7 @@
 
 dist_bin_SCRIPTS = decos_many ech_toarchive
 bin_SCRIPTS = echomop.csh echomop.sh
+dist_noinst_SCRIPTS = ech_coalesce_link_flags
 
 bin_MONOLITHS = echmono ech_scrn2d ech_ftrdb
 echmono_TASKS = \
@@ -50,7 +51,9 @@ echhelp_LDADD = `shl_link` @FCLIBS@
 # Help files
 echomop.shl: echomop.hlp
 	$(HLIB) echomop.hlp
-EXTRA_DIST = echomop.hlp
+EXTRA_DIST = echomop.hlp $(PRIVATE_INCLUDES) echomop.csh.in \
+             echomop.sh.in $(echarc_DATA) $(echdef_DATA) $(echdata_DATA) \
+             $(echdemo_DATA) $(echtest_DATA)
 
 # Convenience library, containing all the compiled sources
 noinst_LTLIBRARIES = libechomop.la
@@ -212,3 +215,9 @@ echomop.csh: echomop.csh.in
 	    -e 's,@edited_input\@,DO NOT EDIT: produced from echomop.csh by Makefile.am,' \
 	    $(srcdir)/echomop.csh.in >echomop.csh.tmp \
 	    && mv echomop.csh.tmp echomop.csh
+
+#The News File.
+
+dist_starnews_DATA = echomop.news
+
+
