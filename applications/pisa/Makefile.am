@@ -76,3 +76,9 @@ dist_pkgdata_DATA = pisa.news
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES) sun109fig.ps
 
+CLEANFILES = addnoise.ifc pisa2ard.ifc pisa2cat.ifc pisacut.ifc \
+             pisafind4.ifc pisafind.ifc pisafit4.ifc pisafit.ifc \
+             pisagen.ifc pisagrey.ifc pisahelp pisahelp.shl \
+             pisaknn.ifc pisamatch.ifc pisapeak.ifc pisaplot.ifc \
+             version.dat pisa_mon4 pisa_mon4.ifc pisa_mon4.ifl \
+             pisa_mon pisa_mon.ifc pisa_mon.ifl
