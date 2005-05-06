@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = pda_link pda_link_adam
+dist_bin_SCRIPTS = pda_link pda_link_adam
 
 lib_LTLIBRARIES = libpda.la
 
@@ -111,3 +111,6 @@ Simann_LDADD = `$(srcdir)/pda_link`
 Sorttest_LDADD = `$(srcdir)/pda_link`
 Subplex_LDADD = `$(srcdir)/pda_link`
 
+dist_starnews_DATA = pda.news
+
+dist_pkgdata_DATA = Subplex_README
