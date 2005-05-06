@@ -57,11 +57,12 @@ history.help: atools.news
 atools.csh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
 
-##  Any misc PISA files that have no where else.
-dist_pkgdata_DATA = atools.news
+##  Any misc ATOOLS files that have no where else.
+dist_pkgdata_DATA = ATOOLS_CONDITIONS
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(HELP_SOURCES)
+EXTRA_DIST = $(HELP_SOURCES) atools.star-hlp asttest.sh \
+             skyframe.ast
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = atools.csh atools.icl
@@ -79,3 +80,36 @@ asttest_SOURCES = asttest.f \
 
 # no variable asttest_TASKS -- asttest is an ATASK
 asttest_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`
+
+dist_starnews_DATA = atools.news
+
+MISC_FILES = asttest dtask_applic.lo atools.shl history.help \
+atools_mon version.dat atools.csh atools.icl atools.sh
+
+IFC_FILES = astaddframe.ifc astclear.ifc astcmpframe.ifc astcmpmap.ifc \
+astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
+astfindframe.ifc astfluxframe.ifc astformat.ifc astframe.ifc \
+astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
+astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
+astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc \
+astpermaxes.ifc astpermmap.ifc astpickaxes.ifc astpolygon.ifc \
+astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
+astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
+astshiftmap.ifc astsimplify.ifc astskyframe.ifc astspecframe.ifc \
+asttest.ifc asttran1.ifc asttran2.ifc asttranmap.ifc asttrann.ifc \
+astunitmap.ifc astwinmap.ifc atlhelp.ifc  atools_mon.ifc
+
+IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
+astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
+astfindframe.ifl astfluxframe.ifl astformat.ifl astframe.ifl \
+astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
+astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \
+astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl \
+astpermaxes.ifl astpermmap.ifl astpickaxes.ifl astpolygon.ifl \
+astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
+astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \
+astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl \
+asttest.ifl asttran1.ifl asttran2.ifl asttranmap.ifl asttrann.ifl \
+astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl
+
+CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)
