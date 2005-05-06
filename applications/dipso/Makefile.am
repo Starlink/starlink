@@ -87,14 +87,19 @@ dipsosupportdir = $(bindir)
 dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
  ATOMIC.DAT DEMO2.sdf LWRLO.ABS SWPCOR.DAT command.hlp  \
  exercise.cmd SWPLO.ABS demo1.cmd dipso.hlp help.lis testspec2.cmd \
- DEMO1_STK.sdf NEBCONT.DAT updates.lis
+ DEMO1_STK.sdf NEBCONT.DAT updates.lis installtest.in
 
 ## Data files for etc/dipso.
 staretc_DATA = specdat/*.*
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in
+EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in \
+             $(dipsosupport_DATA)
+
+## News file
+
+dist_starnews_DATA = dipso.news
 
 ## Simple installation test.
 
@@ -106,3 +111,5 @@ installtest: installtest.in
 	   $(srcdir)/installtest.in > installtest.tmp
 	mv installtest.tmp installtest
 	chmod 755 installtest
+
+CLEANFILES = installtest
