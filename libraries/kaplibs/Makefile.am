@@ -2,7 +2,7 @@
 
 SUBDIRS = aif fts ira irq ctg lpg kpg kgs kapgrf
 
-bin_SCRIPTS = kaplibs_link_adam kaplibs_link
+dist_bin_SCRIPTS = kaplibs_link_adam kaplibs_link
 dist_noinst_SCRIPTS = kaplibs_test_link kaplibs_noadam_test_link
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -19,3 +19,10 @@ kaplibs_test_LDADD = `$(srcdir)/kaplibs_test_link` `prm_link`
 
 kaplibs_noadam_test_SOURCES = kaplibs_noadam_test.f
 kaplibs_noadam_test_LDADD = `$(srcdir)/kaplibs_noadam_test_link`
+
+dist_starnews_DATA = kaplibs.news
+
+CLEANFILES = kaplibs_test.ifc
+
+dist_pkgdata_DATA = KAPLIBS_CONDITIONS
+
