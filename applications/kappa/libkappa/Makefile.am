@@ -31,6 +31,6 @@ KAP_ERR: ../KAP_ERR
 kapmon.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f
 	-rm -f kapmon.hlp
-	PATH="$(PATH)":$(STARLINK)/bin/sst; \
+	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
 	@PROHLP@ in=all.f out=kapmon.hlp single=no
 	-rm all.f

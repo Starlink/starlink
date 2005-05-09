@@ -16,7 +16,7 @@ remqual.f qualtobad.f
 ndfpack.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f
 	-rm -f ndfpack.hlp
-	PATH="$(PATH)":$(STARLINK)/bin/sst; \
+	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ; \
 	@PROHLP@ in=all.f out=ndfpack.hlp single=no
 	-rm all.f
