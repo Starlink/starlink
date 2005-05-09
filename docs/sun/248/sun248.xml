@@ -50,14 +50,14 @@ to change relatively frequently.</px>
 
 <sect id="intro" export="export">
 <subhead>
-<title>Introduction</title>
+<title>Building and installing Starlink software: generic instructions</title>
 </subhead>
 
 <p>Starlink distributes its software products in a variety of ways.</p>
 
-<p>The project makes periodic binary releases.  These are made every
+<p>The Project makes periodic binary releases.  These are made every
 six months in principle, though the intervals are usually somewhat
-longer in fact.  The set of platforms we target is not fixed, but in the
+longer in fact.  The set of platforms Starlink targets is not fixed, but in the
 latest release the list was Linux RHEL3, RH9 and Debian3.0, and Sparc
 8/9, with a beta release for Mac OS X.  For fuller details, see the
 `Software' link on the <webref url="http://www.starlink.ac.uk"
@@ -73,7 +73,7 @@ building and installing our software should be as simple as
 % ./configure; make; make install
 </verbatim>
 exactly as for the majority of open-source software available now.
-Execpt where some technicality prevents it, all the Starlink libraries
+Except where some technicality prevents it, all the Starlink libraries
 are installed as both static and shared libraries, and there should be
 no surprises in linking agsinst them.  The only difference from the
 standard behaviour is that the default installation prefix for our
@@ -89,13 +89,13 @@ compilers.  As with any other very large software system, however, we
 are aware of some wrinkles, and these are discussed in the
 platform-specific notes in <ref id="platform"/> below.  If you find
 any other problems, or have other comments on the build system, please
-do get in touch with the project, through the general contact address
+do get in touch with the Project, through the general contact address
 <webref url="mailto:ussc@star.rl.ac.uk"
 ><code>ussc@star.rl.ac.uk</code></webref>.</p>
 
 <p>You may be used to Starlink's earlier build system, based on
 <code>./mk</code> scripts.  This is now obsolete, and a migration path
-is outlined in <ref id="mk-migration"/> below</p>
+is outlined in <ref id="mk-migration"/> below.</p>
 
 <p>This document is concerned only with the Starlink `classic'
 applications, and does not cover the newer Java applications.  See
@@ -107,7 +107,13 @@ applications, and does not cover the newer Java applications.  See
 </subhead>
 
 <p>All of Starlink's source code is kept in a CVS repository, which is
-publicly available.  The Starlink build system consists of
+publicly available (a CVS repository is a central library of source
+code, maintained in such a way that multiple individuals can have
+convenient access to it it; for further details see
+<url>http://www.astro.gla.ac.uk/users/norman/note/2003/cvsprimer/</url>
+for example).</p>
+
+<p>The Starlink build system consists of
 <ul>
 <li>
 <p>the Starlink CVS repository;</p>
@@ -148,7 +154,8 @@ to
 <li>
 <p>build from the up-to-the-minute versions in the CVS repository
 (though even in that case, you are probably better with the
-up-to-the-day versions available in the nightly build tarballs);</p>
+up-to-the-day versions available in the nightly build tarballs at
+<url>http://dev.starlink.ac.uk/build/</url>);</p>
 </li>
 <li>
 <p>work on the CVS sources themselves, since you are welcome to play
@@ -158,7 +165,7 @@ checkout; or</p>
 
 <li>
 <p>you wish to add further components to the Starlink CVS repository,
-though in this case you should probably talk to the project first, to
+though in this case you should probably talk to the Project first, to
 coordinate your efforts with others.</p>
 </li>
 </ol>
@@ -255,13 +262,14 @@ installed, you'll have to force the build system with a command like:
 <verbatim>
 % ./configure FC=f77 F77=f77 FPPFLAGS='-P -fixed' [other arguments]
 </verbatim>
-where the Solaris Fortran 77 compiler is called <code>f77</code>,. You
+where the Solaris Fortran 77 compiler is called <code>f77</code>. You
 can give the path to the compiler also, if the f77 you want isn't the
-first one in your <code>PATH</code>. </p>
+first one in your <code>PATH</code>.</p>
 
 <p>This dependence on a Fortran 77 compiler is true at present, and
 may be the case indefinitely; at least part of the problem is libtool,
-which appears not to understand f95 on Solaris, so this problem might
+which appears not to understand <code>f95</code> on Solaris, so this
+problem might 
 go away with a libtool update.  As libtool doesn't understand the
 <code>FC</code> flag, the <code>F77</code> variable has to be set to
 match the <code>FC</code> one.</p>
@@ -304,10 +312,11 @@ so it necessary to set environment variables with a command like:
 <title>Building on 64-bit x86</title>
 </subhead>
 
-<p>The only known problem on x86_64 is a distribution-specific one (I
-think). On RHEL, the tetex 1.* package installs the kpathsea library
-as a static library alone, and not a shared one. This produces an
-error message when compiling the <code>dvi2bitmap</code> component,
+<p>The only known problem on x86_64 appears to be a
+distribution-specific one. On RHEL, the the various 1.x versions of
+the <code>tetex</code> package install the <code>kpathsea</code>
+library as a static library alone, and not a shared one. This produces
+an error message when compiling the <code>dvi2bitmap</code> component,
 resembling:
 <verbatim>
 ld: ./libkpathsea.a(tex-file.o): relocation R_X86_64_32 can not be used when making a shared object; recompile with -fPIC
@@ -323,7 +332,7 @@ available at <webref url="http://www.tug.org/ftp/tex/web2c.tar.gz"
 distribution: to do that:
 <ol>
 <li><p>Unpack the distribution, and go to the <code>web2c-x.x.x</code>
-directory</p></li>
+directory.</p></li>
 
 <li><p>Configure using <code>./configure --enable-shared --datadir=XXX
 --prefix=PREFIX</code>, where <code>XXX</code> is the location
@@ -332,10 +341,11 @@ RHEL) and <code>PREFIX</code> is where you would like the newly-built
 library to be installed.</p></li>
 
 <li><p>cd to the kpathsea directory, and delete the lines in the
-Makefile that refer to (unwritable) <code>$(web2cdir)</code></p></li>
+Makefile that refer to (unwritable) <code>$(web2cdir)</code>.</p></li>
 
 <li><p><code>make; make install</code> to install in
- <code>PREFIX</code>.</p></li>
+<code>PREFIX</code>.</p></li>
+
 </ol>
 The installation directory <code>PREFIX</code> will have to be in your
 <code>LD_LIBRARY_PATH</code> when you re-configure
@@ -355,22 +365,22 @@ building using the command <code>./configure</code>. See the sections above
 for more discussion.</p>
 
 <p>This is rather different from the old Starlink system, which used a
-mk script, which set up a number of environment variables to
+<code>mk</code> script, which set up a number of environment variables to
 platform-specific values and then invoked make on your behalf. The
 <code>mk</code> script consisted of a switch which set appropriate
-values for each of the platforms which the project supported (plus
+values for each of the platforms which the Project supported (plus
 sometimes a few other contributed ones). The configure-based system
 should be more portable, and work on a broader range of platforms
 without such platform-specific customisation.</p>
 
-<p>If you have previously built software using the mk-based system, you
-will see little difference in the new system, beyond the difference in
-procedure described above.</p>
+<p>If you have previously built software using the
+<code>mk</code>-based system, you will see little difference in the
+new system, beyond the difference in procedure described above.</p>
 
 <p>If, on the other hand, you have previously developed using the
-mk-based system, there will be a few more changes:
+<code>mk</code>-based system, there will be a few more changes:
 <ol>
-<li><p>mk scripts will no longer work</p></li>
+<li><p><code>mk</code> scripts will no longer work.</p></li>
 
 <li><p>The <code>INSTALL</code> and <code>SYSTEM</code> environment
 variables have disappeared.</p></li>
@@ -391,7 +401,7 @@ built using <code>libtool</code>, and the libtool <code>.la</code>
 
 <p>If you are planning to work on applications in the CVS repository,
 you should probably take a look at <docxref
-doc="SUN/78">SUN/78</docxref>, and might want to introduce yourself on
+doc="SSN/78">SSN/78</docxref>, and might want to introduce yourself on
 the Starlink developers mailing list, at
 <url>http://www.jiscmail.ac.uk/lists/stardev.html</url>.</p>
 
@@ -434,7 +444,7 @@ building.  You should almost certainly <em>not</em> have this variable
 defined, and if it is defined by accident, to anything other than an
 installation program, the buildsystem will probably fail messily.</p>
 
-<p>See the top level <code>README</code> file for further details about
+<p>See the top-level <code>README</code> file for further details about
 environment variables which affect the build.</p>
 </subsect>
 
@@ -459,27 +469,36 @@ consistently upper-case.</p>
 
 <subsect id="mk-shared" export="export">
 <subhead>
-<title>Shared libraries</title>
+<title>Shared libraries: some observations</title>
 </subhead>
 
 <p>With only one or two exceptions, all the Starlink libraries are
-built and installed as shared libraries, as well as static ones. You
-might, therefore, have to do something special to link against
-these. On many Unixes, the environment variable <code>LD_LIBRARY_PATH</code>
-specifies a list of directories which are searched for shared
-libraries, in addition to a set of system defaults. The analogue on
-Mac OS X is <code>DYLD_LIBRARY_PATH</code>.</p>
+built and installed as shared libraries, as well as static ones.  This
+is as normal, and if you refer to a library in the usual way, with a
+<code>-l</code> option, your system will do The Right Thing.  On those
+few occasions where there are library complications (AST, for example,
+can be linked in a surprising variety of ways), the details will be
+described in the package documentation.</p>
 
 <p>The build system uses <webref
 url="http://directory.fsf.org/libtool.html" >libtool</webref>
 extensively, and it installs its `libtool library files',
 <code>wibble.la</code>, in the library directory alongside the more
 usual static <code>.a</code> and dynamic <code>.so</code> files (as
-appropriate for your platform).  If you also use libtool, you can
+appropriate for your platform).  If you also use libtool, you might
 usefully link against these <code>.la</code> files yourself.</p>
 
-<p>See your system's <code>ld</code> man page for more details than
-you can shake a stick at.</p>
+<p>Given the choice, most linkers will prefer to link against a shared
+library, but if the difference matters to you, you will probably
+already know how to make your linker do what you want.  Recall that on many
+Unixes, the environment variable <code>LD_LIBRARY_PATH</code>
+specifies a list of directories which are searched for shared
+libraries, in addition to a set of system defaults; the analogue on
+Mac OS X is <code>DYLD_LIBRARY_PATH</code>.</p>
+
+<p>Systems tend to differ markedly in the details of their linker
+behaviour.  See your system's <code>ld</code> man page for more
+details than a sane mind can comfortably encompass.</p>
 
 </subsect>
 </sect>
