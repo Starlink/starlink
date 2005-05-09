@@ -26,7 +26,7 @@
 
 <docbody>
 <abstract>
-<px>This document contains instructions on how to build the Starlink
+<px>This document contains instructions on how to build the Starlink `classic'
 software from source.  It contains a few platform-specific notes, and
 a comparison with the old 'mk-based' build system.  This document is
 deliberately terse, since we have invested effort in making the
@@ -96,6 +96,10 @@ do get in touch with the project, through the general contact address
 <p>You may be used to Starlink's earlier build system, based on
 <code>./mk</code> scripts.  This is now obsolete, and a migration path
 is outlined in <ref id="mk-migration"/> below</p>
+
+<p>This document is concerned only with the Starlink `classic'
+applications, and does not cover the newer Java applications.  See
+<url>http://www.starlink.ac.uk/java/java.htm</url> for details about these.</p>
 
 <subsect id="starcvs" export="export">
 <subhead>
@@ -173,6 +177,11 @@ coordinate your efforts with others.</p>
 examine the current version of this file, and its history, at
 <url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/README</url>.</p>
 
+<p>In particular, note that you will have to have &latex; installed
+on your machine, or the build will fail when building documentation,
+at an irritatingly late stage of the process.  This and other remarks
+are rehearsed in the <code>README</code>, mentioned above.</p>
+
 <subsect id="platform-osx" export="export">
 <subhead>
 <title>Building on OS X</title>
@@ -206,9 +215,6 @@ You might also have to install ghostscript from Darwinports or Fink.</p>
 X11-SDK, this should be included on your Mac OS X distribution media,
 but not installed by default. Do not use the Darwinports or Fink
 X11.</p>
-
-<p>If you want to build STARJAVA, then you will need to install the Java
-Advanced imaging and 3D support from Apple.</p>
 
 </subsect>
 
@@ -446,7 +452,8 @@ are installed in a standard place, such as /star/include.  All the
 Fortran compilers that we are aware of have a <code>-I</code> option
 to indicate where such include files are to be found.</p>
 
-<p>Note that the Fortran include files are now consistently upper-case.</p>
+<p>Note that the names of the Fortran include files are now
+consistently upper-case.</p>
 
 </subsect>
 
