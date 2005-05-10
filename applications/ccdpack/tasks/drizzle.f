@@ -42,7 +42,7 @@
 *        Name of the sequential file containing the SCALE and ZERO point
 *        corrections for the list of input NDFs given by the IN parameter
 *        [!]
-*     GENVAR = LOGICAL (Read)
+*     GENVAR = _LOGICAL (Read)
 *        If GENVAR is set to TRUE and some of the input images supplied
 *        contain statistical error (variance) information, then variance
 *        information will also be calculated for the output image.
