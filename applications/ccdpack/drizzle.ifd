@@ -20,6 +20,8 @@
 #        Added PRESERVE keyword
 #     31-JAN-2000 (MBT):
 #        Changed default of CORRECT.
+#     10-MAY-2005 (MBT):
+#        Added GENVAR.
 #     {enter_further_changes_here}
 
 #-
@@ -47,6 +49,16 @@
            default  !
            prompt   {File containing corrections}
            helpkey  *
+         }
+
+         parameter genvar {
+                         # Create output variance array?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            default TRUE
+            prompt {Write variance component in output NDF?}
+            helpkey *
          }
                    
          parameter in {

@@ -42,6 +42,11 @@
 *        Name of the sequential file containing the SCALE and ZERO point
 *        corrections for the list of input NDFs given by the IN parameter
 *        [!]
+*     GENVAR = LOGICAL (Read)
+*        If GENVAR is set to TRUE and some of the input images supplied
+*        contain statistical error (variance) information, then variance
+*        information will also be calculated for the output image.
+*        [TRUE]
 *     IN = LITERAL (Read)
 *        A list of the names of the input NDFs which are to be combined
 *        into a mosaic. The NDF names should be separated by commas
@@ -395,6 +400,8 @@
 *        Minor cosmetic changes to output
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     10-MAY-2005 (MBT):
+*        Added GENVAR parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -523,10 +530,12 @@
       
       LOGICAL ADJUST                 ! Apply scale/zero corrections?
       LOGICAL ISECT                  ! NDFs intersect? (not used)
+      LOGICAL GENVAR                 ! Write output variance array?
       LOGICAL GETS                   ! Make scale factor corrections?
       LOGICAL GETZ                   ! Make zero point corrections?
       LOGICAL GETV                   ! Use inverse mean variances as weights?
       LOGICAL GETM                   ! Use inverse variance maps as weights?
+      LOGICAL GVAR                   ! Update output variance for frame?
       LOGICAL LISTIN                 ! Display input NDFs?
       LOGICAL INOPN                  ! Success open of sequential file?
       LOGICAL SAME                   ! NDFs are the same?
@@ -811,7 +820,7 @@
 
 *  Count the number of NDFs to be considered so far.
       NNDF = NIN
-      
+
 *  If not all the images have a variance array then we need to set the
 *  weights for the entire input stack to 1.0 otherwise wierd things will
 *  happen
@@ -820,6 +829,13 @@
             WEIGHT( I ) = 1.0D0
          END DO
       ENDIF
+
+*  Work out if we will be generating an output variance array.
+      IF ( NVAR .GT. 0 ) THEN
+         CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
+      ELSE
+         GENVAR = .FALSE.
+      END IF
           
       IF ( STATUS .NE. SAI__OK ) GO TO 940
 
@@ -1083,7 +1099,7 @@
 
       ENDIF
           
-*  Create the Ouptut NDF
+*  Create the Output NDF
 *  =====================
 *  Get the data type for the input NDF
       IF ( CCD1_IREF .NE. 0 ) THEN
@@ -1111,15 +1127,17 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 940
       
-*  Map the Data array to force them into existance
+*  Map the Data array to force them into existence.
       CALL NDF_MAP( OUTNDF, 'Data', OTYPE, 'WRITE/BAD', 
      :              ODAT, NPXOUT, STATUS )
 
-*  We want to propagate the variance information, so we need an
+*  If we want to propagate the variance information, we need an
 *  output variance array. It should be noted, that the propagated
 *  variances are STATISTICALLY INCORRECT (error are correlated).
-      CALL NDF_MAP( OUTNDF, 'Variance', OTYPE, 'WRITE/BAD', 
-     :              OVAR, NPXOUT, STATUS )
+      IF ( GENVAR ) THEN
+         CALL NDF_MAP( OUTNDF, 'Variance', OTYPE, 'WRITE/BAD', 
+     :                 OVAR, NPXOUT, STATUS )
+      END IF
 
       IF ( STATUS .NE. SAI__OK ) GOTO 940      
 
@@ -1140,16 +1158,18 @@
       END DO
       
 
-*  Create a Weight array and map it 
+*  Create a Weight array and map it.
       CALL CCD1_MKTMP( EL, '_DOUBLE', WDREF, STATUS )
       CALL CCD1_MPTMP( WDREF, 'WRITE', OWHT, STATUS )
       
-*  Create a Weight array for the variances and map it      
-      CALL CCD1_MKTMP( EL, '_DOUBLE', WVREF, STATUS )
-      CALL CCD1_MPTMP( WVREF, 'WRITE', VWHT, STATUS )
+*  Create a Weight array for the variances and map it if required.
+      IF ( GENVAR ) THEN
+         CALL CCD1_MKTMP( EL, '_DOUBLE', WVREF, STATUS )
+         CALL CCD1_MPTMP( WVREF, 'WRITE', VWHT, STATUS )
+      END IF
                  
 *  Create a Count array and map it, we'll use this to count the
-*  number of input pixels we've drizzled onto the output image
+*  number of input pixels we've drizzled onto the output image.
       CALL CCD1_MKTMP( EL, '_INTEGER', CNREF, STATUS )
       CALL CCD1_MPTMP( CNREF, 'WRITE', OCNT, STATUS )  
              
@@ -1229,8 +1249,9 @@
             CALL CCD1_MSG( ' ', 
      :                     '    NDF variance component: present', 
      :                     STATUS )
+            CALL MSG_SETL( 'GENVAR', GENVAR )
             CALL CCD1_MSG( ' ', 
-     :                     '    Propagating variances: TRUE', 
+     :                     '    Propagating variances: ^GENVAR', 
      :                     STATUS )     
             IF( GETV ) THEN
                CALL MSG_SETL( 'REP_USEVAR', GETV )
@@ -1259,6 +1280,10 @@
 *  located in the CCDPACK_EXT NDF extension
          CALL NDF_DIM( NDF(I), NDF__MXDIM, IDIMS, NDIMI, STATUS )
 
+*  Determine whether the output variance array is to be updated for
+*  this frame.
+         GVAR = VAR .AND. GENVAR
+
 *  Byte array
          IF ( OTYPE .EQ. '_BYTE' ) THEN
             CALL CCG1_DODIZB( NDF(I), WEIGHT(I), NPXIN(I), 
@@ -1269,7 +1294,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
           
 *  Double-precision array
@@ -1282,7 +1307,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Integer array
@@ -1295,7 +1320,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Single-precision array
@@ -1308,7 +1333,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Unsigned-byte array
@@ -1321,7 +1346,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
      
@@ -1335,7 +1360,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
       
 *  Word array
@@ -1348,7 +1373,7 @@
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
      :                        %VAL(CNF_PVAL(VWHT)), STATUS )
          END IF                        
      
@@ -1388,6 +1413,9 @@
       CALL MSG_SETL( 'IN_MAP', GETM )
       CALL CCD1_MSG( ' ', '    Weighted variance maps: '
      :             //' ^IN_MAP', STATUS )
+      CALL MSG_SETL( 'GENVAR', GENVAR )
+      CALL CCD1_MSG( ' ', '    Wrote output variance: '
+     :             //' ^GENVAR', STATUS )
       CALL MSG_SETL( 'IN_ZERO', GETZ )
       CALL CCD1_MSG( ' ', '    Carried out zero-point correction: '
      :             //' ^IN_ZERO', STATUS )  
