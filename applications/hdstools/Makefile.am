@@ -70,7 +70,7 @@ hdstools.csh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
 	@IFD2STAR@ hdstools
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) htest.in
+EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) $(PUBLIC_INCLUDES) htest.in
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
@@ -97,6 +97,6 @@ CLEANFILES = hdstools.hlp htest hdstools.shl hdelete.ifc hdir.ifc \
              hdstools.csh hdstools.icl hdstools_mon.ifl hdstools.sh \
              hfill.ifl hget.ifl hhelp.ifl hmodify.ifl hread.ifl \
              hrename.ifl hreset.ifl hreshape.ifl hretype.ifl htab.ifl \
-             hwrite.ifl
+             hwrite.ifl hdstools_master.shl
 
 dist_starnews_DATA = hdstools.news
