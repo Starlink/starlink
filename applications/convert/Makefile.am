@@ -7,8 +7,11 @@ SUBDIRS = @subdirs@ libcoi libcof libcon libaif iraf
 ## fail. 
 FIGLIBS = -ldta -lfigich
 
-bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
- convertndf convertawk
+bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf
+
+dist_bin_SCRIPTS = convertndf convertawk mtfits2ndf.tcsh
+
+dist_noinst_SCRIPTS = convert_link_adam iraf_link
 
 
 bin_MONOLITHS = convert_mon
@@ -42,7 +45,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 	@HLIB@ $<
 
 ##  Any misc files that have no where else.
-dist_pkgdata_DATA = convert.news
+dist_starnews_DATA = convert.news
 
 ##  Edit scripts during make to have the correct paths.
 
@@ -86,4 +89,18 @@ tiff2ndf: tiff2ndf.in Makefile
 	$(edit) \
 	   $(srcdir)/tiff2ndf.in >tiff2ndf.tmp
 	mv tiff2ndf.tmp tiff2ndf
+
+EXTRA_DIST = convert.f convert.csh.in convert.icl.in gif2ndf.in \
+             ndf2gif.in tiff2ndf.in $(HELP_SOURCES)
+
+
+MISC_BUILT_FILES = convert.shl version.dat gif2ndf ndf2gif tiff2ndf convert.csh convert.icl
+convert_mon convert_mon.ifl
+
+IFC_FILES = conhelp.ifc da2ndf.ifc dst2ndf.ifc fits2ndf.ifc gasp2ndf.ifc iraf2ndf.ifc \
+ircam2ndf.ifc ndf2ascii.ifc ndf2da.ifc ndf2dst.ifc ndf2fits.ifc ndf2gasp.ifc \
+ndf2iraf.ifc ndf2pgm.ifc ndf2tiff.ifc ndf2unf.ifc specx2ndf.ifc unf2ndf.ifc \
+ascii2ndf.ifc ast2ndf.ifc convert_mon.ifc 
+
+CLEANFILES = $(MISC_BUILT_FILES) $(IFC_FILES)
 
