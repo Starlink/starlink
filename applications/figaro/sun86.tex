@@ -20,7 +20,7 @@
                                 Mark~Taylor, Tim~Ash, Tim~Wilkins, Dave~Axon,
                                 John~Palmer, Anthony~Holloway and 
                                 Vito~Graffagnino}
-\newcommand{\stardocdate}      {9 February 2004}
+\newcommand{\stardocdate}      {2004 February 17}
 \newcommand{\stardoctitle}     {FIGARO \\ [1ex] A general data reduction system}
 \newcommand{\stardocversion}   {Version \Figaroversion}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -744,7 +744,7 @@ To start Figaro from the Unix shell simply type:
 \begin{verbatim}
  ----------- Initialising for  Figaro ------------
               General data reduction
-           Version 5.6-1 19 Septembber 2002
+           Version 5.6-1 19 September 2002
  
            Type  "help figaro" for help
  
@@ -14418,7 +14418,7 @@ Some items described in previous release notes have been removed.
  The following notes are a slightly modified version of the news item
  which accompanied the release of Figaro version 5.6-3 (spring 2004).
 
- The changes in Version 5.6-3 comprise only a couple of minor bug fixes
+ The changes in Version 5.6-3 comprise only a few minor bug fixes
  and enhancements, and a missing flux calibration file has been added.
  Brief details of the changes are given below.
 
@@ -14427,6 +14427,15 @@ Some items described in previous release notes have been removed.
  {\tt GAUSS} and {\tt IARC} have each received both a bug fix and a minor
  enhancement.  Consequently, there has been an equally minor revision to
  the description of {\tt GAUSS} in the user manual.
+
+ {\tt EMLT} has a new NOISE keyword.  If it is specified, allowance for
+ noise is made when determining the line limits.  This is intended for
+ broad emission features or beam location rather than narrow arc lines.
+ It defaults to the former behaviour.
+
+ {\tt SDIST} allows for broader spectral profiles when tracing a
+ spectrum.  There was an arbitrary cut-off of the size of the
+ extracted cross-section to be fitted.
 
 \subsubsection{Flux Calibration Files}
 
