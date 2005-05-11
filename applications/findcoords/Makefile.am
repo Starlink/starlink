@@ -3,7 +3,7 @@
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 dist_bin_SCRIPTS = findcoords
-dist_pkgdata_DATA = findcoords.news
+dist_starnews_DATA = findcoords.news
 
 # The findcoords script needs to have installation locations edited into it
 # Can not be done during configure since @bindir@ gets converted
@@ -20,3 +20,7 @@ findcoords: findcoords.in
 	 $(srcdir)/findcoords.in > findcoords.tmp
 	mv findcoords.tmp findcoords
 	chmod +x findcoords
+
+EXTRA_DIST = findcoords.in
+
+CLEANFILES = findcoords
