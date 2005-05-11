@@ -83,6 +83,17 @@ PAR_FILES = \
 # Help files
 esp.shl: esp.hlp
 	$(HLIB) esp.hlp
-EXTRA_DIST = esp.hlp
+HELP_SOURCES = esp.hlp
 
 starhelp_DATA = esp.shl
+
+EXTRA_DIST = $(HELP_SOURCES)
+
+dist_starnews_DATA = esp.news
+
+IFC_FILES = corr.ifc ellfou.ifc ellpro.ifc esphelp.ifc fastmed.ifc gaufit.ifc \
+graphs.ifc histpeak.ifc hsub.ifc loback.ifc mask.ifc mixup.ifc \
+sector.ifc selfc.ifc selfcw.ifc skew.ifc topped.ifc esp_mon.ifc
+
+MISC_BUILT_FILES = version.dat dtask_applic.lo esp_mon.ifl esp_mon esp.shl
+
