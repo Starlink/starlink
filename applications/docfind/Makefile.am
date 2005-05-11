@@ -3,7 +3,7 @@
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 dist_bin_SCRIPTS = docfind
-dist_pkgdata_DATA = docfind.news
+dist_starnews_DATA = docfind.news
 
 # The coco script needs to have installation locations edited into it
 # Can not be done during configure since @bindir@ gets converted
@@ -19,3 +19,7 @@ docfind: docfind.in
 	 $(srcdir)/docfind.in > docfind.tmp
 	mv docfind.tmp docfind
 	chmod +x docfind
+
+EXTRA_DIST = docfind.in
+
+CLEANFILES = docfind
