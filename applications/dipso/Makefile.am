@@ -84,10 +84,12 @@ dipsosetup: dipsosetup.in
 
 ## Files that should be copied into bindir.
 dipsosupportdir = $(bindir)
-dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
+dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS user.f \
  ATOMIC.DAT DEMO2.sdf LWRLO.ABS SWPCOR.DAT command.hlp  \
  exercise.cmd SWPLO.ABS demo1.cmd dipso.hlp help.lis testspec2.cmd \
  DEMO1_STK.sdf NEBCONT.DAT updates.lis installtest.in
+
+nodist_dipsosupport_DATA = run_dipso.o
 
 ## Data files for etc/dipso.
 staretc_DATA = specdat/*.*
