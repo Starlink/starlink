@@ -46,6 +46,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 ##  Any misc files that have no where else.
 dist_starnews_DATA = convert.news
+dist_pkgdata_DATA = CONVERT_CONDITIONS
 
 ##  Edit scripts during make to have the correct paths.
 
