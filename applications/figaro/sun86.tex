@@ -6,21 +6,21 @@
 %
 % Set the Figaro version number.
 
-\newcommand{\Figaroversion}{5.6-1~}
+\newcommand{\Figaroversion}{5.6-3~}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {86.20}
+\newcommand{\stardocnumber}    {86.21}
 \newcommand{\stardocauthors}   {Keith~Shortridge, Horst~Meyerdierks,
                                 Malcolm~Currie, Martin~Clayton, Jon~Lockley, 
                                 Anne~Charles, Clive~Davenhall,
                                 Mark~Taylor, Tim~Ash, Tim~Wilkins, Dave~Axon,
                                 John~Palmer, Anthony~Holloway and 
                                 Vito~Graffagnino}
-\newcommand{\stardocdate}      {19 September 2002}
+\newcommand{\stardocdate}      {9 February 2004}
 \newcommand{\stardoctitle}     {FIGARO \\ [1ex] A general data reduction system}
 \newcommand{\stardocversion}   {Version \Figaroversion}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -6729,6 +6729,13 @@ The first letter of each command is sufficient.
 %       -----------------------------------------------------------------------
 
 \subsubsection{\label{techno12running}Running the program}
+
+   `gauss' requires an input spectrum in which the data points are
+   equally spaced in wavelength.  If you supply a spectrum with
+   unequally spaced points it will abort with an error message.  A
+   spectrum with unequally spaced points can be converted to one with
+   equally spaced points using Figaro command `scrunch' (see
+   Section~\ref{techno8scrunch}).
 
    Before running `gauss' make sure that a soft and a hard plot device
    have been allocated using the Figaro commands `soft' and `hard'.
@@ -14398,6 +14405,33 @@ Some items described in previous release notes have been removed.
  in flux calibration with Figaro are available.  One comprises 25 standard
  stars observed by Oke, the other 27 HST standard stars.  Copies can be
  retrieved by anonymous ftp.
+
+\subsection{\label{news562}Figaro 5.6-2 release}
+
+ The following notes are a slightly modified version of the news item
+ which accompanied the release of Figaro version 5.6-2 (summer 2003).
+
+ The only changes in Version 5.6-2 are a couple of bug fixes.
+
+\subsection{\label{news563}Figaro 5.6-3 release}
+
+ The following notes are a slightly modified version of the news item
+ which accompanied the release of Figaro version 5.6-3 (spring 2004).
+
+ The changes in Version 5.6-3 comprise only a couple of minor bug fixes
+ and enhancements, and a missing flux calibration file has been added.
+ Brief details of the changes are given below.
+
+\subsubsection{Bug Fixes and Minor Enhancements}
+
+ {\tt GAUSS} and {\tt IARC} have each received both a bug fix and a minor
+ enhancement.  Consequently, there has been an equally minor revision to
+ the description of {\tt GAUSS} in the user manual.
+
+\subsubsection{Flux Calibration Files}
+
+ The flux calibration file for Hiltner 102, {\tt hil102.tab}, was missing.
+ It has been added.
 
 % =============================================================================
 
