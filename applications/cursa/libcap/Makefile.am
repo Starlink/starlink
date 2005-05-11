@@ -44,3 +44,9 @@ ATASK_ROUTINES = \
  catchart.f  catchartrn.f  catcoord.f  catcopy.f  catgrid.f  \
  catgscin.f  catheader.f   catpair.f  catphotomfit.f  catphotomlst.f  \
  catphotomtrn.f  catselect.f  catsort.f
+
+PRIVATE_INCLUDES = SGZ_PAR SGZ_CMN SPLOT_CMN CIO_PAR CIO_CMN CHART_PAR \
+                   CHART_CMN CAP_PAR
+
+EXTRA_DIST = $(PRIVATE_INCLUDES)
+

@@ -7,6 +7,8 @@ bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
 
 nobase_bin_SCRIPTS = xcatviewLib/adamMessageRelay
 
+dist_noinst_SCRIPTS = cursa_link_adam
+
 LOCAL_LINK = libcap/libcap.la `$(srcdir)/cursa_link_adam`
 
 bin_MONOLITHS = catview cursa
@@ -108,3 +110,8 @@ cursa_test.csh: cursa_test.csh.in
 	   -e 's,@edited_input\@,cursa_test.csh: produced from cursa_test.csh.in by Makefile.am,' \
 	   $(srcdir)/cursa_test.csh.in >cursa_test.csh.tmp
 	mv cursa_test.csh.tmp cursa_test.csh
+
+
+EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in catremote.in \
+             UrlReader.class UrlReader.java adamMessageRelay.in $(xcatviewsupport_DATA) \
+             xcatviewLib/adamMessageRelay.in 
