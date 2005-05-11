@@ -115,3 +115,10 @@ cursa_test.csh: cursa_test.csh.in
 EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in catremote.in \
              UrlReader.class UrlReader.java adamMessageRelay.in $(xcatviewsupport_DATA) \
              xcatviewLib/adamMessageRelay.in 
+
+CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
+             catchart.ifc catchartrn.ifc catcoord.ifc catcopy.ifc catgrid.ifc \
+             catgscin.ifc catheader.ifc catpair.ifc catphotomfit.ifc catphotomlst.ifc \
+             catphotomtrn.ifc catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
+             catview.ifc
+          
