@@ -1,11 +1,14 @@
 1 Figaro - Spectroscopy Data Reduction Package
                                                       Expires: ????.??.??
 
- Version 5.6-2 of Figaro has recently been released.  Figaro is a
+ Version 5.6-3 of Figaro has recently been released.  Figaro is a
  powerful and comprehensive general-purpose package for the reduction
  of astronomical images and spectra.  It contains particularly extensive
- facilities for spectroscopy.  The only changes in Version 5.6-2 are a
- couple of bug fixes.
+ facilities for spectroscopy.
+
+ The changes in Version 5.6-3 comprise only a few minor bug fixes
+ and enhancements, and a missing flux calibration file has been added.
+ Brief details of the changes are given below.
 
  Figaro is documented in SUN/86.  To view a hypertext version of this
  document type:
@@ -25,4 +28,26 @@
  address figaro@star.rl.ac.uk.
 
 
- A C Davenhall, 2 May 2003.
+ A C Davenhall, 9 February 2004.
+ revised Malcolm J Currie 2004 February 17
+
+
+2 Bug Fixes and Minor Enhancements
+
+ GAUSS and IARC have each received both a bug fix and a minor
+ enhancement.  Consequently, there has been an equally minor revision to
+ the description of GAUSS in the user manual.
+
+ EMLT has a new NOISE keyword.  If it is specified, allowance for
+ noise is made when determining the line limits.  This is intended for
+ broad emission features or beam location rather than narrow arc lines.
+ It defaults to the former behaviour.
+
+ SDIST allows for broader spectral profiles when tracing a  spectrum.  There
+ was an arbitrary cut-off of the size of the extracted cross-section to be
+ fitted.
+
+2 Flux Calibration Files
+
+ The flux calibration file for Hiltner 102, hil102.tab, was missing.  It
+ has been added.
