@@ -7,7 +7,8 @@ bin_MONOLITHS = pongo_mon
 dist_noinst_SCRIPTS = pongo_link_adam
 
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
-dist_pkgdata_DATA = pongo.news $(PONGO_EXAMPLES) $(EXAMPLE_DATA_FILES)
+dist_pkgdata_DATA = $(PONGO_EXAMPLES) $(EXAMPLE_DATA_FILES)
+dist_starnews_DATA = pongo.news
 bindatadir = $(bindir)
 bindata_DATA = $(DATA_FILES)
 
@@ -47,4 +48,7 @@ edit = sed \
 pongo.icl: ;
 
 ## File not mentioned elsewhere that we need to distribute.
-EXTRA_DIST = PONGO_PAR PONGO_CMN
+EXTRA_DIST = PONGO_PAR PONGO_CMN $(HELP_SOURCES) 
+
+CLEANFILES = pongohelp.shl pongo_mon version.dat pongo_mon.ifc
+
