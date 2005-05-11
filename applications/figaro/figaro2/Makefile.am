@@ -38,3 +38,18 @@ figaro2_LDADD = $(LDADD) \
 ../ich/libfigich.la \
 `pda_link` `pgplot_link_adam` `agp_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
 
+MISC_BUILT_FILES = version.dat figaro2 figaro2.ifl
+
+IFC_FILES = flconv.ifc irconv.ifc linterp.ifc spifit.ifc bfft.ifc cmplx2i.ifc \
+cmplx2m.ifc cmplxdiv.ifc cmplxmult.ifc cmplxsub.ifc figs321.ifc \
+figs322.ifc figsee.ifc figsflux.ifc fitset.ifc fitskeys.ifc foto.ifc \
+fwconv.ifc gauss.ifc gspike.ifc i2cmplx.ifc impos.ifc interp.ifc \
+irflat.ifc irflux.ifc mask.ifc mcfit.ifc peak.ifc r2cmplx.ifc rcgs2.ifc \
+rdfits.ifc rdipso.ifc spflux.ifc spied.ifc table.ifc wdfits.ifc wdipso.ifc \
+abconv.ifc abline.ifc alasin.ifc alasout.ifc aperture.ifc bsmult.ifc 
+caldiv.ifc centers.ifc cmplx2r.ifc cmplxadd.ifc cmplxconj.ifc cmplxfilt.ifc \
+cosbell.ifc cspike.ifc emlt.ifc extin.ifc fet321.ifc ffcross.ifc ff.ifc \
+fft.ifc figs422.ifc figs423.ifc figs424.ifc figaro2.ifc
+
+CLEANFILES = $(MISC_BUILT_FILES) $(IFC_FILES)
+

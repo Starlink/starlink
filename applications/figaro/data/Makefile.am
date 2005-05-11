@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = $(DATA_FILES) $(DATA_STRUCTURE_DEFINITIONS) \
+dist_bin_SCRIPTS = $(DATA_FILES) $(DATA_STRUCTURE_DEFINITIONS) \
               $(DEMO_FLUX_STANDARDS) $(LINE_IDS) 
 
-staretc_DATA = $(MISC_FILES) $(ARCLINES) $(EXTINCTION_COEFFS) \
+dist_staretc_DATA = $(MISC_FILES) $(ARCLINES) $(EXTINCTION_COEFFS) \
                $(FILTER_TRANSMISSIONS) $(FLUX_STANDARDS) $(LUTS) \
                $(MENUS) $(MISC_FILES)
 
@@ -74,3 +74,5 @@ ndprnbow_lut.sdf ndps_lut.sdf pandora_lut.sdf standard_lut.sdf
 MENUS = arcmenu.txt echarcmenu.txt
 
 MISC_FILES = abline.txt arcparm.txt echselect.txt gauss.txt kmags.dat
+
+

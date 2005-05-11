@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = specdre.csh specdre.icl figaro.csh figaro.icl demo.icl \
-demo_specdre.icl demo_twodspec.icl twodspec.icl twodspec.csh
+bin_SCRIPTS = figaro.csh figaro.icl
+
+dist_bin_SCRIPTS = specdre.csh specdre.icl twodspec.csh twodspec.icl \
+                   demo_specdre.icl demo_twodspec.icl demo.icl
 
 ## Should really call this FIG_DYNAMIC_MEMORY
 include_HEADERS = include/DYNAMIC_MEMORY 
@@ -16,15 +18,21 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
     sun86_spec2.eps sun86_spec.eps
 
 # Define the help source file.
+HELP_SOURCES = figaro.hlp
 starhelp_DATA = figaro.shl
 
 .hlp.shl:
 	@HLIB@ $<
 
 ## News files
-dist_pkgdata_DATA = figaro.news
+dist_starnews_DATA = figaro.news
 
 SUBDIRS = \
     appcb appsub dsa dta fda fig fibre fit fitres fla gen gkd graph ich jty \
     main opt par spext sploop tio twoutil unix work util \
-    figaro1 figaro2 figaro3 figaro4 figaro5 data
+    figaro1 figaro2 figaro3 figaro4 figaro5 fighelp data
+
+EXTRA_DIST = $(HELP_SOURCES)
+
+
+CLEANFILES = figaro.shl version.dat 

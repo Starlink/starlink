@@ -47,3 +47,28 @@ figaro1_LDADD = $(LDADD) \
 ../par/libfigpar.la \
 ../ich/libfigich.la \
 `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
+
+
+MISC_BUILT_FILES = version.dat figaro1 figaro1.ifl
+
+IFC_FILES = xtplane.ifc xyplane.ifc ycadd.ifc ycdiv.ifc ycmult.ifc ycsub.ifc \
+ytplane.ifc growx.ifc growxt.ifc growxy.ifc growy.ifc growyt.ifc \
+hard.ifc iadd.ifc ialog.ifc icadd.ifc icdiv.ifc icmult.ifc icsub.ifc \
+idev.ifc idiv.ifc igrey.ifc imult.ifc irevx.ifc irevy.ifc isub.ifc \
+isxadd.ifc isxdiv.ifc isxmul.ifc isxsub.ifc isyadd.ifc isydiv.ifc \
+isymul.ifc isysub.ifc lxset.ifc lyset.ifc medfiltr.ifc xcadd.ifc \
+xcdiv.ifc xcmult.ifc xcsub.ifc elsplot.ifc esplot.ifc lsplot.ifc
+medfilt.ifc medsky.ifc msplot.ifc ncset.ifc optextract.ifc polysky.ifc \
+profile.ifc q2bad.ifc qual2flag.ifc rembad.ifc renobj.ifc resample.ifc \
+rescale.ifc retype.ifc rotx.ifc sclean.ifc scnsky.ifc scross.ifc scrunch.ifc \
+setobj.ifc sfit.ifc slice.ifc soft.ifc splot.ifc sqrterr.ifc tippex.ifc \
+trimfile.ifc xcur.ifc ystract.ifc adjoin.ifc bclean.ifc ccdlin.ifc ccur.ifc \
+cfit.ifc clean.ifc clip.ifc coadd.ifc colour.ifc combine.ifc copobj.ifc \
+cosrej.ifc creobj.ifc cset.ifc delobj.ifc dvdplot.ifc errcon.ifc extlist.ifc \
+extract.ifc figinfo.ifc flag2qual.ifc fscrunch.ifc goodvar.ifc hcross.ifc \
+hist.ifc hopt.ifc icont.ifc iconv3.ifc icor16.ifc icset.ifc icur.ifc idiff.ifc \
+igconv.ifc igcur.ifc ilist.ifc ilog.ifc image.ifc iplots.ifc ipower.ifc \
+irot90.ifc isedit.ifc ishift.ifc ismooth.ifc isplot.ifc istat.ifc istretch.ifc \
+isubset.ifc isuper.ifc ixsmooth.ifc figaro1.ifc
+
+CLEANFILES = $(IFC_FILES) $(MISC_BUILT_FILES)

@@ -21,3 +21,14 @@ figaro4_LDADD = $(LDADD) \
 ../sploop/libsploop.la \
 `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
 
+IFC_FILES = arcdisp.ifc arcgendb.ifc arcident.ifc arclocat.ifc ascin.ifc
+ascout.ifc bbody.ifc correl.ifc editext.ifc evalfit.ifc fillcube.ifc
+fitbb.ifc fitgauss.ifc fitpoly.ifc fittri.ifc grow.ifc moments.ifc
+movie.ifc resamp.ifc speccont.ifc specgrid.ifc specplot.ifc subset.ifc
+xtract.ifc figaro4.ifc
+
+MISC_BUILT_FILES = version.dat figaro4.ifl figaro4
+
+CLEANFILES = $(IFC_FILES) $(MISC_BUILT_FILES)
+
+

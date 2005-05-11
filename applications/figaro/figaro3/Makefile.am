@@ -30,3 +30,16 @@ figaro3_LDADD = $(LDADD) \
 ../ich/libfigich.la \
 `pda_link`  `agp_link_adam` `grp_link_adam` `ndf_link_adam` \
 `fio_link_adam` 
+
+IFC_FILES = echselect.ifc findsp.ifc flaircomp.ifc flairext.ifc iarc.ifc \
+iscrunch.ifc iscruni.ifc maskext.ifc offdist.ifc overpf.ifc \
+polext.ifc sdist.ifc skyliner.ifc vachel.ifc xcopi.ifc xcopy.ifc \
+arc.ifc cdist.ifc echarc.ifc echfind.ifc echmask.ifc echmerge.ifc \
+figaro3.ifc
+
+MISC_BUILT_FILES = version.dat figaro3 figaro3.ifl
+
+CLEANFILES = $(IFC_FILES) $(MISC_BUILT_FILES)
+
+
+
