@@ -37,3 +37,4 @@ vig.ifc arc2d.ifc figaro5.ifc
 
 MISC_BUILT_FILES = version.dat figaro5 figaro5.ifl
 
+CLEANFILES = $(IFC_FILES) $(MISC_BUILT_FILES)

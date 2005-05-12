@@ -57,7 +57,7 @@ hard.ifc iadd.ifc ialog.ifc icadd.ifc icdiv.ifc icmult.ifc icsub.ifc \
 idev.ifc idiv.ifc igrey.ifc imult.ifc irevx.ifc irevy.ifc isub.ifc \
 isxadd.ifc isxdiv.ifc isxmul.ifc isxsub.ifc isyadd.ifc isydiv.ifc \
 isymul.ifc isysub.ifc lxset.ifc lyset.ifc medfiltr.ifc xcadd.ifc \
-xcdiv.ifc xcmult.ifc xcsub.ifc elsplot.ifc esplot.ifc lsplot.ifc
+xcdiv.ifc xcmult.ifc xcsub.ifc elsplot.ifc esplot.ifc lsplot.ifc \
 medfilt.ifc medsky.ifc msplot.ifc ncset.ifc optextract.ifc polysky.ifc \
 profile.ifc q2bad.ifc qual2flag.ifc rembad.ifc renobj.ifc resample.ifc \
 rescale.ifc retype.ifc rotx.ifc sclean.ifc scnsky.ifc scross.ifc scrunch.ifc \
