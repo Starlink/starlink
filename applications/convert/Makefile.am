@@ -95,7 +95,7 @@ EXTRA_DIST = convert.f convert.csh.in convert.icl.in gif2ndf.in \
              ndf2gif.in tiff2ndf.in $(HELP_SOURCES)
 
 
-MISC_BUILT_FILES = convert.shl version.dat gif2ndf ndf2gif tiff2ndf convert.csh convert.icl
+MISC_BUILT_FILES = convert.shl version.dat gif2ndf ndf2gif tiff2ndf convert.csh convert.icl \
 convert_mon convert_mon.ifl
 
 IFC_FILES = conhelp.ifc da2ndf.ifc dst2ndf.ifc fits2ndf.ifc gasp2ndf.ifc iraf2ndf.ifc \
