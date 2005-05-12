@@ -111,9 +111,12 @@ cursa_test.csh: cursa_test.csh.in
 	   $(srcdir)/cursa_test.csh.in >cursa_test.csh.tmp
 	mv cursa_test.csh.tmp cursa_test.csh
 
+dist_starnews_DATA = cursa.news
+
+dist_pkgdata_DATA = CURSA_CONDITIONS
 
 EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in catremote.in \
-             UrlReader.class UrlReader.java adamMessageRelay.in $(xcatviewsupport_DATA) \
+             UrlReader.class UrlReader.java $(xcatviewsupport_DATA) \
              xcatviewLib/adamMessageRelay.in 
 
 CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
