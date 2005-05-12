@@ -127,6 +127,7 @@
 *     TDCA: Tim Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -173,6 +174,8 @@
 *        (RANGE is now "Given and Returned").
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     12-MAY-2005 (PWD):
+*        Normalise coordinates written to logfile.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -261,6 +264,7 @@
       DOUBLE PRECISION SIGOUT    ! Sigma in Current Frame 
       DOUBLE PRECISION XOUT      ! Current Frame axis 1 centre
       DOUBLE PRECISION YOUT      ! Current Frame axis 2 centre
+      DOUBLE PRECISION NORMS( 2 ) ! Normalized axis centres.
       INTEGER BINPTS             ! Number of pixels in to be considered
       INTEGER DAPTR              ! Pointer to the workspace for the radial-bin pixels
       INTEGER FRM2               ! FWHM reporting Frame
@@ -454,11 +458,15 @@
 
 *  Format the centre axis values, and the seeing, converting from
 *  a sigma value to an FWHM value (assuming a Gaussian profile).
-               FMTVAL = AST_FORMAT( CFRM, 1, XOUT, STATUS )
+               NORMS( 1 ) = XOUT
+               NORMS( 2 ) = YOUT
+               CALL AST_NORM( CFRM, NORMS, STATUS )
+
+               FMTVAL = AST_FORMAT( CFRM, 1, NORMS( 1 ), STATUS )
                CALL CHR_LDBLK( FMTVAL )
                XVAL = FMTVAL
 
-               FMTVAL = AST_FORMAT( CFRM, 2, YOUT, STATUS )
+               FMTVAL = AST_FORMAT( CFRM, 2, NORMS( 2 ), STATUS )
                CALL CHR_LDBLK( FMTVAL )
                YVAL = FMTVAL
 
@@ -486,11 +494,15 @@
      :                          STATUS )
 
 *  Format the centre axis values.
-               FMTVAL = AST_FORMAT( CFRM, 1, XOUT, STATUS )
+               NORMS( 1 ) = XOUT
+               NORMS( 2 ) = YOUT
+               CALL AST_NORM( CFRM, NORMS, STATUS )
+
+               FMTVAL = AST_FORMAT( CFRM, 1, NORMS( 1 ), STATUS )
                CALL CHR_LDBLK( FMTVAL )
                XVAL = FMTVAL
 
-               FMTVAL = AST_FORMAT( CFRM, 2, YOUT, STATUS )
+               FMTVAL = AST_FORMAT( CFRM, 2, NORMS( 2 ), STATUS )
                CALL CHR_LDBLK( FMTVAL )
                YVAL = FMTVAL
 
