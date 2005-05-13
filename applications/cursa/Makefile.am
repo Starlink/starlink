@@ -30,7 +30,14 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 geturl_SOURCES = geturl.c
 
 #  List of ancillary data files (all types). These need a home at some point.
-EXAMPLE_FILES = examples/*
+EXAMPLE_FILES = examples/0README.LIS examples/angles.TXT examples/bd.grt \
+examples/usno.grt examples/catpair_cart.script examples/catpair_sphplr.script \
+examples/complex.dat examples/complex.grt examples/complex.TXT examples/gsc.grt \
+examples/iras_psc.grt examples/kappa.TXT examples/photoprog.TXT examples/simple.TXT \
+examples/photostandards.TXT examples/pisaresults.TXT examples/pisasizes.TXT \
+examples/polygon.TXT examples/ppm.grt examples/propmotn.TXT examples/rc3.grt \
+examples/sao.grt examples/scale.TXT examples/scosmosbw.grt examples/scosmoscol.grt \
+examples/simbad.grt examples/simple.grt examples/simple_radians.TXT
 
 ##  Extra files for CURSA bin directory.
 cursasupportdir = $(bindir)
@@ -56,6 +63,9 @@ xcatviewsupport_DATA = \
  xcatviewLib/GetExprn.tcl xcatviewLib/GetScatter.tcl \
  xcatviewLib/RemoteQuery.tcl xcatviewLib/RemoteUrl.tcl \
  xcatviewLib/adamtask.tcl xcatviewLib/tclIndex
+
+
+
 
 ##  Edit scripts during make to have the correct paths.
 NETWORKED = "yes"
@@ -113,15 +123,15 @@ cursa_test.csh: cursa_test.csh.in
 
 dist_starnews_DATA = cursa.news
 
-dist_pkgdata_DATA = CURSA_CONDITIONS
+dist_pkgdata_DATA = CURSA_CONDITIONS $(EXAMPLE_FILES)
 
 EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in catremote.in \
              UrlReader.class UrlReader.java $(xcatviewsupport_DATA) \
-             xcatviewLib/adamMessageRelay.in 
+             xcatviewLib/adamMessageRelay.in $(cursasupport_DATA)
 
 CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
              catchart.ifc catchartrn.ifc catcoord.ifc catcopy.ifc catgrid.ifc \
              catgscin.ifc catheader.ifc catpair.ifc catphotomfit.ifc catphotomlst.ifc \
              catphotomtrn.ifc catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
-             catview.ifc
+             catview.ifc xcatviewLib/adamMessageRelay
           
