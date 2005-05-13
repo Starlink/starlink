@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="period" status="obsolete">
+<component id="period" status="obsolete" support="U">
   <version>5.0-3</version>
   <path>applications/obsolete/period</path>
   <description>PERIOD - A Time-series analysis package</description>

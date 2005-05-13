@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="chart" status="obsolete">
+<component id="chart" status="obsolete" support="U">
   <version>4.0-1</version>
   <path>applications/obsolete/chart</path>
   <description>CHART - Finding chart and stellar data system</description>

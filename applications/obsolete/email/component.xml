@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="email" status="obsolete">
+<component id="email" status="obsolete" support="U">
   <version>1.4-1</version>
   <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>

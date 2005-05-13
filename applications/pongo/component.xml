@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pongo">
+<component id="pongo" support="U">
   <version>2.0-3</version>
   <path>applications/pongo</path>
   <description>PONGO - a suite of commands for interactively plotting data stored in text files</description>

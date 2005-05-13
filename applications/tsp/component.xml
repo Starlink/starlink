@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="tsp">
+<component id="tsp" support="U">
   <version>2.3-3</version>
   <path>applications/tsp</path>
   <description>TSP - Time Series/Polarimetry Package</description>

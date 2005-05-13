@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ircamdr" status="obsolete">
+<component id="ircamdr" status="obsolete" support="U">
   <version>1.1-2</version>
   <path>applications/obsolete/ircamdr</path>
   <description>IRCAMDR - IRCAM3 Data Reduction Software</description>

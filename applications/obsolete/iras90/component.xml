@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="iras90" status="obsolete">
+<component id="iras90" status="obsolete" support="U">
   <version>1.1-2</version>
   <path>applications/obsolete/iras90</path>
   <description>IRAS90 - IRAS data processing</description>
