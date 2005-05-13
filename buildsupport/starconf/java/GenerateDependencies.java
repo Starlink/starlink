@@ -378,6 +378,24 @@ public class GenerateDependencies {
             makefile.println();
         }
 
+        // Generate a list of all the supported components
+        makefile.println("# List of all supported components");
+        makefile.print("SUPPORTED_COMPONENTS =");
+        for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
+            Component c = (Component) ci.next();
+
+            if (c.getSupported() == Component.SUPPORTED_YES) {
+                if (c.getStatus() == Component.STATUS_OBSOLETE) {
+                    System.err.println("Component " + c.getName()
+                                       + " is both supported and obsolete!");
+                } else {
+                    makefile.println(" \\");
+                    makefile.print("\t$(MANIFESTS)/" + c.getName());
+                }
+            }
+        }
+        makefile.println();
+
         // Add all of the buildsupport tools to either autoBuildsupport or
         // nonautoBuildsupport, depending on whether they are or are not
         // (respectively) to be build automatically.
@@ -609,8 +627,10 @@ public class GenerateDependencies {
         private NodeList depElements;
         /** Indicates whether this is a buildsupport object */
         private int buildsupportType;
-        /** Is this a current component or an obsolete one? */
-        private int statusType;
+        /** Indicates the current/obsolete status of this component */
+        private int currencyStatus;
+        /** Indicates the supported/unsupported status of this component */
+        private int supportStatus;
 
         private Set marks = new java.util.HashSet();
 
@@ -640,6 +660,15 @@ public class GenerateDependencies {
         public static final int STATUS_OBSOLETE = 2;
 
         /**
+         * This component is a supported one.
+         */
+        private static final int SUPPORTED_YES = 1;
+        /**
+         * This component is unsupported.
+         */
+        private static final int SUPPORTED_NO = 2;
+
+        /**
          * If true, then the resolveComponents method has been
          * called.  All component references are solved, and so
          * it becomes an error to create any new components.
@@ -659,7 +688,8 @@ public class GenerateDependencies {
             name = el.getAttribute("id").intern();
             buildsupportType = extractBuildsupport(el);
             path = extractComponentPath(el);
-            statusType = extractStatus(el);
+            currencyStatus = extractStatus(el);
+            supportStatus = extractSupportStatus(el);
             depElements = el.getElementsByTagName("dependencies");
 
             allComponentDependencies = new java.util.HashMap();
@@ -768,7 +798,7 @@ public class GenerateDependencies {
          * {@link #STATUS_OBSOLETE}
          */
         public int getStatus() {
-            return statusType;
+            return currencyStatus;
         }
 
         private int extractStatus(Element el) {
@@ -785,6 +815,37 @@ public class GenerateDependencies {
                                    + " has unknown status " + s
                                    + " (defaulting to 'current')");
                 ret = STATUS_CURRENT;
+            }
+            return ret;
+        }
+
+        /**
+         * Retrieves the supported/unsupported status of this component.
+         * @return one of the values {@link SUPPORTED_YES} or
+         * {@link SUPPORTED_NO}
+         */
+        public int getSupported() {
+            return supportStatus;
+        }
+
+        private int extractSupportStatus(Element el) {
+            String s = el.getAttribute("support");
+            int ret;
+
+            if (s.equals("")) {
+                System.err.println("Component " + getName()
+                                   + " has blank support attribute "
+                                   + "(defaulting to 'supported')");
+                ret = SUPPORTED_YES;
+            } else if (s.equals("S")) {
+                ret = SUPPORTED_YES;
+            } else if (s.equals("U")) {
+                ret = SUPPORTED_NO;
+            } else {
+                System.err.println("Component " + getName()
+                                   + " has unrecognised support status " + s
+                                   + " (defaulting to 'supported')");
+                ret = SUPPORTED_YES;
             }
             return ret;
         }
