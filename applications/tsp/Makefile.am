@@ -16,7 +16,7 @@ mydatadir=$(bindir)
 mydata_DATA = exo.sdf sn1987a.sdf
 
 tsp_mon_SOURCES = tsp_mon.f $(TSP_F_ROUTINES)
-tsp_mon_LDADD = libtsp.la `$(srcdir)/tsp_link_adam` ../figaro/fda/libfda.la \
+tsp_mon_LDADD = libtsp.la `$(srcdir)/tsp_link_adam` $(libdir)/libfda.la \
 	-lfigich -lfiggen
 tsp_mon_TASKS = $(TSP_F_ROUTINES:.f=)
 
