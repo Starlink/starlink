@@ -111,7 +111,7 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	sed -e s#@PKG_VERS@#$(PACKAGE_VERSION)# VERSION.in >$ VERSION ;\
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
-	STARLINK=$(STARCONF_DEFAULT_STARLINK); export STARLINK;\
+	STARLINK=$(STARLINK); export STARLINK;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
 	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES); do \
