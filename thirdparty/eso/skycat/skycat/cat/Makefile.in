@@ -4,7 +4,7 @@
 # Component level Makefile
 
 # directories to run make in
-SUBDIRS = @CAT_SUBDIRS@
+SUBDIRS = astrocat ccat tclcat
 
 # this dir
 SRCDIR = @SRC_ROOT@

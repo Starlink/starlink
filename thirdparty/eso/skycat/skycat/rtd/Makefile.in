@@ -9,7 +9,8 @@
 #
 
 # directories containing library sources
-SUBDIRS 	= @RTD_SUBDIRS@
+SUBDIRS 	= rtdevt rtilib rtdrmt rtdimg
+SRC_ROOT        = @SCR_ROOT@
 
 # directories to run make in
 ALLDIRS 	= $(SUBDIRS)
@@ -22,7 +23,7 @@ ASTROTCL_SUBDIRS = @ASTROTCL_SUBDIRS@
 TCLUTIL_SUBDIRS  = @TCLUTIL_SUBDIRS_NOTIX@
 
 # library source dirs, including dependent packages
-DEP_LIB_SUBDIRS	= $(SUBDIRS) $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS)
+DEP_LIB_SUBDIRS	= @RTD_SUBDIRS@ $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS)
 
 # names of master libraries to generate
 LIBRARY_a 	= librtd.a

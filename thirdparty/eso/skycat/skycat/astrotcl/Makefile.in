@@ -9,7 +9,8 @@
 #
 
 # directories to run make in
-SUBDIRS 	= @ASTROTCL_SUBDIRS@
+SUBDIRS 	= compress wcslib imageio astrotcl
+SRC_ROOT        = @SRC_ROOT@
 
 # names of master libraries to generate
 LIBRARY_a 	= libastrotcl.a
@@ -79,7 +80,7 @@ master_lib:
 	@cd tmp ;\
 	rm -f *.o ;\
 	for i in $(SUBDIRS); do \
-	   cp `cat $$i/src/.objs` . ;\
+	   cp `cat $(SRC_ROOT)/$$i/src/.objs` . ;\
 	done ;\
 	if test $(SHARED) -eq 1 ; then \
 	   echo "making master $(LIBRARY_sl) lib from $(SUBDIRS)" ;\
