@@ -138,23 +138,23 @@ distclean-local:
 MAINTAINERCLEANFILES = $(TCL_FILES) $(SKYCAT_FILES) $(GAIA_FILES)
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps
+EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps gaia.htx
 
 ##  Additional files. These have traditionally gone into bindir.
-##  Not having frame.sdf there would be an issue. Use a trick to get these
-##  installed.
 gaiasupportdir = $(bindir)
-gaiasupport_DATA = demodata.tar
+dist_gaiasupport_DATA = demodata.tar
 
-##  Demodata depends on demodata
-demodata.tar: demodata
+##  demodata.tar depends on demodata
+demodata.tar:
 	(cd demodata; \
 	tar cvf ../demodata.tar *)
 
 ##  Before distributing subdirectories we need to clean then up (we get all
-##  the files in these directories). Also remove the CVS trace.
+##  the files in these directories). Also remove the CVS trace and any
+##  softlinks.
 dist-hook:
 	rm -rf `find $(distdir) -type d -name CVS`
+	rm -rf `find $(distdir) -type l`
 	- (cd $(distdir)/tcl; make distclean);
 	- (cd $(distdir)/skycat; make distclean);
 	- (cd $(distdir)/gaia; make distclean);
