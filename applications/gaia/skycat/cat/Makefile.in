@@ -14,7 +14,7 @@ ASTROTCL_SUBDIRS = @ASTROTCL_SUBDIRS@
 TCLUTIL_SUBDIRS  = @TCLUTIL_SUBDIRS@
 
 # library source dirs, including dependent packages
-DEP_LIB_SUBDIRS	= $(SUBDIRS) $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS)
+DEP_LIB_SUBDIRS	= @CAT_SUBDIRS@ $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS)
 
 # names of master libraries to generate
 LIBRARY_a 	= libcat.a
