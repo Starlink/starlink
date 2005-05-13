@@ -2,6 +2,8 @@
 
 bin_SCRIPTS = tsp.csh tsp.icl
 
+dist_noints_SCRIPTS = tsp_link tsp_link_adam
+
 bin_MONOLITHS = tsp_mon
 noinst_LTLIBRARIES = libtsp.la
 
@@ -51,5 +53,9 @@ tsp_phssubs.f tsp_phsxlimits.f tsp_qplotsubs.f tsp_qupltscale.f	     \
 tsp_resize.f tsp_rlu.f tsp_rlu_lambda.f tsp_rlu_time.f tsp_rlu_x.f   \
 tsp_rlu_y.f tsp_size.f tsp_stokes.f tsp_temp.f tsp_unmap.f tsp_wlu.f \
 tsp_wlu_lambda.f tsp_wlu_time.f tsp_wlu_x.f tsp_wlu_y.f
+
+PRIVATE_INCLUDES = POL_PAR
+
+EXTRA_DIST = $(PRIVATE_INCLUDES)
 
 
