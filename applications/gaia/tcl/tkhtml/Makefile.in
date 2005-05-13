@@ -55,7 +55,7 @@ install-lib: libtkhtml.a
 	$(INSTALL) libtkhtml.a $(LIBDIR)
 
 clean:	
-	rm -f htmltokens.o htmlcmd.o htmldraw.o htmlform.o htmlimage.o \
+	- rm -f htmltokens.o htmlcmd.o htmldraw.o htmlform.o htmlimage.o \
 	htmlindex.o htmllayout.o htmlparse.o htmlsizer.o \
 	htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o \
 	libtkhtml.a
@@ -63,6 +63,6 @@ clean:
 
 
 distclean: clean
-	rm config.status config.cache config.log Makefile
+	- rm config.status config.cache config.log Makefile
 
 install: install-lib
