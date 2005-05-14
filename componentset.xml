@@ -948,7 +948,7 @@ them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="chart" status="obsolete">
+<component id="chart" status="obsolete" support="U">
   <version>4.0-1</version>
   <path>applications/obsolete/chart</path>
   <description>CHART - Finding chart and stellar data system</description>
@@ -986,7 +986,7 @@ or perform astrometric reductions.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="email" status="obsolete">
+<component id="email" status="obsolete" support="U">
   <version>1.4-1</version>
   <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>
@@ -1021,7 +1021,7 @@ and astronomy groups in the UK and the rest of the world.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="iras90" status="obsolete">
+<component id="iras90" status="obsolete" support="U">
   <version>1.1-2</version>
   <path>applications/obsolete/iras90</path>
   <description>IRAS90 - IRAS data processing</description>
@@ -1050,7 +1050,7 @@ IRAS90 is a suite of programs for processing IRAS data.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="ircamdr" status="obsolete">
+<component id="ircamdr" status="obsolete" support="U">
   <version>1.1-2</version>
   <path>applications/obsolete/ircamdr</path>
   <description>IRCAMDR - IRCAM3 Data Reduction Software</description>
@@ -1076,7 +1076,7 @@ file extension stored in the standard Starlink NDF data format.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="period" status="obsolete">
+<component id="period" status="obsolete" support="U">
   <version>5.0-3</version>
   <path>applications/obsolete/period</path>
   <description>PERIOD - A Time-series analysis package</description>
@@ -1182,7 +1182,7 @@ display of vector maps.
   </copyright>
 </component>
 
-<component id="pongo">
+<component id="pongo" support="U">
   <version>2.0-3</version>
   <path>applications/pongo</path>
   <description>PONGO - a suite of commands for interactively plotting data stored in text files</description>
@@ -1496,7 +1496,7 @@ UNIX).
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="tsp">
+<component id="tsp" support="U">
   <version>2.3-3</version>
   <path>applications/tsp</path>
   <description>TSP - Time Series/Polarimetry Package</description>

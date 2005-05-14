@@ -1757,6 +1757,72 @@ $(MANIFESTS)/xdisplay: \
 	cd applications/xdisplay \
 	  && $(MAKE_CPT)
 
+# List of all supported components
+SUPPORTED_COMPONENTS = \
+	$(MANIFESTS)/agi \
+	$(MANIFESTS)/ard \
+	$(MANIFESTS)/ary \
+	$(MANIFESTS)/ast \
+	$(MANIFESTS)/astrom \
+	$(MANIFESTS)/atools \
+	$(MANIFESTS)/cat \
+	$(MANIFESTS)/ccdpack \
+	$(MANIFESTS)/chr \
+	$(MANIFESTS)/cnf \
+	$(MANIFESTS)/coco \
+	$(MANIFESTS)/convert \
+	$(MANIFESTS)/cursa \
+	$(MANIFESTS)/datacube \
+	$(MANIFESTS)/dipso \
+	$(MANIFESTS)/docfind \
+	$(MANIFESTS)/dvi2bitmap \
+	$(MANIFESTS)/echomop \
+	$(MANIFESTS)/echwind \
+	$(MANIFESTS)/ems \
+	$(MANIFESTS)/esp \
+	$(MANIFESTS)/extractor \
+	$(MANIFESTS)/figaro \
+	$(MANIFESTS)/fio \
+	$(MANIFESTS)/gaia \
+	$(MANIFESTS)/generic \
+	$(MANIFESTS)/graphpar \
+	$(MANIFESTS)/grp \
+	$(MANIFESTS)/hds \
+	$(MANIFESTS)/hdstools \
+	$(MANIFESTS)/hdstrace \
+	$(MANIFESTS)/hlp \
+	$(MANIFESTS)/htx \
+	$(MANIFESTS)/icl \
+	$(MANIFESTS)/ifd \
+	$(MANIFESTS)/img \
+	$(MANIFESTS)/info \
+	$(MANIFESTS)/init \
+	$(MANIFESTS)/jpl \
+	$(MANIFESTS)/kaplibs \
+	$(MANIFESTS)/kappa \
+	$(MANIFESTS)/messgen \
+	$(MANIFESTS)/nbs \
+	$(MANIFESTS)/ndf \
+	$(MANIFESTS)/ndg \
+	$(MANIFESTS)/news \
+	$(MANIFESTS)/par \
+	$(MANIFESTS)/pcs \
+	$(MANIFESTS)/pda \
+	$(MANIFESTS)/pgp \
+	$(MANIFESTS)/pgplot \
+	$(MANIFESTS)/photom \
+	$(MANIFESTS)/polpack \
+	$(MANIFESTS)/prm \
+	$(MANIFESTS)/rv \
+	$(MANIFESTS)/sgmlkit \
+	$(MANIFESTS)/sgs \
+	$(MANIFESTS)/shl \
+	$(MANIFESTS)/sla \
+	$(MANIFESTS)/sst \
+	$(MANIFESTS)/star2html \
+	$(MANIFESTS)/startcl \
+	$(MANIFESTS)/trn \
+	$(MANIFESTS)/xdisplay
 
 # Buildsupport tools -- building and cleaning
 BUILDSUPPORT_MANIFESTS = \
