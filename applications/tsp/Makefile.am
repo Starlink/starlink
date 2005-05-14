@@ -2,7 +2,7 @@
 
 bin_SCRIPTS = tsp.csh tsp.icl
 
-dist_noints_SCRIPTS = tsp_link tsp_link_adam
+dist_noinst_SCRIPTS = tsp_link tsp_link_adam
 
 bin_MONOLITHS = tsp_mon
 noinst_LTLIBRARIES = libtsp.la
