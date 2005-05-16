@@ -58,6 +58,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *        Re-written to allow for arbitrary pixel origin, and PSF centre.
 *     7-NOV-2000 (DSB):
 *        Argument AMP added.
+*     16-MAY-2005 (PWD):
+*        Changed amplitude set at centre to AMP, was 1.0.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -142,9 +145,9 @@
 *  this column.
             XD = REAL( I ) - 0.5 - PX
 
-*  The profile is 1.0 at the centre.
+*  The profile is AMP at the centre.
             IF( YD .EQ. 0.0 .AND. XD .EQ. 0.0 ) THEN
-               ARRAY( I, J ) = 1.0
+               ARRAY( I, J ) = AMP
 
 *  Otherwise,
             ELSE
