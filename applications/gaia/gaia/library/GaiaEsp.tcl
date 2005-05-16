@@ -467,6 +467,7 @@ itcl::class gaia::GaiaEsp {
 		set ell_x   [$stl table $elln x]
 		set ell_y   [$stl table $elln y]
 		set ell_sma [$stl table $elln semimajor]
+		set ell_count [$stl table $elln count]
 		set ell_pos [$stl table $elln pa]
 		# invell is 1/Ellipticity
 		# semiminor axis is semimajor axis / ellipticity
@@ -507,7 +508,7 @@ itcl::class gaia::GaiaEsp {
 		}
 
 		lappend ESP_results_ \
-		    [list $sourcen $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
+		    [list $sourcen $ell_x $ell_y $ell_sma $ell_count $ell_pos [expr 1/$ell_invell]]
 	    }
 	    show_ellprofou_results_ 1
 	    # Force the label on the menu to be updated.
@@ -1045,12 +1046,14 @@ itcl::class gaia::GaiaEsp {
 	itk_component add results {
 	    TableList $parent.results \
 		    -title "Results" \
-		    -headings {SourceN X Y SemiMajor PA Ellipt} \
-		    -sizes {10 10 10 10 10 10}
+                    -hscroll 1 -vscroll 1 \
+		    -headings {SourceN X Y SemiMajor Count PA Ellipt} \
+		    -sizes {10 10 10 10 10 10 10}
 	}
 	$itk_component(results) set_option X Precision 1
 	$itk_component(results) set_option Y Precision 1
 	$itk_component(results) set_option SemiMajor Precision 1
+	$itk_component(results) set_option Count Precision 1
 	$itk_component(results) set_option PA Precision 3
 	$itk_component(results) set_option Ellipt Precision 3
 	$itk_component(results) set_option SourceN Show 0
