@@ -56,6 +56,6 @@ tsp_wlu_lambda.f tsp_wlu_time.f tsp_wlu_x.f tsp_wlu_y.f
 
 PRIVATE_INCLUDES = POL_PAR
 
-EXTRA_DIST = $(PRIVATE_INCLUDES)
+EXTRA_DIST = $(PRIVATE_INCLUDES) $(mydata_DATA)
 
 
