@@ -9,7 +9,7 @@
 #
 
 # directories to run make in
-SUBDIRS 	= tclutil tix util
+SUBDIRS 	= util tclutil tix
 SRC_ROOT        = @SRC_ROOT@
 
 # names of master libraries to generate
