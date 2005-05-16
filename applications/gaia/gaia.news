@@ -4,9 +4,10 @@
   These are converted into temporary files on the fly and can be 
   used with all other tasks within GAIA.
   
-
   Stop problems with foreign-file conversion deleting the input files
   and re-opening creating a new copy.
+
+  ESP toolbox now reports mean count along isophote.
 
   Release 2.8-0: 04 November 2004
   ===============================

@@ -2,8 +2,6 @@
   GAIA TODO LIST
   ==============
 
-Note not many of these are likely as time and funding are short...
-
   o CCD Mosaics
 
      - Display CCD Mosaics as a single exposure, partially done, 
@@ -14,8 +12,7 @@ Note not many of these are likely as time and funding are short...
 
   o FITS images
 
-     - Add warnings or other work around for multiple period names
-
+     - Add warnings or other work around for multiple period names.
 
   o Add facilities to replace INSPECT
 
@@ -49,6 +46,8 @@ Note not many of these are likely as time and funding are short...
   o ESP toolbox
 
       - Extend report of results and add results analysis
+  
+      - Display profiles of various kinds
        
       - GAUFIT analyses
 
