@@ -24,7 +24,7 @@ noinst_MESSAGES = USER_ERR
 BUILT_SOURCES = USER_ERR
 
 TESTS = tsp_test
-check_SCRIPTS = tsp_test
+dist_check_SCRIPTS = tsp_test
 
 IFL_FILES = tsp_mon.ifl $(TSP_F_ROUTINES:.f=.ifl)
 
@@ -54,8 +54,28 @@ tsp_resize.f tsp_rlu.f tsp_rlu_lambda.f tsp_rlu_time.f tsp_rlu_x.f   \
 tsp_rlu_y.f tsp_size.f tsp_stokes.f tsp_temp.f tsp_unmap.f tsp_wlu.f \
 tsp_wlu_lambda.f tsp_wlu_time.f tsp_wlu_x.f tsp_wlu_y.f
 
+IFC_FILES = build3d.ifc calfit.ifc calfitpa.ifc calib.ifc \
+calpa.ifc ccd2pol.ifc ccd2stokes.ifc ccdphot.ifc \
+ccdpol.ifc cgs4pol.ifc cmult.ifc combine.ifc display.ifc \
+divide.ifc dstokes.ifc eplot.ifc extin.ifc flconv.ifc \
+flip.ifc fplot.ifc imotion.ifc impol.ifc ipcs2stokes.ifc \
+irflux.ifc irisapc.ifc irisap.ifc irispolc.ifc irispol.ifc \
+lhatpol.ifc lmerge.ifc ltcorr.ifc phaseplot.ifc pplot.ifc \
+ptheta.ifc qplot.ifc qumerge.ifc quplot.ifc qusub.ifc \
+rccdts.ifc rcgs2.ifc reverse.ifc rfigaro.ifc rhathsp.ifc \
+rhatpol.ifc rhdsplot.ifc rhsp3.ifc rirps.ifc rotpa.ifc \
+rturku.ifc scrunch.ifc shiftadd.ifc skysub.ifc slist.ifc \
+spflux.ifc splot.ifc subset.ifc subtract.ifc tbin.ifc \
+tcadd.ifc tderiv.ifc textin.ifc tlist.ifc tmerge.ifc \
+tsetbad.ifc tsextract.ifc tshift.ifc tsplot.ifc tsprofile.ifc \
+xcopy.ifc tsp_mon.ifc
+
+MISC_BUILT_FILES = tsp_mon version.dat tsp.csh tsp.icl tsp.sh
+
 PRIVATE_INCLUDES = POL_PAR
 
 EXTRA_DIST = $(PRIVATE_INCLUDES) $(mydata_DATA)
 
+CLEANFILES = $(MISC_BUILT_FILES) $(IFC_FILES) $(MISC_BUILT_FILES) \
+             $(IFL_FILES)
 
