@@ -674,6 +674,7 @@ typedef struct AstFrameVtab {
    void (* ClearTitle)( AstFrame * );
    void (* ClearUnit)( AstFrame *, int );
    void (* Norm)( AstFrame *, double[] );
+   void (* NormBox)( AstFrame *, double *, double *, AstMapping * );
    void (* Offset)( AstFrame *, const double[], const double[], double, double[] );
    double (* AxAngle)( AstFrame *, const double[2], const double[2], int );
    double (* Offset2)( AstFrame *, const double[2], double, double, double[2] );
@@ -789,6 +790,7 @@ int astGetActiveUnit_( AstFrame * );
 void astSetActiveUnit_( AstFrame *, int );
 
 #if defined(astCLASS)            /* Protected */
+void astNormBox_( AstFrame *, double *, double *, AstMapping * );
 AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping ** );
 const char *astFormat_( AstFrame *, int, double );
 int astUnformat_( AstFrame *, int, const char *, double * );
@@ -980,6 +982,8 @@ astINVOKE(V,astGetActiveUnit_(astCheckFrame(this)))
 astINVOKE(V,astSetActiveUnit_(astCheckFrame(this),value))
 
 #if defined(astCLASS)            /* Protected */
+#define astNormBox(this,lbnd,ubnd,reg) \
+astINVOKE(V,astNormBox_(astCheckFrame(this),lbnd,ubnd,astCheckMapping(reg)))
 #define astFormat(this,axis,value) \
 astINVOKE(V,astFormat_(astCheckFrame(this),axis,value))
 #define astPermAxes(this,perm) \

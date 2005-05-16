@@ -458,6 +458,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 /* Local Variables: */
    AstCircle *this;              /* Pointer to Circle structure */
+   AstFrame *frm;                /* Encapsulated Frame */
+   AstFrame *reg;                /* Base Frame region */
    double axcen;                 /* Central axis value */
    int i;                        /* Axis index */
    int nc;                       /* No. of axes in base Frame */
@@ -484,6 +486,25 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
       lbnd[ i ] = axcen - this->radius;
       ubnd[ i ] = axcen + this->radius;
    }
+
+/* Get a pointer to the base Frame in the frameset encapsulated by the
+   parent Region structure. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* The astNormBox requires a Mapping which can be used to test points in 
+   this base Frame. Create a copy of the Circle and then set its
+   FrameSet so that the current Frame in the copy is the same as the base
+   Frame in the original. */
+   reg = astCopy( this );
+   astSetRegFS( reg, frm );
+   astSetNegated( reg, 0 );
+
+/* Normalise this box. */
+   astNormBox( frm, lbnd, ubnd, reg );
+
+/* Free resources */
+   reg = astAnnul( reg );
+   frm = astAnnul( frm );
 
 }
 
@@ -1704,8 +1725,8 @@ f        If FORM
 c     unc
 f     UNC = INTEGER (Given)
 *        An optional pointer to an existing Region which specifies the 
-*        uncertainties associated with the boundary of the Box being created. 
-*        The uncertainty in any point on the boundary of the Box is found by 
+*        uncertainties associated with the boundary of the Circle being created. 
+*        The uncertainty in any point on the boundary of the Circle is found by 
 *        shifting the supplied "uncertainty" Region so that it is centred at 
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
@@ -1717,11 +1738,11 @@ f     UNC = INTEGER (Given)
 *        or be a Prism containing centro-symetric component Regions. A deep 
 *        copy of the supplied Region will be taken, so subsequent changes to 
 *        the uncertainty Region using the supplied pointer will have no 
-*        effect on the created Box. Alternatively, 
+*        effect on the created Circle. Alternatively, 
 f        a null Object pointer (AST__NULL) 
 c        a NULL Object pointer 
 *        may be supplied, in which case a default uncertainty is used 
-*        equivalent to a box 1.0E-6 of the size of the Box being created.
+*        equivalent to a box 1.0E-6 of the size of the Circle being created.
 *
 *        The uncertainty Region has two uses: 1) when the 
 c        astOverlap

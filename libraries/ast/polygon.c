@@ -96,6 +96,7 @@ f     The Polygon class does not define any new routines beyond those
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
 #include "slalib.h"              /* SLALIB library interface */
+#include "frame.h"               /* Coordinate system description */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -330,7 +331,6 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
 }
 
-
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /*
 *  Name:
@@ -374,17 +374,15 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 */
 
 /* Local Variables: */
-   AstFrame *frm;                /* Pointer to encapsulated Frame */
-   AstPointSet *pset;            /* Pointer to PointSet defining the Region */
-   AstPolygon *this;             /* Pointer to Polygon structure */
-   double **ptr;                 /* Pointer to PointSet data */
-   double *p;                    /* Pointer to next axis value */
-   double d;                     /* Axis offset from reference value */
-   double dinc;                  /* Axis offset from previous value */
-   double p0;                    /* Reference axis value */
-   int ic;                       /* Axis index */
-   int ip;                       /* Point index */
-   int np;                       /* No. of points in PointSet */
+   AstFrame *frm;             /* Pointer to encapsulated Frame */
+   AstPointSet *pset;         /* Pointer to PointSet defining the Region */
+   AstPolygon *this;          /* Pointer to Polygon structure */
+   AstRegion *reg;            /* Base Frame equivalent of supplied Polygon */
+   double **ptr;              /* Pointer to PointSet data */
+   double *x;                 /* Pointer to next X axis value */
+   double *y;                 /* Pointer to next Y axis value */
+   int ip;                    /* Point index */
+   int np;                    /* No. of points in PointSet */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -392,9 +390,17 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /* Get a pointer to the Polygon structure. */
    this = (AstPolygon *) this_region;
 
+/* If the base Frame bounding box has already been found, return the
+   values stored in the Polygon structure. */
+   if( this->lbnd[ 0 ] != AST__BAD ) {
+      lbnd[ 0 ] = this->lbnd[ 0 ];
+      lbnd[ 1 ] = this->lbnd[ 1 ];
+      ubnd[ 0 ] = this->ubnd[ 0 ];
+      ubnd[ 1 ] = this->ubnd[ 1 ];
+
 /* If the base Frame bounding box has not yet been found, find it now and
    store it in the Polygon structure. */
-   if( this->lbnd[ 0 ] == AST__BAD ) {
+   } else {
 
 /* Get the axis values for the PointSet which defines the location and
    extent of the region in the base Frame of the encapsulated FrameSet. */
@@ -402,53 +408,46 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
       ptr = astGetPoints( pset );
       np = astGetNpoint( pset );
 
-/* Get a pointer to the base Frame in the encapsulated FrameSet. */
-      frm = astGetFrame( this_region->frameset, AST__BASE );
-
-/* Check pointers can be used safely. */
-      if( astOK ) {
-
-/* Find the bounds on each axis in turn. */ 
-         for( ic = 0; ic < 2; ic++ ) {
-
-/* We first find the max and min axis offsets from the first point. We
-   used astAxDistance to cater for the possbility that the Frame may be a
-   SkyFrame and thus have circular redundancy. */
-            this->lbnd[ ic ] = 0.0;
-            this->ubnd[ ic ] = 0.0;
-
-            p = ptr[ ic ] + 1;
-            p0 = p[ -1 ];
-            d = 0.0;
-            for( ip = 1; ip < np; ip++, p++ ) {
-               dinc = astAxDistance( frm, ic + 1, p0, *p );        
-               if( dinc != AST__BAD ) {   
-                  d += dinc;
-                  if( d < this->lbnd[ ic ] ) this->lbnd[ ic ] = d;
-                  if( d > this->ubnd[ ic ] ) this->ubnd[ ic ] = d;
-               }
-               p0 = *p;
-            }
-
-/* Now convert these offsets to actual axis values. */
-            this->lbnd[ ic ] += ptr[ ic ][ 0 ];
-            this->ubnd[ ic ] += ptr[ ic ][ 0 ];
-         }
+/* Find the upper and lower bounds of the box enclosing all the vertices. */
+      lbnd[ 0 ] = DBL_MAX;
+      lbnd[ 1 ] = DBL_MAX;
+      ubnd[ 0 ] = -DBL_MAX;
+      ubnd[ 1 ] = -DBL_MAX;
+      x = ptr[ 0 ];
+      y = ptr[ 1 ];
+      for( ip = 0; ip < np; ip++, x++, y++ ) {
+         if( *x < lbnd[ 0 ] ) lbnd[ 0 ] = *x;
+         if( *x > ubnd[ 0 ] ) ubnd[ 0 ] = *x;
+         if( *y < lbnd[ 1 ] ) lbnd[ 1 ] = *y;
+         if( *y > ubnd[ 1 ] ) ubnd[ 1 ] = *y;
       }
 
-/* Free resources */
-      frm = astAnnul( frm );   
-   }
+/* Get a pointer to the base Frame in the frameset encapsulated by the
+   parent Region structure. */
+      frm = astGetFrame( this_region->frameset, AST__BASE );
 
-/* If the bounding box has been found succesfully, copy it into the supplied
-   arrays. */
-   if( astOK ) {
-      lbnd[ 0 ] = this->lbnd[ 0 ];
-      lbnd[ 1 ] = this->lbnd[ 1 ];
-      ubnd[ 0 ] = this->ubnd[ 0 ];
-      ubnd[ 1 ] = this->ubnd[ 1 ];
+/* The astNormBox requires a Mapping which can be used to test points in 
+   this base Frame. Create a copy of the Polygon and then set its
+   FrameSet so that the current Frame in the copy is the same as the base
+   Frame in the original. */
+      reg = astCopy( this );
+      astSetRegFS( reg, frm );
+      astSetNegated( reg, 0 );
+
+/* Normalise this box. */
+      astNormBox( frm, lbnd, ubnd, reg );
+
+/* Free resources */
+      reg = astAnnul( reg );
+      frm = astAnnul( frm );
+
+/* Store it in the olygon structure for future use. */
+      this->lbnd[ 0 ] = lbnd[ 0 ];
+      this->lbnd[ 1 ] = lbnd[ 1 ];
+      this->ubnd[ 0 ] = ubnd[ 0 ];
+      this->ubnd[ 1 ] = ubnd[ 1 ];
+
    }
-   
 }
 
 static AstPointSet *RegBaseMesh( AstRegion *this_region ){

@@ -91,6 +91,7 @@
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
+char **astChrSplit_( const char *, int * );
 int astChrMatch_( const char *, const char * );
 int astChrMatchN_( const char *, const char *, size_t );
 char **astStringArray_( const char *, int, int );
@@ -137,6 +138,7 @@ void *astFindIdPtr_( int );
 #define astStringArray(chars,nel,len) astStringArray_(chars,nel,len)
 #define astChrLen(string) astChrLen_(string)
 #define astSscanf astSscanf_
+#define astChrSplit(str,n) astChrSplit_(str,n)
 #endif
 
 #ifdef DEBUG

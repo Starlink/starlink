@@ -117,6 +117,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        propagate the changed epoch value to the component Frames.
 *     5-APR-2005 (DSB):
 *        Correct error checking in Clear/Get/Set/TestAttrib.
+*     12-MAY-2005 (DSB):
+*        Override astNormBox method.
 *class--
 */
 
@@ -598,6 +600,7 @@ static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *,
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void Norm( AstFrame *, double [] );
+static void NormBox( AstFrame *, double[], double[], AstMapping * );
 static void Offset( AstFrame *, const double [], const double [], double, double [] );
 static void PartitionSelection( int, const int [], const int [], int, int, int [], int );
 static void PermAxes( AstFrame *, const int[] );
@@ -3126,6 +3129,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
+   frame->NormBox = NormBox;
    frame->Offset = Offset;
    frame->PermAxes = PermAxes;
    frame->PrimaryFrame = PrimaryFrame;
@@ -3616,6 +3620,171 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 /* Free the memory used for the permuted coordinates. */
    v = astFree( v );
+}
+
+static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
+                     AstMapping *reg ) {
+/*
+*  Name:
+*     NormBox
+
+*  Purpose:
+*     Extend a box to include effect of any singularities in the Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
+*                      AstMapping *reg )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astNormBox method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function modifies a supplied box to include the effect of any
+*     singularities in the co-ordinate system represented by the Frame.
+*     For a normal Cartesian coordinate system, the box will be returned
+*     unchanged. Other classes of Frame may do other things. For instance,
+*     a SkyFrame will check to see if the box contains either the north
+*     or south pole and extend the box appropriately.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     lbnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        lower axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     ubnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        upper axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     reg
+*        A Mapping which should be used to test if any singular points are
+*        inside or outside the box. The Mapping should leave an input
+*        position unchanged if the point is inside the box, and should
+*        set all bad if the point is outside the box.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;
+   AstCmpMap *m1;
+   AstCmpMap *m2;
+   AstCmpMap *m3;
+   AstCmpMap *m4;
+   AstCmpMap *m5;
+   AstCmpMap *m6;
+   AstPermMap *pm1;
+   AstPermMap *pm2;
+   AstPermMap *pm3;
+   const int *perm;  
+   double *vl;       
+   double *vu;       
+   int *inperm;
+   int axis;         
+   int naxes1;       
+   int naxes;        
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. */
+   perm = astGetPerm( this );
+
+/* Obtain the number of axes in the CmpFrame and in the first
+   component Frame. */
+   naxes = astGetNaxes( this );
+   naxes1 = astGetNaxes( this->frame1 );
+
+/* Allocate memory to hold the permuted coordinates. */
+   vl = astMalloc( sizeof( double ) * (size_t) naxes );
+   vu = astMalloc( sizeof( double ) * (size_t) naxes );
+   inperm = astMalloc( sizeof( int ) * (size_t) naxes );
+   if( inperm ) {
+
+/* Permute the coordinates using the CmpFrame's axis permutation array
+   to put them into the order required internally (i.e. by the two
+   component Frames). */
+      for ( axis = 0; axis < naxes; axis++ ) {
+         vl[ perm[ axis ] ] = lbnd[ axis ];
+         vu[ perm[ axis ] ] = ubnd[ axis ];
+      }
+
+/* Create a PermMap with a forward transformation which reorders a position 
+   which uses internal axis ordering into a position which uses external axis 
+   ordering. */
+      pm1 = astPermMap( naxes, NULL, naxes, perm, NULL, "" );
+
+/* Put it in front of the supplied Mapping. The combination transforms an
+   input internal position into an output external position.  */
+      m1 = astCmpMap( pm1, reg, 1, "" );
+
+/* Invert it and add it to the end. This combination now transforms an
+   input internal position into an output internal position.  */
+      astInvert( pm1 );
+      m2 = astCmpMap( m1, pm1, 1, "" );
+
+/* Create a PermMap with a forward transformation which copies the lower
+   naxes1 inputs to the same outputs, and supplies AST__BAD for the other
+   outputs. */
+      for( axis = 0; axis < naxes1; axis++ ) inperm[ axis ] = axis;
+      pm2 = astPermMap( naxes1, inperm, naxes, NULL, NULL, "" );
+
+/* Put it in front of the Mapping created above, then invert it and add
+   it at the end. */
+      m3 = astCmpMap( pm2, m2, 1, "" );
+      astInvert( pm2 );
+      m4 = astCmpMap( m3, pm2, 1, "" );
+
+/* Invoke the astNormBox method of the first component Frame, passing the
+   relevant (permuted) coordinate values for normalisation. */
+      astNormBox( this->frame1, vl, vu, m4 );
+
+/* Create a PermMap with a forward transformation which copies the upper
+   inputs to the same outputs, and supplied AST__BAD for the other
+   outputs. */
+      for( axis = 0; axis < naxes - naxes1; axis++ ) inperm[ axis ] = naxes1 + axis;
+      pm3 = astPermMap( naxes1, inperm, naxes, NULL, NULL, "" );
+
+/* Put it in front of the Mapping created above, then invert it and add
+   it at the end. */
+      m5 = astCmpMap( pm3, m2, 1, "" );
+      astInvert( pm3 );
+      m6 = astCmpMap( m5, pm3, 1, "" );
+
+/* Invoke the astNormBox method of the seond component Frame, passing the
+   relevant (permuted) coordinate values for normalisation. */
+      astNormBox( this->frame2, vl + naxes1, vu + naxes1, m6 );
+
+/* Copy the normalised values back into the original coordinate array,
+   un-permuting them in the process. */
+      for ( axis = 0; axis < naxes; axis++ ) {
+         lbnd[ axis ] = vl[ perm[ axis ] ];
+         ubnd[ axis ] = vu[ perm[ axis ] ];
+      }
+
+/* Free resources. */
+      pm1 = astAnnul( pm1 );
+      pm2 = astAnnul( pm2 );
+      pm3 = astAnnul( pm3 );
+      m1 = astAnnul( m1 );
+      m2 = astAnnul( m2 );
+      m3 = astAnnul( m3 );
+      m4 = astAnnul( m4 );
+      m5 = astAnnul( m5 );
+      m6 = astAnnul( m6 );
+   }
+   inperm = astFree( inperm );
+   vl = astFree( vl );
+   vu = astFree( vu );
 }
 
 static void Offset( AstFrame *this_frame, const double point1[],

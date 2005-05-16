@@ -55,10 +55,12 @@ F77_LOGICAL_FUNCTION(ast_isanullregion)( INTEGER(THIS), INTEGER(STATUS) ) {
 }
 
 F77_INTEGER_FUNCTION(ast_nullregion)( INTEGER(FRAME),
+                                      INTEGER(UNC),
                                       CHARACTER(OPTIONS),
                                       INTEGER(STATUS)
                                       TRAIL(OPTIONS) ) {
    GENPTR_INTEGER(FRAME)
+   GENPTR_INTEGER(UNC)
    GENPTR_CHARACTER(OPTIONS)
    F77_INTEGER_TYPE(RESULT);
    char *options;
@@ -75,7 +77,7 @@ F77_INTEGER_FUNCTION(ast_nullregion)( INTEGER(FRAME),
          }
       }
 
-      RESULT = astP2I( astNullRegion( astI2P( *FRAME ), "%s", options ) );
+      RESULT = astP2I( astNullRegion( astI2P( *FRAME ), astI2P( *UNC ), "%s", options ) );
       astFree( options );
    )
    return RESULT;

@@ -352,6 +352,105 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n ) {
    return match;
 }
 
+char **astChrSplit_( const char *str, int *n ) {
+/*
+*+
+*  Name:
+*     astChrSplit
+
+*  Purpose:
+*     Extract words from a supplied string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char **astChrSplit_( const char *str, int *n ) 
+
+*  Description:
+*     This function extracts all space-separated words form the supplied
+*     string and returns them in an array of dynamically allocated strings.
+
+*  Parameters:
+*     str
+*        Pointer to the string to be split.
+*     n
+*        Address of an int in which to return the number of words returned.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array containing "*n" elements.
+*     Each element is a pointer to a dynamically allocated character
+*     string containing a word extracted from the supplied string. Each
+*     of these words will have no leading or trailing white space.
+
+*  Notes:
+*     -  A NULL pointer is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason, or if
+*     the supplied string contains no words.
+*-
+*/
+
+/* Local Variables: */
+   char **result;
+   char *w;
+   const char *p;
+   const char *ws;
+   int first;
+   int state;
+   int wl;        
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Initialise. */
+   result = NULL;
+   *n = 0;
+
+/* State 0 is "looking for the next non-white character which marks the
+   start of the next word". State 1 is "looking for the next white character 
+   which marks the end of the current word". */
+   state = 0;
+
+/* Loop through all characters in the supplied string, including the
+   terminating null. */
+   p = str - 1;
+   first = 1;
+   while( *(p++) || first ) {
+      first = 0;
+
+/* If this is the terminating null or a space, and we are currently looking
+   for the end of a word, allocate memory for the new word, copy the text
+   in, terminate it, extend the returned array by one element, and store 
+   the new word in it. */
+      if( !*p || isspace( *p ) ) {
+         if( state == 1 ) {      
+            wl = p - ws;
+            w = astMalloc( wl + 1 );
+            if( w ) {
+               strncpy( w, ws, wl );
+               w[ wl ] = 0;
+               result = astGrow( result, *n + 1, sizeof( char * ) );
+               if( result ) result[ (*n)++ ] = w;
+            }
+            state = 0;
+         }
+
+/* If this is non-blank character, and we are currently looking for the
+   start of a word, note the address of the start of the word, and
+   indicate that we are now looking for the end of a word. */
+      } else {
+         if( state == 0 ) {
+            state = 1;
+            ws = p;
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 void *astFree_( void *ptr ) {
 /*
 *+

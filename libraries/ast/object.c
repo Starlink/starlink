@@ -277,7 +277,7 @@ f     error value
 #ifdef DEBUG
    {   int rc;
        char buf[100];
-       rc = astGetRefCount( this );
+       rc = this->ref_count;
        sprintf(buf,"annulled (refcnt: %d -> %d)", rc, rc-1 );
        astIdHandler( this, buf );   
    }
@@ -538,7 +538,7 @@ f     function is invoked with STATUS set to an error value, or if it
 #ifdef DEBUG
    {   int rc;
        char buf[100];
-       rc = astGetRefCount( this );
+       rc = this->ref_count );
        sprintf(buf,"cloned (refcnt: %d -> %d)", rc, rc+1 );
        astIdHandler( this, buf );   
    }

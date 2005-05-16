@@ -190,6 +190,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        SkyAxes. 
 *     5-APR-2005 (DSB):
 *        Correct error checking in Clear/Get/Set/TestAttrib.
+*     12-MAY-2005 (DSB):
+*        Added astNormBox method.
 *class--
 */
 
@@ -751,6 +753,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void Norm( AstFrame *, double[] );
+static void NormBox( AstFrame *, double[], double[], AstMapping * );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void PermAxes( AstFrame *, const int[] );
@@ -4720,6 +4723,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->IsUnitFrame = IsUnitFrame;
    vtab->Match = Match;
    vtab->Norm = Norm;
+   vtab->NormBox = NormBox;
    vtab->AxDistance = AxDistance;
    vtab->AxOffset = AxOffset;
    vtab->AxIn = AxIn;
@@ -5833,6 +5837,59 @@ f     (using AST_FORMAT).
 /* Quit looping if an error occurs. */
       if ( !astOK ) break;
    }
+}
+
+static void NormBox( AstFrame *this, double lbnd[], double ubnd[],
+                     AstMapping *reg ) {
+/*
+*+
+*  Name:
+*     astNormBox
+
+*  Purpose:
+*     Extend a box to include effect of any singularities in the Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
+*                      AstMapping *reg )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function modifies a supplied box to include the effect of any
+*     singularities in the co-ordinate system represented by the Frame.
+*     For a normal Cartesian coordinate system, the box will be returned
+*     unchanged. Other classes of Frame may do other things. For instance,
+*     a SkyFrame will check to see if the box contains either the north
+*     or south pole and extend the box appropriately.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     lbnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        lower axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     ubnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        upper axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     reg
+*        A Mapping which should be used to test if any singular points are
+*        inside or outside the box. The Mapping should leave an input
+*        position unchanged if the point is inside the box, and should
+*        set all bad if the point is outside the box.
+*-
+*/
+
+/* This base class returns the box limits unchanged. */
 }
 
 static double Offset2( AstFrame *this, const double point1[2], double angle,
@@ -7227,7 +7284,10 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 *     These values will be signed (positive values are in the same sense as 
 *     movement from point 1 to point 2. The second axis will hold the lengths 
 *     of the vector components perpendicular to the basis vector. These
-*     values will always be positive.
+*     values will be signed only if the Frame is 2-dimensional, in which
+*     case a positive value indicates that rotation from the basis vector 
+*     to the tested vector is in the same sense as rotation from the first 
+*     to the second axis of the Frame.
 
 *  Notes:
 *     - The number of coordinate values per point in the input
@@ -7255,6 +7315,10 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
    double c;                     /* Constant value */
    double d;                     /* Component length */
    double dp;                    /* Dot product */
+   double x1;                    /* First axis of basis vector */
+   double x2;                    /* First axis of test vector */
+   double y1;                    /* Second axis of basis vector */
+   double y2;                    /* Second axis of test vector */
    int axis;                     /* Loop counter for axes */
    int ipoint;                   /* Index of next point */
    int nax;                      /* Number of Frame axes */
@@ -7343,7 +7407,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
    irrelevant - the returned perpendicular distances are always zero and
    the returned parallel distances are just the distances from point1 
    to each input point. */
-   if( nax < 2 && astOK ) {
+   if( nax < 2 && basisv ) {
       ip = ptr_in[ 0 ];
       for( ipoint = 0; ipoint < npoint; ipoint++, d1++, d2++, ip++ ) {
          *d1 = astAxDistance( this, 1, point1[0], *ip );
@@ -7351,7 +7415,7 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
       }
 
 /* Now deal with Frames which have 2 or more axes */
-   } else if( astOK ){
+   } else if( basisv ){
 
 /* Check if the supplied positions defining the basis vector are good.
    Store the basis vector, and get its squared length. */
@@ -7409,14 +7473,26 @@ static AstPointSet *ResolvePoints( AstFrame *this, const double point1[],
 
 /* Offset away from point 1 towards point 2 by a distance of d1, and form the 
    required length d2. */
-               *d2 = 0.0;
                c = *d1/bv;
-               for( axis = 0; axis < nax; axis++ ){
-                  d = ptr_in[ axis ][ ipoint ] - 
-                      ( point1[ axis ] + c*basisv[ axis ] );
-                  *d2 += d*d;
+               if( nax > 2 ) {
+                  *d2 = 0.0;
+                  for( axis = 0; axis < nax; axis++ ){
+                     d = ptr_in[ axis ][ ipoint ] - 
+                         ( point1[ axis ] + c*basisv[ axis ] );
+                     *d2 += d*d;
+                  }
+                  *d2 = sqrt( *d2 );
+
+/* If the Frame is 2 dimensional, we can give a sign the the perpendicular 
+   component. */
+               } else {
+                  x1 = c*basisv[ 0 ];
+                  y1 = c*basisv[ 1 ];
+                  x2 = ptr_in[ 0 ][ ipoint ] - ( point1[ 0 ] + x1 );
+                  y2 = ptr_in[ 1 ][ ipoint ] - ( point1[ 1 ] + y1 );
+                  *d2 = sqrt( x2*x2 + y2*y2 );
+                  if( x1*y2 - x2*y1 < 0.0 ) *d2 = -(*d2);
                }
-               *d2 = sqrt( *d2 );
 
 /* If this input vector is bad, put bad values in the output */
             } else {
@@ -12131,6 +12207,10 @@ int astIsUnitFrame_( AstFrame *this ){
 void astNorm_( AstFrame *this, double value[] ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Norm))( this, value );
+}
+void astNormBox_( AstFrame *this, double lbnd[], double ubnd[], AstMapping *reg ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,NormBox))( this, lbnd, ubnd, reg );
 }
 double astAxDistance_( AstFrame *this, int axis, double v1, double v2 ) {
    if ( !astOK ) return AST__BAD;

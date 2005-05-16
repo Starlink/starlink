@@ -129,6 +129,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Fix memory leaks in astLoadSkyFrame_ and Match.
 *     7-APR-2005 (DSB):
 *        Allow SkyRefIs to be set to "Ignored".
+*     12-MAY-2005 (DSB):
+*        Override astNormBox method.
 *class--
 */
 
@@ -528,7 +530,7 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include "sphmap.h"              /* Cartesian<->Spherical transformations */
 #include "skyframe.h"            /* Interface definition for this class */
 #include "slalib.h"              /* SLALIB library interface */
-#include "slalib.h"              /* SLALIB library interface */
+#include "wcsmap.h"              /* Factors of PI */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -662,6 +664,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void Norm( AstFrame *, double[] );
+static void NormBox( AstFrame *, double[], double[], AstMapping * );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
@@ -3266,6 +3269,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->Angle = Angle;
    frame->Distance = Distance;
    frame->Norm = Norm;
+   frame->NormBox = NormBox;
    frame->Resolve = Resolve;
    frame->ResolvePoints = ResolvePoints;
    frame->Offset = Offset;
@@ -4949,6 +4953,151 @@ static void Norm( AstFrame *this_frame, double value[] ) {
    }
 }
 
+static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
+                     AstMapping *reg ) {
+/*
+*  Name:
+*     NormBox
+
+*  Purpose:
+*     Extend a box to include effect of any singularities in the Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
+*                      AstMapping *reg )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astNormBox method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function modifies a supplied box to include the effect of any
+*     singularities in the co-ordinate system represented by the Frame.
+*     For a normal Cartesian coordinate system, the box will be returned
+*     unchanged. Other classes of Frame may do other things. For instance,
+*     a SkyFrame will check to see if the box contains either the north
+*     or south pole and extend the box appropriately.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     lbnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        lower axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     ubnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        upper axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     reg
+*        A Mapping which should be used to test if any singular points are
+*        inside or outside the box. The Mapping should leave an input
+*        position unchanged if the point is inside the box, and should
+*        set all bad if the point is outside the box.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   const int *perm;              /* Axis permutation array */
+   double lb[ 2 ];               /* Permuted lower bounds */
+   double t;                     /* Temporary storage */
+   double t2;                    /* Temporary storage */
+   double ub[ 2 ];               /* Permuted upper bounds */
+   double x[2];                  /* 1st axis values at poles */
+   double xo[2];                 /* Tested 1st axis values at poles */
+   double y[2];                  /* 2nd axis values at poles */
+   double yo[2];                 /* Tested 2nd axis values at poles */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+   perm = astGetPerm( this );
+   if( perm ) {
+
+/* Obtain the sky longitude and latitude limits, allowing for any axis
+   permutation. */
+      lb[ perm[ 0 ] ] = lbnd[ 0 ];
+      lb[ perm[ 1 ] ] = lbnd[ 1 ];
+      ub[ perm[ 0 ] ] = ubnd[ 0 ];
+      ub[ perm[ 1 ] ] = ubnd[ 1 ];
+
+/* Use the supplied Mapping to test if box includes either pole. */
+      if( perm[ 0 ] == 0 ) {
+         x[ 0 ] = 0.0;
+         y[ 0 ] = AST__DPIBY2;
+         x[ 1 ] = 0.0;
+         y[ 1 ] = -AST__DPIBY2;
+      } else {
+         x[ 0 ] = AST__DPIBY2;
+         y[ 0 ] = 0.0;
+         x[ 1 ] = -AST__DPIBY2;
+         y[ 1 ] = 0.0;
+      }
+      astTran2( reg, 2, x, y, 1, xo, yo );
+
+/* If the box includes the north pole... */
+      if( xo[ 0 ] != AST__BAD ) {
+
+/* Find the lowest latitude after normalisation. */
+         if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
+            t = slaDrange( ub[ 1 ] );
+            t2 = slaDrange( lb[ 1 ] );
+            if( t2 < t ) t = t2;         
+         } else {
+            t = AST__BAD;
+         }
+
+/* Set the lower returned limit to this value and the upper returned limit
+   to +90 degs */
+         lb[ 1 ] = t;
+         ub[ 1 ] = AST__DPIBY2;
+
+/* Set the longitude range to 0 to 2PI */
+         lb[ 0 ] = 0;
+         ub[ 0 ] = 2*AST__DPI;
+
+      }         
+
+/* If the box includes the south pole... */
+      if( xo[ 1 ] != AST__BAD ) {
+
+/* Find the highest latitude after normalisation. */
+         if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
+            t = slaDrange( ub[ 1 ] );
+            t2 = slaDrange( lb[ 1 ] );
+            if( t2 > t ) t = t2;         
+         } else {
+            t = AST__BAD;
+         }
+
+/* Set the upper returned limit to this value and the lower returned limit
+   to -90 degs */
+         lb[ 1 ] = -AST__DPIBY2;
+         ub[ 1 ] = t;
+
+/* Set the longitude range to 0 to 2PI */
+         lb[ 0 ] = 0;
+         ub[ 0 ] = 2*AST__DPI;
+      }         
+
+/* Return the modified limits. */
+      lbnd[ 0 ] = lb[ perm[ 0 ] ];
+      lbnd[ 1 ] = lb[ perm[ 1 ] ];
+      ubnd[ 0 ] = ub[ perm[ 0 ] ];
+      ubnd[ 1 ] = ub[ perm[ 1 ] ];
+   }
+}
+
 static void Offset( AstFrame *this_frame, const double point1[],
                     const double point2[], double offset, double point3[] ) {
 /*
@@ -5886,7 +6035,10 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 *     These values will be signed (positive values are in the same sense as 
 *     movement from point 1 to point 2. The second axis will hold the lengths 
 *     of the vector components perpendicular to the basis vector. These
-*     values will always be positive.
+*     values will be signed only if the Frame is 2-dimensional, in which
+*     case a positive value indicates that rotation from the basis vector 
+*     to the tested vector is in the same sense as rotation from the first 
+*     to the second axis of the Frame.
 
 *  Notes:
 *     - The number of coordinate values per point in the input
@@ -5914,6 +6066,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
    double p1[ 2 ];               /* Permuted coordinates for point1 */
    double p2[ 2 ];               /* Permuted coordinates for point2 */
    double p3[ 2 ];               /* Permuted coordinates for point3 */
+   double sign;                  /* Sign for perpendicular distances */
    double v1[ 3 ];               /* 3-vector for p1 */
    double v2[ 3 ];               /* 3-vector for p2 */
    double v3[ 3 ];               /* 3-vector for p3 */
@@ -5998,6 +6151,10 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 
 /* Obtain a pointer to the SkyFrame's axis permutation array. */
    perm = astGetPerm( this );
+
+/* If the axes have been swapped we need to swap the sign of the returned
+   perpendicular distances. */
+   sign = ( perm[ 0 ] == 0 ) ? -1.0 : 1.0;
 
 /* Check pointers can be used safely */
    if( astOK ) {
@@ -6091,7 +6248,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 /* The dot product of v4 and v3 is the cos of the perpendicular distance,
    d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
    distance. Use these to get the perpendicular distance. */
-                  *d2 = fabs( atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) ) );
+                  *d2 = sign*atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) );
                }
             }
          }

@@ -11811,6 +11811,15 @@ f     be reversed.
                                             (size_t) ncoord_in );
       out_ptr = astMalloc( sizeof( double * ) * (size_t) ncoord_out );
 
+
+#ifdef DEBUG
+      { int i, ns;
+        ns = ncoord_out*outdim;
+        for( i = 0; i < ns; i++ ) out[ i ] = 0.0;
+      }
+#endif
+
+
 /* Initialise the input data pointers to locate the coordinate data in
    the "in" array. */
       if ( astOK ) {

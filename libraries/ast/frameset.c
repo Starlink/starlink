@@ -190,6 +190,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *       long time ago!
 *     8-SEP-2004 (DSB):
 *       Override astResolvePoints.
+*     12-MAY-2005 (DSB):
+*        Override astNormBox method.
 *class--
 */
 
@@ -828,6 +830,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void Norm( AstFrame *, double[] );
+static void NormBox( AstFrame *, double[], double[], AstMapping * );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void PermAxes( AstFrame *, const int[] );
@@ -4603,6 +4606,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
+   frame->NormBox = NormBox;
    frame->Offset = Offset;
    frame->Offset2 = Offset2;
    frame->Overlay = Overlay;
@@ -5307,6 +5311,73 @@ static void Norm( AstFrame *this_frame, double value[] ) {
    pointer afterwards. */
    fr = astGetFrame( this, AST__CURRENT );
    astNorm( fr, value );
+   fr = astAnnul( fr );
+}
+
+static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
+                     AstMapping *reg ) {
+/*
+*  Name:
+*     NormBox
+
+*  Purpose:
+*     Extend a box to include effect of any singularities in the Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
+*                      AstMapping *reg )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the astNormBox method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function modifies a supplied box to include the effect of any
+*     singularities in the co-ordinate system represented by the Frame.
+*     For a normal Cartesian coordinate system, the box will be returned
+*     unchanged. Other classes of Frame may do other things. For instance,
+*     a SkyFrame will check to see if the box contains either the north
+*     or south pole and extend the box appropriately.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     lbnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        lower axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     ubnd
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). Initially, this should contain a set of
+*        upper axis bounds for the box. They will be modified on exit
+*        to include the effect of any singularities within the box.
+*     reg
+*        A Mapping which should be used to test if any singular points are
+*        inside or outside the box. The Mapping should leave an input
+*        position unchanged if the point is inside the box, and should
+*        set all bad if the point is outside the box.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to the current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astNormBox method to obtain the new values. Annul the Frame
+   pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   astNormBox( fr, lbnd, ubnd, reg );
    fr = astAnnul( fr );
 }
 

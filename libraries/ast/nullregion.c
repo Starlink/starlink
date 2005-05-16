@@ -60,6 +60,7 @@ f     The NullRegion class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "nullregion.h"          /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
+#include "circle.h"              /* Circle regions */
 #include "unitmap.h"             /* Unit Mapping */
 
 /* Error code definitions. */
@@ -91,7 +92,7 @@ static AstMapping *(* parent_simplify)( AstMapping * );
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstNullRegion *astNullRegionId_( void *, const char *, ... );
+AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -148,10 +149,32 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
 *     reason.
 *-
 */
-   astError( AST__INTER, "astGetDefUnc(%s): The %s class does not define "
-             "any default uncertainties (programming error).", 
-             astGetClass( this ), astGetClass( this ) );
-   return NULL;
+
+/* Local Variables: */
+   AstRegion *result;
+   double *cen;
+   double rad;
+   int i;              
+   int n;
+
+/* Initialise */
+   result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Create a Circle centred on the origin with zero radius. */
+   n = astGetNaxes( this );
+   cen = astMalloc( sizeof(double)*(size_t) n );
+   if( cen ) {
+      for( i = 0; i < n; i++ ) cen[ i ] = 0.0;
+      rad = 0.0;
+      result = (AstRegion *) astCircle( this, 1, cen, &rad, NULL, "" );
+      cen = astFree( cen );
+   }
+
+/* Return the default uncertainty Region. */
+   return result;
 }
 
 void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
@@ -701,9 +724,10 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 */
 
 /* Local Variables: */
-   AstMapping *result;        /* Result pointer to return */
    AstFrame *frm;             /* Current Frame */
    AstMapping *map;           /* Base->current Mapping */
+   AstMapping *result;        /* Result pointer to return */
+   AstRegion *new;            /* Simplified Region */
    AstRegion *this;           /* Pointer to supplied Region structure */
 
 /* Initialise. */
@@ -715,27 +739,32 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Get a pointer to the supplied Region structure. */
    this = (AstRegion *) this_mapping;
 
+/* Invoke the parent Simplify method inherited from the Region class. This
+   will simplify the encapsulated FrameSet and uncertainty Region. */
+   new = (AstRegion *) (*parent_simplify)( this_mapping );
+
 /* Is the Mapping from base Frame to current Frame in the Region a
    UnitMap? If so, no simplification is possible. */
-   map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
+   map = astGetMapping( new->frameset, AST__BASE, AST__CURRENT );
    if( astIsAUnitMap( map ) ){
-      result = astClone( this );
+      result = astClone( new );
 
    } else {
 
-/* Create a NullRegion form the current Frame. */
-      frm = astGetFrame( this->frameset, AST__CURRENT );
-      result = (AstMapping *) astNullRegion( frm, "" );
-
-/* Coopy Region attributes from the supplied Region to the returned
-   Region. */
-      astRegOverlay( result, this );
+/* Create a NullRegion from the current Frame. */
+      frm = astGetFrame( new->frameset, AST__CURRENT );
+      result = (AstMapping *) astNullRegion( frm, astGetUnc( new, 0 ), "" );
 
 /* Free resources. */
-     frm = astAnnul( frm );      
+      frm = astAnnul( frm );      
 
    }
    map = astAnnul( map );      
+   new = astAnnul( new );      
+
+/* If any simplification took place, copy Region attributes from the 
+   supplied Region to the returned Region. */
+   if( result != this_mapping ) astRegOverlay( result, this );
 
 /* If an error occurred, annul the returned pointer. */
    if ( !astOK ) result = astAnnul( result );
@@ -928,7 +957,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 astMAKE_ISA(NullRegion,Region,check,&class_init)
 astMAKE_CHECK(NullRegion)
 
-AstNullRegion *astNullRegion_( void *frame_void, const char *options, ... ) {
+AstNullRegion *astNullRegion_( void *frame_void, AstRegion *unc, const char *options, ... ) {
 /*
 *++
 *  Name:
@@ -943,8 +972,8 @@ f     AST_NULLREGION
 
 *  Synopsis:
 c     #include "nullregion.h"
-c     AstNullRegion *astNullRegion( AstFrame *frame, const char *options, ... )
-f     RESULT = AST_NULLREGION( FRAME, OPTIONS, STATUS )
+c     AstNullRegion *astNullRegion( AstFrame *frame, AstRegion *unc, const char *options, ... )
+f     RESULT = AST_NULLREGION( FRAME, UNC, OPTIONS, STATUS )
 
 *  Class Membership:
 *     NullRegion constructor.
@@ -966,6 +995,26 @@ f     FRAME = INTEGER (Given)
 *        copy is taken of the supplied Frame. This means that any
 *        subsequent changes made to the Frame using the supplied pointer
 *        will have no effect the Region.
+c     unc
+f     UNC = INTEGER (Given)
+*        An optional pointer to an existing Region which specifies the 
+*        uncertainties associated with positions in the supplied Frame. 
+*        The uncertainty in any point in the Frame is found by shifting the 
+*        supplied "uncertainty" Region so that it is centred at the point 
+*        being considered. The area covered by the shifted uncertainty 
+*        Region then represents the uncertainty in the position. The 
+*        uncertainty is assumed to be the same for all points.
+*
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, 
+f        a null Object pointer (AST__NULL) 
+c        a NULL Object pointer 
+*        may be supplied, in which case a default uncertainty of zero is 
+*        used.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -1014,7 +1063,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init, 
-                            &class_vtab, "NullRegion", frame );
+                            &class_vtab, "NullRegion", frame, unc );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1035,7 +1084,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstNullRegion *astNullRegionId_( void *frame_void, const char *options, ... ) {
+AstNullRegion *astNullRegionId_( void *frame_void, AstRegion *unc, const char *options, ... ) {
 /*
 *  Name:
 *     astNullRegionId_
@@ -1048,7 +1097,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, const char *options, ... ) {
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstNullRegion *astNullRegionId_( AstFrame *frame, const char *options, ... )
+*     AstNullRegion *astNullRegionId_( AstFrame *frame, AstRegion *unc, const char *options, ... )
 
 *  Class Membership:
 *     NullRegion constructor.
@@ -1088,7 +1137,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, const char *options, ... ) {
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitNullRegion( NULL, sizeof( AstNullRegion ), !class_init, 
-                            &class_vtab, "NullRegion", frame );
+                            &class_vtab, "NullRegion", frame, unc );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1111,7 +1160,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, const char *options, ... ) {
 
 AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init, 
                                    AstNullRegionVtab *vtab, const char *name, 
-                                   AstFrame *frame ) {
+                                   AstFrame *frame, AstRegion *unc ) {
 /*
 *+
 *  Name:
@@ -1127,7 +1176,7 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 *     #include "nullregion.h"
 *     AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init, 
 *                                        AstNullRegionVtab *vtab, const char *name, 
-*                                        AstFrame *frame ) 
+*                                        AstFrame *frame, AstRegion *unc  ) 
 
 *  Class Membership:
 *     NullRegion initialiser.
@@ -1168,6 +1217,17 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 *        method).
 *     frame
 *        A pointer to the Frame in which the region is defined.
+*     unc
+*        A pointer to a Region which specifies the uncertainty of positions 
+*        within the supplied Frame. A NULL pointer can be supplied, in which 
+*        case default uncertainties of zero are used. If an uncertainty 
+*        Region is supplied, it must be either a Box, a Circle or an Ellipse,
+*        and its encapsulated Frame must be related to the Frame supplied
+*        for parameter "frame" (i.e. astConvert should be able to find a 
+*        Mapping between them). The centre of the supplied uncertainty 
+*        Region is immaterial since it will be re-centred on the point 
+*        being tested before use. A deep copy is taken of the supplied 
+*        Region.
 
 *  Returned Value:
 *     A pointer to the new NullRegion.
@@ -1190,7 +1250,7 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 /* Initialise a Region structure (the parent class) as the first component
    within the NullRegion structure, allocating memory if necessary. */
    new = (AstNullRegion *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab,
-                                          name, frame, NULL, NULL );
+                                          name, frame, NULL, unc );
 
 /* If an error occurred, clean up by deleting the new NullRegion. */
    if ( !astOK ) new = astDelete( new );

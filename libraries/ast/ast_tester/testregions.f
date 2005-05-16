@@ -6,14 +6,14 @@
       status = sai__ok
 
 
-      call checkBox( status )
       call checkInterval( status )
-      call checkPolygon( status )
-      call checkNullRegion( status )
-      call checkPrism( status )
-      call generalChecks( status )
-      call checkCircle( status )
       call checkEllipse( status )
+      call checkPrism( status )
+      call checkPolygon( status )
+      call checkCircle( status )
+      call checkBox( status )
+      call checkNullRegion( status )
+      call generalChecks( status )
       call checkCmpRegion( status ) 
       call checkPointList( status )
 
@@ -823,9 +823,12 @@
       include 'AST_PAR'
       include 'SAE_PAR'
 
-      integer status, frm, unc, pol1, pol2
+      integer status, frm, unc, pol1, pol2, f2, r2, r3, r4
       double precision pi, p(5,2), q(5,2), p1(2), p2(2)
+      double precision xin(2), yin(2), xout(2), yout(2), lbnd(5),
+     :                 ubnd(5)
       logical hasframeset
+
 
       if( status .ne.sai__ok ) return
 
@@ -937,6 +940,68 @@
       if( hasframeset( pol2, status ) ) then
          call stopit( status, 'pol2 has FrameSet' )
       end if
+
+
+
+      frm = ast_SkyFrame( ' ', status )
+
+      p1(1) = 0.0
+      p1(2) = 0.5*pi
+      p2(1) = 0.01  
+      unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
+
+      p(1,1) = 0.0
+      p(1,2) = 0.4*pi
+      p(2,1) = 0.5*pi
+      p(2,2) = 0.4*pi
+      p(3,1) = pi
+      p(3,2) = 0.4*pi
+      p(4,1) = 1.5*pi
+      p(4,2) = 0.4*pi
+
+      pol1 = ast_polygon( frm, 4, 5, p, unc, ' ', status )
+
+      xin(1) = 0.0
+      yin(1) = 0.5*pi
+      call ast_tran2( pol1, 1, xin, yin, .true., xout, yout, status )
+
+      if( xout(1) .ne. xin(1) ) call stopit( status, 'Poly 21' )
+      if( yout(1) .ne. yin(1) ) call stopit( status, 'Poly 22' )
+
+      call ast_getregionbounds( pol1, lbnd, ubnd, status )
+      if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 'Poly 23' )
+      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 24' )
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 25' )
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 26' )
+
+
+      f2 = ast_specframe( 'Unit=Angstrom', status )
+      lbnd( 1 ) = 5000.0
+      ubnd( 1 ) = 6000.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r3 = ast_prism( pol1, r2, ' ', status )
+      r4 = ast_Simplify( r3, status )
+
+      call ast_getregionbounds( r4, lbnd, ubnd, status )
+      if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 'Poly 27' )
+      if( abs( lbnd(2) - 1.25663708 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 28' )
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 29' )
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 30' )
+      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 ) 
+     :           call stopit( status, 'Poly 31' )
+      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Poly 32' )
+
+
+
+
+
 
 
       call ast_end( status )
@@ -1815,12 +1880,12 @@ C
       inperm(2) = -1
 
       pm = ast_permmap( 2, inperm, 1, outperm, 1.6D0, ' ', status )
-      
       frm2 = ast_frame( 1, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
-
       if( .not. ast_isanullregion( reg, status ) ) call stopit( status, 
      :                                            'Box: perm check 10' )
+
+
       if( hasFrameSet( reg, status ) ) call stopit( status, 
      :                                            'Box: perm check 11' )
       if( ast_geti( reg, 'naxes', status ) .ne. 1 ) call stopit( status, 
@@ -2160,7 +2225,8 @@ C
 
       integer status, cir1, cir2, fc, i, fs, frm1,unc,f1,f2,f3
       double precision p1(4),p2(4),xin(2),yin(2),xout(2),yout(2),
-     :                 p3(3),rad,zin(2),zout(2),pp1(3),pp2(3)
+     :                 p3(3),rad,zin(2),zout(2),pp1(3),pp2(3),
+     :                 lbnd(2),ubnd(2)
       character cards(8)*80, sys*40
       logical hasframeset
 
@@ -2194,6 +2260,7 @@ C
       p1( 2 ) = 1.3962634
       p2( 1 ) = 0.8
       p2( 2 ) = 0.8
+
       cir1 = ast_circle( frm1, 0, p1, p2, AST__NULL, ' ', status )
       call checkdump( cir1, 'checkdump cir1', status )
 
@@ -2213,6 +2280,13 @@ C
      :                                         'Circle: Error 3' )
       if( yout(2) .ne. AST__BAD ) call stopit( status, 
      :                                         'Circle: Error 4' )
+
+
+      xin(1) = 0.0
+      yin(1) = 1.5707963
+      call ast_tran2( cir1, 1, xin, yin, .true., xout, yout, status )
+      if( xout(1) .ne. xin(1) ) call stopit( status, 'Circle: Error 1b')
+      if( yout(1) .ne. yin(1) ) call stopit( status, 'Circle: Error 2b')
 
       p2(1)=0.0
       p2(2)=0.0
@@ -2325,6 +2399,22 @@ C
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
       if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
      :                                          'Circle: Error 16' )
+
+
+      p1( 1 ) = 0.8
+      p1( 2 ) = 1.5707963
+      p2( 1 ) = 0.1
+      cir2 = ast_circle( frm1, 1, p1, p2, unc, ' ', status )
+      call ast_getregionbounds( cir2, lbnd, ubnd, status )
+      if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 
+     :                                      'Circle: Error 16a'  )
+      if( abs( lbnd(2) - 1.47079625 ) .gt. 1.0E-6 ) call stopit( status, 
+     :                                      'Circle: Error 16b'  )
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) call stopit( status, 
+     :                                      'Circle: Error 16c'  )
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) call stopit( status, 
+     :                                      'Circle: Error 16d'  )
+
 
       frm1 = ast_frame(2,"domain=aa",status)
 
@@ -2552,7 +2642,7 @@ C
       integer status, ell1, ell2, fc, i, fs, frm1, fs2,mm,ell3,ell4,
      :       reg, unc, f1, f2, f3, f4, f5, map, perm(2)
       double precision p1(2),p2(2),p3(2),p4(2),pp1(2),pp2(2)
-      double precision q1(2),q2(2),q3(2),q4(2)
+      double precision q1(2),q2(2),q3(2),q4(2),lbnd(2),ubnd(2)
       double precision q1b(2),q2b(2),q3b(2),q4b(2)
       double precision p1b(2),p2b(2),p3b(2),p4b(2),matrix(4)
       character cards(10)*80
@@ -2636,6 +2726,17 @@ C
 
       ell1 = ast_ellipse( frm1, 0, p1, p2, p3, AST__NULL, ' ', status )
       call checkdump( ell1, 'checkdump ell1', status )
+
+
+      call ast_getregionbounds( ell1, lbnd, ubnd, status )
+      if( abs( lbnd(1) ) .gt. 1.0E-10 ) call stopit( status, 
+     :                                               'Error b1' )
+      if( abs( lbnd(2) - 1.19059777 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Error b2' )
+      if( abs( ubnd(1) - 6.28318531 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Error b3' )
+      if( abs( ubnd(2) - 1.57079633 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Error b4' )
 
       rad = ast_distance( ell1, p1, p2, status )
 
@@ -2960,7 +3061,7 @@ C
       f1 = ast_skyframe( ' ', status )
       f2 = ast_frame( 2, ' ', status )
       f3 = ast_cmpframe( f1, f2, ' ', status )
-      nr = ast_NullRegion( f3, ' ', status )
+      nr = ast_NullRegion( f3, AST__NULL, ' ', status )
 
       call checkdump( nr, 'checkdump NullRegion:nr', status )
 
@@ -3013,7 +3114,7 @@ C
          end do
       end do
 
-      nr = ast_NullRegion( f2, 'negated=1', status )
+      nr = ast_NullRegion( f2, AST__NULL, 'negated=1', status )
       res = ast_maskd( nr, AST__NULL, .false., 2, lbnd_in, ubnd_in, 
      :                 rin, VAL__BADD, status )
 
@@ -3607,6 +3708,34 @@ C
       if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status,
      :                                                    'Prism 15' )
 
+
+      f1 = ast_skyframe( 'system=fk5', status )
+      p1(1) = 0.0
+      p1(2) = -1.57
+      p2(1) = 0.8
+      p2(2) = -1.5
+      r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
+
+      f2 = ast_specframe( 'Unit=Angstrom', status )
+      lbnd( 1 ) = 5000.0
+      ubnd( 1 ) = 6000.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r3 = ast_prism( r1, r2, ' ', status )
+      r4 = ast_Simplify( r3, status )
+
+      call ast_getregionbounds( r4, lbnd, ubnd, status )
+      if( abs( lbnd(1) + 0.8D0 ) .gt. 1.0E-6 ) call stopit( status, 
+     :                                               'Prism 16' )
+      if( abs( lbnd(2) + 1.64D0 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Prism 17' )
+      if( abs( ubnd(1) - 0.8D0 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Prism 18' )
+      if( abs( ubnd(2) + 1.5 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Prism 19' )
+      if( abs( lbnd(3) - 5000.0 ) .gt. 1.0E-10 ) 
+     :           call stopit( status, 'Prism 20' )
+      if( abs( ubnd(3) - 6000.0 ) .gt. 1.0E-6 ) 
+     :           call stopit( status, 'Prism 21' )
 
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Prism tests failed'

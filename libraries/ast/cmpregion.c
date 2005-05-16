@@ -90,7 +90,7 @@ f     The CmpRegion class does not define any new routines beyond those
 #include "region.h"              /* Regions (parent class) */
 #include "channel.h"             /* I/O channels */
 #include "nullregion.h"          /* Boundless Regions */
-#include "cmpregion.h"       /* Interface definition for this class */
+#include "cmpregion.h"           /* Interface definition for this class */
 #include "unitmap.h"             /* Unit Mapings */
 
 /* Error code definitions. */
@@ -2164,7 +2164,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* If null.. */
       if( !astGetNegated( nullreg ) ){
          if( oper == AST__AND ) {
-            newb = (AstCmpRegion *) astNullRegion( othereg, "" );
+            newb = (AstCmpRegion *) astNullRegion( othereg, 
+                                             astGetUnc( othereg, 0 ), "" );
 
          } else if( oper == AST__OR ) {
             newb = astCopy( othereg );
@@ -2182,7 +2183,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             newb = astCopy( othereg );
 
          } else if( oper == AST__OR ) {
-            newb = (AstCmpRegion *) astNullRegion( othereg, "negated=1" );
+            newb = (AstCmpRegion *) astNullRegion( othereg, 
+                                      astGetUnc( othereg, 0 ), "negated=1" );
 
          } else {
             astError( AST__INTER, "astSimplify(%s): The %s refers to an "
@@ -2204,14 +2206,16 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* If the components have no overlap, and they are combined using AND, then 
    the CmpRegion is null. */
       if( ( overlap == 1 || overlap == 6 ) && oper == AST__AND ) {
-         newb = (AstCmpRegion *) astNullRegion( sreg1, "" );
+         newb = (AstCmpRegion *) astNullRegion( sreg1, astGetUnc( sreg1, 0 ),
+                                                "" );
          simpler = 1;
 
 /* If one component is the negation of the other component, and they are 
    combined using OR, then the CmpRegion is infinite. This is represented 
    by a negated null region.*/
       } else if( overlap == 6 && oper == AST__OR ) {
-         newb = (AstCmpRegion  *) astNullRegion( sreg1, "negated=1" );
+         newb = (AstCmpRegion  *) astNullRegion( sreg1, astGetUnc( sreg1, 0 ),
+                                                 "negated=1" );
          simpler = 1;
 
 /* If the two components are identical... */

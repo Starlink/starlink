@@ -12,7 +12,14 @@ f     AST_BOX
 
 *  Description:
 *     The Box class implements a Region which represents a box with sides 
-*     parallel to the axes of a Frame.
+*     parallel to the axes of a Frame (i.e. an area which encloses a given 
+*     range of values on each axis). A Box is similar to an Interval, the
+*     only real difference being that the Interval class allows some axis
+*     limits to be unspecified. Note, a Box will only look like a box if
+*     the Frame geometry is approximately flat. For instance, a Box centred
+*     close to a pole in a SkyFrame will look more like a fan than a box
+*     (the Polygon class can be used to create a box-like region close to a 
+*     pole).
 
 *  Inheritance:
 *     The Box class inherits from the Region class.
@@ -676,7 +683,7 @@ static void Cache( AstBox *this, int lohi ){
          hi = NULL;
       }
 
-/* If lo and hi values arre to be used, ensure they are expanded to at
+/* If lo and hi values are to be used, ensure they are expanded to at
    least the width of an uncertainty box. */
       if( lohi ) {
 
@@ -2375,7 +2382,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
  
 /* Create a new Region of the required class. */
             if( isNull ) {
-               new = (AstRegion *) astNullRegion( frm, "" );
+               new = (AstRegion *) astNullRegion( frm, unc, "" );
 
             } else if( isInterval ){
                new = (AstRegion *) astInterval( frm, lbnd, ubnd, unc, "" );
@@ -2930,7 +2937,14 @@ f     RESULT = AST_BOX( FRAME, FORM, POINT1, POINT2, UNC, OPTIONS, STATUS )
 *     attributes.
 *
 *     The Box class implements a Region which represents a box with sides 
-*     parallel to the axes of a Frame.
+*     parallel to the axes of a Frame (i.e. an area which encloses a given 
+*     range of values on each axis). A Box is similar to an Interval, the
+*     only real difference being that the Interval class allows some axis
+*     limits to be unspecified. Note, a Box will only look like a box if
+*     the Frame geometry is approximately flat. For instance, a Box centred
+*     close to a pole in a SkyFrame will look more like a fan than a box
+*     (the Polygon class can be used to create a box-like region close to a 
+*     pole).
 
 *  Parameters:
 c     frame

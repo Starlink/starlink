@@ -127,6 +127,7 @@ static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetDefUnc( AstRegion * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int );
+static int *OneToOne( AstMapping * );
 static int GetBounded( AstRegion * );
 static int Overlap( AstRegion *, AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
@@ -439,9 +440,9 @@ static AstBox *Cache( AstInterval *this ){
 */
 
 /* Local Variables: */
+   AstBox *bbox;            /* Equivalent base Box */
    AstFrame *bfrm;          /* Interval base Frame */
    AstFrame *cfrm;          /* Interval current Frame */
-   AstBox *bbox;            /* Equivalent base Box */
    AstRegion *map;          /* Interval base->current Mapping */
    AstRegion *reg;          /* Pointer to this Region structure */
    AstRegion *unc;          /* Pointer to uncertainty Region */
@@ -499,15 +500,11 @@ static AstBox *Cache( AstInterval *this ){
 /* The Interval is not a Box if any axis limit is missing. In this case
    use -DBL_MAX or +DBL_MAX as the limit to be stored in the Interval
    structure. */
-         if( lbnd[ i ] == AST__BAD ) {
-            isBox = 0;
-            lbnd[ i ] = -DBL_MAX;
-         }
+         if( lbnd[ i ] == AST__BAD ) lbnd[ i ] = -DBL_MAX;
+         if( fabs( lbnd[ i ] ) == DBL_MAX ) isBox = 0;
 
-         if( ubnd[ i ] == AST__BAD ) {
-            isBox = 0;
-            ubnd[ i ] = DBL_MAX;
-         }
+         if( ubnd[ i ] == AST__BAD ) ubnd[ i ] = DBL_MAX;
+         if( fabs( ubnd[ i ] ) == DBL_MAX ) isBox = 0;
 
 /* If this is the first axis, note if the axis interval is included or
    excluded. This is determined by whether the "lower limit" is greater
@@ -547,11 +544,10 @@ static AstBox *Cache( AstInterval *this ){
          }
 
          if( unc ) unc = astAnnul( unc );
-         bfrm = astAnnul( bfrm );
          cfrm = astAnnul( cfrm );
+         bfrm = astAnnul( bfrm );
          map = astAnnul( map );
          bbox = astAnnul( bbox );
-
       }
 
 /* Store the axis limits in the Interval structure. */
@@ -559,7 +555,6 @@ static AstBox *Cache( AstInterval *this ){
       if( this->ubnd ) astFree( this->ubnd );
       this->lbnd = lbnd;
       this->ubnd = ubnd;
-
    }
 
 /* Indicate the cached information is no longer stale, and return a
@@ -1094,6 +1089,108 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
    astSetDump( vtab, Dump, "Interval", "Axis intervals" );
 }
 
+static int *OneToOne( AstMapping *map ){
+/*
+*  Name:
+*     OneToOne
+
+*  Purpose:
+*     Does each output of the supplied Mapping depend on only one input?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     int OneToOne( AstMapping *map )
+
+*  Class Membership:
+*     Interval method 
+
+*  Description:
+*     This function returns a flag indicating if the Mapping is 1-to-1.
+*     That is, if each output depends only on one input.
+
+*  Parameters:
+*     map
+*        Pointer to the Mapping.
+
+*  Returned Value:
+*     If the Mapping is 1-to-1, a pointer to an array of ints is returned
+*     (NULL is returned otherwise). There is one int for each output of
+*     the supplied Mapping. The value of each int is the index of the
+*     corresponding input which feeds the output. The array should be
+*     freed using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   int *result;      
+   const char *class;
+   int nout;
+   int i;
+   int *tt;
+   AstMapping *tmap;
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of outputs for the Mapping. */
+   nout = astGetNout( map );
+
+/* The Mapping cannot be 1-to-1 if the number of inputs is different.*/
+   if( astGetNin( map ) == nout ) {
+
+/* Allocate an output array on the assumption that the Mapping is 1-to-1. */
+      result = astMalloc( sizeof( int )*(size_t) nout );
+      if( result ) {
+
+/* Check known specal cases for speed. */
+         class = astGetClass( map );
+         if( !strcmp( class, "WinMap" ) ||
+             !strcmp( class, "ZoomMap" ) ||
+             !strcmp( class, "UnitMap" ) ||
+             !strcmp( class, "ShiftMap" ) ){
+
+/* Each output is fed by the corresponding input for these classes of
+   Mapping. */
+            for( i = 0; i < nout; i++ ) result[ i ] = i;
+
+/* Now do the general case. */
+         } else {
+
+/* Loop round each input axis. */
+            for( i = 0; i < nout; i++ ) {
+
+/* Use astMapSplit to see if this input corresponds to a single output. */
+               tt = astMapSplit( map, 1, &i, &tmap );
+
+/* If not, annul the returned array and break. */
+               if( !tmap ) {
+                  result = astFree( result );
+                  break;
+
+/* If so, store the index of the corresponding input in the returned
+   array and free resources. */
+               } else {
+                 result[ tt[ 0 ] ] = i;
+                 tt = astFree( tt );
+                 if( astGetNout( tmap ) != 1 ) result = astFree( result );
+                 tmap = astAnnul( tmap );
+                 if( !result ) break;
+               }
+            }
+         }
+      }
+   }
+
+/* Return the result */
+   return result;
+}
+
 static int Overlap( AstRegion *this, AstRegion *that ){
 /*
 *  Name:
@@ -1169,7 +1266,6 @@ static int Overlap( AstRegion *this, AstRegion *that ){
    AstRegion *unc_temp;
    AstRegion *unc_that;
    AstRegion *unc_this;
-   const char *class;
    double **ptr_that;
    double **ptr_this;
    double *lbndu_that;
@@ -1184,6 +1280,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
    double tmp;
    double ub_that;
    double ub_this;
+   int *outperm;
    int ic;
    int inc_that;
    int inc_this;
@@ -1241,15 +1338,10 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 /* Simplify this Mapping. */
          smap = astSimplify( map );
 
-/* We can only proceed if the simplified Mapping is a WinMap, ZoomMap, UnitMap,
-   ShiftMap or PermMap. These are linear Mappings in which each output axis 
-   depends on only one input axis. */
-         class = astGetClass( smap );
-         if( !strcmp( class, "WinMap" ) ||
-             !strcmp( class, "ZoomMap" ) ||
-             !strcmp( class, "UnitMap" ) ||
-             !strcmp( class, "ShiftMap" ) ||
-             !strcmp( class, "PermMap" ) ) {
+/* We can only proceed if each output of the simplified Mapping depends
+   on only one input. Test this. */
+         outperm = OneToOne( smap );
+         if( outperm ){
 
 /* Get the uncertainty Regions for both Intervals, expressed in the base
    Frames of the Intervals. */
@@ -1477,6 +1569,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
             ubndu_this = astFree( ubndu_this );
             lbndu_that = astFree( lbndu_that );
             ubndu_that = astFree( ubndu_that );
+            outperm = astFree( outperm );
          }
 
          smap = astAnnul( smap );
@@ -1823,30 +1916,234 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 */
 
-/* Local Variables: */
-   AstBox *box;                  /* The equivalent Box */
-   int result;                   /* The returned value */
+/* Local variables: */
+   AstBox *box;              /* The equivalent Box */
+   AstInterval *large_int;   /* Interval slightly larger than "this" */
+   AstInterval *small_int;   /* Interval slightly smaller than "this" */
+   AstInterval *this;        /* Pointer to the Interval structure. */
+   AstFrame *frm;            /* Base Frame in supplied Interval */
+   AstPointSet *ps1;         /* Points masked by larger Interval */
+   AstPointSet *ps2;         /* Points masked by larger and smaller Intervals */
+   AstRegion *tunc;          /* Uncertainity Region from "this" */
+   double **ptr;             /* Pointer to axis values in "ps2" */
+   double *large_lbnd;       /* Lower bounds of larger interval */
+   double *large_ubnd;       /* Upper bounds of larger interval */
+   double *lbnd_tunc;        /* Lower bounds of "this" uncertainty Region */ 
+   double *lbnd_unc;         /* Lower bounds of supplied uncertainty Region */ 
+   double *p;                /* Pointer to next axis value */
+   double *small_lbnd;       /* Lower bounds of smaller interval */
+   double *small_ubnd;       /* Upper bounds of smaller interval */
+   double *ubnd_tunc;        /* Upper bounds of "this" uncertainty Region */ 
+   double *ubnd_unc;         /* Upper bounds of supplied uncertainty Region */ 
+   double *wid;              /* Widths of "this" border */
+   double lb;                /* Lower bound */
+   double ub;                /* Upper bound */
+   double t;                 /* Swap space */
+   double w;                 /* Width */
+   int i;                    /* Axis index */
+   int j;                    /* Point index */
+   int nc;                   /* No. of axes in Interval base frame */
+   int np;                   /* No. of supplied points */
+   int result;               /* Returned flag */
 
 /* Initialise */
    result = 0;
    if( mask ) *mask = NULL;
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
+/* Check the inherited status. */
+   if( !astOK ) return result;
 
-/* If the Interval is effectively a Box, invoke the astRegPins
-   function on the equivalent Box. A pointer to the equivalent Box will
-   be stored in the Interval structure. */
-   box = Cache( (AstInterval *) this_region );
-   if( box ) {
-      result = astRegPins( box, pset, unc, mask );
+/* Get a pointer to the Interval structure. */
+   this = (AstInterval *) this_region;
 
-/* If the Interval is not equivalent to a Box, report an error. */
+/* If the Interval is effectively a Box, invoke the astRegPins function on 
+   the equivalent Box. A pointer to the equivalent Box will be stored in the 
+   Interval structure. */
+   box = Cache( this );
+   if( box ) return astRegPins( box, pset, unc, mask );
+
+/* Arrive here only if the Interval is not equivalent to a box (i.e. has
+   at least one infinite boundary). Get the number of base Frame axes in the 
+   Interval, and check the supplied PointSet has the same number of axis 
+   values per point. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+   nc = astGetNaxes( frm );
+   if( astGetNcoord( pset ) != nc && astOK ) {
+      astError( AST__INTER, "astRegPins(%s): Illegal number of axis "
+                "values per point (%d) in the supplied PointSet - should be "
+                "%d (internal AST programming error).", astGetClass( this ),
+                astGetNcoord( pset ), nc );
+   }
+
+/* Get the number of axes in the uncertainty Region and check it is the 
+   same as above. */
+   if( unc && astGetNaxes( unc ) != nc && astOK ) {
+      astError( AST__INTER, "astRegPins(%s): Illegal number of axes (%d) "
+                "in the supplied uncertainty Region - should be "
+                "%d (internal AST programming error).", astGetClass( this ),
+                astGetNaxes( unc ), nc );
+   }
+
+/* We now find the maximum distance on each axis that a point can be from 
+   the boundary of the Interval for it still to be considered to be on the
+   boundary. First get the Region which defines the uncertainty within the 
+   Interval being checked (in its base Frame), and get its bounding box. */
+   tunc = astGetUncFrm( this, AST__BASE );      
+   lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
+   ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
+   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+
+/* Also get the Region which defines the uncertainty of the supplied points
+   and get its bounding box. */
+   if( unc ) {
+      lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
+      ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
+      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
    } else {
-      astError( AST__INTER, "astRegPins(%s): The %s given is "
-                "unbounded and therefore the boundary mesh cannot be "
-                "checked (internal AST programming error).", 
-                astGetClass( this_region ) );
+      lbnd_unc = NULL;
+      ubnd_unc = NULL;
+   }
+
+/* The required border width for each axis is half of the total width of
+   the two bounding boxes. Use a zero sized box "unc" if no box was supplied. */   
+   wid = astMalloc( sizeof( double )*(size_t) nc );
+   large_lbnd = astMalloc( sizeof( double )*(size_t) nc );
+   large_ubnd = astMalloc( sizeof( double )*(size_t) nc );
+   small_lbnd = astMalloc( sizeof( double )*(size_t) nc );
+   small_ubnd = astMalloc( sizeof( double )*(size_t) nc );
+   if( small_ubnd ) {
+      if( unc ) {
+         for( i = 0; i < nc; i++ ) {
+            wid[ i ] = 0.5*( astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] )
+                           + astAxDistance( frm, i + 1, lbnd_unc[ i ], ubnd_unc[ i ] ) );
+         }
+      } else {
+         for( i = 0; i < nc; i++ ) {
+            wid[ i ] = 0.5*astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] );
+         }
+      }
+
+/* Create two new Intervals, one of which is larger than "this" by the widths 
+   found above, and the other of which is smaller than "this" by the widths 
+   found above. */
+      for( i = 0; i < nc; i++ ) {
+         lb = this->lbnd[ i ];
+         ub = this->ubnd[ i ];
+         if( lb > ub ) {
+            t = ub;
+            ub = lb;
+            lb = t;
+         }
+
+         w = fabs( wid[ i ] );
+         if( lb != -DBL_MAX ){
+            large_lbnd[ i ] = lb - w;
+            small_lbnd[ i ] = lb + w;
+         } else {
+            large_lbnd[ i ] = AST__BAD;
+            small_lbnd[ i ] = AST__BAD;
+         }
+
+         if( ub != DBL_MAX ){
+            large_ubnd[ i ] = ub + w;
+            small_ubnd[ i ] = ub - w;
+         } else {
+            large_ubnd[ i ] = AST__BAD;
+            small_ubnd[ i ] = AST__BAD;
+         }
+
+         if( small_lbnd[ i ] > small_ubnd[ i ] ) {
+            small_lbnd[ i ] = small_ubnd[ i ];
+         }
+      }
+
+      large_int = astInterval( frm, large_lbnd, large_ubnd, NULL, "" );
+      small_int = astInterval( frm, small_lbnd, small_ubnd, NULL, "" );
+
+/* Negate the smaller interval.*/
+      astNegate( small_int );
+
+/* Points are on the boundary of "this" if they are inside both the large
+   interval and the negated small interval. First transform the supplied 
+   PointSet using the large interval, then transform them using the negated 
+   smaller Interval. */
+      ps1 = astTransform( large_int, pset, 1, NULL );
+      ps2 = astTransform( small_int, ps1, 1, NULL );
+
+/* Get a point to the resulting axis values, and the number of axis
+   values per axis. */
+      ptr = astGetPoints( ps2 );
+      np = astGetNpoint( ps2 );
+
+/* If a mask array is to be returned, create one. */
+      if( mask ) {
+         *mask = astMalloc( sizeof(int)*(size_t) np );
+
+/* Check all the resulting points, setting mask values for all of them. */
+         if( astOK ) {
+   
+/* Initialise the mask elements on the basis of the first axis values */
+            result = 1;
+            p = ptr[ 0 ];
+            for( j = 0; j < np; j++ ) {
+               if( *(p++) == AST__BAD ) {
+                  result = 0;
+                  (*mask)[ j ] = 0;
+               } else {
+                  (*mask)[ j ] = 1;
+               }
+            }
+
+/* Now check for bad values on other axes. */
+            for( i = 1; i < nc; i++ ) {
+               p = ptr[ i ];
+               for( j = 0; j < np; j++ ) {
+                  if( *(p++) == AST__BAD ) {
+                     result = 0;
+                     (*mask)[ j ] = 0;
+                  }
+               }
+            }
+         }
+
+/* If no output mask is to be made, we can break out of the check as soon
+   as the first bad value is found. */
+      } else if( astOK ) {
+         result = 1;
+         for( i = 0; i < nc && result; i++ ) {
+            p = ptr[ i ];
+            for( j = 0; j < np; j++ ) {
+               if( *(p++) == AST__BAD ) {
+                  result = 0;
+                  break;
+               }
+            }
+         }
+      }
+
+/* Free resources. */
+      large_int = astAnnul( large_int );
+      small_int = astAnnul( small_int );
+      ps1 = astAnnul( ps1 );
+      ps2 = astAnnul( ps2 );
+   }
+
+   tunc = astAnnul( tunc );
+   frm = astAnnul( frm );
+   lbnd_tunc = astFree( lbnd_tunc );
+   ubnd_tunc = astFree( ubnd_tunc );
+   if( unc ) lbnd_unc = astFree( lbnd_unc );
+   if( unc ) ubnd_unc = astFree( ubnd_unc );
+   wid = astFree( wid );
+   large_lbnd = astFree( large_lbnd );
+   large_ubnd = astFree( large_ubnd );
+   small_lbnd = astFree( small_lbnd );
+   small_ubnd = astFree( small_ubnd );
+
+/* If an error has occurred, return zero. */
+   if( !astOK ) {
+      result = 0;
+      if( mask ) *mask = astAnnul( *mask );
    }
 
 /* Return the result. */
@@ -3519,8 +3816,6 @@ AstInterval *astMergeInterval_( AstInterval *this, AstRegion *reg ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Interval,MergeInterval))( this, reg );
 }
-
-
 
 
 

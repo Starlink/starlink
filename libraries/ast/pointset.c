@@ -1192,6 +1192,10 @@ static double **GetPoints( AstPointSet *this ) {
       nval = this->npoint * this->ncoord;
       this->values = (double *) astMalloc( sizeof( double ) * (size_t) nval );
 
+#ifdef DEBUG
+      for( i = 0; i < nval; i++ ) this->values[ i ] = 0.0;
+#endif
+
 /* If OK, also allocate memory for the array of pointers into this values
    array, storing a pointer to this pointer array in the PointSet structure. */
       if ( astOK ) {
@@ -1209,6 +1213,25 @@ static double **GetPoints( AstPointSet *this ) {
             this->values = (double *) astFree( (void *) this->values );
          }
       }
+
+#ifdef DEBUG
+   } else {
+
+/* Check for bad values */
+      if( this->values ) {
+         int i, j;
+         for( i = 0; astOK && i < this->ncoord; i++ ) {
+            for( j = 0; j < this->npoint; j++ ) {
+               if( !finite( (this->ptr)[ i ][ j ] ) ) {
+                  astError( AST__INTER, "astGetPoints(PointSet): Non-finite "
+                            "axis value returned.");
+                  break;
+               }
+            }
+         }
+      }
+
+#endif
    }
 
 /* Return the required pointer. */

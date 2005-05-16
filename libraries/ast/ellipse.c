@@ -757,16 +757,19 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
    AstEllipse *this;              /* The Ellipse structure */
    AstFrame *frm;                 /* Base Frame in encapsulated FrameSet */
    AstPointSet *result;           /* Returned pointer */
+   AstRegion *reg;                /* Copy of supplied Ellipse */
    double **ptr;                  /* Pointers to data */
    double ang;                    /* Position angular of primary axis at "dx" */
    double angle;                  /* Ellipse parametric angle at point */
    double delta;                  /* Angular separation of points */
    double dx;                     /* Primary axis offset */
    double dy;                     /* Secondary axis offset */
+   double lbnd[2];                /* Lower bounding box bounds */
    double lbx;                    /* Lower x bound of mesh bounding box */
    double lby;                    /* Lower y bound of mesh bounding box */
    double p2[ 2 ];                /* Position in 2D Frame */
    double p[ 2 ];                 /* Position in 2D Frame */
+   double ubnd[2];                /* Upper bounding box bounds */
    double ubx;                    /* Upper x bound of mesh bounding box */
    double uby;                    /* Upper y bound of mesh bounding box */
    int i;                         /* Point index */
@@ -864,19 +867,38 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
          }
       }
 
-/* Free resources. */
-      frm = astAnnul( frm );
-
 /* Save the returned pointer in the Region structure so that it does not
    need to be created again next time this function is called. Also cache
    the bounding box in the Ellipse structure. */
       if( astOK && result ) {
          this_region->basemesh = astClone( result );
-         this->lbx = lbx;
-         this->ubx = ubx;
-         this->lby = lby;
-         this->uby = uby;
+
+/* Extend the bounding box if it contains any singularies. The astNormBox 
+   requires a Mapping which can be used to test points in the base Frame. 
+   Create a copy of the Circle and then set its FrameSet so that the current 
+   Frame in the copy is the same as the base Frame in the original. */
+         reg = astCopy( this );
+         astSetRegFS( reg, frm );
+         astSetNegated( reg, 0 );
+
+/* Normalise this box. */
+         lbnd[ 0 ] = lbx;
+         lbnd[ 1 ] = lby;
+         ubnd[ 0 ] = ubx;
+         ubnd[ 1 ] = uby;
+         astNormBox( frm, lbnd, ubnd, reg );
+
+/* Save this box */
+         this->lbx = lbnd[ 0 ];
+         this->ubx = ubnd[ 0 ];
+         this->lby = lbnd[ 1 ];
+         this->uby = ubnd[ 1 ];
+
+/* Free resources. */
+         reg = astAnnul( reg );
       }
+      frm = astAnnul( frm );
+
    }
 
 /* Annul the result if an error has occurred. */

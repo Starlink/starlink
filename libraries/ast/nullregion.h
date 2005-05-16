@@ -99,16 +99,16 @@ astPROTO_ISA(NullRegion)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstNullRegion *astNullRegion_( void *, const char *, ... );
+AstNullRegion *astNullRegion_( void *, AstRegion *, const char *, ... );
 #else
-AstNullRegion *astNullRegionId_( void *, const char *, ... );
+AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstNullRegion *astInitNullRegion_( void *, size_t, int, AstNullRegionVtab *,
-                           const char *, AstFrame * );
+                                   const char *, AstFrame *, AstRegion * );
 
 /* Vtab initialiser. */
 void astInitNullRegionVtab_( AstNullRegionVtab *, const char * );
@@ -151,8 +151,8 @@ AstNullRegion *astLoadNullRegion_( void *, size_t, AstNullRegionVtab *,
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitNullRegion(mem,size,init,vtab,name,frame) \
-astINVOKE(O,astInitNullRegion_(mem,size,init,vtab,name,frame))
+#define astInitNullRegion(mem,size,init,vtab,name,frame,unc) \
+astINVOKE(O,astInitNullRegion_(mem,size,init,vtab,name,frame,unc))
 
 /* Vtab Initialiser. */
 #define astInitNullRegionVtab(vtab,name) astINVOKE(V,astInitNullRegionVtab_(vtab,name))
