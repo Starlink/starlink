@@ -7,7 +7,8 @@
   Stop problems with foreign-file conversion deleting the input files
   and re-opening creating a new copy.
 
-  ESP toolbox now reports mean count along isophote.
+  ESP toolbox now reports mean count along isophote and plots intensity
+  profiles.
 
   Release 2.8-0: 04 November 2004
   ===============================
