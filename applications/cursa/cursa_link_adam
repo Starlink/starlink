@@ -31,6 +31,7 @@
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     ACD:  A.C. Davenhall (Starlink, ROE)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     PWD: Peter W. Draper (Starlink, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -48,7 +49,13 @@
 #        Added link to NDF library.  Removed links to FITSIO, FIO and
 #        CHR (which are included in the link to CAT).
 #     23-FEB-2005 (TIMJ):
-#        Switch from GKS PGPLOT to Native PGPLOT
+#        Switch from GKS PGPLOT to Native PGPLOT.
+#     17-MAY-2005 (PWD):
+#        Switch back to GKS PGPLOT. CURSA does not use AGI, so 
+#        cannot understand old-style Starlink device names (like 
+#        "xwindows") which means the Tcl scripts and documentation
+#        also need changing. There's also the issue of backwards 
+#        compatibility.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -56,7 +63,7 @@
 
 #-
 
-      echo `cat_link_adam` `pgplot_link_adam` `pda_link` `ndf_link_adam` \
+      echo `cat_link_adam` `pgp_link_adam` `pda_link` `ndf_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
