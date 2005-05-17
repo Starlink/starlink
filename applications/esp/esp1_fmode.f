@@ -1531,6 +1531,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
     
 *   Look at all the entries in the text file.
       FSTAT=-1
+      FLAG=0
       DO WHILE (FLAG.LT.1)
 
 *      Obtain the results from the file.

@@ -1431,6 +1431,7 @@
 
 *   Determine the angular bin for each pixel.
 *   Add values to the histogram.
+      INDEX=0
       DO 20 I=1,COUNTR
 
 *      Find the angle of the current pixel relative to the origin.
