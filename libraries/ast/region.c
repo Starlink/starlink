@@ -2912,6 +2912,8 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    AstRegion *result;         /* Returned pointer */
    double *lbnd;              /* Ptr. to array holding axis lower bounds */
    double *ubnd;              /* Ptr. to array holding axis upper bounds */
+   double c;                  /* Central axis value */
+   double hw;                 /* Half width of uncertainty interval */
    int i;                     /* Axis index */
    int nax;                   /* Number of base Frame axes */
 
@@ -2937,15 +2939,19 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    ubnd = astMalloc( sizeof( double)*(size_t) nax );
    astRegBaseBox2( this, lbnd, ubnd );
 
-/* Create a Box covering 1.0E-6 of this bounding box, centred on the origin. */
+/* Create a Box covering 1.0E-6 of this bounding box, centred on the
+   centre of the box. */
    if( astOK ) {
       for( i = 0; i < nax; i++ ) {
          if( ubnd[ i ] != DBL_MAX && lbnd[ i ] != -DBL_MAX ) {
-            ubnd[ i ] = 0.5E-6*(  ubnd[ i ] - lbnd[ i ] );
+            hw = fabs( 0.5E-6*(  ubnd[ i ] - lbnd[ i ] ) );
+            c = 0.5*(  ubnd[ i ] + lbnd[ i ] );
+            ubnd[ i ] = c + hw;
+            lbnd[ i ] = c - hw;
          } else {
             ubnd[ i ] = 0.0;
+            lbnd[ i ] = 0.0;
          }
-         lbnd[ i ] = 0.0;
       }
       result = (AstRegion *) astBox( bfrm, 0, lbnd, ubnd, NULL, "" );
    }
@@ -5426,7 +5432,8 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 */
 
 /* Local Variables: */
-   AstFrame *frm_reg1;            /* Pointer to "reg1" Frame */
+   AstFrame *frm_reg1;            /* Pointer to current Frame in "reg1" Frame */
+   AstFrame *bfrm_reg1;           /* Pointer to base Frame in "reg1" Frame */
    AstFrameSet *fs;               /* FrameSet connecting Region Frames */
    AstMapping *cmap;              /* Mapping connecting Region Frames */
    AstMapping *map;               /* Mapping form "reg2" current to "reg1" base */
@@ -5559,7 +5566,8 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    the second supplied Region into the base Frame of the first supplied 
    Region. */
       unc = astGetUncFrm( reg2, AST__CURRENT );
-      unc1 = astMapRegion( unc, map, frm_reg1 );
+      bfrm_reg1 = astGetFrame( reg1->frameset, AST__BASE );
+      unc1 = astMapRegion( unc, map, bfrm_reg1 );
 
 /* See if all points within this transformed mesh fall on the boundary of
    the first Region, to within the joint uncertainty of the two Regions. If
@@ -5697,6 +5705,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 
 /* Free resources.*/
       fs = astAnnul( fs );
+      bfrm_reg1 = astAnnul( bfrm_reg1 );
       frm_reg1 = astAnnul( frm_reg1 );
       map_reg1 = astAnnul( map_reg1 );
       cmap = astAnnul( cmap );

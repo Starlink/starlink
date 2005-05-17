@@ -836,7 +836,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
          i = ( iaxis == 0 ) ? 1 : 0;
          while( i < naxes ) {
             p[ i ] += step[ i ];
-            if( p[ i ] > upad[ i ] ) {
+            if( step[ i ] == 0.0 || p[ i ] > upad[ i ] ) {
                p[ i ] = lbnd[ i ];
                i++;
                if( i == iaxis ) i++;

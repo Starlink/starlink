@@ -2605,6 +2605,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    int j;                        /* Loop count */
    int nax1;                     /* Number of axes in first component Region */
    int nax2;                     /* Number of axes in second component Region */
+   int naxt;                     /* Total number of axes in current Frame */
    int naxout1;                  /* Number of current axes for reg1 */
    int naxout2;                  /* Number of current axes for reg2 */
    int neg;                      /* Negated flag for supplied Prism */
@@ -2740,15 +2741,63 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Assume for the moment that the component Regions cannot be simplified.
    In this case we will use a clone of the supplied Prism. */
       new = astClone( this_mapping );
+
+/* Determine the number of outputs from these Mappings. */
+      if( nmap1 ){
+         naxout1 = astGetNout( nmap1 );
+      } else {
+         naxout1 = 0;
+      }
+      if( nmap2 ){
+         naxout2 = astGetNout( nmap2 );
+      } else {
+         naxout2 = 0;
+      }
+
+/* Determine the number of axes in the current Frame of the Prism. */
+      naxt = astGetNout( bcmap );
+
+/* If the second component does not contribute any axes to the total
+   Prism, we can ignore it. */
+      if( naxout1 == naxt && naxout2 == 0 ) {
+         newfrm1 = astPickAxes( cfrm, naxout1, axout1, NULL );
+         newreg1 = astMapRegion( reg1, nmap1, newfrm1 );
+         astAnnul( new );
+         new = astSimplify( newreg1 );      
+         if( neg ) astNegate( new );
+         perm = astMalloc( sizeof( int )*(size_t) ( naxout1 ) );
+         if( astOK ) {
+            for( i = 0; i < naxout1; i++ ) perm[ i ] = axout1[ i ];
+            astPermAxes( new, perm );
+            perm = astFree( perm );
+         }
+         newfrm1 = astAnnul( newfrm1 );
+         newreg1 = astAnnul( newreg1 );
+
+/* If the first component does not contribute any axes to the total
+   Prism, we can ignore it. */
+      } else if( naxout1 == 0 && naxout2 == naxt ) {
+         newfrm2 = astPickAxes( cfrm, naxout2, axout2, NULL );
+         newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
+         astAnnul( new );
+         new = astSimplify( newreg2 );      
+         if( neg ) astNegate( new );
+         perm = astMalloc( sizeof( int )*(size_t) ( naxout2 ) );
+         if( astOK ) {
+            for( i = 0; i < naxout2; i++ ) perm[ i ] = axout2[ i ];
+            astPermAxes( new, perm );
+            perm = astFree( perm );
+         }
+         newfrm2 = astAnnul( newfrm2 );
+         newreg2 = astAnnul( newreg2 );
    
-/* If each component Region corresponds to a distinct subspace within the
+/* If both component Regions correspond to a distinct subspace within the
    current Frame, then we can try to express each component Region within
    the current Frame. */
-      if( nmap1 && nmap2 ) {
+      } else if( nmap1 && nmap2 ) {
    
 /* Create a Frame representing the subspace of the current Frame which
-      corresponds to the axes of the first component Region. */
-         naxout1 = astGetNout( nmap1 );
+   corresponds to the axes of the first component Region. */
          newfrm1 = astPickAxes( cfrm, naxout1, axout1, NULL );
    
 /* Remap the first component Region so that it represents an area in this
@@ -2805,7 +2854,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    we can replace the Prism by a single Interval defined within a CmpFrame.
    Attempt to do this. If succesful, attempt to simplify the new Region
    and use it in place of the original. */
-      if( new ) {
+      if( new && astIsAPrism( new ) ) {
          new2 = astMergeInterval( new->region2, new->region1 );
          if( new2 ) {
             astAnnul( new );

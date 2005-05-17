@@ -658,11 +658,13 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
 
 /* Local Variables: */
    AstBox *box;               /* Pointer to equivalent Box */
-   AstInterval *this;         /* Pointer to Interval structure */
    AstFrame *bfrm;            /* Base Frame of supplied Region */
+   AstInterval *this;         /* Pointer to Interval structure */
    AstRegion *result;         /* Returned pointer */
    double *lbnd;              /* Ptr. to array holding axis lower bounds */
    double *ubnd;              /* Ptr. to array holding axis upper bounds */
+   double c;                  /* Central axis value */
+   double hw;                 /* Half width of uncertainty interval */
    int i;                     /* Axis index */
    int nax;                   /* Number of base Frame axes */
 
@@ -706,8 +708,10 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
    limits. */
             if( this->lbnd[ i ] != -DBL_MAX && 
                 this->ubnd[ i ] != DBL_MAX ) {
-               ubnd[ i ] = 0.5E-6*fabs( this->ubnd[ i ] - this->lbnd[ i ] );
-               lbnd[ i ] = -ubnd[ i ];
+               hw = fabs( 0.5E-6*(  this->ubnd[ i ] - this->lbnd[ i ] ) );
+               c = 0.5*(  this->ubnd[ i ] + this->lbnd[ i ] );
+               ubnd[ i ] = c + hw;
+               lbnd[ i ] = c - hw;
 
 /* Otherwise use zero. */
             } else {
@@ -1267,6 +1271,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
    AstRegion *unc_that;
    AstRegion *unc_this;
    double **ptr_that;
+   double **ptr_thato;
    double **ptr_this;
    double *lbndu_that;
    double *lbndu_this;
@@ -1371,6 +1376,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 /* Get pointers for accesing the limits of the two Intervals, expressed
    in a common Frame (the base Frame of the first Interval). */
             ptr_that = astGetPoints( pset_that );
+            ptr_thato = astGetPoints( that->points );
             ptr_this = astGetPoints( this->points );
             if( astOK ) {
 
@@ -1384,12 +1390,32 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 /* Add this together in quadrature to get the tolerance for two values on
    the current axis to be considered equal. */
                   err = sqrt( err_that*err_that + err_this*err_this );
-
+ 
 /* Get the limits on this axis from both Intervals. */
                   lb_this = ptr_this[ ic ][ 0 ];
                   ub_this = ptr_this[ ic ][ 1 ];
                   lb_that = ptr_that[ ic ][ 0 ];
                   ub_that = ptr_that[ ic ][ 1 ];
+
+/* The limits for "that" have been mapped, which may have resulted in
+   them being swapped. We need to unswap them in this case to prevent the 
+   swapping being used as an indication of a desire to use an excluded
+   interval rather than an included interval. */ 
+                   if( lb_that != AST__BAD && ub_that != AST__BAD ) {
+                      if( ptr_thato[ ic ][ 0 ] < ptr_thato[ ic ][ 1 ] ) {
+                         if( lb_that > ub_that ) {
+                            tmp = lb_that;
+                            lb_that = ub_that;
+                            ub_that = tmp;
+                         }
+                      } else {
+                         if( lb_that < ub_that ) {
+                            tmp = lb_that;
+                            lb_that = ub_that;
+                            ub_that = tmp;
+                         }
+                      }
+                   }
 
 /* If the regions are not closed, reduce the limits by the smallest
    amount possible. */
