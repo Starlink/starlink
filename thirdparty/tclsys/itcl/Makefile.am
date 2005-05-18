@@ -403,7 +403,7 @@ EXTRA_DIST = tcl.m4 makefile.bc makefile.vc $(itcl_config_dir) \
              $(itcl_iwidgets3.0.0_incoming_dir) $(itcl_iwidgets3.0.0_incoming_doc_dir) \
              $(itcl_iwidgets3.0.0_incoming_tests_dir) $(itcl_iwidgets3.0.0_outgoing_dir) \
              $(itcl_iwidgets3.0.0_tests_dir) $(itcl_iwidgets3.0.0_unix_dir) \
-             $(itcl_iwidgets3.0.0_win_dir) $(itcl_tools_dir) \
+             $(itcl_iwidgets3.0.0_win_dir) $(itcl_tools_dir)
 
 
 dist_pkgdata_DATA = license.terms INCOMPATIBLE CHANGES
