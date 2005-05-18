@@ -211,7 +211,7 @@ iwidgets2.2.0/generic/tclIndex iwidgets2.2.0/generic/toolbar.itk iwidgets2.2.0/g
  
 itcl_iwidgets2.2.0_incoming_dir = iwidgets2.2.0/incoming/README  
  
-itcl_iwidgets2.2.0_incoming_doc_dir = itcl_iwidgets2.2.0/incoming/doc/man.macros  
+itcl_iwidgets2.2.0_incoming_doc_dir = iwidgets2.2.0/incoming/doc/man.macros  
  
 itcl_iwidgets2.2.0_incoming_tests_dir = iwidgets2.2.0/incoming/tests/defs iwidgets2.2.0/incoming/tests/all
 
@@ -403,7 +403,8 @@ EXTRA_DIST = tcl.m4 makefile.bc makefile.vc $(itcl_config_dir) \
              $(itcl_iwidgets3.0.0_incoming_dir) $(itcl_iwidgets3.0.0_incoming_doc_dir) \
              $(itcl_iwidgets3.0.0_incoming_tests_dir) $(itcl_iwidgets3.0.0_outgoing_dir) \
              $(itcl_iwidgets3.0.0_tests_dir) $(itcl_iwidgets3.0.0_unix_dir) \
-             $(itcl_iwidgets3.0.0_win_dir) $(itcl_tools_dir)
+             $(itcl_iwidgets3.0.0_win_dir) $(itcl_tools_dir) tcl.m4 makefile.vc makefile.bc
+
 
 
 dist_pkgdata_DATA = license.terms INCOMPATIBLE CHANGES
