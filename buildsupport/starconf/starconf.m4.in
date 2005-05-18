@@ -779,11 +779,22 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
             AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
             AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
             if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM; then
-                AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
+                if $_star_docs_only; then
+                    # Building documentation is all we're supposed to do,
+                    # and we can't, so suppress further building.
+                    STAR_SUPPRESS_BUILD_IF(:,
+                        [This docs-only component requires both Jade
+                         and sgmlnorm.  All I could find were $JADE for Jade,
+                         and $SGMLNORM for sgmlnorm.  Your system may have
+                         a way to install them as a package, in which case
+                         you should re-run configure and make.])
+                else
+                    AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
+                fi
             else
                 AC_FOREACH([DocCode], [$1],
                    [m4_if(m4_bregexp(DocCode,[/]), -1,
-                          [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar"
+                          [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar DocCode.pdf"
 ],
                           [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
                            STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
