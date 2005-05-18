@@ -2,7 +2,7 @@
 
 SUBDIRS = polsub ccdpack
 
-bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
+dist_bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
 
 LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_link_adam`
 
@@ -104,4 +104,32 @@ edit = sed \
 # Polka needs to be installed as other .htx_tar files but into starhelp
 # starhelp_DATA is used earlier
 polkahelpdir = $(starhelpdir)
-polkahelp_DATA = polka.htx_tar
+dist_polkahelp_DATA = polka.htx_tar
+
+dist_starnews_DATA = polpack.news
+
+MISC_BUILT_FILES = polpack.hlp polpack.shl polka.htx_tar \
+version.dat polpack_mon polpack.csh polpack.icl polpack.sh
+
+BUILT_IFC_FILES = polbin.ifc polcal.ifc polcent.ifc polexp.ifc \
+polexpx.ifc polext.ifc polhelp.ifc polimage.ifc \
+polimp.ifc polimpx.ifc polka.ifc polplot.ifc \
+polprep.ifc polrdtcl.ifc polsim.ifc polstack.ifc \
+polvec.ifc polversion.ifc polwrtcl.ifc polzconv.ifc \
+polpack_mon.ifc
+
+
+BUILT_IFL_FILES = polbin.ifl polcal.ifl polcent.ifl polexp.ifl \
+polexpx.ifl polext.ifl polhelp.ifl polimage.ifl \
+polimp.ifl polimpx.ifl polka.ifl polpack_mon.ifl \
+polplot.ifl polprep.ifl polrdtcl.ifl polsim.ifl \
+polstack.ifl polvec.ifl polversion.ifl polwrtcl.ifl \
+polzconv.ifl
+
+EXTRA_DIST = polpack_master.hlp
+
+CLEANFILES = $(MISC_BUILT_FILES) $(BUILT_IFC_FILES) $(BUILT_IFL_FILES)
+
+
+
+
