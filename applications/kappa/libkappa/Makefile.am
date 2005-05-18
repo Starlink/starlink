@@ -34,3 +34,5 @@ kapmon.hlp: $(F_ROUTINES)
 	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
 	@PROHLP@ in=all.f out=kapmon.hlp single=no
 	-rm all.f
+
+CLEANFILES = kapmon.hlp KAP_ERR

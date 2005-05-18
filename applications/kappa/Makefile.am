@@ -3,10 +3,10 @@
 SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
 
-bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
+dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) kappa_nogks_link_adam
 
 bindatadir = $(bindir)
-bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
+dist_bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
 
 include_MESSAGES = kap_err.h KAP_ERR
 BUILT_SOURCES = $(include_MESSAGES)
@@ -204,3 +204,96 @@ multiplot.csh: multiplot.csh.in
 	    $(srcdir)/multiplot.csh.in > multiplot.csh.tmp
 	mv multiplot.csh.tmp multiplot.csh
 
+
+MISC_BUILT_FILES = kappa.shl kappa.hlp version.dat \
+multiplot.csh ndfpack_mon kapview_mon kappa_mon \
+kappa.csh kappa.icl kappa.sh
+
+
+BUILT_IFC_FILES = chain.ifc fitsmod.ifc fitstext.ifc hiscom.ifc \
+hislist.ifc hisset.ifc native.ifc ndfcopy.ifc \
+ndftrace.ifc qualtobad.ifc remqual.ifc reshape.ifc \
+setaxis.ifc setbad.ifc setbb.ifc setbound.ifc \
+setext.ifc setlabel.ifc setnorm.ifc setorigin.ifc \
+setqual.ifc setsky.ifc settitle.ifc settype.ifc \
+setunits.ifc setvar.ifc showqual.ifc wcsadd.ifc \
+wcsattrib.ifc wcscopy.ifc wcsframe.ifc wcsremove.ifc \
+wcsshow.ifc axconv.ifc axlabel.ifc axunits.ifc \
+erase.ifc fitsdin.ifc fitsexist.ifc fitsexp.ifc \
+fitsimp.ifc fitsin.ifc fitslist.ifc linplot.ifc \
+lutable.ifc lutedit.ifc lutsave.ifc lutview.ifc \
+mlinplot.ifc paldef.ifc palentry.ifc palread.ifc \
+palsave.ifc piccur.ifc picdef.ifc picempty.ifc \
+picentire.ifc picin.ifc piclabel.ifc piclist.ifc \
+picsel.ifc pictrans.ifc picvis.ifc scatter.ifc \
+vecplot.ifc ardplot.ifc colcomp.ifc contour.ifc \
+cursor.ifc display.ifc drawnorth.ifc drawsig.ifc \
+elprof.ifc gdclear.ifc gdnames.ifc gdset.ifc \
+gdstate.ifc kaphelp.ifc kapversion.ifc listmake.ifc \
+listshow.ifc profile.ifc rotate.ifc segment.ifc \
+setmagic.ifc shadow.ifc slide.ifc sqorst.ifc \
+stats.ifc sub.ifc substitute.ifc surfit.ifc \
+thresh.ifc trandat.ifc trig.ifc wcsalign.ifc \
+wcstran.ifc wiener.ifc zaplin.ifc errclip.ifc \
+expon.ifc ffclean.ifc fillbad.ifc fitsurface.ifc \
+flip.ifc fourier.ifc gausmooth.ifc glitch.ifc \
+globals.ifc histat.ifc histeq.ifc histogram.ifc \
+kstest.ifc laplace.ifc logar.ifc look.ifc \
+lucy.ifc makesurface.ifc manic.ifc maths.ifc \
+median.ifc mstats.ifc mult.ifc noglobals.ifc \
+nomagic.ifc normalize.ifc numb.ifc outset.ifc \
+parget.ifc paste.ifc permaxes.ifc pixdupe.ifc \
+psf.ifc regrid.ifc rift.ifc add.ifc aperadd.ifc \
+ardgen.ifc ardmask.ifc block.ifc cadd.ifc calc.ifc \
+calpol.ifc cdiv.ifc centroid.ifc chpix.ifc cmult.ifc \
+collapse.ifc compadd.ifc compave.ifc compick.ifc \
+convolve.ifc copybad.ifc creframe.ifc csub.ifc div.ifc \
+pow.ifc ndfpack_mon.ifc kapview_mon.ifc kappa_mon.ifc
+
+
+BUILT_IFL_FILES = kappa_mon.ifl chpix.ifl cmult.ifl collapse.ifl \
+compadd.ifl compave.ifl compick.ifl convolve.ifl \
+copybad.ifl creframe.ifl csub.ifl div.ifl errclip.ifl \
+expon.ifl ffclean.ifl fillbad.ifl fitsurface.ifl \
+flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
+globals.ifl histat.ifl histeq.ifl histogram.ifl \
+kaphelp.ifl kapversion.ifl kstest.ifl \
+laplace.ifl listmake.ifl listshow.ifl logar.ifl \
+look.ifl lucy.ifl makesurface.ifl manic.ifl \
+maths.ifl median.ifl mstats.ifl mult.ifl \
+noglobals.ifl nomagic.ifl normalize.ifl numb.ifl \
+outset.ifl parget.ifl paste.ifl permaxes.ifl \
+pixdupe.ifl pow.ifl profile.ifl psf.ifl regrid.ifl \
+rift.ifl rotate.ifl segment.ifl setmagic.ifl \
+shadow.ifl slide.ifl sqorst.ifl stats.ifl sub.ifl \
+substitute.ifl surfit.ifl thresh.ifl trandat.ifl \
+trig.ifl wcsalign.ifl wcstran.ifl wiener.ifl \
+zaplin.ifl add.ifl aperadd.ifl ardgen.ifl ardmask.ifl \
+ardplot.ifl axlabel.ifl axunits.ifl block.ifl cadd.ifl \
+calc.ifl calpol.ifl cdiv.ifl centroid.ifl chain.ifl \
+colcomp.ifl contour.ifl cursor.ifl display.ifl \
+drawnorth.ifl drawsig.ifl elprof.ifl erase.ifl \
+fitsdin.ifl fitsexist.ifl fitsexp.ifl fitsimp.ifl \
+fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl \
+gdclear.ifl gdnames.ifl gdset.ifl gdstate.ifl \
+hiscom.ifl hislist.ifl hisset.ifl kapview_mon.ifl \
+linplot.ifl lutable.ifl lutedit.ifl lutsave.ifl \
+lutview.ifl mlinplot.ifl native.ifl ndfcopy.ifl \
+ndfpack_mon.ifl ndftrace.ifl paldef.ifl palentry.ifl \
+palread.ifl palsave.ifl piccur.ifl picdef.ifl \
+picempty.ifl picentire.ifl picin.ifl piclabel.ifl \
+piclist.ifl picsel.ifl pictrans.ifl picvis.ifl \
+qualtobad.ifl remqual.ifl reshape.ifl scatter.ifl \
+setaxis.ifl setbad.ifl setbb.ifl setbound.ifl \
+setext.ifl setlabel.ifl setnorm.ifl setorigin.ifl \
+setqual.ifl setsky.ifl settitle.ifl settype.ifl \
+setunits.ifl setvar.ifl showqual.ifl vecplot.ifl \
+wcsadd.ifl wcsattrib.ifl wcscopy.ifl wcsframe.ifl \
+wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl
+
+
+EXTRA_DIST = multiplot.csh.in kappa_master.hlp $(HELP_FILES)
+
+CLEANFILES = $(BUILT_IFL_FILES) $(BUILT_IFC_FILES) $(MISC_BUILT_FILES)
+
+dist_starnews_DATA = kappa.news

@@ -19,3 +19,5 @@ kapview.hlp: $(F_ROUTINES)
 	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
 	@PROHLP@ in=all.f out=kapview.hlp single=no
 	-rm all.f
+
+CLEANFILES = kapview.hlp

@@ -22,3 +22,9 @@ ccg1_wmd3r.f ccg1_wtm2d.f ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f \
 ccg1_wtm4d.f ccg1_wtm4r.f ccg1_umd1d.f ccg1_umr1r.f ccg1_umd3d.f \
 ccg1_umr3r.f
 
+
+PRIVATE_INCLUDES = CCD1_PAR
+
+
+EXTRA_DIST = CCD1_PAR
+

@@ -20,3 +20,6 @@ ndfpack.hlp: $(F_ROUTINES)
 	export PATH ; \
 	@PROHLP@ in=all.f out=ndfpack.hlp single=no
 	-rm all.f
+
+CLEANFILES = ndfpack.hlp
+
