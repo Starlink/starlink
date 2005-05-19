@@ -23,7 +23,7 @@ PUBLIC_INCLUDES = tclAdam.h tkGwm.h tkNbs.h tclNbs.h
 ##  which form part of the package and are required in order to build
 ##  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = tkGwm_sys.h
+PRIVATE_INCLUDES = tkGwm_sys.h gwm_sys.h
 
 ##  C routines required for building the package.  This is just a list of
 ##  all the C source files.
@@ -142,4 +142,9 @@ tclIndex: $(LIBRARY_FILES)
            'set auto_index(gwm) [list load [file join $$dir [concat libtkGwm[info sharedlibextension]] ] tkGwm]'
 	echo >> tclIndex \
            'set auto_index(adam_start) [list load [file join $$dir [concat libtclAdam[info sharedlibextension]] ] tclAdam]'
+
+EXTRA_DIST = $(PRIVATE_INCLUDES) $(LIBRARY_FILES) adamMessageRelay.in adamtest.in \
+             gwmXrefresh.in gwm.in startcl_test startcl_test2 tester.sh nbstrace
+
+dist_starnews_DATA = startcl.news
 
