@@ -6,7 +6,7 @@ ccdsupportdir = $(bindir)
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
                   $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) $(TCL_INDEX)
 
-bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
+dist_bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
 bin_PROGRAMS = ccdwish
 
@@ -19,8 +19,8 @@ libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
 
 ccdwish_SOURCES = ccdwish.c
 
-STARTCL_OBJ = $(libdir)/tkGwm.o $(libdir)/tkGwmCanv.o \
-              $(libdir)/tkGwmPrint.o $(libdir)/tclAdam.o
+STARTCL_OBJ = $(STARLINK)/lib/tkGwm.o $(STARLINK)/lib/tkGwmCanv.o \
+              $(STARLINK)/lib/tkGwmPrint.o $(STARLINK)/lib/tclAdam.o
 
 ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
                 `$(srcdir)/pgp_ccdpack_link` -ljpeg @FCLIBS@
@@ -36,7 +36,7 @@ starhelp_DATA = ccdpack.shl
 ## This is installed -- is that correct?
 include_MESSAGES = USER_ERR
 
-dist_pkgdata_DATA = ccdpack.news
+dist_starnews_DATA = ccdpack.news
 
 ccdpack_red_SOURCES = ccdpack_red.f
 ccdpack_reg_SOURCES = ccdpack_reg.f
@@ -281,7 +281,33 @@ $(TCL_SUPPORT_MSGRLY): Makefile
 
 BUILT_SOURCES = ccdhelp.ifl USER_ERR
 
-EXTRA_DIST = $(SHELL_SCR) $(IFD_FILES)
+PRIVATE_INCLUDES = CCD1_CACM CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
+                   CCD1_MOSCM CCD1_MOSPR CCD1_PAR.in CCD1_TMPCM
+
+LINKSCRIPTS = ccdpack_link ccdpack_link_adam pgp_ccdpack_link pgp_ccdpack_link_adam
+
+
+EXTRA_DIST = $(SHELL_SCR) $(IFD_FILES) $(PRIVATE_INCLUDES) $(ccdsupport_DATA) \
+             $(LINKSCRIPTS) ccdpack.hlp
+
+MISC_BUILT_FILES = adamMessageRelay version.dat ccdhelp ccdpack_scr \
+ccdpack_res ccdpack_reg ccdpack_red ccdpack.csh \
+ccdpack.icl ccdpack.sh
+
+IFC_BUILT_FILES = ccdalign.ifc ccdexp.ifc ccdgenerate.ifc ccdimp.ifc \
+ccdndfac.ifc import.ifc makeset.ifc picinfo.ifc \
+present.ifc reduce.ifc schedule.ifc showset.ifc \
+xreduce.ifc astexp.ifc astimp.ifc ccdclear.ifc \
+ccdedit.ifc ccdnote.ifc ccdsetup.ifc ccdshow.ifc \
+drawndf.ifc drizzle.ifc findobj.ifc findoff.ifc \
+idicurs.ifc makemos.ifc pairndf.ifc plotlist.ifc \
+register.ifc tranlist.ifc tranndf.ifc wcsedit.ifc \
+wcsreg.ifc calcor.ifc debias.ifc findcent.ifc \
+flatcor.ifc makebias.ifc makecal.ifc makeflat.ifc \
+ccdhelp.ifc ccdpack_scr.ifc ccdpack_res.ifc ccdpack_reg.ifc \
+ccdpack_red.ifc
+
+CLEANFILES = $(IFL_FILES) $(MISC_BUILT_FILES) $(IFC_BUILT_FILES) 
 
 SUBDIRS = tasks gen help main
 

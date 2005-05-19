@@ -84,3 +84,9 @@ CSUBSRC = slv.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c \
  ccd1_linflt.c
 
+
+PRIVATE_INCLUDES = FIO1_CLOG slv.h tcltalk.h tclndf.h ccdaux.h grp_par.h
+
+EXTRA_DIST = $(PRIVATE_INCLUDES)
+
+
