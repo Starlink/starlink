@@ -42,6 +42,8 @@ f     The PolyMap class does not define any new routines beyond those
 *        Changed the keys used by the Dump/astLoadPolyMap functions. They
 *        used to exceed 8 characters and consequently caused problems for 
 *        FitsChans. 
+*     20-MAY-2005 (DSB):
+*        Correct the indexing of keywords produced in the Dump function.
 *class--
 */
 
@@ -1046,11 +1048,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       }
 
 /* Store the coefficient values used by the forward transformation. */
-      iv = 0;
+      iv = 1;
       for( i = 0; i < nout; i++ ){
-         for( j = 0; j < this->ncoeff_f[ i ]; j++ ){
+         for( j = 0; j < this->ncoeff_f[ i ]; j++, iv++ ){
             if( (this->coeff_f)[ i ][ j ] != AST__BAD ) {
-               (void) sprintf( buff, "CF%d", ++iv );
+               (void) sprintf( buff, "CF%d", iv );
                (void) sprintf( comm, "Coeff %d of forward polynomial %d", j + 1, i + 1 );
                astWriteDouble( channel, buff, 1, 1, (this->coeff_f)[ i ][ j ], comm );
             }
@@ -1059,12 +1061,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Store the input axis powers associated with each coefficient of the forward 
    transformation. */
-      iv = 0;
+      iv = 1;
       for( i = 0; i < nout; i++ ){
          for( j = 0; j < this->ncoeff_f[ i ]; j++ ){
-            for( k = 0; k < nin; k++ ){
+            for( k = 0; k < nin; k++, iv++ ){
                if( (this->power_f)[ i ][ j ][ k ] > 0 ) {
-                  (void) sprintf( buff, "PF%d", ++iv );
+                  (void) sprintf( buff, "PF%d", iv );
                   (void) sprintf( comm, "Power of i/p %d for coeff %d of fwd poly %d", k + 1, j + 1, i + 1 );
                   astWriteDouble( channel, buff, 1, 1, (this->power_f)[ i ][ j ][ k ], comm );
                }
@@ -1093,11 +1095,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       }
 
 /* Store the coefficient values used by the inverse transformation. */
-      iv = 0;
+      iv = 1;
       for( i = 0; i < nin; i++ ){
-         for( j = 0; j < this->ncoeff_i[ i ]; j++ ){
+         for( j = 0; j < this->ncoeff_i[ i ]; j++, iv++ ){
             if( (this->coeff_i)[ i ][ j ] != AST__BAD ) {
-               (void) sprintf( buff, "CI%d", ++iv );
+               (void) sprintf( buff, "CI%d", iv );
                (void) sprintf( comm, "Coeff %d of inverse polynomial %d", j + 1, i + 1 );
                astWriteDouble( channel, buff, 1, 1, (this->coeff_i)[ i ][ j ], comm );
             }
@@ -1106,12 +1108,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Store the output axis powers associated with each coefficient of the inverse 
    transformation. */
-      iv = 0;
+      iv = 1;
       for( i = 0; i < nin; i++ ){
          for( j = 0; j < this->ncoeff_i[ i ]; j++ ){
-            for( k = 0; k < nout; k++ ){
+            for( k = 0; k < nout; k++, iv++ ){
                if( (this->power_i)[ i ][ j ][ k ] > 0 ) {
-                  (void) sprintf( buff, "PI%d", ++iv );
+                  (void) sprintf( buff, "PI%d", iv );
                   (void) sprintf( comm, "Power of o/p %d for coeff %d of inv poly %d", k + 1, j + 1, i + 1 );
                   astWriteDouble( channel, buff, 1, 1, (this->power_i)[ i ][ j ][ k ], comm );
                }
