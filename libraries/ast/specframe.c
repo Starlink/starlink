@@ -2523,10 +2523,9 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Local Variables: */
    AstFrame *frame0;             /* Pointer to Frame underlying axis 0 */
-   AstSpecFrame *template;   /* Pointer to template SpecFrame structure */
+   AstSpecFrame *template;       /* Pointer to template SpecFrame structure */
    int iaxis0;                   /* Axis index underlying axis 0 */
    int match;                    /* Coordinate conversion possible? */
-   int target_naxes;             /* Number of target axes */
 
 /* Initialise the returned values. */
    *template_axes = NULL;
@@ -2540,9 +2539,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Obtain a pointer to the template SpecFrame structure. */
    template = (AstSpecFrame *) template_frame;
-
-/* Obtain the number of axes in the target Frame. */
-   target_naxes = astGetNaxes( target );
 
 /* Obtain pointers to the primary Frame which underlies the target axis. */
    astPrimaryFrame( target, 0, &frame0, &iaxis0 );
