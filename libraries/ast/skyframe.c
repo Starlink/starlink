@@ -3421,6 +3421,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
    double *b;                    /* Pointer to Cartesian coords array */
    double bb[3];                 /* Buffer for Cartesian coords */
    double p1[2];                 /* Buffer for Spherical coords */
+   double t1, t2;
    int result;                   /* Returned value */
 
 /* Initialise */
@@ -3465,7 +3466,10 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
 
 /* Check that the point is 90 degrees away from the pole of the great
    circle containing the line. */
-        if( fabs( slaDvdv( sl->dir, b ) ) <= 1.0E-7*sl->length ) result = 1;
+        t1 = slaDvdv( sl->dir, b );
+        t2 = 1.0E-7*sl->length;
+        if( t2 < 1.0E-10 ) t2 = 1.0E-10;
+        if( fabs( t1 ) <= t2 ) result = 1;
      }
    }
 
@@ -3785,6 +3789,9 @@ static int LineIncludes( SkyLineDef *l, double point[3] ) {
 *     error status set, or if it should fail for any reason.
 */
 
+/* Local Variables: */
+   double t1, t2, t3;
+
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
@@ -3792,8 +3799,10 @@ static int LineIncludes( SkyLineDef *l, double point[3] ) {
    the range 0 - 180 degs. Check it is less than the line length. Then
    check that the point is not more than 90 degs away from the quarter 
    point. */
-   return ( acos( slaDvdv( l->start, point ) ) < l->length && 
-            slaDvdv( l->q, point ) >= 0.0 );
+   t1 = slaDvdv( l->start, point );
+   t2 = acos( t1 );
+   t3 = slaDvdv( l->q, point );   
+   return ( ((l->length > 0) ? t2 < l->length : t2 == 0.0 ) && t3 >= -1.0E-8 );
 }
 
 static void LineOffset( AstFrame *this, AstLineDef *line, double par, 

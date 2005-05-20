@@ -496,7 +496,7 @@ static int GetBounded( AstRegion *this_region ) {
          result = 1;
 
 /* If neither of the two components is bounded, then the AND region is 
-   bounded if there is partial or no overlap between them and is unbounded
+   unbounded if there is partial or no overlap between them and is bounded
    otherwise. */
       } else {
          overlap = astOverlap( reg1, reg2 );

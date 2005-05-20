@@ -23651,6 +23651,8 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
    int lbad;          /* Was the previous cell corner bad? */
    int lost;          /* Has the curve been lost? */
    int ncell;         /* No. of cells in the fine grid */
+   int npass;         /* No. of passes through loop */
+   int npass_lim;     /* Maximum number of passes through loop to make */
    int test_edge;     /* Edge to test for a crossing */
 
 /* Check the global error status. */
@@ -23891,13 +23893,16 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
       ed = ed0;
 
 /* We now follow the curve until it crosses one of the edges of the grid, or 
-   is lost. */
+   is lost. Loops in the border may cause an infinte loop so abort after
+   half the cells in the grid have been checked. */
+      npass = 0;
+      npass_lim = 0.5*ncell*ncell;
       lost = 0;
-      while( !lost ){
+      while( !lost && npass++ < npass_lim ){
+         k = j*dim + i;
 
 /* Store pointers to the graphics and physical coordinates at the four corners 
    of the current cell. */
-         k = j*dim + i;
          gx[ 0 ] = ptr1[ 0 ] + k;
          gy[ 0 ] = ptr1[ 1 ] + k; 
          px[ 0 ] = ptr2[ 0 ] + k;

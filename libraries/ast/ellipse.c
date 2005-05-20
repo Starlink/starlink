@@ -1170,7 +1170,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    First get the Region which defines the uncertainty within the Ellipse being
    checked (in its base Frame), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );      
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of 
    the bounding box. */
@@ -1180,7 +1180,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box in the same Frame. */
    if( unc ) {
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Find the geodesic length of the diagonal of this bounding box. */
       l2 = astDistance( frm, lbnd_unc, ubnd_unc );

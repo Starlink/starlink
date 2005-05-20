@@ -1483,6 +1483,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 /* Local Variables: */
    AstPermMap *map;
    int *outperm;
+   int *inperm;
+   int result;
 
 /* Check inherited status */
    if( !astOK ) return AST__BAD;
@@ -1491,12 +1493,19 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    map = (AstPermMap *) this;
 
 /* Obtain a pointer to the appropriate output coordinate permutation array, 
-   according to whether the PermMap has been inverted. */
+   according to whether the PermMap has been inverted. If the specified 
+   output is derived from the specified input then the rate is unity. 
+   Otherwise it is zero. */
    outperm = astGetInvert( this ) ? map->inperm : map->outperm;
+   if( outperm ) {
+      result = ( ax2 == outperm[ ax1 ] ) ? 1.0 : 0.0;
 
-/* If the specified output is derived from the specified input then the
-   rate is unity. Otherwise it is zero. */
-   return ( ax2 == outperm[ ax1 ] ) ? 1.0 : 0.0;
+   } else {
+      inperm = astGetInvert( this ) ? map->outperm : map->inperm;
+      result = ( inperm[ ax2 ] == ax1 ) ? 1.0 : 0.0;
+   }
+
+   return result;
 }
 
 static AstPointSet *Transform( AstMapping *map, AstPointSet *in,

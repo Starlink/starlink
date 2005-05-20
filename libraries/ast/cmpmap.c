@@ -103,6 +103,7 @@ f     The CmpMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "permmap.h"             /* Coordinate permutation Mappings */
 #include "cmpmap.h"              /* Interface definition for this class */
+#include "frameset.h"            /* Interface definition for FrameSets */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -3043,13 +3044,26 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
 
 /* Initialise the CmpMap data. */
 /* --------------------------- */
-/* Store pointers to the component Mappings. */
-         new->map1 = astClone( map1 );
-         new->map2 = astClone( map2 );
+/* Store pointers to the component Mappings. Extract Mappings if
+   FrameSets are provided. */
+         if( astIsAFrameSet( map1 ) ) {
+            new->map1 = astGetMapping( (AstFrameSet *) map1, AST__BASE, 
+                                       AST__CURRENT );
+         } else {
+            new->map1 = astClone( map1 );
+         }
+
+         if( astIsAFrameSet( map2 ) ) {
+            new->map2 = astGetMapping( (AstFrameSet *) map2, AST__BASE, 
+                                       AST__CURRENT );
+         } else {
+            new->map2 = astClone( map2 );
+         }
+
 
 /* Save the initial values of the inversion flags for these Mappings. */
-         new->invert1 = astGetInvert( map1 );
-         new->invert2 = astGetInvert( map2 );
+         new->invert1 = astGetInvert( new->map1 );
+         new->invert2 = astGetInvert( new->map2 );
 
 /* Note whether the Mappings are joined in series (instead of in parallel),
    constraining this flag to be 0 or 1. */

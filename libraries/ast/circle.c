@@ -955,7 +955,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length withi the base Frame of "this" of the diagonal of 
    the bounding box. */
@@ -966,7 +966,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( unc ) {
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Find the geodesic length of the diagonal of this bounding box. */
       l2 = astDistance( frm, lbnd_unc, ubnd_unc );

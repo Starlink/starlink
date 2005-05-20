@@ -565,7 +565,7 @@
       int1 = ast_interval( frm1, lbnd, ubnd, unc, ' ', status )
 
       outperm(1) = 2
-      outperm(2) = 0
+      outperm(2) = -1
       outperm(3) = 1
      
       inperm(1) = 3
@@ -587,13 +587,13 @@
       in( 1, 2 ) = 0.0
       in( 1, 3 ) = -0.5
       in( 2, 1 ) = 20.0   ! Inside
-      in( 2, 2 ) = 10.0
+      in( 2, 2 ) = 0.0
       in( 2, 3 ) = -0.5
       in( 3, 1 ) = 20.0   ! Outside
       in( 3, 2 ) = -10.0
       in( 3, 3 ) = 0.5
       in( 4, 1 ) = 20.0   ! Boundary
-      in( 4, 2 ) = -10.0
+      in( 4, 2 ) = 0.0
       in( 4, 3 ) = -2.0
 
       call ast_trann( reg, 4, 3, 4, in, .true., 3, 4, out, status )
@@ -1741,7 +1741,7 @@ C
 
 
       outperm(1) = 2
-      outperm(2) = 0
+      outperm(2) = -1
       outperm(3) = 1
      
       inperm(1) = 3
@@ -1752,7 +1752,7 @@ C
       frm2 = ast_frame( 3, 'Domain=B', status )
       reg = ast_mapregion( box1, pm, frm2, status )
 
-      if( .not. ast_isainterval( reg, status ) ) call stopit( status, 
+      if( .not. ast_isabox( reg, status ) ) call stopit( status, 
      :                                            'Box: perm check 1' )
       if( hasFrameSet( reg, status ) ) call stopit( status, 
      :                                            'Box: perm check 2' )
@@ -1763,13 +1763,13 @@ C
       in( 1, 2 ) = 0.0
       in( 1, 3 ) = 0.0
       in( 2, 1 ) = 0.7   ! Inside
-      in( 2, 2 ) = 10.0
+      in( 2, 2 ) = 0.0
       in( 2, 3 ) = -0.5
       in( 3, 1 ) = 2.0   ! Outside
-      in( 3, 2 ) = -10.0
+      in( 3, 2 ) = 0.0
       in( 3, 3 ) = -1.0
       in( 4, 1 ) = 1.5   ! Boundary
-      in( 4, 2 ) = 0.5
+      in( 4, 2 ) = 0.0
       in( 4, 3 ) = 0.0
 
       call ast_trann( reg, 4, 3, 4, in, .true., 3, 4, out, status )

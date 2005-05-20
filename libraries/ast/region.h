@@ -105,6 +105,7 @@ typedef struct AstRegionVtab {
    void (* RegSetAttrib)( AstRegion *, const char *, char ** );
    void (* RegClearAttrib)( AstRegion *, const char *, char ** );
    void (* GetRegionBounds)( AstRegion *, double *, double * );
+   void (* GetUncBounds)( AstRegion *, double *, double * );
    void (* GetRegionBounds2)( AstRegion *, double *, double * );
    void (* ClearUnc)( AstRegion * );
    void (* RegOverlay)( AstRegion *, AstRegion * );
@@ -219,6 +220,7 @@ AstRegion *astGetUnc_( AstRegion *, int );
 void astGetRegionBounds_( AstRegion *, double *, double * );
 
 #if defined(astCLASS)            /* Protected */
+void astGetUncBounds_( AstRegion *, double *, double * );
 void astGetRegionBounds2_( AstRegion *, double *, double * );
 AstRegion *astMapRegion_( AstRegion *, AstMapping *, AstFrame * );
 AstFrame *astRegFrame_( AstRegion * );
@@ -359,6 +361,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 /* ----------------------------------------- */
 #if defined(astCLASS)            /* Protected */
 
+#define astGetUncBounds(this,lbnd,ubnd) astINVOKE(V,astGetUncBounds_(astCheckRegion(this),lbnd,ubnd))
 #define astGetRegionBounds2(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds2_(astCheckRegion(this),lbnd,ubnd))
 #define astClearUnc(this) astINVOKE(V,astClearUnc_(astCheckRegion(this)))
 #define astDumpUnc(this) astINVOKE(V,astDumpUnc_(astCheckRegion(this)))

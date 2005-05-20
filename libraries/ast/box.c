@@ -427,7 +427,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    if( axval ) {
 
 /* Get the bounding box of the uncertainty region. */
-      astGetRegionBounds( unc, lbnd, ubnd ); 
+      astGetUncBounds( unc, lbnd, ubnd ); 
 
 /* We fit the box one axis at a time. */
       for( ic = 0; ic < nc; ic++ ) {
@@ -696,7 +696,7 @@ static void Cache( AstBox *this, int lohi ){
 /* Get the bounding box of the uncertainty Region in the base Frame of
    the supplied Box. */
             unc = astGetUncFrm( this, AST__BASE );
-            astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
+            astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Ensure the shrunk extents are at least half the width of the uncertainty 
    bounding box. */
@@ -1741,17 +1741,16 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    First get the Region which defines the uncertainty within the Box being
    checked (in its base Frame), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );      
-
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box. */
    if( unc ) {
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
    } else {
       lbnd_unc = NULL;
       ubnd_unc = NULL;
@@ -1765,12 +1764,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( astOK ) {
       if( unc ) {
          for( i = 0; i < nc; i++ ) {
-            wid[ i ] = 0.5*( astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] )
-                           + astAxDistance( frm, i + 1, lbnd_unc[ i ], ubnd_unc[ i ] ) );
+            wid[ i ] = 0.5*( fabs( astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] ) )
+                           + fabs( astAxDistance( frm, i + 1, lbnd_unc[ i ], ubnd_unc[ i ] ) ) );
          }
       } else {
          for( i = 0; i < nc; i++ ) {
-            wid[ i ] = 0.5*astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] );
+            wid[ i ] = fabs( 0.5*astAxDistance( frm, i + 1, lbnd_tunc[ i ], ubnd_tunc[ i ] ) );
          }
       }
 
@@ -2193,8 +2192,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 */
 
 /* Local Variables: */
-   AstBox *newbox;               /* Pointer to simpler Box */
    AstBox *box;                  /* Pointer to Box structure */
+   AstBox *newbox;               /* Pointer to simpler Box */
    AstFrame *frm;                /* Pointer to current Frame */
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
@@ -2211,8 +2210,13 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    double *lbnd;                 /* Lower bounds for new Box */
    double *ubnd;                 /* Upper bounds for new Box */
    double corners[8];            /* Box corners in current Frame */
+   double det;                   /* Determinant of Jacobian matrix */
    double k;                     /* Axis constant value */
    double lb;                    /* Lower axis bound */
+   double rxx;                   /* Element of the Jacobian matrix */
+   double rxy;                   /* Element of the Jacobian matrix */
+   double ryx;                   /* Element of the Jacobian matrix */
+   double ryy;                   /* Element of the Jacobian matrix */
    double ub;                    /* Upper axis bound */
    int *inperm;                  /* Input axis permutation array */
    int *outperm;                 /* Output axis permutation array */
@@ -2323,7 +2327,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* If any base Frame axes are not present in the current Frame, we need
    to check that the PermMap selects a slice which intersects the base
-   Frame box. If th eslice does not intersect the base Frame box, then
+   Frame box. If the slice does not intersect the base Frame box, then
    the resulting Region willbe NullRegion. To do this, we check each
    element in the input axis permutation array, "inperm". */
          for( ic = 0; ic < nin; ic++ ) {
@@ -2451,17 +2455,47 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             box = (AstBox *) new;
             Cache( box, 0 );
 
-            ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
-            ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
+/* If the determinant of the Jacobian matrix of the Mapping is negative
+   then a clockwise rotation is mapped into an anti-clockwise rotation
+   by the Mapping. We need to know this in order to determine the order
+   in which to store the polygon vertices. */
+            rxx = astRate( map, box->centre, 0, 0 );
+            rxy = astRate( map, box->centre, 0, 1 );
+            ryx = astRate( map, box->centre, 1, 0 );
+            ryy = astRate( map, box->centre, 1, 1 );
+            det = rxx*ryy - rxy*ryx;
 
-            ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
-            ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+/* If the mapping does not reverse rotation, store the corners in an
+   anti-clockwise order as required by the Polygon constructor. */
+            if( det > 0.0 ) {
+               ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
+               ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 1 ] = box->centre[ 0 ] - box->extent[ 0 ];
+               ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 2 ] = box->centre[ 0 ] + box->extent[ 0 ];
+               ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 3 ] = box->centre[ 0 ] + box->extent[ 0 ];
+               ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-            ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
-            ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
-
-            ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
-            ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
+/* Otherwise, store the corners in a clockwise order so tha the mapping will 
+   then turn them into an anti-clockwise order, as required by the Polygon 
+   constructor. */
+            } else {
+               ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
+               ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
+               ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
+               ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+   
+               ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
+               ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
+            }
          }
 
 /* Transform the Box corners into the current Frame. */
@@ -3296,10 +3330,12 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
       if( point1[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
                    "undefined at point 1 of the box.", name, i + 1 );
+         break;
       } 
       if( point2[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
                    "undefined at point 2 of the box.", name, i + 1 );
+         break;
       }
       ptr[ i ][ 0 ] = point1[ i ];
       ptr[ i ][ 1 ] = point2[ i ];

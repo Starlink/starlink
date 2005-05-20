@@ -183,7 +183,10 @@ static void Cache( AstPolygon *this ){
    double end[2];       /* Start position for edge */
    double start[2];     /* Start position for edge */
    int i;               /* Axis index */
+   int j;               /* Axis index */
    int nv;              /* Number of vertices in Polygon */
+   int nzedge;          /* INdex of edge used to define interior point */
+   int good;            /* Is interior point not on any edge? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -224,13 +227,46 @@ static void Cache( AstPolygon *this ){
             start[ 0 ] = end[ 0 ];
             start[ 1 ] = end[ 1 ];
          }     
-   
-/* Find a point which is just inside the Polygon. This is 1.0E-6 of the
-   length of the first edge away from the mid point of the first edge 
-   (on the inside). We assume that no other edge will be closer than 
-   this to the mid point of the first edge. */
-         d = this->edges[0]->length;
-         astLineOffset( frm,this->edges[0], 0.5*d, 1.0E-6*d, this->in );
+
+/* Find an edge which has non-zero length and for which the start
+   position is not contained in any other edge (the end position of each
+   line will be checked as the start position of the next line). */
+         nzedge = -1;
+         start[ 0 ] = ptr[ 0 ][ nv - 1 ];
+         start[ 1 ] = ptr[ 1 ][ nv - 1 ];
+         for( i = 0; i < nv; i++ ) {
+            if( this->edges[ i ]->length > 0.0 ) {
+               good = 1;
+               for( j = 0; j < nv; j++ ) {
+                  if( j != i ) {
+                     if( astLineContains( frm, this->edges[ j ], 0, start ) ) {
+                        good = 0;
+                        break;
+                     } 
+                  }
+               }
+               if( good ){
+                  nzedge = i;
+                  break;
+               } 
+            }
+            start[ 0 ] = ptr[ 0 ][ i ];
+            start[ 1 ] = ptr[ 1 ][ i ];
+         }
+
+/* Report an error if no such edge was found. */
+         if( nzedge < 0 ) {
+            if( astOK ) astError( AST__BADIN, "astInitPolygon(%s): Degenerate "
+                                  "(zero-area) polygon supplied.",
+                                  astGetClass( this ) );
+
+/* Otherwise, find a point which is just inside the Polygon. This is 1.0E-6
+   of the length of the edge found above away from the mid point of the 
+   edge (on the inside). */
+         } else {
+            d = this->edges[nzedge]->length;
+            astLineOffset( frm,this->edges[nzedge], 0.5*d, 1.0E-6*d, this->in );
+         }
       }
    
 /* Free resources */
@@ -816,7 +852,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    Frame of the uncertainty Region is the same as the base Frame of the
    Polygon. */
    tunc = astGetUncFrm( this, AST__BASE );      
-   astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc ); 
+   astGetUncBounds( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of 
    the bounding box. */
@@ -826,7 +862,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* Also get the Region which defines the uncertainty of the supplied points
    and get its bounding box in the same Frame. */
    if( unc ) {
-      astGetRegionBounds( unc, lbnd_unc, ubnd_unc ); 
+      astGetUncBounds( unc, lbnd_unc, ubnd_unc ); 
 
 /* Find the geodesic length of the diagonal of this bounding box. */
       l2 = astDistance( frm, lbnd_unc, ubnd_unc );
