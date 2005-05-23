@@ -25,6 +25,10 @@ STAR_CHECK_PROGS(tk,Tk_Init)
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
+AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
+
+AC_ARG_WITH(tk, [  --with-tk              directory containing tk configuration (tkConfig.sh)], with_tkconfig=${withval})
+
 dnl    Define subdirectories which need to be recursed into
 itcl_subdirs="itcl itk iwidgets2.2.0 iwidgets3.0.0"
 AC_SUBST(itcl_subdirs)
@@ -48,7 +52,9 @@ export star_extra_items
          cmd="./configure --prefix=$prefix \
                           --srcdir=. \
                           $star_extra_items \
-                          --cache-file=../config.cache"; \
+                          --cache-file=../config.cache" \
+                          --with-tcl=$with_tcl \
+                          --with-tk=$with_tk; \
          echo $cmd; \
          $cmd; ) \
     done
