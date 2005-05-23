@@ -54,7 +54,7 @@ export star_extra_items
                           $star_extra_items \
                           --cache-file=../config.cache" \
                           --with-tcl=$with_tcl \
-                          --with-tk=$with_tk; \
+                          --with-tk=$with_tk"; \
          echo $cmd; \
          $cmd; ) \
     done
