@@ -10765,7 +10765,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        - "AWAV" or "AIRWAVE": Wave-length in air (Angstrom)
 *        - "VRAD" or "VRADIO": Radio velocity (km/s)
 *        - "VOPT" or "VOPTICAL": Optical velocity (km/s)
-*        - "ZOPT" or "REDSHIFT": Reshift (dimensionless)
+*        - "ZOPT" or "REDSHIFT": Redshift (dimensionless)
 *        - "BETA": Beta factor (dimensionless)
 *        - "VELO" or "VREL": Apparent radial ("relativistic") velocity (km/s)
 *
