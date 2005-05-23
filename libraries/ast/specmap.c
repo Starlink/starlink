@@ -2572,7 +2572,7 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "WNTOFR": Convert wave number to frequency.
 *     - "FRTOWN": Convert frequency to wave number.
 *     - "WVTOFR": Convert wavelength (vacuum) to frequency.
-*     - "FRTOWV": Convert fFrequency to wavelength (vacuum).
+*     - "FRTOWV": Convert frequency to wavelength (vacuum).
 *     - "AWTOFR": Convert wavelength (air) to frequency.
 *     - "FRTOAW": Convert frequency to wavelength (air).
 *     - "VRTOVL": Convert radio to relativistic velocity.
