@@ -15,16 +15,14 @@ dnl    Get EXEEXT for make.config
 
 AC_PROG_MAKE_SET
 
-AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
-
 dnl    To configure Tcl, run ./configure in the `unix' directory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
 dnl    to try to reconfigure that directory, and automake to assume 
 dnl    it's allowed to play there, too.
 (
     cd unix
-    echo ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl
-    ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl
+    echo ./configure --prefix=$prefix --cache-file=config.cache
+    ./configure --prefix=$prefix --cache-file=config.cache
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([
