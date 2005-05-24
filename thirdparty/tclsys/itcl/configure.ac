@@ -63,7 +63,7 @@ export star_extra_items
 STAR_SPECIAL_INSTALL_COMMAND([
         for d in @itcl_subdirs@;
         do
-           ( cd $$d; $(MAKE) INSTALL_ROOT=$$DESTDIR install );
+           ( cd $$d; $(MAKE) INSTALL_ROOT=$$DESTDIR DESTDIR=$$DESTDIR install );
         done])
 
 AC_CONFIG_FILES([Makefile component.xml make.config])
