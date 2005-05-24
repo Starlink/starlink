@@ -52,7 +52,7 @@ export star_extra_items
          cmd="./configure --prefix=$prefix \
                           --srcdir=. \
                           $star_extra_items \
-                          --cache-file=../config.cache" \
+                          --cache-file=../config.cache \
                           --with-tcl=$with_tcl \
                           --with-tk=$with_tk"; \
          echo $cmd; \
