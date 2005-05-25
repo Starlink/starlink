@@ -144,7 +144,12 @@ tclIndex: $(LIBRARY_FILES)
            'set auto_index(adam_start) [list load [file join $$dir [concat libtclAdam[info sharedlibextension]] ] tclAdam]'
 
 EXTRA_DIST = $(PRIVATE_INCLUDES) $(LIBRARY_FILES) adamMessageRelay.in adamtest.in \
-             gwmXrefresh.in gwm.in startcl_test startcl_test2 tester.sh nbstrace
+             gwmXrefresh.in gwm.in startcl_test startcl_test2 tester.sh nbstrace \
+             gwm.help
 
 dist_starnews_DATA = startcl.news
+
+CLEANFILES = gwmXrefresh gwm adamtest adamMessageRelay tclIndex
+
+
 
