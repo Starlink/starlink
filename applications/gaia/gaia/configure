@@ -3632,7 +3632,6 @@ fi
 #  "FFLAGS".
 echo "$as_me:$LINENO: checking Fortran flags" >&5
 echo $ECHO_N "checking Fortran flags... $ECHO_C" >&6
-echo "FCFLAGS = $FCFLAGS"
 FFLAGS=${FCFLAGS:--O}
 if test -z "${FCFLAGS}"; then
    if test "${FC}" = "g77"; then
