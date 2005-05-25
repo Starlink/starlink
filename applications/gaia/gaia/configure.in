@@ -567,16 +567,21 @@ fi
 AC_MSG_RESULT($STARLINK)
 AC_SUBST(STARLINK)
 
-#  Name of Fortran compiler
+#  Name of Fortran compiler, should be part of CVS environment?
 if test "${FC}" = ""; then
+   echo "FC set to blank"
    AC_CHECK_PROGS( FC, g77 f77, fort77 )
 fi
 
-#  Compilation flags, for g77 we also need -fno-second-underscore.
+#  Compilation flags, for g77 we also need -fno-second-underscore. 
+#  Note we now use the newer "FCFLAGS" from the environment in preference to
+#  "FFLAGS".
 AC_MSG_CHECKING([Fortran flags])
-FFLAGS=${FFLAGS=-O}
-if test "${FC}" = "g77"; then
-   FFLAGS="$FFLAGS -fno-second-underscore"
+FFLAGS=${FCFLAGS:--O}
+if test -z "${FCFLAGS}"; then
+   if test "${FC}" = "g77"; then
+      FFLAGS="$FFLAGS -fno-second-underscore"
+   fi
 fi
 AC_MSG_RESULT($FFLAGS)
 AC_SUBST(FFLAGS)
@@ -594,74 +599,78 @@ AC_CHECK_PROG(ALINK,alink,alink,${STARLINK}/bin/alink)
 #  C/C++ program that has f77 libraries or subroutines.
 #--------------------------------------------------------------------
 #  Create a dummy program.
-AC_MSG_CHECKING([mixed language libraries])
+dnl None of this is used in the CVS system. AST provides the necessary
+dnl command to link against Fortran.
+dnl
+dnl AC_MSG_CHECKING([mixed language libraries])
 
-echo >  /tmp/tmp$$.f "      program tmp"
-echo >> /tmp/tmp$$.f "      end"
+dnl echo >  /tmp/tmp$$.f "      program tmp"
+dnl echo >> /tmp/tmp$$.f "      end"
 
-#  Compile it and get the complete ld line used (assumes -v echos
-#  all commands performed by compiler).
-${FC} -v -o /tmp/tmp$$ /tmp/tmp$$.f 2> /tmp/tmp$$.log 1>&2
+dnl #  Compile it and get the complete ld line used (assumes -v echos
+dnl #  all commands performed by compiler).
+dnl ${FC} -v -o /tmp/tmp$$ /tmp/tmp$$.f 2> /tmp/tmp$$.log 1>&2
 
-#  Now for the tricky bit.
-#  First we need to strip out the ld line. First form assumes /xxx/ld
-#  and second ' /xxx/ld ' (g77).
-ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
-if test "$ldline" = "" ; then
-   ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
-fi
+dnl #  Now for the tricky bit.
+dnl #  First we need to strip out the ld line. First form assumes /xxx/ld
+dnl #  and second ' /xxx/ld ' (g77).
+dnl ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
+dnl if test "$ldline" = "" ; then
+dnl    ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
+dnl fi
 
-#  Now we try to keep words that are -lxxx -Lxxx */lib*.a,
-#  i.e. library references.
-F77_LIBS=""
-for w in $ldline
-do
-   case $w in
-      -l* | -L* | */lib*\.a ) F77_LIBS="$F77_LIBS $w";;
-   esac
-done
-rm /tmp/tmp$$
-rm /tmp/tmp$$.f
-rm /tmp/tmp$$.log
-AC_MSG_RESULT($F77_LIBS)
-AC_SUBST(F77_LIBS)
+dnl #  Now we try to keep words that are -lxxx -Lxxx */lib*.a,
+dnl #  i.e. library references.
+dnl F77_LIBS=""
+dnl for w in $ldline
+dnl do
+dnl    case $w in
+dnl       -l* | -L* | */lib*\.a ) F77_LIBS="$F77_LIBS $w";;
+dnl    esac
+dnl done
+dnl rm /tmp/tmp$$
+dnl rm /tmp/tmp$$.f
+dnl rm /tmp/tmp$$.log
+dnl AC_MSG_RESULT($F77_LIBS)
+dnl AC_SUBST(F77_LIBS)
 
-#   If using g77, locate libf2c.a and remove main.o, this
-#   clashes with main in tkAppinit.C.
-if test "$FC" = "g77"; then
-   AC_MSG_CHECKING([main in -lf2c])
+dnl #   If using g77, locate libf2c.a and remove main.o, this
+dnl #   clashes with main in tkAppinit.C.
+dnl g77 currently uses g2c and this problem has been resolved.
+dnl if test "$FC" = "g77"; then
+dnl    AC_MSG_CHECKING([main in -lf2c])
 
-#  Create and compile a dummy program. The compilation uses
-#  -v to get all the information we should require.
-   ffile=/tmp/tmp$$
-   echo >  ${ffile}.f "      program test"
-   echo >> ${ffile}.f "      end"
-   $FC -v -o $ffile ${ffile}.f 2> ${ffile}.log 1>&2
+dnl #  Create and compile a dummy program. The compilation uses
+dnl #  -v to get all the information we should require.
+dnl    ffile=/tmp/tmp$$
+dnl    echo >  ${ffile}.f "      program test"
+dnl    echo >> ${ffile}.f "      end"
+dnl    $FC -v -o $ffile ${ffile}.f 2> ${ffile}.log 1>&2
 
-#  Look for ld line.
-   ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
-   if test "$ldline" = "" ; then
-      ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
-   fi
+dnl #  Look for ld line.
+dnl    ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
+dnl    if test "$ldline" = "" ; then
+dnl       ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
+dnl    fi
 
-#  Now we try each word of this line until we can concatenate it
-#  with the string "libf2c.a" and locate the library.  i.e. directory
-#  references for libraries
-   for w in $ldline ""; do
-      cw=`echo $w | sed -e 's:-L::'`
-      if test -e "${cw}/libf2c.a"; then
-         cp -p ${cw}/libf2c.a ./libf2c.a
-         ar d ./libf2c.a main.o
-         AC_MSG_RESULT([removed])
-         break
-      fi
-   done
+dnl #  Now we try each word of this line until we can concatenate it
+dnl #  with the string "libf2c.a" and locate the library.  i.e. directory
+dnl #  references for libraries
+dnl    for w in $ldline ""; do
+dnl       cw=`echo $w | sed -e 's:-L::'`
+dnl       if test -e "${cw}/libf2c.a"; then
+dnl          cp -p ${cw}/libf2c.a ./libf2c.a
+dnl          ar d ./libf2c.a main.o
+dnl          AC_MSG_RESULT([removed])
+dnl          break
+dnl       fi
+dnl    done
 
-#  Clean up the mess.
-   rm -f /tmp/tmp$$
-   rm -f /tmp/tmp$$.f
-   rm -f /tmp/tmp$$.log
-fi
+dnl #  Clean up the mess.
+dnl    rm -f /tmp/tmp$$
+dnl    rm -f /tmp/tmp$$.f
+dnl    rm -f /tmp/tmp$$.log
+dnl fi
 
 #--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.

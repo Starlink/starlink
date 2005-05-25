@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="src/StarRtdImage.C"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS GAIA_VERSION SRC_ROOT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX LIBTOOL TCLUTIL_DEFS LD_VARNAME LIB_RUNTIME_DIR TCLTK_ROOT TCLUTIL_VERSION ASTROTCL_VERSION RTD_VERSION CAT_VERSION TCL_VERSION TK_VERSION ITCL_VERSION ITK_VERSION TCLX_VERSION BLT_VERSION CXX_INCLUDE CXX_DEPEND_FLAGS OSVERSION DEPEND_TARGET CDEBUGFLAGS CXXDEBUGFLAGS SHARED SHLIB_CFLAGS SHLIB_LD SHLIB_SUFFIX SHLIB_LD_LIBS DL_LIBS LD_FLAGS LD_SEARCH_FLAGS XINCSW XLIBSW TCL_LIB_SPEC TK_LIB_SPEC TCLX_LIB_SPEC ITCL_LIB_SPEC ITK_LIB_SPEC BLT_LIB_SPEC TCLINCSW TKINCSW XLIBSW_STATIC TCL_LIB_SPEC_STATIC TK_LIB_SPEC_STATIC TCLX_LIB_SPEC_STATIC ITCL_LIB_SPEC_STATIC ITK_LIB_SPEC_STATIC BLT_LIB_SPEC_STATIC TIX_LIB_SPEC TIX_LIB_SPEC_STATIC TCL_LIBRARY TK_LIBRARY BLT_LIBRARY TCLUTIL_LIBRARY ASTROTCL_LIBRARY RTD_LIBRARY CAT_LIBRARY SKYCAT_LIBRARY ITCL_LIBRARY ITK_LIBRARY TCLX_LIBRARY IWIDGETS_VERSION IWIDGETS_LIBRARY TCLUTIL_LIB TCLUTIL_LIB_SPEC TCLUTIL_LIB_STATIC TCLUTIL_BUILD_LIBRARY ASTROTCL_LIB ASTROTCL_LIB_SPEC ASTROTCL_LIB_STATIC ASTROTCL_BUILD_LIBRARY RTD_LIB RTD_LIB_SPEC RTD_LIB_STATIC RTD_BUILD_LIBRARY CAT_LIB CAT_LIB_SPEC CAT_LIB_STATIC CAT_BUILD_LIBRARY SKYCAT_LIB SKYCAT_LIB_SPEC SKYCAT_LIB_STATIC SKYCAT_BUILD_LIBRARY STARLINK FC FFLAGS LN_S LINK ALINK F77_LIBS DESTDIR BINDIR LIBDIR GAIA_DIR GAIA_LIBRARY GAIA_BUILD_LIBRARY LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS GAIA_VERSION SRC_ROOT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX LIBTOOL TCLUTIL_DEFS LD_VARNAME LIB_RUNTIME_DIR TCLTK_ROOT TCLUTIL_VERSION ASTROTCL_VERSION RTD_VERSION CAT_VERSION TCL_VERSION TK_VERSION ITCL_VERSION ITK_VERSION TCLX_VERSION BLT_VERSION CXX_INCLUDE CXX_DEPEND_FLAGS OSVERSION DEPEND_TARGET CDEBUGFLAGS CXXDEBUGFLAGS SHARED SHLIB_CFLAGS SHLIB_LD SHLIB_SUFFIX SHLIB_LD_LIBS DL_LIBS LD_FLAGS LD_SEARCH_FLAGS XINCSW XLIBSW TCL_LIB_SPEC TK_LIB_SPEC TCLX_LIB_SPEC ITCL_LIB_SPEC ITK_LIB_SPEC BLT_LIB_SPEC TCLINCSW TKINCSW XLIBSW_STATIC TCL_LIB_SPEC_STATIC TK_LIB_SPEC_STATIC TCLX_LIB_SPEC_STATIC ITCL_LIB_SPEC_STATIC ITK_LIB_SPEC_STATIC BLT_LIB_SPEC_STATIC TIX_LIB_SPEC TIX_LIB_SPEC_STATIC TCL_LIBRARY TK_LIBRARY BLT_LIBRARY TCLUTIL_LIBRARY ASTROTCL_LIBRARY RTD_LIBRARY CAT_LIBRARY SKYCAT_LIBRARY ITCL_LIBRARY ITK_LIBRARY TCLX_LIBRARY IWIDGETS_VERSION IWIDGETS_LIBRARY TCLUTIL_LIB TCLUTIL_LIB_SPEC TCLUTIL_LIB_STATIC TCLUTIL_BUILD_LIBRARY ASTROTCL_LIB ASTROTCL_LIB_SPEC ASTROTCL_LIB_STATIC ASTROTCL_BUILD_LIBRARY RTD_LIB RTD_LIB_SPEC RTD_LIB_STATIC RTD_BUILD_LIBRARY CAT_LIB CAT_LIB_SPEC CAT_LIB_STATIC CAT_BUILD_LIBRARY SKYCAT_LIB SKYCAT_LIB_SPEC SKYCAT_LIB_STATIC SKYCAT_BUILD_LIBRARY STARLINK FC FFLAGS LN_S LINK ALINK DESTDIR BINDIR LIBDIR GAIA_DIR GAIA_LIBRARY GAIA_BUILD_LIBRARY LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3581,8 +3581,9 @@ echo "$as_me:$LINENO: result: $STARLINK" >&5
 echo "${ECHO_T}$STARLINK" >&6
 
 
-#  Name of Fortran compiler
+#  Name of Fortran compiler, should be part of CVS environment?
 if test "${FC}" = ""; then
+   echo "FC set to blank"
    for ac_prog in g77 f77
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3627,11 +3628,16 @@ test -n "$FC" || FC="fort77 "
 fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore.
+#  Note we now use the newer "FCFLAGS" from the environment in preference to
+#  "FFLAGS".
 echo "$as_me:$LINENO: checking Fortran flags" >&5
 echo $ECHO_N "checking Fortran flags... $ECHO_C" >&6
-FFLAGS=${FFLAGS=-O}
-if test "${FC}" = "g77"; then
-   FFLAGS="$FFLAGS -fno-second-underscore"
+echo "FCFLAGS = $FCFLAGS"
+FFLAGS=${FCFLAGS:--O}
+if test -z "${FCFLAGS}"; then
+   if test "${FC}" = "g77"; then
+      FFLAGS="$FFLAGS -fno-second-underscore"
+   fi
 fi
 echo "$as_me:$LINENO: result: $FFLAGS" >&5
 echo "${ECHO_T}$FFLAGS" >&6
@@ -3695,78 +3701,15 @@ fi
 #  C/C++ program that has f77 libraries or subroutines.
 #--------------------------------------------------------------------
 #  Create a dummy program.
-echo "$as_me:$LINENO: checking mixed language libraries" >&5
-echo $ECHO_N "checking mixed language libraries... $ECHO_C" >&6
-
-echo >  /tmp/tmp$$.f "      program tmp"
-echo >> /tmp/tmp$$.f "      end"
-
-#  Compile it and get the complete ld line used (assumes -v echos
-#  all commands performed by compiler).
-${FC} -v -o /tmp/tmp$$ /tmp/tmp$$.f 2> /tmp/tmp$$.log 1>&2
-
-#  Now for the tricky bit.
-#  First we need to strip out the ld line. First form assumes /xxx/ld
-#  and second ' /xxx/ld ' (g77).
-ldline=`grep '^[^\ ]*ld[\ ]' /tmp/tmp$$.log`
-if test "$ldline" = "" ; then
-   ldline=`grep '[^\ ]*ld[\ ]' /tmp/tmp$$.log`
-fi
-
-#  Now we try to keep words that are -lxxx -Lxxx */lib*.a,
-#  i.e. library references.
-F77_LIBS=""
-for w in $ldline
-do
-   case $w in
-      -l* | -L* | */lib*\.a ) F77_LIBS="$F77_LIBS $w";;
-   esac
-done
-rm /tmp/tmp$$
-rm /tmp/tmp$$.f
-rm /tmp/tmp$$.log
-echo "$as_me:$LINENO: result: $F77_LIBS" >&5
-echo "${ECHO_T}$F77_LIBS" >&6
 
 
-#   If using g77, locate libf2c.a and remove main.o, this
-#   clashes with main in tkAppinit.C.
-if test "$FC" = "g77"; then
-   echo "$as_me:$LINENO: checking main in -lf2c" >&5
-echo $ECHO_N "checking main in -lf2c... $ECHO_C" >&6
 
-#  Create and compile a dummy program. The compilation uses
-#  -v to get all the information we should require.
-   ffile=/tmp/tmp$$
-   echo >  ${ffile}.f "      program test"
-   echo >> ${ffile}.f "      end"
-   $FC -v -o $ffile ${ffile}.f 2> ${ffile}.log 1>&2
 
-#  Look for ld line.
-   ldline=`grep '^[^\ ]*ld[\ ]' /tmp/tmp$$.log`
-   if test "$ldline" = "" ; then
-      ldline=`grep '[^\ ]*ld[\ ]' /tmp/tmp$$.log`
-   fi
 
-#  Now we try each word of this line until we can concatenate it
-#  with the string "libf2c.a" and locate the library.  i.e. directory
-#  references for libraries
-   for w in $ldline ""; do
-      cw=`echo $w | sed -e 's:-L::'`
-      if test -e "${cw}/libf2c.a"; then
-         cp -p ${cw}/libf2c.a ./libf2c.a
-         ar d ./libf2c.a main.o
-         echo "$as_me:$LINENO: result: removed" >&5
-echo "${ECHO_T}removed" >&6
-         break
-      fi
-   done
 
-#  Clean up the mess.
-   rm -f /tmp/tmp$$
-   rm -f /tmp/tmp$$.f
-   rm -f /tmp/tmp$$.log
-fi
+
+
+
 
 #--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.
@@ -4556,7 +4499,6 @@ s,@FFLAGS@,$FFLAGS,;t t
 s,@LN_S@,$LN_S,;t t
 s,@LINK@,$LINK,;t t
 s,@ALINK@,$ALINK,;t t
-s,@F77_LIBS@,$F77_LIBS,;t t
 s,@DESTDIR@,$DESTDIR,;t t
 s,@BINDIR@,$BINDIR,;t t
 s,@LIBDIR@,$LIBDIR,;t t
