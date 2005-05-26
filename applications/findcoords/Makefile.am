@@ -2,7 +2,7 @@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-dist_bin_SCRIPTS = findcoords
+nodist_bin_SCRIPTS = findcoords
 dist_starnews_DATA = findcoords.news
 
 # The findcoords script needs to have installation locations edited into it
