@@ -2,12 +2,15 @@
 
 SUBDIRS = subs tasks sun137
 
-dist_bin_SCRIPTS = pongo.icl pongowww icl/pongo_proc.icl
+dist_bin_SCRIPTS = pongo.icl pongowww 
+nodist_bin_SCRIPTS = icl/pongo_proc.icl
+
 bin_MONOLITHS = pongo_mon
 dist_noinst_SCRIPTS = pongo_link_adam
 
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
-dist_pkgdata_DATA = $(PONGO_EXAMPLES) $(EXAMPLE_DATA_FILES)
+nodist_pkgdata_DATA = $(PONGO_EXAMPLES)
+dist_pkgdata_DATA = $(EXAMPLE_DATA_FILES)
 dist_starnews_DATA = pongo.news
 bindatadir = $(bindir)
 bindata_DATA = $(DATA_FILES)
@@ -29,6 +32,8 @@ icl/spectrum.icl icl/ppdotdiag.icl icl/histogram.icl		    \
 icl/errors.icl icl/ellipses.icl icl/agi.icl icl/interactive.icl \
 icl/cover.icl icl/figures.icl icl/radec.icl icl/vector.icl
 
+PONGO_EXAMPLES_INFILES = $(PONGO_EXAMPLES:.icl=.icl.in)
+
 EXAMPLE_DATA_FILES = data/dor.sdf data/cljon.dat data/ellipses.dat \
 data/ppdot.dat data/tutorial.dat data/swp3196.lap data/highppm.dat \
 data/gridlabels.dat
@@ -48,7 +53,8 @@ edit = sed \
 pongo.icl: ;
 
 ## File not mentioned elsewhere that we need to distribute.
-EXTRA_DIST = PONGO_PAR PONGO_CMN $(HELP_SOURCES) 
+EXTRA_DIST = PONGO_PAR PONGO_CMN $(HELP_SOURCES) $(PONGO_EXAMPLES_INFILES) \
+	icl/pongo_proc.icl.in
 
 CLEANFILES = pongohelp.shl pongo_mon version.dat pongo_mon.ifc
 
