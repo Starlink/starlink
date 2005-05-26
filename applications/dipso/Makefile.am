@@ -8,7 +8,9 @@ dipso_SOURCES = run_dipso.c
 dipso_LDADD = libdipso.la `$(srcdir)/dipso_link` @FCLIBS@
 dipso_LDFLAGS =
 
-dist_bin_SCRIPTS = dipsosetup dipsotest dipso_link my_dipso
+nodist_bin_SCRIPTS = dipsosetup dipso_link my_dipso
+
+dist_bin_SCRIPTS = dipsotest
 
 lib_LTLIBRARIES = libdipso.la
 
