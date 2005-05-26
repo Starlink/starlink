@@ -402,6 +402,11 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     10-MAY-2005 (MBT):
 *        Added GENVAR parameter.
+*     26-MAY-2005 (MBT):
+*        Output NDF is now created by propagation from the first input
+*        NDF rather than created from scratch.  This means that any 
+*        extensions are propagated.  Also removed the DRIZZLE entry 
+*        in the CCDPACK extension, which doesn't seem to be for anything.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -502,6 +507,7 @@
       INTEGER MAPN ( CCD1__MXNDF + 1 )   ! Compound mapping of MAPC and MAPZ
       INTEGER MAPZ                   ! New multipicative (ZOOM) map
       INTEGER NDF( CCD1__MXNDF + 1 ) ! Array of input NDF identifiers
+      INTEGER NDFX                   ! NDF identifier for temporary section
       INTEGER NDIMI                  ! Number of dimensions in input NDF
       INTEGER NDIMX                  ! Maximum (overall) no. of dimensions
       INTEGER NFRM                   ! Number of frames in frameset
@@ -1101,6 +1107,7 @@
           
 *  Create the Output NDF
 *  =====================
+
 *  Get the data type for the input NDF
       IF ( CCD1_IREF .NE. 0 ) THEN
          CALL NDF_TYPE( NDF( CCD1_IREF ), 'Data', ITYPE, STATUS )
@@ -1108,8 +1115,7 @@
          CALL NDF_TYPE( NDF( 1 ), 'Data', ITYPE, STATUS )
       ENDIF
 
-*  Create the output NDF, check to see whether we're preserving type
-
+*  Get the data type for the output NDF.
       IF ( PREVD ) THEN
          OTYPE = ITYPE
       ELSE IF( ITYPE .EQ. '_DOUBLE' .OR. 
@@ -1119,15 +1125,16 @@
          OTYPE = '_REAL'
       ENDIF
 
-      CALL PAR_GET0C( 'OUT', NAME, STATUS )
-      CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', 
-     :               OUTNDF, PLACE, STATUS )
-      CALL NDF_NEW( OTYPE, NDIMX, LBNDX, UBNDX, PLACE, 
-     :              OUTNDF, STATUS)
-
+*  Create the output NDF by propagation from an appropriately-sized
+*  section of one of the input ones.  This ensures that extensions
+*  are propagated correctly.
+      CALL NDF_SECT( NDF( 1 ), NDIMX, LBNDX, UBNDX, NDFX, STATUS )
+      CALL NDF_PROP( NDFX, 'Units', 'OUT', OUTNDF, STATUS )
+      CALL NDF_ANNUL( NDFX, STATUS )
+      CALL NDF_STYPE( OTYPE, OUTNDF, 'Data', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 940
-      
-*  Map the Data array to force them into existence.
+
+*  Map the Data array to force it into existence.
       CALL NDF_MAP( OUTNDF, 'Data', OTYPE, 'WRITE/BAD', 
      :              ODAT, NPXOUT, STATUS )
 
@@ -1135,16 +1142,13 @@
 *  output variance array. It should be noted, that the propagated
 *  variances are STATISTICALLY INCORRECT (error are correlated).
       IF ( GENVAR ) THEN
+         CALL NDF_STYPE( OTYPE, OUTNDF, 'Variance', STATUS )
          CALL NDF_MAP( OUTNDF, 'Variance', OTYPE, 'WRITE/BAD', 
      :                 OVAR, NPXOUT, STATUS )
       END IF
 
       IF ( STATUS .NE. SAI__OK ) GOTO 940      
 
-*  Create the CCDPACK_EXT extension
-      CALL CCD1_CEXT( OUTNDF, .TRUE., 'UPDATE', DLOC, STATUS )
-      CALL CCD1_TOUCH( OUTNDF, 'DRIZZLE', STATUS )
-    
 *  Setup stuff for workspace creation 
       EL = 0     
       DO IDIM = 1, NDIMX
@@ -1156,7 +1160,6 @@
             EL = EL*ODIM( IDIM )
          END IF
       END DO
-      
 
 *  Create a Weight array and map it.
       CALL CCD1_MKTMP( EL, '_DOUBLE', WDREF, STATUS )

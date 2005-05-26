@@ -163,7 +163,7 @@
 
 1 Changes_this_release
 
-  Release v4.0-17 is a bugfix update of CCDPACK.
+  Release v4.0-19 is a bugfix update of CCDPACK.
 
   Changes since v4.0-14
   ---------------------
@@ -186,6 +186,14 @@
   - Some of the file number restrictions have been loosened.
     You can now execute most tasks with up to 1000 files (up from 100)
     and you can perform FINDOFF matching with up to 400 (up from 100).
+
+  Changes since v4.0-18
+  ---------------------
+
+  - A new parameter GENVAR has been added to the DRIZZLE task.
+
+  - DRIZZLE now propagates extensions from the first input NDF to the 
+    output.
 
 1 ASTEXP
 Exports coordinate system information from images
