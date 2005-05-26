@@ -71,7 +71,6 @@ xcatviewsupport_DATA = \
 NETWORKED = "yes"
 edit = sed \
         -e 's,@bindir\@,$(bindir),g' \
-        -e 's,@EXPECTK\@,$(EXPECTK),g' \
         -e 's,@PERL\@,$(PERL),g' \
         -e 's,@AWISH\@,$(AWISH),g' \
         -e 's,@ATCLSH\@,$(ATCLSH),g' \
