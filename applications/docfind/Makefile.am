@@ -2,7 +2,7 @@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-dist_bin_SCRIPTS = docfind
+nodist_bin_SCRIPTS = docfind
 dist_starnews_DATA = docfind.news
 
 # The coco script needs to have installation locations edited into it
