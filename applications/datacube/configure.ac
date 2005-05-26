@@ -51,7 +51,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml datacube.csh datacube.icl
     help/Makefile subs/Makefile tasks/Makefile
     sun237/Makefile sc16/Makefile
-    demo/Makefile demo/datacube_demo.csh])
+    demo/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
