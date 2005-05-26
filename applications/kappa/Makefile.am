@@ -5,6 +5,8 @@ SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
 dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) kappa_nogks_link_adam
 
+nodist_bin_SCRIPTS = $(NODIST_PUBLICSCRIPTS)
+
 bindatadir = $(bindir)
 dist_bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
 
@@ -129,8 +131,11 @@ remqual qualtobad
 PUBLICSCRIPTS = $(SHELLSCRIPTS) $(ICL_FILES) $(TCL_FILES) \
 	$(AWKSCRIPTS)
 
-SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
-pazo.csh s2p
+NODIST_PUBLICSCRIPTS = $(NODIST_SHELLSCRIPTS)
+
+SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh pazo.csh s2p
+
+NODIST_SHELLSCRIPTS = multiplot.csh
 
 AWKSCRIPTS = nfi.awk
 
