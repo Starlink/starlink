@@ -346,6 +346,7 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx
 	cd applications/cursa \
 	  && $(MAKE_CPT)
@@ -658,6 +659,7 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx
 	cd applications/findcoords \
 	  && $(MAKE_CPT)
@@ -1474,6 +1476,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/trn
