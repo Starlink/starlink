@@ -28,9 +28,14 @@ This directory contains the following directories:
      or library.
 
 
+Building the Starlink source set from scratch
+---------------------------------------------
 
 To build the COMPLETE set of Starlink classic applications the
-following steps are required:
+following steps are required.  If you wish to do more elaborate
+things, then you should refer to Starlink document SSN/78, which also
+contains some FAQs.  Details of this document are at the end of this
+README.
 
  - Specify where you want the installed files to end up (_PREFIX) and
    where you want the build to find any previously installed Starlink
@@ -133,7 +138,8 @@ following steps are required:
    Each of these steps also takes around an hour.
 
  - If you wish to disable the building of shared libraries you should
-   use the --disable-shared configure option
+   use the --disable-shared configure option when you give the
+   ./configure command above.
  
       % ./configure -C --disable-shared
 
@@ -154,6 +160,8 @@ following steps are required:
    component and everything it depends on.
 
 
+Building invidual components
+----------------------------
 
 Note that this sequence of './bootstrap; ./configure; make world' is
 indeed a`make world' command -- it builds everything in the repository
@@ -194,7 +202,25 @@ specific component, the instructions are slightly different.
    nothing if it is not required.
 
 
+Updating the source set
+-----------------------
 
-See SSN/78 (in docs/ssn/078) for more details on building Starlink classic
-applications.
+The `make world' command will not _re_build the tree after you do a
+CVS update, possibly unexpectedly.  For an explanation of why this is
+so and what to do about it, see the `General FAQs' in SSN/78,
+described below.
+
+
+SSN/78 and FAQs
+---------------
+
+See Starlink document SSN/78 for more details on building Starlink
+classic applications.  The source for this document is in the
+repository at docs/ssn/078, and a built version should be available on
+the Starlink web pages.  A version is also currently (May 2005)
+available at <http://www.astro.gla.ac.uk/users/norman/star/ssn78/>.
+This document contains some FAQs: some of these will likely be of
+interest to thise building the system from a checkout, though others
+address quite specific details of how to configure software to work
+within the Starlink source tree.
 
