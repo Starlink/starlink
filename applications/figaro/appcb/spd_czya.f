@@ -32,6 +32,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +51,8 @@
 *     27 May 1992 (hme):
 *        Port to NDF and Unix. Consider the Extension.
 *        Initialise labels and units to blank.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,6 +68,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER WIDTH
@@ -176,9 +180,9 @@
       CALL NDF_CGET( NDF1, 'LABEL', ZLABEL, STATUS )
       CALL NDF_CGET( NDF1, 'UNITS', ZUNITS, STATUS )
       CALL NDF_MAP(  NDF1, 'DATA', '_REAL', 'READ', DAT, IDUMMY,
-     :   STATUS )
+     :               STATUS )
       IF ( VARUSE ) CALL NDF_MAP( NDF1, 'VARIANCE', '_REAL', 'READ',
-     :   VAR, IDUMMY, STATUS )
+     :                            VAR, IDUMMY, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Now loop through all axes and get the information we need.
@@ -217,11 +221,11 @@
             UNITS(J) = ' '
             IF ( I .EQ. SPAXIS ) THEN
                CALL SPD_EAEA( NDF1, XLOC, I, 'READ', TYPE, LABEL(J),
-     :            UNITS(J), CEN(I), NDF2, IDUMMY, STATUS )
+     :                        UNITS(J), CEN(I), NDF2, IDUMMY, STATUS )
                USEVAL = ( NDF2 .NE. NDF__NOID )
             ELSE
                CALL SPD_EAEC( NDF1, I, 'READ', '_REAL', LABEL(J),
-     :            UNITS(J), CEN(I), IDUMMY, STATUS )
+     :                        UNITS(J), CEN(I), IDUMMY, STATUS )
             END IF
 
 *        If widths to be printed, get axis width.
@@ -233,7 +237,7 @@
             IF ( WIDTH .NE. 0 ) THEN
                K = K + 1
                CALL SPD_EAFA( NDF1, XLOC, I, 'READ', '_REAL', WID(I),
-     :            NDF3, IDUMMY, STATUS )
+     :                        NDF3, IDUMMY, STATUS )
 
 *        Else (no widths), have the width pointer point to the data
 *        array. That is certain to exist, be of right type and
@@ -302,20 +306,32 @@
 
 *  Write the header to the output file.
       CALL SPD_WZYA( FILENO, VARUSE, WIDTH.NE.0, BADVAL, IN, DBAXIS,
-     :   ACTDIM,
-     :   NELM, LABEL, UNITS, ZLABEL, ZUNITS, DBCOL, FORM, STATUS )
+     :               ACTDIM, NELM, LABEL, UNITS, ZLABEL, ZUNITS, DBCOL,
+     :               FORM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Write the data to the output file.
 *  We pass 7 pointers, assuming that NDF__MXDIM=7.
       CALL SPD_WZYB( DCENTR, USEVAL, WIDTH.NE.0, VARUSE,
-     :   SPAXIS, NELM, DIM, FILENO, FORM, BADVAL,
-     :   %VAL(CEN(1)), %VAL(CEN(2)), %VAL(CEN(3)), %VAL(CEN(4)),
-     :   %VAL(CEN(5)), %VAL(CEN(6)), %VAL(CEN(7)),
-     :   %VAL(WID(1)), %VAL(WID(2)), %VAL(WID(3)), %VAL(WID(4)),
-     :   %VAL(WID(5)), %VAL(WID(6)), %VAL(WID(7)),
-     :   %VAL(SCEN), %VAL(SWID), %VAL(DAT), %VAL(VAR),
-     :   %VAL(DBL1), %VAL(DBL2), STATUS )
+     :               SPAXIS, NELM, DIM, FILENO, FORM, BADVAL,
+     :               %VAL( CNF_PVAL( CEN(1) ) ), 
+     :               %VAL( CNF_PVAL( CEN(2) ) ),
+     :               %VAL( CNF_PVAL( CEN(3) ) ),
+     :               %VAL( CNF_PVAL( CEN(4) ) ),
+     :               %VAL( CNF_PVAL( CEN(5) ) ),
+     :               %VAL( CNF_PVAL( CEN(6) ) ),
+     :               %VAL( CNF_PVAL( CEN(7) ) ),
+     :               %VAL( CNF_PVAL( WID(1) ) ),
+     :               %VAL( CNF_PVAL( WID(2) ) ),
+     :               %VAL( CNF_PVAL( WID(3) ) ),
+     :               %VAL( CNF_PVAL( WID(4) ) ),
+     :               %VAL( CNF_PVAL( WID(5) ) ),
+     :               %VAL( CNF_PVAL( WID(6) ) ),
+     :               %VAL( CNF_PVAL( WID(7) ) ),
+     :               %VAL( CNF_PVAL( SCEN ) ), %VAL( CNF_PVAL( SWID ) ),
+     :               %VAL( CNF_PVAL( DAT ) ), %VAL( CNF_PVAL( VAR ) ),
+     :               %VAL( CNF_PVAL( DBL1 ) ), %VAL( CNF_PVAL( DBL2 ) ),
+     :               STATUS )
 
 *  Close down.
  500  CONTINUE

@@ -1,5 +1,5 @@
-      SUBROUTINE SPD_CZBE( NDF, AXIS, FRAME,
-     :   BADVAL, IMIN, IMAX, OMIN, OMAX, NELM, ODATA, STATUS )
+      SUBROUTINE SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
+     :                     OMIN, OMAX, NELM, ODATA, STATUS )
 *+
 *  Name:
 *     SPD_CZBE
@@ -58,11 +58,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19 May 1994 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,6 +79,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -133,8 +137,8 @@
       END IF
 
 *  Prepare for display.
-      CALL SPD_WZBA( BADVAL, IMIN, IMAX, OMIN, OMAX,
-     :   SNELM, %VAL(PNTR), ODATA, STATUS )
+      CALL SPD_WZBA( BADVAL, IMIN, IMAX, OMIN, OMAX, SNELM,
+     :               %VAL( CNF_PVAL( PNTR ) ), ODATA, STATUS )
 
 *  Tidy up.
  500  CONTINUE

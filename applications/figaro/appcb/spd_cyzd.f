@@ -1,10 +1,10 @@
-      SUBROUTINE SPD_CYZD( REASON, PICID, OVER, NDF,
-     :   LIN, BIN, MARK, ERROR, WIDTH, FRAME,
-     :   LABGVN, CWGIVN, SWGIVN, LEGIVN,
-     :   TEXT, BOTTOM, LEFT, TOP, RIGHT, XLEGND, YLEGND,
-     :   FILL, CWORLD, SWORLD, LEGEND, CELLSZ,
-     :   LABSPC, ROMAN, CHIGHT, COLOUR, THICK,
-     :   AXES, TICK, NUML, MAJOR, MINOR, DASH, STATUS )
+      SUBROUTINE SPD_CYZD( REASON, PICID, OVER, NDF, LIN,
+     :                     BIN, MARK, ERROR, WIDTH, FRAME, LABGVN,
+     :                     CWGIVN, SWGIVN, LEGIVN, TEXT, BOTTOM, LEFT,
+     :                     TOP, RIGHT, XLEGND, YLEGND, FILL, CWORLD,
+     :                     SWORLD, LEGEND, CELLSZ, LABSPC, ROMAN, 
+     :                     CHIGHT, COLOUR, THICK, AXES, TICK, NUML,
+     :                     MAJOR, MINOR, DASH, STATUS )
 *+
 *  Name:
 *     SPD_CYZD
@@ -170,11 +170,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     22 Sep 1994 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -189,6 +192,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER REASON
@@ -293,7 +297,7 @@
                STATUS = SAI__ERROR
                CALL ERR_REP( 'SPD_CYZD_E01',
      :            'SPECGRID: Error: Spectroscopic axis is not first.',
-     :         STATUS )
+     :             STATUS )
                GO TO 500
             END IF
  1001    CONTINUE
@@ -301,7 +305,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPD_CYZD_E02',
      :         'SPECGRID: Error: Spectroscopic axis is degenerate.',
-     :      STATUS )
+     :         STATUS )
             GO TO 500
          END IF
 
@@ -316,7 +320,7 @@
          TYPE(1) = '_REAL'
          TYPE(2) = '_REAL'
          CALL SPD_EAJD( NDF, XLOC, 'READ', TYPE, CLABEL, CUNITS,
-     :      COORDS, CNDFS, NROWS, STATUS )
+     :                  COORDS, CNDFS, NROWS, STATUS )
 
 *     Map the data (intensity or whatever).
 *     This is a 2-D array, each row a spectrum.
@@ -338,7 +342,7 @@
          SLABEL = ' '
          SUNITS = ' '
          CALL SPD_EAEA( NDF, XLOC, SPAXIS, 'READ', '_REAL', SLABEL,
-     :      SUNITS, SVAL, SVNDF, I, STATUS )
+     :                  SUNITS, SVAL, SVNDF, I, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 500
          SVISND = 0
          IF ( SVNDF .NE. NDF__NOID ) SVISND = 1
@@ -441,10 +445,12 @@
 
 *     Else (the plot window is to be derived from the data).
          ELSE
-            CALL SPD_UAAAR( .FALSE., NROWS(1), %VAL(COORDS(1)),
-     :         WORLD(1), WORLD(2), STATUS )
-            CALL SPD_UAAAR( .FALSE., NROWS(1), %VAL(COORDS(2)),
-     :         WORLD(3), WORLD(4), STATUS )
+            CALL SPD_UAAAR( .FALSE., NROWS(1),
+     :                      %VAL( CNF_PVAL( COORDS(1) ) ),
+     :                      WORLD(1), WORLD(2), STATUS )
+            CALL SPD_UAAAR( .FALSE., NROWS(1),
+     :                      %VAL( CNF_PVAL( COORDS(2) ) ),
+     :                      WORLD(3), WORLD(4), STATUS )
             WORLD(1) = WORLD(1) - CELLSZ(1) / 2.
             WORLD(2) = WORLD(2) + CELLSZ(1) / 2.
             WORLD(3) = WORLD(3) - CELLSZ(2) / 2.
@@ -478,14 +484,15 @@
             WORLD(8) = SWORLD(4)
          ELSE
             IF ( SVISND .NE. 0 ) THEN
-               CALL SPD_UAAAR( .FALSE., NELM, %VAL(SVAL),
-     :            WORLD(5), WORLD(6), STATUS )
+               CALL SPD_UAAAR( .FALSE., NELM, %VAL( CNF_PVAL( SVAL ) ),
+     :                         WORLD(5), WORLD(6), STATUS )
             ELSE
-               CALL SPD_UAAAR( .FALSE., DIM(SPAXIS), %VAL(SVAL),
-     :            WORLD(5), WORLD(6), STATUS )
+               CALL SPD_UAAAR( .FALSE., DIM(SPAXIS),
+     :                         %VAL( CNF_PVAL( SVAL ) ),
+     :                         WORLD(5), WORLD(6), STATUS )
             END IF
-            CALL SPD_UAAAR( .TRUE., NELM, %VAL(DATA),
-     :         WORLD(7), WORLD(8), STATUS )
+            CALL SPD_UAAAR( .TRUE., NELM, %VAL( CNF_PVAL( DATA ) ),
+     :                      WORLD(7), WORLD(8), STATUS )
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 500
 
@@ -553,14 +560,15 @@
 
 *     This is left to a subroutine. One advantage is that the pointers
 *     to arrays then can become arrays.
-         CALL SPD_WYZA( PICID, OVER,
-     :      LIN, BIN, MARK, ERROR, WIDTH, FRAME,
-     :      TEXT, LEGIVN, LABEL, VIEW, WORLD, LEGEND, LCELSZ,
-     :      LABSPC, ROMAN, CHIGHT, COLOUR, THICK,
-     :      AXES, TICK, NUML, MAJOR, MINOR, DASH,
-     :      SVISND, DIM(SPAXIS), NROWS(1),
-     :      %VAL(COORDS(1)), %VAL(COORDS(2)), %VAL(SVAL), %VAL(DATA),
-     :      STATUS )
+         CALL SPD_WYZA( PICID, OVER, LIN, BIN, MARK, ERROR, WIDTH,
+     :                  FRAME, TEXT, LEGIVN, LABEL, VIEW, WORLD,
+     :                  LEGEND, LCELSZ, LABSPC, ROMAN, CHIGHT, COLOUR,
+     :                  THICK, AXES, TICK, NUML, MAJOR, MINOR, DASH,
+     :                  SVISND, DIM(SPAXIS), NROWS(1),
+     :                  %VAL( CNF_PVAL( COORDS(1) ) ),
+     :                  %VAL( CNF_PVAL( COORDS(2) ) ),
+     :                  %VAL( CNF_PVAL( SVAL ) ),
+     :                  %VAL( CNF_PVAL( DATA ) ), STATUS )
 
 
 *     Tidy up.

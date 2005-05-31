@@ -101,6 +101,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -130,6 +131,8 @@
 *        after growing the vector into the array. Now we set ONE(SPAXJ).
 *     25 Nov 1994 (hme):
 *        Use new libraries.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -146,6 +149,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL INFO
@@ -248,7 +252,7 @@
       IF ( INFO ) THEN
          CALL MSG_SETI( 'GROW_T01', NDIM1 )
          CALL MSG_OUT( 'GROW_M01', 'Found ^GROW_T01 axes in IN.',
-     :      STATUS )
+     :                STATUS )
       END IF
 
 *  Get start and end of target area in OUT.
@@ -316,7 +320,7 @@
      :            'differ.', STATUS )
                GO TO 500
             END IF
-         ENDIF
+         END IF
  1    CONTINUE
 
 *  Did we detect an inconsistency in the given arrays?
@@ -331,7 +335,7 @@
          CALL ERR_REP( 'GROW_E26', 'GROW: Error: Number of zeros ' //
      :      'in EXPAND does not match IN dimensionality.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Fill arrays till NDF_MXDIM.
       DO 2 J = NDIM3+1, NDF__MXDIM
@@ -355,7 +359,7 @@
          CALL ERR_REP( 'GROW_E27', 'GROW: Error accessing input or ' //
      :      'output Specdre Extension.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  STAPIX and ENDPIX should denote the real start and end of the target
 *  area in OUT.
@@ -413,8 +417,8 @@
                CALL ERR_REP( 'GROW_E29', 'GROW: Error: Target ' //
      :            'exceeds output along axis ^SPD_CZTE_T02.', STATUS )
                GO TO 500
-            ENDIF
-         ENDIF
+            END IF
+         END IF
  3    CONTINUE
 
 *  Check Extensions scalars --------------------------------
@@ -479,9 +483,9 @@
       UNITS1  = ' '
       UNITS2  = ' '
       CALL SPD_EAEA( NDF(1), XLOC1, SPAXI, 'READ', TYPE(1),
-     :   LABEL1, UNITS1, PNTR1, NDF(3), NELM1, STATUS )
+     :               LABEL1, UNITS1, PNTR1, NDF(3), NELM1, STATUS )
       CALL SPD_EAEA( NDF(2), XLOC2, SPAXJ, 'READ', TYPE(2),
-     :   LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
+     :               LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
 
 *  Find out whether the two arrays are in AXIS or Extension.
       VEXT1 = ( NDF(3) .NE. NDF__NOID )
@@ -504,7 +508,7 @@
          END IF
          TYPE(1) = XT6D
          CALL SPD_EAEA( NDF(1), XLOC1, SPAXI, 'READ', TYPE(1),
-     :      LABEL1, UNITS1, PNTR1, NDF(3), NELM1, STATUS )
+     :                  LABEL1, UNITS1, PNTR1, NDF(3), NELM1, STATUS )
       END IF
 
 *  We still have access to the input spectroscopic values. What follows
@@ -520,14 +524,18 @@
 *     Access OUT spectroscopic values in Extension (create if
 *     necessary), then grow from IN Extension to OUT Extension.
          CALL SPD_EAED( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :      LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
+     :                  LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
+         END IF
          CALL NDF_ANNUL( NDF(3), STATUS )
          CALL NDF_ANNUL( NDF(4), STATUS )
 
@@ -538,15 +546,19 @@
 *     Access OUT spectroscopic values in Extension, then grow from IN
 *     axis structure.
          CALL SPD_EAEE( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :      LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
+     :                  LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
          ONE(SPAXJ) = NELM1
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, ONE, DIM3, NELM1, NELM3,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, ONE, DIM3, NELM1, NELM3,
+     :                      STATUS )
+         END IF
          ONE(SPAXJ) = 1
          CALL NDF_AUNMP( NDF(1), 'CENTRE', SPAXI, STATUS )
          CALL NDF_ANNUL( NDF(4), STATUS )
@@ -557,14 +569,16 @@
 
 *     Access OUT centre array and check centre equality.
          CALL NDF_AMAP( NDF(2), 'CENTRE', SPAXJ, TYPE(1), 'READ',
-     :      PNTR3, NELM3, STATUS )
+     :                  PNTR3, NELM3, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAALD( NELM3, %VAL(PNTR1), %VAL(PNTR3), 1D-5,
-     :         MATCH, STATUS )
+            CALL SPD_UAALD( NELM3, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), 1D-5,
+     :                      MATCH, STATUS )
          ELSE
-            CALL SPD_UAALR( NELM3, %VAL(PNTR1), %VAL(PNTR3), 1E-5,
-     :         MATCH, STATUS )
-         ENDIF
+            CALL SPD_UAALR( NELM3, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), 1E-5,
+     :                      MATCH, STATUS )
+         END IF
          CALL NDF_AUNMP( NDF(2), 'CENTRE', SPAXJ, STATUS )
 
 *     If no match.
@@ -572,16 +586,20 @@
 
 *        Access OUT spectroscopic values in Extension (includes creating
 *        it), and grow from IN axis structure.
-            CALL SPD_EAED( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :         LABEL2, UNITS2, PNTR3, NDF(4), NELM3, STATUS )
+            CALL SPD_EAED( NDF(2), XLOC2, 'UPDATE', TYPE(1), LABEL2,
+     :                     UNITS2, PNTR3, NDF(4), NELM3, STATUS )
             ONE(SPAXJ) = NELM1
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, ONE, DIM3,
+     :                         NELM1, NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, ONE, DIM3,
+     :                         NELM1, NELM3, STATUS )
+            END IF
             ONE(SPAXJ) = 1
             CALL NDF_ANNUL( NDF(4), STATUS )
          END IF
@@ -593,7 +611,7 @@
          CALL ERR_REP( 'GROW_E31', 'GROW: Error growing ' //
      :      'spectroscopic values in Specdre Extension.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Grow spectroscopic widths -------------------------------
 *  =========================================================
@@ -607,7 +625,7 @@
 *  release OUT's width information.
       TYPE(1) = ' '
       CALL SPD_EAFA( NDF(2), XLOC2, SPAXJ, 'READ', TYPE(1),
-     :   PNTR3, NDF(4), NELM3, STATUS )
+     :               PNTR3, NDF(4), NELM3, STATUS )
       IF ( NDF(4) .EQ. NDF__NOID ) THEN
          CALL NDF_AUNMP( NDF(2), 'WIDTH', SPAXJ, STATUS )
       ELSE
@@ -628,16 +646,20 @@
 
 *        Grow from IN's Extension widths into OUT's.
             CALL SPD_EAFE( NDF(1), XLOC1, 'READ', TYPE(1),
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
             CALL SPD_EAFE( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :         PNTR3, NDF(4), NELM3, STATUS )
+     :                     PNTR3, NDF(4), NELM3, STATUS )
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         NELM1, NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         NELM1, NELM3, STATUS )
+            END IF
             CALL NDF_ANNUL( NDF(3), STATUS )
             CALL NDF_ANNUL( NDF(4), STATUS )
 
@@ -648,16 +670,20 @@
 *        Grow from IN's Extension widths (will be created temporarily
 *        from IN's Extension values) into OUT's.
             CALL SPD_EAFD( NDF(1), XLOC1, 'READ', TYPE(1),
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
             CALL SPD_EAFE( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :         PNTR3, NDF(4), NELM3, STATUS )
+     :                     PNTR3, NDF(4), NELM3, STATUS )
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         NELM1, NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3, NELM1,
+     :                         NELM3, STATUS )
+            END IF
             CALL NDF_ANNUL( NDF(3), STATUS )
             CALL NDF_ANNUL( NDF(4), STATUS )
 
@@ -667,17 +693,21 @@
 
 *        Grow from IN's axis structure into OUT's Extension.
             CALL NDF_AMAP( NDF(1), 'WIDTH', SPAXI, TYPE(1), 'READ',
-     :         PNTR1, NELM1, STATUS )
+     :                     PNTR1, NELM1, STATUS )
             CALL SPD_EAFE( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :         PNTR3, NDF(4), NELM3, STATUS )
+     :                     PNTR3, NDF(4), NELM3, STATUS )
             ONE(SPAXJ) = NELM1
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, ONE, DIM3,
+     :                         NELM1, NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, ONE, DIM3,
+     :                         NELM1, NELM3, STATUS )
+            END IF
             ONE(SPAXJ) = 1
             CALL NDF_AUNMP( NDF(1), 'WIDTH', SPAXI, STATUS )
             CALL NDF_ANNUL( NDF(4), STATUS )
@@ -692,16 +722,20 @@
 *        Create OUT's Extension widths (in the process of accessing it).
 *        Grow from IN's Extension widths into OUT's.
             CALL SPD_EAFD( NDF(1), XLOC1, 'READ', TYPE(1),
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
             CALL SPD_EAFE( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :         PNTR3, NDF(4), NELM3, STATUS )
+     :                     PNTR3, NDF(4), NELM3, STATUS )
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         NELM1, NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         NELM1, NELM3, STATUS )
+            END IF
             CALL NDF_ANNUL( NDF(3), STATUS )
             CALL NDF_ANNUL( NDF(4), STATUS )
 
@@ -721,33 +755,37 @@
 *        Check the two width arrays (in the axis structures) for
 *        equality.
             CALL NDF_AMAP( NDF(1), 'WIDTH', SPAXI, TYPE(1), 'READ',
-     :         PNTR1, NELM1, STATUS )
+     :                     PNTR1, NELM1, STATUS )
             CALL NDF_AMAP( NDF(2), 'WIDTH', SPAXJ, TYPE(1), 'READ',
-     :         PNTR3, NELM3, STATUS )
+     :                     PNTR3, NELM3, STATUS )
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAALD( NELM3, %VAL(PNTR1), %VAL(PNTR3), 1D-5,
-     :            MATCH, STATUS )
+               CALL SPD_UAALD( NELM3, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), 1D-5,
+     :                         MATCH, STATUS )
             ELSE
-               CALL SPD_UAALR( NELM3, %VAL(PNTR1), %VAL(PNTR3), 1E-5,
-     :            MATCH, STATUS )
-            ENDIF
+               CALL SPD_UAALR( NELM3, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), 1E-5,
+     :                         MATCH, STATUS )
+            END IF
             CALL NDF_AUNMP( NDF(2), 'WIDTH', SPAXJ, STATUS )
 
 *        If the arrays do not match, create output Extension widths and
 *        grow from input width in axis structure.
             IF ( .NOT. MATCH ) THEN
                CALL SPD_EAFD( NDF(2), XLOC2, 'UPDATE', TYPE(1),
-     :            PNTR3, NDF(4), NELM3, STATUS )
+     :                        PNTR3, NDF(4), NELM3, STATUS )
                ONE(SPAXJ) = NELM1
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3),
-     :               STAPIX, ENDPIX,
-     :               NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
+                  CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ), 
+     :                            %VAL( CNF_PVAL( PNTR3 ) ),
+     :                            STAPIX, ENDPIX, NDF__MXDIM, ONE,
+     :                            DIM3, NELM1, NELM3, STATUS )
                ELSE
-                  CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3),
-     :               STAPIX, ENDPIX,
-     :               NDF__MXDIM, ONE, DIM3, NELM1, NELM3, STATUS )
-               ENDIF
+                  CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                            %VAL( CNF_PVAL( PNTR3 ) ),
+     :                            STAPIX, ENDPIX, NDF__MXDIM, ONE,
+     :                            DIM3, NELM1, NELM3, STATUS )
+               END IF
                ONE(SPAXJ) = 1
                CALL NDF_ANNUL( NDF(4), STATUS )
             END IF
@@ -760,7 +798,7 @@
          CALL ERR_REP( 'GROW_E32', 'GROW: Error growing ' //
      :      'spectroscopic widths in Specdre Extension.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Grow main data and variances ----------------------------
 *  =========================================================
@@ -769,16 +807,20 @@
       CALL NDF_TYPE( NDF(2), 'DATA', TYPE(1), STATUS )
       IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = '_REAL'
       CALL NDF_MAP( NDF(1), 'DATA', TYPE(1), 'READ',
-     :   PNTR1, NELM1, STATUS )
+     :              PNTR1, NELM1, STATUS )
       CALL NDF_MAP( NDF(2), 'DATA', TYPE(1), 'UPDATE',
-     :   PNTR3, NELM3, STATUS )
+     :              PNTR3, NELM3, STATUS )
       IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-         CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+         CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                   %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                   NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                   STATUS )
       ELSE
-         CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-      ENDIF
+         CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                   %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                   NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                   STATUS )
+      END IF
       CALL NDF_UNMAP( NDF(1), 'DATA', STATUS )
       CALL NDF_UNMAP( NDF(2), 'DATA', STATUS )
 
@@ -793,16 +835,20 @@
          CALL NDF_TYPE(  NDF(2), 'VARIANCE', TYPE(1), STATUS )
          IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = '_REAL'
          CALL NDF_MAP( NDF(1), 'VARIANCE', TYPE(1), 'READ',
-     :      PNTR1, NELM1, STATUS )
+     :                 PNTR1, NELM1, STATUS )
          CALL NDF_MAP( NDF(2), 'VARIANCE', TYPE(1), 'UPDATE',
-     :      PNTR3, NELM3, STATUS )
+     :                 PNTR3, NELM3, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                      NELM1, NELM3, STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                      NELM1, NELM3, STATUS )
+         END IF
          CALL NDF_UNMAP( NDF(1), 'VARIANCE', STATUS )
          CALL NDF_UNMAP( NDF(2), 'VARIANCE', STATUS )
 
@@ -814,16 +860,20 @@
          CALL NDF_TYPE(  NDF(1), 'VARIANCE', TYPE(1), STATUS )
          IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = '_REAL'
          CALL NDF_MAP( NDF(1), 'VARIANCE', TYPE(1), 'READ',
-     :      PNTR1, NELM1, STATUS )
+     :                 PNTR1, NELM1, STATUS )
          CALL NDF_MAP( NDF(2), 'VARIANCE', TYPE(1), 'WRITE/BAD',
-     :      PNTR3, NELM3, STATUS )
+     :                 PNTR3, NELM3, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
+         END IF
          CALL NDF_UNMAP( NDF(1), 'VARIANCE', STATUS )
          CALL NDF_UNMAP( NDF(2), 'VARIANCE', STATUS )
 
@@ -835,9 +885,10 @@
 *     in each direction. And it contains the bad value.
          TYPE(1) = '_REAL'
          CALL NDF_MAP( NDF(2), 'VARIANCE', TYPE(1), 'UPDATE',
-     :      PNTR3, NELM3, STATUS )
-         CALL SPD_UAAMR( VAL__BADR, %VAL(PNTR3), STAPIX, ENDPIX,
-     :      NDF__MXDIM, ONE, DIM3, 1, NELM3, STATUS )
+     :                 PNTR3, NELM3, STATUS )
+         CALL SPD_UAAMR( VAL__BADR, %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                   ENDPIX, NDF__MXDIM, ONE, DIM3, 1, NELM3,
+     :                   STATUS )
          CALL NDF_UNMAP( NDF(2), 'VARIANCE', STATUS )
       END IF
 
@@ -846,7 +897,7 @@
          CALL ERR_REP( 'GROW_E33', 'GROW: Error growing ' //
      :      'data or variances.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Grow covariance row sums --------------------------------
 *  =========================================================
@@ -862,16 +913,20 @@
          CALL NDF_TYPE( NDF(4), XC8D, TYPE(1), STATUS )
          IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = XT8D
          CALL NDF_MAP( NDF(4), XC8D, TYPE(1), 'UPDATE',
-     :      PNTR3, NELM3, STATUS )
+     :                 PNTR3, NELM3, STATUS )
          CALL SPD_EAGE( NDF(1), XLOC1, 'READ', TYPE(1),
-     :      PNTR1, NDF(3), NELM1, STATUS )
+     :                  PNTR1, NDF(3), NELM1, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
+         END IF
          CALL NDF_ANNUL( NDF(3), STATUS )
          CALL NDF_ANNUL( NDF(4), STATUS )
 
@@ -935,44 +990,52 @@
          COMP(1) = 1
          COMP(2) = NCOMP
          CALL SPD_FDHE( NDF(1), XLOC1, 'READ', TYPE, COMP, NDF(3),
-     :      CLOC1, PLOC1, DPNTR1, CPNTR1, PPNTR1, RNELM, STATUS )
+     :                  CLOC1, PLOC1, DPNTR1, CPNTR1, PPNTR1, RNELM,
+     :                  STATUS )
          CALL SPD_FDHE( NDF(2), XLOC2, 'UPDATE', TYPE, COMP, NDF(4),
-     :      CLOC2, PLOC2, DPNTR2, CPNTR2, PPNTR2, RNELM, STATUS )
+     :                  CLOC2, PLOC2, DPNTR2, CPNTR2, PPNTR2, RNELM,
+     :                  STATUS )
 
 *     Compare the component related extension vectors.
          DO 4 I = 1, NCOMP
 
 *        Line names.
-            STRNG1 = SPD_UAAGC( %VAL(CPNTR1(1)), I, STATUS, %VAL(32) )
-            STRNG2 = SPD_UAAGC( %VAL(CPNTR2(1)), I, STATUS, %VAL(32) )
+            STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR1(1) ) ), I,
+     :                          STATUS, %VAL( CNF_PVAL( 32 ) ) )
+            STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR2(1) ) ), I,
+     :                          STATUS, %VAL( CNF_PVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6
             END IF
 
 *        Component types.
-            STRNG1 = SPD_UAAGC( %VAL(CPNTR1(3)), I, STATUS, %VAL(32) )
-            STRNG2 = SPD_UAAGC( %VAL(CPNTR2(3)), I, STATUS, %VAL(32) )
+            STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR1(3) ) ), I,
+     :                          STATUS, %VAL( CNF_PVAL( 32 ) ) )
+            STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR2(3) ) ), I,
+     :                          STATUS, %VAL( CNF_PVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6
             END IF
 
 *        Numbers of parameters.
-            J = SPD_UAAGI( %VAL(CPNTR1(4)), I, STATUS )
-            K = SPD_UAAGI( %VAL(CPNTR2(4)), I, STATUS )
+            J = SPD_UAAGI( %VAL( CNF_PVAL( CPNTR1(4) ) ), I, STATUS )
+            K = SPD_UAAGI( %VAL( CNF_PVAL( CPNTR2(4) ) ), I, STATUS )
             IF ( J .NE. K ) THEN
                MATCH = .FALSE.
                GO TO 6
             END IF
 
 *        Laboratory frequencies.
-            NUMBR1 = SPD_UAAGR( %VAL(CPNTR1(2)), I, STATUS )
-            NUMBR2 = SPD_UAAGR( %VAL(CPNTR2(2)), I, STATUS )
+            NUMBR1 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR1(2) ) ), I,
+     :                          STATUS )
+            NUMBR2 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR2(2) ) ), I,
+     :                          STATUS )
             IF ( NUMBR1 .NE. VAL__BADR .AND.
      :           NUMBR2 .NE. VAL__BADR ) THEN
                IF ( ABS( NUMBR1-NUMBR2 ) .GT.
-     :              .5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
+     :              0.5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
                   MATCH = .FALSE.
                   GO TO 6
                END IF
@@ -983,12 +1046,14 @@
             END IF
 
 *        MASKL.
-            NUMBR1 = SPD_UAAGR( %VAL(CPNTR1(5)), I, STATUS )
-            NUMBR2 = SPD_UAAGR( %VAL(CPNTR2(5)), I, STATUS )
+            NUMBR1 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR1(5) ) ), I,
+     :                          STATUS )
+            NUMBR2 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR2(5) ) ), I,
+     :                          STATUS )
             IF ( NUMBR1 .NE. VAL__BADR .AND.
      :           NUMBR2 .NE. VAL__BADR ) THEN
                IF ( ABS( NUMBR1-NUMBR2 ) .GT.
-     :              .5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
+     :              0.5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
                   MATCH = .FALSE.
                   GO TO 6
                END IF
@@ -999,12 +1064,14 @@
             END IF
 
 *        MASKR.
-            NUMBR1 = SPD_UAAGR( %VAL(CPNTR1(6)), I, STATUS )
-            NUMBR2 = SPD_UAAGR( %VAL(CPNTR2(6)), I, STATUS )
+            NUMBR1 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR1(6) ) ), I,
+     :                          STATUS )
+            NUMBR2 = SPD_UAAGR( %VAL( CNF_PVAL( CPNTR2(6) ) ), I,
+     :                          STATUS )
             IF ( NUMBR1 .NE. VAL__BADR .AND.
      :           NUMBR2 .NE. VAL__BADR ) THEN
                IF ( ABS( NUMBR1-NUMBR2 ) .GT.
-     :              .5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
+     :              0.5E-5 * ABS( NUMBR1+NUMBR2 ) ) THEN
                   MATCH = .FALSE.
                   GO TO 6
                END IF
@@ -1017,8 +1084,10 @@
 
 *     Compare the parameter related extension vector.
          DO 5 I = 1, TNPAR
-            STRNG1 = SPD_UAAGC( %VAL(PPNTR1(1)), I, STATUS, %VAL(32) )
-            STRNG2 = SPD_UAAGC( %VAL(PPNTR2(1)), I, STATUS, %VAL(32) )
+            STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( PPNTR1(1) ) ), I,
+     :                           STATUS, %VAL( CNF_PVAL( 32 ) ) )
+            STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( PPNTR2(1) ) ), I,
+     :                           STATUS, %VAL( CNF_PVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6
@@ -1068,20 +1137,24 @@
 
 *        Grow data and variance into target.
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-               CALL SPD_UAAMD( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(1) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(1) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(2) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-               CALL SPD_UAAMR( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(1) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(1) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(2) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+            END IF
 
 *        Annul the Extension NDFs.
             CALL NDF_ANNUL( NDF(3), STATUS )
@@ -1101,7 +1174,7 @@
             CALL ERR_REP( 'GROW_E34', 'GROW: Error comparing or ' //
      :         'growing results in the Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *  Else if IN has RESULTS.
       ELSE IF ( REXT1 ) THEN
@@ -1114,7 +1187,7 @@
             CALL ERR_REP( 'GROW_E35', 'GROW: Error creating output ' //
      :         'results in the Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *     Delete OUT.RESULTS.MORE.
 *     Copy IN.RESULTS.MORE to OUT.RESULTS.
@@ -1130,14 +1203,15 @@
             CALL ERR_REP( 'GROW_E36', 'GROW: Error copying result ' //
      :         'extensions in the Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *     Access IN.RESULTS.
          IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = XT9D
          COMP(1) = 1
          COMP(2) = NCOMP
          CALL SPD_FDHE( NDF(1), XLOC1, 'READ', TYPE, COMP, NDF(3),
-     :      CLOC1, PLOC1, DPNTR1, CPNTR1, PPNTR1, RNELM, STATUS )
+     :                  CLOC1, PLOC1, DPNTR1, CPNTR1, PPNTR1, RNELM,
+     :                  STATUS )
 
 *     Annul the extension locators.
          DO 11 I = 1, XC9NC
@@ -1150,12 +1224,12 @@
 *     Access OUT.RESULTS.
          CALL NDF_FIND( XLOC2, XCMP9, NDF(4), STATUS )
          CALL NDF_MAP( NDF(4), 'DATA,VARIANCE', TYPE(1), 'UPDATE',
-     :      DPNTR2, NELM3, STATUS )
+     :                 DPNTR2, NELM3, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'GROW_E37', 'GROW: Error accessing ' //
      :         'results in Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *     Work out modified target, applicable to RESULTS.
 *     The dimensions for the target DIM3 are easy, simply the
@@ -1184,20 +1258,24 @@
 
 *     Grow data and variance into target.
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :         STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-            CALL SPD_UAAMD( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :         STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(1) ) ),
+     :                      %VAL( CNF_PVAL( DPNTR2(1) ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3, RNELM(1),
+     :                      NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                      %VAL( CNF_PVAL( DPNTR2(2) ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3, RNELM(1),
+     :                      NELM3, STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :         STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-            CALL SPD_UAAMR( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :         STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(1) ) ),
+     :                      %VAL( CNF_PVAL( DPNTR2(1) ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3, RNELM(1),
+     :                      NELM3, STATUS )
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                      %VAL( CNF_PVAL( DPNTR2(2) ) ), STAPIX,
+     :                      ENDPIX, NDF__MXDIM, DIM2, DIM3, RNELM(1),
+     :                      NELM3, STATUS )
+         END IF
 
 *     Annul the Extension NDFs.
          CALL NDF_ANNUL( NDF(3), STATUS )
@@ -1206,7 +1284,7 @@
             CALL ERR_REP( 'GROW_E38', 'GROW: Error growing results ' //
      :         'in Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *  Else if OUT has RESULTS.
       ELSE IF ( REXT2 ) THEN
@@ -1218,7 +1296,8 @@
          TYPE(2) = ' '
          TYPE(3) = ' '
          CALL SPD_FDHD( NDF(2), XLOC2, 'UPDATE', TYPE, COMP, NDF(4),
-     :      CLOC2, PLOC2, DPNTR2, CPNTR2, PPNTR2, RNELM, STATUS )
+     :                  CLOC2, PLOC2, DPNTR2, CPNTR2, PPNTR2, RNELM,
+     :                  STATUS )
 
 *     Annul the extension locators.
          DO 14 I = 1, XC9NC
@@ -1253,10 +1332,12 @@
 *     Grow data and variance into target.
 *     This is a joke: The source is a 7-D array with only one pixel, one
 *     in each direction. And it contains the bad value.
-         CALL SPD_UAAMR( VAL__BADR, %VAL(DPNTR2(1)), STAPIX, ENDPIX,
-     :      NDF__MXDIM, ONE, DIM3, 1, NELM3, STATUS )
-         CALL SPD_UAAMR( VAL__BADR, %VAL(DPNTR2(2)), STAPIX, ENDPIX,
-     :      NDF__MXDIM, ONE, DIM3, 1, NELM3, STATUS )
+         CALL SPD_UAAMR( VAL__BADR, %VAL( CNF_PVAL( DPNTR2(1) ) ),
+     :                   STAPIX, ENDPIX, NDF__MXDIM, ONE, DIM3, 1,
+     :                   NELM3, STATUS )
+         CALL SPD_UAAMR( VAL__BADR, %VAL( CNF_PVAL( DPNTR2(2) ) ),
+     :                   STAPIX, ENDPIX, NDF__MXDIM, ONE, DIM3, 1,
+     :                   NELM3, STATUS )
 
 *     Annul the Extension NDFs.
          CALL NDF_ANNUL( NDF(4), STATUS )
@@ -1264,7 +1345,7 @@
             CALL ERR_REP( 'GROW_E39', 'GROW: Error clearing results ' //
      :         'in the Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
       END IF
 
 *  Tidy up.

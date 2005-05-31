@@ -39,6 +39,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,8 @@
 *        'Copy' the non-existence of optional components, too.
 *     24 Nov 1994 (hme):
 *        Renamed from SPACG.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -62,6 +65,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF1
@@ -136,15 +140,15 @@
       CALL NDF_ASTYP( TYPE, NDF2, 'CENTRE', AXIS2, STATUS )
       IF ( TYPE .NE. '_REAL' ) TYPE = '_DOUBLE'
       CALL NDF_AMAP( NDF1, 'CENTRE', AXIS1, TYPE, 'READ',
-     :   PNTR1, NELM, STATUS )
+     :               PNTR1, NELM, STATUS )
       CALL NDF_AMAP( NDF2, 'CENTRE', AXIS2, TYPE, 'WRITE',
-     :   PNTR2, NELM, STATUS )
+     :               PNTR2, NELM, STATUS )
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOD( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :      LB, UB, STATUS )
+         CALL VEC_DTOD( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                  %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
       ELSE
-         CALL VEC_RTOR( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :      LB, UB, STATUS )
+         CALL VEC_RTOR( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                  %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
       END IF
       CALL NDF_AUNMP( NDF1, 'CENTRE', AXIS1, STATUS )
       CALL NDF_AUNMP( NDF2, 'CENTRE', AXIS2, STATUS )
@@ -156,15 +160,15 @@
          CALL NDF_ASTYP( TYPE, NDF2, 'WIDTH', AXIS2, STATUS )
          IF ( TYPE .NE. '_REAL' ) TYPE = '_DOUBLE'
          CALL NDF_AMAP( NDF1, 'WIDTH', AXIS1, TYPE, 'READ',
-     :      PNTR1, NELM, STATUS )
+     :                  PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'WIDTH', AXIS2, TYPE, 'WRITE',
-     :      PNTR2, NELM, STATUS )
+     :                  PNTR2, NELM, STATUS )
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :         LB, UB, STATUS )
+            CALL VEC_DTOD( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                     %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
          ELSE
-            CALL VEC_RTOR( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :         LB, UB, STATUS )
+            CALL VEC_RTOR( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                     %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
          END IF
          CALL NDF_AUNMP( NDF1, 'WIDTH', AXIS1, STATUS )
          CALL NDF_AUNMP( NDF2, 'WIDTH', AXIS2, STATUS )
@@ -182,15 +186,15 @@
          CALL NDF_ASTYP( TYPE, NDF2, 'VARIANCE', AXIS2, STATUS )
          IF ( TYPE .NE. '_REAL' ) TYPE = '_DOUBLE'
          CALL NDF_AMAP( NDF1, 'VARIANCE', AXIS1, TYPE, 'READ',
-     :      PNTR1, NELM, STATUS )
+     :                  PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'VARIANCE', AXIS2, TYPE, 'WRITE',
-     :      PNTR2, NELM, STATUS )
+     :                  PNTR2, NELM, STATUS )
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :         LB, UB, STATUS )
+            CALL VEC_DTOD( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :         %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
          ELSE
-            CALL VEC_RTOR( .FALSE., NELM, %VAL(PNTR1), %VAL(PNTR2),
-     :         LB, UB, STATUS )
+            CALL VEC_RTOR( .FALSE., NELM, %VAL( CNF_PVAL( PNTR1 ) ),
+     :         %VAL( CNF_PVAL( PNTR2 ) ), LB, UB, STATUS )
          END IF
          CALL NDF_AUNMP( NDF1, 'VARIANCE', AXIS1, STATUS )
          CALL NDF_AUNMP( NDF2, 'VARIANCE', AXIS2, STATUS )

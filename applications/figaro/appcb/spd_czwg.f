@@ -35,6 +35,7 @@
 
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *        Use SPE-routines and include file SPEPAR.
 *     24 Nov 1994 (hme):
 *        Renamed from SPAAQ.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,6 +62,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL FILE
@@ -105,8 +109,8 @@
       TYPE(3) = '_REAL'
       COMP(1) = 1
       COMP(2) = NCOMP
-      CALL SPD_FDHD( NDF, XLOC, 'READ', TYPE, COMP,
-     :   XNDF, CLOC, PLOC, DPNTR, CPNTR, PPNTR, NELM, STATUS )
+      CALL SPD_FDHD( NDF, XLOC, 'READ', TYPE, COMP, XNDF,
+     :               CLOC, PLOC, DPNTR, CPNTR, PPNTR, NELM, STATUS )
 
 *  If list goes to ASCII file.
       IF ( FILE ) THEN
@@ -116,14 +120,24 @@
 *     List the components.
          IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
             CALL SPD_CZWH( FILE, FU, NCOMP,
-     :         %VAL(CPNTR(1)), %VAL(CPNTR(2)), %VAL(CPNTR(3)),
-     :         %VAL(CPNTR(4)), %VAL(CPNTR(5)), %VAL(CPNTR(6)),
-     :         STATUS, %VAL(32), %VAL(32) )
+     :                     %VAL( CNF_PVAL( CPNTR(1) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(2) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(3) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
+     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
+     :                     %VAL( CNF_PVAL( 32 ) ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             CALL SPD_CZWJ( FILE, FU, NCOMP,
-     :         %VAL(CPNTR(1)), %VAL(CPNTR(2)), %VAL(CPNTR(3)),
-     :         %VAL(CPNTR(4)), %VAL(CPNTR(5)), %VAL(CPNTR(6)),
-     :         STATUS, %VAL(32), %VAL(32) )
+     :                     %VAL( CNF_PVAL( CPNTR(1) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(2) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(3) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
+     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
+     :                     %VAL( CNF_PVAL( 32 ) ) )
          ELSE
             WRITE( FU, 102 )
      :         ' Cannot map laboratory frequencies. ' //
@@ -132,8 +146,8 @@
 
 *     List the parameters.
          WRITE( FU, 102 ) ' '
-         CALL SPD_CZWK( FILE, FU, TNPAR, %VAL(PPNTR(1)),
-     :      STATUS, %VAL(32) )
+         CALL SPD_CZWK( FILE, FU, TNPAR, %VAL( CNF_PVAL( PPNTR(1) ) ),
+     :                  STATUS, %VAL( CNF_PVAL( 32 ) ) )
 
 *  Else (list goes to screen etc.)
       ELSE
@@ -145,16 +159,26 @@
 *     List the components.
          IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
             CALL SPD_CZWH( FILE, FU, NCOMP,
-     :         %VAL(CPNTR(1)), %VAL(CPNTR(2)), %VAL(CPNTR(3)),
-     :         %VAL(CPNTR(4)), %VAL(CPNTR(5)), %VAL(CPNTR(6)),
-     :         STATUS, %VAL(32), %VAL(32) )
+     :                     %VAL( CNF_PVAL( CPNTR(1) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(2) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(3) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
+     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
+     :                     %VAL( CNF_PVAL( 32 ) ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             SHORT = ' '
             CALL MSG_OUT( 'SPD_CZWG_LIST', SHORT, STATUS )
             CALL SPD_CZWJ( FILE, FU, NCOMP,
-     :         %VAL(CPNTR(1)), %VAL(CPNTR(2)), %VAL(CPNTR(3)),
-     :         %VAL(CPNTR(4)), %VAL(CPNTR(5)), %VAL(CPNTR(6)),
-     :         STATUS, %VAL(32), %VAL(32) )
+     :                     %VAL( CNF_PVAL( CPNTR(1) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(2) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(3) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
+     :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
+     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
+     :                     %VAL( CNF_PVAL( 32 ) ) )
          ELSE
             CALL MSG_OUT( 'SPD_CZWG_LIST',
      :         ' Cannot map laboratory frequencies. ' //
@@ -164,8 +188,8 @@
 *     List the parameters.
          SHORT = ' '
          CALL MSG_OUT( 'SPD_CZWG_LIST', SHORT, STATUS )
-         CALL SPD_CZWK( FILE, FU, TNPAR, %VAL(PPNTR(1)),
-     :      STATUS, %VAL(32) )
+         CALL SPD_CZWK( FILE, FU, TNPAR, %VAL( CNF_PVAL( PPNTR(1) ) ),
+     :                  STATUS, %VAL( CNF_PVAL( 32 ) ) )
       END IF
 
 *  Unmap and release locators.

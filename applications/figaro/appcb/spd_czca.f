@@ -39,11 +39,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     02 Mar 1994 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,6 +63,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER VARUSE
@@ -158,7 +162,7 @@
 *  Access spectroscopic values. Unless we decided on _DOUBLE above, this
 *  will make the decision between _REAL and _DOUBLE.
       CALL SPD_EAEA( MNDF, XLOC, SPAXIS, 'READ', TYPE, LABEL, UNITS,
-     :   XPNTR, XNDF, XNELM, STATUS )
+     :               XPNTR, XNDF, XNELM, STATUS )
 
 *  Access the data and variance.
       CALL NDF_MAP( MNDF, 'DATA', TYPE, 'READ', YPNTR, YNELM, STATUS )
@@ -186,7 +190,7 @@
          CALL SPD_FAAA(  MNDF, 'UPDATE', 0,  0, RTYPE, STATUS )
          CALL SPD_FAAC(  MNDF, I, NCOMP, TNPAR, RTYPE, STATUS )
          CALL SPD_FABER( MNDF, LINNAM, VAL__BADR, CMPTYP,
-     :      NPARA, PARTYP, COMP, STATUS )
+     :                   NPARA, PARTYP, COMP, STATUS )
 
 *  Else (structure does not exist).
       ELSE
@@ -198,7 +202,7 @@
          TNPAR = 15
          CALL SPD_FAAA(  MNDF, 'WRITE', NCOMP, TNPAR, RTYPE, STATUS )
          CALL SPD_FABBR( MNDF, COMP, LINNAM, VAL__BADR, CMPTYP,
-     :      NPARA, PARTYP, STATUS )
+     :                   NPARA, PARTYP, STATUS )
       END IF
 
 *  Call a routine to process each row. That is not a work routine, since
@@ -206,12 +210,16 @@
 *  via SPD_F* routines.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_CZCBD( (XNDF.NE.NDF__NOID), LVARUS, MNDF, COMP,
-     :      XNELM, YNELM/DIM(1), DIM(1), DBLE(BIAS),
-     :      %VAL(XPNTR), %VAL(YPNTR), %VAL(VPNTR), STATUS )
+     :                   XNELM, YNELM/DIM(1), DIM(1), DBLE(BIAS),
+     :                   %VAL( CNF_PVAL( XPNTR ) ),
+     :                   %VAL( CNF_PVAL( YPNTR ) ),
+     :                   %VAL( CNF_PVAL( VPNTR ) ), STATUS )
       ELSE
          CALL SPD_CZCBR( (XNDF.NE.NDF__NOID), LVARUS, MNDF, COMP,
-     :      XNELM, YNELM/DIM(1), DIM(1), BIAS,
-     :      %VAL(XPNTR), %VAL(YPNTR), %VAL(VPNTR), STATUS )
+     :                   XNELM, YNELM/DIM(1), DIM(1), BIAS,
+     :                   %VAL( CNF_PVAL( XPNTR ) ),
+     :                   %VAL( CNF_PVAL( YPNTR ) ),
+     :                   %VAL( CNF_PVAL( VPNTR ) ), STATUS )
       END IF
 
 *  Close down.

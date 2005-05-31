@@ -1,5 +1,6 @@
-      SUBROUTINE SPD_CZPED( INFO, COVRS, KMAX, XNK, DTYPE, ATYPE,
-     :   INDF, AXIS, LMAX, XL, ONDF, XNDF, MESSAG, STATUS )
+      SUBROUTINE SPD_CZPED( INFO, COVRS, KMAX, XNK, DTYPE, ATYPE, INDF,
+     :                      AXIS, LMAX, XL, ONDF, XNDF, MESSAG,
+     :                      STATUS )
 *+
 *  Name:
 *     SPD_CZPE{DR}
@@ -77,6 +78,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acc: Anne Charles (RAL, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +106,8 @@
 *        Renamed from SPAABx.
 *     15 Oct 1997 (acc):
 *        Change name RESAMPLE to RESAMP due to clash of names with FIGARO.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,6 +123,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL INFO
@@ -298,12 +303,12 @@
 *           of the first two axes remain the same.
                CALL NDF_FIND( XLOC, XCMP9, RNDF, STATUS )
                CALL NDF_BOUND( RNDF, NDF__MXDIM, RLBND, RUBND, RNDIM,
-     :            STATUS )
+     :                        STATUS )
 
 *           Find out the bounds of INDF, which indicate the section
 *           taken to make it from its base NDF.
                CALL NDF_BOUND( INDF, NDF__MXDIM, DLBND, DUBND, DNDIM,
-     :            STATUS )
+     :                         STATUS )
 
 *           Convert this to the sectioning bounds to be applied to the
 *           inherited result NDF. Fortunately the NDF's extension needs
@@ -335,21 +340,29 @@
                CALL NDF_TYPE( RNDF, 'DATA,VARIANCE', TYPE, STATUS )
                IF ( TYPE .NE. '_DOUBLE' ) TYPE = '_REAL'
                CALL NDF_MAP(  RNDF, 'DATA,VARIANCE', TYPE, 'WRITE/BAD',
-     :            RPNTR, RNELM, STATUS )
+     :                        RPNTR, RNELM, STATUS )
                CALL NDF_MAP(  TNDF, 'DATA,VARIANCE', TYPE, 'READ',
-     :            TPNTR, TNELM, STATUS )
+     :                        TPNTR, TNELM, STATUS )
 
 *           Copy back the contents from the copy into the reshaped NDF.
                IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .TRUE., RNELM, %VAL(TPNTR(1)),
-     :               %VAL(RPNTR(1)), I, J, STATUS )
-                  CALL VEC_DTOD( .TRUE., RNELM, %VAL(TPNTR(2)),
-     :               %VAL(RPNTR(2)), I, J, STATUS )
+                  CALL VEC_DTOD( .TRUE., RNELM,
+     :                           %VAL( CNF_PVAL( TPNTR(1) ) ),
+     :                           %VAL( CNF_PVAL( RPNTR(1) ) ), I, J,
+     :                           STATUS )
+                  CALL VEC_DTOD( .TRUE., RNELM,
+     :                           %VAL( CNF_PVAL( TPNTR(2) ) ),
+     :                           %VAL( CNF_PVAL( RPNTR(2) ) ), I, J,
+     :                            STATUS )
                ELSE
-                  CALL VEC_RTOR( .TRUE., RNELM, %VAL(TPNTR(1)),
-     :               %VAL(RPNTR(1)), I, J, STATUS )
-                  CALL VEC_RTOR( .TRUE., RNELM, %VAL(TPNTR(2)),
-     :               %VAL(RPNTR(2)), I, J, STATUS )
+                  CALL VEC_RTOR( .TRUE., RNELM,
+     :                           %VAL( CNF_PVAL( TPNTR(1) ) ),
+     :                           %VAL( CNF_PVAL( RPNTR(1) ) ), I, J,
+     :                           STATUS )
+                  CALL VEC_RTOR( .TRUE., RNELM,
+     :                           %VAL( CNF_PVAL( TPNTR(2) ) ),
+     :                           %VAL( CNF_PVAL( RPNTR(2) ) ), I, J,
+     :                           STATUS )
                END IF
 
 *           Annul the result and temporary NDFs.
@@ -410,8 +423,9 @@
 
 *  Map output pixel positions and fill it linearly with values.
       CALL NDF_AMAP( ONDF, 'Centre', 1, ATYPE, 'WRITE', XL, IDUMMY,
-     :   STATUS )
-      CALL SPD_UAAJD( XSTART, XEND, LMAX, %VAL(XL), STATUS )
+     :               STATUS )
+      CALL SPD_UAAJD( XSTART, XEND, LMAX, %VAL( CNF_PVAL( XL ) ),
+     :                STATUS )
 
 *  Tidy up.
  500  CONTINUE

@@ -75,6 +75,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        Original version.
 *     04 May 1994 (hme):
 *        Add the finder image handling.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDFCUB
@@ -234,22 +238,22 @@
 *  which are packed into one array. This array is _REAL.
       CALL NDF_TEMP( PLACE, STATUS )
       CALL NDF_NEW( '_REAL', 1, 1, 4*DIM(SPAXIS), PLACE,
-     :   NDF(3), STATUS )
+     :              NDF(3), STATUS )
       CALL NDF_MAP( NDF(3), 'DATA', '_REAL', 'WRITE',
-     :   PTRMSK, I, STATUS )
+     :              PTRMSK, I, STATUS )
 
 *  Get four more work spaces. All components will be usurped for
 *  different things.
       CALL NDF_TEMP( PLACE, STATUS )
       CALL NDF_NEW( '_REAL', 1, 1, DIM(SPAXIS), PLACE, NDF(4), STATUS )
       CALL NDF_AMAP( NDF(4), 'CENTRE', 1, '_REAL', 'WRITE',
-     :   PTRW1, NELM, STATUS )
+     :               PTRW1, NELM, STATUS )
       CALL NDF_AMAP( NDF(4), 'WIDTH',  1, '_REAL', 'WRITE',
-     :   PTRW2, NELM, STATUS )
-      CALL NDF_MAP(  NDF(4), 'DATA',      '_REAL', 'WRITE',
-     :   PTRW3, NELM, STATUS )
-      CALL NDF_MAP(  NDF(4), 'VARIANCE',  '_REAL', 'WRITE',
-     :   PTRW4, NELM, STATUS )
+     :              PTRW2, NELM, STATUS )
+      CALL NDF_MAP( NDF(4), 'DATA',      '_REAL', 'WRITE',
+     :              PTRW3, NELM, STATUS )
+      CALL NDF_MAP( NDF(4), 'VARIANCE',  '_REAL', 'WRITE',
+     :              PTRW4, NELM, STATUS )
 
 *  Work out the actual dimensionality and dimensions.
       CUBDIM = 0
@@ -270,25 +274,28 @@
 *        Get work space.
             CALL NDF_TEMP( PLACE, STATUS )
             CALL NDF_NEW( '_REAL', 1, 1, ADIM(1)*ADIM(2), PLACE,
-     :         NDF(5), STATUS )
+     :                    NDF(5), STATUS )
             CALL NDF_MAP( NDF(5), 'DATA', '_REAL', 'WRITE',
-     :         PTRFI, I, STATUS )
+     :                    PTRFI, I, STATUS )
 
 *        Copy data to work space.
-            CALL VEC_RTOR( .FALSE., ADIM(1)*ADIM(2), %VAL(PTRCD),
-     :         %VAL(PTRFI), I, J, STATUS )
+            CALL VEC_RTOR( .FALSE., ADIM(1)*ADIM(2), 
+     :                     %VAL( CNF_PVAL( PTRCD ) ), 
+     :                     %VAL( CNF_PVAL( PTRFI ) ), I, J, STATUS )
 
 *        Work out extrema of work space.
-            CALL SPD_UAAAR( .TRUE., ADIM(1)*ADIM(2), %VAL(PTRFI),
-     :         MINVAL, MAXVAL, STATUS )
+            CALL SPD_UAAAR( .TRUE., ADIM(1)*ADIM(2), 
+     :                      %VAL( CNF_PVAL( PTRFI ) ), MINVAL, MAXVAL,
+     :                      STATUS )
 
 *        Replace bad values with 2*min-max in work space.
             CALL SPD_UAABR( ADIM(1)*ADIM(2),
-     :         2*MINVAL-MAXVAL, %VAL(PTRFI), STATUS )
+     :                      2*MINVAL-MAXVAL, %VAL( CNF_PVAL( PTRFI ) ),
+     :                      STATUS )
 
 *        Register work space as finder image.
             CALL SPD_PDAA( PTRFI, ADIM(1), ADIM(2), ALBND(1), ALBND(2),
-     :         STATUS )
+     :                     STATUS )
 
 *     Else if dimensionality is 3.
          ELSE IF ( CUBDIM .EQ. 3 ) THEN
@@ -296,39 +303,42 @@
 *        Get work spaces.
             CALL NDF_TEMP( PLACE, STATUS )
             CALL NDF_NEW( '_REAL', 1, 1, ADIM(2)*ADIM(3), PLACE,
-     :         NDF(5), STATUS )
+     :                    NDF(5), STATUS )
             CALL NDF_ASTYP( '_INTEGER', NDF(5), 'CENTRE', 1, STATUS )
             CALL NDF_MAP( NDF(5), 'DATA', '_REAL', 'WRITE',
-     :         PTRFI, I, STATUS )
+     :                    PTRFI, I, STATUS )
             CALL NDF_MAP( NDF(5), 'VARIANCE', '_REAL', 'WRITE',
-     :         WORKR, I, STATUS )
+     :                     WORKR, I, STATUS )
             CALL NDF_AMAP( NDF(5), 'CENTRE', 1, '_INTEGER', 'WRITE',
-     :         WORKI, I, STATUS )
+     :                     WORKI, I, STATUS )
 
 *        Average cube along first axis, result into work space.
             IMDIM(1) = 1
             IMDIM(2) = ADIM(2)
             IMDIM(3) = ADIM(3)
             CALL SPD_UAACR( .FALSE., 3, ADIM(1)*ADIM(2)*ADIM(3),
-     :         ADIM(2)*ADIM(3), VAL__BADR, ADIM, IMDIM,
-     :         %VAL(PTRCD), 0., BADDAT, BADVAR,
-     :         %VAL(PTRFI), %VAL(WORKR), %VAL(WORKI), STATUS )
+     :                      ADIM(2)*ADIM(3), VAL__BADR, ADIM, IMDIM,
+     :                      %VAL( CNF_PVAL( PTRCD ) ), 0., BADDAT,
+     :                      BADVAR, %VAL( CNF_PVAL( PTRFI ) ),
+     :                      %VAL( CNF_PVAL( WORKR ) ),
+     :                      %VAL( CNF_PVAL( WORKI ) ), STATUS )
 
 *        Release work spaces other than the finder image.
             CALL NDF_AUNMP( NDF(5), 'CENTRE', 1, STATUS )
             CALL NDF_UNMAP( NDF(5), 'VARIANCE',  STATUS )
 
 *        Work out extrema of work space.
-            CALL SPD_UAAAR( .TRUE., ADIM(2)*ADIM(3), %VAL(PTRFI),
-     :         MINVAL, MAXVAL, STATUS )
+            CALL SPD_UAAAR( .TRUE., ADIM(2)*ADIM(3),
+     :                      %VAL( CNF_PVAL( PTRFI ) ), MINVAL,
+     :                      MAXVAL, STATUS )
 
 *        Replace bad values with 2*min-max in work space.
-            CALL SPD_UAABR( ADIM(2)*ADIM(3),
-     :         2*MINVAL-MAXVAL, %VAL(PTRFI), STATUS )
+            CALL SPD_UAABR( ADIM(2)*ADIM(3), 2*MINVAL-MAXVAL, 
+     :                      %VAL( CNF_PVAL( PTRFI ) ), STATUS )
 
 *        Register work space as finder image.
             CALL SPD_PDAA( PTRFI, ADIM(2), ADIM(3), ALBND(2), ALBND(3),
-     :         STATUS )
+     :                     STATUS )
 
          END IF
 

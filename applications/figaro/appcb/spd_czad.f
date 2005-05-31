@@ -1,8 +1,8 @@
-      SUBROUTINE SPD_CZAD( REASON, PICID, OVER, NDF,
-     :   TEXT, LABGVN, BOTTOM, LEFT, TOP, RIGHT,
-     :   FILL, WLDGVN, WORLD, LABSPC, ROMAN, CHIGHT, COLOUR, THICK,
-     :   AXES, TICK, NUML, MAJOR, MINOR, DASH,
-     :   START, STEP, NMAJOR, STATUS )
+      SUBROUTINE SPD_CZAD( REASON, PICID, OVER, NDF, TEXT, LABGVN,
+     :                     BOTTOM, LEFT, TOP, RIGHT, FILL, WLDGVN, 
+     :                     WORLD, LABSPC, ROMAN, CHIGHT, COLOUR, THICK,
+     :                     AXES, TICK, NUML, MAJOR, MINOR, DASH,
+     :                     START, STEP, NMAJOR, STATUS )
 *+
 *  Name:
 *     SPD_CZAD
@@ -126,6 +126,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -142,6 +143,8 @@
 *     20 Nov 1995 (hme):
 *        Remove the STYLE and NMINOR arguments. This routine uses plain
 *        PGPLOT.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +161,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER REASON
@@ -307,16 +311,16 @@
 
 *     Check that the coordinates are linear.
 *     We get the first and last values as a side effect.
-         CALL SPD_UAAHR( DIM(AXIS(1)), %VAL(ADAT(1)), EPS,
-     :      DATRNG(1), DATRNG(2), LINEAR, STATUS )
+         CALL SPD_UAAHR( DIM(AXIS(1)), %VAL( CNF_PVAL( ADAT(1) ) ),
+     :                   EPS, DATRNG(1), DATRNG(2), LINEAR, STATUS )
          IF ( .NOT. LINEAR ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPD_CZAD_E03', 'SPECCONT: Error: First ' //
      :         'axis is not linear.', STATUS )
             GO TO 500
          END IF
-         CALL SPD_UAAHR( DIM(AXIS(2)), %VAL(ADAT(2)), EPS,
-     :      DATRNG(3), DATRNG(4), LINEAR, STATUS )
+         CALL SPD_UAAHR( DIM(AXIS(2)), %VAL( CNF_PVAL( ADAT(2) ) ),
+     :                   EPS, DATRNG(3), DATRNG(4), LINEAR, STATUS )
          IF ( .NOT. LINEAR ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPD_CZAD_E04', 'SPECCONT: Error: Second ' //
@@ -324,8 +328,8 @@
             GO TO 500
          END IF
 
-*     At the moment we have the data coordinate range in DATRNG, which
-*     we use to remember how to convert array index to coordinate.
+*     At the moment we have the data co-ordinate range in DATRNG, which
+*     we use to remember how to convert array index to co-ordinate.
 *     We work out the transform matrix for the plotting routine here.
          TR(2) = ( DATRNG(2) - DATRNG(1) ) / FLOAT( DIM(AXIS(1)) - 1 )
          TR(6) = ( DATRNG(4) - DATRNG(3) ) / FLOAT( DIM(AXIS(2)) - 1 )
@@ -426,20 +430,20 @@
 *        the full view surface.
             CALL PGSVP( 0., 1., 0., 1. )
 
-*        Now, the picture will first of all have world coordinates.
+*        Now, the picture will first of all have world co-ordinates.
 *        These are free, but must be linear and increasing. Kappa
 *        DISPLAY, for example uses NDF pixel indices to set a picture's
-*        world coordinates. Then, the picture may have a
+*        world co-ordinates. Then, the picture may have a
 *        transformation. The forward function transforms our world
-*        coordinates (axis centres, which may run backward and in other
+*        co-ordinates (axis centres, which may run backward and in other
 *        applications might not be monotonous or linear) into the
-*        picture's world coordinates. The inverse function transforms
-*        the picture's world coordinates into ours. (AGI calls our world
-*        coordinates data coordinates.)
+*        picture's world co-ordinates. The inverse function transforms
+*        the picture's world co-ordinates into ours. (AGI calls our world
+*        co-ordinates data co-ordinates.)
 *        There are two things to do here. Firstly the transform must be
-*        linear in each direction and independent of the coordinate in
+*        linear in each direction and independent of the co-ordinate in
 *        the other direction. Secondly we need to transform the
-*        picture's world coordinate range into our world coordinates and
+*        picture's world co-ordinate range into our world co-ordinates and
 *        use those numbers for the PGPLOT window.
 
 *        Get workspace to transform axis centres. The transformation is
@@ -448,27 +452,31 @@
 *        constant values 1 to pair with the axis centre arrays.
             CALL NDF_TEMP( I, STATUS )
             CALL NDF_NEW( '_REAL', 1, 1, MAX(DIM(AXIS(1)),DIM(AXIS(2))),
-     :         I, WNDF(3), STATUS )
+     :                    I, WNDF(3), STATUS )
             CALL NDF_AMAP( WNDF(3), 'CENTRE', 1, '_REAL', 'WRITE',
-     :         WPTR(1), I, STATUS )
+     :                     WPTR(1), I, STATUS )
             CALL NDF_MAP(  WNDF(3), 'DATA,VARIANCE', '_REAL', 'WRITE',
-     :         WPTR(2), I, STATUS )
-            CALL SPD_UAAFR( 1, I, %VAL(WPTR(1)), 1., STATUS )
+     :                     WPTR(2), I, STATUS )
+            CALL SPD_UAAFR( 1, I, %VAL( CNF_PVAL( WPTR(1) ) ), 1.,
+     :                      STATUS )
 
 *        Transform pixels parallel to x axis from data to world. Result
 *        x should be linear, result y should be constant.
 *        For data x we can use the mapped axis centres. But we need a
 *        corresponding array of y values identical to 1 (not 0).
-            CALL AGI_TDTOW( PICID, DIM(AXIS(1)),
-     :         %VAL(ADAT(1)), %VAL(WPTR(1)),
-     :         %VAL(WPTR(2)), %VAL(WPTR(3)), STATUS )
+            CALL AGI_TDTOW( PICID, DIM(AXIS(1)), 
+     :                      %VAL( CNF_PVAL( ADAT(1) ) ),
+     :                      %VAL( CNF_PVAL( WPTR(1) ) ),
+     :                      %VAL( CNF_PVAL( WPTR(2) ) ),
+     :                      %VAL( CNF_PVAL( WPTR(3) ) ), STATUS )
 
 *        If transform was successful.
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *           Check that world x is linear w.r.t. data x.
-               CALL SPD_UAAHR( DIM(AXIS(1)), %VAL(WPTR(2)), EPS,
-     :            RTEMP(1), RTEMP(2), LINEAR, STATUS )
+               CALL SPD_UAAHR( DIM(AXIS(1)),
+     :                         %VAL( CNF_PVAL( WPTR(2) ) ),
+     :                         EPS, RTEMP(1), RTEMP(2), LINEAR, STATUS )
                IF ( .NOT. LINEAR .OR. RTEMP(1) .EQ. RTEMP(2) ) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'SPD_CZAD_E03',
@@ -477,8 +485,9 @@
                END IF
 
 *           Check that world y is independent of data x.
-               CALL SPD_UAAAR( .FALSE., DIM(AXIS(1)), %VAL(WPTR(3)),
-     :            RTEMP(1), RTEMP(2), STATUS )
+               CALL SPD_UAAAR( .FALSE., DIM(AXIS(1)),
+     :                         %VAL( CNF_PVAL( WPTR(3) ) ),
+     :                         RTEMP(1), RTEMP(2), STATUS )
                IF ( (RTEMP(2)-RTEMP(1)) .GT.
      :               EPS*(ABS(RTEMP(2))+ABS(RTEMP(1))) ) THEN
                   STATUS = SAI__ERROR
@@ -494,15 +503,18 @@
 *        For data y we can use the mapped axis centres. But we need a
 *        corresponding array of x values identical to 1 (not 0).
             CALL AGI_TDTOW( PICID, DIM(AXIS(2)),
-     :         %VAL(WPTR(1)), %VAL(ADAT(2)),
-     :         %VAL(WPTR(2)), %VAL(WPTR(3)), STATUS )
+     :                      %VAL( CNF_PVAL( WPTR(1) ) ),
+     :                      %VAL( CNF_PVAL( ADAT(2) ) ),
+     :                      %VAL( CNF_PVAL( WPTR(2) ) ),
+     :                      %VAL( CNF_PVAL( WPTR(3) ) ), STATUS )
 
 *        If transform was successful.
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *           Check that world y is linear w.r.t. data y.
-               CALL SPD_UAAHR( DIM(AXIS(2)), %VAL(WPTR(3)), EPS,
-     :            RTEMP(1), RTEMP(2), LINEAR, STATUS )
+               CALL SPD_UAAHR( DIM(AXIS(2)),
+     :                         %VAL( CNF_PVAL( WPTR(3) ) ),
+     :                         EPS, RTEMP(1), RTEMP(2), LINEAR, STATUS )
                IF ( .NOT. LINEAR .OR. RTEMP(1) .EQ. RTEMP(2) ) THEN
                   STATUS = SAI__ERROR
                   CALL ERR_REP( 'SPD_CZAD_E04',
@@ -511,8 +523,9 @@
                END IF
 
 *           Check that world y is independent of data x.
-               CALL SPD_UAAAR( .FALSE., DIM(AXIS(2)), %VAL(WPTR(2)),
-     :            RTEMP(1), RTEMP(2), STATUS )
+               CALL SPD_UAAAR( .FALSE., DIM(AXIS(2)),
+     :                         %VAL( CNF_PVAL( WPTR(2) ) ),
+     :                         RTEMP(1), RTEMP(2), STATUS )
                IF ( (RTEMP(2)-RTEMP(1)) .GT.
      :               EPS*(ABS(RTEMP(2))+ABS(RTEMP(1))) ) THEN
                   STATUS = SAI__ERROR
@@ -528,12 +541,12 @@
             IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *        Derive window from transform. For this we must get the
-*        picture's world coordinates and transform two opposite corners
-*        to data coordinates.
+*        picture's world co-ordinates and transform two opposite corners
+*        to data co-ordinates.
             CALL AGI_IWOCO( RTEMP(1), RTEMP(2), RTEMP(3), RTEMP(4),
-     :         STATUS )
+     :                      STATUS )
             CALL AGI_TWTOD( PICID, 2, RTEMP(1), RTEMP(3),
-     :         LWORLD(1), LWORLD(3), STATUS )
+     :                      LWORLD(1), LWORLD(3), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
             CALL PGSWIN( LWORLD(1), LWORLD(2), LWORLD(3), LWORLD(4) )
 
@@ -563,7 +576,7 @@
 
 *        Derive viewport from current picture and LABSPC.
             CALL PGSVP( LABSPC(2), 1.-LABSPC(4),
-     :         LABSPC(1), 1.-LABSPC(3) )
+     :                  LABSPC(1), 1.-LABSPC(3) )
 
 *        Set window from given WORLD or as derived from data.
             IF ( FILL .NE. 0 ) THEN
@@ -598,7 +611,7 @@
             IF ( NUML(1) .EQ. 1 ) BOXOPT(5:5) = 'N'
             IF ( BOXOPT .NE. ' ' )
      :         CALL PGBOX( BOXOPT, MAJOR(1), MINOR(1),
-     :            ' ', MAJOR(2), MINOR(2) )
+     :                     ' ', MAJOR(2), MINOR(2) )
             BOXOPT = '      '
             IF ( AXES(2) .EQ. 1 ) BOXOPT(1:1) = 'B'
             IF ( TICK(2) .NE. 0 ) BOXOPT(2:3) = 'TS'
@@ -607,7 +620,7 @@
             IF ( NUML(2) .EQ. 1 ) BOXOPT(6:6) = 'V'
             IF ( BOXOPT .NE. ' ' )
      :         CALL PGBOX( ' ', MAJOR(1), MINOR(1),
-     :            BOXOPT, MAJOR(2), MINOR(2) )
+     :                     BOXOPT, MAJOR(2), MINOR(2) )
             BOXOPT = '      '
             IF ( AXES(3) .EQ. 1 ) BOXOPT(1:1) = 'C'
             IF ( TICK(3) .NE. 0 ) BOXOPT(2:3) = 'TS'
@@ -615,7 +628,7 @@
             IF ( NUML(3) .EQ. 1 ) BOXOPT(5:5) = 'M'
             IF ( BOXOPT .NE. ' ' )
      :         CALL PGBOX( BOXOPT, MAJOR(1), MINOR(1),
-     :            ' ', MAJOR(2), MINOR(2) )
+     :                     ' ', MAJOR(2), MINOR(2) )
             BOXOPT = '      '
             IF ( AXES(4) .EQ. 1 ) BOXOPT(1:1) = 'C'
             IF ( TICK(4) .NE. 0 ) BOXOPT(2:3) = 'TS'
@@ -624,7 +637,7 @@
             IF ( NUML(4) .EQ. 1 ) BOXOPT(6:6) = 'V'
             IF ( BOXOPT .NE. ' ' )
      :         CALL PGBOX( ' ', MAJOR(1), MINOR(1),
-     :            BOXOPT, MAJOR(2), MINOR(2) )
+     :                     BOXOPT, MAJOR(2), MINOR(2) )
 
 *        Plot the text labels.
 *        The position must be specified in units of character height
@@ -649,30 +662,26 @@
 
 *        Bottom label.
             IF ( TEXT(1) .EQ. 1 ) THEN
-               CALL PGMTXT( 'B',
-     :            LABSPC(1) * 40 / CHIGHT - 1.,
-     :            .5, .5, LPLAB(1) )
+               CALL PGMTXT( 'B', LABSPC(1) * 40 / CHIGHT - 1.,
+     :                      0.5, .5, LPLAB(1) )
             END IF
 
 *        Left label.
             IF ( TEXT(2) .EQ. 1 ) THEN
-               CALL PGMTXT( 'L',
-     :            LABSPC(2) * 40 * ASPECT / CHIGHT - 1.,
-     :            .5, .5, LPLAB(2) )
+               CALL PGMTXT( 'L', LABSPC(2) * 40 * ASPECT / CHIGHT - 1.,
+     :                      0.5, .5, LPLAB(2) )
             END IF
 
 *        Top label.
             IF ( TEXT(3) .EQ. 1 ) THEN
-               CALL PGMTXT( 'T',
-     :            LABSPC(3) * 40 / CHIGHT - 1.,
-     :            .5, .5, LPLAB(3) )
+               CALL PGMTXT( 'T', LABSPC(3) * 40 / CHIGHT - 1.,
+     :                      0.5, .5, LPLAB(3) )
             END IF
 
 *        Right label.
             IF ( TEXT(4) .EQ. 1 ) THEN
-               CALL PGMTXT( 'R',
-     :            LABSPC(2) * 40 * ASPECT / CHIGHT - 1.,
-     :            .5, .5, LPLAB(4) )
+               CALL PGMTXT( 'R', LABSPC(2) * 40 * ASPECT / CHIGHT - 1.,
+     :                      0.5, .5, LPLAB(4) )
             END IF
 
          END IF
@@ -688,14 +697,14 @@
          CALL NDF_TEMP( I, STATUS )
          CALL NDF_NEW( '_REAL', 1, 1, NMAJOR, I, WNDF(2), STATUS )
          CALL NDF_MAP( WNDF(2), 'DATA', '_REAL', 'WRITE',
-     :      IPATH, I, STATUS )
+     :                 IPATH, I, STATUS )
          CALL SPD_UAAJR( START, START+(NMAJOR-1)*STEP, NMAJOR,
-     :      %VAL(IPATH), STATUS )
+     :                   %VAL( CNF_PVAL( IPATH ) ), STATUS )
 
 *     Plot the contours.
-         CALL PGCONB( %VAL(DATA), DIM(AXIS(1)), DIM(AXIS(2)),
-     :      1, DIM(AXIS(1)), 1, DIM(AXIS(2)),
-     :      %VAL(IPATH), NMAJOR, TR, VAL__BADR )
+         CALL PGCONB( %VAL( CNF_PVAL( DATA ) ), DIM(AXIS(1)), 
+     :                DIM(AXIS(2)), 1, DIM(AXIS(1)), 1, DIM(AXIS(2)),
+     :                %VAL( CNF_PVAL( IPATH ) ), NMAJOR, TR, VAL__BADR )
 
 *     Release the data and path work spaces.
          CALL NDF_ANNUL( WNDF(2), STATUS )

@@ -27,6 +27,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,8 @@
 *        Remove MESSAG argument, add EXPAND parameter.
 *     25 Nov 1994 (hme):
 *        Use new libraries.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -57,6 +60,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL INFO
@@ -179,7 +183,7 @@
             DIM3(J)  = DIM2(J)
             UBND3(J) = UBND1(I)
             LBND3(J) = LBND1(I)
-         ENDIF
+         END IF
  1    CONTINUE
 
 *  Did we detect an inconsistency in the given arrays?
@@ -194,7 +198,7 @@
          CALL ERR_REP( 'GROW_E06', 'GROW: Error: Number of zeros ' //
      :      'in EXPAND does not match IN dimensionality.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Fill arrays till NDF_MXDIM.
       DO 2 J = NDIM3+1, NDF__MXDIM
@@ -210,12 +214,12 @@
 *  Create OUT NDF.
       CALL NDF_TYPE( NDF(1), 'DATA', TYPE(1), STATUS )
       CALL NDF_CREAT( 'OUT', TYPE(1), NDIM3, LBND3, UBND3,
-     :   NDF(2), STATUS )
+     :                NDF(2), STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GROW_E07', 'GROW: Error creating output NDF.',
      :      STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Find out if IN has Extension, and what its spectroscopic axis is.
 *  Create Extension for OUT, if only to store SPECAXIS.
@@ -226,7 +230,7 @@
          CALL ERR_REP( 'GROW_E08', 'GROW: Error accessing input or ' //
      :      'output Specdre Extension.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  As yet, EXPAND .EQ. 0 signified an original axis.
 *  Below we will use DIM2 .NE. 1 for that purpose.
@@ -252,27 +256,29 @@
                SPAXJ = J
                CALL SPD_EABB( NDF(2), XLOC2, SPAXJ, STATUS )
             END IF
-         ENDIF
+         END IF
  3    CONTINUE
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GROW_E09', 'GROW: Error copying axes from ' //
      :      'input to output.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  Grow the data.
       IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = '_REAL'
       CALL NDF_MAP( NDF(1), 'DATA', TYPE(1), 'READ',
-     :   PNTR1, NELM1, STATUS )
+     :              PNTR1, NELM1, STATUS )
       CALL NDF_MAP( NDF(2), 'DATA', TYPE(1), 'WRITE/BAD',
-     :   PNTR3, NELM3, STATUS )
+     :              PNTR3, NELM3, STATUS )
       IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-         CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+         CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                   %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                   NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
       ELSE
-         CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-      ENDIF
+         CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                   %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                   NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+      END IF
       CALL NDF_UNMAP( NDF(1), 'DATA', STATUS )
       CALL NDF_UNMAP( NDF(2), 'DATA', STATUS )
 
@@ -283,16 +289,20 @@
          CALL NDF_STYPE( TYPE(1), NDF(2), 'VARIANCE', STATUS )
          IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = '_REAL'
          CALL NDF_MAP( NDF(1), 'VARIANCE', TYPE(1), 'READ',
-     :      PNTR1, NELM1, STATUS )
+     :                 PNTR1, NELM1, STATUS )
          CALL NDF_MAP( NDF(2), 'VARIANCE', TYPE(1), 'WRITE/BAD',
-     :      PNTR3, NELM3, STATUS )
+     :                 PNTR3, NELM3, STATUS )
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+            CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
-         ENDIF
+            CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                      %VAL( CNF_PVAL( PNTR3 ) ), STAPIX, ENDPIX,
+     :                      NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                      STATUS )
+         END IF
          CALL NDF_UNMAP( NDF(1), 'VARIANCE', STATUS )
          CALL NDF_UNMAP( NDF(2), 'VARIANCE', STATUS )
       END IF
@@ -300,7 +310,7 @@
          CALL ERR_REP( 'GROW_E10', 'GROW: Error accessing input or ' //
      :      'output data or variance.', STATUS )
          GO TO 500
-      ENDIF
+      END IF
 
 *  If IN has Extension.
       IF ( EXIST ) THEN
@@ -336,7 +346,7 @@
             CALL ERR_REP( 'GROW_E11', 'GROW: Error copying scalars ' //
      :         'in Specdre Extension.', STATUS )
             GO TO 500
-         ENDIF
+         END IF
 
 *     If IN.SPECVALS exist.
          CALL DAT_THERE( XLOC1, XCMP6, EXIST2, STATUS )
@@ -345,25 +355,30 @@
 *        Access IN.SPECVALS.
             TYPE(1) = ' '
             CALL SPD_EAED( NDF(1), XLOC1, 'READ', TYPE(1), LABEL, UNITS,
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
 
 *        Create OUT.SPECVALS without defaults in it.
             CALL NDF_PLACE( XLOC2, XCMP6, PLACE, STATUS )
             CALL NDF_NEW( TYPE(1), NDIM3, LBND3, UBND3, PLACE,
-     :         NDF(4), STATUS )
+     :                    NDF(4), STATUS )
 
 *        Grow IN.SPECVALS to fill all of OUT.SPECVALS.
             CALL NDF_MAP( NDF(4), 'DATA', TYPE(1), 'WRITE',
-     :         PNTR3, NELM3, STATUS )
+     :                    PNTR3, NELM3, STATUS )
+
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), ONE, DIM3,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), ONE, DIM3,
+     :                         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                         STATUS )
             ELSE IF ( TYPE(1) .EQ. '_REAL' ) THEN
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), ONE, DIM3,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), ONE, DIM3,
+     :                         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                         STATUS )
             ELSE
                STATUS = SAI__ERROR
-            ENDIF
+            END IF
 
 *        Put OUT.SPECVALS label and unit. (Must exist anyway.)
             CALL NDF_CPUT( LABEL, NDF(4), 'LABEL', STATUS )
@@ -376,7 +391,7 @@
                CALL ERR_REP( 'GROW_E12', 'GROW: Error growing ' //
      :            'spectroscopic values in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
          END IF
 
 *     If IN.SPECWIDS exist.
@@ -386,25 +401,30 @@
 *        Access IN.SPECWIDS.
             TYPE(1) = ' '
             CALL SPD_EAFD( NDF(1), XLOC1, 'READ', TYPE(1),
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
 
 *        Create OUT.SPECWIDS without defaults in it.
             CALL NDF_PLACE( XLOC2, XCMP7, PLACE, STATUS )
             CALL NDF_NEW( TYPE(1), NDIM3, LBND3, UBND3, PLACE,
-     :         NDF(4), STATUS )
+     :                    NDF(4), STATUS )
 
 *        Grow IN.SPECWIDS to fill all of OUT.SPECWIDS.
             CALL NDF_MAP( NDF(4), 'DATA', TYPE(1), 'WRITE',
-     :         PNTR3, NELM3, STATUS )
+     :                   PNTR3, NELM3, STATUS )
+
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), ONE, DIM3,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), ONE, DIM3,
+     :                         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                         STATUS )
             ELSE IF ( TYPE(1) .EQ. '_REAL' ) THEN
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), ONE, DIM3,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), ONE, DIM3,
+     :                         NDF__MXDIM, DIM2, DIM3, NELM1, NELM3,
+     :                         STATUS )
             ELSE
                STATUS = SAI__ERROR
-            ENDIF
+            END IF
 
 *        Annul the Extension NDFs.
             CALL NDF_ANNUL( NDF(3), STATUS )
@@ -413,7 +433,7 @@
                CALL ERR_REP( 'GROW_E13', 'GROW: Error growing ' //
      :            'spectroscopic widths in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
          END IF
 
 *     If IN.COVRS exist, issue a warning that it is not propagated.
@@ -423,25 +443,29 @@
 *        Access IN.COVRS.
             TYPE(1) = ' '
             CALL SPD_EAGD( NDF(1), XLOC1, 'READ', TYPE(1),
-     :         PNTR1, NDF(3), NELM1, STATUS )
+     :                     PNTR1, NDF(3), NELM1, STATUS )
 
 *        Create OUT.COVRS with bad values in it.
             CALL NDF_PLACE( XLOC2, XCMP8, PLACE, STATUS )
             CALL NDF_NEW( TYPE(1), NDIM3, LBND3, UBND3, PLACE,
-     :         NDF(4), STATUS )
+     :                    NDF(4), STATUS )
             CALL NDF_MAP( NDF(4), 'DATA', TYPE(1), 'WRITE/BAD',
-     :         PNTR3, NELM3, STATUS )
+     :                    PNTR3, NELM3, STATUS )
 
 *        Grow IN.COVRS.
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3, NELM1,
+     :                         NELM3, STATUS )
             ELSE IF ( TYPE(1) .EQ. '_REAL' ) THEN
-               CALL SPD_UAAMR( %VAL(PNTR1), %VAL(PNTR3), STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, NELM1, NELM3, STATUS )
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( PNTR1 ) ),
+     :                         %VAL( CNF_PVAL( PNTR3 ) ), STAPIX,
+     :                         ENDPIX, NDF__MXDIM, DIM2, DIM3, NELM1,
+     :                         NELM3, STATUS )
             ELSE
                STATUS = SAI__ERROR
-            ENDIF
+            END IF
 
 *        Annul the Extension NDFs.
             CALL NDF_ANNUL( NDF(3), STATUS )
@@ -450,7 +474,7 @@
                CALL ERR_REP( 'GROW_E14', 'GROW: Error growing ' //
      :            'covariance row sums in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
          END IF
 
 *     If IN.RESULTS exist.
@@ -465,7 +489,7 @@
                CALL ERR_REP( 'GROW_E15', 'GROW: Error creating ' //
      :            'output results in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
 
 *        Delete OUT.RESULTS.MORE.
 *        Copy IN.RESULTS.MORE to OUT.RESULTS.
@@ -481,14 +505,15 @@
                CALL ERR_REP( 'GROW_E16', 'GROW: Error copying ' //
      :            'result extensions in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
 
 *        Access IN.RESULTS.
             IF ( TYPE(1) .NE. '_DOUBLE' ) TYPE(1) = XT9D
             COMP(1) = 1
             COMP(2) = NCOMP
-            CALL SPD_FDHE( NDF(1), XLOC1, 'READ', TYPE, COMP,
-     :         NDF(3), CLOC, PLOC, DPNTR1, CPNTR, PPNTR, RNELM, STATUS )
+            CALL SPD_FDHE( NDF(1), XLOC1, 'READ', TYPE, COMP, NDF(3),
+     :                     CLOC, PLOC, DPNTR1, CPNTR, PPNTR, RNELM,
+     :                     STATUS )
 
 *        Annul the extension locators.
             DO 4 I = 1, XC9NC
@@ -501,12 +526,12 @@
 *        Access OUT.RESULTS.
             CALL NDF_FIND( XLOC2, XCMP9, NDF(4), STATUS )
             CALL NDF_MAP( NDF(4), 'DATA,VARIANCE', TYPE(1), 'UPDATE',
-     :         DPNTR2, NELM3, STATUS )
+     :                    DPNTR2, NELM3, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_REP( 'GROW_E17', 'GROW: Error accessing ' //
      :            'results in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
 
 *        Work out modified target, applicable to RESULTS.
 *        The dimensions for the target DIM3 are easy, simply the
@@ -535,20 +560,24 @@
 
 *        Grow data and variance into target.
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAMD( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-               CALL SPD_UAAMD( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(1) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(1) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMD( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(2) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
             ELSE
-               CALL SPD_UAAMR( %VAL(DPNTR1(1)), %VAL(DPNTR2(1)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-               CALL SPD_UAAMR( %VAL(DPNTR1(2)), %VAL(DPNTR2(2)),
-     :            STAPIX, ENDPIX,
-     :            NDF__MXDIM, DIM2, DIM3, RNELM(1), NELM3, STATUS )
-            ENDIF
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(1) ) ), 
+     :                         %VAL( CNF_PVAL( DPNTR2(1) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+               CALL SPD_UAAMR( %VAL( CNF_PVAL( DPNTR1(2) ) ),
+     :                         %VAL( CNF_PVAL( DPNTR2(2) ) ),
+     :                         STAPIX, ENDPIX, NDF__MXDIM, DIM2, DIM3,
+     :                         RNELM(1), NELM3, STATUS )
+            END IF
 
 *        Annul the Extension NDFs.
             CALL NDF_ANNUL( NDF(3), STATUS )
@@ -557,7 +586,7 @@
                CALL ERR_REP( 'GROW_E18', 'GROW: Error growing ' //
      :            'results in Specdre Extension.', STATUS )
                GO TO 500
-            ENDIF
+            END IF
          END IF
 
 *     Annul the IN Extension.

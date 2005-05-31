@@ -40,6 +40,7 @@
 
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +53,8 @@
 *        this routine and immediately.
 *     24 Nov 1995 (hme):
 *        Add support for COORD (Extension v. 0.7 -> 1.1)
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +71,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -194,9 +198,9 @@
             IF ( EXIST2 ) THEN
                CALL NDF_BASE( NDF, BNDF, STATUS )
                CALL SPD_EAED( BNDF, XLOC, 'READ', WORD(3), LABEL, UNITS,
-     :            TPNTR(1), XNDF, NELM, STATUS )
-               CALL SPD_EAFF( BNDF, XLOC, WORD(3), %VAL(TPNTR(1)),
-     :            STATUS )
+     :                        TPNTR(1), XNDF, NELM, STATUS )
+               CALL SPD_EAFF( BNDF, XLOC, WORD(3),
+     :                        %VAL( CNF_PVAL( TPNTR(1) ) ), STATUS )
                CALL NDF_ANNUL( XNDF, STATUS )
                CALL NDF_ANNUL( BNDF, STATUS )
             ELSE

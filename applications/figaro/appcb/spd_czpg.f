@@ -22,6 +22,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acc: Anne Charles (RAL, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -31,6 +32,8 @@
 *        Renamed from SPACY.
 *     15 Oct 1997 (acc):
 *        Change name RESAMPLE to RESAMP due to clash of names with FIGARO.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -47,6 +50,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -126,7 +130,7 @@
       END IF
       CALL GRP_GET( GID, 1, 1, NDFNAM, STATUS )
       CALL NDF_OPEN( DAT__ROOT, NDFNAM, 'READ', 'OLD',
-     :   NDF1, PLACE2, STATUS )
+     :               NDF1, PLACE2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  If VARUSE, see that variances exist.
@@ -226,21 +230,21 @@
 *  Map input centre and width.
       IF ( USEEXT ) THEN
          CALL SPD_EAEE( NDF1, XLOC, 'READ', MTYPE, TALAB, TAUNIT,
-     :      XK, XNDF1, I, STATUS )
+     :                  XK, XNDF1, I, STATUS )
          CALL SPD_EAFD( NDF1, XLOC, 'READ', MTYPE,
-     :      WK, XNDF2, I, STATUS )
+     :                  WK, XNDF2, I, STATUS )
       ELSE
          CALL NDF_AMAP( NDF1, 'CENTRE', 1, MTYPE, 'READ',
-     :      XK, I, STATUS ) 
+     :                  XK, I, STATUS ) 
          CALL NDF_AMAP( NDF1, 'WIDTH',  1, MTYPE, 'READ',
-     :      WK, I, STATUS ) 
+     :                  WK, I, STATUS ) 
       END IF
 
 *  Map the input data and variances.
       CALL NDF_MAP( NDF1, 'DATA', MTYPE, 'READ',
-     :   IK, I, STATUS )
+     :              IK, I, STATUS )
       IF ( VARUSE ) CALL NDF_MAP( NDF1, 'VARIANCE', MTYPE, 'READ',
-     :   VK, I, STATUS )
+     :                            VK, I, STATUS )
 
 *  Check status.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -252,11 +256,13 @@
 *  Generate the output NDF and propagate auxiliaries.
 *  This includes setting the output pixel positions.
       IF ( MTYPE .EQ. '_DOUBLE' ) THEN
-         CALL SPD_CZPHD( INFO, VARUSE, KMAX, %VAL(XK), DTYPE, ATYPE,
-     :      NDF1, NDF2, LMAX, XL, NDFX, STATUS )
+         CALL SPD_CZPHD( INFO, VARUSE, KMAX, %VAL( CNF_PVAL( XK ) ),
+     :                   DTYPE, ATYPE, NDF1, NDF2, LMAX, XL, NDFX,
+     :                   STATUS )
       ELSE
-         CALL SPD_CZPHR( INFO, VARUSE, KMAX, %VAL(XK), DTYPE, ATYPE,
-     :      NDF1, NDF2, LMAX, XL, NDFX, STATUS )
+         CALL SPD_CZPHR( INFO, VARUSE, KMAX, %VAL( CNF_PVAL( XK ) ),
+     :                   DTYPE, ATYPE, NDF1, NDF2, LMAX, XL, NDFX,
+     :                   STATUS )
       END IF
 
 *  The axis label and unit may have to be copied from the input
@@ -277,9 +283,9 @@
       CALL NDF_MAP( NDF2, 'DATA', MTYPE, 'WRITE', IL, I, STATUS )
       IF ( VARUSE ) THEN
          CALL NDF_MAP( NDF2, 'VARIANCE', MTYPE, 'WRITE',
-     :      VL, I, STATUS )
+     :                 VL, I, STATUS )
          CALL NDF_MAP( NDFX, 'DATA', MTYPE, 'WRITE',
-     :      CRSL, I, STATUS )
+     :                 CRSL, I, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'SPD_CZPG_E07',
@@ -313,14 +319,22 @@
 *  Now process the data, row by row.
       IF ( MTYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_WZPPD( INFO, VARUSE, USEEXT, KMAX, LMAX, DIM(2),
-     :      %VAL(XK), %VAL(WK), %VAL(IK), %VAL(VK), %VAL(XL), %VAL(WL),
-     :      %VAL(OKL), %VAL(CLM), %VAL(IL), %VAL(VL), %VAL(CRSL),
-     :      STATUS )
+     :                   %VAL( CNF_PVAL( XK ) ), %VAL( CNF_PVAL( WK ) ),
+     :                   %VAL( CNF_PVAL( IK ) ), %VAL( CNF_PVAL( VK ) ),
+     :                   %VAL( CNF_PVAL( XL ) ), %VAL( CNF_PVAL( WL ) ),
+     :                   %VAL( CNF_PVAL( OKL ) ),
+     :                   %VAL( CNF_PVAL( CLM ) ),
+     :                   %VAL( CNF_PVAL( IL ) ), %VAL( CNF_PVAL( VL ) ),
+     :                   %VAL( CNF_PVAL( CRSL ) ), STATUS )
       ELSE
          CALL SPD_WZPPR( INFO, VARUSE, USEEXT, KMAX, LMAX, DIM(2),
-     :      %VAL(XK), %VAL(WK), %VAL(IK), %VAL(VK), %VAL(XL), %VAL(WL),
-     :      %VAL(OKL), %VAL(CLM), %VAL(IL), %VAL(VL), %VAL(CRSL),
-     :      STATUS )
+     :                   %VAL( CNF_PVAL( XK ) ), %VAL( CNF_PVAL( WK ) ),
+     :                   %VAL( CNF_PVAL( IK ) ), %VAL( CNF_PVAL( VK ) ),
+     :                   %VAL( CNF_PVAL( XL ) ), %VAL( CNF_PVAL( WL ) ),
+     :                   %VAL( CNF_PVAL( OKL ) ),
+     :                   %VAL( CNF_PVAL( CLM ) ),
+     :                   %VAL( CNF_PVAL( IL ) ), %VAL( CNF_PVAL( VL ) ),
+     :                   %VAL( CNF_PVAL( CRSL ) ), STATUS )
       END IF
 
 *  Tidy up.

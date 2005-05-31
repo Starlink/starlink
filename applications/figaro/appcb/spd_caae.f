@@ -48,6 +48,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,6 +58,8 @@
 *        Make limited use of CLIST.
 *     25 Nov 1994 (hme):
 *        Renamed from SPACH.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,6 +73,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF1
@@ -150,11 +154,12 @@
       IF ( CLIST .EQ. '*' .OR.
      :     CLIST .EQ. 'C' .OR. CLIST .EQ. 'c' ) THEN
          CALL NDF_AMAP( NDF1, 'CENTRE', AXIS1, '_REAL',
-     :      'READ', PNTR1, NELM, STATUS )
+     :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'CENTRE', AXIS2, '_REAL',
-     :      'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL(PNTR1), %VAL(PNTR2), 1E-5,
-     :      MATCH, STATUS )
+     :                  'READ', PNTR2, NELM, STATUS )
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
+     :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'CENTRE', AXIS1, STATUS )
          CALL NDF_AUNMP( NDF2, 'CENTRE', AXIS2, STATUS )
          IF ( .NOT. MATCH ) GO TO 500
@@ -168,11 +173,12 @@
 *  Widths.
       IF ( CLIST .EQ. '*' ) THEN
          CALL NDF_AMAP( NDF1, 'WIDTH', AXIS1, '_REAL',
-     :      'READ', PNTR1, NELM, STATUS )
+     :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'WIDTH', AXIS2, '_REAL',
-     :      'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL(PNTR1), %VAL(PNTR2), 1E-5,
-     :      MATCH, STATUS )
+     :                  'READ', PNTR2, NELM, STATUS )
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
+     :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'WIDTH', AXIS1, STATUS )
          CALL NDF_AUNMP( NDF2, 'WIDTH', AXIS2, STATUS )
       END IF
@@ -181,11 +187,12 @@
 *  Variances.
       IF ( CLIST .EQ. '*' ) THEN
          CALL NDF_AMAP( NDF1, 'VARIANCE', AXIS1, '_REAL',
-     :      'READ', PNTR1, NELM, STATUS )
+     :                  'READ', PNTR1, NELM, STATUS )
          CALL NDF_AMAP( NDF2, 'VARIANCE', AXIS2, '_REAL',
-     :      'READ', PNTR2, NELM, STATUS )
-         CALL SPD_UAALR( NELM, %VAL(PNTR1), %VAL(PNTR2), 1E-5,
-     :      MATCH, STATUS )
+     :                  'READ', PNTR2, NELM, STATUS )
+         CALL SPD_UAALR( NELM, %VAL( CNF_PVAL( PNTR1 ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2 ) ), 1E-5,
+     :                   MATCH, STATUS )
          CALL NDF_AUNMP( NDF1, 'VARIANCE', AXIS1, STATUS )
          CALL NDF_AUNMP( NDF2, 'VARIANCE', AXIS2, STATUS )
       END IF

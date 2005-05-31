@@ -22,6 +22,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acc: Anne Charles (RAL, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        locator coming back, and no file to close with HDS_CLOSE.
 *     15 Oct 1997 (acc):
 *        Change name RESAMPLE to RESAMP due to clash of names with FIGARO.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +76,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -177,7 +181,7 @@
 *     SPD_CZPD will use or not use IRG
          N = N + 1
          CALL SPD_CZPD( INFO, VARUSE, GID, NMAX, N, NDF1, AXIS,
-     :      EOF, STATUS )
+     :                  EOF, STATUS )
 
 *     If NDF group exhausted and no valid NDF dealt with so far.
          IF ( EOF .AND. NVALID .EQ. 0 ) THEN
@@ -290,7 +294,7 @@
                CALL NDF_FIND( XLOC, XCMP6, XNDF1, STATUS )
                CALL NDF_FIND( XLOC, XCMP7, XNDF2, STATUS )
                CALL NDF_MTYPE( '_REAL,_DOUBLE', XNDF1, XNDF2, 'DATA',
-     :            ATYPE, FTYPE, STATUS )
+     :                         ATYPE, FTYPE, STATUS )
                CALL NDF_ANNUL( XNDF1, STATUS )
                CALL NDF_ANNUL( XNDF2, STATUS )
 
@@ -309,7 +313,7 @@
 *        Else (no information in Extension).
             ELSE
                CALL NDF_ATYPE( NDF1, 'CENTRE,WIDTH', AXIS, ATYPE,
-     :            STATUS )
+     :                         STATUS )
             END IF
 
 *        Check status.
@@ -349,15 +353,15 @@
 
 *     Map input centre and width.
          CALL SPD_EAEA( NDF1, XLOC, AXIS, 'READ', MTYPE, TALAB, TAUNIT,
-     :      XNK, XNDF1, KMAX, STATUS )
+     :                  XNK, XNDF1, KMAX, STATUS )
          CALL SPD_EAFA( NDF1, XLOC, AXIS, 'READ', MTYPE,
-     :      WNK, XNDF2, KMAX, STATUS )
+     :                  WNK, XNDF2, KMAX, STATUS )
 
 *     Map the input data and variances.
          CALL NDF_MAP( NDF1, 'DATA', MTYPE, 'READ',
-     :      INK, IDUMMY, STATUS )
+     :                 INK, IDUMMY, STATUS )
          IF ( VARUSE ) CALL NDF_MAP( NDF1, 'VARIANCE', MTYPE, 'READ',
-     :      VNK, IDUMMY, STATUS )
+     :                               VNK, IDUMMY, STATUS )
 
 *     Annul the Extension locator.
          IF ( USEEXT ) CALL DAT_ANNUL( XLOC, STATUS )
@@ -375,13 +379,15 @@
 *        Generate the output NDF and propagate auxiliaries.
 *        This includes setting the output pixel positions.
             IF ( MTYPE .EQ. '_DOUBLE' ) THEN
-               CALL SPD_CZPED( INFO, PROPCO, KMAX, %VAL(XNK), DTYPE,
-     :            ATYPE, NDF1, AXIS, LMAX, XL, NDF2, NDFX, MESSAG,
-     :            STATUS )
+               CALL SPD_CZPED( INFO, PROPCO, KMAX, 
+     :                         %VAL( CNF_PVAL( XNK ) ), DTYPE,
+     :                         ATYPE, NDF1, AXIS, LMAX, XL, NDF2,
+     :                         NDFX, MESSAG, STATUS )
             ELSE
-               CALL SPD_CZPER( INFO, PROPCO, KMAX, %VAL(XNK), DTYPE,
-     :            ATYPE, NDF1, AXIS, LMAX, XL, NDF2, NDFX, MESSAG,
-     :            STATUS )
+               CALL SPD_CZPER( INFO, PROPCO, KMAX,
+     :                         %VAL( CNF_PVAL( XNK ) ), DTYPE,
+     :                         ATYPE, NDF1, AXIS, LMAX, XL, NDF2,
+     :                         NDFX, MESSAG, STATUS )
             END IF
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_REP( 'SPD_CZPF_ERR',
@@ -404,11 +410,11 @@
 *        The arrays VEC2 and VEC3 are not called IL and VL because they
 *        are used temporarily for other, related vectors.
             CALL NDF_MAP( NDF2, 'Data', MTYPE, 'WRITE', VEC2, LMAX,
-     :         STATUS )
+     :                    STATUS )
             CALL NDF_MAP( NDF2, 'Variance', MTYPE, 'WRITE', VEC3,
-     :         IDUMMY, STATUS )
+     :                    IDUMMY, STATUS )
             IF ( PROPCO ) CALL NDF_MAP( NDFX, 'Data', MTYPE, 'WRITE',
-     :         CRSL, IDUMMY, STATUS )
+     :                                  CRSL, IDUMMY, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_REP(
      :            'SPD_CZPF_ERR', 'RESAMP: Error mapping ' //
@@ -422,11 +428,15 @@
 *        creates a BAD_PIXEL flag equal to FALSE along with the array,
 *        which is not desired.
             IF ( MTYPE .EQ. '_DOUBLE' ) THEN
-               CALL SPD_UAAJD( 0D0, 0D0, LMAX, %VAL(VEC2), STATUS )
-               CALL SPD_UAAJD( 0D0, 0D0, LMAX, %VAL(VEC3), STATUS )
+               CALL SPD_UAAJD( 0D0, 0D0, LMAX, %VAL( CNF_PVAL( VEC2 ) ),
+     :                         STATUS )
+               CALL SPD_UAAJD( 0D0, 0D0, LMAX, %VAL( CNF_PVAL( VEC3 ) ),
+     :                         STATUS )
             ELSE
-               CALL SPD_UAAJR( 0E0, 0E0, LMAX, %VAL(VEC2), STATUS )
-               CALL SPD_UAAJR( 0E0, 0E0, LMAX, %VAL(VEC3), STATUS )
+               CALL SPD_UAAJR( 0E0, 0E0, LMAX, %VAL( CNF_PVAL( VEC2 ) ),
+     :                         STATUS )
+               CALL SPD_UAAJR( 0E0, 0E0, LMAX, %VAL( CNF_PVAL( VEC3 ) ),
+     :                         STATUS )
             END IF
 
 *        Get a workspace NDF for the covariance matrices or variance
@@ -438,16 +448,16 @@
 *           as one-dimensional.
                CALL NDF_TEMP( PLACE1, STATUS )
                CALL NDF_NEW( MTYPE, 1, 1, LMAX*LMAX, PLACE1, NDFCOV,
-     :            STATUS )
+     :                       STATUS )
 
 *           Get workspace for post-resample covariance and output
 *           covariance (zero-initialised).
 *           The arrays MAT2 and MAT3 are not called CNLM and CLM because
 *           they are used temporarily for other, related matrices.
                CALL NDF_MAP( NDFCOV, 'Variance', MTYPE, 'WRITE', MAT2,
-     :            IDUMMY, STATUS )
+     :                       IDUMMY, STATUS )
                CALL NDF_MAP( NDFCOV, 'Data', MTYPE, 'WRITE/ZERO', MAT3,
-     :            IDUMMY, STATUS )
+     :                       IDUMMY, STATUS )
             END IF
 
 *        Get a workspace NDF for the good pixel counter and the
@@ -464,9 +474,9 @@
 *        if VARUSE is false. It is also needed to know whether an
 *        output value or variance should be bad.
             CALL NDF_MAP( NDFRES, 'Data', '_INTEGER', 'WRITE/ZERO',
-     :         VECI, IDUMMY, STATUS )
+     :                    VECI, IDUMMY, STATUS )
             CALL NDF_MAP( NDFRES, 'Variance', MTYPE, 'WRITE', INL,
-     :         IDUMMY, STATUS )
+     :                    IDUMMY, STATUS )
 
 *        Check status.
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -487,14 +497,14 @@
          IF ( NVALID .EQ. 1 ) THEN
             CALL NDF_TEMP( PLACE3, STATUS )
             CALL NDF_NEW( MTYPE, 1, 1, KMAX*LMAX, PLACE3, NDFOVL,
-     :         STATUS )
+     :                    STATUS )
          ELSE
             CALL NDF_UNMAP( NDFOVL, 'DATA', STATUS )
             CALL NDF_RESET( NDFOVL, '*', STATUS )
             CALL NDF_SBND( 1, 1, KMAX*LMAX, NDFOVL, STATUS )
          END IF
          CALL NDF_MAP( NDFOVL, 'DATA', MTYPE, 'WRITE', MAT1,
-     :      IDUMMY, STATUS )
+     :                 IDUMMY, STATUS )
 
 *     Check status.
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -508,8 +518,11 @@
 
 *        Calculate the matrix of overlaps between pixels of n-th
 *        input and output pixels.
-            CALL SPD_WZPCD( INFO, KMAX, LMAX, %VAL(XNK), %VAL(WNK),
-     :         %VAL(XL), %VAL(WL), %VAL(MAT1), STATUS )
+            CALL SPD_WZPCD( INFO, KMAX, LMAX, %VAL( CNF_PVAL( XNK ) ),
+     :                      %VAL( CNF_PVAL( WNK ) ),
+     :                      %VAL( CNF_PVAL( XL ) ),
+     :                      %VAL( CNF_PVAL( WL ) ),
+     :                      %VAL( CNF_PVAL( MAT1 ) ), STATUS )
 
 *        Resample data values of n-th input.
 *        This also turns the overlaps into resampling coefficients. I.e.
@@ -518,23 +531,31 @@
 *        is 1 (or 0).
 *        Furthermore, an input value is ignored also if its variance is
 *        bad. This is also reflected in the returned coefficient matrix.
-            CALL SPD_WZPDD( VARUSE, KMAX, LMAX, %VAL(INK), %VAL(VNK),
-     :         %VAL(MAT1), %VAL(INL), STATUS )
+            CALL SPD_WZPDD( VARUSE, KMAX, LMAX, %VAL( CNF_PVAL( INK ) ),
+     :                      %VAL( CNF_PVAL( VNK ) ),
+     :                      %VAL( CNF_PVAL( MAT1 ) ),
+     :                      %VAL( CNF_PVAL( INL ) ), STATUS )
 
 *        Post-resample covariance.
 *        We don't care about post-resample variance, because it is
 *        contained as diagonal in the covariance.
 *        If VARUSE is false, this will be known except for a factor V0.
             IF ( PROPCO ) CALL SPD_WZPED( VARUSE, KMAX, LMAX,
-     :            %VAL(VNK), %VAL(MAT1), %VAL(MAT2), STATUS )
+     :                                    %VAL( CNF_PVAL( VNK ) ),
+     :                                    %VAL( CNF_PVAL( MAT1 ) ),
+     :                                    %VAL( CNF_PVAL( MAT2 ) ),
+     :                                    STATUS )
 
 *     Process the n-th input. Else (mapped _REAL).
          ELSE
 
 *        Calculate the matrix of overlaps between pixels of n-th
 *        input and output pixels.
-            CALL SPD_WZPCR( INFO, KMAX, LMAX, %VAL(XNK), %VAL(WNK),
-     :         %VAL(XL), %VAL(WL), %VAL(MAT1), STATUS )
+            CALL SPD_WZPCR( INFO, KMAX, LMAX, %VAL( CNF_PVAL( XNK ) ),
+     :                      %VAL( CNF_PVAL( WNK ) ),
+     :                      %VAL( CNF_PVAL( XL ) ),
+     :                      %VAL( CNF_PVAL( WL ) ),
+     :                      %VAL( CNF_PVAL( MAT1 ) ), STATUS )
 
 *        Resample data values of n-th input.
 *        This also turns the overlaps into resampling coefficients. I.e.
@@ -543,15 +564,20 @@
 *        is 1 (or 0).
 *        Furthermore, an input value is ignored also if its variance is
 *        bad. This is also reflected in the returned coefficient matrix.
-            CALL SPD_WZPDR( VARUSE, KMAX, LMAX, %VAL(INK), %VAL(VNK),
-     :         %VAL(MAT1), %VAL(INL), STATUS )
+            CALL SPD_WZPDR( VARUSE, KMAX, LMAX, %VAL( CNF_PVAL( INK ) ),
+     :                      %VAL( CNF_PVAL( VNK ) ),
+     :                      %VAL( CNF_PVAL( MAT1 ) ),
+     :                      %VAL( CNF_PVAL( INL ) ), STATUS )
 
 *        Post-resample covariance.
 *        We don't care about post-resample variance, because it is
 *        contained as diagonal in the covariance.
 *        If VARUSE is false, this will be known except for a factor V0.
             IF ( PROPCO ) CALL SPD_WZPER( VARUSE, KMAX, LMAX,
-     :         %VAL(VNK), %VAL(MAT1), %VAL(MAT2), STATUS )
+     :                                    %VAL( CNF_PVAL( VNK ) ),
+     :                                    %VAL( CNF_PVAL( MAT1 ) ),
+     :                                    %VAL( CNF_PVAL( MAT2 ) ),
+     :                                    STATUS )
          END IF
 
 *     Check if input data processed ok.
@@ -568,11 +594,19 @@
 *     inverse variance, and in MAT3 the covariance weighted with the
 *     reciprocal of the two related variances (sum_n{C_nlm/C_nll/C_nmm})
          IF ( MTYPE .EQ. '_DOUBLE' ) THEN
-            CALL SPD_WZPFD( PROPCO, LMAX, %VAL(INL), %VAL(MAT2),
-     :         %VAL(VECI), %VAL(VEC2), %VAL(VEC3), %VAL(MAT3), STATUS )
+            CALL SPD_WZPFD( PROPCO, LMAX, %VAL( CNF_PVAL( INL ) ),
+     :                      %VAL( CNF_PVAL( MAT2 ) ),
+     :                      %VAL( CNF_PVAL( VECI ) ),
+     :                      %VAL( CNF_PVAL( VEC2 ) ),
+     :                      %VAL( CNF_PVAL( VEC3 ) ),
+     :                      %VAL( CNF_PVAL( MAT3 ) ), STATUS )
          ELSE
-            CALL SPD_WZPFR( PROPCO, LMAX, %VAL(INL), %VAL(MAT2),
-     :         %VAL(VECI), %VAL(VEC2), %VAL(VEC3), %VAL(MAT3), STATUS )
+            CALL SPD_WZPFR( PROPCO, LMAX, %VAL( CNF_PVAL( INL ) ),
+     :                      %VAL( CNF_PVAL( MAT2 ) ),
+     :                      %VAL( CNF_PVAL( VECI ) ),
+     :                      %VAL( CNF_PVAL( VEC2 ) ),
+     :                      %VAL( CNF_PVAL( VEC3 ) ),
+     :                      %VAL( CNF_PVAL( MAT3 ) ), STATUS )
          END IF
 
 *     Release input NDFs.
@@ -608,8 +642,9 @@
 *     If PROPCO is false, we have only one spectrum in the average and
 *     we used weights of 1 in SPD_WZPFD above. So the operation of
 *     SPD_WZPGD is different. It must be, because MAT3 is not available.
-         CALL SPD_WZPGD( PROPCO,
-     :      LMAX, %VAL(VECI), %VAL(MAT3), %VAL(VEC2), STATUS )
+         CALL SPD_WZPGD( PROPCO, LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                   %VAL( CNF_PVAL( MAT3 ) ),
+     :                   %VAL( CNF_PVAL( VEC2 ) ), STATUS )
 
 *     Final variance and covariance processing.
          IF ( PROPCO ) THEN
@@ -621,28 +656,36 @@
             IF ( VARUSE ) THEN
                NEEDC = .TRUE.
                GOODV = .TRUE.
-               CALL SPD_WZPHD( LMAX, %VAL(VECI), %VAL(MAT3), %VAL(VEC3),
-     :            STATUS )
+               CALL SPD_WZPHD( LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                         %VAL( CNF_PVAL( MAT3 ) ),
+     :                         %VAL( CNF_PVAL( VEC3 ) ),
+     :                         STATUS )
 
 *        Else get final variance and covariance.
 *        This routine is more complicated, because it has to work out
 *        V0.
             ELSE
-               CALL SPD_WZPJD( INFO, LMAX, %VAL(VECI), %VAL(VEC2),
-     :            %VAL(VEC3), %VAL(MAT3), NEEDC, GOODV, STATUS )
+               CALL SPD_WZPJD( INFO, LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                         %VAL( CNF_PVAL( VEC2 ) ),
+     :                         %VAL( CNF_PVAL( VEC3 ) ),
+     :                         %VAL( CNF_PVAL( MAT3 ) ), NEEDC, GOODV,
+     :                         STATUS )
             END IF
 
 *        Add up the covariance row sums.
-            IF ( NEEDC ) CALL SPD_WZPKD( LMAX, %VAL(MAT3), %VAL(CRSL),
-     :            NEEDC, STATUS )
+            IF ( NEEDC ) CALL SPD_WZPKD( LMAX,
+     :                                   %VAL( CNF_PVAL( MAT3 ) ),
+     :                                   %VAL( CNF_PVAL( CRSL ) ),
+     :                                   NEEDC, STATUS )
          END IF
 
 *  Final processing of output. Else.
       ELSE
 
 *     Get final value from preliminary value.
-         CALL SPD_WZPGR( PROPCO,
-     :      LMAX, %VAL(VECI), %VAL(MAT3), %VAL(VEC2), STATUS )
+         CALL SPD_WZPGR( PROPCO, LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                   %VAL( CNF_PVAL( MAT3 ) ),
+     :                   %VAL( CNF_PVAL( VEC2 ) ), STATUS )
 
 *     Final variance and covariance processing.
          IF ( PROPCO ) THEN
@@ -651,18 +694,25 @@
             IF ( VARUSE ) THEN
                NEEDC = .TRUE.
                GOODV = .TRUE.
-               CALL SPD_WZPHR( LMAX, %VAL(VECI), %VAL(MAT3), %VAL(VEC3),
-     :            STATUS )
+               CALL SPD_WZPHR( LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                         %VAL( CNF_PVAL( MAT3 ) ),
+     :                         %VAL( CNF_PVAL( VEC3 ) ),
+     :                         STATUS )
 
 *        Else get final variance and covariance.
             ELSE
-               CALL SPD_WZPJR( INFO, LMAX, %VAL(VECI), %VAL(VEC2),
-     :            %VAL(VEC3), %VAL(MAT3), NEEDC, GOODV, STATUS )
+               CALL SPD_WZPJR( INFO, LMAX, %VAL( CNF_PVAL( VECI ) ),
+     :                         %VAL( CNF_PVAL( VEC2 ) ),
+     :                         %VAL( CNF_PVAL( VEC3 ) ),
+     :                         %VAL( CNF_PVAL( MAT3 ) ), NEEDC, GOODV,
+     :                         STATUS )
             END IF
 
 *        Add up the covariance row sums.
-            IF ( NEEDC ) CALL SPD_WZPKR( LMAX, %VAL(MAT3), %VAL(CRSL),
-     :            NEEDC, STATUS )
+            IF ( NEEDC ) CALL SPD_WZPKR( LMAX,
+     :                                   %VAL( CNF_PVAL( MAT3 ) ),
+     :                                   %VAL( CNF_PVAL( CRSL ) ),
+     :                                   NEEDC, STATUS )
          END IF
       END IF
 
@@ -725,7 +775,7 @@
 *  Annul the group of input NDFs. Only GID and -1 are important in this
 *  context.
       CALL SPD_CZPD( INFO, VARUSE, GID, NMAX, -1,
-     :   NDF1, AXIS, EOF, STATUS )
+     :               NDF1, AXIS, EOF, STATUS )
 
 *  Close NDF.
       CALL NDF_END( STATUS )

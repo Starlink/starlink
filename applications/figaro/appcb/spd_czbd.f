@@ -1,5 +1,5 @@
-      SUBROUTINE SPD_CZBD( REASON, INFO, MODE, OMAX,
-     :   NDF, T_AXIS, T_FRAME, DELAY, IMIN, IMAX, STATUS )
+      SUBROUTINE SPD_CZBD( REASON, INFO, MODE, OMAX, NDF,
+     :                     T_AXIS, T_FRAME, DELAY, IMIN, IMAX, STATUS )
 *+
 *  Name:
 *     SPD_CZBD
@@ -61,10 +61,13 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     {enter_new_authors_here}
+*     {enter_new_authors_here}
 
 *  History:
 *     19 May 1994 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +81,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER REASON
@@ -207,12 +211,12 @@
 *     converted.
          CALL NDF_TEMP( PLACE, STATUS )
          CALL NDF_NEW( '_INTEGER', NDF__MXDIM, LBND, UBND, PLACE,
-     :      WNDF, STATUS )
+     :                 WNDF, STATUS )
          CALL NDF_MAP( WNDF, 'DATA', '_INTEGER', 'WRITE',
-     :      WPTR, I, STATUS )
+     :                 WPTR, I, STATUS )
          CALL NDF_AMAP( WNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
-     :      FPTR, I, STATUS )
-         CALL SPD_UAAFI( 1, I, %VAL(FPTR), 0, STATUS )
+     :                  FPTR, I, STATUS )
+         CALL SPD_UAAFI( 1, I, %VAL( CNF_PVAL( FPTR ) ), 0, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 
@@ -306,19 +310,20 @@
             J = J + 1
 
 *        If it has not been converted before, convert it.
-            IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS ) 
+     :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, I, BADVAL, IMIN, IMAX,
-     :            OMIN, OMAX, SNELM,
-     :            %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
             END IF
 
 *        Flag it as converted.
-            CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+            CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *        Display it.
-            CALL PGPIXL( %VAL(WPTR+(J-1)*SNELM*INTESZ),
-     :         IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
-     :         IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
+            CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+     :                   IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
+     :                   IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
 *        Report frame number.
             IF ( INFO .NE. 0 ) THEN
@@ -350,19 +355,20 @@
             J = J - 1
 
 *        If it has not been converted before, convert it.
-            IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, I, BADVAL, IMIN, IMAX,
-     :            OMIN, OMAX, SNELM,
-     :            %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                       OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                       WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
             END IF
 
 *        Flag it as converted.
-            CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+            CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *        Display it.
-            CALL PGPIXL( %VAL(WPTR+(J-1)*SNELM*INTESZ),
-     :         IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
-     :         IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
+            CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+     :                   IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
+     :                   IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
 *        Report frame number.
             IF ( INFO .NE. 0 ) THEN
@@ -401,19 +407,20 @@
          J = FRAME - LBND(AXIS) + 1
 
 *     If it has not been converted before, convert it.
-         IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+         IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
-     :         OMIN, OMAX, SNELM,
-     :         %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
          END IF
 
 *     Flag it as converted.
-         CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+         CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL(WPTR+(J-1)*SNELM*INTESZ),
-     :      IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
-     :      IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+     :                IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
+     :                IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
 *     Report frame number.
          IF ( INFO .NE. 0 ) THEN
@@ -442,19 +449,20 @@
          END IF
 
 *     If it has not been converted before, convert it.
-         IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+         IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
-     :         OMIN, OMAX, SNELM,
-     :         %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
          END IF
 
 *     Flag it as converted.
-         CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+         CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL(WPTR+(J-1)*SNELM*INTESZ),
-     :      IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
-     :      IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+     :               IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
+     :               IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
 *     Report frame number.
          IF ( INFO .NE. 0 ) THEN
@@ -467,12 +475,13 @@
 *     user enjoys this display.
          IF ( FRAME .GT. LBND(AXIS) ) THEN
             J = J - 1
-            IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, FRAME-1, BADVAL, IMIN, IMAX,
-     :            OMIN, OMAX, SNELM,
-     :            %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
             END IF
-            CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+            CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
          END IF
 
 
@@ -495,19 +504,20 @@
          END IF
 
 *     If it has not been converted before, convert it.
-         IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+         IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
-     :         OMIN, OMAX, SNELM,
-     :         %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
          END IF
 
 *     Flag it as converted.
-         CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+         CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL(WPTR+(J-1)*SNELM*INTESZ),
-     :      IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
-     :      IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+     :                IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
+     :                IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
 *     Report frame number.
          IF ( INFO .NE. 0 ) THEN
@@ -520,12 +530,13 @@
 *     user enjoys this display.
          IF ( FRAME .LT. UBND(AXIS) ) THEN
             J = J + 1
-            IF ( SPD_UAAGI( %VAL(FPTR), J, STATUS ) .EQ. 0 ) THEN
+            IF ( SPD_UAAGI( %VAL( CNF_PVAL( FPTR ) ), J, STATUS )
+     :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, FRAME+1, BADVAL, IMIN, IMAX,
-     :            OMIN, OMAX, SNELM,
-     :            %VAL(WPTR+(J-1)*SNELM*INTESZ), STATUS )
+     :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
+     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
             END IF
-            CALL SPD_UAAFI( J, J, %VAL(FPTR), 1, STATUS )
+            CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
          END IF
 
       END IF

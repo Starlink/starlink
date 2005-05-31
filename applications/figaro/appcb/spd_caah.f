@@ -113,6 +113,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -122,6 +123,8 @@
 *        Use SPE-routines and SPEPAR include.
 *     27 Jan 1995 (hme):
 *        Renamed from SPABR.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -250,48 +254,52 @@
      :      RNELM, STATUS )
 
 *     If the line names do not match ...
-         TESTC = SPD_UAAGC( %VAL(RPNTR(1)), 1, STATUS, %VAL(XCLEN) )
+         TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(1) ) ), 1, STATUS,
+     :                      %VAL( CNF_PVAL( XCLEN ) ) )
          IF ( .NOT. CHR_SIMLR( LINENA, 'unidentified component' ) .AND.
      :        .NOT. CHR_SIMLR( LINENA, TESTC ) ) GO TO 3
 
 *     If the component types do not match ...
-         TESTC = SPD_UAAGC( %VAL(RPNTR(3)), 1, STATUS, %VAL(XCLEN) )
+         TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(3) ) ), 1, STATUS,
+     :                      %VAL( CNF_PVAL( XCLEN ) ) )
          IF ( .NOT. CHR_SIMLR( COMPTY, 'unknown function' ) .AND.
      :        .NOT. CHR_SIMLR( COMPTY, TESTC ) ) GO TO 3
 
 *     If the laboratory frequencies do not match ...
          IF ( LABTYP .EQ. '_DOUBLE' ) THEN
             IF ( LABFRE .NE. VAL__BADD ) THEN
-               TESTD = SPD_UAAGD( %VAL(RPNTR(2)), 1, STATUS )
+               TESTD = SPD_UAAGD( %VAL( CNF_PVAL( RPNTR(2) ) ), 1, 
+     :                            STATUS )
                IF ( TESTD .EQ. VAL__BADD ) THEN
                   GO TO 3
                ELSE
                   IF ( ABS( LABFRE-TESTD ) .GT.
-     :               .5D-5 * ABS( LABFRE+TESTD ) ) GO TO 3
+     :                 0.5D-5 * ABS( LABFRE+TESTD ) ) GO TO 3
                END IF
             END IF
          ELSE
             IF ( LABFRE .NE. VAL__BADR ) THEN
-               TESTR = SPD_UAAGR( %VAL(RPNTR(2)), 1, STATUS )
+               TESTR = SPD_UAAGR( %VAL( CNF_PVAL( RPNTR(2) ) ), 1,
+     :                 STATUS )
                IF ( TESTR .EQ. VAL__BADR ) THEN
                   GO TO 3
                ELSE
                   IF ( ABS( LABFRE-TESTR ) .GT.
-     :               .5E-5 * ABS( LABFRE+TESTR ) ) GO TO 3
+     :                 0.5E-5 * ABS( LABFRE+TESTR ) ) GO TO 3
                END IF
             END IF
          END IF
 
 *     If the component has a different number of parameters ...
-         IF ( NPARA .NE. SPD_UAAGI( %VAL(RPNTR(4)), 1, STATUS ) )
-     :      GO TO 3
-
+         IF ( NPARA .NE. SPD_UAAGI( %VAL( CNF_PVAL( RPNTR(4) ) ),
+     :        1, STATUS ) ) GO TO 3 
+ 
 *     If the parameter types do not match ...
          DO 2 I = 1, NPARA
 
 *        Test is positive if one of the strings is blank.
-            TESTC = SPD_UAAGC( %VAL(RPNTR(XC9NC+1)), I, STATUS,
-     :         %VAL(XCLEN) )
+            TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(XC9NC+1) ) ), I,
+     :                         STATUS, %VAL( CNF_PVAL( XCLEN ) ) )
             IF ( .NOT. CHR_SIMLR( PARATY(I), 'unknown parameter' ) .AND.
      :           .NOT. CHR_SIMLR( PARATY(I), TESTC ) ) GO TO 3
  2       CONTINUE
@@ -374,27 +382,30 @@
          CMPRNG(1) = COMP
          CMPRNG(2) = COMP
          CALL SPD_FDHE( NDF, XLOC, 'UPDATE', TYPE, CMPRNG, SNDF,
-     :      RLOC, RLOC(1+XC9NC), XPNTR, RPNTR, RPNTR(1+XC9NC),
-     :      RNELM, STATUS )
+     :                  RLOC, RLOC(1+XC9NC), XPNTR, RPNTR, 
+     :                  RPNTR(1+XC9NC), RNELM, STATUS )
 
 *     Set the new vector elements for the new component in the extension
 *     of the result structure.
 *     NPARA is not set, it should be all right from the creation
 *     or reshaping.
-         CALL SPD_UAAFC( 1, 1, %VAL(RPNTR(1)), LINENA,
-     :      STATUS, %VAL(XCLEN) )
-         CALL SPD_UAAFC( 1, 1, %VAL(RPNTR(3)), COMPTY,
-     :      STATUS, %VAL(XCLEN) )
+         CALL SPD_UAAFC( 1, 1, %VAL( CNF_PVAL( RPNTR(1) ) ), LINENA,
+     :                   STATUS, %VAL( CNF_PVAL( XCLEN ) ) )
+         CALL SPD_UAAFC( 1, 1, %VAL( CNF_PVAL( RPNTR(3) ) ), COMPTY,
+     :                   STATUS, %VAL( CNF_PVAL( XCLEN ) ) )
          IF ( LABTYP .EQ. '_DOUBLE' ) THEN
-            CALL SPD_UAAFD( 1, 1, %VAL(RPNTR(2)), LABFRE, STATUS )
+            CALL SPD_UAAFD( 1, 1, %VAL( CNF_PVAL( RPNTR(2) ) ), LABFRE,
+     :                      STATUS )
          ELSE
-            CALL SPD_UAAFR( 1, 1, %VAL(RPNTR(2)), LABFRE, STATUS )
+            CALL SPD_UAAFR( 1, 1, %VAL( CNF_PVAL( RPNTR(2) ) ), LABFRE,
+     :                      STATUS )
          END IF
 
 *     Now set the parameter types.
          DO 5 I = 1, NPARA
-            CALL SPD_UAAFC( I, I, %VAL(RPNTR(XC9NC+1)), PARATY(I),
-     :         STATUS, %VAL(XCLEN) )
+            CALL SPD_UAAFC( I, I, %VAL( CNF_PVAL( RPNTR(XC9NC+1) ) ),
+     :                      PARATY(I), STATUS, 
+     :                      %VAL( CNF_PVAL( XCLEN ) ) )
  5       CONTINUE
       END IF
 
@@ -409,15 +420,15 @@
 
 *  Put the values.
       IF ( NDFTYP .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOD( .FALSE., NELM, DATA, %VAL(XPNTR(1)), I, J,
-     :      STATUS )
-         CALL VEC_DTOD( .FALSE., NELM, VARS, %VAL(XPNTR(2)), I, J,
-     :      STATUS )
+         CALL VEC_DTOD( .FALSE., NELM, DATA, 
+     :                   %VAL( CNF_PVAL( XPNTR(1) ) ), I, J, STATUS )
+         CALL VEC_DTOD( .FALSE., NELM, VARS,
+     :                  %VAL( CNF_PVAL( XPNTR(2) ) ), I, J, STATUS )
       ELSE
-         CALL VEC_RTOR( .FALSE., NELM, DATA, %VAL(XPNTR(1)), I, J,
-     :      STATUS )
-         CALL VEC_RTOR( .FALSE., NELM, VARS, %VAL(XPNTR(2)), I, J,
-     :      STATUS )
+         CALL VEC_RTOR( .FALSE., NELM, DATA,
+     :                  %VAL( CNF_PVAL( XPNTR(1) ) ), I, J, STATUS )
+         CALL VEC_RTOR( .FALSE., NELM, VARS,
+     :                  %VAL( CNF_PVAL( XPNTR(2) ) ), I, J, STATUS )
       END IF
 
 *  Tidy up.

@@ -1,5 +1,5 @@
       SUBROUTINE SPD_CZWE( NDF, XLOC, REQEST, MXNWRD, NWORD, WORD,
-     :   STARTW, STATUS )
+     :                     STARTW, STATUS )
 *+
 *  Name:
 *     SPD_CZWE
@@ -44,6 +44,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        In fact there were about a handful of these bugs.
 *     24 Nov 1995 (hme):
 *        Add support for COORD (Extension v. 0.7 -> 1.1)
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,6 +79,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -306,8 +310,9 @@
          IF ( EXIST ) THEN
             CALL NDF_BASE( NDF, BNDF, STATUS )
             CALL SPD_EAED( BNDF, XLOC, 'READ', TYPE(1), LABEL, UNITS,
-     :         TPNTR(1), XNDF, NELM, STATUS )
-            CALL SPD_EAFF( BNDF, XLOC, TYPE(1), %VAL(TPNTR(1)), STATUS )
+     :                     TPNTR(1), XNDF, NELM, STATUS )
+            CALL SPD_EAFF( BNDF, XLOC, TYPE(1),
+     :                     %VAL( CNF_PVAL( TPNTR(1) ) ), STATUS )
             CALL NDF_ANNUL( XNDF, STATUS )
             CALL NDF_ANNUL( BNDF, STATUS )
          ELSE
@@ -442,10 +447,10 @@
 *     result parameters.
          CALL DAT_THERE( XLOC, WORD(2), EXIST, STATUS )
          IF ( EXIST ) THEN
-            CALL NDF_FIND(  XLOC, WORD(2), XNDF, STATUS )
-            CALL NDF_TYPE(  XNDF, 'DATA,VARIANCE', TYPE(1), STATUS )
-            CALL NDF_MAP(   XNDF, 'DATA,VARIANCE', TYPE(1), 'WRITE/BAD',
-     :         TPNTR, NELM, STATUS )
+            CALL NDF_FIND( XLOC, WORD(2), XNDF, STATUS )
+            CALL NDF_TYPE( XNDF, 'DATA,VARIANCE', TYPE(1), STATUS )
+            CALL NDF_MAP(  XNDF, 'DATA,VARIANCE', TYPE(1), 'WRITE/BAD',
+     :                     TPNTR, NELM, STATUS )
             CALL NDF_ANNUL( XNDF, STATUS )
          ELSE
             TYPE(1) = XT9D
