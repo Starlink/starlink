@@ -90,6 +90,8 @@ C                    name.
 C                    Append 'G' to top level name to construct HDS group
 C                    name.
 C     12th Mar 1993  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
+C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped 
+C                    data.
 C+
       IMPLICIT NONE
 C
@@ -121,6 +123,8 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DTAMAP'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
 C
 C     Local variables
 C
@@ -239,7 +243,8 @@ C     the actual data, even for character data. This is handled by having
 C     two versions of DTA_CHRPTR - on the VAX it does the necessary processing,
 C     while under UNIX it is a null routine.
 C
-      IF (ITYPE.EQ.TYP_DSCHAR) CALL DTA_CHRPTR(%VAL(POINTER),POINTER)
+      IF (ITYPE.EQ.TYP_DSCHAR) 
+     :  CALL DTA_CHRPTR(%VAL( CNF_PVAL(POINTER) ), POINTER)
 C
 C     Update the common blocks.
 C

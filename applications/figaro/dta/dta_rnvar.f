@@ -97,6 +97,8 @@ C                    not as easy as calling DTA_LOCATE with OLEVELS-1.
 C                    One must make sure that OLASTC(OLEVELS-1) points
 C                    in front of any array index.
 C     12th Mar 1993  HME / UoE. Changed CHARACTER*15 to *(DAT__SZLOC).
+C     2005 May 31    MJC/Starlink Use CNF_PVAL for pointers to mapped 
+C                    data.
 C+
       IMPLICIT NONE
 C
@@ -117,6 +119,7 @@ C
       INCLUDE 'DTASDEF'
       INCLUDE 'DAT_PAR'
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
@@ -427,15 +430,16 @@ C
 C                    Copy the old into the new, then fill up any
 C                    extra space in the new object with blanks or zeros.
 C
-                     CALL DTA_COPY(MIN(SIZE1,SIZE2),%VAL(POINT1),
-     :                                                %VAL(POINT2))
+                     CALL DTA_COPY(MIN(SIZE1,SIZE2),
+     :                             %VAL( CNF_PVAL(POINT1) ),
+     :                             %VAL( CNF_PVAL(POINT2) ) )
                      IF (SIZE2.GT.SIZE1) THEN
                         IF (TYPE.EQ.'CHAR') THEN
-                           CALL DTA_FILL(SIZE2-SIZE1,ICHAR(' '),
-     :                                         %VAL(POINT2+SIZE1))
+                           CALL DTA_FILL(SIZE2-SIZE1,ICHAR(' '),%VAL(
+     :                                   CNF_PVAL(POINT2+SIZE1) ) )
                         ELSE
-                           CALL DTA_FILL(SIZE2-SIZE1,0,
-     :                                         %VAL(POINT2+SIZE1))
+                           CALL DTA_FILL(SIZE2-SIZE1,0,%VAL(
+     :                                   CNF_PVAL(POINT2+SIZE1) ) )
                         END IF
                      END IF
 C
