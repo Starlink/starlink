@@ -126,8 +126,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
-     :                     %VAL( CNF_PVAL( 32 ) ) )
+     :                     STATUS, %VAL( 32 ), %VAL( 32 ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             CALL SPD_CZWJ( FILE, FU, NCOMP,
      :                     %VAL( CNF_PVAL( CPNTR(1) ) ),
@@ -136,8 +135,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
-     :                     %VAL( CNF_PVAL( 32 ) ) )
+     :                     STATUS, %VAL( 32 ), %VAL( 32 ) )
          ELSE
             WRITE( FU, 102 )
      :         ' Cannot map laboratory frequencies. ' //
@@ -147,7 +145,7 @@
 *     List the parameters.
          WRITE( FU, 102 ) ' '
          CALL SPD_CZWK( FILE, FU, TNPAR, %VAL( CNF_PVAL( PPNTR(1) ) ),
-     :                  STATUS, %VAL( CNF_PVAL( 32 ) ) )
+     :                  STATUS, %VAL( 32 ) )
 
 *  Else (list goes to screen etc.)
       ELSE
@@ -165,8 +163,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
-     :                     %VAL( CNF_PVAL( 32 ) ) )
+     :                     STATUS, %VAL( 32 ), %VAL( 32 ) )
          ELSE IF ( TYPE(2) .EQ. '_REAL' ) THEN
             SHORT = ' '
             CALL MSG_OUT( 'SPD_CZWG_LIST', SHORT, STATUS )
@@ -177,8 +174,7 @@
      :                     %VAL( CNF_PVAL( CPNTR(4) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(5) ) ),
      :                     %VAL( CNF_PVAL( CPNTR(6) ) ),
-     :                     STATUS, %VAL( CNF_PVAL( 32 ) ),
-     :                     %VAL( CNF_PVAL( 32 ) ) )
+     :                     STATUS, %VAL( 32 ), %VAL( 32 ) )
          ELSE
             CALL MSG_OUT( 'SPD_CZWG_LIST',
      :         ' Cannot map laboratory frequencies. ' //
@@ -189,7 +185,7 @@
          SHORT = ' '
          CALL MSG_OUT( 'SPD_CZWG_LIST', SHORT, STATUS )
          CALL SPD_CZWK( FILE, FU, TNPAR, %VAL( CNF_PVAL( PPNTR(1) ) ),
-     :                  STATUS, %VAL( CNF_PVAL( 32 ) ) )
+     :                  STATUS, %VAL( 32 ) )
       END IF
 
 *  Unmap and release locators.
