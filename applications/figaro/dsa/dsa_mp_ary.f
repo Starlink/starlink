@@ -84,6 +84,7 @@ C  Version date: 25th October 1994.
 C
 C  Authors: Keith Shortridge, AAO
 C           Horst Meyerdierks, UoE, Starlink
+C           Malcolm J. Currie, Starlink
 C-
 C  Common variable details:
 C     (<) DTA_CODE      (Integer) Last DTA_ system error code.
@@ -169,6 +170,7 @@ C     25th Oct  1994.   KS / AAO. Calling sequence now includes START and NMAP
 C                       to support mapping of array subsets.
 C      6th Feb  1995.   KS / AAO. Now uses new calling sequence for 
 C                       DSA_UNFLAG_DATA.
+C     2005 May 31       Use CNF_PVAL for pointers to mapped data. MJC
 C
 C  Note:
 C     This version can handle the following types of SGP38 structured
@@ -181,6 +183,8 @@ C+
      :                         COPY,UNFLAG,PROP,ADDRESS,SLOT,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -828,8 +832,10 @@ C
      :                                                          STATUS)
          MAP_CALL_FSLOT(SLOT)=WORK_SLOT
          CALL DSA_ZFILL_ARRAY (NMAPPED,WORK_PTR,'BYTE',STATUS)
-         CALL DSA_UNFLAG_DATA(NMAPPED,.FALSE.,TYPE,%VAL(POINTER),
-     :                      %VAL(WORK_PTR),MAP_CALL_NFLAG(SLOT),STATUS)
+         CALL DSA_UNFLAG_DATA(NMAPPED,.FALSE.,TYPE,
+     :                        %VAL( CNF_PVAL(POINTER) ),
+     :                        %VAL( CNF_PVAL(WORK_PTR) ),
+     :                        MAP_CALL_NFLAG(SLOT),STATUS)
          IF (STATUS.NE.0) GO TO 500     ! Error exit
       ELSE
          MAP_CALL_FSLOT(SLOT)=0

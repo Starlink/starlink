@@ -40,6 +40,7 @@ C  Version date: 2nd July 1993
 C
 C  Authors: Keith Shortridge, AAO
 C           Horst Meyerdierks, UoE, Starlink
+C           Malcolm J. Currie, Starlink
 C-
 C  Subroutine / function details:
 C     DSA_WRUSER      Output message to user
@@ -73,6 +74,7 @@ C     24th Feb  1993  Arrays are now passed to DSA_FMTCON as arrays instead
 C                     of by pointer. KS/AAO.
 C      2nd Jul  1993  Now closes down any workspace used to hold flagged
 C                     data information. KS/AAO.
+C     2005 May 31     Use CNF_PVAL for pointers to mapped data. MJC
 C
 C  Note:
 C     This version can handle the following types of SGP38 structured
@@ -84,6 +86,8 @@ C+
       SUBROUTINE DSA_UNMAP (SLOT,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -253,8 +257,8 @@ C              Yes, it has been unflagged.  So we need to reflag it.
 C
                FLAGS_ADDR=WORK_POINTER(MAP_CALL_FSLOT(SLOT))
                CALL DSA_REFLAG_DATA(NELM,WORK_TYPE(WORK_SLOT),
-     :                  %VAL(WORK_POINTER(WORK_SLOT)),%VAL(FLAGS_ADDR),
-     :                                                          STATUS)
+     :                  %VAL( CNF_PVAL(WORK_POINTER(WORK_SLOT) ) ),
+     :                  %VAL( CNF_PVAL(FLAGS_ADDR) ), STATUS)
             END IF
 C
 C           Now we can get on with updating the base data array.

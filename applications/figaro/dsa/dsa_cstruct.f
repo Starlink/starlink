@@ -52,7 +52,8 @@ C  Prior requirements:
 C     This routine is intended for call by DSA_MAP_ARRAY, which should
 C     have done all the prior processing.
 C
-C  Support: Keith Shortridge, AAO
+C  Authors: Keith Shortridge, AAO
+C           Malcolm J. Currie, Starlink
 C
 C  Version date: 29th August 1992
 C-
@@ -71,6 +72,8 @@ C     24th Apr 1989   Support for USHORT type added. KS / AAO.
 C     21st Aug 1992   Automatic portability modifications
 C                     ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
+C     2005 May 31     Use CNF_PVAL for pointers to mapped data. MJC
+
 C+
       SUBROUTINE DSA_CSTRUCT (NAME,ELEMENTS,BASE_TYPE,BASE_ARRAY,
      :                                       TYPE_CODE,ADDRESS,STATUS)
@@ -90,6 +93,7 @@ C
 C     DSA_ system error codes
 C
       INCLUDE 'DSA_ERRORS'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
@@ -161,23 +165,29 @@ C     Apply BSCALE and BZERO according to the type of the data.
 C
       ERRORS=0
       IF (TYPE_CODE.EQ.FLOAT_TYPE) THEN
-         CALL DSA_FCSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_FCSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       ELSE IF (TYPE_CODE.EQ.DOUBLE_TYPE) THEN
-         CALL DSA_DCSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_DCSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       ELSE IF (TYPE_CODE.EQ.BYTE_TYPE) THEN
-         CALL DSA_BCSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_BCSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       ELSE IF (TYPE_CODE.EQ.INT_TYPE) THEN
-         CALL DSA_ICSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_ICSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       ELSE IF (TYPE_CODE.EQ.SHORT_TYPE) THEN
-         CALL DSA_SCSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_SCSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       ELSE IF (TYPE_CODE.EQ.USHORT_TYPE) THEN
-         CALL DSA_UCSTR (ELEMENTS,BSCALE,BZERO,%VAL(BASE_ARRAY),
-     :                                         %VAL(ADDRESS),ERRORS)
+         CALL DSA_UCSTR (ELEMENTS,BSCALE,BZERO,
+     :                   %VAL( CNF_PVAL(BASE_ARRAY) ),
+     :                   %VAL( CNF_PVAL(ADDRESS) ),ERRORS)
       END IF
 C
 C     Log any conversion errors

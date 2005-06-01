@@ -39,6 +39,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     KS:  Keith Shortridge (AAO)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Take care of case where the 1-D axis data are there, but
 *        undefined. DSA and DTA do not have the concept of undefined HDS
 *        objects, so we have to invent a new DTA routine for this.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA common block
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER REF_SLOT
@@ -188,7 +192,7 @@
                CALL DTA_FRVAR( NAME2, IGNORE )
                GO TO 500
             END IF
-            CALL GEN_NFILLF( DIMS(I), %VAL(PNTR) )
+            CALL GEN_NFILLF( DIMS(I), %VAL( CNF_PVAL( PNTR ) ) )
             CALL DTA_FRVAR( NAME2, STATUS )
             IF ( STATUS .NE. 0 ) GO TO 500
          END IF
