@@ -80,6 +80,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       integer odensc
@@ -153,8 +154,8 @@
             do i = 1, spdim1
               if(ref(i,j).eq.1) then
                 call check_masking(1,i,i,j,j,masked,
-     :                    %VAL(d_mptr))
-                call fibchkfit(%VAL(staptr),deccntr,i,j,fit)
+     :                    %VAL(CNF_PVAL(d_mptr)))
+                call fibchkfit(%VAL(CNF_PVAL(staptr)),deccntr,i,j,fit)
               end if
             end do
           end do
@@ -171,8 +172,9 @@
 *         if(par_quest('Store fit results',(fit.and.(.not.masked))))
 *    :             then
             call fibstres(g_parms,g_error,nparms,ref,
-     :        %VAL(d_rptr),ix,iy,deccntr,npts,%VAL(d_mptr)
-     :        ,nfailed,nnew,aic,%VAL(d_vptr),%VAL(staptr))
+     :        %VAL(CNF_PVAL(d_rptr)),ix,iy,deccntr,npts,
+     :        %VAL(CNF_PVAL(d_mptr)),nfailed,nnew,aic,
+     :        %VAL(d_vptr),%VAL(CNF_PVAL(staptr)))
             stored = .true.
           end if
         else if(key.eq.2) then
@@ -181,8 +183,9 @@
 
           call getwork(wavdim,'float',w1ptr,slot,status)
           if(status.ne.SAI__OK) return
-          call fibprofplt(dynamic_mem(w1ptr),ix,iy,%VAL(d_rptr),
-     :                  dynamic_mem(d_sptr))
+          call fibprofplt(dynamic_mem(w1ptr),ix,iy,
+     :                    %VAL(CNF_PVAL(d_rptr)),
+     :                    dynamic_mem(d_sptr))
           call dsa_free_workspace(slot,status)
 
         else if(key.eq.3) then
@@ -197,7 +200,7 @@
           iteration = iteration + 1
           call accres(' ','more.twodspec.iteration','ws',1,iteration,
      :            ' ',status)
-          call updtmsk(%VAL(staptr),%VAL(d_mptr))
+          call updtmsk(%VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_mptr)))
         end if
       end if
       end

@@ -86,6 +86,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       real x(spdim1)
@@ -412,16 +413,16 @@
 *            encode into control
 
                 call encode_contrl(deccntr,ncntrl,fit_status)
-                call set_control(%VAL(d_cptr),line,ix,iy,
+                call set_control(%VAL(CNF_PVAL(d_cptr)),line,ix,iy,
      :                  fit_status)
                 nfit = nfit + 1
 
 *             Perform fitting
 
-                call one_line(1,%VAL(d_tlptr),
-     :                  %VAL(d_trptr),ix,ix,nfit,
-*     :     dynamic_chars(idsptr:idsend),%VAL(d_cptr)
-     :            idstring,%VAL(d_cptr)
+                call one_line(1,%VAL(CNF_PVAL(d_tlptr)),
+     :                  %VAL(CNF_PVAL(d_trptr)),ix,ix,nfit,
+*     :     dynamic_chars(idsptr:idsend),%VAL(CNF_PVAL(d_cptr))
+     :            idstring,%VAL(CNF_PVAL(d_cptr))
      :                  ,line,nnew,nold,nfailed,maskedout,
      :            par_quest('Plot data',.true.),.true.,floop,iy,iy,
      :            status)

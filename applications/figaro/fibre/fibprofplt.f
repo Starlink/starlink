@@ -67,6 +67,7 @@
       include 'status_inc'
       include 'arc_dims'
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real fit_parms(max_parms)
       real y(wavdim),vcorr,odensc
       integer vtype,status,w1ptr,ix,iy,tix,tiy
@@ -90,7 +91,7 @@
       call par_qstr('Enter title for plot',' ',.true.,.false.,title)
 
       call getres(results,1,ix,iy,fit_parms,deccntr,odensc,
-     :            %VAL(staptr),status)
+     :            %VAL(CNF_PVAL(staptr)),status)
 
       if((status.eq.SAI__OK).and.((deccntr(fit_stat).eq.1).or.
      :            (deccntr(fit_stat).eq.2))) then
@@ -145,10 +146,10 @@
           
 *     Make plot
 
-          call line_vplot(fit_parms,y,%VAL(d_tlptr),
-     :             %VAL(d_trptr),1,.false.,vcorr,
-     :             %VAL(d_wptr),dynamic_mem(w1ptr),0,0,deccntr,
-     :             status)
+          call line_vplot(fit_parms,y,%VAL(CNF_PVAL(d_tlptr)),
+     :             %VAL(CNF_PVAL(d_trptr)),1,.false.,vcorr,
+     :             %VAL(CNF_PVAL(d_wptr)),dynamic_mem(w1ptr),0,0,
+     :             deccntr,status)
           call dsa_free_workspace(slot,status)
           xunits = dxunit
         else
@@ -156,12 +157,13 @@
 *   Plot with wavelength scale on X-axis
 
           call line_plot(fit_parms,dynamic_mem(d_xptr),y,
-     :            %VAL(d_tlptr),%VAL(d_trptr),1,deccntr,
-     :            .true.,.false.,0,0,status)
+     :                   %VAL(CNF_PVAL(d_tlptr)),
+     :                   %VAL(CNF_PVAL(d_trptr)),1,deccntr,
+     :                   .true.,.false.,0,0,status)
         end if
       else
         call gr_hard(status)
-        call plot_spect(wavdim,dynamic_mem(d_xptr),idata(1,ix,iy),title
-     :            ,xunits,' ')
+        call plot_spect(wavdim,dynamic_mem(d_xptr),idata(1,ix,iy),
+     :                  title,xunits,' ')
       end if
       end

@@ -78,6 +78,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       real dispersion,vcorr,dumr
@@ -140,9 +141,9 @@
 
       if(cur_flav(FL_HARD)) then
         showvel = par_quest('Use velocity scale',.true.)
-        call plot_all_fits(%VAL(d_rptr),
-     :       nagerr,vcorr,vtype,showvel,%VAL(staptr))
-c        call fibpltwhcube(dynamic_mem(d_wptr),%VAL(d_rptr),
+        call plot_all_fits(%VAL(CNF_PVAL(d_rptr)),
+     :       nagerr,vcorr,vtype,showvel,%VAL(CNF_PVAL(staptr)))
+c        call fibpltwhcube(dynamic_mem(d_wptr),%VAL(CNF_PVAL(d_rptr)),
 c     :       dynamic_mem(d_sptr),dynamic_mem(xptr),dynamic_mem(yptr),
 c     :       dynamic_mem(xdptr),vcorr,vtype)
       end if
@@ -150,15 +151,15 @@ c     :       dynamic_mem(xdptr),vcorr,vtype)
 * List fit results in a file
 
       if(cur_flav(FL_TABLE)) then
-        call table(%VAL(d_rptr),nagerr,hex,status)
+        call table(%VAL(CNF_PVAL(d_rptr)),nagerr,hex,status)
       end if
 
       if(cur_flav(FL_PRINT)) then
 
-        call prvel(%VAL(d_rptr),%VAL(d_vptr),
+        call prvel(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
 *     :       dynamic_mem(staptr),dynamic_chars(idsptr:idsend),
-     :       %VAL(staptr),idstring,
-     :       %VAL(d_wptr),vcorr,nagerr,dispersion,
+     :       %VAL(CNF_PVAL(staptr)),idstring,
+     :       %VAL(CNF_PVAL(d_wptr)),vcorr,nagerr,dispersion,
      :       dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr),
      :       hex)
       end if
@@ -166,10 +167,10 @@ c     :       dynamic_mem(xdptr),vcorr,vtype)
 * "FULL" option
 
       if(cur_flav(FL_FULL)) then
-        call wrtab(%VAL(d_rptr),%VAL(d_vptr),
+        call wrtab(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
 *     :      dynamic_chars(idsptr:idsend),dynamic_mem(d_wptr),vcorr,
-     :      idstring,%VAL(d_wptr),vcorr,
-     :      nagerr,dispersion,%VAL(staptr),status)
+     :      idstring,%VAL(CNF_PVAL(d_wptr)),vcorr,
+     :      nagerr,dispersion,%VAL(CNF_PVAL(staptr)),status)
       end if
 
       end

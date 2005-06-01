@@ -78,6 +78,7 @@
       include 'SAE_PAR'
       include 'PRM_PAR'
       include 'DYNAMIC_MEMORY'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 
       status = SAI__OK
       call gr_selct(ifsoft,status)
@@ -124,7 +125,7 @@
       call pgvport(0.01,xvend,0.01,0.99)
       call pgwnad(xmin,xmax,ymin,ymax)
       wavst = rx2chn(dynamic_mem(d_xptr),wavdim,
-     :     gen_elemf(%VAL(d_tlptr),line))
+     :     gen_elemf(%VAL(CNF_PVAL(d_tlptr)),line))
       off_d_xptr = d_xptr + (wavst - 1) * VAL__NBR
       nwav = rx2chn(dynamic_mem(d_xptr),wavdim,
      :     gen_elemf(%VAL(d_trptr),line)) - wavst + 1
@@ -154,7 +155,7 @@
 
               call drawpoly(dynamic_mem(off_d_xptr),data(wavst,i,j),
      :             nwav,datmin,datmax)
-              call addfit(i,j,%VAL(d_rptr),line)
+              call addfit(i,j,%VAL(CNF_PVAL(d_rptr)),line)
             end if
           end if
         end do

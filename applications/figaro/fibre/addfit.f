@@ -38,6 +38,7 @@
       implicit none
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'opt_cmn'
       include 'gr_inc'
@@ -64,7 +65,7 @@
       end if
       if(ninfit.eq.1) then
         call getres(results,line,i,j,fit_parms,deccntr,value,
-     :            %VAL(staptr),stat)
+     :              %VAL(CNF_PVAL(staptr)),stat)
       else
 
 *   Fit is to more than 1 point, so cannot be plotted here
@@ -78,8 +79,9 @@
 *            Plot profile with fit
 
         call line_plot_sub(fit_parms,dynamic_mem(d_xptr),0.0,
-     :      %VAL(d_tlptr),%VAL(d_trptr),line,wavdim,
-     :       deccntr,.false.,0,0,max_parms,status)
+     :                     %VAL(CNF_PVAL(d_tlptr)),
+     :                     %VAL(CNF_PVAL(d_trptr)),line,wavdim,
+     :                     deccntr,.false.,0,0,max_parms,status)
         call gr_spen(1)
 * fit a success or nag error
 
