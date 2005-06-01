@@ -103,8 +103,14 @@ C     23 Jul 1993 HME/UoE, Starlink.  Disuse GKD_*.
 C     18 Apr 1995 HME/UoE, Starlink.  Changed size of WORK1 in caller
 C                 according to new needs in ECH_ARCFIT. Changed its
 C                 dimension here to WORK1(1).
+C     2005 May 31 MJC/Starlink  Use CNF_PVAL for pointers to mapped
+C                 data.
 C+
       IMPLICIT NONE
+
+C    Global Constants
+
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 C
 C     Functions
 C
@@ -731,8 +737,10 @@ C
                      END IF
 C
                      CALL ECH_ARFILL(WDATA,NX,NORDERS,FORDR,LORDR,
-     :                               FITS,NFITS,NCFILL,%VAL(MPTR),
-     :                                       %VAL(WPTR),%VAL(OPTR))
+     :                               FITS,NFITS,NCFILL,
+     :                               %VAL( CNF_PVAL( MPTR ) ),
+     :                               %VAL( CNF_PVAL( WPTR ) ),
+     :                               %VAL( CNF_PVAL( OPTR ) ) )
 C
 C                    This ought to count for a lot when improving things
 C
