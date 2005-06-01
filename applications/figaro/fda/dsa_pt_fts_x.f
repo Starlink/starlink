@@ -49,6 +49,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        "INCLUDE" filenames now upper case.
 *     23 Feb 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,6 +178,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -232,6 +236,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -286,6 +291,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -336,6 +342,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -386,6 +393,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER SLOT
       CHARACTER * ( 80 ) STRING
@@ -449,7 +457,7 @@
 *        Try to find the old item for the keyword.
 *        If this succeeds, it tells where the item is to go.
             CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
-     :         %VAL(DSA__REFFPT(SLOT)), KEYUC, 1,
+     :         %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ), KEYUC, 1,
      :         IGNOR1, IGNOR2, ISTR, ISSTR, STATUS, %VAL(80) )
 
 *        If no old item for keyword.
@@ -476,10 +484,12 @@
 *  We now know that the item is to go into element no. ISTR. Put it
 *  there. Also put 'END' into the last item, in case we altered the
 *  the length of the extension and are overwriting the current 'END'.
-      CALL DSA1_ITMPUT( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   STRING, ISTR, STATUS, %VAL(80) )
-      CALL DSA1_ITMPUT( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   ENDSTR, DSA__REFFNE(SLOT), STATUS, %VAL(80) )
+      CALL DSA1_ITMPUT( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  STRING, ISTR, STATUS, %VAL(80) )
+      CALL DSA1_ITMPUT( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  ENDSTR, DSA__REFFNE(SLOT), STATUS, %VAL(80) )
 
 *  Return.
       END
@@ -515,6 +525,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER SLOT               ! The reference slot
       INTEGER STATUS             ! Global status

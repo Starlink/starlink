@@ -93,6 +93,8 @@
 *     1997 August 26 (ACD):
 *        Force the label and units components of the axis structure to
 *        exist.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,6 +166,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -265,9 +268,10 @@
 
 *        Copy data from stored array to temporary vector.
             CALL DSA1_CPDAT( NDFTY1, NDFTY2, NELM,
-     :         %VAL(DSA__MAPPT1(MSLOT)), %VAL(DSA__MAPPT2(MSLOT)),
-     :         STATUS )
-
+     :                       %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
+     :                       %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
+     :                       STATUS )
+ 
 *        Unmap and annull first locator, zero first pointer.
             CALL DAT_UNMAP( DSA__MAPLO1(MSLOT), STATUS )
             CALL DAT_ANNUL( DSA__MAPLO1(MSLOT), STATUS )
@@ -307,7 +311,8 @@
 
 *        Copy data from stored array to temporary vector.
             CALL DSA1_CPDAT( NDFTY1, NDFTY2, NELM,
-     :         %VAL(DSA__MAPPT1(MSLOT)), %VAL(DSA__MAPPT2(MSLOT)),
+     :                       %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
+     :                       %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
      :         STATUS )
 
          END IF
@@ -376,11 +381,11 @@
 
 *        Fill the array, selecting the routine of the appropriate type.
                IF ( NDFTY2 .EQ. '_REAL' ) THEN
-                  CALL DSA2_IFILLF( NELM, LBND(AXIS), %VAL(ADDRESS),
-     :               STATUS )
+                  CALL DSA2_IFILLF( NELM, LBND(AXIS), 
+     :                              %VAL( CNF_PVAL(ADDRESS) ), STATUS )
                ELSE
-                  CALL DSA2_IFILLD( NELM, LBND(AXIS), %VAL(ADDRESS),
-     :               STATUS )
+                  CALL DSA2_IFILLD( NELM, LBND(AXIS),
+     :                              %VAL( CNF_PVAL(ADDRESS) ), STATUS )
                END IF
             END IF 
 
@@ -412,10 +417,10 @@
 *        Fill the array, selecting the routine of the appropriate type.
             IF ( NDFTY2 .EQ. '_REAL' ) THEN
                CALL DSA2_IFILLF( NELM, LBND(AXIS),
-     :            %VAL(DSA__MAPPT1(MSLOT)), STATUS )
+     :            %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ), STATUS )
             ELSE
                CALL DSA2_IFILLD( NELM, LBND(AXIS),
-     :            %VAL(DSA__MAPPT1(MSLOT)), STATUS )
+     :            %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ), STATUS )
             END IF
 
 *        Fill in map slot.  Specify the name as NCENTRE to get DSA_UNMAP

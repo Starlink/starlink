@@ -54,6 +54,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,8 @@
 *        "INCLUDE" filenames now upper case.
 *     13 Mar 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,6 +88,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -130,8 +134,10 @@
       CALL CHR_UCASE( KEYUC )
 
 *  Given the keyword find a value string and the comment.
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), 
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
+     :                  ISSTR, STATUS, %VAL(80) )
       COMENT = LCOMNT
 
 *  Read the value from the value string.
@@ -161,6 +167,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -186,8 +193,10 @@
       CALL DSA1_ORFITS( SLOT, STATUS )
       KEYUC = KEY
       CALL CHR_UCASE( KEYUC )
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT) ) ),
+     :                  KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR,
+     :                  STATUS, %VAL( CNF_PVAL(80) ) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOD( STRING, VALUE, STATUS )
@@ -221,6 +230,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -246,8 +256,10 @@
       CALL DSA1_ORFITS( SLOT, STATUS )
       KEYUC = KEY
       CALL CHR_UCASE( KEYUC )
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR,
+     :                  STATUS, %VAL(80) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOR( STRING, VALUE, STATUS )
@@ -281,6 +293,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -307,8 +320,10 @@
       CALL DSA1_ORFITS( SLOT, STATUS )
       KEYUC = KEY
       CALL CHR_UCASE( KEYUC )
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
+     :                  ISSTR, STATUS, %VAL(80) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOD( STRING, DVALUE, STATUS )
@@ -344,6 +359,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DSA_COMMON'       ! DSA global variables
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) DSAREF
       CHARACTER * ( * ) KEY
@@ -369,8 +385,10 @@
       CALL DSA1_ORFITS( SLOT, STATUS )
       KEYUC = KEY
       CALL CHR_UCASE( KEYUC )
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
+     :                  ISSTR, STATUS, %VAL(CNF_PVAL(80) ) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOL( STRING, VALUE, STATUS )

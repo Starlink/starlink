@@ -66,6 +66,7 @@
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acd: Clive Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +84,8 @@
 *        FDA library.
 *     18 Dec 2000 (acd):
 *        Corrected data type of arguments to CHR_CTOL.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -156,12 +160,15 @@
 *  Translate the given index into the keyword.
 *  Find the first occurrence of the keyword. Also returns the value
 *  string.
-      CALL DSA1_NTHKEY( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   NTH, KEYUC, STATUS, %VAL(80) )
+      CALL DSA1_NTHKEY( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  NTH, KEYUC, STATUS, %VAL(80) )
       CALL CHR_UCASE( KEYUC )
       KEY = KEYUC
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, 1, STRING, BUFFER, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, 1, STRING, BUFFER, ISTR, ISSTR,
+     :                  STATUS, %VAL(80) )
 
 *  If failure, annul error and return indicating absence of item
 *  (which may be due to absence of the FITS extension).
@@ -185,8 +192,9 @@
       IF ( CMMT ) THEN
 
 *     Count items in the array that have this keyword.
-         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :      KEYUC, NELM, STATUS, %VAL(80) )
+         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT), 
+     :                     %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                     KEYUC, NELM, STATUS, %VAL(80) )
 
 *     Type is CHARACTER.
          TYPE = 'C'

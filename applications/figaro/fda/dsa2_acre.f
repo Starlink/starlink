@@ -33,6 +33,8 @@
 *  History:
 *     1996 July 9 (MJC):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -46,6 +48,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -89,7 +92,8 @@
      :                     PNTR, EL, STATUS )
 
 *  Fill the axis-centre array with pixel indices.
-            CALL DSA2_IFILLF( EL, LBND, %VAL( PNTR( 1 ) ), STATUS )
+            CALL DSA2_IFILLF( EL, LBND, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        STATUS )
 
 *  Unmap the axis-centre array.
             CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )

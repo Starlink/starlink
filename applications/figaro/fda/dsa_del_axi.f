@@ -55,6 +55,8 @@
 *     1996 July 9 (MJC):
 *        Calls DSA2_AFILLF for DSA2_NFILLF to allow default axis
 *        co-ordinates to be pixel indices.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +122,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -190,7 +193,8 @@
      :   STATUS )
       CALL NDF_AMAP( DSA__REFID1(SLOT), 'CENTRE', AXIS, '_REAL',
      :   'WRITE', PNTR, NELM, STATUS )
-      CALL DSA2_AFILLF( NELM, LBND(AXIS), %VAL(PNTR), STATUS )
+      CALL DSA2_AFILLF( NELM, LBND(AXIS), %VAL( CNF_PVAL(PNTR) ),
+     :                  STATUS )
       CALL NDF_AUNMP( DSA__REFID1(SLOT), 'CENTRE', AXIS, STATUS )
 
 *  Return.

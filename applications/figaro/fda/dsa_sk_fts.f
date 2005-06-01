@@ -1,5 +1,5 @@
-      SUBROUTINE DSA_SEEK_FITS( DSAREF, KEY,
-     :   EXIST, TYPE, NELM, STRLEN, STATUS )
+      SUBROUTINE DSA_SEEK_FITS( DSAREF, KEY, EXIST, TYPE,
+     :                          NELM, STRLEN, STATUS )
 *+
 *  Name:
 *     DSA_SEEK_FITS
@@ -48,6 +48,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +64,8 @@
 *        "INCLUDE" filenames now upper case.
 *     28 Feb 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,6 +80,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -138,8 +142,10 @@
 
 *  Find the first occurrence of the keyword. Also returns the value
 *  string.
-      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :   KEYUC, 1, STRING, BUFFER, ISTR, ISSTR, STATUS, %VAL(80) )
+      CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
+     :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                  KEYUC, 1, STRING, BUFFER, ISTR, ISSTR,
+     :                  STATUS, %VAL(80) )
 
 *  If failure, annul error and return indicating absence of item
 *  (or absence of FITS extension.)
@@ -163,8 +169,9 @@
       IF ( CMMT ) THEN
 
 *     Count items in the array that have this keyword.
-         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT), %VAL(DSA__REFFPT(SLOT)),
-     :      KEYUC, NELM, STATUS, %VAL(80) )
+         CALL DSA1_KEYCNT( DSA__REFFNE(SLOT),
+     :                     %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
+     :                     KEYUC, NELM, STATUS, %VAL(80) )
 
 *     Type is CHARACTER.
          TYPE = 'C'

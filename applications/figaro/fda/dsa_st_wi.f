@@ -31,6 +31,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        "INCLUDE" filenames now upper case.
 *     20 Feb 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,6 +60,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -98,7 +102,7 @@
 
 *  Fill the array with the constant value.
       IF ( STATUS .EQ. SAI__OK )
-     :   CALL DSA2_CFILLD( NELM, %VAL(ADDRESS), WIDTH )
+     :   CALL DSA2_CFILLD( NELM, %VAL( CNF_PVAL(ADDRESS) ), WIDTH )
 
 *  Unmap the width array.
       CALL DSA1_UNMAP( MSLOT, STATUS )

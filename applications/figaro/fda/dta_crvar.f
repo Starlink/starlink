@@ -37,6 +37,7 @@
 *     ks: Keith Shortridge (CIT, AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acd: Clive Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,7 +74,8 @@
 *     21 Dec 2000 (acd):
 *        Commented out unused variables (to correspond to the commented
 *        out code).
-
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +88,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PATH
@@ -227,7 +230,8 @@
             CALL ERR_RLSE
 *           CALL CMP_MAPV( LOC, NAME, HDSTYP, 'WRITE',
 *    :         PNTR, NELM, STATUS )
-*           CALL DSA1_BFILL( HDSTYP, NELM, %VAL(PNTR), STATUS )
+*           CALL DSA1_BFILL( HDSTYP, NELM, %VAL( CNF_PVAL(PNTR) ),
+*    :                       STATUS )
 *           CALL CMP_UNMAP( LOC, NAME, STATUS )
          END IF
       END IF

@@ -37,6 +37,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Now uses new calling sequence for DSA_MAP_ARRAY.
 *     21 Feb 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -122,7 +126,8 @@
       VMAX = 0.
       VMIN = 0.
       IF ( STATUS .EQ. SAI__OK )
-     :   CALL DSA2_RANGEF( BAD, %VAL(PNTR), 1, NELM, VMAX, VMIN )
+     :   CALL DSA2_RANGEF( BAD, %VAL( CNF_PVAL(PNTR) ), 1, NELM, VMAX,
+     :                     VMIN )
 
 *  Annul the cloned identifier (implicit unmapping).
       CALL NDF_ANNUL( INDF, STATUS )

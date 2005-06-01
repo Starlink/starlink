@@ -1,5 +1,5 @@
-      SUBROUTINE DSA_CREATE_NAMED_STRUCTURE(
-     :   DSAREF, NDFNAM, STRID, STATUS )
+      SUBROUTINE DSA_CREATE_NAMED_STRUCTURE( DSAREF, NDFNAM, STRID,
+     :                                       STATUS )
 *+
 *  Name:
 *     DSA_CREATE_NAMED_STRUCTURE
@@ -58,6 +58,7 @@
 *     ks:  Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     ACD: A C Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -91,6 +92,8 @@
 *     27 Aug 1997 (ACD):
 *        Explicitly set the character components of the NDF.  (Leaving
 *        them undefined resulted in an invalid NDF.)
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -270,6 +273,7 @@
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) LOC
 
@@ -300,7 +304,7 @@
 *  Map data, fill with zeros, unmap, release.
       CALL DAT_MAPV(  LOCD, '_DOUBLE', 'WRITE', PNTR, NELM, STATUS )
       IF ( STATUS .EQ. SAI__OK )
-     :   CALL DSA2_CFILLD( NELM, %VAL(PNTR), 0D0 )
+     :   CALL DSA2_CFILLD( NELM, %VAL( CNF_PVAL(PNTR) ), 0D0 )
       CALL DAT_UNMAP( LOCD, STATUS )
       CALL DAT_ANNUL( LOCD, STATUS )
 
@@ -331,7 +335,7 @@
                CALL DAT_MAPV(  LOCD, '_DOUBLE', 'WRITE',
      :            PNTR, NELM, STATUS )
                IF ( STATUS .EQ. SAI__OK )
-     :            CALL DSA2_CFILLD( NELM, %VAL(PNTR), 0D0 )
+     :            CALL DSA2_CFILLD( NELM, %VAL( CNF_PVAL(PNTR) ), 0D0 )
                CALL DAT_UNMAP( LOCD, STATUS )
                CALL DAT_ANNUL( LOCD, STATUS )
                CALL DAT_ANNUL( LOCC, STATUS )

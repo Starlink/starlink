@@ -78,6 +78,8 @@
 *        data array.  However, the NDF library gives an error.  So to
 *        avoid changing numerous calls in applications the mode is
 *        changed to write access in this case.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,6 +94,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -187,9 +190,10 @@
             END IF
             CALL NDF_MAP( DSA__REFID2(SLOT), 'DATA', NDFTYP, 'UPDATE',
      :         ADDRESS, NELM, STATUS )
-            CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL(ADDRESS),
-     :         %VAL(QPTR), STATUS )
-            CALL DSA1_CLEAN( SLOT, NDFTYP, NELM, %VAL(ADDRESS), STATUS )
+            CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL( CNF_PVAL(ADDRESS) ),
+     :         %VAL( CNF_PVAL(QPTR) ), STATUS )
+            CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
+     :                       %VAL( CNF_PVAL(ADDRESS) ), STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
                DSA__REFDPT(   SLOT ) = ADDRESS
                DSA__REFQPT(   SLOT ) = QPTR
@@ -268,9 +272,10 @@
      :            'WRITE/ZERO', QPTR, NELM, STATUS )
                CALL NDF_SBB( BADBIT, DSA__REFID1(SLOT), STATUS )
             END IF
-            CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL(ADDRESS),
-     :         %VAL(QPTR), STATUS )
-            CALL DSA1_CLEAN( SLOT, NDFTYP, NELM, %VAL(ADDRESS), STATUS )
+            CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL( CNF_PVAL(ADDRESS) ),
+     :         %VAL( CNF_PVAL(QPTR) ), STATUS )
+            CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
+     :                       %VAL( CNF_PVAL(ADDRESS) ), STATUS )
             CALL NDF_SBAD( .FALSE., DSA__REFID1(SLOT), 'DATA', STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
                DSA__REFDPT(   SLOT ) = ADDRESS
@@ -320,7 +325,7 @@
             CALL NDF_MAP( DSA__REFID1(SLOT), 'QUALITY', '_UBYTE',
      :         'WRITE/ZERO', QPTR, NELM, STATUS )
          ELSE
-            CALL DSA1_QZERO( NELM, %VAL(QPTR), STATUS )
+            CALL DSA1_QZERO( NELM, %VAL( CNF_PVAL(QPTR) ), STATUS )
          END IF
          CALL NDF_SBB( BADBIT, DSA__REFID1(SLOT), STATUS )
          CALL NDF_SBAD( .FALSE., DSA__REFID1(SLOT), 'DATA', STATUS )

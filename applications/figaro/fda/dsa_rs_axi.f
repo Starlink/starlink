@@ -1,6 +1,6 @@
 
       SUBROUTINE DSA_RESHAPE_AXIS( DSAREF, AXIS,
-     :   MODREF, MODAXS, NDIM, DIMS, STATUS )
+     :                             MODREF, MODAXS, NDIM, DIMS, STATUS )
 *+
 *  Name:
 *     DSA_RESHAPE_AXIS
@@ -129,6 +129,8 @@
 *        n-d widths from the model axis widths.
 *     21 Dec 2000 (acd):
 *        Removed unused declaration of CHR_LEN.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,6 +145,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -503,10 +506,12 @@
 
 *        Copy as many elements as the smaller array holds.
             IF ( NELM2 .GT. NELM1 )
-     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                          STATUS )
             NELM1 = MIN( NELM1, NELM2 )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *        Unmap both.
             CALL NDF_AUNMP( DSA__REFID1(SLOT), 'CENTRE', AXIS, STATUS )
@@ -541,10 +546,12 @@
 
 *        Copy as many elements as the smaller array holds.
             IF ( NELM2 .GT. NELM1 )
-     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                          STATUS )
             NELM1 = MIN( NELM1, NELM2 )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *        Unmap both. Remove the old array.
             CALL DAT_UNMAP( TMPLOC, STATUS )
@@ -585,10 +592,12 @@
 
 *        Copy as many elements as the smaller array holds.
             IF ( NELM2 .GT. NELM1 )
-     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                          STATUS )
             NELM1 = MIN( NELM1, NELM2 )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *        Unmap both.
             CALL DAT_UNMAP( TMPLOC, STATUS )
@@ -604,7 +613,8 @@
      :         STATUS )
             CALL NDF_AMAP( DSA__REFID1(SLOT), 'CENTRE', AXIS, '_REAL',
      :         'WRITE', PNTR1, NELM1, STATUS )
-            CALL DSA2_AFILLF( NELM1, LBND(AXIS), %VAL(PNTR1), STATUS )
+            CALL DSA2_AFILLF( NELM1, LBND(AXIS),
+     :                        %VAL( CNF_PVAL(PNTR1) ), STATUS )
             CALL NDF_AUNMP( DSA__REFID1(SLOT), 'CENTRE', AXIS, STATUS )
 
          END IF
@@ -640,10 +650,12 @@
 
 *     Copy as many elements as the smaller array holds.
          IF ( NELM2 .GT. NELM1 )
-     :      CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :      CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                       STATUS )
          NELM1 = MIN( NELM1, NELM2 )
          CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :      %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                    %VAL( CNF_PVAL(PNTR1) ),
+     :                    %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *     Unmap both.
          CALL DAT_UNMAP( ARYLOC, STATUS )
@@ -658,7 +670,8 @@
      :      STATUS )
          CALL NDF_AMAP( DSA__REFID1(SLOT), 'CENTRE', AXIS, '_REAL',
      :      'WRITE', PNTR1, NELM1, STATUS )
-         CALL DSA2_AFILLF( NELM1, LBND(AXIS), %VAL(PNTR1), STATUS )
+         CALL DSA2_AFILLF( NELM1, LBND(AXIS), %VAL( CNF_PVAL(PNTR1) ),
+     :                     STATUS )
          CALL NDF_AUNMP( DSA__REFID1(SLOT), 'CENTRE', AXIS, STATUS )
 
 
@@ -678,10 +691,12 @@
 
 *     Copy as many elements as the smaller array holds.
          IF ( NELM2 .GT. NELM1 )
-     :      CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :      CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                       STATUS )
          NELM1 = MIN( NELM1, NELM2 )
          CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :      %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                    %VAL( CNF_PVAL(PNTR1) ),
+     :                    %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *     Unmap both.
          CALL DAT_UNMAP( ARYLOC, STATUS )
@@ -739,10 +754,12 @@
 
 *           Copy as many elements as the smaller array holds.
                IF ( NELM2 .GT. NELM1 )
-     :            CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :            CALL DSA1_BFILL( NDFTYP, NELM2,
+     :                             %VAL( CNF_PVAL(PNTR2) ), STATUS )
                NELM1 = MIN( NELM1, NELM2 )
                CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :            %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                          %VAL( CNF_PVAL(PNTR1) ),
+     :                          %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *           Unmap both.
                CALL NDF_AUNMP( DSA__REFID1(SLOT),'WIDTH', AXIS, STATUS )
@@ -778,10 +795,12 @@
 
 *           Copy as many elements as the smaller array holds.
                IF ( NELM2 .GT. NELM1 )
-     :            CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :            CALL DSA1_BFILL( NDFTYP, NELM2,
+     :                             %VAL( CNF_PVAL(PNTR2) ), STATUS )
                NELM1 = MIN( NELM1, NELM2 )
                CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :            %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                          %VAL( CNF_PVAL(PNTR1) ),
+     :                          %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *           Unmap both. Remove the old array.
                CALL DAT_UNMAP( TMPLOC, STATUS )
@@ -814,10 +833,12 @@
 
 *           Copy as many elements as the smaller array holds.
                IF ( NELM2 .GT. NELM1 )
-     :            CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :            CALL DSA1_BFILL( NDFTYP, NELM2,
+     :                             %VAL( CNF_PVAL(PNTR2) ), STATUS )
                NELM1 = MIN( NELM1, NELM2 )
                CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :            %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                          %VAL( CNF_PVAL(PNTR1) ),
+     :                          %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *           Unmap both.
                CALL DAT_UNMAP( TMPLOC, STATUS )
@@ -853,10 +874,12 @@
 
 *        Copy as many elements as the smaller array holds.
             IF ( NELM2 .GT. NELM1 )
-     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                          STATUS )
             NELM1 = MIN( NELM1, NELM2 )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *        Unmap both.
             CALL DAT_UNMAP( WIDLOC, STATUS )
@@ -892,10 +915,12 @@
 
 *        Copy as many elements as the smaller array holds.
             IF ( NELM2 .GT. NELM1 )
-     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL(PNTR2), STATUS )
+     :         CALL DSA1_BFILL( NDFTYP, NELM2, %VAL( CNF_PVAL(PNTR2) ),
+     :                          STATUS )
             NELM1 = MIN( NELM1, NELM2 )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
 
 *        Unmap both.
             CALL DAT_UNMAP( WIDLOC, STATUS )

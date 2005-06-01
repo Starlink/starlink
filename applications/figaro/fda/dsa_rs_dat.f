@@ -115,6 +115,8 @@
 *        NDF is a placeholder, and the array size is reduced.  This
 *        extra copy trims the physical size of new NDF.  Some reordering
 *        of the variable/function declarations.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,6 +131,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -321,12 +324,14 @@
          CALL NDF_STATE( MODNDF, 'QUAL', QTHERE, STATUS )
          IF ( QTHERE ) THEN
             CALL NDF_MAP( MODNDF,'QUAL', '_UBYTE', 'READ',
-     :         PNTR1, NELM1, STATUS )
+     :                    PNTR1, NELM1, STATUS )
             CALL NDF_MAP( DSA__REFID1(SLOT),  'QUAL', '_UBYTE', 'WRITE',
-     :         PNTR2, NELM2, STATUS )
+     :                    PNTR2, NELM2, STATUS )
             CALL DSA1_CPDAT( '_UBYTE', '_UBYTE', NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
          END IF
+
          CALL NDF_TYPE(  MODNDF, 'DATA', NDFTYP, STATUS )
          CALL NDF_STYPE( NDFTYP, DSA__REFID1(SLOT),   'DATA', STATUS )
          CALL NDF_MAP(   MODNDF, 'DATA', NDFTYP, 'READ',
@@ -334,9 +339,11 @@
          CALL NDF_MAP( DSA__REFID1(SLOT),     'DATA', NDFTYP, 'WRITE',
      :      PNTR2, NELM2, STATUS )
          CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :      %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                    %VAL( CNF_PVAL(PNTR1) ),
+     :                    %VAL( CNF_PVAL(PNTR2) ), STATUS )
          CALL NDF_UNMAP( MODNDF, 'DATA', STATUS )
          CALL NDF_UNMAP( DSA__REFID1(SLOT),   'DATA', STATUS )
+
          CALL NDF_STATE( MODNDF, 'VAR', THERE, STATUS )
          IF ( THERE ) THEN
             CALL NDF_TYPE(  MODNDF, 'VAR', NDFTYP, STATUS )
@@ -346,7 +353,8 @@
             CALL NDF_MAP( DSA__REFID1(SLOT),     'VAR', NDFTYP, 'WRITE',
      :         PNTR2, NELM2, STATUS )
             CALL DSA1_CPDAT( NDFTYP, NDFTYP, NELM1,
-     :         %VAL(PNTR1), %VAL(PNTR2), STATUS )
+     :                       %VAL( CNF_PVAL(PNTR1) ),
+     :                       %VAL( CNF_PVAL(PNTR2) ), STATUS )
             CALL NDF_UNMAP( MODNDF, 'VAR', STATUS )
             CALL NDF_UNMAP( DSA__REFID1(SLOT),   'VAR', STATUS )
          END IF

@@ -1,5 +1,5 @@
       SUBROUTINE DSA_MAP_COMPLEX( DSAREF, MODE, TYPE,
-     :   RADDR, IADDR, MSLOT, STATUS )
+     :                            RADDR, IADDR, MSLOT, STATUS )
 *+
 *  Name:
 *     DSA_MAP_COMPLEX
@@ -52,6 +52,8 @@
 *  History:
 *     06 Mar 1996 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,11 +213,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     06 Mar 1996 (hme):
 *        Original version.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -230,6 +235,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -311,9 +317,9 @@
                CALL NDF_MAPZ( DSA__REFID2(SLOT), 'DATA', NDFTYP,
      :            'UPDATE', RADDR, IADDR, NELM, STATUS )
                CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
-     :            %VAL(RADDR), STATUS )
+     :            %VAL( CNF_PVAL(RADDR) ), STATUS )
                CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
-     :            %VAL(IADDR), STATUS )
+     :            %VAL( CNF_PVAL(IADDR) ), STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
                   DSA__REFDPT(SLOT) = RADDR
                   DSA__MAPUSD(MSLOT) = .TRUE.
@@ -372,14 +378,14 @@
                END IF
                CALL NDF_MAPZ( DSA__REFID1(SLOT), 'DATA', NDFTYP, MODE,
      :            RADDR, IADDR, NELM, STATUS )
-               CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL(RADDR),
-     :            %VAL(QPTR), STATUS )
+               CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL( CNF_PVAL(RADDR) ),
+     :            %VAL( CNF_PVAL(QPTR) ), STATUS )
                CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
-     :            %VAL(RADDR), STATUS )
-               CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL(IADDR),
-     :            %VAL(QPTR), STATUS )
+     :            %VAL( CNF_PVAL(RADDR) ), STATUS )
+               CALL DSA1_MRGFQ( NDFTYP, NELM, %VAL( CNF_PVAL(IADDR) ),
+     :            %VAL( CNF_PVAL(QPTR) ), STATUS )
                CALL DSA1_CLEAN( SLOT, NDFTYP, NELM,
-     :            %VAL(IADDR), STATUS )
+     :            %VAL( CNF_PVAL(IADDR) ), STATUS )
                CALL NDF_SBAD( .FALSE., DSA__REFID1(SLOT), 'DATA',
      :            STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN

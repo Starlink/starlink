@@ -63,7 +63,7 @@
 *     ks: Keith Shortridge (AAO)
 *     jms: ? (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
-*     mjc: Malcolm J. Currie (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     acd: Clive Davenhall (UoE, Starlink)
 *     {enter_new_authors_here}
 
@@ -88,7 +88,7 @@
 *        FDA library.
 *     16 Feb 1996 (hme):
 *        Translate between application-side status and Starlink status.
-*     15 Aug 1996 (mjc):
+*     15 Aug 1996 (MJC):
 *        No longer accesses the axis units component, as it is not
 *        required for the Starlink PAR routines.  In case the axis
 *        units are needed at some future time, protection against
@@ -96,6 +96,8 @@
 *     21 Dec 2000 (acd):
 *        Comment out unused variables (to correspond to the commented
 *        out code).
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +112,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -226,12 +229,12 @@
 *  multi-dimensional, and the application will accept that, we take the
 *  maximum and minimum over the whole array.
       NELM  = DIMS(1)
-      FIRST = DSA2_ELEMF( %VAL(ADDRESS),    1 )
-      LAST  = DSA2_ELEMF( %VAL(ADDRESS), NELM )
+      FIRST = DSA2_ELEMF( %VAL( CNF_PVAL(ADDRESS) ),    1 )
+      LAST  = DSA2_ELEMF( %VAL( CNF_PVAL(ADDRESS) ), NELM )
       REVERSE = FIRST .GT. LAST
       IF ( NDIM .GT. 1 .AND. .NOT. SIMPLE ) THEN
-         CALL DSA2_RANGEF( .FALSE., %VAL(ADDRESS), 1, ELEMENTS,
-     :      VMAX, VMIN )
+         CALL DSA2_RANGEF( .FALSE., %VAL( CNF_PVAL(ADDRESS) ), 1, 
+     :                     ELEMENTS, VMAX, VMIN )
       ELSE
          VMIN = MIN(FIRST,LAST)
          VMAX = MAX(FIRST,LAST)
@@ -296,8 +299,8 @@
 
 *  Get the values in terms of element numbers.  Note that this is done
 *  only in terms of the first 1d array of the axis data.
-      ISTART = DSA2_BSEARCHF( %VAL(ADDRESS), NELM, START )
-      IEND   = DSA2_BSEARCHF( %VAL(ADDRESS), NELM, END   )
+      ISTART = DSA2_BSEARCHF( %VAL( CNF_PVAL(ADDRESS) ), NELM, START )
+      IEND   = DSA2_BSEARCHF( %VAL( CNF_PVAL(ADDRESS) ), NELM, END   )
       IF ( ISTART .LT. 1 ) ISTART = 1
       IF ( IEND   .LT. 1 ) IEND   = NELM
       IF ( ISTART .GT. IEND ) THEN

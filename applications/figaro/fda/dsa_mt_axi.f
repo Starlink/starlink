@@ -41,6 +41,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +66,8 @@
 *     19 Feb 1996 (hme):
 *        Move action into DSA1_MATAX.
 *        Translate between application-side status and Starlink status.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,6 +155,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -302,8 +306,8 @@
       CALL DSA1_MAPCEN( SLO2, AXIS2, 'READ', 'FLOAT',
      :   PNTR2, MSLOT2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
-      CALL DSA2_COMPAF( %VAL(PNTR1), %VAL(PNTR2), NELM1,
-     :   NERR, ERROR1 )
+      CALL DSA2_COMPAF( %VAL( CNF_PVAL(PNTR1) ),
+     :                  %VAL( CNF_PVAL(PNTR2) ), NELM1, NERR, ERROR1 )
       IF ( NERR .GT. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FDA_T001', DSA__REFNAM(SLO1) )

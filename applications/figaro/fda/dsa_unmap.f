@@ -34,6 +34,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Translate between application-side status and Starlink status.
 *     20 Feb 1996 (hme):
 *        Unmap axis widths.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -276,8 +280,9 @@
                CALL DAT_TYPE( DSA__MAPLO2(MSLOT), NDFTY2, STATUS )
                CALL DAT_SIZE( DSA__MAPLO2(MSLOT), NELM,   STATUS )
                CALL DSA1_CPDAT( NDFTY2, NDFTY1, NELM,
-     :            %VAL(DSA__MAPPT2(MSLOT)), %VAL(DSA__MAPPT1(MSLOT)),
-     :            STATUS )
+     :                          %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
+     :                          %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
+     :                          STATUS )
             END IF
 
 *        Unmap and annull each valid locator.

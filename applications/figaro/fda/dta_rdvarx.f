@@ -34,6 +34,7 @@
 *  Authors:
 *     ks: Keith Shortridge (CIT, AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *        names and to use lower case, to enable compilation on a SUN.
 *     04 Mar 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,6 +63,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PATH
@@ -126,9 +130,11 @@
 
 *  Map the object. Transfer the requested part of the data.
 *     CALL DAT_MAPV( LOC, '<TYPE>', 'READ', PNTR, SIZE, STATUS )
-*     CALL DTA2_COPY<T>( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+*     CALL DTA2_COPY<T>( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+*    :                  STATUS )
       CALL DAT_MAPV( LOC, '_REAL', 'READ', PNTR, SIZE, STATUS )
-      CALL DTA2_COPYF( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+      CALL DTA2_COPYF( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+     :                 STATUS )
 
 *  Tidy up.
  500  CONTINUE
@@ -156,6 +162,7 @@
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) PATH
       INTEGER NITEM
@@ -207,9 +214,11 @@
       END IF
 
 *     CALL DAT_MAPV( LOC, '<TYPE>', 'READ', PNTR, SIZE, STATUS )
-*     CALL DTA2_COPY<T>( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+*     CALL DTA2_COPY<T>( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+*    :                   STATUS )
       CALL DAT_MAPV( LOC, '_DOUBLE', 'READ', PNTR, SIZE, STATUS )
-      CALL DTA2_COPYD( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+      CALL DTA2_COPYD( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+     :                 STATUS )
 
  500  CONTINUE
       CALL DAT_UNMAP( LOC, STATUS )
@@ -234,6 +243,7 @@
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       CHARACTER * ( * ) PATH
       INTEGER NITEM
@@ -285,9 +295,11 @@
       END IF
 
 *     CALL DAT_MAPV( LOC, '<TYPE>', 'READ', PNTR, SIZE, STATUS )
-*     CALL DTA2_COPY<T>( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+*     CALL DTA2_COPY<T>( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+*    :                   STATUS )
       CALL DAT_MAPV( LOC, '_INTEGER', 'READ', PNTR, SIZE, STATUS )
-      CALL DTA2_COPYI( %VAL(PNTR), INDX, NITEM, ARRAY, 1, STATUS )
+      CALL DTA2_COPYI( %VAL( CNF_PVAL(PNTR) ), INDX, NITEM, ARRAY, 1,
+     :                 STATUS )
 
  500  CONTINUE
       CALL DAT_UNMAP( LOC, STATUS )

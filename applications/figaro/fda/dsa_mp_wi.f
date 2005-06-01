@@ -1,5 +1,5 @@
       SUBROUTINE DSA_MAP_WIDTH( DSAREF, AXIS, MODE, TYPE,
-     :   ADDRESS, MSLOT, STATUS )
+     :                          ADDRESS, MSLOT, STATUS )
 *+
 *  Name:
 *     DSA_MAP_WIDTH
@@ -52,6 +52,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Now uses new calling sequence for DSA_MAP_ARRAY.
 *     20 Feb 1996 (hme):
 *        FDA library.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,6 +152,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -309,8 +313,9 @@
 
 *        Copy data from stored array to temporary vector.
             CALL DSA1_CPDAT( NDFTY1, NDFTY2, NELM,
-     :         %VAL(DSA__MAPPT1(MSLOT)), %VAL(DSA__MAPPT2(MSLOT)),
-     :         STATUS )
+     :                       %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
+     :                       %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
+     :                       STATUS )
 
 *        Unmap and annull third locator, zero third pointer.
             CALL DAT_UNMAP( DSA__MAPLO1(MSLOT), STATUS )
@@ -351,8 +356,9 @@
 
 *        Copy data from stored array to temporary vector.
             CALL DSA1_CPDAT( NDFTY1, NDFTY2, NELM,
-     :         %VAL(DSA__MAPPT1(MSLOT)), %VAL(DSA__MAPPT2(MSLOT)),
-     :         STATUS )
+     :                       %VAL( CNF_PVAL(DSA__MAPPT1(MSLOT)) ),
+     :                       %VAL( CNF_PVAL(DSA__MAPPT2(MSLOT)) ),
+     :                       STATUS )
 
          END IF
 
