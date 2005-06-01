@@ -50,15 +50,16 @@
 
 *  Global Variables:
       INCLUDE 'DYNAMIC_MEMORY'
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given:
       INTEGER ADDRESS
 
 *  Local Variables:
-      INTEGER DLOC
+      INTEGER*8 DLOC
 *.
 
       DLOC = %LOC(DYNAMIC_MEM)
-      DYN_ELEMENT = ADDRESS - DLOC + 1
+      DYN_ELEMENT = CNF_PVAL(ADDRESS) - DLOC + 1
 
       END

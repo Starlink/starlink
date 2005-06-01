@@ -41,13 +41,15 @@ C
 C
 C     Parameters
 C
-      INTEGER ADDRESS, DLOC
+      INTEGER ADDRESS
+      INTEGER*8 DLOC
 C
 C     Dynamic memory system common - defines DYNAMIC_MEM
 C
       INCLUDE 'DYNAMIC_MEMORY'
+      INCLUDE 'CNF_PAR'
 C
       DLOC = %LOC(DYNAMIC_MEM)
-      DYN_ELEMENT = ADDRESS - DLOC + 1
+      DYN_ELEMENT = CNF_PVAL(ADDRESS) - DLOC + 1
 C
       END

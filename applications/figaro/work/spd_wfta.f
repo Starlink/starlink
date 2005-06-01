@@ -152,6 +152,7 @@
 
 *  Global Variables:
       INCLUDE 'SPD_WFCM'         ! Line fitting common block
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       LOGICAL INFO
@@ -188,7 +189,7 @@
       DOUBLE PRECISION WORK3( 3*MAXCMP*(3*MAXCMP+10) ) ! Work space
       DOUBLE PRECISION UNITY( 9*MAXCMP*MAXCMP )! Work space for covar.
       DOUBLE PRECISION HESSE( 9*MAXCMP*MAXCMP )! Work space for covar.
-
+      LOGICAL ISREG              ! Pointer already registered with CNF
 *.
 
 *  Check.
@@ -313,9 +314,10 @@
          GO TO 500
       END IF
 
-*  Make the spectral data available to objective function.
+*  Make the spectral data available to objective function. Register
+*  with CNF for 64bit systems.
       NDATA = NELM
-      DATAP = %LOC(XDWC)
+      DATAP = CNF_PREG( %LOC(XDWC), ISREG )
 
 *  Set the guess to zero, as has been done above for the fit PAR1.
       DO 1001 I = 1, 3*MAXCMP

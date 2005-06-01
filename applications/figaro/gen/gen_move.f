@@ -26,7 +26,8 @@ C
       INTEGER BYTES
       BYTE FROM(BYTES),TO(BYTES)
 C
-      INTEGER I,DST,SRC
+      INTEGER I
+      INTEGER*8 DST,SRC
 C
       DST=%LOC(TO(1))
       SRC=%LOC(FROM(1))

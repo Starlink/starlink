@@ -244,6 +244,7 @@
 *  Global Constants:
       INTEGER MAXCMP
       PARAMETER ( MAXCMP = 10 )
+      INCLUDE 'CNF_PAR'            ! CNF functions.
 
 *  Global Variables:
       INTEGER          NCOMP
@@ -292,6 +293,7 @@
       DOUBLE PRECISION PAR2( 3*MAXCMP ) ! Permuted and scaled PAR0, fit
       DOUBLE PRECISION FVAL      ! Value of objective function
       DOUBLE PRECISION WORK( 3*MAXCMP*(3*MAXCMP+10) ) ! Work space
+      LOGICAL ISREG              ! Pointer already registered with CNF.
 
 *.
 
@@ -421,8 +423,9 @@
 *  Since the size of the data is not known at compile time, the common
 *  block can store only a pointer to it. SPD_WFGC will de-reference that
 *  pointer by calling SPD_WFGB with argument %VAL(POINTR).
+*  Register this pointer with CNF so that it can be used on 64bit machines.
       IUSER = NELM
-      POINTR = %LOC(XDWC)
+      POINTR = CNF_PREG( %LOC(XDWC), ISREG ) 
 
 *  Derive FSCALE by direct call to SPD_WFGB with initial FSCALE = 2.
       CALL SPD_WFGC( FITPAR, PAR1, FVAL )
