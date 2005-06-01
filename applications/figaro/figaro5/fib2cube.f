@@ -65,6 +65,7 @@
       character*72 file,ftype*10,chars
       integer status
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer lunit,dims(3),ndims,nx,ny
       integer idims(3),rx2chn,ndims1,start,cxptr
       integer max_gauss
@@ -221,7 +222,7 @@
 * Read positions of data in cube, and copy it over
 
           qstat = par_qnum('Enter true wavelength of line',VAL__SMLR,
-     :         VAL__MAXR,6562.817,.true.,' ',%VAL(d_wptr))
+     :         VAL__MAXR,6562.817,.true.,' ',%VAL(CNF_PVAL(d_wptr)))
         end if
         call wr2new(dims(1),dims(2),dims(3),nx,ny,dynamic_mem(z1ptr),
      :       dynamic_mem(d_sptr),lunit,dynamic_mem(misptr),minleft,

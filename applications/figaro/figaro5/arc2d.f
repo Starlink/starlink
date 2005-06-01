@@ -167,6 +167,7 @@
       logical loop
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'bytesdef'
       character dynamic_chars
       include 'DYNAMIC_MEMORY'
@@ -210,8 +211,8 @@
 
         else if(iopt.eq.1) then
 
-          call look(%VAL(d_rptr),.false.,%VAL(staptr)
-     :                  ,%VAL(d_vptr))
+          call look(%VAL(CNF_PVAL(d_rptr)),.false.,
+     :              %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_vptr)))
 
 * Plots
 
@@ -271,13 +272,15 @@
 
 * fit polynomials
 
-          call arcfit(norder,%VAL(d_rptr),%VAL(d_vptr),
-     :                %VAL(staptr),%VAL(d_wptr),
-     :                %VAL(d_aptr),dynamic_mem(coptr),rmsmax,
-     :                nfits,dynamic_mem(w1ptr),dynamic_mem(w2ptr),
-     :        dynamic_mem(w3ptr),dynamic_mem(w4ptr),dynamic_mem(w5ptr),
-     :        dynamic_mem(w6ptr),dynamic_mem(w7ptr),dynamic_mem(w8ptr)
-     :                ,dynamic_mem(w9ptr),dynamic_mem(w10ptr),
+          call arcfit(norder,%VAL(CNF_PVAL(d_rptr)),
+     :                %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)),
+     :                %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_aptr)),
+     :                dynamic_mem(coptr),rmsmax,nfits,
+     :                dynamic_mem(w1ptr),dynamic_mem(w2ptr),
+     :                dynamic_mem(w3ptr),dynamic_mem(w4ptr),
+     :                dynamic_mem(w5ptr),dynamic_mem(w6ptr),
+     :                dynamic_mem(w7ptr),dynamic_mem(w8ptr),
+     :                dynamic_mem(w9ptr),dynamic_mem(w10ptr),
      :                dynamic_mem(w11ptr),dynamic_mem(w12ptr),polydata,
      :                acceptfits,dynamic_mem(w13ptr),status,
      :                maxnpts)
@@ -288,8 +291,8 @@
 * Output results to file and to terminal
 
               call iroutp(datafile(:chr_len(datafile))//'.iar',
-     :            datafile,wavdim,spdim1,dynamic_mem(coptr),norder
-     :            ,nfits,rmsmax,status)
+     :            datafile,wavdim,spdim1,dynamic_mem(coptr),norder,
+     :            nfits,rmsmax,status)
             end if
           end if
 
@@ -302,9 +305,9 @@
           call getwork(2*line_count,'float',w1ptr,slot,status)
           if(status.ne.SAI__OK) goto 500
           w2ptr = w1ptr + line_count * VAL__NBR
-          call arc_window(dynamic_mem(d_xptr),%VAL(d_tlptr),
+          call arc_window(dynamic_mem(d_xptr),%VAL(CNF_PVAL(d_tlptr)),
 *     :        dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
-     :        %VAL(d_trptr),idstring,
+     :        %VAL(CNF_PVAL(d_trptr)),idstring,
      :        dynamic_mem(w1ptr),dynamic_mem(w2ptr),status)
           call dsa_free_workspace(slot,status)
           if(batch) then

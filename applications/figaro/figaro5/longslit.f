@@ -218,6 +218,7 @@
       implicit none
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER STATUS
 
@@ -395,7 +396,8 @@
             if(par_given('fit_model')) then
 *              call new_anal(dynamic_chars(idsptr:idsend),
               call new_anal(idstring,
-     :               %VAL(d_wptr),%VAL(d_cptr),STATUS)
+     :                      %VAL(CNF_PVAL(d_wptr)),
+     :                      %VAL(CNF_PVAL(d_cptr)),STATUS)
             end if
 
 *     AUTO mode
@@ -405,12 +407,13 @@
 *       (scaled).
 
             if(COPY) then
-              call redo_all_fits(%VAL(d_rptr),
+              call redo_all_fits(%VAL(CNF_PVAL(d_rptr)),
 *     :            dynamic_mem(d_vptr),dynamic_chars(idsptr:idsend),
-     :            %VAL(d_vptr),idstring,
-     :            %VAL(d_tlptr),%VAL(d_trptr),STATUS)
+     :            %VAL(CNF_PVAL(d_vptr)),idstring,
+     :            %VAL(d_tlptr),%VAL(CNF_PVAL(d_trptr)),STATUS)
             else
-              call check_control(%VAL(d_cptr),iftransfer,newfit)
+              call check_control(%VAL(CNF_PVAL(d_cptr)),iftransfer,
+     :                           newfit)
               if(newfit) then
 
 *       "NORMAL" AUTO mode
@@ -422,11 +425,13 @@
 *       If TRANSFER mode, then copy fits from one line to another, to
 *       use as first guesses
 
-                call transfer(%VAL(d_rptr),%VAL(d_vptr),
+                call transfer(%VAL(CNF_PVAL(d_rptr)),
+     :                        %VAL(CNF_PVAL(d_vptr)),
 *     :               dynamic_chars(idsptr:idsend),
      :               idstring,
-     :               %VAL(d_tlptr),%VAL(d_trptr),
-     :               %VAL(d_cptr),%VAL(d_wptr),status)
+     :               %VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :               %VAL(CNF_PVAL(d_cptr)),%VAL(CNF_PVAL(d_wptr)),
+     :               status)
               end if
             end if
 
@@ -442,16 +447,16 @@
 
             call manual_mode(dynamic_mem(d_xptr),
 *     :           dynamic_chars(idsptr:idsend),dynamic_mem(d_tlptr),
-     :           idstring,%VAL(d_tlptr),
-     :           %VAL(d_trptr),status)
+     :           idstring,%VAL(CNF_PVAL(d_tlptr)),
+     :           %VAL(CNF_PVAL(d_trptr)),status)
 
           else if(iopt.eq. DEFINE) then
 
 *     DEFINE fit types (for AUTO mode)
 
 *            call new_anal(dynamic_chars(idsptr:idsend),
-            call new_anal(idstring,
-     :               %VAL(d_wptr),%VAL(d_cptr),STATUS)
+            call new_anal(idstring, %VAL(CNF_PVAL(d_wptr)),
+     :                    %VAL(CNF_PVAL(d_cptr)),STATUS)
 
 *     Look at values of cube
 
@@ -474,8 +479,8 @@
 * SYNTHETIC
           else if(iopt.eq.SYNTHETIC) then
 
-             call mk_synth_data(%VAL(d_tlptr),
-     :                   %VAL(d_trptr),status)
+             call mk_synth_data(%VAL(CNF_PVAL(d_tlptr)),
+     :                   %VAL(CNF_PVAL(d_trptr)),status)
 * SKY
           else if(iopt.eq.SKY) then
 
@@ -497,8 +502,8 @@
 
             call cuban(dynamic_mem(xptr),dynamic_mem(yptr),.false.,
      :           disp,size,dynamic_mem(d_sptr),dynamic_mem(xdptr),
-     :           %VAL(totptr),datmin,datmax,
-     :           %VAL(staptr),status)
+     :           %VAL(CNF_PVAL(totptr)),datmin,datmax,
+     :           %VAL(CNF_PVAL(staptr)),status)
           end if
         end do
 

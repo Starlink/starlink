@@ -140,6 +140,7 @@
       integer start,stop
       include 'SAE_PAR'
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer ref,iopt,slot2,slot3,nels,pstat,tst,tend
       integer iwork1,iwork2,iwork3,get_parnum,ival1,ival2
       integer iter4
@@ -300,18 +301,18 @@
 
 * If "HEX" then display with hexagonal matrix
 
-            call hexdisps(%VAL(d_rptr),mxpars,
+            call hexdisps(%VAL(CNF_PVAL(d_rptr)),mxpars,
      :          dynamic_mem(misptr),plane,dynamic_mem(xdptr),
      :          dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :          disp,.true.,%VAL(staptr))
+     :          disp,.true.,%VAL(CNF_PVAL(staptr)))
           else if(atype.eq.1) then
 
 * Display using GKS cell array
 
             iwork = ref + spdim1 * spdim2 * val__nbw
-            call rectdisps(%VAL(d_rptr),mxpars,
+            call rectdisps(%VAL(CNF_PVAL(d_rptr)),mxpars,
      :           dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(iwork)
-     :          ,plane,xr,yr,limit,disp,.true.,%VAL(staptr))
+     :          ,plane,xr,yr,limit,disp,.true.,%VAL(CNF_PVAL(staptr)))
           end if
         else if(iopt.eq.OPT_PLDAT) then
 
@@ -329,7 +330,7 @@
             call hexdisps(dynamic_mem(d_sptr),wavdim,
      :         dynamic_mem(misptr),plane,dynamic_mem(xdptr),
      :         dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :         disp,.false.,%VAL(staptr))
+     :         disp,.false.,%VAL(CNF_PVAL(staptr)))
           else if(atype.eq.1) then
 
 * Display using GKS cell array
@@ -337,8 +338,8 @@
             iwork = ref + spdim1 * spdim2 * val__nbw
             call rectdisps(dynamic_mem(d_sptr),wavdim,
      :            dynamic_mem(xptr),dynamic_mem(yptr),
-     :            dynamic_mem(iwork),plane,xr,yr,limit,disp,.false.
-     :           ,%VAL(staptr))
+     :            dynamic_mem(iwork),plane,xr,yr,limit,disp,.false.,
+     :           %VAL(CNF_PVAL(staptr)))
           end if
 
         else if((iopt.ge.3).and.(iopt.le.7)) then
@@ -358,8 +359,8 @@
 *   Look at line profiles
 
             call gtprof(dynamic_mem(ref),dynamic_mem(d_sptr),
-     :         dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr)
-     :        ,%VAL(totptr),atype.eq.2,status)
+     :         dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr),
+     :        %VAL(CNF_PVAL(totptr)),atype.eq.2,status)
             disp = .false.
 
           else if(iopt.eq.OPT_HSLI) then
@@ -432,12 +433,12 @@
 
           disp = par_quest('Softcopy plot?',.true.)
           if(atype.eq.2) then
-            call hexprarr(dynamic_mem(d_sptr),%VAL(totptr),
+            call hexprarr(dynamic_mem(d_sptr),%VAL(CNF_PVAL(totptr)),
      :           dynamic_mem(xdptr),dynamic_mem(xptr),dynamic_mem(yptr)
      :           ,size,xr,yr,limit,disp,.true.,datmin,datmax,1)
           else
             call rectprarr(dynamic_mem(d_sptr),dynamic_mem(xptr),
-     :            dynamic_mem(yptr),%VAL(totptr),xr,yr,limit,
+     :            dynamic_mem(yptr),%VAL(CNF_PVAL(totptr)),xr,yr,limit,
      :            disp,.true.,datmin,datmax,1)
           end if
         else if(iopt.eq.OPT_TOTAL) then
@@ -445,15 +446,15 @@
 *   Display total intensity
 
           if(atype.eq.2) then
-            call hexdisps(%VAL(totptr),1,
+            call hexdisps(%VAL(CNF_PVAL(totptr)),1,
      :           dynamic_mem(misptr),1,dynamic_mem(xdptr),
      :           dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :           disp,.false.,%VAL(staptr))
+     :           disp,.false.,%VAL(CNF_PVAL(staptr)))
           else
             iwork = ref + spdim1 * spdim2 * val__nbw
-            call rectdisps(%VAL(totptr),1,
+            call rectdisps(%VAL(CNF_PVAL(totptr)),1,
      :           dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(iwork)
-     :           ,1,xr,yr,limit,disp,.false.,%VAL(staptr))
+     :           ,1,xr,yr,limit,disp,.false.,%VAL(CNF_PVAL(staptr)))
           end if
         else if(iopt.eq.OPT_LIMIT) then
 
@@ -479,16 +480,16 @@
 
 *   Look at values of results block
 
-          call look(%VAL(d_rptr),.true.,%VAL(staptr)
-     :                  ,%VAL(d_vptr))
+          call look(%VAL(CNF_PVAL(d_rptr)),.true.,
+     :              %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_vptr)))
 
         else if(iopt.eq.OPT_DEL) then
 
 *   Delete bad fits
 
-          call delfit(%VAL(d_rptr),mxpars,spdim1,spdim2,nyp,disp,
-     :       dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr),
-     :       atype.eq.2)
+          call delfit(%VAL(CNF_PVAL(d_rptr)),mxpars,spdim1,spdim2,nyp,
+     :       disp,dynamic_mem(xptr),dynamic_mem(yptr),
+     :       dynamic_mem(xdptr),atype.eq.2)
 
         else if(iopt.eq.OPT_DEF) then
 
@@ -496,7 +497,7 @@
 
 *          call new_anal(dynamic_chars(idsptr:idsend),
           call new_anal(idstring,
-     :       %VAL(d_wptr),%VAL(d_cptr),status)
+     :       %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_cptr)),status)
 
         else if(iopt.eq.OPT_OUT) then
 
@@ -522,8 +523,8 @@
 
           call cuban(dynamic_mem(xptr),dynamic_mem(yptr),atype.eq.2,
      :         disp,size,dynamic_mem(d_sptr),dynamic_mem(xdptr),
-     :         %VAL(totptr),datmin,datmax,
-     :         %VAL(staptr),status)
+     :         %VAL(CNF_PVAL(totptr)),datmin,datmax,
+     :         %VAL(CNF_PVAL(staptr)),status)
 
         end if
       end do

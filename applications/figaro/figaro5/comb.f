@@ -141,6 +141,7 @@
 *
       integer status
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real value1,value2
 *
 *  integer
@@ -225,7 +226,7 @@
 * setup arc display
 *
           line_count=0
-          call new_comb(%VAL(d_tlptr),%VAL(d_trptr))
+          call new_comb(%VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)))
           setup = line_count.gt.0
 
 *     .....test return value of setup
@@ -305,8 +306,9 @@
 * Look at values of cube
 
             else if(iopt.eq.OPT_LOOK) then
-              call look(%VAL(d_rptr),.false.,%VAL(staptr)
-     :                  ,%VAL(d_vptr))
+              call look(%VAL(CNF_PVAL(d_rptr)),.false.,
+     :                  %VAL(CNF_PVAL(staptr)),
+     :                  %VAL(CNF_PVAL(d_vptr)))
 
 * Softcopy plots iopt=2
 *  hardcopy plots iopt=3
@@ -328,7 +330,8 @@
               call canaxlim(1)
               call fig_ytract(dynamic_mem(d_sptr),wavdim,spdim1,
      :               ixstart,ixend,dynamic_mem(d_vsptr))
-              call setup_arc2(%VAL(d_tlptr),%VAL(d_trptr)
+              call setup_arc2(%VAL(CNF_PVAL(d_tlptr)),
+     :                        %VAL(CNF_PVAL(d_trptr))
      :                  ,.false.,status)
             else if (iopt.eq.OPT_EXIT) then
               loop=.false.

@@ -31,6 +31,7 @@
       integer status
       include 'SAE_PAR'
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer specdim,dims(2)
       include 'DYNAMIC_MEMORY'
       integer flagptr,d_s2ptr,slot,dyn_element
@@ -69,8 +70,8 @@
 * Compare 2 files
 
       call compare(dynamic_mem(d_sptr),dynamic_mem(d_s2ptr),
-     :       dynamic_mem(flagptr),%VAL(d_tlptr),
-     :       %VAL(d_trptr),dynamic_mem(d_xptr))
+     :       dynamic_mem(flagptr),%VAL(CNF_PVAL(d_tlptr)),
+     :       %VAL(CNF_PVAL(d_trptr)),dynamic_mem(d_xptr))
  500  continue
       call unmap_res(status)
       call dsa_close(status)

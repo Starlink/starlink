@@ -133,6 +133,7 @@
       integer status
       include 'arc_dims'
       include 'gr_inc'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real value,value1
 *
 *  integer
@@ -226,8 +227,9 @@
 * setup arc display
 *
           line_count=0
-          call setup_arc2(%VAL(d_tlptr),%VAL(d_trptr),
-     :          .true.,status)
+          call setup_arc2(%VAL(CNF_PVAL(d_tlptr)),
+     :                    %VAL(CNF_PVAL(d_trptr)),
+     :                    .true.,status)
 
 
 *     .....test return value of setup
@@ -297,9 +299,9 @@
           call getwork(2*line_count,'float',ptr1,slot,status)
           if(status.ne.SAI__OK) goto 500
           ptr2 = ptr1 + line_count * VAL__NBR
-          call arc_window(dynamic_mem(d_xptr),%VAL(d_tlptr),
+          call arc_window(dynamic_mem(d_xptr),%VAL(CNF_PVAL(d_tlptr)),
 *     :        dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
-     :        %VAL(d_trptr),idstring,
+     :        %VAL(CNF_PVAL(d_trptr)),idstring,
      :        dynamic_mem(ptr2),dynamic_mem(ptr2),status)
           call dsa_free_workspace(slot,status)
           call apply_tols(.true.,status)
@@ -323,8 +325,9 @@
 * Look at values of cube
 
             else if(iopt.eq.OPT_LOOK) then
-              call look(%VAL(d_rptr),.false.,%VAL(staptr)
-     :                  ,%VAL(d_vptr))
+              call look(%VAL(CNF_PVAL(d_rptr)),.false.,
+     :                  %VAL(CNF_PVAL(staptr)),
+     :                  %VAL(CNF_PVAL(d_vptr)))
 
 * Softcopy (iopt=2)/hardcopy (iopt=3) plots
 
@@ -341,7 +344,8 @@
               call getwork(2*line_count,'float',ptr1,slot,status)
               if(status.ne.SAI__OK) goto 500
               ptr2 = ptr1 + line_count * VAL__NBR
-              call arc_window(dynamic_mem(d_xptr),%VAL(d_tlptr),
+              call arc_window(dynamic_mem(d_xptr),
+     :                        %VAL(CNF_PVAL(d_tlptr)),
 *     :            dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
      :            %VAL(d_trptr),idstring,
      :            dynamic_mem(ptr2),dynamic_mem(ptr2),status)
@@ -352,8 +356,9 @@
               call canaxlim(2)
               call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
      :             ixstart,ixend,dynamic_mem(d_vsptr))
-              call setup_arc2(%VAL(d_tlptr),%VAL(d_trptr)
-     :                ,.true.,status)
+              call setup_arc2(%VAL(CNF_PVAL(d_tlptr)),
+     :                        %VAL(CNF_PVAL(d_trptr)),
+     :                        .true.,status)
             else if (iopt.eq.OPT_EXIT) then
               loop=.false.
               oloop = .false.
