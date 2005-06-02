@@ -158,7 +158,7 @@
      :                    %VAL( CNF_PVAL(PNTR) ), STATUS )
       ELSE
          CALL FIG_GVRDOR( BADBAD, NEGBAD, ZERBAD, NELM,
-     :      BAD, NEG, ZERO, %VAL(PNTR), STATUS )
+     :      BAD, NEG, ZERO, %VAL( CNF_PVAL(PNTR) ), STATUS )
       END IF
 
 *  Tidy up.
