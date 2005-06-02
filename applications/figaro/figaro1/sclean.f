@@ -83,6 +83,8 @@ C     29th Jul  1998.  MBT / IoA, Starlink. Use quality internally
 C                      instead of flags for bad pixels, and additional 
 C                      display mode for SCUBA data. Name changed from
 C                      CLEAN to SCLEAN. 
+C     2005 May 31      MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                      data.
 C+
       IMPLICIT NONE
 C
@@ -92,6 +94,7 @@ C
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'FIO_ERR'          ! Stati returned by FIO_
       INCLUDE 'PAR_ERR'          ! Stati returned by PAR_
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions 
 C
@@ -179,7 +182,8 @@ C     If there are bad bits, put that information into the quality array.
 C     This way, the rest of the routines used only need to worry about
 C     the quality array and not about magic values.
 C
-      CALL FIG_SCL_FLAG2QUAL(%VAL(DPTR),%VAL(QPTR),NELM,STATUS)
+      CALL FIG_SCL_FLAG2QUAL(%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(QPTR)),
+     :                       NELM,STATUS)
 C
 C     Get dimensions of data
 C
@@ -288,10 +292,11 @@ C
 C
 C     Perform the interactive or batch cleaning.
 C
-      CALL FIG_CSCLEAN(%VAL(DPTR),%VAL(QPTR),%VAL(VPTR),VEXIST,
-     :                 NX,NY,BITNUM,.TRUE.,
-     :                 %VAL(WPTR),WSIZE,ARRAY,COL1,COL2,
-     :                 BATCH,BFD,LOG,LFD,PLOT,CHANGE,STATUS)
+      CALL FIG_CSCLEAN(%VAL(CNF_PVAL(DPTR)),%VAL(QPTR),
+     :                      %VAL(CNF_PVAL(VPTR)),VEXIST,NX,NY,BITNUM,
+     :                      .TRUE.,%VAL(CNF_PVAL(WPTR)),WSIZE,ARRAY,
+     :                      COL1,COL2,BATCH,BFD,LOG,LFD,PLOT,CHANGE,
+     :                      STATUS)
 C
 C     Set user variable IMARRAY to reflect current display parameters
 C     (local error context is used so that an error here does not 
@@ -312,7 +317,8 @@ C     instead) then write the quality info back as flagged values and
 C     remove the quality array.
 C
       IF (.NOT.QEXIST) THEN
-         CALL FIG_SCL_QUAL2FLAG(%VAL(DPTR),%VAL(QPTR),NELM,STATUS)
+         CALL FIG_SCL_QUAL2FLAG(%VAL(CNF_PVAL(DPTR)),
+     :                          %VAL(CNF_PVAL(QPTR)),NELM,STATUS)
          CALL NDF_UNMAP(ONDF,'Quality',STATUS)
          CALL NDF_RESET(ONDF,'Quality',STATUS)
       END IF
@@ -415,6 +421,8 @@ C     26th Jul  1993.  HME / UoE, Starlink. Disuse PAR_Q*. Use PAR_ABORT.
 C     16th Jan  1997.  BKM / RAL, Starlink. Initialise STATUS before use.
 C     29th Jul  1998.  MBT / IoA, Starlink. Use quality array not flags,
 C                                   new display mode 'B'.
+C     2005 May 31      MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                      data.
 C+
       IMPLICIT NONE
 C
@@ -424,6 +432,7 @@ C
       INCLUDE 'FIO_ERR'          ! Stati returned by FIO_
       INCLUDE 'PAR_ERR'          ! Stati returned by PAR_
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -714,12 +723,17 @@ C
                   CALL PGSWIN(AMIN,AMAX,REAL(IYST)-.5,REAL(IYEN)+.5)
                   CALL PGBOX('NTBC',0.0,0,'NTABCS',BYTICK,4)
                   CALL FIG_SCLEAN_2(DATA,QUAL,NX,NY,XCURR,IYST,IYEN,
-     :                              .TRUE.,%VAL(XPTR),%VAL(YPTR),NPT)
-                  IF (NPT.GE.1) CALL PGLINE(NPT,%VAL(XPTR),%VAL(YPTR))
-                  CALL PGPT(NPT,%VAL(XPTR),%VAL(YPTR),4)
+     :                              .TRUE.,%VAL(CNF_PVAL(XPTR)),
+     :                               %VAL(CNF_PVAL(YPTR)),NPT)
+                  IF (NPT.GE.1) CALL PGLINE(NPT,%VAL(CNF_PVAL(XPTR)),
+     :                                      %VAL(CNF_PVAL(YPTR)))
+                  CALL PGPT(NPT,%VAL(CNF_PVAL(XPTR)),
+     :                      %VAL(CNF_PVAL(YPTR)),4)
                   CALL FIG_SCLEAN_2(DATA,QUAL,NX,NY,XCURR,IYST,IYEN,
-     :                             .FALSE.,%VAL(XPTR),%VAL(YPTR),NPT)
-                  IF (NPT.GE.1) CALL PGPT(NPT,%VAL(XPTR),%VAL(YPTR),5)
+     :                              .FALSE.,%VAL(CNF_PVAL(XPTR)),
+     :                               %VAL(CNF_PVAL(YPTR)),NPT)
+                  IF (NPT.GE.1) CALL PGPT(NPT,%VAL(CNF_PVAL(XPTR)),
+     :                                    %VAL(CNF_PVAL(YPTR)),5)
 C
 C                 Then prepare to plot pixels on other half of view 
 C                 surface.
@@ -762,11 +776,12 @@ C              coordinates on the plotting surface, offset by a half pixel.
 C
                CALL FIG_SCLEAN_1(.TRUE.,BADVAL,MINVAL,COLHI,
      :            NX,NY,IXST,IYST,IXEN-IXST+1,IYEN-IYST+1,
-     :            DATA,QUAL,LOW,HIGH,%VAL(IPTR))
-               CALL PGPIXL(%VAL(IPTR),IXEN-IXST+1,IYEN-IYST+1,
-     :            1,IXEN-IXST+1,1,IYEN-IYST+1,
-     :            REAL(IXST)-.5,REAL(IXEN)+.5,
-     :            REAL(IYST)-.5,REAL(IYEN)+.5)
+     :            DATA,QUAL,LOW,HIGH,%VAL(CNF_PVAL(CNF_PVAL(IPTR))))
+               CALL PGPIXL(%VAL(CNF_PVAL(CNF_PVAL(IPTR))),IXEN-IXST+1,
+     :                     IYEN-IYST+1,
+     :                     1,IXEN-IXST+1,1,IYEN-IYST+1,
+     :                     REAL(IXST)-.5,REAL(IXEN)+0.5,
+     :                     REAL(IYST)-0.5,REAL(IYEN)+0.5)
             END IF
 C
          END IF

@@ -56,6 +56,7 @@
 
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *     07-OCT-1992 (HME):
 *        Fix the bug, i.e. use types _REAL or _DOUBLE.
 *        Move the routine to Figaro.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,6 +87,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PAR_ERR'          ! Status returned by PAR_
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -150,7 +154,8 @@
 *  Do the action.
       IF ( DTYPE .EQ. 'DOUBLE' ) THEN
          CALL FIG_GVRDOD( BADBAD, NEGBAD, ZERBAD, NELM,
-     :      DBLE(BAD), DBLE(NEG), DBLE(ZERO), %VAL(PNTR), STATUS )
+     :                    DBLE(BAD), DBLE(NEG), DBLE(ZERO),
+     :                    %VAL( CNF_PVAL(PNTR) ), STATUS )
       ELSE
          CALL FIG_GVRDOR( BADBAD, NEGBAD, ZERBAD, NELM,
      :      BAD, NEG, ZERO, %VAL(PNTR), STATUS )

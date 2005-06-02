@@ -118,6 +118,7 @@
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     MJCL: Martin Clayton (Starlink, UCL)
 *     ACD: Clive Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -172,6 +173,8 @@
 *        to avoid divide-by-zero on ABORT for some parameters.
 *     30 May 2002 (ACD):
 *        Changed the size of variable INAME from 80 to 132.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +184,9 @@
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       REAL FMIN                  ! Smallest acceptable real
@@ -453,14 +459,15 @@
 *  out for bad values (and whether it is allowed to create them).
       CALL FIG_IMAGE_1( .TRUE., PLOG, AUTOSC, NEGATI, HISTOP,
      :   IXST, IYST, DIMS(1), DIMS(2), SDIMS(1), SDIMS(2),
-     :   %VAL(PNTR(1)), LOW, HIGH, %VAL(PNTR(2)) )
+     :   %VAL(CNF_PVAL(PNTR(1))), LOW, HIGH, %VAL(CNF_PVAL(PNTR(2))) )
 
 *  Call a work routine to convert from image (data) pixels to display
 *  pixels. This takes turns bad values into background colour and scales
 *  data from [0.,1.] to the valid range of pen numbers.
       MINVAL = MAXPEN
       CALL FIG_IMAGE_2( .TRUE., BADVAL, MINVAL, NVLUT-1,
-     :   SDIMS(1), SDIMS(2), %VAL(PNTR(2)), %VAL(PNTR(3)) )
+     :                  SDIMS(1), SDIMS(2), %VAL(CNF_PVAL(PNTR(2))),
+     :                  %VAL(CNF_PVAL(PNTR(3))) )
 
 *  Set the transfer window for the display.
 *  This looks as if it goes one pixel beyond the displaylet on the right
@@ -485,8 +492,9 @@
 *  Write the integer array to the display memory.
 *  (Draw pixels, the whole array, world coordinates are display pixel
 *  numbers.)
-      CALL PGPIXL( %VAL(PNTR(3)), SDIMS(1), SDIMS(2), 1, SDIMS(1),
-     :   1, SDIMS(2), WINDOW(1), WINDOW(2), WINDOW(3), WINDOW(4) )
+      CALL PGPIXL( %VAL(CNF_PVAL(PNTR(3))), SDIMS(1), SDIMS(2), 1, 
+     :             SDIMS(1), 1, SDIMS(2), WINDOW(1), WINDOW(2),
+     :             WINDOW(3), WINDOW(4) )
 
 *  Store information about the display and displayed data in a global
 *  variable.

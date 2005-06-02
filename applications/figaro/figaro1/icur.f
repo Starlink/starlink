@@ -58,6 +58,7 @@
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     MJCL: Martin Clayton (Starlink, UCL)
 *     ACD: Clive Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,11 +91,13 @@
 *        the maximum number of points possible.
 *     30 May 2002 (ACD):
 *        Changed the size of variable IMAGE from 80 to 132.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
-
+#
 *-
 
 *  Type Definitions:
@@ -102,6 +105,7 @@
 
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! Global PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum recorded pixels
@@ -273,7 +277,9 @@
 *           arrays. RDATA has three elements, X position, Y position,
 *           image value.
                CALL FIG_ICUR_1( IPOS, DIMS(1), DIMS(2),
-     :            %VAL(XPTR), %VAL(YPTR), %VAL(DPTR), RDATA )
+     :                          %VAL(CNF_PVAL(XPTR)),
+     :                          %VAL(CNF_PVAL(YPTR)),
+     :                          %VAL(CNF_PVAL(DPTR)), RDATA )
 
 *           If it was the space bar.
                IF ( KEY .EQ. ' ' ) THEN

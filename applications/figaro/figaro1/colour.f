@@ -42,6 +42,7 @@
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     mjcl: Martin Clayton (Starlink, UCL)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        Take care of version numbers in VAX/VMS file names.
 *     26 Jul 1996 (mjcl):
 *        Added check for ABORT repsponse to TABLE prompt.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,9 @@
       
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+
+*  Global Variables:
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       INTEGER MAXPEN             ! Protect so many pens
@@ -187,7 +193,7 @@
          END IF
          CALL DSA_MAP_DATA( 'LUT', 'READ', 'FLOAT', PNTR, SLOT, DSASTA )
          IF ( DSASTA .NE. 0 ) GO TO 500
-         CALL GEN_RANGEF( %VAL(PNTR), 1, NELM, DMAX, DMIN )
+         CALL GEN_RANGEF( %VAL( CNF_PVAL(PNTR) ), 1, NELM, DMAX, DMIN )
          IF ( DMIN .LT. 0. .OR. DMAX .GT. 1.0 ) THEN
             CALL PAR_WRUSER( 'COLOUR: Error reading colour lookup ' //
      :         'table. Table values must be between 0.0 and 1.0.',
@@ -196,7 +202,8 @@
          END IF
 
 *     All's well, now do the work.
-         CALL FIG_COLOUR_1( DIMS(2), %VAL(PNTR), MAXPEN, COL2 )
+         CALL FIG_COLOUR_1( DIMS(2), %VAL( CNF_PVAL(PNTR) ), MAXPEN,
+     :                      COL2 )
       END IF
 
 *  Tidy up.

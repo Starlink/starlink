@@ -84,8 +84,11 @@ C                     application is a hybrid of the Figaro and Starlink
 C                     styles.
 C     12th Sep. 2002. ACD / UoE, Starlink.  Added references to the
 C                     prologue comments.
+C     2005 May 31     MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                     data.
 C+
       IMPLICIT NONE
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
@@ -267,7 +270,7 @@ C
       BYTES=BFLOAT*NX0
 C     print4002, bfloat, nx0, bytes
 C4002 format(1x, 'bfloat, nx0, bytes: ', i3, i6, i6)
-      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(SPTR),%VAL(AR0PTR))
+      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(SPTR),%VAL(CNF_PVAL(AR0PTR)))
 C      
       CALL DSA_MAP_DATA('TEMPL','READ','FLOAT',ADDRESS,SLOT,STATUS)
       TPTR=DYN_ELEMENT(ADDRESS)
@@ -275,7 +278,7 @@ C
       IF(STATUS.NE.0)GOTO 500
 C
       BYTES=BFLOAT*NX0
-      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(TPTR),%VAL(AR1PTR))
+      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(TPTR),%VAL(CNF_PVAL(AR1PTR)))
 C
 C     Pick reasonable values for the fourier domain filter - this
 C     section could be refined, but these will do..
@@ -292,10 +295,11 @@ C
       NORM=.TRUE.
 C     print4000, 'before FIG_CROSS'
 C4000 format(1x, a)
-      CALL FIG_CROSS (%VAL(AR0PTR), %VAL(AR1PTR),
+      CALL FIG_CROSS (%VAL(CNF_PVAL(AR0PTR)), %VAL(CNF_PVAL(AR1PTR)),
      :        NX0, NX, CFIT, ZPC, KZ, NORM,
-     :        %VAL(FT0PTR), %VAL(FT1PTR), %VAL(FTCPTR),
-     :        %VAL(XVPTR), %VAL(CFNPTR), SHIFT, WIDTH)
+     :        %VAL(CNF_PVAL(FT0PTR)), %VAL(CNF_PVAL(FT1PTR)),
+     :        %VAL(CNF_PVAL(FTCPTR)), %VAL(CNF_PVAL(XVPTR)),
+     :        %VAL(CNF_PVAL(CFNPTR)), SHIFT, WIDTH)
 C     print4000, 'after FIG_CROSS'
 C
 C     Release work space.
@@ -330,7 +334,7 @@ C
          IF(STATUS.NE.0)GOTO 500
 
          BYTES=NX*BFLOAT
-         CALL GEN_MOVE(BYTES, %VAL(CFNPTR), DYNAMIC_MEM(CPTR))
+         CALL GEN_MOVE(BYTES, %VAL(CNF_PVAL(CFNPTR)), DYNAMIC_MEM(CPTR))
       END IF
 
   500 CONTINUE

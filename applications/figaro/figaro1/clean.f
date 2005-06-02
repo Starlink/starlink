@@ -67,8 +67,12 @@ C     8th  Nov  1998.  ACD / UoE, Starlink. Fixed a couple of instances
 C                      where Y axis quantities were computed from variables
 C                      pertaining to the X axis rather than the equivalent
 C                      Y axis variables (spotted by Mark Taylor).
+C     2005 May 31      MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                      data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions 
 C
@@ -155,8 +159,8 @@ C
 C
 C     Perform the interactive cleaning.
 C
-      CALL FIG_CCLEAN(%VAL(OPTR),NX,NY,.TRUE.,
-     :                       %VAL(WPTR),WSIZE,ARRAY,COL1,COL2)
+      CALL FIG_CCLEAN(%VAL(CNF_PVAL(OPTR)),NX,NY,.TRUE.,
+     :                     %VAL(CNF_PVAL(WPTR)),WSIZE,ARRAY,COL1,COL2)
       IF (PAR_ABORT()) GO TO 500
 C
 C     Set user variable IMARRAY to reflect current display parameters
@@ -254,6 +258,7 @@ C
 C     PRIMDAT constants
 C
       INCLUDE 'PRM_PAR'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Display parameters for FIG_GIMAGE
 C
@@ -446,8 +451,8 @@ C
             CALL PGPAGE
             CALL FIG_CLEAN_1(.TRUE.,BADVAL,MINVAL,COLHI,
      :         NX,NY,IXST,IYST,IXEN-IXST+1,IYEN-IYST+1,
-     :         DATA,LOW,HIGH,%VAL(IPTR))
-            CALL PGPIXL(%VAL(IPTR),IXEN-IXST+1,IYEN-IYST+1,
+     :         DATA,LOW,HIGH,%VAL(CNF_PVAL(IPTR)))
+            CALL PGPIXL(%VAL(CNF_PVAL(IPTR)),IXEN-IXST+1,IYEN-IYST+1,
      :         1,IXEN-IXST+1,1,IYEN-IYST+1,
      :         WINDOW(1),WINDOW(2),WINDOW(3),WINDOW(4))
          END IF

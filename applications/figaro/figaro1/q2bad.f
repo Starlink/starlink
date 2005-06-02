@@ -34,6 +34,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Get quality as logical array.
 *     13-OCT-1992 (HME):
 *        Map quality before data. Rename NDFBAD -> Q2BAD.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -103,11 +107,13 @@
 
 *  Do the action.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL FIG_QLBADD( EL, BADXST, %VAL(PNTR1(2)), %VAL(PNTR1(1)),
-     :      %VAL(PNTR2(1)), STATUS )
+         CALL FIG_QLBADD( EL, BADXST, %VAL(CNF_PVAL(PNTR1(2))),
+     :                    %VAL(CNF_PVAL(PNTR1(1))),
+     :                    %VAL(CNF_PVAL(PNTR2(1))), STATUS )
       ELSE
-         CALL FIG_QLBADR( EL, BADXST, %VAL(PNTR1(2)), %VAL(PNTR1(1)),
-     :      %VAL(PNTR2(1)), STATUS )
+         CALL FIG_QLBADR( EL, BADXST, %VAL(CNF_PVAL(PNTR1(2))),
+     :                    %VAL(CNF_PVAL(PNTR1(1))),
+     :                    %VAL(CNF_PVAL(PNTR2(1))), STATUS )
       END IF
 
 *  End the NDF context.
