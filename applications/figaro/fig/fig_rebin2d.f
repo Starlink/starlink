@@ -107,8 +107,12 @@ C     8th April 1987   KS / AAO.  GEN_SFIT2D is now FIG_SFIT2D - call
 C                      modified.
 C     18th March 1993  HME / UoE, Starlink.  GEN_POLY2D requires this
 C                      routine to supply a work space. Calls changed.
+C     2005 June 1      MJC / Starlink Use CNF_PVAL for pointers to 
+C                      mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -221,11 +225,11 @@ C
                X=0.
                DO IX=1,NXP1
                   PX(IX,IY)=
-     :               XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :              XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                    %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,IY)=
-     :               YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :              YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                    %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
                Y=Y+1.
@@ -235,11 +239,11 @@ C
                X=0.
                DO IX=1,NXP1
                   PX(IX,IY)=
-     :               XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :              XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                    %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,IY)=
-     :               YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :              YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                   %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
                Y=Y+1.
@@ -251,11 +255,11 @@ C
                X=0.
                DO IX=1,NXP1
                   PX(IX,IY)=
-     :               XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :               XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                    %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,IY)=
-     :               YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :               YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                     %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
                Y=Y+1.
@@ -277,11 +281,11 @@ C
                   X=0.
                   DO IX=1,NXP1
                      PX(IX,IY)=
-     :                  XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :                  +XSHIFT
+     :                 XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                 %VAL(CNF_PVAL(CT))))+XSHIFT
                      PY(IX,IY)=
-     :                  YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :                  +YSHIFT
+     :                 YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+YSHIFT
                      X=X+1.
                   END DO
                   Y=Y+1.
@@ -293,13 +297,13 @@ C
 C     Do the position functions increase or decrease with X and Y?
 C
       XUP=XPOS(GEN_POLY2D(FLOAT(NX/2),FLOAT(NY/2),
-     :                     NCXX,NCXY,XCOEFF,%VAL(CT))).LT.
+     :                    NCXX,NCXY,XCOEFF,%VAL(CNF_PVAL(CT)))).LT.
      :    XPOS(GEN_POLY2D(FLOAT(NX/2+1),FLOAT(NY/2),
-     :                     NCXX,NCXY,XCOEFF,%VAL(CT)))
+     :                    NCXX,NCXY,XCOEFF,%VAL(CNF_PVAL(CT))))
       YUP=YPOS(GEN_POLY2D(FLOAT(NX/2),FLOAT(NY/2),
-     :                     NCYX,NCYY,YCOEFF,%VAL(CT))).LT.
+     :                    NCYX,NCYY,YCOEFF,%VAL(CNF_PVAL(CT)))).LT.
      :    YPOS(GEN_POLY2D(FLOAT(NX/2),FLOAT(NY/2+1),
-     :                     NCYX,NCYY,YCOEFF,%VAL(CT)))
+     :                    NCYX,NCYY,YCOEFF,%VAL(CNF_PVAL(CT))))
 C
 C     Do we assume that the data is flat?  Set 'matrix inverted'
 C     flag ready for first call to SFIT2D.
@@ -524,21 +528,21 @@ C
             IF (YLOG) THEN
                DO IX=1,NXP1
                   PX(IX,L2)=
-     :               XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :                 XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,L2)=
-     :               YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :                 YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
             ELSE
                DO IX=1,NXP1
                   PX(IX,L2)=
-     :               XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :                 XPOSL(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,L2)=
-     :               YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :                 YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
             END IF
@@ -546,11 +550,11 @@ C
             IF (YLOG) THEN
                DO IX=1,NXP1
                   PX(IX,L2)=
-     :               XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :               +XSHIFT
+     :                 XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+XSHIFT
                   PY(IX,L2)=
-     :               YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :               +YSHIFT
+     :                 YPOSL(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+YSHIFT
                   X=X+1.
                END DO
             ELSE
@@ -561,11 +565,11 @@ C
                ELSE
                   DO IX=1,NXP1
                      PX(IX,L2)=
-     :                  XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,%VAL(CT)))
-     :                  +XSHIFT
+     :                 XPOS(GEN_POLY2D(X,Y,NCXX,NCXY,XCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+XSHIFT
                      PY(IX,L2)=
-     :                  YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,%VAL(CT)))
-     :                  +YSHIFT
+     :                 YPOS(GEN_POLY2D(X,Y,NCYX,NCYY,YCOEFF,
+     :                      %VAL(CNF_PVAL(CT))))+YSHIFT
                      X=X+1.
                   END DO
                END IF
