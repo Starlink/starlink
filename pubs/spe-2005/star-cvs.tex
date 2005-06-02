@@ -1,7 +1,7 @@
 \documentclass{speauth}
 
 \def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
-\RCS$Version: x $
+\RCS$Revision$
 \RCS$Date$
 
 \usepackage{url}
@@ -43,12 +43,12 @@ Mac\,OS\,X and Cygwin.  This had some unexpected benefits and costs, and
 valuable lessons.
 
 % XXX Comment out before submission
-Version \RCSVersion.
+Version \RCSRevision.
 \end{abstract}
 
 
 
-The Starlink Software Collection (Draper 2005) is a large set of
+The Starlink Software Collection \cite{draper05} is a large set of
 data-reduction 
 applications, written over about two decades in a variety of
 languages.  Until recently the source code was managed, and the
@@ -92,8 +92,8 @@ developing new software, mostly in Java, in tune with more recent
 developments in astronomical software.  Though it is not now actively
 developed, the classic software is still depended upon by astronomers
 world-wide, as well as being a valuable resource for pipelines
-(Cavanagh et al.\ 2003; Currie 2004) and application engines in the VO
-(Giaretta et al.\ 2005).
+(\cite{cavanagh03,currie04}) and application engines in the VO
+\cite{giaretta05}.
 For this reason, and because we expect the community will have to take
 a larger role in its curation, we need to make the classic software as
 accessible as possible.
@@ -108,7 +108,7 @@ time.  Not included in this total is about 300\,kSLOC of Java,
 built separately.  Just to put this in context, David A
 Wheeler's \texttt{SLOCCount} would have us believe that that's worth
 over \$100M and, according to his analysis of the RH7.1 distribution
-(Wheeler 2001), it appears that 1.8\,MSLOC is larger than anything in
+\cite{wheeler02}, it appears that 1.8\,MSLOC is larger than anything in
 that distribution except the kernel, Mozilla and XFree86.  Busy types,
 aren't we?
 
@@ -294,7 +294,8 @@ running, and then another six to adapt the bulk of our code to the new
 system.
 
 
-
+\bibliographystyle{my-spe}
+\bibliography{star-cvs}
 %% \begin{references}
 
 %% \reference  Cavanagh, B., Hirst, P., Jenness, T., Economou, F.,
