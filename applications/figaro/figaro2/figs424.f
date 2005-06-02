@@ -53,8 +53,12 @@ C                    No error messages from DTA. Call PAR_WRUSER instead
 C                    of FIG_DTAERR.
 C     24th Jul 1996  MJCL / Starlink, UCL.  Abuse of SORTED as INTEGER
 C                    removed.
+C     2005 June 1    MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                    data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
@@ -207,7 +211,7 @@ C
 C
 C     Sort the data
 C
-      CALL FIG_FIG424(%VAL(CUPTR),NX,NY,NT,NU,VECTOR,WORK)
+      CALL FIG_FIG424(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NU,VECTOR,WORK)
 C
 C     Force a wavelength array - this code rather assumes that there
 C     isn't one at present in the input structure.
@@ -216,7 +220,8 @@ C
       CALL DSA_COERCE_AXIS_DATA('OUTPUT',1,'FLOAT',1,NX,STATUS)
       CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','FLOAT',
      :   XPTR,SLOT,STATUS)
-      CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),WAVES,%VAL(XPTR))
+      CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),WAVES,
+     :              %VAL(CNF_PVAL(XPTR)))
       IF (STATUS.NE.0) THEN
          CALL PAR_WRUSER('Error writing wavelength array',STATUS)
          GO TO 500

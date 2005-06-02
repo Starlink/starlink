@@ -70,8 +70,12 @@ C                    of FIG_DTAERR.
 C                    Fix bug whereby DSA_OPEN was called a second time
 C                    instead of DSA_CLOSE.
 C                    Fixed the broken-up format string in a WRITE.
+C     2005 June 1    MJC / Starlink Use CNF_PVAL for pointers to mapped
+C                    data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
@@ -311,9 +315,11 @@ C
 C     Perform the basic processing of the cube down to either
 C     an image or a spectrum.
 C
-      CALL FIG_FET321(%VAL(CUPTR),NX,NY,NT,NELM,DETECTOR,DETECTORS,
-     :      ADD,BACK,FACTOR,NORM,CUTOFF,%VAL(WPTR),%VAL(EXPTR),
-     :      %VAL(NUMPTR),%VAL(OPTR),%VAL(EPTR))
+      CALL FIG_FET321(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NELM,DETECTOR,
+     :                DETECTORS,ADD,BACK,FACTOR,NORM,CUTOFF,
+     :                %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(EXPTR)),
+     :                %VAL(CNF_PVAL(NUMPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                %VAL(CNF_PVAL(EPTR)))
 C
 C     Force an etalon position array - this code rather assumes that 
 C     there isn't one at present in the input structure.
@@ -324,7 +330,8 @@ C
       CALL DSA_COERCE_AXIS_DATA('OUTPUT',1,'FLOAT',1,NELM,STATUS)
       CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','FLOAT',
      :   XPTR,SLOT,STATUS)
-      CALL GEN_MOVE(NELM*DSA_TYPESIZE('FLOAT',STATUS),POSNS,%VAL(XPTR))
+      CALL GEN_MOVE(NELM*DSA_TYPESIZE('FLOAT',STATUS),POSNS,
+     :              %VAL(CNF_PVAL(XPTR)))
       IF (STATUS.NE.0) THEN
          CALL PAR_WRUSER('Error writing etalon position array',STATUS)
          GO TO 500
