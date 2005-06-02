@@ -51,6 +51,8 @@
 *        Original version.
 *     1998 October 27 (ACD)
 *        Added a minimal entry for the 'Description' prologue section.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,6 +67,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'NDF_ERR'          ! NDF_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -325,8 +328,10 @@
       END IF
 
 *  Get the bounds of the sky and object spectra.
-      CALL KPG1_AXBNR( IAEL, %VAL( IAPNTR( 1 ) ), IALCO, IAUCO, STATUS )
-      CALL KPG1_AXBNR( IAEL, %VAL( SAPNTR( 1 ) ), SALCO, SAUCO, STATUS )
+      CALL KPG1_AXBNR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ), IALCO,
+     :                 IAUCO, STATUS )
+      CALL KPG1_AXBNR( IAEL, %VAL( CNF_PVAL( SAPNTR( 1 ) ) ), SALCO,
+     :                 SAUCO, STATUS )
 
 *  Check that the bounds are the same.  Report an error if they are not.
       IF ( ABS ( IALCO - SALCO ) .GT. VAL__EPSR .OR.
@@ -341,20 +346,20 @@
 *  Determine pixel limits of the [OI] line.  The three values are the
 *  lower limit, centre and upper limit of the line.  So find the pixel
 *  above the lower limit.
-      CALL KPG1_AXGVR( IAEL, %VAL( IAPNTR( 1 ) ), CALLAM( 1 ),
-     :                 PIND( 1 ), SLAM, STATUS )
+      CALL KPG1_AXGVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
+     :                 CALLAM( 1 ), PIND( 1 ), SLAM, STATUS )
 
 *  Now get the pixel index just below the upper value.
-      CALL KPG1_AXLVR( IAEL, %VAL( IAPNTR( 1 ) ), CALLAM( 3 ),
-     :                 PIND( 3 ), SLAM, STATUS )
+      CALL KPG1_AXLVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
+     :                 CALLAM( 3 ), PIND( 3 ), SLAM, STATUS )
 
 *  Circumvent the bug in the above routine. 
-      PIND( 3 ) = ABS( PIND( 3 ) )     
+      PIND( 3 ) = ABS( PIND( 3 ) )   
 
 *  Finally get the centre value.  This is a floating-point value.
 *  Convert it to integer.
-      CALL KPG1_AINDR( LBND, UBND, %VAL( IAPNTR( 1 ) ), 1, CALLAM( 2 ),
-     :                 RPIND, STATUS )
+      CALL KPG1_AINDR( LBND, UBND, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ), 1,
+     :                 CALLAM( 2 ), RPIND, STATUS )
       PIND( 2 ) = NINT( RPIND )
       
 *  Create the two-dimensional output spectrum.
@@ -370,20 +375,21 @@
 *  2-dimensional spectrum, and then sky-subtract to form the output
 *  2-dimensional spectrum.
       CALL FLA_OISS( LBND( 1 ), UBND( 1 ), DIM( 2 ),
-     :               %VAL( IPNTR( 1 ) ), PIND, %VAL( SPNTR( 1 ) ),
-     :               %VAL( OPNTR( 1 ) ), STATUS )
+     :               %VAL( CNF_PVAL( IPNTR( 1 ) ) ), PIND,
+     :               %VAL( CNF_PVAL( SPNTR( 1 ) ) ),
+     :               %VAL( CNF_PVAL( OPNTR( 1 ) ) ), STATUS )
 
 *  Find the pixel indices of the lines.
       DO I = 1, NLINES
 
 *  Determine pixel limits of the line.  First find the pixel
 *  above the lower limit.
-         CALL KPG1_AXGVR( IAEL, %VAL( IAPNTR( 1 ) ), LINLAM( 1, I ),
-     :                    FPIND( 1, I ), SLAM, STATUS )
+         CALL KPG1_AXGVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
+     :                    LINLAM( 1, I ), FPIND( 1, I ), SLAM, STATUS )
 
 *  Now get the pixel index just below the upper value.
-         CALL KPG1_AXLVR( IAEL, %VAL( IAPNTR( 1 ) ), LINLAM( 2, I ),
-     :                    FPIND( 2, I ), SLAM, STATUS )
+         CALL KPG1_AXLVR( IAEL, %VAL( CNF_PVAL( IAPNTR( 1 ) ) ),
+     :                    LINLAM( 2, I ), FPIND( 2, I ), SLAM, STATUS )
 
 *  Circumvent the bug in the above routine. 
          FPIND( 2, I ) = ABS( FPIND( 2, I ) )
@@ -392,7 +398,7 @@
 
 *  Interpolate across the strongest lines.
       CALL FLA_SLINT( LBND( 1 ), UBND( 1 ), DIM( 2 ), NLINES, FPIND,
-     :                %VAL( OPNTR( 1 ) ), STATUS )
+     :                %VAL( CNF_PVAL( OPNTR( 1 ) ) ), STATUS )
 
 *  Come here if there has been an error.
   999 CONTINUE

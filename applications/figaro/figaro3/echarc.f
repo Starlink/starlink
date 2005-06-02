@@ -289,8 +289,12 @@ C                  image, or a copy of input is made and given the
 C                  fitted wavelengths.
 C     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                  file names to 132 chars.
+C     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
+C                  data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters -  array sizes for arc lines and identified lines
 C                   available logical unit number.
@@ -489,8 +493,8 @@ C
       JORDPTR=IMLDPTR+NINTERACTIVE*4
       FITSPTR=JORDPTR+NINTERACTIVE*4
 
-         FORDR=GEN_ELEMF(%VAL(YPTR),1)
-         LORDR=GEN_ELEMF(%VAL(YPTR),NORDERS)
+         FORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),1)
+         LORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),NORDERS)
          IF (FORDR.LE.LORDR) THEN
             DI=1
             ORDMIN=FLOAT(FORDR)
@@ -501,9 +505,9 @@ C
             ORDMAX=FLOAT(FORDR)
          END IF
 
-      CALL ECH_ORINIT(NINTERACTIVE,FORDR,LORDR,%VAL(IORDPTR))
+      CALL ECH_ORINIT(NINTERACTIVE,FORDR,LORDR,%VAL(CNF_PVAL(IORDPTR)))
       CALL PAR_RDARY('ORDERS',ORDMIN,ORDMAX,'None','Order #',
-     :               NINTERACTIVE,INTMAX,%VAL(IORDPTR))
+     :               NINTERACTIVE,INTMAX,%VAL(CNF_PVAL(IORDPTR)))
       IF (PAR_ABORT()) GO TO 500
 C
 C     Delete all lines that were read from the ARLINES.ECH file and which
@@ -512,11 +516,11 @@ C     not at present used in the fit and to leave them there would cause
 C     problems when bodily shifting an existing fit.
 C
       DO I = 1,NORDERS
-         CORDR=GEN_ELEMF(%VAL(YPTR),I)
+         CORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),I)
          IORDR=CORDR+1
          INTERACT=1
          DO WHILE (IORDR.NE.CORDR.AND.INTERACT.LE.NINTERACTIVE)
-            IORDR=GEN_ELEMF(%VAL(IORDPTR),INTERACT)
+            IORDR=GEN_ELEMF(%VAL(CNF_PVAL(IORDPTR)),INTERACT)
             INTERACT=INTERACT+1
          END DO
          IF (IORDR.NE.CORDR) THEN
@@ -578,7 +582,7 @@ C
 C     Fill the single precision X array, which is the one used throughout
 C     the main part of the program, with the numbers 1..NX
 C
-      CALL GEN_NFILLF(NX,%VAL(XPTR))
+      CALL GEN_NFILLF(NX,%VAL(CNF_PVAL(XPTR)))
 C
 C     Number of BYTES in a single row (order) of image ...
 C
@@ -596,7 +600,7 @@ C
 C        Set integer variable IORDR equal to the next order number
 C           chosen by the user ...
 C
-         IORDR=GEN_ELEMF(%VAL(IORDPTR),INTERACT)
+         IORDR=GEN_ELEMF(%VAL(CNF_PVAL(IORDPTR)),INTERACT)
 C
 C        Initialise the SOFT graphics device
 C
@@ -610,15 +614,17 @@ C        Set I2ZPTR to point to IORDR row of image, and copy row of
 C           image beginning at I2ZPTR over to ZPTR workspace
 C
          I2ZPTR=IPTR+DI*(IORDR-FORDR)*BYTES
-         CALL GEN_MOVE(BYTES,%VAL(I2ZPTR),%VAL(ZPTR))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(I2ZPTR)),
+     :                 %VAL(CNF_PVAL(ZPTR)))
 C
 C        Identify all lines within this order using ARPLOT,ARSLCT,ARMENU
 C
-         CALL ECH_ARINTR(%VAL(XPTR),%VAL(ZPTR),XLAB,ZLAB,NX,
-     :                   NC,COEFFS,NCOEFF,PARMS,SIGMA,IORDR,
-     :                   NLMAX,ORDER,CHANS,WAVES,CLASS,NLID,
+         CALL ECH_ARINTR(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(ZPTR)),
+     :                   XLAB,ZLAB,NX,NC,COEFFS,NCOEFF,PARMS,SIGMA,
+     :                   IORDR,NLMAX,ORDER,CHANS,WAVES,CLASS,NLID,
      :                   NLARCS,ARC1,ARC2,ARC3,ARCS,IOUT,AP,
-     :                   WEIGHTS,%VAL(WPTR),%VAL(WPTR2),RMS)
+     :                   WEIGHTS,%VAL(CNF_PVAL(WPTR)),
+     :                   %VAL(CNF_PVAL(WPTR2)),RMS)
          IF (PAR_ABORT()) GO TO 500
 C
 C        Give user option to CONTINUE [default] on to next order,
@@ -653,13 +659,14 @@ C
 C           Compute the double precision X array, and copy it over to
 C              the output image ....
 C
-            CALL ARC_ARSETXD(NX,COEFFS,NCOEFF,%VAL(XDPTR))
+            CALL ARC_ARSETXD(NX,COEFFS,NCOEFF,%VAL(CNF_PVAL(XDPTR)))
 C
 C           Set O2PTR to point to IORDR row of image, and copy XDPTR data
 C              over to OPTR image beginning at I2ZPTR.
 C
             O2PTR=OPTR+DI*(IORDR-FORDR)*BYTES*2
-            CALL GEN_MOVE(BYTES*2,%VAL(XDPTR),%VAL(O2PTR))
+            CALL GEN_MOVE(BYTES*2,%VAL(CNF_PVAL(XDPTR)),
+     :                    %VAL(CNF_PVAL(O2PTR)))
 C
 C           ...and now continue normally
 C
@@ -720,8 +727,8 @@ C
 C     Now we have NINTERACTIVE rows of %VAL(OPTR) filled with wavelengths; 
 C        below we fill in the rest with rather good guesses ... 
 C
-      CALL ECH_ARFLAG(%VAL(IORDPTR),NINTERACTIVE,NORDERS,
-     :                          FORDR,LORDR,%VAL(FITSPTR))
+      CALL ECH_ARFLAG(%VAL(CNF_PVAL(IORDPTR)),NINTERACTIVE,NORDERS,
+     :                          FORDR,LORDR,%VAL(CNF_PVAL(FITSPTR)))
 C
 C     Determine an appropriate number of coefficients to use for initial
 C        %VAL(OPTR) filling ...
@@ -736,9 +743,9 @@ C
          NCFILL=8
       END IF
 C
-      CALL ECH_ARFILL(%VAL(OPTR),NX,NORDERS,FORDR,LORDR,
-     :                %VAL(FITSPTR),NINTERACTIVE,NCFILL,
-     :          %VAL(IMLDPTR),%VAL(IWTSPTR),%VAL(JORDPTR))
+      CALL ECH_ARFILL(%VAL(CNF_PVAL(OPTR)),NX,NORDERS,FORDR,LORDR,
+     :                %VAL(CNF_PVAL(FITSPTR)),NINTERACTIVE,NCFILL,
+     :          %VAL(CNF_PVAL(IMLDPTR)),%VAL(IWTSPTR),%VAL(JORDPTR))
 C
 C     Below we call a utility routine to get a single, sorted ARC array
 C        after first getting the workspace for it ...
@@ -785,20 +792,25 @@ C      FOPTR=FWPTR+NORDERS*4
       CALL DSA_GET_WORK_ARRAY(NORDERS, 'FLOAT',FOPTR, SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
-      CALL ECH_ARCONE(NLARCS,ARC1,ARC2,ARC3,NARCS,%VAL(ARCPTR))
+      CALL ECH_ARCONE(NLARCS,ARC1,ARC2,ARC3,NARCS,
+     :                %VAL(CNF_PVAL(ARCPTR)))
 C
       NFIT=NINTERACTIVE
 C
 C     Now with %VAL(OPTR) as a starting point, we can go looking for lines
 C        in array %VAL(ARCPTR) and so refine these guesses ...
 C
-      CALL ECH_ARFIND(%VAL(IPTR),NX,NORDERS,%VAL(OPTR),%VAL(IORDPTR),
-     :               NINTERACTIVE,NC,COEFFS,NCOEFF,PARMS,SIGMA,SVRMS,
-     :         NLMAX,ORDER,CHANS,WAVES,CLASS,NLID,NARCS,%VAL(ARCPTR),
-     :  IOUT,FORDR,LORDR,%VAL(WXPTR),%VAL(WZPTR),%VAL(WWPTR),WEIGHTS,
-     :                          %VAL(FITSPTR),NFIT,FMPTR,FWPTR,FOPTR,
-     :   %VAL(F1PTR),%VAL(F2PTR),%VAL(F3PTR),%VAL(F4PTR),%VAL(F5PTR),
-     :                                                DEVICE,MONITOR)
+      CALL ECH_ARFIND(%VAL(CNF_PVAL(IPTR)),NX,NORDERS,
+     :                %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(IORDPTR)),
+     :                NINTERACTIVE,NC,COEFFS,NCOEFF,PARMS,SIGMA,SVRMS,
+     :                NLMAX,ORDER,CHANS,WAVES,CLASS,NLID,NARCS,
+     :                %VAL(CNF_PVAL(ARCPTR)),IOUT,FORDR,LORDR,
+     :                %VAL(CNF_PVAL(WXPTR)),%VAL(CNF_PVAL(WZPTR)),
+     :                %VAL(CNF_PVAL(WWPTR)),WEIGHTS,
+     :                %VAL(CNF_PVAL(FITSPTR)),NFIT,FMPTR,FWPTR,FOPTR,
+     :                %VAL(CNF_PVAL(F1PTR)),%VAL(CNF_PVAL(F2PTR)),
+     :                %VAL(CNF_PVAL(F3PTR)),%VAL(CNF_PVAL(F4PTR)),
+     :                %VAL(CNF_PVAL(F5PTR)),DEVICE,MONITOR)
 C
 C     List name of output list file
 C
@@ -849,12 +861,14 @@ C
          CALL ARC_AHOPEN(NYSUB,STATUS)
          IF (STATUS.EQ.0) THEN
             DO I=1,NORDERS,1
-               IORDR=GEN_ELEMF(%VAL(YPTR),I)
+               IORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),I)
                I2ZPTR=IPTR+DI*(IORDR-FORDR)*BYTES
-               CALL GEN_MOVE(BYTES,%VAL(I2ZPTR),%VAL(ZPTR))
-               CALL ECH_ATLAS(%VAL(XPTR),%VAL(ZPTR),XLAB,ZLAB,NX,
-     :                     IORDR,NLMAX,ORDER,CHANS,WAVES,WEIGHTS,
-     :                                                CLASS,NLID)
+               CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(I2ZPTR)),
+     :                       %VAL(CNF_PVAL(ZPTR)))
+               CALL ECH_ATLAS(%VAL(CNF_PVAL(XPTR)),
+     :                        %VAL(CNF_PVAL(ZPTR)),XLAB,ZLAB,NX,
+     :                        IORDR,NLMAX,ORDER,CHANS,WAVES,
+     :                        WEIGHTS,CLASS,NLID)
                REPLY='* order     hard'
                WRITE (STR3,'(I3)',IOSTAT=IGNORE) IORDR
                REPLY(9:11)=STR3

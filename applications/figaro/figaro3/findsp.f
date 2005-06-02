@@ -100,6 +100,7 @@
 *     jm: Jo Murray (RAL, Starlink)
 *     jms: {author_name} (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -149,6 +150,8 @@
 *        The time has come. No longer use NAG, and take the opportunity
 *        to no longer use GKS or SGS either. This is a re-write of the
 *        code, although the structure remains.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +161,9 @@
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Variables:
       LOGICAL ABORT              ! Status from work routine
@@ -235,7 +241,8 @@
 
 *  Call the work routine. This handles all graphics, interaction, and
 *  file output.
-      CALL FINDSP_WORK( DIMS(1), DIMS(2), %VAL(IPTR), LU, ABORT )
+      CALL FINDSP_WORK( DIMS(1), DIMS(2), %VAL(CNF_PVAL(IPTR)), LU,
+     :                  ABORT )
       IF ( ABORT ) GO TO 400
 
 *  Append some comments to the output text file.

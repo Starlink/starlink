@@ -59,6 +59,7 @@
 *     jms: {author_name} (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     mjcl: Martin Clayton (starlink, UCL)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +101,8 @@
 *     16 Sep 1996 (mjcl):
 *        Changed format for messages to support images of Y-dimension
 *        greater than 999 pixels.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,6 +112,9 @@
       
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants
       INTEGER MAXFIB             ! Maximum number of fibres
@@ -288,8 +294,9 @@
 
 *  Now do the real work.
       CALL OVERPF_WORK( DIMS(1), DIMS(2),
-     :   %VAL(IPTR), %VAL(IYRUN), %VAL(IYLEVEL), %VAL(IXP),
-     :   ADPCOF, NUMFIB, NPTS, NORDER, VERSION )
+     :                  %VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(IYRUN)),
+     :                  %VAL(CNF_PVAL(IYLEVEL)), %VAL(CNF_PVAL(IXP)),
+     :                  ADPCOF, NUMFIB, NPTS, NORDER, VERSION )
 
 *  Close graphics device.
       CALL FIG_PGEND

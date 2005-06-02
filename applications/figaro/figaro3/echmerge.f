@@ -90,8 +90,11 @@
 *                  No concurrent mapping. This was in fact a bug:
 *                  If the user gave two input images, the first one
 *                  would be mapped twice and the second not at all.
+C     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
+C                  data.
 *+
 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *
 *     Constant parameter declarations
 *
@@ -279,8 +282,10 @@
       IF (.NOT.I1OPEN) THEN
          I1DIMS(2) = IDIMS(2)
       ENDIF
-      CALL FIG_ECHMERGE(IDIMS(1),IDIMS(2),I1DIMS(2),%VAL(IPTR),
-     :         I1OPEN,%VAL(I1PTR),BOX,CUTOFF,OIDENT,%VAL(OPTR))
+      CALL FIG_ECHMERGE(IDIMS(1),IDIMS(2),I1DIMS(2),
+     :                  %VAL(CNF_PVAL(IPTR)),I1OPEN,
+     :                  %VAL(CNF_PVAL(I1PTR)),BOX,CUTOFF,OIDENT,
+     :                  %VAL(CNF_PVAL(OPTR)))
 *
 *     It only remains to tidy up.
 *

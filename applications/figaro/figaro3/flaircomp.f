@@ -61,6 +61,8 @@
 *        Replaced explict directory specification for INCLUDE files
 *        with the standard upper-case softlinks.  Also removed
 *        continuing a string constant across a continuation line.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,6 +79,7 @@
       INCLUDE 'PAR_PAR'
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -135,9 +138,10 @@
       CALL PSX_CALLOC( DIM( 1 ), '_REAL', WPNTR, STATUS )
 
 *  Generate the weight array.
-      CALL FLA_WEIGH( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ), 
-     :                %VAL( PNTRO( 1 ) ), %VAL( WPNTR ), NFIBRE,
-     :                STATUS )
+      CALL FLA_WEIGH( DIM( 1 ), DIM( 2 ),
+     :                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), NFIBRE, STATUS )
 
 *  Report the number of fibres.
       CALL MSG_SETI( 'NFIB', NFIBRE )
@@ -158,8 +162,8 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FLAIRCOMP_ERR',
-     :      'FLAIRCOMP: Unable to generate the weight array for '/
-     :      /'the FLAIR NDF.', STATUS )
+     :     'FLAIRCOMP: Unable to generate the weight array for '/
+     :     /'the FLAIR NDF.', STATUS )
       END IF
 
       END

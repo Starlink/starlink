@@ -67,7 +67,9 @@
 *        Use GRP for NDG, and use softlinks to include files.
 *     1998 October 27 (ACD)
 *        Removed continuing a string constant across a continuation line.
-*     {enter_changes_here}
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -82,6 +84,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -232,9 +235,12 @@
      :                 ELO, STATUS )
 
 *  Generate the weight array.
-         CALL FLA_OPEXT( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ),
-     :                   %VAL( PNTRI( 2 ) ), %VAL( PNTRP( 1 ) ), NFIBRE,
-     :                   %VAL( PNTRO( 1 ) ), %VAL( PNTRO( 2 ) ),
+         CALL FLA_OPEXT( DIM( 1 ), DIM( 2 ),
+     :                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTRP( 1 ) ) ), NFIBRE,
+     :                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                   STATUS )
 
 *  Obtain a new title for the output NDF.
@@ -257,8 +263,8 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FLAIREXT_ERR',
-     :      'FLAIREXT: Unable to generate the weight array for '/
-     :      /'the FLAIR NDF.', STATUS )
+     :     'FLAIREXT: Unable to generate the weight array for '/
+     :     /'the FLAIR NDF.', STATUS )
       END IF
 
       END
