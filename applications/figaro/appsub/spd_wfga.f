@@ -1,7 +1,7 @@
-      SUBROUTINE SPD_WFGA( INFO, COVRSX, NELM, NCOMP_ARG,
-     :   FITPAR, FITDIM,
-     :   CONT, XDWC, CFLAGS, PFLAGS, SFLAGS, CENTRE, PEAK, SIGMA,
-     :   CHISQR, COVAR, FITTED, STATUS )
+      SUBROUTINE SPD_WFGA( INFO, COVRSX, NELM, NCOMP_ARG, FITPAR,
+     :                     FITDIM, CONT, XDWC, CFLAGS, PFLAGS,
+     :                     SFLAGS, CENTRE, PEAK, SIGMA,
+     :                     CHISQR, COVAR, FITTED, STATUS )
 *+
 *  Name:
 *     SPD_WFGA
@@ -90,6 +90,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -139,6 +140,8 @@
 *     23 Aug 1995 (hme):
 *        For Figaro 5.0 adapt error reporting to use status 0/1 and
 *        PAR_WRUSER. Don't work out covariance. No longer use NAG.
+*     2005 May 31 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -244,7 +247,7 @@
 *  Global Constants:
       INTEGER MAXCMP
       PARAMETER ( MAXCMP = 10 )
-      INCLUDE 'CNF_PAR'            ! CNF functions.
+      INCLUDE 'CNF_PAR'            ! CNF functions
 
 *  Global Variables:
       INTEGER          NCOMP
@@ -659,6 +662,9 @@
      :   NCOMP, IUSER, POINTR
 
 *.
+
+*  Global Constants:
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FITPAR
