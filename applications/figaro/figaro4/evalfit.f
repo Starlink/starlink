@@ -99,6 +99,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -113,6 +114,8 @@
 *        Before it would make the result bad.
 *     24 Nov 1995 (hme):
 *        Accept polynomials.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,6 +131,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -318,24 +322,28 @@
             CCODE = 0
             IF ( COMP(N) .GE. 1 .AND. COMP(N) .LE. NCOMP ) THEN
                IF ( CHR_SIMLR( 'Chebyshev series',
-     :            SPD_UAAGC(%VAL(PNTR(5)),COMP(N),STATUS,%VAL(CHLEN)) )
-     :            .AND. SPD_UAAGI(%VAL(PNTR(6)),COMP(N),STATUS).EQ.11 )
-     :            THEN
+     :              SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N), 
+     :                         STATUS, %VAL(CHLEN) ) ) .AND.
+     :              SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
+     :                         STATUS ) .EQ. 11 ) THEN
                   CCODE = 1
                ELSE IF ( CHR_SIMLR( 'Gauss',
-     :            SPD_UAAGC(%VAL(PNTR(5)),COMP(N),STATUS,%VAL(CHLEN)) )
-     :            .AND. SPD_UAAGI(%VAL(PNTR(6)),COMP(N),STATUS).EQ. 4 )
-     :            THEN
+     :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
+     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
+     :                              STATUS) .EQ. 4 ) THEN
                   CCODE = 2
                ELSE IF ( CHR_SIMLR( 'triangle',
-     :            SPD_UAAGC(%VAL(PNTR(5)),COMP(N),STATUS,%VAL(CHLEN)) )
-     :            .AND. SPD_UAAGI(%VAL(PNTR(6)),COMP(N),STATUS).EQ. 4 )
-     :            THEN
+     :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
+     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
+     :                              STATUS) .EQ. 4 ) THEN
                   CCODE = 3
                ELSE IF ( CHR_SIMLR( 'polynomial',
-     :            SPD_UAAGC(%VAL(PNTR(5)),COMP(N),STATUS,%VAL(CHLEN)) )
-     :            .AND. SPD_UAAGI(%VAL(PNTR(6)),COMP(N),STATUS).EQ. 9 )
-     :            THEN
+     :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
+     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
+     :                              STATUS) .EQ. 9 ) THEN
                   CCODE = 4
                END IF
             END IF
@@ -344,64 +352,89 @@
             IF ( CCODE .NE. 0 ) THEN
                PARA1 = 1
                DO 3 I = 1, COMP(N)-1
-                  PARA1 = PARA1 + SPD_UAAGI( %VAL(PNTR(6)), I, STATUS )
+                  PARA1 = PARA1 + SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ),
+     :                                       I, STATUS )
  3             CONTINUE
             END IF
 
 *        If Chebyshev series.
             IF ( CCODE .EQ. 1 ) THEN
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_WZHAD( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHAD( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                ELSE
-                  CALL SPD_WZHAR( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHAR( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                END IF
 
 *        Else if Gauss profile.
             ELSE IF ( CCODE .EQ. 2 ) THEN
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_WZHBD( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHBD( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                ELSE
-                  CALL SPD_WZHBR( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHBR( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                END IF
 
 *        Else if triangle profile.
             ELSE IF ( CCODE .EQ. 3 ) THEN
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_WZHCD( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHCD( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                ELSE
-                  CALL SPD_WZHCR( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHCR( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                END IF
 
 *        Else if polynomial.
             ELSE IF ( CCODE .EQ. 4 ) THEN
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL SPD_WZHDD( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHDD( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                ELSE
-                  CALL SPD_WZHDR( SPAXIS, TNPAR, PARA1,
-     :               DIM1(2),DIM1(3),DIM1(4),DIM1(5),DIM1(6),DIM1(7),
-     :               DIM2(2),DIM2(3),DIM2(4),DIM2(5),DIM2(6),DIM2(7),
-     :               %VAL(PNTR(1)),%VAL(PNTR(10)),%VAL(PNTR(11)),STATUS)
+                  CALL SPD_WZHDR( SPAXIS, TNPAR, PARA1, DIM1(2),
+     :                            DIM1(3), DIM1(4), DIM1(5), DIM1(6),
+     :                            DIM1(7), DIM2(2), DIM2(3), DIM2(4),
+     :                            DIM2(5), DIM2(6), DIM2(7),
+     :                            %VAL( CNF_PVAL(PNTR(1)) ),
+     :                            %VAL( CNF_PVAL(PNTR(10)) ),
+     :                            %VAL( CNF_PVAL(PNTR(11)) ),STATUS )
                END IF
 
 *        Else, If INFO issue warning that not included in data.

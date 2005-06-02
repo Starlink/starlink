@@ -97,6 +97,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +105,8 @@
 *        Original version.
 *     25 Nov 1994 (hme):
 *        Use new libraries.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,6 +122,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -284,7 +288,7 @@
 
 *        Check that either axis data array is linear.
             IF ( NELM1 .GT. 1 ) THEN
-               CALL SPD_UAAHD( NELM1, %VAL(PNTR(1)), 1D-5,
+               CALL SPD_UAAHD( NELM1, %VAL( CNF_PVAL(PNTR(1)) ), 1D-5,
      :            LVAL1D, UVAL1D, LINEAR, STATUS )
                IF ( .NOT. LINEAR ) THEN
                   STATUS = SAI__ERROR
@@ -295,11 +299,12 @@
                   GO TO 500
                END IF
             ELSE
-               LVAL1D = SPD_UAAGD( %VAL(PNTR(1)), 1, STATUS )
+               LVAL1D = SPD_UAAGD( %VAL( CNF_PVAL(PNTR(1)) ), 1,
+     :                             STATUS )
                UVAL1D = LVAL1D
             END IF
             IF ( NELM2 .GT. 1 ) THEN
-               CALL SPD_UAAHD( NELM2, %VAL(PNTR(2)), 1D-5,
+               CALL SPD_UAAHD( NELM2, %VAL( CNF_PVAL(PNTR(2)) ), 1D-5,
      :            LVAL2D, UVAL2D, LINEAR, STATUS )
                IF ( .NOT. LINEAR ) THEN
                   STATUS = SAI__ERROR
@@ -310,7 +315,8 @@
                   GO TO 500
                END IF
             ELSE
-               LVAL2D = SPD_UAAGD( %VAL(PNTR(2)), 1, STATUS )
+               LVAL2D = SPD_UAAGD( %VAL( CNF_PVAL(PNTR(2)) ), 1,
+     :                             STATUS )
                UVAL2D = LVAL2D
             END IF
             IF ( STATUS .NE. SAI__OK ) GO TO 500
@@ -354,7 +360,7 @@
 
 *        Check that either axis data array is linear.
             IF ( NELM1 .GT. 1 ) THEN
-               CALL SPD_UAAHR( NELM1, %VAL(PNTR(1)), 1E-5,
+               CALL SPD_UAAHR( NELM1, %VAL( CNF_PVAL(PNTR(1)) ), 1E-5,
      :            LVAL1R, UVAL1R, LINEAR, STATUS )
                IF ( .NOT. LINEAR ) THEN
                   STATUS = SAI__ERROR
@@ -365,11 +371,12 @@
                   GO TO 500
                END IF
             ELSE
-               LVAL1R = SPD_UAAGR( %VAL(PNTR(1)), 1, STATUS )
+               LVAL1R = SPD_UAAGR( %VAL( CNF_PVAL(PNTR(1)) ), 1,
+     :                             STATUS )
                UVAL1R = LVAL1R
             END IF
             IF ( NELM2 .GT. 1 ) THEN
-               CALL SPD_UAAHR( NELM2, %VAL(PNTR(2)), 1E-5,
+               CALL SPD_UAAHR( NELM2, %VAL( CNF_PVAL(PNTR(2)) ), 1E-5,
      :            LVAL2R, UVAL2R, LINEAR, STATUS )
                IF ( .NOT. LINEAR ) THEN
                   STATUS = SAI__ERROR
@@ -380,7 +387,8 @@
                   GO TO 500
                END IF
             ELSE
-               LVAL2R = SPD_UAAGR( %VAL(PNTR(2)), 1, STATUS )
+               LVAL2R = SPD_UAAGR( %VAL( CNF_PVAL(PNTR(2)) ), 1,
+     :                             STATUS )
                UVAL2R = LVAL2R
             END IF
             IF ( STATUS .NE. SAI__OK ) GO TO 500
@@ -459,12 +467,16 @@
 *  OUT but not in IN, then bad values are copied into OUT's variance.
       IF ( TYPE2 .EQ. '_DOUBLE' ) THEN
          CALL SPD_WZQAD( VTHER1, VTHER2, NELM1, NELM2, DIM1, DIM2,
-     :      COEFF0, COEFF1, TOL, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      %VAL(PNTR(3)), %VAL(PNTR(4)), STATUS )
+     :                   COEFF0, COEFF1, TOL, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                   %VAL( CNF_PVAL(PNTR(2)) ),
+     :                   %VAL( CNF_PVAL(PNTR(3)) ),
+     :                   %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
       ELSE
          CALL SPD_WZQAR( VTHER1, VTHER2, NELM1, NELM2, DIM1, DIM2,
-     :      COEFF0, COEFF1, TOL, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      %VAL(PNTR(3)), %VAL(PNTR(4)), STATUS )
+     :                   COEFF0, COEFF1, TOL, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                   %VAL( CNF_PVAL(PNTR(2)) ),
+     :                   %VAL( CNF_PVAL(PNTR(3)) ),
+     :                   %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
       END IF
 
 *  Tidy up.

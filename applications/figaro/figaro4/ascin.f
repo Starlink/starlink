@@ -142,6 +142,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -165,6 +166,8 @@
 *        Use new libraries.
 *     15 Nov 1995 (hme):
 *        Open the ASCII file in list mode, not Fortran.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +181,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -322,8 +326,10 @@
 
 *     Copy axis, width, data, variance from table to output.
          CALL SPD_WZZB( FILENO, BADVAL, LINES, COLAXE, COLWID, COLDAT,
-     :      NELM, %VAL(AXIS(1)), %VAL(AXIS(2)), %VAL(DATA), %VAL(DVAR),
-     :      STATUS )
+     :                  NELM, %VAL( CNF_PVAL(AXIS(1)) ),
+     :                  %VAL( CNF_PVAL(AXIS(2)) ),
+     :                  %VAL( CNF_PVAL(DATA) ), %VAL( CNF_PVAL(DVAR) ),
+     :                  STATUS )
 
 *  Else (if output is N-D, do it the complicated way).
       ELSE
@@ -389,8 +395,8 @@
             CALL NDF_AMAP( NDF, 'CENTRE', I, '_REAL', 'WRITE', AXIS(I),
      :          J, STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
-            CALL SPD_UAAJR( START(I), ENDV(I), UBND(I), %VAL(AXIS(I)),
-     :          STATUS )
+            CALL SPD_UAAJR( START(I), ENDV(I), UBND(I),
+     :                      %VAL( CNF_PVAL(AXIS(I)) ), STATUS )
  6       CONTINUE
 
 *     Map the data and error arrays.
@@ -403,8 +409,9 @@
 
 *     Copy from table to data and variance arrays.
          CALL SPD_WZZD( FILENO, INFO, EPS, BADVAL, LINES, COLAXE,
-     :      COLDAT, NDIM, UBND, START, ENDV, NELM,
-     :      %VAL(DATA), %VAL(DVAR), STATUS )
+     :                  COLDAT, NDIM, UBND, START, ENDV, NELM,
+     :                  %VAL( CNF_PVAL(DATA) ),
+     :                  %VAL( CNF_PVAL(DVAR) ), STATUS )
       END IF
 
 *  Close down.

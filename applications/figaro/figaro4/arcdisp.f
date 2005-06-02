@@ -168,6 +168,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -183,6 +184,8 @@
 *        conversion in NDF_END.
 *     20 Nov 1995 (hme):
 *        Use PDA instead of NAG for polynomial fitting.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -198,6 +201,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Standard Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -332,8 +336,8 @@
 *  coordinates.
       CALL SPD_EAED( NDF(1), LOC(1), 'UPDATE', '_REAL',
      :   'laboratory values', 'unknown', PNTR(1), NDF(2), I, STATUS )
-      CALL SPD_UAAHR( DIM(1), %VAL(PNTR(1)), 1E-5, XSTART, XEND,
-     :   LINEAR, STATUS )
+      CALL SPD_UAAHR( DIM(1), %VAL( CNF_PVAL(PNTR(1)) ), 1E-5, XSTART, 
+     :                XEND, LINEAR, STATUS )
       IF ( .NOT. LINEAR .OR.
      :      XSTART .NE. LBND(1)-0.5 .OR. XEND .NE. UBND(1)-0.5 ) THEN
          CALL MSG_SETR( 'ARCDISP_T01', LBND(1)-0.5 )
@@ -358,8 +362,10 @@
      :   STATUS )
 
 *  Check that the results structure conforms to our needs.
-      CALL SPD_WZMC( NCOMP, TNPAR, %VAL(PNTR(8)), %VAL(PNTR(7)),
-     :   %VAL(PNTR(11)), STATUS, %VAL(XCLEN), %VAL(XCLEN) )
+      CALL SPD_WZMC( NCOMP, TNPAR, %VAL(CNF_PVAL(PNTR(8))),
+     :               %VAL( CNF_PVAL(PNTR(7)) ), 
+     :               %VAL( CNF_PVAL(PNTR(11)) ), STATUS,
+     :               %VAL(XCLEN), %VAL(XCLEN) )
 
 *  Release the results' extension vectors.
       DO 1 I = 2, 8
@@ -400,10 +406,16 @@
 
 *     Enter the graphical dialogue.
          CALL SPD_CZMD( ORDER, NELM(5), NCOMP, DIM(1), NROWS,
-     :      %VAL(PNTR(12)), %VAL(PNTR(13)), %VAL(PNTR(14)),
-     :      %VAL(PNTR(15)), %VAL(PNTR(16)), %VAL(PNTR(17)),
-     :      %VAL(PNTR(1)), %VAL(PNTR(3)), %VAL(PNTR(4)),
-     :      FINSHD, STATUS )
+     :                  %VAL( CNF_PVAL(PNTR(12)) ),
+     :                  %VAL( CNF_PVAL(PNTR(13)) ),
+     :                  %VAL( CNF_PVAL(PNTR(14)) ),
+     :                  %VAL( CNF_PVAL(PNTR(15)) ),
+     :                  %VAL( CNF_PVAL(PNTR(16)) ),
+     :                  %VAL( CNF_PVAL(PNTR(17)) ),
+     :                  %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(PNTR(3)) ),
+     :                  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  FINSHD, STATUS )
 
 *     If the user Quit before all rows have been worked on, issue a
 *     warning and delete the SPECVALS.
@@ -421,9 +433,15 @@
       ELSE
          DO 2 I = 1, NROWS
             CALL SPD_CZME( ORDER, NELM(5), NCOMP, DIM(1), I,
-     :         %VAL(PNTR(12)), %VAL(PNTR(13)), %VAL(PNTR(14)),
-     :         %VAL(PNTR(15)), %VAL(PNTR(16)), %VAL(PNTR(17)),
-     :         %VAL(PNTR(1)), %VAL(PNTR(3)),  %VAL(PNTR(4)), STATUS )
+     :                     %VAL( CNF_PVAL(PNTR(12)) ),
+     :                     %VAL( CNF_PVAL( PNTR(13)) ),
+     :                     %VAL( CNF_PVAL(PNTR(14)) ),
+     :                     %VAL( CNF_PVAL(PNTR(15)) ),
+     :                     %VAL( CNF_PVAL(PNTR(16)) ),
+     :                     %VAL( CNF_PVAL(PNTR(17)) ),
+     :                     %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(3)) ),
+     :                     %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
  2       CONTINUE
       END IF

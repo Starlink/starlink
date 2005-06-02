@@ -173,6 +173,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -182,6 +183,8 @@
 *        Fix bug, where workspace for line fit was much too small.
 *     25 Nov 1994 (hme):
 *        Use new libraries.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -197,6 +200,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -337,9 +341,9 @@
 
 *  Map pixel centres, check that they are pixel coordinates.
       CALL NDF_AMAP( NDF(1), 'CENTRE', 1, '_REAL', 'READ',
-     :   PNTR(1), I, STATUS )
-      CALL SPD_UAAHR( I, %VAL(PNTR(1)), 1E-5, XSTART, XEND,
-     :   LINEAR, STATUS )
+     :               PNTR(1), I, STATUS )
+      CALL SPD_UAAHR( I, %VAL( CNF_PVAL(PNTR(1)) ), 1E-5, XSTART, XEND,
+     :                LINEAR, STATUS )
       IF ( .NOT. LINEAR .OR.
      :      XSTART .NE. LBND(1)-0.5 .OR. XEND .NE. UBND(1)-0.5 ) THEN
          CALL MSG_SETR( 'ARCLOCAT_T01', LBND(1)-0.5 )
@@ -384,9 +388,10 @@
          TNPAR = NELM(4)
 
 *     Check that the results structure conforms to our needs.
-         CALL SPD_WZJA( MODE, NCOMP, TNPAR, %VAL(PNTR(8)),
-     :      %VAL(PNTR(7)), %VAL(PNTR(11)), STATUS,
-     :      %VAL(LEN(MODE)), %VAL(XCLEN), %VAL(XCLEN) )
+         CALL SPD_WZJA( MODE, NCOMP, TNPAR, %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL(CNF_PVAL(PNTR(7))),
+     :                  %VAL(CNF_PVAL(PNTR(11)) ), STATUS,
+     :                  %VAL(LEN(MODE)), %VAL(XCLEN), %VAL(XCLEN) )
 
 *     Release the results' extension vectors.
          DO 1003 I = 2, 8
@@ -417,13 +422,14 @@
 
 *     Set up the results' extension vectors.
          IF ( MODE .EQ. 'G' ) THEN
-            CALL SPD_UAAFC( 1, NELM(3), %VAL(PNTR(7)),
+            CALL SPD_UAAFC( 1, NELM(3), %VAL( CNF_PVAL(PNTR(7)) ),
      :         'Gauss feature', STATUS, %VAL(XCLEN) )
          ELSE IF ( MODE .EQ. 'T' ) THEN
-            CALL SPD_UAAFC( 1, NELM(3), %VAL(PNTR(7)),
+            CALL SPD_UAAFC( 1, NELM(3), %VAL( CNF_PVAL(PNTR(7)) ),
      :         'triangle feature', STATUS, %VAL(XCLEN) )
          END IF
-         CALL SPD_WZJB( NELM(4), %VAL(PNTR(11)), STATUS, %VAL(XCLEN) )
+         CALL SPD_WZJB( NELM(4), %VAL(CNF_PVAL(PNTR(11))), STATUS,
+     :                  %VAL(XCLEN) )
 
 *     Release the results' extension vectors.
          DO 1001 I = 2, 8
@@ -442,15 +448,21 @@
 *  If graphical dialogue was chosen, enter the dedicated routine.
       IF ( DIALOG .EQ. 'G' ) THEN
          CALL SPD_CZJE( MODE, DIM(1), INT(1.5*FWHM), NCOMP, NROWS,
-     :      FWHM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      %VAL(PNTR(12)), %VAL(PNTR(3)), %VAL(PNTR(4)), STATUS )
+     :                  FWHM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(PNTR(2)) ),
+     :                  %VAL( CNF_PVAL(PNTR(12)) ),
+     :                  %VAL( CNF_PVAL(PNTR(3)) ),
+     :                  %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
 
 *  Else (automatic location), scan each row in turn.
       ELSE
          DO 1002 I = 1, NROWS
             CALL SPD_CZJD( INFO, MODE, DIM(1), INT(1.5*FWHM), NCOMP, I,
-     :         FWHM, THRESH, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :         %VAL(PNTR(12)), J, %VAL(PNTR(3)), %VAL(PNTR(4)), STATUS )
+     :                     FWHM, THRESH, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(2)) ),
+     :                     %VAL( CNF_PVAL(PNTR(12)) ), J,
+     :                     %VAL( CNF_PVAL(PNTR(3)) ),
+     :                     %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
  1002    CONTINUE
       END IF

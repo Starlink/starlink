@@ -46,6 +46,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Don't set TITLE.
 *     24 Nov 1994 (hme):
 *        Use new libraries. Report errors immediately.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,6 +73,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Standard SPE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -179,15 +183,15 @@
 
 *     Copy arrays.
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :         %VAL(PNTR(3)), I, J, STATUS )
-            CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(2)),
-     :         %VAL(PNTR(4)), I, J, STATUS )
+            CALL VEC_DTOD( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(3)) ), I, J, STATUS )
+            CALL VEC_DTOD( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(2)) ),
+     :                     %VAL( CNF_PVAL(PNTR(4)) ), I, J, STATUS )
          ELSE
-            CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :         %VAL(PNTR(3)), I, J, STATUS )
-            CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(2)),
-     :         %VAL(PNTR(4)), I, J, STATUS )
+            CALL VEC_RTOR( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(3)) ), I, J, STATUS )
+            CALL VEC_RTOR( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(2)) ),
+     :                     %VAL( CNF_PVAL(PNTR(4)) ), I, J, STATUS )
          END IF
 
 *     Unmap.
@@ -203,11 +207,11 @@
 
 *     Copy array.
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :         %VAL(PNTR(3)), I, J, STATUS )
+            CALL VEC_DTOD( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(1)) ),
+     :                      %VAL( CNF_PVAL(PNTR(3)) ), I, J, STATUS )
          ELSE
-            CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :         %VAL(PNTR(3)), I, J, STATUS )
+            CALL VEC_RTOR( .FALSE., NELM(1), %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(3)) ), I, J, STATUS )
          END IF
 
 *     Unmap.
@@ -326,11 +330,15 @@
 
 *           Copy the array.
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_DTOD( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                ELSE
-                  CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_RTOR( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                END IF
 
 *           Release.
@@ -381,11 +389,15 @@
 
 *           Copy the array.
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_DTOD( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                ELSE
-                  CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_RTOR( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                END IF
 
 *           Release.
@@ -435,11 +447,15 @@
 
 *           Copy the array.
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_DTOD( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                ELSE
-                  CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(2)), I, J, STATUS )
+                  CALL VEC_RTOR( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ), I, J,
+     :                           STATUS )
                END IF
 
 *           Release.
@@ -529,15 +545,23 @@
 
 *           Copy the arrays.
                IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(3)), I, J, STATUS )
-                  CALL VEC_DTOD( .FALSE., NELM(1), %VAL(PNTR(2)),
-     :               %VAL(PNTR(4)), I, J, STATUS )
+                  CALL VEC_DTOD( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(3)) ), I, J,
+     :                           STATUS )
+                  CALL VEC_DTOD( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ),
+     :                           %VAL( CNF_PVAL(PNTR(4)) ), I, J,
+     :                           STATUS )
                ELSE
-                  CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(1)),
-     :               %VAL(PNTR(3)), I, J, STATUS )
-                  CALL VEC_RTOR( .FALSE., NELM(1), %VAL(PNTR(2)),
-     :               %VAL(PNTR(4)), I, J, STATUS )
+                  CALL VEC_RTOR( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(1)) ),
+     :                           %VAL( CNF_PVAL(PNTR(3)) ), I, J,
+     :                           STATUS )
+                  CALL VEC_RTOR( .FALSE., NELM(1),
+     :                           %VAL( CNF_PVAL(PNTR(2)) ),
+     :                           %VAL( CNF_PVAL(PNTR(4)) ), I, J,
+     :                           STATUS )
                END IF
                IF ( STATUS .NE. SAI__OK ) THEN
                   MESSAG = 'Error copying results in Specdre Extension.'

@@ -28,7 +28,7 @@
 *     themselves must be the common logarithm of intensity or flux
 *     density in arbitrary units.
 *
-*     A diluted Plank component is defined as
+*     A diluted Planck component is defined as
 *                                                            3
 *          f_j     Theta_j        alpha_j                  nu
 *        10    = 10        (nu/Hz)        (2h/c^2)  -------------------
@@ -273,6 +273,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -286,6 +287,8 @@
 *        Initialise CHISQR to zero.
 *     21 Nov 1995 (hme):
 *        Open ASCII file with type LIST instead of FORTRAN.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -301,6 +304,7 @@
       INCLUDE 'PAR_ERR'          ! Status returned by PAR_
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! Bad values
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -441,10 +445,10 @@
       PLABEL(2) = 'intensity [log10(arb.u.)]'
 
 *  Find out ranges of given data.
-      CALL SPD_UAAAR( .FALSE., NELM, %VAL(PNTR(1)), RMIN(1), RMAX(1),
-     :   STATUS )
-      CALL SPD_UAAAR( .TRUE.,  NELM, %VAL(PNTR(2)), RMIN(2), RMAX(2),
-     :   STATUS )
+      CALL SPD_UAAAR( .FALSE., NELM, %VAL( CNF_PVAL(PNTR(1)) ), RMIN(1),
+     :                RMAX(1), STATUS )
+      CALL SPD_UAAAR( .TRUE.,  NELM, %VAL( CNF_PVAL(PNTR(2)) ), RMIN(2),
+     :                RMAX(2), STATUS )
 
 *  Get plot device. Null value for no plotting.
 *  Write access means erase active part of screen.
@@ -463,10 +467,13 @@
 *  Plot (data only).
       IF ( PLOT .AND. DIALOG )
      :   CALL SPD_WAAL( .FALSE., .FALSE., .FALSE., ZONID, PLABEL,
-     :      RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :      NELM, %VAL(PNTR(4)), %VAL(PNTR(7)),
-     :      %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                  RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                  MASK, PLTRES, FITX, FITY, NELM,
+     :                  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(PNTR(7)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX, STATUS )
 
 *  Come here to redo mask.
       MSKINI = .TRUE.
@@ -474,11 +481,13 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Find out and apply mask.
-      CALL SPD_CAAGR( DIALOG, MSKINI, .TRUE., VARUSE, COVRSX,
-     :   NELM, MSKDIM,
-     :   %VAL(PNTR(1)), %VAL(PNTR(2)), %VAL(PNTR(3)), %VAL(PNTR(10)),
-     :   MSKUSE, MASK, IMIN, IMAX, RMIN, RMAX, MSKELM, %VAL(PNTR(4)),
-     :   STATUS )
+      CALL SPD_CAAGR( DIALOG, MSKINI, .TRUE., VARUSE, COVRSX, NELM,
+     :                MSKDIM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                %VAL( CNF_PVAL(PNTR(2)) ),
+     :                %VAL( CNF_PVAL(PNTR(3)) ),
+     :                %VAL( CNF_PVAL(PNTR(10)) ), MSKUSE, MASK, IMIN,
+     :                IMAX, RMIN, RMAX, MSKELM,
+     :                %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
       RMIN(3) = SQRT(RMIN(3))
       RMAX(3) = SQRT(RMAX(3))
       MSKINI = .FALSE.
@@ -492,10 +501,14 @@
 *     Plot (data and mask only).
          IF ( PLOT ) THEN
             CALL SPD_WAAL( .TRUE., .FALSE., .FALSE., ZONID, PLABEL,
-     :         RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :         MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :         MSKELM, %VAL(PNTR(4)), %VAL(PNTR(7)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                     MASK, PLTRES, FITX, FITY, MSKELM,
+     :                     %VAL( CNF_PVAL(PNTR(4)) ),
+     :                     %VAL( CNF_PVAL(PNTR(7)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX,
+     :                     STATUS )
          END IF
 
 *     Report to screen.
@@ -527,31 +540,36 @@
       IF ( DIALOG ) THEN
 
 *     Get the guess data corresponding to the masked data.
-         CALL SPD_WZGD( MAXBBS, MSKELM, NCOMP,
-     :      THETA, ALPHA, TEMPE, %VAL(PNTR(4)), %VAL(PNTR(8)), STATUS )
+         CALL SPD_WZGD( MAXBBS, MSKELM, NCOMP, THETA, ALPHA, TEMPE,
+     :                  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ), STATUS )
 
 *     Get residuals as difference of masked data minus guess data. Also
 *     need the range of residuals for plotting purposes.
-         CALL VEC_SUBR( .FALSE., MSKELM, %VAL(PNTR(4)+REALSZ*MSKELM),
-     :      %VAL(PNTR(8)), %VAL(PNTR(7)), I, J, STATUS )
-         CALL SPD_UAAAR( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :      RMIN(4), RMAX(4), STATUS )
+         CALL VEC_SUBR( .FALSE., MSKELM,
+     :                  %VAL( CNF_PVAL(PNTR(4)+REALSZ*MSKELM) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
+         CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                   RMIN(4), RMAX(4), STATUS )
 
 *     Get masked 1/error as square root of weights. Can skip guess data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :      %VAL(PNTR(4)+2*REALSZ*MSKELM), %VAL(PNTR(8)), I, J, STATUS )
+     :                   %VAL( CNF_PVAL(PNTR(4)+2*REALSZ*MSKELM) ),
+     :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.
-         CALL VEC_MULR( .FALSE., MSKELM, %VAL(PNTR(7)), %VAL(PNTR(8)),
-     :      %VAL(PNTR(9)), I, J, STATUS )
+         CALL VEC_MULR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL( CNF_PVAL(PNTR(9)) ), I, J, STATUS )
 
 *     Get CHISQR as the sum of squares over the array hiding behind
 *     pointer 9. This is either chi-squared or
 *     rms = SQRT( CHISQR / degrees of freedom )
 *     Note that the masked 1/error are still behind pointer 8.
 *     They are needed below for plotting.
-         CALL SPD_UAAWR( .FALSE., MSKELM, %VAL(PNTR(9)),
-     :      I, CHISQR, STATUS )
+         CALL SPD_UAAWR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(9)) ),
+     :                   I, CHISQR, STATUS )
 
 *     Calculate guess curve and plot.
          IF ( PLOT ) THEN
@@ -571,20 +589,26 @@
 *        Calculate the bottom and top tips of error bars as residual
 *        plus or minus 1/(1/error).
             IF ( VARUSE )
-     :         CALL SPD_WAAK( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :            %VAL(PNTR(8)), %VAL(PNTR(8)), %VAL(PNTR(9)), STATUS )
+     :         CALL SPD_WAAK( .FALSE., MSKELM,
+     :                        %VAL( CNF_PVAL(PNTR(7)) ),
+     :                        %VAL( CNF_PVAL(PNTR(8)) ),
+     :                        %VAL( CNF_PVAL(PNTR(8)) ),
+     :                        %VAL( CNF_PVAL(PNTR(9)) ), STATUS )
 
 *        Plot guess (the whole lot).
             CALL SPD_WAAL( .TRUE., .TRUE., VARUSE, ZONID, PLABEL,
-     :         RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :         MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :         MSKELM, %VAL(PNTR(4)), %VAL(PNTR(7)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                     MASK, PLTRES, FITX, FITY, MSKELM,
+     :                     %VAL( CNF_PVAL(PNTR(4)) ),
+     :                     %VAL( CNF_PVAL(PNTR(7)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX,
+     :                     STATUS )
          END IF
 
 *     Report to screen.
-         CALL SPD_WZGC( .FALSE., 6, MSKDIM, FITPAR, FITDIM,
-     :      IN, NELM,
+         CALL SPD_WZGC( .FALSE., 6, MSKDIM, FITPAR, FITDIM, IN, NELM,
      :      VARUSE, MSKUSE, MSKELM, RMIN(1), RMAX(1), MASK,
      :      NCOMP, CFLAGS, PFLAGS, SFLAGS, THETA, ALPHA, TEMPE,
      :      COVAR, CHISQR/(MSKELM-FITPAR), STATUS )
@@ -601,8 +625,8 @@
 *  Do the fit.
       CALL ERR_MARK
       CALL SPD_WFPA( INFO, COVRSX, MSKELM, NCOMP, FITPAR, FITDIM,
-     :   %VAL(PNTR(4)), CFLAGS, PFLAGS, SFLAGS, THETA, ALPHA, TEMPE,
-     :   COVAR, FITTED, STATUS )
+     :               %VAL( CNF_PVAL(PNTR(4)) ), CFLAGS, PFLAGS, SFLAGS,
+     :               THETA, ALPHA, TEMPE, COVAR, FITTED, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_FLUSH( STATUS )
          CALL ERR_ANNUL( STATUS )
@@ -613,31 +637,36 @@
       IF ( FITTED ) THEN
 
 *     Get the fit data corresponding to the masked data.
-         CALL SPD_WZGD( MAXBBS, MSKELM, NCOMP,
-     :      THETA, ALPHA, TEMPE, %VAL(PNTR(4)), %VAL(PNTR(8)), STATUS )
+         CALL SPD_WZGD( MAXBBS, MSKELM, NCOMP, THETA, ALPHA, TEMPE,
+     :                  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ), STATUS )
 
 *     Get residuals as difference of masked data minus fit data. Also
 *     need the range of residuals for plotting purposes.
-         CALL VEC_SUBR( .FALSE., MSKELM, %VAL(PNTR(4)+REALSZ*MSKELM),
-     :      %VAL(PNTR(8)), %VAL(PNTR(7)), I, J, STATUS )
-         CALL SPD_UAAAR( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :      RMIN(4), RMAX(4), STATUS )
+         CALL VEC_SUBR( .FALSE., MSKELM,
+     :                  %VAL( CNF_PVAL(PNTR(4)+REALSZ*MSKELM) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
+         CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                   RMIN(4), RMAX(4), STATUS )
 
 *     Get masked 1/error as square root of weights. Can skip fit data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :      %VAL(PNTR(4)+2*REALSZ*MSKELM), %VAL(PNTR(8)), I, J, STATUS )
+     :                   %VAL( CNF_PVAL(PNTR(4)+2*REALSZ*MSKELM) ),
+     :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.
-         CALL VEC_MULR( .FALSE., MSKELM, %VAL(PNTR(7)), %VAL(PNTR(8)),
-     :      %VAL(PNTR(9)), I, J, STATUS )
+         CALL VEC_MULR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     :                  %VAL( CNF_PVAL(PNTR(9)) ), I, J, STATUS )
 
 *     Get CHISQR as the sum of squares over the array hiding behind
 *     pointer 9. This is either chi-squared or
 *     rms = SQRT( CHISQR / degrees of freedom )
 *     Note that the masked weights (1/error) are still behind pointer 8.
 *     They are needed below for plotting.
-         CALL SPD_UAAWR( .FALSE., MSKELM, %VAL(PNTR(9)),
-     :      I, CHISQR, STATUS )
+         CALL SPD_UAAWR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(9)) ),
+     :                   I, CHISQR, STATUS )
 
 *     Work out the variances of all parameters (fixed, fitted, tied),
 *     including the temperatures and line integrals. The scaling factor
@@ -663,23 +692,29 @@
 *        Calculate the bottom and top tips of error bars as residual
 *        plus or minus 1/weight.
             IF ( VARUSE ) THEN
-               CALL SPD_WAAK( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :            %VAL(PNTR(8)), %VAL(PNTR(8)), %VAL(PNTR(9)), STATUS )
+               CALL SPD_WAAK( .FALSE., MSKELM,
+     :                        %VAL( CNF_PVAL(PNTR(7)) ),
+     :                        %VAL( CNF_PVAL(PNTR(8)) ),
+     :                        %VAL( CNF_PVAL(PNTR(8)) ),
+     :                        %VAL( CNF_PVAL(PNTR(9)) ), STATUS )
             END IF
 
 *        Plot fit (the whole lot).
             CALL SPD_WAAL( .TRUE., FITTED, VARUSE, ZONID, PLABEL,
-     :         RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :         MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :         MSKELM, %VAL(PNTR(4)), %VAL(PNTR(7)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                     %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                     MASK, PLTRES, FITX, FITY, MSKELM,
+     :                     %VAL( CNF_PVAL(PNTR(4)) ),
+     :                     %VAL( CNF_PVAL(PNTR(7)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX,
+     :                     STATUS )
          END IF
       END IF
 
 *  Report to screen.
       IF ( INFO .OR. DIALOG )
-     :   CALL SPD_WZGC( .FALSE., 6, MSKDIM, FITPAR, FITDIM,
-     :      IN, NELM,
+     :   CALL SPD_WZGC( .FALSE., 6, MSKDIM, FITPAR, FITDIM, IN, NELM,
      :      VARUSE, MSKUSE, MSKELM, RMIN(1), RMAX(1), MASK,
      :      NCOMP, CFLAGS, PFLAGS, SFLAGS, THETA, ALPHA, TEMPE,
      :      COVAR, CHISQR/(MSKELM-FITPAR), STATUS )

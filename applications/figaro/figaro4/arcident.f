@@ -98,7 +98,7 @@
 *     have bad values as laboratory values. The variances of laboratory
 *     values are set to zero.
 *
-*     Mills' (1992) algorithm performs only an initial line
+*     Mills's (1992) algorithm performs only an initial line
 *     identification. It is important to verify the returned values by
 *     fitting a wavelength or frequency scale (e.g. polynomial or spline
 *     fit), and to reject any out-liers. The algorithm should be given
@@ -222,11 +222,14 @@
 *  Authors:
 *     djm: Dave Mills (UCL)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     11 Jun 1993 (hme):
 *        Original version.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -242,6 +245,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -406,8 +410,8 @@
 *     Axis data must be NDF pixel coordinates.
          CALL NDF_AMAP( NDF(1), 'CENTRE', 1, '_REAL', 'READ',
      :      IPNTR(10), I, STATUS )
-         CALL SPD_UAAHR( I, %VAL(IPNTR(10)), 1E-5, XSTART, XEND,
-     :      LINEAR, STATUS )
+         CALL SPD_UAAHR( I, %VAL( CNF_PVAL(IPNTR(10)) ), 1E-5, XSTART,
+     :                   XEND, LINEAR, STATUS )
          IF ( .NOT. LINEAR .OR.
      :         XSTART .NE. LBND(1)-0.5 .OR. XEND .NE. UBND(1)-0.5 ) THEN
             CALL MSG_SETR( 'ARCIDENT_T01', LBND(1)-0.5 )
@@ -459,9 +463,11 @@
 *     which is NCOMP2 and used to create the output results.
 *     This does not check whether component's parameters are bad,
 *     because the action here is an action for all spectra.
-         CALL SPD_WZKH( NCOMP1, TNPAR1, %VAL(IPNTR(6)), %VAL(IPNTR(5)),
-     :      %VAL(IPNTR(9)), NCOMP2, %VAL(WPNTR(1)), STATUS,
-     :      %VAL(XCLEN), %VAL(XCLEN) )
+         CALL SPD_WZKH( NCOMP1, TNPAR1, %VAL( CNF_PVAL(IPNTR(6)) ),
+     :                  %VAL( CNF_PVAL(IPNTR(5)) ),
+     :                  %VAL( CNF_PVAL(IPNTR(9)) ), NCOMP2,
+     :                  %VAL( CNF_PVAL(WPNTR(1)) ), STATUS,
+     :                  %VAL(XCLEN), %VAL(XCLEN) )
 
 *     Release input results extension vectors.
          DO 1 I = 2, 8
@@ -487,8 +493,9 @@
       CALL SPD_FDHE( NDF(2), LOC(9), 'UPDATE', TYPE3, COMP, NDF(4),
      :   LOC(10), LOC(16), OPNTR(1), OPNTR(3), OPNTR(9), NELM(5),
      :   STATUS )
-      CALL SPD_WZKJ( NELM(6), NELM(7), %VAL(OPNTR(5)), %VAL(OPNTR(9)),
-     :   STATUS, %VAL(XCLEN), %VAL(XCLEN) )
+      CALL SPD_WZKJ( NELM(6), NELM(7), %VAL( CNF_PVAL(OPNTR(5)) ),
+     :               %VAL( CNF_PVAL(OPNTR(9)) ),
+     :               STATUS, %VAL(XCLEN), %VAL(XCLEN) )
       DO 2 I = 10, 16
          CALL DAT_ANNUL( LOC(I), STATUS )
  2    CONTINUE
@@ -602,14 +609,17 @@
 *     remain.
 *     The locations go into one array, the peaks into another, the
 *     centre variances into a third.
-         CALL SPD_WZKK( I, TNPAR1, NCOMP2, %VAL(WPNTR(1)),
-     :      %VAL(IPNTR(1)), %VAL(IPNTR(2)),
-     :      NCOMP3, %VAL(WPNTR(2)), %VAL(WPNTR(3)), %VAL(WPNTR(4)),
-     :      STATUS )
+         CALL SPD_WZKK( I, TNPAR1, NCOMP2, %VAL( CNF_PVAL(WPNTR(1)) ),
+     :                  %VAL( CNF_PVAL(IPNTR(1)) ),
+     :                  %VAL( CNF_PVAL(IPNTR(2)) ), NCOMP3,
+     :                  %VAL( CNF_PVAL(WPNTR(2)) ),
+     :                  %VAL( CNF_PVAL(WPNTR(3)) ),
+     :                  %VAL( CNF_PVAL(WPNTR(4)) ), STATUS )
 
 *     Check that the locations are strictly monotonically increasing.
          MONO = 2
-         CALL SPD_UAASR( NCOMP3, %VAL(WPNTR(2)), MONO, FIRST, STATUS )
+         CALL SPD_UAASR( NCOMP3, %VAL( CNF_PVAL(WPNTR(2)) ), MONO,
+     :                   FIRST, STATUS )
          IF ( MONO .NE. 2 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'ARCIDENT_T03', I )
@@ -655,13 +665,20 @@
 *        and their identifications. Not all located features may have
 *        been identified.
             CALL SPD_WZKA( INFO, DBDIM(1), DBDIM(3), INDXSZ,
-     :         %VAL(FPNTR(1)), %VAL(FPNTR(2)),
-     :         %VAL(FPNTR(3)), %VAL(FPNTR(4)), %VAL(FPNTR(5)),
-     :         %VAL(FPNTR(6)), %VAL(FPNTR(7)), XSTART, XEND,
-     :         STARTW, ENDW, .FALSE., DRANGE(1), DRANGE(2),
-     :         THRESH, MINPOS, MAXPOS, NEIGHB(1), NEIGHB(2), STREN,
-     :         NCOMP3, %VAL(WPNTR(2)), %VAL(WPNTR(3)),
-     :         NCOMP4, %VAL(WPNTR(5)), %VAL(WPNTR(6)), FDBSTA )
+     :                     %VAL( CNF_PVAL(FPNTR(1)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(2)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(3)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(4)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(5)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(6)) ),
+     :                     %VAL( CNF_PVAL(FPNTR(7)) ), XSTART, XEND,
+     :                     STARTW, ENDW, .FALSE., DRANGE(1), DRANGE(2),
+     :                     THRESH, MINPOS, MAXPOS, NEIGHB(1),
+     :                     NEIGHB(2), STREN, NCOMP3,
+     :                     %VAL( CNF_PVAL(WPNTR(2)) ),
+     :                     %VAL( CNF_PVAL(WPNTR(3)) ), NCOMP4,
+     :                     %VAL( CNF_PVAL(WPNTR(5)) ),
+     :                     %VAL( CNF_PVAL(WPNTR(6)) ), FDBSTA )
 
 *        If something went wrong for this row, give a warning.
             IF ( FDBSTA .NE. 0 .OR. NCOMP4 .LE. 0 ) THEN
@@ -673,9 +690,13 @@
 *        Else (this row was fine), sort into output results the locations,
 *        location variances and identifications.
             ELSE
-               CALL SPD_WZKL( NCOMP3, NCOMP4, I, TNPAR2, %VAL(WPNTR(2)),
-     :            %VAL(WPNTR(4)), %VAL(WPNTR(5)), %VAL(WPNTR(6)),
-     :            %VAL(OPNTR(1)), %VAL(OPNTR(2)), STATUS )
+               CALL SPD_WZKL( NCOMP3, NCOMP4, I, TNPAR2,
+     :                        %VAL( CNF_PVAL(WPNTR(2)) ),
+     :                        %VAL( CNF_PVAL(WPNTR(4)) ),
+     :                        %VAL( CNF_PVAL(WPNTR(5)) ),
+     :                        %VAL( CNF_PVAL(WPNTR(6)) ),
+     :                        %VAL( CNF_PVAL(OPNTR(1)) ),
+     :                        %VAL( CNF_PVAL(OPNTR(2)) ), STATUS )
             END IF
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 500

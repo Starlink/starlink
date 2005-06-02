@@ -189,6 +189,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -204,6 +205,8 @@
 *        Chebyshev series. Actually fit an ordinary polynomial (Taylor
 *        expansion about x = 0).
 *        Open ASCII file as type LIST instead of FORTRAN.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,6 +222,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'PAR_ERR'          ! Status returned by PAR_
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -342,10 +346,10 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Find out ranges of given data.
-      CALL SPD_UAAAR( .FALSE., NELM, %VAL(PNTR(1)), RMIN(1), RMAX(1),
-     :   STATUS )
-      CALL SPD_UAAAR( .TRUE.,  NELM, %VAL(PNTR(2)), RMIN(2), RMAX(2),
-     :   STATUS )
+      CALL SPD_UAAAR( .FALSE., NELM, %VAL( CNF_PVAL(PNTR(1)) ), RMIN(1),
+     :                RMAX(1), STATUS )
+      CALL SPD_UAAAR( .TRUE.,  NELM, %VAL( CNF_PVAL(PNTR(2)) ), RMIN(2),
+     :                RMAX(2), STATUS )
 
 *  Get plot device. Null value for no plotting.
 *  Write access means erase active part of screen.
@@ -364,10 +368,13 @@
 *  Plot (data only).
       IF ( PLOT .AND. DIALOG )
      :   CALL SPD_WAAL( .FALSE., .FALSE., .FALSE., ZONID, PLABEL,
-     :      RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :      NELM, %VAL(PNTR(6)), %VAL(PNTR(7)),
-     :      %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                  RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE, MASK,
+     :                  PLTRES, FITX, FITY, NELM,
+     :                  %VAL( CNF_PVAL(PNTR(6)) ),
+     :                  %VAL( CNF_PVAL(PNTR(7)) ),
+     :                  %VAL( CNF_PVAL(PNTR(8)) ),
+     %                  %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX, STATUS )
 
 *  Come here to redo mask.
       MSKINI = .TRUE.
@@ -376,9 +383,11 @@
 
 *  Find out and apply mask.
       CALL SPD_CAAGD( DIALOG, MSKINI, .TRUE., VARUSE, .FALSE.,
-     :   NELM, MSKDIM, %VAL(PNTR(1)), %VAL(PNTR(2)), %VAL(PNTR(3)), 0.,
-     :   MSKUSE, MASK,
-     :   IMIN, IMAX, RMIN, RMAX, MSKELM, %VAL(PNTR(4)), STATUS )
+     :                NELM, MSKDIM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                %VAL( CNF_PVAL(PNTR(2)) ),
+     :                %VAL( CNF_PVAL(PNTR(3)) ), 0., MSKUSE, MASK,
+     :                IMIN, IMAX, RMIN, RMAX, MSKELM,
+     :                %VAL( CNF_PVAL(PNTR(4)) ), STATUS )
       MSKINI = .FALSE.
 
 *  Check status.
@@ -390,10 +399,14 @@
 *     Plot (data and mask only).
          IF ( PLOT ) THEN
             CALL SPD_WAAL( .TRUE., .FALSE., .FALSE., ZONID, PLABEL,
-     :         RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :         MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :         MSKELM, %VAL(PNTR(6)), %VAL(PNTR(7)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                     RMIN, RMAX, NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                     %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                     MASK, PLTRES, FITX, FITY, MSKELM,
+     :                     %VAL( CNF_PVAL(PNTR(6)) ),
+     :                     %VAL( CNF_PVAL(PNTR(7)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX,
+     :                     STATUS )
          END IF
 
 *     Report to screen.
@@ -424,10 +437,13 @@
          FITTED = .FALSE.
          IFAIL2 = 0
          EPS = 0D0
-         CALL PDA_DPOLFT( MSKELM,  %VAL(PNTR(4)),
-     :      %VAL(PNTR(4)+DBLSIZ*MSKELM), %VAL(PNTR(4)+2*DBLSIZ*MSKELM),
-     :      ORDER, NDEG, EPS, %VAL(PNTR(5)),
-     :      IFAIL1, %VAL(PNTR(5)+DBLSIZ*NELM), IFAIL2 )
+         CALL PDA_DPOLFT( MSKELM,  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                    %VAL( CNF_PVAL(PNTR(4)+DBLSIZ*MSKELM) ),
+     :                    %VAL( CNF_PVAL(PNTR(4)+2*DBLSIZ*MSKELM) ),
+     :                    ORDER, NDEG, EPS, %VAL( CNF_PVAL(PNTR(5)) ),
+     :                    IFAIL1, 
+     :                    %VAL( CNF_PVAL(PNTR(5)+DBLSIZ*NELM) ),
+     :                    IFAIL2 )
          STATUS = IFAIL2
          IF ( STATUS .NE. 0 ) THEN
             CALL ERR_FLUSH( STATUS )
@@ -447,8 +463,9 @@
 *     Get the ordinary polynomial coefficient (as DOUBLE array).
          IF ( STATUS .NE. SAI__OK ) GO TO 500
          CALL ERR_MARK
-         CALL PDA_DPCOEF( NDEG, 0D0, COEFF, %VAL(PNTR(5)+DBLSIZ*NELM),
-     :      STATUS )
+         CALL PDA_DPCOEF( NDEG, 0D0, COEFF, 
+     :                    %VAL( CNF_PVAL(PNTR(5)+DBLSIZ*NELM) ),
+     :                    STATUS )
          IF ( STATUS .NE. 0 ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL ERR_ANNUL( STATUS )
@@ -488,43 +505,45 @@
  3          CONTINUE
 
 *        Get residual centres as single precision copy of masked centres.
-            CALL VEC_DTOR( .FALSE., MSKELM, %VAL(PNTR(4)),
-     :         %VAL(PNTR(6)), I, J, STATUS )
+            CALL VEC_DTOR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                     %VAL( CNF_PVAL(PNTR(6)) ), I, J, STATUS )
 
 *        Get the corresponding fit data.
 *        The fit routine returned these in its first work space. We need
 *        only copy to single precision.
-            CALL VEC_DTOR( .FALSE., MSKELM, %VAL(PNTR(5)),
-     :         %VAL(PNTR(8)), I, J, STATUS )
+            CALL VEC_DTOR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(5)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *        Get single precision copy of masked data.
             CALL VEC_DTOR( .FALSE., MSKELM,
-     :         %VAL(PNTR(4)+DBLSIZ*MSKELM), %VAL(PNTR(9)),
-     :         I, J, STATUS )
+     :                      %VAL( CNF_PVAL(PNTR(4)+DBLSIZ*MSKELM) ),
+     :                      %VAL( CNF_PVAL(PNTR(9)) ), I, J, STATUS )
 
 *        Get residuals as difference of masked data minus fit data. Also
 *        need the range of residuals for plotting purposes.
-            CALL VEC_SUBR( .FALSE., MSKELM, %VAL(PNTR(9)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(7)), I, J, STATUS )
-            CALL SPD_UAAAR( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :         RMIN(4), RMAX(4), STATUS )
+            CALL VEC_SUBR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(9)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
+            CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                      RMIN(4), RMAX(4), STATUS )
 
 *        Get single precision copy of masked weights. Can skip fit data.
             CALL VEC_DTOR( .FALSE., MSKELM,
-     :         %VAL(PNTR(4)+2*DBLSIZ*MSKELM), %VAL(PNTR(8)),
-     :         I, J, STATUS )
+     :                     %VAL( CNF_PVAL(PNTR(4)+2*DBLSIZ*MSKELM) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *        Multiply residuals with weights. Can skip masked data.
-            CALL VEC_MULR( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :         %VAL(PNTR(8)), %VAL(PNTR(9)), I, J, STATUS )
+            CALL VEC_MULR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
+     :                     %VAL( CNF_PVAL(PNTR(8)) ),
+     :                     %VAL( CNF_PVAL(PNTR(9)) ), I, J, STATUS )
 
 *        Get CHISQR as the sum of squares over the array hiding behind
 *        pointer 9. This is either chi-squared or
 *        rms = SQRT( CHISQR / degrees of freedom )
 *        Note that the masked weights (1/error) are still behind pointer 8.
 *        They are needed below for plotting.
-            CALL SPD_UAAWR( .FALSE., MSKELM, %VAL(PNTR(9)),
-     :         I, CHISQR, STATUS )
+            CALL SPD_UAAWR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(9)) ),
+     :                      I, CHISQR, STATUS )
 
 *        Calculate fit curve and plot.
             IF ( PLOT ) THEN
@@ -538,8 +557,9 @@
                IF ( STATUS .NE. SAI__OK ) GO TO 500
                CALL ERR_MARK
                DO 4 I = 1, PLTRES
-                  CALL PDA_DP1VLU( NDEG, 0, DBLE(FITX(I)),
-     :               DTEMP1, DTEMP2, %VAL(PNTR(5)+DBLSIZ*NELM), STATUS )
+                  CALL PDA_DP1VLU( NDEG, 0, DBLE(FITX(I)), DTEMP1,
+     :                             DTEMP2, %VAL( CNF_PVAL(PNTR(5)+
+     :                             DBLSIZ*NELM) ), STATUS )
                   IF ( STATUS .NE. 0 ) THEN
                      CALL ERR_FLUSH( STATUS )
                      CALL ERR_ANNUL( STATUS )
@@ -553,17 +573,25 @@
 *           Calculate the bottom and top tips of error bars as residual
 *           plus or minus 1/weight.
                IF ( VARUSE ) THEN
-                  CALL SPD_WAAK( .FALSE., MSKELM, %VAL(PNTR(7)),
-     :               %VAL(PNTR(8)), %VAL(PNTR(8)), %VAL(PNTR(9)),
-     :               STATUS )
+                  CALL SPD_WAAK( .FALSE., MSKELM,
+     :                           %VAL( CNF_PVAL(PNTR(7)) ),
+     :                           %VAL( CNF_PVAL(PNTR(8)) ),
+     :                           %VAL( CNF_PVAL(PNTR(8)) ),
+     :                           %VAL( CNF_PVAL(PNTR(9)) ),
+     :                           STATUS )
                END IF
 
 *           Plot (the whole lot).
                CALL SPD_WAAL( .TRUE., FITTED, VARUSE, ZONID, PLABEL,
-     :            RMIN, RMAX, NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :            MSKDIM, MSKUSE, MASK, PLTRES, FITX, FITY,
-     :            MSKELM, %VAL(PNTR(6)), %VAL(PNTR(7)),
-     :            %VAL(PNTR(8)), %VAL(PNTR(9)), PMIN, PMAX, STATUS )
+     :                        RMIN, RMAX, NELM, 
+     :                        %VAL( CNF_PVAL(PNTR(1)) ),
+     :                        %VAL( CNF_PVAL(PNTR(2)) ), MSKDIM, MSKUSE,
+     :                        MASK, PLTRES, FITX, FITY, MSKELM,
+     :                        %VAL( CNF_PVAL(PNTR(6)) ),
+     :                        %VAL( CNF_PVAL(PNTR(7)) ),
+     :                        %VAL( CNF_PVAL(PNTR(8)) ),
+     :                        %VAL( CNF_PVAL(PNTR(9)) ), PMIN, PMAX,
+     :                        STATUS )
 
 *           Come here if fit could not be evaluated for plot.
  400           CONTINUE

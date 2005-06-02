@@ -105,6 +105,7 @@
 *     hme: Horst Meyerdierks (UoE)
 *     vgg: Vito G. Graffagnino (RAL)
 *     acd: Clive Davenhall (UoE)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,6 +134,8 @@
 *        Use new libraries.
 *     05 Jul 2001 (vgg, acd):
 *        Added error propagation
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,8 +150,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
-      INCLUDE 'PAR_ERR'         ! Standard PAR constants
-      
+      INCLUDE 'PAR_ERR'          ! Standard PAR constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -275,12 +278,13 @@
       IF ( NDF(1) .EQ. NDF__NOID ) THEN
 
 *     Fill according to parameters.
-         CALL SPD_UAAJR( XSTART, XEND, NELM, %VAL(XPTR), STATUS )
+         CALL SPD_UAAJR( XSTART, XEND, NELM, %VAL( CNF_PVAL(XPTR) ),
+     :                   STATUS )
       ELSE
 
 *     Copy input axis data.
-         CALL VEC_RTOR( .FALSE., NELM, %VAL(XPTR1), %VAL(XPTR),
-     :      I, J, STATUS )
+         CALL VEC_RTOR( .FALSE., NELM, %VAL( CNF_PVAL(XPTR1) ),
+     :                  %VAL( CNF_PVAL(XPTR) ), I, J, STATUS )
       END IF
 
 *  Set axis and data info.
@@ -295,7 +299,8 @@
 
 *  Work out the intensity values.
       CALL SPD_WZNA( NELM, TEMP, LBCODE, UNFACT, LGCOD1, LGCOD2,
-     :   %VAL(XPTR), %VAL(DPTR), STATUS )
+     :               %VAL( CNF_PVAL(XPTR) ),
+     :               %VAL( CNF_PVAL(DPTR) ), STATUS )
 
 * If a temperature error is given, work out the maximum and minimum
 * intensity values and then calculate the average errors on these
@@ -310,11 +315,13 @@
 *    of the error range.
         MXTEMP = TEMP + ERRTMP
         CALL SPD_WZNA( NELM, MXTEMP, LBCODE, UNFACT, LGCOD1, LGCOD2,
-     :    %VAL(XPTR), %VAL(EMXPTR), STATUS )
+     :                 %VAL( CNF_PVAL(XPTR) ),
+     :                 %VAL( CNF_PVAL(EMXPTR) ), STATUS )
 
         MNTEMP = TEMP - ERRTMP
         CALL SPD_WZNA( NELM, MNTEMP, LBCODE, UNFACT, LGCOD1, LGCOD2,
-     :    %VAL(XPTR), %VAL(EMNPTR), STATUS )
+     :                 %VAL( CNF_PVAL(XPTR) ),
+     :                 %VAL( CNF_PVAL(EMNPTR) ), STATUS )
 
 *    Calculate the variance from the maximum and minimum spectra.
         CALL SPD_ERTMP( NELM, %VAL(DPTR), %VAL(EMXPTR), %VAL(EMNPTR),

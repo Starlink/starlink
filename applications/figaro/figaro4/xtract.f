@@ -79,6 +79,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acd: Clive Davenhall (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -117,6 +118,8 @@
 *        Modified to check for empty TITLE, LABEL and UNITS strings
 *        before copying them to the output structure.  If an attempt is
 *        made to copy an empty string the application crashes.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +136,7 @@
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -402,14 +406,18 @@
 *  Do the collapsing (averaging).
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_UAACD( VARUSE, NDIM(1), NELM(1), NELM(2), VAL__BADD,
-     :      DIM(1,1), DIM(1,2), %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      BADDAT, BADVAR,
-     :      %VAL(PNTR(3)), %VAL(PNTR(4)), %VAL(PNTR(5)), STATUS )
+     :                   DIM(1,1), DIM(1,2), %VAL( CNF_PVAL(PNTR(1)) ),
+     :                   %VAL( CNF_PVAL(PNTR(2)) ), BADDAT, BADVAR,
+     :                   %VAL( CNF_PVAL(PNTR(3)) ),
+     :                   %VAL( CNF_PVAL(PNTR(4)) ),
+     :                   %VAL( CNF_PVAL(PNTR(5)) ), STATUS )
       ELSE
          CALL SPD_UAACR( VARUSE, NDIM(1), NELM(1), NELM(2), VAL__BADR,
-     :      DIM(1,1), DIM(1,2), %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      BADDAT, BADVAR,
-     :      %VAL(PNTR(3)), %VAL(PNTR(4)), %VAL(PNTR(5)), STATUS )
+     :                   DIM(1,1), DIM(1,2), %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                   %VAL( CNF_PVAL(PNTR(2)) ), BADDAT, BADVAR,
+     :                   %VAL( CNF_PVAL(PNTR(3)) ),
+     :                   %VAL( CNF_PVAL(PNTR(4)) ),
+     :                   %VAL( CNF_PVAL(PNTR(5)) ), STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 

@@ -60,6 +60,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Port to NDF and Unix.
 *     17 Nov 1995 (hme):
 *        Switch from IRG/IRG to GRP to handle INLIST parameter.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +94,7 @@
       INCLUDE 'PAR_ERR'          ! Stati returned by PAR_
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -213,57 +217,74 @@
  7    CONTINUE
 
 *  Correlate 1->2, 2->1.
-      CALL SPD_WAAF( VXIST(2), .TRUE., NELM,
-     :   %VAL(DPTR(1)), %VAL(DPTR(2)), %VAL(VPTR(2)),
-     :   NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+      CALL SPD_WAAF( VXIST(2), .TRUE., NELM, %VAL( CNF_PVAL(DPTR(1)) ),
+     :               %VAL( CNF_PVAL(DPTR(2)) ),
+     :               %VAL( CNF_PVAL(VPTR(2)) ), NS, A0, A1, R,
+     :               DA0, DA1, SIGMA, CHISQR, STATUS )
       CALL SPD_WAAG( FILNO2, INFO, IN(1), IN(2), NS, A0, A1, R,
-     :   DA0, DA1, SIGMA, CHISQR, STATUS )
-      CALL SPD_WAAF( VXIST(1), .TRUE., NELM,
-     :   %VAL(DPTR(2)), %VAL(DPTR(1)), %VAL(VPTR(1)),
-     :   NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+     :               DA0, DA1, SIGMA, CHISQR, STATUS )
+      CALL SPD_WAAF( VXIST(1), .TRUE., NELM, %VAL( CNF_PVAL(DPTR(2)) ),
+     :               %VAL( CNF_PVAL(DPTR(1)) ),
+     :               %VAL( CNF_PVAL(VPTR(1)) ), NS, A0, A1, R, DA0,
+     :               DA1, SIGMA, CHISQR, STATUS )
       CALL SPD_WAAG( FILNO2, INFO, IN(2), IN(1), NS, A0, A1, R,
-     :   DA0, DA1, SIGMA, CHISQR, STATUS )
+     :               DA0, DA1, SIGMA, CHISQR, STATUS )
 
 *  If there is a third subset.
       IF ( THREEF ) THEN
 
 *     Correlate 1->3, 3->1.
-         CALL SPD_WAAF( VXIST(3), .TRUE., NELM,
-     :      %VAL(DPTR(1)), %VAL(DPTR(3)), %VAL(VPTR(3)),
-     :      NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+         CALL SPD_WAAF( VXIST(3), .TRUE., NELM, 
+     :                  %VAL( CNF_PVAL(DPTR(1)) ),
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(VPTR(3)) ), NS, A0, A1, R,
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAG( FILNO2, INFO, IN(1), IN(3), NS, A0, A1, R,
-     :      DA0, DA1, SIGMA, CHISQR, STATUS )
-         CALL SPD_WAAF( VXIST(1), .TRUE., NELM,
-     :      %VAL(DPTR(3)), %VAL(DPTR(1)), %VAL(VPTR(1)),
-     :      NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
+         CALL SPD_WAAF( VXIST(1), .TRUE., NELM, 
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(DPTR(1)) ),
+     :                  %VAL( CNF_PVAL(VPTR(1)) ), NS, A0, A1, R,
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAG( FILNO2, INFO, IN(3), IN(1), NS, A0, A1, R,
-     :      DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
 
 *     Correlate 2->3, 3->2.
          CALL SPD_WAAF( VXIST(3), .TRUE., NELM,
-     :      %VAL(DPTR(2)), %VAL(DPTR(3)), %VAL(VPTR(3)),
-     :      NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  %VAL( CNF_PVAL(DPTR(2)) ),
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(VPTR(3)) ), NS, A0, A1, R,
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAG( FILNO2, INFO, IN(2), IN(3), NS, A0, A1, R,
-     :      DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAF( VXIST(2), .TRUE., NELM,
-     :      %VAL(DPTR(3)), %VAL(DPTR(2)), %VAL(VPTR(2)),
-     :      NS, A0, A1, R, DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(DPTR(2)) ),
+     :                  %VAL( CNF_PVAL(VPTR(2)) ), NS, A0, A1, R,
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
          CALL SPD_WAAG( FILNO2, INFO, IN(3), IN(2), NS, A0, A1, R,
-     :      DA0, DA1, SIGMA, CHISQR, STATUS )
+     :                  DA0, DA1, SIGMA, CHISQR, STATUS )
 
 *     Two-parameter linear fit (1,2)->3.
          CALL SPD_WAAH( VXIST(3), .TRUE., NELM,
-     :      %VAL(DPTR(1)), %VAL(DPTR(2)), %VAL(DPTR(3)), %VAL(VPTR(3)),
-     :      NS, A0, A1, A2, DA0, DA1, DA2, SIGMA, CHISQR, STATUS )
-         CALL SPD_WAAJ( FILNO2, INFO, IN(1), IN(2), IN(3),
-     :      NS, A0, A1, A2, DA0, DA1, DA2, SIGMA, CHISQR, STATUS )
+     :                  %VAL( CNF_PVAL(DPTR(1)) ),
+     :                  %VAL( CNF_PVAL(DPTR(2)) ),
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(VPTR(3)) ), NS, A0, A1, A2,
+     :                  DA0, DA1, DA2, SIGMA, CHISQR, STATUS )
+         CALL SPD_WAAJ( FILNO2, INFO, IN(1), IN(2), IN(3), NS, A0,
+     :                  A1, A2, DA0, DA1, DA2, SIGMA, CHISQR, STATUS )
       END IF
 
 *  Write values 1,2,3 to logfile.
       IF ( OUTFIL )
      :   CALL SPD_WZUA( FILNO1, THREEF, VXIST, NELM,
-     :      %VAL(DPTR(1)), %VAL(DPTR(2)), %VAL(DPTR(3)),
-     :      %VAL(VPTR(1)), %VAL(VPTR(2)), %VAL(VPTR(3)), STATUS )
+     :                  %VAL( CNF_PVAL(DPTR(1)) ),
+     :                  %VAL( CNF_PVAL(DPTR(2)) ),
+     :                  %VAL( CNF_PVAL(DPTR(3)) ),
+     :                  %VAL( CNF_PVAL(VPTR(1)) ),
+     :                  %VAL( CNF_PVAL(VPTR(2)) ),
+     :                  %VAL( CNF_PVAL(VPTR(3)) ), STATUS )
 
 *  Tidy up.
  500  CONTINUE

@@ -105,6 +105,7 @@
 *  Authors:
 *     djm: Dave Mills (UCL)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,8 @@
 *        Use new libraries.
 *     30 Jan 1995 (hme):
 *        Move internal references above DATA statements.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,7 +132,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
-
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -282,13 +286,14 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Second pass through input file, read the values.
-      CALL SPD_WZLA( FU, NLINES, %VAL(PNTR(11)), STATUS )
+      CALL SPD_WZLA( FU, NLINES, %VAL( CNF_PVAL(PNTR(11)) ), STATUS )
 
 *  Check that strictly monotonically increasing.
       MONO = 2
-      CALL SPD_UAASR( NLINES, %VAL(PNTR(11)), MONO, FIRST, STATUS )
+      CALL SPD_UAASR( NLINES, %VAL( CNF_PVAL(PNTR(11)) ), MONO, FIRST,
+     :                STATUS )
       IF ( MONO .NE. 2 ) THEN
-         VALI = SPD_UAAGR( %VAL(PNTR(11)), FIRST, STATUS )
+         VALI = SPD_UAAGR( %VAL( CNF_PVAL(PNTR(11)) ), FIRST, STATUS )
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'ARCGENDB_T01', FIRST )
          CALL MSG_SETR( 'ARCGENDB_T02', VALI )
@@ -302,10 +307,17 @@
 *  Generate the data base by calling SPD_WZLB.
       IF ( STATUS .NE. SAI__OK ) GO TO 500
       CALL SPD_WZLB( INFO, SCOPE, NLINES, INDXSZ,
-     :   %VAL(PNTR(1)), %VAL(PNTR(2)), %VAL(PNTR(3)),
-     :   %VAL(PNTR(4)), %VAL(PNTR(5)), %VAL(PNTR(6)), %VAL(PNTR(7)),
-     :   %VAL(PNTR(8)), %VAL(PNTR(9)), %VAL(PNTR(10)),
-     :   NLINES, %VAL(PNTR(11)), FDBSTA )
+     :               %VAL( CNF_PVAL(PNTR(1)) ),
+     :               %VAL( CNF_PVAL(PNTR(2)) ),
+     :               %VAL( CNF_PVAL(PNTR(3)) ),
+     :               %VAL( CNF_PVAL(PNTR(4)) ),
+     :               %VAL( CNF_PVAL(PNTR(5)) ),
+     :               %VAL( CNF_PVAL(PNTR(6)) ),
+     :               %VAL( CNF_PVAL(PNTR(7)) ),
+     :               %VAL( CNF_PVAL(PNTR(8)) ),
+     :               %VAL( CNF_PVAL(PNTR(9)) ),
+     :               %VAL( CNF_PVAL(PNTR(10)) ),
+     :               NLINES, %VAL( CNF_PVAL(PNTR(11)) ), FDBSTA )
 
 *  Tidy up.
  500  CONTINUE

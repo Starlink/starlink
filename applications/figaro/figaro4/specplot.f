@@ -344,6 +344,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -375,6 +376,8 @@
 *        calls (shorter names).
 *     25 Nov 1994 (hme):
 *        Use new libraries.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -389,6 +392,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -543,11 +547,13 @@
          CALL NDF_TEMP( PLACE, STATUS )
          CALL NDF_NEW( '_REAL', 1, 1, NELM, PLACE, NDF(4), STATUS )
          CALL NDF_MAP( NDF(4), 'DATA,VARIANCE', '_REAL', 'WRITE',
-     :      ZPTR(1), NELM, STATUS )
-         CALL VEC_SUBR( .TRUE., NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      %VAL(ZPTR(1)), IERR, NERR, STATUS )
-         CALL VEC_ADDR( .TRUE., NELM, %VAL(PNTR(1)), %VAL(PNTR(2)),
-     :      %VAL(ZPTR(2)), IERR, NERR, STATUS )
+     :                 ZPTR(1), NELM, STATUS )
+         CALL VEC_SUBR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(PNTR(2)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(1)) ), IERR, NERR, STATUS )
+         CALL VEC_ADDR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                  %VAL( CNF_PVAL(PNTR(2)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(2)) ), IERR, NERR, STATUS )
          CALL NDF_UNMAP( NDF(1), 'VARIANCE', STATUS )
       END IF
 
@@ -556,13 +562,15 @@
          CALL NDF_TEMP( PLACE, STATUS )
          CALL NDF_NEW( '_REAL', 1, 1, NELM, PLACE, NDF(5), STATUS )
          CALL NDF_MAP( NDF(5), 'DATA,VARIANCE', '_REAL', 'WRITE',
-     :      ZPTR(3), NELM, STATUS )
-         CALL SPD_UAARR( .TRUE., NELM, 0.5, %VAL(PNTR(3)),
-     :      %VAL(ZPTR(4)), IERR, NERR, STATUS )
-         CALL VEC_SUBR( .TRUE., NELM, %VAL(PNTR(4)), %VAL(ZPTR(4)),
-     :      %VAL(ZPTR(3)), IERR, NERR, STATUS )
-         CALL VEC_ADDR( .TRUE., NELM, %VAL(ZPTR(4)), %VAL(PNTR(4)),
-     :      %VAL(ZPTR(4)), IERR, NERR, STATUS )
+     :                 ZPTR(3), NELM, STATUS )
+         CALL SPD_UAARR( .TRUE., NELM, 0.5, %VAL( CNF_PVAL(PNTR(3)) ),
+     :                   %VAL( CNF_PVAL(ZPTR(4)) ), IERR, NERR, STATUS )
+         CALL VEC_SUBR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(4)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(3)) ), IERR, NERR, STATUS )
+         CALL VEC_ADDR( .TRUE., NELM, %VAL( CNF_PVAL(ZPTR(4)) ),
+     :                  %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(4)) ), IERR, NERR, STATUS )
          IF ( NDF(3) .EQ. NDF__NOID ) THEN
             CALL NDF_AUNMP( NDF(1), 'WIDTH', AXIS, STATUS )
          ELSE
@@ -741,13 +749,16 @@
 
 *        Transform error bar bottoms and tops.
             IF ( ERROR ) THEN
-               CALL AGI_TDTOW( PICDAT, NELM, %VAL(PNTR(4)),
-     :            %VAL(ZPTR(1)), %VAL(ZPTR(6)), %VAL(ZPTR(5)), STATUS )
+               CALL AGI_TDTOW( PICDAT, NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :            %VAL( CNF_PVAL(ZPTR(1)) ), %VAL( CNF_PVAL(ZPTR(6)) ),
+     :            %VAL( CNF_PVAL(ZPTR(5)) ), STATUS )
                I       = ZPTR(1)
                ZPTR(1) = ZPTR(5)
                ZPTR(5) = I
-               CALL AGI_TDTOW( PICDAT, NELM, %VAL(PNTR(4)),
-     :            %VAL(ZPTR(2)), %VAL(ZPTR(6)), %VAL(ZPTR(5)), STATUS )
+               CALL AGI_TDTOW( PICDAT, NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(2)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(6)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(5)) ), STATUS )
                I       = ZPTR(2)
                ZPTR(2) = ZPTR(5)
                ZPTR(5) = I
@@ -755,21 +766,27 @@
 
 *        Transform width bar ends.
             IF ( WIDTH ) THEN
-               CALL AGI_TDTOW( PICDAT, NELM, %VAL(ZPTR(3)),
-     :            %VAL(PNTR(1)), %VAL(ZPTR(6)), %VAL(ZPTR(5)), STATUS )
+               CALL AGI_TDTOW( PICDAT, NELM, %VAL( CNF_PVAL(ZPTR(3)) ),
+     :                         %VAL( CNF_PVAL(PNTR(1)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(6)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(5)) ), STATUS )
                I       = ZPTR(3)
                ZPTR(3) = ZPTR(6)
                ZPTR(6) = I
-               CALL AGI_TDTOW( PICDAT, NELM, %VAL(ZPTR(4)),
-     :            %VAL(PNTR(1)), %VAL(ZPTR(6)), %VAL(ZPTR(5)), STATUS )
+               CALL AGI_TDTOW( PICDAT, NELM, %VAL( CNF_PVAL(ZPTR(4)) ),
+     :                         %VAL( CNF_PVAL(PNTR(1)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(6)) ),
+     :                         %VAL( CNF_PVAL(ZPTR(5)) ), STATUS )
                I       = ZPTR(4)
                ZPTR(4) = ZPTR(6)
                ZPTR(6) = I
             END IF
 
 *        Transform data points themselves.
-            CALL AGI_TDTOW( PICDAT, NELM, %VAL(PNTR(4)),
-     :         %VAL(PNTR(1)), %VAL(ZPTR(6)), %VAL(ZPTR(5)), STATUS )
+            CALL AGI_TDTOW( PICDAT, NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                      %VAL( CNF_PVAL(PNTR(1)) ),
+     :                      %VAL( CNF_PVAL(ZPTR(6)) ),
+     :                      %VAL( CNF_PVAL(ZPTR(5)) ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *        Release original data.
@@ -858,10 +875,10 @@
 
 *     Now work out the window (file coordinates). The default offered to
 *     the user is derived from the actual ranges in the file.
-         CALL SPD_UAAAR( .FALSE., NELM, %VAL(PNTR(4)),
-     :      WIND(1), WIND(2), STATUS )
-         CALL SPD_UAAAR( .TRUE., NELM, %VAL(PNTR(1)),
-     :      WIND(3), WIND(4), STATUS )
+         CALL SPD_UAAAR( .FALSE., NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                   WIND(1), WIND(2), STATUS )
+         CALL SPD_UAAAR( .TRUE., NELM, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                   WIND(3), WIND(4), STATUS )
          CALL PAR_DEF1R( 'WORLD', 4, WIND, STATUS )
          CALL PAR_GET1R( 'WORLD', 4, WIND, ACTVAL, STATUS )
          IF ( ACTVAL .NE. 4 ) THEN
@@ -954,10 +971,13 @@
 
 *     Do the data plotting.
          CALL SPD_WAAD( ERROR, WIDTH, LIN, BIN,
-     :      (MARK.GE.1.AND.MARK.LE.6), DASH, PGMARK(MARK),
-     :      NELM, %VAL(PNTR(4)), %VAL(PNTR(1)),
-     :      %VAL(ZPTR(1)), %VAL(ZPTR(2)),
-     :      %VAL(ZPTR(3)), %VAL(ZPTR(4)), STATUS )
+     :                  (MARK.GE.1.AND.MARK.LE.6), DASH, PGMARK(MARK),
+     :                  NELM, %VAL( CNF_PVAL(PNTR(4)) ),
+     :                  %VAL( CNF_PVAL(PNTR(1)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(1)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(2)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(3)) ),
+     :                  %VAL( CNF_PVAL(ZPTR(4)) ), STATUS )
 
 *     Reset character height.
          IF ( MARK .GE. 5 .AND. MARK .LE. 6 )
