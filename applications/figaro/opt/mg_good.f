@@ -55,6 +55,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 
       integer lh
       integer n1
@@ -127,9 +128,10 @@
           CALL PSX_CALLOC(n, '_INTEGER', ipvt, status )
 
           IF( STATUS .EQ. SAI__OK ) THEN
-              CALL  PDA_DGEFA(g1,n1,nfree,%VAL( ipvt ),ifail)
+              CALL  PDA_DGEFA(g1,n1,nfree,%VAL(CNF_PVAL( ipvt )),ifail)
               IF( ifail .EQ. 0 ) THEN
-                  CALL  PDA_DGEDI(g1,n1,nfree,%VAL( ipvt ),det,d,01)
+                  CALL  PDA_DGEDI(g1,n1,nfree,%VAL( CNF_PVAL( ipvt ) ),
+     :                            det,d,01)
               ENDIF
           ENDIF
 

@@ -56,6 +56,7 @@
       implicit none
       include 'arc_dims'
       include 'status_inc'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'fit_coding_inc'
       include 'opt_cmn'
       integer iy
@@ -96,8 +97,8 @@
 * Decode status word and read in parameters as they are (i.e. not
 * bothering initially whether the fit is the same as the current one)
 
-      call getres(%VAL(d_rptr),line,oldans,iy,guess,odeccntr,
-     :            odensc,%VAL(staptr),fstat)
+      call getres(%VAL(CNF_PVAL(d_rptr)),line,oldans,iy,guess,odeccntr,
+     :            odensc,%VAL(CNF_PVAL(staptr)),fstat)
       fstat = -fstat
 
 * I we are to take the fit model etc., completely from the old fit, then
