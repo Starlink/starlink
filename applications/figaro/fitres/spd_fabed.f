@@ -70,11 +70,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     02 Mar 1994 (hme):
 *        Original version. Adapted from SPADR, which was more complex.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +94,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_FCOM'         ! Specdre FITRES common block
@@ -167,18 +171,21 @@
       IF ( COMP .GE. 1 .AND. COMP .LE. NCOMP(SLOT) ) THEN
 
 *     Line name.
-         TESTC = SPD_FDABC( %VAL(CPNTR(1,SLOT)),COMP,STATUS,%VAL(XCLEN))
+         TESTC = SPD_FDABC( %VAL( CNF_PVAL(CPNTR(1,SLOT)) ), COMP,
+     :                      STATUS, %VAL(XCLEN) )
          IF ( .NOT. CHR_SIMLR( LINNAM, 'unidentified component' ) .AND.
      :        .NOT. CHR_SIMLR( LINNAM, TESTC ) ) GO TO 4
 
 *     Component type.
-         TESTC = SPD_FDABC(%VAL(CPNTR(3,SLOT)),COMP,STATUS,%VAL(XCLEN))
+         TESTC = SPD_FDABC(%VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
+     :                     COMP, STATUS, %VAL(XCLEN) )
          IF ( .NOT. CHR_SIMLR( CMPTYP, 'unknown function' ) .AND.
      :        .NOT. CHR_SIMLR( CMPTYP, TESTC ) ) GO TO 4
 
 *     Laboratory frequency.
          IF ( LABFRQ .NE. VAL__BADD ) THEN
-            TESTD = SPD_FDABD( %VAL(CPNTR(2,SLOT)), COMP, STATUS )
+            TESTD = SPD_FDABD( %VAL( CNF_PVAL(CPNTR(2,SLOT)) ), COMP,
+     :                         STATUS )
             IF ( TESTD .EQ. VAL__BADD ) THEN
                GO TO 4
             ELSE
@@ -188,19 +195,20 @@
          END IF
 
 *     Number of parameters.
-         IF ( NPARA .NE. SPD_FDABI(%VAL(CPNTR(4,SLOT)),COMP,STATUS) )
-     :      GO TO 4
+         IF ( NPARA .NE. SPD_FDABI( %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                              COMP, STATUS ) ) GO TO 4
 
 *     Parameter types.
          FPARA = 1
          DO 2 I = 1, COMP - 1
-            FPARA = FPARA + SPD_FDABI(%VAL(CPNTR(4,SLOT)),I,STATUS)
+            FPARA = FPARA + SPD_FDABI(%VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                                I, STATUS )
  2       CONTINUE
          DO 3 I = 0, NPARA - 1
-            TESTC = SPD_FDABC( %VAL(PPNTR(1,SLOT)), FPARA+I, STATUS,
-     :         %VAL(XCLEN) )
-            IF ( .NOT. CHR_SIMLR(PARTYP(I+1),'unknown parameter') .AND.
-     :           .NOT. CHR_SIMLR(PARTYP(I+1),TESTC) ) GO TO 4
+            TESTC = SPD_FDABC( %VAL( CNF_PVAL(PPNTR(1,SLOT)) ), FPARA+I,
+     :                         STATUS, %VAL(XCLEN)  )
+            IF ( .NOT. CHR_SIMLR(PARTYP(I+1), 'unknown parameter') .AND.
+     :           .NOT. CHR_SIMLR(PARTYP(I+1),TESTC ) ) GO TO 4
  3       CONTINUE
 
 *     If we got this far and only then, the specified component is
@@ -220,21 +228,23 @@
          CALL SPD_FAAD( A_MNDF, COMP, I, STATUS )
 
 *     Set up the component.
-         CALL SPD_FDAAC( COMP, COMP, %VAL(CPNTR(1,SLOT)), LINNAM,
-     :      STATUS, %VAL(XCLEN) )
-         CALL SPD_FDAAC( COMP, COMP, %VAL(CPNTR(3,SLOT)), CMPTYP,
-     :      STATUS, %VAL(XCLEN) )
-         CALL SPD_FDAAD( COMP, COMP, %VAL(CPNTR(2,SLOT)), LABFRQ,
-     :      STATUS )
-         CALL SPD_FDAAI( COMP, COMP, %VAL(CPNTR(4,SLOT)), NPARA,
-     :      STATUS )
+         CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
+     :                   LINNAM, STATUS, %VAL(XCLEN)  )
+         CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
+     :                   CMPTYP, STATUS, %VAL(XCLEN)  )
+         CALL SPD_FDAAD( COMP, COMP, %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
+     :                   LABFRQ, STATUS )
+         CALL SPD_FDAAI( COMP, COMP, %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                   NPARA, STATUS )
          FPARA = 1
          DO 6 I = 1, COMP - 1
-            FPARA = FPARA + SPD_FDABI(%VAL(CPNTR(4,SLOT)),I,STATUS)
+            FPARA = FPARA + SPD_FDABI(%VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                                I, STATUS )
  6       CONTINUE
          DO 7 I = 0, NPARA - 1
-            CALL SPD_FDAAC( FPARA+I, FPARA+I, %VAL(PPNTR(1,SLOT)),
-     :         PARTYP(I+1), STATUS, %VAL(XCLEN) )
+            CALL SPD_FDAAC( FPARA+I, FPARA+I,
+     :                      %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
+     :                      PARTYP(I+1), STATUS, %VAL(XCLEN)  )
  7       CONTINUE
       END IF
 

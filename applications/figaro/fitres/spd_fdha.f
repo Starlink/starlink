@@ -47,6 +47,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,7 +57,9 @@
 *        Rename from SPEHA.
 *     24 Nov 1994 (hme):
 *        Redirect call to SPABBI to library's own routine.
-*     {enter_changes_here}
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -71,6 +74,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -218,7 +222,8 @@
      :         PNTR, STATUS )
             TNPAR = 0
             DO 1 J = 1, SIZE
-               TNPAR = TNPAR + SPD_FDABI( %VAL(PNTR), J, STATUS )
+               TNPAR = TNPAR + SPD_FDABI( %VAL( CNF_PVAL(PNTR) ), J,
+     :                                    STATUS )
  1          CONTINUE
          END IF
 

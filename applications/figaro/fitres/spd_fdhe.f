@@ -88,6 +88,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +101,8 @@
 *     24 Nov 1994 (hme):
 *        Redirect call to SPEBA to SPD_EABA and call to SPABBI to
 *        library's own routine.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +118,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -227,7 +231,7 @@
       IF ( PARA1 .EQ. 0 .OR. PARA2 .EQ. 0 ) THEN
          J = 0
          DO 1 I = 1, COMP(2)
-            J = J + SPD_FDABI( %VAL(TPNTR), I, STATUS )
+            J = J + SPD_FDABI( %VAL( CNF_PVAL(TPNTR) ), I, STATUS )
             IF ( I .EQ. COMP(1)-1 ) PARA1 = J + 1
  1       CONTINUE
          IF ( PARA2 .EQ. 0 ) PARA2 = J

@@ -51,11 +51,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     03 Mar 1994 (hme):
 *        Original version.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,6 +75,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_FCOM'         ! Specdre FITRES common block
@@ -136,7 +140,8 @@
      :      'Component number is invalid.', STATUS )
          GO TO 500
       END IF
-      IF ( NPARA .NE. SPD_FDABI(%VAL(CPNTR(4,SLOT)),COMP,STATUS) ) THEN
+      IF ( NPARA .NE. SPD_FDABI( %VAL( CNF_PVAL(CPNTR(4,SLOT)) ), COMP,
+     :                           STATUS ) ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'SPD_FACB_E04', 'SPD_FACBR: Error: ' //
      :      'Given number of parameters does not match.', STATUS )
@@ -154,7 +159,8 @@
 *  Find first parameter of component.
       FPARA = 1
       DO 2 I = 1, COMP - 1
-         FPARA = FPARA + SPD_FDABI(%VAL(CPNTR(4,SLOT)),I,STATUS)
+         FPARA = FPARA + SPD_FDABI( %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                              I, STATUS )
  2    CONTINUE
 
 *  Convert row number and number of first parameter into first array
@@ -163,14 +169,16 @@
 
 *  Put the data.
       DO 3 I = 0, NPARA - 1
-         CALL SPD_FDAAR( FELEM+I, FELEM+I, %VAL(DPNTR(1,SLOT)),
+         CALL SPD_FDAAR( FELEM+I, FELEM+I,
+     :                   %VAL( CNF_PVAL(DPNTR(1,SLOT)) ),
      :      DATA(I+1), STATUS, %VAL(XCLEN) )
  3    CONTINUE
 
 *  Put the variances.
       DO 4 I = 0, NPARA - 1
-         CALL SPD_FDAAR( FELEM+I, FELEM+I, %VAL(DPNTR(2,SLOT)),
-     :      VAR(I+1), STATUS, %VAL(XCLEN) )
+         CALL SPD_FDAAR( FELEM+I, FELEM+I,
+     :                   %VAL( CNF_PVAL(DPNTR(2,SLOT)) ),
+     :                   VAR(I+1), STATUS, %VAL(XCLEN) )
  4    CONTINUE
 
 *  Return.

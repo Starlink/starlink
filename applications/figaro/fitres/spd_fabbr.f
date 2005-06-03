@@ -46,11 +46,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     03 Mar 1994 (hme):
 *        Original version. Adapted from SPEHC.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_FCOM'         ! Specdre FITRES common block
@@ -143,12 +147,12 @@
       END IF
 
 *  Set up the line name, lab frequency, component type.
-      CALL SPD_FDAAC( COMP, COMP, %VAL(CPNTR(1,SLOT)), LINNAM,
-     :   STATUS, %VAL(XCLEN) )
-      CALL SPD_FDAAC( COMP, COMP, %VAL(CPNTR(3,SLOT)), CMPTYP,
-     :   STATUS, %VAL(XCLEN) )
-      CALL SPD_FDAAR( COMP, COMP, %VAL(CPNTR(2,SLOT)), LABFRQ,
-     :   STATUS )
+      CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
+     :                LINNAM, STATUS, %VAL(XCLEN) )
+      CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
+     :                CMPTYP, STATUS, %VAL(XCLEN) )
+      CALL SPD_FDAAR( COMP, COMP, %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
+     :                LABFRQ, STATUS )
 
 *  Beyond this point the result structure may be corrupted if something
 *  goes wrong.
@@ -160,7 +164,8 @@
 *  ===================================================================
 
 *  Get the previous number of parameters for component in question.
-      OLDVAL = SPD_FDABI( %VAL(CPNTR(4,SLOT)), COMP, STATUS )
+      OLDVAL = SPD_FDABI( %VAL( CNF_PVAL(CPNTR(4,SLOT)) ), COMP,
+     :                    STATUS )
 
 *  It gets difficult only if the new NPARA is different.
       IF ( NPARA .NE. OLDVAL ) THEN
@@ -172,7 +177,8 @@
 *     SHIFT1 to the right (SHIFT1 may be negative).
          NEWTNP = 0
          DO 2 I = 1, NCOMP(SLOT)
-            NEWTNP = NEWTNP + SPD_FDABI(%VAL(CPNTR(4,SLOT)),I,STATUS)
+            NEWTNP = NEWTNP + SPD_FDABI(%VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                                  I, STATUS )
             IF ( I .EQ. COMP ) SHIFT0 = NEWTNP
  2       CONTINUE
          SHIFT1 = NPARA - OLDVAL
@@ -213,22 +219,23 @@
 *     Currently it assumes there is only one parameter-related array.
          IF ( TYPE(1,SLOT) .EQ. '_DOUBLE' ) THEN
             CALL SPD_FDACD( VAL__BADD, NEWTNP, DIM2, SHIFT0, SHIFT1,
-     :         %VAL(DPNTR(1,SLOT)), STATUS )
+     :                      %VAL( CNF_PVAL(DPNTR(1,SLOT)) ), STATUS )
             CALL SPD_FDACD( VAL__BADD, NEWTNP, DIM2, SHIFT0, SHIFT1,
-     :         %VAL(DPNTR(2,SLOT)), STATUS )
+     :                      %VAL( CNF_PVAL(DPNTR(2,SLOT)) ), STATUS )
          ELSE
             CALL SPD_FDACR( VAL__BADR, NEWTNP, DIM2, SHIFT0, SHIFT1,
-     :         %VAL(DPNTR(1,SLOT)), STATUS )
+     :                      %VAL( CNF_PVAL(DPNTR(1,SLOT)) ), STATUS )
             CALL SPD_FDACR( VAL__BADR, NEWTNP, DIM2, SHIFT0, SHIFT1,
-     :         %VAL(DPNTR(2,SLOT)), STATUS )
+     :                      %VAL( CNF_PVAL(DPNTR(2,SLOT)) ), STATUS )
          END IF
          CALL SPD_FDACC( 'uknown parameter', NEWTNP, 1, SHIFT0, SHIFT1,
-     :      %VAL(PPNTR(1,SLOT)), STATUS, %VAL(XCLEN) )
+     :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ), STATUS,
+     :                   %VAL(XCLEN) )
 
 *     Store the new value into its place.
          TNPAR(SLOT) = NEWTNP
-         CALL SPD_FDAAI( COMP, COMP, %VAL(CPNTR(4,SLOT)), NPARA,
-     :      STATUS )
+         CALL SPD_FDAAI( COMP, COMP, %VAL( CNF_PVAL(CPNTR(4,SLOT)) ), 
+     :                   NPARA, STATUS )
       END IF
 
 *  The danger of corrupting the result structure is over, this is the
@@ -240,11 +247,13 @@
 *  delete the result structure.
       FPARA = 1
       DO 4 I = 1, COMP - 1
-         FPARA = FPARA + SPD_FDABI(%VAL(CPNTR(4,SLOT)),I,STATUS)
+         FPARA = FPARA + SPD_FDABI(%VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                             I, STATUS )
  4    CONTINUE
       DO 5 I = 0, NPARA - 1
-         CALL SPD_FDAAC( FPARA+I, FPARA+I, %VAL(PPNTR(1,SLOT)),
-     :      PARTYP(I+1), STATUS, %VAL(XCLEN) )
+         CALL SPD_FDAAC( FPARA+I, FPARA+I,
+     :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
+     :                   PARTYP(I+1), STATUS, %VAL(XCLEN) )
  5    CONTINUE
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 

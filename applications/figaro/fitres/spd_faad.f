@@ -38,6 +38,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,7 +50,9 @@
 *        Adapt according to SPE-routine convention.
 *     03 Mar 1994 (hme):
 *        Adapt to use the FITRES common blocks.
-*     {enter_changes_here}
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -65,6 +68,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_FCOM'         ! Specdre FITRES common block
@@ -173,47 +177,60 @@
       IF ( A_NCOMP .GT. NCOMP(SLOT) ) THEN
 
 *     Line names.
-         CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(1,SLOT)),
-     :      'unidentified component', STATUS, %VAL(CSIZE) )
+         CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP,
+     :                   %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
+     :                   'unidentified component', STATUS,
+     :                   %VAL(CSIZE) )
 
 *     Laboratory frequencies.
          IF ( TYPE(2,SLOT) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(2,SLOT)),
-     :         VAL__BADD, STATUS )
+            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
+     :                      VAL__BADD, STATUS )
          ELSE
-            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(2,SLOT)),
-     :         VAL__BADR, STATUS )
+            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
+     :                      VAL__BADR, STATUS )
          END IF
 
 *     Component types.
-         CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(3,SLOT)),
-     :      'unknown function', STATUS, %VAL(CSIZE) )
+         CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP,
+     :                   %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
+     :                   'unknown function', STATUS,
+     :                   %VAL(CSIZE) )
 
 *     Number of result parameters for each spectral component.
          I = INT( (A_TNPAR-TNPAR(SLOT)) / (A_NCOMP-NCOMP(SLOT)) )
          I = MAX( I, 0 )
-         CALL SPD_FDAAI( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(4,SLOT)),
-     :      I, STATUS )
+         CALL SPD_FDAAI( NCOMP(SLOT)+1, A_NCOMP,
+     :                   %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                   I, STATUS )
 
 *     Masks.
          IF ( TYPE(3,SLOT) .EQ. '_DOUBLE' ) THEN
-            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(5,SLOT)),
-     :         VAL__BADD, STATUS )
-            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(6,SLOT)),
-     :         VAL__BADD, STATUS )
+            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(5,SLOT)) ),
+     :                      VAL__BADD, STATUS )
+            CALL SPD_FDAAD( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(6,SLOT)) ),
+     :                      VAL__BADD, STATUS )
          ELSE
-            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(5,SLOT)),
-     :         VAL__BADR, STATUS )
-            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP, %VAL(CPNTR(6,SLOT)),
-     :         VAL__BADR, STATUS )
+            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(5,SLOT)) ),
+     :                      VAL__BADR, STATUS )
+            CALL SPD_FDAAR( NCOMP(SLOT)+1, A_NCOMP,
+     :                      %VAL( CNF_PVAL(CPNTR(6,SLOT)) ),
+     :                      VAL__BADR, STATUS )
          END IF
       END IF
 
 *  If result parameter indexed vectors are longer now, fill new
 *  elements.
       IF ( A_TNPAR .GT. TNPAR(SLOT) ) THEN
-         CALL SPD_FDAAC( TNPAR(SLOT)+1, A_TNPAR, %VAL(PPNTR(1,SLOT)),
-     :      'unknown parameter', STATUS, %VAL(CSIZE) )
+         CALL SPD_FDAAC( TNPAR(SLOT)+1, A_TNPAR,
+     :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
+     :                   'unknown parameter', STATUS,
+     :                    %VAL(CSIZE) )
 
 *  If parameter indexed vectors are shorter now, some retained spectral
 *  components may have been deprived of parameters they used to have.
@@ -236,7 +253,8 @@
             I = I + 1
 
 *        Find out what used to be its last parameter.
-            J = J + SPD_FDABI( %VAL(CPNTR(4,SLOT)), I, STATUS )
+            J = J + SPD_FDABI( %VAL( CNF_PVAL(CPNTR(4,SLOT)) ), I,
+     :                         STATUS )
 
 *        Check the WHILE condition.
             GO TO 4
@@ -245,7 +263,8 @@
 *     If components I ... NCOMP lost some or all of their parameters set
 *     their number of parameters to zero.
          IF ( J .GT. A_TNPAR ) THEN
-            CALL SPD_FDAAI( I, A_NCOMP, %VAL(CPNTR(4,SLOT)), 0, STATUS )
+            CALL SPD_FDAAI( I, A_NCOMP, %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
+     :                      0, STATUS )
          END IF
       END IF
 

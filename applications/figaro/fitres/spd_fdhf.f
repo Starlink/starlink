@@ -46,6 +46,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,6 +58,8 @@
 *        Adapt according to SPE-routine convention.
 *     25 Feb 1994 (hme):
 *        Rename from SPEHF.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +76,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -196,8 +200,8 @@
 *  each spectral component.
       CALL NDF_XNEW( XNDF, XC9C1, XT9C1, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-      CALL SPD_FDAAC( 1, NCOMP, %VAL(PNTR(1)), 'unidentified component',
-     :   STATUS, %VAL(CSIZE) )
+      CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), 
+     :                'unidentified component', STATUS, %VAL(CSIZE) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.LABFREQ is a _REAL or _DOUBLE vector. There is one
@@ -205,10 +209,12 @@
       CALL NDF_XNEW( XNDF, XC9C2, TYPE(2), 1, NCOMP, RLOC, STATUS )
       IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
          CALL DAT_MAPD( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAD( 1, NCOMP, %VAL(PNTR(1)), VAL__BADD, STATUS )
+         CALL SPD_FDAAD( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADD,
+     :                   STATUS )
       ELSE
          CALL DAT_MAPR( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAR( 1, NCOMP, %VAL(PNTR(1)), VAL__BADR, STATUS )
+         CALL SPD_FDAAR( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADR,
+     :                   STATUS )
       END IF
       CALL DAT_ANNUL( RLOC, STATUS )
 
@@ -216,8 +222,8 @@
 *  for each spectral component.
       CALL NDF_XNEW( XNDF, XC9C3, XT9C3, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-      CALL SPD_FDAAC( 1, NCOMP, %VAL(PNTR(1)), 'unknown function',
-     :   STATUS, %VAL(CSIZE) )
+      CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                'unknown function', STATUS, %VAL(CSIZE) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.NPARA is an _INTEGER vector. There is one element for
@@ -226,7 +232,7 @@
       CALL NDF_XNEW( XNDF, XC9C4, XT9C4, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPI( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
       I = INT( TNPAR / NCOMP )
-      CALL SPD_FDAAI( 1, NCOMP, %VAL(PNTR(1)), I, STATUS )
+      CALL SPD_FDAAI( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), I, STATUS )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.MASKL is a _REAL or _DOUBLE vector. There is one
@@ -234,10 +240,12 @@
       CALL NDF_XNEW( XNDF, XC9C5, TYPE(3), 1, NCOMP, RLOC, STATUS )
       IF ( TYPE(3) .EQ. '_DOUBLE' ) THEN
          CALL DAT_MAPD( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAD( 1, NCOMP, %VAL(PNTR(1)), VAL__BADD, STATUS )
+         CALL SPD_FDAAD( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADD,
+     :                   STATUS )
       ELSE
          CALL DAT_MAPR( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAR( 1, NCOMP, %VAL(PNTR(1)), VAL__BADR, STATUS )
+         CALL SPD_FDAAR( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADR,
+     :                   STATUS )
       END IF
       CALL DAT_ANNUL( RLOC, STATUS )
 
@@ -246,20 +254,21 @@
       CALL NDF_XNEW( XNDF, XC9C6, TYPE(3), 1, NCOMP, RLOC, STATUS )
       IF ( TYPE(3) .EQ. '_DOUBLE' ) THEN
          CALL DAT_MAPD( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAD( 1, NCOMP, %VAL(PNTR(1)), VAL__BADD, STATUS )
+         CALL SPD_FDAAD( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADD,
+     :                   STATUS )
       ELSE
          CALL DAT_MAPR( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
-         CALL SPD_FDAAR( 1, NCOMP, %VAL(PNTR(1)), VAL__BADR, STATUS )
+         CALL SPD_FDAAR( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), VAL__BADR,
+     :                   STATUS )
       END IF
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.PARATYPE is a _CHAR*32 vector. There is one element
 *  for each result parameter.
-      CALL NDF_XNEW( XNDF, XC9P1, XT9P1, 1, TNPAR, RLOC,
-     :   STATUS )
+      CALL NDF_XNEW( XNDF, XC9P1, XT9P1, 1, TNPAR, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, TNPAR, PNTR(1), STATUS )
-      CALL SPD_FDAAC( 1, TNPAR, %VAL(PNTR(1)), 'unknown parameter',
-     :   STATUS, %VAL(CSIZE) )
+      CALL SPD_FDAAC( 1, TNPAR, %VAL( CNF_PVAL(PNTR(1)) ),
+     :                'unknown parameter', STATUS, %VAL(CSIZE) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  Check status.

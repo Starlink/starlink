@@ -42,6 +42,7 @@
 
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,8 @@
 *        Make it an SPE-routine.
 *     24 Nov 1994 (hme):
 *        Rename from SPEHC.
+*     2005 June 1 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) XLOC
@@ -148,7 +152,7 @@
       CALL DAT_MAPI( CLOC, 'UPDATE', 1, NCOMP, NPARA, STATUS )
 
 *  How many parameters did the COMP-th component use to have.
-      OLDVAL = SPD_FDABI( %VAL(NPARA), COMP, STATUS )
+      OLDVAL = SPD_FDABI( %VAL( CNF_PVAL(NPARA) ), COMP, STATUS )
 
 *  If some fool called this routine to change the value to what it was
 *  anyway, then return in an orderly fashion, but without action.
@@ -167,7 +171,8 @@
 *  SHIFT1 to the right (SHIFT1 may be negative).
       NEWTNP = 0
       DO 1 I = 1, NCOMP
-         NEWTNP = NEWTNP + SPD_FDABI( %VAL(NPARA), I, STATUS )
+         NEWTNP = NEWTNP + SPD_FDABI( %VAL( CNF_PVAL(NPARA) ), I,
+     :                                STATUS )
          IF ( I .EQ. COMP ) SHIFT0 = NEWTNP
  1    CONTINUE
       SHIFT1 = NPARAI  - OLDVAL
@@ -199,20 +204,21 @@
 *  Do the shift.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_FDACD( VAL__BADD, NEWTNP, DIM2, SHIFT0,
-     :      SHIFT1, %VAL(PNTR(2)), STATUS )
+     :                   SHIFT1, %VAL( CNF_PVAL(PNTR(2)) ), STATUS )
          CALL SPD_FDACD( VAL__BADD, NEWTNP, DIM2, SHIFT0,
-     :      SHIFT1, %VAL(PNTR(3)), STATUS )
+     :                   SHIFT1, %VAL( CNF_PVAL(PNTR(3)) ), STATUS )
       ELSE
          CALL SPD_FDACR( VAL__BADR, NEWTNP, DIM2, SHIFT0,
-     :      SHIFT1, %VAL(PNTR(2)), STATUS )
+     :                   SHIFT1, %VAL( CNF_PVAL(PNTR(2)) ), STATUS )
          CALL SPD_FDACR( VAL__BADR, NEWTNP, DIM2, SHIFT0,
-     :      SHIFT1, %VAL(PNTR(3)), STATUS )
+     :                   SHIFT1, %VAL( CNF_PVAL(PNTR(3)) ), STATUS )
       END IF
       CALL SPD_FDACC( 'unknown parameter', NEWTNP, DIM2, SHIFT0,
-     :   SHIFT1, %VAL(PNTR(1)), STATUS, %VAL(CSIZE) )
+     :   SHIFT1, %VAL( CNF_PVAL(PNTR(1) )), STATUS, %VAL(CSIZE) )
 
 *  Finally, store the new value into its place.
-      CALL SPD_FDAAI( COMP, COMP, %VAL(NPARA), NPARAI, STATUS )
+      CALL SPD_FDAAI( COMP, COMP, %VAL( CNF_PVAL(NPARA) ), NPARAI,
+     :                STATUS )
 
 *  Tidy up.
  500  CONTINUE
