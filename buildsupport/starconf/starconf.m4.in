@@ -275,6 +275,15 @@ AC_SUBST(PREDIST)
 AC_PATH_PROG(PAX, pax)
 AC_PATH_PROGS(TAR, [gnutar tar])
 
+## Initialise ALL_TARGET to a safe value, for STAR_[]SUPPRESS_BUILD_IF.
+## Because that's implemented using shell conditionals rather than
+## automake ones, we run into trouble if the macro is invoked inside a
+## shell conditional, since in that case automake spots it, and sets
+## all-am dependent on $(ALL_TARGET), but the variable is never set
+## unless the shell conditional happens to be true; at which point we
+## lose unless ALL_TARGET is initialised here.  Ugh: XXX.
+ALL_TARGET=all-am-normal
+
 # Default $prefix.  This is done by the standard autoconf configure, but at
 # a slightly later stage than this.  Doing it here, as part of STAR_[]DEFAULTS
 # means that the defaulted value of $prefix can be used within the body of
@@ -1279,6 +1288,10 @@ dnl                       $star_cv_initialise_fortran)
 # The macro communicates with the generated Makefile.in by creating a file
 # STAR_SUPPRESS_BUILD if the test evaluates to true.  The file contains
 # the text of the explanation.
+##
+## This would almost certainly be better if it were implemented using
+## automake conditionals.  Note the very ugly initialisation of
+## ALL_TARGET in STAR[]_DEFAULTS above.
 AC_DEFUN([STAR_SUPPRESS_BUILD_IF],
    [m4_ifval([$1], [], [AC_FATAL([$0: needs two arguments])])dnl
     m4_ifval([$2], [], [AC_FATAL([$0: needs two arguments])])dnl
