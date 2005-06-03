@@ -32,6 +32,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer max_kp1
       double precision coeffs(max_kp1)
       integer kp1
@@ -73,8 +74,8 @@
 
 * Set weights inside tram lines to 1.0e-6
 
-      call tram_weights(line_count,%VAL(d_tlptr),
-     :          %VAL(d_trptr),dynamic_mem(d_xptr),wavdim,
+      call tram_weights(line_count,%VAL( CNF_PVAL(d_tlptr) ),
+     :          %VAL( CNF_PVAL(d_trptr) ),dynamic_mem(d_xptr),wavdim,
      :          work(weightptr))
 
 * Perform fitting and get user to decide on order

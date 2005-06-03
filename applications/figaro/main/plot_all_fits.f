@@ -68,6 +68,7 @@
       implicit none
       include 'SAE_PAR'
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real results(mxpars,nyp,spdim1,spdim2)
       integer fitsta(ncntrl,nyp,spdim1,spdim1)
@@ -135,7 +136,8 @@
 
                 title='File '//datafile(:chr_len(datafile))
 
-                call plot_line(line,.false.,vcorr,%VAL(d_wptr),
+                call plot_line(line,.false.,vcorr,
+     :               %VAL( CNF_PVAL(d_wptr) ),
 *     :               ix,iy,velplt,vtype,dynamic_chars(idsptr:idsend),
      :               ix,iy,velplt,vtype,idstring,
      :               results,%VAL(d_vptr),status)

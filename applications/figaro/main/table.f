@@ -45,6 +45,7 @@
 *- ---------------------------------------------------------------------
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real results(mxpars,nyp,spdim1,spdim2)
       logical nagerr,hex
@@ -122,11 +123,11 @@
 
 *         Output fit results to file
 
-              call output_fit(%VAL(staptr),results,
-     :             %VAL(d_vptr),ix,iy,line,deccntr,lu,nagerr
+              call output_fit(%VAL( CNF_PVAL(staptr) ),results,
+     :             %VAL( CNF_PVAL(d_vptr) ),ix,iy,line,deccntr,lu,
+     :             nagerr,,indic_fails,idstring,
 *     :             ,indic_fails,dynamic_chars(idsptr:idsend),
-     :             ,indic_fails,idstring,
-     :             %VAL(d_wptr),hex)
+     :             %VAL( CNF_PVAL(d_wptr) ),hex)
 
 *     new fit
 

@@ -86,6 +86,7 @@
       implicit none
       include 'SAE_PAR'
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'opt_cmn'
       real results(mxpars,nyp,spdim1,spdim2)
@@ -238,8 +239,8 @@
 *            use with fitcont fits only.
 
                 call line_plot_sub(fit_parms,dynamic_mem(d_xptr),
-     :               dynamic_mem(d_vsptr),%VAL(d_tlptr),
-     :               %VAL(d_trptr),line,wavdim,deccntr,
+     :               dynamic_mem(d_vsptr),%VAL( CNF_PVAL(d_tlptr) ),
+     :               %VAL( CNF_PVAL(d_trptr) ),line,wavdim,deccntr,
      :               .true.,first_ix,nwindx,max_parms,status)
 
                 if(status.ne.SAI__OK) goto 500

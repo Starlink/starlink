@@ -65,6 +65,7 @@
 * include common blocks
 *
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
 *
 * character
@@ -89,7 +90,8 @@
 * Find the lines
 *
       call find_lines(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),
-     :         wavdim,%VAL(d_tlptr),%VAL(d_trptr),
+     :         wavdim,%VAL( CNF_PVAL(d_tlptr) ),
+     :         %VAL( CNF_PVAL(d_trptr) ),
      :         line_count,nyp,batch,xlabel,xunits,zunits,status)
 *
 * check for error
@@ -103,7 +105,7 @@
 *
 *        call linepick(dynamic_chars(idsptr:idsend),
         call linepick(idstring,
-     :       %VAL(d_wptr),noldlines,status)
+     :       %VAL( CNF_PVAL(d_wptr) ),noldlines,status)
 
       end if
       if ( line_count .lt. 1) then
@@ -112,8 +114,9 @@
 * Edit line list if required
 
       else if(par_quest('Edit line list?',.false.)) then
-        call edit_list(%VAL(d_tlptr),%VAL(d_trptr),
-     :         line_count,%VAL(d_wptr),
+        call edit_list(%VAL( CNF_PVAL(d_tlptr) ),
+     :                 %VAL( CNF_PVAL(d_trptr) ),
+     :         line_count,%VAL( CNF_PVAL(d_wptr) ),
 *     :         dynamic_chars(idsptr:idsend))
      :         idstring)
       end if

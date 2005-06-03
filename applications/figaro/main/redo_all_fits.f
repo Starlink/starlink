@@ -52,6 +52,7 @@
       implicit none
       include 'SAE_PAR'
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real results(mxpars,nyp,nxp,spdim2)
       real resvar(mxpars,nyp,nxp,spdim2)
@@ -114,7 +115,7 @@
 *        Get previous results
 
             call getres(results,line,xsect,1,fitpar,deccntr,odensc,
-     :                  %VAL(staptr),status)
+     :                  %VAL( CNF_PVAL(staptr) ),status)
 
 *        If fit not ok to use, getres will have set fit model to 0
 
@@ -169,7 +170,8 @@
 
               call store_results(fitpar,fiterr,nnew,nfailed,line,
      :            istarty,iendy,deccntr,odensc,results,resvar,
-     :            %VAL(staptr),%VAL(d_mptr),1,1,-1.0e38)
+     :            %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ),
+     :            1,1,-1.0e38)
 
 *       fit present and ok
 

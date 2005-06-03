@@ -45,6 +45,7 @@
       include 'DAT_PAR'
       include 'DAT_ERR'
       include 'CMP_ERR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
 *- ----------------------------------------------------------------
       logical nocube,ifcomb,ifarc
@@ -132,7 +133,7 @@ C1001 format(3x, 'mxpars, nxp, nyp, spdim2, d_rptr: ',
 C    :  i4, i4, i4, i4, i20)
 C     print1002
 C1002 format(3x, 'Dump of data array:-')
-C     call arrdump (mxpars, nyp, nxp, 1, %val(d_rptr))
+C     call arrdump (mxpars, nyp, nxp, 1, %val( CNF_PVAL(d_rptr) ))
 
 
 * Work out maximum number of fit parameters and components
@@ -250,11 +251,11 @@ C     print *,'map_str'
         call map_data(ifcomb,'READ',status)
         if(status.ne.SAI__OK) return
         call copy_res(onpars,dynamic_mem(rptr),dynamic_mem(cptr),
-*     :       dynamic_chars(pptr:pptrend),%VAL(d_rptr),
-     :       oldparstr,%VAL(d_rptr),
-     :       %VAL(d_vptr),%VAL(d_cptr),
-     :       %VAL(staptr),dynamic_mem(aptr),
-     :       %VAL(d_aptr),resnam,ifarc)
+*     :       dynamic_chars(pptr:pptrend),%VAL( CNF_PVAL(d_rptr) ),
+     :       oldparstr,%VAL( CNF_PVAL(d_rptr) ),
+     :       %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(d_cptr) ),
+     :       %VAL( CNF_PVAL(staptr) ),dynamic_mem(aptr),
+     :       %VAL( CNF_PVAL(d_aptr) ),resnam,ifarc)
 
 *  Unmap old structures
 

@@ -49,6 +49,7 @@
 
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       logical polydata
@@ -127,10 +128,11 @@
 *  Extract positions from results block into a form that control_cpoly can
 * handle.
 
-      call extr_pos(%VAL(d_rptr),%VAL(d_vptr),
-     :      %VAL(staptr),dynamic_mem(cpxptr),dynamic_mem(cpyptr),
-     :     dynamic_mem(npts),ylim,%VAL(d_aptr),dynamic_mem(w2ptr)
-     :     ,dynamic_mem(d_xptr),wavdim,dynamic_mem(ptr1))
+      call extr_pos(%VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
+     :      %VAL( CNF_PVAL(staptr) ),dynamic_mem(cpxptr),
+     :      dynamic_mem(cpyptr),dynamic_mem(npts),ylim,
+     :      %VAL( CNF_PVAL(d_aptr) ),dynamic_mem(w2ptr),
+     :      dynamic_mem(d_xptr),wavdim,dynamic_mem(ptr1))
 
 * Fit polynomials in X-Sect direction.
 
@@ -156,10 +158,10 @@
 
 * Put positions interpolated etc. from fits into results block.
 
-      call set_poly_res(%VAL(d_rptr),%VAL(d_vptr),aa
-     :         ,MAX_KPLUS1,ylim,kp1,dynamic_mem(w2ptr),
-     :         dynamic_mem(npts),dynamic_mem(ptr5),used,
-     :         %VAL(d_aptr),dynamic_mem(ptr1),polydata,
+      call set_poly_res(%VAL( CNF_PVAL(d_rptr) ),
+     :         %VAL( CNF_PVAL(d_vptr) ),aa,MAX_KPLUS1,ylim,kp1,
+     :         dynamic_mem(w2ptr),dynamic_mem(npts),dynamic_mem(ptr5),
+     :         used,%VAL( CNF_PVAL(d_aptr) ),dynamic_mem(ptr1),polydata,
      :         dynamic_mem(ptr4),athree,maxnpts2,a3all)
 
 * Release workspace

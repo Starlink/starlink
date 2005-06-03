@@ -50,6 +50,7 @@
       implicit none             ! No implicit typing
       include 'SAE_PAR'
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       logical loop
       integer NDICT
@@ -74,17 +75,19 @@
          if((iopt.eq.OPT_EXIT).or.(status.ne.SAI__OK)) then
             return
          else if(iopt.eq.OPT_LOOK) then
-            call look(%VAL(d_rptr),.false.,%VAL(staptr)
-     :           ,%VAL(d_vptr))
+            call look(%VAL( CNF_PVAL(d_rptr) ),.false.,
+     :           %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_vptr) ))
          else if(iopt.eq.OPT_PLANES) then
-            call fit_edit(%VAL(d_rptr),%VAL(d_vptr),
-     :           status)
+            call fit_edit(%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL(CNF_PVAL(d_vptr) ),status)
          else if(iopt.eq.OPT_ASC) then
-            call sort_planes(%VAL(staptr),%VAL(d_rptr),
-     :           %VAL(d_vptr),.true.)
+            call sort_planes(%VAL( CNF_PVAL(staptr) ),
+     :           %VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),.true.)
          else if(iopt.eq.OPT_DESC) then
-            call sort_planes(%VAL(staptr),%VAL(d_rptr),
-     :           %VAL(d_vptr),.false.)
+            call sort_planes(%VAL( CNF_PVAL(staptr) ),
+     :          %VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),.false.)
          endif
       enddo
       end

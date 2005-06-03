@@ -74,6 +74,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       integer line
@@ -143,11 +144,12 @@
 * display the window
 
       if(wait) call sla_wait(3.0)
-      call disp_window(%VAL(d_tlptr),%VAL(d_trptr),line,
+      call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
+     :     %VAL( CNF_PVAL(d_trptr) ),line,
      :     dynamic_mem(d_xptr),dynamic_mem(d_vsptr),wavdim)
       if(pltold) then
-         qstat = plot_old_fit(%VAL(d_rptr),%VAL(d_vptr),
-     :        line,istartx,iendx,istarty,iendy,samblk,.false.,
-     :        %VAL(staptr))
+         qstat = plot_old_fit(%VAL( CNF_PVAL(d_rptr) ),
+     :        %VAL( CNF_PVAL(d_vptr) ),line,istartx,iendx,istarty,
+     :        iendy,samblk,.false.,%VAL( CNF_PVAL(staptr) ))
       end if
       end

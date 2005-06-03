@@ -43,6 +43,7 @@
       integer ntemp,ntemp2
 C      integer ptr,slot
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       character dynamic_chars
       include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
@@ -51,7 +52,7 @@ C      integer ptr,slot
 * Set results cube and variance to bad values
 
       call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-     :           %VAL(d_rptr))
+     :           %VAL( CNF_PVAL(d_rptr) ))
 
 C     print *,'gen_cfill1'
 
@@ -61,7 +62,7 @@ C     print *,'gen_cfill1'
 
 
       call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-     :           %VAL(d_vptr))
+     :           %VAL( CNF_PVAL(d_vptr) ))
 
 C     print *,'gen_cfill1'
 
@@ -70,11 +71,11 @@ C     print *,'gen_cfill1'
 
 * zero out wavelength and trams arrays
 
-      call zero_real(%VAL(d_tlptr),nyp)
+      call zero_real(%VAL( CNF_PVAL(d_tlptr) ),nyp)
 C     print *,'zero1'
-      call zero_real(%VAL(d_trptr),nyp)
+      call zero_real(%VAL( CNF_PVAL(d_trptr) ),nyp)
 C     print *,'zero2'
-      call zero_real(%VAL(d_wptr),nyp)
+      call zero_real(%VAL( CNF_PVAL(d_wptr) ),nyp)
 C     print *,'zero3'
 * no singles to doubles and no old or new fits either
 
@@ -88,7 +89,7 @@ C     print *,'zero3'
 
 * store the requested operation in CONTROL
 
-      call set_cont(%VAL(d_cptr),ncntrl,nxp*nyp*spdim2,
+      call set_cont(%VAL( CNF_PVAL(d_cptr) ),ncntrl,nxp*nyp*spdim2,
      :            fit_status)
 
 * set the initial values of mask and fit_status for each point
@@ -97,16 +98,16 @@ C     print *,'zero3'
 
 * mask in all points
 
-      call set_short(%VAL(d_mptr),nxp*nyp*spdim2,ival)
+      call set_short(%VAL( CNF_PVAL(d_mptr) ),nxp*nyp*spdim2,ival)
 C     print *,'setshort'
 
 * Set fit status array to zeros
 
-      call zero_int(%VAL(staptr),ncntrl*nxp*nyp*spdim2)
+      call zero_int(%VAL( CNF_PVAL(staptr) ),ncntrl*nxp*nyp*spdim2)
 c     print *,'zeroint'
 * Set arc usage array to zero
 
-      call zero_short(%VAL(d_aptr),nyp*nslct)
+      call zero_short(%VAL( CNF_PVAL(d_aptr) ),nyp*nslct)
 C     print *,'zeroshort'
 *set the iteration number: by definition one so far
 
@@ -157,7 +158,7 @@ C     print *,'writ tols'
 * fill
 
       if(spdim2.gt.1) then
-        call set_intensity(dynamic_mem(d_sptr),%VAL(totptr),
+        call set_intensity(dynamic_mem(d_sptr),%VAL( CNF_PVAL(totptr) ),
      :          wavdim,spdim1,spdim2)
 
       end if

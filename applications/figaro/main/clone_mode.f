@@ -63,6 +63,7 @@
       integer nbytes,ndims,dims(1)
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       character dynamic_chars
       include 'DYNAMIC_MEMORY'
       equivalence (dynamic_mem,dynamic_chars)
@@ -117,17 +118,17 @@
 
 *          call clone_match(dynamic_chars(idsptr:idsend),
           call clone_match(idstring,
-     :      %VAL(d_tlptr),%VAL(d_trptr),
-     :      %VAL(d_wptr),dynamic_mem(ptr1),
+     :      %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
+     :      %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
      :      dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
      :      dynamic_mem(ptr5),dynamic_chars(ptr6:end6),ifcomb,
-     :      %VAL(d_aptr),dynamic_mem(ptr7),dims(1),status)
+     :      %VAL( CNF_PVAL(d_aptr) ),dynamic_mem(ptr7),dims(1),status)
 
           call dsa_free_workspace(slot,status)
 
         end if
       end if
       if(status.eq.SAI__OK) then
-        call get_lincnt(%VAL(d_tlptr),line_count,nyp)
+        call get_lincnt(%VAL( CNF_PVAL(d_tlptr) ),line_count,nyp)
       end if
       end

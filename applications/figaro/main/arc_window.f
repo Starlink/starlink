@@ -66,6 +66,7 @@
       implicit none
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *-
 *  Input
       integer status
@@ -260,9 +261,9 @@
                   if(status.ne.SAI__OK) return
                   call store_results(sg_parms,sg_error,nnew,nfailed,
      :                 line,istartx,iendx,default_model,0.0,
-     :                 %VAL(d_rptr),%VAL(d_vptr),
-     :                 %VAL(staptr),%VAL(d_mptr),1,1,
-     :                 VAL__BADR)
+     :                 %VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+     :                 %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_mptr)),
+     :                 1,1, VAL__BADR)
 
 *             Update trams, if the fitting didn't crash, and the answer
 *             is believable (we will not allow the centre to move too

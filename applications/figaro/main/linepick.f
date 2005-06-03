@@ -60,6 +60,7 @@
       include 'arc_dims'
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer n_work
       integer list,in_list
       integer i,lu
@@ -292,8 +293,8 @@
 *
         call identify_line(dynamic_chars(namesst:namesend),
      :       dynamic_mem(wavestable),line_name,wavelength,n_work,
-     :       dynamic_mem(d_xptr),%VAL(d_tlptr),
-     :       %VAL(d_trptr),status)
+     :       dynamic_mem(d_xptr),%VAL( CNF_PVAL(d_tlptr) ),
+     :       %VAL( CNF_PVAL(d_trptr) ),status)
         call dsa_free_workspace(slot,status)
 *
 *   Write out current line list

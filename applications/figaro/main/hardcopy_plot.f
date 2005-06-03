@@ -68,6 +68,7 @@
       implicit none
       integer status
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'gr_inc'
       real results(mxpars,nyp,spdim1,spdim2)
       real resvar(mxpars,nyp,spdim1,spdim2)
@@ -188,9 +189,9 @@
 
         call par_wruser('Previous fit : -',pstat)
 
-        call output_fit(fitsta,results,%VAL(d_vptr),ix,iy,line,
-     :       deccntr,-1,.true.,.true.,line_name,%VAL(d_wptr),
-     :       .false.)
+        call output_fit(fitsta,results,%VAL( CNF_PVAL(d_vptr) ),
+     :       ix,iy,line,deccntr,-1,.true.,.true.,line_name,
+     :       %VAL( CNF_PVAL(d_wptr) ),.false.)
 
 *      Prepare labels for plot
 
@@ -198,8 +199,9 @@
 
 *      Perform plotting
 
-        call plot_line(line,.false.,0.0,%VAL(d_wptr),ix,iy,
-     :       .false.,0,line_name,results,%VAL(d_vptr),status)
+        call plot_line(line,.false.,0.0,%VAL( CNF_PVAL(d_wptr) ),ix,iy,
+     :       .false.,0,line_name,results,%VAL( CNF_PVAL(d_vptr) ),
+     :       status)
 
       else
 

@@ -72,6 +72,7 @@
       implicit none
       include 'PRM_PAR'
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'status_inc'
       include 'gr_inc'
@@ -255,9 +256,9 @@
               if(status.ne.SAI__OK) return
             end if
             call store_results(sg_parms,sg_error,nnew,nfailed,line,
-     :          istartx,iendx,deccntr,0.0,%VAL(d_rptr),
-     :          %VAL(d_vptr),%VAL(staptr),
-     :          %VAL(d_mptr),1,1,VAL__BADR)
+     :          istartx,iendx,deccntr,0.0,%VAL( CNF_PVAL(d_rptr) ),
+     :          %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(staptr) ),
+     :          %VAL( CNF_PVAL(d_mptr) ),1,1,VAL__BADR)
             if(.not.crash) then
               left_r(line)=sg_parms(4) + 0.5*(left(line) - right(line))
               right_r(line)=sg_parms(4)+ 0.5*(right(line) - left(line))

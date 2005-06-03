@@ -76,6 +76,7 @@
 *-
       implicit none
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real results(mxpars,nyp,nxp,spdim2)
       real resvar(mxpars,nyp,nxp,spdim2)
       integer fitsta(ncntrl,nyp,nxp,spdim2)
@@ -126,7 +127,7 @@
           px = gen_elemf(dynamic_mem(xptr),ix)
           if(hex) px = px + gen_elemf(dynamic_mem(xdptr),iy)
           py = gen_elemf(dynamic_mem(yptr),iy)
-          call morepts(results,%VAL(d_vptr),ix,iy,line,lu)
+          call morepts(results,%VAL( CNF_PVAL(d_vptr) ),ix,iy,line,lu)
           write(chars,'(''Spatial position : '',f8.3,'','',f8.3)')px,py
           call wft(chars,lu,status)
         endif

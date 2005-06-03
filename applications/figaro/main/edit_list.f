@@ -54,6 +54,7 @@
 *
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 * common
 *
@@ -126,8 +127,8 @@
               wavelength(in) = wavelength(i)
               left(in)=left(i)
               right(in)=right(i)
-              call shift(in,i,%VAL(d_rptr),%VAL(d_cptr),
-     :             %VAL(d_mptr))
+              call shift(in,i,%VAL( CNF_PVAL(d_rptr) ),
+     :               %VAL( CNF_PVAL(d_cptr) ), %VAL( CNF_PVAL(d_mptr) ))
             end if
           end do
           do i =(in+1),lincnt

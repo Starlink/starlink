@@ -72,6 +72,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       integer onpars
       real oldres(onpars,nyp,nxp,spdim2)
@@ -149,27 +150,28 @@
 
 * Read rest_wave array
 
-      call accres(' ','rest_wave','RF',nyp,%VAL(d_wptr),' ',
-     :     status)
+      call accres(' ','rest_wave','RF',nyp,%VAL( CNF_PVAL(d_wptr) ),
+     :            ' ', status)
 
 * Read ids array
 
 *      call accres(' ','ids','RC',10*nyp,0,dynamic_chars(idsptr:idsend)
-      call accres(' ','ids','RC',10*nyp,0,idstring
-     :     ,status)
+      call accres(' ','ids','RC',10*nyp,0,idstring,status)
 
 * Read traml array
 
-      call accres(' ','traml','RF',nyp,%VAL(d_tlptr),' ',status)
+      call accres(' ','traml','RF',nyp,%VAL( CNF_PVAL(d_tlptr) ),' ',
+     :            status)
 
 * Read tramr array
 
-      call accres(' ','tramr','RF',nyp,%VAL(d_trptr),' ',status)
+      call accres(' ','tramr','RF',nyp,%VAL( CNF_PVAL(d_trptr) ),' ',
+     :            status)
 
 * Read mask array
 
-      call accres(' ','mask','RS',nyp*nxp*spdim2,%VAL(d_mptr),
-     :     ' ',status)
+      call accres(' ','mask','RS',nyp*nxp*spdim2,
+     :            %VAL( CNF_PVAL(d_mptr) ),' ',status)
 
 * Read template structure
 
@@ -203,7 +205,7 @@
 
 * Start by getting number of lines
 
-      call get_lincnt(%VAL(d_tlptr),line_count,nyp)
+      call get_lincnt(%VAL( CNF_PVAL(d_tlptr) ),line_count,nyp)
 
 * Now copy over results and control arrays
 

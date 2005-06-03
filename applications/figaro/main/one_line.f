@@ -133,6 +133,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
 * Given
@@ -254,7 +255,7 @@
       masked = .false.
 
       call check_masking(line,istartx,iendx,istarty,iendy,masked,
-     :       %VAL(d_mptr))
+     :       %VAL( CNF_PVAL(d_mptr) ))
 
 * if not masked out check to see if possible to make an improvement
 * on the existing fit
@@ -264,7 +265,7 @@
       if ((.not.masked).or.manual) then
 
         call check_statii(line,fit,nold,control,istartx,iendx,istarty,
-     :            iendy,%VAL(staptr))
+     :            iendy,%VAL( CNF_PVAL(staptr) ))
 
 *.............  Fit the line.................
 
@@ -342,9 +343,9 @@
 
           if(stores) then
             call store_results(fitpar,fiterr,nnew,nfailed,line,
-     :           istartx,iendx,deccntr,odensc,%VAL(d_rptr),
-     :           %VAL(d_vptr),%VAL(staptr),
-     :           %VAL(d_mptr),istarty,iendy,aic)
+     :           istartx,iendx,deccntr,odensc,%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(staptr) ),
+     :           %VAL( CNF_PVAL(d_mptr) ),istarty,iendy,aic)
           end if
 
           if (manual) then

@@ -49,6 +49,7 @@
       integer status
       include 'arc_dims'
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       logical ifsoft
       logical ifcomb
 
@@ -107,10 +108,11 @@
           ptr2=ptr1+nxp*mgauss*VAL__NBR
           ptr3=ptr2+nxp*mgauss*VAL__NBR
           ptr4=ptr3+nxp*mgauss*VAL__NBR
-          call plotvel(%VAL(d_rptr),%VAL(d_vptr),
+          call plotvel(%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),
 *     :            dynamic_mem(staptr),dynamic_chars(idsptr:idsend)
-     :            %VAL(staptr),idstring
-     :           ,%VAL(d_wptr),dynamic_mem(ptr1),
+     :           %VAL( CNF_PVAL(staptr) ),idstring,
+     :           %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
      :           dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
      :           .false.,0,0.0,ifsoft,
      :           par_quest('Show fits with NAG errors?',.false.),ifcomb,
@@ -126,8 +128,9 @@
           ptr2=ptr1+nyp*VAL__NBR
           ptr3=ptr2+nyp*VAL__NBR
           ptr4=ptr3+nyp*VAL__NBR
-          call diagnosis_plt(%VAL(d_rptr),%VAL(d_vptr),
-     :           %VAL(staptr),get_parnum('Width_1'),
+          call diagnosis_plt(%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),
+     :           %VAL( CNF_PVAL(staptr) ),get_parnum('Width_1'),
      :           get_parnum('Centre_1'),'Linewidth v. centre','Centre'
      :           ,'Width',.true.,dynamic_mem(ptr1),dynamic_mem(ptr2),
      :           dynamic_mem(ptr3),dynamic_mem(ptr4),ifsoft)
@@ -142,8 +145,9 @@
           ptr2=ptr1+nyp*VAL__NBR
           ptr3=ptr2+nyp*VAL__NBR
           ptr4=ptr3+nyp*VAL__NBR
-          call diagnosis_plt(%VAL(d_rptr),%VAL(d_vptr),
-     :           %VAL(staptr),(-get_parnum('Centre_1')),
+          call diagnosis_plt(%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),
+     :           %VAL( CNF_PVAL(staptr) ),(-get_parnum('Centre_1')),
      :           get_parnum('Height_1'),'Error on centre v. height',
      :           'Height','Error on centre',.false.,dynamic_mem(ptr1),
      :           dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),

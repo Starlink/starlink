@@ -47,6 +47,7 @@
 * -------------------------------------------------------------------
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 *  Common Blocks Referenced:-
 *
@@ -229,12 +230,12 @@
 *     loop over the lines
 
           do line=1,line_count
-            call one_line(nwindow,%VAL(d_tlptr),
-     :         %VAL(d_trptr),istartx,iendx,nfit,
-*     :         dynamic_chars(idsptr:idsend),%VAL(d_cptr),line,
-     :         idstring,%VAL(d_cptr),line,
-     :         nnew,nold,nfailed,maskedout,.true.,.false.,dummy,istarty
-     :         ,iendy,status)
+            call one_line(nwindow,%VAL( CNF_PVAL(d_tlptr) ),
+     :         %VAL( CNF_PVAL(d_trptr) ),istartx,iendx,nfit,
+*     :         dynamic_chars(idsptr:idsend),%VAL( CNF_PVAL(d_cptr) ),line,
+     :         idstring,%VAL( CNF_PVAL(d_cptr) ),line,
+     :         nnew,nold,nfailed,maskedout,.true.,.false.,dummy,
+     :         istarty,iendy,status)
             if(status.ne.SAI__OK) return
 
 *     ...of inner loop
@@ -267,7 +268,7 @@
 *                          END OF MAIN LOOP
 * ----------------------------------------------------------------------
       iteration = iteration + 1
-      call updtmsk(%VAL(staptr),%VAL(d_mptr))
+      call updtmsk(%VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ))
 *
 *  Send useful diagnostics to user
 *

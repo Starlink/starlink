@@ -30,6 +30,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real left(nyp)
       real right(nyp)
@@ -96,9 +97,9 @@
 * Fill output file
 
       call fill_out(dynamic_mem(outptr),dims(1),line,
-     :            %VAL(staptr),%VAL(d_rptr),
-     :            %VAL(d_vptr),dynamic_mem(outxptr),left(line),
-     :            right(line))
+     :            %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_rptr) ),
+     :            %VAL( CNF_PVAL(d_vptr) ),dynamic_mem(outxptr),
+     :            left(line),right(line))
 
 * Unmap arrays and close file
 

@@ -35,6 +35,7 @@
 *- -------------------------------------------------------------
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       real val,value
@@ -51,7 +52,7 @@
 
 * Get previously located number of lines
 
-      call get_lincnt(%VAL(d_tlptr),line_count,nyp)
+      call get_lincnt(%VAL( CNF_PVAL(d_tlptr) ),line_count,nyp)
 
       if(batch)then
         write(chars,'(a,i4)') 'Current value of iteration = ',

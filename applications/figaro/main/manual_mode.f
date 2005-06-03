@@ -106,6 +106,7 @@
 *  TNW: 14-MAR-1994, return values from WIDTH option of menu to here
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       character*10 line_name(line_count)
       real left(line_count)
@@ -227,7 +228,7 @@
 
 *  Choose which line to start with-first display a list
 
-         call list_lines(line_count,%VAL(d_wptr),line_name)
+         call list_lines(line_count,%VAL( CNF_PVAL(d_wptr) ),line_name)
 
          qstat = par_qnum('Enter starting line number',1.0,
      :        real(line_count),real(line),.true.,' ',value)
@@ -320,8 +321,9 @@
 *   Check fits
 
          else if(ib.eq.OPT_CHECK) then
-            call quick_plot(%VAL(d_rptr),%VAL(d_vptr),
-     :           %VAL(staptr),line_name,
+            call quick_plot(%VAL( CNF_PVAL(d_rptr) ),
+     :           %VAL( CNF_PVAL(d_vptr) ),
+     :           %VAL( CNF_PVAL(staptr) ),line_name,
      :           par_quest('Show fits with fitting errors?',.false.),
      :           line,par_quest('Softcopy plot?',.true.),
      :           par_quest('Plot all lines?',.true.),status)
@@ -381,17 +383,17 @@
 
 *     produce a hardcopy plot
 
-            call hardcopy_plot(%VAL(staptr),%VAL(d_rptr),
-     :           %VAL(d_vptr),line,istartx,iendx,istarty,iendy,
-     :           line_name,status)
+            call hardcopy_plot(%VAL( CNF_PVAL(staptr) ),
+     :           %VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
+     :           line,istartx,iendx,istarty,iendy,line_name,status)
 
          else if(ib.eq.OPT_DEL) then
 
 *   delete fits in range
 
             if(par_quest('Are you sure?',.false.)) then
-               call delete_fit(%VAL(staptr),ncntrl,nyp,nxp
-     :              ,istartx,iendx,line)
+               call delete_fit(%VAL( CNF_PVAL(staptr) ),ncntrl,nyp,nxp,
+     :              istartx,iendx,line)
             end if
             redraw = .false.
          else if(ib.eq.OPT_OLD) then
@@ -401,11 +403,12 @@
             if(pltold) then
                pltold = .false.
             else
-               if(plot_old_fit(%VAL(d_rptr),%VAL(d_vptr),
+               if(plot_old_fit(%VAL( CNF_PVAL(d_rptr) ),
+     :              %VAL( CNF_PVAL(d_vptr) ),
      :              line,istartx,iendx,istarty,iendy,samblk,.true.,
-     :              %VAL(staptr))) then
-                  redraw = par_quest('Replot current data?',(.not.samblk
-     :                 ))
+     :              %VAL( CNF_PVAL(staptr) ))) then
+                  redraw = par_quest('Replot current data?',
+     :                     (.not.samblk))
                else
                   redraw = .false.
                end if
@@ -534,8 +537,8 @@
             call encode_contrl(deccntr,ncntrl,fit_status)
             do j = istarty,iendy
                do i = istartx,iendx
-                  call set_control(%VAL(d_cptr),line,i,j
-     :                 ,fit_status)
+                  call set_control(%VAL( CNF_PVAL(d_cptr) ),line,i,j,
+     :                 fit_status)
                end do
             end do
             nfit = nfit + 1
@@ -547,9 +550,9 @@
 *       Proceede with model fit
 
                call one_line(nwindx,left,right,istartx,iendx,nfit,
-     :              line_name,%VAL(d_cptr),line,nnew,nold,nfailed
-     :              ,maskedout,.false.,.true.,redraw,istarty,iendy
-     :              ,status)
+     :              line_name,%VAL( CNF_PVAL(d_cptr) ),line,nnew,nold,
+     :              nfailed,maskedout,.false.,.true.,redraw,istarty,
+     :              iendy,status)
             else
                redraw = .false.
             end if
@@ -616,7 +619,8 @@
             iteration = iteration + 1
             write (chars,'(''Iteration now'',i3)') iteration
             call par_wruser(chars,pstat)
-            call updtmsk(%VAL(staptr),%VAL(d_mptr))
+            call updtmsk(%VAL( CNF_PVAL(staptr) ),
+     :                   %VAL( CNF_PVAL(d_mptr) ))
          end if
       end if
       end

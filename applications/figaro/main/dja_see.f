@@ -67,6 +67,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       integer line
@@ -183,8 +184,8 @@
 
 * display the window
 
-            call disp_window(%VAL(d_tlptr),
-     :           %VAL(d_trptr),line,dynamic_mem(d_xptr),
+            call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
+     :           %VAL( CNF_PVAL(d_trptr) ),line,dynamic_mem(d_xptr),
      :           dynamic_mem(d_vsptr),wavdim)
 
 *   redraw
@@ -212,8 +213,8 @@
      :           ,prvfit,usepeak,bimtst,tyaic,curmcmp,prvpos,mgauss
      :           ,line_count,errpre,inherit,status)
             if(redraw) then
-               call disp_window(%VAL(d_tlptr),
-     :              %VAL(d_trptr),line,dynamic_mem(d_xptr),
+               call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
+     :              %VAL( CNF_PVAL(d_trptr) ),line,dynamic_mem(d_xptr),
      :              dynamic_mem(d_vsptr),wavdim)
             end if
 
@@ -221,7 +222,8 @@
 
             call encode_contrl(deccntr,ncntrl,fit_status)
             do i = ixstart,ixend
-               call set_control(%VAL(d_cptr),line,i,1,fit_status)
+               call set_control(%VAL( CNF_PVAL(d_cptr) ),line,i,1,
+     :                          fit_status)
             end do
             nfit = nfit + 1
             if(instant) then
@@ -229,10 +231,10 @@
 * proceede with model fit
 
                see_nwindow=ixend-ixstart+1
-               call one_line(see_nwindow,%VAL(d_tlptr),
-     :              %VAL(d_trptr),ixstart,ixend,nfit,line_name,
-     :              %VAL(d_cptr),line,nnew,nold,nfailed,maskedout
-     :              ,.false.,.true.,redraw,1,1,status)
+               call one_line(see_nwindow,%VAL( CNF_PVAL(d_tlptr) ),
+     :              %VAL( CNF_PVAL(d_trptr) ),ixstart,ixend,nfit,
+     :              line_name,%VAL( CNF_PVAL(d_cptr) ),line,nnew,nold,
+     :              nfailed,maskedout,.false.,.true.,redraw,1,1,status)
             else
                redraw=.false.
             end if

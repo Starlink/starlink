@@ -48,6 +48,7 @@
 * Input
 
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *-
       integer status
       logical ifcomb
@@ -127,10 +128,11 @@
 * handle. N.B. PTR1-3 are for workspace only within the routines called
 * here, the values of the arrays on entry are not used anywhere.
 
-      call extr_pos(%VAL(d_rptr),%VAL(d_vptr),
-     :      %VAL(staptr),dynamic_mem(cpxptr),dynamic_mem(cpyptr),
-     :     dynamic_mem(npts),ylim,%VAL(d_aptr),dynamic_mem(w2ptr)
-     :      ,dynamic_mem(d_xptr),notherax,dynamic_mem(ptr1))
+      call extr_pos(%VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
+     :      %VAL( CNF_PVAL(staptr) ),dynamic_mem(cpxptr),
+     :      dynamic_mem(cpyptr), dynamic_mem(npts),ylim,
+     :      %VAL( CNF_PVAL(d_aptr) ),dynamic_mem(w2ptr),
+     :      dynamic_mem(d_xptr),notherax,dynamic_mem(ptr1))
       if(batch) then
         call gr_hard(status)
       else

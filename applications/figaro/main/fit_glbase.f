@@ -76,6 +76,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'status_inc'
       include 'arc_dims'
@@ -137,8 +138,8 @@
 
         kp1 = deccntr(back_order) + 1
         if(kp1.gt.MAX_KPLUS1) then
-          call par_wruser('Error, order too high, setting to maximum'
-     :            ,pstat)
+          call par_wruser('Error, order too high, setting to maximum',
+     :         pstat)
           kp1 = MAX_KPLUS1
         end if
 
@@ -158,9 +159,9 @@
         xin = ptr0
         yin = xin + wavdim*val__nbd
         dbase = yin + wavdim*val__nbd
-        call spline_base(wavdim,sdata,dynamic_mem(d_vsptr),line_count
-     :        ,%VAL(d_tlptr),%VAL(d_trptr),m,adata,
-     :        dynamic_mem(dbase),status,dynamic_mem(xin),
+        call spline_base(wavdim,sdata,dynamic_mem(d_vsptr),line_count,
+     :        %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),m,
+     :        adata,dynamic_mem(dbase),status,dynamic_mem(xin),
      :        dynamic_mem(yin),dynamic_mem(d_xptr))
         status = cnv_fmtcnv('double','real',dynamic_mem(dbase),
      :               dynamic_mem(vbase),m,nbad)

@@ -80,6 +80,7 @@
       implicit none
       include 'SAE_PAR'
       integer status
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'status_inc'
       real results(mxpars,nyp,nxp)
@@ -152,7 +153,7 @@
               masked = .false.
 
               call check_masking(line,istarty,iendy,1,1,masked,
-     :                  %VAL(d_mptr))
+     :                  %VAL( CNF_PVAL(d_mptr) ))
 
 * if not masked out check to see if possible to make an improvement
 * on the existing fit
@@ -162,11 +163,11 @@
 
               fit = .false.
               call check_statii(line,fit,d1,control,istarty,iendy,1,1,
-     :                  %VAL(staptr))
+     :                  %VAL( CNF_PVAL(staptr) ))
 
               if(fit.and.(.not.masked)) then
                 call getres(results,tline,xsect,1,fit_parms,deccntr,
-     :                  odensc,%VAL(staptr),fstatus)
+     :                  odensc,%VAL( CNF_PVAL(staptr) ),fstatus)
 
 *           If fit not ok to use, getres will have set ftype to 0
 
@@ -244,8 +245,8 @@
                   nnew=nnew+1
                   call store_results(fit_parms,fit_error,nnew,nfailed,
      :                line,istarty,iendy,deccntr,odensc,results,resvar,
-     :                %VAL(staptr),%VAL(d_mptr),1,1,
-     :                VAL__BADR)
+     :                %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ),
+     :                1,1,VAL__BADR)
 
 *           fit present and ok
 
@@ -280,5 +281,5 @@
 * Update itteration
 
       iteration = iteration + 1
-      call updtmsk(%VAL(staptr),%VAL(d_mptr))
+      call updtmsk(%VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ))
       end

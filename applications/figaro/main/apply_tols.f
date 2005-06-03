@@ -5,8 +5,10 @@
 
 * Invocation:
 *    CALL APPLY_TOLS(IFARC,STATUS)
+*
 * Purpose:
 *    Test fits against current tolerances
+*
 * Description:
 *    Apply tolerances to a results cube. If called interactively the
 *    user is given the option of altering the values used. Bad fits are
@@ -50,6 +52,7 @@
       logical ifarc
       integer status
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer istore,jstore
       integer pstat
       logical apply
@@ -151,8 +154,8 @@
           do istore = 1 ,spdim1
             do line = 1 ,line_count
               call check_tols(line,istore,jstore,nreject,ifarc,
-     :            %VAL(d_wptr),%VAL(d_rptr),
-     :            %VAL(staptr),%VAL(d_vptr))
+     :            %VAL( CNF_PVAL(d_wptr) ),%VAL( CNF_PVAL(d_rptr) ),
+     :            %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_vptr) ))
             end do
           end do
         end do
@@ -171,6 +174,6 @@
           call chr_putc(' fits rejected',chars,len1)
           call par_wruser(chars(:len1),pstat)
         end if
-        call updtmsk(%VAL(staptr),%VAL(d_mptr))
+        call updtmsk(%VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ))
       end if
       end

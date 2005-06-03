@@ -63,6 +63,7 @@
       include 'arc_dims'
       include 'opt_cmn'
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real results(mxpars,nyp,spdim1,spdim2)
       real resvar(mxpars,nyp,spdim1,spdim2)
       integer fitsta(ncntrl,nyp,spdim1,spdim2)
@@ -212,7 +213,7 @@
         call output_fit(fitsta,results,resvar,ix,iy,line,deccntr,-1,
 *     :       .true.,.true.,dynamic_chars(idsptr:idsend),
      :       .true.,.true.,idstring,
-     :       %VAL(d_wptr),.false.)
+     :       %VAL( CNF_PVAL(d_wptr) ),.false.)
         cstat = deccntr(FIT_STAT)
         if((cstat.eq.1).or.(cstat.eq.2).or.(cstat.eq.5)) then
           if(deccntr(FIT_NCMP).ge.1) then
@@ -264,8 +265,8 @@
 *       Perform the plotting
 
           call line_plot(fit_parms,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),%VAL(d_tlptr),
-     :         %VAL(d_trptr),line,deccntr,replot,.true.,
+     :         dynamic_mem(d_vsptr),%VAL( CNF_PVAL(d_tlptr) ),
+     :         %VAL( CNF_PVAL(d_trptr) ),line,deccntr,replot,.true.,
      :         first_ix,nwindx,status)
 
 *   fit a success or nag error

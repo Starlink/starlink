@@ -24,6 +24,7 @@
 *
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
 *- ---------------------------------------------------------------------
       integer status
@@ -49,7 +50,7 @@
       if(status.ne.SAI__OK) return
       ptr2 = ptr1 + line_count*VAL__NBR
       call comb_window(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),nbls,
-     :      nwindow,%VAL(d_tlptr),%VAL(d_trptr),xstart,
-     :      xend,dynamic_mem(ptr1),dynamic_mem(ptr2))
+     :      nwindow,%VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
+     :      xstart,xend,dynamic_mem(ptr1),dynamic_mem(ptr2))
       call dsa_free_workspace(slot,status)
       end

@@ -33,6 +33,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer lincnt, dummy_array
       double precision waves(lincnt)
       double precision chans(lincnt)
@@ -45,7 +46,7 @@
       CALL PSX_CALLOC(lincnt, '_DOUBLE', dummy_array, status )
 * fill it with `waves'
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL COPD2D( LINCNT, waves, %VAL( dummy_array ))
+         CALL COPD2D( LINCNT, waves, %VAL( CNF_PVAL( dummy_array ) ))
       ELSE
          RETURN
       END IF
@@ -57,11 +58,12 @@
          write(chars,'(''PDA error '',i1,'' (PDA_DSORT)'')')STATUS
          call par_wruser(chars,status)
       ENDIF
-      CALL PDA_DSORT( %VAL( DUMMY_ARRAY ), w, lincnt, 2, STATUS )
+      CALL PDA_DSORT( %VAL( CNF_PVAL( DUMMY_ARRAY ) ), w, lincnt, 2,
+     :                STATUS )
       IF( STATUS .NE. 0 ) THEN
          write(chars,'(''PDA error '',i1,'' (PDA_DSORT)'')')STATUS
          call par_wruser(chars,status)
-      ENDIF
+      END IF
 
       CALL PSX_FREE( dummy_array, STATUS )
 

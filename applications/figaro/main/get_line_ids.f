@@ -74,6 +74,7 @@
       logical new
       character*28 setup_fail(2)
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
       include 'opt_cmn'
       character dynamic_chars
@@ -278,7 +279,7 @@ C             print *,'out setup_arc'
 * information
 
       if((status.eq.SAI__OK).and.(.not.new)) then
-        call list_lines(line_count,%VAL(d_wptr),
+        call list_lines(line_count,%VAL( CNF_PVAL(d_wptr) ),
 *     :            dynamic_chars(idsptr:idsend))
      :            idstring)
       end if
