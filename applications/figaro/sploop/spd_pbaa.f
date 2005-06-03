@@ -58,11 +58,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     29 Apr 1994 (hme):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,6 +78,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_PCOM'         ! Specdre SPLOOP common block
@@ -123,10 +127,10 @@
       END IF
 
 *  Work out bottom viewport windows.
-      CALL SPD_PEAAR( .FALSE., NDATA, %VAL(XDAT),
-     :   SPWIN(1), SPWIN(2), STATUS )
-      CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YBIN),
-     :   SPWIN(3), SPWIN(4), STATUS )
+      CALL SPD_PEAAR( .FALSE., NDATA, %VAL( CNF_PVAL(XDAT) ),
+     :                SPWIN(1), SPWIN(2), STATUS )
+      CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YBIN) ),
+     :                SPWIN(3), SPWIN(4), STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
       DELTA = SPWIN(2) - SPWIN(1)
       SPWIN(1) = SPWIN(1) - DELTA / 40.

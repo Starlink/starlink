@@ -86,11 +86,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     29 Apr 1994 (hme):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,6 +106,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_PCOM'         ! Specdre SPLOOP common block
@@ -177,23 +181,27 @@
 *  model minus data minus error, model minus data plus error.
 *  This must be done at a lower level, since we have pointers only.
       IF ( MODX .AND. VARXST ) THEN
-         CALL MODF( NDATA, %VAL(XDAT), NPAR, MODPAR,
-     :      %VAL(YERU), STATUS )
-         CALL VEC_SUBR( .TRUE., NDATA, %VAL(YBIN), %VAL(YERU),
-     :      %VAL(YCRS), I, J, STATUS )
-         CALL VEC_SQRTR( .TRUE., NDATA, %VAL(YVAR),
-     :      %VAL(YERU), I, J, STATUS )
-         CALL VEC_SUBR( .TRUE., NDATA, %VAL(YCRS), %VAL(YERU),
-     :      %VAL(YERL), I, J, STATUS )
-         CALL VEC_ADDR( .TRUE., NDATA, %VAL(YERU), %VAL(YCRS),
-     :      %VAL(YERU), I, J, STATUS )
-      ELSE IF ( MODX ) THEN
-         CALL MODF( NDATA, %VAL(XDAT), NPAR, MODPAR,
-     :      %VAL(YCRS), STATUS )
-         CALL VEC_SUBR( .TRUE., NDATA, %VAL(YBIN), %VAL(YCRS),
-     :      %VAL(YCRS), I, J, STATUS )
-      END IF
+         CALL MODF( NDATA, %VAL( CNF_PVAL(XDAT) ), NPAR, MODPAR,
+     :              %VAL( CNF_PVAL(YERU) ), STATUS )
+         CALL VEC_SUBR( .TRUE., NDATA, %VAL( CNF_PVAL(YBIN) ),
+     :                   %VAL( CNF_PVAL(YERU) ),
+     :                   %VAL( CNF_PVAL(YCRS) ), I, J, STATUS )
+         CALL VEC_SQRTR( .TRUE., NDATA, %VAL( CNF_PVAL(YVAR) ),
+     :                   %VAL( CNF_PVAL(YERU) ), I, J, STATUS )
+         CALL VEC_SUBR( .TRUE., NDATA, %VAL( CNF_PVAL(YCRS) ),
+     :                   %VAL( CNF_PVAL(YERU) ),
+     :                   %VAL( CNF_PVAL(YERL) ), I, J, STATUS )
+         CALL VEC_ADDR( .TRUE., NDATA, %VAL( CNF_PVAL(YERU) ),
+     :                   %VAL( CNF_PVAL(YCRS) ),
+     :                   %VAL( CNF_PVAL(YERU) ), I, J, STATUS )
 
+      ELSE IF ( MODX ) THEN
+         CALL MODF( NDATA, %VAL( CNF_PVAL(XDAT) ), NPAR, MODPAR,
+     :              %VAL( CNF_PVAL(YCRS) ), STATUS )
+         CALL VEC_SUBR( .TRUE., NDATA, %VAL( CNF_PVAL(YBIN) ),
+     :                  %VAL( CNF_PVAL(YCRS) ),
+     :                  %VAL( CNF_PVAL(YCRS) ), I, J, STATUS )
+      END IF
 
 *  Work out top viewport y window.
 *  ===============================
@@ -210,21 +218,21 @@
 
 *        If error bars exist (and linear curve).
             IF ( MODX .AND. VARXST ) THEN
-               CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YERL),
-     :            RMIN, RMAX, STATUS )
+               CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YERL) ),
+     :                         RMIN, RMAX, STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 500
                SPWIN(5) = MIN( SPWIN(5), RMIN )
                SPWIN(6) = MAX( SPWIN(6), RMAX )
-               CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YERU),
-     :            RMIN, RMAX, STATUS )
+               CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YERU) ),
+     :                         RMIN, RMAX, STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 500
                SPWIN(5) = MIN( SPWIN(5), RMIN )
                SPWIN(6) = MAX( SPWIN(6), RMAX )
 
 *        Else if crosses exist (and linear curve but not error bars).
             ELSE IF ( MODX ) THEN
-               CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YCRS),
-     :            RMIN, RMAX, STATUS )
+               CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YCRS) ),
+     :                         RMIN, RMAX, STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 500
                SPWIN(5) = MIN( SPWIN(5), RMIN )
                SPWIN(6) = MAX( SPWIN(6), RMAX )
@@ -232,18 +240,18 @@
 
 *     Else if error bars exist (but no linear curve).
          ELSE IF ( MODX .AND. VARXST ) THEN
-            CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YERL),
-     :         SPWIN(5), SPWIN(6), STATUS )
-            CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YERU),
-     :         RMIN, RMAX, STATUS )
+            CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YERL) ),
+     :                      SPWIN(5), SPWIN(6), STATUS )
+            CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YERU) ),
+     :                      RMIN, RMAX, STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
             SPWIN(5) = MIN( SPWIN(5), RMIN )
             SPWIN(6) = MAX( SPWIN(6), RMAX )
 
 *     Else if crosses exist (but neither linear curve nor error bars).
          ELSE IF ( MODX ) THEN
-            CALL SPD_PEAAR( .TRUE., NDATA, %VAL(YCRS),
-     :         SPWIN(5), SPWIN(6), STATUS )
+            CALL SPD_PEAAR( .TRUE., NDATA, %VAL( CNF_PVAL(YCRS) ),
+     :                      SPWIN(5), SPWIN(6), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *     Else (nothing to draw in top viewport).
@@ -280,8 +288,10 @@
 *     Plot crosses and error bars.
          IF ( MODX )
      :      CALL SPD_PEAC( VARXST, .FALSE., .FALSE., .FALSE., MODX,
-     :         1, 5, NDATA, %VAL(XDAT), %VAL(YCRS),
-     :         %VAL(YERL), %VAL(YERU), 0., 0., STATUS )
+     :                     1, 5, NDATA, %VAL( CNF_PVAL(XDAT) ),
+     :                     %VAL( CNF_PVAL(YCRS) ),
+     :                      %VAL( CNF_PVAL(YERL) ),
+     :                      %VAL( CNF_PVAL(YERU) ), 0., 0., STATUS )
 
 *     Plot line.
          IF ( MODX2 )
@@ -304,12 +314,13 @@
 
 *  Plot the bin-style curve.
       CALL SPD_PEAC( .FALSE., .FALSE., .FALSE., SPXST, .FALSE., 1, 0,
-     :   NDATA, %VAL(XDAT), %VAL(YBIN), 0., 0., 0., 0., STATUS )
+     :               NDATA, %VAL( CNF_PVAL(XDAT) ),
+     :               %VAL( CNF_PVAL(YBIN) ), 0., 0., 0., 0., STATUS )
 
 *  Plot dashed curve.
       IF ( MODX )
      :   CALL SPD_PEAC( .FALSE., .FALSE., MODX, .FALSE., .FALSE., 2, 0,
-     :      FITRES, XFIT, YDSH, 0., 0., 0., 0., STATUS )
+     :                  FITRES, XFIT, YDSH, 0., 0., 0., 0., STATUS )
 
 *  Plot mask pedestals.
       MASKY = 0.975 * SPWIN(3) + 0.025 * SPWIN(4)

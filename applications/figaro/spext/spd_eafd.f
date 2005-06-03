@@ -77,11 +77,14 @@
 
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     02-JUL-1992 (HME):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,7 +99,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
-      INCLUDE 'SPD_EPAR'           ! Specdre Extension parameters
+      INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -186,7 +190,7 @@
          CALL SPD_EAED( BNDF, XLOC, 'READ', TYPE, LABEL, UNITS,
      :      TPNTR, TNDF, BNELM, STATUS )
          CALL NDF_ANNUL( BNDF, STATUS )
-         CALL SPD_EAFG( NDF, TYPE, BNELM, %VAL(TPNTR),
+         CALL SPD_EAFG( NDF, TYPE, BNELM, %VAL( CNF_PVAL(TPNTR) ),
      :      PNTR, ONDF, NELM, STATUS )
          CALL NDF_ANNUL( TNDF, STATUS )
 
@@ -206,7 +210,8 @@
          CALL NDF_BASE( NDF, BNDF, STATUS )
          CALL SPD_EAED( BNDF, XLOC, 'READ', TYPE, LABEL, UNITS,
      :      TPNTR, TNDF, BNELM, STATUS )
-         CALL SPD_EAFF( BNDF, XLOC, TYPE, BNELM, %VAL(TPNTR), STATUS )
+         CALL SPD_EAFF( BNDF, XLOC, TYPE, BNELM,
+     :                  %VAL( CNF_PVAL(TPNTR) ), STATUS )
          CALL NDF_ANNUL( TNDF, STATUS )
          CALL NDF_ANNUL( BNDF, STATUS )
 

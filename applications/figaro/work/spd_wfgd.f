@@ -130,6 +130,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +147,8 @@
 *        Renamed from SPFGAU, common block in include file.
 *     15 Mar 1995 (hme):
 *        Replace E04DGF/E04DKF with PDA_UNCMND.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +161,7 @@
 
 *  Global Variables:
       INCLUDE 'SPD_WFCM'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FITPAR
@@ -172,17 +176,16 @@
 *  information in the SPD_WFCM common block. The extra layer is
 *  necessary, since the common block contains a pointer to a
 *  variable-size array.
-      CALL SPD_WFGE( FITPAR, PAR1, FVAL,
-     :   NDATA, %VAL(DATAP),
-     :   NCOMP, DCONT, FSCALE, PARNO, PARFLG, PAR0 )
+      CALL SPD_WFGE( FITPAR, PAR1, FVAL, NDATA,
+     :               %VAL( CNF_PVAL(DATAP) ), NCOMP, DCONT, FSCALE,
+     :               PARNO, PARFLG, PAR0 )
 
       END
 
 
 
 
-      SUBROUTINE SPD_WFGE( FITPAR, PAR1, FVAL,
-     :   NDATA, MSKXDW,
+      SUBROUTINE SPD_WFGE( FITPAR, PAR1, FVAL, NDATA, MSKXDW,
      :   NCOMP, DCONT, FSCALE, PARNO, PARFLG, PAR0 )
       
 *  Type Definitions:

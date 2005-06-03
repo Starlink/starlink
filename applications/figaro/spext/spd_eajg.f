@@ -51,6 +51,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Use grow routine properly.
 *     30 Jan 1995 (hme):
 *        Remove unused variables STA/ENDPIX.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -187,10 +191,12 @@
 *     Now grow from the source to the target, filling the target.
          IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
             CALL SPD_EBAAD( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :         NELM(1), %VAL(INDAT), %VAL(PNTR(1)), STATUS )
+     :                      NELM(1), %VAL( CNF_PVAL(INDAT) ),
+     :                      %VAL( CNF_PVAL(PNTR(1) )), STATUS )
          ELSE
             CALL SPD_EBAAR( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :         NELM(1), %VAL(INDAT), %VAL(PNTR(1)), STATUS )
+     :                      NELM(1), %VAL( CNF_PVAL(INDAT) ),
+     :                      %VAL( CNF_PVAL(PNTR(1) )), STATUS )
          END IF
 
 *     Unmap the source data.
@@ -213,10 +219,12 @@
 
          IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
             CALL SPD_EBAAD( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :         NELM(2), %VAL(INDAT), %VAL(PNTR(2)), STATUS )
+     :                      NELM(2), %VAL( CNF_PVAL(INDAT) ),
+     :                      %VAL( CNF_PVAL(PNTR(2) )), STATUS )
          ELSE
             CALL SPD_EBAAR( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :         NELM(2), %VAL(INDAT), %VAL(PNTR(2)), STATUS )
+     :                      NELM(2), %VAL( CNF_PVAL(INDAT) ),
+     :                      %VAL( CNF_PVAL(PNTR(2) )), STATUS )
          END IF
 
 *     Unmap the source data.

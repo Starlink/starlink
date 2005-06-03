@@ -22,11 +22,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     29 Apr 1994 (hme):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -39,6 +42,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_PCOM'         ! Specdre SPLOOP common block
@@ -75,8 +79,8 @@
 
 *  Greyscale display.
 *  All arguments are up to date in the common block.
-      CALL PGGRAY( %VAL(IMAGE), IMDIM(1), IMDIM(2),
-     :   1, IMDIM(1), 1, IMDIM(2), IMRNG(2), IMRNG(1), IMZOOM )
+      CALL PGGRAY( %VAL( CNF_PVAL(IMAGE) ), IMDIM(1), IMDIM(2), 1,
+     :             IMDIM(1), 1, IMDIM(2), IMRNG(2), IMRNG(1), IMZOOM )
 
 *  Draw box.
 *  This draws a simple box with automatic outward ticks and NDF pixel index

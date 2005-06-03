@@ -39,6 +39,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +54,8 @@
 *        two axes. Before an error would result in finding the label,
 *        units, or centres of an axis beyond the dimensionality of the
 *        NDF. Now use 'unknown', 'unknown', 0.5 for COORD.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -232,10 +236,12 @@
 *        Then grow from the source to the target, filling the target.
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
                CALL SPD_EBAAD( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :            ONELM, %VAL(INDAT), %VAL(OUTDAT), STATUS )
+     :                         ONELM, %VAL( CNF_PVAL(INDAT) ),
+     :                         %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             ELSE
                CALL SPD_EBAAR( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :            ONELM, %VAL(INDAT), %VAL(OUTDAT), STATUS )
+     :                         ONELM, %VAL( CNF_PVAL(INDAT) ),
+     :                         %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             END IF
 
 *        And unmap the source data.
@@ -250,10 +256,10 @@
 *        the target.
             IF ( TYPE(1) .EQ. '_DOUBLE' ) THEN
                CALL SPD_EBAAD( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :            ONELM, 0.5D0, %VAL(OUTDAT), STATUS )
+     :            ONELM, 0.5D0, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             ELSE
                CALL SPD_EBAAR( NDF__MXDIM, AXIS(1), ODIM, LDIM(AXIS(1)),
-     :            ONELM, 0.5, %VAL(OUTDAT), STATUS )
+     :            ONELM, 0.5, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             END IF
 
          END IF
@@ -281,19 +287,21 @@
      :         INDAT, LDIM(AXIS(2)), STATUS )
             IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
                CALL SPD_EBAAD( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :            ONELM, %VAL(INDAT), %VAL(OUTDAT), STATUS )
+     :                         ONELM, %VAL( CNF_PVAL(INDAT) ),
+     :                         %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             ELSE
                CALL SPD_EBAAR( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :            ONELM, %VAL(INDAT), %VAL(OUTDAT), STATUS )
+     :                         ONELM, %VAL( CNF_PVAL(INDAT) ),
+     :                         %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             END IF
             CALL NDF_AUNMP( BNDF, 'CENTRE', AXIS(2), STATUS )
          ELSE
             IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
                CALL SPD_EBAAD( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :            ONELM, 0.5D0, %VAL(OUTDAT), STATUS )
+     :             ONELM, 0.5D0, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             ELSE
                CALL SPD_EBAAR( NDF__MXDIM, AXIS(2), ODIM, LDIM(AXIS(2)),
-     :            ONELM, 0.5, %VAL(OUTDAT), STATUS )
+     :            ONELM, 0.5, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
             END IF
          END IF
 

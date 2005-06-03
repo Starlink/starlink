@@ -60,11 +60,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     29 Apr 1994 (hme):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,6 +80,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_PCOM'         ! Specdre SPLOOP common block
@@ -155,8 +159,9 @@
             IMWIN(2) = IMZOOM(1) + FLOAT( IMDIM(1) )
             IMWIN(3) = IMZOOM(4) + 1.
             IMWIN(4) = IMZOOM(4) + FLOAT( IMDIM(2) )
-            CALL SPD_PEAAR( .FALSE., IMDIM(1)*IMDIM(2), %VAL(IMAGE),
-     :         IMRNG(1), IMRNG(2), STATUS )
+            CALL SPD_PEAAR( .FALSE., IMDIM(1)*IMDIM(2),
+     :                      %VAL( CNF_PVAL(IMAGE) ),
+     :                      IMRNG(1), IMRNG(2), STATUS )
             PLOT = .TRUE.
 
 *     Else if "C" increase contrast chosen.
@@ -164,7 +169,7 @@
             I = INT( (XKEY-IMZOOM(1))/IMZOOM(2) + 0.5 )
             J = INT( (YKEY-IMZOOM(4))/IMZOOM(6) + 0.5 )
             K = I + (J-1) * IMDIM(1)
-            ZKEY = SPD_PEABR( %VAL(IMAGE), K, STATUS )
+            ZKEY = SPD_PEABR( %VAL( CNF_PVAL(IMAGE) ), K, STATUS )
             DELTA = ( IMRNG(2) - IMRNG(1) ) / 2.
             IMRNG(1) = ZKEY - DELTA / 2.
             IMRNG(2) = ZKEY + DELTA / 2.

@@ -50,11 +50,14 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     27 Apr 1994 (hme):
 *        Original version.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'SPD_PCOM'         ! Specdre SPLOOP common block
@@ -109,8 +113,8 @@
       IMZOOM(6) = 1.0
 
 *  Work out the image data range.
-      CALL SPD_PEAAR( .FALSE., DIM1*DIM2, %VAL(IMPTR),
-     :   IMRNG(1), IMRNG(2), STATUS )
+      CALL SPD_PEAAR( .FALSE., DIM1*DIM2, %VAL( CNF_PVAL(IMPTR) ),
+     :                IMRNG(1), IMRNG(2), STATUS )
 
 *  Set flag.
       IF ( STATUS .EQ. SAI__OK ) IMXST = .TRUE.

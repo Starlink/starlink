@@ -48,6 +48,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Original version.
 *     24 Feb 1994 (hme):
 *        Make it an SPD_E* routine, and use internal routine to grow.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,7 +72,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
-      INCLUDE 'SPD_EPAR'           ! Specdre Extension parameters
+      INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -149,10 +153,10 @@
 *  Now grow from the source to the target, filling the target.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_EBAAD( NDF__MXDIM, SPAXIS, ODIM, INELM, NELM,
-     :      %VAL(INDAT), %VAL(PNTR), STATUS )
+     :      %VAL( CNF_PVAL(INDAT) ), %VAL( CNF_PVAL(PNTR) ), STATUS )
       ELSE
          CALL SPD_EBAAR( NDF__MXDIM, SPAXIS, ODIM, INELM, NELM,
-     :      %VAL(INDAT), %VAL(PNTR), STATUS )
+     :      %VAL( CNF_PVAL(INDAT) ), %VAL( CNF_PVAL(PNTR) ), STATUS )
       END IF
 
 *  Unmap the source data.

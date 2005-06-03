@@ -49,6 +49,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Original version, adapted from SPABG and SPABM.
 *     24 Feb 1994 (hme):
 *        Change to SPD_E*, call SPD_E*<T> instead of SPABJ<T>.
+*     2005 June 2 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,7 +72,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
-      INCLUDE 'SPD_EPAR'           ! Specdre Extension parameters
+      INCLUDE 'SPD_EPAR'         ! Specdre Extension parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -160,11 +164,11 @@
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL SPD_EBABD( MIN(NDF__MXDIM,7), SPAXIS,
      :      DIM(1), DIM(2), DIM(3), DIM(4), DIM(5), DIM(6), DIM(7),
-     :      SPVALS, %VAL(OUTDAT), STATUS )
+     :      SPVALS, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
       ELSE
          CALL SPD_EBABR( MIN(NDF__MXDIM,7), SPAXIS,
      :      DIM(1), DIM(2), DIM(3), DIM(4), DIM(5), DIM(6), DIM(7),
-     :      SPVALS, %VAL(OUTDAT), STATUS )
+     :      SPVALS, %VAL( CNF_PVAL(OUTDAT) ), STATUS )
       END IF
 
 *  Tidy up.
