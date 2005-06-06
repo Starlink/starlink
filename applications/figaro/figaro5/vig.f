@@ -65,6 +65,10 @@
 *-
       implicit none
 
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
 * image dimensions for axes 1 and 2
 
       integer dims(2)
@@ -161,7 +165,7 @@
 
 * FIGARO handles to VM
 
-      integer slot
+      integer slot,slot1,slot2,slot3,slot4,slot5,slot6,slot7
 
 * bytes required for r*8 array length nl
 
@@ -219,16 +223,6 @@
 
       character*25 prompt
 
-* FIGARO Dynamic Memory Handling Facilities
-
-
-* FIGARO VM handling and Mapping
-
-      integer dyn_element
-      include 'DYNAMIC_MEMORY'
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-
 * set up character prompts and Labels
 
       data prompt,axlabl,labell,axlabi,labeli/
@@ -262,15 +256,12 @@
 *  Map the data and the axis information
 *
       call dsa_map_data('output','UPDATE','float',iptr,slot,status)
-      iptr = dyn_element(iptr)
 
       call dsa_map_axis_data('output',1,'READ','double',lposptr,slot,
-     :   status)
-      lposptr = dyn_element(lposptr)
+     :                       status)
 
       call dsa_map_axis_data('output',2,'READ','double',iposptr,slot,
-     :   status)
-      iposptr = dyn_element(iposptr)
+     :                       status)
 
 *
 *  Get workspace:
@@ -282,23 +273,19 @@
 *   PTR4   400 (d)
 *   PTR5   (NL or NI)*3+60 (d)
 
-      eni         = val__nbd*ni
-      enl         = val__nbd*nl
       max_size    = max(nl,ni)
-      nels        = (4 * (ni+nl)+ 460 + max_size*2)
-
-      call getwork(nels,'double',ptr1,slot,status)
+      call dsa_get_work_array(max_size,'double',ptr1,slot1,status)
+      call dsa_get_work_array(ni,'double',ptr2,slot2,status)
+      call dsa_get_work_array(nl,'double',ptr3,slot3,status)
+      call dsa_get_work_array(nl,'double',wl,slot4,status)
+      call dsa_get_work_array(nl,'double',wi,slot5,status)
+      call dsa_get_work_array(400,'double',ptr4,slot6,status)
+      call dsa_get_work_array(max_size*3+60,'double',ptr5,slot7,status)
 
 * if failed to get WORKSPACE then abort
 
       if(status.ne.SAI__OK) goto 500
 
-      ptr2 = ptr1 + max_size*val__nbd
-      ptr3 = ptr2 + eni
-      wl   = ptr3 + enl
-      wi   = wl + enl
-      ptr4 = wi + eni
-      ptr5 = ptr4 + 400*val__nbd
       inti = ptr2
       intl = ptr3
 *
@@ -322,8 +309,8 @@
 * along the "I" and "L" axes to define 1D arrays which we
 * will fit with polynomials and thereby create the corrections
 *
-        call find_vig(dynamic_mem(iptr),ni,nl,dynamic_mem(inti),
-     :     dynamic_mem(intl))
+        call find_vig(%VAL(CNF_PVAL(iptr)),ni,nl,%VAL(CNF_PVAL(inti)),
+     :                %VAL(CNF_PVAL(intl)))
 *
 * open graphics
 *
@@ -333,35 +320,38 @@
 * the user to define regions which should be excluded from
 * the fit.
 
-        call plot_data(dynamic_mem(lposptr),dynamic_mem(intl),nl,
-     :     axlabl,labell,dynamic_mem(wl),0,' ')
+        call plot_data(%VAL(CNF_PVAL(lposptr)),%VAL(CNF_PVAL(intl)),nl,
+     :                 axlabl,labell,%VAL(CNF_PVAL(wl)),0,' ')
 
-        call weight_fit(0.0,nl,dynamic_mem(wl),.false.)
+        call weight_fit(0.0,nl,%VAL(CNF_PVAL(wl)),.false.)
 
-        call reject_data(dynamic_mem(lposptr),nl,dynamic_mem(wl),axlabl
-     :            ,'data',prompt,tram1,tram2,mwork)
+        call reject_data(%VAL(CNF_PVAL(lposptr)),nl,
+     :                   %VAL(CNF_PVAL(wl)),axlabl,
+     :                   'data',prompt,tram1,tram2,mwork)
 
 * plot the template data for the "I" direction and ask
 * the user to define regions which should be excluded from
 * the fit.
 
         call pgpage
-        call plot_data(dynamic_mem(iposptr),dynamic_mem(inti),ni,
-     :     axlabi,labeli,dynamic_mem(wi),0,' ')
+        call plot_data(%VAL(CNF_PVAL(iposptr)),%VAL(CNF_PVAL(inti)),ni,
+     :                 axlabi,labeli,%VAL(CNF_PVAL(wi)),0,' ')
 
-        call weight_fit(0.0,ni,dynamic_mem(wi),.false.)
+        call weight_fit(0.0,ni,%VAL(CNF_PVAL(wi)),.false.)
 
-        call reject_data(dynamic_mem(iposptr),ni,dynamic_mem(wi),axlabi
-     :            ,'data',prompt,tram1,tram2,mwork)
+        call reject_data(%VAL(CNF_PVAL(iposptr)),ni,%VAL(CNF_PVAL(wi)),
+     :                   axlabi,'data',prompt,tram1,tram2,mwork)
 *
 *   Fit vignetting  in the "I" direction
 *
         chars = 'working on '//labeli
         call par_wruser(chars,status)
 
-        call contrl_cpoly2(dynamic_mem(iposptr),dynamic_mem(inti),ni,
-     :       dynamic_mem(wi),coeffi,mord,kp1i,axlabi,labeli,1
-     :       ,dynamic_mem(ptr4),.true.,.true.,dynamic_mem(ptr5))
+        call contrl_cpoly2(%VAL(CNF_PVAL(iposptr)),
+     :                     %VAL(CNF_PVAL(inti)),,ni,
+     :                     %VAL(CNF_PVAL(wi)),coeffi,mord,kp1i,axlabi,
+     :                     labeli,1,%VAL(CNF_PVAL(ptr4)),.true.,.true.,
+     :                     %VAL(CNF_PVAL(ptr5)))
 
         call par_wruser('Type <return> for next plot',status)
         call par_rduser(chars,status)
@@ -375,9 +365,10 @@
         chars = 'working on '//labell
         call par_wruser(chars,status)
 
-        call contrl_cpoly2(dynamic_mem(lposptr),dynamic_mem(intl),nl,
-     :       dynamic_mem(wl),coeffl,mord,kp1l,axlabl,labell,1
-     :       ,dynamic_mem(ptr4),.true.,.true.,dynamic_mem(ptr5))
+        call contrl_cpoly2(%VAL(CNF_PVAL(lposptr)),%VAL(CNF_PVAL(intl)),
+     :                     nl,%VAL(CNF_PVAL(wl)),coeffl,mord,kp1l,
+     :                     axlabl,labell,1,%VAL(CNF_PVAL(ptr4)),.true.,
+     :                     .true.,%VAL(CNF_PVAL(ptr5)))
 
 * define the fit limits in the "L" and "I" directions
 * these are important as the Chebyshev polynomials are normalized
@@ -404,9 +395,9 @@
 
 * apply the correction to the data
 
-      call correct(dynamic_mem(iptr),coeffi,coeffl,ni,nl,mord,kp1i,kp1l
-     :      ,dynamic_mem(ptr1),dynamic_mem(ptr2),dynamic_mem(ptr3),
-     :      max_size)
+      call correct(%VAL(CNF_PVAL(iptr)),coeffi,coeffl,ni,nl,mord,kp1i,
+     :             kp1l,%VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
+     :             %VAL(CNF_PVAL(ptr3)),max_size)
 
 * close down graphics and DSA
 

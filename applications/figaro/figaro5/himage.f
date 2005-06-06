@@ -44,17 +44,18 @@
 *
 *
 * Subroutines/functions referenced:
-*     GETWORK          : Get work array
+*     CNF_PVAL         : Full pointer to dynamically allocated memory
 *     GR_FOTOR         : Plot greyscale image
 *
 *     DSA_AXIS_RANGE   : Get range along axis to use
 *     DSA_CLOSE        : Close DSA
 *     DSA_DATA_SIZE    : Get size of main data array
+*     DSA_FREE_WORKSPACE : Free workspace
+*     DSA_GET_WORK_ARRAY : Get workspace
 *     DSA_INPUT        : Open input data file
 *     DSA_MAP_DATA     : Map main data array
 *     DSA_OBJECT_NAME  : Get name of object
 *     DSA_OPEN         : Open DSA
-*     DYN_ELEMENT      : Convery address to array element of dynamic_mem
 *     CHR_LEN          : Get non-blank length of character string
 *     PAR_RDCHAR       : Read character string parameter
 *     PAR_RDKEY        : Read key parameter
@@ -76,6 +77,10 @@
 *      5/1/99         AJH change sda_map 'r' to 'READ' 
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 *     Functions
 *
@@ -84,8 +89,6 @@
 *     High and low limits
 *
       real dummy1,dummy2
-      include 'SAE_PAR'
-      include 'PRM_PAR'
 *
 *     Local variables
 *
@@ -95,10 +98,9 @@
       integer nch,nxp,nyp,nelm
       logical plog,key
       real value,low,high,asp
-      integer temp,dyn_element,slot
+      integer temp,slot
       character object*64,pltdev*40
       external par_wruser
-      include 'DYNAMIC_MEMORY'
 *
 *     Initial values
 *
@@ -130,7 +132,6 @@
       end if
 *
       call dsa_map_data('IMAGE','READ','FLOAT',start,slot,status)
-      start = dyn_element(start)
 *
 *     Get parameters for display
 *
@@ -166,13 +167,13 @@
       end if
       call par_rdchar('PLOTDEV','CANON_L',pltdev)
       status = SAI__OK
-      call getwork(nxp*nyp,'INT',temp,slot,status)
+      call dsa_get_work_array(nxp*nyp,'INT',temp,slot,status)
       if(status.ne.SAI__OK) then
         goto 500
       end if
-      call gr_fotor(nxp,nyp,high,low,object,asp,dynamic_mem(start),
-     :     ichst,ixst,dims(1),dims(2),dynamic_mem(temp),shrink,plog,
-     :     key,pltdev,par_wruser,status)
+      call gr_fotor(nxp,nyp,high,low,object,asp,%VAL(CNF_PVAL(start)),
+     :              ichst,ixst,dims(1),dims(2),%VAL(CNF_PVAL(temp)),
+     :              shrink,plog,key,pltdev,par_wruser,status)
 *
 *     Tidy up
 *

@@ -62,6 +62,7 @@
 *    CHECK_CONTROL    : Check whether to perform "normal" and/or
 *                       "transfer" fits
 *    CLGRAP           : Close graphics
+*    CNF_PVAL         : Full pointer to dynamically allocated memory
 *    DATA_WINDOW      : controls the fitting process - automatic
 *    FLAVOURS         : Produce output plots, tables etc.
 *    GET_LINE_IDS     : This opens the file, obtains the line ids etc.,
@@ -296,11 +297,7 @@
       real value
       character*34 chars
       logical FIRSTFLAV
-      character dynamic_chars
       integer pstat
-*
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 *
 * ------------------------------------------------------------------
 
@@ -394,7 +391,6 @@
 *     Allow user to give fit type on command line
 
             if(par_given('fit_model')) then
-*              call new_anal(dynamic_chars(idsptr:idsend),
               call new_anal(idstring,
      :                      %VAL(CNF_PVAL(d_wptr)),
      :                      %VAL(CNF_PVAL(d_cptr)),STATUS)
@@ -408,9 +404,9 @@
 
             if(COPY) then
               call redo_all_fits(%VAL(CNF_PVAL(d_rptr)),
-*     :            dynamic_mem(d_vptr),dynamic_chars(idsptr:idsend),
-     :            %VAL(CNF_PVAL(d_vptr)),idstring,
-     :            %VAL(d_tlptr),%VAL(CNF_PVAL(d_trptr)),STATUS)
+     :                           %VAL(CNF_PVAL(d_vptr)),idstring,
+     :                           %VAL(CNF_PVAL(d_tlptr)),
+     :                           %VAL(CNF_PVAL(d_trptr)),STATUS)
             else
               call check_control(%VAL(CNF_PVAL(d_cptr)),iftransfer,
      :                           newfit)
@@ -427,7 +423,6 @@
 
                 call transfer(%VAL(CNF_PVAL(d_rptr)),
      :                        %VAL(CNF_PVAL(d_vptr)),
-*     :               dynamic_chars(idsptr:idsend),
      :               idstring,
      :               %VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
      :               %VAL(CNF_PVAL(d_cptr)),%VAL(CNF_PVAL(d_wptr)),
@@ -445,10 +440,9 @@
 
 *     MANUAL mode fitting
 
-            call manual_mode(dynamic_mem(d_xptr),
-*     :           dynamic_chars(idsptr:idsend),dynamic_mem(d_tlptr),
-     :           idstring,%VAL(CNF_PVAL(d_tlptr)),
-     :           %VAL(CNF_PVAL(d_trptr)),status)
+            call manual_mode(%VAL(CNF_PVAL(d_xptr)),
+     :                       idstring,%VAL(CNF_PVAL(d_tlptr)),
+     :                       %VAL(CNF_PVAL(d_trptr)),status)
 
           else if(iopt.eq. DEFINE) then
 
@@ -480,7 +474,7 @@
           else if(iopt.eq.SYNTHETIC) then
 
              call mk_synth_data(%VAL(CNF_PVAL(d_tlptr)),
-     :                   %VAL(CNF_PVAL(d_trptr)),status)
+     :                          %VAL(CNF_PVAL(d_trptr)),status)
 * SKY
           else if(iopt.eq.SKY) then
 
@@ -500,10 +494,11 @@
 *    is easier to move around.
 *    Here assume "RECT" in                                 V
 
-            call cuban(dynamic_mem(xptr),dynamic_mem(yptr),.false.,
-     :           disp,size,dynamic_mem(d_sptr),dynamic_mem(xdptr),
-     :           %VAL(CNF_PVAL(totptr)),datmin,datmax,
-     :           %VAL(CNF_PVAL(staptr)),status)
+            call cuban(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                 .false.,disp,size,%VAL(CNF_PVAL(d_sptr)),
+     :                 %VAL(CNF_PVAL(xdptr)),
+     :                 %VAL(CNF_PVAL(totptr)),datmin,datmax,
+     :                 %VAL(CNF_PVAL(staptr)),status)
           end if
         end do
 
@@ -512,7 +507,6 @@
 *     Produce hard plots of the data, rotation curves, tables of fit
 *     parameters, etc. if required. Then close graphics if open.
 
-*          call flavours(dynamic_chars(idsptr:idsend),FIRSTFLAV,STATUS)
           call flavours(idstring,FIRSTFLAV,STATUS)
         end if
       end do

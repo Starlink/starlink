@@ -23,11 +23,13 @@
 
 * Subroutines called:
 *   CLGRAP               : Close graphics
-*   CONTRL_CPOLY2       : Fit polynomials to points, finding order if
+*   CNF_PVAL             : Full pointer to dynamically allocated memory
+*   CONTRL_CPOLY2        : Fit polynomials to points, finding order if
 *                          required
 *   COPR2D               : Copy real to double precision
 *   FITCONT_ST           : Create .fitcont structure
-*   GETWORK              : Get virtual memory
+*   DSA_FREE_WORKSPACE   : Free workspace
+*   DSA_GET_WORK_ARRAY   : Get workspace
 *   GR_SOFT              : Open softcopy device
 *   PGPAGE               : Clear graphics screen
 *   PLOT_DATA            : Plot data
@@ -50,6 +52,11 @@
 *   AJH 5/1/99 Changed dsa_map 'r' to 'READ' mode
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status
       integer max_ord
       integer nl,ni
@@ -100,8 +107,8 @@
 
 * FIGARO VM HANDLING
 
-      integer sptr,wptr,xptr,slot,dyn_element
-      integer jptr,iptr,i,ptr1,ptr2,nels,ptr3
+      integer sptr,wptr,xptr,slot,slota,slotb,slotc
+      integer jptr,iptr,i,ptr1,ptr2,ptr3
 
 * trams pointers
 
@@ -109,11 +116,8 @@
 
 * trams work space
 
-      integer slot1
+      integer slot1,slot1a
 
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       batch = par_batch()
       labelx='channels'
@@ -148,12 +152,10 @@
 *  Map the data
 *
       call dsa_map_data('image','UPDATE','float',iptr,slot,status)
-      iptr = dyn_element(iptr)
 
 *  Axis data required double precision for NAG use.
 
       call dsa_map_axis_data('image',1,'READ','double',xptr,slot,status)
-      xptr = dyn_element(xptr)
       call accres(' ','weights','du',nl,wptr,' ',status)
 *
 *   Find data.
@@ -164,19 +166,19 @@
 *    PTR2  MAX_ORD*MAX_ORD [d]
 *    PTR3  NL*3+MAX_ORD*3 (d)
 
-      nels = nl*4 + max_ord*(max_ord+4)
-      call getwork(nels,'double',sptr,slot,status)
+      call dsa_get_work_array(nl,'double',sptr,slot,status)
+      call dsa_get_work_array(MAX_ORD,'double',ptr1,slota,status)
+      call dsa_get_work_array(MAX_ORD*MAX_ORD,'double',ptr2,slotb,
+     :                        status)
+      call dsa_get_work_array(3*(nl+MAX_ORD),'double',ptr3,slotc,status)
       if(status.ne.SAI__OK) go to 500
-      ptr1 = sptr + nl*val__nbd
-      ptr2 = ptr1 + max_ord*val__nbd
-      ptr3 = ptr2 + max_ord*max_ord*val__nbd
       halfni = max(1,(ni/2))
 
       if(newstruct)  then
 
 *   Zero out coeficient array
 
-        call zero_dble(dynamic_mem(jptr),ni*max_ord)
+        call zero_dble(%VAL(CNF_PVAL(jptr)),ni*max_ord)
       end if
 
 * if we are not in BATCH mode then we allow the user
@@ -189,9 +191,9 @@
         call par_rdval('xsect',1.0,real(ni),real(halfni),' ',value)
         xsect = nint(value)
         start = iptr + (xsect-1)*nl*val__nbr
-        status = cnv_fmtcnv('float','double',dynamic_mem(start),
-     :       dynamic_mem(sptr),nl,nbad)
-        call weight_fit(0.0,nl,dynamic_mem(wptr),.false.)
+        status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(start)),
+     :                      %VAL(CNF_PVAL(sptr)),nl,nbad)
+        call weight_fit(0.0,nl,%VAL(CNF_PVAL(wptr)),.false.)
 *
 * open graphics
 *
@@ -199,31 +201,37 @@
 
 * get VM for the tram lines defining the regions to be ignored
 
-        nels = max_work*2
-        call getwork(nels,'float',t1ptr,slot1,status)
+        call dsa_get_work_array(max_work,'float',t1ptr,slot1,status)
+        call dsa_get_work_array(max_work,'float',t2ptr,slot1a,status)
         if(status.ne.SAI__OK) goto 500
-        t2ptr = t1ptr + max_work*val__nbr
 
 * Plot the continuum
 
         plot_type = data_plot
-        call plot_data(dynamic_mem(xptr),dynamic_mem(sptr),nl,labelx
-     :     ,title,dynamic_mem(wptr),plot_type,labely)
+        call plot_data(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(sptr)),nl,
+     :                 labelx,title,%VAL(CNF_PVAL(wptr)),plot_type,
+     :                 labely)
 
 * reject any regions which are contaminated
 
-        call reject_data(dynamic_mem(xptr),nl,dynamic_mem(wptr),labelx,
-     :            'lines','put tramlines around spectral lines',
-     :            dynamic_mem(t1ptr),dynamic_mem(t2ptr),max_work)
+        call reject_data(%VAL(CNF_PVAL(xptr)),nl,%VAL(CNF_PVAL(wptr)),
+     :                   labelx,'lines',
+     :                   'put tramlines around spectral lines',
+     :                   %VAL(CNF_PVAL(t1ptr)),%VAL(CNF_PVAL(t2ptr)),
+     :                   max_work)
+        call dsa_free_workspace(slot1a,status)
+        call dsa_free_workspace(slot1,status)
 *
 *   Fit continuum
 *   seeking the best fit order to use
         seek = .true.
         plot = .true.
         order = 0
-        call contrl_cpoly2(dynamic_mem(xptr),dynamic_mem(sptr),nl,
-     :      dynamic_mem(wptr),dynamic_mem(ptr1),max_ord,kp1l,labelx,
-     :      labely,2,dynamic_mem(ptr2),plot,seek,dynamic_mem(ptr3))
+        call contrl_cpoly2(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(sptr)),nl,
+     :                     %VAL(CNF_PVAL(wptr)),%VAL(CNF_PVAL(ptr1)),
+     :                     max_ord,kp1l,labelx,labely,2,
+     :                     %VAL(CNF_PVAL(ptr2)),plot,seek,
+     :                     %VAL(CNF_PVAL(ptr3)))
 
 *
         call accres(' ','order','wi',1,kp1l-1,' ',status)
@@ -277,23 +285,25 @@
 *   Find data.
 *
           start = iptr + (i-1)*nl*4
-          status = cnv_fmtcnv('float','double',dynamic_mem(start),
-     :       dynamic_mem(sptr),nl,nbad)
-          call weight_fit(0.0,nl,dynamic_mem(wptr),.false.)
+          status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(start)),
+     :                        %VAL(CNF_PVAL(sptr)),nl,nbad)
+          call weight_fit(0.0,nl,%VAL(CNF_PVAL(wptr)),.false.)
 *
 *   Fit continuum.
 *
           write(chars,'(a,i4)')' x-section',i
           call par_wruser(chars,status)
 
-          call contrl_cpoly2(dynamic_mem(xptr),dynamic_mem(sptr),nl,
-     :      dynamic_mem(wptr),dynamic_mem(ptr1),max_ord,kp1l,labelx,
-     :      labely,2,dynamic_mem(ptr2),plot,seek,dynamic_mem(ptr3))
+          call contrl_cpoly2(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(sptr)),
+     :                       nl,%VAL(CNF_PVAL(wptr)),
+     :                       %VAL(CNF_PVAL(ptr1)),max_ord,kp1l,labelx,
+     :                       labely,2,%VAL(CNF_PVAL(ptr2)),plot,seek,
+     :                       %VAL(CNF_PVAL(ptr3)))
 
 * save these poly result in the .CONTINUUM structure
 
-          call save_cheby(ni,i,i,dynamic_mem(ptr1),kp1l,max_ord,
-     :                          dynamic_mem(jptr))
+          call save_cheby(ni,i,i,%VAL(CNF_PVAL(ptr1)),kp1l,max_ord,
+     :                          %VAL(CNF_PVAL(jptr)))
 
 * if the next X-sect that would be plotted is beyond the end of
 * the data then turn the plotting off

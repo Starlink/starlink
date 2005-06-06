@@ -34,7 +34,7 @@
 
 * Subroutine/functions called:
 *    CANAXLIM          : Reset parameters for axis limits
-*    GETWORK           : Get virtual memory
+*    CNF_PVAL          : Full pointer to dynamically allocated memory
 *    GRCLOSE           : Close graphics
 *    GR_INIT           : Initialise graphics common blocks
 *    GR_SELCT          : Open graphics, selecting a device
@@ -42,12 +42,13 @@
 *
 *    DSA_CLOSE         : Close DSA
 *    DSA_DATA_SIZE     : Get data size
+*    DSA_FREE_WORKSPACE : Free workspace
 *    DSA_GET_AXIS_INFO : Get axis units/label
+*    DSA_GET_WORK_ARRAY : Get workspace
 *    DSA_INPUT         : Open input file
 *    DSA_MAP_AXIS_DATA : Map axis array
 *    DSA_MAP_DATA      : Map data array
 *    DSA_OPEN          : Open DSA
-*    DYN_ELEMENT       : Convert address to array element
 *    FIG_XTRACT        : Take slice thru' data in X direction
 *    ICH_TIDY = INTEGER (Read)
 *        Remove control characters from string
@@ -67,6 +68,10 @@
 *    AJH Change dsa_map.. 'r' to 'READ' etc
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status
       integer nl,ni
       character*64 label
@@ -76,15 +81,13 @@
       integer iptr,ivalue1
       real value2,dummy1,dummy2
       integer ye,ys,yend,ystart,dy,block,nblocks
-      integer wptr,slot,slot2,dyn_element
+      integer wptr,slot,slot2
       integer ich_tidy,lenx1,lenx2
       logical loop
       logical par_quest,scan,hard,par_batch,batch
       character*80 chars
       integer ixstart,npts
       integer len1
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       status = SAI__OK
       label='channel direction cut'
@@ -108,9 +111,7 @@
       ni=dims(2)
 *
       call dsa_map_data('image','READ','float',iptr,slot,status)
-      iptr = dyn_element(iptr)
       call dsa_map_axis_data('image',1,'READ','float',xptr,slot,status)
-      xptr = dyn_element(xptr)
       call dsa_object_name('image',label,status)
       if(status.ne.SAI__OK)  then
         go to 500
@@ -123,7 +124,7 @@
 *
 *   Find data.
 *
-      call getwork(nl,'float',wptr,slot2,status)
+      call dsa_get_work_array(nl,'float',wptr,slot2,status)
       loop=.true.
       call par_rdkey('scan',batch,scan)
       if(batch) then
@@ -152,25 +153,26 @@
           call chr_putc('(',chars,len1)
           call encode_range(' ',' ',ystart,yend,chars,len1)
           call chr_putc(')',chars,len1)
-          call fig_xtract(dynamic_mem(iptr),nl,ni,ystart,yend,
-     :            dynamic_mem(wptr))
+          call fig_xtract(%VAL(CNF_PVAL(iptr)),nl,ni,ystart,yend,
+     :                    %VAL(CNF_PVAL(wptr)))
           call gr_selct((.not.hard),status)
           if(status.ne.SAI__OK) then
             goto 500
           end if
-          call plot_spect(npts,dynamic_mem(xptr+(ixstart-1)*4),
-     :       dynamic_mem(wptr+(ixstart-1)*4),chars(:len1),
-     :   xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
+          call plot_spect(npts,%VAL(CNF_PVAL(xptr+(ixstart-1)*4)),
+     :                    %VAL(CNF_PVAL(wptr+(ixstart-1)*4)),
+     :                    chars(:len1),
+     :                    xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
           call sla_wait(0.3)
         end do
       else
         do while(loop)
-          call dsa_axis_range('image',2,' ',.false.,dummy1,dummy2,ys,ye
-     :     ,status)
+          call dsa_axis_range('image',2,' ',.false.,dummy1,dummy2,ys,
+     :                        ye,status)
           call gr_selct((.not.hard),status)
           if(status.ne.SAI__OK) goto 500
-          call fig_xtract(dynamic_mem(iptr),nl,ni,ys,ye,
-     :        dynamic_mem(wptr))
+          call fig_xtract(%VAL(CNF_PVAL(iptr)),nl,ni,ys,ye,
+     :                    %VAL(CNF_PVAL(wptr)))
           len1 = 0
           call chr_fill(' ',chars)
           call chr_appnd(label,chars,len1)
@@ -178,9 +180,10 @@
           call chr_putc('(',chars,len1)
           call encode_range(' ',' ',ys,ye,chars,len1)
           call chr_putc(')',chars,len1)
-          call plot_spect(npts,dynamic_mem(xptr+(ixstart-1)*4),
-     :     dynamic_mem(wptr+(ixstart-1)*4),chars(:len1),
-     :        xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
+          call plot_spect(npts,%VAL(CNF_PVAL(xptr+(ixstart-1)*4)),
+     :                    %VAL(CNF_PVAL(wptr+(ixstart-1)*4)),
+     :                    chars(:len1),
+     :                    xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
           if(batch) then
             loop = .false.
           else
