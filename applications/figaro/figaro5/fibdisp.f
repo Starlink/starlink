@@ -103,12 +103,12 @@
 *     RECTDISPS        : Display plane of sorted "cube" (rectangular array)
 *     RECTPRARR        : Display array of profiles (rectangular array)
 *
-*     GETWORK          : Get virtual memory
-*     GET_VM           : Get virtual memory (mixed data types)
+*     CNF_PVAL         : Full pointer to dynamically allocated memory
 *     GR_INIT          : Initialise graphics common blocks
 *
 *     DSA_AXIS_RANGE   : Get axis limits
 *     DSA_FREE_WORKSPACE (DSA): Free workspace
+*     DSA_GET_WORK_ARRAY : Get workspace
 *     DSA_GET_RANGE    : Get min/max of main data array
 *     PAR_GIVEN (PAR)(l): Find out parameter given on command line
 *     PAR_QNUM (PAR)(l): Get number from user
@@ -132,16 +132,19 @@
 *   ACD 18/12/00 made data types consistent in call to FIBMEN
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'arc_dims'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       character ftype*10
       integer chr_len,tlen,i,len1
       integer misptr,plane
       integer iwork
       integer status
       integer start,stop
-      include 'SAE_PAR'
-      include 'arc_dims'
-      include 'CNF_PAR'          ! For CNF_PVAL function
-      integer ref,iopt,slot2,slot3,nels,pstat,tst,tend
+      integer ref,iopt,slot,slot2,slot2a,slot3,slot3a,slot3b
+      integer pstat,tst,tend
       integer iwork1,iwork2,iwork3,get_parnum,ival1,ival2
       integer iter4
 
@@ -162,15 +165,10 @@
      :           OPT_TOLS = 12, OPT_LOOK = 13, OPT_DEL = 14,
      :           OPT_DEF = 15, OPT_OUT = 16, OPT_EXIT = 17,
      :           OPT_AUTO = 18, OPT_CUBAN = 19)
-      include 'PRM_PAR'
-      character dynamic_chars
 
 * Fitting control common block
 
       include 'opt_cmn'
-
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 
       line_count = 1
 
@@ -238,15 +236,13 @@
           call data_window(status)
         end if
       else
-        nels = spdim1*spdim2*val__nbw
+        call dsa_get_work_array(spdim1*spdim2,'short',ref,slot2,status)
         if(atype.eq.1) then
-          nels = nels + spdim1*spdim2*val__nbr
+          call dsa_get_work_array(spdim1*spdim2,'float',iwork,slot2a,
+     :                            status)
         else if(atype.eq.2) then
-          nels = nels * 2
-        end if
-        call getvm(nels,ref,slot2,status)
-        if(atype.eq.2) then
-          misptr = ref + spdim1*spdim2*val__nbw
+          call dsa_get_work_array(spdim1*spdim2,'short',misptr,slot2a,
+     :                            status)
         end if
       end if
 
@@ -279,7 +275,6 @@
 	      start=((i-1)*10)+1
 	      stop= start+9
 *                tend = tst + 9
-*                call chr_putc(dynamic_chars(tst:tend),chars,len1)
                 call chr_putc(parval(start:stop),chars,len1)
                 if((len1.ge.60).or.(i.eq.mxpars)) then
                   call par_wruser(chars(:len1),pstat)
@@ -302,17 +297,17 @@
 * If "HEX" then display with hexagonal matrix
 
             call hexdisps(%VAL(CNF_PVAL(d_rptr)),mxpars,
-     :          dynamic_mem(misptr),plane,dynamic_mem(xdptr),
-     :          dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :          disp,.true.,%VAL(CNF_PVAL(staptr)))
-          else if(atype.eq.1) then
+     :          %VAL(CNF_PVAL(misptr)),plane,%VAL(CNF_PVAL(xdptr)),
+     :          %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),size,xr,yr,
+     :          limit,disp,.true.,%VAL(CNF_PVAL(staptr)))
 
 * Display using GKS cell array
 
-            iwork = ref + spdim1 * spdim2 * val__nbw
+          else if(atype.eq.1) then
             call rectdisps(%VAL(CNF_PVAL(d_rptr)),mxpars,
-     :           dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(iwork)
-     :          ,plane,xr,yr,limit,disp,.true.,%VAL(CNF_PVAL(staptr)))
+     :                     %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                     %VAL(CNF_PVAL(iwork)),plane,xr,yr,limit,
+     :                     disp,.true.,%VAL(CNF_PVAL(staptr)))
           end if
         else if(iopt.eq.OPT_PLDAT) then
 
@@ -327,19 +322,19 @@
 
 * If "HEX" then display with hexagonal matrix
 
-            call hexdisps(dynamic_mem(d_sptr),wavdim,
-     :         dynamic_mem(misptr),plane,dynamic_mem(xdptr),
-     :         dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :         disp,.false.,%VAL(CNF_PVAL(staptr)))
-          else if(atype.eq.1) then
+            call hexdisps(%VAL(CNF_PVAL(d_sptr)),wavdim,
+     :                    %VAL(CNF_PVAL(misptr)),plane,
+     :                    %VAL(CNF_PVAL(xdptr)),%VAL(CNF_PVAL(xptr)),
+     :                    %VAL(CNF_PVAL(yptr)),size,xr,yr,limit,
+     :                    disp,.false.,%VAL(CNF_PVAL(staptr)))
 
 * Display using GKS cell array
 
-            iwork = ref + spdim1 * spdim2 * val__nbw
-            call rectdisps(dynamic_mem(d_sptr),wavdim,
-     :            dynamic_mem(xptr),dynamic_mem(yptr),
-     :            dynamic_mem(iwork),plane,xr,yr,limit,disp,.false.,
-     :           %VAL(CNF_PVAL(staptr)))
+          else if(atype.eq.1) then
+            call rectdisps(%VAL(CNF_PVAL(d_sptr)),wavdim,
+     :                     %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                     %VAL(CNF_PVAL(iwork)),plane,xr,yr,limit,
+     :                     disp,.false.,%VAL(CNF_PVAL(staptr)))
           end if
 
         else if((iopt.ge.3).and.(iopt.le.7)) then
@@ -358,42 +353,50 @@
 
 *   Look at line profiles
 
-            call gtprof(dynamic_mem(ref),dynamic_mem(d_sptr),
-     :         dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr),
-     :        %VAL(CNF_PVAL(totptr)),atype.eq.2,status)
+            call gtprof(%VAL(CNF_PVAL(ref)),%VAL(CNF_PVAL(d_sptr)),
+     :                  %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                  %VAL(CNF_PVAL(xdptr)),%VAL(CNF_PVAL(totptr)),
+     :                  atype.eq.2,status)
             disp = .false.
 
           else if(iopt.eq.OPT_HSLI) then
 
 *    Take horizontal slice through data
 
-            nels = spdim1*2+(spdim1*wavdim)
-            call getwork(nels,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork2,slot3a,status)
+            call dsa_get_work_array(spdim1*wavdim,'float',iwork3,slot3b,
+     :                              status)
             if(status.eq.SAI__OK) then
-              iwork2 = iwork1+spdim1*val__nbi
-              iwork3 = iwork2+spdim1*val__nbi
-              call fibslice(dynamic_mem(d_sptr),spdim1,spdim2,wavdim,
-     :             dynamic_mem(iwork1),dynamic_mem(iwork2),spdim1,
-     :             dynamic_mem(xptr),dynamic_mem(yptr),
-     :             dynamic_mem(xdptr),.true.,atype.eq.2,
-     :             dynamic_mem(iwork3),size)
+              call fibslice(%VAL(CNF_PVAL(d_sptr)),spdim1,spdim2,wavdim,
+     :                      %VAL(CNF_PVAL(iwork1)),
+     :                      %VAL(CNF_PVAL(iwork2)),spdim1,
+     :                      %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                      %VAL(CNF_PVAL(xdptr)),.true.,atype.eq.2,
+     :                      %VAL(CNF_PVAL(iwork3)),size)
+              call dsa_free_workspace(slot3b,status)
+              call dsa_free_workspace(slot3a,status)
               call dsa_free_workspace(slot3,status)
             end if
             disp = .false.
+
           else if(iopt.eq.OPT_VSLI) then
-            nels = spdim2*2+(spdim2*wavdim)
-            call getwork(nels,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim2,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim2,'int',iwork2,slot3a,status)
+            call dsa_get_work_array(spdim2*wavdim,'float',iwork3,
+     :                              slot3b,status)
             if(status.eq.SAI__OK) then
-              iwork2 = iwork1+spdim2*val__nbi
-              iwork3 = iwork2+spdim2*val__nbi
 
 *    Take vertical slice through data
 
-              call fibslice(dynamic_mem(d_sptr),spdim1,spdim2,wavdim,
-     :              dynamic_mem(iwork1),dynamic_mem(iwork2),spdim2,
-     :              dynamic_mem(xptr),dynamic_mem(yptr),
-     :              dynamic_mem(xdptr),.false.,atype.eq.2,
-     :              dynamic_mem(iwork3),size)
+              call fibslice(%VAL(CNF_PVAL(d_sptr)),spdim1,spdim2,wavdim,
+     :                      %VAL(CNF_PVAL(iwork1)),
+     :                      %VAL(CNF_PVAL(iwork2)),spdim2,
+     :                      %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                      %VAL(CNF_PVAL(xdptr)),.false.,atype.eq.2,
+     :                      %VAL(CNF_PVAL(iwork3)),size)
+              call dsa_free_workspace(slot3b,status)
+              call dsa_free_workspace(slot3a,status)
               call dsa_free_workspace(slot3,status)
             end if
             disp = .false.
@@ -401,13 +404,15 @@
 
 *   Create file from X cut through cube
 
-            nels = spdim1*2
-            call getwork(nels,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork2,slot3a,status)
             if(status.eq.SAI__OK) then
-              iwork2 = iwork1+spdim1*val__nbi
-              call fibslfil(dynamic_mem(iwork1),dynamic_mem(iwork2),
-     :              spdim1,dynamic_mem(xptr),dynamic_mem(yptr),
-     :              dynamic_mem(xdptr),.true.,atype.eq.2,size)
+              call fibslfil(%VAL(CNF_PVAL(iwork1)),
+     :                      %VAL(CNF_PVAL(iwork2)),spdim1,
+     :                      %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                      %VAL(CNF_PVAL(xdptr)),.true.,atype.eq.2,
+     :                      size)
+              call dsa_free_workspace(slot3a,status)
               call dsa_free_workspace(slot3,status)
             end if
           else
@@ -416,13 +421,15 @@
 
 *   Create file from Y cut through cube
 
-            nels = spdim2*2
-            call getwork(nels,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork1,slot3,status)
+            call dsa_get_work_array(spdim1,'int',iwork2,slot3a,status)
             if(status.eq.SAI__OK) then
-              iwork2 = iwork1+spdim2*val__nbi
-              call fibslfil(dynamic_mem(iwork1),dynamic_mem(iwork2),
-     :                spdim1,dynamic_mem(xptr),dynamic_mem(yptr),
-     :                dynamic_mem(xdptr),.false.,atype.eq.2,size)
+              call fibslfil(%VAL(CNF_PVAL(iwork1)),
+     :                      %VAL(CNF_PVAL(iwork2)),spdim1,
+     :                      %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                      %VAL(CNF_PVAL(xdptr)),.false.,atype.eq.2,
+     :                      size)
+              call dsa_free_workspace(slot3a,status)
               call dsa_free_workspace(slot3,status)
             end if
           end if
@@ -433,13 +440,14 @@
 
           disp = par_quest('Softcopy plot?',.true.)
           if(atype.eq.2) then
-            call hexprarr(dynamic_mem(d_sptr),%VAL(CNF_PVAL(totptr)),
-     :           dynamic_mem(xdptr),dynamic_mem(xptr),dynamic_mem(yptr)
-     :           ,size,xr,yr,limit,disp,.true.,datmin,datmax,1)
+            call hexprarr(%VAL(CNF_PVAL(d_sptr)),%VAL(CNF_PVAL(totptr)),
+     :                    %VAL(CNF_PVAL(xdptr)),%VAL(CNF_PVAL(xptr)),
+     :                    %VAL(CNF_PVAL(yptr)),size,xr,yr,limit,disp,
+     :                    .true.,datmin,datmax,1)
           else
-            call rectprarr(dynamic_mem(d_sptr),dynamic_mem(xptr),
-     :            dynamic_mem(yptr),%VAL(CNF_PVAL(totptr)),xr,yr,limit,
-     :            disp,.true.,datmin,datmax,1)
+            call rectprarr(%VAL(CNF_PVAL(d_sptr)),%VAL(CNF_PVAL(xptr)),
+     :                     %VAL(CNF_PVAL(yptr)),%VAL(CNF_PVAL(totptr)),
+     :                     xr,yr,limit,disp,.true.,datmin,datmax,1)
           end if
         else if(iopt.eq.OPT_TOTAL) then
 
@@ -447,15 +455,17 @@
 
           if(atype.eq.2) then
             call hexdisps(%VAL(CNF_PVAL(totptr)),1,
-     :           dynamic_mem(misptr),1,dynamic_mem(xdptr),
-     :           dynamic_mem(xptr),dynamic_mem(yptr),size,xr,yr,limit,
-     :           disp,.false.,%VAL(CNF_PVAL(staptr)))
+     :                    %VAL(CNF_PVAL(misptr)),1,
+     :                    %VAL(CNF_PVAL(xdptr)),%VAL(CNF_PVAL(xptr)),
+     :                    %VAL(CNF_PVAL(yptr)),size,xr,yr,limit,
+     :                    disp,.false.,%VAL(CNF_PVAL(staptr)))
           else
-            iwork = ref + spdim1 * spdim2 * val__nbw
             call rectdisps(%VAL(CNF_PVAL(totptr)),1,
-     :           dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(iwork)
-     :           ,1,xr,yr,limit,disp,.false.,%VAL(CNF_PVAL(staptr)))
+     :                     %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                     %VAL(CNF_PVAL(iwork)),1,xr,yr,limit,disp,
+     :                     .false.,%VAL(CNF_PVAL(staptr)))
           end if
+
         else if(iopt.eq.OPT_LIMIT) then
 
 *     Toggle limiting of range of data to consider, get range if we
@@ -464,12 +474,13 @@
           limit = .not.limit
           if(limit) then
             call dsa_axis_range('data',2,limtyp,.false.,xr(1),xr(2),
-     :            ival1,ival2,status)
+     :                          ival1,ival2,status)
             call dsa_axis_range('data',3,limtyp,.false.,yr(1),yr(2),
-     :            ival1,ival2,status)
+     :                          ival1,ival2,status)
             call canaxlim(2)
             call canaxlim(3)
           end if
+
         else if(iopt.eq.OPT_TOLS) then
 
 *   Apply/set tolerances
@@ -488,16 +499,15 @@
 *   Delete bad fits
 
           call delfit(%VAL(CNF_PVAL(d_rptr)),mxpars,spdim1,spdim2,nyp,
-     :       disp,dynamic_mem(xptr),dynamic_mem(yptr),
-     :       dynamic_mem(xdptr),atype.eq.2)
+     :                disp,%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :                %VAL(CNF_PVAL(xdptr)),atype.eq.2)
 
         else if(iopt.eq.OPT_DEF) then
 
 *    Define
 
-*          call new_anal(dynamic_chars(idsptr:idsend),
-          call new_anal(idstring,
-     :       %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_cptr)),status)
+          call new_anal(idstring,%VAL(CNF_PVAL(d_wptr)),
+     :                  %VAL(CNF_PVAL(d_cptr)),status)
 
         else if(iopt.eq.OPT_OUT) then
 
@@ -510,6 +520,7 @@
 *    Exit
 
           loop = .false.
+
         else if(iopt.eq.OPT_AUTO) then
 
 *    Fit Gaussians etc. to data
@@ -521,10 +532,10 @@
 *    Cuban-style display etc. This is better for large data files, since
 *    is easier to move around.
 
-          call cuban(dynamic_mem(xptr),dynamic_mem(yptr),atype.eq.2,
-     :         disp,size,dynamic_mem(d_sptr),dynamic_mem(xdptr),
-     :         %VAL(CNF_PVAL(totptr)),datmin,datmax,
-     :         %VAL(CNF_PVAL(staptr)),status)
+          call cuban(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :               atype.eq.2,disp,size,%VAL(CNF_PVAL(d_sptr)),
+     :               %VAL(CNF_PVAL(xdptr)),%VAL(CNF_PVAL(totptr)),
+     :               datmin,datmax,%VAL(CNF_PVAL(staptr)),status)
 
         end if
       end do

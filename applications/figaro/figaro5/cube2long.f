@@ -32,14 +32,17 @@
 *   AJH Changed mode inb dsa_map.. from 'r' to 'READ'
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer zptr,znptr,nz,ny,nx,npixel,status,dims(3),ndim
-      integer ptr1,ptr2,ptr3,ptr4,ptr5,nels,slot,dyn_element,nelm
+      integer ptr1,ptr2,ptr3,ptr4,ptr5
+      integer slot,slot1,slot2,slot3,slot4,slot5,nelm
       real xd,yd,xe,xs,ys,ye,xintersect1,xintersect2,yintersect1
       real yintersect2,angle,x,y,pixlen,slitlen
       character*72 output
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
 
       status = SAI__OK
       call dsa_open(status)
@@ -114,15 +117,11 @@
 
 * Create new output file and map it
 
-
       dims(1) = nz
       dims(2) = npixel
 
 * Replacing dsa_named_output with dsa_output (fda)
 *
-*      call par_rdchar('output',' ',output)
-*      call create_file(output,'output',dims,2,status)
-
       call dsa_output('output','output',' ',1,1,status)
       call dsa_simple_output('output','D','FLOAT',2,dims,status)
 
@@ -130,8 +129,6 @@
       
       call dsa_map_data('cube','READ','float',zptr,slot,status)
       call dsa_map_data('output','UPDATE','float',znptr,slot,status)
-      zptr = dyn_element(zptr)
-      znptr = dyn_element(znptr)
 
 * Get virtual memory:
 *  PTR1  NX     (r)
@@ -140,19 +137,19 @@
 *  PTR4  NPIXEL (r)
 *  PTR5  NPIXEL (r)
 
-      nels = npixel*3+nx+ny
-      call getwork(nels,'float',ptr1,slot,status)
+       call dsa_get_work_array(nx,'float',ptr1,slot1,status)
+       call dsa_get_work_array(npixel,'float',ptr2,slot2,status)
+       call dsa_get_work_array(ny,'float',ptr3,slot3,status)
+       call dsa_get_work_array(npixel,'float',ptr4,slot4,status)
+       call dsa_get_work_array(npixel,'float',ptr5,slot5,status)
       if(status.ne.SAI__OK) goto 500
-      ptr2=ptr1+val__nbr*nx
-      ptr3=ptr2+val__nbr*npixel
-      ptr4=ptr3+val__nbr*ny
-      ptr5=ptr4+val__nbr*npixel
 
 * Copy data
 
-      call copyit(nz,nx,ny,dynamic_mem(zptr),dynamic_mem(znptr),pixlen,
-     :      npixel,angle,xs,ys,dynamic_mem(ptr1),dynamic_mem(ptr2),
-     :      dynamic_mem(ptr3),dynamic_mem(ptr4),dynamic_mem(ptr5))
+      call copyit(nz,nx,ny,%VAL(CNF_PVAL(zptr)),%VAL(CNF_PVAL(znptr)),
+     :            pixlen,npixel,angle,xs,ys,%VAL(CNF_PVAL(ptr1)),
+     :            %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :            %VAL(CNF_PVAL(ptr4)),%VAL(CNF_PVAL(ptr5)))
 
 * Close files
 

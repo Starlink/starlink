@@ -7,7 +7,7 @@
 *    CALL CADD( STATUS )
 *
 * Purpose:
-*   To add a continuum to 2 dimensional data.
+*   To add a continuum to 2-dimensional data.
 
 * Description:
 *  A polynomial previously fitted to the continuum is evaluated and
@@ -30,19 +30,19 @@
 * Changed dsa_map.. from 'u' to 'UPDATE'
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       integer max_ord,jptr,iptr,i
       integer nl,ni
       integer mord
       integer kp1l
-      integer ptr1,ptr2,slot,dyn_element
+      integer ptr1,ptr2,slot,slot1,slot2
       integer nlr,nir
       integer coef_siz,dims_csub(2)
       parameter (max_ord=20)
       integer dims(2),ndim,nelm
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       mord=max_ord
       status = SAI__OK
@@ -89,17 +89,17 @@
 *  Map the data
 *
       call dsa_map_data('output','UPDATE','float',iptr,slot,status)
-      iptr = dyn_element(iptr)
 *
 *   Fit vignetting
 *
       kp1l=max_ord
-      call getwork(nl*2,'double',ptr1,slot,status)
+      call dsa_get_work_array(nl,'double',ptr1,slot1,status)
+      call dsa_get_work_array(nl,'double',ptr2,slot2,status)
       if(status.ne.SAI__OK) goto 500
-      ptr2 = ptr1 + nl*val__nbd
       do i=1,ni
-        call correct2(dynamic_mem(iptr),dynamic_mem(jptr),nl,ni,mord,
-     :            kp1l,i,dynamic_mem(ptr1),dynamic_mem(ptr2),.true.)
+        call correct2(%VAL(CNF_PVAL(iptr)),%VAL(CNF_PVAL(jptr)),nl,ni,
+     :                mord,kp1l,i,%VAL(CNF_PVAL(ptr1)),
+     :                %VAL(CNF_PVAL(ptr2)),.true.)
       end do
 
   500 continue

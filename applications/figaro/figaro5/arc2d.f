@@ -84,6 +84,7 @@
 *                         control_cpoly_w may be used.
 *    ARC_WINDOW         : Find line centres by fitting Gaussians
 *    CLGRAP             : Close graphics
+*    CNF_PVAL           : Full pointer to dynamically allocated memory
 *    CONTIN_CORR        : this fits polynomials in the x-sect direction
 *                         (i.e. along the lines), so as to remove
 *                         discontinuities due to noise. It then set the
@@ -127,6 +128,10 @@
 *-
 * _____________________________________________________________________
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 * include common blocks
 *
@@ -154,7 +159,7 @@
 * to coeffs of poly fits in channel direction
 
       integer coptr
-      integer slot
+      integer slot, slot2
       integer w1ptr,w2ptr,w3ptr,w4ptr,w5ptr,w6ptr,w7ptr,w8ptr,w9ptr
       integer w10ptr,w11ptr,w12ptr,nbytes,nels,w13ptr
 
@@ -165,13 +170,7 @@
       logical polydata
       integer iopt
       logical loop
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'bytesdef'
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       logical par_quest
       integer chr_len
 *
@@ -275,14 +274,14 @@
           call arcfit(norder,%VAL(CNF_PVAL(d_rptr)),
      :                %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)),
      :                %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_aptr)),
-     :                dynamic_mem(coptr),rmsmax,nfits,
-     :                dynamic_mem(w1ptr),dynamic_mem(w2ptr),
-     :                dynamic_mem(w3ptr),dynamic_mem(w4ptr),
-     :                dynamic_mem(w5ptr),dynamic_mem(w6ptr),
-     :                dynamic_mem(w7ptr),dynamic_mem(w8ptr),
-     :                dynamic_mem(w9ptr),dynamic_mem(w10ptr),
-     :                dynamic_mem(w11ptr),dynamic_mem(w12ptr),polydata,
-     :                acceptfits,dynamic_mem(w13ptr),status,
+     :                %VAL(CNF_PVAL(coptr)),rmsmax,nfits,
+     :                %VAL(CNF_PVAL(w1ptr)),%VAL(CNF_PVAL(w2ptr)),
+     :                %VAL(CNF_PVAL(w3ptr)),%VAL(CNF_PVAL(w4ptr)),
+     :                %VAL(CNF_PVAL(w5ptr)),%VAL(CNF_PVAL(w6ptr)),
+     :                %VAL(CNF_PVAL(w7ptr)),%VAL(CNF_PVAL(w8ptr)),
+     :                %VAL(CNF_PVAL(w9ptr)),%VAL(CNF_PVAL(w10ptr)),
+     :                %VAL(CNF_PVAL(w11ptr)),%VAL(CNF_PVAL(w12ptr)),
+     :                polydata,acceptfits,%VAL(CNF_PVAL(w13ptr)),status,
      :                maxnpts)
 
           if(acceptfits) then
@@ -291,8 +290,8 @@
 * Output results to file and to terminal
 
               call iroutp(datafile(:chr_len(datafile))//'.iar',
-     :            datafile,wavdim,spdim1,dynamic_mem(coptr),norder,
-     :            nfits,rmsmax,status)
+     :                    datafile,wavdim,spdim1,%VAL(CNF_PVAL(coptr)),
+     :                    norder,nfits,rmsmax,status)
             end if
           end if
 
@@ -302,14 +301,16 @@
 
         else if(iopt.eq.7) then
 
-          call getwork(2*line_count,'float',w1ptr,slot,status)
+          call dsa_get_work_array(line_count,'float',w1ptr,slot,status)
+          call dsa_get_work_array(line_count,'float',w2ptr,slot2,status)
           if(status.ne.SAI__OK) goto 500
-          w2ptr = w1ptr + line_count * VAL__NBR
-          call arc_window(dynamic_mem(d_xptr),%VAL(CNF_PVAL(d_tlptr)),
-*     :        dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
-     :        %VAL(CNF_PVAL(d_trptr)),idstring,
-     :        dynamic_mem(w1ptr),dynamic_mem(w2ptr),status)
+          call arc_window(%VAL(CNF_PVAL(d_xptr)),
+     :                    %VAL(CNF_PVAL(d_tlptr)),
+     :                    %VAL(CNF_PVAL(d_trptr)),idstring,
+     :                    %VAL(CNF_PVAL(w1ptr)),%VAL(CNF_PVAL(w2ptr)),
+     :                    status)
           call dsa_free_workspace(slot,status)
+          call dsa_free_workspace(slot2,status)
           if(batch) then
             call apply_tols(.true.,status)
             loop = .false.
@@ -332,8 +333,8 @@
           w2ptr = w1ptr + 20*VAL__NBD*line_count
           w3ptr = w2ptr + VAL__NBD*line_count*2
 
-          call contin_corr(dynamic_mem(w1ptr),dynamic_mem(w2ptr),
-     :         dynamic_mem(w3ptr),polydata,status,athree,maxnpts)
+          call contin_corr(%VAL(CNF_PVAL(w1ptr)),%VAL(CNF_PVAL(w2ptr)),
+     :         %VAL(CNF_PVAL(w3ptr)),polydata,status,athree,maxnpts)
 
           call dsa_free_workspace(slot,status)
         end if

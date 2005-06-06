@@ -31,6 +31,7 @@
 * Subroutines/functions referenced:
 *   CANAXLIM           : Reset parameters for axis limits
 *   CLGRAP             : Close graphics
+*   CNF_PVAL           : Full pointer to dynamically allocated memory
 *   DRAWPOLY           : Draw a polyline
 *   GR_SELCT           : Select/open a graphics device
 *
@@ -42,8 +43,6 @@
 *   DSA_MAP_DATA       : Map main data array
 *   DSA_MAP_AXIS_DATA  : Map axis data array
 *   DSA_OPEN           : Open DSA
-*   DYN_ELEMENT = INTEGER
-*        Convert address to array element in dynamic_mem
 *   GEN_RANGEF         : Get range of array
 *   PAR_BATCH = LOGICAL
 *        Find out if running in batch mode
@@ -61,6 +60,8 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status
       integer nl
       integer xptr
@@ -74,7 +75,6 @@
       integer slot,dyn_element
       logical hard,par_batch,batch
       integer ixstart
-      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
 *
 *   Get name of input file
@@ -98,7 +98,6 @@
       iptr = dyn_element(iptr)
 *
       call dsa_map_axis_data('cube',1,'READ','float',xptr,slot,status)
-      xptr = dyn_element(xptr)
 *
 *   Find data.
 *
@@ -115,10 +114,10 @@
 
 * Create plots
 
-      call dsa_axis_range('cube',2,' ',.false.,dummy1,dummy2,ixstart
-     :     ,ixend,status)
-      call dsa_axis_range('cube',3,' ',.false.,dummy1,dummy2,iystart
-     :     ,iyend,status)
+      call dsa_axis_range('cube',2,' ',.false.,dummy1,dummy2,ixstart,
+     :                    ixend,status)
+      call dsa_axis_range('cube',3,' ',.false.,dummy1,dummy2,iystart,
+     :                     iyend,status)
       if(status.ne.SAI__OK) goto 500
 
 *   Open graphics
@@ -168,8 +167,8 @@
           xps = ((real(i)-0.5-xws)/(xwe-xws))*(xve-xvs) + xvs
           xpe = ((real(i)+0.5-xws)/(xwe-xws))*(xve-xvs) + xvs
           call pgvport(xps,xpe,yps,ype)
-          call drawpoly(dynamic_mem(xptr),dynamic_mem(startpos),nz,
-     :             datmin,datmax)
+          call drawpoly(%VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(startpos)),
+     :                  nz,datmin,datmax)
         end do
       end do
       call clgrap

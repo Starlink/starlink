@@ -36,6 +36,7 @@
 *   ZERO_REAL     : Zero a real array
 *   ZERO_SHORT    : Zero an integer*2 array
 *
+*   CNF_PVAL      : Full pointer to dynamically allocated memory
 *   DSA_NAMED_OUTPUT : Open output file. This is used here rather than
 *                      dsa_output since the name should not be set to
 *                      that of an input file.
@@ -62,26 +63,24 @@
 *   AJH 10/98 Replace dsa_map access 'r' to 'READ'
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       character*72 file,ftype*10,chars
       integer status
       include 'arc_dims'
-      include 'CNF_PAR'          ! For CNF_PVAL function
       integer lunit,dims(3),ndims,nx,ny
       integer idims(3),rx2chn,ndims1,start,cxptr
       integer max_gauss
       parameter (max_gauss = 9)
       integer z1ptr,slit,nslit,misptr
-      integer slot,dyn_element,slota,slotd,ml
+      integer slot,slota,slotd,ml
       parameter (ml = 1)
-      character dynamic_chars
       real tl,tr,minleft,maxright,wend
       real value
       character*1 nums(9)
       logical hex,par_qnum,qstat
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data nums/'1','2','3','4','5','6','7','8','9'/
 
       nyp = ml
@@ -144,8 +143,7 @@
         ny=idims(2)
         nx=idims(1)
         call dsa_map_axis_data('image',1,'READ','float',xptr,slota,
-     :       status)
-        xptr = dyn_element(xptr)
+     :                         status)
 
 * Map input data set
 
@@ -153,15 +151,14 @@
         if(status.ne.SAI__OK) then
           go to 500
         end if
-        z1ptr = dyn_element(z1ptr)
         if(slit.eq.1) then
-          call getrange(dynamic_mem(z1ptr),nx,ny,tl,tr,
-     :      dynamic_mem(xptr))
+          call getrange(%VAL(CNF_PVAL(z1ptr)),nx,ny,tl,tr,
+     :                  %VAL(CNF_PVAL(xptr)))
           call clgrap
           minleft = tl
           maxright = tr
-          start = rx2chn(dynamic_mem(xptr),nx,minleft)
-          dims(1) = rx2chn(dynamic_mem(xptr),nx,maxright)
+          start = rx2chn(%VAL(CNF_PVAL(xptr)),nx,minleft)
+          dims(1) = rx2chn(%VAL(CNF_PVAL(xptr)),nx,maxright)
      :       - start + 1
 
 * Create output cube, with Z array.
@@ -193,7 +190,8 @@
 * Map output data set
 
           call mapcube(ftype,.true.,.true.,status)
-          call getwork(dims(2)*dims(3),'short',misptr,slot,status)
+          call dsa_get_work_array(dims(2)*dims(3),'short',misptr,slot,
+     :                            status)
           if(status.ne.SAI__OK) goto 500
 
 * Fill parameter names array
@@ -203,30 +201,33 @@
 * Copy X array (noting that not all of input array is written to output).
 
           cxptr = xptr + (start - 1) * 4
-          call copr2r(dims(1),dynamic_mem(cxptr),dynamic_mem(d_xptr))
+          call copr2r(dims(1),%VAL(CNF_PVAL(cxptr)),
+     :                %VAL(CNF_PVAL(d_xptr)))
 
           if(hex) then
             wend = 1.0 + (dims(3)-1)*0.8660254
-            call fig_wfill(1.0,wend,.false.,dims(3),dynamic_mem(yptr))
+            call fig_wfill(1.0,wend,.false.,dims(3),
+     :                     %VAL(CNF_PVAL(yptr)))
           else
-            call gen_nfillf(dims(3),dynamic_mem(yptr))
+            call gen_nfillf(dims(3),%VAL(CNF_PVAL(yptr)))
           end if
-          call gen_nfillf(dims(2),dynamic_mem(xptr))
+          call gen_nfillf(dims(2),%VAL(CNF_PVAL(xptr)))
 
 *  Zero output filemain data array and missing values array
 
           call gen_cfill(1,dims(1)*dims(2)*dims(3),val__badr,
-     :      dynamic_mem(d_sptr))
-          call zero_short(dynamic_mem(misptr),dims(2)*dims(3))
+     :                   %VAL(CNF_PVAL(d_sptr)))
+          call zero_short(%VAL(CNF_PVAL(misptr)),dims(2)*dims(3))
 
 * Read positions of data in cube, and copy it over
 
           qstat = par_qnum('Enter true wavelength of line',VAL__SMLR,
-     :         VAL__MAXR,6562.817,.true.,' ',%VAL(CNF_PVAL(d_wptr)))
+     :                     VAL__MAXR,6562.817,.true.,' ',
+     :                     %VAL(CNF_PVAL(d_wptr)))
         end if
-        call wr2new(dims(1),dims(2),dims(3),nx,ny,dynamic_mem(z1ptr),
-     :       dynamic_mem(d_sptr),lunit,dynamic_mem(misptr),minleft,
-     :       maxright,dynamic_mem(xptr))
+        call wr2new(dims(1),dims(2),dims(3),nx,ny,%VAL(CNF_PVAL(z1ptr)),
+     :              %VAL(CNF_PVAL(d_sptr)),lunit,%VAL(CNF_PVAL(misptr)),
+     :              minleft,maxright,%VAL(CNF_PVAL(xptr)))
         call dsa_unmap(slota,status)
         call dsa_unmap(slotd,status)
         call dsa_close_structure('image',status)
@@ -235,7 +236,7 @@
 
 * Fill .fibre.xdisp array
 
-        call fillxdisp(dynamic_mem(xdptr),dims(3),lunit)
+        call fillxdisp(%VAL(CNF_PVAL(xdptr)),dims(3),lunit)
       end if
 
 * Close files

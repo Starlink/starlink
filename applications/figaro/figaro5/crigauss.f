@@ -65,10 +65,11 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status,nx,ny,iptr,xptr,dims(2)
       real value
-      integer wptr,dyn_element,slot
-      include 'DYNAMIC_MEMORY'
+      integer wptr,slot
       status = SAI__OK
       call dsa_open(status)
       call dsa_output('data','image',' ',0,0,status)
@@ -85,15 +86,13 @@
       call dsa_simple_output('data','d,a1','float',2,dims,status)
       call dsa_map_data('data','WRITE','float',iptr,slot,status)
       call dsa_map_axis_data('data',1,'WRITE','float',xptr,slot,status)
-      iptr = dyn_element(iptr)
-      xptr = dyn_element(xptr)
 
 * Fill in values of arrays
 
-      call getvm(nx*40,wptr,slot,status)
+      call dsa_get_work_array(nx*10,'int',wptr,slot,status)
       if(status.eq.SAI__OK) then
-        call fillim(dynamic_mem(iptr),dynamic_mem(xptr),nx,ny,
-     :     dynamic_mem(wptr))
+        call fillim(%VAL(CNF_PVAL(iptr)),%VAL(CNF_PVAL(xptr)),nx,ny,
+     :              %VAL(CNF_PVAL(wptr)))
       end if
       call dsa_close(status)
       end

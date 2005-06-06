@@ -33,8 +33,7 @@
       include 'arc_dims'
       include 'CNF_PAR'          ! For CNF_PVAL function
       integer specdim,dims(2)
-      include 'DYNAMIC_MEMORY'
-      integer flagptr,d_s2ptr,slot,dyn_element
+      integer flagptr,d_s2ptr,slot
       logical nocube
 *
 
@@ -60,18 +59,18 @@
 *
       call dsa_data_size('data2',2,specdim,dims,nelm,status)
       call dsa_map_data('data2','READ','float',d_s2ptr,slot,status)
-      d_s2ptr = dyn_element(d_s2ptr)
 
-      call getvm(line_count*spdim1*4,flagptr,slot,status)
+      call dsa_get_work_array(line_count*spdim1,'logical',flagptr,slot,
+     :                        status)
 
       if((specdim.ne.2).or.(dims(1).ne.wavdim).or.
      :       (dims(2).ne.spdim1).or.(status.ne.SAI__OK)) goto 500
 
 * Compare 2 files
 
-      call compare(dynamic_mem(d_sptr),dynamic_mem(d_s2ptr),
-     :       dynamic_mem(flagptr),%VAL(CNF_PVAL(d_tlptr)),
-     :       %VAL(CNF_PVAL(d_trptr)),dynamic_mem(d_xptr))
+      call compare( %VAL(CNF_PVAL(d_sptr)), %VAL(CNF_PVAL(d_s2ptr)),
+     :              %VAL(CNF_PVAL(flagptr)),%VAL(CNF_PVAL(d_tlptr)),
+     :              %VAL(CNF_PVAL(d_trptr)),%VAL(CNF_PVAL(d_xptr)))
  500  continue
       call unmap_res(status)
       call dsa_close(status)

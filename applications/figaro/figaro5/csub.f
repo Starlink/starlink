@@ -30,8 +30,13 @@
 *       AJH - Replaced 'R' in dsa_map.. with 'READ'
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status
-      integer max_ord,jptr,iptr,i,xinptr,nels
+      integer max_ord,jptr,iptr,i,xinptr
       integer nl,ni
       integer mord
       integer kp1l
@@ -45,13 +50,11 @@
       double precision coeffl(max_ord)
       integer dims(2),ndim,nelm
       logical plot,new_csub,ifexit,par_quest
-      integer ptr1,ptr2,slot,dyn_element,ptr01,ptr3
+      integer ptr01,ptr1,ptr2,ptr3
+      integer slot,slot1,slot2,slot3,slot4,slot5
       integer lcorptr
       integer sptr,wptr,lptr
       character*14 chars
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
 *  ---------------------------------------------------------------------
       status = SAI__OK
       mord=max_ord
@@ -90,9 +93,7 @@
 *
       call dsa_map_data('output','UPDATE','float',iptr,slot,status)
       call dsa_map_axis_data('output',1,'READ','double',lptr,
-     :  slot,status)
-      iptr = dyn_element(iptr)
-      lptr = dyn_element(lptr)
+     :                       slot,status)
 
 * Map weights array
 
@@ -110,38 +111,39 @@
 *   Since not all of these are needed at one time, some pointers
 * will have the same value
 
-      nels = (nl*5 + 460)* val__nbd + nl*2*val__nbr
-      call getvm(nels,lcorptr,slot,status)
+      call dsa_get_work_array(nl,'double',lcorptr,slot,status)
+      call dsa_get_work_array(nl,'double',sptr,slot1,status)
+      call dsa_get_work_array(400,'double',ptr01,slot2,status)
+      call dsa_get_work_array(20,'float',ptr1,slot3,status)
+      call dsa_get_work_array(20,'float',ptr2,slot4,status)
+      call dsa_get_work_array(nl*3+60,'double',ptr3,slot5,status)
       if(status.ne.SAI__OK) go to 500
-      sptr = lcorptr + nl*val__nbd
       xinptr = sptr
-      ptr01 = sptr + nl*val__nbd
-      ptr1 = ptr01 + val__nbd*400
-      ptr2 = ptr1 + val__nbr*20
-      ptr3 = ptr2 + val__nbr*20
       if(new_csub) then
 
 *   Zero out coeficient array
 
-        call zero_dble(dynamic_mem(jptr),ni*max_ord)
-        call getrow(dynamic_mem(iptr),nl,ni,dynamic_mem(sptr),
-     :      max(1,(ni/2)))
-        call weight_fit(0.0,nl,dynamic_mem(wptr),.false.)
+        call zero_dble(%VAL(CNF_PVAL(jptr)),ni*max_ord)
+        call getrow(%VAL(CNF_PVAL(iptr)),nl,ni,%VAL(CNF_PVAL(sptr)),
+     :              max(1,(ni/2)))
+        call weight_fit(0.0,nl,%VAL(CNF_PVAL(wptr)),.false.)
 *
 * open graphics
 *
         call gr_soft(status)
-        call plot_data(dynamic_mem(lptr),dynamic_mem(sptr),nl,
-     :    directionl,labell,dynamic_mem(wptr),0,' ')
-        call reject_data(dynamic_mem(lptr),nl,dynamic_mem(wptr),
-     :         directionl,'lines','put tramlines around spectral lines'
-     :         ,dynamic_mem(ptr1),dynamic_mem(ptr2),20)
+        call plot_data(%VAL(CNF_PVAL(lptr)),%VAL(CNF_PVAL(sptr)),nl,
+     :                 directionl,labell,%VAL(CNF_PVAL(wptr)),0,' ')
+        call reject_data(%VAL(CNF_PVAL(lptr)),nl,%VAL(CNF_PVAL(wptr)),
+     :                   directionl,'lines',
+     :                   'put tramlines around spectral lines',
+     :                    %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),20)
 *
 *   Fit continuum
 *
-        call contrl_cpoly2(dynamic_mem(lptr),dynamic_mem(sptr),nl,
-     :      dynamic_mem(wptr),coeffl,mord,kp1l,directionl,labell,2
-     :      ,dynamic_mem(ptr01),.true.,.true.,dynamic_mem(ptr3))
+        call contrl_cpoly2(%VAL(CNF_PVAL(lptr)),%VAL(CNF_PVAL(sptr)),nl,
+     :                     %VAL(CNF_PVAL(wptr)),coeffl,mord,kp1l,
+     :                     directionl,labell,2,%VAL(CNF_PVAL(ptr01)),
+     :                     .true.,.true.,%VAL(CNF_PVAL(ptr3)))
         ifexit = par_quest('Leave now to continue in batch',ni.gt.50)
         call accres(' ','order','wi',1,kp1l-1,' ',status)
       else
@@ -161,7 +163,7 @@
         plot=.true.
         xinptr = lcorptr+ nl*8
         do i=1,ni
-          call getrow(dynamic_mem(iptr),nl,ni,dynamic_mem(sptr),i)
+          call getrow(%VAL(CNF_PVAL(iptr)),nl,ni,%VAL(CNF_PVAL(sptr)),i)
 *
 *   Fit vignetting
 *
@@ -169,14 +171,15 @@
             write(chars,'(a,i4)')'X-section',i
             call par_wruser(chars,status)
           end if
-          call contrl_cpoly2(dynamic_mem(lptr),dynamic_mem(sptr),nl,
-     :         dynamic_mem(wptr),dynamic_mem(ptr1),mord,kp1l,directionl,
-     :         labell,2,dynamic_mem(ptr01),plot,.false.,
-     :         dynamic_mem(ptr3))
-          call save_cheby(ni,i,i,dynamic_mem(ptr1),kp1l,max_ord,
-     :                          dynamic_mem(jptr))
-          call correct2(dynamic_mem(iptr),dynamic_mem(jptr),nl,ni,mord,
-     :          kp1l,i,dynamic_mem(lcorptr),dynamic_mem(xinptr),.false.)
+          call contrl_cpoly2(%VAL(CNF_PVAL(lptr)),%VAL(CNF_PVAL(sptr)),
+     :         nl,%VAL(CNF_PVAL(wptr)),%VAL(CNF_PVAL(ptr1)),mord,kp1l,
+     :         directionl,labell,2,%VAL(CNF_PVAL(ptr01)),plot,.false.,
+     :         %VAL(CNF_PVAL(ptr3)))
+          call save_cheby(ni,i,i,%VAL(CNF_PVAL(ptr1)),kp1l,max_ord,
+     :                    %VAL(CNF_PVAL(jptr)))
+          call correct2(%VAL(CNF_PVAL(iptr)),%VAL(CNF_PVAL(jptr)),nl,ni,
+     :                  mord,kp1l,i,%VAL(CNF_PVAL(lcorptr)),
+     :                  %VAL(CNF_PVAL(xinptr)),.false.)
           plot = mod(i,plot_step).eq.0
           if(plot) call pgpage
         end do

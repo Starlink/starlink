@@ -78,8 +78,7 @@
 *    CLGRAP             : Close graphics
 *    CLONE_MODE         : CLONE continuum locations etc. from another file
 *    GR_SELCT           : Open graphics device
-*    GETVM              : Get virtual memory
-*    GETWORK            : Get virtual memory
+*    CNF_PVAL           : Full pointer to dynamically allocated memory
 *    INIT_RES           : Initialise results structure
 *    MAP_DATA           : Map data
 *    MAP_RES            : Map results structure
@@ -93,9 +92,9 @@
 *    DSA_CLOSE          : Close DSA system
 *    DSA_AXIS_RANGE     : Get axis limits
 *    DSA_FREE_WORKSPACE : Free workspace
+*    DSA_GET_WORK_ARRAY : Get workspace
 *    DSA_OUTPUT         : Create output file
 *    DSA_MAP_DATA       : Map main data array
-*    DYN_ELEMENT        : Convert address to array element in dynamic_mem
 *    FIG_XTRACT         : Take slice thru' data in X direction
 *    PAR_RDKEY          : Read key parameter
 *    PAR_RDVAL          : Read value parameter
@@ -124,6 +123,11 @@
 * _____________________________________________________________________
       implicit none
 
+      include 'gr_inc'
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
 * if clone file opened
 
       logical clopen
@@ -132,8 +136,6 @@
 *
       integer status
       include 'arc_dims'
-      include 'gr_inc'
-      include 'CNF_PAR'          ! For CNF_PVAL function
       real value,value1
 *
 *  integer
@@ -144,12 +146,13 @@
       integer ixstart
       integer sptr
 
-      integer workptr,slot,slot1
+      integer workptr,slot,slot1,slot2,slot3,slot4,slot5,slot6,slot7
+      integer slot8,slot9,slot10,slot11,slot12,slot13
       logical nocube
       logical new
       logical plotcorr
       integer nbytes,ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9,ptr10
-      integer ptr11,aaptr,nels
+      integer ptr11,aaptr
       logical par_given
       integer lu
       integer MAX_ORD
@@ -161,18 +164,11 @@
       logical old
       integer nused
       logical loop,oloop
-      integer dyn_element
       integer OPT_LOOK, OPT_SOFT, OPT_HARD, OPT_TOLS, OPT_GAUSS, OPT_ADD
      :        , OPT_EXIT, OPT_POLY
       parameter (OPT_LOOK = 1, OPT_SOFT = 2, OPT_HARD = 3, OPT_TOLS = 4,
      :           OPT_POLY = 5, OPT_GAUSS = 6, OPT_ADD = 7, OPT_EXIT = 8)
       character*72 chars
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      include 'bytesdef'
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 *
 * include menus
 *
@@ -214,14 +210,14 @@
 *
 *       2 D   d a t a :define a template
 *
-          call dsa_axis_range('data',2,' ',.false.,value,value1,ixstart
-     :                  ,ixend,status)
+          call dsa_axis_range('data',2,' ',.false.,value,value1,ixstart,
+     :                        ixend,status)
           call canaxlim(2)
 *
 * extract template
 *
-          call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,ixstart,
-     :            ixend,dynamic_mem(d_vsptr))
+          call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,ixstart,
+     :                    ixend,%VAL(CNF_PVAL(d_vsptr)))
           call init_res(.true.,status)
 *
 * setup arc display
@@ -296,14 +292,16 @@
 *     If in batch then we want to fit the line profiles
 
         if(batch) then
-          call getwork(2*line_count,'float',ptr1,slot,status)
+          call dsa_get_work_array(line_count,'float',ptr1,slot,status)
+          call dsa_get_work_array(line_count,'float',ptr2,slot2,status)
           if(status.ne.SAI__OK) goto 500
-          ptr2 = ptr1 + line_count * VAL__NBR
-          call arc_window(dynamic_mem(d_xptr),%VAL(CNF_PVAL(d_tlptr)),
-*     :        dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
-     :        %VAL(CNF_PVAL(d_trptr)),idstring,
-     :        dynamic_mem(ptr2),dynamic_mem(ptr2),status)
-          call dsa_free_workspace(slot,status)
+          call arc_window(%VAL(CNF_PVAL(d_xptr)),
+     :                    %VAL(CNF_PVAL(d_tlptr)),
+     :                    %VAL(CNF_PVAL(d_trptr)),idstring,
+     :                    %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
+     :                    status)
+          call dsa_free_workspace(slot2,status)
+          call dsa_free_workspace(slot1,status)
           call apply_tols(.true.,status)
           oloop = par_given('order')
         else
@@ -338,27 +336,32 @@
 
             else if(iopt.eq.OPT_TOLS) then
               call apply_tols(.false.,status)
+
             else if (iopt.eq.OPT_POLY) then
               loop = .false.
-            else if (iopt.eq.OPT_GAUSS) then
-              call getwork(2*line_count,'float',ptr1,slot,status)
+
+                        else if (iopt.eq.OPT_GAUSS) then
+              call dsa_get_work_array(line_count,'float',ptr1,slot1,
+     :                                 status)
+              call dsa_get_work_array(line_count,'float',ptr2,slot2,
+     :                                status)
               if(status.ne.SAI__OK) goto 500
-              ptr2 = ptr1 + line_count * VAL__NBR
-              call arc_window(dynamic_mem(d_xptr),
+              call arc_window(%VAL(CNF_PVAL(d_xptr)),
      :                        %VAL(CNF_PVAL(d_tlptr)),
-*     :            dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
-     :            %VAL(d_trptr),idstring,
-     :            dynamic_mem(ptr2),dynamic_mem(ptr2),status)
-              call dsa_free_workspace(slot,status)
+     :                        %VAL(CNF_PVAL(d_trptr)),idstring,
+     :                        %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
+     :                        status)
+              call dsa_free_workspace(slot1,status)
+              call dsa_free_workspace(slot2,status)
+
             else if (iopt.eq.OPT_ADD) then
               call dsa_axis_range('data',2,' ',.false.,value,value1,
-     :                  ixstart,ixend,status)
+     :                            ixstart,ixend,status)
               call canaxlim(2)
-              call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :             ixstart,ixend,dynamic_mem(d_vsptr))
+              call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                        ixstart,ixend,%VAL(CNF_PVAL(d_vsptr)))
               call setup_arc2(%VAL(CNF_PVAL(d_tlptr)),
-     :                        %VAL(CNF_PVAL(d_trptr)),
-     :                        .true.,status)
+     :                        %VAL(CNF_PVAL(d_trptr)),.true.,status)
             else if (iopt.eq.OPT_EXIT) then
               loop=.false.
               oloop = .false.
@@ -372,15 +375,20 @@
 *   YLIMPTR LINE_COUNT*2        (d)
 *   PTR1    LINE_COUNT          (l)
 
-            nels = (line_count*MAX_ORD + line_count*2)*VAL__NBD
-     :                  + line_count * bytes_logical
-            call getvm(nels,aaptr,slot1,status)
-            ylimptr = aaptr + line_count*MAX_ORD*VAL__NBD
-            ptr1 = ylimptr + line_count*2*VAL__NBD
+            call dsa_get_work_array(line_count*MAX_ORD,'double',aaptr,
+     :                              slot,status)
+            call dsa_get_work_array(line_count*2,'double',ylimptr,slot1,
+     :                              status)
+            call dsa_get_work_array(line_count,'logical',ptr1,slot2,
+     :                              status)
             if(status.ne.SAI__OK) goto 500
-            call comb_contin(dynamic_mem(aaptr),dynamic_mem(ylimptr),
-     :                  dynamic_mem(ptr1),.false.,status)
+
+            call comb_contin(%VAL(CNF_PVAL(aaptr)),
+     :                       %VAL(CNF_PVAL(ylimptr)),
+     :                       %VAL(CNF_PVAL(ptr1)),.false.,status)
+            call dsa_free_workspace(slot2,status)
             call dsa_free_workspace(slot1,status)
+            call dsa_free_workspace(slot,status)
           end if
           oloop = oloop.and.(.not.batch)
         end do
@@ -393,8 +401,7 @@
 *
 *  Map the data
 *
-        call dsa_map_data('output','UPDATE','float',sptr,slot,status)
-        d_sptr = dyn_element(sptr)
+        call dsa_map_data('output','UPDATE','float',d_sptr,slot,status)
 *
 *  Read the coefficients and the starting locations of the tooth.
 *  Before reading anything other than the order and number of window
@@ -411,7 +418,7 @@
     2   format(2(1x,i4))
 
 *
-*  Apply the corections to the data
+*  Apply the corrections to the data.
 *
 *  Get workspace:
 *   AAPTR     (d) * NUSED * MAX_ORD
@@ -422,41 +429,43 @@
 *   PTR7-9  (r) * WAVDIM
 *   PTR10-11  (d) * NUSED
 
-        nbytes = VAL__NBD * (spdim1*(nused+3)
-     :     + VAL__NBR*wavdim) + 3*wavdim*VAL__NBR
-     :     + nused*VAL__NBD*2 + (nused*MAX_ORD + nused*2) * VAL__NBD
-        call getvm(nbytes,workptr,slot,status)
+        call dsa_get_work_array(spdim1*nused,'double',workptr,slot,
+     :                          status)
+        call dsa_get_work_array(spdim1,'double',ptr1,slot1,status)
+        call dsa_get_work_array(spdim1,'double',ptr2,slot2,status)
+        call dsa_get_work_array(wavdim,'double',ptr3,slot3,status)
+        call dsa_get_work_array(wavdim,'double',ptr4,slot4,status)
+        call dsa_get_work_array(wavdim,'double',ptr5,slot5,status)
+        call dsa_get_work_array(wavdim,'double',ptr6,slot6,status)
+        call dsa_get_work_array(wavdim,'float',ptr7,slot7,status)
+        call dsa_get_work_array(wavdim,'float',ptr8,slot8,status)
+        call dsa_get_work_array(wavdim,'float',ptr9,slot9,status)
+        call dsa_get_work_array(nused,'double',ptr10,slot10,status)
+        call dsa_get_work_array(nused,'double',ptr11,slot11,status)
+        call dsa_get_work_array(nused*MAX_ORD,'double',aaptr,slot12,
+     :                          status)
+        call dsa_get_work_array(nused*2,'double',ylimptr,slot13,status)
+
         call par_rdkey('plotcorr',.false.,plotcorr)
         if(plotcorr) call gr_selct((.not.batch),status)
         if(status.ne.SAI__OK) go to 500
-        ptr1 = workptr+spdim1*nused*VAL__NBD
-        ptr2 = ptr1+spdim1*VAL__NBD
-        ptr3 = ptr2+spdim1*VAL__NBD
-        ptr4 = ptr3+wavdim*VAL__NBD
-        ptr5 = ptr4+wavdim*VAL__NBD
-        ptr6 = ptr5+wavdim*VAL__NBD
-        ptr7 = ptr6+wavdim*VAL__NBD
-        ptr8 = ptr7+wavdim*VAL__NBR
-        ptr9 = ptr8+wavdim*VAL__NBR
-        ptr10 = ptr9+wavdim*VAL__NBR
-        ptr11 = ptr10+nused*VAL__NBD
-        aaptr = ptr11+nused*VAL__NBD
-        ylimptr = aaptr + nused*MAX_ORD*VAL__NBD
 
 * Read in coefficients and limits for Cheby fitting
 
-        call read_coeffs(lu,nused,kp1,dynamic_mem(aaptr),
-     :      dynamic_mem(ylimptr))
+        call read_coeffs(lu,nused,kp1,%VAL(CNF_PVAL(aaptr)),
+     :                   %VAL(CNF_PVAL(ylimptr)))
 
 * Apply correction
 
-        call apply2(dynamic_mem(d_sptr),dynamic_mem(aaptr),wavdim,
-     :         spdim1,MAX_ORD,dynamic_mem(ylimptr),nused,kp1,
-     :         dynamic_mem(workptr),(terminal.or.hardcopy),
-     :         dynamic_mem(ptr1),dynamic_mem(ptr2),dynamic_mem(ptr3),
-     :         dynamic_mem(ptr4),dynamic_mem(ptr5),dynamic_mem(ptr6),
-     :         dynamic_mem(ptr7),dynamic_mem(ptr8),dynamic_mem(ptr9),
-     :         dynamic_mem(ptr10),dynamic_mem(ptr11))
+        call apply2(%VAL(CNF_PVAL(d_sptr)),%VAL(CNF_PVAL(aaptr)),wavdim,
+     :              spdim1,MAX_ORD,%VAL(CNF_PVAL(ylimptr)),nused,kp1,
+     :              %VAL(CNF_PVAL(workptr)),(terminal.or.hardcopy),
+     :              %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
+     :              %VAL(CNF_PVAL(ptr3)),%VAL(CNF_PVAL(ptr4)),
+     :              %VAL(CNF_PVAL(ptr5)),%VAL(CNF_PVAL(ptr6)),
+     :              %VAL(CNF_PVAL(ptr7)),%VAL(CNF_PVAL(ptr8)),
+     :              %VAL(CNF_PVAL(ptr9)),%VAL(CNF_PVAL(ptr10)),
+     :              %VAL(CNF_PVAL(ptr11)))
       end if
       call clgrap
       if(.not.old) then

@@ -54,8 +54,9 @@
 *
 *     High and low limits
 *
-      include 'PRM_PAR'
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 *     Local variables
 *
@@ -63,13 +64,12 @@
       integer i,nelm
       integer status,start,ichst,ichen,ixen,zptr
       integer nxp,nyp,tstart,flev,nlevs
-      integer nfound,yest,yeen,slot,dyn_element
+      integer nfound,yest,yeen,slot
       real centre(200),widths(200)
       logical plog,old
       real low,high,dummy1,dummy2
       integer iwork,lu
       character chars*64,ffile*72
-      include 'DYNAMIC_MEMORY'
 *
 *     Initial values
 *
@@ -103,7 +103,6 @@
       if (status.ne.SAI__OK)  then
         go to 500
       end if
-      start = dyn_element(start)
       call gr_init
       call par_rdkey('old',.false.,old)
       if(old) then
@@ -145,18 +144,18 @@
 * Perform greyscale plotting in this
 
         tstart = start + 4*(ixst-1)*nl
-        call getwork(nxp*nyp,'int',iwork,slot,status)
+        call dsa_get_work_array(nxp*nyp,'int',iwork,slot,status)
         if(status.ne.SAI__OK) goto 500
         call pgenv(real(ichst),real(ichen),real(ixst),real(ixen),0,-2)
-        call gryplt(dynamic_mem(tstart),dynamic_mem(iwork),nl,nyp,nxp,
-     :        ichst,nlevs,low,high,.false.,plog,4)
+        call gryplt(%VAL(CNF_PVAL(tstart)),%VAL(CNF_PVAL(iwork)),nl,
+     :        nyp,nxp,ichst,nlevs,low,high,.false.,plog,4)
         call dsa_free_workspace(slot,status)
 
 * Get user to indicate end points with a cursor, and locate the fibre
 * spectra from these.
 
-        call findfib(dynamic_mem(start),nl,ni,ichst,ixst,centre,nfound,
-     :            widths)
+        call findfib(%VAL(CNF_PVAL(start)),nl,ni,ichst,ixst,centre,
+     :               nfound,widths)
         call par_rdchar('file','fibres.lis',ffile)
         call dsa_open_text_file(ffile,' ','new',.true.,lu,chars,status)
         write(lu,'(i5)')nfound
@@ -179,25 +178,24 @@
       if(status.ne.SAI__OK) then
         goto 500
       end if
-      zptr = dyn_element(zptr)
 
 * Copy data to output file
 
       yest = nint(centre(1) - widths(1)*2.0)
       yeen = nint((centre(1) + widths(1)*1.5 + centre(2)
      :    - widths(2)*1.5)*0.5)
-      call fig_xtract(dynamic_mem(start),nl,ni,yest,yeen,
-     :       dynamic_mem(zptr))
+      call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
+     :       %VAL(CNF_PVAL(zptr)))
       do i = 2, nfound-1
         yest = yeen
-        yeen = nint((centre(i) + widths(i)*1.5 + centre(i+1)
-     :      - widths(i+1)*1.5)*0.5)
-        call fig_xtract(dynamic_mem(start),nl,ni,yest,yeen,
-     :    dynamic_mem((i-1)*4*nl+zptr))
+        yeen = nint((centre(i) + widths(i)*1.5 + centre(i+1) -
+     :         widths(i+1)*1.5)*0.5)
+        call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
+     :                  %VAL(CNF_PVAL((i-1)*4*nl+zptr)))
       end do
       yeen = nint(centre(nfound) + widths(nfound)*2.0)
-      call fig_xtract(dynamic_mem(start),nl,ni,yest,yeen,
-     :    dynamic_mem(zptr+(nfound-1)*4*nl))
+      call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
+     :                %VAL(CNF_PVAL(zptr+(nfound-1)*4*nl)))
 *
 *     Tidy up
 *
