@@ -32,7 +32,7 @@ C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
+C     CNF_PVAL, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
 C     DSA_WRUSER, DSA_UNFLAG_DATA
 C
 C  Prior requirements:
@@ -46,15 +46,15 @@ C
 C  Version date: 6th February 1995
 C-
 C  Subroutine / function details:
-C     DYN_ELEMENT    Dynamic memory element corresponding to virtual address
-C     ICH_FOLD       Convert string to upper case
-C     ICH_LEN        Position of last non-blank char in string
-C     DSA_FIND_REF   Look up reference name in common tables
+C     CNF_PVAL         Full pointer to dynamically allocated memory
+C     ICH_FOLD         Convert string to upper case
+C     ICH_LEN          Position of last non-blank char in string
+C     DSA_FIND_REF     Look up reference name in common tables
 C     DSA_GET_ACTUAL_NAME  Get full name corresponding to reference name
-C     DSA_WRUSER     Output message to user
-C     DSA_GET_WORKSPACE    Get specified amount of workspace
-C     DSA_FREE_WORKSPACE   Release workspace obtained by DSA_GET_WORKSPACE
-C     DSA_UNFLAG_DATA      Remove flag values from data array
+C     DSA_WRUSER       Output message to user
+C     DSA_GET_WORKSPACE  Get specified amount of workspace
+C     DSA_FREE_WORKSPACE  Release workspace obtained by DSA_GET_WORKSPACE
+C     DSA_UNFLAG_DATA  Remove flag values from data array
 C
 C  Common variable details:
 C     (>) MAP_POINTER   (Integer array) Memory address for the array.
@@ -71,20 +71,24 @@ C     (>) WORK_TYPE     (String array)  Type of array held in workspace.
 C     (>) PRE_FLAG      (Logical array) Indicates quality preprocessing done.
 C
 C  History:
-C     22nd July 1988  Original version.  KS / AAO.
-C     3rd  May  1990  Flagged value count added to DSA_UNFLAG_DATA call. KS/AAO.
-C     21st Aug 1992   Automatic portability modifications
-C                     ("INCLUDE" syntax etc) made. KS/AAO
-C     23rd Aug 1992   Remove unused variable declarations. KS/AAO
-C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
-C      6th Feb 1995   Modified to allow files with both flagged values and
-C                     quality information, and for both to be handled at
-C                     once. Call to DSA_UNFLAG_DATA changed. KS/AAO.
-C     25th Jul 1996   Corrected type of LEAVE_FLAGGED.  MJCL/Starlink, UCL.
+C     22nd July 1988 Original version.  KS / AAO.
+C     3rd  May  1990 Flagged value count added to DSA_UNFLAG_DATA call. KS/AAO.
+C     21st Aug 1992  Automatic portability modifications
+C                    ("INCLUDE" syntax etc) made. KS/AAO
+C     23rd Aug 1992  Remove unused variable declarations. KS/AAO
+C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
+C      6th Feb 1995  Modified to allow files with both flagged values and
+C                    quality information, and for both to be handled at
+C                    once. Call to DSA_UNFLAG_DATA changed. KS/AAO.
+C     25th Jul 1996  Corrected type of LEAVE_FLAGGED.  MJCL/Starlink, UCL.
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_POST_PROCESS_FLAGGED_VALUES (REF_NAME,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -94,13 +98,11 @@ C
 C     Functions used
 C
       INTEGER ICH_FOLD, ICH_LEN
-      INTEGER DYN_ELEMENT
 C
 C     Local variables
 C
       INTEGER   DATA_ADDR                   ! Virtual address of data array
       CHARACTER DATA_TYPE*16                ! Type of mapped data array 
-      INTEGER   DPTR                        ! Dynamic mem element for data array
       INTEGER   I                           ! Index through dimensions
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   INVOKE                      ! Dummy function value
@@ -110,7 +112,6 @@ C
       INTEGER   NELM                        ! Number of data array elements
       INTEGER   NFLAGGED                    ! Number of flagged data values
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   QPTR                        ! Dynamic mem element for quality
       INTEGER   QUAL_ADDR                   ! Virtual address of quality array
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
       INTEGER   REF_SLOT                    ! Reference table slot # 
@@ -124,10 +125,6 @@ C
 C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
-C     Dynamic memory system common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Return immediately if bad status passed
 C
@@ -226,13 +223,12 @@ C           quality array before calling DSA_UNFLAG_DATA. If we are leaving
 C           flags in the data, we should make sure we have the array flagged
 C           as containing flagged data.
 C
-            QPTR=DYN_ELEMENT(QUAL_ADDR)
-            DPTR=DYN_ELEMENT(DATA_ADDR)
             LEAVE_FLAGGED=.TRUE.
             CALL DSA_ZFILL_ARRAY (NELM,QUAL_ADDR,'BYTE',STATUS)
             CALL DSA_UNFLAG_DATA(NELM,LEAVE_FLAGGED,DATA_TYPE,
-     :                        DYNAMIC_MEM(DPTR),DYNAMIC_MEM(QPTR),
-     :                                             NFLAGGED,STATUS)
+     :                           %VAL(CNF_PVAL(DATA_ADDR)),
+     :                           %VAL(CNF_PVAL(QUAL_ADDR)),
+     :                           NFLAGGED,STATUS)
             IF (QUAL_EXIST(REF_SLOT).GT.0) QUAL_UPDATE(REF_SLOT)=.TRUE.
          END IF
 C

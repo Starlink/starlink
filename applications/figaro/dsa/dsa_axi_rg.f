@@ -10,12 +10,12 @@ C
 C  Description:
 C     Figaro has a large number of applications that operate on a
 C     sub-range of the data in a structure.  Typically, an application
-C     that operates on a limited range of the X-axis will have parameters
-C     XSTART and XEND.  These have to be compared with the data in the
-C     appropriate axis in order to determine the pixel range that they
-C     represent.  This routine interacts with the parameter system and 
-C     the data for a specified axis in order to return such limits
-C     for a specified axis.
+C     that operates on a limited range of the X-axis will have
+C     parameters XSTART and XEND.  These have to be compared with the
+C     data in the appropriate axis in order to determine the pixel
+C     range that they represent.  This routine interacts with the
+C     parameter system and  the data for a specified axis in order to
+C     return such limits for a specified axis.
 C
 C  Language:
 C     FORTRAN
@@ -32,15 +32,16 @@ C     (>) AXIS          (Integer,ref) The number of the axis in question.
 C     (>) CONTROL       (Fixed string,descr)  A string controlling 
 C                       some of the routines options.  Lower case
 C                       characters are ignored.  If CONTROL contains a
-C                       'U' (for 'Unconstrained'), this indicates that the 
-C                       range need not be constrained to lie within the extrema 
-C                       of the axis data.  If it contains a 'C' (for 'Complex')
-C                       this indicates that multi-dimensional axis data is
-C                       acceptable to the program (which will have to use
-C                       DSA_AXIS_BOUNDS to obtain sensible ISTART,IEND values).
-C     (>) WHOLE         (Logical,ref) If true, the parameters will not be
-C                       prompted for.  Instead, the extreme axis values
-C                       will be taken.
+C                       'U' (for 'Unconstrained'), this indicates that
+C                       the  range need not be constrained to lie within
+C                       the extrema of the axis data.  If it contains a
+C                       'C' (for 'Complex') this indicates that
+C                       multi-dimensional axis data is acceptable to the
+C                       program (which will have to use DSA_AXIS_BOUNDS
+C                       to obtain sensible ISTART,IEND values).
+C     (>) WHOLE         (Logical,ref) If true, the parameters will not
+C                       be prompted for.  Instead, the extreme axis
+C                       values will be taken.
 C     (<) START         (Real,ref) The data value of the start of the
 C                       range selected.
 C     (<) END           (Real,ref) The data value of the end of the
@@ -80,7 +81,7 @@ C     DSA_UNMAP          Unmap data array mapped by DSA_ routine
 C     PAR_ABORT          Test parameter system abort flag
 C     PAR_RDVAL          Get numberic value from parameter system
 C     PAR_SDVAL          Set default for numeric parameter
-C     DYN_ELEMENT        Get dynamic element corresponding to address
+C     CNF_PVAL           Full pointer to dynamically allocated memory
 C     GEN_ELEMF          Get element of a real array
 C     GEN_BSEARCH        Find array element nearest to a specified value
 C     GEN_RANGEF         Get maximum and minimum values in an array
@@ -99,6 +100,9 @@ C     21st Aug 1992   Automatic portability modifications
 C                     ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
 C     5th  Oct 1992   TABs removed. HME / UoE, Starlink.
+C     2005 June 3     Replace DYNAMIC_MEMORY with 
+C                     %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                     addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_AXIS_RANGE (REF_NAME,AXIS,CONTROL,WHOLE,START,
      :                                        END,ISTART,IEND,STATUS)
@@ -115,7 +119,7 @@ C
 C     Functions used
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT, GEN_BSEARCH, ICH_LEN
+      INTEGER GEN_BSEARCH, ICH_LEN
       REAL GEN_ELEMF
 C
 C     DSA_ common definition - used to supply value of MAX_AXES
@@ -125,42 +129,44 @@ C
 C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+CC
 C     Local variables
 C
-      INTEGER   ADDRESS           ! Address of the mapped array
-      CHARACTER AXIS_CH*1         ! First letter of axis name
-      INTEGER   DIMS(MAX_AXES)    ! Dimensions of axis data
-      INTEGER   DUMMY             ! Dummy argument
-      INTEGER   ELEMENT           ! Dynamic memory element for data array
-      INTEGER   ELEMENTS          ! Number of data array elements
-      LOGICAL   EXIST             ! Indicates axis data exists
-      REAL      FIRST             ! First value in data array
-      INTEGER   IGNORE            ! Dummy status return from PAR_ routines
-      INTEGER   ITEMP             ! Used to swop ISTART,IEND 
-      REAL      LAST              ! Last value in data array
-      LOGICAL   LIMITED           ! Indicates values constrained to axis values
-      INTEGER   NDIM              ! Number of data array dimensions
-      INTEGER   NELM              ! Elements in 1st 1D array of axis data
-      LOGICAL   REVERSE           ! True if axis values are in descending order
-      LOGICAL   SIMPLE            ! Indicates data has to be 1D (not Complex)
-      INTEGER   SLOT              ! Map slot handle
-      CHARACTER STRUCTURE*128     ! Full name of data structure
-      REAL      PMAX              ! Maximum acceptable parameter value
-      REAL      PMIN              ! Minimum axcceptable parameter value
-      CHARACTER UNITS*32          ! Units for data
-      REAL      VMAX              ! Maximum value in axis data array
-      REAL      VMIN              ! Minimum value in axis data array
+      INTEGER   ADDRESS          ! Address of the mapped array
+      CHARACTER AXIS_CH*1        ! First letter of axis name
+      INTEGER   DIMS(MAX_AXES)   ! Dimensions of axis data
+      INTEGER   DUMMY            ! Dummy argument
+      INTEGER   ELEMENTS         ! Number of data array elements
+      LOGICAL   EXIST            ! Indicates axis data exists
+      REAL      FIRST            ! First value in data array
+      INTEGER   IGNORE           ! Dummy status return from PAR_
+                                 ! routines
+      INTEGER   ITEMP            ! Used to swop ISTART,IEND 
+      REAL      LAST             ! Last value in data array
+      LOGICAL   LIMITED          ! Indicates values constrained to axis
+                                 ! values
+      INTEGER   NDIM             ! Number of data array dimensions
+      INTEGER   NELM             ! Elements in 1st 1D array of axis
+                                 ! data
+      LOGICAL   REVERSE          ! True if axis values are in
+                                 ! descending order
+      LOGICAL   SIMPLE           ! Indicates data has to be 1D
+                                 ! (not Complex)
+      INTEGER   SLOT             ! Map slot handle
+      CHARACTER STRUCTURE*128    ! Full name of data structure
+      REAL      PMAX             ! Maximum acceptable parameter value
+      REAL      PMIN             ! Minimum axcceptable parameter value
+      CHARACTER UNITS*32         ! Units for data
+      REAL      VMAX             ! Maximum value in axis data array
+      REAL      VMIN             ! Minimum value in axis data array
 C
 C     Absolute limits for the values - these are chosen, a little
 C     arbitrarily, to be just inside the machines floating point range.
 C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.0E38, FMIN=-1.0E38)
-C
-C     DYN_ dynamic memory defintion - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Names of axis data structures - note that this routine assumes that
 C     they are all single character names, and can only support up to AXIS=6.
@@ -221,13 +227,13 @@ C        the array is multi-dimensional, and the application will
 C        accept that, we take the maximum and minimum over the
 C        whole array.
 C        
-         ELEMENT=DYN_ELEMENT(ADDRESS)
          NELM=DIMS(1)
-         FIRST=GEN_ELEMF(DYNAMIC_MEM(ELEMENT),1)
-         LAST=GEN_ELEMF(DYNAMIC_MEM(ELEMENT),NELM)
+         FIRST=GEN_ELEMF(%VAL(CNF_PVAL(ADDRESS)),1)
+         LAST=GEN_ELEMF(%VAL(CNF_PVAL(ADDRESS)),NELM)
          REVERSE=FIRST.GT.LAST
          IF ((NDIM.GT.1).AND.(.NOT.SIMPLE)) THEN
-            CALL GEN_RANGEF (DYNAMIC_MEM(ELEMENT),1,ELEMENTS,VMAX,VMIN)
+            CALL GEN_RANGEF (%VAL(CNF_PVAL(ADDRESS)),1,ELEMENTS,VMAX,
+     :                       VMIN)
          ELSE
             VMIN=MIN(FIRST,LAST)
             VMAX=MAX(FIRST,LAST)
@@ -290,8 +296,8 @@ C     Get the values in terms of element numbers.  Note that this is
 C     done only in terms of the first 1d array of the axis data.
 C
       IF (EXIST) THEN
-         ISTART=GEN_BSEARCH(DYNAMIC_MEM(ELEMENT),NELM,START)
-         IEND=GEN_BSEARCH(DYNAMIC_MEM(ELEMENT),NELM,END)
+         ISTART=GEN_BSEARCH(%VAL(CNF_PVAL(ADDRESS)),NELM,START)
+         IEND=GEN_BSEARCH(%VAL(CNF_PVAL(ADDRESS)),NELM,END)
          IF (ISTART.LT.1) ISTART=1
          IF (IEND.LT.1) IEND=NELM
          IF (ISTART.GT.IEND) THEN

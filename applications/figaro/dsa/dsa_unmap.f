@@ -29,9 +29,9 @@ C     (!) STATUS   (Integer,ref) Status value.  If bad status is passed,
 C                  this routine returns immediately.
 C
 C  External subroutines / functions used:  
-C     ICH_CI, ICH_LEN, DSA_WRUSER, DSA_WRNAME, DSA_FMTCON, DSA_STRUCTC
+C     CNF_PVAL, ICH_CI, ICH_LEN, DSA_WRUSER, DSA_WRNAME, DSA_FMTCON, DSA_STRUCTC
 C     DSA_FREE_WORKSPACE, DSA_REFLAG_DATA, DSA_VARIANCE_TO_ERR,
-C     DSA_ERR_TO_VARIANCE, DSA_WRFLUSH, DYN_ELEMENT
+C     DSA_ERR_TO_VARIANCE, DSA_WRFLUSH
 C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system.
@@ -43,18 +43,18 @@ C           Horst Meyerdierks, UoE, Starlink
 C           Malcolm J. Currie, Starlink
 C-
 C  Subroutine / function details:
-C     DSA_WRUSER      Output message to user
-C     DSA_WRFLUSH     Flush output message buffer to user
-C     DSA_WRNAME      Output structure name to user
-C     DSA_STRUCTC     Rewrite array into a contracted structure
+C     CNF_PVAL           Full pointer to dynamically allocated memory
+C     DSA_WRUSER         Output message to user
+C     DSA_WRFLUSH        Flush output message buffer to user
+C     DSA_WRNAME         Output structure name to user
+C     DSA_STRUCTC        Rewrite array into a contracted structure
 C     DSA_FREE_WORKSPACE Release work array
-C     DSA_REFLAG_DATA Reset flagged data values removed by DSA_UNFLAG_DATA
+C     DSA_REFLAG_DATA    Reset flagged data values removed by DSA_UNFLAG_DATA
 C     DSA_VARIANCE_TO_ERR Convert a variance array to an error array
 C     DSA_ERR_TO_VARIANCE Convert an error array to a variance array
-C     DSA_FMTCON      General array type conversion routine
-C     DYN_ELEMENT     Element in DYNAMIC_MEM corresponding to an address.
-C     ICH_LEN         Position of last non-blank char in string
-C     ICH_CI          Formats an integer into a string
+C     DSA_FMTCON         General array type conversion routine
+C     ICH_LEN            Position of last non-blank char in string
+C     ICH_CI             Formats an integer into a string
 C
 C  History:
 C     8th July 1987   Original version.  KS / AAO.
@@ -75,6 +75,8 @@ C                     of by pointer. KS/AAO.
 C      2nd Jul  1993  Now closes down any workspace used to hold flagged
 C                     data information. KS/AAO.
 C     2005 May 31     Use CNF_PVAL for pointers to mapped data. MJC
+C     2005 June 3     Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                     contruct for 64-bit addressing.  MJC / Starlink
 C
 C  Note:
 C     This version can handle the following types of SGP38 structured
@@ -95,7 +97,7 @@ C
 C
 C     Functions used
 C
-      INTEGER DYN_ELEMENT, ICH_LEN
+      INTEGER ICH_LEN
       CHARACTER ICH_CI*8
 C
 C     DSA_ system common definition
@@ -105,10 +107,6 @@ C
 C     DSA_ system error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
-C     Dynamic memory definitions. Defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Local variables
 C
@@ -268,8 +266,8 @@ C
             IF (.NOT.MAP_SCALED(MAP_SLOT)) THEN
                CALL DSA_FMTCON(WORK_PROP(WORK_SLOT),
      :            FMTCON_CODE(TYPE_CODE),FMTCON_CODE(OBJ_TYPE_CODE),
-     :            DYNAMIC_MEM(DYN_ELEMENT(WORK_POINTER(WORK_SLOT))),
-     :            DYNAMIC_MEM(DYN_ELEMENT(MAP_POINTER(MAP_SLOT))),
+     :            %VAL(CNF_PVAL(WORK_POINTER(WORK_SLOT))),
+     :            %VAL(CNF_PVAL(MAP_POINTER(MAP_SLOT))),
      :            NELM,NBAD)
                IF (NBAD.NE.0) THEN
                   CALL DSA_WRUSER('Note: ')

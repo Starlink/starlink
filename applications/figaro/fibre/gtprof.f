@@ -39,6 +39,7 @@
 *        Non-zero if an error occured
 *
 * Subroutines/functions referenced:
+*   CNF_PVAL    : Full pointer to dynamically allocated memory
 *   COPY2WORK   : Copy data to work array
 *   EXAMPROF    : Exaamine line profile
 *   RX2CHN      : Convert value to pixel number in array
@@ -52,6 +53,9 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer status
       include 'arc_dims'
       integer rx2chn,ix,iy
@@ -63,8 +67,6 @@
       integer npts,pstat,len1,pgcurse
       character*44 string
       character ch,chr_upper
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
       call pgqinf('cursor',string,len1)
       if(string(:2).eq.'NO') then
@@ -113,8 +115,8 @@
             call par_wruser(string,pstat)
             npts = npts + 1
             ref(ix,iy) = 1
-            call copy2work(dynamic_mem(d_vsptr),wavdim,data(1,ix,iy),
-     :                add)
+            call copy2work(%VAL(CNF_PVAL(d_vsptr)),wavdim,data(1,ix,iy),
+     :                     add)
             add = .true.
           end if
         end do

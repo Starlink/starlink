@@ -32,7 +32,7 @@ C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
+C     CNF_PVAL, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
 C     DSA_WRUSER, DSA_GET_WORKSPACE, DSA_FREE_WORKSPACE,
 C     DSA_UNFLAG_DATA, VEC_xTOx
 C
@@ -48,17 +48,17 @@ C  Authors: Keith Shortridge, AAO
 C           Horst Meyerdierks, UoE, Starlink
 C-
 C  Subroutine / function details:
-C     DYN_ELEMENT    Dynamic memory element corresponding to virtual address
-C     ICH_FOLD       Convert string to upper case
-C     ICH_LEN        Position of last non-blank char in string
-C     DSA_FIND_REF   Look up reference name in common tables
+C     CNF_PVAL         Full pointer to dynamically allocated memory
+C     ICH_FOLD         Convert string to upper case
+C     ICH_LEN          Position of last non-blank char in string
+C     DSA_FIND_REF     Look up reference name in common tables
 C     DSA_GET_ACTUAL_NAME  Get full name corresponding to reference name
-C     DSA_WRUSER     Output message to user
-C     DSA_WRFLUSH    Flush message buffer to user
-C     DSA_GET_WORKSPACE    Get specified amount of workspace
-C     DSA_FREE_WORKSPACE   Release workspace obtained by DSA_GET_WORKSPACE
-C     DSA_UNFLAG_DATA      Remove flag values from data array
-C     VEC_xTOx       Type conversion
+C     DSA_WRUSER       Output message to user
+C     DSA_WRFLUSH      Flush message buffer to user
+C     DSA_GET_WORKSPACE   Get specified amount of workspace
+C     DSA_FREE_WORKSPACE  Release workspace obtained by DSA_GET_WORKSPACE
+C     DSA_UNFLAG_DATA  Remove flag values from data array
+C     VEC_xTOx         Type conversion
 C
 C  Common variable details:
 C     (>) MAP_POINTER   (Integer array) Memory address for the array.
@@ -76,31 +76,35 @@ C     (>) WORK_TYPE     (String array)  Type of array held in workspace.
 C     (<) PRE_QUAL      (Logical array) Flags quality pre-processing done.
 C
 C  History:
-C     21st July 1988  Original version.  KS / AAO.
-C     3rd  May  1990  Flagged value count added to DSA_UNFLAG_DATA call.
-C                     KS / AAO. 
-C     25th Aug  1992  Replace CNV_ calls with VEC_ calls. If the type
-C                     used internally is not recognised, STATUS is set
-C                     to DSA__INVTYP.  HME / UoE, Starlink.
-C     31st Aug  1992  Introduced use of calls to DSA_WRFLUSH. KS/AAO.
-C      1st Sep  1992  Usused variable declarations removed. KS/AAO.
-C      3rd Feb  1995  Now supports files that have both flagged data values
-C                     and quality arrays, and the simultaneous use of both
-C                     by an application. KS/AAO.
-C      1st Dec  1995  No longer attempts to unflag a write-only array. KS/AAO.
-C     11th Dec  1995  Use the proper check whether write-only. Before (1 Dec)
-C                     the question was whether
-C                     MAP_MODE(MAP_CALL_SLOT(DATA_SLOT(REF_SLOT))).NE.'W'.
-C                     However, that's the access actually used, not the
-C                     one requested by the application. DSA never uses 'W',
-C                     but 'U' if possible and 'R' otherwise.
-C                     Therefore the test must be for the requested access
-C                     MAP_CALL_MODE(DATA_SLOT(REF_SLOT)).NE.'W'.
-C                     HME / UoE, Starlink.
+C     21st July 1988 Original version.  KS / AAO.
+C     3rd  May  1990 Flagged value count added to DSA_UNFLAG_DATA call.
+C                    KS / AAO. 
+C     25th Aug  1992 Replace CNV_ calls with VEC_ calls. If the type
+C                    used internally is not recognised, STATUS is set
+C                    to DSA__INVTYP.  HME / UoE, Starlink.
+C     31st Aug  1992 Introduced use of calls to DSA_WRFLUSH. KS/AAO.
+C      1st Sep  1992 Usused variable declarations removed. KS/AAO.
+C      3rd Feb  1995 Now supports files that have both flagged data values
+C                    and quality arrays, and the simultaneous use of both
+C                    by an application. KS/AAO.
+C      1st Dec  1995 No longer attempts to unflag a write-only array. KS/AAO.
+C     11th Dec  1995 Use the proper check whether write-only. Before (1 Dec)
+C                    the question was whether
+C                    MAP_MODE(MAP_CALL_SLOT(DATA_SLOT(REF_SLOT))).NE.'W'.
+C                    However, that's the access actually used, not the
+C                    one requested by the application. DSA never uses 'W',
+C                    but 'U' if possible and 'R' otherwise.
+C                    Therefore the test must be for the requested access
+C                    MAP_CALL_MODE(DATA_SLOT(REF_SLOT)).NE.'W'.
+C                    HME / UoE, Starlink.
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_PRE_PROCESS_QUALITY (REF_NAME,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -110,13 +114,11 @@ C
 C     Functions used
 C
       INTEGER ICH_FOLD, ICH_LEN
-      INTEGER DYN_ELEMENT
 C
 C     Local variables
 C
       INTEGER   DATA_ADDR      ! Virtual address of data array
       CHARACTER DATA_TYPE*16   ! Type of mapped data array 
-      INTEGER   DPTR           ! Dynamic mem element for data array
       INTEGER   I              ! Index through dimensions
       INTEGER   IGNORE         ! Dummy status value
       INTEGER   INVOKE         ! Dummy function value
@@ -126,7 +128,6 @@ C
       INTEGER   NELM           ! Number of data array elements
       INTEGER   NFLAGGED       ! Number of flagged values - ignored
       CHARACTER OBJ_NAME*128   ! DTA_ name of data object
-      INTEGER   QPTR           ! Dynamic mem element for quality
       INTEGER   QUAL_ADDR      ! Virtual address of quality array
       CHARACTER QUAL_TYPE*16   ! Type of mapped quality array 
       CHARACTER REF_NAME_UC*32 ! Upper case version of REF_NAME
@@ -134,7 +135,6 @@ C
       CHARACTER STRUCTURE*128  ! Full structure name from ref_name
       INTEGER   TEMP_ADDR      ! Virtual address of work array
       INTEGER   TEMP_SLOT      ! Workspace slot for work array
-      INTEGER   TPTR           ! Dynamic mem element for workspace
       INTEGER   WORK_SLOT      ! Workspace slot for data/quality
       INTEGER   IERR, VECSTA   ! Unused for VEC_ routines
 C
@@ -145,10 +145,6 @@ C
 C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
-C     Dynamic memory system common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Return immediately if bad status passed
 C
@@ -270,23 +266,21 @@ C        never be used..)
 C        
          IF (QUAL_TYPE.NE.'BYTE') THEN
             CALL DSA_GET_WORKSPACE(NELM,TEMP_ADDR,TEMP_SLOT,STATUS)
-            TPTR=DYN_ELEMENT(TEMP_ADDR)
-            QPTR=DYN_ELEMENT(QUAL_ADDR)
             IF (QUAL_TYPE.EQ.'DOUBLE') THEN
-               CALL VEC_DTOB(.FALSE.,NELM,DYNAMIC_MEM(QPTR),
-     :            DYNAMIC_MEM(TPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOB(.FALSE.,NELM,%VAL(CNF_PVAL(QUAL_ADDR)),
+     :            %VAL(CNF_PVAL(TEMP_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'SHORT'.OR.QUAL_TYPE.EQ.'WORD') THEN
-               CALL VEC_WTOB(.FALSE.,NELM,DYNAMIC_MEM(QPTR),
-     :            DYNAMIC_MEM(TPTR),IERR,NBAD,VECSTA)
+               CALL VEC_WTOB(.FALSE.,NELM,%VAL(CNF_PVAL(QUAL_ADDR)),
+     :            %VAL(CNF_PVAL(TEMP_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'INT') THEN
-               CALL VEC_ITOB(.FALSE.,NELM,DYNAMIC_MEM(QPTR),
-     :            DYNAMIC_MEM(TPTR),IERR,NBAD,VECSTA)
+               CALL VEC_ITOB(.FALSE.,NELM,%VAL(CNF_PVAL(QUAL_ADDR)),
+     :            %VAL(CNF_PVAL(TEMP_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'FLOAT'.OR.QUAL_TYPE.EQ.'REAL') THEN
-               CALL VEC_RTOB(.FALSE.,NELM,DYNAMIC_MEM(QPTR),
-     :            DYNAMIC_MEM(TPTR),IERR,NBAD,VECSTA)
+               CALL VEC_RTOB(.FALSE.,NELM,%VAL(CNF_PVAL(QUAL_ADDR)),
+     :            %VAL(CNF_PVAL(TEMP_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'USHORT'.OR.QUAL_TYPE.EQ.'UWORD') THEN
-               CALL VEC_UWTOB(.FALSE.,NELM,DYNAMIC_MEM(QPTR),
-     :            DYNAMIC_MEM(TPTR),IERR,NBAD,VECSTA)
+               CALL VEC_UWTOB(.FALSE.,NELM,%VAL(CNF_PVAL(QUAL_ADDR)),
+     :            %VAL(CNF_PVAL(TEMP_ADDR)),IERR,NBAD,VECSTA)
             ELSE
                CALL DSA_WRUSER('Unable to mapped quality array type "')
                CALL DSA_WRUSER(QUAL_TYPE(:ICH_LEN(QUAL_TYPE)))
@@ -294,36 +288,39 @@ C
                CALL DSA_WRFLUSH
                STATUS=DSA__INVTYP
             END IF
-            QPTR=TPTR
+C
+C        Now process the data array using the temporary _BYTE quality
+C        or the original quality.
+C
+            CALL DSA_UNFLAG_DATA(NELM,.FALSE.,DATA_TYPE,
+     :                           %VAL(CNF_PVAL(DATA_ADDR)),
+     :                           %VAL(CNF_PVAL(TEMP_ADDR)),NFLAGGED,
+     :                           STATUS)
          ELSE
-            QPTR=DYN_ELEMENT(QUAL_ADDR)
+            CALL DSA_UNFLAG_DATA(NELM,.FALSE.,DATA_TYPE,
+     :                           %VAL(CNF_PVAL(DATA_ADDR)),
+     :                           %VAL(CNF_PVAL(QUAL_ADDR)),NFLAGGED,
+     :                           STATUS)
          END IF
-C
-C        Now process the data array
-C
-         DPTR=DYN_ELEMENT(DATA_ADDR)
-         CALL DSA_UNFLAG_DATA(NELM,.FALSE.,DATA_TYPE,DYNAMIC_MEM(DPTR),
-     :                            DYNAMIC_MEM(QPTR),NFLAGGED,STATUS)
-C
+CC
 C        And convert into the correct array, should that be necessary.
 C
          IF (QUAL_TYPE.NE.'BYTE') THEN
-            QPTR=DYN_ELEMENT(QUAL_ADDR)
             IF (QUAL_TYPE.EQ.'DOUBLE') THEN
-               CALL VEC_BTOD(.FALSE.,NELM,DYNAMIC_MEM(TPTR),
-     :            DYNAMIC_MEM(QPTR),IERR,NBAD,VECSTA)
+               CALL VEC_BTOD(.FALSE.,NELM,%VAL(CNF_PVAL(TEMP_ADDR)),
+     :                       %VAL(CNF_PVAL(QUAL_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'SHORT'.OR.QUAL_TYPE.EQ.'WORD') THEN
-               CALL VEC_BTOW(.FALSE.,NELM,DYNAMIC_MEM(TPTR),
-     :            DYNAMIC_MEM(QPTR),IERR,NBAD,VECSTA)
+               CALL VEC_BTOW(.FALSE.,NELM,%VAL(CNF_PVAL(TEMP_ADDR)),
+     :                       %VAL(CNF_PVAL(QUAL_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'INT') THEN
-               CALL VEC_BTOI(.FALSE.,NELM,DYNAMIC_MEM(TPTR),
-     :            DYNAMIC_MEM(QPTR),IERR,NBAD,VECSTA)
+               CALL VEC_BTOI(.FALSE.,NELM,%VAL(CNF_PVAL(TEMP_ADDR)),
+     :                       %VAL(CNF_PVAL(QUAL_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'FLOAT'.OR.QUAL_TYPE.EQ.'REAL') THEN
-               CALL VEC_BTOR(.FALSE.,NELM,DYNAMIC_MEM(TPTR),
-     :            DYNAMIC_MEM(QPTR),IERR,NBAD,VECSTA)
+               CALL VEC_BTOR(.FALSE.,NELM,%VAL(CNF_PVAL(TEMP_ADDR)),
+     :                       %VAL(CNF_PVAL(QUAL_ADDR)),IERR,NBAD,VECSTA)
             ELSE IF (QUAL_TYPE.EQ.'USHORT'.OR.QUAL_TYPE.EQ.'UWORD') THEN
-               CALL VEC_BTOUW(.FALSE.,NELM,DYNAMIC_MEM(TPTR),
-     :            DYNAMIC_MEM(QPTR),IERR,NBAD,VECSTA)
+               CALL VEC_BTOUW(.FALSE.,NELM,%VAL(CNF_PVAL(TEMP_ADDR)),
+     :                       %VAL(CNF_PVAL(QUAL_ADDR)),IERR,NBAD,VECSTA)
             ELSE
                STATUS=DSA__INVTYP
             END IF

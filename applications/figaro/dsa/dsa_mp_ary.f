@@ -71,7 +71,7 @@ C  External variables used:
 C     Only common variables used internally by the DSA_ system.
 C
 C  External subroutines / functions used:
-C     DSA_WRUSER, DSA_GET_WORKSPACE, DSA_FMTCON, DSA_CSTRUCT
+C     CNF_PVAL, DSA_WRUSER, DSA_GET_WORKSPACE, DSA_FMTCON, DSA_CSTRUCT
 C     DTA_TYVAR, DTA_STRUC, DTA_ERROR, DTA_FRVAR, DTA_MRVARx, DTA_MUVARx
 C     ICH_FOLD, ICH_CI, ICH_LEN, DSA_WRNAME, DSA_GET_WORK_ARRAY,
 C     DSA_UNFLAG_DATA, CNV_PROPAGATE, CNV_QPROP, DSA__STRUCT_ARRAY,
@@ -115,24 +115,25 @@ C     (<) MAP_CALL_VSLOT(Integer array) Work entry used for err<->variance
 C                       array conversions.  
 C
 C  Subroutine / function details:
-C     DTA_TYVAR     Get type of data object
-C     DTA_STRUC     Determine if a data object is a structure
-C     DTA_ERROR     Get error message from a DTA_ code
-C     DTA_FRVAR     Unmap a data object
-C     DTA_MRVARx    Map data object (x = F,I,B,C,D or S) readonly
-C     DTA_MUVARx    Map data object (x = F,I,B,C,D or S) for update
-C     ICH_LEN       Position of last non-blank char in string
-C     ICH_CI        Format an integer into a string
-C     ICH_FOLD      Convert a string to upper case
-C     DSA_FMTCON    Data array type conversion
-C     DSA_CSTRUCT   Process a contracted structure
+C     CNF_PVAL         Full pointer to dynamically allocated memory
+C     DTA_TYVAR        Get type of data object
+C     DTA_STRUC        Determine if a data object is a structure
+C     DTA_ERROR        Get error message from a DTA_ code
+C     DTA_FRVAR        Unmap a data object
+C     DTA_MRVARx       Map data object (x = F,I,B,C,D or S) readonly
+C     DTA_MUVARx       Map data object (x = F,I,B,C,D or S) for update
+C     ICH_LEN          Position of last non-blank char in string
+C     ICH_CI           Format an integer into a string
+C     ICH_FOLD         Convert a string to upper case
+C     DSA_FMTCON       Data array type conversion
+C     DSA_CSTRUCT      Process a contracted structure
 C     DSA_GET_WORKSPACE  Get a specified amount of workspace.
 C     DSA_GET_WORKARRAY  Get a specified amount of workspace of given type.
-C     DSA_TYPESIZE  Get size of an element of given type.
-C     DSA_UNFLAG_DATA    Remove flagged data from an array.
-C     DSA_WRNAME    Output the name of a data object to the user.
-C     DSA_WRUSER    Output a string to the user.
-C     DSA_WRFLUSH   Flush output message buffer to user.
+C     DSA_TYPESIZE     Get size of an element of given type.
+C     DSA_UNFLAG_DATA  Remove flagged data from an array.
+C     DSA_WRNAME       Output the name of a data object to the user.
+C     DSA_WRUSER       Output a string to the user.
+C     DSA_WRFLUSH      Flush output message buffer to user.
 C     DSA__STRUCT_ARRAY  Classify the stype of a structured array.
 C     DSA__ARRAY_ORIGIN  Get origin values (if any) for a structured array.
 C
@@ -171,6 +172,9 @@ C                       to support mapping of array subsets.
 C      6th Feb  1995.   KS / AAO. Now uses new calling sequence for 
 C                       DSA_UNFLAG_DATA.
 C     2005 May 31       Use CNF_PVAL for pointers to mapped data. MJC
+C     2005 June 3       Replace DYNAMIC_MEMORY with 
+C                       %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                       addressing.  MJC / Starlink
 C
 C  Note:
 C     This version can handle the following types of SGP38 structured
@@ -195,15 +199,11 @@ C
 C     Functions used
 C
       CHARACTER*10 ICH_CI
-      INTEGER DSA_TYPESIZE, DYN_ELEMENT, ICH_FOLD, ICH_LEN
+      INTEGER DSA_TYPESIZE, ICH_FOLD, ICH_LEN
 C
 C     DSA_ system common definition
 C
       INCLUDE 'DSA_COMMON'
-C
-C     Dynamic memory definitions - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     DSA_ system error codes
 C
@@ -779,8 +779,8 @@ C
                   WORK_PROP(WORK_SLOT)=PROP
                   CALL DSA_FMTCON(PROP,
      :               FMTCON_CODE(OBJ_TYPE_CODE),FMTCON_CODE(TYPE_CODE),
-     :               DYNAMIC_MEM(DYN_ELEMENT(POINTER)),
-     :               DYNAMIC_MEM(DYN_ELEMENT(WORK_PTR)),NMAPPED,NBAD)
+     :               %VAL(CNF_PVAL(POINTER)),
+     :               %VAL(CNF_PVAL(WORK_PTR)),NMAPPED,NBAD)
                   IF (NBAD.NE.0) THEN
                      CALL DSA_WRUSER('Note: ')
                      NUMBER=ICH_CI(NBAD)

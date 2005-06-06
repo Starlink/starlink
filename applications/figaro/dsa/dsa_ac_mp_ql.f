@@ -55,11 +55,11 @@ C  External variables used:
 C     Only common variables used internally by the DSA_ routines.
 C
 C  External subroutines / functions used:
-C     ICH_FOLD, DSA_REF_SLOT, DSA_SEEK_QUALITY, 
+C     CNF_PVAL, ICH_FOLD, DSA_REF_SLOT, DSA_SEEK_QUALITY, 
 C     DSA_DATA_SIZE, DSA_MAP_ARRAY, DSA_MAP_DUMMY, DSA_NFILL_ARRAY
 C     DSA_GET_ACTUAL_NAME, DSA_SEEK_FLAGGED_VALUES, DSA__QUAL_NAME
 C     DSA__CREATE_QUAL_ENV, DSA_CREATE_ARRAY, DSA__GET_BADBITS,
-C     DSA__CHECK_BADBITS, DYN_ELEMENT
+C     DSA__CHECK_BADBITS
 C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system, and the
@@ -81,21 +81,21 @@ C                      Indicates unknown (0), known not to exist (-1),
 C                      exists (1).
 C
 C  Subroutine / function details:
-C     DYN_ELEMENT   Dynamic memory array element for given virtual address.
-C     ICH_FOLD      Convert string to upper case.
-C     DSA_MAP_ARRAY Map named data array.
-C     DSA_CREATE_ARRAY Creat a named data array.
-C     DSA_DATA_SIZE Get the size of a structure's main data array.
-C     DSA_MAP_DUMMY Map a dummy data array.
-C     DSA_REF_SLOT  Get reference slot number for named structure.
+C     CNF_PVAL          Full pointer to dynamically allocated memory
+C     ICH_FOLD          Convert string to upper case.
+C     DSA_MAP_ARRAY     Map named data array.
+C     DSA_CREATE_ARRAY  Create a named data array.
+C     DSA_DATA_SIZE     Get the size of a structure's main data array.
+C     DSA_MAP_DUMMY     Map a dummy data array.
+C     DSA_REF_SLOT      Get reference slot number for named structure.
 C     DSA_GET_ACTUAL_NAME  Get name of structure from ref name.
-C     DSA_ZFILL_ARRAY Fill a dummy array with zeros.
-C     DSA_SEEK_QUALITY See if an quality array exists.
+C     DSA_ZFILL_ARRAY   Fill a dummy array with zeros.
+C     DSA_SEEK_QUALITY  See if an quality array exists.
 C     DSA_SEEK_FLAGGED_VALUES See if main data array has flagged values.
 C     DSA_CHECK_BADBITS Check to see if quality values may be misinterpreted.
 C     DSA__CREATE_QUAL_ENV Ensure environment for a quality array exists.
-C     DSA__QUAL_NAME  Get name of quality array in structure.
-C     DSA__GET_BADBITS Get value of BADBITS mask for the quality array.
+C     DSA__QUAL_NAME    Get name of quality array in structure.
+C     DSA__GET_BADBITS  Get value of BADBITS mask for the quality array.
 C
 C  History:
 C     22nd July 1988.   Original version.  KS / AAO.
@@ -123,11 +123,16 @@ C                       and replaced by a new routine that calls this one.
 C                       REF_SLOT used in call instead of REF_NAME. KS / AAO.
 C     30th Nov 1995.    Added possibility that a copy of the array may be
 C                       needed. KS/AAO.
+C     2005 June 3       Replace DYNAMIC_MEMORY with
+C                       %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                       addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_ACT_MAP_QUALITY (REF_NAME,MODE,TYPE,ADDRESS,
      :                                                    SLOT,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -136,7 +141,7 @@ C
 C
 C     Functions used
 C
-      INTEGER DYN_ELEMENT, ICH_FOLD
+      INTEGER ICH_FOLD
 C
 C     DSA_ common definition
 C
@@ -146,31 +151,26 @@ C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
 C
-C     Dynamic memory definitions - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Local variables
 C
-      BYTE      BADBITS                     ! Badbits quality mask value
-      CHARACTER CHR*1                       ! First character of MODE
-      LOGICAL   COPY                        ! True if a copy array needed
-      LOGICAL   CREATE_DUMMY                ! True if dummy array needed
-      INTEGER   DIMS(MAX_AXES)              ! Dimensions of data array
-      LOGICAL   EXIST                       ! True if quality data array exists
-      LOGICAL   FLAGGED                     ! True if data has flagged values
-      INTEGER   IGNORE                      ! Dummy status argument
-      INTEGER   INVOKE                      ! Dummy function return value
-      INTEGER   LENGTH                      ! Object name length
-      CHARACTER NAME*128                    ! Name of dummy or quality array
-      INTEGER   NDIM                        ! Number of data array dimensions
-      INTEGER   NELM                        ! Number of data array elements
-      CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   QPTR                        ! Dynamic mem element for data
-      INTEGER   REF_SLOT                    ! Ref slot for structure
-      CHARACTER STRUCTURE*128               ! Name of structure
-      CHARACTER TYPE_UC*8                   ! Upper case version of TYPE
-      LOGICAL   ZERO_FILL                   ! True if array to be zero-filled
+      BYTE      BADBITS          ! Badbits quality mask value
+      CHARACTER CHR*1            ! First character of MODE
+      LOGICAL   COPY             ! True if a copy array needed
+      LOGICAL   CREATE_DUMMY     ! True if dummy array needed
+      INTEGER   DIMS(MAX_AXES)   ! Dimensions of data array
+      LOGICAL   EXIST            ! True if quality data array exists
+      LOGICAL   FLAGGED          ! True if data has flagged values
+      INTEGER   IGNORE           ! Dummy status argument
+      INTEGER   INVOKE           ! Dummy function return value
+      INTEGER   LENGTH           ! Object name length
+      CHARACTER NAME*128         ! Name of dummy or quality array
+      INTEGER   NDIM             ! Number of data array dimensions
+      INTEGER   NELM             ! Number of data array elements
+      CHARACTER OBJ_NAME*128     ! DTA_ name of data object
+      INTEGER   REF_SLOT         ! Ref slot for structure
+      CHARACTER STRUCTURE*128    ! Name of structure
+      CHARACTER TYPE_UC*8        ! Upper case version of TYPE
+      LOGICAL   ZERO_FILL        ! True if array to be zero-filled
 C
 C     Return immediately on bad status
 C
@@ -178,8 +178,8 @@ C
 C
 C     We need an upper case version of TYPE
 C
-      TYPE_UC=TYPE
-      INVOKE=ICH_FOLD(TYPE_UC)
+      TYPE_UC = TYPE
+      INVOKE = ICH_FOLD(TYPE_UC)
 C
 C     Look up the reference name in the tables and get the name
 C     of the quality array.
@@ -202,8 +202,8 @@ C
 C     Initially, assume we want neither to create the array, not to
 C     fill it with zeros.
 C
-      ZERO_FILL=.FALSE.
-      CREATE_DUMMY=.FALSE.
+      ZERO_FILL = .FALSE.
+      CREATE_DUMMY = .FALSE.
 C
 C     If DSA_MAP_QUALITY is being called directly from the application,
 C     then a call that specifies 'WRITE' or 'UPDATE' will expect to see
@@ -215,14 +215,14 @@ C     difference by looking at the 'use quality' flag, which will be set
 C     if we are being called from DSA_MAP_QUALITY.
 C
       IF ((.NOT.USE_QUALITY(REF_SLOT)).AND.(.NOT.EXIST)) THEN
-         CREATE_DUMMY=.TRUE.
-         ZERO_FILL=.TRUE.
+         CREATE_DUMMY = .TRUE.
+         ZERO_FILL = .TRUE.
       ELSE
 C
 C        Otherwise, see if the mode requires that the array exist
 C
-         CHR=MODE(1:1)
-         INVOKE=ICH_FOLD(CHR)
+         CHR = MODE(1:1)
+         INVOKE = ICH_FOLD(CHR)
 C
          IF (EXIST.OR.(CHR.EQ.'W').OR.(CHR.EQ.'U')) THEN
 C
@@ -239,7 +239,7 @@ C
                CALL DSA_CREATE_ARRAY (' ',OBJ_NAME(:LENGTH),TYPE_UC,
      :                                              NDIM,DIMS,STATUS)
                IF (STATUS.NE.0) GO TO 500    ! Error exit
-               QUAL_EXIST(REF_SLOT)=1
+               QUAL_EXIST(REF_SLOT) = 1
             END IF
 C
 C           There is one case where we need to make a copy of the quality
@@ -252,7 +252,7 @@ C           but if the quality array is being mapped readonly, then we need
 C           a copy of it! So this is an odd combination of circumstances,
 C           but one that has to be allowed for.
 C
-            COPY=(EXIST.AND.(CHR.EQ.'R').AND.FLAGGED.AND.
+            COPY = (EXIST.AND.(CHR.EQ.'R').AND.FLAGGED.AND.
      :            USE_QUALITY(REF_SLOT).AND..NOT.USE_FLAGS(REF_SLOT)) 
 C
 C           Map the quality array.
@@ -267,19 +267,18 @@ C           interpreted by DSA as it stands at present.
 C
             IF (EXIST) THEN
                CALL DSA__GET_BADBITS (REF_SLOT,BADBITS,IGNORE)
-               QPTR=DYN_ELEMENT(ADDRESS)
-               CALL DSA_CHECK_BADBITS (REF_NAME,DYNAMIC_MEM(QPTR),
+               CALL DSA_CHECK_BADBITS (REF_NAME,%VAL(CNF_PVAL(ADDRESS)),
      :                                    NELM,TYPE_UC,BADBITS,STATUS)
             ELSE
-               ZERO_FILL=.TRUE.
+               ZERO_FILL = .TRUE.
             END IF
          ELSE
 C
 C           There is no quality array, so we need to generate a dummy one.
 C           and will want to fill it with zeros.
 C
-            CREATE_DUMMY=.TRUE.
-            ZERO_FILL=.TRUE.
+            CREATE_DUMMY = .TRUE.
+            ZERO_FILL = .TRUE.
          END IF
       END IF
 C
@@ -290,7 +289,7 @@ C     also have ZERO_FILL set.
 C 
       IF (CREATE_DUMMY) THEN
          CALL DSA_GET_ACTUAL_NAME(REF_NAME,STRUCTURE,STATUS)
-         NAME='quality array in '//STRUCTURE
+         NAME = 'quality array in '//STRUCTURE
          CALL DSA_MAP_DUMMY (NAME,MODE,TYPE_UC,NELM,ADDRESS,SLOT,STATUS)
       END IF
       IF (ZERO_FILL) THEN
@@ -300,11 +299,11 @@ C
 C
 C     If the mapping was not readonly, set the update flag.
 C
-      IF (CHR.NE.'R') QUAL_UPDATE(REF_SLOT)=.TRUE.
+      IF (CHR.NE.'R') QUAL_UPDATE(REF_SLOT) = .TRUE.
 C
 C     Tie in the quality mapping to the reference name in the common tables
 C
-      QUALITY_SLOT(REF_SLOT)=SLOT
+      QUALITY_SLOT(REF_SLOT) = SLOT
 C
 C     If the data array has already been mapped, then now is the time to
 C     call the quality pre-processing routine.  Note that we can't assume 

@@ -49,12 +49,14 @@
 *        If first call of this routine
 *     STATUS = INTEGER (Given and returned)
 *        0 if ok, otherwise indicates an error
+*
 * Subroutines referenced:
-*     FIBPLTWHCUBE          : Plot line profiles from whole "data"
-*     TABLE                 : Write results to a file
-*     RV_CORRECT            : Evaluate correction to local standard
-*                                of rest, heliocentric, etc. velocity.
-*     QMENU                 : Obtain menu choices
+C     CNF_PVAL       : Full pointer to dynamically allocated memory
+*     FIBPLTWHCUBE   : Plot line profiles from whole "data"
+*     TABLE          : Write results to a file
+*     RV_CORRECT     : Evaluate correction to local standard
+*                      of rest, heliocentric, etc. velocity.
+*     QMENU          : Obtain menu choices
 *
 *     PAR_QUEST = LOGICAL (Given and returned)
 *        Obtain yes/no response from user
@@ -90,9 +92,6 @@
       logical showvel
       character*46 dict(MAXFLAV+1)
       character dumc
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       integer FL_HARD, FL_TABLE, FL_PRINT, FL_FULL
       parameter (FL_HARD = 1, FL_TABLE = 2, FL_PRINT = 3, FL_FULL = 4)
       save vcorr,vtype
@@ -131,7 +130,7 @@
           call rv_correct('data',vcorr,vtype)
         end if
       end if
-      call get_dispers(dynamic_mem(d_xptr),wavdim,dispersion)
+      call get_dispers(%VAL(CNF_PVAL(d_xptr)),wavdim,dispersion)
       if(cur_flav(FL_TABLE).or.cur_flav(FL_PRINT).or.cur_flav(FL_HARD))
      :     then
         nagerr = par_quest('Show fits with Nag errors?',.false.)
@@ -143,9 +142,9 @@
         showvel = par_quest('Use velocity scale',.true.)
         call plot_all_fits(%VAL(CNF_PVAL(d_rptr)),
      :       nagerr,vcorr,vtype,showvel,%VAL(CNF_PVAL(staptr)))
-c        call fibpltwhcube(dynamic_mem(d_wptr),%VAL(CNF_PVAL(d_rptr)),
-c     :       dynamic_mem(d_sptr),dynamic_mem(xptr),dynamic_mem(yptr),
-c     :       dynamic_mem(xdptr),vcorr,vtype)
+c        call fibpltwhcube(%VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_rptr)),
+c     :       %VAL(CNF_PVAL(d_sptr)),%VAL(CNF_PVAL(xptr)),
+C     :       %VAL(CNF_PVAL(yptr)),%VAL(CNF_PVAL(xdptr)),vcorr,vtype)
       end if
 
 * List fit results in a file
@@ -157,20 +156,18 @@ c     :       dynamic_mem(xdptr),vcorr,vtype)
       if(cur_flav(FL_PRINT)) then
 
         call prvel(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
-*     :       dynamic_mem(staptr),dynamic_chars(idsptr:idsend),
-     :       %VAL(CNF_PVAL(staptr)),idstring,
-     :       %VAL(CNF_PVAL(d_wptr)),vcorr,nagerr,dispersion,
-     :       dynamic_mem(xptr),dynamic_mem(yptr),dynamic_mem(xdptr),
-     :       hex)
+     :             %VAL(CNF_PVAL(staptr)),idstring,
+     :             %VAL(CNF_PVAL(d_wptr)),vcorr,nagerr,dispersion,
+     :             %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :             %VAL(CNF_PVAL(xdptr)),hex)
       end if
 
 * "FULL" option
 
       if(cur_flav(FL_FULL)) then
         call wrtab(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
-*     :      dynamic_chars(idsptr:idsend),dynamic_mem(d_wptr),vcorr,
-     :      idstring,%VAL(CNF_PVAL(d_wptr)),vcorr,
-     :      nagerr,dispersion,%VAL(CNF_PVAL(staptr)),status)
+     :             idstring,%VAL(CNF_PVAL(d_wptr)),vcorr,
+     :             nagerr,dispersion,%VAL(CNF_PVAL(staptr)),status)
       end if
 
       end

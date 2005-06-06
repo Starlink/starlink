@@ -42,7 +42,7 @@ C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     ICH_LEN, ICH_CI, DYN_ELEMENT, DSA_DATA_SIZE, DSA_WRUSER,
+C     CNF_PVAL, ICH_LEN, ICH_CI, DSA_DATA_SIZE, DSA_WRUSER,
 C     DSA_MATCH_AXIS, DSA_GET_ACTUAL_NAME
 C
 C  Prior requirements:
@@ -57,12 +57,13 @@ C  Common variables used:
 C     (>) MAX_AXES   (Integer parameter) Maximum number of axes
 C
 C  Subroutine / function details:
-C     ICH_LEN        Position of last non-blank char in string
-C     ICH_CI         Formats an integer into a string
-C     DYN_ELEMENT    Dynamic array element corresponding to given address
-C     DSA_DATA_SIZE  Get dimensions of main data array
-C     DSA_WRUSER     Output message to user
-C     DSA_MATCH_AXIS Compare data for a single axis
+C     CNF_PVAL         Full pointer to dynamically allocated memory
+C     ICH_LEN          Position of last non-blank char in string
+C     ICH_CI           Formats an integer into a string
+C     DYN_ELEMENT      Dynamic array element corresponding to given address
+C     DSA_DATA_SIZE    Get dimensions of main data array
+C     DSA_WRUSER       Output message to user
+C     DSA_MATCH_AXIS   Compare data for a single axis
 C     DSA_GET_ACTUAL_NAME  Get full structure name
 C
 C  History:
@@ -77,10 +78,14 @@ C     7th  Oct 1992  HME / UoE, Starlink.  When removing spaces from the
 C                    2nd units this routine used to look for spaces in
 C                    UNITS2 but then fiddled with UNITS, corrupting the
 C                    latter and making them unequal all the time.
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_MATCH_AXIS (REF_NAME,AXIS,REF_NAME2,AXIS2,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -89,7 +94,7 @@ C
 C
 C     Functions used
 C
-      INTEGER DYN_ELEMENT, ICH_FOLD, ICH_LEN
+      INTEGER ICH_FOLD, ICH_LEN
       REAL GEN_ELEMF
       CHARACTER ICH_CI*8, ICH_CF*16
 C
@@ -101,18 +106,13 @@ C     DSA_ system error codes.
 C
       INCLUDE 'DSA_ERRORS'
 C
-C     Dynamic memory system definition - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Local variables
 C
-      INTEGER   ADDRESS                    ! Virtual memory address
+      INTEGER   ADDRS1                     ! Virtual memory address
+      INTEGER   ADDRS2                     ! Virtual memory address
       INTEGER   DIMS(MAX_AXES)             ! Dimensions of first structure
       INTEGER   DIMS2(MAX_AXES)            ! Dimensions of second structure
       INTEGER   DUMMY                      ! Dummy argument, unused
-      INTEGER   ELEM                       ! Dynamic memory element, 1st array
-      INTEGER   ELEM2                      ! Dynamic memory element, 2nd array
       INTEGER   ERROR1                     ! First discrepant element number
       LOGICAL   EXIST                      ! True if first axis array exits
       LOGICAL   EXIST2                     ! True if second axis array exits
@@ -290,16 +290,14 @@ C
 C
 C     OK, they're the same size.  Now see if they're the same data.
 C
-      CALL DSA_MAP_AXIS_DATA (REF_NAME,AXIS,'READ','FLOAT',ADDRESS,
-     :                                                   SLOT,STATUS)
+      CALL DSA_MAP_AXIS_DATA (REF_NAME,AXIS,'READ','FLOAT',ADDRS1,
+     :                        SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500        ! Error exit
-      ELEM=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_AXIS_DATA (REF_NAME2,AXIS2,'READ','FLOAT',ADDRESS,
-     :                                                   SLOT2,STATUS)
+      CALL DSA_MAP_AXIS_DATA (REF_NAME2,AXIS2,'READ','FLOAT',ADDRS2,
+     :                        SLOT2,STATUS)
       IF (STATUS.NE.0) GO TO 500        ! Error exit
-      ELEM2=DYN_ELEMENT(ADDRESS)
-      CALL DSA_COMPAF (DYNAMIC_MEM(ELEM),DYNAMIC_MEM(ELEM2),
-     :                                              NELM,NERR,ERROR1)
+      CALL DSA_COMPAF (%VAL(CNF_PVAL(ADDRS1)),%VAL(CNF_PVAL(ADDRS2)),
+     :                 NELM,NERR,ERROR1)
       IF (NERR.GT.0) THEN
          CALL DSA_WRUSER ('The ')
          CALL DSA_WRUSER(AXIS_NAMES(AXIS:AXIS))
@@ -323,10 +321,10 @@ C
          NUMBER=ICH_CI(ERROR1)
          CALL DSA_WRUSER(NUMBER(:ICH_LEN(NUMBER)))
          CALL DSA_WRUSER('. (')
-         NUMBER=ICH_CF(GEN_ELEMF(DYNAMIC_MEM(ELEM),ERROR1))
+         NUMBER=ICH_CF(GEN_ELEMF(%VAL(CNF_PVAL(ADDRS1)),ERROR1))
          CALL DSA_WRUSER(NUMBER(:ICH_LEN(NUMBER)))
          CALL DSA_WRUSER(' vs. ')
-         NUMBER=ICH_CF(GEN_ELEMF(DYNAMIC_MEM(ELEM2),ERROR1))
+         NUMBER=ICH_CF(GEN_ELEMF(%VAL(CNF_PVAL(ADDRS2)),ERROR1))
          CALL DSA_WRUSER(NUMBER(:ICH_LEN(NUMBER)))
          CALL DSA_WRUSER(').')
          CALL DSA_WRFLUSH

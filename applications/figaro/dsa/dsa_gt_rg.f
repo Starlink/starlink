@@ -34,10 +34,10 @@ C
 C  External variables used: None.
 C
 C  External subroutines / functions used:
-C     DSA_REF_SLOT, DSA_WRUSER, DSA_GET_ACTUAL_NAME, DSA_UNMAP, 
+C     CNF_PVAL, DSA_REF_SLOT, DSA_WRUSER, DSA_GET_ACTUAL_NAME, DSA_UNMAP, 
 C     DSA_SET_RANGE, DSA_ARRAY_SIZE, DSA_MAP_ARRAY, DSA_SEEK_QUALITY,
 C     DSA_SEEK_FLAGGED_VALUES, DSA_GET_FLAG_VALUE, DSA__RANGE_STRUCT_NAME,
-C     DSA__DATA_NAME, DSA__QUAL_NAME, DSA__ARRAY, DYN_ELEMENT, DTA_WRVARI, 
+C     DSA__DATA_NAME, DSA__QUAL_NAME, DSA__ARRAY, DTA_WRVARI, 
 C     DTA_STRUC, DTA_RDVARI, DTA_RDVARF, ICH_FOLD, ICH_LEN, GEN_RANGEF, 
 C     GEN_FRANGEF, GEN_QRANGEF
 C
@@ -50,6 +50,7 @@ C
 C  Version date: 26th October 1994
 C-
 C  Subroutine / function details:
+C     CNF_PVAL         Full pointer to dynamically allocated memory
 C     DSA_REF_SLOT     Look up reference name in common tables.
 C     DSA_WRUSER       Output message to user.
 C     DSA_GET_ACTUAL_NAME  Get full structure name from reference name.
@@ -63,7 +64,6 @@ C     DSA_GET_FLAG_VALUE  Get the flag data value for a given type.
 C     DSA__RANGE_STRUCT_NAME Get DTA name of the range sub-structure.
 C     DSA__DATA_NAME   Get DTA name of the main data array.
 C     DSA__ARRAY       See if a name object is a primitive or structured array.
-C     DYN_ELEMENT      Dynamic memory element corresponding to address.
 C     DTA_RDVARI       Read an integer from a data object.
 C     DTA_WRVARI       Write an integer into a data object.
 C     DTA_STRUC        See if an object is a structure.
@@ -75,16 +75,18 @@ C     GEN_QRANGEF      Find max and min values in a real array with quality.
 C     GEN_RANGEF       Find max and min values in a real array.
 C
 C  History:
-C     30th July 1987    Original version.  KS / AAO.
-C     3rd  Feb  1989    Now allows for data quality information.  KS/AAO.
-C     8th  Sept 1989    Now controls flagged value propagation.  KS/AAO.
-C     1st  Mar  1990    Now uses DSA__ routines rather than assuming the
-C                       original Figaro data format.  KS/AAO.
-C     21st Aug 1992     Automatic portability modifications
-C                       ("INCLUDE" syntax etc) made. KS/AAO
-C     23rd Aug 1992     Remove unused variable declarations. KS/AAO
-C     29th Aug 1992     "INCLUDE" filenames now upper case. KS/AAO
-C     26th Oct 1994     Now uses new calling sequence for DSA_MAP_ARRAY. KS/AAO.
+C     30th July 1987  Original version.  KS / AAO.
+C     3rd  Feb  1989  Now allows for data quality information.  KS/AAO.
+C     8th  Sept 1989  Now controls flagged value propagation.  KS/AAO.
+C     1st  Mar  1990  Now uses DSA__ routines rather than assuming the
+C                     original Figaro data format.  KS/AAO.
+C     21st Aug 1992   Automatic portability modifications
+C                     ("INCLUDE" syntax etc) made. KS/AAO
+C     23rd Aug 1992   Remove unused variable declarations. KS/AAO
+C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
+C     26th Oct 1994   Now uses new calling sequence for DSA_MAP_ARRAY. KS/AAO.
+C     2005 June 3     Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS)) 
+C                     contruct for 64-bit addressing.  MJC / Starlink
 C
 C  Note:
 C     This routine assumes that, no matter what the file format used,
@@ -94,6 +96,8 @@ C+
       SUBROUTINE DSA_GET_RANGE (REF_NAME,VMIN,VMAX,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -104,43 +108,38 @@ C
 C     Functions used
 C
       LOGICAL DSA__ARRAY
-      INTEGER DYN_ELEMENT, ICH_FOLD, ICH_LEN
+      INTEGER ICH_FOLD, ICH_LEN
 C
 C     DSA_ common.  Defines MAX_AXES
 C
       INCLUDE 'DSA_COMMON'
 C
-C     Dynamic memory system - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Local variables
 C
-      INTEGER   ADDRESS                     ! Address of data array
-      INTEGER   DIMS(MAX_AXES)              ! Dimensions of data array
-      INTEGER   DTA_STATUS                  ! DTA_ routine status codes
-      INTEGER   ELEM                        ! Dynamic array element for data
-      CHARACTER ERROR*64                    ! DTA_ error string 
-      REAL      FBAD                        ! Floating point flag value
-      LOGICAL   FLAGS                       ! Indicates data is flagged
-      INTEGER   I                           ! Loop index
-      INTEGER   IGNORE                      ! Status code - ignored
-      INTEGER   INVOKE                      ! Dummy function value
-      LOGICAL   KNOWN                       ! If range found in structure
-      INTEGER   LENGTH                      ! Length of structure name
-      CHARACTER NAME*80                     ! DTA_ name for data arrays
-      INTEGER   NDIM                        ! # array dimensions
-      INTEGER   NELM                        ! Number of elements in array
-      CHARACTER OBJ_NAME*80                 ! DTA_ name for range structure 
-      INTEGER   QELM                        ! Dynamic array element for quality
-      LOGICAL   QUALITY                     ! Indicates quality data exists
-      INTEGER   QUAL_SLOT                   ! Slot used for quality mapping
-      CHARACTER RANGE_NAME*64               ! Name of range sub-structure
-      CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT                    ! Reference table slot # 
-      INTEGER   SLOT                        ! Slot used for map call
-      CHARACTER STRUCTURE*128               ! Full name of structure
-      INTEGER   VALID                       ! Value of validity flag
+      INTEGER   DADDRS           ! Address of data array
+      INTEGER   DIMS(MAX_AXES)   ! Dimensions of data array
+      INTEGER   DTA_STATUS       ! DTA_ routine status codes
+      CHARACTER ERROR*64         ! DTA_ error string 
+      REAL      FBAD             ! Floating point flag value
+      LOGICAL   FLAGS            ! Indicates data is flagged
+      INTEGER   I                ! Loop index
+      INTEGER   IGNORE           ! Status code - ignored
+      INTEGER   INVOKE           ! Dummy function value
+      LOGICAL   KNOWN            ! If range found in structure
+      INTEGER   LENGTH           ! Length of structure name
+      CHARACTER NAME*80          ! DTA_ name for data arrays
+      INTEGER   NDIM             ! Number of array dimensions
+      INTEGER   NELM             ! Number of elements in array
+      CHARACTER OBJ_NAME*80      ! DTA_ name for range structure 
+      INTEGER   QADDRS           ! Address of quality array
+      LOGICAL   QUALITY          ! Indicates quality data exists
+      INTEGER   QUAL_SLOT        ! Slot used for quality mapping
+      CHARACTER RANGE_NAME*64    ! Name of range sub-structure
+      CHARACTER REF_NAME_UC*32   ! Upper case version of REF_NAME
+      INTEGER   REF_SLOT         ! Reference table slot number
+      INTEGER   SLOT             ! Slot used for map call
+      CHARACTER STRUCTURE*128    ! Full name of structure
+      INTEGER   VALID            ! Value of validity flag
 C
 C     Return immediately on bad status
 C
@@ -209,9 +208,8 @@ C
          CALL DSA_SEEK_QUALITY (REF_NAME,QUALITY,STATUS)
          CALL DSA_SEEK_FLAGGED_VALUES (REF_NAME,FLAGS,STATUS)
          CALL DSA_MAP_ARRAY (NAME,'READ','FLOAT',1,NELM,NELM,
-     :                     .FALSE.,.FALSE.,FLAGS,ADDRESS,SLOT,STATUS)
+     :                       .FALSE.,.FALSE.,FLAGS,DADDRS,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500         ! Error exit
-         ELEM=DYN_ELEMENT(ADDRESS)
 C
 C        Work out the range using whatever sort of quality data
 C        we have - a quality array, flagged data, or none.  We don't
@@ -222,17 +220,17 @@ C
          IF (QUALITY) THEN
             CALL DSA__QUAL_NAME (REF_SLOT,NAME,LENGTH)
             CALL DSA_MAP_ARRAY (NAME,'READ','BYTE',1,NELM,NELM,
-     :              .FALSE.,.FALSE.,.FALSE.,ADDRESS,QUAL_SLOT,STATUS)
+     :              .FALSE.,.FALSE.,.FALSE.,QADDRS,QUAL_SLOT,STATUS)
             IF (STATUS.NE.0) GO TO 500     ! Error exit
-            QELM=DYN_ELEMENT(ADDRESS)
-            CALL GEN_QRANGEF (DYNAMIC_MEM(ELEM),DYNAMIC_MEM(QELM),
-     :                                             1,NELM,VMAX,VMIN)
+            CALL GEN_QRANGEF (%VAL(CNF_PVAL(DADDRS)),
+     :                        %VAL(CNF_PVAL(QADDRS)),1,NELM,VMAX,VMIN)
             CALL DSA_UNMAP (QUAL_SLOT,STATUS)
          ELSE IF (FLAGS) THEN
             CALL DSA_GET_FLAG_VALUE ('FLOAT',FBAD,STATUS)
-            CALL GEN_FRANGEF (DYNAMIC_MEM(ELEM),FBAD,1,NELM,VMAX,VMIN)
+            CALL GEN_FRANGEF (%VAL(CNF_PVAL(DADDRS)),FBAD,1,NELM,VMAX,
+     :                        VMIN)
          ELSE
-            CALL GEN_RANGEF (DYNAMIC_MEM(ELEM),1,NELM,VMAX,VMIN)
+            CALL GEN_RANGEF (%VAL(CNF_PVAL(DADDRS)),1,NELM,VMAX,VMIN)
          END IF
          CALL DSA_UNMAP(SLOT,STATUS)
          CALL DSA_SET_RANGE (REF_NAME,VMIN,VMAX,STATUS)

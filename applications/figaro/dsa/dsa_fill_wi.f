@@ -46,7 +46,7 @@ C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, ICH_LEN, ICH_CI, DSA_SEEK_AXIS,
+C     CNF_PVAL, ICH_LEN, ICH_CI, DSA_SEEK_AXIS,
 C     DSA_CFILL_ARRAY, DSA_GET_WORK_ARRAY, DSA_MAP_AXIS_DATA,
 C     DSA_CALC_WIDTH, DSA_UNMAP, DSA_WRUSER, DSA_GET_ACTUAL_NAME,
 C     DSA_WRFLUSH, DSA_FREE_WORKSPACE, VEC_DTOx
@@ -58,7 +58,7 @@ C  Authors: Keith Shortridge, AAO
 C           Horst Meyerdierks, UoE, Starlink
 C-
 C  Subroutine / function details:
-C     DYN_ELEMENT          Dynamic memory element corresponding to address
+C     CNF_PVAL             Full pointer to dynamically allocated memory
 C     ICH_LEN              Position of last non blank char in string
 C     ICH_CI               Formats an integer into a character string
 C     DSA_SEEK_AXIS        See if axis data exists
@@ -77,10 +77,15 @@ C  History:
 C     29th Aug 1988.  Original version.  KS / AAO.
 C     31st Aug 1992.  Replace CNV_ call with VEC_ calls.
 C                     HME / UoE, Starlink. Added use of DSA_WRFLUSH. KS/AAO
+C     2005 June 3     Replace DYNAMIC_MEMORY with 
+C                     %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                     addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_FILL_WIDTH (REF_NAME,AXIS,SINGLE,WIDTH,ADDRESS,
      :                                         NDIM,DIMS,TYPE,STATUS)
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -89,10 +94,6 @@ C
       CHARACTER*(*) REF_NAME, TYPE
       DOUBLE PRECISION WIDTH
 C
-C     Dynamic memory definitions - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Functions
 C
       INTEGER DYN_ELEMENT, ICH_LEN
@@ -100,7 +101,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   APTR             ! Dynamic memory element for axis data array
       INTEGER   AXIS_ADDR        ! Virtual address of axis data array
       INTEGER   AXIS_SLOT        ! Slot number for axis mapping
       LOGICAL   EXIST            ! True if axis data exists
@@ -110,13 +110,11 @@ C
       INTEGER   NELM             ! Number of elements in array
       INTEGER   NSECT            ! Number of 1D cross-sections in data
       CHARACTER NUMBER*16        ! Used to format numbers
-      INTEGER   OPTR             ! Dynamic memory element for width array
       LOGICAL   SIMPLE           ! True if a  single value can be used
       CHARACTER STRUCTURE*64     ! Full name of structure
       DOUBLE PRECISION VALUE     ! Single value for width
       INTEGER   WORK_ADDR        ! Virtual address of work array
       INTEGER   WORK_SLOT        ! Slot number for work array
-      INTEGER   WPTR             ! Dynamic memory element for work array
       INTEGER   IERR, VECSTA     ! Unused for VEC_
 C
 C     Return immediately on bad status
@@ -160,35 +158,32 @@ C
             WORK_ADDR=ADDRESS
          ELSE
             CALL DSA_GET_WORK_ARRAY (NELM,'DOUBLE',WORK_ADDR,
-     :                                                WORK_SLOT,STATUS)
+     :                               WORK_SLOT,STATUS)
          END IF
-         WPTR=DYN_ELEMENT(WORK_ADDR)
          CALL DSA_MAP_AXIS_DATA (REF_NAME,AXIS,'READ','DOUBLE',
-     :                                      AXIS_ADDR,AXIS_SLOT,STATUS)
+     :                           AXIS_ADDR,AXIS_SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500      ! Error exit
-         APTR=DYN_ELEMENT(AXIS_ADDR)
-         CALL DSA_CALC_WIDTH (DYNAMIC_MEM(APTR),DIMS(1),NSECT,
-     :                                        DYNAMIC_MEM(WPTR),STATUS)
+         CALL DSA_CALC_WIDTH (%VAL(CNF_PVAL(AXIS_ADDR)),DIMS(1),NSECT,
+     :                        %VAL(CNF_PVAL(WORK_ADDR)),STATUS)
          CALL DSA_UNMAP (AXIS_SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500      ! Error exit
          IF (TYPE.NE.'DOUBLE') THEN
-            OPTR=DYN_ELEMENT(ADDRESS)
             VECSTA=0
             IF (TYPE.EQ.'BYTE') THEN
-               CALL VEC_DTOB(.FALSE.,NELM,DYNAMIC_MEM(WPTR),
-     :            DYNAMIC_MEM(OPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOB(.FALSE.,NELM,%VAL(CNF_PVAL(WORK_ADDR)),
+     :            %VAL(CNF_PVAL(ADDRESS)),IERR,NBAD,VECSTA)
             ELSE IF (TYPE.EQ.'SHORT'.OR.TYPE.EQ.'WORD') THEN
-               CALL VEC_DTOW(.FALSE.,NELM,DYNAMIC_MEM(WPTR),
-     :            DYNAMIC_MEM(OPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOW(.FALSE.,NELM,%VAL(CNF_PVAL(WORK_ADDR)),
+     :            %VAL(CNF_PVAL(ADDRESS)),IERR,NBAD,VECSTA)
             ELSE IF (TYPE.EQ.'INT') THEN
-               CALL VEC_DTOI(.FALSE.,NELM,DYNAMIC_MEM(WPTR),
-     :            DYNAMIC_MEM(OPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOI(.FALSE.,NELM,%VAL(CNF_PVAL(WORK_ADDR)),
+     :            %VAL(CNF_PVAL(ADDRESS)),IERR,NBAD,VECSTA)
             ELSE IF (TYPE.EQ.'FLOAT'.OR.TYPE.EQ.'REAL') THEN
-               CALL VEC_DTOR(.FALSE.,NELM,DYNAMIC_MEM(WPTR),
-     :            DYNAMIC_MEM(OPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOR(.FALSE.,NELM,%VAL(CNF_PVAL(WORK_ADDR)),
+     :            %VAL(CNF_PVAL(ADDRESS)),IERR,NBAD,VECSTA)
             ELSE IF (TYPE.EQ.'USHORT'.OR.TYPE.EQ.'UWORD') THEN
-               CALL VEC_DTOUW(.FALSE.,NELM,DYNAMIC_MEM(WPTR),
-     :            DYNAMIC_MEM(OPTR),IERR,NBAD,VECSTA)
+               CALL VEC_DTOUW(.FALSE.,NELM,%VAL(CNF_PVAL(WORK_ADDR)),
+     :            %VAL(CNF_PVAL(ADDRESS)),IERR,NBAD,VECSTA)
             END IF
             IF (NBAD.NE.0) THEN
                CALL DSA_WRUSER ('Warning - ')

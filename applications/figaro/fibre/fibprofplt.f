@@ -43,14 +43,13 @@
 *        Intensity data
 *
 *   Subroutines/functions referenced:
+C     CNF_PVAL       : Full pointer to dynamically allocated memory
 *     COPY2WORK      : Copy data to work array
 *     DECODE_STATUS  : Decode fit status element
 *     RV_CORRECT     : Get correction to VLSR etc.
 *     LINE_PLOT      : Plot profile with fit
 *     LINE_VPLOT     : As line_plot but with velocity scale on X axis
-*
-*     GETWORK        : Get virtual memory
-*
+*     DSA_GET_WORK_ARRAY : Get virtual memory
 *     DSA_FREE_WORKSPACE : Free virtual memory
 *     PAR_QUEST      : Get yes/no response from user
 *
@@ -81,7 +80,6 @@
       save vcorr,vtype
       character*3 vctype(2)
       character bss*2,bs*1
-      include 'DYNAMIC_MEMORY'
       data vctype/'HEL','LSR'/
       data bss/'\\'/
       bs = bss(1:1)
@@ -121,7 +119,7 @@
 
 *   Plot with velocity scale on X-axis
 
-          call getwork(wavdim,'float',w1ptr,slot,status)
+          call dsa_get_work_array(wavdim,'float',w1ptr,slot,status)
           if(status.ne.SAI__OK) then
             return
           end if
@@ -130,7 +128,7 @@
 
           if(vcorr.ne.0.0) then
             write(chars,'(''Current velocity correction = '',
-     :           e12.5)')vcorr
+     :           e12.5)') vcorr
             call par_wruser(chars,status)
           end if
           if(par_quest('Evaluate velocity correction?',.true.)) then
@@ -147,23 +145,23 @@
 *     Make plot
 
           call line_vplot(fit_parms,y,%VAL(CNF_PVAL(d_tlptr)),
-     :             %VAL(CNF_PVAL(d_trptr)),1,.false.,vcorr,
-     :             %VAL(CNF_PVAL(d_wptr)),dynamic_mem(w1ptr),0,0,
-     :             deccntr,status)
+     :                    %VAL(CNF_PVAL(d_trptr)),1,.false.,vcorr,
+     :                    %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(w1ptr)),
+     :                    0,0,deccntr,status)
           call dsa_free_workspace(slot,status)
           xunits = dxunit
         else
 
 *   Plot with wavelength scale on X-axis
 
-          call line_plot(fit_parms,dynamic_mem(d_xptr),y,
+          call line_plot(fit_parms,%VAL(CNF_PVAL(d_xptr)),y,
      :                   %VAL(CNF_PVAL(d_tlptr)),
      :                   %VAL(CNF_PVAL(d_trptr)),1,deccntr,
      :                   .true.,.false.,0,0,status)
         end if
       else
         call gr_hard(status)
-        call plot_spect(wavdim,dynamic_mem(d_xptr),idata(1,ix,iy),
+        call plot_spect(wavdim,%VAL(CNF_PVAL(d_xptr)),idata(1,ix,iy),
      :                  title,xunits,' ')
       end if
       end

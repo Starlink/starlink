@@ -42,20 +42,19 @@
 *        wavelength dimension of data
 *
 *   Subroutines/functions referenced:
-*     FIBSLCOP           : Copy data to output file
-*     HEXMARK            : Draw hexagon
-*     RX2CHN             : Convert value to pixel number in array
+*     CNF_PVAL       : Full pointer to dynamically allocated memory
+*     FIBSLCOP       : Copy data to output file
+*     HEXMARK        : Draw hexagon
+*     RX2CHN         : Convert value to pixel number in array
 *
-*     DSA_NAMED_OUTPUT   : Create output file
-*     DSA_RESHAPE_DATA   : Create data arrays for output file-based
-*                          on similar arrays with different dimensions
-*     DSA_RESHAPE_AXIS   : Same as reshape_data, but for axis
-*     DSA_MAP_DATA       : Map main data array
-*     DSA_UNMAP          : Unmap array
+*     DSA_NAMED_OUTPUT : Create output file
+*     DSA_RESHAPE_DATA : Create data arrays for output file-based
+*                        on similar arrays with different dimensions
+*     DSA_RESHAPE_AXIS : Same as reshape_data, but for axis
+*     DSA_MAP_DATA    : Map main data array
+*     DSA_UNMAP       : Unmap array
 *     DSA_CLOSE_STRUCTURE : Close data file
-*     DYN_ELEMENT = INTEGER (Given)
-*        Convert address to array element of dynamic_me
-*     PAR_RDCHAR         : Get character parameter from user
+*     PAR_RDCHAR      : Get character parameter from user
 *
 * Author:
 *    T.N.Wilkins Manchester 24/6/88
@@ -67,6 +66,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       integer maxnpt,xpts(maxnpt),ypts(maxnpt)
       real xa(spdim1),ya(spdim2),xadj(spdim2),x,y
@@ -75,7 +75,6 @@
       integer i,ix,iy,npt,rx2chn,dims(2),out,dyn_element,pgcurse
       logical ifxcut,hex
       character*72 output,ch*1
-      include 'DYNAMIC_MEMORY'
 
 *  Find cursor position
 
@@ -150,9 +149,8 @@
 
         call dsa_map_data('output','WRITE','float',out,slot,status)
         if(status.ne.SAI__OK) return
-        out = dyn_element(out)
-        call fibslcop(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,xpts,
-     :            ypts,npt,dynamic_mem(out))
+        call fibslcop(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,xpts,
+     :                ypts,npt,%VAL(CNF_PVAL(out)))
         call dsa_unmap(slot,status)
         call dsa_close_structure('output',status)
       end if

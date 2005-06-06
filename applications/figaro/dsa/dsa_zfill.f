@@ -31,7 +31,7 @@ C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, DSA_WRUSER, GEN_FILL
+C     CNF_PVAL, DSA_WRUSER, GEN_FILL
 C
 C  Prior requirements:  None.
 C
@@ -40,38 +40,34 @@ C
 C  Version date: 29th August 1992
 C-
 C  Subroutine / function details:
-C     GEN_FILL      Fill an array with a specified byte value.
-C     DYN_ELEMENT   Dynamic memory element corresponding to address.
-C     DSA_WRUSER    Output message to user.
+C     CNF_PVAL           Full pointer to dynamically allocated memory
+C     GEN_FILL           Fill an array with a specified byte value.
+C     DSA_WRUSER         Output message to user.
 C
 C  History:
-C     8th July 1987   Original version.  KS / AAO.
-C     25th Apr 1989   Support for USHORT type added.  KS / AAO.
-C     21st Aug 1992   Automatic portability modifications
-C                     ("INCLUDE" syntax etc) made. KS/AAO
-C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
+C     8th July 1987  Original version.  KS / AAO.
+C     25th Apr 1989  Support for USHORT type added.  KS / AAO.
+C     21st Aug 1992  Automatic portability modifications
+C                    ("INCLUDE" syntax etc) made. KS/AAO
+C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_ZFILL_ARRAY (NELM,ADDRESS,TYPE,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
       INTEGER NELM, ADDRESS, STATUS
       CHARACTER*(*) TYPE
 C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
-C
 C     Local variables
 C
       INTEGER   ELEMENT                ! Dynamic array element number
       INTEGER   ITYPE                  ! Type code for data.
-C
-C     DYN_ system dynamic memory.  Defines DYNAMIC_MEM.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Sizes for elements of various types.  Note the order is determined
 C     solely by the 'FDISBU' string used to calculate ITYPE.
@@ -87,10 +83,9 @@ C     Work out number of bytes, given data type, then zero the array.
 C     (Note the implied assumption that zero for all data types is just
 C     a sequence of zero bytes.)
 C
-      ELEMENT=DYN_ELEMENT(ADDRESS)
       ITYPE=INDEX('FDISBU',TYPE(1:1))
       IF (ITYPE.GT.0) THEN
-         CALL GEN_FILL(NELM*SIZES(ITYPE),0,DYNAMIC_MEM(ELEMENT))
+         CALL GEN_FILL(NELM*SIZES(ITYPE),0,%VAL(CNF_PVAL(ADDRESS)))
       END IF
 C
       END

@@ -47,13 +47,13 @@
 *        Size of hexagons
 *
 * Functions/subroutines referenced:
-*     ADDFIT            : Draw fit over data
-*     DRAWPOLY          : Draw line using SGS
-*     GR_SELCT = LOGICAL (Returned)
-*        Open device
-*
-*     GEN_RANGEF        : Get range of array
-*     GEN_ELEMF         : Get element of array
+*    ADDFIT      : Draw fit over data
+*    CNF_PVAL    : Full pointer to dynamically allocated memory
+*    DRAWPOLY    : Draw line using SGS
+*    GR_SELCT = LOGICAL (Returned)
+*      Open device
+*    GEN_RANGEF  : Get range of array
+*    GEN_ELEMF   : Get element of array
 
 * Author:
 *   TNW: T.N.Wilkins Manchester until 1/89, then IoA Cambridge until
@@ -65,6 +65,10 @@
 *   TNW: 17/6/93 Bug fix-off_d_xptr introduced
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer i,j,status,line
       include 'arc_dims'
       real total(spdim1,spdim2)
@@ -75,10 +79,6 @@
       real xws,xwe,yws,ywe,xvs,xve,yvs,yve,xps,xpe,yps,ype,xvend
       integer wavst,nwav,rx2chn,off_d_xptr
       real gen_elemf
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
-      include 'CNF_PAR'          ! For CNF_PVAL function
 
       status = SAI__OK
       call gr_selct(ifsoft,status)
@@ -124,11 +124,11 @@
       end if
       call pgvport(0.01,xvend,0.01,0.99)
       call pgwnad(xmin,xmax,ymin,ymax)
-      wavst = rx2chn(dynamic_mem(d_xptr),wavdim,
-     :     gen_elemf(%VAL(CNF_PVAL(d_tlptr)),line))
+      wavst = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
+     :               gen_elemf(%VAL(CNF_PVAL(d_tlptr)),line))
       off_d_xptr = d_xptr + (wavst - 1) * VAL__NBR
-      nwav = rx2chn(dynamic_mem(d_xptr),wavdim,
-     :     gen_elemf(%VAL(d_trptr),line)) - wavst + 1
+      nwav = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
+     :              gen_elemf(%VAL(d_trptr),line)) - wavst + 1
       do j=1,spdim2
         y = ya(j)
         do i=1,spdim1
@@ -153,7 +153,7 @@
 
 *       Draw profile inside box
 
-              call drawpoly(dynamic_mem(off_d_xptr),data(wavst,i,j),
+              call drawpoly(%VAL(CNF_PVAL(off_d_xptr)),data(wavst,i,j),
      :             nwav,datmin,datmax)
               call addfit(i,j,%VAL(CNF_PVAL(d_rptr)),line)
             end if

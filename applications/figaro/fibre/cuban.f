@@ -67,7 +67,7 @@
 *        "Pointer" to WAVDIM of REAL workspace
 
 * Subroutines/functions referenced:
-*      COPY2WORK, ENCODE_CONTRL, HEXPRARR, RECTPRARR,
+*      CNF_PVAL, COPY2WORK, ENCODE_CONTRL, HEXPRARR, RECTPRARR,
 *      ONE_LINE, RCHN2RX, RX2CHN, SET_FIT, SET_MASK, ZERO_REAL
 *      GEN_RANGEF, PAR_QNUM, PAR_QUEST, PAR_WRUSER
 *      PGBOX, PGCURSE, PGGRAY, PGPOINT, PGQVP, PGQWIN, PGQVPORT,
@@ -116,9 +116,6 @@
       real tr(6),save(8),gr(4),xp1,yp1,rchn2rx
       integer xcmp,ycmp,i,j
       real npltx,nplty
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence(dynamic_mem,dynamic_chars)
 
 * Copy default model into current
 
@@ -386,8 +383,8 @@
 
 *     Add for fit
 
-              call copy2work(dynamic_mem(d_vsptr),wavdim,data(1,ix,iy),
-     :                add)
+              call copy2work(%VAL(CNF_PVAL(d_vsptr)),wavdim,
+     :                       data(1,ix,iy),add)
             else
               call par_wruser('Out of range',pstat)
             end if
@@ -401,8 +398,8 @@
 
 *            Perform fit
 
-                call copy2work(dynamic_mem(d_vsptr),wavdim,data(1,ix,iy)
-     :                  ,add)
+                call copy2work(%VAL(CNF_PVAL(d_vsptr)),wavdim,
+     :                         data(1,ix,iy),add)
 
 *            get the model type
 
@@ -420,14 +417,13 @@
 *             Perform fitting
 
                 call one_line(1,%VAL(CNF_PVAL(d_tlptr)),
-     :                  %VAL(CNF_PVAL(d_trptr)),ix,ix,nfit,
-*     :     dynamic_chars(idsptr:idsend),%VAL(CNF_PVAL(d_cptr))
-     :            idstring,%VAL(CNF_PVAL(d_cptr))
-     :                  ,line,nnew,nold,nfailed,maskedout,
-     :            par_quest('Plot data',.true.),.true.,floop,iy,iy,
-     :            status)
-                floop = .not.par_quest('Return to profile array?'
-     :                                    ,.not.floop)
+     :                        %VAL(CNF_PVAL(d_trptr)),ix,ix,nfit,
+     :                        idstring,%VAL(CNF_PVAL(d_cptr)),
+     :                        line,nnew,nold,nfailed,maskedout,
+     :                        par_quest('Plot data',.true.),.true.,
+     :                        floop,iy,iy,status)
+                floop = .not.par_quest('Return to profile array?',
+     :                                 .not.floop)
                 if(status.ne.SAI__OK) floop = .false.
                 add = .false.
               end do

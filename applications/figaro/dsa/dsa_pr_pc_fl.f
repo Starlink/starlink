@@ -33,7 +33,7 @@ C  External variables used:
 C     Only common variables internal to the DSA package.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
+C     CNF_PVAL, ICH_FOLD, ICH_LEN, DSA_FIND_REF, DSA_GET_ACTUAL_NAME,
 C     DSA_WRUSER, DSA_REFLAG_DATA
 C
 C  Prior requirements:
@@ -46,14 +46,14 @@ C
 C  Version date: 3rd February 1995
 C-
 C  Subroutine / function details:
-C     DYN_ELEMENT    Dynamic memory element corresponding to virtual address
-C     ICH_FOLD       Convert string to upper case
-C     ICH_LEN        Position of last non-blank char in string
-C     DSA_FIND_REF   Look up reference name in common tables
+C     CNF_PVAL         Full pointer to dynamically allocated memory
+C     ICH_FOLD         Convert string to upper case
+C     ICH_LEN          Position of last non-blank char in string
+C     DSA_FIND_REF     Look up reference name in common tables
 C     DSA_GET_ACTUAL_NAME  Get full name corresponding to reference name
 C     DSA_ACT_MAP_QUALITY  Map the quality array (or a dummy)
-C     DSA_WRUSER     Output message to user
-C     DSA_REFLAG_DATA      Flag data values using a quality array.
+C     DSA_WRUSER       Output message to user
+C     DSA_REFLAG_DATA  Flag data values using a quality array.
 C
 C  Common variable details:
 C     (>) MAP_POINTER   (Integer array) Memory address for the array.
@@ -69,18 +69,22 @@ C     (>) WORK_TYPE     (String array)  Type of array held in workspace.
 C     (<) PRE_FLAG      (Logical array) Indicates pre-processing done.
 C
 C  History:
-C     21st July 1988  Original version.  KS / AAO.
-C     21st Aug 1992   Automatic portability modifications
-C                     ("INCLUDE" syntax etc) made. KS/AAO
-C     23rd Aug 1992   Remove unused variable declarations. KS/AAO
-C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
-C      3rd Feb 1995   Now supports files with both flagged values and 
-C                     quality arrays, and simulataneous use of both by
-C                     an application.
+C     21st July 1988 Original version.  KS / AAO.
+C     21st Aug 1992  Automatic portability modifications
+C                    ("INCLUDE" syntax etc) made. KS/AAO
+C     23rd Aug 1992  Remove unused variable declarations. KS/AAO
+C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
+C      3rd Feb 1995  Now supports files with both flagged values and 
+C                    quality arrays, and simulataneous use of both by
+C                    an application.
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_PRE_PROCESS_FLAGGED_VALUES (REF_NAME,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -90,13 +94,11 @@ C
 C     Functions used
 C
       INTEGER ICH_FOLD, ICH_LEN
-      INTEGER DYN_ELEMENT
 C
 C     Local variables
 C
       INTEGER   DATA_ADDR                   ! Virtual address of data array
       CHARACTER DATA_TYPE*16                ! Type of mapped data array 
-      INTEGER   DPTR                        ! Dynamic mem element for data array
       INTEGER   I                           ! Index through dimensions
       INTEGER   IGNORE                      ! Dummy status value
       INTEGER   INVOKE                      ! Dummy function value
@@ -105,7 +107,6 @@ C
       CHARACTER MODE*8                      ! Quality mapping mode
       INTEGER   NELM                        ! Number of data array elements
       CHARACTER OBJ_NAME*128                ! DTA_ name of data object
-      INTEGER   QPTR                        ! Dynamic mem element for quality
       INTEGER   QUAL_ADDR                   ! Virtual address of quality array
       CHARACTER REF_NAME_UC*32              ! Upper case version of REF_NAME
       INTEGER   REF_SLOT                    ! Reference table slot # 
@@ -119,10 +120,6 @@ C
 C     DSA_ error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
-C     Dynamic memory system common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Return immediately if bad status passed
 C
@@ -207,13 +204,11 @@ C
          END IF
          CALL DSA_ACT_MAP_QUALITY(REF_NAME,MODE,'BYTE',QUAL_ADDR,
      :                                 QUALITY_SLOT(REF_SLOT),STATUS)
-         QPTR=DYN_ELEMENT(QUAL_ADDR)
 C
 C        Now process the data array
 C
-         DPTR=DYN_ELEMENT(DATA_ADDR)
-         CALL DSA_REFLAG_DATA(NELM,DATA_TYPE,DYNAMIC_MEM(DPTR),
-     :                                     DYNAMIC_MEM(QPTR),STATUS)
+         CALL DSA_REFLAG_DATA(NELM,DATA_TYPE,%VAL(CNF_PVAL(DATA_ADDR)),
+     :                        %VAL(CNF_PVAL(QUAL_ADDR)),STATUS)
 C
       END IF
 C

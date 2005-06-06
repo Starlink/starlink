@@ -51,6 +51,7 @@
 *
 * Subroutines/functions called:
 *     ACCRES       : Access application-specific structure
+C     CNF_PVAL     : Full pointer to dynamically allocated memory
 *     FIT_LINE     : Perform optimisation of fit
 *     ENCODE_CONTROL : Encode fit type into fit status element
 *     FIBCHKFIT    : Check if fit more "advanced" than previous
@@ -64,7 +65,7 @@
 *     SET_FIT      : Set fit model/type etc. to use
 *
 *     DSA_FREE_WORKSPACE : Free virtual memory
-*     GETWORK      : Get virtual memory
+*     DSA_GET_WORK_ARRAY : Get virtual memory
 *
 *     PAR_QUEST = LOGICAL (Returned)
 *        Get yes/no response from user
@@ -95,7 +96,6 @@
       logical loop,mstore,par_quest,masked,fit
       logical stored,plot,dummy1,dummy2
       include 'status_inc'
-      include 'DYNAMIC_MEMORY'
 *
 *  TRIAL is required by workaround for bug in Digital Fortran Compiler v4.1
 *  Remove when fixed.
@@ -120,8 +120,8 @@
 
 *   Plot profile
 
-          call plot_spect(wavdim,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),' ',xunits,' ')
+          call plot_spect(wavdim,%VAL(CNF_PVAL(d_xptr)),
+     :         %VAL(CNF_PVAL(d_vsptr)),' ',xunits,' ')
         end if
         plot = .false.
 
@@ -142,8 +142,8 @@
 *    Note that spdim1 maps to nYp in fit_line, and spdim2 to nXp! This is
 *    due to "reverse" order of dimensions in fit_line etc.
 
-          call fit_line(g_parms,g_error,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),1,wavdim,deccntr,1,1,1,odensc,
+          call fit_line(g_parms,g_error,%VAL(CNF_PVAL(d_xptr)),
+     :         %VAL(CNF_PVAL(d_vsptr)),1,wavdim,deccntr,1,1,1,odensc,
      :         mstore,iy,0,aic,status)
           call opt_release(status)
           if(status.ne.SAI__OK) return
@@ -174,18 +174,18 @@
             call fibstres(g_parms,g_error,nparms,ref,
      :        %VAL(CNF_PVAL(d_rptr)),ix,iy,deccntr,npts,
      :        %VAL(CNF_PVAL(d_mptr)),nfailed,nnew,aic,
-     :        %VAL(d_vptr),%VAL(CNF_PVAL(staptr)))
+     :        %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)))
             stored = .true.
           end if
         else if(key.eq.2) then
 
 *     Hardcopy plot (need workspace here separate from vsptr)
 
-          call getwork(wavdim,'float',w1ptr,slot,status)
+          call dsa_get_work_array(wavdim,'float',w1ptr,slot,status)
           if(status.ne.SAI__OK) return
-          call fibprofplt(dynamic_mem(w1ptr),ix,iy,
+          call fibprofplt(%VAL(CNF_PVAL(w1ptr)),ix,iy,
      :                    %VAL(CNF_PVAL(d_rptr)),
-     :                    dynamic_mem(d_sptr))
+     :                    %VAL(CNF_PVAL(d_sptr)))
           call dsa_free_workspace(slot,status)
 
         else if(key.eq.3) then

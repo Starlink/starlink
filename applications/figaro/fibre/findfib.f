@@ -33,18 +33,19 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'opt_cmn'
+      include 'gr_inc'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer nl,ni,ixst,ichst,nfib,i,work1,work2,idel
-      integer status,dirn,gen_pmax,nfound,slot
+      integer status,dirn,gen_pmax,nfound,slot,slot2
       real image(nl,ni),xl,yl,xu,yu,x(2),y(2),dummy,value,sep
       real yst,yen,sg_parms(6),sg_error(6),centre(200),flux(200)
       real xmark,widths(200),x1,x2,y1,y2
       integer gen_bsearch,iup,idown,pgcurse
       logical go,loop,censt,par_quest,termsav
       character*1 ch
-      include 'opt_cmn'
-      include 'gr_inc'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
       prfits = .true.
       steprat = 1.0
@@ -85,17 +86,17 @@
       call gr_vline(x(1))
       call gr_vline(x(2))
 
-      call getwork(ni*2,'float',work1,slot,status)
+      call dsa_get_work_array(ni,'float',work1,slot,status)
+      call dsa_get_work_array(ni,'float',work2,slot2,status)
       if(status.ne.SAI__OK) return
-      work2 = work1 + ni*val__nbr
-      call gen_nfillf(ni,dynamic_mem(work2))
+      call gen_nfillf(ni,%VAL(CNF_PVAL(work2)))
       call fig_ytract(image,nl,ni,nint(x(1))+ichst,nint(x(2))+ichst,
-     :    dynamic_mem(work1))
+     :                %VAL(CNF_PVAL(work1)))
       call par_rdval('NFIB',2.0,200.0,30.0,' ',value)
       nfib = nint(value)
       i = 0
       loop = .true.
-      yl = real(gen_pmax(dynamic_mem(work1),ni))
+      yl = real(gen_pmax(%VAL(CNF_PVAL(work1)),ni))
       xmark = (x(1)+x(2))*0.5
       iup = 0
       idown = 0
@@ -133,8 +134,9 @@
 
 *   Fit Gaussian to possible fibre
 
-          call profile_fit(sg_parms,sg_error,ni,dynamic_mem(work2),
-     :          dynamic_mem(work1),nint(yst),nint(yen-yst)+1,status)
+          call profile_fit(sg_parms,sg_error,ni,%VAL(CNF_PVAL(work2)),
+     :                     %VAL(CNF_PVAL(work1)),nint(yst),
+     :                     nint(yen-yst)+1,status)
           call opt_release(status)
           if(status.ne.SAI__OK) return
           sg_parms(2) = abs(sg_parms(2))
@@ -182,6 +184,7 @@
       end do
       terminal = termsav
       call dsa_free_workspace(slot,status)
+      call dsa_free_workspace(slot2,status)
       nfound = i
 
 * Sort by centre

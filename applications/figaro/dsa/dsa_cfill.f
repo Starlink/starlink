@@ -24,14 +24,15 @@ C     (>) ADDRESS     (Integer,ref) The address of the data array.
 C     (>) VALUE       (Double,ref) The constant value to be used.
 C     (>) TYPE        (Fixed string,descr) The type of the data array.
 C                     This must be one of 'FLOAT','INT',SHORT','REAL'
-C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is ignored.
-C     (>) STATUS      (Integer,ref) Status code.  If bad status is passed,
-C                     this routine returns immediately.
+C                     'BYTE', 'USHORT' or 'DOUBLE'.  Anything else is 
+C                     ignored.
+C     (>) STATUS      (Integer,ref) Status code.  If bad status is
+C                     passed, this routine returns immediately.
 C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, DSA_WRUSER, DSA_CFILLx
+C     DSA_WRUSER, DSA_CFILLx, CNF_PVAL
 C
 C  Prior requirements:  None.
 C
@@ -51,10 +52,15 @@ C     24th Apr 1989.   Support for USHORT type added.  KS/AAO.
 C     31st Aug 1992.   No longer rely on CNV_.  HME / UoE, Starlink.
 C      1st Sep 1992.   Usused variable declarations removed. KS/AAO.
 C     24th Feb 1993.   No longer needs to include DSA_TYPES.INC KS/AAO.
+C     2005 June 3      Replace DYNAMIC_MEMORY with 
+C                      %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                      addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_CFILL_ARRAY (NELM,ADDRESS,VALUE,TYPE,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -64,23 +70,18 @@ C
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT, ICH_LEN
+      INTEGER ICH_LEN
       CHARACTER*24 ICH_CD
 C
 C     Local variables
 C
-      BYTE      BVALUE                 ! Byte constant
-      CHARACTER CHR*1                  ! First character of TYPE
-      INTEGER   ELEMENT                ! Dynamic memory array element
-      REAL      FVALUE                 ! Single precision constant
-      INTEGER   IVALUE                 ! Integer constant
-      CHARACTER NUMBER*24              ! Used for formatting numbers
-      INTEGER*2 SVALUE                 ! Short constant (serves for both
-                                       ! signed & unsigned types)
-C
-C     DSA_ system dynamic memory.  Defines DYNAMIC_MEM.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      BYTE      BVALUE           ! Byte constant
+      CHARACTER CHR*1            ! First character of TYPE
+      REAL      FVALUE           ! Single precision constant
+      INTEGER   IVALUE           ! Integer constant
+      CHARACTER NUMBER*24        ! Used for formatting numbers
+      INTEGER*2 SVALUE           ! Short constant (serves for both
+                                 ! signed & unsigned types)
 C
 C     DSA_ system error codes
 C
@@ -92,16 +93,15 @@ C
 C
 C     Call appropriate routine for data type
 C
-      ELEMENT=DYN_ELEMENT(ADDRESS)
       CHR=TYPE(1:1)
       IF (CHR.EQ.'F') THEN
          FVALUE=VALUE
-         CALL DSA_CFILLF (NELM,FVALUE,DYNAMIC_MEM(ELEMENT))
+         CALL DSA_CFILLF (NELM,FVALUE,%VAL(CNF_PVAL(ADDRESS)))
       ELSE IF (CHR.EQ.'D') THEN
-         CALL DSA_CFILLD (NELM,VALUE,DYNAMIC_MEM(ELEMENT))
+         CALL DSA_CFILLD (NELM,VALUE,%VAL(CNF_PVAL(ADDRESS)))
       ELSE IF (CHR.EQ.'I') THEN
          IVALUE=VALUE
-         CALL DSA_CFILLI (NELM,IVALUE,DYNAMIC_MEM(ELEMENT))
+         CALL DSA_CFILLI (NELM,IVALUE,%VAL(CNF_PVAL(ADDRESS)))
       ELSE IF (CHR.EQ.'S') THEN
          IF ((VALUE.GT.32767.0).OR.(VALUE.LT.-32768.0)) THEN
             NUMBER=ICH_CD(VALUE)
@@ -111,7 +111,7 @@ C
             STATUS=DSA__INVTYP
          ELSE
             SVALUE=VALUE
-            CALL DSA_CFILLS (NELM,SVALUE,DYNAMIC_MEM(ELEMENT))
+            CALL DSA_CFILLS (NELM,SVALUE,%VAL(CNF_PVAL(ADDRESS)))
          END IF
       ELSE IF (CHR.EQ.'U') THEN
          IF ((VALUE.GT.65535.0).OR.(VALUE.LT.0.0)) THEN
@@ -124,7 +124,7 @@ C
             IVALUE = VALUE
             IF ( IVALUE .GT. 32767 ) IVALUE = IVALUE - 65536
             SVALUE = IVALUE
-            CALL DSA_CFILLU (NELM,SVALUE,DYNAMIC_MEM(ELEMENT))
+            CALL DSA_CFILLU (NELM,SVALUE,%VAL(CNF_PVAL(ADDRESS)))
          END IF
       ELSE IF (CHR.EQ.'B') THEN
          IF ((VALUE.GT.127.0).OR.(VALUE.LT.-128.0)) THEN
@@ -134,7 +134,7 @@ C
             STATUS=DSA__INVTYP
          ELSE
             BVALUE=VALUE
-            CALL DSA_CFILLB (NELM,BVALUE,DYNAMIC_MEM(ELEMENT))
+            CALL DSA_CFILLB (NELM,BVALUE,%VAL(CNF_PVAL(ADDRESS)))
          END IF
       END IF
 C

@@ -38,7 +38,7 @@ C
 C  External variables used:  None.
 C
 C  External subroutines / functions used:
-C     DSA_SQUARE_{x}
+C     DSA_SQUARE_{x}, CNF_PVAL
 C
 C  Prior requirements:  None.
 C
@@ -54,11 +54,16 @@ C     27th June 1989.   Original version.  KS / AAO.
 C     21st Aug 1992     Automatic portability modifications
 C                       ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992     "INCLUDE" filenames now upper case. KS/AAO
+C     2005 June 3       Replace DYNAMIC_MEMORY with 
+C                       %VAL(CNF_PVAL(ADDRESS)) contruct for 64-bit
+C                       addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_ERR_TO_VARIANCE (NELM,TYPE,ERR_ADDR,VAR_ADDR,
      :                                                         ERRORS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -67,42 +72,34 @@ C
 C
 C     Functions used
 C
-      INTEGER ICH_FOLD, DYN_ELEMENT
-C
-C     Dynamic memory system definition - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER ICH_FOLD
 C
 C     Local variables
 C
       CHARACTER CHR*1        ! First character of TYPE
-      INTEGER   EPTR         ! Dynamic memory array element for error data
       INTEGER   INVOKE       ! Dummy function value
-      INTEGER   VPTR         ! Dynamic memory array element for variance data
 C
       CHR=TYPE(1:1)
       INVOKE=ICH_FOLD(CHR)
-      EPTR=DYN_ELEMENT(ERR_ADDR)
-      VPTR=DYN_ELEMENT(VAR_ADDR)
       ERRORS=0
       IF (CHR.EQ.'B') THEN
-         CALL DSA_SQUARE_B (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_B (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       ELSE IF (CHR.EQ.'F') THEN
-         CALL DSA_SQUARE_F (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_F (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       ELSE IF (CHR.EQ.'D') THEN
-         CALL DSA_SQUARE_D (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_D (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       ELSE IF (CHR.EQ.'U') THEN
-         CALL DSA_SQUARE_U (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_U (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       ELSE IF (CHR.EQ.'I') THEN
-         CALL DSA_SQUARE_I (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_I (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       ELSE IF (CHR.EQ.'S') THEN
-         CALL DSA_SQUARE_S (NELM,DYNAMIC_MEM(EPTR),
-     :                                         DYNAMIC_MEM(VPTR),ERRORS)
+         CALL DSA_SQUARE_S (NELM,%VAL(CNF_PVAL(ERR_ADDR)),
+     :                      %VAL(CNF_PVAL(VAR_ADDR)),ERRORS)
       END IF
 C
       END

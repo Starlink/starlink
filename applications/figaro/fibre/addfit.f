@@ -16,8 +16,9 @@
 *   have been co-added for the fit.
 *
 * Subroutines/functions referenced:
-*     DECODE_STATUS   : Decode fit status word
-*     LINE_PLOT_SUB   : Plot fit onto profile
+C     CNF_PVAL       : Full pointer to dynamically allocated memory
+*     DECODE_STATUS  : Decode fit status word
+*     LINE_PLOT_SUB  : Plot fit onto profile
 *
 * Arguments:
 *    I = INTEGER (Given)
@@ -50,7 +51,6 @@
       integer ninfit,get_parnum
       integer stat
       real fit_parms(MAX_PARMS),value
-      include 'DYNAMIC_MEMORY'
 
       status = SAI__OK
 
@@ -78,7 +78,7 @@
 
 *            Plot profile with fit
 
-        call line_plot_sub(fit_parms,dynamic_mem(d_xptr),0.0,
+        call line_plot_sub(fit_parms,%VAL(CNF_PVAL(d_xptr)),0.0,
      :                     %VAL(CNF_PVAL(d_tlptr)),
      :                     %VAL(CNF_PVAL(d_trptr)),line,wavdim,
      :                     deccntr,.false.,0,0,max_parms,status)

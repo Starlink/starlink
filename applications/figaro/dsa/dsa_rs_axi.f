@@ -53,14 +53,15 @@ C  External variables used:
 C    Only common variables used internally by the DSA routines.
 C
 C  External subroutines / functions used:
-C     GEN_NTH, ICH_CI, ICH_FOLD, ICH_LEN, DSA_ARRAY_SIZE, DSA_AXIS_SIZE,
-C     GEN_MOVE, DSA_PREFERRED_TYPE, DSA_UNMAP, DSA_AXIS_TYPE, DSA_MAP_AXIS_DATA,
-C     DSA_SEEK_WIDTH, DSA_AXIS_WIDTH_TYPE, DSA_MAP_WIDTH, DSA_GET_AXIS_INFO,
-C     DSA_SET_AXIS_INFO, DSA_SET_WIDTH, DSA_TYPESIZE, DYN_ELEMENT,
-C     DSA_FIND_REF, DSA_GET_ACTUAL_NAME, DSA_COERCE_ARRAY, DSA_WRUSER, 
-C     DSA_VALIDATE_ARRAY, DSA__CREATE_AXIS, DSA__AXIS_NAME, DSA__DELETE_AXIS,
-C     DSA_WRNAME, DTA_CYVAR, DTA_CRVAR, DTA_CRNAM, DTA_DLVAR, DTA_ERROR, 
-C     DTA_NMVAR, DTA_STRUC, DTA_TYVAR
+C     CNF_PVAL, GEN_NTH, ICH_CI, ICH_FOLD, ICH_LEN, DSA_ARRAY_SIZE,
+C     DSA_AXIS_SIZE, GEN_MOVE, DSA_PREFERRED_TYPE, DSA_UNMAP,
+C     DSA_AXIS_TYPE, DSA_MAP_AXIS_DATA, DSA_SEEK_WIDTH,
+C     DSA_AXIS_WIDTH_TYPE, DSA_MAP_WIDTH, DSA_GET_AXIS_INFO,
+C     DSA_SET_AXIS_INFO, DSA_SET_WIDTH, DSA_TYPESIZE,  DSA_FIND_REF,
+C     DSA_GET_ACTUAL_NAME, DSA_COERCE_ARRAY, DSA_WRUSER, 
+C     DSA_VALIDATE_ARRAY, DSA__CREATE_AXIS, DSA__AXIS_NAME,
+C     DSA__DELETE_AXIS, DSA_WRNAME, DTA_CYVAR, DTA_CRVAR, DTA_CRNAM,
+C     DTA_DLVAR, DTA_ERROR, DTA_NMVAR, DTA_STRUC, DTA_TYVAR
 C
 C  Prior requirements:
 C     Both structures must have been opened by, for example, DSA_INPUT
@@ -74,6 +75,7 @@ C
 C  Version date: 29th August 1992
 C-
 C  Subroutine / function details:
+C     CNF_PVAL           Full pointer to dynamically allocated memory
 C     GEN_NTH            Returns 'st','th','rd' etc appropriate to a number.
 C     GEN_MOVE           Copies an array of bytes
 C     ICH_CI             Return an integer as a character string.
@@ -107,7 +109,6 @@ C     DTA_ERROR          Get text describing a DTA error code
 C     DTA_NMVAR          Get name of nth object in a structure
 C     DTA_STRUC          Determine if an object is a structure
 C     DTA_TYVAR          Get type of object
-C     DYN_ELEMENT        Dynamic memory element corresponding to virtual address
 C
 C  Common variable details:
 C     (<) DTA_CODE    (Integer) Last DTA_ system failure code
@@ -140,11 +141,15 @@ C     13th Feb 1995  Previous change reversed. N-D arrays are now allowed to
 C                    be created in an NDF, but will be moved to the extension
 C                    structure when the structure is closed. Code now checks
 C                    that it has in fact reshaped the data array. KS/AAO.
+C     2005 June 3    Replace DYNAMIC_MEMORY with %VAL(CNF_PVAL(ADDRESS))
+C                    contruct for 64-bit addressing.  MJC / Starlink
 C+
       SUBROUTINE DSA_RESHAPE_AXIS (REF_NAME,AXIS,MODEL_NAME,MODEL_AXIS,
      :                                                NDIM,DIMS,STATUS)
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -153,63 +158,62 @@ C
 C
 C     Functions used
 C
-      INTEGER DSA_TYPESIZE, DYN_ELEMENT, ICH_FOLD, ICH_LEN
+      INTEGER DSA_TYPESIZE, ICH_FOLD, ICH_LEN
       CHARACTER GEN_NTH*2, ICH_CI*12
 C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Virtual address of mapped data array
-      INTEGER   AR_STATUS           ! Indicates if element is an array
-      INTEGER   BYTES               ! Number of bytes to copy to new array
-      LOGICAL   CHANGE              ! Indicates change in dimensions
-      INTEGER   COUNT               ! Loop counter
-      INTEGER   DTA_STATUS          ! Status from a DTA routine
-      CHARACTER ERROR*64            ! DTA error description
-      LOGICAL   EXIST               ! True if structure element exists
-      INTEGER   I                   ! General loop index
-      INTEGER   ILIM                ! # dimensions matching data array
-      INTEGER   IGNORE              ! Ignored status value
-      CHARACTER IN_STRUCT*80        ! Input main data structure name
-      INTEGER   INVOKE              ! Dummy function value
-      INTEGER   IPOS                ! Element number in data structure
-      INTEGER   LENGTH              ! Number of characters in axis name
-      INTEGER   LENMOD              ! Number of characters in MOD_NAME
-      INTEGER   LENOBJ              ! Number of characters in OBJ_NAME
-      INTEGER   MOD_DATA_SLOT       ! Map slot used for model array
-      INTEGER   MOD_DIM             ! # Dimensions in model data
-      INTEGER   MOD_DIMS(10)        ! Dimensions of model data
-      INTEGER   MOD_DPTR            ! Dynamic memory element for model array
-      CHARACTER MOD_NAME*80         ! DTA object name for MODEL_NAME
-      INTEGER   MOD_NELM            ! Number of elements in model axis data
-      CHARACTER MODEL_NAME_UC*32    ! Upper case version of MODEL_NAME
-      INTEGER   MODEL_SLOT          ! Table slot number for model name
-      CHARACTER NAME*16             ! Name of data structure element
-      INTEGER   NELM                ! Number of elements in axis array
-      INTEGER   NEWDIM              ! # Dimensions in new structure element
-      INTEGER   NEWDIMS(10)         ! Dimensions of new structure element
-      INTEGER   NM_STATUS           ! Status returned by DTA_NMVAR
-      CHARACTER NUMBER*12           ! Formatted number
-      INTEGER   OBJDIM              ! # Dimensions in structure element
-      INTEGER   OBJDIMS(10)         ! Dimensions of structure element
-      CHARACTER OBJECT*80           ! Full element name in structure
-      CHARACTER OBJ_NAME*80         ! DTA object name for REF_NAME
-      CHARACTER OUT_STRUCT*80       ! Output main data structure name
-      INTEGER   REF_DATA_SLOT       ! Map slot used for new array
-      INTEGER   REF_DPTR            ! Dynamic memory element for new array
-      CHARACTER REF_NAME_UC*32      ! Upper case version of REF_NAME
-      INTEGER   REF_SLOT            ! Table slot number for ref name
-      LOGICAL   SAME                ! Indicates data structures are same
-      LOGICAL   SINGLE              ! True if width array is single valued
-      CHARACTER STRINGS(2)*64       ! Axis label and units
-      LOGICAL   STRUCT              ! True if array is of structured type
-      CHARACTER STRUCT_TYPE*16      ! Type of structured array
+      INTEGER   AR_STATUS        ! Indicates if element is an array
+      INTEGER   BYTES            ! Number of bytes to copy to new array
+      LOGICAL   CHANGE           ! Indicates change in dimensions
+      INTEGER   COUNT            ! Loop counter
+      INTEGER   DTA_STATUS       ! Status from a DTA routine
+      CHARACTER ERROR*64         ! DTA error description
+      LOGICAL   EXIST            ! True if structure element exists
+      INTEGER   I                ! General loop index
+      INTEGER   ILIM             ! No. of dimensions matching data array
+      INTEGER   IGNORE           ! Ignored status value
+      CHARACTER IN_STRUCT*80     ! Input main data structure name
+      INTEGER   INVOKE           ! Dummy function value
+      INTEGER   IPOS             ! Element number in data structure
+      INTEGER   LENGTH           ! Number of characters in axis name
+      INTEGER   LENMOD           ! Number of characters in MOD_NAME
+      INTEGER   LENOBJ           ! Number of characters in OBJ_NAME
+      INTEGER   MOD_ADDR         ! Virtual address of mapped model array
+      INTEGER   MOD_DATA_SLOT    ! Map slot used for model array
+      INTEGER   MOD_DIM          ! No. of dimensions in model data
+      INTEGER   MOD_DIMS(10)     ! Dimensions of model data
+      CHARACTER MOD_NAME*80      ! DTA object name for MODEL_NAME
+      INTEGER   MOD_NELM         ! Number of elements in model axis data
+      CHARACTER MODEL_NAME_UC*32 ! Upper case version of MODEL_NAME
+      INTEGER   MODEL_SLOT       ! Table slot number for model name
+      CHARACTER NAME*16          ! Name of data structure element
+      INTEGER   NELM             ! Number of elements in axis array
+      INTEGER   NEWDIM           ! # Dimensions in new structure element
+      INTEGER   NEWDIMS(10)      ! Dimensions of new structure element
+      INTEGER   NM_STATUS        ! Status returned by DTA_NMVAR
+      CHARACTER NUMBER*12        ! Formatted number
+      INTEGER   OBJDIM           ! # Dimensions in structure element
+      INTEGER   OBJDIMS(10)      ! Dimensions of structure element
+      CHARACTER OBJECT*80        ! Full element name in structure
+      CHARACTER OBJ_NAME*80      ! DTA object name for REF_NAME
+      CHARACTER OUT_STRUCT*80    ! Output main data structure name
+      INTEGER   REF_ADDR         ! Virtual address of mapped new array
+      INTEGER   REF_DATA_SLOT    ! Map slot used for new array
+      CHARACTER REF_NAME_UC*32   ! Upper case version of REF_NAME
+      INTEGER   REF_SLOT         ! Table slot number for ref name
+      LOGICAL   SAME             ! Indicates data structures are same
+      LOGICAL   SINGLE           ! True if width array is single valued
+      CHARACTER STRINGS(2)*64    ! Axis label and units
+      LOGICAL   STRUCT           ! True if array is of structured type
+      CHARACTER STRUCT_TYPE*16   ! Type of structured array
       CHARACTER STRUCTURE_NAME*128  ! Full structure name from ref_name
-      CHARACTER TARGET_NAME*80      ! Full name of output structure element
-      INTEGER   TEST_AXIS           ! Axis being tested for validity
-      CHARACTER TEST_NAME*32        ! Structure being tested
-      CHARACTER TYPE*16             ! Type of data structure element
-      DOUBLE PRECISION VALUES(1)    ! Numeric information array for axis
-      DOUBLE PRECISION WIDTH        ! Single width value for axis
+      CHARACTER TARGET_NAME*80   ! Full name of output structure element
+      INTEGER   TEST_AXIS        ! Axis being tested for validity
+      CHARACTER TEST_NAME*32     ! Structure being tested
+      CHARACTER TYPE*16          ! Type of data structure element
+      DOUBLE PRECISION VALUES(1) ! Numeric information array for axis
+      DOUBLE PRECISION WIDTH     ! Single width value for axis
 C
 C     DSA system common
 C
@@ -218,10 +222,6 @@ C
 C     DSA system error codes
 C
       INCLUDE 'DSA_ERRORS'
-C
-C     Dynamic memory include file - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Immediate return if bad status passed
 C
@@ -484,15 +484,13 @@ C
             CALL DSA_PREFERRED_TYPE (STRUCT_TYPE,TYPE,STATUS)
          END IF
          CALL DSA_MAP_AXIS_DATA (MODEL_NAME,MODEL_AXIS,'READ',TYPE,
-     :                                    ADDRESS,MOD_DATA_SLOT,STATUS)
-         MOD_DPTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_AXIS_DATA (REF_NAME,AXIS,'WRITE',TYPE,ADDRESS,
-     :                                             REF_DATA_SLOT,STATUS)
-         REF_DPTR=DYN_ELEMENT(ADDRESS)
+     :                           MOD_ADDR,MOD_DATA_SLOT,STATUS)
+         CALL DSA_MAP_AXIS_DATA (REF_NAME,AXIS,'WRITE',TYPE,
+     :                           REF_ADDR,REF_DATA_SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500      ! Error exit
          BYTES=DSA_TYPESIZE(TYPE,STATUS)*NELM
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(MOD_DPTR),
-     :                                       DYNAMIC_MEM(REF_DPTR))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(MOD_ADDR)),
+     :                 %VAL(CNF_PVAL(REF_ADDR)))
          CALL DSA_UNMAP(REF_DATA_SLOT,STATUS)
          CALL DSA_UNMAP(MOD_DATA_SLOT,STATUS)
 C
@@ -500,27 +498,25 @@ C        Repeat this for the width array, if there is one.  If we have a
 C        single width value, we can set that easily, so we check for that.
 C
          CALL DSA_SEEK_WIDTH (MODEL_NAME,MODEL_AXIS,EXIST,SINGLE,
-     :                                                    WIDTH,STATUS)
+     :                        WIDTH,STATUS)
          IF (EXIST) THEN
             IF (SINGLE) THEN
                CALL DSA_SET_WIDTH (REF_NAME,AXIS,WIDTH,STATUS)
             ELSE
                CALL DSA_AXIS_WIDTH_TYPE (MODEL_NAME,MODEL_AXIS,TYPE,
-     :                                                  STRUCT,STATUS)
+     :                                   STRUCT,STATUS)
                IF (STRUCT) THEN
                   STRUCT_TYPE=TYPE
                   CALL DSA_PREFERRED_TYPE (STRUCT_TYPE,TYPE,STATUS)
                END IF
                CALL DSA_MAP_WIDTH (MODEL_NAME,MODEL_AXIS,'READ',
-     :                              TYPE,ADDRESS,MOD_DATA_SLOT,STATUS)
-               MOD_DPTR=DYN_ELEMENT(ADDRESS)
-               CALL DSA_MAP_WIDTH (REF_NAME,AXIS,'WRITE',TYPE,ADDRESS,
-     :                                             REF_DATA_SLOT,STATUS)
-               REF_DPTR=DYN_ELEMENT(ADDRESS)
+     :                             TYPE,MOD_ADDR,MOD_DATA_SLOT,STATUS)
+               CALL DSA_MAP_WIDTH (REF_NAME,AXIS,'WRITE',TYPE,REF_ADDR,
+     :                             REF_DATA_SLOT,STATUS)
                IF (STATUS.NE.0) GO TO 500      ! Error exit
                BYTES=DSA_TYPESIZE(TYPE,STATUS)*NELM
-               CALL GEN_MOVE(BYTES,DYNAMIC_MEM(MOD_DPTR),
-     :                                       DYNAMIC_MEM(REF_DPTR))
+               CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(MOD_ADDR)),
+     :                       %VAL(CNF_PVAL(REF_ADDR)))
                CALL DSA_UNMAP(REF_DATA_SLOT,STATUS)
                CALL DSA_UNMAP(MOD_DATA_SLOT,STATUS)
             END IF
