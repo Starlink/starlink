@@ -22,16 +22,20 @@ C     by that routine.
 C
       INTEGER MAX_TYPES, FLOAT_TYPE, INT_TYPE, DOUBLE_TYPE,
      :        SHORT_TYPE, CHAR_TYPE, BYTE_TYPE, USHORT_TYPE
-      PARAMETER (MAX_TYPES=7, FLOAT_TYPE=1, INT_TYPE=2, DOUBLE_TYPE=3,
-     :        SHORT_TYPE=4, CHAR_TYPE=5, BYTE_TYPE=6, USHORT_TYPE=7)
+      PARAMETER (MAX_TYPES=8, FLOAT_TYPE=1, INT_TYPE=2, DOUBLE_TYPE=3,
+     :           SHORT_TYPE=4, CHAR_TYPE=5, BYTE_TYPE=6, USHORT_TYPE=7,
+     :           LOGICAL_TYPE=8 )
 C
-      CHARACTER TYPE_NAMES(MAX_TYPES)*6
+      CHARACTER TYPE_NAMES(MAX_TYPES)*7
       INTEGER TYPE_SIZE(MAX_TYPES)
       INTEGER FMTCON_CODE(MAX_TYPES)
       DATA TYPE_NAMES/
-     :  'FLOAT ','INT   ','DOUBLE','SHORT ','CHAR  ','BYTE  ','USHORT'/
+     :  'FLOAT ','INT   ','DOUBLE','SHORT ','CHAR  ','BYTE  ','USHORT',
+     :  'LOGICAL' /
       DATA TYPE_SIZE/
-     :   4,       4,       8,       2,       1,       1,       2/
+     :   4,       4,       8,       2,       1,       1,       2,
+     :   4 /
       DATA FMTCON_CODE/
-     :   4,       3,       5,       2,       1,       1,       7/
+     :   4,       3,       5,       2,       1,       1,       7,
+     :   0 /
 C

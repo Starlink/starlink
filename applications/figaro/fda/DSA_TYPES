@@ -31,6 +31,8 @@
 *        Code for 'FLOAT' data.
 *     USHORT_TYPE = INTEGER (PARAMETER)
 *        Code for 'USHORT' data.
+*     LOGICAL_TYPE = INTEGER (PARAMETER)
+*        Code for 'LOGICAL' data.
 *     TYPE_NAMES( MAX_TYPES ) = CHARACTER * ( 6 ) (DATA)
 *        Names corresponding to type codes.
 *     TYPE_SIZE( MAX_TYPES ) = INTEGER (DATA)
@@ -43,11 +45,15 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
 *     24 Nov 1995 (hme):
 *        Review for FDA.
+*     2005 June  6 (MJC):
+*        Add LOGICAL for the TYPE_SIZE.  Does not apply to FMTCON_CODE,
+*        so use 0 for the latter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,21 +70,23 @@
       INTEGER CHAR_TYPE
       INTEGER BYTE_TYPE
       INTEGER USHORT_TYPE
+      INTEGER LOGICAL_TYPE
+      
       PARAMETER
-     :   ( MAX_TYPES   = 7, FLOAT_TYPE = 1, INT_TYPE  = 2,
+     :   ( MAX_TYPES   = 8, FLOAT_TYPE = 1, INT_TYPE  = 2,
      :     DOUBLE_TYPE = 3, SHORT_TYPE = 4, CHAR_TYPE = 5,
-     :     BYTE_TYPE = 6,  USHORT_TYPE = 7 )
+     :     BYTE_TYPE = 6,  USHORT_TYPE = 7, LOGICAL_TYPE = 8 )
 
 *  Local Variables:
       INTEGER TYPE_SIZE( MAX_TYPES )
       INTEGER FMTCON_CODE( MAX_TYPES )
-      CHARACTER * ( 6 ) TYPE_NAMES( MAX_TYPES )
+      CHARACTER * ( 7 ) TYPE_NAMES( MAX_TYPES )
 
 *  Local Data:
       DATA TYPE_NAMES
      :   / 'FLOAT', 'INT', 'DOUBLE', 'SHORT',
-     :     'CHAR',  'BYTE', 'USHORT' /
-      DATA TYPE_SIZE   / 4, 4, 8, 2, 1, 1, 2 /
-      DATA FMTCON_CODE / 4, 3, 5, 2, 1, 1, 7 /
+     :     'CHAR',  'BYTE', 'USHORT', 'LOGICAL' /
+      DATA TYPE_SIZE   / 4, 4, 8, 2, 1, 1, 2, 4 /
+      DATA FMTCON_CODE / 4, 3, 5, 2, 1, 1, 7, 0 /
 
 *.
