@@ -24,17 +24,17 @@
 \begin{document}
 
 
-\section{Registration of INT Wide Field Camera CCD images}
+\section{Astrometric calibration for INT Wide Field Camera images}
 
 The Wide Field Camera instrument on the Isaac Newton Telescope 
-contains four CCD chips, each 2048 $\times$ 4096 pixels, 
-in roughly the following orientation:
+contains four CCD chips of 2048 $\times$ 4096 pixels 
+positioned roughly, but not exactly, as follows:
 \begin{quote}
 \begin{center}
-\includegraphics{ideal.ps}
+\latexhtml{\includegraphics{ideal.ps}}{\htmladdimg{ideal.gif}}
 \end{center}
 \end{quote}
-In order to do accurate astrometry with frames obtained
+In order to do accurate astrometry with data obtained
 from this instrument, it is necessary to correct for the 
 exact orientation and position of each CCD in relation to
 the others, as well as for nonlinear distortions
@@ -58,7 +58,7 @@ to one pixel of the CCD\#4 system, so that the new coordinates
 are almost equivalent to CCD\#4 coordinates, although they diverge
 away from the origin thanks to the nonlinear distortion.
 Each unit of the new coordinates has the same size, 
-which is approximately 0.3334 arcsec.
+which is approximately 0.333 arcsec.
 
 The corrected coordinates $(x', y')$ are obtained from 
 each set of pixel coordinates $(x_i, y_i)$
@@ -115,7 +115,7 @@ compared to the value
 quoted in the ING observer handbook.
 
 These values of the coefficients are thought to be correct to an
-accuracy of about 1 pixel $\approx$ 1/3 arcsec.
+accuracy of 1 or 2 pixels, which is around half an arcsecond.
 
 The following image gives an exaggerated representation of the 
 shapes and positions of the CCDs as mapped on to the new coordinate system.
@@ -131,19 +131,16 @@ and the ``$\times$'' marks the origin of the unified coordinate system.
 \latexhtml{\newpage}{\htmlrule}
 \section{Attaching modified coordinates using CCDPACK}
 
-% \htmladdnormallink{CCDPACK}{http://www.starlink.rl.ac.uk/ccdpack/} package, 
-
 For users of Starlink software,
-this coordinate information can be attached automatically
+the calibrated coordinate information can be attached automatically
 to image files using the 
 \htmladdnormallink{ASTIMP}{http://capc23.ast.cam.ac.uk/star/local/docs/sun139.htx/node70.html#xref_ASTIMP} 
 command, and the file 
-\htmladdnormallinkfoot{{\tt WFC-b.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/WFC-b.ast}
+\htmladdnormallinkfoot{{\tt INT-WFC.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/INT-WFC.ast}
 
 There are a couple of provisos for using this facility:
-first, it is best if the files are converted to Starlink NDF format
-using the \xref{CONVERT}{sun55}{}
-package as follows:
+first, it is best if the files are converted to Starlink \xref{NDF}{sun33}{} 
+format using the \xref{CONVERT}{sun55}{} package as follows:
 \begin{squote}
 \begin{verbatim}
 % convert
@@ -158,7 +155,8 @@ package as follows:
 % fits2ndf in='r10628?.fits' out='*'
 \end{verbatim}
 \end{squote}
-which will convert file {\tt r106280.fits} into {\tt r106280.sdf} and so on.
+which will convert the FITS file {\tt r106280.fits} 
+into the NDF {\tt r106280.sdf} and so on.
 The Starlink software will in fact work with FITS files,
 but because it converts them on the fly between FITS and NDF formats 
 before and after each command,
@@ -173,7 +171,7 @@ at {\tt mbt@ast.cam.ac.uk}.
 
 
 Once the file is in Starlink NDF format, then obtain the file 
-\htmladdnormallink{{\tt WFC-b.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/WFC-b.ast}
+\htmladdnormallink{{\tt INT-WFC.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/INT-WFC.ast}
 and from the Unix C shell do the following:
 \begin{squote}
 \begin{verbatim}
@@ -183,40 +181,40 @@ and from the Unix C shell do the following:
    
   For help use the commands ccdhelp or ccdwww
 
-% astimp in='r10628?' astfile=WFC-b.ast reset accept
+% astimp in='r10628?' astfile=INT-WFC.ast reset accept
 
     ASTIMP
     ======
-  Framesets read from file WFC-b.ast:
+  Framesets read from file INT-WFC.ast:
     FITS header "ROTSKYPA" used for rotation
 
      N    Base domain         Current domain      Frameset ID
      --   -----------         --------------      -----------
-     1    PIXEL               WFC-B               FITSID CHIPNAME 'A5506-4'
-     2    PIXEL               WFC-B               FITSID CHIPNAME 'A5383-17-7'
-     3    PIXEL               WFC-B               FITSID CHIPNAME 'A5530-3'
-     4    PIXEL               WFC-B               FITSID CHIPNAME 'A5382-1-7'
+     1    PIXEL               INT-WFC             FITSID CHIPNAME 'A5506-4'
+     2    PIXEL               INT-WFC             FITSID CHIPNAME 'A5383-17-7'
+     3    PIXEL               INT-WFC             FITSID CHIPNAME 'A5530-3'
+     4    PIXEL               INT-WFC             FITSID CHIPNAME 'A5382-1-7'
   4 NDFs accessed using parameter IN
 
   Processing NDF /data/cass58a/mbt/data/int4/r106280
     Matched with frameset ID "FITSID CHIPNAME 'A5506-4'"
     Rotating additional 180 degrees
-    New frame in domain "WFC-B" added
+    New frame in domain "INT-WFC" added
 
   Processing NDF /data/cass58a/mbt/data/int4/r106281
     Matched with frameset ID "FITSID CHIPNAME 'A5383-17-7'"
     Rotating additional 180 degrees
-    New frame in domain "WFC-B" added
+    New frame in domain "INT-WFC" added
 
   Processing NDF /data/cass58a/mbt/data/int4/r106282
     Matched with frameset ID "FITSID CHIPNAME 'A5530-3'"
     Rotating additional 180 degrees
-    New frame in domain "WFC-B" added
+    New frame in domain "INT-WFC" added
 
   Processing NDF /data/cass58a/mbt/data/int4/r106283
     Matched with frameset ID "FITSID CHIPNAME 'A5382-1-7'"
     Rotating additional 180 degrees
-    New frame in domain "WFC-B" added
+    New frame in domain "INT-WFC" added
 \end{verbatim}
 \end{squote}
 This command sets the Current coordinate frame of the specified 
@@ -227,7 +225,7 @@ it also rotates the coordinates according to the value of the
 ROTSKYPA FITS header card, which records the orientation of the
 turntable when the observation was made;
 in this case it was oriented at 180$^\circ$.
-In this way, applying the {\tt WFC-b.ast} file to any set of 
+In this way, applying the {\tt INT-WFC.ast} file to any set of 
 image NDF files will result in them sharing coordinates which 
 are related by a simple shift in X and Y coordinates, 
 since the nonlinear optical distortions, 
@@ -259,9 +257,9 @@ will give the following display:
 \latexhtml{\includegraphics[scale=0.4]{r106282-s8-display.ps}}{\htmladdimg{r106282-display.gif}}
 \end{center}
 \end{quote}
-Close inspection will show that the grid is not parallel to the 
-sides of the image, because of the slight rotation from the vertical
-and nonlinear distortion.
+Close inspection will show that the grid is not quite parallel to the 
+sides of the image, or straight, 
+because of the slight rotation from the vertical and nonlinear distortion.
 
 If some of the frames overlap, the corresponding X and Y 
 offsets can then easily be determined 
@@ -270,19 +268,24 @@ using CCDPACK's object matching registration facilities.
 
 \section*{Acknowledgements}
 
-This calibration was done with assistance from 
+This calibration was done on Starlink time with assistance from 
 Peter Draper and David Gilbank in Durham.
 
-\vspace{\fill}
+\begin{htmlonly}
+\htmlrule
+This document is also available as a
+\htmladdnormallink{postscript file}{../calibrate.ps}.
+\end{htmlonly}
 
 
-\begin{latexonly}
-  \begin{flushright}
-  \it
-  Mark Taylor \\
-  24 March 2000
-  \end{flushright}
-\end{latexonly}
+\latexhtml{\vspace{\fill}}{\htmlrule}
+
+\begin{flushright}
+\it
+Mark Taylor \\
+\htmladdnormallink{Starlink}{http://star-www.rl.ac.uk/} \\
+24 March 2000
+\end{flushright}
 
 
 \end{document}
