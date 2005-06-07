@@ -21,7 +21,8 @@ C     values into the other arrays.  The CNV_FMTCON codes are determined
 C     by that routine.
 C
       INTEGER MAX_TYPES, FLOAT_TYPE, INT_TYPE, DOUBLE_TYPE,
-     :        SHORT_TYPE, CHAR_TYPE, BYTE_TYPE, USHORT_TYPE
+     :        SHORT_TYPE, CHAR_TYPE, BYTE_TYPE, USHORT_TYPE,
+     :        LOGICAL_TYPE
       PARAMETER (MAX_TYPES=8, FLOAT_TYPE=1, INT_TYPE=2, DOUBLE_TYPE=3,
      :           SHORT_TYPE=4, CHAR_TYPE=5, BYTE_TYPE=6, USHORT_TYPE=7,
      :           LOGICAL_TYPE=8 )
