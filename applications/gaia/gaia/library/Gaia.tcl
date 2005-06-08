@@ -1730,26 +1730,24 @@ window gives you access to this."
 
    #  Import a text file as a catalogue.
    protected method import_catalogue_ {} {
-      busy {
-         #  Start import dialog. The output file is fixed and the user
-         #  chooses the input file. The format of the output file is a
-         #  TAB table.
-         utilReUseWidget gaia::GaiaTextImport $importer_ \
-            -title "Import text file to catalogue" \
-            -outfile "GaiaTextImport.TAB" \
-            -format tab \
-            -show_infile 1 \
-            -show_outfile 1
+      #  Start import dialog. The output file is fixed and the user
+      #  chooses the input file. The format of the output file is a
+      #  TAB table.
+      utilReUseWidget gaia::GaiaTextImport $importer_ \
+         -title "Import text file to catalogue" \
+         -outfile "GaiaTextImport.TAB" \
+         -format tab \
+         -show_infile 1 \
+         -show_outfile 1
 
-         #  Wait for import to complete and get the catalogue name.
-         lassign [$importer_ activate] outfile
-         if { $outfile != {} && [file exists $outfile] } {
-            cat::AstroCat::open_catalog_window \
-               $outfile \
-               [code $image_] \
-               ::gaia::GaiaSearch \
-               0 $this
-         }
+      #  Wait for import to complete and get the catalogue name.
+      lassign [$importer_ activate] outfile
+      if { $outfile != {} && [file exists $outfile] } {
+         cat::AstroCat::open_catalog_window \
+            $outfile \
+            [code $image_] \
+            ::gaia::GaiaSearch \
+            0 $this
       }
    }
 
