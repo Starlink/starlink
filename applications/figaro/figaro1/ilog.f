@@ -23,37 +23,37 @@ C                                      KS / CIT 22nd April 1984
 C
 C     Modified:
 C
-C     24th Jul 1987  DJA/AAO . Revised DSA_ routines - some specs changed.
-C                    Also dynamic memory handling modified - now uses
-C                    the DYN_ set of routines.
+C     24th Jul 1987  DJA/AAO . Revised DSA_ routines - some specs
+C                    changed. Also dynamic memory handling modified - 
+C                    now uses the DYN_ set of routines.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
-C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs removed.
+C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs 
+C                    removed.
 C     26th Jul 1997  MJCL / Starlink, UCL.  Initialise VEXIST to .FALSE.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Function
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   DIMS(10)         ! The sizes of the dimensions of the data
+      INTEGER   DIMS(10)         ! Sizes of the dimensions of the data
       INTEGER   ADDRESS          ! Address of dynamic memory element
       INTEGER   NDIM             ! Dimensionality of input structure
-      INTEGER   NELM             ! Total number of elements in data array
-      INTEGER   OPTR             ! Dynamic memory pointer to output array
+      INTEGER   NELM             ! Total number of elements in data
+                                 ! array
+      INTEGER   OPTR             ! Dynamic memory pointer to output 
+                                 ! array
       INTEGER   OSLOT            ! Map slot number for output data
       INTEGER   STATUS           ! Status return from DSA_xxx routines
-      INTEGER   VOPTR            ! Dynamic memory pointer to output variance
+      INTEGER   VOPTR            ! Dynamic memory pointer to output
+                                 ! variance
       INTEGER   VOSLOT           ! Map slot number for output variance
       LOGICAL   VEXIST           ! True if the variance array exists
       CHARACTER COMMAND*8        ! Actual FIGARO command passed
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -80,9 +80,8 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,
      :                                                       STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     See if the variance array exists. If so, map it.
@@ -90,10 +89,9 @@ C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE('IMAGE',VEXIST,STATUS)
       IF (VEXIST) THEN
-          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,
      :                           VOSLOT,STATUS)
-          VOPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
       IF (STATUS.NE.0) GOTO 500
 
 C
@@ -101,12 +99,13 @@ C     Operate on the data. Note that GEN_LOG and GEN_ALOG can operate
 C     on data in situ.
 C
       IF ( COMMAND .EQ. 'ILOG' ) THEN
-         CALL GEN_LOG(VEXIST,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR),
-     :                NELM,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR))
+         CALL GEN_LOG(VEXIST,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)),
+     :                NELM,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)))
 
       ELSE
-         CALL GEN_ALOG(VEXIST,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR),
-     :                 NELM,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR))
+         CALL GEN_ALOG(VEXIST,%VAL(CNF_PVAL(OPTR)),
+     :                 %VAL(CNF_PVAL(VOPTR)),NELM,
+     :                 %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)))
       END IF
 C
 C     Tidy up

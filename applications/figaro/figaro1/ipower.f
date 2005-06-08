@@ -3,11 +3,11 @@ C+
 C
 C     I P O W E R
 C
-C     Raises the data in an image to a power of itself.  This can be used
-C     to multiply an image by itself (POWER=2.0) or to take the square
-C     root of an image (POWER=0.5), or may be used with an arbitrary power.
-C     Pixels whose value is such that the operation is illegal will give
-C     a zero result.
+C     Raises the data in an image to a power of itself.  This can be
+C     used to multiply an image by itself (POWER=2.0) or to take the
+C     square root of an image (POWER=0.5), or may be used with an
+C     arbitrary power. Pixels whose value is such that the operation is 
+C     illegal will give a zero result.
 C
 C     Command parameters -
 C
@@ -48,38 +48,43 @@ C                  than an error structure in the NDF.
 C     23 Feb 2001  ACD / UoE, Starlink. Initialise the pointer to
 C                  the quality array to zero (previously it was
 C                  uninitialised).
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
       INTEGER DSA_TYPESIZE
       LOGICAL DSA_SAME_DATA
-      CHARACTER*11 ICH_CI          ! Returns an integer as a string
-      INTEGER   ICH_LEN            ! Returns the length of a string
-      LOGICAL PAR_ABORT            ! (F)PAR abort flag
+      CHARACTER*11 ICH_CI        ! Returns an integer as a string
+      INTEGER ICH_LEN            ! Returns the length of a string
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   BYTES              ! Bytes required for an array
-      INTEGER   DIMS(10)           ! Image dimensions
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   OPTR               ! Dynamic memory element for output daa
-      REAL      POWER              ! Power to which data array is raised
-      INTEGER   STATUS             ! Running status for DSA routines
-      INTEGER   Q2PTR              ! Dynamic pointer to second image data.
-      INTEGER   E2PTR              ! Dynamic pointer to second image data.
-      LOGICAL   ERRORS             ! True if image has variance data
-      INTEGER   FAILURES           ! Number of times illegal values encountered
-      REAL      FBAD               ! Flag value for 'FLOAT' data
-      LOGICAL   FLAGS              ! True if image has flagged data values
-      CHARACTER*80 STRING          ! Used to format user message
-      INTEGER   IPT                ! Holds the value returned by ich_len
-      INTEGER   IGNORE             ! Value of status returned by par_wruser.
+      INTEGER   BYTES            ! Bytes required for an array
+      INTEGER   DIMS(10)         ! Image dimensions
+      INTEGER   E2PTR            ! Dynamic pointer to second image data
+      LOGICAL   ERRORS           ! True if image has variance data
+      INTEGER   FAILURES         ! Number of times illegal values
+      REAL      FBAD             ! Flag value for 'FLOAT' data
+      LOGICAL   FLAGS            ! True if image has flagged data values
+      INTEGER   IPT              ! Holds the value returned by ICH_LEN
+      INTEGER   IGNORE           ! Value of status returned by 
+                                 ! PAR_WRUSER
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   OPTR             ! Dynamic memory pointer for output
+                                 ! data
+      REAL      POWER            ! Power to which data array is raised
+      INTEGER   Q2PTR            ! Dynamic pointer to second image data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+                                 ! encountered
+      CHARACTER*80 STRING        ! Used to format user message
 C
 C     Maximum power allowed (a completely arbitrary value)
 C
@@ -91,10 +96,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -132,8 +133,7 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
 C
 C     If the image had an error array, map it and the error array
 C     for the spectrum.
@@ -141,18 +141,18 @@ C
       ERRORS = .FALSE.
       CALL DSA_SEEK_VARIANCE ('IMAGE',ERRORS,STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',E2PTR,SLOT,
      :                         STATUS)
-         E2PTR=DYN_ELEMENT(ADDRESS)
       END IF
 C
 C     Operate on the data.
 C
       Q2PTR = 0
-      CALL GEN_POWEREQ(DYNAMIC_MEM(OPTR),NELM,POWER,
-     :                 .FALSE.,DYNAMIC_MEM(Q2PTR),FLAGS,FBAD,ERRORS,
-     :                 DYNAMIC_MEM(E2PTR),DYNAMIC_MEM(E2PTR),
-     :                 DYNAMIC_MEM(Q2PTR),DYNAMIC_MEM(OPTR),FAILURES)
+      CALL GEN_POWEREQ(%VAL(CNF_PVAL(OPTR)),NELM,POWER,
+     :                 .FALSE.,%VAL(CNF_PVAL(Q2PTR)),FLAGS,FBAD,ERRORS,
+     :                 %VAL(CNF_PVAL(E2PTR)),%VAL(CNF_PVAL(E2PTR)),
+     :                 %VAL(CNF_PVAL(Q2PTR)),%VAL(CNF_PVAL(OPTR)),
+     :                 FAILURES)
 C
 C
 C     Display the number of times the operation failed

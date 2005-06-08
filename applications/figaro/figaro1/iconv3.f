@@ -30,38 +30,34 @@ C
 C                                      KS / AAO 30th Oct 1987
 C     Modified:
 C    
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     25th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed. TABs
-C                     removed.
-C     16th Sep 1994.  HME / UoE, Starlink.  Change call to GEN_FILT3,
-C                     which now has one argument less.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
+C                    mapping calls.
+C     25th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
+C                    removed.
+C     16th Sep 1994  HME / UoE, Starlink.  Change call to GEN_FILT3,
+C                    which now has one argument less.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         CENTER       ! Value of CENTER parameter
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      REAL         EDGE         ! Value of EDGE parameter
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL         CENTER        ! Value of CENTER parameter
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      REAL         EDGE          ! Value of EDGE parameter
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number outputdata array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Limits for numeric parameters - close to VAX limits
 C
@@ -101,17 +97,15 @@ C
 C     Map data
 C
       CALL DSA_MATCH_SIZES('IMAGE','OUTPUT',STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,
+     :                   STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get workspace for GEN_FILT3 (if data is 1D we can use a 
 C     dummy workspace - GEN_FILT3 will ignore it)
 C
       IF ((NX.GT.1).AND.(NY.GT.1)) THEN
-         CALL DSA_GET_WORK_ARRAY(NX*2,'FLOAT',ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY(NX*2,'FLOAT',WPTR,WSLOT,STATUS)
       ELSE
          WPTR=OPTR
       END IF
@@ -119,7 +113,7 @@ C
 C     Pass the filter through the data.
 C
       CALL GEN_FILT3(NX,NY,CENTER,EDGE,
-     :                     DYNAMIC_MEM(WPTR),DYNAMIC_MEM(OPTR))
+     :                     %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

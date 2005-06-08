@@ -31,16 +31,15 @@ C                    uses DYN_ routines.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NELM         ! Total number of elements in data
@@ -48,10 +47,6 @@ C
       INTEGER      OPTR         ! Dynamic-memory pointer to output data array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -76,13 +71,11 @@ C
 C
 C     Map data.  Note that GEN_ICOR16 can operate on data in situ.
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
 C
 C     Operate on the data.
 C
-      CALL GEN_ICOR16(DYNAMIC_MEM(OPTR),NELM,DYNAMIC_MEM(OPTR),OK)
+      CALL GEN_ICOR16(%VAL(CNF_PVAL(OPTR)),NELM,%VAL(CNF_PVAL(OPTR)),OK)
       IF (.NOT.OK) THEN
          CALL PAR_WRUSER(
      :          'WARNING - Input data were not integers'

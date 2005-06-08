@@ -50,23 +50,24 @@ C                  Bad pixel handling.
 C     23 Feb 2001  ACD / UoE, Starlink. Initialise the pointers to
 C                  the quality arrays to zero (previously they were
 C                  uninitialised).
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
-C
-C     Function used
-C
-      INTEGER  DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS    ! Address of dynamic memory element
       CHARACTER COMMAND*16 ! Figaro command being serviced.
       INTEGER   D1PTR      ! Dynamic pointer to first image data.
       INTEGER   D2PTR      ! Dynamic pointer to second image data.
       INTEGER   D3PTR      ! Dynamic pointer to output image data.
       INTEGER   DIMS(10)   ! Dimensions of first image.  Ignored.
-      INTEGER   E1PTR      ! Dynamic pointer to first image variance array
-      INTEGER   E2PTR      ! Dynamic pointer to second image variance array
+      INTEGER   E1PTR      ! Dynamic pointer to first image variance 
+                           ! array
+      INTEGER   E2PTR      ! Dynamic pointer to second image variance 
+                           ! array
       INTEGER   E3PTR      ! Dynamic pointer to output variance array
       LOGICAL   ERR        ! True if IMAGE1 has variance information
       LOGICAL   ERR1       ! True if IMAGE2 has variance information
@@ -75,16 +76,12 @@ C
       INTEGER   IGNORE     ! Disregarded status return value.
       INTEGER   NDIM       ! Dimensionality of first image.  Ignored.
       INTEGER   NELM       ! Number of elements in input image.
-      INTEGER   Q1PTR      ! Dynamic pointer to first image quality array
-      INTEGER   Q2PTR      ! Dynamic pointer to second image quality array
-      INTEGER   Q3PTR      ! Dynamic pointer to output image quality array
+      INTEGER   Q1PTR      ! Dynamic pointer to first quality array
+      INTEGER   Q2PTR      ! Dynamic pointer to second quality array
+      INTEGER   Q3PTR      ! Dynamic pointer to output quality array
       INTEGER   SLOT       ! Map slot number - ignored
       INTEGER   STATUS     ! Running status for DSA_ routines.
       LOGICAL   VARIANCE   ! True if either inputs has variance data
-C     
-C     Required for dynamic memory handling - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial settings
 C
@@ -122,12 +119,9 @@ C
 C
 C     Map data arrays.
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      D1PTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('IMAGE1','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      D2PTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      D3PTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',D1PTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('IMAGE1','READ','FLOAT',D2PTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',D3PTR,SLOT,STATUS)
 C
 C     If either image has variance information, map all three variance
 C     arrays. Note that MAP_VARIANCE returns a zero array if there is 
@@ -139,17 +133,14 @@ C
       ERR1 = .FALSE.
       CALL DSA_SEEK_VARIANCE ('IMAGE1',ERR1,STATUS)
       IF (ERR.OR.ERR1) THEN
-         CALL DSA_MAP_VARIANCE ('IMAGE','READ','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_VARIANCE ('IMAGE','READ','FLOAT',E1PTR,SLOT,
      :                         STATUS)
-         E1PTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_VARIANCE ('IMAGE1','READ','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_VARIANCE ('IMAGE1','READ','FLOAT',E2PTR,SLOT,
      :                         STATUS)
-         E2PTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_VARIANCE ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_VARIANCE ('OUTPUT','WRITE','FLOAT',E3PTR,SLOT,
      :                         STATUS)
-         E3PTR=DYN_ELEMENT(ADDRESS)
          VARIANCE=.TRUE.
-         CALL GEN_FILL( 4*NELM, 0, DYNAMIC_MEM(E3PTR) )
+         CALL GEN_FILL( 4*NELM, 0, %VAL(CNF_PVAL(E3PTR)) )
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
@@ -163,32 +154,36 @@ C     Operate on the image data
 C
       CALL PAR_COMMAND(COMMAND)
       IF (COMMAND.EQ.'IADD') THEN
-         CALL GEN_ADDAFE(NELM,
-     :      DYNAMIC_MEM(D1PTR),DYNAMIC_MEM(D2PTR),DYNAMIC_MEM(D3PTR),
-     :      DYNAMIC_MEM(Q1PTR),DYNAMIC_MEM(Q2PTR),DYNAMIC_MEM(Q3PTR),
-     :      DYNAMIC_MEM(E1PTR),DYNAMIC_MEM(E2PTR),DYNAMIC_MEM(E3PTR),
-     :                     .FALSE.,FLAGS,FBAD,VARIANCE)
+         CALL GEN_ADDAFE(NELM,%VAL(CNF_PVAL(D1PTR)),
+     :                   %VAL(CNF_PVAL(D2PTR)),%VAL(CNF_PVAL(D3PTR)),
+     :                   %VAL(CNF_PVAL(Q1PTR)),%VAL(CNF_PVAL(Q2PTR)),
+     :                   %VAL(CNF_PVAL(Q3PTR)),%VAL(CNF_PVAL(E1PTR)),
+     :                   %VAL(CNF_PVAL(E2PTR)),%VAL(CNF_PVAL(E3PTR)),
+     :                   .FALSE.,FLAGS,FBAD,VARIANCE)
 C
       ELSE IF (COMMAND.EQ.'ISUB') THEN
-         CALL GEN_SUBAFE(NELM,
-     :      DYNAMIC_MEM(D1PTR),DYNAMIC_MEM(D2PTR),DYNAMIC_MEM(D3PTR),
-     :      DYNAMIC_MEM(Q1PTR),DYNAMIC_MEM(Q2PTR),DYNAMIC_MEM(Q3PTR),
-     :      DYNAMIC_MEM(E1PTR),DYNAMIC_MEM(E2PTR),DYNAMIC_MEM(E3PTR),
-     :                     .FALSE.,FLAGS,FBAD,VARIANCE)
+         CALL GEN_SUBAFE(NELM,%VAL(CNF_PVAL(D1PTR)),
+     :                    %VAL(CNF_PVAL(D2PTR)),%VAL(CNF_PVAL(D3PTR)),
+     :                   %VAL(CNF_PVAL(Q1PTR)),%VAL(CNF_PVAL(Q2PTR)),
+     :                   %VAL(CNF_PVAL(Q3PTR)),%VAL(CNF_PVAL(E1PTR)),
+     :                   %VAL(CNF_PVAL(E2PTR)),%VAL(CNF_PVAL(E3PTR)),
+     :                   .FALSE.,FLAGS,FBAD,VARIANCE)
 C
       ELSE IF (COMMAND.EQ.'IMULT') THEN
-         CALL GEN_MULTAFE(NELM,
-     :      DYNAMIC_MEM(D1PTR),DYNAMIC_MEM(D2PTR),DYNAMIC_MEM(D3PTR),
-     :      DYNAMIC_MEM(Q1PTR),DYNAMIC_MEM(Q2PTR),DYNAMIC_MEM(Q3PTR),
-     :      DYNAMIC_MEM(E1PTR),DYNAMIC_MEM(E2PTR),DYNAMIC_MEM(E3PTR),
-     :                     .FALSE.,FLAGS,FBAD,VARIANCE)
+         CALL GEN_MULTAFE(NELM,%VAL(CNF_PVAL(D1PTR)),
+     :                    %VAL(CNF_PVAL(D2PTR)),%VAL(CNF_PVAL(D3PTR)),
+     :                    %VAL(CNF_PVAL(Q1PTR)),%VAL(CNF_PVAL(Q2PTR)),
+     :                    %VAL(CNF_PVAL(Q3PTR)),%VAL(CNF_PVAL(E1PTR)),
+     :                    %VAL(CNF_PVAL(E2PTR)),%VAL(CNF_PVAL(E3PTR)),
+     :                    .FALSE.,FLAGS,FBAD,VARIANCE)
 C
       ELSE IF (COMMAND.EQ.'IDIV') THEN
-         CALL GEN_DIVAFE(NELM,
-     :      DYNAMIC_MEM(D1PTR),DYNAMIC_MEM(D2PTR),DYNAMIC_MEM(D3PTR),
-     :      DYNAMIC_MEM(Q1PTR),DYNAMIC_MEM(Q2PTR),DYNAMIC_MEM(Q3PTR),
-     :      DYNAMIC_MEM(E1PTR),DYNAMIC_MEM(E2PTR),DYNAMIC_MEM(E3PTR),
-     :                     .FALSE.,FLAGS,FBAD,VARIANCE)
+         CALL GEN_DIVAFE(NELM,%VAL(CNF_PVAL(D1PTR)),
+     :                   %VAL(CNF_PVAL(D2PTR)),%VAL(CNF_PVAL(D3PTR)),
+     :                   %VAL(CNF_PVAL(Q1PTR)),%VAL(CNF_PVAL(Q2PTR)),
+     :                   %VAL(CNF_PVAL(Q3PTR)),%VAL(CNF_PVAL(E1PTR)),
+     :                   %VAL(CNF_PVAL(E2PTR)),%VAL(CNF_PVAL(E3PTR)),
+     :                   .FALSE.,FLAGS,FBAD,VARIANCE)
       END IF
 C
 C     Tidy up.

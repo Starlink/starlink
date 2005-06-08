@@ -78,13 +78,16 @@ C                 use FIG_PGBEG/FIG_PGEND instead of PGBEGIN/PGEND.
 C     18 Jul 1996 MJCL / Starlink, UCL.  Set variables for storage of
 C                 file names to 132 chars.
 C     26 Jul 1996 MJCL / Starlink, UCL.  Added PAR_ABORT checks.
+C     2005 June 8 MJC / Starlink  Use CNF_PVAL for pointers to
+C                 mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL FIG_SCRCHK, PAR_ABORT
-      INTEGER DYN_ELEMENT
 C
 C     Maximum number of contours
 C
@@ -93,70 +96,66 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Address of a dynamic memorty element
-      LOGICAL   ADJUST              ! See above
-      INTEGER   ASLOT               ! Map slot used for axis data
-      LOGICAL   AXES                ! TRUE if axes are to be drawn
-      INTEGER   AXIS                ! Loop index through axes
-      INTEGER   AXPTR               ! Dynamic memory element for axis data
-      LOGICAL   BYVALUE             ! Value of BYVALUE keyword
-      CHARACTER COMMAND*8           ! Actual FIGARO command passed
-      CHARACTER DEVICE*32           ! PGPLOT device specification
-      INTEGER   DDIMS(10)           ! The sizes of the dimensions of the data
-      REAL      DELTA               ! Increment between contour levels
-      INTEGER   DPTR                ! Dynamic-memory pointer to data array
-      INTEGER   DSLOT               ! Map slot number used for data
-      CHARACTER DUNITS*32           ! Structure data axis units
-      DOUBLE PRECISION DUMMY        ! Dummy argument for GET_AXIS_INFO
-      LOGICAL   ERASE               ! TRUE if the screen is to be wiped
-      LOGICAL   EXIST               ! True if axis data array exists
-      LOGICAL   HARD                ! True if the output device is hard
-      LOGICAL   HARDCOPY            ! True if hardcopy is required
-      REAL      HIGH                ! The highest brightness level
-      INTEGER   I                   ! General loop index
-      LOGICAL   IGNORE              ! Used to ignore status codes
-      INTEGER   INVOKE              ! Used to invoke functions
-      INTEGER   IXEN                ! Last element to be plotted in x-axis
-      INTEGER   IXST                ! First element to be plotted in x-axis
-      INTEGER   IYEN                ! Last element to be plotted in y-axis
-      INTEGER   IYST                ! First element to be plotted in y-axis
-      LOGICAL   KNOWN               ! True if data range already known
-      CHARACTER LABEL*64            ! The group label for all the plots
-      REAL      LEVELS(MAX_CONT)    ! The values of each of the contour levels
-      LOGICAL   LINES               ! See above
-      REAL      LOW                 ! The lowest brightness level
-      INTEGER   NCONT               ! The number of contours
-      INTEGER   NDELM               ! Total number of elements in the data
-      INTEGER   NDIM                ! Number of dimensions in data structure
-      INTEGER   NEXT                ! ICH_KEY arguement - ignored
-      INTEGER   NX                  ! The size of the data's 1st dimension
-      INTEGER   NY                  ! The size of the data's 2nd dimension
-      LOGICAL   SAME_UNITS          ! True if units for both axes are same
-      INTEGER   STATUS              ! Status return from DSA_xxx routines
-      CHARACTER STRINGS(2)*64       ! Axis labels and units
-      INTEGER   THICK               ! Thickness for hardcopy plots
-      REAL      XEND                ! Last X axis value to plot
-      CHARACTER XLAB*64             ! Label for X axis
-      REAL      XSTART              ! First X axis value to plot
-      CHARACTER XUNITS*16           ! Units for X axis
-      REAL      YEND                ! Last Y axis value to plot
-      CHARACTER YLAB*64             ! Label for Y axis
-      REAL      YSTART              ! First Y axis value to plot
-      REAL      VALUE               ! Temporary REAL number
-      REAL      VMAX                ! Maximum data value
-      REAL      VMIN                ! Minimum data value
-      REAL      PGARRAY(6)          ! The PGENV arguments used
-      CHARACTER INAME*132           ! Actual name of the image
+      LOGICAL   ADJUST           ! See above
+      INTEGER   ASLOT            ! Map slot used for axis data
+      LOGICAL   AXES             ! TRUE if axes are to be drawn
+      INTEGER   AXIS             ! Loop index through axes
+      INTEGER   AXPTR            ! Dynamic memory element for axis data
+      LOGICAL   BYVALUE          ! Value of BYVALUE keyword
+      CHARACTER COMMAND*8        ! Actual FIGARO command passed
+      CHARACTER DEVICE*32        ! PGPLOT device specification
+      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
+      REAL      DELTA            ! Increment between contour levels
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number used for data
+      CHARACTER DUNITS*32        ! Structure data axis units
+      DOUBLE PRECISION DUMMY     ! Dummy argument for GET_AXIS_INFO
+      LOGICAL   ERASE            ! TRUE if the screen is to be wiped
+      LOGICAL   EXIST            ! True if axis data array exists
+      LOGICAL   HARD             ! True if the output device is hard
+      LOGICAL   HARDCOPY         ! True if hardcopy is required
+      REAL      HIGH             ! The highest brightness level
+      INTEGER   I                ! General loop index
+      LOGICAL   IGNORE           ! Used to ignore status codes
+      INTEGER   INVOKE           ! Used to invoke functions
+      INTEGER   IXEN             ! Last element to be plotted in x-axis
+      INTEGER   IXST             ! First element to be plotted in x-axis
+      INTEGER   IYEN             ! Last element to be plotted in y-axis
+      INTEGER   IYST             ! First element to be plotted in y-axis
+      LOGICAL   KNOWN            ! True if data range already known
+      CHARACTER LABEL*64         ! The group label for all the plots
+      REAL      LEVELS(MAX_CONT) ! Values of each of the contour levels
+      LOGICAL   LINES            ! See above
+      REAL      LOW              ! The lowest brightness level
+      INTEGER   NCONT            ! The number of contours
+      INTEGER   NDELM            ! Total number of elements in the data
+      INTEGER   NDIM             ! Number of dimensions in data 
+                                 ! structure
+      INTEGER   NEXT             ! ICH_KEY arguement - ignored
+      INTEGER   NX               ! The size of the data's 1st dimension
+      INTEGER   NY               ! The size of the data's 2nd dimension
+      LOGICAL   SAME_UNITS       ! True if units for both axes are same
+      INTEGER   STATUS           ! Status return from DSA_xxx routines
+      CHARACTER STRINGS(2)*64    ! Axis labels and units
+      INTEGER   THICK            ! Thickness for hardcopy plots
+      REAL      XEND             ! Last X axis value to plot
+      CHARACTER XLAB*64          ! Label for X axis
+      REAL      XSTART           ! First X axis value to plot
+      CHARACTER XUNITS*16        ! Units for X axis
+      REAL      YEND             ! Last Y axis value to plot
+      CHARACTER YLAB*64          ! Label for Y axis
+      REAL      YSTART           ! First Y axis value to plot
+      REAL      VALUE            ! Temporary REAL number
+      REAL      VMAX             ! Maximum data value
+      REAL      VMIN             ! Minimum data value
+      REAL      PGARRAY(6)       ! The PGENV arguments used
+      CHARACTER INAME*132        ! Actual name of the image
 C
 C     Limiting values for HIGH and LOW.  (somewhat arbitrary, each a
 C     factor ten from the VAX limits)
 C
       REAL FMAX,FMIN
       PARAMETER (FMAX=1.7E37,FMIN=-1.7E37)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -191,8 +190,7 @@ C     Map the data
 C
       NX=DDIMS(1)
       NY=DDIMS(2)
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Check on the axis values.  If the image has non-linear axis
@@ -202,10 +200,9 @@ C
       DO AXIS=1,2
          CALL DSA_SEEK_AXIS ('IMAGE',AXIS,EXIST,STATUS)
          IF (EXIST) THEN
-            CALL DSA_MAP_AXIS_DATA ('IMAGE',AXIS,'READ','FLOAT',ADDRESS,
-     :                                                     ASLOT,STATUS)
-            AXPTR=DYN_ELEMENT(ADDRESS)
-            IF (.NOT.FIG_SCRCHK(DDIMS(AXIS),DYNAMIC_MEM(AXPTR))) THEN
+            CALL DSA_MAP_AXIS_DATA ('IMAGE',AXIS,'READ','FLOAT',AXPTR,
+     :                              ASLOT,STATUS)
+            IF (.NOT.FIG_SCRCHK(DDIMS(AXIS),%VAL(CNF_PVAL(AXPTR)))) THEN
                CALL PAR_WRUSER('Warning - axis data is not linear. The '
      :                 //'axis scales will only be approximate.',IGNORE)
              
@@ -365,13 +362,14 @@ C     Generate the plot, depending on the command being processed.
 C
       IF (PAR_ABORT()) GO TO 500      ! User requested abort
       IF (COMMAND.EQ.'ICONT') THEN
-         CALL FIG_CPLOT(DYNAMIC_MEM(DPTR),NX,NY,IXST,IXEN,XSTART,XEND,
-     :              IYST,IYEN,YSTART,YEND,DEVICE,XLAB,YLAB,LABEL,ERASE,
-     :                           AXES,ADJUST,LEVELS,NCONT,THICK,STATUS)
+         CALL FIG_CPLOT(%VAL(CNF_PVAL(DPTR)),NX,NY,IXST,IXEN,XSTART,
+     :                  XEND,IYST,IYEN,YSTART,YEND,DEVICE,XLAB,YLAB,
+     :                  LABEL,ERASE,AXES,ADJUST,LEVELS,NCONT,THICK,
+     :                  STATUS)
       ELSE
-         CALL FIG_GPLOT(DYNAMIC_MEM(DPTR),NX,NY,IXST,IXEN,XSTART,XEND,
-     :              IYST,IYEN,YSTART,YEND,DEVICE,XLAB,YLAB,LABEL,ERASE,
-     :                                     AXES,ADJUST,HIGH,LOW,STATUS)
+         CALL FIG_GPLOT(%VAL(CNF_PVAL(DPTR)),NX,NY,IXST,IXEN,XSTART,
+     :                  XEND,IYST,IYEN,YSTART,YEND,DEVICE,XLAB,YLAB,
+     :                  LABEL,ERASE,AXES,ADJUST,HIGH,LOW,STATUS)
       END IF
 C
 C     Set the user variables describing the plot.

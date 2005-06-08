@@ -10,9 +10,9 @@ C     the command keyword 'HARDCOPY'.
 C
 C     Command parameters -
 C
-C     IMAGE       The data to be plotted.  If there is X-axis information
-C                 then this will be used.  If not, the X-axis will just
-C                 have to be the numbers from 1 to n.
+C     IMAGE       The data to be plotted.  If there is X-axis 
+C                 information then this will be used.  If not, the 
+C                  X-axis will just have to be the numbers from 1 to n.
 C     XSTART      The x-value at which plotting is to start. XSTART and
 C                 XEND are only prompted for if WHOLE is not specified.
 C     XEND        The x-value at which plotting is to end.
@@ -27,13 +27,14 @@ C
 C     Command keywords -
 C
 C     WHOLE       The program is to display all of each cross-section.
-C     AUTOSCALE   If NO (the default) , then each spectrum will be scaled to
-C                 the extrema of all the sections under consideration. If YES
-C                 then all spectra will be autoscaled individually.
-C     HARDCOPY    If specified then output is sent to the device determined
-C                 by HARD. If no device is specified by HARD, or HARDCOPY is
-C                 not specified, then IPLOTS will attempt to plot on the 
-C                 current SOFT device.
+C     AUTOSCALE   If NO (the default) , then each spectrum will be
+C                 scaled to the extrema of all the sections under
+C                 consideration. If YES then all spectra will be
+C                 autoscaled individually.
+C     HARDCOPY    If specified then output is sent to the device
+C                 determined by HARD. If no device is specified by HARD,
+C                 or HARDCOPY is not specified, then IPLOTS will attempt
+C                 to plot on the current SOFT device.
 C     NEXT        Used to pause between plots.
 C
 C     User variables -    (">" input, "<" output)
@@ -74,13 +75,17 @@ C                  No concurrent mapping. Had to swap axis map behind
 C                  axis range for X.
 C     14 May 1999  TDCA / RAL, Starlink. Type of MAGNITUDE changed from
 C                  REAL to DOUBLE PRECISION.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY,DYN_ELEMENT
+      INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY
       REAL GEN_ELEMF
       CHARACTER ICH_CI*3
 C
@@ -97,7 +102,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       LOGICAL   AUTOSC           ! True if AUTOSCALE is specified
       INTEGER   CKEY             ! Colour code used by PGPLOT
       CHARACTER COLOUR*10        ! COLOUR specification
@@ -105,7 +109,7 @@ C
       CHARACTER CONTROL3*32      ! Controller for x-axis,2d array
       INTEGER   CURXSECT         ! Current cross-section being plotted
       CHARACTER DEVICE*32        ! PGPLOT device specification
-      INTEGER   DDIMS(10)        ! The sizes of the dimensions of the data
+      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       CHARACTER DLAB*64          ! Plot data axis label
       CHARACTER DLABEL*32        ! Structure data axis label
       INTEGER   DSLOT            ! Map slot number used for data
@@ -113,59 +117,66 @@ C
       REAL      DUMMY            ! REAL dummy arguement
       CHARACTER DUNITS*32        ! Structure data axis units
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
-      LOGICAL   HARD             ! True if the output device is the hard one
+      LOGICAL   HARD             ! Output device is the hard one?
       REAL      HIGH             ! Maximum Y-value for a plot
       INTEGER   IDYMAX           ! The last cross-section to be plotted
       INTEGER   IDYMIN           ! The first cross-section to be plotted
       INTEGER   IGNORE           ! Used to ignore status codes
       INTEGER   INVOKE           ! Used to invoke functions
-      INTEGER   IDEN             ! Last element to be plotted in data array
-      INTEGER   IDST             ! First element to be plotted in data array
+      INTEGER   IDEN             ! Last element to be plotted in data 
+                                 ! array
+      INTEGER   IDST             ! First element to be plotted in data
+                                 ! array
       INTEGER   IXEN             ! Last element to be plotted in x-axis 
       INTEGER   IXST             ! First element to be plotted in x-axis
       LOGICAL   KEEPGOING        ! FALSE if plotting to be stopped early
       CHARACTER LABEL*64         ! The group label for all the plots
-      INTEGER   LASTY            ! Number of last cross-section on a page
+      INTEGER   LASTY            ! Number of last cross-section on a 
+                                 ! page
       INTEGER   LLAB             ! Length of label string
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Magnitude flag value for data
-      INTEGER   NCROSS           ! Number of cross-sections plotted per page
-      INTEGER   NDD              ! Dimensionality of input data structure
+      INTEGER   NCROSS           ! Number of cross-sections plotted per
+                                 ! page
+      INTEGER   NDD              ! Dimensionality of input data
+                                 ! structure
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   ND1              ! Total number of elements per cross-section
+      INTEGER   ND1              ! Total number of elements per 
+                                 ! cross-section
       INTEGER   NEXT             ! ICH_KEY arguement - ignored
-      INTEGER   NPELMS           ! Number of array elements to be plotted
-      INTEGER   NXELM            ! Total number of elements in x-axis array
+      INTEGER   NPELMS           ! Number of array elements to be 
+                                 ! plotted
+      INTEGER   NXELM            ! Total number of elements in x-axis
+                                 ! array
       INTEGER   NX1              ! The number of elements per x-axis
       INTEGER   NX2              ! The number of x-axes
       INTEGER   NXD              ! Dimensionality of x-axis info
-      CHARACTER PLAB*6           ! The sub-label for corners of each plot
-      LOGICAL   SOFT             ! True if the output device is the soft one
+      CHARACTER PLAB*6           ! Sub-label for corners of each plot
+      LOGICAL   SOFT             ! Output device is the soft one?
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
-      INTEGER        THICK       ! Line thickness of plot
-      INTEGER   TOPPAGE          ! The cross-section at the top of the page
+      INTEGER   THICK            ! Line thickness of plot
+      INTEGER   TOPPAGE          ! Cross-section at the top of the page
       REAL      VALUE1           ! Temporary REAL
       REAL      VALUE2           ! Temporary REAL
       REAL      VMAX             ! Maximum value in data array
       REAL      VMIN             ! Minimum value in data array
       LOGICAL   WHOLE            ! Value specified for WHOLE
-      INTEGER   XDIMS(10)        ! The sizes of the dimensions of x-axis data
+      INTEGER   XDIMS(10)        ! Sizes of the dimensions of x-axis
+                                 ! data
       LOGICAL   XINDCALC         ! TRUE if both x-axis & data are 2D
       CHARACTER XLAB*64          ! X-axis label for plot
       CHARACTER XLABEL*32        ! Structure x-axis label
       REAL      XMAX             ! Maximum value in x-axis data per plot
       REAL      XMIN             ! Minimum value in x-axis data per plot
       INTEGER   XSLOT            ! Map slot number used for x-axis info
-      LOGICAL   XTWODIMS         ! True if the x-axis data is two dimensional
+      LOGICAL   XTWODIMS         ! X-axis data is two dimensional?
       CHARACTER XUNITS*32        ! Structure x-axis units
       INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
-      REAL      XVEN             ! Max x-axis value in all data to be plotted
-      REAL      XVST             ! Min x-axis value in all data to be plotted
-C
-C      Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL      XVEN             ! Max x-axis value in all data to be 
+                                 ! plotted
+      REAL      XVST             ! Min x-axis value in all data to be 
+                                 ! plotted
 C
 C      Initialisation of DSA_ routines
 C
@@ -239,15 +250,13 @@ C
 C
 C      Try to map the X-axis data array
 C
-      CALL DSA_MAP_AXIS_DATA ('SPECTRA',1,'READ','FLOAT',ADDRESS,
-     :                                                 XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('SPECTRA',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C      Map in the image data
 C
-      CALL DSA_MAP_DATA ('SPECTRA','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECTRA','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C      Get data information (units and label)
@@ -338,8 +347,8 @@ C
          GOTO 500
       END IF
 C
-C      If AUTOSCALE not specified then find the extrema of the data values
-C      in all the cross-sections under consideration.
+C      If AUTOSCALE not specified then find the extrema of the data 
+C      values in all the cross-sections under consideration.
 C
       IF (.NOT.AUTOSC) THEN
          VALUE1=0.
@@ -347,7 +356,7 @@ C
          DO CURXSECT=IDYMIN,IDYMAX
             IDST=(CURXSECT-1)*ND1+IXST
             IDEN=IDST+(IXEN-IXST)
-            CALL GEN_RANGEF(DYNAMIC_MEM(DPTR),IDST,IDEN,VMAX,VMIN)
+            CALL GEN_RANGEF(%VAL(CNF_PVAL(DPTR)),IDST,IDEN,VMAX,VMIN)
             VALUE1=MIN(VMIN,VALUE1)
             VALUE2=MAX(VMAX,VALUE2)
          END DO
@@ -391,7 +400,7 @@ C            If AUTOSCALE was specified then scale this section otherwise
 C            use the values derived for all the data.
 C
             IF (AUTOSC) THEN
-               CALL GEN_RANGEF(DYNAMIC_MEM(DPTR),IDST,IDEN,VMAX,VMIN)
+               CALL GEN_RANGEF(%VAL(CNF_PVAL(DPTR)),IDST,IDEN,VMAX,VMIN)
             END IF
             HIGH=VMAX+(VMAX-VMIN)*.10
             LOW=VMIN
@@ -417,9 +426,9 @@ C
 C
 C            Plot the cross-section
 C
-            CALL FIG_SEG_PLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),
-     :                           NXELM,NDELM,IXST,IDST,NPELMS,HIGH,
-     :                         LOW,XLAB,DLAB,PLAB,CKEY,XMIN,XMAX)
+            CALL FIG_SEG_PLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
+     :                        NXELM,NDELM,IXST,IDST,NPELMS,HIGH,
+     :                        LOW,XLAB,DLAB,PLAB,CKEY,XMIN,XMAX)
 C
 C            Clear viewport unless we're at the last plot on the page , as
 C            this would prematurely clear the screen.

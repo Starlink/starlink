@@ -26,62 +26,63 @@
 *                                          KS / CIT 20th March 1984
 *     Modified:
 *
-*     Summer 1987 Converted to use DSA_ routines.  DJA/AAO.
-*     18 Aug 1988 References to `Grinnell' removed from comments.
-*                 Now uses TVSIZE and TVCSIZE to get image display
-*                 characteristics (and so will needs a version of
-*                 TVPCKG that supports these), so no longer assumes
-*                 display is 512 by 512. KS/AAO.
-*     05 Feb 1991 Now handles the display parameters as set in IMARRAY
-*                 by the latest version of IMAGE, which is not as limited
-*                 in the stretching it can apply to an image to fit it
-*                 onto the display. KS/AAO.
-*     16 Nov 1992 HME / UoE, Starlink.  Adapted and simplified from
-*                 ICUR: Use PGCURSE for input and terminal for output.
-*                 INCLUDE changed. TABs removed.
-*     07 Apr 1993 HME / UoE, Starlink.  Change G format so as to not
-*                 truncate numbers >1 to integer.
-*     18 Jul 1996 MJCL / Starlink, UCL.  Set variables for storage of
-*                 file names to 132 chars.
+*     Summer 1987  Converted to use DSA_ routines.  DJA/AAO.
+*     18 Aug 1988  References to `Grinnell' removed from comments.
+*                  Now uses TVSIZE and TVCSIZE to get image display
+*                  characteristics (and so will needs a version of
+*                  TVPCKG that supports these), so no longer assumes
+*                  display is 512 by 512. KS/AAO.
+*     05 Feb 1991  Now handles the display parameters as set in IMARRAY
+*                  by the latest version of IMAGE, which is not as 
+*                  limited in the stretching it can apply to an image 
+*                  to fit it onto the display. KS/AAO.
+*     16 Nov 1992  HME / UoE, Starlink.  Adapted and simplified from
+*                  ICUR: Use PGCURSE for input and terminal for output.
+*                  INCLUDE changed. TABs removed.
+*     07 Apr 1993  HME / UoE, Starlink.  Change G format so as to not
+*                  truncate numbers >1 to integer.
+*     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+*                  file names to 132 chars.
+*     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+*                  mapped data.
 *+
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
 *  Functions
-      INTEGER ICH_LEN,DYN_ELEMENT,GEN_BSEARCH,PGBEGIN
+      INTEGER ICH_LEN,GEN_BSEARCH,PGBEGIN
 
 *  Maximum number of points that can be selected
       INTEGER MAXPTS
       PARAMETER (MAXPTS=50)
 
 *  Local variables
-      INTEGER   ADDRESS             ! Virtual address of array
-      REAL      ARRAY(6)            ! Display parameters recorded by IGREY
-      INTEGER   DIMS(10)            ! The sizes of the dimensions of the data
-      CHARACTER DEVICE*32           ! Plot device name
-      INTEGER   DPTR                ! Dynamic-memory pointer to data array
-      INTEGER   DSLOT               ! Map slot number used for data
-      INTEGER   I                   !
-      INTEGER   IGNORE              ! Used to ignore status codes
-      CHARACTER IMAGE*132           ! Name of image file on current device
-      INTEGER   IXEN                !
-      INTEGER   IXST                !
-      INTEGER   IYEN                !
-      INTEGER   IYST                !
-      INTEGER   NDELM               ! Total number of elements in the data
-      INTEGER   NDIM                ! Dimensionality of input data structure
-      INTEGER   NPIX                !
-      INTEGER   STAT1               !
-      INTEGER   STAT2               !
-      INTEGER   STATUS              ! Status return from DSA_xxx routines
-      INTEGER   XPTR                ! Dynamic-memory pointer to x-axis data
-      REAL      XS(MAXPTS)          !
-      INTEGER   XSLOT               ! Map slot number used for x-axis info
-      INTEGER   YPTR                ! Dynamic-memory pointer to y-axis data
-      REAL      YS(MAXPTS)          !
-      INTEGER   YSLOT               ! Map slot number used for y-axis info
-
-*  Dynamic memory support - defines DYNAMIC_MEM
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL      ARRAY(6)         ! Display parameters recorded by IGREY
+      INTEGER   DIMS(10)         ! Sizes of the dimensions of the data
+      CHARACTER DEVICE*32        ! Plot device name
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number used for data
+      INTEGER   I                !
+      INTEGER   IGNORE           ! Used to ignore status codes
+      CHARACTER IMAGE*132        ! Name of image file on current device
+      INTEGER   IXEN             !
+      INTEGER   IXST             !
+      INTEGER   IYEN             !
+      INTEGER   IYST             !
+      INTEGER   NDELM            ! Total number of elements in the data
+      INTEGER   NDIM             ! Dimensionality of input data 
+                                 ! structure
+      INTEGER   NPIX             !
+      INTEGER   STAT1            !
+      INTEGER   STAT2            !
+      INTEGER   STATUS           ! Status return from DSA_xxx routines
+      INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
+      REAL      XS(MAXPTS)       !
+      INTEGER   XSLOT            ! Map slot number used for x-axis info
+      INTEGER   YPTR             ! Dynamic-memory pointer to y-axis data
+      REAL      YS(MAXPTS)       !
+      INTEGER   YSLOT            ! Map slot number used for y-axis info
 
 *  Initialisation of DSA_ routines
       STATUS=0
@@ -100,26 +101,23 @@
 *  Map displayed data.
       CALL DSA_NAMED_INPUT ('IMAGE',IMAGE,STATUS)
       CALL DSA_DATA_SIZE ('IMAGE',10,NDIM,DIMS,NDELM,STATUS)
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 
 *  Get X-axis data
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                        STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',XPTR,XSLOT,
+     :                        STATUS)
 
 *  And the same for the Y-axis
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',ADDRESS,YSLOT,
-     :                                                     STATUS)
-      YPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',YPTR,YSLOT,
+     :                        STATUS)
       IF (STATUS.NE.0) GOTO 500
 
 *  Work out the pixel range displayed.
-      IXST=GEN_BSEARCH(DYNAMIC_MEM(XPTR),DIMS(1),ARRAY(1))
-      IXEN=GEN_BSEARCH(DYNAMIC_MEM(XPTR),DIMS(1),ARRAY(2))
-      IYST=GEN_BSEARCH(DYNAMIC_MEM(YPTR),DIMS(2),ARRAY(3))
-      IYEN=GEN_BSEARCH(DYNAMIC_MEM(YPTR),DIMS(2),ARRAY(4))
+      IXST=GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),DIMS(1),ARRAY(1))
+      IXEN=GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),DIMS(1),ARRAY(2))
+      IYST=GEN_BSEARCH(%VAL(CNF_PVAL(YPTR)),DIMS(2),ARRAY(3))
+      IYEN=GEN_BSEARCH(%VAL(CNF_PVAL(YPTR)),DIMS(2),ARRAY(4))
       IF (IXEN.LE.IXST .OR. IYEN.LE.IYST) THEN
          CALL PAR_WRUSER('Invalid pixel bounds',STATUS)
          GOTO 500
@@ -145,10 +143,9 @@
      :   INT(ARRAY(5)+.5),-2)
 
 *  Now do the real work
-      CALL IGCUR_WORK(DYNAMIC_MEM(DPTR),DIMS(1),DIMS(2),
-     :   IXST,IXEN,IYST,IYEN,
-     :   DYNAMIC_MEM(XPTR),DYNAMIC_MEM(YPTR),
-     :   MAXPTS,XS,YS,NPIX,STATUS)
+      CALL IGCUR_WORK(%VAL(CNF_PVAL(DPTR)),DIMS(1),DIMS(2),
+     :                IXST,IXEN,IYST,IYEN,%VAL(CNF_PVAL(XPTR)),
+     :                %VAL(CNF_PVAL(YPTR)),MAXPTS,XS,YS,NPIX,STATUS)
 
 *  Close down display device
       CALL PGEND

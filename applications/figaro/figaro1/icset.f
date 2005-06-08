@@ -43,22 +43,26 @@ C                                              KS / CIT 27th March 1985
 C
 C     Modified:
 C
-C     31st Jul 1987  DJA /AAO. Revised DSA_ routines - some specs changed.
-C                    Dynamic memory handling now though DYN_ routines.
+C     31st Jul 1987  DJA /AAO. Revised DSA_ routines - some specs 
+C                    changed. Dynamic memory handling now though DYN_ 
+C                    routines.
 C     16th Aug 1989  MAS / UoM. Modified to handle 2D images rather than
 C                    1D spectra.
-C     31st Jul 1991  HME / UoE. Accept also YSTART/YEND. Constant defaults
-C                    to 0.
+C     31st Jul 1991  HME / UoE. Accept also YSTART/YEND. Constant 
+C                    defaults to 0.
 C     2nd  Aug 1991  HME / UoE.  Call it ICSET.
 C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TAB removed.
 C     26th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checks.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Limits for VALUE - close to the VAX number limits
 C
@@ -67,29 +71,25 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      NX, NY       ! Axis dimensions of data arrays
-      INTEGER      DSLOT        ! Map slot for input array
-      INTEGER      IXEN         ! Last pixel to be set constant
-      INTEGER      IXST         ! First  "   "  "   "      "
-      INTEGER      IYEN         ! Last pixel to be set constant
-      INTEGER      IYST         ! First  "   "  "   "      "
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! No. of elements in data array
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      REAL         XMAX         !
-      REAL         XMIN         !
-      REAL         YMAX         !
-      REAL         YMIN         !
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      NX, NY        ! Axis dimensions of data arrays
+      INTEGER      DSLOT         ! Map slot for input array
+      INTEGER      IXEN          ! Last pixel to be set constant
+      INTEGER      IXST          ! First  "   "  "   "      "
+      INTEGER      IYEN          ! Last pixel to be set constant
+      INTEGER      IYST          ! First  "   "  "   "      "
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! No. of elements in data array
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number outputdata array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALUE         ! Temporary real number
+      REAL         XMAX          !
+      REAL         XMIN          !
+      REAL         YMAX          !
+      REAL         YMIN          !
 C
 C     Initialisation of DSA_ routines
 C
@@ -114,18 +114,18 @@ C
       IF (NDIM.NE.2) THEN
          CALL PAR_WRUSER ('Data is not a 2D image',IGNORE)
          GO TO 500
-      ENDIF
+      END IF
 C
 C     NOW Get YSTART and YEND (axis number 2)
 C
       CALL DSA_AXIS_RANGE('IN',2,' ',.FALSE.,YMIN,YMAX,IYST,
-     :                                             IYEN,STATUS)
+     :                    IYEN,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     NOW Get XSTART and XEND (axis number 1)
 C
       CALL DSA_AXIS_RANGE('IN',1,' ',.FALSE.,XMIN,XMAX,IXST,
-     :                                             IXEN,STATUS)
+     :                    IXEN,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get value for CONSTANT
@@ -140,14 +140,13 @@ C
 C
 C     Map data array to receive modified image
 C
-      CALL DSA_MAP_DATA('OUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Set the region to the constant value
 C
       CALL FILL( NX, NY, IXST, IXEN, IYST, IYEN, VALUE,
-     :           NELM, DYNAMIC_MEM(OPTR) )
+     :           NELM, %VAL(CNF_PVAL(OPTR)) )
 C
 C     Tidy up
 C
@@ -199,6 +198,6 @@ C
       DO IY=I3,I4
          DO IX=I1,I2
             OUTPUT_ARRAY(IX,IY) = VALUE
-         ENDDO
-      ENDDO
+         END DO
+      END DO
       END

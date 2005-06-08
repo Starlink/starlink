@@ -37,12 +37,16 @@ C                  mapping axis data, for Y and X.
 C     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                  file names to 132 chars.
 C     26 Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT check.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_LEN,DYN_ELEMENT
+      INTEGER ICH_LEN
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
@@ -50,12 +54,11 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       INTEGER   DIMS(10)         ! The sizes of the dimensions of arrays
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
       REAL      DUMMY            ! REAL dummy arguement
-      INTEGER   FILE             ! The logical unit number for the output
+      INTEGER   FILE             ! Logical unit number for the output
       CHARACTER FILENAME*132     ! The name of the output file
       LOGICAL   HARD             ! True if the output device is hard
       INTEGER   IGNORE           ! Used to pass ignorable status
@@ -65,7 +68,8 @@ C
       INTEGER   IYEN             ! Last element to be plotted in y-axis
       INTEGER   IYST             ! First element to be plotted in y-axis
       CHARACTER LABELS(3)*64     ! Labels for axes and data
-      INTEGER   NDD              ! Dimensionality of input data structure
+      INTEGER   NDD              ! Dimensionality of input data
+                                 ! structure
       INTEGER   NDELM            ! Total number of elements in the data
       INTEGER   NDX              ! Dimensionality of x-axis array
       INTEGER   NX               ! The size of the data's 1st dimension
@@ -92,10 +96,6 @@ C
       INTEGER X,Y,D
       PARAMETER (X=1,Y=2,D=3)
 C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Initialisation of DSA_ routines
 C
       STATUS=0
@@ -116,8 +116,7 @@ C
 C
 C     Map input data
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Try to get units and label for data array
@@ -134,10 +133,9 @@ C
 C        Get limits in Y and Y data.
 C
          CALL DSA_AXIS_RANGE ('IMAGE',2,' ',.FALSE.,YMIN,YMAX,IYST,
-     :                                                IYEN,STATUS)
-         CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',ADDRESS,
-     :                                            YSLOT,STATUS)
-         YPTR=DYN_ELEMENT(ADDRESS)
+     :                        IYEN,STATUS)
+         CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',YPTR,
+     :                           YSLOT,STATUS)
 C
 C        Now try for label and units
 C
@@ -157,10 +155,9 @@ C
       CALL DSA_SEEK_AXIS ('IMAGE',1,XEXIST,STATUS)
       CALL DSA_AXIS_SIZE ('IMAGE',1,1,NDX,DIMS,NXELM,STATUS)
       CALL DSA_AXIS_RANGE ('IMAGE',1,' ',.FALSE.,XMIN,XMAX,IXST,
-     :                                           IXEN,STATUS)
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',ADDRESS,
-     :                                          XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+     :                     IXEN,STATUS)
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       CALL DSA_GET_AXIS_INFO ('IMAGE',1,2,STRINGS,0,DUMMY,STATUS)
       UNITS(X)=STRINGS(1)
       LABELS(X)=STRINGS(2)
@@ -189,9 +186,10 @@ C
 C
 C     List the data
 C
-      CALL FIG_LIST(OBJECT,DYNAMIC_MEM(DPTR),NX,NY,DYNAMIC_MEM(XPTR),
-     :                  IXST,IXEN,XEXIST,DYNAMIC_MEM(YPTR),IYST,IYEN,
-     :                                      YEXIST,UNITS,LABELS,FILE)
+      CALL FIG_LIST(OBJECT,%VAL(CNF_PVAL(DPTR)),NX,NY,
+     :              %VAL(CNF_PVAL(XPTR)),IXST,IXEN,XEXIST,
+     :              %VAL(CNF_PVAL(YPTR)),IYST,IYEN,
+     :              YEXIST,UNITS,LABELS,FILE)
 C
 C     Close down everything
 C

@@ -3,11 +3,11 @@ C+
 C
 C     I G C O N V
 C
-C     This is a general-purpose convolution program, able to convolve the
-C     main data array in a Figaro file with a rectangular array of any
-C     dimensions. This is a more flexible routine than ICONV3, where the
-C     convolution is with a 3x3 array specified only by a center and an
-C     edge value, but the additional flexibility probably makes it
+C     This is a general-purpose convolution program, able to convolve
+C     the main data array in a Figaro file with a rectangular array of
+C     any dimensions. This is a more flexible routine than ICONV3, where 
+C     the convolution is with a 3x3 array specified only by a center and 
+C     an edge value, but the additional flexibility probably makes it
 C     noticeably slower, particularly for very large convolution arrays.
 C
 C     Command parameters -
@@ -24,51 +24,53 @@ C              is created, with everything but the data a direct
 C              copy of the input.
 C
 C     File format:
-C        The text file defining the convolution array should simply contain
-C     the values for the array in a free format, one line at a time. Lines
-C     beginning with a '*' are ignored, as are blank lines. If the data for
-C     a line of the array has to be continued onto another line, a '\'
-C     should appear at the end of the line to be continued.
+C        The text file defining the convolution array should simply
+C     contain the values for the array in a free format, one line at a
+C     time. Lines beginning with a '*' are ignored, as are blank lines. 
+C     If the data for a line of the array has to be continued onto
+C     another line, a '\' should appear at the end of the line to be
+C     continued.
 C-
 C     History:
 C    
-C     11th Mar 1994.  Original version.  KS / AAO
-C     18th Jul 1996.  MJCL / Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
+C     11th Mar 1994  Original version.  KS / AAO
+C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage
+C                    of file names to 132 chars.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DSA_TYPESIZE, DYN_ELEMENT, ICH_LEN
+      INTEGER DSA_TYPESIZE, ICH_LEN
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BPTR         ! Dynamic-memory pointer to box data
-      INTEGER      BSLOT        ! Map slot number of box data
-      CHARACTER    CONVOL*132   ! Name of convolution definition file
-      INTEGER      DIMS(2)      ! Sizes of dimensions of data
-      INTEGER      DUMMY        ! Dummy data array on first pass through file
-      INTEGER      FNBX         ! X-dimension of box data from 1st pass
-      INTEGER      FNBY         ! Y_dimension of box data from first pass
-      INTEGER      LU           ! Logical unit number for file
-      CHARACTER    NAME*256     ! Full name of convolution file
-      INTEGER      NBX          ! X-dimension of box data
-      INTEGER      NBY          ! Y_dimension of box data
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      BPTR          ! Dynamic-memory pointer to box data
+      INTEGER      BSLOT         ! Map slot number of box data
+      CHARACTER    CONVOL*132    ! Name of convolution definition file
+      INTEGER      DIMS(2)       ! Sizes of dimensions of data
+      INTEGER      DUMMY         ! Dummy data array on first pass
+                                 ! through file
+      INTEGER      FNBX          ! X-dimension of box data from 1st pass
+      INTEGER      FNBY          ! Y-dimension of box data from 1st pass
+      INTEGER      LU            ! Logical unit number for file
+      CHARACTER    NAME*256      ! Full name of convolution file
+      INTEGER      NBX           ! X-dimension of box data
+      INTEGER      NBY           ! Y_dimension of box data
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number output data array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -116,11 +118,10 @@ C
      :     'Note: ideally, a convolution array has odd dimensions',
      :                                                      STATUS)
       END IF
-      CALL DSA_GET_WORK_ARRAY (NBX*NBY,'FLOAT',ADDRESS,BSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NBX*NBY,'FLOAT',BPTR,BSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500       ! Error exit.
-      BPTR=DYN_ELEMENT(ADDRESS)
-      CALL GCONV_READ (LU,.TRUE.,NBX,NBY,DYNAMIC_MEM(BPTR),
-     :                                             FNBX,FNBY,STATUS)
+      CALL GCONV_READ (LU,.TRUE.,NBX,NBY,%VAL(CNF_PVAL(BPTR)),
+     :                 FNBX,FNBY,STATUS)
       IF (STATUS.NE.0) GOTO 500       ! Error exit.
 C
 C     Get output structure name
@@ -130,26 +131,23 @@ C
 C     Map data
 C
       CALL DSA_MATCH_SIZES('IMAGE','OUTPUT',STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
 C
 C     GEN_GCONV can't work in situ, so we need a copy of the data array.
 C     (We could have mapped the input array and tested to see if the
 C     output file is the same and only got workspace if it was, but
 C     it's simpler like this, if marginally less efficient).
 C
-      CALL DSA_GET_WORK_ARRAY(NX*NY,'FLOAT',ADDRESS,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX*NY,'FLOAT',WPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
-      WPTR=DYN_ELEMENT(ADDRESS)
       CALL GEN_MOVE (NX*NY*DSA_TYPESIZE('FLOAT',STATUS),
-     :                            DYNAMIC_MEM(OPTR),DYNAMIC_MEM(WPTR))
+     :               %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(WPTR)))
       IF (STATUS.NE.0) GOTO 500
 C
 C     Pass the filter through the data.
 C
-      CALL GEN_ICONV (DYNAMIC_MEM(WPTR),NX,NY,DYNAMIC_MEM(BPTR),
-     :                                     NBX,NBY,DYNAMIC_MEM(OPTR))
+      CALL GEN_ICONV (%VAL(CNF_PVAL(WPTR)),NX,NY,%VAL(CNF_PVAL(BPTR)),
+     :                NBX,NBY,%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

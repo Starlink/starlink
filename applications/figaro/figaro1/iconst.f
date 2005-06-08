@@ -38,18 +38,19 @@ C     Modified:
 C
 C     30 Dec 1985  KS / AAO.  ICSUB added.
 C     10 Jul 1986  KS / AAO.  XCxxx routines added.
-C     24 Jul 1987  DJA/ AAO.  Revised DSA_ routines - some specs changed.
-C                  Modified dynamic memory handling - now uses DYN_ package
+C     24 Jul 1987  DJA/ AAO.  Revised DSA_ routines - some specs 
+C                  changed.  Modified dynamic memory handling - now uses 
+C                  DYN_ package
 C     30 Oct 1987  KS / AAO.  Added calls to check match between input
 C                  and output arrays.
 C     20 Mar 1989  JM / RAL.  Error and quality handling added.
 C     13 Dec 1989  KS / AAO.  Reorganised to remove redundant mapping of
-C                  arrays copied by DSA_OUTPUT.  Quality and flagged value
-C                  tests moved prior to map calls.
+C                  arrays copied by DSA_OUTPUT.  Quality and flagged 
+C                  value tests moved prior to map calls.
 C     02 May 1995  PND / JAC. Added support for YCxxx routines.
 C     20 Jul 1995  HME / UoE, Starlink.  INCLUDE changed.
-C     20 Jul 1995  KS / AAO.  Calls to DSA_MATCH_AXES and DSA_MATCH_SIZES
-C                  were in the wrong places. Switched.
+C     20 Jul 1995  KS / AAO.  Calls to DSA_MATCH_AXES and 
+C                  DSA_MATCH_SIZES were in the wrong places. Switched.
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
 C     26 Jul 1996  MJCL / Starlink, UCL.  Handling for ABORT response
@@ -59,17 +60,20 @@ C                  variance.
 C     26 Feb 2001  ACD / UoE, Starlink. Initialise the pointer to
 C                  the quality array to zero (previously it was
 C                  uninitialised).
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_LEN,DYN_ELEMENT
+      INTEGER ICH_LEN
       LOGICAL PAR_ABORT
 C
 C     Local variables
 C
-      INTEGER   ADDRESS     ! Address of dynamic memory element
       CHARACTER COMMAND*64  ! The actual FIGARO command requested
       INTEGER   DIMS(10)    ! The sizes of the data's dimensions
       INTEGER   ERPTR       ! Dynamic pointer to output error array
@@ -91,10 +95,6 @@ C     Numeric parameter limits - close to VAX real limits
 C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.7E38, FMIN=-1.7E38)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -163,18 +163,17 @@ C     Map data arrays (main data array or axis data array)
 C
       IF (XFUNC) THEN
          CALL DSA_MATCH_SIZES ('IMAGE','OUTPUT',STATUS)
-         CALL DSA_MAP_AXIS_DATA ('OUTPUT',1,'UPDATE','FLOAT',ADDRESS,
-     :                                                   SLOT,STATUS)
+         CALL DSA_MAP_AXIS_DATA ('OUTPUT',1,'UPDATE','FLOAT',OUTELM,
+     :                           SLOT,STATUS)
       ELSE IF (YFUNC) THEN
          CALL DSA_MATCH_SIZES ('IMAGE','OUTPUT',STATUS)
-         CALL DSA_MAP_AXIS_DATA ('OUTPUT',2,'UPDATE','FLOAT',ADDRESS,
-     :                                                   SLOT,STATUS)
+         CALL DSA_MAP_AXIS_DATA ('OUTPUT',2,'UPDATE','FLOAT',OUTELM,
+     :                           SLOT,STATUS)
       ELSE
          CALL DSA_MATCH_AXES ('IMAGE','OUTPUT',STATUS)
-         CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
-     :                                                      STATUS)
+         CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OUTELM,SLOT,
+     :                      STATUS)
       END IF
-      OUTELM=DYN_ELEMENT(ADDRESS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     The main data array may have an error array associated
@@ -184,9 +183,8 @@ C     was any quality array - however, we have to map both for update,
 C     just so the DSA system doesn't think they're now invalid.
 C
       IF (ERRORS) THEN
-         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',ERPTR,SLOT,
      :                           STATUS)
-         ERPTR=DYN_ELEMENT(ADDRESS)
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
@@ -195,27 +193,27 @@ C     the actual command.
 C
       QPTR = 0
       IF (COMMAND(2:).EQ.'CMULT') THEN
-         CALL GEN_MULCAFE(DYNAMIC_MEM(OUTELM),NELM,FACTOR,
-     :                   DYNAMIC_MEM(OUTELM),
-     :                   DYNAMIC_MEM(QPTR),DYNAMIC_MEM(QPTR),
-     :                   DYNAMIC_MEM(ERPTR),DYNAMIC_MEM(ERPTR),
-     :                   .FALSE.,FLAGS,FBAD,ERRORS)
+         CALL GEN_MULCAFE(%VAL(CNF_PVAL(OUTELM)),NELM,FACTOR,
+     :                    %VAL(CNF_PVAL(OUTELM)),
+     :                    %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QPTR)),
+     :                    %VAL(CNF_PVAL(ERPTR)),%VAL(CNF_PVAL(ERPTR)),
+     :                    .FALSE.,FLAGS,FBAD,ERRORS)
       ELSE IF (COMMAND(2:).EQ.'CADD') THEN
-         CALL GEN_ADDCAFE(DYNAMIC_MEM(OUTELM),NELM,FACTOR,
-     :                   DYNAMIC_MEM(OUTELM),
-     :                   DYNAMIC_MEM(QPTR),
+         CALL GEN_ADDCAFE(%VAL(CNF_PVAL(OUTELM)),NELM,FACTOR,
+     :                    %VAL(CNF_PVAL(OUTELM)),
+     :                    %VAL(CNF_PVAL(QPTR)),
      :                   .FALSE.,FLAGS,FBAD)
       ELSE IF (COMMAND(2:).EQ.'CSUB') THEN
-         CALL GEN_ADDCAFE(DYNAMIC_MEM(OUTELM),NELM,-FACTOR,
-     :                   DYNAMIC_MEM(OUTELM),
-     :                   DYNAMIC_MEM(QPTR),
-     :                   .FALSE.,FLAGS,FBAD)
+         CALL GEN_ADDCAFE(%VAL(CNF_PVAL(OUTELM)),NELM,-FACTOR,
+     :                    %VAL(CNF_PVAL(OUTELM)),
+     :                    %VAL(CNF_PVAL(QPTR)),
+     :                    .FALSE.,FLAGS,FBAD)
       ELSE IF (COMMAND(2:).EQ.'CDIV') THEN
-         CALL GEN_MULCAFE(DYNAMIC_MEM(OUTELM),NELM,1.0/FACTOR,
-     :                   DYNAMIC_MEM(OUTELM),
-     :                   DYNAMIC_MEM(QPTR),DYNAMIC_MEM(QPTR),
-     :                   DYNAMIC_MEM(ERPTR),DYNAMIC_MEM(ERPTR),
-     :                   .FALSE.,FLAGS,FBAD,ERRORS)
+         CALL GEN_MULCAFE(%VAL(CNF_PVAL(OUTELM)),NELM,1.0/FACTOR,
+     :                    %VAL(CNF_PVAL(OUTELM)),
+     :                    %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QPTR)),
+     :                    %VAL(CNF_PVAL(ERPTR)),%VAL(CNF_PVAL(ERPTR)),
+     :                    .FALSE.,FLAGS,FBAD,ERRORS)
       END IF
 C
 C     Closedown everything

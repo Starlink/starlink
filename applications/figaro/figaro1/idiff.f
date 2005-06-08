@@ -29,16 +29,19 @@ C     27th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs
 C                    changed. Modified dynamic memory handling - now
 C                    uses DYN_ package.
 C     25th Sep 1992  HME / UoE, Starlink. INCLUDE changed. TABs removed.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      BYTES        ! Number of bytes of workspace required
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       INTEGER      DPTR         ! Dynamic-memory pointer to data array
@@ -52,10 +55,6 @@ C
       INTEGER      STATUS       ! Running status for DSA_ routines
       INTEGER      WPTR         ! Dynamic-memory pointer to workspace
       INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -84,22 +83,19 @@ C     Map data.  Note that GEN_IDIFF cannot operate on data in situ,
 C     so in the single operand case workspace must be obtained and
 C     the data copied back from it later.
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (DPTR.EQ.OPTR) THEN
          BYTES=DSA_TYPESIZE('FLOAT',STATUS)*NELM
-         CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
-         CALL GEN_MOVE (BYTES,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(WPTR))
+         CALL DSA_GET_WORKSPACE (BYTES,WPTR,WSLOT,STATUS)
+         CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(WPTR)))
          DPTR=WPTR
       END IF
       IF (STATUS.NE.0) GOTO 500
 C
 C     Operate on the data.
 C
-      CALL GEN_IDIFF(DYNAMIC_MEM(DPTR),NX,NY,DYNAMIC_MEM(OPTR))
+      CALL GEN_IDIFF(%VAL(CNF_PVAL(DPTR)),NX,NY,%VAL(CNF_PVAL(OPTR)))
 C
   500 CONTINUE
 C
