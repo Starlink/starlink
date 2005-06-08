@@ -139,13 +139,27 @@ STYLESHEET=!!pkglibdir!!/dsssl/sl
 SGML_CATALOG_FILES=./CATALOG:$DTDDIR/CATALOG-override:$SGML_CATALOG_FILES
 export SGML_CATALOG_FILES
 
+# Magic environment variable to switch on debugging by default;
+# otherwise off unless switched on by --debug
+if test -n "$SGMLKIT_DEBUG"; then
+    DEBUGGING=:
+    echo "sgml2docs:I: SGMLKIT_DEBUG=$SGMLKIT_DEBUG: debugging on by default"
+else
+    DEBUGGING=false
+fi
+
 # Binaries
 # Allow the names of the jade and sgmlnorm binaries to be overridden
 # (mostly for testing, though I can imagine _some_ production use of
 # this feature).
 : ${JADE='@JADE@'}
 : ${SGMLNORM='@SGMLNORM@'}
-JADEFLAGS=
+# Jade version-number flag
+if $DEBUGGING; then
+    JADEFLAGS=-v
+else
+    JADEFLAGS=-v  # temporary: remove this -v in future
+fi
 : ${IMGEQ="$LIBDIR/img-eqlist.pl"}
 : ${DVI2BITMAP='@DVI2BITMAP@'}
 : ${LATEX=latex}
@@ -156,7 +170,6 @@ JADEFLAGS=
 TARGETFORMAT=0			# html
 OPTIONS=
 
-DEBUGGING=false
 # A file MANIFEST is always generated, and only files listed in this
 # are included in the final tarball.  If USEMANIFEST is true, then the
 # manifest written by the jade run is used as the basis for this
@@ -361,6 +374,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: JADE=$JADE"
     echo "$PROGNAME:I: SGMLNORM=$SGMLNORM"
     echo "$PROGNAME:I: LIBDIR=$LIBDIR"
+    echo "$PROGNAME:I: SGML_CATALOG_FILES=$SGML_CATALOG_FILES"
     echo "$PROGNAME:I: DVI2BITMAP=$DVI2BITMAP"
     echo "$PROGNAME:I: dvi2bitmap version is $d2bv"
     echo "$PROGNAME:I: LATEX=$LATEX"
@@ -402,6 +416,10 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate $ROOT.imgeq.list and convert it to a set of bitmaps.
     # Also extract citations ready for BibTeX.
     $VERBOSE && echo "$PROGNAME:I: Pre-processing..."
+    $DEBUGGING && echo $JADE -t sgml -iOnly.web $JADEFLAGS \
+	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
+	    $usedecl $SGMLSRC \
+	    '>' $tempdest
     $run $JADE -t sgml -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
 	    $usedecl $SGMLSRC \
@@ -474,6 +492,10 @@ if [ $TARGETFORMAT -eq 0 ]; then
 
     # Generate the destination file
     $VERBOSE && echo "$PROGNAME:I: Generating output..."
+    $DEBUGGING && echo $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
+	    -d $STYLESHEET/html/sl.dsl#html \
+	    $usedecl $SGMLSRC \
+	    '>' $tempdest
     $run $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/sl.dsl#html \
 	    $usedecl $SGMLSRC \
@@ -516,6 +538,10 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 	fi
     fi
 
+    $DEBUGGING && echo $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
+	-d $STYLESHEET/latex/slback.dsl#back.main \
+	$usedecl $SGMLSRC \
+	'>' $tempdest
     $run $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	-d $STYLESHEET/latex/slback.dsl#back.main \
 	$usedecl $SGMLSRC \
@@ -528,6 +554,10 @@ elif [ $TARGETFORMAT -eq 1 ]; then
     fi
 
     # Generate the final file
+    $DEBUGGING && echo $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
+	    -d $STYLESHEET/latex/sl.dsl#latex \
+	    $usedecl $SGMLSRC \
+	    '>' $tempdest
     $run $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	    -d $STYLESHEET/latex/sl.dsl#latex \
 	    $usedecl $SGMLSRC \
@@ -542,6 +572,10 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 elif [ $TARGETFORMAT -eq 2 ]; then
     # Generate TeXML
 
+    $DEBUGGING && echo $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
+        -d $STYLESHEET/texml/slback.dsl#back.main \
+        $usedecl $SGMLSRC \
+        '>' $tempdest
     $run $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
         -d $STYLESHEET/texml/slback.dsl#back.main \
         $usedecl $SGMLSRC \
@@ -559,6 +593,10 @@ elif [ $TARGETFORMAT -eq 2 ]; then
     fi
 
     # Generate the XML file
+    $DEBUGGING && echo $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
+        -d $STYLESHEET/texml/sl.dsl#texml \
+        $usedecl $SGMLSRC \
+        '>' $tempdest
     $run $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
         -d $STYLESHEET/texml/sl.dsl#texml \
         $usedecl $SGMLSRC \
@@ -571,7 +609,7 @@ elif [ $TARGETFORMAT -eq 2 ]; then
     fi
 
     # convert the $ROOT.xml file into LaTeX
-    $VERBOSE && echo "$PYTHON $TEXMLDIR/texml.py $ROOT.xml $ROOT.tex"
+    $DEBUGGING && echo "$PYTHON $TEXMLDIR/texml.py $ROOT.xml $ROOT.tex"
     $run $PYTHON $TEXMLDIR/texml.py $ROOT.xml $ROOT.tex
     echo $ROOT.tex >>MANIFEST
 
