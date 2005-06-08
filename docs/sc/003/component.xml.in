@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/003</path>
+  <description>Echelle Data Reduction Cookbook</description>
+  <abstract><p>This document is the first version of the Starlink Echelle Data
+      Reduction Cookbook.  It contains scripts and procedures developed by
+      regular or heavy users of the existing software packages.  These scripts
+      are generally of two types; {\em templates} which readers may be able to
+      modify to suit their particular needs and {\em utilities} which carry out
+      a particular common task and can probably be used `off-the-shelf'.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2000, 2003</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
