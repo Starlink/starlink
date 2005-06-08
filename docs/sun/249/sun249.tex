@@ -135,24 +135,25 @@ For users of Starlink software,
 the calibrated coordinate information can be attached automatically
 to image files using the 
 \htmladdnormallink{ASTIMP}{http://capc23.ast.cam.ac.uk/star/local/docs/sun139.htx/node70.html#xref_ASTIMP} 
-command, and the file 
-\htmladdnormallinkfoot{{\tt INT-WFC.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/INT-WFC.ast}
+command, and the file {\tt INT-WFC.ast}.
+This file is distributed in the CCDPACK package 
+(in directory {\tt \$CCDPACK\_DIR}, or {\tt bin/ccdpack}).
 
-There are a couple of provisos for using this facility:
-first, it is best if the files are converted to Starlink \xref{NDF}{sun33}{} 
+To use this facility,
+it is best if the files are first converted to Starlink \xref{NDF}{sun33}{} 
 format using the \xref{CONVERT}{sun55}{} package as follows:
 \begin{squote}
 \begin{verbatim}
 % convert
 
-   CONVERT commands are now available -- (Version 1.2-4, 2000 January)
+   CONVERT commands are now available -- (Version 1.5-4)
  
    Defaults for automatic NDF conversion are set.
  
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
  
-% fits2ndf in='r10628?.fits' out='*'
+% fits2ndf in='r10628?.fits' out='*' container=true
 \end{verbatim}
 \end{squote}
 which will convert the FITS file {\tt r106280.fits} 
@@ -162,26 +163,17 @@ but because it converts them on the fly between FITS and NDF formats
 before and after each command,
 this can be rather slow with files the size of WFC frames.
 
-Secondly, you must have CCDPACK version 3.
-This will be in the Starlink Spring 2000 release, which at the time
-of writing this document has not been distributed.
-However, copies can be obtained on request from Mark Taylor 
-at {\tt mbt@ast.cam.ac.uk}.
-
-
-
-Once the file is in Starlink NDF format, then obtain the file 
-\htmladdnormallink{{\tt INT-WFC.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/INT-WFC.ast}
-and from the Unix C shell do the following:
+Once the file is in Starlink NDF format,
+from the Unix C shell do the following:
 \begin{squote}
 \begin{verbatim}
 % ccdpack 
 
-   CCDPACK commands are now available -- (Version 3.0-1)
+   CCDPACK commands are now available -- (Version 4.0-16)
    
   For help use the commands ccdhelp or ccdwww
 
-% astimp in='r10628?' astfile=INT-WFC.ast reset accept
+% astimp in='r10628?' astfile=$CCDPACK_DIR/INT-WFC.ast reset accept
 
     ASTIMP
     ======
