@@ -16,12 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.15}
+\newcommand{\stardocnumber}    {214.16}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {10th November 2004}
-\newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
-                                Image Analysis Tool}
-\newcommand{\stardocversion}   {2.12}
+\newcommand{\stardocdate}      {8th June 2005}
+\newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
+\newcommand{\stardocversion}   {2.9.0}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -874,7 +873,32 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\subsection{The current release 2.8}
+\section{This release 2.9}
+
+There have been several minor changes in this release of GAIA.
+
+The minor changes are:
+\begin{itemize}
+
+\item GAIA can now display in-line compressed images (such as RICE from WFCAM).
+      These are converted into temporary files on the fly and can be used with
+      all other tasks within GAIA.
+
+\item The ESP toolbox now reports the mean count along the isophote and plots
+      intensity profiles.
+
+\item A rarely seen problem with foreign-file conversion deleting the input files
+      has been fixed.
+
+\end{itemize}
+
+Internally GAIA has undergone major changes in the way that it is built and
+distributed. One immediate consequence of this is that GAIA no longer
+distributes any files for IRAF support. 
+
+AUTOASTROM does not exist, so that is also missing...
+
+\subsection{Release 2.8}
 
 This is a major release of GAIA (2.8.0) which can now display image planes
 from data cubes. Using this you can step through along an axis and display the

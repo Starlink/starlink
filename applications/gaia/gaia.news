@@ -1,14 +1,25 @@
-1 Starlink GAIA major update
+1 Starlink GAIA update
 
-  Add changes to display in-line compressed images (such as RICE).
-  These are converted into temporary files on the fly and can be 
-  used with all other tasks within GAIA.
-  
-  Stop problems with foreign-file conversion deleting the input files
-  and re-opening creating a new copy.
+  Release 2.9-0: 06 June 2005
+  ===========================
 
-  ESP toolbox now reports mean count along isophote and plots intensity
-  profiles.
+  There have been several minor changes in this release of GAIA.
+
+  The minor changes are:
+
+    - GAIA can now display in-line compressed images (such as RICE from WFCAM).
+      These are converted into temporary files on the fly and can be
+      used with all other tasks within GAIA.
+
+    - The ESP toolbox now reports the mean count along the isophote and plots
+      intensity profiles.
+
+    - A rarely seen problem with foreign-file conversion deleting the input files
+      has been fixed.
+
+  Internally GAIA has undergone major changes in the way that it is built and
+  distributed. One immediate consequence of this is that GAIA no longer
+  distributes any files for IRAF support. AUTOASTROM does not exist.
 
   Release 2.8-0: 04 November 2004
   ===============================
@@ -29,14 +40,14 @@
 
     - Contouring toolbox bug fixed. If you entered an incorrect NDF name for
       the second image, the error was never recovered and GAIA had to be
-      restarted. 
+      restarted.
 
-    - GAIA has been relinked against AST to fix a problem when the 
+    - GAIA has been relinked against AST to fix a problem when the
       presence of multiple possible astrometries in FITS headers
       causes the image scale to be incorrectly estimated.
 
     - Printing the "whole image" now works when repeated without exiting
-      GAIA. 
+      GAIA.
 
     - Incompatibilities in the WCS components of NDFs are now ignored (older
       versions of AST cannot read newer encodings).
@@ -44,7 +55,7 @@
     - A problem with coordinate readout coupling when using more than one
       interactive slice or XY profile is being used.
 
-    - A error reading the CRPIX values in the blink/compare toolbox has been 
+    - A error reading the CRPIX values in the blink/compare toolbox has been
       fixed.
 
   Changes in the previous version of GAIA (2.7-5):
@@ -56,15 +67,15 @@
   program. These make it possible to provide a minimum of positional
   information (image centre and scale) and then fit an astrometric
   solution. They also make it possible, for the first time, to fit optical
-  distortions. The new toolboxes are available at: 
- 
+  distortions. The new toolboxes are available at:
+
      Image-Analysis->Astrometry Calibration->Automatic position matching
 
   One is for simple use and the other for advanced use.
-  
-  The blink comparison toolbox was substantially upgraded in this release. 
-  New features are options to alignment to NDF origins or FITS CRPIX values. 
-  This gives much better behaviour when comparing images of different 
+
+  The blink comparison toolbox was substantially upgraded in this release.
+  New features are options to alignment to NDF origins or FITS CRPIX values.
+  This gives much better behaviour when comparing images of different
   dimensions. Better performance (less flickering artifacts). The ability to
   drag images and enter image coordinate offsets. All images can now be viewed
   together or one-by-one as before. Images should now always scroll and the
@@ -101,11 +112,11 @@
        positions.
 
      - The "$GAIA_DIR/pix2wcs" and "$GAIA_DIR/wcs2pix" scripts should be
-       working again. 
+       working again.
 
      - The "$GAIA_DIR/displaycat" command now creates fully functional
        catalogue windows (previous these did not include any GAIA specific
-       changes). 
+       changes).
 
      - The "-catalog" command-line option now accepts a list of catalogues to
        display immediately.
@@ -129,15 +140,15 @@
        This now supports AST 3.2 super-script and sub-script, font and colour
        changes within a string. Fonts drawn on the overlay grid can now be
        scaled with image. Better matching of postscript font size to displayed
-       size has also been implemented. A long term memory leak has been cured 
-       (only seen when drawing overlays). 
+       size has also been implemented. A long term memory leak has been cured
+       (only seen when drawing overlays).
 
      - A new configuration option "always_merge" controls if the primary header
        of any FITS files are merged with those of extension being viewed to
        create a full set of headers for creating a world coordinate system. By
        default this merging no longer occurs when the primary HDU contains a
-       non dummy image. 
-     
+       non dummy image.
+
      - Region statistics now also include values for the NDF variance
        component.
 
