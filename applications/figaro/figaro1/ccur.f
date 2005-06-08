@@ -37,18 +37,21 @@ C                    GKD_ calls are used for terminal output.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
 C                    removed. Unused declarations of SMG$... removed.
 C     23rd Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       INTEGER GEN_BSEARCH,ICH_LEN,PGBEGIN
-      INTEGER DYN_ELEMENT,ICH_ENCODE
+      INTEGER ICH_ENCODE
       REAL GEN_ELEMF
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of a dynamic memory element
       CHARACTER CH               ! User's response to prompting
       CHARACTER DEVICE*32        ! PGPLOT plotting device
       INTEGER   DIMS(10)         ! Dimensions of data
@@ -90,10 +93,6 @@ C
       REAL      XST              ! Leftmost x-value on the screen
       CHARACTER XUNITS*32        ! Structure x-axis units
       REAL      Y                ! Current cursor y-position
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -139,16 +138,14 @@ C
 C     Map the X-axis array - note that we do not require
 C     that there be an X array.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get main data array
 C
       CALL DSA_DATA_SIZE('SPECT',1,NDIM,DIMS,NX,STATUS)
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get the labels and units for the two axes
@@ -202,9 +199,9 @@ C
 C
 C        Find nearest pixel value
 C
-         VALUE=GEN_BSEARCH(DYNAMIC_MEM(XPTR),NX,X)
-         IXPIX=MAX(1,MIN(NX,GEN_BSEARCH(DYNAMIC_MEM(XPTR),NX,X)))
-         VALUE=GEN_ELEMF(DYNAMIC_MEM(DPTR),IXPIX)
+         VALUE=GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),NX,X)
+         IXPIX=MAX(1,MIN(NX,GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),NX,X)))
+         VALUE=GEN_ELEMF(%VAL(CNF_PVAL(DPTR)),IXPIX)
 C
 C        Encode and output information
 C

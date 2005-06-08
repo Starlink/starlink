@@ -59,17 +59,19 @@ C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Avoid _NAMED_ routines.
 C                  Input read-only.
 C     26 Jul 1996  MJCL / starlink, UCL.  PAR_ABORT check for NEW.
+C     2005 June 7  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
 C
 C     Local variables
 C
-      INTEGER   ADDRESS    ! Virtual address for data array
       CHARACTER COMMAND*6  ! Figaro command name
       INTEGER   CUPTR      ! Dynamic memory element for CUBE data
       INTEGER   DIMS(5)    ! Various dimensions
@@ -80,7 +82,7 @@ C
       LOGICAL   GROWYT     ! True if command is GROWYT
       INTEGER   IDX        ! A dimension of CUBE
       INTEGER   IDY        ! A dimension of CUBE
-      INTEGER   IPTR       ! Dynamic memory element for IMAGE data
+      INTEGER   IPTR       ! Dynamic memory pointer for IMAGE data
       INTEGER   LIM1       ! Lower axis limit for extra dimension of CUBE
       INTEGER   LIM2       ! Upper axis limit for extra dimension of CUBE
       INTEGER   NDIM       ! No. of dimensions for various structures
@@ -101,10 +103,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -140,8 +138,7 @@ C
       IDX=DIMS(1)
       IDY=DIMS(2)
 
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 
 C
@@ -152,7 +149,7 @@ C
       IF (PAR_ABORT()) GOTO 500
       IF (NEW) THEN
          CALL DSA_OUTPUT('CUBE','CUBE','IMAGE',NO_DATA,NEW_FILE,
-     :                          STATUS)
+     :                   STATUS)
          OLDFIL=.FALSE.
       ELSE
          CALL DSA_INPUT_UPDATE('CUBE','CUBE',STATUS)
@@ -167,7 +164,7 @@ C
          IF(STATUS.NE.0)GOTO 500
          IF (NDIM.NE.3) THEN
             CALL PAR_WRUSER('This is not three-dimensional data',
-     :                                                        STATUS)
+     :                      STATUS)
             GO TO 500
          END IF
          NX=DIMS(1)
@@ -183,12 +180,12 @@ C
          ELSEIF(GROWXY)THEN
             CALL DSA_MATCH_DIMENSION('IMAGE',1,'CUBE',1,STATUS)
             CALL DSA_MATCH_DIMENSION('IMAGE',2,'CUBE',2,STATUS)
-         ENDIF
+         END IF
          IF(STATUS.NE.0)GOTO 500
       END IF
 C
-C     Get the appropriate axis start and end parameters.  If we don't have
-C     an cube yet, we set ludicrous maximum values for the size
+C     Get the appropriate axis start and end parameters.  If we don't 
+C     have a cube yet, we set ludicrous maximum values for the size
 C     limits.
 C
       IF (NEW) THEN
@@ -238,12 +235,12 @@ C
             CALL DSA_AXIS_SIZE('IMAGE',1,5,NDIM,DIMS,NELM,STATUS)
             IF (GROWXY.OR.GROWXT) THEN
                CALL DSA_RESHAPE_AXIS('CUBE',1,'IMAGE',1,NDIM,DIMS,
-     :                                STATUS)
+     :                               STATUS)
             ELSE
                CALL DSA_RESHAPE_AXIS('CUBE',3,'IMAGE',1,NDIM,DIMS,
-     :                             STATUS)
-            ENDIF
-         ENDIF       
+     :                               STATUS)
+            END IF
+         END IF       
        
          CALL DSA_SEEK_AXIS('IMAGE',2,EXIST,STATUS)
          IF(EXIST)THEN
@@ -254,38 +251,35 @@ C
             ELSE
                CALL DSA_RESHAPE_AXIS('CUBE',3,'IMAGE',2,NDIM,DIMS,
      :                                STATUS)
-            ENDIF
-         ENDIF       
+            END IF
+         END IF       
       END IF
 C
 C     Map the cube data and set it to all zeros if new.
 C
-C     CALL DSA_MAP_DATA('CUBE','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-C     CUPTR=DYN_ELEMENT(ADDRESS)
+C     CALL DSA_MAP_DATA('CUBE','UPDATE','FLOAT',CUPTR,SLOT,STATUS)
 C     IF(STATUS.NE.0)GOTO 500
-C     IF (NEW) CALL GEN_FILL(NX*NY*NT*4,0,DYNAMIC_MEM(CUPTR))
+C     IF (NEW) CALL GEN_FILL(NX*NY*NT*4,0,%VAL(CNF_PVAL(CUPTR)))
       IF (NEW) THEN
-         CALL DSA_MAP_DATA('CUBE','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-         CUPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('CUBE','WRITE','FLOAT',CUPTR,SLOT,STATUS)
          IF(STATUS.NE.0)GOTO 500
-         CALL GEN_FILL(NX*NY*NT*4,0,DYNAMIC_MEM(CUPTR))
+         CALL GEN_FILL(NX*NY*NT*4,0,%VAL(CNF_PVAL(CUPTR)))
       ELSE
-         CALL DSA_MAP_DATA('CUBE','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-         CUPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('CUBE','UPDATE','FLOAT',CUPTR,SLOT,STATUS)
          IF(STATUS.NE.0)GOTO 500
       END IF
 C
 C     Now, we have all the data mapped, perform the grow.
 C
       IF (GROWXY) THEN
-         CALL GEN_GROWXY(DYNAMIC_MEM(IPTR),NX,NY,NT,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(CUPTR))
+         CALL GEN_GROWXY(%VAL(CNF_PVAL(IPTR)),NX,NY,NT,LIM1,LIM2,
+     :                   %VAL(CNF_PVAL(CUPTR)))
       ELSE IF (GROWXT) THEN
-         CALL GEN_GROWXT(DYNAMIC_MEM(IPTR),NX,NY,NT,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(CUPTR))
+         CALL GEN_GROWXT(%VAL(CNF_PVAL(IPTR)),NX,NY,NT,LIM1,LIM2,
+     :                   %VAL(CNF_PVAL(CUPTR)))
       ELSE
-         CALL GEN_GROWYT(DYNAMIC_MEM(IPTR),NX,NY,NT,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(CUPTR))
+         CALL GEN_GROWYT(%VAL(CNF_PVAL(IPTR)),NX,NY,NT,LIM1,LIM2,
+     :                   %VAL(CNF_PVAL(CUPTR)))
       END IF
 
   500 CONTINUE

@@ -22,35 +22,34 @@ C
 C                                          JAB / AAO  14th July 1986
 C     Modified:
 C
-C     15th July 1986.  KS / AAO. Minor changes so routine will work
-C                      on data with more than 1 dimension.  
-C     22nd July 1986.  KS / AAO. Modified to work with absolute rather
-C                      than percentage error values.
-C     13th Aug  1987.  DJA/ AAO. Revised DSA_ routines - some specs changed.
-C                      Now uses DYN_ package for dynamic memory handling.
-C                      Changed inconsistent variable naming. The variables for
-C                      the first spectrum are numbered 1, until they are 
-C                      superceded by the OUTPUT vars.  and those of the
-C                      second 2 : after the output filename is obtained, the
-C                      names are prefixed with an 'O'. 
-C      8th Dec  1990.  JAB / JAC. Use Data Quality.
-C      1st Mar  1991.  JAB / JAC. Rewrite subroutine performing the combine.
-C      2nd Apr  1991.  JMS / AAO. Added the correction, made by KS, on the use
-C                      of 'UPDATE' and 'WRITE' in mapping calls.
-C      26th Apr 1991.  JMS / AAO. Fixed variance mapping bug - now maps from
-C                      'SPECT2' instead of 'OUTPUT'.
-C      29th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed, TABs
-C                      removed.
+C     15th July 1986  KS / AAO. Minor changes so routine will work
+C                     on data with more than 1 dimension.  
+C     22nd July 1986  KS / AAO. Modified to work with absolute rather
+C                     than percentage error values.
+C     13th Aug  1987  DJA/ AAO. Revised DSA_ routines - some specs changed.
+C                     Now uses DYN_ package for dynamic memory handling.
+C                     Changed inconsistent variable naming. The variables for
+C                     the first spectrum are numbered 1, until they are 
+C                     superceded by the OUTPUT vars.  and those of the
+C                     second 2 : after the output filename is obtained, the
+C                     names are prefixed with an 'O'. 
+C      8th Dec  1990  JAB / JAC. Use Data Quality.
+C      1st Mar  1991  JAB / JAC. Rewrite subroutine performing the combine.
+C      2nd Apr  1991  JMS / AAO. Added the correction, made by KS, on the use
+C                     of 'UPDATE' and 'WRITE' in mapping calls.
+C      26th Apr 1991  JMS / AAO. Fixed variance mapping bug - now maps from
+C                     'SPECT2' instead of 'OUTPUT'.
+C      29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
+C                     removed.
+C      2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                     mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       INTEGER      V2PTR        ! Dynamic memory pointer to 2nd variance array
       LOGICAL      ER2EXIST     ! TRUE if spectrum 2 has valid error data
@@ -71,10 +70,6 @@ C
       INTEGER      Q2PTR        ! Dynamic memory pointer to spec2's quality
       INTEGER      Q2SLOT       ! Map slot number of spectrum2's quality
       INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -109,38 +104,31 @@ C
 C
 C     Map input and output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',ADDRESS,OQSLOT,
-     :      STATUS)
-      OQPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
+      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',OQPTR,OQSLOT,
+     :                     STATUS)
       CALL DSA_SEEK_ERRORS('OUTPUT',OEREXIST,STATUS)
       IF (STATUS.NE.0) GOTO 500
       IF (OEREXIST) THEN
-         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :                                                OERSLOT,STATUS)
-         OVPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',OVPTR,
+     :                         OERSLOT,STATUS)
       ELSE
          CALL PAR_WRUSER('Will not perform error calculation',IGNORE)
       END IF
 C
 C     Map spectrum 2 data
 C
-      CALL DSA_MAP_DATA('SPECT2','READ','FLOAT',ADDRESS,S2SLOT,STATUS)
-      S2PTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('SPECT2','READ','BYTE',ADDRESS,Q2SLOT,
-     :      STATUS)
-      Q2PTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT2','READ','FLOAT',S2PTR,S2SLOT,STATUS)
+      CALL DSA_MAP_QUALITY('SPECT2','READ','BYTE',Q2PTR,Q2SLOT,STATUS)
       CALL DSA_SEEK_ERRORS('SPECT2',ER2EXIST,STATUS)
       IF (STATUS.NE.0) GOTO 500
       IF (ER2EXIST) THEN
-         CALL DSA_MAP_VARIANCE('SPECT2','READ','FLOAT',ADDRESS,
-     :                                                ER2SLOT,STATUS)
-         V2PTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('SPECT2','READ','FLOAT',V2PTR,
+     :                         ER2SLOT,STATUS)
       ELSE
          CALL PAR_WRUSER('No error information for spectrum 2 data',
      :                                                       IGNORE)
-      ENDIF
+      END IF
 C
 C     Check that axes of the two spectra match
 C
@@ -148,9 +136,10 @@ C
 C
 C     Operate on the spectra
 C
-      CALL FIG_COMBINE(OEREXIST,ER2EXIST,NELM,DYNAMIC_MEM(OPTR),
-     :     DYNAMIC_MEM(OVPTR),DYNAMIC_MEM(OQPTR),DYNAMIC_MEM(S2PTR),
-     :                 DYNAMIC_MEM(V2PTR),DYNAMIC_MEM(Q2PTR))
+      CALL FIG_COMBINE(OEREXIST,ER2EXIST,NELM,%VAL(CNF_PVAL(OPTR)),
+     :                 %VAL(CNF_PVAL(OVPTR)),%VAL(CNF_PVAL(OQPTR)),
+     :                 %VAL(CNF_PVAL(S2PTR)),%VAL(CNF_PVAL(V2PTR)),
+     :                 %VAL(CNF_PVAL(Q2PTR)))
 C
 C     Tidy up
 C
@@ -257,7 +246,7 @@ C     Only 1st spectrum has variance of zero, so it has infinite weight
 C     and is therefore the output spectrum - hence nothing to do
 C
                CONTINUE
-            ENDIF
+            END IF
          ELSE IF (VSPEC2(I) .EQ. 0.0) THEN
 C
 C     Only 2nd spectrum has variance of zero, so it has infinite weight

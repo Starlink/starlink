@@ -13,7 +13,7 @@ C     the wavelength from bin to bin is constant.
 C
 C     If the input file is 2D data, then it is treated as a set of
 C     1D spectra and each is scrunched individually.   If the wavelength
-C     array (.X.DATA) is 1D, then this single array will be used for all 
+C     array (.X.DATA) is 1D, then this single array will be used for all
 C     the spectra.  If it is 2D, then each spectrum will be scrunched
 C     according to the corresponding cross-section of the wavelength
 C     array.
@@ -38,27 +38,29 @@ C     WSTART       (Numeric) The wavelength of the CENTER of the first
 C                  bin of the resulting scrunched spectrum.  
 C     WEND         (Numeric) The wavelength of the CENTER of the final
 C                  bin of the resulting scrunched spectrum.  If WEND is
-C                  less than WSTART, then FSCRUNCH assumes that it is the
-C                  increment rather than the final value that is being
-C                  specified.  If the scrunch is logarithmic and WSTART
-C                  is greater than WEND, FSCRUNCH assumes that the WEND
-C                  value represents a velocity in km/sec.  These
-C                  assumptions can be controlled directly by the keywords
-C                  INCREMENT and FINAL, if they will not give the desired
-C                  effect.
-C     BINS         (Numeric) The number of bins for the resulting spectrum.
+C                  less than WSTART, then FSCRUNCH assumes that it is
+C                  the increment rather than the final value that is
+C                  being specified.  If the scrunch is logarithmic and 
+C                  WSTART is greater than WEND, FSCRUNCH assumes that 
+C                  the WEND value represents a velocity in km/sec. These
+C                  assumptions can be controlled directly by the 
+C                  keywords INCREMENT and FINAL, if they will not give 
+C                  the desired effect.
+C     BINS         (Numeric) The number of bins for the resulting 
+C                  spectrum.
 C     INORDER      (Numeric) The order of local fit to be used for the
 C                  input data.   Can be 0,1 or 2.
 C     OUTPUT       (Character) The name of the resulting spectrum.
-C                  Note that FSCRUNCH cannot rebin a spectrum into itself
-C                  and so will always create a new output file.
+C                  Note that FSCRUNCH cannot rebin a spectrum into 
+C                  itself and so will always create a new output file.
 C
 C     Command keywords -
 C
 C     LOG          Bin into logarithmic wavelength bins.
 C     DENSITY      Treat input data as being in units of flux per unit
 C                  wavelength.
-C     INCREMENT    WEND is an increment value, even though it is > WSTART.
+C     INCREMENT    WEND is an increment value, even though it is > 
+C                  WSTART.
 C     FINAL        WEND is a final value, even though it is < WSTART.
 C
 C     User variables - 
@@ -87,16 +89,19 @@ C                    of ICH_ENCODE - allows automatic precision setting.
 C     22nd Apr 1991  KS / AAO.  Modified to use DSA routines.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
 C                    PAR_WRUSER rather than DSA_WRUSER, FIG_SETERR
-C                    rather than SETERR. Call ICH_ENCODE with a single
+C                    rather than SETERR. Call ICH_ENCODE with a single-
 C                    precision number, not double.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT, PAR_GIVEN, GEN_INCCHKD
       INTEGER ICH_CLEAN,ICH_ENCODE,ICH_FOLD,ICH_LEN
-      INTEGER DYN_ELEMENT,DYN_INCREMENT
       DOUBLE PRECISION GEN_ELEMD
       CHARACTER*16 ICH_CF
 C
@@ -107,7 +112,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Virtual memory address of mapped array
       DOUBLE PRECISION C         ! Speed of light
       LOGICAL   DEFDEN           ! True if default is flux density units
       DOUBLE PRECISION DELTA     ! Wavelength increment 
@@ -115,8 +119,9 @@ C
       INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
       DOUBLE PRECISION DWEND     ! WEND in double precision
       DOUBLE PRECISION DWSTART   ! WSTART in double precision
-      DOUBLE PRECISION DVALUE    ! General double precision real variable
-      INTEGER   EPTR             ! Dynamic mem element for input error array
+      DOUBLE PRECISION DVALUE    ! General double-precision real variable
+      INTEGER   DPTR             ! Dynamic mem dummy pointer
+      INTEGER   EPTR             ! Dynamic mem pointer for input error array
       LOGICAL   ERRORS           ! True if spectrum has error information
       LOGICAL   EXIST            ! True if width values exist in data
       LOGICAL   FAULT            ! Indicates non-DSA fault encountered 
@@ -125,8 +130,14 @@ C
       LOGICAL   INCREM           ! Value of INCREMENT keyword
       INTEGER   INTERP           ! Value of INORDER keyword
       INTEGER   INVOKE           ! Dummy function value
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      LOGICAL   ISNEWE           ! Is EPTR address new to CNF?
+      LOGICAL   ISNEWW           ! Is WPTR address new to CNF?
+      LOGICAL   ISNEWX           ! Is XPTR address new to CNF?
+      LOGICAL   ISNRE            ! Is address REPTR new to CNF?
+      LOGICAL   ISNRZ            ! Is address RZPTR new to CNF?
       INTEGER   ISPECT           ! Loop index through spectra
-      LOGICAL   LOGW             ! True if input data is logarithmicaly binned
+      LOGICAL   LOGW             ! True if input data is logarithmicly binned
       LOGICAL   LOGWR            ! Value of LOG keyword
       INTEGER   NBINR            ! Number of elements in scrunched spectra
       INTEGER   NCH              ! Number of characters in string
@@ -139,34 +150,31 @@ C
       INTEGER   NX               ! Length of input spectra
       INTEGER   NXELM            ! Number of X-axis data array elements
       INTEGER   NXSPECT          ! Number of 'spectra' in x-axis arrays
-      INTEGER   REPTR            ! Dynamic mem element for rebinned error array
+      INTEGER   OTPTR            ! Temporary dynamic mem pointer
+      INTEGER   REPTR            ! Dynamic mem pointer for rebinned error array
       REAL      RESET            ! Used for default wavelength values
-      INTEGER   RXPTR            ! Dynamic mem element for output X-data array
-      INTEGER   RZPTR            ! Dynamic mem element for output data array
+      INTEGER   RXPTR            ! Dynamic mem pointer for output X-data array
+      INTEGER   RZPTR            ! Dynamic mem pointer for output data array
       LOGICAL   SINGLE           ! True if width info is a single value
       INTEGER   SLOT             ! Slot number for mapped arrays - ignored
       INTEGER   STATUS           ! General status variable
       CHARACTER STRING*72        ! General character variable
-      INTEGER   TPTR             ! Temporary dynamic mem element
+      INTEGER   TPTR             ! Temporary dynamic mem pointer
       REAL      VALUE            ! General single precision real variable
-      INTEGER   WPTR             ! Dynamic mem element for width array
-      INTEGER   WKPTR            ! Dynamic mem element for work array
+      INTEGER   WPTR             ! Dynamic mem pointer for width array
+      INTEGER   WKPTR            ! Dynamic mem pointer for work array
       REAL      WEND             ! Value of WEND parameter
       REAL      WSTART           ! Value of WSTART parameter
       REAL      WIDTH            ! Single width value
-      INTEGER   XPTR             ! Dynamic mem element for input X-data array
+      INTEGER   XPTR             ! Dynamic mem pointer for input X-data array
       CHARACTER XUNITS*72        ! X-axis data units
-      INTEGER   ZPTR             ! Dynamic mem element for input data array
+      INTEGER   ZPTR             ! Dynamic mem pointer for input data array
       CHARACTER ZUNITS*72        ! Data units
 C
 C     Parameters for DSA_OUTPUT
 C
       INTEGER   NO_DATA,NEW_FILE
       PARAMETER (NO_DATA=1,NEW_FILE=1)
-C
-C     Dynamic memory include file - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Velocity of light in Km/sec
 C
@@ -190,24 +198,27 @@ C
       CALL DSA_AXIS_SIZE ('SPECT',1,5,NDIM,DIMS,NXELM,DSA_STATUS)
       NX=DIMS(1)
       NXSPECT=NXELM/NX
-      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','DOUBLE',ADDRESS,
-     :                                              SLOT,DSA_STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','DOUBLE',XPTR,
+     :                        SLOT,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500    ! Error exit
 C
 C     Make sure the X array is in increasing order
 C
       TPTR=XPTR
+      ISNEW = .FALSE.
       DO ISPECT=1,NXSPECT
-         IF (.NOT.GEN_INCCHKD(DYNAMIC_MEM(TPTR),NX)) THEN
+         IF (.NOT.GEN_INCCHKD(%VAL(CNF_PVAL(TPTR)),NX)) THEN
             CALL PAR_WRUSER(
      :         'Wavelength array needs to be in increasing order',
      :                                                     STATUS)
             FAULT=.TRUE.
             GO TO 500
          END IF
-         TPTR=DYN_INCREMENT(TPTR,'DOUBLE',NX)
+         CALL DYN_INCAD(TPTR,'DOUBLE',NX,OTPTR,ISNEW,STATUS)
+         IF (ISPECT.GT.1.AND.ISNEW) CALL CNF_UNPREG(TPTR)
+         TPTR = OTPTR
       END DO
+      IF (ISNEW) CALL CNF_UNPREG(TPTR)
 C
 C     Now look at the X-axis width information. We can accept this as
 C     a scalar, a 1D array, or a 2D array, but it ought to exist.
@@ -232,26 +243,23 @@ C
 C
 C        Width is an array, so check its dimensions and map it.
 C
-         CALL DSA_MAP_WIDTH ('SPECT',1,'READ','FLOAT',ADDRESS,SLOT,
-     :                                                     DSA_STATUS)
+         CALL DSA_MAP_WIDTH ('SPECT',1,'READ','FLOAT',WPTR,SLOT,
+     :                       DSA_STATUS)
          NWID=NX
-         WPTR=DYN_ELEMENT(ADDRESS)
       END IF
 C
 C     Get dimensions of main data array and map it.
 C
       CALL DSA_DATA_SIZE ('SPECT',5,NDIM,DIMS,NELM,DSA_STATUS)
       NSPECT=NELM/NX
-      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,SLOT,DSA_STATUS)
-      ZPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ZPTR,SLOT,DSA_STATUS)
 C
 C     Look for an error array.  If it exists, map it.
 C
       CALL DSA_SEEK_ERRORS ('SPECT',ERRORS,DSA_STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',ADDRESS,
-     :                                                SLOT,DSA_STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',EPTR,
+     :                        SLOT,DSA_STATUS)
       END IF
 C
 C     Determine the wavelength units being used for the data, and also
@@ -283,9 +291,9 @@ C     angstroms - probably not very useful).  Also find if data
 C     is to be binned logarithmically.
 C
       CALL PAR_RDKEY('LOG',.FALSE.,LOGWR)
-      RESET=(INT(GEN_ELEMD(DYNAMIC_MEM(XPTR),1))/10)*10
+      RESET=(INT(GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),1))/10)*10
       CALL PAR_RDVAL('WSTART',FMIN,FMAX,RESET,XUNITS,WSTART)
-      RESET=(INT(GEN_ELEMD(DYNAMIC_MEM(XPTR),NX))/10+1)*10
+      RESET=(INT(GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),NX))/10+1)*10
       CALL PAR_RDVAL('WEND',FMIN,FMAX,RESET,XUNITS,WEND)
       CALL PAR_RDVAL('BINS',1.,50000.,FLOAT(NX),' ',VALUE)
       NBINR=VALUE
@@ -395,30 +403,27 @@ C
 C
 C     Then map the output data arrays
 C
-      CALL DSA_MAP_AXIS_DATA ('OUTPUT',1,'WRITE','DOUBLE',ADDRESS,SLOT,
-     :                                                       DSA_STATUS)
-      RXPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                                                       DSA_STATUS)
-      RZPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('OUTPUT',1,'WRITE','DOUBLE',RXPTR,SLOT,
+     :                        DSA_STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',RZPTR,SLOT,
+     :                   DSA_STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                                                       DSA_STATUS)
-         REPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS ('OUTPUT','WRITE','FLOAT',REPTR,SLOT,
+     :                        DSA_STATUS)
       END IF
 C
 C     Fill up the output wavelength array
 C
-      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,DYNAMIC_MEM(RXPTR))
+      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,%VAL(CNF_PVAL(RXPTR)))
 C
 C     A little information for the user about the input data..
 C
       CALL PAR_WRUSER(' ',STATUS)
       STRING='Original wavelength range was '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(XPTR),1)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),1)
       STATUS=ICH_ENCODE(STRING,VALUE,31,3,NEXT)
       STRING(NEXT:)=' to '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(XPTR),NX)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),NX)
       STATUS=ICH_ENCODE(STRING,VALUE,NEXT+4,3,NEXT)
       STRING(NEXT:)=' '//XUNITS
       CALL PAR_WRUSER(STRING,STATUS)
@@ -426,8 +431,7 @@ C
 C
 C     Get a workspace array
 C
-      CALL DSA_GET_WORK_ARRAY (NBINR,'FLOAT',ADDRESS,SLOT,DSA_STATUS)
-      WKPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (NBINR,'FLOAT',WKPTR,SLOT,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500    ! Error exit
 C
 C     Now we're finally in a position to perform the scrunch..
@@ -437,35 +441,61 @@ C     width value held in WIDTH.
 C
       DO ISPECT=1,NSPECT
          IF (SINGLE) THEN
-            CALL FIG_FREBIN(DYNAMIC_MEM(ZPTR),NX,NBINR,
-     :                  DYNAMIC_MEM(XPTR),DYNAMIC_MEM(RXPTR),NWID,WIDTH,
-     :                  ERRORS,DYNAMIC_MEM(EPTR),LOGWR,INTERP,FLUXDEN,
-     :                  DYNAMIC_MEM(WKPTR),DYNAMIC_MEM(RZPTR),
-     :                  DYNAMIC_MEM(REPTR))
+            CALL FIG_FREBIN(%VAL(CNF_PVAL(ZPTR)),NX,NBINR,
+     :                      %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(RXPTR)),
+     :                      NWID,WIDTH,ERRORS,%VAL(CNF_PVAL(EPTR)),
+     :                      LOGWR,INTERP,FLUXDEN,%VAL(CNF_PVAL(WKPTR)),
+     :                      %VAL(CNF_PVAL(RZPTR)),%VAL(CNF_PVAL(REPTR)))
          ELSE
-            CALL FIG_FREBIN(DYNAMIC_MEM(ZPTR),NX,NBINR,
-     :                  DYNAMIC_MEM(XPTR),DYNAMIC_MEM(RXPTR),NWID,
-     :                  DYNAMIC_MEM(WPTR),ERRORS,DYNAMIC_MEM(EPTR),
-     :                  LOGWR,INTERP,FLUXDEN,DYNAMIC_MEM(WKPTR),
-     :                  DYNAMIC_MEM(RZPTR),DYNAMIC_MEM(REPTR))
+            CALL FIG_FREBIN(%VAL(CNF_PVAL(ZPTR)),NX,NBINR,
+     :                      %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(RXPTR)),
+     :                      NWID,%VAL(CNF_PVAL(WPTR)),ERRORS,
+     :                      %VAL(CNF_PVAL(EPTR)),LOGWR,INTERP,FLUXDEN,
+     :                      %VAL(CNF_PVAL(WKPTR)),%VAL(CNF_PVAL(RZPTR)),
+     :                      %VAL(CNF_PVAL(REPTR)))
          END IF
-         RZPTR=DYN_INCREMENT(RZPTR,'FLOAT',NBINR)
-         ZPTR=DYN_INCREMENT(ZPTR,'FLOAT',NX)
+
+C       Increment the pointers for the next spectrum, tidying up
+C       unwanted CNF resources as they're no longer needed.
+         CALL DYN_INCAD(ZPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (ISPECT.GT.1.AND.ISNEW) CALL CNF_UNPREG(ZPTR)
+         ZPTR=TPTR
+         CALL DYN_INCAD(RZPTR,'FLOAT',NBINR,TPTR,ISNRZ,STATUS)
+         IF (ISPECT.GT.1.AND.ISNRZ) CALL CNF_UNPREG(RZPTR)
+         RZPTR=TPTR
          IF (ERRORS) THEN
-            EPTR=DYN_INCREMENT(EPTR,'FLOAT',NX)
-            REPTR=DYN_INCREMENT(REPTR,'FLOAT',NBINR)
+            CALL DYN_INCAD(EPTR,'FLOAT',NX,TPTR,ISNEWE,STATUS)
+            IF (ISPECT.GT.1.AND.ISNEWE) CALL CNF_UNPREG(EPTR)
+            EPTR=TPTR
+            CALL DYN_INCAD(REPTR,'FLOAT',NBINR,TPTR,ISNRE,STATUS)
+            IF (ISPECT.GT.1.AND.ISNRE) CALL CNF_UNPREG(REPTR)
+            REPTR=TPTR
          END IF
          IF (NXSPECT.GT.1) THEN
-            XPTR=DYN_INCREMENT(XPTR,'DOUBLE',NX)
-            WPTR=DYN_INCREMENT(WPTR,'FLOAT',NX)
+            CALL DYN_INCAD(XPTR,'DOUBLE',NX,TPTR,ISNEWX,STATUS)
+            IF (ISPECT.GT.1.AND.ISNEWX) CALL CNF_UNPREG(XPTR)
+            XPTR=TPTR
+            CALL DYN_INCAD(WPTR,'FLOAT',NX,TPTR,ISNEWW,STATUS)
+            IF (ISPECT.GT.1.AND.ISNEWW) CALL CNF_UNPREG(WPTR)
+            WPTR=TPTR
          END IF
       END DO
+      IF (ISNEW) CALL CNF_UNPREG(ZPTR)
+      IF (ISNRZ) CALL CNF_UNPREG(RZPTR)
+      IF (ERRORS) THEN
+         IF (ISNEWE) CALL CNF_UNPREG(EPTR)
+         IF (ISNRE)  CALL CNF_UNPREG(REPTR)
+      END IF
+      IF (NXSPECT.GT.1) THEN
+         IF (ISNEWX)  CALL CNF_UNPREG(XPTR)
+         IF (ISNEWW) CALL CNF_UNPREG(WPTR)
+      END IF
 C
 C     In 2D, explain how the X data is being used.
 C
       IF (NSPECT.GT.1) THEN
          CALL PAR_WRUSER('2-dimensional data array scrunched using',
-     :                                                         STATUS)
+     :                   STATUS)
          IF (NXSPECT.GT.1) THEN
             CALL PAR_WRUSER('a 2-dimensional wavelength array,',STATUS)
          ELSE
@@ -485,12 +515,12 @@ C     And something about the output data and set the SCRUNCH_INC and
 C     SCRUNCH_END variables.
 C
       STRING='Data rebinned into '
-      STATUS=ICH_ENCODE(STRING,FLOAT(NBINR),20,0,NEXT)
+      STATUS=ICH_ENCODE(STRING,REAL(NBINR),20,0,NEXT)
       STRING(NEXT:)=' bins from '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(RXPTR),1)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(RXPTR)),1)
       STATUS=ICH_ENCODE(STRING,VALUE,NEXT+11,2,NEXT)
       STRING(NEXT:)=' to '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(RXPTR),NBINR)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(RXPTR)),NBINR)
       STATUS=ICH_ENCODE(STRING,VALUE,NEXT+4,2,NEXT)
       IF (LOGWR) STRING(NEXT:)=' (on a log scale)'
       CALL PAR_WRUSER(STRING,STATUS)

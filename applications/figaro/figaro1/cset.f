@@ -37,7 +37,8 @@ C
 C                                              KS / CIT 11th April 1984
 C     Modified:
 C
-C     10th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs changed.
+C     10th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C                    changed.
 C                    Now uses DYN_ routines for dynamic memory handling
 C     21st Mar 1988  KS/AAO.  Modified for GKS version of PGPLOT.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
@@ -46,14 +47,18 @@ C     28th Aug 1992  HME / UoE, Starlink. Change INCLUDE, remove TABs.
 C     26th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* and PAR_Q*, use
 C                    PAR_ABORT.
 C     23rd Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
-C      1st May 1997  JJL / Soton, Starlink. Maps variances and sets their
-C                    values to zero when a pixel value is set.
+C      1st May 1997  JJL / Soton, Starlink. Maps variances and sets 
+C                    their values to zero when a pixel value is set.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
 C
 C     Limits for VALUE - close to the VAX number limits
 C
@@ -62,7 +67,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      BYTES        ! Number of bytes of workspace required
       INTEGER      CKEY         ! GRPCKG code of plot colour
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
@@ -91,10 +95,6 @@ C
       INTEGER      XPTR         ! Dynamic memory pointer to x-axis data
       INTEGER      XSLOT        ! Map slot number for x-axis data array
       REAL         XST          ! Value of rightmost pixel
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -158,53 +158,46 @@ C
 C
 C     Map data array to receive fitted spectrum
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Map the X-array
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Test to see if the variance array exists.
 C
       CALL DSA_SEEK_VARIANCE('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
-      CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',ADDRESS,VXSLOT,
+      CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',VXPTR,VXSLOT,STATUS)
+      CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,VOSLOT,
      :                       STATUS)
-      VXPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,VOSLOT,
-     :                       STATUS)
-      VOPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
       IF(STATUS.NE.0) GO TO 500
 
 C
 C     Get a copy of the original data in a work area
 C
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
-      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(WPTR))
+      CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
+      CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(WPTR)))
 C
 C     If needed, set aside variance work space
 C
       IF (VEXIST) THEN
-        CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,VWSLOT,STATUS)
-        VWPTR=DYN_ELEMENT(ADDRESS)
-        CALL GEN_MOVE(BYTES,DYNAMIC_MEM(VOPTR),DYNAMIC_MEM(VWPTR))
-      ENDIF
+        CALL DSA_GET_WORKSPACE(BYTES,VWPTR,VWSLOT,STATUS)
+        CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(VOPTR)),%VAL(CNF_PVAL(VWPTR)))
+      END IF
       IF (STATUS.NE.0) GO TO 500
 C
 C     Now interactively modify the spectrum.
 C
       CALL FIG_CSET(VALUE,PGDEV,XST,XEN,HIGH,LOW,CKEY,NX,
-     :              DYNAMIC_MEM(XPTR),DYNAMIC_MEM(WPTR),
-     :              DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VXPTR),
-     :              DYNAMIC_MEM(VWPTR),DYNAMIC_MEM(VOPTR),
+     :              %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(WPTR)),
+     :              %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VXPTR)),
+     :              %VAL(CNF_PVAL(VWPTR)),%VAL(CNF_PVAL(VOPTR)),
      :              VEXIST,STATUS)
 C
 C     Tidy up
@@ -475,7 +468,7 @@ C
                   DO IX = ILX, IRX
                      VAR(IX) = SVAR(IX)
                   END DO
-               ENDIF
+               END IF
                CALL PGBIN(IX2-IX1+1,XDATA(IX1),DATA(IX1),.TRUE.)
             END IF
          END IF
@@ -496,7 +489,7 @@ C
                DO IX=ILX,IRX
                  VAR(IX)=0
                END DO
-            ENDIF
+            END IF
             LPTR=LPTR+1
             IF (LPTR.GT.MAXREM) THEN
                LPTR=1

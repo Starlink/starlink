@@ -39,17 +39,22 @@ C
 C     Modified:
 C
 C     30th Jul 1987  DJA / AAO. New DSA_ routines - some specs changed.
-C                    Modified dynamic memory handling, now uses DYN_ routines
+C                    Modified dynamic memory handling, now uses DYN_ 
+C                    routines
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     11th Jan 1995  HME / UoE, Starlink. Passive AGI compliance,
 C                    use FIG_PGBEG/END.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER FIG_PGBEG,DYN_ELEMENT
+      INTEGER FIG_PGBEG
 C
 C     Size of histogram array
 C
@@ -63,7 +68,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      BYTES        ! Number of bytes of workspace required
       CHARACTER    DEVICE*64    ! Actual name of plotting device
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
@@ -82,16 +86,13 @@ C
       INTEGER      NX           ! Size of 1st dimension
       INTEGER      NY           ! Size of 2nd dimension (if present)
       LOGICAL      OK           !
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
+      INTEGER      OPTR         ! Dynamic-memory pointer to output data 
+                                ! array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines
       REAL         VMAX         !
       REAL         VMIN         !
       REAL         XVALS(NH)    ! 
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -116,13 +117,12 @@ C
 C
 C     Map input data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get range of data in image.
 C
-      CALL GEN_RANGEF(DYNAMIC_MEM(DPTR),1,NELM,DMAX,DMIN)
+      CALL GEN_RANGEF(%VAL(CNF_PVAL(DPTR)),1,NELM,DMAX,DMIN)
 C
 C     Get range to use for optimisation
 C
@@ -165,15 +165,13 @@ C
 C
 C        Map output data
 C
-         CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-         OPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       END IF
       IF (STATUS.NE.0) GOTO 500
 C
 C     Work out the initial histogram
 C
-      CALL IHOPT1(DYNAMIC_MEM(DPTR),NX,NY,VMIN,VMAX,NH,HIST)
+      CALL IHOPT1(%VAL(CNF_PVAL(DPTR)),NX,NY,VMIN,VMAX,NH,HIST)
 C
 C     Display the histogram
 C
@@ -190,13 +188,13 @@ C
 C     If we are to generate an equalised image, do it
 C
       IF (EQUAL) THEN
-         CALL IHOPT2(DYNAMIC_MEM(DPTR),NX,NY,VMIN,VMAX,NH,HIST,
-     :                                            DYNAMIC_MEM(OPTR))
+         CALL IHOPT2(%VAL(CNF_PVAL(DPTR)),NX,NY,VMIN,VMAX,NH,HIST,
+     :               %VAL(CNF_PVAL(OPTR)))
 C
 C        Then generate the new histogram and display it.
 C
          IF (GRAPHOK) THEN
-            CALL IHOPT1(DYNAMIC_MEM(OPTR),NX,NY,VMIN,VMAX,NH,HIST)
+            CALL IHOPT1(%VAL(CNF_PVAL(OPTR)),NX,NY,VMIN,VMAX,NH,HIST)
             CALL GEN_RANGEF(HIST,1,NH,DMAX,DMIN)
             CALL PGENV(XVALS(1),XVALS(NH),DMIN,DMAX,.FALSE.,1)
             CALL PGLABEL('Data values','Number',

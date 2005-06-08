@@ -43,16 +43,19 @@ C     26th Jul 1993  Disuse GKD_*, PAR_Q*. Added parameters CHANGE and
 C                    REDRAW. Use PAR_ABORT.  HME / UoE, Starlink.
 C     23rd Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
 C      5th Apr 1995  HME / UoE, Starlink. No longer use NAG.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      BYTES        ! Number of bytes of workspace required
       INTEGER      CKEY         ! GRPCKG code for plot colour
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
@@ -76,10 +79,6 @@ C
       INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data
       INTEGER      XSLOT        ! Map slot number of x-axis data
       REAL         XST          ! Value of leftmost pixel on display
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -138,15 +137,12 @@ C
 C
 C     Map data arrays
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (DPTR.EQ.OPTR) THEN
          BYTES=DSA_TYPESIZE('FLOAT',STATUS)*NX
-         CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
-         CALL GEN_MOVE (BYTES,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(WPTR))
+         CALL DSA_GET_WORKSPACE (BYTES,WPTR,WSLOT,STATUS)
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(WPTR)))
          DPTR=WPTR
       END IF
       IF (STATUS.NE.0) GOTO 500
@@ -154,15 +150,15 @@ C
 C     Map the X-array (if there is one).  If there isn't, create
 C     one, using the element numbers.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Now interactively generate the fitted spectrum.
 C
-      CALL FIG_CSFIT(PGDEV,XST,XEN,HIGH,LOW,CKEY,NX,DYNAMIC_MEM(XPTR),
-     :                     DYNAMIC_MEM(DPTR),DYNAMIC_MEM(OPTR),STATUS)
+      CALL FIG_CSFIT(PGDEV,XST,XEN,HIGH,LOW,CKEY,NX,
+     :               %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
+     :               %VAL(CNF_PVAL(OPTR)),STATUS)
 C
 C     Tidy up
 C

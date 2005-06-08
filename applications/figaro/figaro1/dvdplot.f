@@ -9,29 +9,30 @@ C     Plots the data in one data array against the data in another.
 C
 C  Description:
 C     DVDPLOT (Data Versus Data PLOT) plots the data in the main data
-C     array in one Figaro structure against the corresponding data elements
-C     of the main data array in another structure.  This was originally
-C     written to help with linearity tests (where data in an image taken
-C     at a low data rate could be plotted against one taken at a higher
-C     data rate), but may have other applications.
+C     array in one Figaro structure against the corresponding data 
+C     elements of the main data array in another structure.  This was
+C     originally written to help with linearity tests (where data in an 
+C     image taken at a low data rate could be plotted against one taken 
+C     at a higher data rate), but may have other applications.
 C
 C  Usage:
 C     DVDPLOT IMage IMAGE2 XLow XHigh LOw HIgh AUtoscale
 C
 C  Parameters:
 C     IMAGE     (Character) The name of the first structure.  It is this
-C               structure whose data is plotted against the data in IMAGE2,
-C               so its data values form the Y values of the plotted points.
+C               structure whose data is plotted against the data in 
+C               IMAGE2, so its data values form the Y values of the 
+C               plotted points.
 C     IMAGE2    (Character) The name of the second structure.  Its data
 C               values form the X values of the plotted points.
-C     XLOW      (Numeric) The low end of the data range plotted in X (ie
-C               the lower limit for the data in IMAGE2).
-C     XHIGH     (Numeric) The high end of the data range plotted in X (ie
-C               the upper limit for the data in IMAGE2).
-C     LOW       (Numeric) The low end of the data range plotted in Y (ie
-C               the lower limit for the data in IMAGE).
-C     HIGH      (Numeric) The high end of the data range plotted in Y (ie
-C               the upper limit for the data in IMAGE).
+C     XLOW      (Numeric) The low end of the data range plotted in X
+C               (i.e. the lower limit for the data in IMAGE2).
+C     XHIGH     (Numeric) The high end of the data range plotted in X
+C               (i.e. the upper limit for the data in IMAGE2).
+C     LOW       (Numeric) The low end of the data range plotted in Y
+C               (i.e. the lower limit for the data in IMAGE).
+C     HIGH      (Numeric) The high end of the data range plotted in Y 
+C               (i.e. the upper limit for the data in IMAGE).
 C
 C  Keywords:
 C     WHOLE     If specified, XLOW and XHIGH will be set to the limits
@@ -61,18 +62,14 @@ C                    Before, PGEND was not called.
 C     6th  Aug 1997  MJCL / Starlink, UCL.  Explicit typecast of
 C                    the fourth argument to PGPOINT due to Solaris
 C                    problem.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       SUBROUTINE DVDPLOT 
 C
       IMPLICIT NONE
-C
-C     Functions used
-C
-      INTEGER DYN_ELEMENT
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Floating point limits
 C
@@ -81,7 +78,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDR              ! Memory address of mapped array
       LOGICAL   AUTO              ! Value of AUTOSCALE keyword
       CHARACTER DEVICE*32         ! Plot device name (PGPLOT spec)
       INTEGER   DIMS(10)          ! Data dimensions (ignored)
@@ -147,10 +143,8 @@ C
 C
 C     Map the two main data arrays
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDR,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDR)
-      CALL DSA_MAP_DATA ('IMAGE2','READ','FLOAT',ADDR,SLOT,STATUS)
-      IPTR2=DYN_ELEMENT(ADDR)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('IMAGE2','READ','FLOAT',IPTR2,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500    ! Error exit
 C
 C     See if 'WHOLE' was specified.  If so, get range of IMAGE2 data.
@@ -158,7 +152,8 @@ C     Otherwise get the range from XLOW and XHIGH.
 C
       CALL PAR_RDKEY ('WHOLE',.FALSE.,WHOLE)
       IF (WHOLE) THEN
-         CALL DVDPLOT_RANGEF (DYNAMIC_MEM(IPTR2),NELM,FLAG,XHIGH,XLOW)
+         CALL DVDPLOT_RANGEF (%VAL(CNF_PVAL(IPTR2)),NELM,FLAG,XHIGH,
+     :                        XLOW)
          CALL PAR_SDVAL ('XLOW',XLOW,IGNORE)
          CALL PAR_SDVAL ('XHIGH',XHIGH,IGNORE)
       ELSE
@@ -180,8 +175,9 @@ C     and XLOW).
 C
       CALL PAR_RDKEY ('AUTOSCALE',.FALSE.,AUTO)
       IF (AUTO) THEN
-         CALL DVDPLOT_RANGE (NELM,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(IPTR2),
-     :                                       FLAG,XHIGH,XLOW,HIGH,LOW)
+         CALL DVDPLOT_RANGE (NELM,%VAL(CNF_PVAL(IPTR)),
+     :                       %VAL(CNF_PVAL(IPTR2)),
+     :                       FLAG,XHIGH,XLOW,HIGH,LOW)
          CALL PAR_SDVAL ('LOW',LOW,IGNORE)
          CALL PAR_SDVAL ('HIGH',HIGH,IGNORE)
       ELSE
@@ -214,8 +210,9 @@ C
 C
 C     Now do the real work.
 C
-      CALL DVDPLOT_PLOT (NELM,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(IPTR2),
-     :                            FLAG,XLOW,XHIGH,LOW,HIGH,DEVICE)      
+      CALL DVDPLOT_PLOT (NELM,%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(IPTR2)),
+     :                   FLAG,XLOW,XHIGH,LOW,HIGH,DEVICE)      
 C
 C     Close everything down.
 C

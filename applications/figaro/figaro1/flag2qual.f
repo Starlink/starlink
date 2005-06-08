@@ -32,17 +32,20 @@ C-
 C  History:
 C     11th Feb 1995  KS / AAO.  Original version.
 C     27th Nov 1995  KS / AAO.  Added call to DSA_QUALITY_AND_FLAGS_OK.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_LEN,DYN_ELEMENT
+      INTEGER ICH_LEN
       CHARACTER ICH_CI*16,ICH_CF*32
 C
 C     Local variables
 C
-      INTEGER   ADDRESS     ! Address of dynamic memory element
       INTEGER   DIMS(10)    ! The sizes of the data's dimensions
       REAL      FBAD        ! Flag value for 'FLOAT' data
       LOGICAL   FIXED       ! Value of FIXED keyword
@@ -65,10 +68,6 @@ C     Floating point range limits - close to those of the VAX.
 C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.7E38, FMIN=-1.7E38)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -141,19 +140,17 @@ C
 C
 C     Map main output data array.
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OUTELM=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OUTELM,SLOT,STATUS)
 C
 C     Map the data quality array
 C
-      CALL DSA_MAP_QUALITY('OUTPUT',QMODE,'BYTE',ADDRESS,SLOT,STATUS)
-      QPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_QUALITY('OUTPUT',QMODE,'BYTE',QPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Process the flagged values out of the data.
 C
-      CALL FLAG2QUAL_DO (DYNAMIC_MEM(OUTELM),NELM,
-     :           DYNAMIC_MEM(QPTR),FBAD,FIXED,VALUE,NFLAGGED)
+      CALL FLAG2QUAL_DO (%VAL(CNF_PVAL(OUTELM)),NELM,
+     :                   %VAL(CNF_PVAL(QPTR)),FBAD,FIXED,VALUE,NFLAGGED)
 C
 C     Report on what happened
 C

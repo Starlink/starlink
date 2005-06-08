@@ -36,13 +36,16 @@ C     22nd June 1993  KS / AAO.  Include file syntax changed for
 C                     portable version. Added calls to DSA_RESHAPE_xx
 C                     routines.
 C     27th July 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 7     MJC / Starlink  Use CNF_PVAL for pointers to
+C                     mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      LOGICAL PAR_ABORT           ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Maximum number of rows to be added
 C
@@ -51,28 +54,23 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS           ! Address of dynamic memory element
-      INTEGER   DIMS(10)          ! The sizes of the dimensions of the data
-      INTEGER   DSLOT             ! Map slot number used for data
-      INTEGER   DPTR              ! Dynamic-memory pointer to image data
-      INTEGER   I                 !
-      LOGICAL   IGNORE            ! Used to ignore status codes
-      INTEGER   NDIM              ! Dimensionality of input data structure
-      INTEGER   NELM              ! Total number of elements in the data
-      INTEGER   NX                ! Total number of elements per cross-section
-      INTEGER   NY                ! Total number of cross-section
-      INTEGER   NROWS             ! The number of rows to be added together
-      REAL      ROWS(MAXROWS)     ! Temporary real values of row numbers
-      INTEGER   ROWNUMS(MAXROWS)  ! Final numbers of rows to be added
-      INTEGER   SPTR              ! Dynamic-mem pointer to new spectrum data
-      INTEGER   SSLOT             ! Map slot number used for data
-      INTEGER   STATUS            ! Status return from DSA_xxx routines
-      REAL      VALUE             ! Temporary real number
-      LOGICAL   YEXIST            ! TRUE if there is y-axis data
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DIMS(10)         ! The sizes of the dimensions of the data
+      INTEGER   DSLOT            ! Map slot number used for data
+      INTEGER   DPTR             ! Dynamic-memory pointer to image data
+      INTEGER   I                !
+      LOGICAL   IGNORE           ! Used to ignore status codes
+      INTEGER   NDIM             ! Dimensionality of input data structure
+      INTEGER   NELM             ! Total number of elements in the data
+      INTEGER   NX               ! Total number of elements per cross-section
+      INTEGER   NY               ! Total number of cross-section
+      INTEGER   NROWS            ! The number of rows to be added together
+      REAL      ROWS(MAXROWS)    ! Temporary real values of row numbers
+      INTEGER   ROWNUMS(MAXROWS) ! Final numbers of rows to be added
+      INTEGER   SPTR             ! Dynamic-mem pointer to new spectrum data
+      INTEGER   SSLOT            ! Map slot number used for data
+      INTEGER   STATUS           ! Status return from DSA_xxx routines
+      REAL      VALUE            ! Temporary real number
+      LOGICAL   YEXIST           ! TRUE if there is y-axis data
 C
 C     Initialisation of DSA_ routines
 C
@@ -127,16 +125,14 @@ C
 C
 C     Map the input and output data
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',ADDRESS,SSLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
+      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',SPTR,SSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Perform the extraction
 C
-      CALL FIG_EXT_LIST(DYNAMIC_MEM(DPTR),NX,NY,ROWNUMS,
-     :                                     DYNAMIC_MEM(SPTR))
+      CALL FIG_EXT_LIST(%VAL(CNF_PVAL(DPTR)),NX,NY,ROWNUMS,
+     :                  %VAL(CNF_PVAL(SPTR)))
 C
 C     Close down everything
 C

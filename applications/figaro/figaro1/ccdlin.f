@@ -26,29 +26,31 @@ C
 C                                      KS / AAO 10th Sept 1986
 C     Modified:
 C
-C     27th Jun  1989.  JM / RAL. Modified to use DSA_ routines
-C                      Dynamic memory handling changed to use
-C                      DYN_ routines
-C     24th Jan 1991.   JMS / AAO. Modified to check if FITS structures 
-C                      exist before prompting user. Set Max and Min values
-C                      to +/- 3.0E18 respec. so as not to cause a floating 
-C                      point error in FIG_RCALIN.
-C     18th Feb. 1991.  JMS / AAO. Corrected an error - now uses ELEMENTS 
-C                      instead of NELM when calling DSA_SEEK_FITS.
-C     25th Sep. 1992.  HME / UoE, Starlink.  INCLUDE changed.
+C     27th Jun 1989  JM / RAL. Modified to use DSA_ routines
+C                    Dynamic memory handling changed to use
+C                    DYN_ routines
+C     24th Jan 1991  JMS / AAO. Modified to check if FITS structures 
+C                    exist before prompting user. Set Max and Min values
+C                    to +/- 3.0E18 respec. so as not to cause a floating 
+C                    point error in FIG_RCALIN.
+C     18th Feb 1991  JMS / AAO. Corrected an error - now uses ELEMENTS 
+C                    instead of NELM when calling DSA_SEEK_FITS.
+C     25th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      INTEGER ICH_CLEAN     
-      INTEGER  ICH_ENCODE
+      INTEGER ICH_CLEAN
+      INTEGER ICH_ENCODE
 C
 C     Local variables
 C
       CHARACTER ACCESS*1  ! Single FITS character that determines routine used.
-      INTEGER   ADDRESS   ! Virtual address for data array
       REAL      ALPHA     ! the alpha used to evaluate the linearity correction.
       REAL      CBIAS     ! The value of the bias level to be applied
       CHARACTER COMENT    ! Comment associated with FITS item
@@ -78,10 +80,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -156,8 +154,7 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',IPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Explain what's going to happen
@@ -173,7 +170,7 @@ C
 C
 C     Apply the linearity correction.
 C
-      CALL FIG_RCALIN(DYNAMIC_MEM(IPTR),NELM,ALPHA,CBIAS)
+      CALL FIG_RCALIN(%VAL(CNF_PVAL(IPTR)),NELM,ALPHA,CBIAS)
 C
 C     Flag the data as having been corrected.
 C
@@ -228,7 +225,8 @@ C     M=C*(1+alpha*C) where M is the measured intensity and C is the
 C     corrected intensity (both with the bias subtracted).  The code
 C     below solves this quadratic individually for each pixel, and
 C     is less than ideal.  The way the bias is treated may lead to
-C     rounding constant s, although with the expected values this is unlikely.
+C     rounding constant s, although with the expected values this is
+C     unlikely.
 C
       DO I=1,NELM
          DATA(I)=CBIAS+

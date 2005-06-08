@@ -52,25 +52,29 @@ C  Files used:
 C     BADPIX.DAT  Contains a list of the cosmic rays removed from the data.
 C
 C  History:
-C     8th  Sept  1987.   Original version DJA / AAO 
-C     6th  March 1990.   Reworked to use DSA routines, and some changes
-C                        to the parameters made.  KS / AAO.
-C     2nd  July  1990.   Fixed 'double counting' bug causing excessive
-C                        cosmic rays to be reported.
-C     22nd Sep   1992.   HME / UoE, Starlink. TABs removed. INCLUDE changed.
-C                        Lowercase file name.
-C     10th July  1995.   HME / UoE, Starlink. Close loophole whereby
-C                        less than 2 good pixels might remain in some
-C                        columns. Once there would be less than 2, a
-C                        division by zero would have occured.
+C     8th  Sept  1987  Original version DJA / AAO 
+C     6th  March 1990  Reworked to use DSA routines, and some changes
+C                      to the parameters made.  KS / AAO.
+C     2nd  July  1990  Fixed 'double counting' bug causing excessive
+C                      cosmic rays to be reported.
+C     22nd Sep   1992  HME / UoE, Starlink. TABs removed. INCLUDE changed.
+C                      Lowercase file name.
+C     10th July  1995  HME / UoE, Starlink. Close loophole whereby
+C                      less than 2 good pixels might remain in some
+C                      columns. Once there would be less than 2, a
+C                      division by zero would have occured.
+C     2005 June 7      MJC / Starlink  Use CNF_PVAL for pointers to
+C                      mapped data.
 C+
       SUBROUTINE COSREJ
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER    DYN_ELEMENT, ICH_LEN
+      INTEGER    ICH_LEN
       CHARACTER  ICH_CI*5
 C
 C     Maximum number of spectra to be analysed.  This must match the
@@ -84,13 +88,8 @@ C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.7E38, FMIN=-1.7E38)
 C
-C     Dynamic memory include file - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Virtual address for mapped arrays
       INTEGER   BFILE               ! Logical unit for list file, 0 if none
       REAL      CRSIG               ! Sigma value for rejection criterion
       INTEGER   DIMS(10)            ! The dimensions of the image data array
@@ -186,9 +185,7 @@ C
       IF (WMEAN) THEN
          CALL DSA_OUTPUT ('MSPECT','MSPECT',' ',0,0,STATUS)
          CALL DSA_SIMPLE_OUTPUT ('MSPECT','DATA','FLOAT',1,NY,STATUS)
-         CALL DSA_MAP_DATA ('MSPECT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                                                          STATUS)
-         MPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA ('MSPECT','WRITE','FLOAT',MPTR,SLOT,STATUS)
       END IF
 C
 C     Open the output image file.
@@ -197,14 +194,13 @@ C
 C
 C     Map the data array
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',DPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      DPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Perform the rejection algorithm
 C
       CALL FIG_COS_REJ(NX,NY,IXST,IXEN,CRSIG,WMEAN,BFILE,
-     :                       DYNAMIC_MEM(DPTR),DYNAMIC_MEM(MPTR),REJ)
+     :                 %VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(MPTR)),REJ)
 C
 C     Exit and close everything down
 C

@@ -68,24 +68,27 @@ C     1  Apr 1999  TDCA / Starlink, RAL. Fixed bug in variance mapping of
 C                  an existing image.
 C     2  Jun 1999  TDCA / Starlink, RAL. GROWX or GROWY set to .FALSE. if
 C                  appropriate.
+C     2005 June 7  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER DSA_TYPESIZE, DYN_ELEMENT
+      INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER   ADDRESS     ! Virtual address for data array
       CHARACTER COMMAND*5   ! Figaro command name
       INTEGER   DIMS(2)     ! Image dimensions
       REAL      END         ! Used to read in LIM2
       LOGICAL   EXIST       ! True if SPECT AXIS(1) exists
       LOGICAL   GROWX       ! True if command is GROWX
       LOGICAL   GROWY       ! True if command is GROWY
-      INTEGER   IPTR        ! Dynamic memory element for image data
+      INTEGER   IPTR        ! Dynamic memory pointer for image data
       INTEGER   LIM1        ! First cross-section spectrum copied into
       INTEGER   LIM2        ! Last cross-section spectrum copied into
       INTEGER   NDIM        ! Number of dimensions
@@ -97,23 +100,19 @@ C
       LOGICAL   OLDFIL      ! True if GROW performed into old file
       REAL      SIZE        ! Size of extra axis dimension of IMAGE
       INTEGER   SLOT        ! Slot number for mapped data - ignored
-      INTEGER   SPTR        ! Dynamic memory element for spectrum data
+      INTEGER   SPTR        ! Dynamic memory pointer for spectrum data
       REAL      START       ! Used to read in LIM1
       INTEGER   STATUS      ! Running status for DSA routines
-      INTEGER   SVPTR       ! Dynamic memory element for spectrum variances
+      INTEGER   SVPTR       ! Dynamic memory pointer for spectrum variances
       LOGICAL   VEXIST      ! Is there a variance structure?
       REAL      VMAX        ! Max. size of extra axis dimension of IMAGE
-      INTEGER   VPTR        ! Dynamic memory element for image variance
+      INTEGER   VPTR        ! Dynamic memory pointer for image variance
       CHARACTER XYCH*1      ! (Old Figaro) name of axis (for parameters)
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -150,18 +149,16 @@ C
       NSPECT=DIMS(1)
 C
       CALL DSA_USE_FLAGGED_VALUES ('SPECT',STATUS)
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',SPTR,SLOT,STATUS)
 C
 C     Check to see if a variance structure exists and if so, map it.
 C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE ('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',ADDRESS,SLOT,
-     :        STATUS)
-         SVPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF      
+         CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',SVPTR,SLOT,
+     :                         STATUS)
+      END IF      
 C
 C     See if output is new or old image. A new image is opened with
 C     DSA_OUTPUT, an old image with DSA_INPUT_UPDATE.
@@ -200,7 +197,7 @@ C
             CALL DSA_MATCH_DIMENSION('SPECT',1,'IMAGE',1,STATUS)
          ELSE
             CALL DSA_MATCH_DIMENSION('SPECT',1,'IMAGE',2,STATUS)
-         ENDIF
+         END IF
     
       END IF
       IF(STATUS.NE.0)GOTO 500
@@ -257,61 +254,56 @@ C
             ELSE
                CALL DSA_RESHAPE_AXIS('IMAGE',2,'SPECT',1,NDIM,DIMS,
      :                                STATUS)
-            ENDIF
-         ENDIF       
+            END IF
+         END IF       
 
       END IF
 C
 C     Map the image data.
 C
 C     CALL DSA_USE_FLAGGED_VALUES ('IMAGE',STATUS)
-C     CALL DSA_MAP_DATA('IMAGE','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-C     IPTR=DYN_ELEMENT(ADDRESS)
+C     CALL DSA_MAP_DATA('IMAGE','UPDATE','FLOAT',IPTR,SLOT,STATUS)
 C     IF(STATUS.NE.0)GOTO 500
 C     IF (NEW) CALL GEN_FILL(NX*NY*DSA_TYPESIZE('FLOAT',STATUS),
-C    :                                           0,DYNAMIC_MEM(IPTR))
+C    :                       0,%VAL(CNF_PVAL(IPTR)))
       IF (NEW) THEN
          CALL DSA_USE_FLAGGED_VALUES ('IMAGE',STATUS)
-         CALL DSA_MAP_DATA('IMAGE','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-         IPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('IMAGE','WRITE','FLOAT',IPTR,SLOT,STATUS)
          IF (VEXIST) THEN
-           CALL DSA_MAP_VARIANCE('IMAGE','WRITE','FLOAT',ADDRESS,SLOT,
-     :                            STATUS)
-           VPTR=DYN_ELEMENT(ADDRESS)
-         ENDIF
+           CALL DSA_MAP_VARIANCE('IMAGE','WRITE','FLOAT',VPTR,SLOT,
+     :                           STATUS)
+         END IF
          IF(STATUS.NE.0)GOTO 500
          CALL GEN_FILL(NX*NY*DSA_TYPESIZE('FLOAT',STATUS),
-     :                                           0,DYNAMIC_MEM(IPTR))
+     :                 0,%VAL(CNF_PVAL(IPTR)))
       ELSE
          CALL DSA_USE_FLAGGED_VALUES ('IMAGE',STATUS)
-         CALL DSA_MAP_DATA('IMAGE','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-         IPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('IMAGE','UPDATE','FLOAT',IPTR,SLOT,STATUS)
          IF (VEXIST) THEN
-           CALL DSA_MAP_VARIANCE('IMAGE','UPDATE','FLOAT',ADDRESS,SLOT,
+           CALL DSA_MAP_VARIANCE('IMAGE','UPDATE','FLOAT',VPTR,SLOT,
      :                        STATUS)
-           VPTR=DYN_ELEMENT(ADDRESS)
-         ENDIF
+         END IF
          IF(STATUS.NE.0)GOTO 500
       END IF
 C
 C     Now, we have all the data mapped, perform the grow.
 C
       IF (GROWX) THEN
-         CALL GEN_GROWX(DYNAMIC_MEM(SPTR),NX,NY,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(IPTR))
+         CALL GEN_GROWX(%VAL(CNF_PVAL(SPTR)),NX,NY,LIM1,LIM2,
+     :                  %VAL(CNF_PVAL(IPTR)))
          IF (VEXIST) THEN
-             CALL GEN_GROWX(DYNAMIC_MEM(SVPTR),NX,NY,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(VPTR))
-         ENDIF
-      ENDIF
+             CALL GEN_GROWX(%VAL(CNF_PVAL(SVPTR)),NX,NY,LIM1,LIM2,
+     :                      %VAL(CNF_PVAL(VPTR)))
+         END IF
+      END IF
 
       IF (GROWY) THEN
-         CALL GEN_GROWY(DYNAMIC_MEM(SPTR),NX,NY,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(IPTR))
+         CALL GEN_GROWY(%VAL(CNF_PVAL(SPTR)),NX,NY,LIM1,LIM2,
+     :                  %VAL(CNF_PVAL(IPTR)))
          IF (VEXIST) THEN
-             CALL GEN_GROWY(DYNAMIC_MEM(SVPTR),NX,NY,LIM1,LIM2,
-     :                                    DYNAMIC_MEM(VPTR))
-         ENDIF
+             CALL GEN_GROWY(%VAL(CNF_PVAL(SVPTR)),NX,NY,LIM1,LIM2,
+     :                      %VAL(CNF_PVAL(VPTR)))
+         END IF
       END IF
 
   500 CONTINUE
@@ -321,10 +313,3 @@ C
       CALL DSA_CLOSE(STATUS)
 
       END
-
-
-
-
-
-
-

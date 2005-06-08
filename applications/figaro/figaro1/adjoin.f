@@ -45,8 +45,12 @@ C                  MJC / Starlink, RAL.
 C     24 Jul 1996  MJCL / Starlink, UCL.  Corrected type of GEN_INCCHK.
 C     29 Jul 1996  MJCL / Starlink, UCL.  Catch-all status check before
 C                  calling any GEN_ routines.
+C     2005 June 6  MJC / Starlink  Use CNF_PVAL for pointers to mapped
+C                  data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER STATUS
 C
@@ -54,7 +58,6 @@ C     External routines
 C
       LOGICAL GEN_CHKNSF
       LOGICAL GEN_INCCHK
-      INTEGER DYN_ELEMENT,DYN_INCREMENT
       INTEGER DSA_TYPESIZE
 C
 C     Local variables
@@ -75,17 +78,14 @@ C
       INTEGER D1_SLOT, D1_PTR
       INTEGER A1_SLOT, A1_PTR
       INTEGER V1_SLOT, V1_PTR
-      INTEGER DO_SLOT, DO_PTR
-      INTEGER AO_SLOT, AO_PTR
-      INTEGER VO_SLOT, VO_PTR
+      INTEGER DO_SLOT, DO_PTR, ODO_PTR
+      INTEGER AO_SLOT, AO_PTR, OAO_PTR
+      INTEGER VO_SLOT, VO_PTR, OVO_PTR
       INTEGER W_SLOT, WK_PTR, VW_PTR
+      LOGICAL ISNEW, ISNEWV
       REAL XMIN, XMAX, X1MIN, X1MAX
       CHARACTER*80 SPECT, SPECT1, OUTPUT
       CHARACTER UNITS*64, UNITS1*64
-C
-C     Required for dynamic memory handling - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -124,15 +124,15 @@ C
             CALL PAR_WRUSER(
      :         'Warning: X-axis units for the two spectra differ.',
      :          STATUS)
-         ENDIF
-      ENDIF
+         END IF
+      END IF
       CALL DSA_GET_DATA_INFO ('SPECT', 1, UNITS, 0, 0, STATUS)
       CALL DSA_GET_DATA_INFO ('SPECT1', 1, UNITS1, 0, 0, STATUS)
       IF ( UNITS1 .NE. UNITS .AND. STATUS .EQ. 0 ) THEN
          CALL PAR_WRUSER(
      :      'Warning: Data units for the two spectra differ.',
      :      STATUS)
-      ENDIF
+      END IF
 C
 C     Use flagged values, seek for them later after mapping.
 C
@@ -150,34 +150,28 @@ C
      :         'Warning: only one array has an error array.',STATUS)
             CALL PAR_WRUSER (
      :         'Error information will not be propagated.',STATUS)
-         ENDIF
-      ENDIF
+         END IF
+      END IF
       ERRORS = (ERRORS .AND. ERRORS1)
 C
 C     Map in all the arrays
 C
-      CALL DSA_MAP_DATA ('SPECT', 'READ', 'FLOAT', ADDRESS, D_SLOT,
-     :   STATUS)
-      D_PTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_AXIS_DATA ('SPECT', 1, 'READ', 'FLOAT', ADDRESS,
-     :   A_SLOT, STATUS)
-      A_PTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT', 'READ', 'FLOAT', D_PTR, D_SLOT,
+     :                   STATUS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT', 1, 'READ', 'FLOAT', A_PTR,
+     :                        A_SLOT, STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('SPECT', 'READ', 'FLOAT', ADDRESS,
-     :      V_SLOT, STATUS)
-         V_PTR = DYN_ELEMENT(ADDRESS)
-      ENDIF
-      CALL DSA_MAP_DATA ('SPECT1', 'READ', 'FLOAT', ADDRESS, D1_SLOT,
-     :   STATUS)
-      D1_PTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_AXIS_DATA ('SPECT1', 1, 'READ', 'FLOAT', ADDRESS,
-     :   A1_SLOT, STATUS)
-      A1_PTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS ('SPECT', 'READ', 'FLOAT', V_PTR,
+     :                        V_SLOT, STATUS)
+      END IF
+      CALL DSA_MAP_DATA ('SPECT1', 'READ', 'FLOAT', D1_PTR, D1_SLOT,
+     :                   STATUS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT1', 1, 'READ', 'FLOAT', A1_PTR,
+     :                        A1_SLOT, STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('SPECT1', 'READ', 'FLOAT', ADDRESS,
-     :      V1_SLOT, STATUS)
-         V1_PTR = DYN_ELEMENT(ADDRESS)
-      ENDIF
+         CALL DSA_MAP_ERRORS ('SPECT1', 'READ', 'FLOAT', v1_PTR,
+     :                        V1_SLOT, STATUS)
+      END IF
 C
 C     Both data arrays have been mapped. Now is the best chance to
 C     look for bad values.
@@ -190,10 +184,12 @@ C
 C     If existing X data are just pixel numbers, life is easy too.
 C
       IF ( .NOT. EASY ) THEN
-         IF ( XIST ) XIST = .NOT. GEN_CHKNSF( DYNAMIC_MEM(A_PTR), NX )
-         IF ( XIST1) XIST1 = .NOT. GEN_CHKNSF( DYNAMIC_MEM(A_PTR), NX1 )
+         IF ( XIST )
+     :     XIST = .NOT. GEN_CHKNSF( %VAL(CNF_PVAL(A_PTR)), NX )
+         IF ( XIST1) 
+     :     XIST1 = .NOT. GEN_CHKNSF( %VAL(CNF_PVAL(A_PTR)), NX1 )
          EASY = (.NOT. XIST) .AND. (.NOT. XIST1)
-      ENDIF
+      END IF
 C
 C     Check the X order of the two files.  We try to put the one with
 C     the lower X values into the output spectrum first, to avoid the
@@ -204,9 +200,9 @@ C
          OVRLAP = .FALSE.
       ELSE
          IF (STATUS .EQ. 0) THEN
-            CALL GEN_RANGEF(DYNAMIC_MEM(A_PTR),1,NX,XMAX,XMIN)
-            CALL GEN_RANGEF(DYNAMIC_MEM(A1_PTR),1,NX1,X1MAX,X1MIN)
-         ENDIF
+            CALL GEN_RANGEF(%VAL(CNF_PVAL(A_PTR)),1,NX,XMAX,XMIN)
+            CALL GEN_RANGEF(%VAL(CNF_PVAL(A1_PTR)),1,NX1,X1MAX,X1MIN)
+         END IF
          IF (XMIN.GT.X1MIN) THEN
             REVERSE=.TRUE.
             OVRLAP=X1MAX.GT.XMIN
@@ -214,7 +210,7 @@ C
             OVRLAP=XMAX.GT.X1MIN
             REVERSE=.FALSE.
          END IF
-      ENDIF
+      END IF
       IF (OVRLAP) THEN
          IF (STATUS .EQ. 0) THEN
             CALL PAR_WRUSER(
@@ -223,7 +219,7 @@ C
             CALL PAR_WRUSER(
      :         'They will be merged to produce the output '//
      :         'spectrum.',STATUS)
-         ENDIF
+         END IF
       ELSE IF (REVERSE) THEN
          IF (STATUS .EQ. 0) THEN
             CALL PAR_WRUSER(
@@ -252,36 +248,36 @@ C
       IF (FLAGS)
      :   CALL DSA_USE_FLAGGED_VALUES ('OUTPUT', STATUS)
       IF ( .NOT. EASY ) THEN
-         CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'FLOAT', ADDRESS,
-     :      AO_SLOT, STATUS)
-         AO_PTR = DYN_ELEMENT(ADDRESS)
-      ENDIF
-      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS, DO_SLOT,
-     :   STATUS)
-      DO_PTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA ('OUTPUT', 1, 'WRITE', 'FLOAT', AO_PTR,
+     :                           AO_SLOT, STATUS)
+      END IF
+      CALL DSA_MAP_DATA ('OUTPUT', 'WRITE', 'FLOAT', DO_PTR, DO_SLOT,
+     :                   STATUS)
       IF (ERRORS) THEN
-         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
-     :      VO_SLOT, STATUS)
-         VO_PTR = DYN_ELEMENT(ADDRESS)
-      ENDIF
+         CALL DSA_MAP_ERRORS ('OUTPUT', 'WRITE', 'FLOAT', VO_PTR,
+     :                        VO_SLOT, STATUS)
+      END IF
 C
 C     Copy the input X arrays into the output X array.
 C
       IF ( (.NOT. EASY) .AND. STATUS .EQ. 0 ) THEN
          IF (REVERSE) THEN
             CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :         DYNAMIC_MEM(A1_PTR),DYNAMIC_MEM(AO_PTR))
+     :                    %VAL(CNF_PVAL(A1_PTR)),%VAL(CNF_PVAL(AO_PTR)))
+            CALL DYN_INCAD(AO_PTR,'FLOAT',NX1,OAO_PTR,ISNEW,STATUS)
             CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :         DYNAMIC_MEM(A_PTR),
-     :         DYNAMIC_MEM(DYN_INCREMENT(AO_PTR,'FLOAT',NX1)))
+     :                    %VAL(CNF_PVAL(A_PTR)),
+     :                    %VAL(CNF_PVAL(OAO_PTR)))
          ELSE
             CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :         DYNAMIC_MEM(A_PTR),DYNAMIC_MEM(AO_PTR))
+     :                    %VAL(CNF_PVAL(A_PTR)),%VAL(CNF_PVAL(AO_PTR)))
+            CALL DYN_INCAD(AO_PTR,'FLOAT',NX,OAO_PTR,ISNEW,STATUS)
             CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :         DYNAMIC_MEM(A1_PTR),
-     :         DYNAMIC_MEM(DYN_INCREMENT(AO_PTR,'FLOAT',NX)))
-         ENDIF
-      ENDIF
+     :                    %VAL(CNF_PVAL(A1_PTR)),
+     :                    %VAL(CNF_PVAL(OAO_PTR)))
+         END IF
+         IF ( ISNEW ) CALL UNREGP(OAO_PTR)
+      END IF
 C
 C     See if we are going to have to sort the data.  If we are, get
 C     workspace for the sort vector, calculate it, and re-order the
@@ -291,7 +287,7 @@ C     sorting routine GEN_FVSORT.
 C
       SORT=.FALSE.
       IF ( (.NOT. EASY) .AND. STATUS .EQ. 0 ) THEN
-         IF (.NOT.GEN_INCCHK(DYNAMIC_MEM(AO_PTR),NX+NX1)) THEN
+         IF (.NOT.GEN_INCCHK(%VAL(CNF_PVAL(AO_PTR)),NX+NX1)) THEN
             IF (.NOT.OVRLAP) THEN
                CALL PAR_WRUSER(
      :           'The resulting X array is not in increasing order.',
@@ -299,19 +295,19 @@ C
                CALL PAR_WRUSER(
      :           'The data arrays will be sorted into increasing '//
      :           'X-order.',STATUS)
-            ENDIF
+            END IF
             SORT=.TRUE.
             BYTES=(NX+NX1)*DSA_TYPESIZE('FLOAT',STATUS)*2
-            CALL DSA_GET_WORKSPACE (BYTES, ADDRESS, W_SLOT, STATUS)
-            VW_PTR = DYN_ELEMENT(ADDRESS)
+            CALL DSA_GET_WORKSPACE (BYTES, VW_PTR, W_SLOT, STATUS)
             WK_PTR=VW_PTR+(NX+NX1)*DSA_TYPESIZE('FLOAT',STATUS)
             IF (STATUS .EQ. 0) THEN
-               CALL GEN_QFISORT(DYNAMIC_MEM(AO_PTR),NX+NX1,
-     :               DYNAMIC_MEM(VW_PTR))
-               CALL GEN_FVSORT(DYNAMIC_MEM(VW_PTR),NX+NX1,1,
-     :               DYNAMIC_MEM(WK_PTR),DYNAMIC_MEM(AO_PTR))
-            ENDIF
-         ENDIF
+               CALL GEN_QFISORT(%VAL(CNF_PVAL(AO_PTR)),NX+NX1,
+     :                          %VAL(CNF_PVAL(VW_PTR)))
+               CALL GEN_FVSORT(%VAL(CNF_PVAL(VW_PTR)),NX+NX1,1,
+     :                         %VAL(CNF_PVAL(WK_PTR)),
+     :                         %VAL(CNF_PVAL(AO_PTR)))
+            END IF
+         END IF
       END IF
 C
 C     Now copy the data and error arrays as necessary into
@@ -320,41 +316,52 @@ C     array as required
 C
       IF (STATUS .EQ. 0) THEN
          IF (REVERSE) THEN
+            CALL DYN_INCAD(DO_PTR,'FLOAT',NX1,ODO_PTR,ISNEW,STATUS)
             CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(D1_PTR),DYNAMIC_MEM(DO_PTR))
+     :                    %VAL(CNF_PVAL(D1_PTR)),%VAL(CNF_PVAL(DO_PTR)))
             CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :           DYNAMIC_MEM(D_PTR),
-     :           DYNAMIC_MEM(DYN_INCREMENT(DO_PTR,'FLOAT',NX1)))
+     :                    %VAL(CNF_PVAL(D_PTR)),
+     :                    %VAL(CNF_PVAL(ODO_PTR)))
             IF (ERRORS) THEN
+               CALL DYN_INCAD(VO_PTR,'FLOAT',NX1,OVO_PTR,ISNEWV,STATUS)
                CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(V1_PTR),DYNAMIC_MEM(VO_PTR))
+     :                       %VAL(CNF_PVAL(V1_PTR)),
+     :                       %VAL(CNF_PVAL(VO_PTR)))
                CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(V_PTR),
-     :            DYNAMIC_MEM(DYN_INCREMENT(VO_PTR,'FLOAT',NX1)))
-            ENDIF
+     :                       %VAL(CNF_PVAL(V_PTR)),
+     :                       %VAL(CNF_PVAL(OVO_PTR)))
+            END IF
          ELSE
+            CALL DYN_INCAD(DO_PTR,'FLOAT',NX,ODO_PTR,ISNEW,STATUS)
             CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(D_PTR),DYNAMIC_MEM(DO_PTR))
+     :                    %VAL(CNF_PVAL(D_PTR)),%VAL(CNF_PVAL(DO_PTR)))
             CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(D1_PTR),
-     :            DYNAMIC_MEM(DYN_INCREMENT(DO_PTR,'FLOAT',NX)))
+     :                    %VAL(CNF_PVAL(D1_PTR)),
+     :                    %VAL(CNF_PVAL(ODO_PTR)))
             IF (ERRORS) THEN
+               CALL DYN_INCAD(VO_PTR,'FLOAT',NX,OVO_PTR,ISNEWV,STATUS)
                CALL GEN_MOVE(NX*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(V_PTR),DYNAMIC_MEM(VO_PTR))
+     :                       %VAL(CNF_PVAL(V_PTR)),
+     :                       %VAL(CNF_PVAL(VO_PTR)))
                CALL GEN_MOVE(NX1*DSA_TYPESIZE('FLOAT',STATUS),
-     :            DYNAMIC_MEM(V1_PTR),
-     :            DYNAMIC_MEM(DYN_INCREMENT(VO_PTR,'FLOAT',NX)))
-            ENDIF
-         ENDIF
+     :                       %VAL(CNF_PVAL(V1_PTR)),
+     :                       %VAL(CNF_PVAL(OVO_PTR)))
+            END IF
+         END IF
+         IF (ISNEW) CALL UNREGP(ODO_PTR)
+         IF (ERRORS.AND.ISNEW) CALL UNREGP(OVO_PTR)
+
          IF (SORT.AND.(STATUS .EQ. 0)) THEN
-            CALL GEN_FVSORT(DYNAMIC_MEM(VW_PTR),NX+NX1,1,
-     :                     DYNAMIC_MEM(WK_PTR),DYNAMIC_MEM(DO_PTR))
+            CALL GEN_FVSORT(%VAL(CNF_PVAL(VW_PTR)),NX+NX1,1,
+     :                      %VAL(CNF_PVAL(WK_PTR)),
+     :                      %VAL(CNF_PVAL(DO_PTR)))
             IF (ERRORS) THEN
-               CALL GEN_FVSORT(DYNAMIC_MEM(VW_PTR),NX+NX1,1,
-     :                     DYNAMIC_MEM(WK_PTR),DYNAMIC_MEM(VO_PTR))
-            ENDIF
-         ENDIF
-      ENDIF
+               CALL GEN_FVSORT(%VAL(CNF_PVAL(VW_PTR)),NX+NX1,1,
+     :                         %VAL(CNF_PVAL(WK_PTR)),
+     :                         %VAL(CNF_PVAL(VO_PTR)))
+            END IF
+         END IF
+      END IF
 C
 C     Tidy up
 C

@@ -35,20 +35,23 @@ C                  Avoid _NAMED_ routines.
 C     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                  file names to 132 chars.
 C     26 Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT in some places.
+C     2005 June 7  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
-      CHARACTER ICH_CI*12   ! Return an integer as a character string.
-      INTEGER ICH_CLEAN     ! Clip a string at first non-printing character.
-      INTEGER ICH_ENCODE    ! Encodes a character string
+      CHARACTER ICH_CI*12    ! Return an integer as a character string
+      INTEGER ICH_CLEAN      ! Clip a string at first non-printing 
+                             ! character
+      INTEGER ICH_ENCODE     ! Encodes a character string
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
       CHARACTER CITEMS(2)*32 ! Axis character items retrieved
       INTEGER   DIMS(10)     ! Image dimensions
       REAL      DMAX         ! Upper limit of data range
@@ -65,15 +68,19 @@ C
       DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
       INTEGER   NNITEMS      ! Number of axis numeric items retrieved
       INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   SPTR         ! Dynamic memory element for histogram array
+      INTEGER   SPTR         ! Dynamic memory pointer for histogram 
+                             ! array
       INTEGER   STATUS       ! Running status for DSA_routines
       CHARACTER STRING*256   ! Used to format strings
       INTEGER   STRLEN       ! Length of a string 
       CHARACTER UNITS*64     ! Units
       REAL      VALUE        ! NBINS as a REAL
-      REAL      VMAX         ! Value at the center of last histogram bin.
-      REAL      VMIN         ! Value at the center of first histogram bin.
-      INTEGER   XPTR         ! Dynamic memory element for histogram AXIS(1) array
+      REAL      VMAX         ! Value at the center of last histogram 
+                             ! bin
+      REAL      VMIN         ! Value at the center of first histogram
+                             ! bin
+      INTEGER   XPTR         ! Dynamic memory pointer for histogram 
+                             ! AXIS(1) array
 
 C
 C     Range limits (close to VAX floating point limits)
@@ -85,10 +92,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -119,8 +122,7 @@ C
 C
 C     Map the input data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IMPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IMPTR,SLOT,STATUS)
 C
 C     Get the data range, and data units, and tell the user.
 C
@@ -178,23 +180,20 @@ C
 C
 C     Map the data arrays in the output structure.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'UPDATE','FLOAT',ADDRESS,
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'UPDATE','FLOAT',XPTR,
      :                       SLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
 
-      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',ADDRESS,
-     :                       SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',SPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Set the AXIS(1) data array
 C
-      CALL FIG_WFILL(VMIN,VMAX,.FALSE.,NBINS,DYNAMIC_MEM(XPTR))
+      CALL FIG_WFILL(VMIN,VMAX,.FALSE.,NBINS,%VAL(CNF_PVAL(XPTR)))
 C
 C     Work out the histogram, which goes into the output data array
 C
-      CALL FIG_CHIST(DYNAMIC_MEM(IMPTR),NELM,VMIN,VMAX,NBINS,
-     :               DYNAMIC_MEM(SPTR))
+      CALL FIG_CHIST(%VAL(CNF_PVAL(IMPTR)),NELM,VMIN,VMAX,NBINS,
+     :               %VAL(CNF_PVAL(SPTR)))
 
   500 CONTINUE
 C

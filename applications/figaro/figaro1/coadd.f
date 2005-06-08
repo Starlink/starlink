@@ -10,24 +10,25 @@ C     (i.e. SIGMA/SQRT(N) when N rows or planes are combined). Any error
 C     information in the original image or cube is ignored.
 C
 C     An XY image is collapsed along the Y direction to give a spectrum,
-C     and an XYT cube is collapsed along the T direction to give an XY image.
+C     and an XYT cube is collapsed along the T direction to give an XY
+C     image.
 C
 C     Typical uses include the combination of the various cycles of a
-C     CGS2 or FIGS observation as output by the FIGS322 or RCGS2 programs,
-C     or coadding of CGS4 observations (for this purpose the individual images
-C     must be first grown into a cube using GROWXY).
+C     CGS2 or FIGS observation as output by the FIGS322 or RCGS2 
+C     programs, or coadding of CGS4 observations (for this purpose the
+C     individual images must be first grown into a cube using GROWXY).
 C
 C     If the NORM keyword is specified the errors are calculated after
 C     normalizing each row or plane so that the mean value is the same
 C     for all rows (planes). This does not effect the output data but
-C     generates errors which are determined only by the noise level in the
-C     data and are not influenced by any general trend in the data. 
+C     generates errors which are determined only by the noise level in 
+C     the data and are not influenced by any general trend in the data. 
 C
-C     If the CUTOFF parameter is specified, points which deviate from the
-C     mean by more than CUTOFF times the standard error for the mean are
-C     excluded from the calculation. The mean is recalculated until no
-C     points exceed the CUTOFF limit. This procedure allows spikes in the
-C     data to be removed.
+C     If the CUTOFF parameter is specified, points which deviate from
+C     the mean by more than CUTOFF times the standard error for the
+C     mean are excluded from the calculation. The mean is recalculated
+C     until no points exceed the CUTOFF limit. This procedure allows
+C     spikes in the data to be removed.
 C
 C     Command parameters -
 C
@@ -53,15 +54,13 @@ C                    requested aborts. Now aborts if Input Data is
 C                    not 2 or 3 dimensional.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
 C                    removed.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
 
-      INTEGER   DYN_ELEMENT
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
       INTEGER   DIMS(3)            ! Image dimensions
       INTEGER   IPTR               ! Dynamic memory element for image data
       INTEGER   IYEN               ! Last image row to extract
@@ -82,10 +81,6 @@ C
       REAL      CUTOFF             ! Cutoff value for despiking
       REAL      YEND               ! Last Y value used - ignored
       REAL      YSTART             ! First Y value used - ignored
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -149,37 +144,31 @@ C
 C
 C     Map the input and output data
 C
-      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('IMAGE','READ','BYTE',ADDRESS,SLOT,STATUS)
-      IQPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('SPECT','WRITE','BYTE',ADDRESS,SLOT,STATUS)
-      QPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',SPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
+      CALL DSA_MAP_QUALITY('IMAGE','READ','BYTE',IQPTR,SLOT,STATUS)
+      CALL DSA_MAP_QUALITY('SPECT','WRITE','BYTE',QPTR,SLOT,STATUS)
 C
 C     Only map the output error array (which will cause it to be created)
 C     if there is more than one cycle
 C
       IF (IYEN .NE. IYST) THEN
-         CALL DSA_MAP_ERRORS('SPECT','WRITE','FLOAT',ADDRESS,
-     :       SLOT,STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS('SPECT','WRITE','FLOAT',EPTR,SLOT,
+     :                       STATUS)
       ENDIF
 C
 C     Get workspace arays
 C
-      CALL DSA_GET_WORK_ARRAY(NX*NY,'BYTE',ADDRESS,SLOT,STATUS)
-      EXPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX,'INT',ADDRESS,SLOT,STATUS)
-      NPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NX*NY,'BYTE',EXPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'INT',NPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500     ! Error exit
 C
 C     Perform the coadding
 C
-      CALL FIG_COADD(DYNAMIC_MEM(IPTR),NX,NY,IYST,IYEN,NORM,CUTOFF,
-     :   DYNAMIC_MEM(IQPTR),DYNAMIC_MEM(EXPTR),DYNAMIC_MEM(NPTR),
-     :   DYNAMIC_MEM(SPTR),DYNAMIC_MEM(EPTR),DYNAMIC_MEM(QPTR))
+      CALL FIG_COADD(%VAL(CNF_PVAL(IPTR)),NX,NY,IYST,IYEN,NORM,CUTOFF,
+     :               %VAL(CNF_PVAL(IQPTR)),%VAL(CNF_PVAL(EXPTR)),
+     :               %VAL(CNF_PVAL(NPTR)),%VAL(CNF_PVAL(SPTR)),
+     :               %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(QPTR)))
 C
 C     Close down everything
 C

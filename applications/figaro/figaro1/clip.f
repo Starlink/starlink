@@ -30,17 +30,20 @@ C     6th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     26th Jul 1996  MJCL / Starlink, UCL.  Changed to PAR_ABORT check
 C                    rather than STATUS check for thresholds.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_ENCODE, DYN_ELEMENT
+      INTEGER ICH_ENCODE
       LOGICAL PAR_ABORT         ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       REAL         HIGH         ! Value of high threshold
       INTEGER      IGNORE       ! Used to pass ignorable status
@@ -60,10 +63,6 @@ C     Numeric parameter limits - close to VAX real limits
 C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.7E38, FMIN=-1.7E38)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -94,25 +93,24 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Clip the image and report results. Note GEN_CLIPF can operate on its
 C     data in situ.
 C
-      CALL GEN_CLIPF(DYNAMIC_MEM(OPTR),NELM,LOW,HIGH,NLOW,NHIGH,
-     :                                        DYNAMIC_MEM(OPTR))
+      CALL GEN_CLIPF(%VAL(CNF_PVAL(OPTR)),NELM,LOW,HIGH,NLOW,NHIGH,
+     :                                        %VAL(CNF_PVAL(OPTR)))
 C
       MESSAGE='Number of points set to low  threshold ('
       INVOKE=ICH_ENCODE(MESSAGE,LOW,41,3,NEXT)
       MESSAGE(NEXT:)=') = '
-      INVOKE=ICH_ENCODE(MESSAGE,FLOAT(NLOW),NEXT+4,0,NEXT)
+      INVOKE=ICH_ENCODE(MESSAGE,REAL(NLOW),NEXT+4,0,NEXT)
       CALL PAR_WRUSER(MESSAGE(:NEXT-1),IGNORE)
       MESSAGE='Number of points set to high threshold ('
       INVOKE=ICH_ENCODE(MESSAGE,HIGH,41,3,NEXT)
       MESSAGE(NEXT:)=') = '
-      INVOKE=ICH_ENCODE(MESSAGE,FLOAT(NHIGH),NEXT+4,0,NEXT)
+      INVOKE=ICH_ENCODE(MESSAGE,REAL(NHIGH),NEXT+4,0,NEXT)
       CALL PAR_WRUSER(MESSAGE(:NEXT-1),IGNORE)
 C
 C     Tidy up

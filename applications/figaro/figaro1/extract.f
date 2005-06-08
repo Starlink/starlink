@@ -35,16 +35,19 @@ C     8th  Jul 1988  Rewritten to use DSA routines.  KS / AAO.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     19th Mar 1997  JJL / Southampton, Starlink. Error propagation included. 
 C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised EXIST to .FALSE.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+CC
 C     Functions
 C
-      INTEGER DYN_ELEMENT, ICH_LEN
+      INTEGER ICH_LEN
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
       INTEGER   DIMS(2)            ! Image dimensions
       INTEGER   IPTR               ! Dynamic memory element for image data
       INTEGER   IVPTR              ! Dynamic memory element for image variance
@@ -66,10 +69,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -115,35 +114,31 @@ C
 C
 C     Map the input and output data
 C
-      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','WRITE','FLOAT',SPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500     ! Error exit
 C
 C     Map the variance array if needed
 C
       IF (EXIST) THEN
-          CALL DSA_MAP_VARIANCE ('IMAGE','READ','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE ('IMAGE','READ','FLOAT',IVPTR,
      :                            SLOT,STATUS)
-          IVPTR=DYN_ELEMENT(ADDRESS)
-          CALL DSA_MAP_VARIANCE ('SPECT','WRITE','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE ('SPECT','WRITE','FLOAT',SVPTR,
      :                            SLOT, STATUS)
-          SVPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
 C
 C     Perform the extraction of the data
 C
-      CALL FIG_XTRACT(DYNAMIC_MEM(IPTR),NX,NY,IYST,IYEN,
-     :                                              DYNAMIC_MEM(SPTR))
+      CALL FIG_XTRACT(%VAL(CNF_PVAL(IPTR)),NX,NY,IYST,IYEN,
+     :                %VAL(CNF_PVAL(SPTR)))
 
 C
 C     Perform the extraction of the variances if required
 C
       IF (EXIST) THEN
-      CALL FIG_XTRACT(DYNAMIC_MEM(IVPTR),NX,NY,IYST,IYEN,
-     :                                              DYNAMIC_MEM(SVPTR))
-      ENDIF
+      CALL FIG_XTRACT(%VAL(CNF_PVAL(IVPTR)),NX,NY,IYST,IYEN,
+     :                %VAL(CNF_PVAL(SVPTR)))
+      END IF
 C
 C     Close down everything
 C

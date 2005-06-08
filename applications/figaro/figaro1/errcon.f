@@ -28,16 +28,15 @@ C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     5th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       LOGICAL      ERREXIST     ! TRUE if error array exists
       INTEGER      IGNORE       ! Used to pass ignorable staus code
@@ -48,10 +47,6 @@ C
       INTEGER      OEPTR        ! Dynamic-memory pointer to output error array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -84,20 +79,17 @@ C
 C
 C     Map data and errors
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,OESLOT,
-     :                                                     STATUS)
-      OEPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
+      CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',OEPTR,OESLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Check on the error data array
 C
-      CALL FIG_ECHECK(DYNAMIC_MEM(OEPTR),NELM)
+      CALL FIG_ECHECK(%VAL(CNF_PVAL(OEPTR)),NELM)
 C
 C     Now perform the conversion
 C
-      CALL FIG_ECON(DYNAMIC_MEM(OPTR),NELM,DYNAMIC_MEM(OEPTR))
+      CALL FIG_ECON(%VAL(CNF_PVAL(OPTR)),NELM,%VAL(CNF_PVAL(OEPTR)))
 C
 C     Tidy up
 C

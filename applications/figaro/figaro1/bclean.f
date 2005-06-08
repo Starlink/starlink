@@ -102,13 +102,17 @@ C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised VEXIST to .FALSE.
 C     30th Oct 1998  ACD / Starlink, Edinburgh.  Increased the values
 C                    of MAXBROWS and MAXRAYS (necessitated by the
 C                    increasing size of CCDs).
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to mapped
+C                    data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       LOGICAL PAR_GIVEN
-      INTEGER ICH_ENCODE,DYN_ELEMENT
+      INTEGER ICH_ENCODE
 C
 C     Maximum number of cosmic rays and bad rows
 C
@@ -117,7 +121,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       LOGICAL      AUTODEF      ! See above
       LOGICAL      AUTOROW      ! See above
       INTEGER      BADROWS(MAXBROWS) !
@@ -164,10 +167,6 @@ C
       INTEGER      WPTR         ! Dynamic-memory pointer to workspace
       INTEGER      WSLOT        ! Map slot number of workspace
       INTEGER      DIRECTION    ! direction for CR interpolation 
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -226,8 +225,7 @@ C
 C
 C        An automatic search will need workspace
 C
-         CALL DSA_GET_WORK_ARRAY(NY*NPASS,'FLOAT',ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY(NY*NPASS,'FLOAT',WPTR,WSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
       ELSE
 C
@@ -269,8 +267,7 @@ C
 C
 C     Map the image data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Do a test for a variance array. VEXIST = .TRUE. if there is.
@@ -278,16 +275,15 @@ C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE('OUTPUT',VEXIST,STATUS)      
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
+         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VPTR,
      :                          VSLOT,STATUS)
-         VPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get the range of data in the image, in order to determine a
 C     suitable bad pixel flag value.
 C
-      CALL GEN_RANGEF(DYNAMIC_MEM(OPTR),1,NELM,VMAX,VMIN)
+      CALL GEN_RANGEF(%VAL(CNF_PVAL(OPTR)),1,NELM,VMAX,VMIN)
       FLAG=VMIN-1000.0
 C
 C     If necessary, perform the bad row search.
@@ -295,8 +291,8 @@ C
       CALL PAR_WRUSER(' ',IGNORE)
       IF (AUTOROW) THEN
          CALL PAR_WRUSER('Performing automatic bad row search',IGNORE)
-         CALL FIG_ABROWS(DYNAMIC_MEM(OPTR),NX,NY,BRFACT,NPASS,MAXBROWS,
-     :                                  DYNAMIC_MEM(WPTR),NBROWS,BROWS)
+         CALL FIG_ABROWS(%VAL(CNF_PVAL(OPTR)),NX,NY,BRFACT,NPASS,
+     :                   MAXBROWS,%VAL(CNF_PVAL(WPTR)),NBROWS,BROWS)
          IF (NBROWS.LE.0) THEN
             CALL PAR_WRUSER('No bad rows found',IGNORE)
          ELSE
@@ -322,16 +318,16 @@ C     Now zap the bad rows
 C
       NBADROW=0
       IF (NBROWS.GT.0) THEN
-         CALL FIG_ZAPROW(DYNAMIC_MEM(OPTR),VEXIST,DYNAMIC_MEM(VPTR),
-     :                   NX,NY,1,NX,1,NY,NBROWS,BROWS,FLAG,MAXBROWS,
-     :                   NBADROW,BADROWS,STATUS)
+         CALL FIG_ZAPROW(%VAL(CNF_PVAL(OPTR)),VEXIST,
+     :                   %VAL(CNF_PVAL(VPTR)),NX,NY,1,NX,1,NY,NBROWS,
+     :                   BROWS,FLAG,MAXBROWS,NBADROW,BADROWS,STATUS)
       END IF
 C
 C     Then find and zap the cosmic rays
 C
       CALL PAR_WRUSER('Searching for cosmic rays',IGNORE)
       NRAYS=0
-      CALL FIG_ZAPRAYS(DYNAMIC_MEM(OPTR),VEXIST,DYNAMIC_MEM(VPTR),
+      CALL FIG_ZAPRAYS(%VAL(CNF_PVAL(OPTR)),VEXIST,%VAL(CNF_PVAL(VPTR)),
      :                 NX,NY,1,NX,1,NY,MAXRAYS,CRSIG,CRFACT,CRMINV,
      :                 SHARPNESS,CRSHARPNESS,TEXTFILE,IMAGENAME,
      :                 FLAG,RAYS,NRAYS,STATUS)
@@ -377,13 +373,13 @@ C     Are we supposed to fix the data?
 C
       IF (FIX) THEN
          IF (NBROWS.GT.0) THEN
-            CALL FIG_FIXROWS(DYNAMIC_MEM(OPTR),NX,NY,1,NX,1,NY,NBROWS,
-     :                                              BROWS,NCOEFF,FLAG)
+            CALL FIG_FIXROWS(%VAL(CNF_PVAL(OPTR)),NX,NY,1,NX,1,NY,
+     :                       NBROWS,BROWS,NCOEFF,FLAG)
             CALL PAR_WRUSER('Bad rows fixed',STATUS)
          END IF
          DO I=1,NRAYS
-            CALL FIG_FIXAREA1(DYNAMIC_MEM(OPTR),NX,NY,RAYS(1,I),NCOEFF,
-     :                                                 FLAG,DIRECTION)
+            CALL FIG_FIXAREA1(%VAL(CNF_PVAL(OPTR)),NX,NY,RAYS(1,I),
+     :                        NCOEFF,FLAG,DIRECTION)
          END DO
          CALL PAR_WRUSER('Cosmic rays fixed',IGNORE)
       END IF
@@ -394,7 +390,7 @@ C
 C
 C     Set the bad row numbers
 C
-      CALL PAR_SDVAL('NBROWS',FLOAT(NBROWS),STATUS)
+      CALL PAR_SDVAL('NBROWS',REAL(NBROWS),STATUS)
       IF (NBROWS.GT.0) THEN
          DO I=1,NBROWS
             ROWS(I)=BROWS(I)
