@@ -1,11 +1,68 @@
-\documentclass[11pt]{article}
+\documentclass[twoside,11pt]{article}
 
-\usepackage{graphicx}
-\usepackage{html}
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
 
+\pagestyle{myheadings}
 
-%  Set lengths for nicer output.
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {249.2}
+\newcommand{\stardocauthors}   {Mark Taylor}
+\newcommand{\stardocdate}      {8 June 2005}
+\newcommand{\stardoctitle}     {INT-WFC - Astrometric Calibration for the INT Wide Field Camera}
+\newcommand{\stardocversion}   {}
+\newcommand{\stardocmanual}    {User Note}
+\newcommand{\stardocabstract}  {
+Images observed using the Wide Field Camera instrument
+on the Isaac Newton Telescope contain nonlinear optical distortions.
+This note gives a quantitative description of these distortions.
+It also explains how they can be corrected for easily using 
+the \xref{CCDPACK}{sun139}{} package.
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -15,25 +72,258 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
-%  New private macros.
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
-\newenvironment{squote}{\begin{quote}\small}{\end{quote}}
-\newcommand{\xref}[3]{\htmladdnormallink{#1}{http://www.starlink.rl.ac.uk/cgi-bin/htxserver/#2.htx/?xref_#3}}
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+% Size of \tt text - looks better smaller in LaTeX but not HTML.
+\newcommand{\ttsize}{\latexhtml{\small}{}}
+
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\ttsize}{\end{quote}}
+
+% Figure environment. Defined for latex2html. #1 is postscript file
+% #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
+\newcommand{\myfig} [5] {
+  \begin{figure}
+    \centering\includegraphics[#2]{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \caption{\label{#4}#5}
+  \end{figure}
+  }
+\begin{htmlonly}
+  \newcommand{\myfig}[5]{
+    \htmladdimg{#3}\\
+    Figure: \label{#4} #5
+    }
+\end{htmlonly}
 
 
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
+\thispagestyle{empty}
 
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
 
 \section{Astrometric calibration for INT Wide Field Camera images}
 
 The Wide Field Camera instrument on the Isaac Newton Telescope 
 contains four CCD chips of 2048 $\times$ 4096 pixels 
-positioned roughly, but not exactly, as follows:
-\begin{quote}
-\begin{center}
-\latexhtml{\includegraphics{ideal.eps}}{\htmladdimg{ideal.gif}}
-\end{center}
-\end{quote}
+positioned roughly, but not exactly, as shown in 
+figure~\ref{fig:ideal}.
+
+\myfig{ideal.eps}{}{ideal.gif}{fig:ideal}{Idealised arrangement of WFC CCDs}
+
 In order to do accurate astrometry with data obtained
 from this instrument, it is necessary to correct for the 
 exact orientation and position of each CCD in relation to
@@ -117,16 +407,13 @@ quoted in the ING observer handbook.
 These values of the coefficients are thought to be correct to an
 accuracy of 1 or 2 pixels, which is around half an arcsecond.
 
-The following image gives an exaggerated representation of the 
+Figure~\ref{fig:exag} gives an exaggerated representation of the 
 shapes and positions of the CCDs as mapped on to the new coordinate system.
-The dots in the corners of the CCDs mark the pixel origin for each CCD
-and the ``$\times$'' marks the origin of the unified coordinate system.
-\begin{quote}
-\begin{center}
-\latexhtml{\includegraphics{exag4.eps}}{\htmladdimg{exag4.gif}}
-\end{center}
-\end{quote}
 
+\myfig{exag4.eps}{}{exag4.gif}{fig:exag}{Exagerrated view of the 
+actual arrangement of the CCDs.  The dots in the corners mark the
+pixel origin for each CCD and the ``$\times$'' marks the origin of
+the unified coordinate system.}
 
 \latexhtml{\newpage}{\htmlrule}
 \section{Attaching modified coordinates using CCDPACK}
@@ -142,7 +429,7 @@ This file is distributed in the CCDPACK package
 To use this facility,
 it is best if the files are first converted to Starlink \xref{NDF}{sun33}{} 
 format using the \xref{CONVERT}{sun55}{} package as follows:
-\begin{squote}
+\begin{myquote}
 \begin{verbatim}
 % convert
 
@@ -155,7 +442,7 @@ format using the \xref{CONVERT}{sun55}{} package as follows:
  
 % fits2ndf in='r10628?.fits' out='*' container=true
 \end{verbatim}
-\end{squote}
+\end{myquote}
 which will convert the FITS file {\tt r106280.fits} 
 into the NDF {\tt r106280.sdf} and so on.
 The Starlink software will in fact work with FITS files,
@@ -165,7 +452,7 @@ this can be rather slow with files the size of WFC frames.
 
 Once the file is in Starlink NDF format,
 from the Unix C shell do the following:
-\begin{squote}
+\begin{myquote}
 \begin{verbatim}
 % ccdpack 
 
@@ -208,7 +495,7 @@ from the Unix C shell do the following:
     Rotating additional 180 degrees
     New frame in domain "INT-WFC" added
 \end{verbatim}
-\end{squote}
+\end{myquote}
 This command sets the Current coordinate frame of the specified 
 NDF files to the new coordinate system $(x',y')$ described above.
 As well as applying the linear and nonlinear geometry terms whose
@@ -230,8 +517,9 @@ then most Starlink applications will make use of this as appropriate.
 If you display any of the images using 
 \xref{KAPPA}{sun95}{}'s
 \xref{DISPLAY}{sun95}{DISPLAY}
-application, the axes will show the coordinates in the new frame:
-\begin{squote}
+application, the axes will show the coordinates in the new frame
+as in figure~\ref{fig:display}:
+\begin{myquote}
 \begin{verbatim}
 % kappa
  
@@ -242,44 +530,23 @@ application, the axes will show the coordinates in the new frame:
 
 % display r106282 style='"grid=1,gap=500"'
 \end{verbatim}
-\end{squote}
-will give the following display:
-\begin{quote}
-\begin{center}
-\latexhtml{\includegraphics{r106282-s8-display.eps}}{\htmladdimg{r106282-display.gif}}
-\end{center}
-\end{quote}
+\end{myquote}
+
+\myfig{r106282-s8-display.eps}{}{r106282-display.gif}{fig:display}{Display
+of a single CCD image with coordinates grafted onto it using {\tt ASTIMP}.
 Close inspection will show that the grid is not quite parallel to the 
 sides of the image, or straight, 
-because of the slight rotation from the vertical and nonlinear distortion.
+because of the slight rotation from the vertical and nonlinear distortion.}
 
 If some of the frames overlap, the corresponding X and Y 
 offsets can then easily be determined 
 using CCDPACK's object matching registration facilities.
 
 
-\section*{Acknowledgements}
+\section{Acknowledgements}
 
 This calibration was done on Starlink time with assistance from 
 Peter Draper and David Gilbank in Durham.
 
-\begin{htmlonly}
-\htmlrule
-This document is also available as a
-\htmladdnormallink{postscript file}{../calibrate.ps}.
-\end{htmlonly}
-
-
-\latexhtml{\vspace{\fill}}{\htmlrule}
-
-\begin{flushright}
-\it
-Mark Taylor \\
-\htmladdnormallink{Starlink}{http://star-www.rl.ac.uk/} \\
-24 March 2000
-\end{flushright}
-
-
+% ? End of main text
 \end{document}
-
-% $Id$
