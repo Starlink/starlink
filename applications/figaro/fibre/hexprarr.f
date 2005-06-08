@@ -75,7 +75,7 @@
       real data(wavdim,spdim1,spdim2),xadj(spdim2),xa(spdim1)
       real xmin,xmax,ymin,ymax,xdisp,ydisp,size
       real tsize,xr(2),yr(2),ya(spdim2),x,y,datmin,datmax
-      logical limit,ifsoft,full
+      logical limit,ifsoft,full,isnew
       real xws,xwe,yws,ywe,xvs,xve,yvs,yve,xps,xpe,yps,ype,xvend
       integer wavst,nwav,rx2chn,off_d_xptr
       real gen_elemf
@@ -126,9 +126,9 @@
       call pgwnad(xmin,xmax,ymin,ymax)
       wavst = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
      :               gen_elemf(%VAL(CNF_PVAL(d_tlptr)),line))
-      off_d_xptr = d_xptr + (wavst - 1) * VAL__NBR
+      call dyn_incad(d_xptr,'float',wavst-1,off_d_xptr,isnew,status)
       nwav = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
-     :              gen_elemf(%VAL(d_trptr),line)) - wavst + 1
+     :              gen_elemf(%VAL(CNF_PVAL(d_trptr)),line)) - wavst + 1
       do j=1,spdim2
         y = ya(j)
         do i=1,spdim1
@@ -163,4 +163,7 @@
       call pgvport(0.0,1.0,0.0,1.0)
       call pgwnad(xmin,xmax,ymin,ymax)
       call gr_spen(1)
+
+* Free CNF resource.
+      if ( isnew ) call cnf_unregp(off_d_xptr)
       end

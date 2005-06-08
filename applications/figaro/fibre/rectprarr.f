@@ -77,7 +77,7 @@
       real xdisp,ydisp,xmin,xmax,ymin,ymax,xr(2),yr(2)
       real total(spdim1,spdim2),datmin,datmax,xps,xpe,yps,ype
       real xws,xwe,yws,ywe,xvs,xve,yvs,yve,xvend
-      logical limit,ifsoft,full
+      logical limit,ifsoft,full,isnew
       integer xst,yst,xen,yen,rx2chn,status,off_d_xptr
       integer wavst,nwav
       real gen_elemf
@@ -133,7 +133,7 @@
       call pgqvp(0,xvs,xve,yvs,yve)
       wavst = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
      :               gen_elemf(%VAL(CNF_PVAL(d_tlptr)),line))
-      off_d_xptr = d_xptr + (wavst - 1) * VAL__NBR
+      call dyn_incad(d_xptr,'float',wavst-1,off_d_xptr,isnew,status)
       nwav = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,
      :              gen_elemf(%VAL(CNF_PVAL(d_trptr)),line)) - wavst + 1
       do j=yst,yen
@@ -160,4 +160,7 @@
       call pgvport(xvs,xve,yvs,yve)
       call pgwindow(xws,xwe,yws,ywe)
       call gr_spen(1)
+
+* Free CNF resource.
+      if ( isnew ) call cnf_unregp(off_d_xptr)
       end
