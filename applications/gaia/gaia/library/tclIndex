@@ -47,7 +47,6 @@ set auto_index(::gaia::GaiaAstTransfer) [list source [file join $dir GaiaAstTran
 set auto_index(::gaia::GaiaAstTransferTable) [list source [file join $dir GaiaAstTransferTable.tcl]]
 set auto_index(::gaia::GaiaAstTransform) [list source [file join $dir GaiaAstTransform.tcl]]
 set auto_index(::gaia::GaiaAutoAstrom) [list source [file join $dir GaiaAutoAstrom.tcl]]
-set auto_index(::gaia::GaiaAutoAstromSimple) [list source [file join $dir GaiaAutoAstromFull.tcl]]
 set auto_index(::gaia::GaiaBlink) [list source [file join $dir GaiaBlink.tcl]]
 set auto_index(::gaia::GaiaContour) [list source [file join $dir GaiaContour.tcl]]
 set auto_index(::gaia::GaiaConvertTable) [list source [file join $dir GaiaConvertTable.tcl]]
