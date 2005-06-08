@@ -139,12 +139,12 @@ C     CNF_PVAL     : Full pointer to dynamically allocated memory
      :          ,prvfit,usepeak,bimtst,tyaic,curmcmp,prvpos,mgauss
      :          ,line_count,errpre,inherit,status)
 
-*    Note that spdim1 maps to nYp in fit_line, and spdim2 to nXp! This is
-*    due to "reverse" order of dimensions in fit_line etc.
+*    Note that spdim1 maps to nYp in fit_line, and spdim2 to nXp! This
+*    is due to "reverse" order of dimensions in fit_line etc.
 
           call fit_line(g_parms,g_error,%VAL(CNF_PVAL(d_xptr)),
-     :         %VAL(CNF_PVAL(d_vsptr)),1,wavdim,deccntr,1,1,1,odensc,
-     :         mstore,iy,0,aic,status)
+     :                  %VAL(CNF_PVAL(d_vsptr)),1,wavdim,deccntr,
+     :                  1,1,1,odensc,mstore,iy,0,aic,status)
           call opt_release(status)
           if(status.ne.SAI__OK) return
           plot = par_quest('Replot data',.false.)
@@ -154,7 +154,7 @@ C     CNF_PVAL     : Full pointer to dynamically allocated memory
             do i = 1, spdim1
               if(ref(i,j).eq.1) then
                 call check_masking(1,i,i,j,j,masked,
-     :                    %VAL(CNF_PVAL(d_mptr)))
+     :                             %VAL(CNF_PVAL(d_mptr)))
                 call fibchkfit(%VAL(CNF_PVAL(staptr)),deccntr,i,j,fit)
               end if
             end do
@@ -172,9 +172,9 @@ C     CNF_PVAL     : Full pointer to dynamically allocated memory
 *         if(par_quest('Store fit results',(fit.and.(.not.masked))))
 *    :             then
             call fibstres(g_parms,g_error,nparms,ref,
-     :        %VAL(CNF_PVAL(d_rptr)),ix,iy,deccntr,npts,
-     :        %VAL(CNF_PVAL(d_mptr)),nfailed,nnew,aic,
-     :        %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)))
+     :                    %VAL(CNF_PVAL(d_rptr)),ix,iy,deccntr,npts,
+     :                    %VAL(CNF_PVAL(d_mptr)),nfailed,nnew,aic,
+     :                    %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)))
             stored = .true.
           end if
         else if(key.eq.2) then

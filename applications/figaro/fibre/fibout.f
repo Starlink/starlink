@@ -140,8 +140,8 @@ C     CNF_PVAL       : Full pointer to dynamically allocated memory
 
       if(cur_flav(FL_HARD)) then
         showvel = par_quest('Use velocity scale',.true.)
-        call plot_all_fits(%VAL(CNF_PVAL(d_rptr)),
-     :       nagerr,vcorr,vtype,showvel,%VAL(CNF_PVAL(staptr)))
+        call plot_all_fits(%VAL(CNF_PVAL(d_rptr)),nagerr,vcorr,
+     :                     vtype,showvel,%VAL(CNF_PVAL(staptr)))
 c        call fibpltwhcube(%VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_rptr)),
 c     :       %VAL(CNF_PVAL(d_sptr)),%VAL(CNF_PVAL(xptr)),
 C     :       %VAL(CNF_PVAL(yptr)),%VAL(CNF_PVAL(xdptr)),vcorr,vtype)
