@@ -12,8 +12,8 @@
 * Description:
 *   As with VIG, lines can be excluded from the polynomial
 *   fitting. FITCONT stores the polynomial fitting coefficients in
-*   the actual data file, for use by LONGSLIT (the program is specfically
-*   for use with LONGSLIT, and of no use otherwise).
+*   the actual data file, for use by LONGSLIT (the program is
+*   specifically for use with LONGSLIT, and of no use otherwise).
 
 * Parameters:
 *   IMAGE = FILE (Read)
@@ -27,9 +27,8 @@
 *   CONTRL_CPOLY2        : Fit polynomials to points, finding order if
 *                          required
 *   COPR2D               : Copy real to double precision
-*   FITCONT_ST           : Create .fitcont structure
-*   DSA_FREE_WORKSPACE   : Free workspace
-*   DSA_GET_WORK_ARRAY   : Get workspace
+*   FITCONT_ST           : Create .fitcont structure by a number of
+*                          elements
 *   GR_SOFT              : Open softcopy device
 *   PGPAGE               : Clear graphics screen
 *   PLOT_DATA            : Plot data
@@ -39,10 +38,13 @@
 *   CNV_FMTCNV           : Format conversion routine
 *   DSA_CLOSE            : Close DSA
 *   DSA_DATA_SIZE        : Get data size
+*   DSA_FREE_WORKSPACE   : Free workspace
+*   DSA_GET_WORK_ARRAY   : Get workspace
 *   DSA_INPUT            : Open input file
 *   DSA_MAP_AXIS_DATA    : Map axis data
 *   DSA_MAP_DATA         : Map data
 *   DSA_OPEN             : Open DSA
+*   DYN_INCAD            : Address offset
 *   PAR_RDVAL            : Read value from user
 *   PAR_WRUSER           : Write string to user
 
@@ -109,6 +111,7 @@
 
       integer sptr,wptr,xptr,slot,slota,slotb,slotc
       integer jptr,iptr,i,ptr1,ptr2,ptr3
+      logical isnew
 
 * trams pointers
 
@@ -190,10 +193,11 @@
 
         call par_rdval('xsect',1.0,real(ni),real(halfni),' ',value)
         xsect = nint(value)
-        start = iptr + (xsect-1)*nl*val__nbr
+        call dyn_incad(iptr,'FLOAT',(xsect-1)*nl,start,isnew,status)
         status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(start)),
      :                      %VAL(CNF_PVAL(sptr)),nl,nbad)
         call weight_fit(0.0,nl,%VAL(CNF_PVAL(wptr)),.false.)
+        if ( isnew ) call cnf_unregp(start)
 *
 * open graphics
 *
@@ -284,10 +288,11 @@
 *
 *   Find data.
 *
-          start = iptr + (i-1)*nl*4
+          call dyn_incad(iptr,'FLOAT',(i-1)*nl,start,isnew,status)
           status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(start)),
      :                        %VAL(CNF_PVAL(sptr)),nl,nbad)
           call weight_fit(0.0,nl,%VAL(CNF_PVAL(wptr)),.false.)
+          if ( isnew ) call cnf_unregp(start)
 *
 *   Fit continuum.
 *

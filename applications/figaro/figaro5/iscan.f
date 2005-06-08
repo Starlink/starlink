@@ -49,6 +49,7 @@
 *    DSA_MAP_AXIS_DATA : Map axis array
 *    DSA_MAP_DATA      : Map data array
 *    DSA_OPEN          : Open DSA
+*    DYN_INCAD         : Address offset
 *    FIG_XTRACT        : Take slice thru' data in X direction
 *    ICH_TIDY = INTEGER (Read)
 *        Remove control characters from string
@@ -75,15 +76,15 @@
       integer status
       integer nl,ni
       character*64 label
-      integer xptr
+      integer xptr,oxptr,wptr,owptr
       integer dims(2),ndim,nelm
       character*64 xinfo(2)
       integer iptr,ivalue1
       real value2,dummy1,dummy2
       integer ye,ys,yend,ystart,dy,block,nblocks
-      integer wptr,slot,slot2
+      integer slot,slot2
       integer ich_tidy,lenx1,lenx2
-      logical loop
+      logical loop,isnew,isneww
       logical par_quest,scan,hard,par_batch,batch
       character*80 chars
       integer ixstart,npts
@@ -133,14 +134,14 @@
         call par_rdkey('hardcopy',.false.,hard)
       end if
       call dsa_axis_range('image',1,' ',.false.,dummy1,dummy2,ixstart,
-     :     ivalue1,status)
+     :                    ivalue1,status)
       npts = ivalue1 - ixstart + 1
       if (scan) then
-        call dsa_axis_range('image',2,' ',.false.,dummy1,dummy2,ys,ye
-     :     ,status)
+        call dsa_axis_range('image',2,' ',.false.,dummy1,dummy2,ys,ye,
+     :                      status)
         if(status.ne.SAI__OK) goto 500
-        call par_rdval('yblock',1.0,real(ni),max(1.0,real(ni/10))
-     :     ,'x-sects',value2)
+        call par_rdval('yblock',1.0,real(ni),max(1.0,real(ni/10)),
+     :                 'x-sects',value2)
         dy=nint(value2)
         nblocks=(ye-ys+1)/dy
         do block=1,nblocks
@@ -159,10 +160,14 @@
           if(status.ne.SAI__OK) then
             goto 500
           end if
-          call plot_spect(npts,%VAL(CNF_PVAL(xptr+(ixstart-1)*4)),
-     :                    %VAL(CNF_PVAL(wptr+(ixstart-1)*4)),
-     :                    chars(:len1),
+          call dyn_incad(xptr,'FLOAT',ixstart-1,oxptr,isnew,status)
+          call dyn_incad(wptr,'FLOAT',ixstart-1,owptr,isneww,status)
+          call plot_spect(npts,%VAL(CNF_PVAL(oxptr)),
+     :                    %VAL(CNF_PVAL(owptr)),chars(:len1),
      :                    xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
+          if ( isnew ) call cnf_unregp(oxptr)
+          if ( isneww ) call cnf_unregp(owptr)
+     
           call sla_wait(0.3)
         end do
       else
@@ -180,10 +185,14 @@
           call chr_putc('(',chars,len1)
           call encode_range(' ',' ',ys,ye,chars,len1)
           call chr_putc(')',chars,len1)
-          call plot_spect(npts,%VAL(CNF_PVAL(xptr+(ixstart-1)*4)),
-     :                    %VAL(CNF_PVAL(wptr+(ixstart-1)*4)),
-     :                    chars(:len1),
+
+          call dyn_incad(xptr,'FLOAT',ixstart-1,oxptr,isnew,status)
+          call dyn_incad(wptr,'FLOAT',ixstart-1,owptr,isneww,status)
+          call plot_spect(npts,%VAL(CNF_PVAL(oxptr)),
+     :                    %VAL(CNF_PVAL(owptr)),chars(:len1),
      :                    xinfo(2)(:lenx2)//' '//xinfo(1)(:lenx1),' ')
+          if ( isnew ) call cnf_unregp(oxptr)
+          if ( isneww ) call cnf_unregp(owptr)
           if(batch) then
             loop = .false.
           else

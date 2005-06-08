@@ -66,7 +66,7 @@
       integer nxp,nyp,tstart,flev,nlevs
       integer nfound,yest,yeen,slot
       real centre(200),widths(200)
-      logical plog,old
+      logical plog,old,isnew
       real low,high,dummy1,dummy2
       integer iwork,lu
       character chars*64,ffile*72
@@ -108,7 +108,7 @@
       if(old) then
         call par_rdchar('file','fibres.lis',ffile)
         call dsa_open_text_file(ffile,' ','old',.false.,lu,chars,
-     :     status)
+     :                          status)
         read(lu,'(i5)')nfound
         do i = 1, nfound
           read(lu,'(e12.5)')centre(i)
@@ -120,9 +120,9 @@
 *     Get parameters for display
 *
         call dsa_axis_range('image',1,' ',.false.,dummy1,dummy2,ichst,
-     :     ichen,status)
+     :                      ichen,status)
         call dsa_axis_range('image',2,' ',.false.,dummy1,dummy2,ixst,
-     :     ixen,status)
+     :                      ixen,status)
         call par_rdval('LOW',VAL__MINR,VAL__MAXR,0.,' ',low)
         call par_rdval('HIGH',VAL__MINR,VAL__MAXR,1000.,' ',high)
         nxp = ichen-ichst+1
@@ -143,13 +143,16 @@
 
 * Perform greyscale plotting in this
 
-        tstart = start + 4*(ixst-1)*nl
+        call dyn_incad(start,'FLOAT',(ixst-1)*nl,tstart,isnew,status)
         call dsa_get_work_array(nxp*nyp,'int',iwork,slot,status)
         if(status.ne.SAI__OK) goto 500
         call pgenv(real(ichst),real(ichen),real(ixst),real(ixen),0,-2)
         call gryplt(%VAL(CNF_PVAL(tstart)),%VAL(CNF_PVAL(iwork)),nl,
-     :        nyp,nxp,ichst,nlevs,low,high,.false.,plog,4)
+     :              nyp,nxp,ichst,nlevs,low,high,.false.,plog,4)
+
+* Free resources.
         call dsa_free_workspace(slot,status)
+        if ( isnew ) call cnf_unregp(tstart)
 
 * Get user to indicate end points with a cursor, and locate the fibre
 * spectra from these.
@@ -182,20 +185,25 @@
 * Copy data to output file
 
       yest = nint(centre(1) - widths(1)*2.0)
-      yeen = nint((centre(1) + widths(1)*1.5 + centre(2)
-     :    - widths(2)*1.5)*0.5)
+      yeen = nint((centre(1) + widths(1)*1.5 + centre(2) -
+     :       widths(2)*1.5)*0.5)
       call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
-     :       %VAL(CNF_PVAL(zptr)))
+     :                %VAL(CNF_PVAL(zptr)))
       do i = 2, nfound-1
         yest = yeen
         yeen = nint((centre(i) + widths(i)*1.5 + centre(i+1) -
      :         widths(i+1)*1.5)*0.5)
+        call dyn_incad(zptr,'FLOAT',(i-1)*nl,tstart,isnew,status)
         call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
-     :                  %VAL(CNF_PVAL((i-1)*4*nl+zptr)))
+     :                  %VAL(CNF_PVAL(tstart)))
+        if ( isnew ) call cnf_unregp(tstart)
       end do
+      
       yeen = nint(centre(nfound) + widths(nfound)*2.0)
+      call dyn_incad(zptr,'FLOAT',(nfound-1)*nl,tstart,isnew,status)
       call fig_xtract(%VAL(CNF_PVAL(start)),nl,ni,yest,yeen,
-     :                %VAL(CNF_PVAL(zptr+(nfound-1)*4*nl)))
+     :                %VAL(CNF_PVAL(tstart)))
+      if ( isnew ) call cnf_unregp(tstart)
 *
 *     Tidy up
 *
