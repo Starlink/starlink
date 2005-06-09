@@ -81,7 +81,8 @@ C
       INTEGER DO_SLOT, DO_PTR, ODO_PTR
       INTEGER AO_SLOT, AO_PTR, OAO_PTR
       INTEGER VO_SLOT, VO_PTR, OVO_PTR
-      INTEGER W_SLOT, WK_PTR, VW_PTR
+      INTEGER W_SLOT, VW_PTR
+      INTEGER WK_SLOT, WK_PTR
       LOGICAL ISNEW, ISNEWV
       REAL XMIN, XMAX, X1MIN, X1MAX
       CHARACTER*80 SPECT, SPECT1, OUTPUT
@@ -276,7 +277,7 @@ C
      :                    %VAL(CNF_PVAL(A1_PTR)),
      :                    %VAL(CNF_PVAL(OAO_PTR)))
          END IF
-         IF ( ISNEW ) CALL CNF_UNREGP(OAO_PTR)
+         IF (ISNEW) CALL CNF_UNREGP(OAO_PTR)
       END IF
 C
 C     See if we are going to have to sort the data.  If we are, get
@@ -298,8 +299,10 @@ C
             END IF
             SORT=.TRUE.
             BYTES=(NX+NX1)*DSA_TYPESIZE('FLOAT',STATUS)*2
-            CALL DSA_GET_WORKSPACE (BYTES, VW_PTR, W_SLOT, STATUS)
-            WK_PTR=VW_PTR+(NX+NX1)*DSA_TYPESIZE('FLOAT',STATUS)
+            CALL DSA_GET_WORK_ARRAY (NX+NX1, 'FLOAT', VW_PTR, W_SLOT,
+     :                               STATUS)
+            CALL DSA_GET_WORK_ARRAY (NX+NX1, 'FLOAT', WK_PTR, WK_SLOT,
+     :                               STATUS)
             IF (STATUS .EQ. 0) THEN
                CALL GEN_QFISORT(%VAL(CNF_PVAL(AO_PTR)),NX+NX1,
      :                          %VAL(CNF_PVAL(VW_PTR)))
