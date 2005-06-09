@@ -137,11 +137,14 @@ C
       LOGICAL   ISNRE            ! Is address REPTR new to CNF?
       LOGICAL   ISNRZ            ! Is address RZPTR new to CNF?
       INTEGER   ISPECT           ! Loop index through spectra
-      LOGICAL   LOGW             ! True if input data is logarithmicly binned
+      LOGICAL   LOGW             ! Input data are logarithmically 
+                                 ! binned?
       LOGICAL   LOGWR            ! Value of LOG keyword
-      INTEGER   NBINR            ! Number of elements in scrunched spectra
+      INTEGER   NBINR            ! Number of elements in scrunched 
+                                 ! spectra
       INTEGER   NCH              ! Number of characters in string
-      INTEGER   NCHXU            ! Number of characters in X-units string
+      INTEGER   NCHXU            ! Number of characters in X-units
+                                 ! string
       INTEGER   NDIM             ! Number of data dimensions
       INTEGER   NELM             ! Number of main data array elements
       INTEGER   NEXT             ! Next character position in string
@@ -151,24 +154,38 @@ C
       INTEGER   NXELM            ! Number of X-axis data array elements
       INTEGER   NXSPECT          ! Number of 'spectra' in x-axis arrays
       INTEGER   OTPTR            ! Temporary dynamic mem pointer
-      INTEGER   REPTR            ! Dynamic mem pointer for rebinned error array
+      LOGICAL   PISNE            ! Previous CNF pointer to errors new?
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
+      LOGICAL   PISNRE           ! Previous CNF pointer to output errors
+                                 ! new?
+      LOGICAL   PISNRZ           ! Previous CNF pointer to output data
+                                 ! new?
+      LOGICAL   PISNW            ! Previous CNF pointer widths new?
+      LOGICAL   PISNX            ! Previous CNF pointer wavelengths new?
+      INTEGER   REPTR            ! Dynamic mem pointer for rebinned 
+                                 ! error array
       REAL      RESET            ! Used for default wavelength values
-      INTEGER   RXPTR            ! Dynamic mem pointer for output X-data array
-      INTEGER   RZPTR            ! Dynamic mem pointer for output data array
+      INTEGER   RXPTR            ! Dynamic mem pointer for output 
+                                 ! X-data array
+      INTEGER   RZPTR            ! Dynamic mem pointer for output data 
+                                 ! array
       LOGICAL   SINGLE           ! True if width info is a single value
-      INTEGER   SLOT             ! Slot number for mapped arrays - ignored
+      INTEGER   SLOT             ! Slot number for mapped arrays-ignored
       INTEGER   STATUS           ! General status variable
       CHARACTER STRING*72        ! General character variable
       INTEGER   TPTR             ! Temporary dynamic mem pointer
-      REAL      VALUE            ! General single precision real variable
+      REAL      VALUE            ! General single-precision real 
+                                 ! variable
       INTEGER   WPTR             ! Dynamic mem pointer for width array
       INTEGER   WKPTR            ! Dynamic mem pointer for work array
       REAL      WEND             ! Value of WEND parameter
       REAL      WSTART           ! Value of WSTART parameter
       REAL      WIDTH            ! Single width value
-      INTEGER   XPTR             ! Dynamic mem pointer for input X-data array
+      INTEGER   XPTR             ! Dynamic mem pointer for input X-data
+                                 ! array
       CHARACTER XUNITS*72        ! X-axis data units
-      INTEGER   ZPTR             ! Dynamic mem pointer for input data array
+      INTEGER   ZPTR             ! Dynamic mem pointer for input data
+                                 ! array
       CHARACTER ZUNITS*72        ! Data units
 C
 C     Parameters for DSA_OUTPUT
@@ -205,7 +222,7 @@ C
 C     Make sure the X array is in increasing order
 C
       TPTR=XPTR
-      ISNEW = .FALSE.
+      PISNEW = .FALSE.
       DO ISPECT=1,NXSPECT
          IF (.NOT.GEN_INCCHKD(%VAL(CNF_PVAL(TPTR)),NX)) THEN
             CALL PAR_WRUSER(
@@ -215,8 +232,9 @@ C
             GO TO 500
          END IF
          CALL DYN_INCAD(TPTR,'DOUBLE',NX,OTPTR,ISNEW,STATUS)
-         IF (ISPECT.GT.1.AND.ISNEW) CALL CNF_UNREGP(TPTR)
+         IF (PISNEW) CALL CNF_UNREGP(TPTR)
          TPTR = OTPTR
+         PISNEW = ISNEW
       END DO
       IF (ISNEW) CALL CNF_UNREGP(TPTR)
 C
@@ -439,6 +457,12 @@ C     Note that the call has to be different for the cases where we have
 C     a width array held in dynamic memory and where we have a single
 C     width value held in WIDTH.
 C
+      PISNEW = .FALSE.
+      PISNRZ = .FALSE.
+      PISNE = .FALSE.
+      PISNRE = .FALSE.
+      PISNX = .FALSE.
+      PISNW = .FALSE.
       DO ISPECT=1,NSPECT
          IF (SINGLE) THEN
             CALL FIG_FREBIN(%VAL(CNF_PVAL(ZPTR)),NX,NBINR,
@@ -458,26 +482,37 @@ C
 C       Increment the pointers for the next spectrum, tidying up
 C       unwanted CNF resources as they're no longer needed.
          CALL DYN_INCAD(ZPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
-         IF (ISPECT.GT.1.AND.ISNEW) CALL CNF_UNREGP(ZPTR)
+         IF (ISNEW) CALL CNF_UNREGP(ZPTR)
          ZPTR=TPTR
+         PISNEW = ISNEW
+
          CALL DYN_INCAD(RZPTR,'FLOAT',NBINR,TPTR,ISNRZ,STATUS)
-         IF (ISPECT.GT.1.AND.ISNRZ) CALL CNF_UNREGP(RZPTR)
+         IF (ISNRZ) CALL CNF_UNREGP(RZPTR)
          RZPTR=TPTR
+         PISNRZ = ISNRZ
+
          IF (ERRORS) THEN
             CALL DYN_INCAD(EPTR,'FLOAT',NX,TPTR,ISNEWE,STATUS)
-            IF (ISPECT.GT.1.AND.ISNEWE) CALL CNF_UNREGP(EPTR)
+            IF (ISNEWE) CALL CNF_UNREGP(EPTR)
             EPTR=TPTR
+            PISNE = ISNEWE
+
             CALL DYN_INCAD(REPTR,'FLOAT',NBINR,TPTR,ISNRE,STATUS)
-            IF (ISPECT.GT.1.AND.ISNRE) CALL CNF_UNREGP(REPTR)
+            IF (ISNRE) CALL CNF_UNREGP(REPTR)
             REPTR=TPTR
+            PISNRE = ISNRE
          END IF
+
          IF (NXSPECT.GT.1) THEN
             CALL DYN_INCAD(XPTR,'DOUBLE',NX,TPTR,ISNEWX,STATUS)
-            IF (ISPECT.GT.1.AND.ISNEWX) CALL CNF_UNREGP(XPTR)
+            IF (ISNEWX) CALL CNF_UNREGP(XPTR)
             XPTR=TPTR
+            PISNX = ISNEWX
+
             CALL DYN_INCAD(WPTR,'FLOAT',NX,TPTR,ISNEWW,STATUS)
-            IF (ISPECT.GT.1.AND.ISNEWW) CALL CNF_UNREGP(WPTR)
+            IF (ISNEWW) CALL CNF_UNREGP(WPTR)
             WPTR=TPTR
+            PISNW = ISNEWW
          END IF
       END DO
       IF (ISNEW) CALL CNF_UNREGP(ZPTR)
