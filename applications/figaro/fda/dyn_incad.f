@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DYN_INCAD( BASEAD, TYPE, INCR, ADDRS, ISNEW, STATUS )
+*     CALL DYN_INCAD( BASEAD, TYPE, INCR, ADDRES, ISNEW, STATUS )
 
 *  Description:
 *     This routine is a CNF pointer-based replacement for the
@@ -28,7 +28,7 @@
 *           CALL DSA_MAP_DATA('SPECT','READ','FLOAT',BASEAD,SLOT,STATUS)
 *
 *     *  Offset by 1000 floating point values into spectrum.
-*           OFFAD = DYN_INCAD(BASEAD,'FLOAT',1000,ISNEW)
+*           CALL DYN_INCAD(BASEAD,'FLOAT',1000,OFFAD,ISNEW,STATUS)
 *
 *           CALL MYSUB(%VAL(CNF_PVAL(OFFAD)))
 *
@@ -43,9 +43,9 @@
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The type of the dynamically allocated memory array.  This
 *        should be one of 'FLOAT ', 'INT', 'DOUBLE', 'SHORT', 'CHAR',
-*        'BYTE', or'USHORT'. Case is not significant.  If TYPE is none
-*        of these, STATUS is retrurned as SAI__ERROR, and the result
-*        will be set equal to OLD.
+*        'BYTE', 'LOGICAL' or 'USHORT'. Case is not significant.  If
+*        TYPE is none of these, STATUS is returned as SAI__ERROR, and
+*        the result will be set equal to BASEAD.
 *     INCR = INTEGER (Given)
 *        The number of elements of the dynamically allocated array by
 *        which the current element number is to be incremented.
@@ -64,7 +64,9 @@
 *     This routine is platform specific in so far as data types may have
 *     different lengths in bytes on different machines. It also accepts
 *     and returns pointers that may not be actual memory addresses and
-*     should be looked up using CNF_PVAL.
+*     should be looked up using CNF_PVAL. If INTEGER*8 is not supported
+*     then a replacement for this routine will be required (in which
+*     case a C implementation may be required).
 
 *  Authors:
 *     PWD: Peter W. Draper (STARLINK, Durham University)
@@ -78,6 +80,8 @@
 *        Renamed from FIG_INCR and turned into a subroutine given that
 *        it had a returned arguments.  Removed unused declarations, and
 *        correct a few typos.  Added STATUS argument.
+*     09-JUN-2005 (PWD):
+*        Few tidyups.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +111,7 @@
       
 *  Local Variables:
       INTEGER I                  ! Loop index
-      CHARACTER * ( 6 ) TYPEUC   ! Given type in upper case
+      CHARACTER * ( 7 ) TYPEUC   ! Given type in upper case
       INTEGER * 8 NEWAD          ! New address, full type.
       INTEGER * 8 OFFSET         ! Offset in bytes
 
@@ -133,12 +137,13 @@
       STATUS = SAI__ERROR
       CALL MSG_SETC( 'TYPE', TYPE )
       CALL ERR_REP( 'DYN_INC_BADTYPE',
-     :  'Probable programming error.  DYN_INCAD invoke with invalid '/
+     :  'Probable programming error.  DYN_INCAD invoked with invalid '/
      :  /'data type ^TYPE. ', STATUS ) 
+
+*   Arrive here when a valid type has been located.
  2    CONTINUE
 
-*  Register this address with CNF.  Should we recommend deregister and
-*  pass out isnew?
+*  Register this address with CNF.
       ADDRES = CNF_PREG( NEWAD, ISNEW )
 
       END
