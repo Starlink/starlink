@@ -8,9 +8,9 @@ C     a constant amount expressed in pixels.
 C
 C     The VARIANCE array, if present, is propagated in exactly the same
 C     way as the DATA array.  This procedure it not formally correct if
-C     re-sampling occurs (that is, if either of the shifts is non-integer)
-C     and in this case the resulting variance will probably under-estimate
-C     the true error.
+C     re-sampling occurs (that is, if either of the shifts is
+C     non-integer) and in this case the resulting variance will probably 
+C     under-estimate the true error.
 C
 C     Command parameters -
 C
@@ -50,78 +50,82 @@ C                                      KS / CIT 11th Sept 1983
 C
 C     Modified:
 C
-C     28th Jul 1987   DJA/AAO. Revised DSA_ routines - some specs changed.
-C                     Now uses DYN_ dynamic memory handling routines.
-C                     All WRUSERs changed to PAR_WRUSERs.
-C     27th Oct 1987   KS / AAO.  Corrected code to handle case of 1D
-C                     input data properly.
-C     29th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed, TABs
-C                     removed.
-C     26th Jul 1996.  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
-C     27th Sep 2001.  VGG / Starlink, RAL and ACD / Starlink, UoE.
-C                     Error propagation added.
+C     28th Jul 1987  DJA/AAO. Revised DSA_ routines - some specs
+C                    changed. Now uses DYN_ dynamic memory handling
+C                    routines. All WRUSERs changed to PAR_WRUSERs.
+C     27th Oct 1987  KS / AAO.  Corrected code to handle case of 1D
+C                    input data properly.
+C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
+C                    removed.
+C     26th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
+C     27th Sep 2001  VGG / Starlink, RAL and ACD / Starlink, UoE.
+C                    Error propagation added.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      INTEGER DSA_TYPESIZE
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Amount of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      REAL         EXTRA        !
-      INTEGER      IGNORE       ! Used to ignore status codes
-      INTEGER      MODE         !
-      INTEGER      NCXX         !
-      INTEGER      NCXY         !
-      INTEGER      NCYX         !
-      INTEGER      NCYY         !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NDX          !
-      INTEGER      NDY          !
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NPIX         ! Size of 1st dimension
-      INTEGER      NLINE        ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      PSLOT        ! Map slot number for workspace
-      INTEGER      PX           !
-      INTEGER      PY           !
-      LOGICAL      REALS        !
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALS(20,20)  !
-      REAL         VALUE        ! Temporary real number
-      INTEGER      WBYTES       !
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
+      INTEGER      BYTES         ! Amount of workspace required
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      REAL         EXTRA         !
+      CHARACTER    HIST(3)*50    ! History text.
+      INTEGER      IGNORE        ! Used to ignore status codes
+      INTEGER      MODE          !
+      INTEGER      NCXX          !
+      INTEGER      NCXY          !
+      INTEGER      NCYX          !
+      INTEGER      NCYY          !
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NDX           !
+      INTEGER      NDY           !
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NPIX          ! Size of 1st dimension
+      INTEGER      NLINE         ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      OVPTR         ! Dynamic-memory pointer to output 
+                                 ! variance 
+      INTEGER      OVSLOT        ! Map slot number for output variance 
+                                 ! array
+      INTEGER      PX            ! Workspace pointer
+      INTEGER      PXSLOT        ! Map slot number for workspace
+      INTEGER      PY            ! Workspace pointer
+      INTEGER      PYSLOT        ! Map slot number for workspace
+      LOGICAL      REALS         !
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALS(20,20)   !
+      REAL         VALUE         ! Temporary real number
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
       DOUBLE PRECISION XCOEFF(1,2) !
-      LOGICAL      XLOG         !
-      REAL         XRESMIN      !
-      REAL         XRESMAX      !
-      REAL         XSHIFT       !
-      REAL         XSPLIT       !
+      LOGICAL      XLOG          !
+      REAL         XRESMIN       !
+      REAL         XRESMAX       !
+      REAL         XSHIFT        !
+      REAL         XSPLIT        !
       DOUBLE PRECISION YCOEFF(2,1) !
-      LOGICAL      YLOG         !
-      REAL         YRESMIN      !
-      REAL         YRESMAX      !
-      REAL         YSHIFT       !
-      REAL         YSPLIT       !
-      LOGICAL      VEXIST       ! TRUE if a variance array exists
-      INTEGER      VPTR         ! Dynamic-memory pointer to input variance 
-      INTEGER      VSLOT        ! Map slot number for input variance array
-      INTEGER      OVPTR        ! Dynamic-memory pointer to output variance 
-      INTEGER      OVSLOT       ! Map slot number for output variance array
-      CHARACTER    HIST(3)*50   ! History text.
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL      YLOG          !
+      REAL         YRESMIN       !
+      REAL         YRESMAX       !
+      REAL         YSHIFT        !
+      REAL         YSPLIT        !
+      LOGICAL      VEXIST        ! TRUE if a variance array exists
+      INTEGER      VPTR          ! Dynamic-memory pointer to input
+                                 ! variance 
+      INTEGER      VSLOT         ! Map slot number for input variance
+                                 ! array
 C
 C     Parameter values for FIG_REBIN2D
 C
@@ -151,8 +155,7 @@ C
 C
 C     Map input data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get the various parameters, checking for the integer shift case
@@ -178,8 +181,7 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Single operand (result replaces original data). Get workspace to
@@ -188,44 +190,43 @@ C
       IF (OPTR.EQ.DPTR) THEN
          IF (REALS) THEN
             BYTES=NELM*DSA_TYPESIZE('FLOAT',STATUS)
-            CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
+            CALL DSA_GET_WORKSPACE (BYTES,WPTR,WSLOT,STATUS)
             IF (STATUS.NE.0) GO TO 500
-            WPTR=DYN_ELEMENT(ADDRESS)
-            CALL GEN_MOVE (BYTES,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(WPTR))
+            CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(DPTR)),
+     :                     %VAL(CNF_PVAL(WPTR)))
             DPTR=WPTR
          END IF
       END IF
 C
 C     If either of the shifts are real, we have to do this the hard
-C     way.  Get the rest of the workspace needed by FIG_REBIN2D
+C     way.  Get the rest of the workspace needed by FIG_REBIN2D.
 C
       IF (REALS) THEN
-         WBYTES=16*(NPIX+3)
-         CALL DSA_GET_WORKSPACE(WBYTES,ADDRESS,PSLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY(2*(NPIX+3),'FLOAT',PX,PXSLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY(2*(NPIX+3),'FLOAT',PY,PYSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
-         PX=DYN_ELEMENT(ADDRESS)
-         PY=PX+WBYTES/2
 C
-C        Set the remaining parameters for FIG_REBIN2D and then let it get
-C        on with the job.
+C        Set the remaining parameters for FIG_REBIN2D and then let it 
+C        get on with the job.
 C
          MODE=1
          XRESMIN=0.
          XRESMAX=FLOAT(NPIX)
          YRESMIN=0.
          YRESMAX=FLOAT(NLINE)
-         CALL FIG_REBIN2D(DYNAMIC_MEM(DPTR),NPIX,NLINE,NPIX,NLINE,
-     :             XRESMIN,XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,NCXY,NCXX,
-     :             XCOEFF,NCYY,NCYX,YCOEFF,XSHIFT,YSHIFT,NDX,NDY,
-     :             MODE,EXTRA,DYNAMIC_MEM(PX),DYNAMIC_MEM(PY),VALS,
-     :                                           DYNAMIC_MEM(OPTR))
+         CALL FIG_REBIN2D(%VAL(CNF_PVAL(DPTR)),NPIX,NLINE,NPIX,NLINE,
+     :                    XRESMIN,XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,
+     :                    NCXY,NCXX,XCOEFF,NCYY,NCYX,YCOEFF,
+     :                    XSHIFT,YSHIFT,NDX,NDY,MODE,EXTRA,
+     :                    %VAL(CNF_PVAL(PX)),%VAL(CNF_PVAL(PY)),VALS,
+     :                    %VAL(CNF_PVAL(OPTR)))
       ELSE
 C
 C        This is the simple integer shift case.  Note that this
 C        operation can be performed in situ, if needed.
 C
-         CALL GEN_ISHIFT(DYNAMIC_MEM(DPTR),NPIX,NLINE,NINT(XSHIFT),
-     :                              NINT(YSHIFT),DYNAMIC_MEM(OPTR))
+         CALL GEN_ISHIFT(%VAL(CNF_PVAL(DPTR)),NPIX,NLINE,NINT(XSHIFT),
+     :                   NINT(YSHIFT),%VAL(CNF_PVAL(OPTR)))
       END IF
 C
 C     Check whether a variance array exists.  If so then process it
@@ -242,13 +243,11 @@ C
 C
 C        Map the input and output variance arrays.
 C
-         CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',ADDRESS,
-     :     VSLOT,STATUS)
-         VPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',VPTR,
+     :                         VSLOT,STATUS)
          IF (STATUS.NE.0) GOTO 500
-         CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',ADDRESS,
-     :     OVSLOT, STATUS)
-         OVPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',OVPTR,
+     :                         OVSLOT, STATUS)
          IF (STATUS.NE.0) GOTO 500
 C
 C        Check for the single operand case (the new variance replaces
@@ -256,8 +255,8 @@ C        the original one).
 C
          IF (OVPTR.EQ.VPTR) THEN
             IF (REALS) THEN
-               CALL GEN_MOVE (BYTES,DYNAMIC_MEM(VPTR),
-     :           DYNAMIC_MEM(OVPTR))
+               CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(VPTR)),
+     :                        %VAL(CNF_PVAL(OVPTR)))
                VPTR=OVPTR
             END IF
          END IF
@@ -266,18 +265,20 @@ C        If either of the shifts are real, we have to do this the hard
 C        way.  Get the rest of the workspace needed by FIG_REBIN2D
 C
          IF (REALS) THEN
-            CALL FIG_REBIN2D(DYNAMIC_MEM(VPTR),NPIX,NLINE,NPIX,NLINE,
-     :        XRESMIN,XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,NCXY,NCXX,
-     :        XCOEFF,NCYY,NCYX,YCOEFF,XSHIFT,YSHIFT,NDX,NDY,
-     :        MODE,EXTRA,DYNAMIC_MEM(PX),DYNAMIC_MEM(PY),VALS,
-     :        DYNAMIC_MEM(OVPTR))
+            CALL FIG_REBIN2D(%VAL(CNF_PVAL(VPTR)),NPIX,NLINE,NPIX,NLINE,
+     :                       XRESMIN,XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,
+     :                       NCXY,NCXX,XCOEFF,NCYY,NCYX,YCOEFF,
+     :                       XSHIFT,YSHIFT,NDX,NDY,MODE,EXTRA,
+     :                       %VAL(CNF_PVAL(PX)),%VAL(CNF_PVAL(PY)),VALS,
+     :                       %VAL(CNF_PVAL(OVPTR)))
          ELSE
 C
 C           This is the simple integer shift case.  Note that this
 C           operation can be performed in situ, if needed.
 C
-            CALL GEN_ISHIFT(DYNAMIC_MEM(VPTR),NPIX,NLINE,
-     :        NINT(XSHIFT),NINT(YSHIFT),DYNAMIC_MEM(OVPTR))
+            CALL GEN_ISHIFT(%VAL(CNF_PVAL(VPTR)),NPIX,NLINE,
+     :                      NINT(XSHIFT),NINT(YSHIFT),
+     :                      %VAL(CNF_PVAL(OVPTR)))
          END IF
 C
 C        Add comments to the history section.  Comments are only

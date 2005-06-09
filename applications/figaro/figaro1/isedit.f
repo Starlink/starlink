@@ -23,85 +23,97 @@ C                                     JAB / JAC 11th Dec 1990
 C
 C     Modified:
 C
-C     4th Feb. 1991.  JMS / AAO. Added PAR_ABORT and STATUS checks to
-C                     support user requested aborts. Made minor modification
-C                     to initialisation of NY variable. Added another
-C                     interpolation option, "J", to interpolate between 
-C                     chosen points.
-C     15th Mar. 1991. JMS / AAO. Write an error array only if there was one
-C                     in the input (taken from HME's modification of 20/2/91). 
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     26th Apr 1991.  JMS / AAO. Removed the statements IXS=1 and IXE=NX.
-C                     FIG_ISEDIT_RANGE now uses only the selected part of
-C                     the spectrum to calculate the high, low and mean levels.
-C     6th Nov 1991.   HME / UoE, Starlink. Take care of HIGH=LOW. Increase plot
-C                     range by 5% on either side.
-C     4th  Sep 1992.  HME / UoE, Starlink. Change INCLUDE.
-C                     PGASK is banned from ADAM, commented out.
-C                     Check status after data access complete.
-C     25th Jan 1993.  HME / UoE, Starlink.  Put PGASK back in.
-C     27th Jul 1993.  HME / UoE, Starlink.  Disuse GKD_* except
-C                     GKD_WRITE_LINE. Disuse PAR_Q*. Add parameter
-C                     YVALUE.
+C     4th Feb 1991   JMS / AAO. Added PAR_ABORT and STATUS checks to
+C                    support user requested aborts. Made minor
+C                    modification to initialisation of NY variable. 
+C                    Added another interpolation option, "J", to 
+C                    interpolate between chosen points.
+C     15th Mar 1991  JMS / AAO. Write an error array only if there was 
+C                    one in the input (taken from HME's modification of
+C                    20/2/91). 
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
+C                    mapping calls.
+C     26th Apr 1991  JMS / AAO. Removed the statements IXS=1 and IXE=NX.
+C                    FIG_ISEDIT_RANGE now uses only the selected part of
+C                    the spectrum to calculate the high, low and mean
+C                    levels.
+C     6th Nov 1991.  HME / UoE, Starlink. Take care of HIGH=LOW. 
+C                    Increase plot range by 5% on either side.
+C     4th  Sep 1992  HME / UoE, Starlink. Change INCLUDE.
+C                    PGASK is banned from ADAM, commented out.
+C                    Check status after data access complete.
+C     25th Jan 1993  HME / UoE, Starlink.  Put PGASK back in.
+C     27th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* except
+C                    GKD_WRITE_LINE. Disuse PAR_Q*. Add parameter
+C                    YVALUE.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL   PAR_ABORT
-      INTEGER   DYN_ELEMENT
-      INTEGER   DYN_INCREMENT
       INTEGER   DSA_TYPESIZE
       INTEGER   PGBEGIN      
       CHARACTER ICH_CI*13,ICH_CF*13
  
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      CHARACTER COMMAND            ! Command character from cursor 
-      CHARACTER DEVICE*32          ! PGPLOT device specification
-      INTEGER   DIMS(2)            ! Image dimensions
-      INTEGER   DSTATUS            ! Status on getting SOFT device
-      INTEGER   DUMMY              ! Dummy argument
-      INTEGER   EPTR1              ! Dynamic memory element for spectrum errors
-      INTEGER   EPTR               ! Dynamic memory element for current scan
-      LOGICAL   EXIST              ! TRUE if errors exist in input file
-      LOGICAL   FINISHED           ! TRUE if finished
-      REAL      HIGH               ! Highest data value
-      INTEGER   IGNORE             ! Ignoreable status
-      INTEGER   IXS                ! Initial pixel number
-      INTEGER   IXE                ! Final pixel number
-      REAL      LOW                ! Lowest data value
-      REAL      MEAN               ! Mean data value
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NUM                ! Number of good data points
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   OPTR1              ! Dynamic memory element for image data
-      INTEGER   OPTR               ! Dynamic memory element for current scan
-      CHARACTER PLAB*40            ! Plot label
-      INTEGER   SCAN               ! Scan number
-      INTEGER   SLOT1              ! Slot number for mapped data - ignored
-      INTEGER   SLOT2              ! Slot number for mapped data - ignored
-      INTEGER   SLOT3              ! Slot number for mapped data - ignored
-      INTEGER   SLOT4              ! Slot number for mapped data - ignored
-      INTEGER   STATUS             ! Running status for DSA routines
-      CHARACTER STRINGS(2)*64      ! Receives axis information
-      INTEGER   QPTR1              ! Output quality pointer for image
-      INTEGER   QPTR               ! Output quality pointer for current scan
-      LOGICAL   WHOLE              ! TRUE to plot whole of spectrum
-      REAL      XEN                ! Final X-value
-      CHARACTER XLAB*64            ! X-axis label for plot
-      CHARACTER XLABEL*32          ! Structure X-axis label
-      INTEGER   XPTR               ! Dynamic memory element for X axis data
-      REAL      XST                ! Initial X-value
-      CHARACTER XUNITS*32          ! Structure X-axis units
-      REAL      YVAL               ! Y value (Scan number) to plot        
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER COMMAND          ! Command character from cursor 
+      CHARACTER DEVICE*32        ! PGPLOT device specification
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   DSTATUS          ! Status on getting SOFT device
+      INTEGER   DUMMY            ! Dummy argument
+      INTEGER   EPTR1            ! Dynamic memory pointer for spectrum
+                                 ! errors
+      INTEGER   EPTR             ! Dynamic memory pointer for current
+                                 ! scan
+      LOGICAL   EXIST            ! TRUE if errors exist in input file
+      LOGICAL   FINISHED         ! TRUE if finished
+      REAL      HIGH             ! Highest data value
+      INTEGER   IGNORE           ! Ignoreable status
+      LOGICAL   ISNEW            ! Is CNF pointer to data new?
+      LOGICAL   ISNEWE           ! Is CNF pointer to errors new?
+      LOGICAL   ISNEWO           ! Is CNF pointer to outout data new?
+      LOGICAL   ISNEWQ           ! Is CNF pointer to quality new?
+      INTEGER   IXS              ! Initial pixel number
+      INTEGER   IXE              ! Final pixel number
+      REAL      LOW              ! Lowest data value
+      REAL      MEAN             ! Mean data value
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NUM              ! Number of good data points
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   OPTR1            ! Dynamic memory pointer for image data
+      INTEGER   OPTR             ! Dynamic memory pointer for current
+                                 ! scan
+      LOGICAL   PISNE            ! Previous CNF pointer to errors new?
+      LOGICAL   PISNO            ! Previous CNF pointer to data new?
+      LOGICAL   PISNQ            ! Previous CNF pointer to quality new?
+      CHARACTER PLAB*40          ! Plot label
+      INTEGER   SCAN             ! Scan number
+      INTEGER   SLOT1            ! Slot number for mapped data - ignored
+      INTEGER   SLOT2            ! Slot number for mapped data - ignored
+      INTEGER   SLOT3            ! Slot number for mapped data - ignored
+      INTEGER   SLOT4            ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER STRINGS(2)*64    ! Receives axis information
+      INTEGER   QPTR1            ! Output quality pointer for image
+      INTEGER   QPTR             ! Output quality pointer for current
+                                 ! scan
+      INTEGER   TPTR             ! Temporary pointer for
+      LOGICAL   WHOLE            ! TRUE to plot whole of spectrum
+      REAL      XEN              ! Final X-value
+      CHARACTER XLAB*64          ! X-axis label for plot
+      CHARACTER XLABEL*32        ! Structure X-axis label
+      INTEGER   XPTR             ! Dynamic memory pointer for X axis
+                                 ! data
+      REAL      XST              ! Initial X-value
+      CHARACTER XUNITS*32        ! Structure X-axis units
+      REAL      YVAL             ! Y value (Scan number) to plot        
 C     
 C     Initial values
 C
@@ -149,29 +161,22 @@ C
 C
 C     Map the output data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT1,
-     :                                                          STATUS)
-      OPTR1=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR1,SLOT1,STATUS)
 C
 C     If input had errors use them, else use a zeroed work array
 C
       IF (EXIST) THEN
-         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT2,
-     :                                                          STATUS)
-         EPTR1=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR1,SLOT2,
+     :                       STATUS)
       ELSE 
-         CALL DSA_GET_WORK_ARRAY(NELM,'FLOAT',ADDRESS,SLOT2,STATUS)
-         EPTR1=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY(NELM,'FLOAT',EPTR1,SLOT2,STATUS)
          CALL GEN_FILL(NELM*DSA_TYPESIZE('FLOAT',STATUS),0,
-     :                                          DYNAMIC_MEM(EPTR1))
+     :                 %VAL(CNF_PVAL(EPTR1)))
       END IF
 C
-      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',ADDRESS,SLOT3,
-     :                                                          STATUS)
-      QPTR1=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',ADDRESS,
-     :    SLOT4,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',QPTR1,SLOT3,STATUS)
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',XPTR,
+     :                       SLOT4,STATUS)
 C
 C     Check status.
 C
@@ -204,19 +209,35 @@ C
 C
 C     Main loop
 C
+      PISNE = .FALSE.
+      PISNO = .FALSE.
+      PISNQ = .FALSE.
       FINISHED = .FALSE.
       DO WHILE (.NOT. FINISHED)
 C
 C     Set pointers to appropriate scan
 C
-         OPTR = DYN_INCREMENT(OPTR1,'FLOAT',(SCAN-1)*NX)
-         EPTR = DYN_INCREMENT(EPTR1,'FLOAT',(SCAN-1)*NX)
-         QPTR = DYN_INCREMENT(QPTR1,'BYTE',(SCAN-1)*NX)
+         CALL DYN_INCAD(OPTR1,'FLOAT',(SCAN-1)*NX,TPTR,ISNEWO,STATUS)
+         IF (PISNO) CALL CNF_UNREGP(OPTR1)
+         OPTR1 = TPTR
+         PISNO = ISNEWO
+         
+         CALL DYN_INCAD(EPTR1,'FLOAT',(SCAN-1)*NX,TPTR,ISNEWE,STATUS)
+         IF (PISNE) CALL CNF_UNREGP(EPTR1)
+         EPTR1 = TPTR
+         PISNE = ISNEW
+          
+         CALL DYN_INCAD(QPTR1,'BYTE',(SCAN-1)*NX,TPTR,ISNEWQ,STATUS)
+         IF (PISNQ) CALL CNF_UNREGP(QPTR1)
+         QPTR1 = TPTR
+         PISNQ = ISNEWQ
 C
 C     Get Range
 C
-         CALL FIG_ISEDIT_RANGE(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),
-     :      DYNAMIC_MEM(QPTR),IXS,IXE,HIGH,LOW,MEAN,NUM)
+         CALL FIG_ISEDIT_RANGE(%VAL(CNF_PVAL(OPTR)),
+     :                         %VAL(CNF_PVAL(EPTR)),
+     :                         %VAL(CNF_PVAL(QPTR)),
+     :                         IXS,IXE,HIGH,LOW,MEAN,NUM)
 C
 C     Do the plot
 C     Take care of HIGH=LOW
@@ -236,11 +257,10 @@ C
             HIGH = 1.05 * HIGH - 0.05 * LOW
             LOW  = 0.947619 * LOW - 0.047619 * HIGH
          ENDIF
-         CALL FIG_ISEDIT_PLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(OPTR),
-     :     DYNAMIC_MEM(QPTR),DYNAMIC_MEM(EPTR),NX,IXS,IXE,
-     :     HIGH,LOW,XLAB,' ',PLAB,
-     :     .TRUE.,.TRUE.,1,1,XST,XEN,
-     :     STATUS)
+         CALL FIG_ISEDIT_PLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                        %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(EPTR)),
+     :                        NX,IXS,IXE,HIGH,LOW,XLAB,' ',PLAB,
+     :                        .TRUE.,.TRUE.,1,1,XST,XEN,STATUS)
 C
 C     Output HELP information
 C
@@ -248,9 +268,10 @@ C
 C
 C     Put up cursor and handle commands
 C
-         CALL FIG_ISEDIT_CURS(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(OPTR),
-     :     DYNAMIC_MEM(QPTR),DYNAMIC_MEM(EPTR),NX,NY,IXS,IXE,HIGH,LOW,
-     :     XST,XEN,FINISHED,SCAN,STATUS)
+         CALL FIG_ISEDIT_CURS(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                        %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(EPTR)),
+     :                        NX,NY,IXS,IXE,HIGH,LOW,
+     :                        XST,XEN,FINISHED,SCAN,STATUS)
          IF (PAR_ABORT()) GO TO 100
       ENDDO
   100 CONTINUE

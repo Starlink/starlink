@@ -40,50 +40,55 @@ C                                      KS / CIT 18th Feb 1983
 C
 C     Modified:
 C
-C     28th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs changed
-C                    Now uses DYN_ package for dynamic memory handling. All
-C                    WRUSERs converted to PAR_WRUSERs.
+C     28th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN_ package for dynamic-memory 
+C                    handling. All WRUSERs converted to PAR_WRUSERs.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C      1st May 1997  JJL / Soton, Starlink. Variances included.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_FOLD,DYN_ELEMENT
+      INTEGER ICH_FOLD
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    COMMAND*64   ! The actual FIGARO command passed
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      INTEGER      IGNORE       ! Dummy status arguement for PAR_WRUSER
-      INTEGER      INVOKE       ! Used to invoke function calls
-      INTEGER      LSPECT       ! The length of the spectrum
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      SPTR         ! Dynamic-memory pointer to spectrum data
-      INTEGER      SSLOT        ! Map slot number of spectrum data
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      VDPTR        ! Dynamic-memory pointer to variance array
-      INTEGER      VDSLOT       ! Map slot number of input variance array
-      INTEGER      VOPTR        ! Dynamic-memory pointer to output variance 
-      LOGICAL      VEXIST       ! TRUE if variance exists in both files
-      INTEGER      VOSLOT       ! Map slot number output variance array
-      INTEGER      VSPTR        ! Dynamic-memory pointer to spectrum variance
-      INTEGER      VSSLOT       ! Map slot number of spectrum variance
-      LOGICAL      XCOM         ! True if the FIGARO command was an X one
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    COMMAND*64    ! The actual FIGARO command passed
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      INTEGER      IGNORE        ! Dummy status arguement for PAR_WRUSER
+      INTEGER      INVOKE        ! Used to invoke function calls
+      INTEGER      LSPECT        ! The length of the spectrum
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number outputdata array
+      INTEGER      SPTR          ! Dynamic-memory pointer to spectrum
+                                 ! data
+      INTEGER      SSLOT         ! Map slot number of spectrum data
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      VDPTR         ! Dynamic-memory pointer to variance
+                                 ! array
+      INTEGER      VDSLOT        ! Map slot number of input variance 
+                                 ! array
+      INTEGER      VOPTR         ! Dynamic-memory pointer to output 
+                                 ! variance 
+      LOGICAL      VEXIST        ! TRUE if variance exists in both files
+      INTEGER      VOSLOT        ! Map slot number output variance array
+      INTEGER      VSPTR         ! Dynamic-memory pointer to spectrum 
+                                 ! variance
+      INTEGER      VSSLOT        ! Map slot number of spectrum variance
+      LOGICAL      XCOM          ! FIGARO command was an X one?
 C
 C     Set variances FALSE
 C
@@ -145,12 +150,9 @@ C
 C     Map output data (this is either the actual input data, or a
 C     copy of it)
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SSLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',SPTR,SSLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Now check to see if the variance structure exists. If so, map it.
@@ -158,30 +160,27 @@ C
       CALL DSA_SEEK_VARIANCE('IMAGE',VEXIST,STATUS)
       IF (VEXIST) CALL DSA_SEEK_VARIANCE('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
-          CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',VDPTR,
      :                           VDSLOT,STATUS)
-          VDPTR=DYN_ELEMENT(ADDRESS)
-          CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE('SPECT','READ','FLOAT',VSPTR,
      :                           VSSLOT,STATUS)
-          VSPTR=DYN_ELEMENT(ADDRESS)
-          CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',VOPTR,
      :                           VOSLOT,STATUS)
-          VOPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
-          IF (STATUS.NE.0) GOTO 500
+      END IF
+      IF (STATUS.NE.0) GOTO 500
 C
 C     Perform the operation
 C
       IF (XCOM) THEN
          CALL GEN_XOP21(COMMAND(4:4), VEXIST, NX, NY,
-     :                  DYNAMIC_MEM(DPTR), DYNAMIC_MEM(VDPTR),
-     :                  DYNAMIC_MEM(SPTR), DYNAMIC_MEM(VSPTR),
-     :                  DYNAMIC_MEM(OPTR), DYNAMIC_MEM(VOPTR))
+     :                  %VAL(CNF_PVAL(DPTR)), %VAL(CNF_PVAL(VDPTR)),
+     :                  %VAL(CNF_PVAL(SPTR)), %VAL(CNF_PVAL(VSPTR)),
+     :                  %VAL(CNF_PVAL(OPTR)), %VAL(CNF_PVAL(VOPTR)))
       ELSE
          CALL GEN_YOP21(COMMAND(4:4), VEXIST, NX, NY,
-     :                  DYNAMIC_MEM(DPTR), DYNAMIC_MEM(VDPTR),
-     :                  DYNAMIC_MEM(SPTR), DYNAMIC_MEM(VSPTR),
-     :                  DYNAMIC_MEM(OPTR), DYNAMIC_MEM(VOPTR))
+     :                  %VAL(CNF_PVAL(DPTR)), %VAL(CNF_PVAL(VDPTR)),
+     :                  %VAL(CNF_PVAL(SPTR)), %VAL(CNF_PVAL(VSPTR)),
+     :                  %VAL(CNF_PVAL(OPTR)), %VAL(CNF_PVAL(VOPTR)))
       END IF
 C
 C     Closedown everything

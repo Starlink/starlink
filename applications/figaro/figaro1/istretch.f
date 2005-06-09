@@ -58,64 +58,65 @@ C     7th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed. Redundant second set of DATA statements
 C                    removed.
 C     26th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_LEN , DYN_ELEMENT , DYN_INCREMENT , DSA_TYPESIZE
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      INTEGER ICH_LEN , DSA_TYPESIZE
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Amount of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      REAL         EXTRA        ! 
-      INTEGER      IGNORE       ! Used to ignore status codes
-      INTEGER      MODE         !
-      INTEGER      NCXX         !
-      INTEGER      NCXY         !
-      INTEGER      NCYX         !
-      INTEGER      NCYY         !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NDX          !
-      INTEGER      NDY          !
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NPIX         ! Size of 1st dimension
-      INTEGER      NLINE        ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      PSLOT        ! Map slot number for workspace
-      INTEGER      PX           ! 
-      INTEGER      PY           ! 
-      LOGICAL      REALS        ! 
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALS(20,20)  ! 
-      REAL         VALUE        ! Temporary real number
-      INTEGER      WBYTES       ! 
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
+      INTEGER      BYTES         ! Amount of workspace required
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      REAL         EXTRA         ! 
+      INTEGER      IGNORE        ! Used to ignore status codes
+      INTEGER      MODE          !
+      INTEGER      NCXX          !
+      INTEGER      NCXY          !
+      INTEGER      NCYX          !
+      INTEGER      NCYY          !
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NDX           !
+      INTEGER      NDY           !
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NPIX          ! Size of 1st dimension
+      INTEGER      NLINE         ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      PSLOT         ! Map slot number for workspace
+      INTEGER      PX            ! Workspace pointer
+      INTEGER      PXSLOT        ! Map slot number for workspace
+      INTEGER      PY            ! Workspace pointer
+      INTEGER      PYSLOT        ! Map slot number for workspace
+      LOGICAL      REALS         ! 
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALS(20,20)   ! 
+      REAL         VALUE         ! Temporary real number
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
       DOUBLE PRECISION XCOEFF(1,2) !
-      LOGICAL      XLOG         ! 
-      REAL         XRESMIN      ! 
-      REAL         XRESMAX      ! 
-      REAL         XSHIFT       !  
-      REAL         XSTRCH       ! 
-      REAL         XSPLIT       ! 
+      LOGICAL      XLOG          ! 
+      REAL         XRESMIN       ! 
+      REAL         XRESMAX       ! 
+      REAL         XSHIFT        !  
+      REAL         XSTRCH        ! 
+      REAL         XSPLIT        ! 
       DOUBLE PRECISION YCOEFF(2,1) !
-      LOGICAL      YLOG         ! 
-      REAL         YRESMIN      ! 
-      REAL         YRESMAX      ! 
-      REAL         YSHIFT       ! 
-      REAL         YSTRCH       ! 
-      REAL         YSPLIT       ! 
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL      YLOG          ! 
+      REAL         YRESMIN       ! 
+      REAL         YRESMAX       ! 
+      REAL         YSHIFT        ! 
+      REAL         YSTRCH        ! 
+      REAL         YSPLIT        ! 
 C
 C     Parameter values for FIG_REBIN2D
 C
@@ -149,8 +150,7 @@ C
 C
 C     Map input data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get the various parameters.
@@ -158,9 +158,9 @@ C
       CALL PAR_RDVAL('XSTRETCH',0.,1000.,1.,' ',XSTRCH)
       CALL PAR_RDVAL('YSTRETCH',0.,1000.,1.,' ',YSTRCH)
       CALL PAR_RDVAL('XSHIFT',-FLOAT(NPIX),FLOAT(NPIX),0.,'Pixels',
-     :                                                      XSHIFT)
+     :               XSHIFT)
       CALL PAR_RDVAL('YSHIFT',-FLOAT(NLINE),FLOAT(NLINE),0.,'Pixels',
-     :                                                      YSHIFT)
+     :               YSHIFT)
       CALL PAR_RDVAL('XSPLIT',1.,20.,1.,'sub-pixels',VALUE)
       NDX=VALUE
       CALL PAR_RDVAL('YSPLIT',1.,20.,1.,'sub-pixels',VALUE)
@@ -173,8 +173,7 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
       IF (DPTR.EQ.OPTR) THEN
 C
@@ -182,18 +181,15 @@ C        Single operand (result replaces original data). Get
 C        workspace to rebin into.  
 C
          BYTES=NPIX*NLINE*DSA_TYPESIZE('FLOAT',STATUS)
-         CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(WPTR))
+         CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(WPTR)))
          DPTR=WPTR
       END IF
 C
 C     Get the rest of the workspace needed by FIG_REBIN2D
 C
-      WBYTES=16*(NPIX+3)
-      CALL DSA_GET_WORKSPACE(WBYTES,ADDRESS,PSLOT,STATUS)
-      PX=DYN_ELEMENT(ADDRESS)
-      PY=PX+WBYTES/2
+      CALL DSA_GET_WORK_ARRAY(2*(NPIX+3),'FLOAT',PX,PXSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(2*(NPIX+3),'FLOAT',PY,PYSLOT,STATUS)
 C
 C     Set the parameters for FIG_REBIN2D and then let it get
 C     on with the job.
@@ -207,11 +203,11 @@ C
       XRESMAX=FLOAT(NPIX)
       YRESMIN=0.
       YRESMAX=FLOAT(NLINE)
-      CALL FIG_REBIN2D(DYNAMIC_MEM(DPTR),NPIX,NLINE,NPIX,NLINE,XRESMIN,
-     :             XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,NCXY,NCXX,
-     :             XCOEFF,NCYY,NCYX,YCOEFF,XSHIFT,YSHIFT,NDX,NDY,
-     :             MODE,EXTRA,DYNAMIC_MEM(PX),DYNAMIC_MEM(PY),VALS,
-     :                                            DYNAMIC_MEM(OPTR))
+      CALL FIG_REBIN2D(%VAL(CNF_PVAL(DPTR)),NPIX,NLINE,NPIX,NLINE,
+     :                 XRESMIN,XRESMAX,XLOG,YRESMIN,YRESMAX,YLOG,NCXY,
+     :                 NCXX,XCOEFF,NCYY,NCYX,YCOEFF,XSHIFT,YSHIFT,
+     :                 NDX,NDY,MODE,EXTRA,%VAL(CNF_PVAL(PX)),
+     :                 %VAL(CNF_PVAL(PY)),VALS,%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

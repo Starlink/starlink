@@ -53,9 +53,9 @@ C                  it for both.
 C     12 Feb 1995  KS/AAO. Now calls DSA_USE_FLAGGED_VALUES and
 C                  DSA_USE_QUALITY for the output as well as for the
 C                  input. 
-C     29 Nov 1995  KS/AAO. Now calls DSA_QUALITY_AND_FLAGS_OK to indicate
-C                  the program can handle both types of quality information
-C                  simultaneously.
+C     29 Nov 1995  KS/AAO. Now calls DSA_QUALITY_AND_FLAGS_OK to 
+C                  indicate that the program can handle both types of
+C                  quality information simultaneously.
 C     01 Dec 1995  HME / UoE, Starlink.  Re-did the corrections of 6
 C                  October 1993. In fact, since then, all output was
 C                  changed to map for write access, since there had
@@ -71,76 +71,90 @@ C                  Bad pixel handling.
 C     22 Jul 1996  MJC / STARLINK.  Take the appropriate subset of
 C                  2-dimensional axis centres, and all axis widths.
 C     24 Jul 1996  MJCL / Starlink, UCL.  Corrected type of SINGLE.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
       LOGICAL GEN_CHKNSF
 C
 C     Local variables
 C
-      INTEGER  ADDRESS  ! Virtual address for data array
-      INTEGER  DIMS(2)  ! Image dimensions
-      LOGICAL  EEXIST   ! True if image has an error array
-      INTEGER  EPTR     ! Dynamic memory element for input errors
-      INTEGER  EPTRO    ! Dynamic memory element for output errors
-      LOGICAL  ERRORS   ! True if error information is an uncertainty array
-      LOGICAL  FEXIST   ! True if data contains flagged values
-      INTEGER  IPTR     ! Dynamic memory element for input data
-      INTEGER  IPTRO    ! Dynamic memory element for output data
-      INTEGER  ITXST    ! Temporary value of IXST used for axis data only
-      INTEGER  ITYST    ! Temporary value of IYST used for axis data only
-      INTEGER  IXEN     ! Index of last AXIS(1) element used
-      INTEGER  IXST     ! Index of first AXIS(1) element used
-      INTEGER  IYEN     ! Index of last AXIS(2) element used
-      INTEGER  IYST     ! Index of first AXIS(2) element used
-      INTEGER  NDIM     ! Number of image dimensions
-      INTEGER  NELM     ! Number of elements in image 
-      LOGICAL  NONE     ! True if no error information available - ignored
-      INTEGER  NX       ! First dimension of image
-      INTEGER  NXNEW    ! First dimension of subsetted image
-      INTEGER  NY       ! Second dimension of image
-      INTEGER  NYNEW    ! Second dimension of subsetted image
-      LOGICAL  SINGLE   ! True if axis width is a single value
-      INTEGER  SLOT     ! Slot number for mapped data - ignored 
-      INTEGER  STATUS   ! Running status for DSA routines
-      LOGICAL  VARIANCE ! True if error information is a variance array
-      DOUBLE PRECISION WIDTH ! Single axis width value - ignored.
-      INTEGER  XDIMS(2) ! Dimensions of AXIS(1) data array
-      INTEGER  XDIMSN(2)! Dimensions of new AXIS(1) data array
-      REAL     XEN      ! Value of last AXIS(1) element used
-      LOGICAL  XEXIST   ! True if image has an AXIS(1) data array
-      INTEGER  XNDIM    ! Number of dimensions of original X data array
-      INTEGER  XNDIMN   ! Number of dimensions of new X data array
-      INTEGER  XPTR     ! Dynamic memory element for input AXIS(1) data
-      INTEGER  XPTRO    ! Dynamic memory element for output AXIS(1) data
-      REAL     XST      ! Value of first AXIS(1) element used
-      LOGICAL  XWEXIST  ! True if AXIS(1) array also has a width array.
-      INTEGER  XWPTR    ! Dynamic memory element for input AXIS(1) width data
-      INTEGER  XWPTRO   ! Dynamic memory element for output AXIS(1) width data
-      INTEGER  YDIMS(2) ! Dimensions of AXIS(2) data array
-      INTEGER  YDIMSN(2)! Dimensions of new AXIS(2) data array
-      REAL     YEN      ! Value of last AXIS(2) element used
-      LOGICAL  YEXIST   ! True if image has an AXIS(2) data array
-      INTEGER  YNDIM    ! Number of dimensions of original Y data array
-      INTEGER  YNDIMN   ! Number of dimensions of new Y data array
-      INTEGER  YPTR     ! Dynamic memory element for input AXIS(2) data
-      INTEGER  YPTRO    ! Dynamic memory element for output AXIS(2) data
-      LOGICAL  YWEXIST  ! True if AXIS(2) array also has a width array.
-      INTEGER  YWPTR    ! Dynamic memory element for input AXIS(2) width data
-      INTEGER  YWPTRO   ! Dynamic memory element for output AXIS(2) width data
-      REAL     YST      ! Value of first AXIS(2) element used
+      INTEGER  DIMS(2)           ! Image dimensions
+      LOGICAL  EEXIST            ! Image has an error array?
+      INTEGER  EPTR              ! Dynamic mem pointer for input errors
+      INTEGER  EPTRO             ! Dynamic mem pointer for output errors
+      LOGICAL  ERRORS            ! Error information is an uncertainty 
+                                 ! array?
+      LOGICAL  FEXIST            ! Data contains flagged values?
+      INTEGER  IPTR              ! Dynamic mem pointer for input data
+      INTEGER  IPTRO             ! Dynamic mem pointer for output data
+      INTEGER  ITXST             ! Temporary value of IXST used for axis 
+                                 ! data only
+      INTEGER  ITYST             ! Temporary value of IYST used for axis
+                                 ! data only
+      INTEGER  IXEN              ! Index of last AXIS(1) element used
+      INTEGER  IXST              ! Index of first AXIS(1) element used
+      INTEGER  IYEN              ! Index of last AXIS(2) element used
+      INTEGER  IYST              ! Index of first AXIS(2) element used
+      INTEGER  NDIM              ! Number of image dimensions
+      INTEGER  NELM              ! Number of elements in image 
+      LOGICAL  NONE              ! No error information available?
+      INTEGER  NX                ! First dimension of image
+      INTEGER  NXNEW             ! First dimension of subsetted image
+      INTEGER  NY                ! Second dimension of image
+      INTEGER  NYNEW             ! Second dimension of subsetted image
+      LOGICAL  SINGLE            ! True if axis width is a single value
+      INTEGER  SLOT              ! Slot number for mapped data -ignored 
+      INTEGER  STATUS            ! Running status for DSA routines
+      LOGICAL  VARIANCE          ! Error information is a variance
+                                 ! array?
+      DOUBLE PRECISION WIDTH     ! Single axis width value - ignored
+      INTEGER  XDIMS(2)          ! Dimensions of AXIS(1) data array
+      INTEGER  XDIMSN(2)         ! Dimensions of new AXIS(1) data array
+      REAL     XEN               ! Value of last AXIS(1) element used
+      LOGICAL  XEXIST            ! Image has an AXIS(1) data array?
+      INTEGER  XNDIM             ! Number of dimensions of original X 
+                                 ! data array
+      INTEGER  XNDIMN            ! Number of dimensions of new X data
+                                 ! array
+      INTEGER  XPTR              ! Dynamic mem pointer for input AXIS(1)
+                                 ! data
+      INTEGER  XPTRO             ! Dynamic mem pointer for output 
+                                 ! AXIS(1) data
+      REAL     XST               ! Value of first AXIS(1) element used
+      LOGICAL  XWEXIST           ! AXIS(1) array also has a width array?
+      INTEGER  XWPTR             ! Dynamic mem pointer for input AXIS(1)
+                                 ! width data
+      INTEGER  XWPTRO            ! Dynamic mem pointer for output 
+                                 ! AXIS(1) width data
+      INTEGER  YDIMS(2)          ! Dimensions of AXIS(2) data array
+      INTEGER  YDIMSN(2)         ! Dimensions of new AXIS(2) data array
+      REAL     YEN               ! Value of last AXIS(2) element used
+      LOGICAL  YEXIST            ! Image has an AXIS(2) data array?
+      INTEGER  YNDIM             ! Number of dimensions of original Y
+                                 ! data array
+      INTEGER  YNDIMN            ! Number of dimensions of new Y data
+                                 ! array
+      INTEGER  YPTR              ! Dynamic mem pointer for input AXIS(2)
+                                 ! data
+      INTEGER  YPTRO             ! Dynamic mem pointer for output
+                                 ! AXIS(2) data
+      LOGICAL  YWEXIST           ! AXIS(2) array also has a width array?
+      INTEGER  YWPTR             ! Dynamic mem pointer for input AXIS(2)
+                                 ! width data
+      INTEGER  YWPTRO            ! Dynamic mem pointer for output
+                                 ! AXIS(2) width data
+      REAL     YST               ! Value of first AXIS(2) element used
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -168,8 +182,7 @@ C
 C     Map input data
 C
       CALL DSA_USE_FLAGGED_VALUES('IMAGE',STATUS)
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       CALL DSA_SEEK_FLAGGED_VALUES('IMAGE',FEXIST,STATUS)
 C
 C     Don't bother with AXIS(2) values if this is a 1D 'image'
@@ -184,10 +197,9 @@ C
      :                        STATUS)        
          NYNEW=IYEN-IYST+1
          IF(YEXIST)THEN
-            CALL DSA_MAP_AXIS_DATA('IMAGE',2,'READ','FLOAT',
-     :                              ADDRESS,SLOT,STATUS)
-            YPTR=DYN_ELEMENT(ADDRESS)
-         ENDIF
+            CALL DSA_MAP_AXIS_DATA('IMAGE',2,'READ','FLOAT',YPTR,
+     :                             SLOT,STATUS)
+         END IF
 C
 C        Check for the existence of a width array and map it if
 C        it exists and is not just a single value.
@@ -195,9 +207,8 @@ C
          CALL DSA_SEEK_WIDTH('IMAGE',2,YWEXIST,SINGLE,WIDTH,STATUS)
          IF (YWEXIST.AND.SINGLE) YWEXIST=.FALSE.
          IF (YWEXIST) THEN
-            CALL DSA_MAP_WIDTH('IMAGE',2,'READ','FLOAT',
-     :                              ADDRESS,SLOT,STATUS)
-            YWPTR=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_WIDTH('IMAGE',2,'READ','FLOAT',YWPTR,
+     :                         SLOT,STATUS)
          END IF
       ELSE
 C
@@ -215,16 +226,14 @@ C
      :                     STATUS)        
       NXNEW=IXEN-IXST+1
       IF(XEXIST)THEN
-         CALL DSA_MAP_AXIS_DATA('IMAGE',1,'READ','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_AXIS_DATA('IMAGE',1,'READ','FLOAT',XPTR,SLOT,
      :                           STATUS)
-            XPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
       CALL DSA_SEEK_WIDTH('IMAGE',1,XWEXIST,SINGLE,WIDTH,STATUS)
       IF (XWEXIST.AND.SINGLE) XWEXIST=.FALSE.
       IF (XWEXIST) THEN
-         CALL DSA_MAP_WIDTH('IMAGE',1,'READ','FLOAT',
-     :                              ADDRESS,SLOT,STATUS)
-         XWPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_WIDTH('IMAGE',1,'READ','FLOAT',XWPTR,
+     :                      SLOT,STATUS)
       END IF
 C
 C     Get output structure name and indicate that we can handle 
@@ -244,9 +253,7 @@ C
          NDIM=1
       END IF
       CALL DSA_RESHAPE_DATA('OUTPUT','IMAGE',NDIM,DIMS,STATUS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                   STATUS)
-      IPTRO=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',IPTRO,SLOT,STATUS)
 C
       IF (XEXIST) THEN
          CALL DSA_AXIS_SIZE('IMAGE',1,2,XNDIM,XDIMS,NELM,STATUS)
@@ -260,13 +267,11 @@ C
          END IF
          CALL DSA_RESHAPE_AXIS('OUTPUT',1,'IMAGE',1,XNDIMN,XDIMSN,
      :                                                       STATUS)
-         CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','FLOAT',ADDRESS,
+         CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','FLOAT',XPTRO,
      :                           SLOT,STATUS)
-         XPTRO=DYN_ELEMENT(ADDRESS)
          IF (XWEXIST) THEN
-            CALL DSA_MAP_WIDTH('OUTPUT',1,'WRITE','FLOAT',ADDRESS,
-     :                                                 SLOT,STATUS)
-            XWPTRO=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_WIDTH('OUTPUT',1,'WRITE','FLOAT',XWPTRO,
+     :                         SLOT,STATUS)
          END IF
       END IF
       IF (NDIM.GT.1.AND.YEXIST) THEN
@@ -280,14 +285,12 @@ C
             YDIMSN(2)=NXNEW
          END IF
          CALL DSA_RESHAPE_AXIS('OUTPUT',2,'IMAGE',2,YNDIMN,YDIMSN,
-     :                                                       STATUS)
-         CALL DSA_MAP_AXIS_DATA('OUTPUT',2,'WRITE','FLOAT',ADDRESS,
-     :                           SLOT,STATUS)
-         YPTRO=DYN_ELEMENT(ADDRESS)
+     :                         STATUS)
+         CALL DSA_MAP_AXIS_DATA('OUTPUT',2,'WRITE','FLOAT',YPTRO,
+     :                          SLOT,STATUS)
          IF (YWEXIST) THEN
-            CALL DSA_MAP_WIDTH('OUTPUT',2,'WRITE','FLOAT',ADDRESS,
-     :                                                 SLOT,STATUS)
-            YWPTRO=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_WIDTH('OUTPUT',2,'WRITE','FLOAT',YWPTRO,
+     :                         SLOT,STATUS)
          END IF
       END IF
 C
@@ -300,23 +303,21 @@ C
       CALL DSA_SEEK_ERRORS('IMAGE',EEXIST,STATUS)
       IF(EEXIST)THEN
          CALL DSA_ERROR_INFORMATION('IMAGE',ERRORS,VARIANCE,NONE,
-     :                                                       STATUS)
+     :                              STATUS)
          IF (ERRORS) THEN
-            CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',ADDRESS,SLOT,
-     :                                                       STATUS)
+            CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',EPTR,SLOT,
+     :                          STATUS)
          ELSE
-            CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',ADDRESS,
-     :                                                  SLOT,STATUS)
+            CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',EPTR,
+     :                            SLOT,STATUS)
          END IF
-         EPTR=DYN_ELEMENT(ADDRESS)
          IF (ERRORS) THEN
-            CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',ADDRESS,
-     :                                                  SLOT,STATUS)
+            CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',EPTRO,
+     :                          SLOT,STATUS)
          ELSE
-            CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',ADDRESS,
-     :                                                  SLOT,STATUS)
+            CALL DSA_MAP_VARIANCE('OUTPUT','WRITE','FLOAT',EPTRO,
+     :                            SLOT,STATUS)
          END IF
-         EPTRO=DYN_ELEMENT(ADDRESS)
       END IF
 C
       IF(STATUS.NE.0)GOTO 500
@@ -328,26 +329,26 @@ C     rather than just take the corresponding subset.
 C
 C     First, subset the data
 C
-      CALL GEN_SUBSET(DYNAMIC_MEM(IPTR),NX,NY,NXNEW,NYNEW,IXST,IYST,
-     :                DYNAMIC_MEM(IPTRO))
+      CALL GEN_SUBSET(%VAL(CNF_PVAL(IPTR)),NX,NY,NXNEW,NYNEW,IXST,IYST,
+     :                %VAL(CNF_PVAL(IPTRO)))
 C 
 C     Now the AXIS(1) data if any (checking for the nos 1-N).  Also
 C     take the appropriate section from a 2-dimensional axis when this
 C     axis does not have values 1 to NX*NY.
 C
       IF(XEXIST)THEN
-         IF (GEN_CHKNSF(DYNAMIC_MEM(XPTR),NX)) THEN
+         IF (GEN_CHKNSF(%VAL(CNF_PVAL(XPTR)),NX)) THEN
             ITXST=1
          ELSE
             ITXST=IXST
-         ENDIF
+         END IF
 
          IF ( XNDIM .GT. 1 ) THEN
-            CALL GEN_SUBSET(DYNAMIC_MEM(XPTR),NX,XDIMS(2),NXNEW,
-     :                      XDIMSN(2),IXST,IYST,DYNAMIC_MEM(XPTRO))
+            CALL GEN_SUBSET(%VAL(CNF_PVAL(XPTR)),NX,XDIMS(2),NXNEW,
+     :                      XDIMSN(2),IXST,IYST,%VAL(CNF_PVAL(XPTRO)))
          ELSE
-            CALL GEN_SUBSET(DYNAMIC_MEM(XPTR),NX,XDIMS(2),NXNEW,
-     :                      XDIMSN(2),ITXST,1,DYNAMIC_MEM(XPTRO))
+            CALL GEN_SUBSET(%VAL(CNF_PVAL(XPTR)),NX,XDIMS(2),NXNEW,
+     :                      XDIMSN(2),ITXST,1,%VAL(CNF_PVAL(XPTRO)))
          END IF
 C
 C     And the AXIS(1) width, if any.  Note that although the axis
@@ -359,41 +360,43 @@ C     (MJC).
 C
          IF (XWEXIST) THEN
             IF ( XNDIM .GT. 1 ) THEN
-               CALL GEN_SUBSET(DYNAMIC_MEM(XWPTR),NX,XDIMS(2),NXNEW,
-     :                         XDIMSN(2),IXST,IYST,DYNAMIC_MEM(XWPTRO))
+               CALL GEN_SUBSET(%VAL(CNF_PVAL(XWPTR)),NX,XDIMS(2),NXNEW,
+     :                         XDIMSN(2),IXST,IYST,
+     :                         %VAL(CNF_PVAL(XWPTRO)))
             ELSE
-               CALL GEN_SUBSET(DYNAMIC_MEM(XWPTR),NX,XDIMS(2),NXNEW,
-     :                         XDIMSN(2),IXST,1,DYNAMIC_MEM(XWPTRO))
+               CALL GEN_SUBSET(%VAL(CNF_PVAL(XWPTR)),NX,XDIMS(2),NXNEW,
+     :                         XDIMSN(2),IXST,1,%VAL(CNF_PVAL(XWPTRO)))
             END IF
          END IF
-      ENDIF
+      END IF
 C
 C    Ditto for AXIS(2).
 C
       IF (NDIM.GT.1.AND.YEXIST) THEN
-         IF (GEN_CHKNSF(DYNAMIC_MEM(YPTR),NY)) THEN
+         IF (GEN_CHKNSF(%VAL(CNF_PVAL(YPTR)),NY)) THEN
             ITYST=1
          ELSE
             ITYST=IYST
-         ENDIF
+         END IF
 
          IF ( YNDIM .GT. 1 ) THEN
-            CALL GEN_SUBSET(DYNAMIC_MEM(YPTR),NY,YDIMS(2),NYNEW,
-     :                      YDIMSN(2),IYST,IXST,DYNAMIC_MEM(YPTRO))
+            CALL GEN_SUBSET(%VAL(CNF_PVAL(YPTR)),NY,YDIMS(2),NYNEW,
+     :                      YDIMSN(2),IYST,IXST,%VAL(CNF_PVAL(YPTRO)))
          ELSE
-            CALL GEN_SUBSET(DYNAMIC_MEM(YPTR),NY,YDIMS(2),NYNEW,
-     :                      YDIMSN(2),ITYST,1,DYNAMIC_MEM(YPTRO))
+            CALL GEN_SUBSET(%VAL(CNF_PVAL(YPTR)),NY,YDIMS(2),NYNEW,
+     :                      YDIMSN(2),ITYST,1,%VAL(CNF_PVAL(YPTRO)))
          END IF
 C
 C        And the AXIS(2) width, if any.
 C
          IF (YWEXIST) THEN
             IF ( YNDIM .GT. 1 ) THEN
-               CALL GEN_SUBSET(DYNAMIC_MEM(YWPTR),NY,YDIMS(2),NYNEW,
-     :                         YDIMSN(2),IYST,IXST,DYNAMIC_MEM(YWPTRO))
+               CALL GEN_SUBSET(%VAL(CNF_PVAL(YWPTR)),NY,YDIMS(2),NYNEW,
+     :                         YDIMSN(2),IYST,IXST,
+     :                         %VAL(CNF_PVAL(YWPTRO)))
             ELSE
-               CALL GEN_SUBSET(DYNAMIC_MEM(YWPTR),NY,YDIMS(2),NYNEW,
-     :                         YDIMSN(2),IYST,1,DYNAMIC_MEM(YWPTRO))
+               CALL GEN_SUBSET(%VAL(CNF_PVAL(YWPTR)),NY,YDIMS(2),NYNEW,
+     :                         YDIMSN(2),IYST,1,%VAL(CNF_PVAL(YWPTRO)))
             END IF
          END IF
       END IF
@@ -401,9 +404,9 @@ C
 C     And the error (or variance) array (if any)
 C
       IF(EEXIST)THEN
-         CALL GEN_SUBSET(DYNAMIC_MEM(EPTR),NX,NY,NXNEW,NYNEW,IXST,IYST,
-     :                  DYNAMIC_MEM(EPTRO))
-      ENDIF
+         CALL GEN_SUBSET(%VAL(CNF_PVAL(EPTR)),NX,NY,NXNEW,NYNEW,IXST,
+     :                   IYST,%VAL(CNF_PVAL(EPTRO)))
+      END IF
 
   500 CONTINUE
 C

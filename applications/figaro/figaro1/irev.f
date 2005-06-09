@@ -31,9 +31,9 @@ C     2nd  Jul 1984  PCP / CIT.  Renamed from IREVX to IREV, now
 C                    supports both IREVX and IREVY.
 C     27th May 1986  KS / AAO.  Now closes down the output file
 C                    properly.
-C     27th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs changed.
-C                    Modified dynamic emmeory handling - now uses DYN_
-C                    routines.
+C     27th Jul 1987  DJA / AAO. Revised DSA_ routines - some specs 
+C                    changed. Modified dynamic emmeory handling - now 
+C                    uses DYN_ routines.
 C     18th Sep 1988  KS / AAO. Use of SAME corrected.  Was only working
 C                    properly for in situ reversals.
 C     18th Dec 1990  KS / AAO. Now handles non-float data properly.
@@ -46,43 +46,44 @@ C                    instead of INPUT, and if STATUS ok instead of not
 C                    ok).
 C     7th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL GEN_CHKNSF
-      INTEGER DYN_ELEMENT
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      APTR         ! Dynamic-memory pointer to xy-axis data
-      INTEGER      ASLOT        ! Map slot number of xy-axis data
-      INTEGER      AXIS         ! The axis number of rotation
-      CHARACTER    COMMAND*64   ! The actual FIGARO command used
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      LOGICAL      EXIST        ! TRUE if an axis data structure exists
-      INTEGER      IOFF         !
-      INTEGER      IY           !
-      INTEGER      NA1          ! Size of 1st dimension of xy-axis data
-      INTEGER      NA2          ! Size of 2st dimension of xy-axis data
-      INTEGER      NAELM        ! Number of elements in axis array
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension of main data array
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      EPTR         ! Dynamic-memory pointer to errors array
-      INTEGER      ESLOT        ! Map slot number for errors array
-      LOGICAL      REV          ! TRUE if the axis-data is to be reversed
-      LOGICAL      SAME         ! True if input and output data areas are same
-      INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      APTR          ! Dynamic-memory pointer to xy-axis 
+                                 ! data
+      INTEGER      ASLOT         ! Map slot number of xy-axis data
+      INTEGER      AXIS          ! The axis number of rotation
+      CHARACTER    COMMAND*64    ! The actual FIGARO command used
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      LOGICAL      EXIST         ! TRUE if an axis data structure exists
+      INTEGER      IY            !
+      INTEGER      NA1           ! Size of 1st dimension of xy-axis data
+      INTEGER      NA2           ! Size of 2st dimension of xy-axis data
+      INTEGER      NAELM         ! Number of elements in axis array
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension of main data
+                                 ! array
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output
+                                 ! data array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      EPTR          ! Dynamic-memory pointer to errors 
+                                 ! array
+      INTEGER      ESLOT         ! Map slot number for errors array
+      LOGICAL      REV           ! Axis-data is to be reversed?
+      LOGICAL      SAME          ! Input and output data areas are same?
+      INTEGER      STATUS        ! Running status for DSA_ routines
 C
 C     Initialisation of DSA_ routines
 C
@@ -136,52 +137,50 @@ C
          CALL DSA_AXIS_SIZE('IMAGE',AXIS,2,NDIM,DIMS,NAELM,STATUS)
          NA1=DIMS(1)
          NA2=NAELM/NA1
-         CALL DSA_MAP_AXIS_DATA('OUTPUT',AXIS,'UPDATE','FLOAT',ADDRESS,
-     :                                                 ASLOT,STATUS)
-         APTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA('OUTPUT',AXIS,'UPDATE','FLOAT',APTR,
+     :                          ASLOT,STATUS)
          IF (STATUS.NE.0) GOTO 500
 C
 C        Make sure array isn't just bin numbers
 C
          REV=.FALSE.
-         IOFF=0
          DO IY=1,NA2
-            IF (.NOT.GEN_CHKNSF(DYNAMIC_MEM(APTR+IOFF),NA1)) REV=.TRUE.
+            REV = .NOT.GEN_CHKNSF(%VAL(CNF_PVAL(APTR)),NA1)
          END DO
          SAME=.TRUE.
          IF (REV) THEN
-            CALL GEN_REV2D(DYNAMIC_MEM(APTR),NA1,NA2,SAME,
-     :                                 DYNAMIC_MEM(APTR))
+            CALL GEN_REV2D(%VAL(CNF_PVAL(APTR)),NA1,NA2,SAME,
+     :                          %VAL(CNF_PVAL(APTR)))
          END IF
       END IF
 C
 C     Now map and reverse the main data array
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
       SAME=.TRUE.
       IF (AXIS.EQ.1) THEN
-         CALL GEN_REV2D(DYNAMIC_MEM(OPTR),NX,NY,SAME,DYNAMIC_MEM(OPTR))
+         CALL GEN_REV2D(%VAL(CNF_PVAL(OPTR)),NX,NY,SAME,
+     :                  %VAL(CNF_PVAL(OPTR)))
       ELSE
-         CALL GEN_REF2D(DYNAMIC_MEM(OPTR),NX,NY,SAME,DYNAMIC_MEM(OPTR))
+         CALL GEN_REF2D(%VAL(CNF_PVAL(OPTR)),NX,NY,SAME,
+     :                  %VAL(CNF_PVAL(OPTR)))
       END IF
 C
 C     Now see if there is an errors array. Map and reverse it.
 C
       CALL DSA_SEEK_ERRORS( 'IMAGE', EXIST, STATUS )
       IF ( EXIST ) THEN
-         CALL DSA_MAP_ERRORS( 'OUTPUT', 'UPDATE', 'FLOAT', ADDRESS,
-     :      ESLOT, STATUS )
-         EPTR = DYN_ELEMENT( ADDRESS )
+         CALL DSA_MAP_ERRORS( 'OUTPUT', 'UPDATE', 'FLOAT', EPTR,
+     :                        ESLOT, STATUS )
          IF ( STATUS .NE. 0 ) GO TO 500
          SAME = .TRUE.
          IF ( AXIS .EQ. 1 ) THEN
-            CALL GEN_REV2D( DYNAMIC_MEM(EPTR), NX, NY, SAME,
-     :         DYNAMIC_MEM(EPTR) )
+            CALL GEN_REV2D( %VAL(CNF_PVAL(EPTR)), NX, NY, SAME,
+     :                      %VAL(CNF_PVAL(EPTR)) )
          ELSE
-            CALL GEN_REF2D( DYNAMIC_MEM(EPTR), NX, NY, SAME,
-     :         DYNAMIC_MEM(EPTR) )
+            CALL GEN_REF2D( %VAL(CNF_PVAL(EPTR)), NX, NY, SAME,
+     :                      %VAL(CNF_PVAL(EPTR)) )
          END IF
       END IF
 C

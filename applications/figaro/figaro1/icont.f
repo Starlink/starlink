@@ -391,7 +391,7 @@ C
          PGARRAY(5)=0
       ELSE
          PGARRAY(5)=1
-      ENDIF
+      END IF
       PGARRAY(6)=0
       CALL VAR_SETARY('PGENVARG',6,PGARRAY,STATUS)
 C

@@ -43,57 +43,65 @@ C     13 Oct 1992  HME / UoE, Starlink.  INCLUDE changed. Renamed from
 C                  ROTATE to IROT90.
 C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
-C     26 Jul 1996  MJCL / Starlink, UCL.  Added parameter ABORT checking.
+C     26 Jul 1996  MJCL / Starlink, UCL.  Added parameter ABORT 
+C                  checking.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL GEN_CHKNSF
-      INTEGER DYN_ELEMENT, DYN_INCREMENT
-      LOGICAL PAR_ABORT  ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER   ADDRESS  ! Virtual address for data array
-      LOGICAL   AEXIST   ! Checks for existence of axes structures
-      LOGICAL   ANTI     !
-      INTEGER   APTR     ! Dynamic memory element for axis data
-      INTEGER   DIMS(2)  ! Image (or axis) dimensions
-      LOGICAL   EEXIST   ! True if image has an error array
-      INTEGER   EPTR     ! Dynamic memory element for input errors
-      INTEGER   EPTRO    ! Dynamic memory element for output errors
-      LOGICAL   FLAGGED  ! True if data array has flagged values
-      INTEGER   IPTR     ! Dynamic memory element for IMAGE data
-      INTEGER   J        ! Do loop variable
-      INTEGER   MODE     !
-      INTEGER   NAX      !
-      INTEGER   NAXOUT   ! Axis number
-      INTEGER   NDIM     ! Number of image dimensions
-      INTEGER   NELM     ! Number of elements in image - ignored
-      INTEGER   NLINE    ! Second dimension of original image
-      INTEGER   NPIX     ! First dimension of original image
-      INTEGER   OPTR     ! Dynamic memory element for OUTPUT data
-      LOGICAL   QEXIST   ! True if image has a quality array
-      INTEGER   QPTR     ! Dynamic memory element for input quality array
-      INTEGER   QPTRO    ! Dynamic memory element for output quality array
-      LOGICAL   REV      ! True if axis data needs reversing
-      LOGICAL   SINGLE   ! True if axis width is a single value
-      INTEGER   SLOT     ! Slot number for input mapped data
-      INTEGER   SLOTO    ! Slot number for output mapped data
-      INTEGER   STATUS   ! Running status for DSA routines
-      LOGICAL   WEXIST   ! True if axis has width data
-      DOUBLE PRECISION WIDTH ! Width value for axis, if single - ignored
-      INTEGER   WPTR     ! Dynamic memory element for axis width data
+      LOGICAL   AEXIST           ! Checks for existence of axes
+                                 ! structures
+      LOGICAL   ANTI             !
+      INTEGER   APTR             ! Dynamic-mem pointer for axis data
+      INTEGER   AXPTR            ! Dynamic-mem pointer for axis data
+      INTEGER   DIMS(2)          ! Image (or axis) dimensions
+      LOGICAL   EEXIST           ! True if image has an error array
+      INTEGER   EPTR             ! Dynamic-mem pointer for input errors
+      INTEGER   EPTRO            ! Dynamic-mem pointer for output errors
+      LOGICAL   FLAGGED          ! True if data array has flagged values
+      INTEGER   IPTR             ! Dynamic-mem pointer for IMAGE data
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      INTEGER   J                ! Do loop variable
+      INTEGER   MODE             !
+      INTEGER   NAX              !
+      INTEGER   NAXOUT           ! Axis number
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NLINE            ! Second dimension of original image
+      INTEGER   NPIX             ! First dimension of original image
+      INTEGER   OPTR             ! Dynamic-mem pointer for OUTPUT data
+      LOGICAL   QEXIST           ! True if image has a quality array
+      INTEGER   QPTR             ! Dynamic-mem pointer for input quality
+                                 ! array
+      INTEGER   QPTRO            ! Dynamic-mem pointer for output
+                                 ! quality array
+      LOGICAL   REV              ! True if axis data needs reversing
+      LOGICAL   SINGLE           ! True if axis width is a single value
+      INTEGER   SLOT             ! Slot number for input mapped data
+      INTEGER   SLOTO            ! Slot number for output mapped data
+      INTEGER   STATUS           ! Running status for DSA routines
+      INTEGER   TPTR             ! Temporary dynamic-mem pointer for 
+                                 ! axis
+      LOGICAL   WEXIST           ! True if axis has width data
+      DOUBLE PRECISION WIDTH     ! Width value for axis, if single -
+                                 ! ignored
+      INTEGER   WPTR             ! Dynamic-mem pointer for axis-width 
+                                 ! data
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -118,8 +126,7 @@ C
 C     Map input data
 C
       CALL DSA_USE_FLAGGED_VALUES ('IMAGE',STATUS)
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       CALL DSA_SEEK_FLAGGED_VALUES ('IMAGE',FLAGGED,STATUS)
 C
 C     anti-clockwise?
@@ -139,15 +146,13 @@ C
       DIMS(1)=NLINE
       IF (FLAGGED) CALL DSA_USE_FLAGGED_VALUES ('OUTPUT',STATUS)
       CALL DSA_RESHAPE_DATA('OUTPUT','IMAGE',NDIM,DIMS,STATUS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,SLOTO,
-     :                   STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,SLOTO,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Rotate input into output
 C
-      CALL JRL_ROT2D(DYNAMIC_MEM(IPTR),NPIX,NLINE,mode,
-     : DYNAMIC_MEM(OPTR))
+      CALL JRL_ROT2D(%VAL(CNF_PVAL(IPTR)),NPIX,NLINE,MODE,
+     :               %VAL(CNF_PVAL(OPTR)))
       CALL DSA_UNMAP(SLOT,STATUS)
       CALL DSA_UNMAP(SLOTO,STATUS)
 C
@@ -158,15 +163,12 @@ C     by DSA_RESHAPE_DATA.
 C
       CALL DSA_SEEK_ERRORS('IMAGE',EEXIST,STATUS)
       IF(EEXIST)THEN
-         CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',ADDRESS,SLOT,
+         CALL DSA_MAP_ERRORS('IMAGE','READ','FLOAT',EPTR,SLOT,STATUS)
+         CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',EPTRO,SLOTO,
      :                        STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',ADDRESS,SLOTO,
-     :                        STATUS)
-         EPTRO=DYN_ELEMENT(ADDRESS)
          IF(STATUS.NE.0)GOTO 500
-         CALL JRL_ROT2D(DYNAMIC_MEM(EPTR),NPIX,NLINE,mode,
-     :   DYNAMIC_MEM(EPTRO))
+         CALL JRL_ROT2D(%VAL(CNF_PVAL(EPTR)),NPIX,NLINE,MODE,
+     :                  %VAL(CNF_PVAL(EPTRO)))
          CALL DSA_UNMAP(SLOT,STATUS)
          CALL DSA_UNMAP(SLOTO,STATUS)
       END IF
@@ -182,8 +184,8 @@ C
             CALL DSA_AXIS_SIZE('IMAGE',J,2,NDIM,DIMS,NELM,STATUS)
             CALL DSA_RESHAPE_AXIS('OUTPUT',NAXOUT,'IMAGE',J,
      :                             NDIM,DIMS,STATUS)
-         ENDIF
-      ENDDO
+         END IF
+      END DO
 C
 C     Note that the rotation is such that X -> Y but Y -> -X, so
 C     if there is a new X-array, it should be reversed, so long as
@@ -198,33 +200,39 @@ C
       CALL DSA_SEEK_AXIS ('OUTPUT',NAX,AEXIST,STATUS)
       IF (AEXIST) THEN
          CALL DSA_AXIS_SIZE ('OUTPUT',NAX,2,NDIM,DIMS,NELM,STATUS)
-         CALL DSA_MAP_AXIS_DATA ('OUTPUT',NAX,'UPDATE','FLOAT',ADDRESS,
-     :                                                   SLOT,STATUS)
+         CALL DSA_MAP_AXIS_DATA ('OUTPUT',NAX,'UPDATE','FLOAT',AXPTR,
+     :                           SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
-         APTR=DYN_ELEMENT(ADDRESS)
          REV=.FALSE.
          IF (NDIM.EQ.1) DIMS(2)=1
+         APTR = AXPTR
          DO J=1,DIMS(2)
-            IF (.NOT.GEN_CHKNSF(DYNAMIC_MEM(APTR),DIMS(1))) REV=.TRUE.
-            APTR=DYN_INCREMENT(APTR,'FLOAT',DIMS(1))
+            REV = .NOT.GEN_CHKNSF(%VAL(CNF_PVAL(APTR)),DIMS(1))
+
+C   Increment the pointer for the offset.  Tidy CNF pointer resource.
+            CALL DYN_INCAD(APTR,'FLOAT',DIMS(1),TPTR,ISNEW,STATUS)
+            IF (J.GT.1.AND.ISNEW) CALL CNF_UNREGP(APTR)
+            APTR=TPTR
          END DO
          IF (REV) THEN
-            APTR=DYN_ELEMENT(ADDRESS)
-            CALL GEN_REV2D(DYNAMIC_MEM(APTR),DIMS(1),DIMS(2),.TRUE.,
-     :                                            DYNAMIC_MEM(APTR))
+
+C  Return to the original pointer.
+            APTR=AXPTR
+            CALL GEN_REV2D(%VAL(CNF_PVAL(APTR)),DIMS(1),DIMS(2),.TRUE.,
+     :                     %VAL(CNF_PVAL(APTR)))
             CALL DSA_UNMAP(SLOT,STATUS)
             CALL DSA_SEEK_WIDTH ('OUTPUT',NAX,WEXIST,SINGLE,WIDTH,
-     :      STATUS)
+     :                           STATUS)
             IF (WEXIST.AND.(.NOT.SINGLE)) THEN
                CALL DSA_MAP_WIDTH ('OUTPUT',NAX,'UPDATE','FLOAT',
-     :                                            ADDRESS,SLOT,STATUS)
+     :                             WPTR,SLOT,STATUS)
                IF (STATUS.NE.0) GO TO 500
-               WPTR=DYN_ELEMENT(ADDRESS)
-               CALL GEN_REV2D(DYNAMIC_MEM(WPTR),DIMS(1),DIMS(2),.TRUE.,
-     :                                            DYNAMIC_MEM(WPTR))
+               CALL GEN_REV2D(%VAL(CNF_PVAL(WPTR)),DIMS(1),DIMS(2),
+     :                        .TRUE.,%VAL(CNF_PVAL(WPTR)))
                CALL DSA_UNMAP(SLOT,STATUS)
             END IF
          END IF
+         IF (ISNEW) CALL CNF_UNREGP(TPTR)
       END IF
 C
   500 CONTINUE

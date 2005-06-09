@@ -95,14 +95,17 @@ C                  to FIG_MAKE_AXIS_LABEL.
 C     24 Jul 1996  MJCL / Starlink, UCL.  Corrected type of REVERS.
 C                  Catenations updated for Linux.
 C     26 Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_GIVEN
       INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY
-      INTEGER DYN_ELEMENT,DYN_INCREMENT
       REAL    GEN_ELEMF
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
@@ -119,14 +122,13 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       LOGICAL   AUTOSC           ! TRUE if AUTOSCALE is specified
       LOGICAL   AXES             ! TRUE if axes are to be drawn
       REAL      BIAS             !
       INTEGER   CKEY             ! Colour code used by PGPLOT
       CHARACTER COLOUR*10        ! COLOUR specification
       CHARACTER DEVICE*32        ! PGPLOT device specification
-      INTEGER   DDIMS(10)        ! The sizes of the dimensions of the data
+      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       REAL      DHIGH            !
       CHARACTER DLAB*64          ! Plot data axis label
       CHARACTER DLABEL*32        ! Structure data axis label
@@ -148,6 +150,7 @@ C
       INTEGER   IDST             ! First element to be plotted in data
       INTEGER   INCY             ! +1 for normal plots, -1 for reverse
       INTEGER   IPTR             ! 
+      LOGICAL   ISNEW            ! Is address new to CNF?
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
       INTEGER   IY               !
@@ -156,34 +159,40 @@ C
       INTEGER   IYEN             ! Last element to be plotted in y-axis
       INTEGER   IYST             ! First element to be plotted in y-axis
       CHARACTER LABEL*64         ! The group label for all the plots
-      INTEGER   LASTY            ! Number of last cross-section on a page
-      LOGICAL   LINES
+      INTEGER   LASTY            ! Number of last cross-section on a 
+                                 ! page
+      LOGICAL   LINES            !
       INTEGER   LLAB             ! Length of label string
       REAL      LOW              ! Minimum Y-value for a plot
       REAL      MAGNITUDE        !
       INTEGER   MSPEC            !
       INTEGER   NCH              !
-      INTEGER   NDD              ! Dimensionality of input data structure
+      INTEGER   NDD              ! Dimensionality of input data 
+                                 ! structure
       INTEGER   NDELM            ! Total number of elements in the data
-      INTEGER   ND1              ! Total number of elements per x-section
+      INTEGER   ND1              ! Total number of elements per 
+                                 ! x-section
       INTEGER   ND2              ! Total number of cross-sections
       INTEGER   NEXT             ! ICH_KEY arguement - ignored
-      INTEGER   NPELMS           ! Number of array elements to be plotted
+      INTEGER   NPELMS           ! Number of array elements to be 
+                                 ! plotted
       INTEGER   NSPECT           ! Number of x-sections to be plotted
       INTEGER   NXELM            ! Total number of elements in x-axis
       REAL      OFFSET           ! 
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
       REAL      RESET            !
       LOGICAL   REVERS           ! TRUE if REVERSE is specified
       INTEGER   SLANT            ! Slant in pixels between x-sections
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
+      INTEGER   TPTR             ! Temp dynamic-memory pointer
       REAL      TVDIM            !
       REAL      VALUE            ! Temporary REAL
       REAL      VMAX             ! Maximum value in data array
       REAL      VMIN             ! Minimum value in data array
       LOGICAL   WHOLE            ! Value specified for WHOLE
       INTEGER   WPTR             ! Pointer to plotting workspace
-      INTEGER   WSLOT            ! Map slot number used for plot workspace
+      INTEGER   WSLOT            ! Map slot number for plot workspace
       CHARACTER XLAB*64          ! X-axis label for plot
       CHARACTER XLABEL*32        ! Structure x-axis label
       INTEGER   XSLOT            ! Map slot number used for x-axis info
@@ -195,10 +204,6 @@ C
       INTEGER   YSLOT            ! Map slot number used for y-axis info
       REAL      YVEN             ! Last Y-axis value to be plotted
       REAL      YVST             ! First Y-axis value to be plotted
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -223,10 +228,9 @@ C
 C     Get limits on data range  (YSTART, YEND)
 C
       CALL DSA_AXIS_RANGE('IMAGE',2,' ',.FALSE.,YVST,YVEN,
-     :                                      IYST,IYEN,STATUS)
-      CALL DSA_MAP_AXIS_DATA('IMAGE',2,'READ','FLOAT',ADDRESS,
-     :                                         YSLOT,STATUS)
-      YPTR=DYN_ELEMENT(ADDRESS)
+     :                    IYST,IYEN,STATUS)
+      CALL DSA_MAP_AXIS_DATA('IMAGE',2,'READ','FLOAT',YPTR,
+     :                       YSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Try for x-axis information
@@ -241,19 +245,17 @@ C
       CALL PAR_RDKEY('WHOLE',.TRUE.,WHOLE)
       IF ( PAR_ABORT() ) GO TO 500
       CALL DSA_AXIS_RANGE ('IMAGE',1,'Unconstrained',WHOLE,XVST,
-     :                                    XVEN,IXST,IXEN,STATUS)
+     :                     XVEN,IXST,IXEN,STATUS)
 C
 C     Try to map the x-axis data array
 C
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',ADDRESS,
-     :                                         XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Map the image data
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     See if REVERSE specified
@@ -276,26 +278,35 @@ C
 C
 C     Specified or not, find out the scale range because we can
 C     use that for the reset values.  The calculation of the reset
-C     values for HIGH and LOW is as follows - 
-C     LOW is simply the lowest value found in whichever cross-section
-C     is to be plotted first.
-C     HIGH is then calculated on the basis of the following relation:
-C     if m is the cross-section number containing the data that will
-C     reach the highest in the plot, and Y is the maximum value in
-C     that cross-section, then OFFSET=(HIGH-LOW)/(IYEN-IYST+1) and
-C     HIGH = OFFSET*(M-1)+Y-LOW
-C     which can be solved for HIGH for each cross-section in turn,
-C     and the highest resulting value is used.
+C     values for HIGH and LOW is as follows:
+C       LOW is simply the lowest value found in whichever cross-section
+C       is to be plotted first.
 C
-      IPTR=DYN_INCREMENT(DPTR,'FLOAT',(IY1-1)*ND1)
-      CALL GEN_RANGEF(DYNAMIC_MEM(IPTR),IXST,IXEN,VMAX,DLOW)
+C       HIGH is then calculated on the basis of the following relation:
+C       if m is the cross-section number containing the data that will
+C       reach the highest in the plot, and Y is the maximum value in
+C       that cross-section, then OFFSET=(HIGH-LOW)/(IYEN-IYST+1) and
+C       HIGH = OFFSET*(M-1)+Y-LOW, which can be solved for HIGH for 
+C       each cross-section in turn, and the highest resulting value is 
+C       used.
+C
+C     Clear up previous CNF pointer if new.
+C
+      CALL DYN_INCAD(DPTR,'FLOAT',(IY1-1)*ND1,IPTR,ISNEW,STATUS)
+      CALL GEN_RANGEF(%VAL(CNF_PVAL(IPTR)),IXST,IXEN,VMAX,DLOW)
       NSPECT=IYEN-IYST+1
       MSPEC=0
+      PISNEW = .FALSE.
       DO IY=IY1,IY2,INCY
          IF (IY.NE.IY1) THEN
-            CALL GEN_RANGEF(DYNAMIC_MEM(IPTR),IXST,IXEN,VMAX,VMIN)
+            CALL GEN_RANGEF(%VAL(CNF_PVAL(IPTR)),IXST,IXEN,VMAX,VMIN)
          END IF
-         IPTR=DYN_INCREMENT(IPTR,'FLOAT',ND1*INCY)
+
+         CALL DYN_INCAD(IPTR,'FLOAT',INCY*ND1,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(IPTR)
+         IPTR = TPTR
+         PISNEW = ISNEW
+
          MSPEC=MSPEC+1
          HIGHD=(VMAX*(NSPECT)-DLOW*(MSPEC+NSPECT-1))/(NSPECT-MSPEC+1)
          IF (IY.NE.IY1) THEN
@@ -304,6 +315,7 @@ C
             DHIGH=HIGHD
          END IF
       END DO
+      IF (ISNEW) CALL CNF_UNREGP(IPTR)
 C
 C     Get image data information (units and label)
 C
@@ -395,8 +407,8 @@ C
       IF (IXST.EQ.IXEN) THEN
          IXST=MAX(IXST-1,1)
          IXEN=MIN(IXEN+1,ND1)
-         XVST=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXST)
-         XVEN=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXEN)
+         XVST=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXST)
+         XVEN=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXEN)
       END IF
 C
 C     Get the axis labels from the labels and units
@@ -406,15 +418,14 @@ C
 C
 C     Get workspace for PLHI2D
 C
-      CALL DSA_GET_WORK_ARRAY (ND1,'FLOAT',ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (ND1,'FLOAT',WPTR,WSLOT,STATUS)
 C
 C     Finally, perform the plot
 C
-      CALL FIG_PLHI2D(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),ND1,ND2,
+      CALL FIG_PLHI2D(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),ND1,ND2,
      :                IY1,IY2,IXST,IXEN,HIGH,LOW,SLANT,OFFSET,XLAB,
      :                DLAB,LABEL,AXES,ERASE,DEVICE,CKEY,XVST,XVEN,
-     :                                     DYNAMIC_MEM(WPTR),STATUS)
+     :                %VAL(CNF_PVAL(WPTR)),STATUS)
 C
 C     Set the user variables describing the plot.
 C

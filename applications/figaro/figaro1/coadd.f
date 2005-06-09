@@ -139,7 +139,7 @@ C
       CALL DSA_RESHAPE_AXIS('SPECT',1,'IMAGE',1,1,DIMS(1),STATUS)
       IF (NDIM .EQ. 3) THEN
          CALL DSA_RESHAPE_AXIS('SPECT',2,'IMAGE',2,1,DIMS(2),STATUS)
-      ENDIF
+      END IF
       CALL DSA_USE_QUALITY('SPECT',STATUS)
 C
 C     Map the input and output data
@@ -155,7 +155,7 @@ C
       IF (IYEN .NE. IYST) THEN
          CALL DSA_MAP_ERRORS('SPECT','WRITE','FLOAT',EPTR,SLOT,
      :                       STATUS)
-      ENDIF
+      END IF
 C
 C     Get workspace arays
 C
@@ -278,15 +278,15 @@ C
                   IF (EXCLUDE(IX,IY) .EQ. 0) THEN
                      SUM=SUM+IMAGE(IX,IY)
                      NSUM=NSUM+1
-                  ENDIF
+                  END IF
                END DO
             END DO
             IF (NSUM .NE. 0) THEN
                 SUM=SUM/NSUM
             ELSE
                 SUM = 0.0
-            ENDIF
-         ENDIF
+            END IF
+         END IF
 C
 C        Calculate the spectrum by summing the points for all rows and
 C        dividing by the number of good cycles
@@ -298,13 +298,13 @@ C
                IF (EXCLUDE(IX,IY) .EQ. 0) THEN
                    SPECT(IX)=SPECT(IX)+IMAGE(IX,IY)
                    NUM_CYCLES(IX)=NUM_CYCLES(IX)+1
-               ENDIF
-            ENDDO
+               END IF
+            END DO
             IF (NUM_CYCLES(IX) .NE. 0) THEN
                 SPECT(IX)=SPECT(IX)/REAL(NUM_CYCLES(IX))
             ELSE
                 QUALITY(IX) = 1
-            ENDIF
+            END IF
          END DO
 C
 C     Create the errors array
@@ -322,13 +322,13 @@ C
                      IF (EXCLUDE(IX,IY) .EQ. 0) THEN
                          NF=NF+IMAGE(IX,IY)
                          NSUM = NSUM+1
-                     ENDIF
+                     END IF
                   END DO
                   IF (NSUM .NE. 0) THEN
                       NF=NF/NSUM
                   ELSE
                       NF = 0.0
-                  ENDIF
+                  END IF
 C
 C     Now calculate the rms deviation from the mean after scaling each
 C     point by the factor SUM/NF which sets the mean for the cycle to
@@ -338,7 +338,7 @@ C
                      IF (EXCLUDE(IX,IY) .EQ. 0) THEN
                          X=SUM/NF*IMAGE(IX,IY)-SPECT(IX)
                          ERRORS(IX)=ERRORS(IX)+X*X
-                     ENDIF
+                     END IF
                   END DO
                ELSE
 C
@@ -348,9 +348,9 @@ C
                      IF (EXCLUDE(IX,IY) .EQ. 0) THEN
                         X=IMAGE(IX,IY)-SPECT(IX)
                         ERRORS(IX)=ERRORS(IX)+X*X
-                     ENDIF
+                     END IF
                   END DO
-               ENDIF
+               END IF
             END DO
 C
 C     Calculate standard error
@@ -363,9 +363,9 @@ C
      :                     (NUM_CYCLES(IX)-1))
                ELSE
                    ERRORS(IX)=FUNKNOWN_OUT
-               ENDIF
+               END IF
             END DO
-         ENDIF
+         END IF
 C
 C     Check for points to exclude - i.e. any that deviate from
 C     the mean by more than CUTOFF times SIGMA - if there are any, set 
@@ -384,15 +384,15 @@ C
                            WRITE(OUTMES,'('' Point'',I4,'' Cycle'',I4,  
      :                          '' Excluded'')') IX,IY                  
                            CALL PAR_WRUSER(OUTMES,STATUS)               
-                        ENDIF                                           
-                     ENDIF                                              
-                  ENDDO
-               ENDIF                                                 
-            ENDDO
-         ENDIF
+                        END IF                                           
+                     END IF                                              
+                  END DO
+               END IF                                                 
+            END DO
+         END IF
 C
 C   Loop back to repeat calculation of mean and errors until there are
 C   no more points to exclude
 C
-      ENDDO
+      END DO
       END

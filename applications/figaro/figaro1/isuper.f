@@ -34,81 +34,84 @@ C
 C                                            KS / CIT 9th Aug 1984
 C     Modified -
 C
-C     25th Mar 1985.  KS / AAO.  Code to handle linear X and Y data
-C                     added.
-C     9th  May 1986.  KS / AAO.  Use of DTA_MRVAR to map output data
-C                     corrected.  DTA_MUVAR used instead.
-C     25th Aug  1988. JM / AAO. Modified to use DSA_ routines
-C                     Dynamic memory handling changed to use
-C                     DYN_ routines
-C     15th Jan. 1991. JMS / AAO. Now informs user that it will not
-C                     extrapolate 2D x-axis. Made minor changes to the
-C                     assignment of the NX and NY variables.
-C     29th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed. Call
-C                     PAR_WRUSER instead of DSA_WRUSER.
-C     15th May 1995.  HME / UoE, Starlink.  Change access to output data
-C                     to 'WRITE'.
-C     26th Jul 1996.  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
+C     25th Mar 1985  KS / AAO.  Code to handle linear X and Y data
+C                    added.
+C     9th  May 1986  KS / AAO.  Use of DTA_MRVAR to map output data
+C                    corrected.  DTA_MUVAR used instead.
+C     25th Aug  1988 JM / AAO. Modified to use DSA_ routines
+C                    Dynamic memory handling changed to use
+C                    DYN_ routines
+C     15th Jan. 1991 JMS / AAO. Now informs user that it will not
+C                    extrapolate 2D x-axis. Made minor changes to the
+C                    assignment of the NX and NY variables.
+C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
+C                    PAR_WRUSER instead of DSA_WRUSER.
+C     15th May 1995  HME / UoE, Starlink.  Change access to output data
+C                    to 'WRITE'.
+C     26th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
+C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER    DYN_ELEMENT
       LOGICAL    FIG_SCRCHK
       LOGICAL    GEN_CHKNSF
       REAL       GEN_ELEMF
       CHARACTER  ICH_CI*12   
-      LOGICAL PAR_ABORT      ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
-      LOGICAL   AEXIST       ! True if axis exists
-      CHARACTER CNAXIS*(1)   ! Axis number as a character
-      INTEGER   DIMS(2)      ! Image dimensions
-      INTEGER   ELEMENTS     ! Number of elements in axis array
-      INTEGER   IPTR         ! Dynamic memory element for input data
-      INTEGER   IXYST        ! IXST or IYST (used in loop)
-      INTEGER   IXST         ! The pixel number in AXIS(1) at which the input
-*                              image is to start.
-      INTEGER   IYST         ! The pixel number in AXIS(2) at which the input
-*                              image is to start
-      INTEGER   NAXIS        ! Axis number
-      INTEGER   NDIM         ! Number of image dimensions
-      INTEGER   NDIMA        ! Number of dimensions of an axis
-      INTEGER   NELM         ! Number of elements in image - ignored
-      INTEGER   NX           ! First dimension of input image
-      INTEGER   NY           ! Second dimension of input image
-      INTEGER   NXOUT        ! First dimension of output image
-      INTEGER   NYOUT        ! Second dimension of output image
-      INTEGER   NXY          ! NX or NY (used in loop)
-      INTEGER   NXYOUT       ! NXOUT or NYOUT (used in loop)
-      INTEGER   OPTR         ! Dynamic memory element for output data
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   STATUS       ! Running status for DSA routines
-      REAL      VALUE        ! Used to read in IXST and IYST
-      REAL      VEND         ! Value of last axis element in scaled output array
-      REAL      VSTART       ! Value of 1st axis element in scaled output array
-      INTEGER   XYPTR        ! Dynamic memory element for input axis data
-      INTEGER   XYOPTR       ! Dynamic memory element for output axis data
-      REAL      XVALUE       ! Used to read in NXOUT
-      DOUBLE PRECISION XY1   ! Value of first axis data element in input 
-*                              AXIS(1) or AXIS(2)
-      DOUBLE PRECISION XYLST ! Value of last axis data element in input 
-*                              AXIS(1) or AXIS(2)
-      DOUBLE PRECISION XYDEL ! Increment used in scaling linear axis data
-      REAL      YVALUE       ! Used to read in NYOUT
+      LOGICAL   AEXIST           ! True if axis exists
+      CHARACTER CNAXIS*(1)       ! Axis number as a character
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   ELEMENTS         ! Number of elements in axis array
+      INTEGER   IPTR             ! Dynamic mem pointer for input data
+      INTEGER   IXYST            ! IXST or IYST (used in loop)
+      INTEGER   IXST             ! Pixel number in AXIS(1) at which the 
+                                 ! input image is to start
+      INTEGER   IYST             ! Pixel number in AXIS(2) at which the 
+                                 ! input image is to start
+      INTEGER   NAXIS            ! Axis number
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NDIMA            ! Number of dimensions of an axis
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of input image
+      INTEGER   NY               ! Second dimension of input image
+      INTEGER   NXOUT            ! First dimension of output image
+      INTEGER   NYOUT            ! Second dimension of output image
+      INTEGER   NXY              ! NX or NY (used in loop)
+      INTEGER   NXYOUT           ! NXOUT or NYOUT (used in loop)
+      INTEGER   OPTR             ! Dynamic mem pointer for output data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+      REAL      VALUE            ! Used to read in IXST and IYST
+      REAL      VEND             ! Value of last axis element in scaled
+                                 ! output array
+      REAL      VSTART           ! Value of 1st axis element in scaled
+                                 ! output array
+      INTEGER   XYPTR            ! Dynamic mem pointer for input axis
+                                 ! data
+      INTEGER   XYOPTR           ! Dynamic mem pointer for output axis
+                                 ! data
+      REAL      XVALUE           ! Used to read in NXOUT
+      DOUBLE PRECISION XY1       ! Value of first axis data element in 
+                                 ! input AXIS(1) or AXIS(2)
+      DOUBLE PRECISION XYLST     ! Value of last axis data element in
+                                 ! input AXIS(1) or AXIS(2)
+      DOUBLE PRECISION XYDEL     ! Increment used in scaling linear axis
+                                 ! data
+      REAL      YVALUE           ! Used to read in NYOUT
 
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -168,17 +171,15 @@ C
 C
 C     Map input and output images
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Copy the overlapping pixels and zero others in output image
 C
-      CALL GEN_SUPSET(DYNAMIC_MEM(IPTR),NX,NY,NXOUT,NYOUT,IXST,IYST,
-     :                DYNAMIC_MEM(OPTR))
+      CALL GEN_SUPSET(%VAL(CNF_PVAL(IPTR)),NX,NY,NXOUT,NYOUT,IXST,IYST,
+     :                %VAL(CNF_PVAL(OPTR)))
 C
 C     Deal with the axes structures.  This loop is executed
 C     twice, once for AXIS(1), once for AXIS(2), unless the output 
@@ -203,13 +204,12 @@ C
      :         '1D axis based on 1st. cross section of input axis.',
      :         STATUS)
             END IF
-            CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',ADDRESS,
+            CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',XYPTR,
      :                              SLOT,STATUS)
-            XYPTR=DYN_ELEMENT(ADDRESS)
 C
 C           See if linear.
 C
-            IF (FIG_SCRCHK(NXY,DYNAMIC_MEM(XYPTR))) THEN
+            IF (FIG_SCRCHK(NXY,%VAL(CNF_PVAL(XYPTR)))) THEN
 C
 C              It is, so copy the structure - except for the data
 C
@@ -221,20 +221,19 @@ C              unless they are just the numbers 1..N, in which case
 C              just number the output elements too.
 C
                CALL DSA_MAP_AXIS_DATA('OUTPUT',NAXIS,'UPDATE','FLOAT',
-     :                                 ADDRESS,SLOT,STATUS)
-               XYOPTR=DYN_ELEMENT(ADDRESS)
+     :                                 XYOPTR,SLOT,STATUS)
                IF(STATUS.NE.0)GOTO 500
 
-               IF (GEN_CHKNSF(DYNAMIC_MEM(XYPTR),NXY)) THEN
-                  CALL GEN_NFILLF(NXYOUT,DYNAMIC_MEM(XYOPTR))
+               IF (GEN_CHKNSF(%VAL(CNF_PVAL(XYPTR)),NXY)) THEN
+                  CALL GEN_NFILLF(NXYOUT,%VAL(CNF_PVAL(XYOPTR)))
                ELSE
-                  XY1=GEN_ELEMF(DYNAMIC_MEM(XYPTR),1)
-                  XYLST=GEN_ELEMF(DYNAMIC_MEM(XYPTR),NXY)
+                  XY1=GEN_ELEMF(%VAL(CNF_PVAL(XYPTR)),1)
+                  XYLST=GEN_ELEMF(%VAL(CNF_PVAL(XYPTR)),NXY)
                   XYDEL=(XYLST-XY1)/DBLE(NXY-1)
                   VSTART=XY1-XYDEL*(IXYST-1)
                   VEND=XY1+XYDEL*(NXYOUT-IXYST)
                   CALL FIG_WFILL(VSTART,VEND,.FALSE.,NXYOUT,
-     :                           DYNAMIC_MEM(XYOPTR))
+     :                           %VAL(CNF_PVAL(XYOPTR)))
                END IF
             ELSE
                CNAXIS=ICH_CI(NAXIS)

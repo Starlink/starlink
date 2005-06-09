@@ -33,7 +33,7 @@ C     (<) STAT_TOTAL   The sum of the data.
 C     (<) STAT_MIN     The minimum data value.
 C     (<) STAT_MAX     The maximum data value.
 C     (<) STAT_MEAN    The mean data value.
-C     (<) STAT_MEDIAN  The median data value (only set if MEDIAN specified)
+C     (<) STAT_MEDIAN  The median data value (set if MEDIAN specified)
 C     (<) STAT_XMAX    The x-value of the pixel where the max was found.
 C     (<) STAT_YMAX    The y-  "   "   "    "     "     "   "   "    "
 C     (<) STAT_XMIN    The x-  "   "   "    "     "     " min   "    "
@@ -55,38 +55,43 @@ C                  files closed under error conditions.
 C     19 Mar 1987  KS / AAO.  PASS2 keyword added and call to GEN_ASTAT2
 C                  added.  (Note, GEN_ASTAT also modified, so default
 C                  single pass calculation is slightly better anyway.)
-C     20 Jul 1987  DJA / AAO. Revised DSA_ routines - some specifications
-C                  changed. Updated all WRUSER calls to PAR_WRUSERs.
+C     20 Jul 1987  DJA / AAO. Revised DSA_ routines - some 
+C                  specifications changed. Updated all WRUSER calls to
+C                  PAR_WRUSERs.
 C     22 Jul 1987  DJA / AAO. Modifed dynamic memory routines - now use
 C                  DYN_ package.
 C     31 Jul 1987  KS / AAO.  Added call to DSA_SET_RANGE.
 C     05 Apr 1989  KS / AAO.  MEDIAN added. 
 C     30 Mar 1991  KS / AAO.  Fix integer division bug if !! given in
 C                  response to IMAGE prompt.  Y range no longer listed 
-C                  for 1D data. Range info includes axis values if known.
+C                  for 1D data. Range info includes axis values if 
+C                  known.
 C     07 Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                  removed.
 C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  No concurrent mapping. Had to swap mapping axis data
 C                  and getting axis range.
 C     21 May 1997  MJCL / Starlink, UCL.
-C                  Moved Y-range string output into the test for Y-range.
+C                  Moved Y-range string output into the test for 
+C                  Y-range.
+C     2005 June 8  MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
       INTEGER ICH_ENCODE
-      INTEGER DYN_ELEMENT
       REAL    GEN_ELEMF
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of element of dynamic memory
       REAL      AMAX             ! The maximum data value
       REAL      AMIN             ! The minimum data value
-      INTEGER   DDIMS(10)        ! The sizes of the dimensions of the data
+      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
       REAL      DUMMY            ! REAL dummy arguement
@@ -96,7 +101,7 @@ C
       INTEGER   IXST             ! First "    "   "     "     "      "
       INTEGER   IYEN             ! Last  "    "   "     "     "   y-axis
       INTEGER   IYST             ! First "    "   "     "     "      "
-      REAL      MEAN             ! The average value of a pixel in the image
+      REAL      MEAN             ! Average value of a pixel in the image
       LOGICAL   MEDIAN           ! Value of the MEDIAN keyword
       REAL      MEDVAL           ! Value of median of data
       INTEGER   NDELM            ! Total number of elements in the data
@@ -116,19 +121,15 @@ C
       INTEGER   WPTR             ! Dynamic mem element for work array
       INTEGER   WSLOT            ! Slot number for workspace - ignored
       LOGICAL   XEXIST           ! True if X-axis info exists
-      REAL      XMAX             ! Pixel x-component of 'brightest' pixel
-      REAL      XMIN             !   "        "      "    'lowest'    "
+      REAL      XMAX             ! Pixel x-co-ord of 'brightest' pixel
+      REAL      XMIN             !   "        "   "    'lowest'    "
       LOGICAL   YEXIST           ! True if Y-axis info exists
-      REAL      YMAX             ! Pixel y-component of 'brightest' pixel
-      REAL      YMIN             !   "        "      "    'lowest'    "
+      REAL      YMAX             ! Pixel y-co-ord of 'brightest' pixel
+      REAL      YMIN             !   "        "   "    'lowest'    "
       INTEGER   XSLOT            ! Map slot number used for x-axis info
       INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
       INTEGER   YPTR             ! Dynamic-memory pointer to y-axis data
       INTEGER   YSLOT            ! Map slot number used for y-axis info
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -146,8 +147,7 @@ C
 C
 C     Map input data
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     See if we have a data component giving Y-values
@@ -159,11 +159,10 @@ C
 C        Get limits in Y.
 C
          CALL DSA_AXIS_RANGE ('IMAGE',2,' ',.FALSE.,YMIN,YMAX,
-     :                                       IYST,IYEN,STATUS)
+     :                        IYST,IYEN,STATUS)
          CALL DSA_SEEK_AXIS ('IMAGE',2,YEXIST,STATUS)
-         CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',ADDRESS,
-     :                                               YSLOT,STATUS)
-         YPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',YPTR,
+     :                           YSLOT,STATUS)
       ELSE
          IYST=1
          IYEN=1
@@ -173,11 +172,10 @@ C
 C     And ditto for x-axis
 C
       CALL DSA_AXIS_RANGE ('IMAGE',1,' ',.FALSE.,XMIN,XMAX,
-     :                                      IXST,IXEN,STATUS)
+     :                     IXST,IXEN,STATUS)
       CALL DSA_SEEK_AXIS ('IMAGE',1,XEXIST,STATUS)
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',ADDRESS,
-     :                                          XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     See if 2-pass option is required.
@@ -195,33 +193,34 @@ C
       IF (PAR_ABORT()) GO TO 500       ! User requested abort
       IF (MEDIAN) THEN
          NSUB=(IYEN-IYST+1)*(IXEN-IXST+1)
-         CALL DSA_GET_WORK_ARRAY (NSUB,'FLOAT',ADDRESS,WSLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY (NSUB,'FLOAT',WPTR,WSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500    ! Error exit
-         WPTR=DYN_ELEMENT(ADDRESS)
       END IF
 C
 C     Get the statistics
 C
       IF (PASS2) THEN
-         CALL GEN_ASTAT2(DYNAMIC_MEM(DPTR),NX,NY,IXST,IXEN,IYST,
-     :     IYEN,TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,YMIN,SIGMA,SIZE)
+         CALL GEN_ASTAT2(%VAL(CNF_PVAL(DPTR)),NX,NY,IXST,IXEN,IYST,
+     :                   IYEN,TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,
+     :                   YMIN,SIGMA,SIZE)
       ELSE
-         CALL GEN_ASTAT(DYNAMIC_MEM(DPTR),NX,NY,IXST,IXEN,IYST,
-     :     IYEN,TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,YMIN,SIGMA,SIZE)
+         CALL GEN_ASTAT(%VAL(CNF_PVAL(DPTR)),NX,NY,IXST,IXEN,IYST,
+     :                  IYEN,TOTAL,AMAX,AMIN,MEAN,XMAX,XMIN,YMAX,
+     :                  YMIN,SIGMA,SIZE)
       END IF
 C
 C     If the median is required, the data has to be copied into
 C     the work array so it can be sorted.
 C
       IF (MEDIAN) THEN
-         CALL FIG_MED2D(DYNAMIC_MEM(DPTR),NX,NY,IXST,IXEN,IYST,IYEN,
-     :                                      DYNAMIC_MEM(WPTR),MEDVAL)
+         CALL FIG_MED2D(%VAL(CNF_PVAL(DPTR)),NX,NY,IXST,IXEN,IYST,IYEN,
+     :                  %VAL(CNF_PVAL(WPTR)),MEDVAL)
       END IF
 C
 C     Set the range values in the structure, if all the data was used.
 C
-      IF ((IXST.EQ.1).AND.(IYST.EQ.1).AND.(IXEN.EQ.NX)
-     :                                   .AND.(IYEN.EQ.NY)) THEN
+      IF ((IXST.EQ.1)  .AND. (IYST.EQ.1).AND.
+     :    (IXEN.EQ.NX) .AND. (IYEN.EQ.NY)) THEN
          CALL DSA_SET_RANGE ('IMAGE',AMIN,AMAX,STATUS)
       END IF
 C
@@ -233,7 +232,7 @@ C
          IGNORE=ICH_ENCODE(STRING,FLOAT(IYST),9,0,NEXT)
          IF (YEXIST.AND.(NDIM.EQ.2)) THEN
             STRING(NEXT:)=' ('
-            VALUE=GEN_ELEMF(DYNAMIC_MEM(YPTR),IYST)
+            VALUE=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IYST)
             IGNORE=ICH_ENCODE(STRING,VALUE,NEXT+2,3,NEXT)
             STRING(NEXT:)=')'
             NEXT=NEXT+1
@@ -242,7 +241,7 @@ C
          IGNORE=ICH_ENCODE(STRING,FLOAT(IYEN),NEXT+4,0,NEXT)
          IF (YEXIST.AND.(NDIM.EQ.2)) THEN
             STRING(NEXT:)=' ('
-            VALUE=GEN_ELEMF(DYNAMIC_MEM(YPTR),IYEN)
+            VALUE=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IYEN)
             IGNORE=ICH_ENCODE(STRING,VALUE,NEXT+2,3,NEXT)
             STRING(NEXT:)=')'
             NEXT=NEXT+1
@@ -253,7 +252,7 @@ C
       IGNORE=ICH_ENCODE(STRING,FLOAT(IXST),9,0,NEXT)
       IF (XEXIST) THEN
          STRING(NEXT:)=' ('
-         VALUE=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXST)
+         VALUE=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXST)
          IGNORE=ICH_ENCODE(STRING,VALUE,NEXT+2,3,NEXT)
          STRING(NEXT:)=')'
          NEXT=NEXT+1
@@ -262,7 +261,7 @@ C
       IGNORE=ICH_ENCODE(STRING,FLOAT(IXEN),NEXT+4,0,NEXT)
       IF (XEXIST) THEN
          STRING(NEXT:)=' ('
-         VALUE=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXEN)
+         VALUE=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXEN)
          IGNORE=ICH_ENCODE(STRING,VALUE,NEXT+2,3,NEXT)
          STRING(NEXT:)=')'
          NEXT=NEXT+1
