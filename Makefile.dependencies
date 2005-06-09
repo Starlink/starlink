@@ -1557,6 +1557,11 @@ $(MANIFESTS)/sae: \
 	cd libraries/sae \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sc3: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/003 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/scb: \
 		$(MANIFESTS)/star2html
 	cd applications/scb \
@@ -1817,6 +1822,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/polpack \
 	$(MANIFESTS)/prm \
 	$(MANIFESTS)/rv \
+	$(MANIFESTS)/sc3 \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \
