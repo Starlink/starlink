@@ -38,55 +38,63 @@ C                                      KS / CIT 23rd March 1983
 C
 C     Modified:
 C
-C     28th July 1987  -  DJA/AAO.Revised DSA_ routines - some specs changed.
-C                        now uses DYN_ package for dynamic memory handling.
-C                        all WRUSERs changed to PAR_WRUSERs.
-C     26th Mar  1991  -  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                        mapping calls.
-C     28th May  1992  -  HME / UoE, Starlink.  Ensure at this level that
-C                        WIDTH is an odd positive integer. GEN_GCONV does
-C                        not work properly for even width.
-C     22nd Sep  1992  -  HME / UoE, Starlink.  INCLUDE changed.
-C     26th Jul  1996  -  MJCL / Starlink, UCL.  Added PAR_ABORT checking.
-C     28th Oct  2001  -  VGG / Starlink, RAL and ACD / Starlink, UoE.
-C                        Simple error propagation added.
+C     28th July 1987  DJA/AAO.Revised DSA_ routines - some specs 
+C                     changed. Now uses DYN_ package for 
+C                     dynamic-memory handling. All WRUSERs changed to 
+C                     PAR_WRUSERs.
+C     26th Mar  1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
+C                     in mapping calls.
+C     28th May  1992  HME / UoE, Starlink.  Ensure at this level that
+C                     WIDTH is an odd positive integer. GEN_GCONV
+C                     does not work properly for even width.
+C     22nd Sep  1992  HME / UoE, Starlink.  INCLUDE changed.
+C     26th Jul  1996  MJCL / Starlink, UCL.  Added PAR_ABORT
+C                     checking.
+C     28th Oct  2001  VGG / Starlink, RAL and ACD / Starlink, UoE.
+C                     Simple error propagation added.
+C     2005 June 8     MJC / Starlink  Use CNF_PVAL for pointers to
+C                     mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DYN_INCREMENT,DSA_TYPESIZE
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      INTEGER DSA_TYPESIZE
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      REAL         FACTOR       !
-      INTEGER      IX           !
-      INTEGER      IY           !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      SCRPTR       !
-      REAL         SIGMA        !
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        !
-      INTEGER      WIDTH        !
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-      LOGICAL      VEXIST       ! Flag: TRUE if variance array exists
-      INTEGER      OVPTR        ! Dynamic-memory pointer to output variance array
-      INTEGER      OVSLOT       ! Map slot number for output variance array
-      CHARACTER    HIST(3)*50   ! Array for comments in the NDF history.
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      BYTES         ! Number of bytes of workspace required
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      REAL         FACTOR        !
+      CHARACTER    HIST(3)*50    ! Array for comments in the NDF history
+      LOGICAL      ISNEW         ! Is address new to CNF?
+      INTEGER      IX            !
+      INTEGER      IY            !
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 !  array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      OVPTR         ! Dynamic-memory pointer to output
+                                 ! variance array
+      INTEGER      OVSLOT        ! Map slot number for output variance
+                                 ! array
+      LOGICAL      PISNEW        ! Previous CNF pointer to data new?
+      INTEGER      SCRPTR        !
+      INTEGER      SCSLOT        ! Map slot number of workspace
+      REAL         SIGMA         !
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      TPTR          ! Temporary dynamic mem pointer
+      REAL         VALUE         !
+      INTEGER      WIDTH         !
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
+      LOGICAL      VEXIST        ! Variance array exists?
 C
 C     Initialisation of DSA_ routines
 C
@@ -125,9 +133,7 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                      STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Check whether the variance array exists and if so then map it.
@@ -135,39 +141,50 @@ C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE ('IMAGE',VEXIST,STATUS)
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :                           OVSLOT, STATUS)
-         OVPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',OVPTR,
+     :                         OVSLOT, STATUS)
          IF (STATUS .NE. 0) GOTO 500
       END IF
 C
 C     Get workspace for a) a result array, b) scratch space needed
 C     by GCONV.
 C
-      CALL DSA_GET_WORK_ARRAY((NX+WIDTH),'FLOAT',ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
-      SCRPTR=DYN_INCREMENT(WPTR,'FLOAT',NX)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',WPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(WIDTH,'FLOAT',SCRPTR,SCSLOT,STATUS)
 C
 C     Smooth the data, x-section by x-section, into the work
 C     area and then copy back into the data.
 C
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
+      PISNEW = .FALSE.
       DO IY=1,NY
-         CALL GEN_GCONV(DYNAMIC_MEM(OPTR),NX,SIGMA,WIDTH,
-     :             DYNAMIC_MEM(SCRPTR),DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(OPTR))
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
+         CALL GEN_GCONV(%VAL(CNF_PVAL(OPTR)),NX,SIGMA,WIDTH,
+     :             %VAL(CNF_PVAL(SCRPTR)),%VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)))
+
+         CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(TPTR)
+         OPTR = TPTR
+         PISNEW = ISNEW
       END DO
+      IF (ISNEW) CALL CNF_UNREGP(TPTR)
 C
 C     If the variance array exists then smooth it.
 C
       IF (VEXIST) THEN
+         PISNEW = .FALSE.
          DO IY=1,NY
-            CALL GEN_GCONV(DYNAMIC_MEM(OVPTR),NX,SIGMA,WIDTH,
-     :                DYNAMIC_MEM(SCRPTR),DYNAMIC_MEM(WPTR))
-            CALL GEN_MOVE(BYTES,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(OVPTR))
-            OVPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
+            CALL GEN_GCONV(%VAL(CNF_PVAL(OVPTR)),NX,SIGMA,WIDTH,
+     :                     %VAL(CNF_PVAL(SCRPTR)),%VAL(CNF_PVAL(WPTR)))
+            CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(WPTR)),
+     :                    %VAL(CNF_PVAL(OVPTR)))
+
+            CALL DYN_INCAD(OVPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+            IF (PISNEW) CALL CNF_UNREGP(TPTR)
+            OVPTR = TPTR
+            PISNEW = ISNEW
          END DO
+         IF (ISNEW) CALL CNF_UNREGP(TPTR)
 C
 C        Add cautionary comments to the history section.
 C
