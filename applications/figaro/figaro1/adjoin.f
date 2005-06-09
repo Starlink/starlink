@@ -276,7 +276,7 @@ C
      :                    %VAL(CNF_PVAL(A1_PTR)),
      :                    %VAL(CNF_PVAL(OAO_PTR)))
          END IF
-         IF ( ISNEW ) CALL UNREGP(OAO_PTR)
+         IF ( ISNEW ) CALL CNF_UNREGP(OAO_PTR)
       END IF
 C
 C     See if we are going to have to sort the data.  If we are, get
@@ -348,8 +348,8 @@ C
      :                       %VAL(CNF_PVAL(OVO_PTR)))
             END IF
          END IF
-         IF (ISNEW) CALL UNREGP(ODO_PTR)
-         IF (ERRORS.AND.ISNEW) CALL UNREGP(OVO_PTR)
+         IF (ISNEW) CALL CNF_UNREGP(ODO_PTR)
+         IF (ERRORS.AND.ISNEW) CALL CNF_UNREGP(OVO_PTR)
 
          IF (SORT.AND.(STATUS .EQ. 0)) THEN
             CALL GEN_FVSORT(%VAL(CNF_PVAL(VW_PTR)),NX+NX1,1,
