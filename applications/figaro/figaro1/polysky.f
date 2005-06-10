@@ -126,7 +126,7 @@ C
           TEMP = YE1
           YE1 = YS1
           YS1 = TEMP
-      ENDIF
+      END IF
 C
 C     Get range of Y values for second region
 C     Put in ascending order if necessary
@@ -139,7 +139,7 @@ C
           TEMP = YE2
           YE2 = YS2
           YS2 = TEMP
-      ENDIF
+      END IF
 C
 C     Check that regions don't overlap
 C
@@ -158,13 +158,13 @@ C
                CALL PAR_WRUSER('The two regions must not overlap',
      :          IGNORE)
                GOTO 500
-            ENDIF
+            END IF
          ELSE
             CALL PAR_WRUSER('The two regions must not overlap',
      :          IGNORE)
             GOTO 500
-         ENDIF
-      ENDIF
+         END IF
+      END IF
 C
 C     Get the polynomial degree and rejection parameters             
 C
@@ -185,7 +185,7 @@ C
          CALL PAR_RDKEY('WEIGHT',.TRUE.,WEIGHT)
       ELSE
          WEIGHT = .FALSE.
-      ENDIF
+      END IF
 C
 C     Create output file.
 C
@@ -198,7 +198,7 @@ C
       IF (WEIGHT) THEN
          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VPTR1,
      :                         SLOT,STATUS)
-      ENDIF
+      END IF
       CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',QPTR1,SLOT,STATUS)
 C
 C     Get workspace arrays needed for polynomial fitting
@@ -218,7 +218,7 @@ C
      :                     %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(WPTR)),
      :                     %VAL(CNF_PVAL(W1PTR)),YS1,YE1,YS2,YE2,
      :                     DEGREE,REJECT,WEIGHT)
-      ENDIF
+      END IF
 
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
@@ -359,20 +359,20 @@ C
                 IF (ERRORS) THEN
                    IF (V(IX,IY) .EQ. FUNKNOWN_IN) THEN
                       ERRORS = .FALSE.
-                   ENDIF
-                ENDIF
-             ENDIF
-          ENDDO 
+                   END IF
+                END IF
+             END IF
+          END DO 
           DO IY = YS2,YE2
              IF (Q(IX,IY) .EQ. 0) THEN
                 NGOOD = NGOOD+1
                 IF (ERRORS) THEN
                    IF (V(IX,IY) .EQ. FUNKNOWN_IN) THEN
                       ERRORS = .FALSE.
-                   ENDIF
-                ENDIF
-             ENDIF
-          ENDDO 
+                   END IF
+                END IF
+             END IF
+          END DO 
 C
 C     First sky region
 C
@@ -385,13 +385,13 @@ C
                       W(INDEX) = 1D0/VMAX
                     ELSE
                       W(INDEX) = 1D0/V(IX,IY)
-                    ENDIF
+                    END IF
                  ELSE  
                     W(INDEX) = 1D0
-                 ENDIF
+                 END IF
                  INDEX = INDEX+1
-              ENDIF
-          ENDDO
+              END IF
+          END DO
 C
 C     Second sky region
 C
@@ -404,13 +404,13 @@ C
                       W(INDEX) = 1.0/VMAX
                     ELSE
                       W(INDEX) = 1D0/V(IX,IY)
-                    ENDIF
+                    END IF
                  ELSE  
                     W(INDEX) = 1D0
-                 ENDIF
+                 END IF
                  INDEX = INDEX+1
-              ENDIF
-          ENDDO
+              END IF
+          END DO
 C
 C     Remove REJECT worst points
 C
@@ -421,7 +421,7 @@ C
               MEAN = 0D0                             
               DO INDEX = 1,NGOOD                         
                   MEAN = MEAN + Y(INDEX)         
-              ENDDO                                  
+              END DO                                  
               MEAN = MEAN/NGOOD                         
 C
 C     Calculate deviation from mean and delete the worst point
@@ -432,15 +432,15 @@ C
                  IF (R .GT. RMAX) THEN          
                      RMAX = R                   
                      IMAX = INDEX               
-                 ENDIF                          
-              ENDDO
+                 END IF                          
+              END DO
               DO INDEX = IMAX,NGOOD-1
                  Y(INDEX)=Y(INDEX+1)
                  W(INDEX)=W(INDEX+1)
                  X(INDEX)=X(INDEX+1)
-              ENDDO
+              END DO
               NGOOD=NGOOD-1
-          ENDDO     
+          END DO     
 C
 C     Now calculate the second moment of the skybackground if errors
 C     are being propogated.
@@ -474,7 +474,7 @@ C
      :         'column '//ICH_CI(IX),IGNORE)
              DO IY=YS1,YE2
                 Q(IX,IY) = 0
-             ENDDO
+             END DO
           ELSE
 C 
 C     Do the polynomial fit
@@ -486,7 +486,7 @@ C
              IF (NDEG.NE.KPLUS1-1.OR.IFAIL.NE.1.OR.IFAIL2.NE.0) THEN
                  CALL PAR_WRUSER('Error in PDA_DPOLFT',IGNORE)
                  GO TO 500                                            
-             ENDIF                                                    
+             END IF                                                    
 C
 C     Subtract sky values
 C
@@ -499,9 +499,9 @@ C
                       I(IX,IY) = I(IX,IY) - VALUE
                    ELSE
                       CALL PAR_WRUSER('Error in PDA_DP1VLU',IGNORE)
-                   ENDIF
-                ENDIF
-             ENDDO
+                   END IF
+                END IF
+             END DO
 C
 C     Now propagate the errors through the sky and object regions.
 C
@@ -512,10 +512,10 @@ C
                        V (IX,IY)=0
                    ELSE
                        V (IX,IY) =  ABS(V(IX,IY)) + SVAR
-                   ENDIF
+                   END IF
                 END DO
-             ENDIF
-          ENDIF
+             END IF
+          END IF
 500       CONTINUE
-      ENDDO
+      END DO
       END
