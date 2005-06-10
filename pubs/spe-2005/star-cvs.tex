@@ -12,7 +12,7 @@
 % SPE-specific stuff ...
 \SPE{1}{1}{00}{00}{2004}
 
-\runningheads{N Gray}{Dragged from the stone-age}
+\runningheads{N Gray}{Dragged from the stone-age [v\RCSRevision]}
 
 \title{Dragged from the stone-age: autoconfing a big old project}
 
@@ -31,33 +31,35 @@
 % ... to here
 
 \begin{abstract}
-The Starlink software collection currently runs on three different
-Unix platforms and contains around 100 separate software items,
+The Starlink software collection currently runs on multiple
+Unix and POSIX platforms and contains around 100 separate software items,
 totalling 2.5~million lines of code, in a mixture of languages.  We
-have changed the build system from a hand-maintained collection of
+recently changed the build system from a hand-maintained collection of
 makefiles with hard-wired OS variants to a scheme involving
 feature-discovery via GNU Autoconf.
 
-As a result of this work, we have already ported the collection to
-Mac\,OS\,X and Cygwin.  This had some unexpected benefits and costs, and
-valuable lessons.
+We describe here the practical lessons we learned from this
+experience, including the sometimes unexpected benefits and costs.
 
 % XXX Comment out before submission
-Version \RCSRevision.
+[Version \RCSRevision]
 \end{abstract}
 
 
 
 The Starlink Software Collection \cite{draper05} is a large set of
-data-reduction 
+astronomical data-reduction 
 applications, written over about two decades in a variety of
-languages.  Until recently the source code was managed, and the
+languages, mostly written in~C, C++ and Fortran.  Until recently the source
+code was managed, and the
 products distributed, using a system that worked, but which was
 rather ad hoc and opaque, and which was correspondingly rather
 expensive to maintain.  For a variety of technical, political, and financial
 reasons we made the decision to overhaul this build system, resulting
-in an CVS-plus-autoconf setup which is much more familiar to current users and
-developers.   In Section~\ref{s:background} we elaborate the
+in an CVS-plus-autoconf setup which is much more efficient for the
+developers, as well as more familiar to the users and and the
+community which will have to take a larger role in its maintainance.
+In Section~\ref{s:background} we elaborate the 
 motivations for this and the problems we faced; in
 Section~\ref{s:result} we briefly describe the resulting system; and
 in Section~\ref{s:lessons} we list some of the lessons we learned, in
@@ -71,31 +73,26 @@ same important move.
 % Ought this section to be shorter -- folk are interested in the
 % solutions, not the original problems.
 
-Starlink \url{http://www.starlink.ac.uk} was set up
+The Starlink Project (\url{http://www.starlink.ac.uk}) was set up
 originally in the late seventies, as a way of supplying UK astronomy
 with hardware (`astronomers will never need more than six
 VAXes\dots'), naturally along with the data-analysis software to go
 with it, and the system management to make it all work smoothly.
-
-We switched the hardware and software to Unix in the early nineties,
-ending up via a sequence of lesser migrations (plus Digital/Compaq
-rebrandings) supporting the collection on Solaris, Tru64 and RedHat
-Linux.  The port to Unix meant that some software was dropped at this
-time, and the rest preened quite extensively.  The build system we are
-now moving away from was designed in this period.
-
-Starting in the late nineties, Starlink slimmed down (the diet was not
-voluntary), dropped the hardware and management provision, and focused
-on maintaining and developing the large legacy codebase -- now renamed
-the `Classic' collection, in the best marketing traditions -- and on
-developing new software, mostly in Java, in tune with more recent
+Since then, the project has seen hardware and technology changes
+(including multiple Digital/Compaq rebrandings), been fattened up,
+slimmed down; it has discarded applications when it could, but
+generally it has seen more and more of its products depended on by
+some section or other of its user community.  By 2000, the project had
+dropped its provision of hardware and sysadmins, renamed its legacy
+codebase the `Classic Collection', and switched its focus to
+developing new Java applications, in tune with more recent
 developments in astronomical software.  Though it is not now actively
 developed, the classic software is still depended upon by astronomers
 world-wide, as well as being a valuable resource for pipelines
 (\cite{cavanagh03,currie04}) and application engines in the VO
-\cite{giaretta05}.
-For this reason, and because we expect the community will have to take
-a larger role in its curation, we need to make the classic software as
+\cite{giaretta05}.  For this reason, and because, with further
+enforced dieting, we expect the community will have to take a larger
+role in its curation, we needed to make the classic software as
 accessible as possible.
 
 The biggest problem with the software was that there was an awful lot
@@ -109,40 +106,39 @@ built separately.  Just to put this in context, David A
 Wheeler's \texttt{SLOCCount} would have us believe that that's worth
 over \$100M and, according to his analysis of the RH7.1 distribution
 \cite{wheeler02}, it appears that 1.8\,MSLOC is larger than anything in
-that distribution except the kernel, Mozilla and XFree86.  Busy types,
-aren't we?
+that distribution except the kernel, Mozilla and XFree86.  We've been busy.
 
-As mentioned above, the build system we had was idiosyncratic, with
-code scattered amongst the distributed developers, and a set of source
-and compiled build products maintained by cut-and-paste of template
-makefiles.  This system did work, and was a reasonable design for the
-early nineties, but it required discipline and effort to maintain, and
-worked largely because most users obtained their software through
-pre-built tape and CD distributions, in many cases installed by system
-managers who were also at that time employed by the Starlink Project
-(whose complaints could therefore be bought off by donations of beer).
-As Starlink's role changes, it is important that this software set
-appear more normal, and be maintainable (without medication) by a
-broader range of developers.
-
-One of the reasons the build system was odd was because the collection
-had a large number of conventions about installation locations, plus
-documentation and code-generation tools, all of which had to be
-catered for when building software.  In order to avoid major rewrites
-of the code base, it was necessary to duplicate these conventions and
-tool support in the new build system.
+The build system we had was idiosyncratic, with code scattered amongst
+the distributed developers, and a set of source and compiled build
+products maintained by cut-and-paste of template makefiles.  This
+system did work, and was a reasonable design for the early nineties,
+but it required discipline and effort to maintain, and worked largely
+because most users obtained their software through pre-built tape, network and
+CD distributions, in many cases installed by system managers who were
+also at that time employed by the Starlink Project (whose complaints
+could therefore be bought off by donations of beer).  As Starlink's
+role changed, it became increasingly important that this software set
+appear more `normal', and be maintainable (without medication) by a
+broader range of developers.  One important source of complication in the
+template makefiles was the need to cater for the collection's various
+conventions about installation locations for libraries, headers,
+documentation and other support files, plus the project's private
+documentation and code-generation tools.  In order to avoid major
+rewrites of the code base, it was necessary to duplicate these
+conventions and tool support in the new build system.  Similar
+problems would likely be faced by by projects of a similar size and age.
 
 Portability was not expected to be a major problem (and wasn't in
 fact), since the software was already being supported on three Unix
 platforms; as well, some of the older applications had already been
-through a port from VMS to Unix.  Also, the project has benefited from
+through a port to Unix from VMS.  Also, the project has benefited from
 generally good software practices over the years, so the code is
-mostly clean, conservative, and well documented; the project's
+mostly clean, conservative, and well documented -- the project's
 long-standing obsession with code-standards has certainly paid off,
 with interest.  Known portability issues were isolated, though these
-were handled by including platform-specific versions of key routines,
-selected by the user at build-time; this limited the target platforms
-to those explicitly supported by the project.
+were historically handled by including platform-specific versions of
+key routines, selected by the user at build-time; this limited the
+target platforms to those explicitly supported by the project.
 
 % Do we need to mention the age of the software -- crustiness?
 
@@ -184,36 +180,6 @@ be portable to other Unix-like systems, and in particular
 \section{Lessons and Warnings}
 \label{s:lessons}
 
-The Fortran support in autoconf is rather slim.  A large proportion of the
-autoconf extensions addressed the rather inadequate support for
-Fortran in the standard autoconf distribution, and these new macros -- for
-testing for intrinsics, open specifiers, support for \texttt{\%val}
-and the like -- will be offered back to the autoconf mainline.
-
-The port to OS\,X was easier, in some ways, than we expected, partly
-because the OS\,X system compiler is a modified GCC.  However Apple's
-GCC installation does not include \texttt{g77}, so we needed to
-install the Fink/OpenDarwin port of that.  This causes a number of
-linking problems because of slight differences in the code generated
-by the two GCC back-ends.  This is the \texttt{restFP/saveFP} problem:
-see (Gray 2004) for a summary.  Be warned: the OS\,X linker has some
-very fixed ideas about the organisation of code.
-
-Let's say that again.  The OS\,X linker can in some circumstances
-resolve library symbols lazily at runtime, and as a result is particularly
-alert to duplications, and will find more duplicated
-globals than you thought you had symbols.  It doesn't like common
-blocks at all.  And it has very certain opinions about how libraries
-should be put together.  GNU \texttt{libtool} can hide many of the
-details from you, but be prepared to spend time tweaking your library
-code.
-
-We couldn't automatically convert our old build system to the new one,
-because it was mostly hand-maintained.  But that turned out not to be
-a problem in fact: disciplined coding in the past meant that packages
-could generally be ported to the new system with little thought, and
-this turned out to be a small part of the effort.
-
 The original plan was to autoconf everything with only necessary code
 changes.  However it was impossible to stop ourselves refactoring and
 tidying, sometimes rather extensively.  This is both a warning to
@@ -234,31 +200,38 @@ consequent perception that code is owned in common means that the
 developers are more willing to criticise each others' code, and with
 appropriate consultation refactor or fix it.
 
-Starlink is a well-run project with disciplined developers, but we
-were surprised by the number of individually minor hurdles we had
-accumulated over a decade, despite our care, enough that working with
-the code would have been daunting for a non-insider.  Given that we
-last that long, we should probably plan to have another buildsystem
-overhaul in a decade or so.
-
 We should have bowed to the inevitable, and started patching the
-autotools earlier, since delaying this meant some functionality had to be
-implemented twice.  Our initial expectation was that we could provide
-all of our extra boilerplate using autoconf macros (using the now
-partly deprecated \texttt{aclocal} extension mechanism), but as soon as
-this boilerplate consisted of extra makefile rules, the scripting
-involved in supporting this became extremely complicated and obviously
-fragile.  Patching automake is not a trivial undertaking, but the
-resulting increase in robustness, and the control it gave us over the
-build system, made it worthwhile.  Though it is undeniably
-complicated, the automake code is well written, and reasonably easy to
-patch.  Even if we had not patched it, it
+autotools earlier, since delaying this meant some functionality had to
+be implemented twice.  Our initial expectation was that we could
+provide all of our extra boilerplate using autoconf macros (using the
+now partly deprecated \texttt{aclocal} extension mechanism).  Autoconf
+works by adjusting pre-existing template files, but as soon as the
+boilerplate consists of extra makefile rules, so that these templates
+themselves have to be significantly adjusted, the scripting involved
+in supporting this seems inevitably to become extremely complicated
+and obviously fragile.
+
+Patching automake is not a trivial undertaking, but the size of our
+project, the resulting increase in robustness, and the control it gave
+us over the build system, made it worthwhile.  The automake code is
+undeniably complicated, and the bulk of the program logic is in a
+monolithic kernel; however the makefile fragments which it manages are
+probably organised in as modular a way as possible, and the code is
+well written, so that the tool as a whole is reasonably easy to patch.
+Part of the reason for this is that, although many of the details are
+complicated and rather confusing, the overall design of the program is
+relatively simple, so that it is fairly amenable to cautious hacking,
+spotting likely features in existing \texttt{Makefile.in} files, and
+tracing them back to the code which generates them.
+
+Even if we had not patched it, it
 would probably be wise, in a project of this size, to keep a
 repository copy of the automake and autoconf distributions and mandate
 their use when bootstrapping the source tree; apart from the increase
 in long-term security, there are a number of potentially nasty
 version-skew problems that this practice evades.  This admittedly adds
 an extra step for a developer interested in working on CVS sources,
+and an extra stage to be documented and supported,
 but since the bootstrapping of the CVS sources is necessarily
 elaborate anyway, and since it is only the more sophisticated
 developers who would work on CVS rather than distributed sources, this
@@ -275,6 +248,56 @@ adapting a pre-existing makefile to automake can be frustrating and
 hard, and it is better in this case to start again, and produce the
 much shorter \texttt{Makefile.am} automake source file from scratch.
 
+The Fortran support in autoconf is rather slim.  A large proportion of the
+autoconf extensions addressed the rather inadequate support for
+Fortran in the standard autoconf distribution, and added tests for
+intrinsics, open specifiers, support for \texttt{\%val} 
+and the like.  These modifications affected only one component of the
+autoconf system, and will be offered back to the autoconf mainline.
+If they are accepted, we will be running an unpatched autoconf once more.
+
+The port to OS\,X was easier, in some ways, than we expected, partly
+because the OS\,X system compiler is a modified GCC.  However Apple's
+GCC installation does not include \texttt{g77}, so we needed to
+install the Fink/OpenDarwin port of that.  This causes a number of
+linking problems because of slight differences in the code generated
+by the two GCC back-ends; this is the \texttt{restFP/saveFP} problem:
+see \cite{gray04} for a summary.  The OS\,X loader architecture is
+intolerant of duplicated symbols, and the linker found such symbols
+which had been present for years in our code without causing problems.
+As a corollary of this, the loader had problems with Fortran common
+blocks.  GNU \texttt{libtool} helped with many of these problems, but
+even so, while most of our code compiled perfectly happily on OS\,X,
+the linking stage consumed a disproportionate amount of effort.
+
+We couldn't automatically convert our old build system to the new one,
+because it was mostly hand-maintained.  But that turned out not to be
+a problem in fact: disciplined coding in the past meant that packages
+could generally be ported to the new system with little thought, and
+this turned out to be a small part of the effort.
+
+Starlink is a well-run project with disciplined developers, but we
+were surprised by the number of individually minor hurdles we had
+accumulated over a decade, despite our care, enough that working with
+the code would have been daunting for a non-insider.  Given that we
+last that long, we should probably plan to have another buildsystem
+overhaul in a decade or so.
+
+One of our own and others' criticisms of our code base was that, over
+twenty years, it had had plenty time to fall victim to `big sticky
+lump' syndrome, and one of our hopes at the beginning of this effort
+was that reorganising the build system would resolve this problem.
+This was over-optimistic.  Although we did become aware of a few
+easily removed dependencies, in part because this was the first time
+that the network of dependencies was expressed explicitly, doing this
+on a larger scale would have required a more formal analysis we did
+not have the resources to perform.
+
+We found dependencies more complicated than we expected, and found at
+least four types in our code base, which had their effects at
+different phases, and had to be handled in different ways.  XXX
+description of dependency types???
+
 In parallel with this porting project, we worked through the internal
 bureaucracy involved in applying a GPL licence to the code where
 possible.  This turned out to be harder than we expected, largely
@@ -284,14 +307,30 @@ only'!).  We ended up conceding defeat on this, as it would clearly be
 a huge effort to work through all the contributed code, identifying
 first authors then consistent conditions for each module.  We have
 adopted the pragmatic policy of stating that everything in the
-collection with an explicit CCLRC copyright is GPL; users concerned
-about the remainder should get in touch with us and we'll try to work
-it out.
+collection with an explicit project copyright is GPL (this includes
+all of the build system); all of the rest is at least licensed for
+academic use; users concerned about the remainder should get in touch
+with us and we'll try to work it out.
 
 The project took a \emph{lot} longer than we expected (surprise!).  It
 took around six person-months to get the initial system up and
 running, and then another six to adapt the bulk of our code to the new
-system.
+system, followed by another six months of low-level tinkering to
+remove the wrinkles and have the nightly builds produce relocatable
+and useful distribution tarballs.
+
+\section{Conclusions}
+
+Though this autoconfing project consumed more resources than we
+expected, it has produced worthwhile results.  The code is now in a
+state where it is no longer buildable only by project initiates; this
+is essential, since the project has now had its funding terminated.  A
+few excess dependencies have been broken, though not as many as we had hoped.
+The project toolset is now distributed in more manageable components,
+even though the dependency issues mean these are still not as small as
+we would like.  Finally, the codebase has been extensively preened, to the
+extent that it is possibly now in a tidier state than it has been for
+a decade.
 
 
 \bibliographystyle{my-spe}
