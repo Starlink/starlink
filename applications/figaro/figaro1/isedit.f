@@ -201,7 +201,7 @@ C
           GOTO 500
       ELSE
           STATUS=0
-      ENDIF
+      END IF
       CALL PGASK(.FALSE.)
 C 
 C     Initialize GKD package
@@ -256,7 +256,7 @@ C
             PLAB = 'Y = '//ICH_CI(SCAN)//'MEAN = '//ICH_CF(MEAN)
             HIGH = 1.05 * HIGH - 0.05 * LOW
             LOW  = 0.947619 * LOW - 0.047619 * HIGH
-         ENDIF
+         END IF
          CALL FIG_ISEDIT_PLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OPTR)),
      :                        %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(EPTR)),
      :                        NX,IXS,IXE,HIGH,LOW,XLAB,' ',PLAB,
@@ -273,7 +273,7 @@ C
      :                        NX,NY,IXS,IXE,HIGH,LOW,
      :                        XST,XEN,FINISHED,SCAN,STATUS)
          IF (PAR_ABORT()) GO TO 100
-      ENDDO
+      END DO
   100 CONTINUE
       CALL PGEND
 C
@@ -427,7 +427,7 @@ C                  false, errors should be taken as zero.
           WIDTH=(XVALS(IXEN)-XVALS(IXST))/(IXEN-IXST)
       ELSE
           WIDTH=XVALS(IXEN)-XVALS(IXST)
-      ENDIF
+      END IF
       XVAL1=XVALS(IX)-WIDTH*0.5                   
       XVAL2=XVALS(IX)+WIDTH*0.5                   
       CALL PGERRX(1,XVAL1,XVAL2,ZVALS(IX),0.0)              
@@ -459,11 +459,11 @@ C                  false, errors should be taken as zero.
               IF (A(IX)-E(IX) .LT. LOW) LOW=A(IX)-E(IX)
               MEAN=MEAN+A(IX)
               NUM=NUM+1
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       IF (NUM .GT. 0) THEN
           MEAN=MEAN/NUM
-      ENDIF
+      END IF
       END
      
       SUBROUTINE FIG_ISEDIT_CURS(XVALS,ZVALS,QUALITY,ERRORS,NX,NY,
@@ -547,14 +547,14 @@ C
      :              ICH_CI(SCAN))
               DO IX=1,NX
                   QUALITY(IX)=1
-              ENDDO            
+              END DO            
               CALL PGQCOL(CI1,CI2)
               IF (CI2 .GE. 3) THEN
                   CALL PGSCI(3)
                   DO IX=1,NX
                       CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                 IXEN,IX,.TRUE.)
-                  ENDDO
+                  END DO
                   CALL PGSCI(1)
               ELSE IF (CI1 .LE. 0) THEN
                   DO IX=1,NX
@@ -566,8 +566,8 @@ C
                      CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                 IXEN,IX,.TRUE.)
                      CALL PGSLS(1)
-                  ENDDO
-              ENDIF
+                  END DO
+              END IF
           ELSE IF (CH .EQ. 'I' .OR. CH .EQ. 'i') THEN
 C
 C         Interpolate between two data points
@@ -587,7 +587,7 @@ C
                        IX=IX1
                        IX1=IX2
                        IX2=IX
-                    ENDIF
+                    END IF
                     DZX=(ZVALS(IX2)-ZVALS(IX1))/(XVALS(IX2)-XVALS(IX1))
                     DO IX=IX1,IX2
                        CALL PGQCOL(CI1,CI2)
@@ -596,14 +596,14 @@ C
                            CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,
      :                        IXST,IXEN,IX,.TRUE.)
                           CALL PGSCI(1)
-                       ENDIF
+                       END IF
                        ZVALS(IX)=ZVALS(IX1)+(XVALS(IX)-XVALS(IX1))*DZX
                        QUALITY(IX)=0
                        CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,
      :                       IXST,IXEN,IX,.TRUE.)
-                    ENDDO
-                 ENDIF
-              ENDIF
+                    END DO
+                 END IF
+              END IF
           ELSE IF (CH .EQ. 'J' .OR. CH .EQ. 'j') THEN
 C
 C         Interpolate between two indicated points
@@ -645,7 +645,7 @@ C
                        IX=IX1
                        IX1=IX2
                        IX2=IX
-                    ENDIF
+                    END IF
                     DZX=(ZVALS(IX2)-ZVALS(IX1))/(XVALS(IX2)-XVALS(IX1))
                     DO IX=IX1,IX2
                        CALL PGQCOL(CI1,CI2)
@@ -654,14 +654,14 @@ C
                            CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,
      :                        IXST,IXEN,IX,.TRUE.)
                           CALL PGSCI(1)
-                       ENDIF
+                       END IF
                        ZVALS(IX)=ZVALS(IX1)+(XVALS(IX)-XVALS(IX1))*DZX
                        QUALITY(IX)=0
                        CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,
      :                       IXST,IXEN,IX,.TRUE.)
-                    ENDDO
-                 ENDIF
-              ENDIF
+                    END DO
+                 END IF
+              END IF
           ELSE IF (CH .EQ. 'D' .OR. CH .EQ. 'd') THEN
 C
 C         Delete Point
@@ -698,8 +698,8 @@ C
                      CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                   IXEN,IX,.TRUE.)
                      CALL PGSLS(1)
-                  ENDIF
-              ENDIF
+                  END IF
+              END IF
           ELSE IF (CH .EQ. 'M' .OR. CH .EQ. 'm') THEN
 C
 C         Move Point
@@ -722,7 +722,7 @@ C
                      CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                   IXEN,IX,.TRUE.)
                      CALL PGSCI(1)
-                  ENDIF
+                  END IF
 C
 C         Change data
 C
@@ -732,14 +732,14 @@ C         Redraw point at new position
 C
                   CALL FIG_ISEDIT_POINT(XVALS,ZVALS,ERRORS,NX,IXST,
      :                   IXEN,IX,.TRUE.)
-              ENDIF
+              END IF
           ELSE IF (CH .EQ. 'H' .OR. CH .EQ. 'h') THEN
 C
 C         Output help information
 C
               CALL FIG_ISEDIT_HELP 
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       END
 
 
