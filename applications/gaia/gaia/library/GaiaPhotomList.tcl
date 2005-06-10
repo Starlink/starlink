@@ -510,6 +510,7 @@ itcl::class gaia::GaiaPhotomList {
 
    #  Read back an aperture file.
    protected method read_apfile_ {fid filename update} {
+      set old_selected $selected_
       set ok 1
 
       #  Loop over non-blank lines. If line starts with # it is
@@ -541,12 +542,17 @@ itcl::class gaia::GaiaPhotomList {
             set ok 0
          }
       }
+
+      if { $old_selected != {} } {
+         set selected_ $old_selected
+      }
    }
 
    #  Read an optimal photometry file. This is a special case as the
    #  reference PSF star, with index 0, is ignored.
    protected method read_optfile_ {fid filename update} {
       set ok 1
+      set old_selected $selected_
 
       #  Loop over non-blank lines. If line starts with # it is
       #  either a comment or a sky region spec. Sky region specs
@@ -584,11 +590,16 @@ itcl::class gaia::GaiaPhotomList {
             set ok 0
          }
       }
+
+      if { $old_selected != {} } {
+         set selected_ $old_selected
+      }
    }
 
    #  Read a PSF object entry. This is the one with index 0.
    protected method read_psffile_ {fid filename update} {
       set ok 1
+      set old_selected $selected_
 
       #  Loop over non-blank lines. If line starts with # it is
       #  either a comment or a sky region spec. Sky region specs
@@ -626,6 +637,10 @@ itcl::class gaia::GaiaPhotomList {
          } elseif { $llen < 0 } {
             set ok 0
          }
+      }
+
+      if { $old_selected != {} } {
+         set selected_ $old_selected
       }
    }
 
