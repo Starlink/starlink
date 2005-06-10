@@ -66,13 +66,17 @@ C     27 Jul 1993  Disuse PAR_Q*. Added parameter NEXT.
 C     16 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  No concurrent mapping. Had to swap mapping x data
 C                  behind x axis range.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT, PAR_GIVEN 
-      INTEGER DYN_ELEMENT, ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
       REAL GEN_ELEMF
 C
 C     Floating point limits
@@ -86,58 +90,53 @@ C     plotting.
 C
 C     Local variables
 C
-      INTEGER   ADDRESS                  ! Actual array address
-      INTEGER   CKEY                     ! Colour code used by PGPLOT
-      CHARACTER COLOUR*10                ! COLOUR specification
-      CHARACTER COMMAND*16               ! Figaro command being executed
-      CHARACTER DEVICE*32                ! PGPLOT device specification
-      CHARACTER DLAB*64                  ! Plot data axis label
-      CHARACTER DLABEL*32                ! Label for data given in structure
-      INTEGER   DPTR                     ! Dynamic memory pointer to data array
-      INTEGER   DSLOT                    ! Map slot number used for data
-      INTEGER   DSTATUS                  ! Status code for PGPLOT device names
-      REAL      DUMMY                    ! Dummy argument
-      CHARACTER DUNITS*32                ! Data units given in structure
-      INTEGER   EPTR                     ! Dynamic memory pointer to error array
-      LOGICAL   ERRUSE                   ! True if errors to be used
-      INTEGER   ESLOT                    ! Map slot used for error data
-      LOGICAL   FAULT                    ! True if non DSA error occurs
-      LOGICAL   HARD                     ! True if HARD specified
-      INTEGER   IGNORE                   ! Used for disregarded status codes
-      INTEGER   INVOKE                   ! Used to invoke functions
-      INTEGER   IXEN                     ! Last element to be plotted
-      INTEGER   IXST                     ! First integer to be plotted
-      DOUBLE PRECISION MAGNITUDE         ! Magnitude flag value for data
-      LOGICAL   MSPLO                    ! True if command is MSPLOT
-      INTEGER   NDIM                     ! Dimensionality of input spectrum
-      INTEGER   NELM                     ! Number of elements in data - ignored
-      INTEGER   NEXT                     ! ICH_KEY argument - ignored
-      INTEGER   NSPECT                   ! Value of NSPECT parameter
-      INTEGER   NX                       ! Number of elements in data
-      CHARACTER PLAB*64                  ! Label for plot
-      LOGICAL   REVPLOT                  ! True if scales have to be reversed
-      LOGICAL   SAMESCALE                ! True if SAMESCALE specified
-      LOGICAL   SHOWZERO                 ! True if SHOWZERO specified
-      CHARACTER SPECT*80                 ! Actual name of spectrum
-      INTEGER   STATUS                   ! Status return from DSA_ routines
-      CHARACTER STRINGS(2)*64            ! Receives data and axis information
-      INTEGER   THICK                    ! Line thickness for plot
-      REAL      VALUE                    ! Temporary real 
-      REAL      VMAX                     ! Maximum value in data array
-      REAL      VMIN                     ! Minimum value in data array
-      LOGICAL   WHOLE                    ! True if WHOLE specified
-      CHARACTER XLAB*64                  ! X-axis label for plot
-      CHARACTER XLABEL*32                ! Structure x-axis label
-      INTEGER   XPTR                     ! Dynamic memory pointer to X-axis data
-      INTEGER   XSLOT                    ! Map slot used for X-axis data
-      REAL      XRANGE                   ! Range in X for a single plot
-      CHARACTER XUNITS*32                ! Structure X-axis units
-      REAL      XVEN                     ! Last X-axis value to be plotted
-      REAL      XVST                     ! First X-axis value to be plotted
-C
-C     Dynamic memory support - defines DYNAMIC_MEM.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   CKEY             ! Colour code used by PGPLOT
+      CHARACTER COLOUR*10        ! COLOUR specification
+      CHARACTER COMMAND*16       ! Figaro command being executed
+      CHARACTER DEVICE*32        ! PGPLOT device specification
+      CHARACTER DLAB*64          ! Plot data axis label
+      CHARACTER DLABEL*32        ! Label for data given in structure
+      INTEGER   DPTR             ! Dynamic memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number used for data
+      INTEGER   DSTATUS          ! Status code for PGPLOT device names
+      REAL      DUMMY            ! Dummy argument
+      CHARACTER DUNITS*32        ! Data units given in structure
+      INTEGER   EPTR             ! Dynamic memory pointer to error array
+      LOGICAL   ERRUSE           ! True if errors to be used
+      INTEGER   ESLOT            ! Map slot used for error data
+      LOGICAL   FAULT            ! True if non DSA error occurs
+      LOGICAL   HARD             ! True if HARD specified
+      INTEGER   IGNORE           ! Used for disregarded status codes
+      INTEGER   INVOKE           ! Used to invoke functions
+      INTEGER   IXEN             ! Last element to be plotted
+      INTEGER   IXST             ! First integer to be plotted
+      DOUBLE PRECISION MAGNITUDE ! Magnitude flag value for data
+      LOGICAL   MSPLO            ! True if command is MSPLOT
+      INTEGER   NDIM             ! Dimensionality of input spectrum
+      INTEGER   NELM             ! Number of elements in data - ignored
+      INTEGER   NEXT             ! ICH_KEY argument - ignored
+      INTEGER   NSPECT           ! Value of NSPECT parameter
+      INTEGER   NX               ! Number of elements in data
+      CHARACTER PLAB*64          ! Label for plot
+      LOGICAL   REVPLOT          ! True if scales have to be reversed
+      LOGICAL   SAMESCALE        ! True if SAMESCALE specified
+      LOGICAL   SHOWZERO         ! True if SHOWZERO specified
+      CHARACTER SPECT*80         ! Actual name of spectrum
+      INTEGER   STATUS           ! Status return from DSA_ routines
+      CHARACTER STRINGS(2)*64    ! Receives data and axis information
+      INTEGER   THICK            ! Line thickness for plot
+      REAL      VALUE            ! Temporary real 
+      REAL      VMAX             ! Maximum value in data array
+      REAL      VMIN             ! Minimum value in data array
+      LOGICAL   WHOLE            ! True if WHOLE specified
+      CHARACTER XLAB*64          ! X-axis label for plot
+      CHARACTER XLABEL*32        ! Structure x-axis label
+      INTEGER   XPTR             ! Dynamic memory pointer to X-axis data
+      INTEGER   XSLOT            ! Map slot used for X-axis data
+      REAL      XRANGE           ! Range in X for a single plot
+      CHARACTER XUNITS*32        ! Structure X-axis units
+      REAL      XVEN             ! Last X-axis value to be plotted
+      REAL      XVST             ! First X-axis value to be plotted
 C
 C     Initialisation of DSA_ routines
 C
@@ -178,10 +177,9 @@ C
 C
 C     Map the X-axis data array (will be 1..N if no such array).
 C
-      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                              XSLOT,STATUS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      XPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Get the number of plots per page
 C
@@ -192,21 +190,19 @@ C
 C     And get the x-axis increment for each.
 C
       CALL PAR_RDVAL ('XRANGE',ABS(XVEN-XVST)*.001,ABS(XVEN-XVST)*2.,
-     :                              ABS(XVST-XVEN)/NSPECT,' ',XRANGE)
+     :                ABS(XVST-XVEN)/NSPECT,' ',XRANGE)
 C
 C     Map the spectrum data
 C
-      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
 C
 C     For ESPLOT, try to map the error data
 C
       IF (.NOT.MSPLO) THEN
          CALL DSA_SEEK_ERRORS ('SPECT',ERRUSE,STATUS)
          IF (ERRUSE) THEN
-            CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',ADDRESS,
-     :                                              ESLOT,STATUS)
-            EPTR=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',EPTR,
+     :                           ESLOT,STATUS)
          END IF
          IF (STATUS.NE.0) GO TO 500
       END IF
@@ -228,7 +224,7 @@ C
 C
 C     Get the colour for the plot (note that BLACK and BLUE are reversed
 C     in the colour list, so BL will be taken as BLUE - the codes are
-C     then reversed to give the correct PGPLOT colour code)
+C     then reversed to give the correct PGPLOT colour code).
 C
       CALL PAR_RDCHAR('COLOUR','White',COLOUR)
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
@@ -292,8 +288,8 @@ C
       IF (IXST.EQ.IXEN) THEN
          IXST=MAX(IXST-1,1)
          IXEN=MIN(IXEN+1,NX)
-         XVST=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXST)
-         XVEN=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXEN)
+         XVST=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXST)
+         XVEN=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXEN)
       END IF
 C
 C     Get the axis labels from the labels and units
@@ -310,9 +306,10 @@ C     as well for the ELSE clause, but there isn't yet.
 C
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
       IF (MSPLO) THEN
-         CALL FIG_MXZPLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),NX,IXST,
-     :             IXEN,SAMESCALE,SHOWZERO,XLAB,DLAB,PLAB,DEVICE,THICK,
-     :                CKEY,REVPLOT,NSPECT,XRANGE,HARD,XVST,XVEN,IGNORE)
+         CALL FIG_MXZPLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
+     :                    NX,IXST,IXEN,SAMESCALE,SHOWZERO,XLAB,DLAB,
+     :                    PLAB,DEVICE,THICK,CKEY,REVPLOT,NSPECT,XRANGE,
+     :                    HARD,XVST,XVEN,IGNORE)
          IF (PAR_ABORT()) GO TO 500   ! User requested abort
       END IF
 C

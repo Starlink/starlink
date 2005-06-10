@@ -8,11 +8,11 @@ C     produce a 2D data object.  YTPLANE, XTPLANE and XYPLANE
 C     take planes whose X,Y or T values respectively are 
 C     constant over the extracted plane.  (Pedantic note:
 C     strictly, a cuboid is meant, rather than a cube.)
-C     (Further pedantic note: the X, Y and T axes
-C     mentioned in this routine should really be referred to
-C     as AXIS(1), AXIS(2) and AXIS(3) respectively. However,
-C     explanations become confusing if this is done, so the references to 
-C     X, Y and T remain. This does not mean that the data is stored in
+C     (Further pedantic note: the X, Y and T axes mentioned
+C     in this routine should really be referred to as AXIS(1),
+C     AXIS(2) and AXIS(3) respectively. However, explanations become
+C     confusing if this is done, so the references to X, Y and T
+C     remain. This does not mean that the data are stored in
 C     .X .Y and .T structures - JM.)
 C
 C     Command parameters -
@@ -52,44 +52,39 @@ C                    DYN_ routines
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
 C                    PAR_WRUSER rather than DSA_WRUSER.
 C     25th Jul 1995  HME / UoE, Starlink.  Map output with write access.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
-      EXTERNAL DYN_ELEMENT
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
-      REAL      AXEND        ! Data value of end of selected axis range
-      INTEGER   AXIS         ! Axis number
-      REAL      AXST         ! Data value of start of selected axis range 
-      CHARACTER COMMAND*6    ! Command name
-      INTEGER   CUPTR        ! Dynamic memory element for cube data
-      INTEGER   DIMS(5)      ! Various dimensions
-      LOGICAL   EXIST        ! Used to check for existence of axis data
-      INTEGER   IEN          ! Higher axis pixel number
-      INTEGER   IPTR         ! Dynamic memory element for image data
-      INTEGER   IST          ! Lower axis pixel number
-      INTEGER   J            ! Do loop variable
-      INTEGER   NDIM         ! Number of various dimensions
-      INTEGER   NELM         ! Number of elements in various arrays
-      INTEGER   NT           ! Third dimension of cube
-      INTEGER   NX           ! First dimension of cube
-      INTEGER   NY           ! Second dimension of cube
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   STATUS       ! Running status for DSA routines
+      REAL      AXEND            ! Data value of end of selected axis 
+                                 ! range
+      INTEGER   AXIS             ! Axis number
+      REAL      AXST             ! Data value of start of selected axis 
+                                 ! range 
+      CHARACTER COMMAND*6        ! Command name
+      INTEGER   CUPTR            ! Dynamic-memory pointer for cube data
+      INTEGER   DIMS(5)          ! Various dimensions
+      LOGICAL   EXIST            ! Axis data exist?
+      INTEGER   IEN              ! Higher axis pixel number
+      INTEGER   IPTR             ! Dynamic-memory pointer for image data
+      INTEGER   IST              ! Lower axis pixel number
+      INTEGER   J                ! Do loop variable
+      INTEGER   NDIM             ! Number of various dimensions
+      INTEGER   NELM             ! Number of elements in various arrays
+      INTEGER   NT               ! Third dimension of cube
+      INTEGER   NX               ! First dimension of cube
+      INTEGER   NY               ! Second dimension of cube
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -160,34 +155,32 @@ C
 C
 C     Map the input and output data
 C
-      CALL DSA_MAP_DATA('CUBE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      CUPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('CUBE','READ','FLOAT',CUPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('IMAGE','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
-      IF(STATUS.NE.0)GOTO 500
+      CALL DSA_MAP_DATA('IMAGE','WRITE','FLOAT',IPTR,SLOT,STATUS)
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Perform the extraction
 C
-      CALL FIG_PLANE(DYNAMIC_MEM(CUPTR),NX,NY,NT,AXIS,IST,IEN,
-     :               DIMS(1),DIMS(2),DYNAMIC_MEM(IPTR))
+      CALL FIG_PLANE(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,AXIS,IST,IEN,
+     :               DIMS(1),DIMS(2),%VAL(CNF_PVAL(IPTR)))
 C
 C     If the original cube had certain axis structures these
 C     may need to be copied and possibly renamed.
 C
       CALL DSA_SEEK_AXIS('CUBE',3,EXIST,STATUS)
-      IF(EXIST.AND.(AXIS.NE.3))THEN
+      IF(EXIST.AND.(AXIS.NE.3)) THEN
          CALL DSA_AXIS_SIZE('CUBE',3,5,NDIM,DIMS,NELM,STATUS)
          CALL DSA_RESHAPE_AXIS('IMAGE',AXIS,'CUBE',3,NDIM,DIMS,STATUS)
-      ENDIF
+      END IF
 
       DO J=1,2
          CALL DSA_SEEK_AXIS('CUBE',J,EXIST,STATUS)
          IF(EXIST.AND.(AXIS.NE.J))THEN
             CALL DSA_AXIS_SIZE('CUBE',J,5,NDIM,DIMS,NELM,STATUS)
             CALL DSA_RESHAPE_AXIS('IMAGE',J,'CUBE',J,NDIM,DIMS,STATUS)
-         ENDIF
-      ENDDO
+         END IF
+      END DO
 
   500 CONTINUE
 C

@@ -12,7 +12,8 @@ C
 C     Command parameters -
 C
 C     IMAGE  (Character) The name of the structure containing the image.
-C            Uses main data array, or the x-axis data for the XCxxx routines.
+C            Uses main data array, or the x-axis data for the XCxxx 
+C            routines.
 C
 C     LOWFAC (Numeric) The lower limit of the rescaling.
 C
@@ -30,39 +31,37 @@ C     30-JUL-1991  HME (UoE, Starlink): Remove MAS_ prefix. Say
 C                  precisely what the routine does. LOWFACT default 0.
 C     06-NOV-1991  HME (UoE, Starlink): Map the data for update access.
 C     30-SEP-1992  HME (UoE, Starlink): INCLUDE changed.
+C     2005 June 10 MJC (Starlink)  Use CNF_PVAL for pointers to
+C                  mapped data.  Remove unused variables.
 C
 C     This routine is a modification of ICONST.FOR+GEN_ADDCAF
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_LEN,DYN_ELEMENT
+      INTEGER ICH_LEN
 C
 C     Local variables
 C
       CHARACTER*64 COMMAND       ! The actual FIGARO command requested
       INTEGER      DIMS(10)      ! The sizes of the data's dimensions
-      REAL         LOWFAC        ! The LOWER factor used to operate on the data
-      REAL         HIGHFAC       ! The UPPER factor used to operate on the data
-      INTEGER      INADDR        ! Address of input dynamic memory element
-      INTEGER      INELM         ! Dynamic memory pointer to input data
-      INTEGER      ISLOT         ! Input data slot number
+      REAL         HIGHFAC       ! UPPER factor used to operate on the 
+                                 ! data
+      REAL         LOWFAC        ! LOWER factor used to operate on the 
+                                 ! data
       INTEGER      NDIM          ! The number of dimensions in the data
-      INTEGER      NELM          ! The total number of elements in the data
+      INTEGER      NELM          ! Total number of elements in the data
       INTEGER      OSLOT         ! Output data slot number
-      INTEGER      OUTADDR       ! Address of output dynamic memory element
-      INTEGER      OUTELM        ! Dynamic memory pointer to output data
+      INTEGER      OUTELM        ! Dynamic-memory pointer to output data
       INTEGER      STATUS        ! Running status for DSA_ routines
 C
 C     Numeric parameter limits - close to VAX real limits
 C
       REAL FMAX, FMIN
       PARAMETER (FMAX=1.7E38, FMIN=-1.7E38)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -90,16 +89,14 @@ C
 C
 C     Map data arrays
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OUTADDR,
-     :                                                 OSLOT,STATUS)
-      OUTELM=DYN_ELEMENT(OUTADDR)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OUTELM,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Operate on the data using FACTOR, depending on
 C     the actual command.
 C
-      CALL ADDCAF(DYNAMIC_MEM(OUTELM),NELM,LOWFAC,HIGHFAC,
-     :                              DYNAMIC_MEM(OUTELM))
+      CALL ADDCAF(%VAL(CNF_PVAL(OUTELM)),NELM,LOWFAC,HIGHFAC,
+     :            %VAL(CNF_PVAL(OUTELM)))
 C
 C     Closedown everything 
 C

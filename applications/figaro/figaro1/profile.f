@@ -9,24 +9,25 @@ C     technique described by Horne, 1986 (PASP 98, 609). An initial
 C     (noisy) estimate of the spatial profile is made by dividing the
 C     values along each column by the sum over that column. A smoothed
 C     version of this profile is then constructed by fitting polynomials
-C     along each row to account for smooth variations of the spatial profile
-C     with wavelength. The technique ensures that the profile is normalized
-C     (sums to one along each column) and is everywhere positive. Rejection
-C     of the NREJECT worst points in each fit allows the method to be
-C     insensitive to cosmic ray hits or other bad data points.
+C     along each row to account for smooth variations of the spatial
+C     profile with wavelength. The technique ensures that the profile
+C     is normalized (sums to one along each column) and is everywhere
+C     positive. Rejection of the NREJECT worst points in each fit
+C     allows the method to be insensitive to cosmic-ray hits or other
+C     bad data points.
 C
-C     Error and quality information may be present on the input image. Points
-C     with bad quality will be ignored in the fit, and the errors may
-C     be used to weight the fit.
+C     Error and quality information may be present on the input image.
+C     Points with bad quality will be ignored in the fit, and the errors 
+C     may be used to weight the fit.
 C
 C     An image containing the residuals of the fit to the profile is
 C     generated and may be used to judge the quality of the fit.
 C
-C     The Horne algorithm is appropriate for the case where there is only
-C     a slight tilt or distortion on the spectrum. Where the tilt or
-C     distortion is more extreme, such as in a cross-dispersed echelle
-C     spectrum, an algorithm such as that of Marsh, 1989 (PASP 101, 1032)
-C     should be used to generate the spatial profile.
+C     The Horne algorithm is appropriate for the case where there is 
+C     only a slight tilt or distortion on the spectrum. Where the tilt
+C     or distortion is more extreme, such as in a cross-dispersed
+C     echelle spectrum, an algorithm such as that of Marsh, 1989
+C     (PASP 101, 1032) should be used to generate the spatial profile.
 C
 C     Command parameters -
 C
@@ -51,8 +52,8 @@ C
 C     Modified:
 C     10th Feb 1991  JAB / JAC  Add NREJECT parameter and RESIDUAL 
 C                    output file
-C     8th  Mar 1991  JAB / JAC  Use Variance instead of error, add WEIGHT
-C                    keyword
+C     8th  Mar 1991  JAB / JAC  Use Variance instead of error, add 
+C                    WEIGHT keyword
 C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     17th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
 C                    PDA_DPOLFT requires 1/variance as weight.
@@ -61,50 +62,47 @@ C                    DSA_COERCE_DATA_ARRAY for RESIDUAL to be before
 C                    DSA_SET_OBJECT so that there is a dataset in which
 C                    to write the object.
 C     29th Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER MAX_DEGREE
       PARAMETER (MAX_DEGREE = 10)
 C
 C     Functions
 C
-
-      INTEGER   DYN_ELEMENT
-      INTEGER   DYN_INCREMENT
-      LOGICAL   PAR_ABORT          ! (F)PAR abort flag
+      LOGICAL   PAR_ABORT        ! (F)PAR abort flag
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   DEGREE             ! Polynomial degree
-      INTEGER   DIMS(2)            ! Image dimensions
-      INTEGER   DUMMY              ! Dummy argument
-      LOGICAL   EXIST              ! True if error information available
-      INTEGER   IGNORE             ! Ignoreable status
-      INTEGER   YS                 ! Initial pixel number
-      INTEGER   YE                 ! Final pixel number
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   NREJECT            ! Number of points to reject
-      INTEGER   OPTR1              ! Dynamic memory element for image data
-      INTEGER   QPTR1              ! Output quality pointer for image
-      INTEGER   RPTR               ! Pointer to residual data
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   STATUS             ! Running status for DSA routines
-      CHARACTER*40 STRINGS(2)      ! Strings for SET_DATA_INFO
-      INTEGER   TEMP               ! Temporary value
-      REAL      VALUE              ! value from PAR_RDVAL
-      INTEGER   VPTR1              ! Dynamic memory element for image variance
-      LOGICAL   WEIGHT             ! True if errors to be used as weights
-      INTEGER   WPTR               ! Dynamic memory element of W array
-      INTEGER   W1PTR              ! Dynamic memory element of W1 array
-      INTEGER   XPTR               ! Dynamic memory element of X array
-      INTEGER   YPTR               ! Dynamic memory element of Y array
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DEGREE           ! Polynomial degree
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   DUMMY            ! Dummy argument
+      LOGICAL   EXIST            ! True if error information available
+      INTEGER   IGNORE           ! Ignoreable status
+      INTEGER   YS               ! Initial pixel number
+      INTEGER   YE               ! Final pixel number
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   NREJECT          ! Number of points to reject
+      INTEGER   OPTR1            ! Dynamic-memory pointer for image data
+      INTEGER   QPTR1            ! Output quality pointer for image
+      INTEGER   RPTR             ! Pointer to residual data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER*40 STRINGS(2)    ! Strings for SET_DATA_INFO
+      INTEGER   TEMP             ! Temporary value
+      REAL      VALUE            ! value from PAR_RDVAL
+      INTEGER   VPTR1            ! Dynamic-memory pointer for image
+                                 ! variance
+      LOGICAL   WEIGHT           ! True if errors to be used as weights
+      INTEGER   WPTR             ! Dynamic-memory pointer of W array
+      INTEGER   W1PTR            ! Dynamic-memory pointer of W1 array
+      INTEGER   XPTR             ! Dynamic-memory pointer of X array
+      INTEGER   YPTR             ! Dynamic-memory pointer of Y array
 C     
 C     Initial values
 C
@@ -140,7 +138,7 @@ C
           TEMP = YE
           YE = YS
           YS = TEMP
-      ENDIF
+      END IF
 C
 C     Get polynomial degree
 C
@@ -161,7 +159,7 @@ C
          IF ( PAR_ABORT() ) GO TO 500
       ELSE
          WEIGHT = .FALSE.
-      ENDIF
+      END IF
 C
 C     Create output file.
 C
@@ -185,39 +183,29 @@ C     Map the output data - note that we map a variance array even
 C     if it does not exist, this will be filled with zeros indicating
 C     that the profile is perfect data.
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :   SLOT,STATUS)
-      OPTR1=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :       SLOT,STATUS)
-      VPTR1=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',ADDRESS,
-     :    SLOT,STATUS)
-      QPTR1=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('RESIDUAL','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      RPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR1,SLOT,STATUS)
+      CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VPTR1,SLOT,STATUS)
+      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',QPTR1,SLOT,STATUS)
+      CALL DSA_MAP_DATA('RESIDUAL','WRITE','FLOAT',RPTR,SLOT,STATUS)
 C
 C     Get workspace arrays
 C
-      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',ADDRESS,SLOT,STATUS)
-      XPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',ADDRESS,SLOT,STATUS)
-      YPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',ADDRESS,SLOT,STATUS)
-      WPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',XPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',YPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',WPTR,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(4*NX+3*(MAX_DEGREE+1),
-     :   'DOUBLE',ADDRESS,SLOT,STATUS)
-      W1PTR = DYN_ELEMENT(ADDRESS)
+     :                        'DOUBLE',W1PTR,SLOT,STATUS)
 C
 C     Process data
 C
       IF (STATUS .EQ. 0) THEN
          CALL PROFILE_WORK(NX,NY,4*NX+3*(MAX_DEGREE+1),
-     :      DYNAMIC_MEM(OPTR1),DYNAMIC_MEM(VPTR1),DYNAMIC_MEM(QPTR1),
-     :      DYNAMIC_MEM(RPTR),DYNAMIC_MEM(XPTR),DYNAMIC_MEM(YPTR),
-     :      DYNAMIC_MEM(WPTR),DYNAMIC_MEM(W1PTR),YS,YE,DEGREE,NREJECT,
-     :      WEIGHT)
-      ENDIF
+     :                     %VAL(CNF_PVAL(OPTR1)),%VAL(CNF_PVAL(VPTR1)),
+     :                     %VAL(CNF_PVAL(QPTR1)),%VAL(CNF_PVAL(RPTR)),
+     :                     %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(YPTR)),
+     :                     %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(W1PTR)),
+     :                     YS,YE,DEGREE,NREJECT,WEIGHT)
+      END IF
 
   500 CONTINUE
       CALL DSA_CLOSE(STATUS)
@@ -333,24 +321,24 @@ C
               ELSE
                   DO JY=YS,YE
                      Q(IX,JY) = 1
-                  ENDDO
-              ENDIF
-          ENDDO
+                  END DO
+              END IF
+          END DO
           IF (ABS(SUM) .GE. MINVAL) THEN
               DO IY=YS,YE
                   IF (Q(IX,IY) .EQ. 0) THEN
                       I(IX,IY)=I(IX,IY)/SUM
                       IF (WEIGHT) THEN
                           V(IX,IY)=V(IX,IY)/(SUM*SUM)
-                      ENDIF
-                  ENDIF
-              ENDDO
+                      END IF
+                  END IF
+              END DO
           ELSE
               DO IY=YS,YE
                   Q(IX,IY) = 1
-              ENDDO
-          ENDIF
-      ENDDO
+              END DO
+          END IF
+      END DO
 C
 C     Do polynomial fits along each row to give more accurate profile image
 C              
@@ -378,10 +366,10 @@ C
                    IF (V(IX,IY) .LE. 0 .OR. 
      :                 V(IX,IY) .EQ. FUNKNOWN_IN) THEN
                       ERRORS = .FALSE.
-                   ENDIF
-                ENDIF
-             ENDIF
-          ENDDO 
+                   END IF
+                END IF
+             END IF
+          END DO 
 C
 C     Set up arrays for polynomial fit to curent row.
 C     Note that the weight required by E02ADF is 1/uncertainty,
@@ -398,10 +386,10 @@ C
                      W(INDEX) = 1D0/V(IX,IY)
                   ELSE  
                      W(INDEX) = 1D0
-                  ENDIF
+                  END IF
                   INDEX = INDEX+1
-              ENDIF
-          ENDDO
+              END IF
+          END DO
 C
 C     Do the polynomial fit
 C
@@ -412,7 +400,7 @@ C
           IF (NDEG.NE.KPLUS1 .OR. IFAIL.NE.1 .OR. IFAIL2.NE.0 ) THEN
               CALL PAR_WRUSER('Error in PDA_DPOLFT',IGNORE)
               GOTO 500
-          ENDIF
+          END IF
 
           DO NREJ = 1,NREJECT
 C
@@ -427,13 +415,13 @@ C
                   IF (R .GT. RMAX) THEN          
                       RMAX = R                   
                       IMAX = INDEX               
-                  ENDIF                          
-              ENDDO
+                  END IF                          
+              END DO
               DO INDEX = IMAX,NGOOD-1
                  Y(INDEX)=Y(INDEX+1)
                  W(INDEX)=W(INDEX+1)
                  X(INDEX)=X(INDEX+1)
-              ENDDO
+              END DO
               NGOOD=NGOOD-1
 C
 C     Do the polynomial fit
@@ -445,8 +433,8 @@ C
               IF (NDEG.NE.KPLUS1 .OR. IFAIL.NE.1 .OR. IFAIL2.NE.0 ) THEN
                   CALL PAR_WRUSER('Error in PDA_DPOLFT',IGNORE)
                   GOTO 500
-              ENDIF
-          ENDDO
+              END IF
+          END DO
 C
 C    Replace data by fit
 C
@@ -465,10 +453,10 @@ C
                   I(IX,IY) = 0.0
                   RES(IX,IY) = 0.0
                   Q(IX,IY) = 1
-              ENDIF
-          ENDDO
+              END IF
+          END DO
 500       CONTINUE
-      ENDDO
+      END DO
 C
 C     Enforce normalization
 C
@@ -477,12 +465,12 @@ C
           DO IY=YS,YE
               IF (Q(IX,IY) .EQ. 0) THEN
                   SUM = SUM+I(IX,IY)
-              ENDIF
-          ENDDO
+              END IF
+          END DO
           DO IY=YS,YE
               I(IX,IY)=I(IX,IY)/SUM
-          ENDDO
-      ENDDO
+          END DO
+      END DO
 C
 C     Outside window set quality to bad and data to zero
 C
@@ -491,14 +479,14 @@ C
               Q(IX,IY)=1
               I(IX,IY)=0.0
               RES(IX,IY)=0.0
-          ENDDO
-      ENDDO
+          END DO
+      END DO
       DO IY=YE+1,NY
           DO IX=1,NX
               Q(IX,IY)=1
               I(IX,IY)=0.0
               RES(IX,IY)=0.0
-          ENDDO
-      ENDDO
+          END DO
+      END DO
 
       END

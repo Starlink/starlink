@@ -78,14 +78,17 @@ C     16 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  No concurrent mapping. Had to swap mapping x data
 C                  behind x axis range.
 C     26 Jul 1996  MJCL / Starlink, UCL.  One extra PAR_ABORT check.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.  Tidy variable declarations.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT,PAR_BATCH,PAR_GIVEN
       INTEGER GEN_BSEARCH,ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY,PGBEGIN
-      INTEGER DYN_ELEMENT
       REAL GEN_ELEMF
 C
 C     Real variable plot value limits - keeps plot range within
@@ -101,13 +104,12 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       LOGICAL   AUTOSC           ! TRUE if AUTOSCALE is specified
       LOGICAL   AXES             ! TRUE if axes are to be drawn
       REAL      BIAS             ! Value of bias parameter
       CHARACTER COMMAND*96       ! The Figaro command passed
       CHARACTER DEVICE*32        ! PGPLOT device specification
-      INTEGER   DDIMS(10)        ! The sizes of the dimensions of the data
+      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       CHARACTER DLAB*64          ! Plot data axis label
       CHARACTER DLABEL*32        ! Structure data axis label
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
@@ -132,7 +134,8 @@ C
       LOGICAL   LINES            ! Value of keyword LINES
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Flag TRUE if data in magnitudes
-      INTEGER   NDIM             ! Dimensionality of input data structure
+      INTEGER   NDIM             ! Dimensionality of input data 
+                                 ! structure
       INTEGER   NDELM            ! Total number of elements in the data
       INTEGER   NX               ! X-dimension of data
       INTEGER   NXELM            ! Total number of elements in x-axis
@@ -161,10 +164,6 @@ C
       INTEGER   YPTR             ! Dynamic-memory pointer to y-axis data
       REAL      YSIZE            ! Physical width of plot, in metres
       INTEGER   YSLOT            ! Map slot number used for y-axis info
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -234,28 +233,24 @@ C
       CALL PAR_RDKEY('WHOLE',.FALSE.,WHOLE)
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
       CALL DSA_AXIS_RANGE ('SPECT',1,'Unconstrained',WHOLE,XVST,XVEN,
-     :                                         IXST,IXEN,STATUS)
+     :                     IXST,IXEN,STATUS)
 C
 C     Try to map the X-axis data array
 C
-      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                          XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Map the main data array
 C
-      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     For an error plot, map the error data.
 C
       IF (ERRPLT) THEN
          CALL DSA_SEEK_ERRORS ('SPECT',EREXIST,STATUS)
-         CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',ADDRESS,
-     :                                           ESLOT,STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',EPTR,ESLOT,STATUS)
       END IF
 C
 C     Was AUTOSCALE specified?
@@ -267,10 +262,10 @@ C     Specified or not, find out the scale range because we can
 C     use that for the reset values.
 C
       IF (ERRPLT) THEN
-         CALL FIG_ERANGE(DYNAMIC_MEM(DPTR),DYNAMIC_MEM(EPTR),IXST,
-     :                                                IXEN,VMAX,VMIN)
+         CALL FIG_ERANGE(%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(EPTR)),IXST,
+     :                   IXEN,VMAX,VMIN)
       ELSE
-         CALL GEN_RANGEF(DYNAMIC_MEM(DPTR),IXST,IXEN,VMAX,VMIN)
+         CALL GEN_RANGEF(%VAL(CNF_PVAL(DPTR)),IXST,IXEN,VMAX,VMIN)
       END IF
 C
 C     Get data information (units and label)
@@ -309,8 +304,8 @@ C
       IF (IXST.EQ.IXEN) THEN
          IXST=MAX(IXST-1,1)
          IXEN=MIN(IXEN+1,NX)
-         XVST=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXST)
-         XVEN=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXEN)
+         XVST=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXST)
+         XVEN=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXEN)
       END IF
 C
 C     Get the axis labels from the labels and units
@@ -329,11 +324,11 @@ C
 C     Finally, perform the plot
 C
       IF (ERRPLT) THEN
-         CALL FIG_LEXZPLT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),
-     :                  DYNAMIC_MEM(EPTR),NX,IXST,IXEN,HIGH,
-     :                  LOW,XLAB,DLAB,PLAB,EREXIST,XVST,XVEN,STATUS)
+         CALL FIG_LEXZPLT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
+     :                    %VAL(CNF_PVAL(EPTR)),NX,IXST,IXEN,HIGH,
+     :                    LOW,XLAB,DLAB,PLAB,EREXIST,XVST,XVEN,STATUS)
       ELSE
-         CALL FIG_LXZPLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),
+         CALL FIG_LXZPLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
      :                    NX,IXST,IXEN,HIGH,LOW,XLAB,DLAB,PLAB,
      :                    LINES,XVST,XVEN,STATUS)
       END IF

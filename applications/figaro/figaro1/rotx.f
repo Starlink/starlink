@@ -8,12 +8,12 @@ C     X direction.  The X data is not changed.
 C
 C     Command parameters -
 C
-C     IMAGE  (Character) The name of the structure containing the data to
-C            be rotated.
+C     IMAGE  (Character) The name of the structure containing the data
+C            to be rotated.
 C
 C     PIXELS (Numeric) The number of pixels by which the data is to be
-C            rotated.  A positive number indicates a shift towards higher
-C            pixel numbers.
+C            rotated.  A positive number indicates a shift towards
+C            higher pixel numbers.
 C
 C     OUTPUT (Character) The name of the result of the operation.  This 
 C            can be the same as for IMAGE.  If not, a new structure
@@ -31,36 +31,39 @@ C                    mapping calls.
 C     30th Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
 C                    changed.
 C     27th Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 10   MJC (Starlink)  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT , DYN_INCREMENT , DSA_TYPESIZE
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      INTEGER DSA_TYPESIZE
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes in workspace area
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to ignore status errors
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NSPECT       ! Total number of spectra in image
-      INTEGER      NX           ! The size of the data's first dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number output data array
-      INTEGER      PIXELS       ! Number of pixels to rotate
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number for workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   BYTES            ! Number of bytes in workspace area
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      INTEGER   I                !
+      INTEGER   IGNORE           ! Used to ignore status errors
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NELM             ! Total number of elements in data
+      INTEGER   NSPECT           ! Total number of spectra in image
+      INTEGER   NX               ! Size of the data's first dimension
+      INTEGER   OPTR             ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER   OSLOT            ! Map slot number output data array
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
+      INTEGER   PIXELS           ! Number of pixels to rotate
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      INTEGER   TPTR             ! Temporary dynamic mem pointer
+      REAL      VALUE            ! Temporary real number
+      INTEGER   WPTR             ! Dynamic-memory pointer to workspace
+      INTEGER   WSLOT            ! Map slot number for workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -82,12 +85,12 @@ C
 C     Get number of pixels to rotate.
 C
       CALL PAR_RDVAL('PIXELS',-FLOAT(NX),FLOAT(NX),FLOAT(NX/2),
-     :                                                 ' ',VALUE)
+     :               ' ',VALUE)
       IF ( PAR_ABORT() ) GO TO 500
       PIXELS=NINT(VALUE)
       IF (FLOAT(PIXELS).NE.VALUE) THEN
          CALL PAR_WRUSER('Note that a rotation must be by an '
-     :                     //'integer number of pixels.',IGNORE)
+     :                   //'integer number of pixels.',IGNORE)
          CALL PAR_WRUSER('The value supplied will be truncated.',IGNORE)
       END IF
 C
@@ -98,24 +101,27 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                        STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     We need workspace sufficient for one cross-section of the data.
 C
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Now rotate the data.
 C
+      PISNEW = .FALSE.
       DO I=1,NSPECT
-         CALL FIG_ROTX(NX,PIXELS,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(OPTR))
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
+         CALL FIG_ROTX(NX,PIXELS,%VAL(CNF_PVAL(OPTR)),
+     :                 %VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)))
+
+         CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
+         PISNEW = ISNEW
       END DO
 C
 C     Tidy up

@@ -39,55 +39,57 @@ C                  of CNV_FMTCNV, we need to work with FMTCON type
 C                  codes from dsa_types.inc. And we have to pass
 C                  pointers to DSA_FMTCON rather than arrays. As a
 C                  consequence %VAL must replace DYNAMIC_MEM.
-C     07 Oct 1994  KS / AAO. DSA_FMTCON modified to use arrays rather than
-C                  pointers. DYNAMIC_MEM re-instated (thereby fixing,
-C                  rather belatedly) a bug reported by many users!
+C     07 Oct 1994  KS / AAO. DSA_FMTCON modified to use arrays rather
+C                  than pointers. DYNAMIC_MEM re-instated (thereby
+C                  fixing, rather belatedly) a bug reported by many 
+C                  users!
 C     21 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
 C     24 Jul 1996  MJC / Starlink, UCL.  Corrected type of SAME.
+C     2005 June 10 MJC (Starlink)  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       SUBROUTINE RETYPE
 C
       IMPLICIT NONE
-C
-C     Standard definitions for dynamic memory system
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       LOGICAL DSA_SAME_DATA
-      INTEGER DYN_ELEMENT
       INTEGER DSA_TYPESIZE, ICH_LEN
       CHARACTER*16 ICH_CI
 C
 C     Local variables
 C
-      INTEGER   ADDR             ! Address of mapped data
       INTEGER   BYTES            ! Number of bytes in input array
       INTEGER   DIMS(10)         ! Dimensions of data array
       LOGICAL   FLAGGED          ! True if data has flagged values
       INTEGER   I                ! Loop index
       INTEGER   IGNORE           ! Status we don't care about
-      INTEGER   IPTR             ! Dynamic mem element for input data (or copy)
+      INTEGER   IPTR             ! Dynamic-mem pointer for input data 
+                                 ! (or copy)
       INTEGER   LENGTH           ! Number of characters in STRING
       INTEGER   NBAD             ! Number of bad conversions
       INTEGER   NDIM             ! Number of data array dimensions
       INTEGER   NELM             ! Number of elements in data array
       CHARACTER OLDTYPE*32       ! Original type for data
       INTEGER   OLD_PRIM_CODE    ! Original primitive type code
-      CHARACTER OLD_PRIM_TYPE*16 ! Primitive type corresponding to OLDTYPE
-      INTEGER   OPTR             ! Dynamic mem element for output data 
+      CHARACTER OLD_PRIM_TYPE*16 ! Primitive type corresponding to 
+                                 ! OLDTYPE
+      INTEGER   OPTR             ! Dynamic-mem pointer for output data 
       INTEGER   PRIM_CODE        ! Requested primitive type code
       CHARACTER PRIM_TYPE*16     ! Primitive type to use to map data
-      LOGICAL   SAME             ! True if input and output are the same array
+      LOGICAL   SAME             ! Input and output are the same array?
       INTEGER   SLOT             ! Slot used for data mapping
       INTEGER   STATUS           ! Inherited status used by DSA routines
-      CHARACTER STRING*64        ! Used to format conversion error message
-      LOGICAL   STRUCT           ! True if input array is a structured type
+      CHARACTER STRING*64        ! Used to format conversion error 
+                                 ! message
+      LOGICAL   STRUCT           ! Input array is a structured type?
       CHARACTER TYPE*32          ! Requested data type
       INTEGER   WORK_SLOT        ! Slot for work array - ignored
-      INTEGER   WPTR             ! Dynamic mem element for work array
+      INTEGER   WPTR             ! Dynamic-mem pointer for work array
 C
 C     Include DSA type codes.
 C
@@ -133,9 +135,7 @@ C     data values).
 C
       CALL DSA_PREFERRED_TYPE (OLDTYPE,OLD_PRIM_TYPE,STATUS)
       CALL DSA_USE_FLAGGED_VALUES ('INPUT',STATUS)
-      CALL DSA_MAP_DATA ('INPUT','READ',OLD_PRIM_TYPE,ADDR,SLOT,
-     :                                                        STATUS)
-      IPTR=DYN_ELEMENT(ADDR)
+      CALL DSA_MAP_DATA ('INPUT','READ',OLD_PRIM_TYPE,IPTR,SLOT,STATUS)
       CALL DSA_SEEK_FLAGGED_VALUES ('INPUT',FLAGGED,STATUS)
       IF (FLAGGED) CALL DSA_USE_FLAGGED_VALUES ('OUTPUT',STATUS)
       SAME=DSA_SAME_DATA('INPUT','OUTPUT',STATUS)
@@ -145,12 +145,11 @@ C        For the in situ case, get a work array the size of the
 C        original data array, copy the data into the work array and 
 C        close the input array.
 C
-         CALL DSA_GET_WORK_ARRAY (NELM,OLD_PRIM_TYPE,ADDR,
-     :                                                WORK_SLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDR)
+         CALL DSA_GET_WORK_ARRAY (NELM,OLD_PRIM_TYPE,WPTR,
+     :                            WORK_SLOT,STATUS)
          BYTES=NELM*DSA_TYPESIZE(OLD_PRIM_TYPE,STATUS)
          IF (STATUS.NE.0) GO TO 500    ! Error exit
-         CALL GEN_MOVE (BYTES,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(WPTR))
+         CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(WPTR)))
          CALL DSA_UNMAP (SLOT,STATUS)
          IPTR=WPTR
       END IF
@@ -159,10 +158,8 @@ C     Now coerce the output array type and map the new array.
 C
       CALL DSA_COERCE_DATA_ARRAY ('OUTPUT',TYPE,NDIM,DIMS,STATUS)
       CALL DSA_PREFERRED_TYPE (TYPE,PRIM_TYPE,STATUS)
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE',PRIM_TYPE,ADDR,SLOT,
-     :                                                       STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE',PRIM_TYPE,OPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500    ! Error exit
-      OPTR=DYN_ELEMENT(ADDR)
 C
 C     And then convert the input data (or our copy of it) into the 
 C     output array.
@@ -173,7 +170,8 @@ C
          IF (PRIM_TYPE.EQ.TYPE_NAMES(I)) PRIM_CODE=FMTCON_CODE(I)
       ENDDO
       CALL DSA_FMTCON(FLAGGED,OLD_PRIM_CODE,PRIM_CODE,
-     :           DYNAMIC_MEM(IPTR),DYNAMIC_MEM(OPTR),NELM,NBAD)
+     :                %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                NELM,NBAD)
       IF (NBAD.GT.0) THEN
          CALL PAR_WRUSER(' ',IGNORE)
          STRING='Warning - '//ICH_CI(NBAD)

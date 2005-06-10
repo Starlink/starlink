@@ -26,17 +26,18 @@ C                                              KS / CIT 27th March 1985
 C
 C     Modified:
 C
-C     31st Jul 1987 - DJA/AAO. Revised DSA_ routines - some specs changed.
-C                     Dynamic memory handling now though DYN_ routines.
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     22nd Sep 1992.  HME / UoE, Starlink.  TAB removed, INCLUDE changed.
+C     31st Jul 1987  DJA/AAO. Revised DSA_ routines - some specs 
+C                    changed. Dynamic memory handling now though DYN_
+C                    routines.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
+C                    in mapping calls.
+C     22nd Sep 1992  HME / UoE, Starlink.  TAB removed, INCLUDE changed.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Limits for VALUE - close to the VAX number limits
 C
@@ -45,22 +46,18 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       INTEGER      IXEN         ! Last pixel to be set constant
       INTEGER      IXST         ! First  "   "  "   "      "
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
+      INTEGER      OPTR         ! Dynamic-memory pointer to output data 
+                                ! array
       INTEGER      OSLOT        ! Map slot number outputdata array
       INTEGER      STATUS       ! Running status for DSA_ routines
       REAL         VALUE        ! Temporary real number
       REAL         VMAX         !
       REAL         VMIN         !
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -81,7 +78,7 @@ C
 C     Get XSTART and XEND
 C
       CALL DSA_AXIS_RANGE('SPECT',1,' ',.FALSE.,VMIN,VMAX,IXST,
-     :                                             IXEN,STATUS)
+     :                    IXEN,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get value for VALUE
@@ -95,14 +92,12 @@ C
 C
 C     Map data array to receive fitted spectrum
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                       STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Set the region to the constant value
 C
-      CALL GEN_CFILL(IXST,IXEN,VALUE,DYNAMIC_MEM(OPTR))
+      CALL GEN_CFILL(IXST,IXEN,VALUE,%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

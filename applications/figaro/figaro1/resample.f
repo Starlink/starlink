@@ -33,25 +33,24 @@ C
 C                                  Michael Ashley / MSSSO 12th Dec 1986
 C     Modified -
 C
-C     12th Dec 1986.  MCBA / MSSSO. Based on the program ISUPER by
-C                     Keith Shortridge of the AAO, and the program REBIN by
-C                     R. F. Warren-Smith of STARLINK.
-C     30th Sep 1994.  KS / AAO. Modified to use the DSA library instead of 
-C                     explicit DTA calls. Should now work on both DST and
-C                     NDF format data.
-C     24th Jul 1996.  MJCL / Starlink, UCL.  Changed to use COS/SIN
-C                     instead of COSD/SIND.
+C     12th Dec 1986  MCBA / MSSSO. Based on the program ISUPER by
+C                    Keith Shortridge of the AAO, and the program 
+C                    REBIN by R. F. Warren-Smith of STARLINK.
+C     30th Sep 1994  KS / AAO. Modified to use the DSA library instead 
+C                    of explicit DTA calls. Should now work on both DST
+C                    and NDF format data.
+C     24th Jul 1996  MJCL / Starlink, UCL.  Changed to use COS/SIN
+C                    instead of COSD/SIND.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+CC
 C     Functions used
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
-C
-C     Standard dynamic memory include file
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Flags for DSA_OUTPUT
 C
@@ -61,7 +60,7 @@ C
 C     Local variables
 C
       LOGICAL FAULT
-      INTEGER ADDR, DIMS(10), DSA_STATUS, I, IPTR
+      INTEGER DIMS(10), DSA_STATUS, I, IPTR
       INTEGER NDIM, NELM, NX, NY, NXOUT
       INTEGER NYOUT, OPTR, SLOT, STATUS
       INTEGER METHOD
@@ -213,17 +212,15 @@ C
 C
 C     Map input and output images
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDR,SLOT,DSA_STATUS)
-      IPTR=DYN_ELEMENT(ADDR)
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',ADDR,SLOT,DSA_STATUS)
-      OPTR=DYN_ELEMENT(ADDR)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,DSA_STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',OPTR,SLOT,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
 C
 C Do it!
 C
-      CALL RESAMPLE_REBIN(DYNAMIC_MEM(IPTR),NX,NY,INVALID,INVALID,
-     &            1,NXOUT,1,NYOUT,C,SCALE,METHOD,
-     &            DYNAMIC_MEM(OPTR),NXOUT,NYOUT,STATUS)
+      CALL RESAMPLE_REBIN(%VAL(CNF_PVAL(IPTR)),NX,NY,INVALID,INVALID,
+     :                    1,NXOUT,1,NYOUT,C,SCALE,METHOD,
+     :                    %VAL(CNF_PVAL(OPTR)),NXOUT,NYOUT,STATUS)
 C
       IF (STATUS.NE.0) THEN
          CALL PAR_WRUSER('Error rebinning the image',STATUS)

@@ -75,20 +75,25 @@ C                    Avoid calling GEN_???PHYSMEM by assuming 1 Mbyte
 C                    maximum and 0.5 Mbyte current.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
-C     27th Jan 1997  MJCL / Starlink, UCL.  I have, somewhat arbitrarily,
-C                    modified the estimate of physical memory.  The old
-C                    value of 1 Mbyte maximum is too low for efficeint
-C                    use of contemporary machines.  The value is now set
-C                    at 16384 Kbytes in the parameter PHYS_AVAIL.
+C     27th Jan 1997  MJCL / Starlink, UCL.  I have, somewhat
+C                    arbitrarily, modified the estimate of physical
+C                    memory.  The old value of 1 Mbyte maximum is too low 
+C                    for efficient use of contemporary machines.  The
+C                    value is now set at 16384 Kbytes in the parameter
+C                    PHYS_AVAIL.
 C     21st May 1997  MJCL / Starlink, UCL.  Initialise FAULT to .FALSE.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+CC
 C     Functions:
 C
       LOGICAL     PAR_ABORT
       INTEGER     ICH_LEN,ICH_CLEAN
-      INTEGER     DYN_ELEMENT,DSA_TYPESIZE,DYN_INCREMENT
+      INTEGER     DSA_TYPESIZE
       REAL        GEN_QFMED
       CHARACTER   ICH_CF*15, ICH_CI*4
 C
@@ -99,7 +104,7 @@ C
 C
 C     Maximum number of images that can be handled if SCALED OR LOG
 C     is specified (if neither are used, any number of files can be
-C     accomodated).
+C     accommodated).
 C
       INTEGER MAX_FILES
       PARAMETER (MAX_FILES=500)
@@ -111,57 +116,66 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BPTR         ! Pointer to current pixel in input data
-      INTEGER      CURBATPIX    ! Current size of batch of pixels
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of data array
-      LOGICAL      FAULT        ! Indicates error while reading the input file
-      LOGICAL      FIRST        ! TRUE if the current image is the first one
-      LOGICAL      FIRSTPASS    ! TRUE if the 1st batch of pixels is being done
-      CHARACTER    FILE*80      ! A particular line from the input file
-      CHARACTER    FILENAME*132 ! The filename of the input file
-      LOGICAL      FOPEN        ! TRUE if the input file was opened correctly
-      INTEGER      IFILE        ! The current file number
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      INPUT        ! The logical unit number of the input file
-      INTEGER      INVOKE       ! Used to invoke functions
-      INTEGER      LOGLU        ! Logical unit for Scaling log file
-      LOGICAL      LOGNS        ! Value of the LOG parameter
-      INTEGER      LOGPTR       ! Dynamic memory element for log image data
-      INTEGER      LPIX         ! The number of the last pixels in the batch
-      INTEGER      LSLOT        ! Map slot number log image array
-      INTEGER      MAXBATPIX    ! Maximum number of pixels per pass through file
-      REAL         MEDIANS(MAX_FILES)
-                                ! Overall median values for the different images
-      LOGICAL      MOREFILES    ! TRUE while there are more input images
-      LOGICAL      MOREPIX      ! TRUE while there are more pixels to do
-      CHARACTER    NAME*32      ! Full name of log file - ignored
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      CHARACTER    NEXT*132     ! Reference name of current image
-      INTEGER      NFB          ! The number of bytes in a 'FLOAT'
-      INTEGER      NFILE        ! The number of images in the input file
-      INTEGER      NPIX         ! The number of pixels in the current batch
-      INTEGER      PHYBYTES     ! Total amount of physical memory available
-      INTEGER      PIX          ! The current pixel number
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number output data array
-      REAL         SCALE        ! Scale factor to apply to data if scaled
-      LOGICAL      SCALED       ! Value of SCALED parameter
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*80    ! Used to format lines of log file
-      INTEGER      WBYTES       ! Amount of workspace required per batch
-      INTEGER      WMEDPTR      ! Dynamic mem pointer to image median work array
-      REAL         WORK(MAX_FILES)
-                                ! Work array used only if LOG is specified
-      INTEGER      WPTR         ! Dynamic memory pointer to workspace data
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   BPTR             ! Pointer to current pixel in input 
+                                 ! data
+      INTEGER   CURBATPIX        ! Current size of batch of pixels
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number of data array
+      LOGICAL   FAULT            ! Indicates error while reading the 
+                                 ! input file
+      LOGICAL   FIRST            ! Current image is the first one?
+      LOGICAL   FIRSTPASS        ! 1st batch of pixels is being done?
+      CHARACTER FILE*80          ! A particular line from the input file
+      CHARACTER FILENAME*132     ! The filename of the input file
+      LOGICAL   FOPEN            ! Input file was opened correctly?
+      INTEGER   IFILE            ! The current file number
+      INTEGER   IGNORE           ! Used to pass ignorable status
+      INTEGER   INPUT            ! The logical unit number of the input
+                                 ! file
+      INTEGER   INVOKE           ! Used to invoke functions
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      LOGICAL   ISNEWL           ! Is address for logs new to CNF?
+      INTEGER   LOGLU            ! Logical unit for Scaling log file
+      LOGICAL   LOGNS            ! Value of the LOG parameter
+      INTEGER   LOGPTR           ! Dynamic-memory pointer for log image
+                                 ! data
+      INTEGER   LPIX             ! Number of the last pixel in the batch
+      INTEGER   LSLOT            ! Map slot number log image array
+      INTEGER   MAXBATPIX        ! Maximum number of pixels per pass
+                                 ! through file
+      REAL      MEDIANS(MAX_FILES) ! Overall median values for the 
+                                 ! different images
+      LOGICAL   MOREFILES        ! More input images?
+      LOGICAL   MOREPIX          ! More pixels to do?
+      CHARACTER NAME *32         ! Full name of log file - ignored
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NELM             ! Total number of elements in data
+      CHARACTER NEXT*132         ! Reference name of current image
+      INTEGER   NFB              ! The number of bytes in a 'FLOAT'
+      INTEGER   NFILE            ! Number of images in the input file
+      INTEGER   NPIX             ! Number of pixels in the current batch
+      INTEGER   PHYBYTES         ! Total amount of physical memory 
+                                 ! available
+      LOGICAL   PISNL            ! Previous CNF pointer to log data new?
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
+      INTEGER   PIX              ! The current pixel number
+      INTEGER   OPTR             ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER   OSLOT            ! Map slot number output data array
+      REAL      SCALE            ! Scale factor to apply to scaled data
+      LOGICAL   SCALED           ! Value of SCALED parameter
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      CHARACTER STRING*80        ! Used to format lines of log file
+      INTEGER   TPTR             ! Temporary dynamic mem pointer
+      INTEGER   WBYTES           ! Amount of workspace required per 
+                                 ! batch
+      INTEGER   WMEDPTR          ! Dynamic-memory pointer to image-
+                                 ! median work array
+      REAL      WORK(MAX_FILES)  ! Work array used only if LOG is 
+                                 ! specified
+      INTEGER   WPTR             ! Dynamic-memory pointer to workspace 
+      INTEGER   WSLOT            ! Map slot number of workspace
 C
 C     Initial values
 C
@@ -247,8 +261,7 @@ C
          STRING(49:)='-------------'
          STRING(64:)='-------------'
          WRITE (LOGLU,'(A)',IOSTAT=IGNORE) STRING
-         CALL DSA_GET_WORK_ARRAY (NELM,'FLOAT',ADDRESS,WSLOT,STATUS)
-         WMEDPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY (NELM,'FLOAT',WMEDPTR,WSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
       END IF
 C
@@ -260,15 +273,13 @@ C
       PHYBYTES=1024*PHYS_AVAIL
       MAXBATPIX=MIN(NINT((0.5*PHYBYTES)/(FLOAT((2+NFILE)*NFB))),NELM)
       WBYTES=MAXBATPIX*NFILE*NFB
-      CALL DSA_GET_WORKSPACE(WBYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORKSPACE(WBYTES,WPTR,WSLOT,STATUS)
 C
 C     Get the name of the OUTPUT array, and map it in
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','FIRST',0,0,STATUS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
-      OPTR=DYN_ELEMENT(ADDRESS)
 C
 C     See if the rather unusual LOG keyword has been speciifed.  If so,
 C     create the output log image and map it.
@@ -285,87 +296,89 @@ C
          CALL DSA_OUTPUT ('IMGLOG','IMGLOG',' ',0,0,STATUS)
          CALL DSA_SIMPLE_OUTPUT ('IMGLOG','DATA','SHORT',NDIM,DIMS,
      :                                                         STATUS)
-         CALL DSA_MAP_DATA ('IMGLOG','WRITE','INT',ADDRESS,LSLOT,STATUS)
-         LOGPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA ('IMGLOG','WRITE','INT',LOGPTR,LSLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
       END IF
 C
-C     Pass through file repeatedly until all the pixels have been processed
+C     Pass through file repeatedly until all the pixels have been
+C     processed
 C
       DO WHILE (MOREPIX)
 C
 C        For each image in the list file, map its data and transfer the
-C        section containing the appropriate pixels for this pass into the
-C        workspace array. The 'geometry' of the process is shown below, for
-C        NFILE images (they are always treated as one dimensional) and a batch
-C        of pixels NPIX long:
+C        section containing the appropriate pixels for this pass into 
+C        the workspace array. The 'geometry' of the process is shown 
+C        below, for NFILE images (they are always treated as 
+C        one-dimensional) and a batch of pixels NPIX long:
 C
-C                               STAGE 1            STAGE 2
+C                                STAGE 1          STAGE 2
 C
-C        1st input image (NELM,1)       Work (N,NPIX)   Output (NELM,1)
+C        1st input image (NELM,1)      Work (N,NPIX)     Output (NELM,1)
 C
 C         <----- NELM ------->           <-NFILE->
-C        +--------------------+       ^  +-------+
-C        |   |segment_1|      |       |  | s   s | median_1 -+
-C        +--------------------|       |  | e   e |           |
-C            <--NPIX-->               N  | g   g |           |
-C                ...                  P  | m . m |       +---v----------+
-C                                =>   I  | e . e | ...   |  |medians|   |
-C        N th input image             X  | n . n |       +---------^----+
-C                                     |  | t   t |                 |
-C        +--------------------+       |  |       |                 |
-C        |   |segement_N|     |       |  | 1   N | median_N -------+
-C        +--------------------+       v  +-------+
+C        +--------------------+      ^  +-------+
+C        |    |segment_1|     |      |  | s   s | median_1 -+
+C        +--------------------|      |  | e   e |           |
+C            <--NPIX-->              N  | g   g |           |
+C                ...                 P  | m . m |       +---v----------+
+C                                =>  I  | e . e | ...   |  |medians|   |
+C        N th input image            X  | n . n |       +---------^----+
+C                                    |  | t   t |                 |
+C        +--------------------+      |  |       |                 |
+C        |    |segment_N|     |      |  | 1   N | median_N -------+
+C        +--------------------+      v  +-------+
 C
-C        STAGE 1 - All the pixels in the current segment are transferred to the
-C                  work array for each image.
-C        STAGE 2 - The median of the values in each row of the work array is
-C                  found, and repeated for every row.
+C        STAGE 1 - All the pixels in the current segment are transferred 
+C                  to the work array for each image.
+C        STAGE 2 - The median of the values in each row of the work
+C                  array is found, and repeated for every row.
 C
          MOREFILES=.TRUE.
          IFILE=1
+         PISNEW = .FALSE.
          DO WHILE(MOREFILES)
             READ (INPUT,'(A)',IOSTAT=STATUS) FILE
             IF ((FILE(:1).NE.'*').AND.(FILE.GT.' ').AND.
-     :                                          (STATUS.EQ.0)) THEN
+     :          (STATUS.EQ.0)) THEN
                CALL DSA_NAMED_INPUT('NEXT',FILE,STATUS)
-               CALL DSA_MAP_DATA('NEXT','READ','FLOAT',ADDRESS,DSLOT,
-     :                                                         STATUS)
+               CALL DSA_MAP_DATA('NEXT','READ','FLOAT',DPTR,DSLOT,
+     :                           STATUS)
 C
-C              If this the first file in the list, work out how much memory
-C              is currently available. This is done here as we have all the data
-C              mapped in and want to know what the optimum number of pixels is
-C              to minimise page faulting. This is very sensitive to the factor
-C              of PHYBYTES - currently 0.75. Too high and page faulting rises
-C              steeply, too low and maximum use of memory isn't being made.
+C              If this the first file in the list, work out how much 
+C              memory is currently available. This is done here as we 
+C              have all the data mapped in and want to know what the 
+C              optimum number of pixels is to minimise page faulting. 
+C              This is very sensitive to the factor of PHYBYTES, 
+C              currently 0.75. Too high and page faulting rises steeply,
+C              too low and maximum use of memory isn't being made.
 C              Both will result in a longer execution time.
 C
                IF (IFILE.EQ.1) THEN
                   PHYBYTES=512*PHYS_AVAIL
                   CURBATPIX=MIN(NINT((0.75*PHYBYTES)/(FLOAT((2+NFILE)*
-     :                                               NFB))),MAXBATPIX)
+     :              NFB))),MAXBATPIX)
                   LPIX=MIN(NELM,PIX+CURBATPIX-1)
                   NPIX=LPIX-PIX+1
                   IF (LPIX.EQ.NELM) MOREPIX=.FALSE.
                ELSE IF (FIRSTPASS) THEN
 C
-C                 It wasn't the first file - if this is the first pass through
-C                 the list then check that the size of the current file is
-C                 the same as the first in the list.
+C                 It wasn't the first file - if this is the first pass
+C                 through the list then check that the size of the
+C                 current file is the same as the first in the list.
 C
                   CALL DSA_MATCH_SIZES('FIRST','NEXT',STATUS)
                END IF
                IF (STATUS.NE.0) GOTO 500
-               DPTR=DYN_ELEMENT(ADDRESS)
 C
 C              Preliminary stage - If data is to be scaled, on the first
 C              pass, determine the median of the image data (copying
 C              it into the median workspace array first)
 C
                IF (SCALED.AND.FIRSTPASS) THEN
-                  CALL GEN_MOVE (NELM*NFB,DYNAMIC_MEM(DPTR),
-     :                                           DYNAMIC_MEM(WMEDPTR))
-                  MEDIANS(IFILE)=GEN_QFMED(DYNAMIC_MEM(WMEDPTR),NELM)
+                  CALL GEN_MOVE (NELM*NFB,%VAL(CNF_PVAL(DPTR)),
+     :                           %VAL(CNF_PVAL(WMEDPTR)))
+                  MEDIANS(IFILE)=GEN_QFMED(%VAL(CNF_PVAL(WMEDPTR)),NELM)
+
                   CALL DSA_GET_ACTUAL_NAME('NEXT',FILE,STATUS)
                   STRING=ICH_CI(IFILE)//FILE
                   STRING(49:)=ICH_CF(MEDIANS(IFILE))
@@ -381,9 +394,12 @@ C
                ELSE
                   SCALE=1.0
                END IF
-               BPTR=DYN_INCREMENT(DPTR,'FLOAT',PIX-1)
-               CALL FIG_MOVE_ROWTOCOL(DYNAMIC_MEM(BPTR),NPIX,SCALE,
-     :                         DYNAMIC_MEM(WPTR),NFILE,CURBATPIX,IFILE)
+
+               CALL DYN_INCAD(DPTR,'FLOAT',PIX-1,BPTR,ISNEW,STATUS)
+               CALL FIG_MOVE_ROWTOCOL(%VAL(CNF_PVAL(BPTR)),NPIX,SCALE,
+     :                                %VAL(CNF_PVAL(WPTR)),NFILE,
+     :                                CURBATPIX,IFILE)
+               IF (ISNEW) CALL CNF_UNREGP(BPTR)
 C
 C              Unmap current image
 C
@@ -407,10 +423,21 @@ C
 C        STAGE 2 - We've now got all the data in the workspace array. Operate on
 C                  the data, putting the results into OUTPUT.
 C
-         CALL FIG_MEDX2D(DYNAMIC_MEM(WPTR),NFILE,NPIX,LOGNS,WORK,
-     :                          DYNAMIC_MEM(OPTR),DYNAMIC_MEM(LOGPTR))
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',CURBATPIX)
-         IF (LOGNS) LOGPTR=DYN_INCREMENT(LOGPTR,'INT',CURBATPIX)
+         CALL FIG_MEDX2D(%VAL(CNF_PVAL(WPTR)),NFILE,NPIX,LOGNS,WORK,
+     :                        %VAL(CNF_PVAL(OPTR)),
+     :                   %VAL(CNF_PVAL(LOGPTR)))
+         
+         CALL DYN_INCAD(OPTR,'FLOAT',CURBATPIX,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
+         PISNEW = ISNEW
+
+         IF (LOGNS) THEN
+            CALL DYN_INCAD(LOGPTR,'INT',CURBATPIX,TPTR,ISNEWL,STATUS)
+            IF (PISNL) CALL CNF_UNREGP(LOGPTR)
+            LOGPTR = TPTR
+            PISNL = ISNEWL
+         END IF
          PIX=LPIX+1
       END DO
 C

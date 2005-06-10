@@ -5,12 +5,12 @@ C     M E D F I L T   /    M E D F I L T R
 C
 C     Figaro routines to median filter an image.  The result of
 C     this operation is an image in which the value of each pixel 
-C     is the median value of a rectangular box of pixels centered on the 
+C     is the median value of a rectangular box of pixels centered on the
 C     corresponding pixel in the original array. MEDFILTR allows the
 C     box to be specified with different X and Y dimensions, while the
-C     original MEDFILT only supported a square box. MEDFILTR is therefore
-C     a full superset of MEDFILT, but the older application has to be
-C     retained for compatability reasons.
+C     original MEDFILT only supported a square box. MEDFILTR is 
+C     therefore a full superset of MEDFILT, but the older application 
+C     has to be retained for compatability reasons.
 C
 C     Command parameters for MEDFILT -
 C
@@ -50,12 +50,16 @@ C                    uses DYN_ routines for dynamic memory handling.
 C     7th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
 C     21st Mar 1994  KS / AAO. Added MEDFILTR code.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DSA_TYPESIZE,DYN_ELEMENT
+      INTEGER DSA_TYPESIZE
 C
 C     Maximum size of median box
 C
@@ -64,30 +68,27 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      CHARACTER    COMMAND*8    ! Command being serviced.
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      INTEGER      IXBOX        ! X-dimension of median box
-      INTEGER      IYBOX        ! Y-dimension of median box
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      LOGICAL      WARN         ! Indicates we need to warn about box size
-      REAL   WORK(BOXMAX*BOXMAX)! Data over which median is calculated
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      BYTES         ! Number of bytes of workspace required
+      CHARACTER    COMMAND*8     ! Command being serviced.
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      INTEGER      IXBOX         ! X-dimension of median box
+      INTEGER      IYBOX         ! Y-dimension of median box
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number outputdata array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALUE         ! Temporary real number
+      LOGICAL      WARN          ! Indicates we need to warn about box
+                                 ! size
+      REAL   WORK(BOXMAX*BOXMAX) ! Data over which median is calculated
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -146,7 +147,7 @@ C
       IF ((NDIM.NE.2).AND.(IYBOX.GT.1)) THEN
          CALL PAR_WRUSER (
      :      'For anything other than 2D data, the Y size of the filter',
-     :                                                           STATUS)
+     :      STATUS)
          CALL PAR_WRUSER (
      :      'box must be 1. Y size is being set to 1.',STATUS)
          IYBOX=1
@@ -161,23 +162,20 @@ C     Map data.  Note that GEN_MEDFLT cannot operate on data in situ,
 C     so in the single operand case workspace must be obtained and
 C     the data copied back from it later.
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (DPTR.EQ.OPTR) THEN
-         CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
-         CALL GEN_MOVE (BYTES,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(WPTR))
+         CALL DSA_GET_WORKSPACE (BYTES,WPTR,WSLOT,STATUS)
+         CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(WPTR)))
          DPTR=WPTR
       END IF
       IF (STATUS.NE.0) GOTO 500
 C
 C     Perform filtering
 C
-      CALL GEN_MEDFLT(DYNAMIC_MEM(DPTR),NX,NY,IXBOX,IYBOX,WORK,
-     :                                     DYNAMIC_MEM(OPTR))
+      CALL GEN_MEDFLT(%VAL(CNF_PVAL(DPTR)),NX,NY,IXBOX,IYBOX,WORK,
+     :                                     %VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

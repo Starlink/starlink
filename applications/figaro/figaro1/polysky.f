@@ -7,19 +7,20 @@ C     POLYSKY is used to subtract sky from a long slit spectrum by
 C     polynomial fitting in the spatial direction to two regions of
 C     sky on either side of an object of interest.
 C
-C     Only the region of the image between the outer edges of the two sky 
-C     fields is sky subtracted. Data outside this region is unchanged.
-C     This enables POLYSKY to be used repeatedly to remove sky from more 
-C     than one object spectrum on an image.
+C     Only the region of the image between the outer edges of the two 
+C     sky fields is sky subtracted. Data outside this region is
+C     unchanged. This enables POLYSKY to be used repeatedly to remove
+C     sky from more than one object spectrum on an image.
 C
 C     The input image may optionally have associated error and quality
 C     information. If quality is present points with bad quality will
-C     be omitted from the fit. If error or variance is present the values
-C     may be used to weight the fit.
+C     be omitted from the fit. If error or variance is present the
+C     values may be used to weight the fit.
 C
 C     If a non zero value for NREJECT is specified this number of points
-C     will be omitted from the fit to each column. The points chosen for 
-C     omission will be those which deviate most from the mean for the column.
+C     will be omitted from the fit to each column. The points chosen for
+C     omission will be those which deviate most from the mean for the
+C     column.
 C
 C     Command parameters -
 C
@@ -41,60 +42,54 @@ C                                     JAB / JAC 7th Feb 1991
 C
 C     Modified:
 C     
-C      7th Mar 1991.  JAB / JAC. Only use error weighting if ALL errors
-C                     are known and non-zero.
-C      7th Mar 1991.  JAB / JAC. Use Variance rather than error.
-C      8th Mar 1991.  JAB / JAC. Add WEIGHT keyword.
-C     23rd Sep 1992.  HME / UoE, Starlink.  INCLUDE changed.
-C      6th Apr 1995.  HME / UoE, Starlink.  No longer use NAG.
-C                     DPOLFT requires 1/variance as weight.
-C     18th Mar 1997.  JJL / Soton, Starlink. Error propagation included. 
+C      7th Mar 1991  JAB / JAC. Only use error weighting if ALL errors
+C                    are known and non-zero.
+C      7th Mar 1991  JAB / JAC. Use Variance rather than error.
+C      8th Mar 1991  JAB / JAC. Add WEIGHT keyword.
+C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C      6th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
+C                    DPOLFT requires 1/variance as weight.
+C     18th Mar 1997  JJL / Soton, Starlink. Error propagation included. 
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Maximum polynomial degree
 C
       INTEGER MAX_DEGREE
       PARAMETER (MAX_DEGREE = 10)
 C
-C     Functions
-C
-
-      INTEGER   DYN_ELEMENT
-      INTEGER   DYN_INCREMENT
-C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   DEGREE             ! Degree of polynomial
-      INTEGER   DIMS(2)            ! Image dimensions
-      INTEGER   DUMMY              ! Dummy argument
-      LOGICAL   EXIST              ! TRUE if error information present
-      INTEGER   IGNORE             ! Ignoreable status
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   OPTR1              ! Dynamic memory element for image data
-      INTEGER   REJECT             ! Number of points to reject
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   STATUS             ! Running status for DSA routines
-      INTEGER   TEMP               ! Temporary value
-      INTEGER   QPTR1              ! Output quality pointer for image
-      REAL      VALUE              ! VALUE FROM PAR_RDVAL
-      INTEGER   VPTR1              ! Dynamic memory element for image variance
-      LOGICAL   WEIGHT             ! Value of WEIGHT keyword
-      INTEGER   WPTR               ! Dynamic memory element of W array
-      INTEGER   W1PTR              ! Dynamic memory element of W1 array
-      INTEGER   XPTR               ! Dynamic memory element of X array
-      INTEGER   YPTR               ! Dynamic memory element of Y array
-      INTEGER   YS1                ! Initial pixel number for field 1
-      INTEGER   YE1                ! Final pixel number for field 1
-      INTEGER   YS2                ! Initial pixel number for field 2
-      INTEGER   YE2                ! Final pixel number for field 2
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DEGREE           ! Degree of polynomial
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   DUMMY            ! Dummy argument
+      LOGICAL   EXIST            ! TRUE if error information present
+      INTEGER   IGNORE           ! Ignoreable status
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   OPTR1            ! Dynamic-memory pointer for image data
+      INTEGER   REJECT           ! Number of points to reject
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+      INTEGER   TEMP             ! Temporary value
+      INTEGER   QPTR1            ! Output quality pointer for image
+      REAL      VALUE            ! VALUE FROM PAR_RDVAL
+      INTEGER   VPTR1            ! Dynamic-memory pointer for image
+                                 ! variance
+      LOGICAL   WEIGHT           ! Value of WEIGHT keyword
+      INTEGER   WPTR             ! Dynamic-memory pointer of W array
+      INTEGER   W1PTR            ! Dynamic-memory pointer of W1 array
+      INTEGER   XPTR             ! Dynamic-memory pointer of X array
+      INTEGER   YPTR             ! Dynamic-memory pointer of Y array
+      INTEGER   YS1              ! Initial pixel number for field 1
+      INTEGER   YE1              ! Final pixel number for field 1
+      INTEGER   YS2              ! Initial pixel number for field 2
+      INTEGER   YE2              ! Final pixel number for field 2
 C     
 C     Initial values
 C
@@ -183,7 +178,8 @@ C
       EXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE('IMAGE',EXIST,STATUS)
 C
-C     If there is error information, should it be used to weight the fit?
+C     If there is error information, should it be used to weight the 
+C     fit?
 C
       IF (EXIST) THEN
          CALL PAR_RDKEY('WEIGHT',.TRUE.,WEIGHT)
@@ -198,37 +194,30 @@ C
 C
 C     Map the output data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR1=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR1,SLOT,STATUS)
       IF (WEIGHT) THEN
-         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :      SLOT,STATUS)
-         VPTR1=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VPTR1,
+     :                         SLOT,STATUS)
       ENDIF
-      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',ADDRESS,
-     :    SLOT,STATUS)
-      QPTR1=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_QUALITY ('OUTPUT','UPDATE','BYTE',QPTR1,SLOT,STATUS)
 C
 C     Get workspace arrays needed for polynomial fitting
 C
-      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',ADDRESS,SLOT,STATUS)
-      XPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',ADDRESS,SLOT,STATUS)
-      YPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',ADDRESS,SLOT,STATUS)
-      WPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',XPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',YPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NY,'DOUBLE',WPTR,SLOT,STATUS)
       CALL DSA_GET_WORK_ARRAY(4*NY+3*(MAX_DEGREE+1),
-     :   'DOUBLE',ADDRESS,SLOT,STATUS)
-      W1PTR = DYN_ELEMENT(ADDRESS)
+     :                        'DOUBLE',W1PTR,SLOT,STATUS)
 C
 C     Process data
 C
       IF (STATUS .EQ. 0) THEN
          CALL POLYSKY_WORK(NX,NY,4*NY+3*(MAX_DEGREE+1),
-     :      DYNAMIC_MEM(OPTR1),DYNAMIC_MEM(VPTR1),
-     :      DYNAMIC_MEM(QPTR1),DYNAMIC_MEM(XPTR),DYNAMIC_MEM(YPTR),
-     :      DYNAMIC_MEM(WPTR),DYNAMIC_MEM(W1PTR),YS1,YE1,YS2,YE2,
-     :      DEGREE,REJECT,WEIGHT)
+     :                     %VAL(CNF_PVAL(OPTR1)),%VAL(CNF_PVAL(VPTR1)),
+     :                     %VAL(CNF_PVAL(QPTR1)),%VAL(CNF_PVAL(XPTR)),
+     :                     %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(WPTR)),
+     :                     %VAL(CNF_PVAL(W1PTR)),YS1,YE1,YS2,YE2,
+     :                     DEGREE,REJECT,WEIGHT)
       ENDIF
 
   500 CONTINUE
