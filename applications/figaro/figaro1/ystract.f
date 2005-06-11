@@ -40,43 +40,42 @@ C                    PAR_WRUSER rather than DSA_WRUSER.
 C     29th Sep 1994  HME / UoE, Starlink.  Map the output data for
 C                    write access, not update.
 C     1st April 1997 JJL/ Soton, Starlink. Handles Variances.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions used
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS    ! Address of dynamic memory element
-      INTEGER   DIMS(2)    ! Accomodates IMAGE dimensions
-      LOGICAL   EXIST      ! Used to check for existence of AXIS(2) data
-      INTEGER   IPTR       ! Dynamic memory pointer to IMAGE data
-      INTEGER   IXEN       ! Last image column to extract
-      INTEGER   IXST       ! First image column to extract
-      INTEGER   NDIM       ! Number of dimensions 
-      INTEGER   NELM       ! Number of elements - ignored
-      INTEGER   NX         ! First dimension of image
-      INTEGER   NY         ! Second dimension of image
-      INTEGER   SLOT       ! Slot number - ignored
-      INTEGER   SPTR       ! Dynamic memory pointer to SPECT data
-      INTEGER   STATUS     ! Running status for DSA_ routines
-      INTEGER   SVPTR      ! Dynamic memory pointer to SPECT variances
-      LOGICAL   VEXIST     ! Does IMAGE have a variance structure?
-      INTEGER   VPTR       ! Dynamic memory pointer to IMAGE variances
-      REAL      XEND       ! Last AXIS(1) value used - ignored
-      REAL      XSTART     ! First AXIS(1) value used - ignored
+      INTEGER   DIMS(2)          ! IMAGE dimensions
+      LOGICAL   EXIST            ! Used to check for existence of 
+                                 ! AXIS(2) data
+      INTEGER   IPTR             ! Dynamic-memory pointer to IMAGE data
+      INTEGER   IXEN             ! Last image column to extract
+      INTEGER   IXST             ! First image column to extract
+      INTEGER   NDIM             ! Number of dimensions 
+      INTEGER   NELM             ! Number of elements - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   SLOT             ! Slot number - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer to SPECT data
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      INTEGER   SVPTR            ! Dynamic memory pointer to SPECT 
+                                 ! variances
+      LOGICAL   VEXIST           ! Does IMAGE have a variance 
+                                 ! structure?
+      INTEGER   VPTR             ! Dynamic-memory pointer to IMAGE 
+                                 ! variances
+      REAL      XEND             ! Last AXIS(1) value used - ignored
+      REAL      XSTART           ! First AXIS(1) value used - ignored
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -105,7 +104,7 @@ C
 C     See if we have a data component giving AXIS(1)-values
 C
       CALL DSA_AXIS_RANGE('IMAGE',1,' ',.FALSE.,XSTART,XEND,
-     :                     IXST,IXEN,STATUS)
+     :                    IXST,IXEN,STATUS)
 
 C
 C     Check to see if a variance structure exists.
@@ -124,44 +123,39 @@ C
 C
 C     Map the input and output data, and their variances if needed
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       IF (VEXIST) THEN
-       CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',ADDRESS,SLOT,
-     :                       STATUS)
-       VPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+         CALL DSA_MAP_VARIANCE('IMAGE','READ','FLOAT',VPTR,SLOT,STATUS)
+      END IF
 
-      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',SPTR,SLOT,STATUS)
       IF (VEXIST) THEN
-       CALL DSA_MAP_VARIANCE('SPECT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                       STATUS)
-       SVPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+         CALL DSA_MAP_VARIANCE('SPECT','WRITE','FLOAT',SVPTR,SLOT,
+     :                         STATUS)
+      END IF
       IF(STATUS.NE.0)GOTO 500
 
 C     Perform the extraction
 C
-      CALL FIG_YTRACT(DYNAMIC_MEM(IPTR),NX,NY,IXST,IXEN,
-     :                DYNAMIC_MEM(SPTR))
+      CALL FIG_YTRACT(%VAL(CNF_PVAL(IPTR)),NX,NY,IXST,IXEN,
+     :                %VAL(CNF_PVAL(SPTR)))
 C
 C     If variances exist, pass these through FIG_YTRACT as well.
 C    
       IF (VEXIST) THEN
-      CALL FIG_YTRACT(DYNAMIC_MEM(VPTR),NX,NY,IXST,IXEN,
-     :                DYNAMIC_MEM(SVPTR))
-      ENDIF
+         CALL FIG_YTRACT(%VAL(CNF_PVAL(VPTR)),NX,NY,IXST,IXEN,
+     :                   %VAL(CNF_PVAL(SVPTR)))
+      END IF
 
 C
 C     If the original image had an AXIS(2) structure, then this
 C     should be copied into the SPECTRUM AXIS(1) structure.
 C
       CALL DSA_SEEK_AXIS('IMAGE',2,EXIST,STATUS)
-      IF(EXIST)THEN
+      IF(EXIST) THEN
          CALL DSA_AXIS_SIZE('IMAGE',2,2,NDIM,DIMS,NELM,STATUS)
          CALL DSA_RESHAPE_AXIS('SPECT',1,'IMAGE',2,NDIM,DIMS,STATUS)
-      ENDIF
+      END IF
 
   500 CONTINUE
 C

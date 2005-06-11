@@ -92,10 +92,10 @@ C                  requested aborts.
 C     13 Dec 1990  JAB / JAC.  Handle data quality.
 C     25 Jan 1991  JMS/AAO & JAB/JAC. AAO recent modifications (bug
 C                  fixes: PAR_ABORT calls added, BUILD code corrected)
-C                  merged with data quality support added by JAB at UKIRT.
-C                  PAR_ABORTS and STATUS checks added.
-C     31 Jan 1991  JMS / AAO. Exits program if number of good data points
-C                  is less than or equal to one.
+C                  merged with data quality support added by JAB at
+C                  UKIRT.  PAR_ABORTS and STATUS checks added.
+C     31 Jan 1991  JMS / AAO. Exits program if number of good data 
+C                  points is fewer than or equal to one.
 C     10 Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Eliminate
 C                  DSK_ package (and the build option).
 C                  Call PAR_WRUSER rather than DSA_WRUSER.
@@ -108,13 +108,17 @@ C     23 Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
 C     16 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  No concurrent mapping. Had to swap mapping x data
 C                  behind getting x axis range.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT, PAR_GIVEN 
-      INTEGER DYN_ELEMENT, ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
       REAL GEN_ELEMF
 C
 C     Real variable plot value limits - keeps plot range within
@@ -130,67 +134,62 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS                  ! Actual array address
-      LOGICAL   AUTOSC                   ! True if AUTOSCALE specified
-      LOGICAL   AXES                     ! True if axes to be plotted
-      REAL      BIAS                     ! Value specified for BIAS
-      LOGICAL   BUILD                    ! True if BUILD specified
-      INTEGER   CKEY                     ! Colour code used by PGPLOT
-      CHARACTER COLOUR*10                ! COLOUR specification
-      CHARACTER COMMAND*16               ! Figaro command being executed
-      CHARACTER DEVICE*32                ! PGPLOT device specification
-      CHARACTER DLAB*64                  ! Plot data axis label
-      CHARACTER DLABEL*32                ! Label for data given in structure
-      INTEGER   DPTR                     ! Dynamic memory pointer to data array
-      INTEGER   DSLOT                    ! Map slot number used for data
-      INTEGER   DSTATUS                  ! Status code for PGPLOT device names
-      REAL      DUMMY                    ! Dummy argument
-      CHARACTER DUNITS*32                ! Data units given in structure
-      INTEGER   EPTR                     ! Dynamic memory pointer to error array
-      LOGICAL   ERASE                    ! True if ERASE specified
-      LOGICAL   ERRUSE                   ! True if errors to be used
-      INTEGER   ESLOT                    ! Map slot used for error data
-      LOGICAL   HARD                     ! True if HARD specified
-      REAL      HIGH                     ! Maximum Y-value for plot
-      INTEGER   IGNORE                   ! Used for disregarded status codes
-      INTEGER   INVOKE                   ! Used to invoke functions
-      INTEGER   IXEN                     ! Last element to be plotted
-      INTEGER   IXST                     ! First integer to be plotted
-      LOGICAL   LINES                    ! True if LINES specified
-      REAL      LOW                      ! Maximum Y-value for plot
-      DOUBLE PRECISION MAGNITUDE         ! Mganitude flag value for data
-      INTEGER   NDIM                     ! Dimensionality of input spectrum
-      INTEGER   NELM                     ! Number of elements in data - ignored
-      INTEGER   NEXT                     ! ICH_KEY argument - ignored
-      INTEGER   NGOOD                    ! Number of good points in spectrum
-      INTEGER   NX                       ! Number of elements in data
-      CHARACTER PLAB*64                  ! Label for plot
-      INTEGER   QPTR                     ! Dynamic memory pointer to quality
-      INTEGER   QSLOT                    ! Map slot used for quality
-      CHARACTER SPECT*132                ! Actual name of spectrum
-      LOGICAL   SPLO                     ! True if command is SPLOT
-      INTEGER   STATUS                   ! Status return from DSA_ routines
-      CHARACTER STRINGS(2)*64            ! Receives data and axis information
-      INTEGER   THICK                    ! Line thickness for plot
-      INTEGER   TDPTR                    ! Temporary Data pointer
-      INTEGER   TEPTR                    ! Temporary Error pointer
-      INTEGER   TXPTR                    ! Temporary X pointer
-      INTEGER   TSLOT                    ! Temporary slot
-      REAL      VALUE                    ! Temporary real 
-      REAL      VMAX                     ! Maximum value in data array
-      REAL      VMIN                     ! Minimum value in data array
-      LOGICAL   WHOLE                    ! True if WHOLE specified
-      CHARACTER XLAB*64                  ! X-axis label for plot
-      CHARACTER XLABEL*32                ! Structure x-axis label
-      INTEGER   XPTR                     ! Dynamic memory pointer to X-axis data
-      INTEGER   XSLOT                    ! Map slot used for X-axis data
-      CHARACTER XUNITS*32                ! Structure X-axis units
-      REAL      XVEN                     ! Last X-axis value to be plotted
-      REAL      XVST                     ! First X-axis value to be plotted
-C
-C     Dynamic memory support - defines DYNAMIC_MEM.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL   AUTOSC           ! True if AUTOSCALE specified
+      LOGICAL   AXES             ! True if axes to be plotted
+      REAL      BIAS             ! Value specified for BIAS
+      LOGICAL   BUILD            ! True if BUILD specified
+      INTEGER   CKEY             ! Colour code used by PGPLOT
+      CHARACTER COLOUR*10        ! COLOUR specification
+      CHARACTER COMMAND*16       ! Figaro command being executed
+      CHARACTER DEVICE*32        ! PGPLOT device specification
+      CHARACTER DLAB*64          ! Plot data axis label
+      CHARACTER DLABEL*32        ! Label for data given in structure
+      INTEGER   DPTR             ! Dynamic memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number used for data
+      INTEGER   DSTATUS          ! Status code for PGPLOT device names
+      REAL      DUMMY            ! Dummy argument
+      CHARACTER DUNITS*32        ! Data units given in structure
+      INTEGER   EPTR             ! Dynamic memory pointer to error array
+      LOGICAL   ERASE            ! True if ERASE specified
+      LOGICAL   ERRUSE           ! True if errors to be used
+      INTEGER   ESLOT            ! Map slot used for error data
+      LOGICAL   HARD             ! True if HARD specified
+      REAL      HIGH             ! Maximum Y-value for plot
+      INTEGER   IGNORE           ! Used for disregarded status codes
+      INTEGER   INVOKE           ! Used to invoke functions
+      INTEGER   IXEN             ! Last element to be plotted
+      INTEGER   IXST             ! First integer to be plotted
+      LOGICAL   LINES            ! True if LINES specified
+      REAL      LOW              ! Maximum Y-value for plot
+      DOUBLE PRECISION MAGNITUDE ! Mganitude flag value for data
+      INTEGER   NDIM             ! Dimensionality of input spectrum
+      INTEGER   NELM             ! Number of elements in data - ignored
+      INTEGER   NEXT             ! ICH_KEY argument - ignored
+      INTEGER   NGOOD            ! Number of good points in spectrum
+      INTEGER   NX               ! Number of elements in data
+      CHARACTER PLAB*64          ! Label for plot
+      INTEGER   QPTR             ! Dynamic memory pointer to quality
+      INTEGER   QSLOT            ! Map slot used for quality
+      CHARACTER SPECT*132        ! Actual name of spectrum
+      LOGICAL   SPLO             ! True if command is SPLOT
+      INTEGER   STATUS           ! Status return from DSA_ routines
+      CHARACTER STRINGS(2)*64    ! Receives data and axis information
+      INTEGER   THICK            ! Line thickness for plot
+      INTEGER   TDPTR            ! Temporary Data pointer
+      INTEGER   TEPTR            ! Temporary Error pointer
+      INTEGER   TXPTR            ! Temporary X pointer
+      INTEGER   TSLOT            ! Temporary slot
+      REAL      VALUE            ! Temporary real 
+      REAL      VMAX             ! Maximum value in data array
+      REAL      VMIN             ! Minimum value in data array
+      LOGICAL   WHOLE            ! True if WHOLE specified
+      CHARACTER XLAB*64          ! X-axis label for plot
+      CHARACTER XLABEL*32        ! Structure x-axis label
+      INTEGER   XPTR             ! Dynamic memory pointer to X-axis data
+      INTEGER   XSLOT            ! Map slot used for X-axis data
+      CHARACTER XUNITS*32        ! Structure X-axis units
+      REAL      XVEN             ! Last X-axis value to be plotted
+      REAL      XVST             ! First X-axis value to be plotted
 C
 C     Initialisation of DSA_ routines
 C
@@ -234,36 +233,32 @@ C
 C
 C     Map the X-axis data array (will be 1..N if no such array).
 C
-      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                              XSLOT,STATUS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      XPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Map the spectrum data
 C
-      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
 C
 C     Map the data quality
 C
-      CALL DSA_MAP_QUALITY ('SPECT','READ','BYTE',ADDRESS,QSLOT,STATUS)
-      QPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_QUALITY ('SPECT','READ','BYTE',QPTR,QSLOT,STATUS)
 C
 C     For ESPLOT, try to map the error data
 C
       IF (.NOT.SPLO) THEN
          CALL DSA_SEEK_ERRORS ('SPECT',ERRUSE,STATUS)
          IF (ERRUSE) THEN
-            CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',ADDRESS,
-     :                                              ESLOT,STATUS)
-            EPTR=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_ERRORS ('SPECT','READ','FLOAT',EPTR,
+     :                           ESLOT,STATUS)
          END IF
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
 C     Are there any bad points? If so remove them.
 C
-      CALL FIG_SPLOT_NGOOD(NX,DYNAMIC_MEM(QPTR),NGOOD)
+      CALL FIG_SPLOT_NGOOD(NX,%VAL(CNF_PVAL(QPTR)),NGOOD)
 C
 C     If number of good points is just "1", then exit program since
 C     SPLOT cannot plot just one data point in isolation.
@@ -279,23 +274,23 @@ C
       END IF
 C
       IF (NGOOD .NE. NX) THEN
-          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',ADDRESS,TSLOT,STATUS)
-          TDPTR=DYN_ELEMENT(ADDRESS)
-          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',ADDRESS,TSLOT,STATUS)
-          TEPTR=DYN_ELEMENT(ADDRESS)
-          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',ADDRESS,TSLOT,STATUS)
-          TXPTR=DYN_ELEMENT(ADDRESS)
+          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',TDPTR,TSLOT,STATUS)
+          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',TEPTR,TSLOT,STATUS)
+          CALL DSA_GET_WORK_ARRAY(NGOOD,'FLOAT',TXPTR,TSLOT,STATUS)
           IF (STATUS .NE. 0) GO TO 500
-          CALL FIG_SPLOT_REMOVE(NX,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(EPTR),
-     :        DYNAMIC_MEM(XPTR),DYNAMIC_MEM(QPTR),ERRUSE,
-     :        NGOOD,DYNAMIC_MEM(TDPTR),DYNAMIC_MEM(TEPTR),
-     :        DYNAMIC_MEM(TXPTR),IXST,IXEN)
+          CALL FIG_SPLOT_REMOVE(NX,%VAL(CNF_PVAL(DPTR)),
+     :                          %VAL(CNF_PVAL(EPTR)),
+     :                          %VAL(CNF_PVAL(XPTR)),
+     :                          %VAL(CNF_PVAL(QPTR)),ERRUSE,
+     :                          NGOOD,%VAL(CNF_PVAL(TDPTR)),
+     :                          %VAL(CNF_PVAL(TEPTR)),
+     :                          %VAL(CNF_PVAL(TXPTR)),IXST,IXEN)
                        
           NX=NGOOD
           DPTR=TDPTR
           EPTR=TEPTR
           XPTR=TXPTR
-      ENDIF
+      END IF
 C
 C     Was AUTOSCALE specified?
 C
@@ -306,10 +301,10 @@ C     Specified or not, find out the scale range because we can
 C     use that for the reset values.
 C
       IF ((.NOT.SPLO).AND.ERRUSE) THEN
-         CALL FIG_ERANGE(DYNAMIC_MEM(DPTR),DYNAMIC_MEM(EPTR),
-     :                                           IXST,IXEN,VMAX,VMIN)
+         CALL FIG_ERANGE(%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(EPTR)),
+     :                   IXST,IXEN,VMAX,VMIN)
       ELSE
-         CALL GEN_RANGEF(DYNAMIC_MEM(DPTR),IXST,IXEN,VMAX,VMIN)
+         CALL GEN_RANGEF(%VAL(CNF_PVAL(DPTR)),IXST,IXEN,VMAX,VMIN)
       END IF
 C
 C     Get Z data information (units and label)
@@ -422,8 +417,8 @@ C
       IF (IXST.EQ.IXEN) THEN
          IXST=MAX(IXST-1,1)
          IXEN=MIN(IXEN+1,NX)
-         XVST=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXST)
-         XVEN=GEN_ELEMF(DYNAMIC_MEM(XPTR),IXEN)
+         XVST=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXST)
+         XVEN=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IXEN)
       END IF
 C
 C     Get the axis labels from the labels and units
@@ -443,14 +438,14 @@ C     Finally, perform the plot
 C
       IF (PAR_ABORT()) GO TO 500   ! User requested abort
       IF (SPLO) THEN
-         CALL FIG_XZPLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),NX,IXST,
-     :                 IXEN,HIGH,LOW,XLAB,DLAB,PLAB,AXES,ERASE,LINES,
-     :                      DEVICE,BUILD,THICK,CKEY,XVST,XVEN,IGNORE)
+         CALL FIG_XZPLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),NX,
+     :                   IXST,IXEN,HIGH,LOW,XLAB,DLAB,PLAB,AXES,ERASE,
+     :                   LINES,DEVICE,BUILD,THICK,CKEY,XVST,XVEN,IGNORE)
       ELSE
-         CALL FIG_XZEPLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),
-     :                 DYNAMIC_MEM(EPTR),NX,IXST,IXEN,HIGH,LOW,XLAB,
-     :                      DLAB,PLAB,AXES,ERASE,ERRUSE,DEVICE,BUILD,
-     :                                     THICK,CKEY,XVST,XVEN,IGNORE)
+         CALL FIG_XZEPLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),
+     :                    %VAL(CNF_PVAL(EPTR)),NX,IXST,IXEN,HIGH,LOW,
+     :                    XLAB,DLAB,PLAB,AXES,ERASE,ERRUSE,DEVICE,BUILD,
+     :                    THICK,CKEY,XVST,XVEN,IGNORE)
       END IF
 C
 C     Set the user variables describing the plot.
@@ -772,7 +767,7 @@ C
       NGOOD=0
       DO IX=1,NX
           IF (QUALITY(IX) .EQ. 0) NGOOD=NGOOD+1
-      ENDDO
+      END DO
       END
 
   
@@ -798,6 +793,6 @@ C
               X2(I2)=X1(I1)
               IF (ERRUSE) E2(I2)=E1(I1)
               I2=MIN(I2+1,NGOOD)
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       END

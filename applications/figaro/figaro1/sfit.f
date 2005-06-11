@@ -27,21 +27,26 @@ C
 C                                              KS / CIT 5th June 1983
 C     Modified:
 C
-C     25th Mar 1985.  KS / AAO.  Workspace used and call to FIG_SPFIT
-C                     modified in order to use the NAG library.
-C     11th Aug 1987.  DJA/ AAO.  Revised DSA_ routines - some specs
-C                     changed. Now uses DYN_ routines for dynamic memory
-C                     handling.
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     29th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed, TABs
-C                     removed.
-C     17th Apr 1995.  HME / UoE, Starlink.  No longer use NAG.
-C     24th May 1998   ACD / UoE, Starlink.  Increased max. order to 30.
-C      4th Jul 2001   VGG / RAL, Starlink.  Error Propogation included. 
-C      7th Jul 2001   ACD / UoE, Starlink.  Small amount of cosmetic tidying.
+C     25th Mar 1985  KS / AAO.  Workspace used and call to FIG_SPFIT
+C                    modified in order to use the NAG library.
+C     11th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                    changed. Now uses DYN_ routines for dynamic memory
+C                    handling.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
+C                    in mapping calls.
+C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
+C                    removed.
+C     17th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
+C     24th May 1998  ACD / UoE, Starlink.  Increased max. order to 30.
+C      4th Jul 2001  VGG / RAL, Starlink.  Error Propogation included. 
+C      7th Jul 2001  ACD / UoE, Starlink.  Small amount of cosmetic
+C                    tidying.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Maximum allowed degree (plus 1)
 C
@@ -50,35 +55,33 @@ C
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE,DYN_INCREMENT
+      INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DXPTR        ! Dynamic-memory pointer to workspace
-      INTEGER      DYPTR        ! Dynamic-memory pointer to workspace
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      LOGICAL      LOGS         ! See above
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      ORDER        ! The order of the polynomial fit
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      OVPTR        ! Dynamic-memory pointer to output variance array
-      INTEGER      OVSLOT       ! Map slot number for output variance array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      LOGICAL      VEXIST       ! TRUE if a variance array exists
-      INTEGER      WKPTR        ! Dynamic-memory pointer to workspace
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      BYTES         ! Number of bytes of workspace required
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DXPTR         ! Dynamic-memory pointer to workspace
+      INTEGER      DYPTR         ! Dynamic-memory pointer to workspace
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      LOGICAL      LOGS          ! See above
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      ORDER         ! The order of the polynomial fit
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      OVPTR         ! Dynamic-memory pointer to output
+                                 ! variance array
+      INTEGER      OVSLOT        ! Map slot number for output variance
+                                 ! array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALUE         ! Temporary real number
+      LOGICAL      VEXIST        ! TRUE if a variance array exists
+      INTEGER      WKPTR         ! Dynamic-memory pointer to workspace
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -109,9 +112,7 @@ C
 C
 C     Map data array to receive fitted spectrum
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                      STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C                                            
@@ -121,26 +122,23 @@ C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE ('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',ADDRESS,
+         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',OVPTR,
      :                           OVSLOT, STATUS)
-         OVPTR=DYN_ELEMENT(ADDRESS)
       END IF
 C
 C     Get workspace for the fitting routine
 C
-      BYTES=(NX+NX+NX+4*NX+3*MAXDP1)*DSA_TYPESIZE('DOUBLE',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      DXPTR=DYN_ELEMENT(ADDRESS)
-      DYPTR=DYN_INCREMENT(DXPTR,'DOUBLE',NX)
-      WPTR=DYN_INCREMENT(DYPTR,'DOUBLE',NX)
-      WKPTR=DYN_INCREMENT(WPTR,'DOUBLE',NX)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',DXPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',DYPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',WPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(4*NX+3*MAXDP1,'DOUBLE',WKPTR,WSLOT,STATUS)
 C
 C     Do the fit and generate the new spectrum
 C
-      CALL FIG_SPFIT(DYNAMIC_MEM(OPTR),NX,ORDER,LOGS,
-     :               DYNAMIC_MEM(DXPTR),DYNAMIC_MEM(DYPTR),
-     :               DYNAMIC_MEM(WPTR),DYNAMIC_MEM(WKPTR),
-     :               DYNAMIC_MEM(OPTR))
+      CALL FIG_SPFIT(%VAL(CNF_PVAL(OPTR)),NX,ORDER,LOGS,
+     :               %VAL(CNF_PVAL(DXPTR)),%VAL(CNF_PVAL(DYPTR)),
+     :               %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(WKPTR)),
+     :               %VAL(CNF_PVAL(OPTR)))
 C     
 C     Tidy up
 C

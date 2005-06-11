@@ -3,11 +3,11 @@ C+
 C
 C     S C R U N C H
 C
-C     Figaro routine to scrunch a spectrum or set of spectra.  Can scrunch
-C     either into a linear wavelength scale, where the wavelength
-C     increment from bin to bin is constant across the spectrum, or
-C     into a logarithmic scale, where the increment of the log of
-C     the wavelength from bin to bin is constant.  The operation
+C     Figaro routine to scrunch a spectrum or set of spectra.  Can 
+C     scrunch either into a linear wavelength scale, where the
+C     wavelength increment from bin to bin is constant across the
+C     spectrum, or into a logarithmic scale, where the increment of the
+C     log of the wavelength from bin to bin is constant.  The operation
 C     is performed by the routine FIG_REBIN.
 C
 C     If the input file is 2D data, then it is treated as a set of
@@ -40,10 +40,11 @@ C                  increment rather than the final value that is being
 C                  specified.  If the scrunch is logarithmic and WSTART
 C                  is greater than WEND, SCRUNCH assumes that the WEND
 C                  value represents a velocity in km/sec.  These
-C                  assumptions can be controlled directly by the keywords
-C                  INCREMENT and FINAL, if they will not give the desired
-C                  effect.
-C     BINS         (Numeric) The number of bins for the resulting spectrum.
+C                  assumptions can be controlled directly by the 
+C                  keywords INCREMENT and FINAL, if they will not give 
+C                  the desired effect.
+C     BINS         (Numeric) The number of bins for the resulting
+C                  spectrum.
 C     OUTPUT       (Character) The name of the resulting spectrum.
 C                  Note that SCRUNCH cannot rebin a spectrum into itself
 C                  and so will always create a new output file.
@@ -55,7 +56,8 @@ C     MEAN         Conserve mean data level rather than flux.
 C     FLUX         Conserve flux rather than mean data level.
 C     LINEAR       Use linear interpolation when rebinning.
 C     QUAD         Use quadratic interpolation when rebinning.
-C     INCREMENT    WEND is an increment value, even though it is > WSTART.
+C     INCREMENT    WEND is an increment value, even though it is >
+C                  WSTART.
 C     FINAL        WEND is a final value, even though it is < WSTART.
 C
 C     User variables - 
@@ -70,48 +72,51 @@ C
 C                                              KS / CIT 7th Feb 1984
 C     Modified:
 C
-C     28th Mar 1985.  KS / AAO.  AXIS(1) log flag now written into the
-C                     output file rather than the input!
-C     29th Apr 1985.  KS / AAO.  SCRUNCH_INC now set.
-C     12th Sep 1985.  KS / AAO.  Now works on a double precision 
-C                     wavelength array, to handle high dispersion data.
-C     30th Dec 1985.  KS / AAO.  Ends of spectra are now zeroed properly
-C                     when they represent wavelength values outside the
-C                     range of the input spectrum.
-C     2nd  Jan 1986.  KS / AAO.  Use of WEND as an increment value 
-C                     introduced, along with INCREMENT and FINAL keywords
-C                     and setting of SCRUNCH_INC in the log case and setting
-C                     of SCRUNCH_END. Now operates on a 2D set of spectra
-C                     as well as on a single spectrum.  Error arrays now
-C                     no longer copied over.
-C     4th  May 1986.  KS / AAO.  Initial values for flags now set explicitly
-C                     instead of being assumed to default to .FALSE.
-C     17th Oct 1988.  KS / AAO.  GEN_ELEMD values properly cast to float
-C                     before being passed to ICH_ENCODE.
-C     3rd  Nov 1988.  JM / RAL. Modified to use DSA_ routines
-C                     Dynamic memory handling changed to use
-C                     DYN_ routines
-C     2nd  Mar 1990.  KS / AAO. DSA_GET/SET_AXIS_INFO now support the log
-C                     flag, so that is now used.  DYN_INCREMENT used instead
-C                     of assuming DYNAMIC_MEM elements are bytes.
-C     29th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed. Call
-C                     ICH_ENCODE with float, not double.
-C      6th Oct 1993.  HME / UoE, Starlink.  Mapping the output for update
-C                     causes DSA_MAP_DATA to unflag whatever garbage may
-C                     be in the new array.  Change access to "write".
-C                     (This is for the output data only, any other output
-C                     arrays are still mapped update.)
-C     24th Jul 1996.  MJCL / Starlink, UCL.  Changed type of INVOKE.
-C     12th Dec 1997.  ACD / UoE, Starlink.  Increased the maximum size
-C                     of the rebinned data from 50000 to 5,000,000
-C                     elements.
+C     28th Mar 1985  KS / AAO.  AXIS(1) log flag now written into the
+C                    output file rather than the input!
+C     29th Apr 1985  KS / AAO.  SCRUNCH_INC now set.
+C     12th Sep 1985  KS / AAO.  Now works on a double precision 
+C                    wavelength array, to handle high dispersion data.
+C     30th Dec 1985  KS / AAO.  Ends of spectra are now zeroed properly
+C                    when they represent wavelength values outside the
+C                    range of the input spectrum.
+C     2nd  Jan 1986  KS / AAO.  Use of WEND as an increment value 
+C                    introduced, along with INCREMENT and FINAL keywords
+C                    and setting of SCRUNCH_INC in the log case and setting
+C                    of SCRUNCH_END. Now operates on a 2D set of spectra
+C                    as well as on a single spectrum.  Error arrays now
+C                    no longer copied over.
+C     4th  May 1986  KS / AAO.  Initial values for flags now set
+C                    explicitly instead of being assumed to default to 
+C                    .FALSE.
+C     17th Oct 1988  KS / AAO.  GEN_ELEMD values properly cast to float
+C                    before being passed to ICH_ENCODE.
+C     3rd  Nov 1988  JM / RAL. Modified to use DSA_ routines
+C                    Dynamic memory handling changed to use
+C                    DYN_ routines
+C     2nd  Mar 1990  KS / AAO. DSA_GET/SET_AXIS_INFO now support the log
+C                    flag, so that is now used.  DYN_INCREMENT used 
+C                    instead of assuming DYNAMIC_MEM elements are bytes.
+C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
+C                    ICH_ENCODE with float, not double.
+C      6th Oct 1993  HME / UoE, Starlink.  Mapping the output for update
+C                    causes DSA_MAP_DATA to unflag whatever garbage may
+C                    be in the new array.  Change access to "write".
+C                    (This is for the output data only, any other output
+C                    arrays are still mapped update.)
+C     24th Jul 1996  MJCL / Starlink, UCL.  Changed type of INVOKE.
+C     12th Dec 1997  ACD / UoE, Starlink.  Increased the maximum size
+C                    of the rebinned data from 50000 to 5,000,000
+C                    elements.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER  DYN_ELEMENT
-      INTEGER  DYN_INCREMENT
       DOUBLE PRECISION GEN_ELEMD
       INTEGER  ICH_ENCODE
       INTEGER  ICH_FOLD
@@ -120,64 +125,80 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Address of dynamic memory element
-      INTEGER   BYTES        ! Bytes required for an array
-      DOUBLE PRECISION C     ! Speed of light
-      CHARACTER CITEMS(2)*32 ! Axis character items retrieved
-      INTEGER   CSTAT        ! Used to format character strings
-      DOUBLE PRECISION DELTA ! Wavelength increment
-      INTEGER   DIMS(5)      ! Accomodates axis data dimensions
-      DOUBLE PRECISION DWEND ! Final wavelength with 'DOUBLE' precision
-      DOUBLE PRECISION DWSTART ! Start wavelength with 'DOUBLE' precision
-      LOGICAL   EXIST        ! Used to check for existence of axis data
-      LOGICAL   FINAL        ! True if  WEND is a final value
-      LOGICAL   FLUX         ! True if the program is to conserve flux.  
-      INTEGER   IDIM         ! Loop variable
-      INTEGER   IMODE        ! Selects mode of transfer for input bins 
-      LOGICAL   INCREM       ! True if WEND is an increment value
-      INTEGER   INVOKE       ! Used to format character strings
-      INTEGER   IQUAD        ! Equals 0 for lin. interp. non-zero for quadratic
-      INTEGER   ISPECT       ! Loop variable
-      LOGICAL   LINEAR       ! If true, linear interpolation used
-      LOGICAL   LOGW         ! True if wavelengths in WAVES are logarithmic
-      LOGICAL   LOGWR        ! True if wavelengths in WAVESR are logarithmic
-      LOGICAL   MEAN         ! If true, conserve mean data level, not flux
-      INTEGER   NADD         ! No. of input bins added to form one output bin
-      INTEGER   NBINR        ! Number of elements (bins) in rebinned data
-      INTEGER   NCITEMS      ! Number of axis character items retrieved
-      INTEGER   NDIM         ! Number of dimensions in axis data
-      INTEGER   NELM         ! No. of elements
-      INTEGER   NEXT         ! Used in formatting strings
+      DOUBLE PRECISION C         ! Speed of light
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      INTEGER   CSTAT            ! Used to format character strings
+      DOUBLE PRECISION DELTA     ! Wavelength increment
+      INTEGER   DIMS(5)          ! Accommodates axis-data dimensions
+      DOUBLE PRECISION DWEND     ! Final wavelength with 'DOUBLE'
+                                 ! precision
+      DOUBLE PRECISION DWSTART   ! Start wavelength with 'DOUBLE'
+                                 ! precision
+      LOGICAL   EXIST            ! Used to check for existence of axis
+                                 ! data
+      LOGICAL   FINAL            ! True if  WEND is a final value
+      LOGICAL   FLUX             ! Conserve flux?
+      INTEGER   IDIM             ! Loop variable
+      INTEGER   IMODE            ! Selects mode of transfer for input 
+                                 ! bins 
+      LOGICAL   INCREM           ! True if WEND is an increment value
+      INTEGER   INVOKE           ! Used to format character strings
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      LOGICAL   ISNEWX           ! Is XPTR address new to CNF?
+      LOGICAL   ISNRZ            ! Is address RZPTR new to CNF?
+      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero 
+                                 ! for quadratic
+      INTEGER   ISPECT           ! Loop variable
+      LOGICAL   LINEAR           ! If true, linear interpolation used
+      LOGICAL   LOGW             ! Wavelengths in WAVES logarithmic?
+      LOGICAL   LOGWR            ! Wavelengths in WAVESR logarithmic?
+      LOGICAL   MEAN             ! Conserve mean data level, not flux?
+      INTEGER   NADD             ! No. of input bins added to form one
+                                 ! output bin
+      INTEGER   NBINR            ! Number of elements (bins) in 
+                                 ! rebinned data
+      INTEGER   NCITEMS          ! Number of axis character items
+                                 ! retrieved
+      INTEGER   NDIM             ! Number of dimensions in axis data
+      INTEGER   NELM             ! No. of elements
+      INTEGER   NEXT             ! Used in formatting strings
       DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
-      INTEGER   NNITEMS      ! Number of axis numeric items retrieved
-      INTEGER   NSPECT       ! No. of spectra in SPECT 
-      INTEGER   NX           ! Number of elements (bins) in input data
-      INTEGER   NXSPECT      ! No spectra in axis structure
-      INTEGER   PSTAT        ! Status for PAR_ routines
-      LOGICAL   QUAD         ! If true, quadratic interpolation used
-      REAL      RESET        ! Reset value for real parameter
-      INTEGER   RXPTR        ! Pointer to output wavelength array (Mode 1 only)
-      INTEGER   RZPTR        ! Pointer to output array containing rebinned data
-      INTEGER   SLOT         ! Slot number
-      REAL      SSKEW        ! No. of bins the input array is to be shifted 
-      INTEGER   STATUS       ! Running status for DSA_ routines
-      CHARACTER STRING*72    ! Used to format strings
-      CHARACTER TYPE*16      ! Data type
-      REAL      VALUE        ! Accomodates value of some real parameters
-      REAL      WEND         ! End wavelength
-      REAL      WSTART       ! Start wavelength
-      INTEGER   XPTR         ! Pointer to input wavelength array (Mode 1 only)
-      CHARACTER XUNITS*72    ! Axis data units
-      INTEGER   ZPTR         ! Pointer  to input data      
+      INTEGER   NNITEMS          ! Number of axis numeric items
+                                 ! retrieved
+      INTEGER   NSPECT           ! No. of spectra in SPECT 
+      INTEGER   NX               ! Number of elements (bins) in input
+                                 ! data
+      INTEGER   NXSPECT          ! No. of spectra in axis structure
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
+      LOGICAL   PISNRZ           ! Previous CNF pointer to output data
+                                 ! new?
+      LOGICAL   PISNX            ! Previous CNF pointer wavelengths new?
+      INTEGER   PSTAT            ! Status for PAR_ routines
+      LOGICAL   QUAD             ! Quadratic interpolation used?
+      REAL      RESET            ! Reset value for real parameter
+      INTEGER   RXPTR            ! Pointer to output wavelength array 
+                                 ! (Mode 1 only)
+      INTEGER   RZPTR            ! Pointer to output array containing
+                                 ! rebinned data
+      INTEGER   SLOT             ! Slot number
+      REAL      SSKEW            ! No. of bins the input array is to
+                                 ! be shifted 
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      CHARACTER STRING*72        ! Used to format strings
+      INTEGER   TPTR             ! Temporary pointer
+      CHARACTER TYPE*16          ! Data type
+      REAL      VALUE            ! Value of some real parameters
+      REAL      WEND             ! End wavelength
+      REAL      WSTART           ! Start wavelength
+      INTEGER   XPTR             ! Pointer to input wavelength array 
+                                 ! (Mode 1 only)
+      CHARACTER XUNITS*72        ! Axis data units
+      INTEGER   ZPTR             ! Pointer to input data      
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Real value limits
 C
@@ -208,7 +229,7 @@ C
       IF(.NOT.EXIST)THEN
          CALL PAR_WRUSER('No axis data array',PSTAT)
          GOTO 500
-      ENDIF
+      END IF
       CALL DSA_AXIS_SIZE('SPECT',1,5,NDIM,DIMS,NELM,STATUS)
       NX=DIMS(1)
       NXSPECT=1
@@ -218,9 +239,7 @@ C
          END DO
       END IF
 
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','DOUBLE',
-     :                        ADDRESS,SLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','DOUBLE',XPTR,SLOT,STATUS)
 C
 C     Get dimensions of data, check it for compatibility with the
 C     AXIS(1) data, then map it.
@@ -228,7 +247,7 @@ C
       CALL DSA_DATA_SIZE('SPECT',5,NDIM,DIMS,NELM,STATUS)
       IF (DIMS(1).NE.NX) THEN
          CALL PAR_WRUSER('Data & wavelength arrays differ in size',
-     :                                                        PSTAT)
+     :                   PSTAT)
          GO TO 500
       END IF
       NSPECT=1
@@ -240,11 +259,10 @@ C
       IF ((NXSPECT.NE.1).AND.(NXSPECT.NE.NSPECT)) THEN
          CALL PAR_WRUSER(
      :       'Wavelength and data arrays have incompatible dimensions',
-     :                                                          PSTAT)
+     :       PSTAT)
          GO TO 500
       END IF
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      ZPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ZPTR,SLOT,STATUS)
 C
 C     Determine the wavelength units being used for the data
 C
@@ -269,10 +287,13 @@ C     angstroms - probably not very useful).  Also find if data
 C     is to be binned logarithmically.
 C
       CALL PAR_RDKEY('LOG',.FALSE.,LOGWR)
-      RESET=(INT(GEN_ELEMD(DYNAMIC_MEM(XPTR),1))/10)*10
+
+      RESET=(INT(GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),1))/10)*10
       CALL PAR_RDVAL('WSTART',FMIN,FMAX,RESET,XUNITS,WSTART)
-      RESET=(INT(GEN_ELEMD(DYNAMIC_MEM(XPTR),NX))/10+1)*10
+
+      RESET=(INT(GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),NX))/10+1)*10
       CALL PAR_RDVAL('WEND',FMIN,FMAX,RESET,XUNITS,WEND)
+
       CALL PAR_RDVAL('BINS',1.,5.0E6,FLOAT(NX),' ',VALUE)
       NBINR=VALUE
 C
@@ -383,26 +404,23 @@ C
 C
 C     Then map the output data arrays
 C
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',
-     :                        ADDRESS,SLOT,STATUS)
-      RZPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',RZPTR,SLOT,STATUS)
       CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','DOUBLE',
-     :                        ADDRESS,SLOT,STATUS)
-      RXPTR=DYN_ELEMENT(ADDRESS)
+     :                       RXPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Fill up the output wavelength array
 C
-      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,DYNAMIC_MEM(RXPTR))
+      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,%VAL(CNF_PVAL(RXPTR)))
 C
 C     A little information for the user about the input data..
 C
       CALL PAR_WRUSER(' ',PSTAT)
       STRING='Original wavelength range was '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(XPTR),1)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),1)
       CSTAT=ICH_ENCODE(STRING,VALUE,31,3,NEXT)
       STRING(NEXT:)=' to '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(XPTR),NX)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(XPTR)),NX)
       CSTAT=ICH_ENCODE(STRING,VALUE,NEXT+4,3,NEXT)
       STRING(NEXT:)=' '//XUNITS
       CALL PAR_WRUSER(STRING,PSTAT)
@@ -415,17 +433,39 @@ C
       IF (QUAD) IQUAD=1
       NADD=1
       SSKEW=0.
+
+      PISNEW = .FALSE.
+      PISNRZ = .FALSE.
+      PISNX = .FALSE.
+
       DO ISPECT=1,NSPECT
-         CALL FIG_REBIND(IMODE,IQUAD,DYNAMIC_MEM(ZPTR),NX,
-     :                   DYNAMIC_MEM(RZPTR),NBINR,NADD,SSKEW,FLUX,
-     :                   DYNAMIC_MEM(XPTR),DYNAMIC_MEM(RXPTR),
+         CALL FIG_REBIND(IMODE,IQUAD,%VAL(CNF_PVAL(ZPTR)),NX,
+     :                   %VAL(CNF_PVAL(RZPTR)),NBINR,NADD,SSKEW,FLUX,
+     :                   %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(RXPTR)),
      :                   LOGW,LOGWR)
-         RZPTR=DYN_INCREMENT(RZPTR,'FLOAT',NBINR)
-         ZPTR=DYN_INCREMENT(ZPTR,'FLOAT',NX)
+
+C       Increment the pointers for the next spectrum, tidying up
+C       unwanted CNF resources as they're no longer needed.
+         CALL DYN_INCAD(ZPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (ISNEW) CALL CNF_UNREGP(ZPTR)
+         ZPTR=TPTR
+         PISNEW = ISNEW
+
+         CALL DYN_INCAD(RZPTR,'FLOAT',NBINR,TPTR,ISNRZ,STATUS)
+         IF (ISNRZ) CALL CNF_UNREGP(RZPTR)
+         RZPTR=TPTR
+         PISNRZ = ISNRZ
+
          IF (NXSPECT.GT.1) THEN
-            XPTR=DYN_INCREMENT(XPTR,'DOUBLE',NX)
+            CALL DYN_INCAD(XPTR,'DOUBLE',NX,TPTR,ISNEWX,STATUS)
+            IF (ISNEWX) CALL CNF_UNREGP(XPTR)
+            XPTR=TPTR
+            PISNX = ISNEWX
          END IF
       END DO
+      IF (ISNEW) CALL CNF_UNREGP(ZPTR)
+      IF (ISNRZ) CALL CNF_UNREGP(RZPTR)
+      IF (NXSPECT.GT.1.AND.ISNEWX) CALL CNF_UNREGP(XPTR)
 C
 C     In 2D, explain how the axis data is being used.
 C
@@ -446,10 +486,10 @@ C
       STRING='Data rebinned into '
       CSTAT=ICH_ENCODE(STRING,FLOAT(NBINR),20,0,NEXT)
       STRING(NEXT:)=' bins from '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(RXPTR),1)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(RXPTR)),1)
       CSTAT=ICH_ENCODE(STRING,VALUE,NEXT+11,2,NEXT)
       STRING(NEXT:)=' to '
-      VALUE=GEN_ELEMD(DYNAMIC_MEM(RXPTR),NBINR)
+      VALUE=GEN_ELEMD(%VAL(CNF_PVAL(RXPTR)),NBINR)
       CSTAT=ICH_ENCODE(STRING,VALUE,NEXT+4,2,NEXT)
       IF (LOGWR) STRING(NEXT:)=' (on a log scale)'
       CALL PAR_WRUSER(STRING,PSTAT)

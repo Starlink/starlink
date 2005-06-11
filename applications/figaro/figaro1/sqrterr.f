@@ -35,13 +35,16 @@ C                    mapping calls.
 C     30th Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
 C                    changed.
 C     29th Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Numeric parameter limits - close to VAX real limits
 C
@@ -50,21 +53,17 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      EPTR         ! Dynamic-memory pointer to output error array
-      INTEGER      ESLOT        ! Map slot number for output error array
-      REAL         FACTOR       ! See above
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      EPTR          ! Dynamic-memory pointer to output 
+                                 ! error array
+      INTEGER      ESLOT         ! Slot number for output error array
+      REAL         FACTOR        ! See above
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+                                 ! data array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      STATUS        ! Running status for DSA_ routines
 C
 C     Initialisation of DSA_ routines
 C
@@ -94,20 +93,18 @@ C
 C
 C     Map the data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Map error array
 C
-      CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',ADDRESS,ESLOT,STATUS)
-      EPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',EPTR,ESLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Generate the error values from the data and from FACTOR.
 C
-      CALL FIG_SQRERR(DYNAMIC_MEM(OPTR),NELM,FACTOR,DYNAMIC_MEM(EPTR))
+      CALL FIG_SQRERR(%VAL(CNF_PVAL(OPTR)),NELM,FACTOR,
+     :                %VAL(CNF_PVAL(EPTR)))
 C
 C     Tidy up
 C

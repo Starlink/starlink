@@ -13,11 +13,14 @@ C     calculated fit.
 C
 C  Command parameters:
 C     IMAGE    The image to be fitted.
-C     XKNOTS   The number of interior knots along the X-axis of the image.
-C     YKNOTS   The number of interior knots along the Y-axis of the image.
-C     VMODE    'Average' or 'Median' (only first letter counts), to indicate
-C              the way the values used are calculated.
-C     MOSAIC   Indicates that a mosaic rather than a fit is to be produced.
+C     XKNOTS   The number of interior knots along the X-axis of the
+C              image.
+C     YKNOTS   The number of interior knots along the Y-axis of the
+C              image.
+C     VMODE    'Average' or 'Median' (only first letter counts), to
+C              indicate the way the values used are calculated.
+C     MOSAIC   Indicates that a mosaic rather than a fit is to be
+C              produced.
 C     OUTPUT   The resulting image.
 C
 C  Treatment of errors:  Ignored.
@@ -29,48 +32,47 @@ C
 C  Version date: 20th February 1995
 C-
 C  History:
-C     28 Jul 1988. Original version. KS/AAO.
-C     20 Feb 1995. NAG deprecated the routine E02DBF. Modified to use
-C                  E02DEF instead. KS/AAO.
-C     16 Feb 1996  HME / UoE, Starlink. Convert to FDA:
-C                  Bad pixel handling. Had to swap mapping input data
-C                  before mapping input quality.
+C     28 Jul 1988   Original version. KS/AAO.
+C     20 Feb 1995   NAG deprecated the routine E02DBF. Modified to use
+C                   E02DEF instead. KS/AAO.
+C     16 Feb 1996   HME / UoE, Starlink. Convert to FDA:
+C                   Bad-pixel handling. Had to swap mapping input data
+C                   before mapping input quality.
+C     2005 June 10  MJC / Starlink  Use CNF_PVAL for pointers to
+C                   mapped data.
 C+
       SUBROUTINE SURFIT
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT, ICH_FOLD
+      INTEGER ICH_FOLD
 C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Virtual address of mapped arrays
-      INTEGER   DIMS(2)             ! Data dimensions
-      LOGICAL   FAULT               ! Indicates non-DSA detected error
-      INTEGER   IGNORE              ! Dummy status argument
-      INTEGER   INVOKE              ! Dummy function value
-      INTEGER   IPTR                ! Input data dynamic array element
-      LOGICAL   MOSAIC              ! Value of MOSAIC parameter
-      INTEGER   NDIM                ! Number of data dimensions
-      INTEGER   NELM                ! Number of data elements
-      INTEGER   NX                  ! First data dimension
-      INTEGER   NY                  ! Second data dimension
-      LOGICAL   OK                  ! Result of FIG_SURFIT call
-      INTEGER   OPTR                ! Output data dynamic array element
-      INTEGER   QPTR                ! Quality data dynamic array element
-      LOGICAL   QUAL                ! True if quality data present
-      INTEGER   SLOT                ! Map slot for mapped arrays
-      INTEGER   STATUS              ! Inherited status for DSA routines
-      REAL      VALUE               ! Temporary real variable
-      CHARACTER VMODE*16            ! Value of VMODE parameter
-      INTEGER   XKNOTS              ! Value of XKNOTS parameter
-      INTEGER   YKNOTS              ! Value of YKNOTS parameter
-C
-C     Dynamic memory system definition - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DIMS(2)          ! Data dimensions
+      LOGICAL   FAULT            ! Indicates non-DSA detected error
+      INTEGER   IGNORE           ! Dummy status argument
+      INTEGER   INVOKE           ! Dummy function value
+      INTEGER   IPTR             ! Input data dynamic array element
+      LOGICAL   MOSAIC           ! Value of MOSAIC parameter
+      INTEGER   NDIM             ! Number of data dimensions
+      INTEGER   NELM             ! Number of data elements
+      INTEGER   NX               ! First data dimension
+      INTEGER   NY               ! Second data dimension
+      LOGICAL   OK               ! Result of FIG_SURFIT call
+      INTEGER   OPTR             ! Output data dynamic array element
+      INTEGER   QPTR             ! Quality data dynamic array element
+      LOGICAL   QUAL             ! True if quality data present
+      INTEGER   SLOT             ! Map slot for mapped arrays
+      INTEGER   STATUS           ! Inherited status for DSA routines
+      REAL      VALUE            ! Temporary real variable
+      CHARACTER VMODE*16         ! Value of VMODE parameter
+      INTEGER   XKNOTS           ! Value of XKNOTS parameter
+      INTEGER   YKNOTS           ! Value of YKNOTS parameter
 C
 C     Initialise system
 C
@@ -99,14 +101,10 @@ C     Map the input image
 C
       IF (QUAL) THEN
          CALL DSA_USE_QUALITY ('IMAGE',STATUS)
-         CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-         IPTR = DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_QUALITY ('IMAGE','READ','BYTE',ADDRESS,
-     :                                                   SLOT,STATUS)
-         QPTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
+         CALL DSA_MAP_QUALITY ('IMAGE','READ','BYTE',QPTR,SLOT,STATUS)
       ELSE
-         CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-         IPTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
       END IF
       IF (STATUS.NE.0) GO TO 500    ! Error exit
 C
@@ -138,14 +136,14 @@ C
 C
 C     Map the output image
 C
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',OPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500    ! Error exit
 C
 C     Perform the fitting
 C
-      CALL FIG_SURFIT (DYNAMIC_MEM(IPTR),NX,NY,QUAL,DYNAMIC_MEM(QPTR),
-     :                XKNOTS,YKNOTS,VMODE,MOSAIC,DYNAMIC_MEM(OPTR),OK)
+      CALL FIG_SURFIT (%VAL(CNF_PVAL(IPTR)),NX,NY,QUAL,
+     :                 %VAL(CNF_PVAL(QPTR)),XKNOTS,YKNOTS,VMODE,
+     :                 MOSAIC,%VAL(CNF_PVAL(OPTR)),OK)
       IF (.NOT.OK) THEN
          FAULT = .TRUE.
          GO TO 500       ! Error exit
@@ -171,10 +169,11 @@ C
 C  Description:
 C     This routine divides an image up into a number of panels.  Within
 C     each panel it calculates either the average value or the median of
-C     the data and treats the data as just having that value at the center 
-C     of the panel. It then performs a set of bi-cubic spline fits between 
-C     these generated points, and then evaluates the fit for each point 
-C     of the original image.  The result is the output image.
+C     the data and treats the data as just having that value at the
+C     centre of the panel. It then performs a set of bi-cubic-spline 
+C     fits between these generated points, and then evaluates the fit 
+C     for each point of the original image.  The result is the output
+C     image.
 C
 C  Language:
 C     FORTRAN
@@ -195,22 +194,23 @@ C     (>) XPOINTS  (Integer,ref) The number of data points in
 C                  X to be generated and fitted.
 C     (>) YPOINTS  (Integer,ref) The number of data points in
 C                  Y to be generated and fitted.
-C     (>) VMODE    (Fixed string,descr) Indicates if the values used are 
-C                  to be average values, in which case it should begin
-C                  with 'A', or median values, in which case it should
-C                  begin with 'M'.
-C     (>) MOSAIC   (Logical,ref) True if a mosaic rather than a fit is to
-C                  be generated.  This is mainly a debugging tool for
+C     (>) VMODE    (Fixed string,descr) Indicates if the values used
+C                  are to be average values, in which case it should
+C                  begin with 'A', or median values, in which case it
+C                  should begin with 'M'.
+C     (>) MOSAIC   (Logical,ref) True if a mosaic rather than a fit is
+C                  to be generated.  This is mainly a debugging tool for
 C                  the application - it shows the data that gets fitted.
-C     (<) OUTPUT   (Real array, ref) The resulting image.  OUTPUT(NX,NY).
-C                  INPUT and OUTPUT may be the same array.
+C     (<) OUTPUT   (Real array, ref) The resulting image. 
+C                  OUTPUT(NX,NY).  INPUT and OUTPUT may be the same
+C                  array.
 C     (<) OK       (Logical,ref) Indicates if the fitting was OK, or
 C                  if an error occurred.
 C
 C  External variables used:   None.
 C
 C  External subroutines / functions used:
-C     DYN_ELEMENT, DYN_INCREMENT, FIG_SURFIT_NAG, DSA_GET_WORK_ARRAY
+C     FIG_SURFIT_NAG, DSA_GET_WORK_ARRAY
 C
 C  Support: Keith Shortridge, AAO
 C
@@ -221,10 +221,15 @@ C     29th July 1988.  Original version.  KS / AAO.
 C     June 89.         JOS/AAO.  Fixed bug in calculation of workspace.
 C     6th Sept 1989.   KS/AAO.   Formalised previous fix, by changing
 C                      so COVER is known here and passed down.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       SUBROUTINE FIG_SURFIT (INPUT,NX,NY,QUAL,QDATA,XPOINTS,YPOINTS,
      :                                         VMODE,MOSAIC,OUTPUT,OK)
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
       LOGICAL QUAL,OK,MOSAIC
       INTEGER NX,NY,XPOINTS,YPOINTS
       BYTE QDATA(NX,NY)
@@ -233,18 +238,17 @@ C+
 C
 C     Local variables
 C
-      INTEGER ADDRESS           ! Address of workspace obtained
-      INTEGER ADRES             ! Dynamic memory element for ADRES array
-      INTEGER C                 ! Dynamic memory element for C array
+      INTEGER ADRES             ! Dynamic-memory pointer for ADRES array
+      INTEGER C                 ! Dynamic-memory pointer for C array
       REAL    COVER             ! Panel overlap factor
-      INTEGER D                 ! Dynamic memory element for D array
-      INTEGER DL                ! Dynamic memory element for DL array
-      INTEGER F                 ! Dynamic memory element for F array
-      INTEGER FW                ! Dynamic memory element for FW array
-      INTEGER IWRK              ! Dynamic memory element for IWRK array
-      INTEGER LAMDA             ! Dynamic memory element for LAMDA array
+      INTEGER D                 ! Dynamic-memory pointer for D array
+      INTEGER DL                ! Dynamic-memory pointer for DL array
+      INTEGER F                 ! Dynamic-memory pointer for F array
+      INTEGER FW                ! Dynamic-memory pointer for FW array
+      INTEGER IWRK              ! Dynamic-memory pointer for IWRK array
+      INTEGER LAMDA             ! Dynamic-memory pointer for LAMDA array
       INTEGER M                 ! Number of points for fit
-      INTEGER MU                ! Dynamic memory element for MU array
+      INTEGER MU                ! Dynamic-memory pointer for MU array
       INTEGER NADRES            ! Number of elements in ADRES array
       INTEGER NC                ! Number of elements in C array
       INTEGER ND                ! Number of elements in D array
@@ -258,21 +262,13 @@ C
       INTEGER PY                ! Number of knots in Y for spline fit
       INTEGER SLOT              ! Slot entry for workspace array
       INTEGER STATUS            ! Status for DSA calls
-      INTEGER W                 ! Dynamic memory element for W array
-      INTEGER WRK               ! Dynamic memory element for WRK array
-      INTEGER WS                ! Dynamic memory element for WS array
-      INTEGER X                 ! Dynamic memory element for X array
-      INTEGER XW                ! Dynamic memory element for XW array
-      INTEGER Y                 ! Dynamic memory element for Y array
-      INTEGER YW                ! Dynamic memory element for YW array
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT, DYN_INCREMENT
-C
-C     Dynamic memory system definition - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER W                 ! Dynamic-memory pointer for W array
+      INTEGER WRK               ! Dynamic-memory pointer for WRK array
+      INTEGER WS                ! Dynamic-memory pointer for WS array
+      INTEGER X                 ! Dynamic-memory pointer for X array
+      INTEGER XW                ! Dynamic-memory pointer for XW array
+      INTEGER Y                 ! Dynamic-memory pointer for Y array
+      INTEGER YW                ! Dynamic-memory pointer for YW array
 C
 C     This routine is nothing more than an interface between the main
 C     routine and the routine FIG_SURFIT_NAG that actually calls the
@@ -288,8 +284,8 @@ C
       COVER = 1.5
 C
 C     All these variables have the meaning used in the NAG documentation
-C     Note that PX/PY are the total number of knots in the axis directions,
-C     and so are 8 more than the number of internal knots.  
+C     Note that PX/PY are the total number of knots in the axis
+C     directions, and so are 8 more than the number of internal knots.  
 C
       PX = XPOINTS + 8
       PY = YPOINTS + 8
@@ -306,39 +302,39 @@ C
 C
       OK = .FALSE.
       STATUS = 0
-      CALL DSA_GET_WORK_ARRAY(M*4+PX+PY+2*NC+NWS+3*NX+NWRK,'DOUBLE',
-     :                                        ADDRESS,SLOT,STATUS)
-      X = DYN_ELEMENT(ADDRESS)
-      Y = DYN_INCREMENT(X,'DOUBLE',M)
-      F = DYN_INCREMENT(Y,'DOUBLE',M)
-      W = DYN_INCREMENT(F,'DOUBLE',M)
-      LAMDA = DYN_INCREMENT(W,'DOUBLE',M)
-      MU = DYN_INCREMENT(LAMDA,'DOUBLE',PX)
-      DL = DYN_INCREMENT(MU,'DOUBLE',PY)
-      C = DYN_INCREMENT(DL,'DOUBLE',NC)
-      WS = DYN_INCREMENT(C,'DOUBLE',NC)
-      XW = DYN_INCREMENT(WS,'DOUBLE',NWS)
-      YW = DYN_INCREMENT(XW,'DOUBLE',NX)
-      FW = DYN_INCREMENT(YW,'DOUBLE',NX)
-      WRK = DYN_INCREMENT(FW,'DOUBLE',NX)
-      CALL DSA_GET_WORK_ARRAY(NPOINT+NADRES+NIWRK,'INT',ADDRESS,
-     :                                                     SLOT,STATUS)
-      POINT = DYN_ELEMENT(ADDRESS)
-      ADRES = DYN_INCREMENT(POINT,'INT',NPOINT)
-      IWRK = DYN_INCREMENT(ADRES,'INT',NADRES)
-      CALL DSA_GET_WORK_ARRAY(ND,'FLOAT',ADDRESS,SLOT,STATUS)
-      D = DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(M,'DOUBLE',X,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(M,'DOUBLE',Y,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(M,'DOUBLE',F,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(M,'DOUBLE',W,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(PX,'DOUBLE',LAMDA,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(PY,'DOUBLE',MU,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NC,'DOUBLE',DL,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NC,'DOUBLE',C,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NWS,'DOUBLE',WS,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',XW,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',YW,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',FW,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NWRK,'DOUBLE',WRK,SLOT,STATUS)
+
+      CALL DSA_GET_WORK_ARRAY(NPOINT,'INT',POINT,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NADRES,'INT',ADRES,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NIWRK,'INT',IWRK,SLOT,STATUS)
+
+      CALL DSA_GET_WORK_ARRAY(ND,'FLOAT',D,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500      ! Error exit
 C
       CALL FIG_SURFIT_NAG (INPUT,NX,NY,QUAL,QDATA,XPOINTS,YPOINTS,COVER,
-     :          VMODE,MOSAIC,M,PY,PX,NC,NWS,NPOINT,NADRES,NWRK,NIWRK,ND,
-     :                     DYNAMIC_MEM(X),DYNAMIC_MEM(Y),DYNAMIC_MEM(F),
-     :                DYNAMIC_MEM(W),DYNAMIC_MEM(LAMDA),DYNAMIC_MEM(MU),
-     :            DYNAMIC_MEM(POINT),DYNAMIC_MEM(ADRES),DYNAMIC_MEM(DL),
-     :                                   DYNAMIC_MEM(C),DYNAMIC_MEM(WS),
-     :                  DYNAMIC_MEM(XW),DYNAMIC_MEM(YW),DYNAMIC_MEM(FW),
-     :                               DYNAMIC_MEM(WRK),DYNAMIC_MEM(IWRK),
-     :                                         DYNAMIC_MEM(D),OUTPUT,OK)
+     :                     VMODE,MOSAIC,M,PY,PX,NC,NWS,NPOINT,NADRES,
+     :                     NWRK,NIWRK,ND,%VAL(CNF_PVAL(X)),
+     :                     %VAL(CNF_PVAL(Y)),%VAL(CNF_PVAL(F)),
+     :                     %VAL(CNF_PVAL(W)),%VAL(CNF_PVAL(LAMDA)),
+     :                     %VAL(CNF_PVAL(MU)),%VAL(CNF_PVAL(POINT)),
+     :                     %VAL(CNF_PVAL(ADRES),%VAL(CNF_PVAL(DL)),
+     :                     %VAL(CNF_PVAL(C)),%VAL(CNF_PVAL(WS)),
+     :                     %VAL(CNF_PVAL(XW)),%VAL(CNF_PVAL(YW)),
+     :                     %VAL(CNF_PVAL(FW),%VAL(CNF_PVAL(WRK)),
+     :                     %VAL(CNF_PVAL(IWRK)),%VAL(CNF_PVAL(D)),
+     :                     OUTPUT,OK)
 C
   500 CONTINUE
 C

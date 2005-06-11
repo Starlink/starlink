@@ -47,47 +47,46 @@ C
 C                                     KS / CIT 25th May 1983
 C     Modified:
 C
-C     31st Sep  1988.  JM / RAL. Modified to use DSA_ routines
-C                      Dynamic memory handling changed to use
-C                      DYN_ routines
-C     7th Feb. 1991.   JMS / AAO. Now copies the spectrum X-axis only if the
-C                      number of it's dimensions is equal to one.
-C     23rd Sep 1992.   HME / UoE, Starlink.  INCLUDE changed. Call
-C                      PAR_WRUSER rather than DSA_WRUSER.
+C     31st Sep  1988 JM / RAL. Modified to use DSA_ routines
+C                    Dynamic memory handling changed to use
+C                    DYN_ routines
+C     7th Feb. 1991  JMS / AAO. Now copies the spectrum X-axis only if
+C                    the number of its dimensions is equal to one.
+C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Call
+C                    PAR_WRUSER rather than DSA_WRUSER.
+C     2005 June 7    MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
-
-      INTEGER DYN_ELEMENT
       LOGICAL PAR_GIVEN
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   DIMS(2)            ! Image dimensions
-      INTEGER   IPTR               ! Dynamic memory element for image data
-      INTEGER   LSECT              ! No. of elements per section for columns
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   SPTR               ! Dynamic memory element for spectrum data
-      INTEGER   STATUS             ! Running status for DSA routines
-      LOGICAL   USEMIN             ! True if the VMIN value is to be used.
-      REAL      VALUE              ! Initial & final value for LSECT
-      REAL      VMIN               ! Minimum pixel value to be used
-      INTEGER   WPTR               ! Dynamic memory element for workspace
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   IPTR             ! Dynamic-memory pointer for image data
+      INTEGER   LSECT            ! No. of elements per section for 
+                                 ! columns
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum 
+                                 ! data
+      INTEGER   STATUS           ! Running status for DSA routines
+      LOGICAL   USEMIN           ! True if the VMIN value is to be used
+      REAL      VALUE            ! Initial & final value for LSECT
+      REAL      VMIN             ! Minimum pixel value to be used
+      INTEGER   WPTR             ! Dynamic memory element for workspace
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NO_DATA
       PARAMETER (NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -148,22 +147,19 @@ C
 C
 C     Map the input and output data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',SPTR,SLOT,STATUS)
 C
 C     Get workspace
 C
-      CALL DSA_GET_WORK_ARRAY(LSECT,'FLOAT',ADDRESS,SLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(LSECT,'FLOAT',WPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Generate the sky spectrum
 C
-      CALL FIG_MEDMIN(DYNAMIC_MEM(IPTR),NX,NY,LSECT,VMIN,USEMIN,
-     :                DYNAMIC_MEM(WPTR),DYNAMIC_MEM(SPTR))
+      CALL FIG_MEDMIN(%VAL(CNF_PVAL(IPTR)),NX,NY,LSECT,VMIN,USEMIN,
+     :                %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(SPTR)))
 
   500 CONTINUE
 

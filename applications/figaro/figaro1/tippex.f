@@ -43,38 +43,36 @@ C     27th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* except
 C                    GKD_WRITE_LINE. Disuse PAR_Q*, use PAR_ABORT.
 C                    Added parameters CONFIRM, QUIT.
 C     23rd Jan 1995  HME / UoE, Starlink. Increase TVFILE to *132.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      CKEY         ! The GRPCKG colour code for the plot
-      CHARACTER    DEVICE*32    ! The PG package device name
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      REAL         HIGH         ! The 'brightest' value in the image
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      REAL         LOW          ! The 'lowest' value in the image
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      CHARACTER    SPECT*132    ! The actual file name of the image
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      INTEGER      XEN          ! Pixel number of the display's right edge
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data array
-      INTEGER      XSLOT        ! Map slot number for x-axis data array
-      INTEGER      XST          ! The pixel number of the display's left edge 
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      CKEY          ! The GRPCKG colour code for the plot
+      CHARACTER    DEVICE*32     ! The PG package device name
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      REAL         HIGH          ! The 'brightest' value in the image
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      REAL         LOW           ! The 'lowest' value in the image
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of first dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number outputdata array
+      CHARACTER    SPECT*132     ! The actual file name of the image
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALUE         ! Temporary real number
+      INTEGER      XEN           ! Pixel number of the display's right
+                                 ! edge
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data array
+      INTEGER      XSLOT         ! Map slot number for x-axis data array
+      INTEGER      XST           ! Pixel number of the display's left 
+                                 ! edge 
 C
 C     Initialisation of DSA_ routines
 C
@@ -133,23 +131,19 @@ C
 C
 C     Map data array to receive fitted spectrum
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                      STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Map the X-array (if there is one).  If there isn't, create
 C     one, using the element numbers.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Now interactively modify the spectrum.
 C
       CALL FIG_FUDGE(DEVICE,XST,XEN,HIGH,LOW,CKEY,NX,
-     :      DYNAMIC_MEM(XPTR),DYNAMIC_MEM(OPTR),STATUS)
+     :               %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OPTR)),STATUS)
 C
 C     Tidy up
 C

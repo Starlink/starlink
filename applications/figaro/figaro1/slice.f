@@ -26,82 +26,85 @@ C               for pixels refer to the CENTERS of those pixels -
 C               This means, for example, that if IMAGE is a 256 by 256
 C               image, the commands
 C               SLICE IMAGE XSTART=1.0 XEND=256.0 YSTART=128.0 YEND=128.0
-C               EXTRACT IMAGE,128,128   will have exactly the same 
-C               results.
+C               EXTRACT IMAGE,128,128
+C               will have exactly the same results.
 C     ELEMENTS  (Numeric) Number of pixels in the resulting spectrum.
 C     SPECTRUM  (Character) The resulting spectrum.
 C
 C                                               KS / CIT 23rd March 1984
 C     Modified:
 C
-C     27th Jan 1989.   JM / RAL. Modified to use DSA_ routines
-C                      Dynamic memory handling changed to use
-C                      DYN_ routines
-C     17th Jan 1991.   JMS / AAO. Added PAR_ABORT calls to support user
-C                      requested aborts.
-C     18th Jan 1991.   JMS / AAO. Changed the maximum number of allowed data
-C                      array dimensions from 10 to 2.
-C     26th Mar 1991.   KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                      mapping calls.
-C     23rd Sep 1992.   HME / UoE, Starlink.  INCLUDE changed.
-C     27th Jul 1996.   MJCL / Starlink, UCL.  One more PAR_ABORT check.
+C     27th Jan 1989  JM / RAL. Modified to use DSA_ routines
+C                    Dynamic memory handling changed to use
+C                    DYN_ routines
+C     17th Jan 1991  JMS / AAO. Added PAR_ABORT calls to support user
+C                    requested aborts.
+C     18th Jan 1991  JMS / AAO. Changed the maximum number of allowed
+C                    data-array dimensions from 10 to 2.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected 
+C                    in mapping calls.
+C     23rd Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C     27th Jul 1996  MJCL / Starlink, UCL.  One more PAR_ABORT check.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C
 C     Functions 
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
-      INTEGER GEN_BSEARCH    ! Returns the array index of the element 
-*                            ! closest to a given test value
-      REAL GEN_ELEMF         ! Returns value of Nth element of a given array
+      INTEGER GEN_BSEARCH        ! Returns the array index of the 
+                                 ! element closest to a given test value
+      REAL GEN_ELEMF             ! Returns value of Nth element of a
+                                 ! given array
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Address of dynamic memory element
-      CHARACTER CITEMS(2)*32 ! Axis character items retrieved
-      INTEGER   DIMS(2)     ! Dimensions of an array
-      REAL      ENDS(4)      ! The ends of the slice
-      INTEGER   IND          ! Array index of number closest to VALUE
-      INTEGER   IND1         ! Array index one less than IND (min value=1)
-      INTEGER   IND2         ! Array index one greater than IND 
-      INTEGER   IORD         ! The order to be used for interpolation.
-      INTEGER   IPTR         ! Pointer to IMAGE data
-      INTEGER   NAXIS        ! Axis number
-      INTEGER   NCITEMS      ! Number of axis character items retrieved
-      INTEGER   NDIM         ! Number of dimensions of an array
-      INTEGER   NELM         ! Total no. of elements in data array
-      DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
-      INTEGER   NNITEMS      ! Number of axis numeric items retrieved
-      INTEGER   NX           ! No. of elements in IMAGE's 1st data dimension
-      INTEGER   NY           ! No. of elements in IMAGE's 2nd data dimension
-      INTEGER   SLOT         ! Map slot number
-      INTEGER   SPTR         ! Pointer to SPECT data
-      INTEGER   STATUS       ! Running status for DSA_routines
-      CHARACTER UNITS*64     ! Units found in IMAGE
-      REAL      VAL1         ! Value of (IND1)th element in axis array
-      REAL      VAL2         ! Value of (IND2)th element in axis array
-      REAL      VALUE        ! Value of an  axis array element
-      REAL      VMAX         ! Value of last element in axis array
-      REAL      VMIN         ! Value of first element in axis array
-      REAL      XEND         ! The AXIS(1) value for the end of the slice.
-      LOGICAL   XEXIST       ! True if image has AXIS(1) array
-      INTEGER   XPTR         ! Pointer to AXIS(1) data in IMAGE
-      REAL      XSTART       ! The AXIS(1) value for the start of the slice.
-      REAL      YEND         !The AXIS(2) value for the end of the slice.
-      LOGICAL   YEXIST       ! True if image has AXIS(2) array
-      INTEGER   YPTR         ! Pointer to AXIS(2) data in IMAGE
-      REAL      YSTART       !The AXIS(2) value for the start of the slice.
+      INTEGER   ADDRESS          ! Address of dynamic memory element
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      INTEGER   DIMS(2)          ! Dimensions of an array
+      REAL      ENDS(4)          ! The ends of the slice
+      INTEGER   IND              ! Array index of number closest to 
+                                 ! VALUE
+      INTEGER   IND1             ! Array index one less than IND (min 
+                                 ! value=1)
+      INTEGER   IND2             ! Array index one greater than IND 
+      INTEGER   IORD             ! Order to be used for interpolation
+      INTEGER   IPTR             ! Pointer to IMAGE data
+      INTEGER   NAXIS            ! Axis number
+      INTEGER   NCITEMS          ! Number of axis character items
+                                 ! retrieved
+      INTEGER   NDIM             ! Number of dimensions of an array
+      INTEGER   NELM             ! Total no. of elements in data array
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   NNITEMS          ! No. of axis numeric items retrieved
+      INTEGER   NX               ! IMAGE's 1st data dimension
+      INTEGER   NY               ! IMAGE's 2nd data dimension
+      INTEGER   SLOT             ! Map slot number
+      INTEGER   SPTR             ! Pointer to SPECT data
+      INTEGER   STATUS           ! Running status for DSA_routines
+      CHARACTER UNITS*64         ! Units found in IMAGE
+      REAL      VAL1             ! (IND1)th element in axis array
+      REAL      VAL2             ! (IND2)th element in axis array
+      REAL      VALUE            ! Axis-array element
+      REAL      VMAX             ! Last element in axis array
+      REAL      VMIN             ! irst element in axis array
+      REAL      XEND             ! AXIS(1) value for the end of slice
+      LOGICAL   XEXIST           ! True if image has AXIS(1) array
+      INTEGER   XPTR             ! Pointer to AXIS(1) data in IMAGE
+      REAL      XSTART           ! AXIS(1) value for the start of slice
+      REAL      YEND             ! AXIS(2) value for the end of slice
+      LOGICAL   YEXIST           ! True if image has AXIS(2) array
+      INTEGER   YPTR             ! Pointer to AXIS(2) data in IMAGE
+      REAL      YSTART           ! AXIS(2) value for the start of slice
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -131,18 +134,17 @@ C     Map data
       NAXIS=2
       CALL DSA_SEEK_AXIS('IMAGE',NAXIS,YEXIST,STATUS)
       IF(YEXIST)THEN
-         CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',ADDRESS,
-     :                                         SLOT,STATUS)
-         YPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',YPTR,
+     :                          SLOT,STATUS)
          CALL DSA_GET_AXIS_INFO('IMAGE',NAXIS,NCITEMS,CITEMS,
      :                           NNITEMS,NITEMS,STATUS)
          UNITS=CITEMS(1)
-      ENDIF
+      END IF
       IF(STATUS.NE.0)GOTO 500
 
       IF (YEXIST) THEN
-         VMAX=GEN_ELEMF(DYNAMIC_MEM(YPTR),NY)
-         VMIN=GEN_ELEMF(DYNAMIC_MEM(YPTR),1)
+         VMAX=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),NY)
+         VMIN=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),1)
       ELSE
          VMAX=NY
          VMIN=1.
@@ -152,11 +154,11 @@ C     Map data
       IF (PAR_ABORT()) GOTO 500
 
       IF (YEXIST) THEN
-         IND=GEN_BSEARCH(DYNAMIC_MEM(YPTR),NY,VALUE)
+         IND=GEN_BSEARCH(%VAL(CNF_PVAL(YPTR)),NY,VALUE)
          IND1=MAX(IND-1,1)
          IND2=MIN(IND+1,NY)
-         VAL1=GEN_ELEMF(DYNAMIC_MEM(YPTR),IND1)
-         VAL2=GEN_ELEMF(DYNAMIC_MEM(YPTR),IND2)
+         VAL1=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IND1)
+         VAL2=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IND2)
          YSTART=(VALUE-VAL1)*FLOAT(IND2-IND1)/(VAL2-VAL1)+FLOAT(IND1)
       ELSE
          YSTART=VALUE
@@ -166,11 +168,11 @@ C     Map data
       IF (PAR_ABORT()) GOTO 500
 
       IF (YEXIST) THEN
-         IND=GEN_BSEARCH(DYNAMIC_MEM(YPTR),NY,VALUE)
+         IND=GEN_BSEARCH(%VAL(CNF_PVAL(YPTR)),NY,VALUE)
          IND1=MAX(IND-1,1)
          IND2=MIN(IND+1,NY)
-         VAL1=GEN_ELEMF(DYNAMIC_MEM(YPTR),IND1)
-         VAL2=GEN_ELEMF(DYNAMIC_MEM(YPTR),IND2)
+         VAL1=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IND1)
+         VAL2=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),IND2)
          YEND=(VALUE-VAL1)*FLOAT(IND2-IND1)/(VAL2-VAL1)+FLOAT(IND1)
       ELSE
          YEND=VALUE
@@ -181,18 +183,17 @@ C
       NAXIS=1
       CALL DSA_SEEK_AXIS('IMAGE',NAXIS,XEXIST,STATUS)
       IF(XEXIST)THEN
-         CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',ADDRESS,
-     :                                         SLOT,STATUS)
-         XPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA('IMAGE',NAXIS,'READ','FLOAT',XPTR,
+     :                          SLOT,STATUS)
          CALL DSA_GET_AXIS_INFO('IMAGE',NAXIS,NCITEMS,CITEMS,
-     :                           NNITEMS,NITEMS,STATUS)
+     :                          NNITEMS,NITEMS,STATUS)
          UNITS=CITEMS(1)
-      ENDIF
+      END IF
       IF(STATUS.NE.0)GOTO 500
 
       IF (XEXIST) THEN
-         VMAX=GEN_ELEMF(DYNAMIC_MEM(XPTR),NX)
-         VMIN=GEN_ELEMF(DYNAMIC_MEM(XPTR),1)
+         VMAX=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),NX)
+         VMIN=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),1)
       ELSE
          VMAX=NX
          VMIN=1.
@@ -202,11 +203,11 @@ C
       IF (PAR_ABORT()) GOTO 500
 
       IF (XEXIST) THEN
-         IND=GEN_BSEARCH(DYNAMIC_MEM(XPTR),NX,VALUE)
+         IND=GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),NX,VALUE)
          IND1=MAX(IND-1,1)
          IND2=MIN(IND+1,NX)
-         VAL1=GEN_ELEMF(DYNAMIC_MEM(XPTR),IND1)
-         VAL2=GEN_ELEMF(DYNAMIC_MEM(XPTR),IND2)
+         VAL1=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IND1)
+         VAL2=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IND2)
          XSTART=(VALUE-VAL1)*FLOAT(IND2-IND1)/(VAL2-VAL1)+FLOAT(IND1)
       ELSE
          XSTART=VALUE
@@ -216,11 +217,11 @@ C
       IF (PAR_ABORT()) GOTO 500
 
       IF (XEXIST) THEN
-         IND=GEN_BSEARCH(DYNAMIC_MEM(XPTR),NX,VALUE)
+         IND=GEN_BSEARCH(%VAL(CNF_PVAL(XPTR)),NX,VALUE)
          IND1=MAX(IND-1,1)
          IND2=MIN(IND+1,NX)
-         VAL1=GEN_ELEMF(DYNAMIC_MEM(XPTR),IND1)
-         VAL2=GEN_ELEMF(DYNAMIC_MEM(XPTR),IND2)
+         VAL1=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IND1)
+         VAL2=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),IND2)
          XEND=(VALUE-VAL1)*FLOAT(IND2-IND1)/(VAL2-VAL1)+FLOAT(IND1)
       ELSE
          XEND=VALUE
@@ -239,14 +240,12 @@ C
 C
 C     Map the input image
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
 C
 C     Create and map the output spectrum data
 C
       CALL DSA_RESHAPE_DATA('SPECT','IMAGE',1,NELM,STATUS)
-      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',SPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Now do the real work
@@ -256,8 +255,8 @@ C
       ENDS(3)=XEND
       ENDS(4)=YEND
       IORD=3
-      CALL FIG_CSLICE(DYNAMIC_MEM(IPTR),NX,NY,NELM,ENDS,IORD,
-     :                DYNAMIC_MEM(SPTR))
+      CALL FIG_CSLICE(%VAL(CNF_PVAL(IPTR)),NX,NY,NELM,ENDS,IORD,
+     :                %VAL(CNF_PVAL(SPTR)))
   500 CONTINUE
 C
 C     Close down everything
