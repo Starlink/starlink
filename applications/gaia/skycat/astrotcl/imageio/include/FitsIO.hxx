@@ -19,6 +19,7 @@
  *                           non-const member can be used within this
  *                           member. 
  *                 15/08/00  Made write virtual so it can be overriden.
+ *                 13/06/05  Made setHDU virtual so it can be overriden.
  */
 
 #include <stdio.h>
@@ -195,7 +196,7 @@ public:
     int getHDUNum();
 
     // Move to the specified HDU and make it the current one
-    int setHDU(int num);
+    virtual int setHDU(int num);
 
     // Delete the given HDU
     int deleteHDU(int num);
