@@ -21,6 +21,7 @@
  *                           access mode can be determined.
  *                 16/08/00  Added write and mergeHeader members.
  *                 16/02/04  Added alwaysMerge_ member.
+ *                 13/06/05  Added setHDU member.
  */
 
 #include "FitsIO.hxx"
@@ -79,6 +80,9 @@ public:
 
     // Get whether to always merge headers or not.
     static int getAlwaysMerge() { return alwaysMerge_; }
+
+    // Move to the specified HDU and make it the current one
+    int setHDU( int num );
 
 protected:
     // Whether to merge headers or not.

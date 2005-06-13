@@ -29,6 +29,9 @@
  *                 16/02/04  Changed merging of headers to be optional and
  *                           also to only be done if the primary HDU contains
  *                           a dummy image.
+ *                 13/06/05  Added setHDU member. Overrides the FitsIO version
+ *                           (which is now virtual), so we can register
+ *                           the pointer with CNF.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -576,4 +579,18 @@ int StarFitsIO::write( const char *filename )
     }
 
     return OK;
+}
+
+/*
+ * Move to the specified HDU and make it the current one 
+ */
+int StarFitsIO::setHDU( int num )
+{
+    int result = FitsIO::setHDU( num );
+
+    //  Register new pointers.
+    cnfRegp( header_.ptr() );
+    cnfRegp( data_.ptr() );
+
+    return result;
 }
