@@ -28,7 +28,7 @@
 *
 *  Called:  sla_DVXV, sla_DVN, sla_DVDV
 *
-*  Last revision:   7 May 2000
+*  Last revision:   14 June 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *
@@ -67,7 +67,7 @@
       C = sla_DVDV(V1,V2)
 
 *  Angle between the vectors.
-      IF (S.NE.0D0) THEN
+      IF ( S.NE.0D0 .OR. C.NE.0D0 ) THEN
          sla_DSEPV = ATAN2(S,C)
       ELSE
          sla_DSEPV = 0D0

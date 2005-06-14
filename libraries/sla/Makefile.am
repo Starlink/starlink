@@ -13,6 +13,7 @@ libsla_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES)
 libsla_la_LIBADD = $(LTLIBOBJS)
+libsla_la_LDFLAGS = -version-info $(libsla_la_version_info)
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
@@ -58,7 +59,3 @@ sla_test_LDADD = libsla.la
 dist_starnews_DATA = sla.news
 
 DISTCLEANFILES = gresid.F random.F wait.f
-
-
-
-

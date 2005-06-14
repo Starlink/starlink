@@ -2,7 +2,21 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(sla, 2.5-1, ussc@star.rl.ac.uk)
+AC_INIT(sla, 2.5-2, ussc@star.rl.ac.uk)
+# Version-info specifications.  See SSN/78 for guidelines, and update the table
+# below for ANY change of version number.
+#
+# The library version numbers below match PTW's LIB_VERS 1.6 and 1.7
+# respectively, as it happens.  There is no need to continue this pattern
+# with any future changes, since these should respect the rather different
+# rules for the -version-info numbers.  Instead the PTW makefile LIB_VERS
+# changes should be regarded as guidelines for which changes are and are
+# not backwards-compatible.
+#
+#   Release    libsla.la
+#    2.4-12       6:0:0
+#    2.5-2        7:0:0
+AC_SUBST(libsla_la_version_info, 7:0:0)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

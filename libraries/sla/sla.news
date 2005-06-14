@@ -1,8 +1,12 @@
-#     8-APR-2005 (PTW):
-#        New routine - sla_EPV - plus miscellaneous improvements.
-#        Revised document:  SUN/67.68.
-#        Package version number changed to 2.5-1.
+#     14-JUN-2005 (PTW):
+#        Bug fix in sla_DSEPV.
+#        Package version number changed to 2.5-2.
 
+
+SLALIB_Version_2.5.2                                  Expiry 31 March 2006
+
+* Bug-fix to sla_DSEPV.  Precisely antipodal vectors returned zero
+  instead of pi.
 
 SLALIB_Version_2.5.1                                  Expiry 31 March 2006
 

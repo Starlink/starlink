@@ -1,6 +1,6 @@
 READ.ME
 
-Revision date 8 April 2005                         SLALIB Version 2.5-1
+Revision date 14 June 2005                         SLALIB Version 2.5-2
 
 -----------------------------------------------------------------------
 
@@ -430,6 +430,9 @@ at the end):
    Position accuracy is a few km;  velocity accuracy is a few mm/s.
    The sla_PERTUE and sla_PLANTU routines now call this routine in
    order to deliver better predictions for near-Earth objects.
+
+*  There was a bug in sla_DSEPV.  For the unique case of two precisely
+   antipodal vectors zero was returned instead of pi.
 
 -----------------------------------------------------------------------
 
