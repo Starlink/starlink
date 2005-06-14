@@ -17,6 +17,11 @@
 **    along with this program; if not, write to the Free Software 
 **    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  
 **    USA.
+**
+**  History:
+**    14-JUN-2004 (DSB):
+**       Corrected slaDsepv to fix bug which caused precisely antipodal
+**       vectors to return zero instead of pi.
 */
 
 #include "slalib.h"
@@ -228,7 +233,7 @@ baz,q0,fOobaR);return slaDsepv(fobar,fOobaR);}
 
 double slaDsepv(double foo[3],double Q0[3]){double BAR[3],q1
 [3],BAZ,fObaR;slaDvxv(foo,Q0,BAR);slaDvn(BAR,q1,&BAZ);fObaR=
-slaDvdv(foo,Q0);return BAZ!=0.0?atan2(BAZ,fObaR):0.0;}
+slaDvdv(foo,Q0);return (BAZ!=0.0||fObaR!=0.0)?atan2(BAZ,fObaR):0.0;}
 
 void slaDtf2d(int q0,int foo,double q1,double*bar,int*Q2)
 #define q3 86400.0
