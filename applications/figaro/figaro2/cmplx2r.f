@@ -41,40 +41,36 @@ C     13th Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                    No concurrent mapping. Delete output imaginary
 C                    before mapping output data.
 C                    Map complex in single call.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
-      INTEGER DSA_TYPESIZE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS     ! Virtual address for data array
-      INTEGER   ADDRESS2    ! Virtual address for data array
-      CHARACTER COMMAND*8   ! Figaro command name 
-      INTEGER   DIMS(10)    ! Image dimensions
-      LOGICAL   FAULT       ! True if input is not a valid complex structure
-      INTEGER   IERR        ! Returned by VEC_
-      INTEGER   IGNORE      ! Status for VEC_
-      INTEGER   IPTR        ! Dynamic memory element for imaginary data
-      INTEGER   NBAD        ! Number of bad format conversions
-      INTEGER   NDIM        ! Number of image dimensions
-      INTEGER   NELM        ! Number of elements in image
-      INTEGER   OPTR        ! Dynamic memory element for output data
-      INTEGER   RPTR        ! Dynamic memory element for real data
-      INTEGER   SLOT        ! Slot number for mapped data - ignored
-      INTEGER   STATUS      ! Running status for DSA routines
+      CHARACTER COMMAND*8        ! Figaro command name 
+      INTEGER   DIMS(10)         ! Image dimensions
+      LOGICAL   FAULT            ! Input is not a valid complex 
+                                 ! structure?
+      INTEGER   IERR             ! Returned by VEC_
+      INTEGER   IGNORE           ! Status for VEC_
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary 
+                                 ! data
+      INTEGER   NBAD             ! Number of bad format conversions
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image
+      INTEGER   OPTR             ! Dynamic-memory pointer for output
+                                 ! data
+      INTEGER   RPTR             ! Dynamic-memory pointer for real data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -112,8 +108,7 @@ C     Force the existence of a data array of type 'FLOAT' and
 C     map this for 'WRITE'.
 C
       CALL DSA_COERCE_DATA_ARRAY('OUTPUT','FLOAT',NDIM,DIMS,STATUS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OPTR,SLOT,STATUS)
 C
 C     Write the appropriate data into the output data array
 C
@@ -121,54 +116,47 @@ C
 C
 C       Output data is a copy of input data array
 C 
-         CALL DSA_MAP_DATA('CDATA','READ','DOUBLE',ADDRESS,SLOT,
-     :                      STATUS)
-         RPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('CDATA','READ','DOUBLE',RPTR,SLOT,
+     :                     STATUS)
          IF(STATUS.NE.0)GOTO 500
          IGNORE=0
-         CALL VEC_DTOR(.FALSE.,NELM,DYNAMIC_MEM(RPTR),
-     :      DYNAMIC_MEM(OPTR),IERR,NBAD,IGNORE)
+         CALL VEC_DTOR(.FALSE.,NELM,%VAL(CNF_PVAL(RPTR)),
+     :                  %VAL(CNF_PVAL(OPTR)),IERR,NBAD,IGNORE)
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
-C        CALL CNV_FMTCNV('DOUBLE','FLOAT',DYNAMIC_MEM(RPTR),
-C    :                    DYNAMIC_MEM(OPTR),NELM,NBAD)
+C        CALL CNV_FMTCNV('DOUBLE','FLOAT',%VAL(CNF_PVAL(RPTR)),
+C    :                    %VAL(CNF_PVAL(OPTR)),NELM,NBAD)
          
-      ELSEIF (COMMAND.EQ.'CMPLX2I') THEN
+      ELSE IF (COMMAND.EQ.'CMPLX2I') THEN
 C
 C       Output data is copied from input imaginary array
 C
-C        CALL DSA_MAP_IMAGINARY('CDATA','READ','DOUBLE',ADDRESS,SLOT,
+C        CALL DSA_MAP_IMAGINARY('CDATA','READ','DOUBLE',IPTR,SLOT,
 C    :                           STATUS)
          CALL DSA_MAP_COMPLEX('CDATA','READ','DOUBLE',
-     :      ADDRESS2,ADDRESS,SLOT,STATUS)
-         IPTR=DYN_ELEMENT(ADDRESS)
+     :                        RPTR,IPTR,SLOT,STATUS)
          IF(STATUS.NE.0)GOTO 500
          IGNORE=0
-         CALL VEC_DTOR(.FALSE.,NELM,DYNAMIC_MEM(IPTR),
-     :      DYNAMIC_MEM(OPTR),IERR,NBAD,IGNORE)
+         CALL VEC_DTOR(.FALSE.,NELM,%VAL(CNF_PVAL(IPTR)),
+     :                  %VAL(CNF_PVAL(OPTR)),IERR,NBAD,IGNORE)
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
-C        CALL CNV_FMTCNV('DOUBLE','FLOAT',DYNAMIC_MEM(IPTR),
-C    :                    DYNAMIC_MEM(OPTR),NELM,NBAD)
+C        CALL CNV_FMTCNV('DOUBLE','FLOAT',%VAL(CNF_PVAL(IPTR)),
+C    :                    %VAL(CNF_PVAL(OPTR)),NELM,NBAD)
           
-      ELSEIF (COMMAND.EQ.'CMPLX2M') THEN
+      ELSE IF (COMMAND.EQ.'CMPLX2M') THEN
 C
 C         Input real and imaginary data arrays are mapped and used to 
 C         calculate the modulus array which is written to the output
 C         data array.
 C
-C        CALL DSA_MAP_IMAGINARY('CDATA','READ','DOUBLE',ADDRESS,SLOT,
-C    :                            STATUS)
-C        IPTR=DYN_ELEMENT(ADDRESS)
-C        CALL DSA_MAP_DATA('CDATA','READ','DOUBLE',ADDRESS,SLOT,
-C    :                       STATUS)
-C        RPTR=DYN_ELEMENT(ADDRESS)
+C        CALL DSA_MAP_IMAGINARY('CDATA','READ','DOUBLE',IPTR,SLOT,
+C    :                          STATUS)
+C        CALL DSA_MAP_DATA('CDATA','READ','DOUBLE',RPTR,SLOT,STATUS)
          CALL DSA_MAP_COMPLEX('CDATA','READ','DOUBLE',
-     :      ADDRESS,ADDRESS2,SLOT,STATUS)
-         RPTR=DYN_ELEMENT(ADDRESS)
-         IPTR=DYN_ELEMENT(ADDRESS2)
+     :                        RPTR,IPTR,SLOT,STATUS)
          IF(STATUS.NE.0)GOTO 500
-         CALL FIG_CMODUL(NELM,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(IPTR),
-     :                    DYNAMIC_MEM(OPTR))
-      ENDIF
+         CALL FIG_CMODUL(NELM,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(OPTR)))
+      END IF
 
 
   500 CONTINUE

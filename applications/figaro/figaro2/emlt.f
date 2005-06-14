@@ -5,46 +5,51 @@ C     E M L T
 C
 C     Figaro version of the original SDRSYS routine EMLT, which analyses
 C     emission lines in a spectrum, fitting gaussians to the strongest
-C     lines and logging their positions, widths and centers.  Optionally,
-C     it will also give line centers using a centre of moment analysis,
-C     and can also produce a synthetic spectrum generated from the
-C     positions and widths of the located lines.  Note: Figaro and SDRSYS
-C     differ in their pixel numbering, Figaro counting from 1 and SDRSYS
-C     counting from 0, so there will be a discrepancy of 1 between the
-C     output from the two versions for any pixel number values; wavelength
-C     values produced by the two should be the same.
+C     lines and logging their positions, widths and centers.  
+C     Optionally, it will also give line centers using a centre of 
+C     moment analysis, and can also produce a synthetic spectrum 
+C     generated from the positions and widths of the located lines.  
+C     Note: Figaro and SDRSYS differ in their pixel numbering, Figaro 
+C     counting from 1 and SDRSYS counting from 0, so there will be a
+C     discrepancy of 1 between the output from the two versions for any
+C     pixel-number values; wavelength values produced by the two should 
+C     be the same.
 C
 C     Parameters -
 C
 C     SPECTRUM    (Character) The name of the spectrum to be analysed.
-C     XSTART      (Numeric) The first X-value to be used for the analysis.
-C     XEND        (Numeric) The last X-value to be used for the analysis.
+C     XSTART      (Numeric) The first X-value to be used for the
+C                 analysis.
+C     XEND        (Numeric) The last X-value to be used for the
+C                 analysis.
 C     LINES       (Numeric) If LINES is zero, all lines that can be
 C                 fitted are listed.  Otherwise, it gives the number of
-C                 lines to be included in the analysis, starting with the
-C                 strongest and cutting off the weaker lines.
-C     FWHM        (Numeric) If non-zero, all lines fitted are constrained
-C                 to a full width at half maximum of this value - in pixels.
+C                 lines to be included in the analysis, starting with
+C                 the strongest and cutting off the weaker lines.
+C     FWHM        (Numeric) If non-zero, all lines fitted are
+C                 constrained to a full width at half maximum of this
+C                 value - in pixels.
 C     OUTPUT      (Character) The name of any synthetic spectrum to be
 C                 generated.
 C
 C     Keywords -
 C
-C     MOMENTS     If specified, a center of moment analysis is also performed
-C                 on all lines found.
+C     MOMENTS     If specified, a center of moment analysis is also 
+C                 performed on all lines found.
 C     SYNTH       If specified, a synthetic spectrum is generated.
 C
 C     User variables -  (">" input, "<" output)
 C
 C     (<) EMLT_LINES    (Real) Number of lines found.
 C     (<) EMLT_BIN      (Real array) List of line centres (pixels).
-C     (<) EMLT_POS      (Real array) List of line centres (wavelength units).
+C     (<) EMLT_POS      (Real array) List of line centres (wavelength 
+C                                    units).
 C     (<) EMLT_FWHM_BIN (Real array) List of FWHM (pixels).
 C     (<) EMLT_FWHM_ANG (Real array) List of FWHM (wavelength units).
 C     (<) EMLT_STREN    (Real array) List of line strengths.
 C     (<) EMLT_PEAK     (Real array) List of peak heights.
 C
-C                                                  KS / AAO  4th March 1988
+C                                               KS / AAO  4th March 1988
 C     Modified:
 C  
 C     16 Aug 1988  Some output formatting problems corrected.  KS/AAO.
@@ -69,67 +74,80 @@ C                  the prologue comments.
 C     24 Apr 2002  ACD / UoE, Starlink. Ensured that the output ADAM
 C                  parameters have the correct values when no lines are
 C                  found.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       LOGICAL GEN_CHKNSF
-      INTEGER ICH_LEN, DYN_ELEMENT, DYN_INCREMENT, DSA_TYPESIZE
+      INTEGER ICH_LEN, DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER   ADDRESS        ! Used for memory addresses
-      INTEGER   AXDIMS(6)      ! Axis array dimensions
-      INTEGER   BINPTR         ! Dynamic memory element for workspace array
-      INTEGER   BYTES          ! Number of bytes in one cross-section
-      LOGICAL   CALIB          ! True if axis is calibrated (not just 1..NX)
-      INTEGER   DIMS(6)        ! Data array dimensions
-      INTEGER   DPTR           ! Dynamic memory element for spectral data
-      DOUBLE PRECISION DUMMY   ! Dummy numeric argument
-      REAL      FWHM           ! Value of FWHM parameter
-      INTEGER   IGNORE         ! Returned status value - ignored
-      INTEGER   IPTR           ! Dynamic memory element for input data
-      INTEGER   ISPEC          ! Loop index through data cross-sections
-      INTEGER   IXEN           ! Last spectral element to be used
-      INTEGER   IXSPEC         ! Counts through axis cross-sections
-      INTEGER   IXST           ! First spectral element to be used
-      INTEGER   LINES          ! Value of LINES parameter
-      INTEGER   LOGLU          ! Logical unit number for output file
-      LOGICAL   MOMENTS        ! Value of MOMENTS keyword
-      CHARACTER NAME*132       ! Full name of results file
-      INTEGER   NASPEC         ! Number of cross-sections in axis data
-      INTEGER   NAXDIM         ! Number of axis array dimensions
-      INTEGER   NAXELM         ! Number of axis array elements
-      INTEGER   NDIM           ! Number of data array dimensions
-      INTEGER   NELM           ! Number of data array elements
-      INTEGER   NOCENS         ! Moments keyword, numeric value for FIG_EMLT
-      INTEGER   NSPECT         ! Number of spectra in data
-      INTEGER   NX             ! First dimension of data array
-      INTEGER   OPTR           ! Dynamic memory element for output data
-      INTEGER   SLOT           ! Used for DSA_ slot values
-      INTEGER   STATUS         ! Running status for DSA_ routines
-      CHARACTER STRING*20      ! Used for formatting spectrum numbers
-      INTEGER   STRPTR         ! Dynamic memory element for workspace array
-      LOGICAL   SYNTH          ! Value of SYNTH keyword
-      CHARACTER UNITS*10       ! Axis units
-      REAL      VALUE          ! Real value of numeric parameter
-      REAL      WEND           ! Last axis value - ignored
-      INTEGER   WIDPTR         ! Dynamic memory element for workspace array
-      INTEGER   WPTR           ! Dynamic memory element for workspace array
-      REAL      WSTART         ! First axis value - ignored
-      INTEGER   XBASE          ! Dynamic memory element for start of axis data
-      LOGICAL   XEXIST         ! True if there is an axis data array
-      INTEGER   XPTR           ! Dynamic memory element for axis data
-      INTEGER   BNAPTR         ! Dynamic memory element for workspace array
-      INTEGER   FAPTR          ! Dynamic memory element for workspace array
-      INTEGER   FWHPTR         ! Dynamic memory element for workspace array
-      INTEGER   STAPTR         ! Dynamic memory element for workspace array
-      INTEGER   PKPTR          ! Dynamic memory element for workspace array
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   AXDIMS(6)        ! Axis array dimensions
+      INTEGER   BINPTR           ! Dynamic-memory pointer for workspace
+                                 ! array
+      INTEGER   BNAPTR           ! Dynamic-memory pointer for workspace 
+      INTEGER   BYTES            ! Number of bytes in one cross-section
+      LOGICAL   CALIB            ! Axis is calibrated (not just 1..NX)?
+      INTEGER   DIMS(6)          ! Data array dimensions
+      INTEGER   DPTR             ! Dynamic-memory pointer for spectral 
+                                 ! data
+      DOUBLE PRECISION DUMMY     ! Dummy numeric argument
+      INTEGER   FAPTR            ! Dynamic-memory pointer for workspace
+      REAL      FWHM             ! Value of FWHM parameter
+      INTEGER   FWHPTR           ! Dynamic-memory pointer for workspace
+      INTEGER   IGNORE           ! Returned status value - ignored
+      INTEGER   IPTR             ! Dynamic-memory pointer for input data
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      LOGICAL   ISNEWX           ! Is XPTR address new to CNF?
+      INTEGER   ISPEC            ! Loop index through data 
+                                 ! cross-sections
+      INTEGER   IXEN             ! Last spectral element to be used
+      INTEGER   IXSPEC           ! Counts through axis cross-sections
+      INTEGER   IXST             ! First spectral element to be used
+      INTEGER   LINES            ! Value of LINES parameter
+      INTEGER   LOGLU            ! Logical unit number for output file
+      LOGICAL   MOMENTS          ! Value of MOMENTS keyword
+      CHARACTER NAME*132         ! Full name of results file
+      INTEGER   NASPEC           ! Number of cross-sections in axis data
+      INTEGER   NAXDIM           ! Number of axis array dimensions
+      INTEGER   NAXELM           ! Number of axis array elements
+      INTEGER   NDIM             ! Number of data array dimensions
+      INTEGER   NELM             ! Number of data array elements
+      INTEGER   NOCENS           ! Moments keyword, numeric value for
+                                 ! FIG_EMLT
+      INTEGER   NSPECT           ! Number of spectra in data
+      INTEGER   NX               ! First dimension of data array
+      INTEGER   OPTR             ! Dynamic-memory pointer for output 
+                                 ! data
+      INTEGER   PKPTR            ! Dynamic-memory pointer for workspace
+      LOGICAL   PISNEW           ! Previous CNF pointer new?
+      LOGICAL   PISNX            ! Previous CNF pointer new?
+      INTEGER   SLOT             ! Used for DSA_ slot values
+      INTEGER   STAPTR           ! Dynamic-memory pointer for workspace
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      CHARACTER STRING*20        ! Used for formatting spectrum numbers
+      INTEGER   STRPTR           ! Dynamic-memory pointer for workspace 
+                                 ! array
+      LOGICAL   SYNTH            ! Value of SYNTH keyword
+      INTEGER   TPTR             ! Temp dynamic-memory pointer
+      CHARACTER UNITS*10         ! Axis units
+      REAL      VALUE            ! Real value of numeric parameter
+      REAL      WEND             ! Last axis value - ignored
+      INTEGER   WIDPTR           ! Dynamic-memory pointer for workspace 
+                                 ! array
+      INTEGER   WPTR             ! Dynamic-memory pointer for workspace
+                                 ! array
+      REAL      WSTART           ! First axis value - ignored
+      INTEGER   XBASE            ! Dynamic-memory pointer for start of
+                                 ! axis data
+      LOGICAL   XEXIST           ! True if there is an axis data array
+      INTEGER   XPTR             ! Dynamic-memory pointer for axis data
 C
 C     Initialisation of DSA_ routines
 C
@@ -151,7 +169,7 @@ C
 C     Get range of data to be examined.
 C
       CALL DSA_AXIS_RANGE ('SPECT',1,' ',.FALSE.,WSTART,WEND,
-     :                                            IXST,IXEN,STATUS)
+     :                     IXST,IXEN,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     See if there is any axis data, and if so, get its size
@@ -163,9 +181,8 @@ C
          IF (STATUS.NE.0) GO TO 500
          NASPEC = NAXELM / AXDIMS(1)
          CALL DSA_GET_AXIS_INFO ('SPECT',1,1,UNITS,0,DUMMY,STATUS)
-         CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                                     SLOT,STATUS)
-         XPTR = DYN_ELEMENT (ADDRESS)
+         CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                           SLOT,STATUS)
       END IF
       IF (STATUS.NE.0) GO TO 500
 C
@@ -187,29 +204,26 @@ C
       CALL PAR_RDKEY ('SYNTH',.FALSE.,SYNTH)
       IF (SYNTH) THEN
          CALL DSA_OUTPUT ('OUTPUT','OUTPUT','SPECT',0,0,STATUS)
-         CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :                                                 SLOT,STATUS)
-         OPTR = DYN_ELEMENT (ADDRESS)
+         CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
       END IF
 C
 C     FIG_EMLT needs a certain amount of workspace.  In total eight real
 C     arrays, all (NX/5 + 1) elements long are needed.
 C
-      CALL DSA_GET_WORK_ARRAY (8*(NX/5 +1),'FLOAT',ADDRESS,SLOT,STATUS)
-      STRPTR = DYN_ELEMENT (ADDRESS)
-      WIDPTR = DYN_INCREMENT (STRPTR,'FLOAT',(NX/5 + 1))
-      BINPTR = DYN_INCREMENT (WIDPTR,'FLOAT',(NX/5 + 1))
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',STRPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',WIDPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',BINPTR,SLOT,STATUS)
 C
 C     Get additional workspace for the arrays to hold the values to be
-C     written as ADAM parameter arrays.  This workspace is also passed to
-C     FIG_EMLT.
+C     written as ADAM parameter arrays.  This workspace is also passed
+C     to FIG_EMLT.
 C
-      BNAPTR = DYN_INCREMENT (BINPTR,'FLOAT',(NX/5 + 1))
-      FAPTR = DYN_INCREMENT (BNAPTR,'FLOAT',(NX/5 + 1))
-      FWHPTR = DYN_INCREMENT (FAPTR,'FLOAT',(NX/5 + 1))
-      STAPTR = DYN_INCREMENT (FWHPTR,'FLOAT',(NX/5 + 1))
-      PKPTR = DYN_INCREMENT (STAPTR,'FLOAT',(NX/5 + 1))
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',BNAPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',FAPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',FWHPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',STAPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX/5+1,'FLOAT',PKPTR,SLOT,STATUS)
 C
 C     We have to be a little bit careful about the data array we pass
 C     to FIG_EMLT, since it modifies it in the course of its analysis.
@@ -222,32 +236,31 @@ C     the data into before letting FIG_EMLT loose on it.  We also
 C     need to map the input spectrum.
 C
       IF (.NOT.SYNTH) THEN
-         CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,
-     :                                                 SLOT,STATUS)
-         IPTR = DYN_ELEMENT (ADDRESS)
-         CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',ADDRESS,SLOT,STATUS)
-         WPTR = DYN_ELEMENT (ADDRESS)
+         CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',IPTR,SLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',WPTR,SLOT,STATUS)
       END IF
 C
 C     Open an output file for the results
 C
       CALL DSA_OPEN_TEXT_FILE ('emlt.lis',' ','NEW',.TRUE.,LOGLU,
-     :                                                 NAME,STATUS)
+     :                         NAME,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     See if we do have calibrated X-axis data
 C
       CALIB = .FALSE.
-      IF (XEXIST) CALIB = .NOT. GEN_CHKNSF (DYNAMIC_MEM(XPTR),NX)
+      IF (XEXIST) CALIB = .NOT. GEN_CHKNSF (%VAL(CNF_PVAL(XPTR)),NX)
 C
 C     Now we loop through all the spectra in the DATA.  If we are
 C     producing a synthetic spectrum, we can just pass FIG_EMLT the
 C     output array.  Otherwise, we copy the data into the work array
 C     first.  If the data is wavelength calibrated, we have to run 
 C     through the wavelength array as well as the data array.
-C     
+C
       CALL PAR_WRUSER(' ',STATUS)
       IXSPEC = 1
+      PISNEW = .FALSE.
+      PISNX = .FALSE.
       XBASE = XPTR
       BYTES = NX * DSA_TYPESIZE ('FLOAT',STATUS)
       DO ISPEC=1,NSPECT
@@ -258,29 +271,48 @@ C
          END IF
          IF (SYNTH) THEN
             DPTR = OPTR
-            OPTR = DYN_INCREMENT (OPTR,'FLOAT',NX)
+
+            CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+            IF (ISNEW) CALL CNF_UNREGP(OPTR)
+            OPTR=TPTR
+            PISNEW = ISNEW
          ELSE
-            CALL GEN_MOVE (BYTES,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(WPTR))
-            IPTR = DYN_INCREMENT (IPTR,'FLOAT',NX)
+            CALL GEN_MOVE (BYTES,%VAL(CNF_PVAL(IPTR)),
+     :                     %VAL(CNF_PVAL(WPTR)))
+
+            CALL DYN_INCAD(IPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+            IF (ISNEW) CALL CNF_UNREGP(IPTR)
+            IPTR=TPTR
+            PISNEW = ISNEW
+
             DPTR = WPTR
          END IF
-         CALL FIG_EMLT (DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),NX,IXST,
-     :              IXEN,FWHM,NOCENS,LINES,DYNAMIC_MEM(STRPTR),
-     :              DYNAMIC_MEM(WIDPTR),DYNAMIC_MEM(BINPTR),
-     :              DYNAMIC_MEM(BNAPTR),DYNAMIC_MEM(FAPTR),
-     :              DYNAMIC_MEM(FWHPTR),DYNAMIC_MEM(STAPTR),
-     :              DYNAMIC_MEM(PKPTR),
-     :              CALIB,SYNTH,UNITS,LOGLU)
+         CALL FIG_EMLT (%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),NX,
+     :                  IXST,IXEN,FWHM,NOCENS,LINES,
+     :                  %VAL(CNF_PVAL(STRPTR)),%VAL(CNF_PVAL(WIDPTR)),
+     :                  %VAL(CNF_PVAL(BINPTR)),%VAL(CNF_PVAL(BNAPTR)),
+     :                  %VAL(CNF_PVAL(FAPTR)),%VAL(CNF_PVAL(FWHPTR)),
+     :                  %VAL(CNF_PVAL(STAPTR)),%VAL(CNF_PVAL(PKPTR)),
+     :                  CALIB,SYNTH,UNITS,LOGLU)
          IF (CALIB) THEN
             IXSPEC = IXSPEC + 1
             IF (IXSPEC.GT.NASPEC) THEN
                IXSPEC = 1
                XPTR = XBASE
             ELSE
-               XPTR = DYN_INCREMENT (XPTR,'FLOAT',NX)
+               CALL DYN_INCAD(XPTR,'FLOAT',NX,TPTR,ISNEWX,STATUS)
+               IF (ISNEWX) CALL CNF_UNREGP(IPTR)
+               IPTR=TPTR
+               PISNX = ISNEWX
             END IF
          END IF
       END DO
+      IF (ISNEW) THEN
+         IF (SYNTH) CALL CNF_UNREGP(OPTR)
+      ELSE
+         CALL CNF_UNREGP(IPTR)
+      END IF
+      IF (ISNEWX) CALL CNF_UNREGP(IPTR)
 C
 C     Let the user know the file being used.
 C

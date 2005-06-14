@@ -30,28 +30,24 @@ C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Remove the
 C                    source of FIG_CMPCHK again.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                    Map complex in single call.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   ADDRESS2           ! Virtual address for data array
-      INTEGER   DIMS(10)           ! Image dimensions
-      LOGICAL   FAULT              ! True if input is not valid complex data
-      INTEGER   IPTR               ! Dynamic memory element for imaginary data
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   STATUS             ! Running status for DSA routines
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DIMS(10)         ! Image dimensions
+      LOGICAL   FAULT            ! Input is not valid complex data?
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary 
+                                 ! data
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image
+      INTEGER   RPTR             ! Dynamic-memory pointer for real data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
 C     
 C     Initial values
 C
@@ -83,18 +79,17 @@ C
 C
 C     Map imaginary array in OUTPUT structure
 C
-C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',ADDRESS,SLOT,
+C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',IPTR,SLOT,
 C    :                       STATUS)
-C     IPTR=DYN_ELEMENT(ADDRESS)
       CALL DSA_MAP_COMPLEX('OUTPUT','UPDATE','DOUBLE',
-     :   ADDRESS2,ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+     :                     RPTR,IPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Negate the imaginary array, thereby producing the complex
 C     conjugate of the data.
 C
-      CALL GEN_MULCAD(DYNAMIC_MEM(IPTR),NELM,-1.0D0,DYNAMIC_MEM(IPTR))
+      CALL GEN_MULCAD(%VAL(CNF_PVAL(IPTR)),NELM,-1.0D0,
+     :                %VAL(CNF_PVAL(IPTR)))
 
   500 CONTINUE
 

@@ -21,53 +21,61 @@ C
 C                                         KS / CIT 24th July 1984
 C     Modified:
 C
-C     18th Feb 1985.  KS / AAO.  Modified to work on 2D data.
-C     11th July 1986. KS / AAO.  Data in the one operand case now
-C                     mapped with MUVAR instead of MRVAR.  (In V1
-C                     you could get away with this; in V2 you can't)
-C     27th July 1987  DJA /AAO.  Revised DSA_ routines - some specs
-C                     changed. Modified dynamic memory handling - now
-C                     uses DYN_ package.
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     31st Aug 1992.  INCLUDE changed. TABs removed.  HME / UoE, Starlink.
+C     18th Feb 1985  KS / AAO.  Modified to work on 2D data.
+C     11th July 1986 KS / AAO.  Data in the one operand case now
+C                    mapped with MUVAR instead of MRVAR.  (In V1
+C                    you could get away with this; in V2 you can't)
+C     27th July 1987 DJA /AAO.  Revised DSA_ routines - some specs
+C                    changed. Modified dynamic memory handling - now
+C                    uses DYN_ package.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
+C                    in mapping calls.
+C     31st Aug 1992  INCLUDE changed. TABs removed.  HME / UoE, 
+C                    Starlink.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used 
 C
-      INTEGER ICH_LEN,ICH_ENCODE,DYN_ELEMENT,DYN_INCREMENT
+      INTEGER ICH_LEN,ICH_ENCODE
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         AIRM         ! The air mass
-      REAL         BSECZ        !
-      INTEGER      CPTR         ! Dynamic-memory pointer to coefficient array
-      INTEGER      CSLOT        ! Map slot number of input coefficient array
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      CHARACTER    DUMMY*1      ! Dummy arguement for DATA_INFO routine
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to ignore status errors
-      INTEGER      INVOKE       ! Used to invoke function calls
-      INTEGER      IY           !
-      LOGICAL      MAGS         !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NCELM        ! Total number of elements in coefficient array
-      INTEGER      NELM         ! Total number of elements in data array
-      INTEGER      NEXT         !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number output data array
-      REAL         SSECZ        !
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      DOUBLE PRECISION  VALUE   ! Magnitude flag
-      LOGICAL      XEXIST       ! Used to check on x-axis compatiblity
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL      AIRM             ! The air mass
+      REAL      BSECZ            !
+      INTEGER   CPTR             ! Dynamic-memory pointer to coefficient
+                                 ! array
+      INTEGER   CSLOT            ! Map slot number of input coefficient 
+                                 ! array
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      CHARACTER DUMMY*1          ! Dummy arguement for DATA_INFO routine
+      INTEGER   I                !
+      INTEGER   IGNORE           ! Used to ignore status errors
+      INTEGER   INVOKE           ! Used to invoke function calls
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      INTEGER   IY               !
+      LOGICAL   MAGS             !
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NCELM            ! Total number of elements in 
+                                 ! coefficient array
+      INTEGER   NELM             ! Total number of elements in data 
+                                 ! array
+      INTEGER   NEXT             !
+      INTEGER   NX               ! Size of 1st dimension
+      INTEGER   NY               ! Size of 2nd dimension
+      INTEGER   OPTR             ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER   OSLOT            ! Map slot number output data array
+      LOGICAL   PISNEW           ! Previous CNF pointer new?
+      REAL      SSECZ            !
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      INTEGER   TPTR             ! Temp dynamic-memory pointer
+      DOUBLE PRECISION  VALUE    ! Magnitude flag
+      LOGICAL   XEXIST           ! Used to check on x-axis compatiblity
 C
 C     Initialisation of DSA_ routines
 C
@@ -114,21 +122,25 @@ C
 C     Map output spectrum (note: FIG_EXTCOR will allow its
 C     input and result arrays to be the same)
 C
-      CALL DSA_MAP_DATA ('COEFF','READ','FLOAT',ADDRESS,CSLOT,STATUS)
-      CPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                        STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('COEFF','READ','FLOAT',CPTR,CSLOT,STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500 
 C
 C     Generate the corrected spectrum (or spectra).  FIG_EXTCOR
 C     processes one spectrum at at time.
 C
+      PISNEW = .FALSE.
       DO IY=1,NY
-         CALL FIG_EXTCOR(NX,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(CPTR),AIRM,
-     :                                        MAGS,DYNAMIC_MEM(OPTR))
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
+         CALL FIG_EXTCOR(NX,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(CPTR)),
+     :                   AIRM,MAGS,%VAL(CNF_PVAL(OPTR)))
+
+         CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (ISNEW) CALL CNF_UNREGP(OPTR)
+         OPTR=TPTR
+         PISNEW = ISNEW
       END DO
+      IF (ISNEW) CALL CNF_UNREGP(OPTR)
+
 C
 C     Tidy up
 C

@@ -28,16 +28,19 @@ C                                J.G. Robertson   September 1985
 C     Modified:
 C
 C     22nd Apr 1986  KS / AAO.  Names of routines EXTRACT and CHUNK
-C                    changed to avoid conflict with other Figaro routines.
-C     27th Aug 1987  KS / AAO.  Revised DSA_ routines - some specs changed.
-C                    Now uses DYN routines for dynamic memory handling. Will
-C                    no longer fail if data isn't FLOAT or DOUBLE, as DSA_
-C                    routines force conversion. EXTRCT1 and CHUNK1 removed -
-C                    their functions being performed by DSA_ routines much
-C                    more tidily. Can no longer alter XSTART,XEND if range is
-C                    too big, this would never have worked before anyway!
-C     20th Dec 1990  JMS / AAO. Now prints from XSTART to XEND. Also fixed
-C                    the array dimensioning problem by using dynamic memory.
+C                    changed to avoid conflict with other Figaro 
+C                    routines.
+C     27th Aug 1987  KS / AAO.  Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN routines for dynamic-memory
+C                    handling. Will no longer fail if data aren't FLOAT
+C                    or DOUBLE, as DSA_ routines force conversion. 
+C                    EXTRCT1 and CHUNK1 removed - their functions being 
+C                    performed by DSA_ routines much more tidily. Can 
+C                    no longer alter XSTART,XEND if range is too big, 
+C                    this would never have worked before anyway!
+C     20th Dec 1990  JMS / AAO. Now prints from XSTART to XEND. Also 
+C                    fixed the array-dimensioning problem by using 
+C                    dynamic memory.
 C     29th Sep 1992  HME / UoE, Starlink.  Lowercase extension .als for
 C                    ALAS file. INCLUDE changed. TABs removed. No RECL
 C                    keyword in open statement. Give a message if file
@@ -49,49 +52,54 @@ C                    No error messages from DTA. Call PAR_WRUSER instead
 C                    of FIG_DTAERR.
 C     18th Jul 1996  MJCL / Starlink, UCL.  ALAS set to 132 chars.
 C     16th Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER  DYN_ELEMENT,ICH_LEN,DSA_TYPESIZE
+      INTEGER ICH_LEN,DSA_TYPESIZE
       REAL GEN_ELEMF
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    ALAS*132     ! The filename for the output
-      INTEGER      BYTES        ! The size of the specified range in bytes
-      REAL         D            ! A data value from the main input array
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      LOGICAL      FAULT        ! TRUE if an error occurs
-      LOGICAL      FOPEN        ! TRUE if output opened OK
-      INTEGER      I            ! Counter for pixels being output
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      IXEN         ! The second pixel number to be selected
-      INTEGER      IXST         ! The first pixel number to be selected
-      INTEGER      LEALAS       ! Length of output filename
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NPIX         ! The number of array elements to be transferred
-      INTEGER      NX           ! Size of the 1st dimension of the input array
-      INTEGER      NXX          ! Size of the x-axis array
-      INTEGER      PDPOS        ! Position of '.' in output filename
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*80    ! Output message text
-      REAL         X            ! A value from the x-axis array
-      LOGICAL      XEXIST       ! TRUE if a valid x-axis structure exists
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data array
-      INTEGER      XSLOT        ! Map slot number of input x-axis data array
-      REAL         XVEN         ! Value of last pixel in specified range
-      REAL         XVST         ! Value of first pixel in specified range
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    ALAS*132      ! The filename for the output
+      INTEGER      BYTES         ! Size of the specified range in bytes
+      REAL         D             ! Data value from the main input array
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      LOGICAL      FAULT         ! TRUE if an error occurs
+      LOGICAL      FOPEN         ! TRUE if output opened OK
+      INTEGER      I             ! Counter for pixels being output
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      IXEN          ! Second pixel number to be selected
+      INTEGER      IXST          ! First pixel number to be selected
+      INTEGER      LEALAS        ! Length of output filename
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NPIX          ! Number of array elements to be 
+                                 ! transferred
+      INTEGER      NX            ! Size of the 1st dimension of the 
+                                 ! input array
+      INTEGER      NXX           ! Size of the x-axis array
+      INTEGER      PDPOS         ! Position of '.' in output filename
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*80     ! Output message text
+      REAL         X             ! A value from the x-axis array
+      LOGICAL      XEXIST        ! Valid x-axis structure exists?
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
+                                 ! array
+      INTEGER      XSLOT         ! Map slot number of input x-axis data 
+                                 ! array
+      REAL         XVEN          ! Value of last pixel in specified
+                                 ! range
+      REAL         XVST          ! Value of first pixel in specified
+                                 ! range
 C
 C     Initialisation of DSA_ routines
 C
@@ -157,7 +165,7 @@ C
 C     Get XSTART and XEND.
 C
       CALL DSA_AXIS_RANGE('SPECT',1,' ',.FALSE.,XVST,XVEN,IXST,IXEN,
-     :                                                       STATUS)
+     :                    STATUS)
 C
       NPIX=IXEN-IXST+1
       IF (NPIX.GT.300) THEN
@@ -168,20 +176,18 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,
      :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
       IF (STATUS.NE.0) GOTO 500
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Write to output file
 C
       DO I=IXST,IXEN
-         X=GEN_ELEMF(DYNAMIC_MEM(XPTR),I)
-         D=GEN_ELEMF(DYNAMIC_MEM(DPTR),I)
+         X=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),I)
+         D=GEN_ELEMF(%VAL(CNF_PVAL(DPTR)),I)
          IF(X.GE.99999. .OR. X.LT.-9999.)THEN
            CALL PAR_WRUSER('X-axis value out of range -9999 to +99999.'
      :                                     //'  Set to 99999 !',IGNORE)

@@ -30,45 +30,48 @@ C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     5th  Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
 C                    removed.
-C     26th Mar 1997  JJL / Southampton, Starlink. Error propagation included.
+C     26th Mar 1997  JJL / Southampton, Starlink. Error propagation
+C                    included.
 C     27th Jul 1997  MJCL / Starlink, UCL.  Initialise VIEXIST and VFEXIST
 C                    to .FALSE.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT,DSA_TYPESIZE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      FPTR         ! Dynamic-memory pointer to flat data array
-      INTEGER      FSLOT        ! Map slot number flat field data array
-      INTEGER      IORDER       ! The order of the fit
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NLINE        ! Size of 2nd dimension
-      INTEGER      NPIX         ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      REAL         VALUE        ! Temporary real number
-      LOGICAL      VEXIST       ! Does variance exist in both files?
-      LOGICAL      VFEXIST      ! Does flat field contain a variance array?
-      LOGICAL      VIEXIST      ! Does the data contain a variance array?
-      INTEGER      VFPTR        ! Dyn-mem pointer to flat field variance array
-      INTEGER      VFSLOT       ! Map slot number of variance
-      INTEGER      VOPTR        ! Dynamic-mem pointer to output variance array
-      INTEGER      VSLOT        ! Map slot number of variance
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      FPTR          ! Dynamic-memory pointer to flat data
+                                 ! array
+      INTEGER      FSLOT         ! Map slot number flat field data array
+      INTEGER      IORDER        ! The order of the fit
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NLINE         ! Size of 2nd dimension
+      INTEGER      NPIX          ! Size of 1st dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      REAL         VALUE         ! Temporary real number
+      LOGICAL      VEXIST        ! Does variance exist in both files?
+      LOGICAL      VFEXIST       ! Does flat field contain a variance
+                                 ! array?
+      LOGICAL      VIEXIST       ! Does the data contain a variance
+                                 ! array?
+      INTEGER      VFPTR         ! Dyn-mem pointer to flat field
+                                 ! variance array
+      INTEGER      VFSLOT        ! Map slot number of variance
+      INTEGER      VOPTR         ! Dynamic-mem pointer to output
+                                 ! variance array
+      INTEGER      VSLOT         ! Map slot number of variance
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WPTR2         ! Dynamic-memory pointer to workspace
+      INTEGER      WPTR3         ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -117,41 +120,36 @@ C
 C     Get output structure name and map data
 C
       CALL DSA_OUTPUT('OUTPUT','OUTPUT','IMAGE',0,0,STATUS)
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                       STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (VEXIST) THEN
-          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :                                                 VSLOT,STATUS)
-          VOPTR=DYN_ELEMENT(ADDRESS)
+          CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,
+     :                          VSLOT,STATUS)
       ENDIF
       IF (STATUS.NE.0) GO TO 500
 C
 C
 C     Map flat field data
 C
-      CALL DSA_MAP_DATA ('FLAT','READ','FLOAT',ADDRESS,FSLOT,STATUS)
-      FPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('FLAT','READ','FLOAT',FPTR,FSLOT,STATUS)
       IF (VEXIST) THEN
-          CALL DSA_MAP_VARIANCE ('FLAT','READ','FLOAT',ADDRESS,
+          CALL DSA_MAP_VARIANCE ('FLAT','READ','FLOAT',VFPTR,
      :                            VFSLOT,STATUS)
-           VFPTR=DYN_ELEMENT(ADDRESS)
       ENDIF
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get workspace for flattening routine
 C
-      BYTES=NPIX*3*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (NPIX,'FLOAT',WPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NPIX,'FLOAT',WPTR2,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NPIX,'FLOAT',WPTR3,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Flatten the image
 C
-      CALL FIG_FLAT2D(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR),VEXIST,
-     :                DYNAMIC_MEM(FPTR),DYNAMIC_MEM(VFPTR),NPIX,
-     :                NLINE,IORDER,DYNAMIC_MEM(WPTR),
-     :                DYNAMIC_MEM(WPTR+NPIX*4),DYNAMIC_MEM(WPTR+NPIX*8))
+      CALL FIG_FLAT2D(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)),VEXIST,
+     :                %VAL(CNF_PVAL(FPTR)),%VAL(CNF_PVAL(VFPTR)),NPIX,
+     :                NLINE,IORDER,%VAL(CNF_PVAL(WPTR)),
+     :                %VAL(CNF_PVAL(WPTR2)),%VAL(CNF_PVAL(WPTR3)))
 C
 C     Tidy up
 C

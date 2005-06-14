@@ -2,21 +2,22 @@
 C+
 C     A B L I N E
 C
-C     This routine does interactive analysis of absorption lines in spectra.
+C     This routine does interactive analysis of absorption lines in
+C     spectra.
 C
 C     The user designates a segment of the input spectrum to 
 C     be analysed in each pass.  First a continuum is fitted to this
 C     region, using only wavelength subsegments selected graphically
 C     by the user (ie. ignoring the absorption line in question and any
 C     other nearby lines or spikes).  In addition to this selection,
-C     iterative rejection of discrepant points is performed.  The functional
-C     form of the continuum is a polynomial of degree specified by the
-C     user (0 - 7).  Alternatively, if a precomputed continuum spectrum
-C     is available, it can be used instead.
+C     iterative rejection of discrepant points is performed.  The
+C     functional form of the continuum is a polynomial of degree
+C     specified by the user (0 - 7).  Alternatively, if a precomputed
+C      continuum spectrum is available, it can be used instead.
 C
-C     The user specifies the wavelength limits of the interval containing
-C     the line itself: the median wavelength and equivalent width of the
-C     absorption line are calculated.
+C     The user specifies the wavelength limits of the interval
+C     containing the line itself: the median wavelength and equivalent
+C     width of the absorption line are calculated.
 C
 C     The routine finishes up each segment with a hard copy plot showing
 C     the data, continuum and wavelength limits of the line, with a 
@@ -97,18 +98,18 @@ C     24 Jul 1996  MJCL / Starlink, UCL.  Mod to FORMAT labelled 44
 C                  to be shorter than 72 characters for Linux port.
 C     23 Feb 2001  ACD / UoE, Starlink. Removed technically illegal
 C                  jumps into IF blocks.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
+C+
 C+
       IMPLICIT NONE
-C
-C     Dynamic memory include file.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       LOGICAL DSA_SAME_DATA,PAR_ABORT
       INTEGER PGBEGIN,ICH_LEN,ICH_ENCODE
-      INTEGER DYN_ELEMENT
       INTEGER DSA_TYPESIZE
       REAL GEN_ELEMF
 C
@@ -133,7 +134,6 @@ C
      :   QLIM
 C
       INTEGER
-     :   ADDRESS,
      :   NPOL,
      :   NDEG,
      :   LESPEC,
@@ -178,16 +178,17 @@ C
 C
 C     Initial values
 C
-      PLTOPN=.FALSE.           ! True if soft copy plot open
-      FAULT=.FALSE.            ! True if error occurs
-      CONTOPN=.FALSE.          ! True when continuum spectrum file opened
-      PLTTED=.FALSE.           ! True if a soft plot has been made
-      OUOPEN=.FALSE.           ! True when output continuum file open
-      SELECT=.FALSE.           ! True if subsegments selected.
-      LIMIT=.FALSE.            ! .TRUE. : cutoff equiv width sum at designated
-C                              ! limits.  .FALSE. : cutoff at first channel
-C                              ! exceeding continuum.
-      CONTWR=.FALSE.           ! True when a continuum file to be written.
+      PLTOPN=.FALSE.             ! True if soft copy plot open
+      FAULT=.FALSE.              ! True if error occurs
+      CONTOPN=.FALSE.            ! True when continuum spectrum file 
+                                 ! opened
+      PLTTED=.FALSE.             ! True if a soft plot has been made
+      OUOPEN=.FALSE.             ! True when output continuum file open
+      SELECT=.FALSE.             ! True if subsegments selected.
+      LIMIT=.FALSE.              ! .TRUE. : cutoff equiv width sum at 
+                                 ! designated limits.  .FALSE. : cutoff 
+                                 ! at first channel exceeding continuum
+      CONTWR=.FALSE.             ! True when a continuum file to be written.
 C
 C     Initialise.
 C
@@ -218,8 +219,7 @@ C
 C
 C     Get workspace.  First, we need space for the continuum spectrum.
 C
-      CALL DSA_GET_WORK_ARRAY( NCHAN, 'FLOAT', ADDRESS, WSLOT, STATUS )
-      IPTRC=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY( NCHAN, 'FLOAT', IPTRC, WSLOT, STATUS )
       IF (STATUS.NE.0) GO TO 500
 C
 C     Continuum spectrum - either new or old file.
@@ -259,11 +259,10 @@ C           the modified data will be written later on, possibly into
 C           the same file. So here it is best to unmap the data after
 C           copy.
 C
-         CALL DSA_MAP_DATA('CONT','READ','FLOAT',ADDRESS,SLOT,STATUS)
+         CALL DSA_MAP_DATA('CONT','READ','FLOAT',TPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
-         TPTR=DYN_ELEMENT(ADDRESS)
          CALL GEN_MOVE(DSA_TYPESIZE('FLOAT',STATUS)*NCHAN,
-     :      DYNAMIC_MEM(TPTR),DYNAMIC_MEM(IPTRC))
+     :                 %VAL(CNF_PVAL(TPTR)),%VAL(CNF_PVAL(IPTRC)))
          CALL DSA_UNMAP(SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
 C
@@ -274,10 +273,11 @@ C
          NPOL=1
       ELSE
 C
-C        No existing continuum file to be used, so set continuum to zero.
+C        No existing continuum file to be used, so set continuum to 
+C        zero.
 C
          CALL GEN_FILL(DSA_TYPESIZE('FLOAT',STATUS)*NCHAN,
-     :      0,DYNAMIC_MEM(IPTRC))
+     :                  0,%VAL(CNF_PVAL(IPTRC)))
 C
 C        Get the other continuum fitting parameters 
 C
@@ -304,8 +304,7 @@ C
 C
 C     Map spectrum data file, to enable access to any of its elements
 C
-      CALL DSA_MAP_DATA('SPEC','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTRS=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPEC','READ','FLOAT',IPTRS,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Map input spectrum's X data, for access to wavelength scale
@@ -321,16 +320,14 @@ C
 C
 C     Map X data for spectrum
 C
-      CALL DSA_MAP_AXIS_DATA('SPEC',1,'READ','FLOAT',
-     :   ADDRESS,SLOT,STATUS)
-      IPTRX=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPEC',1,'READ','FLOAT',IPTRX,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Find and print minimum and maximum values of X (wavelength) for
 C     entire spectrum
 C
-      XMIN=GEN_ELEMF(DYNAMIC_MEM(IPTRX),1)
-      XMAX=GEN_ELEMF(DYNAMIC_MEM(IPTRX),NCHAN)
+      XMIN=GEN_ELEMF(%VAL(CNF_PVAL(IPTRX)),1)
+      XMAX=GEN_ELEMF(%VAL(CNF_PVAL(IPTRX)),NCHAN)
       WRITE (STRING,8,IOSTAT=IGNORE) XMIN,XMAX
     8 FORMAT('Input spectrum X (wavelength) axis ranges from',F10.3,
      :                                                 '  to',F10.3)
@@ -449,7 +446,8 @@ C
      :                  //'limit of 2048',STATUS)
             GO TO 5
          END IF
-         CALL CHUNK(DYNAMIC_MEM(IPTRX),NCHAN,XVALS,CHDELM,NSEG,STATUS)
+         CALL CHUNK(%VAL(CNF_PVAL(IPTRX)),NCHAN,XVALS,CHDELM,NSEG,
+     :              STATUS)
          IF(STATUS.NE.0)THEN
    12       CALL PAR_WRUSER(
      :             'Index out of range in extraction of segment from '
@@ -457,7 +455,8 @@ C
             FAULT=.TRUE.
             GO TO 500
          END IF
-         CALL CHUNK(DYNAMIC_MEM(IPTRS),NCHAN,YVALS,CHDELM,NSEG,STATUS)
+         CALL CHUNK(%VAL(CNF_PVAL(IPTRS)),NCHAN,YVALS,CHDELM,NSEG,
+     :              STATUS)
          IF(STATUS.NE.0) THEN
             CALL PAR_WRUSER(
      :             'Failure extracting segment from '
@@ -507,7 +506,8 @@ C
 C
 C        and plot the corresponding continuum section as a line plot
 C
-         CALL CHUNK(DYNAMIC_MEM(IPTRC),NCHAN,CVALS,CHDELM,NSEG,STATUS)
+         CALL CHUNK(%VAL(CNF_PVAL(IPTRC)),NCHAN,CVALS,CHDELM,NSEG,
+     :              STATUS)
          IF(STATUS.NE.0)THEN
             CALL PAR_WRUSER(
      :          'Index out of range in extraction of segment from '
@@ -712,7 +712,7 @@ C
          END IF
          DO I=1,8
             SNAG(I)=0D0
-         ENDDO
+         END DO
          SNAG(NPOL+1)=EPS
          WRITE (STRING,27,IOSTAT=IGNORE)SNAG,NFIT,NREJ
    27    FORMAT(8F7.2,2I6)
@@ -800,7 +800,7 @@ C
 C
 C       Write this section of continuum fit to the continuum array.
 C
-        CALL CHUNKWRITE(DYNAMIC_MEM(IPTRC),NCHAN,CHDELM+JST-1,
+        CALL CHUNKWRITE(%VAL(CNF_PVAL(IPTRC)),NCHAN,CHDELM+JST-1,
      :      CVALS,NSEG,JST,JEND-JST+1,STATUS)
 C
 C          Remember which channels we've just fitted.
@@ -1100,12 +1100,10 @@ C       a copy of the original spectrum file - and write the
 C       continuum data out to it.
 C
       IF (CONTWR) THEN
-         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',
-     :         ADDRESS,SLOT,STATUS)
+         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',TPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
-         TPTR=DYN_ELEMENT(ADDRESS)
          CALL GEN_MOVE(DSA_TYPESIZE('FLOAT',STATUS)*NCHAN,
-     :      DYNAMIC_MEM(IPTRC),DYNAMIC_MEM(TPTR))
+     :                 %VAL(CNF_PVAL(IPTRC)),%VAL(CNF_PVAL(TPTR)))
       END IF
 C
 C     Tidy up

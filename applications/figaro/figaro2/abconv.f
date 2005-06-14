@@ -31,66 +31,70 @@ C     16 Jan 1985  KS / AAO.  FLCONV code added.
 C     12 Aug 1987  DJA/ AAO.  Revised DSA_ routines added - some specs
 C                  have changed. Dynamic memory handling modified - now
 C                  uses DYN_ routines
-C     06 Dec 1990  JAB / JACH.  Add IRCONV, use errors and allow wavelength
-C                  in microns.
+C     06 Dec 1990  JAB / JACH.  Add IRCONV, use errors and allow
+C                  wavelength in microns.
 C     14 Feb 1991  HME / UoE.  Change Z.UNITS strings. Support bad
 C                  values. Don't use FIG_ prefix.
 C     21 Feb 1991  HME / UoE.  Bug fix: Set flagged in output, if it
 C                  has no quality.
-C     05 Apr 1991  KS / AAO.  Merged with recent changes made at AAO, trap
-C                  confusing error message when units are blank, give
-C                  subroutines ABCONV_ prefix, trap too-complex X arrays.
+C     05 Apr 1991  KS / AAO.  Merged with recent changes made at AAO,
+C                  trap confusing error message when units are blank,
+C                  give subroutines ABCONV_ prefix, trap too-complex X 
+C                  arrays.
 C     08 Sep 1992  HME / UoE, Starlink. Changed INCLUDE.
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Bad pixel handling.
 C     10 Apr 1997  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_CLEAN, ICH_FOLD, ICH_LEN , DYN_ELEMENT
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_LEN
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         BADVAL       ! Bad value
-      CHARACTER    COMMAND*64   ! The actual Figaro command entered
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      EPTR         ! Dynamic memory pointer to error array
-      LOGICAL      ERRORS       ! True if errors are present
-      INTEGER      ESLOT        ! Map slot number of error data
-      LOGICAL      FAULT        ! Set if a non-DSA error is deteccted
-      LOGICAL      FLCO         ! TRUE if the Figaro command was FLCONV
-      INTEGER      I            ! General loop variable
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      LOGICAL      IRCO         ! TRUE if the Figaro command was IRCONV
-      LOGICAL      MICRONS      ! True if wavelength in microns
-      INTEGER      NCH          ! Index of a substring in a string
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NTYPE        ! Type of units, used to index ULEN/UNITAB
-      INTEGER      NXELM        ! Number of elements in x-axis
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      LOGICAL      QXIST        ! TRUE if a quality array exists
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      ULEN(3)      ! Length in characters of the different units
-      CHARACTER    UNITAB(3)*14 ! The names of the different units
-      CHARACTER    UNITS*64     ! The units of the data
-      INTEGER      XDIMS(10)    ! X-axis data array dimensions
-      LOGICAL      XEXIST       ! TRUE if an x-axis array exists
-      INTEGER      XNDIM        ! Number of x-axis data array dimensions
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data
-      INTEGER      XSLOT        ! Map slot number of x-axis data
-      CHARACTER    XUNITS*64    ! The units of the x-axis data
-C
-      DOUBLE PRECISION DUMMY      ! Dummy argument
+      INTEGER      ADDRESS       ! Address of dynamic-memory pointer
+      REAL         BADVAL        ! Bad value
+      CHARACTER    COMMAND*64    ! The actual Figaro command entered
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      DOUBLE PRECISION DUMMY     ! Dummy argument
+      INTEGER      EPTR          ! Dynamic-memory pointer to error array
+      LOGICAL      ERRORS        ! True if errors are present
+      INTEGER      ESLOT         ! Map slot number of error data
+      LOGICAL      FAULT         ! Set if a non-DSA error is deteccted
+      LOGICAL      FLCO          ! TRUE if the Figaro command was FLCONV
+      INTEGER      I             ! General loop variable
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      LOGICAL      IRCO          ! TRUE if the Figaro command was IRCONV
       DOUBLE PRECISION MAGNITUDES ! Indicates TRUE if data in magnitudes
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL      MICRONS       ! True if wavelength in microns
+      INTEGER      NCH           ! Index of a substring in a string
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NTYPE         ! Type of units, used to index
+                                 ! ULEN/UNITAB
+      INTEGER      NXELM         ! Number of elements in x-axis
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      LOGICAL      QXIST         ! TRUE if a quality array exists
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      ULEN(3)       ! Length in characters of the different
+                                 ! units
+      CHARACTER    UNITAB(3)*14  ! The names of the different units
+      CHARACTER    UNITS*64      ! The units of the data
+      INTEGER      XDIMS(10)     ! X-axis data array dimensions
+      LOGICAL      XEXIST        ! TRUE if an x-axis array exists
+      INTEGER      XNDIM         ! Number of x-axis data array
+                                 ! dimensions
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
+      INTEGER      XSLOT         ! Map slot number of x-axis data
+      CHARACTER    XUNITS*64     ! The units of the x-axis data
 C
       DATA UNITAB/'Janskys','Milli-Janskys','Micro-Janskys'/
       DATA ULEN/7,13,13/
@@ -196,25 +200,22 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Map the errors
 C 
       CALL DSA_SEEK_ERRORS('OUTPUT',ERRORS,STATUS)
       IF (ERRORS) THEN
-          CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,ESLOT,
-     :              STATUS)
-          EPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+          CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR,ESLOT,
+     :                        STATUS)
+      END IF
 C
 C     For FLCONV or IRCONV, map the X data as well.
 C
       IF (FLCO .OR. IRCO) THEN
-         CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                               XSLOT,STATUS)
-         XPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                           XSLOT,STATUS)
       END IF
       IF (STATUS.NE.0) GOTO 500
 C
@@ -222,18 +223,23 @@ C     Operate on the data. Note that these routines can operate
 C     on their data in situ.
 C 
       IF (IRCO) THEN
-         CALL ABCONV_IRCON(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),NELM,
-     :       NTYPE,DYNAMIC_MEM(XPTR),NXELM,ERRORS,MICRONS,
-     :       DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),BADVAL)
+         CALL ABCONV_IRCON(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)),
+     :                     NELM,NTYPE,%VAL(CNF_PVAL(XPTR)),NXELM,
+     :                     ERRORS,MICRONS,%VAL(CNF_PVAL(OPTR)),
+     :                     %VAL(CNF_PVAL(EPTR)),BADVAL)
          UNITS='W/(m**2*micron)'
+
       ELSE IF (.NOT.FLCO) THEN
-         CALL ABCONV_ABCON(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),NELM,
-     :       NTYPE,ERRORS,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),BADVAL)
+         CALL ABCONV_ABCON(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)),
+     ;                     NELM,NTYPE,ERRORS,%VAL(CNF_PVAL(OPTR)),
+     :                     %VAL(CNF_PVAL(EPTR)),BADVAL)
          UNITS='AB magnitudes'
+
       ELSE
-         CALL ABCONV_FLCON(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),NELM,
-     :       NTYPE,DYNAMIC_MEM(XPTR),NXELM,ERRORS,MICRONS,
-     :       DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR),BADVAL)
+         CALL ABCONV_FLCON(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)),
+     :                     NELM,NTYPE,%VAL(CNF_PVAL(XPTR)),NXELM,
+     :                     ERRORS,MICRONS,%VAL(CNF_PVAL(OPTR)),
+     :                     %VAL(CNF_PVAL(EPTR)),BADVAL)
          UNITS='erg/(s*cm**2*Ang)'
       END IF
 C
@@ -322,8 +328,8 @@ C
                      OUTE(IELM) = INE(IELM) / IN(IELM) / LOG(10.) * 2.5
                   ELSE
                      OUTE(IELM) = BADVAL
-                  ENDIF
-               ENDIF
+                  END IF
+               END IF
                OUT(IELM) = ( 6.56 - LOG10( IN(IELM) * SCALE ) ) * 2.5
             ELSE
                OUT(IELM)=BADVAL
@@ -400,7 +406,7 @@ C
           WSCALE = 1E8
       ELSE
           WSCALE = 1.0
-      ENDIF
+      END IF
       IF ((NTYPE.GT.0).AND.(NTYPE.LE.3)) THEN
          SCALE=SCALES(NTYPE)*2.998E-5/WSCALE
          IWPTR=1
@@ -413,12 +419,12 @@ C
                      OUTE(IELM) = FAC * INE(IELM)
                   ELSE
                      OUTE(IELM) = BADVAL
-                  ENDIF
-               ENDIF
+                  END IF
+               END IF
             ELSE
                OUT(IELM) = BADVAL
                IF (ERRORS) OUTE(IELM) = BADVAL
-            ENDIF
+            END IF
             IWPTR=IWPTR+1
             IF (IWPTR.GT.NWAV) IWPTR=1
          END DO
@@ -493,7 +499,7 @@ C
           WSCALE = 1.0
       ELSE
           WSCALE = 1.0E-8
-      ENDIF
+      END IF
       IF ((NTYPE.GT.0).AND.(NTYPE.LE.3)) THEN
          SCALE=SCALES(NTYPE)*2.9979E-12/WSCALE
          IWPTR=1
@@ -506,12 +512,12 @@ C
                      OUTE(IELM) = FAC * INE(IELM)
                   ELSE
                      OUTE(IELM) = BADVAL
-                  ENDIF
-               ENDIF
+                  END IF
+               END IF
             ELSE
                OUT(IELM) = BADVAL
                IF (ERRORS) OUTE(IELM) = BADVAL
-            ENDIF
+            END IF
             IWPTR=IWPTR+1
             IF (IWPTR.GT.NWAV) IWPTR=1
          END DO

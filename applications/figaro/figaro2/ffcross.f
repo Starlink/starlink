@@ -9,10 +9,10 @@ C     shift between the flat field and the data.  For each
 C     cross-section in a given range, this routine calculates the
 C     cross-correlation between the flat field and the data.  It then
 C     calculates the average shift for each cross-section, as determined
-C     from the individual cross-correlation.  It also sums the individual
-C     cross-correlations, and calculates the shift given by that summed
-C     cross-correlation.  The idea is that the shift determined in this
-C     way can then be applied using ISHIFT.
+C     from the individual cross-correlation.  It also sums the
+C     individual cross-correlations, and calculates the shift given by
+C     that summed cross-correlation.  The idea is that the shift
+C     determined in this way can then be applied using ISHIFT.
 C
 C     Command parameters - 
 C
@@ -60,94 +60,113 @@ C                    CFIT to parameters in call to FIG_CROSS.
 C    21st Oct  1988. JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C    21st Jan 1991.  JMS / AAO. Changed maximum allowed dimensions of image
-C                    to 2, and aborts if image is 1D. Added STATUS checks
-C                    and PAR_ABORT calls to support user requested aborts.
-C                    Modified calculation of SIGMA variable to handle 
-C                    negative values. Also, modified FIG_CROSS to handle
-C                    zero arrays.
+C    21st Jan 1991.  JMS / AAO. Changed maximum allowed dimensions of
+C                    image to 2, and aborts if image is 1D. Added STATUS
+C                    checks and PAR_ABORT calls to support 
+C                    user-requested aborts. Modified calculation of 
+C                    SIGMA variable to handle negative values. Also,
+C                    modified FIG_CROSS to handle zero arrays.
 C    14th Feb 1991.  JMS / AAO. Set minimum X axis range to two pixels.
-C    25th Sep 1992.  HME / UoE, Starlink. INCLUDE changed. Call PAR_WRUSER
-C                    rather than DSA_WRUSER, FIG_SETERR rather than SETERR,
-C                    JTY_PEAKFIT rather than PEAKFIT.
+C    25th Sep 1992.  HME / UoE, Starlink. INCLUDE changed. Call
+C                    PAR_WRUSER rather than DSA_WRUSER, FIG_SETERR 
+C                    rather than SETERR, JTY_PEAKFIT rather than
+C                    PEAKFIT.
 C    30th Oct 1992.  HME / EIA, Starlink. Unused FAULT logical removed.
 C    15th Feb 1996.  HME / UoE, Starlink. Change access for cross
 C                    correlation from update to write.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_INCREMENT
-      INTEGER DYN_ELEMENT
       INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      DOUBLE PRECISION A(5)! Parabola polynomial coefficients?
-      INTEGER   ADDRESS   ! Virtual address for data array
-      INTEGER   ARRAY0    ! Dynamic memory element for workspace
-      INTEGER   ARRAY1    ! Dynamic memory element for workspace
-      REAL      AVSHFT    ! Average shift of the individual cross-sections
-      INTEGER   BDOUBP    ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BFLOAT    ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BYTES     ! Bytes required for an array
-      REAL      CENTER    ! Centre of peak
-      LOGICAL   CFIT      ! True if continuum fit used
-      INTEGER   CFN       ! Pointer to workspace for the correlation function
-      INTEGER   CFNSUM    ! Pointer to workspace for the correlation sum array
-      INTEGER   CORPTR    ! Dynamic memory element for cross-corr. data
-      INTEGER   DIMS(2)   ! Flat field dimensions
-      LOGICAL   ERRFLG    ! True if error detected while fitting peak
-      INTEGER   FLPTR     ! Dynamic memory element for flat field data
-      INTEGER   FT0       ! Pointer to workspace for FT of first spectrum
-      INTEGER   FT1       ! Pointer to workspace for FT of second spectrum
-      INTEGER   FTFCN     ! Pointer to workspace for the correlation function
-      INTEGER   IMPTR     ! Dynamic memory element for image data
-      INTEGER   IXEN      ! Last AXIS(1) element to be used
-      INTEGER   IXST      ! First AXIS(1) element to be used
-      INTEGER   IY        ! Loop variable
-      INTEGER   IYEN      ! Last AXIS(2) element to be used
-      INTEGER   IYST      ! First AXIS(2) element to be used
-      INTEGER   KZ(4)     ! Defines the cosine bell 
-      LOGICAL   LOG       ! If true, the individual shifts will be logged 
-      INTEGER   NDIM      ! Number of image dimensions
-      INTEGER   NDIMI     ! Image dimensions
-      INTEGER   NELM      ! Number of elements in image - ignored
-      INTEGER   NEXT      ! Used to format user messages
-      LOGICAL   NORM      ! True if the cross-corr fn to be normalised 
-      INTEGER   NX        ! NX0 or the next highest integer power of 2
-      INTEGER   NX0       ! No. of elements in the two spectra
-      INTEGER   NXLEN     ! First dimension of image
-      INTEGER   NY        ! Second dimension of image
-      LOGICAL   RECORD    ! If true, the cross-corr. is recorded
-      REAL      SHIFT     ! Shift of the peak of the corr fn from the zero point
-      REAL      SIGMA     ! Average of individual shifts
-      REAL      SIGSQ     ! Correlation sum
-      REAL      SIZE      ! Length of array undergoing peak fitting
-      INTEGER   SLOT      ! Slot number for mapped data - ignored
-      INTEGER   SPTR      ! Dynamic memory element for spectrum data
-      INTEGER   STATUS    ! Running status for DSA routines
-      CHARACTER STRING*64 ! Used to format user messages
-      REAL      SUMSH     ! Shift sum
-      REAL      WIDTH     ! The width of the correlation function
-      REAL      XEN       ! Last AXIS(1) value to be used
-      REAL      XST       ! First AXIS(1) value to be used
-      INTEGER   XV        ! Pointer to workspace for pixel values
-      REAL      YEN       ! Last AXIS(2) value to be used
-      REAL      YST       ! First AXIS(2) value to be used
-      REAL      ZPC       ! % of spectrum covered at each end by cosine bell 
+      DOUBLE PRECISION A(5)      ! Parabola polynomial coefficients?
+      INTEGER   ARRAY0           ! Dynamic-memory pointer for workspace
+      INTEGER   ARRAY1           ! Dynamic-memory pointer for workspace
+      REAL      AVSHFT           ! Average shift of the individual
+                                 ! cross-sections
+      INTEGER   BFLOAT           ! Number of bytes per item of type
+                                 ! 'FLOAT'
+      INTEGER   BYTES            ! Bytes required for an array
+      REAL      CENTER           ! Centre of peak
+      LOGICAL   CFIT             ! True if continuum fit used
+      INTEGER   CFN              ! Pointer to workspace for the 
+                                 ! correlation function
+      INTEGER   CFNSUM           ! Pointer to workspace for the
+                                 ! correlation sum array
+      INTEGER   CORPTR           ! Dynamic-memory pointer for
+                                 ! cross-corr. data
+      INTEGER   DIMS(2)          ! Flat field dimensions
+      LOGICAL   ERRFLG           ! True if error detected while fitting
+                                 ! peak
+      INTEGER   FLPTR            ! Dynamic-memory pointer for flat field
+                                 ! data
+      INTEGER   FT0              ! Pointer to workspace for FT of first
+                                 ! spectrum
+      INTEGER   FT1              ! Pointer to workspace for FT of second
+                                 ! spectrum
+      INTEGER   FTFCN            ! Pointer to workspace for the
+                                 ! correlation function
+      INTEGER   IMPTR            ! Dynamic-memory pointer for image data
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      LOGICAL   ISNEWF           ! Is IMPTR address new to CNF?
+      LOGICAL   ISNEWI           ! Is FLPTR address new to CNF?
+      INTEGER   IXEN             ! Last AXIS(1) element to be used
+      INTEGER   IXST             ! First AXIS(1) element to be used
+      INTEGER   IY               ! Loop variable
+      INTEGER   IYEN             ! Last AXIS(2) element to be used
+      INTEGER   IYST             ! First AXIS(2) element to be used
+      INTEGER   KZ(4)            ! Defines the cosine bell 
+      LOGICAL   LOG              ! If true, the individual shifts will
+                                 ! be logged 
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NDIMI            ! Image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NEXT             ! Used to format user messages
+      LOGICAL   NORM             ! Cross-corr function to be normalised?
+      INTEGER   NX               ! NX0 or the next highest integer power
+                                 ! of 2
+      INTEGER   NX0              ! No. of elements in the two spectra
+      INTEGER   NXLEN            ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      LOGICAL   PISNFL           ! Previous CNF pointer FLPTR new?
+      LOGICAL   PISNIM           ! Previous CNF pointer IMPTR new?
+      LOGICAL   RECORD           ! If true, the cross-corr. is recorded
+      REAL      SHIFT            ! Shift of the peak of the corr fn from
+                                 ! the zero point
+      REAL      SIGMA            ! Average of individual shifts
+      REAL      SIGSQ            ! Correlation sum
+      REAL      SIZE             ! Length of array undergoing peak
+                                 ! fitting
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
+                                 ! data
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER STRING*64        ! Used to format user messages
+      REAL      SUMSH            ! Shift sum
+      INTEGER   TPTR             ! Temp dynamic-memory pointer
+      REAL      WIDTH            ! The width of the correlation function
+      REAL      XEN              ! Last AXIS(1) value to be used
+      REAL      XST              ! First AXIS(1) value to be used
+      INTEGER   XV               ! Pointer to workspace for pixel values
+      REAL      YEN              ! Last AXIS(2) value to be used
+      REAL      YST              ! First AXIS(2) value to be used
+      REAL      ZPC              ! % of spectrum covered at each end by
+                                 ! cosine bell 
 
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -212,22 +231,17 @@ C
 C     The cross-correlation needs a lot of workspace, so grab that now.
 C
       BFLOAT=DSA_TYPESIZE('FLOAT',STATUS)
-      BDOUBP=DSA_TYPESIZE('DOUBLE',STATUS)
       CALL GEN_POWER2(NX0,NX)
-      BYTES = 2*NX0*BFLOAT + 3*NX*BDOUBP + 3*NX*BFLOAT
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-      ARRAY0=DYN_ELEMENT(ADDRESS)
+      
+      CALL DSA_GET_WORK_ARRAY(NX0,'FLOAT',ARRAY0,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX0,'FLOAT',ARRAY1,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',FT0,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',FT1,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',FTFCN,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',XV,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',CFN,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',CFNSUM,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
-C
-C     Calculate values for pointers into work area.
-C
-      ARRAY1=ARRAY0+NX0*BFLOAT
-      FT0=ARRAY1+NX0*BFLOAT
-      FT1=FT0+NX*BDOUBP
-      FTFCN=FT1+NX*BDOUBP
-      XV=FTFCN+NX*BDOUBP
-      CFN=XV+NX*BFLOAT
-      CFNSUM=CFN+NX*BFLOAT
 C
 C     Find out if the cross-correlation is to be recorded, and if so,
 C     get the name of the output file.
@@ -249,31 +263,39 @@ C     Zero out the shift sum variable, and the correlation sum array
 C
       SUMSH=0.
       SIGSQ=0.
-      CALL GEN_FILL(NX*BFLOAT,0,DYNAMIC_MEM(CFNSUM))
+      CALL GEN_FILL(NX*BFLOAT,0,%VAL(CNF_PVAL(CFNSUM)))
 C
 C     Go through all the selected cross-sections, calculating the
 C     relative shifts and cross-correlations.
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IMPTR=DYN_ELEMENT(ADDRESS)
-      IMPTR=DYN_INCREMENT(IMPTR,'FLOAT',(IXST-1)+(IYST-1)*NXLEN)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IMPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA('FLAT','READ','FLOAT',FLPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('FLAT','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      FLPTR=DYN_ELEMENT(ADDRESS)
-      FLPTR=DYN_INCREMENT(FLPTR,'FLOAT',(IXST-1)+(IYST-1)*NXLEN)
+      CALL DYN_INCAD(FLPTR,'FLOAT',(IXST-1)+(IYST-1)*NXLEN,TPTR,
+     :               ISNEW,STATUS)
       BYTES=NX0*BFLOAT
       IF(STATUS.NE.0)GOTO 500
         
-  
+      PISNFL = .FALSE.
+      PISNIM = .FALSE.
       DO IY=IYST,IYEN
 C
-C        Read the spectrum and template data into the work arrays
+C        Read the spectrum and template data into the work arrays.
 C
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(IMPTR),DYNAMIC_MEM(ARRAY0))
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(FLPTR),DYNAMIC_MEM(ARRAY1))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(IMPTR)),
+     :                 %VAL(CNF_PVAL(ARRAY0)))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(FLPTR)),
+     :                 %VAL(CNF_PVAL(ARRAY1)))
 
-         IMPTR=DYN_INCREMENT(IMPTR,'FLOAT',NXLEN)
-         FLPTR=DYN_INCREMENT(FLPTR,'FLOAT',NXLEN)
+         CALL DYN_INCAD(IMPTR,'FLOAT',NXLEN,TPTR,ISNEWI,STATUS)
+         IF (ISNEWI) CALL CNF_UNREGP(IMPTR)
+         IMPTR=TPTR
+         PISNIM = ISNEWI
+
+         CALL DYN_INCAD(FLPTR,'FLOAT',NXLEN,TPTR,ISNEWF,STATUS)
+         IF (ISNEW) CALL CNF_UNREGP(FLPTR)
+         FLPTR=TPTR
+         PISNFL = ISNEWF
 C
 C        Pick reasonable values for the fourier domain filter - this
 C        section could be refined, but these will do..
@@ -288,10 +310,11 @@ C
 C        Perform the cross-correlation
 C
          NORM=.FALSE.
-         CALL FIG_CROSS(DYNAMIC_MEM(ARRAY0),DYNAMIC_MEM(ARRAY1),NX0,NX,
-     :                  CFIT,ZPC,KZ,NORM,DYNAMIC_MEM(FT0),
-     :                  DYNAMIC_MEM(FT1),DYNAMIC_MEM(FTFCN),
-     :                  DYNAMIC_MEM(XV),DYNAMIC_MEM(CFN),SHIFT,WIDTH)
+         CALL FIG_CROSS(%VAL(CNF_PVAL(ARRAY0)),%VAL(CNF_PVAL(ARRAY1)),
+     :                  NX0,NX,CFIT,ZPC,KZ,NORM,%VAL(CNF_PVAL(FT0)),
+     :                  %VAL(CNF_PVAL(FT1)),%VAL(CNF_PVAL(FTFCN)),
+     :                  %VAL(CNF_PVAL(XV)),%VAL(CNF_PVAL(CFN)),SHIFT,
+     :                  WIDTH)
 C
 C        Log the result, if LOG was specified
 C
@@ -303,21 +326,25 @@ C
 C
 C        Add this result into what we have already
 C
-         CALL GEN_ADDAF(NX,DYNAMIC_MEM(CFN),DYNAMIC_MEM(CFNSUM),
-     :                  DYNAMIC_MEM(CFNSUM))
+         CALL GEN_ADDAF(NX,%VAL(CNF_PVAL(CFN)),%VAL(CNF_PVAL(CFNSUM)),
+     :                  %VAL(CNF_PVAL(CFNSUM)))
          SUMSH=SUMSH+SHIFT
          SIGSQ=SIGSQ+SHIFT*SHIFT
       END DO
+
+      IF (ISNEWI) CALL CNF_UNREGP(IMPTR)
+      IF (ISNEWF) CALL CNF_UNREGP(FLPTR)
 C
 C     Calculate the two values for the shift
 C
-      CALL GEN_NFILLF(NX,DYNAMIC_MEM(XV))
-      CALL JTY_PEAKFIT(NX,DYNAMIC_MEM(XV),0.,FLOAT(NX),
-     :             DYNAMIC_MEM(CFNSUM),CENTER,WIDTH,A,ERRFLG)
+      CALL GEN_NFILLF(NX,%VAL(CNF_PVAL(XV)))
+      CALL JTY_PEAKFIT(NX,%VAL(CNF_PVAL(XV)),0.,FLOAT(NX),
+     :                 %VAL(CNF_PVAL(CFNSUM)),CENTER,WIDTH,A,ERRFLG)
       IF (ERRFLG) THEN
          CALL PAR_WRUSER(
      :      'Warning - error detected while fitting peak',STATUS)
       END IF
+
       SHIFT=FLOAT(NX/2)-CENTER+1.
       SIZE=FLOAT(IYEN-IYST+1)
       AVSHFT=SUMSH/SIZE
@@ -354,11 +381,11 @@ C     cross-correlation.
 C
       IF (RECORD) THEN
          CALL DSA_COERCE_DATA_ARRAY('CORRL','FLOAT',1,NX,STATUS)   
-         CALL DSA_MAP_DATA('CORRL','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-         CORPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('CORRL','WRITE','FLOAT',CORPTR,SLOT,STATUS)
          BYTES=NX*BFLOAT
          IF(STATUS.NE.0)GOTO 500
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(CFNSUM),DYNAMIC_MEM(CORPTR))
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(CFNSUM)),
+     :                 %VAL(CNF_PVAL(CORPTR)))
       END IF
   500 CONTINUE
 C

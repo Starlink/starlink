@@ -37,38 +37,40 @@ C                    source of FIG_CMPCHK again. Call PAR_WRUSER
 C                    rather than DSA_WRUSER.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                    Map complex in single call.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
       LOGICAL DSA_SAME_DATA
 C
 C     Local variables
 C
-      INTEGER   ADDRESS   ! Virtual address for data array
-      INTEGER   ADDRESS2  ! Virtual address for data array
-      CHARACTER COMMAND*9 ! Figaro command name
-      INTEGER   DIMS(10)  ! Image dimensions
-      LOGICAL   FAULT     ! True if either input is not valid complex structure
-      INTEGER   NDIM      ! Number of image dimensions
-      INTEGER   NELM      ! Number of elements in image
-      INTEGER   IPTR      ! Dynamic memory element for imag. data in CDATA
-      INTEGER   I1PTR     ! Dynamic memory element for imag. data in CDATA1
-      INTEGER   RPTR      ! Dynamic memory element for real data in CDATA
-      INTEGER   R1PTR     ! Dynamic memory element for real data in CDATA1
-      INTEGER   SLOT      ! Slot number for mapped data - ignored
-      INTEGER   STATUS    ! Running status for DSA routines
+      CHARACTER COMMAND*9        ! Figaro command name
+      INTEGER   DIMS(10)         ! Image dimensions
+      LOGICAL   FAULT            ! Either input is not valid complex 
+                                 ! structure?
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image
+      INTEGER   IPTR             ! Dynamic-memory pointer for imaginary
+                                 ! data in CDATA
+      INTEGER   I1PTR            ! Dynamic-memory pointer for imaginary
+                                 ! data in CDATA1
+      INTEGER   RPTR             ! Dynamic-memory pointer for real data 
+                                 ! in CDATA
+      INTEGER   R1PTR            ! Dynamic-memory pointer for real data 
+                                 ! in CDATA1
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -125,33 +127,28 @@ C     Map the first structure input data arrays.  Note that these will
 C     have been copied to 'OUTPUT' as a new output file was created by 
 C     copying the first input file, so these arrays can be used instead.
 C     
-C     CALL DSA_MAP_DATA('OUTPUT','UPDATE','DOUBLE',ADDRESS,SLOT,STATUS)
-C     RPTR=DYN_ELEMENT(ADDRESS)
-C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',ADDRESS,SLOT,
-C    :                        STATUS)
+C     CALL DSA_MAP_DATA('OUTPUT','UPDATE','DOUBLE',RPTR,SLOT,STATUS)
+C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',IPTR,SLOT,
+C    :                       STATUS)
 C     IPTR=DYN_ELEMENT(ADDRESS)
       CALL DSA_MAP_COMPLEX('OUTPUT','UPDATE','DOUBLE',
-     :   ADDRESS,ADDRESS2,SLOT,STATUS)
-      RPTR=DYN_ELEMENT(ADDRESS)
-      IPTR=DYN_ELEMENT(ADDRESS2)
+     :                     RPTR,IPTR,SLOT,STATUS)
 C
 C     Now map the second structure arrays
 C
       IF (.NOT.DSA_SAME_DATA('CDATA0','CDATA1',STATUS)) THEN
-C        CALL DSA_MAP_DATA('CDATA1','READ','DOUBLE',ADDRESS,SLOT,STATUS)
+C        CALL DSA_MAP_DATA('CDATA1','READ','DOUBLE',R1PTR,SLOT,STATUS)
 C        R1PTR=DYN_ELEMENT(ADDRESS)
-C        CALL DSA_MAP_IMAGINARY('CDATA1','READ','DOUBLE',ADDRESS,SLOT,
-C    :                           STATUS)
+C        CALL DSA_MAP_IMAGINARY('CDATA1','READ','DOUBLE',I1PTR,SLOT,
+C    :                          STATUS)
 C        I1PTR=DYN_ELEMENT(ADDRESS)
          CALL DSA_MAP_COMPLEX('CDATA1','READ','DOUBLE',
-     :      ADDRESS,ADDRESS2,SLOT,STATUS)
-         R1PTR=DYN_ELEMENT(ADDRESS)
-         I1PTR=DYN_ELEMENT(ADDRESS2)
+     :                        R1PTR,I1PTR,SLOT,STATUS)
       ELSE
          R1PTR=RPTR
          I1PTR=IPTR
       END IF
-      IF(STATUS.NE.0)GOTO 500
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Work out which command we're servicing
 C
@@ -160,23 +157,23 @@ C
 C     Perform the required arithmetic
 C
       IF (COMMAND.EQ.'CMPLXADD') THEN
-         CALL GEN_ADDAD(NELM,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(R1PTR),
-     :                  DYNAMIC_MEM(RPTR))
-         CALL GEN_ADDAD(NELM,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(I1PTR),
-     :                  DYNAMIC_MEM(IPTR))
+         CALL GEN_ADDAD(NELM,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(R1PTR)),
+     :                  %VAL(CNF_PVAL(RPTR)))
+         CALL GEN_ADDAD(NELM,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(I1PTR)),
+     :                  %VAL(CNF_PVAL(IPTR)))
       ELSE IF (COMMAND.EQ.'CMPLXSUB') THEN
-         CALL GEN_SUBAD(NELM,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(R1PTR),
-     :                  DYNAMIC_MEM(RPTR))
-         CALL GEN_SUBAD(NELM,DYNAMIC_MEM(IPTR),DYNAMIC_MEM(I1PTR),
-     :                  DYNAMIC_MEM(IPTR))
+         CALL GEN_SUBAD(NELM,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(R1PTR)),
+     :                  %VAL(CNF_PVAL(RPTR)))
+         CALL GEN_SUBAD(NELM,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(I1PTR)),
+     :                  %VAL(CNF_PVAL(IPTR)))
       ELSE IF (COMMAND.EQ.'CMPLXMULT') THEN
-         CALL FIG_CMPMUL(NELM,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(IPTR),
-     :                   DYNAMIC_MEM(R1PTR),DYNAMIC_MEM(I1PTR),
-     :                   DYNAMIC_MEM(RPTR),DYNAMIC_MEM(IPTR))
+         CALL FIG_CMPMUL(NELM,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(R1PTR)),%VAL(CNF_PVAL(I1PTR)),
+     :                   %VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(IPTR)))
       ELSE IF (COMMAND.EQ.'CMPLXDIV') THEN
-         CALL FIG_CMPDIV(NELM,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(IPTR),
-     :                   DYNAMIC_MEM(R1PTR),DYNAMIC_MEM(I1PTR),
-     :                   DYNAMIC_MEM(RPTR),DYNAMIC_MEM(IPTR))
+         CALL FIG_CMPDIV(NELM,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(R1PTR)),%VAL(CNF_PVAL(I1PTR)),
+     :                   %VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(IPTR)))
       END IF
 
   500 CONTINUE

@@ -23,9 +23,9 @@ C                   Note that this should include an exposure time data
 C                   object.  If it does not, a time of 1 sec will be
 C                   assumed, and the calibration will only be relative.
 C                   Both SPECTRUM and SPIKETRUM should contain an
-C                   AXIS(1) data array, giving the wavelength values.  These
-C                   should normally be exactly the same, although this
-C                   is not essential.
+C                   AXIS(1) data array, giving the wavelength values. 
+C                   These should normally be exactly the same, although 
+C                   this is not essential.
 C     OUTPUT        (Character) The resulting spiketrum of calibration
 C                   points.
 C
@@ -47,67 +47,68 @@ C                    Lowercase file name spiketrum (.def).
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                    No error messages from DTA. Call PAR_WRUSER instead
 C                    of FIG_DTAERR.
-C      7th Aug 1996  MJCL / Starlink, UCL.  Changed reference to non-existent
-C                    HELP text to point to SUN/86.
+C      7th Aug 1996  MJCL / Starlink, UCL.  Changed reference to
+C                    non-existent HELP text to point to SUN/86.
 C     28th Jun 1999  TDCA / Starlink, RAL. Initialised DIMS to zero.
 C     17th May 2001  ACD / UoE, Starlink.  Revised obtaining the
 C                    exposure time with DSA_GET_EXPOSURE.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DSA_TYPESIZE
-      INTEGER DYN_ELEMENT
       INTEGER ICH_ENCODE
       LOGICAL FIG_WCHECK
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
-      REAL      BANDW        ! Bandwidth
-      INTEGER   BFLOAT       ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BYTES        ! Bytes required for an array
-      CHARACTER CITEMS(2)*32 ! Axis character items retrieved
-      INTEGER   DIMS(2)      ! Dimensions
-      REAL      DLAMB        ! Doubling wavelength
-      CHARACTER DNAME*72     ! DTA name
-      INTEGER   DSTAT        ! Status for DTA routines
-      REAL      ENDS(4)      ! End values
-      LOGICAL   FAULT        ! True if non-DSA fault occurs
-      INTEGER   I            ! Loop variable
-      INTEGER   INVOKE       ! Used to format messages to user
-      INTEGER   NCITEMS      ! Number of axis character items retrieved
-      INTEGER   NDIM         ! Number of dimensions
-      INTEGER   NELM         ! Number of elements in image - ignored
-      INTEGER   NEXT         ! Used to format messages to user
-      DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
-      INTEGER   NNITEMS      ! Number of axis numeric items retrieved
-      INTEGER   NTAB         ! Dimensions of TABLE_DATA structure
-      INTEGER   NX           ! First dimension of spiketrum
-      INTEGER   OUTPTR       ! Dynamic memory element for output data
-      INTEGER   PSTAT        ! Status for PAR routines
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   SPEPTR       ! Dynamic memory element for spectrum data
-      INTEGER   SPEXPR       ! Dynamic memory element for spectrum axis data
-      INTEGER   SPIPTR       ! Dynamic memory element for spiketrum data
-      INTEGER   SPIXPR       ! Dynamic memory element for spiketrum axis data
-      INTEGER   STATUS       ! Running status for DSA routines
-      CHARACTER STRING*64    ! Used to format messages to user
-      LOGICAL   TABLED       ! True if table structure is found
-      REAL      TIME         ! Exposure time
-      INTEGER   TXPTR        ! Dynamic memory element for workspace
-      INTEGER   TZPTR        ! Dynamic memory element for workspace
+      REAL      BANDW            ! Bandwidth
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      INTEGER   DIMS(2)          ! Dimensions
+      REAL      DLAMB            ! Doubling wavelength
+      CHARACTER DNAME*72         ! DTA name
+      INTEGER   DSTAT            ! Status for DTA routines
+      REAL      ENDS(4)          ! End values
+      LOGICAL   FAULT            ! True if non-DSA fault occurs
+      INTEGER   I                ! Loop variable
+      INTEGER   INVOKE           ! Used to format messages to user
+      INTEGER   NCITEMS          ! Number of axis character items 
+                                 ! retrieved
+      INTEGER   NDIM             ! Number of dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NEXT             ! Used to format messages to user
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   NNITEMS          ! Number of axis numeric items 
+                                 ! retrieved
+      INTEGER   NTAB             ! Dimensions of TABLE_DATA structure
+      INTEGER   NX               ! First dimension of spiketrum
+      INTEGER   OUTPTR           ! Dynaelement element for output data
+      INTEGER   PSTAT            ! Status for PAR routines
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPEPTR           ! Dynamic-memory pointer for spectrum 
+                                 ! data
+      INTEGER   SPEXPR           ! Dynamic-memory pointer for spectrum
+                                 ! axis centres
+      INTEGER   SPIPTR           ! Dynamic-memory pointer for spiketrum
+                                 ! data
+      INTEGER   SPIXPR           ! Dynamic-memory pointer for spiketrum
+                                 ! axis data
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER STRING*64        ! Used to format messages to user
+      LOGICAL   TABLED           ! True if table structure is found
+      REAL      TIME             ! Exposure time
+      INTEGER   TXPTR            ! Dynamic-memory pointer for workspace
+      INTEGER   TZPTR            ! Dynamic-memory pointer for workspace
       
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -155,23 +156,20 @@ C
       CALL DSA_DATA_SIZE('SPIKE',1,NDIM,DIMS,NELM,STATUS)
       NX=DIMS(1)
 
-      CALL DSA_MAP_DATA('SPIKE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      SPIPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPIKE','READ','FLOAT',SPIPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      SPEPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',SPEPTR,SLOT,STATUS)
 C
-C     Map the AXIS(1) data arrays (the wavelengths).  First the spectrum.
+C     Map the AXIS(1) data arrays (the wavelengths).  First the
+C     spectrum.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,SLOT,
-     :                        STATUS)
-      SPEXPR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',SPEXPR,SLOT,
+     :                       STATUS)
 C
 C     then the spiketrum
 C
-      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'READ','FLOAT',ADDRESS,SLOT,
+      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'READ','FLOAT',SPIXPR,SLOT,
      :                        STATUS)
-      SPIXPR=DYN_ELEMENT(ADDRESS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Check that the wavelength arrays match.  Strictly speaking,
@@ -179,20 +177,20 @@ C     they don't have to - this calculation doesn't require it - but
 C     if they don't something is probably amiss and later steps will
 C     foul up.
 C
-      IF (.NOT.FIG_WCHECK(NX,DYNAMIC_MEM(SPIXPR),
-     :                    DYNAMIC_MEM(SPEXPR))) THEN
+      IF (.NOT.FIG_WCHECK(NX,%VAL(CNF_PVAL(SPIXPR)),
+     :                    %VAL(CNF_PVAL(SPEXPR)))) THEN
          CALL DSA_WRUSER(
      :     'Warning: Wavelength calibrations are not identical.\N')
       END IF
 C
 C     What we want to do with the Spiketrum data is generate two
-C     tables of wavelength and data values.  (In fact, we're reproducing the
-C     original tables used by GSPIKE!)  So we need a little work
+C     tables of wavelength and data values.  (In fact, we're reproducing
+C     the original tables used by GSPIKE!)  So we need a little work
 C     space for these.  There may be a table of exact wavelength
 C     values for the spiketrum (TABLE_DATA) or there may not, in
 C     which case we have to get the values from the wavelength array.
-C     So - look for any 'end' values. These are located with the aid of the
-C     structure definition file SPIKETRUM.DEF. Failure to find these
+C     So - look for any 'end' values. These are located with the aid of 
+C     the structure definition file SPIKETRUM.DEF. Failure to find these
 C     end values in the input spiketrum file simply results in 
 C     default values being used.
 C
@@ -209,30 +207,26 @@ C
          DO I=1,4
             ENDS(I)=0.
          END DO
-         CALL FIG_NPSPIK(NX,DYNAMIC_MEM(SPIPTR),ENDS,NTAB)
+         CALL FIG_NPSPIK(NX,%VAL(CNF_PVAL(SPIPTR)),ENDS,NTAB)
       END IF
-      BFLOAT=DSA_TYPESIZE('FLOAT',STATUS)
-      BYTES=2*NTAB*BFLOAT
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-      TXPTR=DYN_ELEMENT(ADDRESS)
-      TZPTR=TXPTR+NTAB*BFLOAT
+      CALL DSA_GET_WORK_ARRAY(NTAB,'FLOAT',TXPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NTAB,'FLOAT',TZPTR,SLOT,STATUS)
       IF (TABLED) THEN
-         CALL DTA_RDVARF(DNAME,NTAB,DYNAMIC_MEM(TXPTR),DSTAT)
+         CALL DTA_RDVARF(DNAME,NTAB,%VAL(CNF_PVAL(TXPTR)),DSTAT)
          IF (DSTAT.NE.0) THEN
-            CALL PAR_WRUSER(
-     :                      'Error reading spiketrum table data',DSTAT)
+            CALL PAR_WRUSER('Error reading spiketrum table data',DSTAT)
             FAULT=.TRUE.
             GO TO 500
          END IF
       END IF
 C
 C     Fill the  table data values, given the spiketrum AXIS(1) array,
-C     the spiketrum data array, and the AXIS(1) table values if they were
-C     available (otherwise, fill the AXIS(1) table values as well).
+C     the spiketrum data array, and the AXIS(1) table values if they 
+C     were available (otherwise, fill the AXIS(1) table values as well).
 C
-      CALL FIG_FSPTAB(NTAB,DYNAMIC_MEM(TXPTR),TABLED,NX,
-     :                DYNAMIC_MEM(SPIXPR),DYNAMIC_MEM(SPIPTR),
-     :                DYNAMIC_MEM(TZPTR))
+      CALL FIG_FSPTAB(NTAB,%VAL(CNF_PVAL(TXPTR)),TABLED,NX,
+     :                %VAL(CNF_PVAL(SPIXPR)),%VAL(CNF_PVAL(SPIPTR)),
+     :                %VAL(CNF_PVAL(TZPTR)))
 C
 C     Create the new output file.
 C
@@ -241,9 +235,7 @@ C
 C
 C     Map the data array in the new file
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
-     :                   STATUS)
-      OUTPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OUTPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Now for the incidental values - the wavelength range (BANDWIDTH),
@@ -278,12 +270,12 @@ C
       CALL DTA_RDVARF(DNAME,1,DLAMB,DSTAT)
       IF (DSTAT.NE.0) DLAMB=0.
 C
-C     And finally, create the result spiketrum, given the Z table values,
-C     the input spectrum, and the assorted other data.
+C     And finally, create the result spiketrum, given the Z-table
+C     values, the input spectrum, and the assorted other data.
 C
-      CALL FIG_CSPIKE(NTAB,DYNAMIC_MEM(TXPTR),DYNAMIC_MEM(TZPTR),NX,
-     :                DYNAMIC_MEM(SPEXPR),DYNAMIC_MEM(SPEPTR),TIME,
-     :                BANDW,DLAMB,DYNAMIC_MEM(OUTPTR))
+      CALL FIG_CSPIKE(NTAB,%VAL(CNF_PVAL(TXPTR)),%VAL(CNF_PVAL(TZPTR)),
+     :                NX,%VAL(CNF_PVAL(SPEXPR)),%VAL(CNF_PVAL(SPEPTR)),
+     :                TIME,BANDW,DLAMB,%VAL(CNF_PVAL(OUTPTR)))
 C
 C     Any TABLE information in the original spiketrum is not relevant
 C     to the output spiketrum, so delete it

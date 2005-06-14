@@ -7,7 +7,7 @@ C   ---------------
 C
 C   Description
 C   -----------
-C   Do simple minded aperture photometry on a series of frames
+C   Do simple-minded aperture photometry on a series of frames
 C
 C
 C   Scope of program
@@ -27,13 +27,14 @@ C
 C
 C   Parameters
 C   ----------
-C   OUTPUT    Name of output ASCII file for results. The output info goes in
-C             the following order: (1) Either 'O' or 'S' for "object" or 
-C             "sky"; (2) a sequence number; (3) the x,y coords of the
-C             cursor, (4) the radius of the aperture; (5) the total
-C             flux in pixels which are with a radial distance less than
-C             or equal to the aperture radius.  No correction is made for
-C             partial pixels; (6) the total number of pixels included.
+C   OUTPUT    Name of output ASCII file for results. The output info 
+C             goes in the following order: (1) Either 'O' or 'S' for 
+C             "object" or  "sky"; (2) a sequence number; (3) the x,y 
+C             coordinates of the cursor, (4) the radius of the aperture;
+C             (5) the total flux in pixels which are with a radial
+C             distance less than or equal to the aperture radius.  No 
+C             correction is made for partial pixels; (6) the total 
+C             number of pixels included.
 C             (character)(prompted for)
 C
 C   IMAGE     Name of individual images in case you're not using a 
@@ -41,9 +42,11 @@ C             list file. (character)(prompted for)
 C
 C   RADIUS    Radius for integration. (real)(prompted for)
 C
-C   LOW       Data value for lowest level in 2-d plot (real)(prompted for)
+C   LOW       Data value for lowest level in 2-d plot 
+C             (real)(prompted for)
 C
-C   HIGH      Data value for highest level in 2-d plot (real)(prompted for)
+C   HIGH      Data value for highest level in 2-d plot
+C             (real)(prompted for)
 C
 C
 C   Keywords 
@@ -60,11 +63,11 @@ C   Method
 C   ------
 C   - The image name is read and that image is plotted on the current
 C     plot device.
-C   - The user is presented with a menu which allows him/her/it to specify
-C     object and sky regions, change the colour levels, change the radius
-C     of the aperture, show cuts or quit.
-C   - Integrations are a simple sum of the values of the pixels within the
-C     aperture radius.
+C   - The user is presented with a menu which allows him/her/it to
+C     specify object and sky regions, change the colour levels, change 
+C     the radius of the aperture, show cuts or quit.
+C   - Integrations are a simple sum of the values of the pixels within
+C     the aperture radius.
 C   
 C
 C   External functions & subroutines called
@@ -75,18 +78,14 @@ C     DSA_DATA_SIZE
 C     DSA_FREE_WORKSPACE
 C     DSA_GET_ACTUAL_NAME
 C     DSA_GET_FLAG_VALUE
-C     DSA_GET_WORKSPACE
+C     DSA_GET_WORK_ARRAY
 C     DSA_MAP_DATA
 C     DSA_INPUT
 C     DSA_OPEN
 C     DSA_OPEN_TEXT_FILE
 C     DSA_SEEK_FLAGGED_VALUES
-C     DSA_TYPESIZE
 C     DSA_USE_FLAGGED_VALUES
 C     DSA_WRUSER
-C
-C   Library DYN:
-C     DYN_ELEMENT
 C
 C   Library ICH:
 C     ICH_FOLD
@@ -128,11 +127,6 @@ C     PLOT_CUT
 C     SUB_APERTURE
 C
 C
-C   INCLUDE statements
-C   ------------------
-C   INCLUDE 'DYNAMIC_MEMORY'
-C
-C
 C   Extensions to FORTRAN77
 C   -----------------------
 C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters /
@@ -154,68 +148,66 @@ C     05 Sep 1991  Original program
 C     04 Feb 1992  Modified to use new NDP 2d graphics routines. (JRL)
 C     27 Aug 1992  Modified to allow list directed parameters.  A bit
 C                  of general tidying up was also done. (JRL)
-C     16 Jun 1993  Use user variable SOFT, not SOFTDEV. Allow "?" instead
-C                  of "H" to get help. In "P" option do not cancel TABLE
-C                  parameter. Thus it should not be asked for, a new value
-C                  would have no effect anyway. Check PAR_ABORT flag. (hme)
+C     16 Jun 1993  Use user variable SOFT, not SOFTDEV. Allow "?"
+C                  instead of "H" to get help. In "P" option do not 
+C                  cancel TABLE parameter. Thus it should not be asked 
+C                  for, a new value would have no effect anyway. Check 
+C                  PAR_ABORT flag. (hme)
 C     24 Aug 1994  Port to Unix. Change INCLUDE. Disable colour table.
 C                  Problem is that the PGBEGIN calls will reset the
 C                  colour table from what might be set previously. Must
-C                  use the technique of IMAGE, i.e. open /append and draw
-C                  some nonsense and advance one page. Use DSA_WRUSER
-C                  with DSA_FLUSH where appropriate.
+C                  use the technique of IMAGE, i.e. open /append and
+C                  draw some nonsense and advance one page. Use 
+C                  DSA_WRUSER with DSA_FLUSH where appropriate.
 C                  Reserve 16 pens instead of four. Thus compatible with
 C                  IMAGE. Then also use IDEV instead of SOFT.
 C                  (hme)
 C     15 Sep 1994  Where the two 1-D cuts are plotted, two calls
-C                  PGPOINT/PGPAGE are necessary. In the same area, disuse
-C                  PAR_RDUSER and introduce the logical parameter OK. (hme)
+C                  PGPOINT/PGPAGE are necessary. In the same area,
+C                  disuse PAR_RDUSER and introduce the logical 
+C                  parameter OK. (hme)
 C     15 Feb 1996  HME / UoE, Starlink. Convert to FDA:
 C                  Avoid _NAMED_ routines.
 C                  Bad pixel handling.
 C     18 Jul 1996  MJCL / Starlink, UCL.  Set CHARACTER variables for
 C                  storage of file names to 132 chars.
-C
+C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C
 C   Other Comments
 C   --------------
 C
 C+-----------------------------------------------------------------------------
       implicit none
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
 C
 C     Functions
 C
       logical par_abort
-      integer dsa_typesize
-      integer dyn_element
       integer ich_len
 C
 C     Local variables
 C
-      integer   address      ! Dynamic memory address
-      logical   badpix       ! Flag for existence of magic values
-      integer   bytes_int    ! Number of bytes in integer data type
-      integer   bytes_float  ! Number of bytes in float data type
-      integer   dims(2)      ! Dimensions of input data
-      character input*132    ! Name of input file
-      integer   iptr         ! Dynamic memory pointer
-      integer   islot        ! Dynamic memory slot
-      character message*80   ! Message character variable
-      integer   ndim         ! Number of dimensions
-      integer   nelm         ! Number of elements
-      character oname*132    ! Full name of output file
-      character output*132   ! Name of output file
-      integer   ounit        ! Output file logical unit
-      integer   status       ! Status variable
-      integer   totspace     ! Total space for workspace allocation
-      integer   wptr         ! Dynamic memeory pointer
-      integer   wslot        ! Dynamic memory slot
-      integer   wxptr        ! Dynamic memory pointer
-      integer   wyptr        ! Dynamic memory pointer
-C
-C     Dynamic memory
-C
-      include 'DYNAMIC_MEMORY'
+      logical   badpix           ! Flag for existence of magic values
+      integer   dims(2)          ! Dimensions of input data
+      character input*132        ! Name of input file
+      integer   iptr             ! Dynamic-memory pointer
+      integer   islot            ! Dynamic-memory slot
+      character message*80       ! Message character variable
+      integer   ndim             ! Number of dimensions
+      integer   nelm             ! Number of elements
+      character oname*132        ! Full name of output file
+      character output*132       ! Name of output file
+      integer   ounit            ! Output file logical unit
+      integer   status           ! Status variable
+      integer   wptr             ! Dynamic-memeory pointer
+      integer   wslot            ! Dynamic-memory slot
+      integer   wxslot           ! Dynamic-memory slot
+      integer   wyslot           ! Dynamic-memory slot
+      integer   wxptr            ! Dynamic-memory pointer
+      integer   wyptr            ! Dynamic-memory pointer
 C
 C     Startup DSA
 C
@@ -234,10 +226,10 @@ C
       call par_rdchar('output',' ',output)
       if (par_abort()) go to 500
       call dsa_open_text_file(output,'.out','unknown',.true.,ounit,
-     : oname,status)
+     :                        oname,status)
       close(ounit)
       open(unit=ounit,file=oname,status='old',access='append',
-     : iostat=status)
+     :     iostat=status)
       if (status .ne. 0) then
          call dsa_wruser('Trouble opening output file')
          call dsa_wrflush
@@ -248,21 +240,15 @@ C     Get dimensionality and map input
 C     
       call dsa_data_size('image',2,ndim,dims,nelm,status)
       call dsa_use_flagged_values('image',status)
-      call dsa_map_data('image','read','float',address,islot,status)
+      call dsa_map_data('image','read','float',iptr,islot,status)
       call dsa_seek_flagged_values('image',badpix,status)
       if (status .ne. 0) go to 500
-      iptr = dyn_element(address)
 C
 C     Get some dummy arrays for the axis arrays and for display
 C
-      bytes_int = dsa_typesize('int',status)
-      bytes_float = dsa_typesize('float',status)
-      totspace = (dims(1) + dims(2))*bytes_float + 
-     : dims(1)*dims(2)*bytes_int
-      call dsa_get_workspace(totspace,address,wslot,status)
-      wxptr = dyn_element(address)
-      wyptr = wxptr + dims(1)*bytes_float
-      wptr = wyptr + dims(2)*bytes_float
+      call dsa_get_work_array(dims(1),'float',wxptr,wxslot,status)
+      call dsa_get_work_array(dims(2),'float',wyptr,wyslot,status)
+      call dsa_get_work_array(dims(1)*dims(2),'int',wptr,wslot,status)
       if (status .ne. 0) go to 500
 C
 C     Write a few things to the output file
@@ -284,9 +270,10 @@ C
 C     
 C     Now do any work required
 C
-      call sub_aperture(dims(1),dims(2),dynamic_mem(iptr),
-     : badpix,dynamic_mem(wxptr),dynamic_mem(wyptr),
-     : dynamic_mem(wptr),ounit,status)
+      call sub_aperture(dims(1),dims(2),%VAL(CNF_PVAL(iptr)),
+     :                  badpix,%VAL(CNF_PVAL(wxptr)),
+     :                  %VAL(CNF_PVAL(wyptr)),
+     :                  %VAL(CNF_PVAL(wptr)),ounit,status)
       if (status .ne. 0) go to 500
 C
 C     Tidy and exit
@@ -296,11 +283,11 @@ C
 
 
       subroutine sub_aperture(nx,ny,input,badpix,xaxis,yaxis,work,unit,
-     : status)
-C+-----------------------------------------------------------------------------
+     :                        status)
+C+----------------------------------------------------------------------
 C     SUB_APERTURE --- Present the menu for aperture photometry
 C
-C     Parameters (">" Input, "<" Output, "W" Workspace, "!" Changed)
+C     Parameters (">" Input, "<" Output, "W" Workspace, "    !" Changed)
 C
 C     (>) NX:          (integer) X dimension of the data
 C     (>) NY:          (integer) Y dimension of the data
@@ -318,8 +305,10 @@ C     DATE:        05-SEP-1991
 C     UPDATE:      04-FEB-1991 -- Modified to use new NDP 2d plotting
 C                                 routines (JRL)
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
       implicit none
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters
 C
@@ -331,18 +320,15 @@ C
 C     Functions
 C
       logical par_abort
-      integer dsa_typesize
-      integer dyn_element
       integer ich_fold
       integer ich_len
 C
 C     Local variables
 C
-      integer dumint,i,wslot,wpt1,wpt2,wpt3,wpt4,totspace,iobj,isky,
-     : ixmin,ixmax,iymin,iymax,bytes_float,address,wpt5,wpt6,
-     : wslot2,nbig
-      real low,high,x,y,pi,sum,sumsky,radius,oldlow,oldhigh,
-     : apparea
+      integer dumint,i,wslot,wslot2,wslot3,wslot4,wslot5,wslot6
+      integer wpt1,wpt2,wpt3,wpt4,wpt5,wpt6
+      integer iobj,isky,ixmin,ixmax,iymin,iymax,nbig
+      real low,high,x,y,pi,sum,sumsky,radius,oldlow,oldhigh,apparea
       character opt*1,optup*1,table*20,ch*1,softdev*16
       logical continue,picture,init
 C
@@ -350,10 +336,6 @@ C     Number of pixels used to draw a circle
 C
       integer npix
       parameter (npix=50)
-C
-C     Dynamic memory
-C
-      include 'DYNAMIC_MEMORY'
 C
 C     Numeric ranges
 C
@@ -408,21 +390,18 @@ C
 C     Preliminary set of radius
 C
       call par_rdval('radius',0.0,max_float,1.0,'pixels',
-     : radius)
+     :               radius)
       if (par_abort()) go to 500
 C
 C     Get workspace for drawing circles
 C
-      bytes_float = dsa_typesize('float',status)
-      totspace = 4*npix*bytes_float
-      call dsa_get_workspace(totspace,address,wslot,status)
-      wpt1 = dyn_element(address)
-      wpt2 = wpt1 + npix*bytes_float
-      wpt3 = wpt2 + npix*bytes_float
-      wpt4 = wpt3 + npix*bytes_float
+      call dsa_get_work_array(npix,'float',wpt1,wslot,status)
+      call dsa_get_work_array(npix,'float',wpt2,wslot2,status)
+      call dsa_get_work_array(npix,'float',wpt3,wslot3,status)
+      call dsa_get_work_array(npix,'float',wpt4,wslot4,status)
       if (status .ne. 0) go to 500
-      call cre_circle(npix,radius,dynamic_mem(wpt1),
-     : dynamic_mem(wpt2))
+      call cre_circle(npix,radius,%VAL(CNF_PVAL(wpt1)),
+     :                %VAL(CNF_PVAL(wpt2)))
 C
 C     Do preliminary display
 C
@@ -467,7 +446,7 @@ C
             table = 'grey'
             if ((low .ne. oldlow) .or. (high .ne. oldhigh)) then
                call ndp_image_index(nx*ny,low,high,input,badpix,
-     :         work,status)
+     :                              work,status)
                if (status .ne. 0) go to 500
             end if             
             call pgpage
@@ -482,10 +461,10 @@ C
          else if (optup .eq. 'R') then
             call par_cnpar('radius')
             call par_rdval('radius',0.0,max_float,1.0,'pixels',
-     :      radius)
+     :                     radius)
             if (par_abort()) go to 500
-            call cre_circle(npix,radius,dynamic_mem(wpt1),
-     :      dynamic_mem(wpt2))
+            call cre_circle(npix,radius,%VAL(CNF_PVAL(wpt1)),
+     :                      %VAL(CNF_PVAL(wpt2)))
 C
 C        Q:  Quit
 C
@@ -501,16 +480,18 @@ C
                call dsa_wruser(' P first')
                call dsa_wrflush
             else
-               call move_circle(npix,dynamic_mem(wpt1),
-     :         dynamic_mem(wpt2),x,y,dynamic_mem(wpt3),
-     :         dynamic_mem(wpt4))
-               call pgline(npix,dynamic_mem(wpt3),dynamic_mem(wpt4))
+               call move_circle(npix,%VAL(CNF_PVAL(wpt1)),
+     :                          %VAL(CNF_PVAL(wpt2)),x,y,
+     :                          %VAL(CNF_PVAL(wpt3)),
+     :                          %VAL(CNF_PVAL(wpt4)))
+               call pgline(npix,%VAL(CNF_PVAL(wpt3)),
+     :                     %VAL(CNF_PVAL(wpt4)))
                ixmin = max(nint(x-radius),1)
                ixmax = min(nint(x+radius),nx)
                iymin = max(nint(y-radius),1)
                iymax = min(nint(y+radius),ny)
                call addup(nx,ny,ixmin,ixmax,iymin,iymax,radius,x,y,
-     :         input,sum,apparea)
+     :                    input,sum,apparea)
                iobj = iobj + 1
                write(unit,100) 'O',iobj,x,y,radius,sum,apparea
   100          format(3x,a,i3,3f8.2,2(1pg12.4))
@@ -525,16 +506,18 @@ C
                call dsa_wruser(' P first')
                call dsa_wrflush
             else
-               call move_circle(npix,dynamic_mem(wpt1),
-     :         dynamic_mem(wpt2),x,y,dynamic_mem(wpt3),
-     :         dynamic_mem(wpt4))
-               call pgline(npix,dynamic_mem(wpt3),dynamic_mem(wpt4))
+               call move_circle(npix,%VAL(CNF_PVAL(wpt1)),
+     :                          %VAL(CNF_PVAL(wpt2)),x,y,
+     :                          %VAL(CNF_PVAL(wpt3)),
+     :                          %VAL(CNF_PVAL(wpt4)))
+               call pgline(npix,%VAL(CNF_PVAL(wpt3)),
+     :                     %VAL(CNF_PVAL(wpt4)))
                ixmin = max(nint(x-radius),1)
                ixmax = min(nint(x+radius),nx)
                iymin = max(nint(y-radius),1)
                iymax = min(nint(y+radius),ny)
                call addup(nx,ny,ixmin,ixmax,iymin,iymax,radius,x,y,
-     :         input,sum,apparea)
+     :                    input,sum,apparea)
                isky = isky + 1
                write(unit,100) 'S',isky,x,y,radius,sum,apparea
                sumsky = sumsky + sum
@@ -544,14 +527,13 @@ C        C:  Show cuts in X and Y through the cursor point
 C
          else if (optup .eq. 'C') then
             nbig = max(nx,ny)
-            totspace = 2*nbig*bytes_float
-            call dsa_get_workspace(totspace,address,wslot2,status)
-            wpt5 = dyn_element(address)
-            wpt6 = wpt5 + nbig*bytes_float
+            call dsa_get_work_array(nbig,'float',wpt5,wslot5,status)
+            call dsa_get_work_array(nbig,'float',wpt6,wslot6,status)
             if (status .ne. 0) go to 500
-            call plot_cut(nx,ny,nbig,input,x,y,dynamic_mem(wpt5),
-     :      dynamic_mem(wpt6),status)
-            call dsa_free_workspace(wslot2,status)
+            call plot_cut(nx,ny,nbig,input,x,y,%VAL(CNF_PVAL(wpt5)),
+     :                    %VAL(CNF_PVAL(wpt6)),status)
+            call dsa_free_workspace(wslot6,status)
+            call dsa_free_workspace(wslot5,status)
             if (status .ne. 0) go to 500
             call pgbegin(0,softdev(:ich_len(softdev))//'/append',1,1)
             call pgask(.false.)
@@ -584,6 +566,11 @@ C
          end if
       end do      
       call pgend
+      
+      call dsa_free_workspace(wslot4,status)
+      call dsa_free_workspace(wslot3,status)
+      call dsa_free_workspace(wslot2,status)
+      call dsa_free_workspace(wslot,status)
 C
 C     Average the sky values
 C
@@ -665,7 +652,7 @@ C     Plot it
 C
       control = 'AR'
       call ndp_image_plot(array,nx,ny,spx2d,epx2d,sta2d,
-     : end2d,high,low,' ',control,ximv,yimv)
+     :                    end2d,high,low,' ',control,ximv,yimv)
       call pgwindow(sta2d(1),end2d(1),sta2d(2),end2d(2))
   500 end
 
@@ -755,8 +742,8 @@ C
 
 
       subroutine addup(nx,ny,ix1,ix2,iy1,iy2,radius,x,y,input,sum,
-     : apparea)
-C+-----------------------------------------------------------------------------
+     :                 apparea)
+C+----------------------------------------------------------------------
 C     ADDUP  --- Add up the amount of signal in an aperture
 C
 C     Parameters (">" Input, "<" Output, "W" Workspace, "!" Changed)
@@ -779,7 +766,7 @@ C     AUTHOR:      Jim Lewis -- RGO
 C     DATE:        05-SEP-1991
 C     UPDATE:
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
       implicit none
 C
 C     Parameters
@@ -817,7 +804,7 @@ C
 
 
       subroutine plot_cut(nx,ny,nw,input,x,y,work1,work2,status)
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 C     PLOT_CUT -- Plot horizontal and vertical cuts through a point
 C
 C     Parameters (">" Input, "<" Output, "W" Workspace, "!" Changed)
@@ -837,7 +824,7 @@ C     AUTHOR:      Jim Lewis -- RGO
 C     DATE:        05-SEP-1991
 C     UPDATE:
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
       implicit none
 C
 C     Parameters
@@ -925,7 +912,7 @@ C     call par_rduser(dummy,status)
   500 end
 
       subroutine ndp_image_index(nelm,low,high,input,badpix,output,
-     : status)
+     :                           status)
 C+-----------------------------------------------------------------------------
 C
 C   -----------------------------
@@ -934,7 +921,7 @@ C   -----------------------------
 C
 C   Description
 C   -----------
-C   Translate a real array into an array of integer colour indicies.
+C   Translate a real array into an array of integer colour indices.
 C
 C
 C   Parameters
@@ -1038,7 +1025,7 @@ C
       subroutine ndp_image_plot
      &  (array,nx,ny,stapix,endpix,start,end,high,low,label,control,
      &   ximv,yimv)
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 C
 C   ---------------------------
 C   N D P _ I M A G E _ P L O T
@@ -1100,15 +1087,16 @@ C
 C   History
 C   -------
 C   01-FEB-1989   - Original program
-C   14-JUN-1900   - Changed calling parameters so that ARRAY isn't dimensions with
-C                   elements of another array.  (JRL)
-C   21-JAN-1992   - Input array is now an integer array of colour indices.
-C                   The original data should have been processed with
-C                   NDP_IMAGE_INDEX.  Now makes use of PGPIXL which give more
-C                   control over colour plotting. (JRL)
+C   14-JUN-1900   - Changed calling parameters so that ARRAY isn't 
+C                   dimensions with elements of another array.  (JRL)
+C   21-JAN-1992   - Input array is now an integer array of colour 
+C                   indices. The original data should have been
+C                   processed with NDP_IMAGE_INDEX.  Now makes use of 
+C                   PGPIXL which give more control over colour 
+C                   plotting. (JRL)
 C
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 c
       implicit none
 c
@@ -1140,9 +1128,9 @@ c
 c   Plot image.
 c
       call pgpixl(array,nx,ny,stapix(1),endpix(1),stapix(2),
-     : endpix(2),start(1),end(1),start(2),end(2))
+     :            endpix(2),start(1),end(1),start(2),end(2))
 c      call pgpixl(array,nx,ny,stapix(1),endpix(1),stapix(2),
-c     : endpix(2),start(1),end(1),end(2),start(2))
+c     :            endpix(2),start(1),end(1),end(2),start(2))
 c
 c   Plot axes if required.
 c
@@ -1156,8 +1144,8 @@ c   Plot label.
 c
       call pglabel(' ',' ',label)
 c
-c   Plot colour or grey scale ramp if required. Afterwards restore the image
-c   viewport.
+c   Plot colour or grey scale ramp if required. Afterwards restore the 
+c   image viewport.
 c
       if(ramp)then
         call ndp_image_ramp(ximv,yimv,low,high)
@@ -1177,11 +1165,11 @@ C
 C   Description
 C   -----------
 C   Sets the PGPLOT viewport for image display. The image size may be 
-C   selected as a fraction of the whole display durface. The location on the 
-C   surface may be any combination of Top/Centre/Bottom paired with 
-C   Left/Centre/Right, e.g. 'TL' is top left. A central position is always
-C   returned unless otherwise specified, e.g. 'L' gives left of screen,
-C   vertically centred.
+C   selected as a fraction of the whole display durface. The location on
+C   the surface may be any combination of Top/Centre/Bottom paired with 
+C   Left/Centre/Right, e.g. 'TL' is top left. A central position is 
+C   always returned unless otherwise specified, e.g. 'L' gives left of 
+C   screen, vertically centred.
 C
 C
 C   Parameters
@@ -1233,7 +1221,7 @@ C   -------
 C   01-FEB-1989   - Original program
 C
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 c
       implicit none
 c
@@ -1398,7 +1386,7 @@ c
       end
 
       subroutine ndp_device_index(ci_start,ci_end,status)
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 C
 C   -------------------------------
 C   N D P _ D E V I C E _ I N D E X
@@ -1448,7 +1436,7 @@ C   03-FEB-1992   - Now checks that a device is open first (JRL)
 C   24-AUG-1994   - Reserve 16 pens instead of four. (hme)
 C
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
       implicit none
 C
 C     Parameters
@@ -1555,7 +1543,7 @@ C                   functionality or calling sequence. (GTR)
 C   21-JAN-1992   - Changed to use PGPIXL instead of PGGRAY. (JRL)
 C
 C
-C+-----------------------------------------------------------------------------
+C+----------------------------------------------------------------------
 c
       implicit none
 c
@@ -1578,21 +1566,24 @@ c
 c    Local variables:
 c
       integer       
-     :   mincol, maxcol,    ! maximum and minimum colour indicies available
+     :   mincol, maxcol,    ! maximum and minimum colour indices 
+                            ! available
      :   cispan,            ! number of colour values to be set
-     :   i, j,              ! loop indicies
+     :   i, j,              ! loop indices
      :   iarray(xdim,ydim), ! colour index array
      :   ci_start,ci_end,   ! colour index range
      :   status             ! status variable
       real          
      :   rarray(xdim,ydim), ! array of ramp values
-     :   tran(6),           ! transformation coeffs., pixels to world coords.
+     :   tran(6),           ! transformation coeffs., pixels to world 
+                            ! coords.
      :   xmax, xmin,        ! limits of the ramp viewport
      :   val                ! dummy variable
 
 
 c
-c    Set the ramp viewport. The ramp will appear at the right of the image.
+c    Set the ramp viewport. The ramp will appear at the right of the 
+c    image.
 c
       xmin=ximv(2)+0.025*(ximv(2)-ximv(1))
       xmax=xmin+0.05*(ximv(2)-ximv(1))
@@ -1602,8 +1593,8 @@ c    Set world coordinates in Y to the image data range.
 c
       call pgwindow(1.0,2.0,low,high)
 c
-c    Fill the ramp array with the image data range interpolated over the 
-c    available colour indices.
+c    Fill the ramp array with the image data range interpolated over
+c    the available colour indices.
 c
       call ndp_device_index(ci_start,ci_end,status)
       if (status .ne. 0) go to 500
@@ -1615,13 +1606,13 @@ c
          end do
       end do
       call ndp_image_index(xdim*ydim,low,high,rarray,.false.,iarray,
-     : status)
+     :                     status)
       if (status .ne. 0) go to 500
 c
 c    Plot the ramp array.
 c
       call pgpixl(iarray,xdim,ydim,1,xdim,1,cispan,1.0,float(xdim),
-     : low,high)
+     :            low,high)
 c
 c    Plot box with annotation on right side only.
 c

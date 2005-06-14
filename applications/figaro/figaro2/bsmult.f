@@ -28,51 +28,67 @@ C
 C                                         KS / CIT 3rd July 1984
 C     Modified:
 C
-C     6th May 1986  KS / AAO.  Now will accept an image for SPECT,
-C                   although it still expects BSTAR to be a single
-C                   spectrum.
-C     24th Aug 1987 DJA/ AAO.  Now uses DSA_ routines - some specs changed. Now
-C                   uses DYN_ package for dynamic memory handling.
-C     19th Dec 1990 JMS / AAO. Now works for 2D B Star Data.
-C     26th Mar 1991 KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                   mapping calls.
-C     5th  Oct 1992 HME / UoE, Starlink. Changed INCLUDE. TABs removed.
-C     1st  May 1997 JJL / Soton, Starlink. Propogates the variances
-C     29th Jul 1997 MJCL / Starlink, UCL.  Initialised VEXIST to .FALSE.
+C     6th May 1986   KS / AAO.  Now will accept an image for SPECT,
+C                    although it still expects BSTAR to be a single
+C                    spectrum.
+C     24th Aug 1987  DJA/ AAO.  Now uses DSA_ routines - some specs 
+C                    changed. Now uses DYN_ package for dynamic-memory 
+C                    handling.
+C     19th Dec 1990  JMS / AAO. Now works for 2D B Star Data.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
+C                    mapping calls.
+C     5th  Oct 1992  HME / UoE, Starlink. Changed INCLUDE. TABs removed.
+C     1st  May 1997  JJL / Soton, Starlink. Propogates the variances
+C     29th Jul 1997  MJCL / Starlink, UCL.  Initialised VEXIST to 
+C                    .FALSE.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions used 
-C
-      INTEGER DYN_ELEMENT,DYN_INCREMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         BAIRM        ! The air mass for the B star
-      INTEGER      BDIM         ! The number of Dimensions for the B Star data
-      REAL         BETA         ! See above
-      INTEGER      BPTR         ! Dynamic-memory pointer to B star data 
-      INTEGER      BSLOT        ! Map slot number of input B star data
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      I            ! Counter for each spectrum in image
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      SAIRM        ! The air mass for the input spectrum
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      VBPTR        ! Dyn-memory pointer to B star variances
-      LOGICAL      VEXIST       ! TRUE if variances exist in both spectra
-      INTEGER      VOPTR        ! Dyn-memory pointer to output variance array
-      INTEGER      VBSLOT       ! Map slot number of input B star variance
-      INTEGER      VOSLOT       ! Map slot number for output variance array
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL      BAIRM            ! The air mass for the B star
+      INTEGER   BDIM             ! Number of dimensions for the B-star 
+                                 ! data
+      REAL      BETA             ! See above
+      INTEGER   BPTR             ! Dynamic-memory pointer to B-star data
+      INTEGER   BSLOT            ! Map slot number of input B star data
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      INTEGER   I                ! Counter for each spectrum in image
+      LOGICAL   ISNEVB           ! Is VBPTR address new to CNF?
+      LOGICAL   ISNEW            ! Is OPTR address new to CNF?
+      LOGICAL   ISNEWB           ! Is BPTR address new to CNF?
+      LOGICAL   ISNEWV           ! Is VOPTR address new to CNF?
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NELM             ! Total number of elements in data
+      INTEGER   NX               ! Size of 1st dimension
+      INTEGER   NY               ! Size of 2nd dimension (if present)
+      INTEGER   OPTR             ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER   OSLOT            ! Map slot number for output data array
+      LOGICAL   PISNB            ! Previous CNF pointer to B-star data
+                                 ! new?
+      LOGICAL   PISNEW           ! Previous CNF pointer to output data 
+                                 ! new?
+      LOGICAL   PISNVB           ! Previous CNF pointer to B-star errors
+                                 ! new?
+      LOGICAL   PISNVO           ! Previous CNF pointer to output errors
+                                 ! new?
+      INTEGER   SAIRM            ! The air mass for the input spectrum
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      INTEGER   TPTR             ! Temp dynamic-memory pointer
+      INTEGER   VBPTR            ! Dyn-memory pointer to B-star 
+                                 ! variances
+      LOGICAL   VEXIST           ! Variances exist in both spectra?
+      INTEGER   VOPTR            ! Dyn-memory pointer to output 
+                                 ! variance array
+      INTEGER   VBSLOT           ! Map slot number of input B-star 
+                                 ! variance
+      INTEGER   VOSLOT           ! Map slot number for output variance
+                                 ! array
 C
 C     Initialisation of DSA_ routines
 C
@@ -123,11 +139,9 @@ C     Map input and output spectra (note: FIG_BSMULT will allow its
 C     input and result arrays to be the same). Also test to see if
 C     a variance array exists.
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
-      CALL DSA_MAP_DATA('BST','READ','FLOAT',ADDRESS,BSLOT,STATUS)
-      BPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('BST','READ','FLOAT',BPTR,BSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE('SPECT',VEXIST,STATUS)
@@ -137,29 +151,55 @@ C
 C     If the variance structure exists, map it.
 C   
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',ADDRESS,
+         CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,
      :                          VOSLOT,STATUS)
-         VOPTR = DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_VARIANCE('BST','READ','FLOAT',ADDRESS,VBSLOT,
+         CALL DSA_MAP_VARIANCE('BST','READ','FLOAT',VBPTR,VBSLOT,
      :                          STATUS)
-         VBPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+      END IF
       IF (STATUS.NE.0) GOTO 500
 C
 C     Generate the corrected spectrum
 C
+      PISNEW = .FALSE.
+      PISNB = .FALSE.
+      PISNVO = .FALSE.
+      PISNVB = .FALSE.
       DO I=1,NY
-         CALL FIG_BSMULT(NX,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR),
-     :                      DYNAMIC_MEM(BPTR),DYNAMIC_MEM(VBPTR),
+         CALL FIG_BSMULT(NX,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)),
+     :                      %VAL(CNF_PVAL(BPTR)),%VAL(CNF_PVAL(VBPTR)),
      :                      SAIRM,BAIRM,BETA,VEXIST,
-     :                      DYNAMIC_MEM(OPTR),DYNAMIC_MEM(VOPTR))
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
-         IF (VEXIST) VOPTR=DYN_INCREMENT(VOPTR,'FLOAT',NX)
+     :                      %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(VOPTR)))
+
+         CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
+         PISNEW = ISNEW
+
+         IF (VEXIST) THEN
+            CALL DYN_INCAD(VOPTR,'FLOAT',NX,TPTR,ISNEWV,STATUS)
+            IF (ISNEWV) CALL CNF_UNREGP(VOPTR)
+            VOPTR = TPTR
+            PISNVO = ISNEWV
+         END IF
          IF (BDIM.EQ.2) THEN
-             BPTR=DYN_INCREMENT(BPTR,'FLOAT',NX)
-             IF (VEXIST) VBPTR=DYN_INCREMENT(VBPTR,'FLOAT',NX)
-         ENDIF
+            CALL DYN_INCAD(BPTR,'FLOAT',NX,TPTR,ISNEWB,STATUS)
+            IF (ISNEWB) CALL CNF_UNREGP(BPTR)
+            BPTR = TPTR
+            PISNB = ISNEWB
+
+            IF (VEXIST) THEN
+               CALL DYN_INCAD(VBPTR,'FLOAT',NX,TPTR,ISNEVB,STATUS)
+               IF (ISNEVB) CALL CNF_UNREGP(VBPTR)
+               VBPTR = TPTR
+               PISNVB = ISNEVB
+            END IF
+         END IF
       END DO
+
+      IF (ISNEW) CALL CNF_UNREGP(OPTR)
+      IF (ISNEWV) CALL CNF_UNREGP(VOPTR)
+      IF (ISNEWB) CALL CNF_UNREGP(BPTR)
+      IF (ISNEVB)  CALL CNF_UNREGP(VBPTR)
 C
 C     Tidy up
 C
@@ -240,6 +280,6 @@ C
      :                 (BDATA(IX)**(((SSECZ/BSECZ)**BETA)-1. )))
          VRESULT(IX)=TEMP
          END DO
-      ENDIF
+      END IF
 C
       END

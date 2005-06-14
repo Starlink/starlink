@@ -13,15 +13,16 @@ C
 C     SPECTRUM (Character) The name of the structure containing the 
 C              template data.
 C
-C     BELLPC   (Numeric) The percentage of the data that is to be covered
-C              by the rising (or falling) part of the cosine bell.
+C     BELLPC   (Numeric) The percentage of the data that is to be 
+C              covered by the rising (or falling) part of the cosine
+C              bell.
 C
-C     OUTPUT   (Character) The name of the result of the operation.  This 
-C              can be the same as for SPECTRUM. If not, a new structure
-C              is created, with everything but the data a direct
-C              copy of the input.
+C     OUTPUT   (Character) The name of the result of the operation.
+C              This can be the same as for SPECTRUM. If not, a new
+C              structure is created, with everything but the data a
+C              direct copy of the input.
 C
-C                                                 KS / AAO 23rd Sept 1986
+C                                                KS / AAO 23rd Sept 1986
 C
 C     Modified:
 C
@@ -31,30 +32,26 @@ C                    memory handling
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed, TAB removed.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      IGNORE       ! Used to ignore status errors
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of first image dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number output data array
-      REAL         PERCENT      ! See BELLPC above
-      INTEGER      STATUS       ! Running status for DSA_ routines
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      IGNORE        ! Used to ignore status errors
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NX            ! Size of first image dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data 
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number output data array
+      REAL         PERCENT       ! See BELLPC above
+      INTEGER      STATUS        ! Running status for DSA_ routines
 C
 C     Initialisation of DSA_ routines
 C
@@ -84,17 +81,15 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                   STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Now generate the cosine bell.
 C
       IF (NDIM.EQ.1) THEN
-         CALL FIG_1DCOSB(NX,PERCENT,DYNAMIC_MEM(OPTR))
+         CALL FIG_1DCOSB(NX,PERCENT,%VAL(CNF_PVAL(OPTR)))
       ELSE
-         CALL FIG_2DCOSB(NX,DIMS(2),PERCENT,DYNAMIC_MEM(OPTR))
+         CALL FIG_2DCOSB(NX,DIMS(2),PERCENT,%VAL(CNF_PVAL(OPTR)))
       END IF
 C
 C     Tidy up

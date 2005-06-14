@@ -35,48 +35,52 @@ C
 C                                        KS / CIT 28th May 1984
 C     Modified:
 C
-C     24th Aug 1987 - DJA/AAO. Revised DSA_ routines - some specs changed. Now
-C                     uses DYN_ routines for dynamic memory handling.
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     5th  Oct 1992   HME / UoE, Starlink. Changed INCLUDE. TABs removed.
+C     24th Aug 1987  DJA/AAO. Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN_ routines for dynamic-memory
+C                    handling.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected
+C                    in mapping calls.
+C     5th  Oct 1992  HME / UoE, Starlink. Changed INCLUDE. TABs 
+C                    removed.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL FIG_SCRCHK, FIG_WCHECK
-      INTEGER ICH_ENCODE, DYN_ELEMENT
+      INTEGER ICH_ENCODE
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      CHARACTER    DUMMY*1      ! Dummy string arguement
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      INVOKE       ! Used to invoke functions
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NEXT         ! Dummy arguement for ICH_ENCODE
-      INTEGER      NX           ! Number of elements in data
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      SPDPTR       ! Pointer to spectrum data
-      INTEGER      SPDSLOT      ! Map slot number for spectrum data
-      INTEGER      SPXPTR       ! Pointer to spectrum x-axis data
-      INTEGER      SPXSLOT      ! Map slot number for spectrum x-axis data
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! Output message text
-      INTEGER      STXPTR       ! Pointer to standard x-axis data
-      INTEGER      STXSLOT      ! Map slot number for standard x-axis data
-      REAL         TIME         ! The exposure time
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      CHARACTER    DUMMY*1       ! Dummy string arguement
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INVOKE        ! Used to invoke functions
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NEXT          ! Dummy arguement for ICH_ENCODE
+      INTEGER      NX            ! Number of elements in data
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      SPDPTR        ! Pointer to spectrum data
+      INTEGER      SPDSLOT       ! Map slot number for spectrum data
+      INTEGER      SPXPTR        ! Pointer to spectrum x-axis data
+      INTEGER      SPXSLOT       ! Map slot number for spectrum x-axis 
+                                 ! data
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*64     ! Output message text
+      INTEGER      STXPTR        ! Pointer to standard x-axis data
+      INTEGER      STXSLOT       ! Map slot number for standard x-axis
+                                 ! data
+      REAL         TIME          ! The exposure time
 C
       DOUBLE PRECISION  MAGNITUDE ! Non zero if data is in magnitudes
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -115,24 +119,22 @@ C
 C
 C     Map the X data arrays
 C
-      CALL DSA_MAP_AXIS_DATA('STAND',1,'READ','FLOAT',ADDRESS,STXSLOT,
-     :                                                         STATUS)
-      STXPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,SPXSLOT,
-     :                                                         STATUS)
-      SPXPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('STAND',1,'READ','FLOAT',STXPTR,STXSLOT,
+     :                       STATUS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',SPXPTR,SPXSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Check that the data arrays match
 C
-      IF (.NOT.FIG_WCHECK(NX,DYNAMIC_MEM(SPXPTR),
-     :                       DYNAMIC_MEM(STXPTR))) THEN
+      IF (.NOT.FIG_WCHECK(NX,%VAL(CNF_PVAL(SPXPTR)),
+     :                       %VAL(CNF_PVAL(STXPTR)))) THEN
          CALL PAR_WRUSER(
      :     'Spectrum and standard have different wavelength scales',
      :                                                       IGNORE)
          GO TO 500
       END IF
-      IF (.NOT.FIG_SCRCHK(NX,DYNAMIC_MEM(SPXPTR))) THEN
+      IF (.NOT.FIG_SCRCHK(NX,%VAL(CNF_PVAL(SPXPTR)))) THEN
          CALL PAR_WRUSER(
      :      'Warning: Data is not on a linear wavelength scale',IGNORE)
          CALL PAR_WRUSER(
@@ -146,10 +148,8 @@ C
 C
 C     Map the data arrays
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SPDSLOT,STATUS)
-      SPDPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',SPDPTR,SPDSLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get the exposure time for the spectrum.
@@ -163,8 +163,8 @@ C
 C
 C     Calculate the calibration spectrum
 C
-      CALL FIG_CALDIV(NX,DYNAMIC_MEM(SPXPTR),DYNAMIC_MEM(SPDPTR),
-     :                    DYNAMIC_MEM(OPTR),TIME,DYNAMIC_MEM(OPTR))
+      CALL FIG_CALDIV(NX,%VAL(CNF_PVAL(SPXPTR)),%VAL(CNF_PVAL(SPDPTR)),
+     :                %VAL(CNF_PVAL(OPTR)),TIME,%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C

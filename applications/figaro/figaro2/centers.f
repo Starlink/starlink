@@ -10,9 +10,9 @@ C
 C     The approximate positions input are obtained from environment
 C     variables.  These variables should be set up prior to running
 C     CENTERS, usually by using Figaro functions IGCUR or ICUR.
-C     Alternatively, you may enter the positions into a text file and use
-C     IMPOS to read this file and copy the values into the environment
-C     variables required by CENTERS.
+C     Alternatively, you may enter the positions into a text file and 
+C     use IMPOS to read this file and copy the values into the
+C     environment variables required by CENTERS.
 C
 C     The computed centroids are output to a new file called center.dat.
 C
@@ -69,8 +69,9 @@ C
 C                                       KS / CIT 29th Sept 1983
 C     Modified:
 C
-C     31st Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs changed.
-C                    Now uses DYN routines for dynamic memory handling
+C     31st Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN routines for dynamic-memory
+C                    handling.
 C     22nd Mar 1988  KS / AAO. Conversion completed.  Use of STATUS
 C                    restricted to DSA routines.  Modified for use
 C                    with GKS version of PGPLOT.
@@ -82,8 +83,9 @@ C                    names profiles.lis, cursor.dat, center.dat. Build
 C                    file stuff commented out. Call FIG_SETERR rather
 C                    than SETERR. PGASK is banned from ADAM, commented
 C                    out.
-C     18th Nov 1992  HME / UoE, Starlink.  Instead of cursor.dat, get input
-C                    from the user variables set by IGCUR (or ICUR).
+C     18th Nov 1992  HME / UoE, Starlink.  Instead of cursor.dat, get
+C                    input from the user variables set by IGCUR (or
+C                    ICUR).
 C     25th Jan 1993  HME / UoE, Starlink.  Put PGASK back in.
 C     26th Jul 1993  HME / UoE, Starlink.  Disuse GKD_*, PAR_Q*. Added
 C                    parameters DISPROF, CHGPROF, PROFBOX, PROFMIN,
@@ -98,8 +100,12 @@ C                    rather than before, each value is obtained.
 C     29th Oct 2001  ACD / UoE, Starlink.  Changed the prologue comments
 C                    to correspond to the modifications made by HME on
 C                    8th Nov 1992.
+C     2005 June 10   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Maximum aperture size
 C
@@ -124,60 +130,56 @@ C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_LEN,DYN_ELEMENT
+      INTEGER ICH_LEN
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      LOGICAL      BUOPEN       ! True if build file opened
-      LOGICAL      CENTOK       !
-      LOGICAL      CEOPEN       ! True if center.dat opened
-      LOGICAL      CUOPEN       ! True if CURSOR.DAT opened
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      LOGICAL      FAULT        ! TRUE if an error occurred
-      CHARACTER    FILE*32      ! The name of the build file if required
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      CHARACTER    IMAGE*132    ! The actual name of the image file
-      INTEGER      IREC         !
-      INTEGER      ISTAT        ! Status variable for non-DSA routines
-      INTEGER      IX           !
-      INTEGER      IY           !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NEXT         !
-      INTEGER      NRAD         !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      LOGICAL      PFILE        ! Value of PFILE keyword
-      LOGICAL      POPEN        !
-      LOGICAL      PROFIL       !
-      LOGICAL      REPLY        ! Reply from would-be PAR_Q*
-      INTEGER      RADIUS       !
-      INTEGER      SIZE         !
-      CHARACTER    SOFT*32      ! The name of the soft device
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! Output message text
-      REAL       SUMX(NRMAX*2+1)!
-      REAL       SUMY(NRMAX*2+1)!
-      INTEGER      SZMAX        !
-      REAL         VALUE        ! Temporary real number
-      INTEGER      X            !
-      REAL         XCENT        !
-      REAL         XOFF         !
-      INTEGER      Y            !
-      REAL         YCENT        !
-      REAL         YOFF         !
+      LOGICAL      BUOPEN        ! True if build file opened
+      LOGICAL      CENTOK        !
+      LOGICAL      CEOPEN        ! True if center.dat opened
+      LOGICAL      CUOPEN        ! True if CURSOR.DAT opened
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      LOGICAL      FAULT         ! TRUE if an error occurred
+      CHARACTER    FILE*32       ! Name of the build file if required
+      INTEGER      I             !
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      CHARACTER    IMAGE*132     ! The actual name of the image file
+      INTEGER      IPIX          !
+      INTEGER      IREC          !
+      INTEGER      ISTAT         ! Status variable for non-DSA routines
+      INTEGER      IX            !
+      INTEGER      IY            !
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NEXT          !
+      INTEGER      NPIX          !
+      REAL         NPIXELS       !
+      INTEGER      NRAD          !
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      LOGICAL      PFILE         ! Value of PFILE keyword
+      LOGICAL      POPEN         !
+      LOGICAL      PROFIL        !
+      LOGICAL      REPLY         ! Reply from would-be PAR_Q*
+      INTEGER      RADIUS        !
+      INTEGER      SIZE          !
+      CHARACTER    SOFT*32       ! The name of the soft device
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*64     ! Output message text
+      REAL       SUMX(NRMAX*2+1) !
+      REAL       SUMY(NRMAX*2+1) !
+      INTEGER      SZMAX         !
+      REAL         VALUE         ! Temporary real number
+      INTEGER      X             !
+      REAL         XCENT         !
+      REAL         XOFF          !
+      INTEGER      Y             !
+      REAL         YCENT         !
+      REAL         YOFF          !
       REAL         XPIXELS(MAXPTS)
       REAL         YPIXELS(MAXPTS)
-      REAL         NPIXELS
-      INTEGER      IPIX, NPIX
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -223,8 +225,7 @@ C
       END IF
       NX=DIMS(1)
       NY=DIMS(2)
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get offsets and aperture size
@@ -323,8 +324,8 @@ C        to terminal.
 C
          X=IX+XOFF
          Y=IY+YOFF
-         CALL FIG_CPCENT(DYNAMIC_MEM(DPTR),NX,NY,X,Y,NRAD,SUMX,
-     :                                 SUMY,XCENT,YCENT,ISTAT)
+         CALL FIG_CPCENT(%VAL(CNF_PVAL(DPTR)),NX,NY,X,Y,NRAD,SUMX,
+     :                   SUMY,XCENT,YCENT,ISTAT)
          IF (ISTAT.NE.0) THEN
             WRITE (STRING,'(2I5,A)',IOSTAT=IGNORE) X,Y,
      :                               ' Cannot calculate centroid: '
@@ -358,9 +359,9 @@ C
             CALL PAR_CNPAR('DISPROF')
             IF (PAR_ABORT()) GO TO 500
             IF (REPLY) THEN
-               CALL FIG_RPROF(SOFT,FILE,DYNAMIC_MEM(DPTR),NX,NY,
+               CALL FIG_RPROF(SOFT,FILE,%VAL(CNF_PVAL(DPTR)),NX,NY,
      :                        XCENT,YCENT,SZMAX,BUOPEN,SIZE,SUMX,
-     :                                               SUMY,ISTAT)
+     :                        SUMY,ISTAT)
                IF (PAR_ABORT()) GO TO 500
                PROFIL=ISTAT.EQ.0
             ELSE
@@ -373,8 +374,8 @@ C        using SUMY as workspace, and write to output file.
 C
          IF (PFILE) THEN
             RADIUS=INT(1.4142*SIZE*.5+.5)
-            CALL FIG_CPCALC(DYNAMIC_MEM(DPTR),NX,NY,XCENT,YCENT,
-     :                                         RADIUS,SUMY,SUMX)
+            CALL FIG_CPCALC(%VAL(CNF_PVAL(DPTR)),NX,NY,XCENT,YCENT,
+     :                      RADIUS,SUMY,SUMX)
             WRITE (PUNIT,'(/2F8.2,10G10.3)',IOSTAT=ISTAT)
      :                     XCENT,YCENT,(SUMX(I),I=1,MIN(10,RADIUS))
             IF (RADIUS.GT.10) THEN
