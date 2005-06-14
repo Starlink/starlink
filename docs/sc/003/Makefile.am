@@ -20,7 +20,7 @@ sc3-scripts.tex: scripts
 	    echo '\end{verbatim}'; \
 	fi; done > ../$@
 
-$(distdir)-scripts.tar:
+$(distdir)-scripts.tar: scripts
 	DN=$(distdir)-scripts; \
 	    mkdir $$DN; \
 	    for f in scripts/*; do if test -f $$f; then cp $$f $$DN; fi; done;\
