@@ -36,11 +36,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = fpdemo$(EXEEXT) fpp$(EXEEXT) dfpp$(EXEEXT) \
 	mixed$(EXEEXT) crash$(EXEEXT) timewaster$(EXEEXT)
 noinst_PROGRAMS = islittleendian$(EXEEXT)
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/README.in \
 	$(srcdir)/config.h.in $(top_srcdir)/configure compile \
 	config.guess config.sub depcomp install-sh missing
@@ -75,9 +76,8 @@ islittleendian_LDADD = $(LDADD)
 am_mixed_OBJECTS = mixed-f.$(OBJEXT) mixed-c.$(OBJEXT)
 mixed_OBJECTS = $(am_mixed_OBJECTS)
 mixed_LDADD = $(LDADD)
-am_timewaster_OBJECTS = timewaster-timewaster.$(OBJEXT) \
-	timewaster-p1.$(OBJEXT) timewaster-p2.$(OBJEXT) \
-	timewaster-p3.$(OBJEXT)
+am_timewaster_OBJECTS = timewaster-p1.$(OBJEXT) \
+	timewaster-p2.$(OBJEXT) timewaster-p3.$(OBJEXT)
 timewaster_OBJECTS = $(am_timewaster_OBJECTS)
 timewaster_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -88,14 +88,16 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/fpp-fpp.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/islittleendian.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/mixed-c.Po
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) \
+	$(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+FCCOMPILE = $(FC) $(STAR_FCFLAGS) $(AM_FCFLAGS) $(FCFLAGS)
 FCLD = $(FC)
-FCLINK = $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
-	$@
+FCLINK = $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(STAR_LDFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = crash.c $(dfpp_SOURCES) $(fpdemo_SOURCES) $(fpp_SOURCES) \
 	islittleendian.c $(mixed_SOURCES) $(timewaster_SOURCES)
 DIST_SOURCES = crash.c $(dfpp_SOURCES) $(fpdemo_SOURCES) \
@@ -103,8 +105,7 @@ DIST_SOURCES = crash.c $(dfpp_SOURCES) $(fpdemo_SOURCES) \
 	$(timewaster_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 am__remove_distdir = \
@@ -115,6 +116,17 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
+# Use AM_MAKEFLAGS to pass the value of the MANIFEST variable into
+# submakes (not all makes do this automatically).  This can still be
+# overridden with a setting of this variable on the $(MAKE) command
+# line.  I think we really shouldn't be setting this variable -- if
+# it causes a problem for anyone, we should edit a new variable in to
+# the .am templates.
+AM_MAKEFLAGS = MANIFEST=$(MANIFEST)
+REAL_INSTALL = install-am
+# Set to : to emit manifest lines, too
+# (don't actually do this here -- it's done within install-manifest below).
+MANIFEST = false
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -215,14 +227,14 @@ fpp_SOURCES = fpp.c bytesex.h
 fpp_CPPFLAGS = $(ENABLENAN) -DDOUBLEPRECISION=0
 dfpp_SOURCES = fpp.c bytesex.h
 dfpp_CPPFLAGS = $(ENABLENAN) -DDOUBLEPRECISION=1
-timewaster_SOURCES = timewaster.f p1.f p2.f p3.f
-timewaster_FFLAGS = $(PROFILINGOPTION) $(AM_FFLAGS)
+timewaster_SOURCES = p1.f p2.f p3.f
+timewaster_FCFLAGS = $(PROFILINGOPTION) $(AM_FCFLAGS)
 timewaster_LDFLAGS = $(PROFILINGOPTION)
-p1_FFLAGS = $(PROFILING) $(AM_FFLAGS)
-p2_FFLAGS = $(PROFILING) $(AM_FFLAGS)
-p3_FFLAGS = $(PROFILING) $(AM_FFLAGS)
+p1_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
+p2_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
+p3_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
 mixed_SOURCES = mixed-f.f mixed-c.c
-mixed_f_FFLAGS = $(NOUNDERSCORES) $(AM_FFLAGS)
+mixed_f_FCFLAGS = $(NOUNDERSCORES) $(AM_FCFLAGS)
 BUILT_SOURCES = bytesex.h
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -291,9 +303,7 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
 	   echo " $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f"; \
 	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f || exit 1; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(bindir)/$$f" >>$$MANIFEST_FILE; \
-	    else :; fi; \
+	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$f" || :; \
 	  else :; fi; \
 	done
 
@@ -312,25 +322,25 @@ clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 crash$(EXEEXT): $(crash_OBJECTS) $(crash_DEPENDENCIES) 
 	@rm -f crash$(EXEEXT)
-	$(LINK) $(crash_LDFLAGS) $(crash_OBJECTS) $(crash_LDADD) $(LIBS)
+	$(LINK) $(crash_LDFLAGS) $(crash_OBJECTS) $(crash_LDADD) $(LIBS) 
 dfpp$(EXEEXT): $(dfpp_OBJECTS) $(dfpp_DEPENDENCIES) 
 	@rm -f dfpp$(EXEEXT)
-	$(LINK) $(dfpp_LDFLAGS) $(dfpp_OBJECTS) $(dfpp_LDADD) $(LIBS)
+	$(LINK) $(dfpp_LDFLAGS) $(dfpp_OBJECTS) $(dfpp_LDADD) $(LIBS) 
 fpdemo$(EXEEXT): $(fpdemo_OBJECTS) $(fpdemo_DEPENDENCIES) 
 	@rm -f fpdemo$(EXEEXT)
-	$(LINK) $(fpdemo_LDFLAGS) $(fpdemo_OBJECTS) $(fpdemo_LDADD) $(LIBS)
+	$(LINK) $(fpdemo_LDFLAGS) $(fpdemo_OBJECTS) $(fpdemo_LDADD) $(LIBS) 
 fpp$(EXEEXT): $(fpp_OBJECTS) $(fpp_DEPENDENCIES) 
 	@rm -f fpp$(EXEEXT)
-	$(LINK) $(fpp_LDFLAGS) $(fpp_OBJECTS) $(fpp_LDADD) $(LIBS)
+	$(LINK) $(fpp_LDFLAGS) $(fpp_OBJECTS) $(fpp_LDADD) $(LIBS) 
 islittleendian$(EXEEXT): $(islittleendian_OBJECTS) $(islittleendian_DEPENDENCIES) 
 	@rm -f islittleendian$(EXEEXT)
-	$(LINK) $(islittleendian_LDFLAGS) $(islittleendian_OBJECTS) $(islittleendian_LDADD) $(LIBS)
+	$(LINK) $(islittleendian_LDFLAGS) $(islittleendian_OBJECTS) $(islittleendian_LDADD) $(LIBS) 
 mixed$(EXEEXT): $(mixed_OBJECTS) $(mixed_DEPENDENCIES) 
 	@rm -f mixed$(EXEEXT)
-	$(FCLINK) $(mixed_LDFLAGS) $(mixed_OBJECTS) $(mixed_LDADD) $(LIBS)
+	$(FCLINK) $(mixed_LDFLAGS) $(mixed_OBJECTS) $(mixed_LDADD) $(LIBS) $(C_FC_FCLINK_MAGIC)
 timewaster$(EXEEXT): $(timewaster_OBJECTS) $(timewaster_DEPENDENCIES) 
 	@rm -f timewaster$(EXEEXT)
-	$(FCLINK) $(timewaster_LDFLAGS) $(timewaster_OBJECTS) $(timewaster_LDADD) $(LIBS)
+	$(FCLINK) $(timewaster_LDFLAGS) $(timewaster_OBJECTS) $(timewaster_LDADD) $(LIBS) $(C_FC_FCLINK_MAGIC)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -362,52 +372,52 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 dfpp-fpp.o: fpp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dfpp-fpp.o -MD -MP -MF "$(DEPDIR)/dfpp-fpp.Tpo" -c -o dfpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dfpp-fpp.o -MD -MP -MF "$(DEPDIR)/dfpp-fpp.Tpo" -c -o dfpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/dfpp-fpp.Tpo" "$(DEPDIR)/dfpp-fpp.Po"; else rm -f "$(DEPDIR)/dfpp-fpp.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpp.c' object='dfpp-fpp.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/dfpp-fpp.Po' tmpdepfile='$(DEPDIR)/dfpp-fpp.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dfpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dfpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c
 
 dfpp-fpp.obj: fpp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dfpp-fpp.obj -MD -MP -MF "$(DEPDIR)/dfpp-fpp.Tpo" -c -o dfpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dfpp-fpp.obj -MD -MP -MF "$(DEPDIR)/dfpp-fpp.Tpo" -c -o dfpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/dfpp-fpp.Tpo" "$(DEPDIR)/dfpp-fpp.Po"; else rm -f "$(DEPDIR)/dfpp-fpp.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpp.c' object='dfpp-fpp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/dfpp-fpp.Po' tmpdepfile='$(DEPDIR)/dfpp-fpp.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dfpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(dfpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dfpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`
 
 fpdemo-fpdemo.o: fpdemo.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpdemo-fpdemo.o -MD -MP -MF "$(DEPDIR)/fpdemo-fpdemo.Tpo" -c -o fpdemo-fpdemo.o `test -f 'fpdemo.c' || echo '$(srcdir)/'`fpdemo.c; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpdemo-fpdemo.o -MD -MP -MF "$(DEPDIR)/fpdemo-fpdemo.Tpo" -c -o fpdemo-fpdemo.o `test -f 'fpdemo.c' || echo '$(srcdir)/'`fpdemo.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fpdemo-fpdemo.Tpo" "$(DEPDIR)/fpdemo-fpdemo.Po"; else rm -f "$(DEPDIR)/fpdemo-fpdemo.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpdemo.c' object='fpdemo-fpdemo.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/fpdemo-fpdemo.Po' tmpdepfile='$(DEPDIR)/fpdemo-fpdemo.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpdemo-fpdemo.o `test -f 'fpdemo.c' || echo '$(srcdir)/'`fpdemo.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpdemo-fpdemo.o `test -f 'fpdemo.c' || echo '$(srcdir)/'`fpdemo.c
 
 fpdemo-fpdemo.obj: fpdemo.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpdemo-fpdemo.obj -MD -MP -MF "$(DEPDIR)/fpdemo-fpdemo.Tpo" -c -o fpdemo-fpdemo.obj `if test -f 'fpdemo.c'; then $(CYGPATH_W) 'fpdemo.c'; else $(CYGPATH_W) '$(srcdir)/fpdemo.c'; fi`; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpdemo-fpdemo.obj -MD -MP -MF "$(DEPDIR)/fpdemo-fpdemo.Tpo" -c -o fpdemo-fpdemo.obj `if test -f 'fpdemo.c'; then $(CYGPATH_W) 'fpdemo.c'; else $(CYGPATH_W) '$(srcdir)/fpdemo.c'; fi`; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fpdemo-fpdemo.Tpo" "$(DEPDIR)/fpdemo-fpdemo.Po"; else rm -f "$(DEPDIR)/fpdemo-fpdemo.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpdemo.c' object='fpdemo-fpdemo.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/fpdemo-fpdemo.Po' tmpdepfile='$(DEPDIR)/fpdemo-fpdemo.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpdemo-fpdemo.obj `if test -f 'fpdemo.c'; then $(CYGPATH_W) 'fpdemo.c'; else $(CYGPATH_W) '$(srcdir)/fpdemo.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpdemo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpdemo-fpdemo.obj `if test -f 'fpdemo.c'; then $(CYGPATH_W) 'fpdemo.c'; else $(CYGPATH_W) '$(srcdir)/fpdemo.c'; fi`
 
 fpp-fpp.o: fpp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpp-fpp.o -MD -MP -MF "$(DEPDIR)/fpp-fpp.Tpo" -c -o fpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpp-fpp.o -MD -MP -MF "$(DEPDIR)/fpp-fpp.Tpo" -c -o fpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fpp-fpp.Tpo" "$(DEPDIR)/fpp-fpp.Po"; else rm -f "$(DEPDIR)/fpp-fpp.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpp.c' object='fpp-fpp.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/fpp-fpp.Po' tmpdepfile='$(DEPDIR)/fpp-fpp.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpp-fpp.o `test -f 'fpp.c' || echo '$(srcdir)/'`fpp.c
 
 fpp-fpp.obj: fpp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpp-fpp.obj -MD -MP -MF "$(DEPDIR)/fpp-fpp.Tpo" -c -o fpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`; \
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpp-fpp.obj -MD -MP -MF "$(DEPDIR)/fpp-fpp.Tpo" -c -o fpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fpp-fpp.Tpo" "$(DEPDIR)/fpp-fpp.Po"; else rm -f "$(DEPDIR)/fpp-fpp.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fpp.c' object='fpp-fpp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/fpp-fpp.Po' tmpdepfile='$(DEPDIR)/fpp-fpp.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(fpp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpp-fpp.obj `if test -f 'fpp.c'; then $(CYGPATH_W) 'fpp.c'; else $(CYGPATH_W) '$(srcdir)/fpp.c'; fi`
 
 .f.o:
 	$(FCCOMPILE) -c -o $@ $<
@@ -415,29 +425,23 @@ fpp-fpp.obj: fpp.c
 .f.obj:
 	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-timewaster-timewaster.o: timewaster.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-timewaster.o `test -f 'timewaster.f' || echo '$(srcdir)/'`timewaster.f
-
-timewaster-timewaster.obj: timewaster.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-timewaster.obj `if test -f 'timewaster.f'; then $(CYGPATH_W) 'timewaster.f'; else $(CYGPATH_W) '$(srcdir)/timewaster.f'; fi`
-
 timewaster-p1.o: p1.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p1.o `test -f 'p1.f' || echo '$(srcdir)/'`p1.f
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p1.o `test -f 'p1.f' || echo '$(srcdir)/'`p1.f
 
 timewaster-p1.obj: p1.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p1.obj `if test -f 'p1.f'; then $(CYGPATH_W) 'p1.f'; else $(CYGPATH_W) '$(srcdir)/p1.f'; fi`
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p1.obj `if test -f 'p1.f'; then $(CYGPATH_W) 'p1.f'; else $(CYGPATH_W) '$(srcdir)/p1.f'; fi`
 
 timewaster-p2.o: p2.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p2.o `test -f 'p2.f' || echo '$(srcdir)/'`p2.f
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p2.o `test -f 'p2.f' || echo '$(srcdir)/'`p2.f
 
 timewaster-p2.obj: p2.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p2.obj `if test -f 'p2.f'; then $(CYGPATH_W) 'p2.f'; else $(CYGPATH_W) '$(srcdir)/p2.f'; fi`
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p2.obj `if test -f 'p2.f'; then $(CYGPATH_W) 'p2.f'; else $(CYGPATH_W) '$(srcdir)/p2.f'; fi`
 
 timewaster-p3.o: p3.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p3.o `test -f 'p3.f' || echo '$(srcdir)/'`p3.f
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p3.o `test -f 'p3.f' || echo '$(srcdir)/'`p3.f
 
 timewaster-p3.obj: p3.f
-	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c -o timewaster-p3.obj `if test -f 'p3.f'; then $(CYGPATH_W) 'p3.f'; else $(CYGPATH_W) '$(srcdir)/p3.f'; fi`
+	$(FC) $(STAR_FCFLAGS) $(timewaster_FCFLAGS) $(FCFLAGS) -c -o timewaster-p3.obj `if test -f 'p3.f'; then $(CYGPATH_W) 'p3.f'; else $(CYGPATH_W) '$(srcdir)/p3.f'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -619,11 +623,12 @@ check: $(BUILT_SOURCES)
 all-am: Makefile $(PROGRAMS) config.h
 installdirs:
 	$(mkdir_p) $(DESTDIR)$(bindir)
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
+
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL)
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -644,6 +649,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f make.log
+	-rm -f configure.log
+	-rm -f starconf.status
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
@@ -706,8 +714,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	distdir distuninstallcheck dvi dvi-am html html-am info \
 	info-am install install-am install-binPROGRAMS install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-manifest install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS uninstall-info-am
@@ -717,11 +725,11 @@ bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
 
 # The following are maintenance targets only.
-# Create SGML-ised versions of the example programs (with < and & escaped)
-%.sgml: %
+# Create XML-ised versions of the example programs (with < and & escaped)
+%.xml: %
 	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
 
-sgmlexamples: $(EXAMPLES:=.sgml)
+xmlexamples: $(EXAMPLES:=.xml)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
