@@ -18,12 +18,12 @@ C     residuals box above the main plot. If error bars are available
 C     for the spectrum they are plotted in the residuals box. The fit
 C     may be optimized and any single Gaussian parameter can be
 C     constrained or its value chained to another. The residuals on
-C     the fit for the purposes of the optimization can be weighted either
-C     by value or error. Data on the fit - central wavelength, height and 
-C     sigma - are reported for each Gaussian and r.m.s. and mean 
-C     fractional error ( if errors available ) on fit. The results may be 
-C     recorded on a data file. The final fit spectrum can be saved as a 
-C     file for subsequent analysis.
+C     the fit for the purposes of the optimization can be weighted
+C     either by value or error. Data on the fit - central wavelength,
+C     height and sigma - are reported for each Gaussian and r.m.s. and
+C     mean fractional error (if errors available) on fit. The results
+C     may be recorded in a data file. The final fit spectrum can be
+C     saved as a file for subsequent analysis.
 C 
 C     Command parameters -
 C
@@ -77,36 +77,37 @@ C
 C                                          JRW / AAO March 1987
 C
 C     Modified:
-C      1987 Mar 13 JRW / AAO
-C                  Highest order, highest iteration continuum fit plotted 
-C                  in continuum fitting menu ( FIT ) to allow visual check on 
-C                  goodness of fit. 
+C      1987 Mar 13 JRW / AAO 
+C                  Highest order, highest iteration continuum fit 
+C                  plotted in continuum fitting menu (FIT) to allow 
+C                  visual check on goodness of fit. 
 C                  Default values of ORD, ITN, SIG and ERR in continuum
 C                  fitting menu are not reset at each entry to this
-C                  subroutine. Default values printed to terminal on a second
-C                  entry to this subroutine are now the actual values used. 
-C                  Can fit further new lines after optimization in the
-C                  Gaussian fitting menu.
+C                  subroutine. Default values printed to terminal on a 
+C                  second entry to this subroutine are now the actual
+C                  values used.  Can fit further new lines after 
+C                  optimization in the Gaussian fitting menu.
 C                  Data on all fits are recorded in results file.
 C      1987 Apr 24 KS / AAO.
 C                  'DEFAULTFILE' added to INQUIRE and OPEN statements 
-C                  for the results file ( prevents error if return 
-C                  or blank pressed for name of file ).
+C                  for the results file (prevents error if return 
+C                  or blank pressed for name of file).
 C      1987 Apr 26 JRW / AAO
 C                  If OPT chosen in Gaussian fitting then residuals can 
 C                  be weighted either by inverse square of error 
 C                  ( if errors available ) or by value.
 C                  Prompt for accepting manual fit changed to PAR_RDKEY
 C      1987 Jun 10 JRW/AAO
-C                  Second Gaussian has its flux correctly calculated ( 
-C                  factor 2.354 was omitted ) in RECORD
+C                  Second Gaussian has its flux correctly calculated 
+C                  (factor 2.354 was omitted) in RECORD.
 C                  Lower limits to line width corrected to be in terms
-C                  of sigma and not FWHM ( in AUTOFIT )
-C                  In OPT of GAUMENU, a check is made for lines whose peaks
-C                  occur outside the range of GXVALS and any such are deleted.
+C                  of sigma and not FWHM (in AUTOFIT).
+C                  In OPT of GAUMENU, a check is made for lines whose 
+C                  peaks occur outside the range of GXVALS and any such
+C                  are deleted.
 C      1987 Jul 6  KS/AAO
-C                  The appendage of .DAT to the file name, which remained 
-C                  from the Apr 24 bug fix is deleted.
+C                  The appendage of .DAT to the file name, which 
+C                  remained from the Apr 24 bug fix is deleted.
 C      1987 Aug 6  JRW/AAO 
 C                  In Gaussian fitting menu if full name of prompt given
 C                  it would not be recognized. Full names now accepted
@@ -126,20 +127,21 @@ C                  assessment of results printed to terminal )
 C      1987 Dec 21 JRW/AAO
 C                  If dimension of spectrum greater than 4096 an error 
 C                  message is issued and program stops. 
-C                  Can now exit from Gaussian fitting menu without having
-C                  fitted a line. This can be useful if only a continuum
-C                  fit is required.
+C                  Can now exit from Gaussian fitting menu without
+C                  having fitted a line. This can be useful if only a
+C                  continuum fit is required.
 C                  In Gaussian fitting menu SIN now tests for a sensible
 C                  extent for the line. If no left edge is available the
-C                  left edge of the spectrum is used; similarly for right
-C                  edge. Warning messages are issued in these cases.
+C                  left edge of the spectrum is used; similarly for
+C                  right edge. Warning messages are issued in these
+C                  cases.
 C      1988 Mar 24 KS / AAO
 C                  Modified to work with GKS version of PGPLOT.  Only
-C                  minimal changes made - replacement of now-discontinued
-C                  GRPCKG routines and suchlike.  Proper modifications to
-C                  introduce GKD_ dialogue etc, are a bigger job - partly
-C                  because of use of PAR_ system for dialogue - eg use of
-C                  PAR_CNPAR.
+C                  minimal changes made - replacement of 
+C                  now-discontinued GRPCKG routines and suchlike. 
+C                  Proper modifications to introduce GKD_ dialogue etc, 
+C                  are a bigger job - partly because of use of PAR_
+C                  system for dialogue - e.g. use of PAR_CNPAR.
 C      1991 Apr  5 JMS / AAO. Modified to use DSA_ routines.
 C      1992 Sep 10 HME / UoE, Starlink.  INCLUDE changed. INQUIRE
 C                  statement changed, to not use "DEFAULTFILE". Calls to
@@ -153,7 +155,7 @@ C      1993 Jul 21 HME / UoE, Starlink.  Use DSA_GET_LU.
 C      1993 Jul 27 HME / UoE, Starlink.  Disuse PAR_RDUSER, use
 C                  PAR_ABORT. Added parameters CCMD and GCMD.
 C                  Change use of PGASK, so that no prompting occurs.
-C      1994 Dec 21 HME / UoE, Starlink.  Re-write the line fit part. The
+C      1994 Dec 21 HME / UoE, Starlink.  Re-write the line-fit part. The
 C                  new algorithm is taken from Specdre's FITGAUSS. The
 C                  reason is that the old algorithm used routines
 C                  removed from the NAG library at Mark 16. But the new
@@ -163,13 +165,16 @@ C                  lines at a time with the "NEXT" option. This is the
 C                  internal limit and specifying an 11th line did mess
 C                  up the guess parameters.
 C      1995 Aug 23 HME / UoE, Starlink.  No longer use NAG.
+C      2005 Jun 14 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
       INTEGER ICH_CLEAN,ICH_LEN,PGBEGIN
       REAL GEN_ELEMF
 C
@@ -190,13 +195,9 @@ C
       LOGICAL GAU,AUTOSC,AXES,EMAP,ERASE,ERRUSE,HARD,WHOLE,LOPEN,
      :FAULT,XMAP,XIMAP,ZMAP,LCON,LREC,LSECT,CRES,GRES,GTOT,GALL,
      :SAVE,SAVEF,SOPEN,GOTVM,PGOPEN,SAVOPN,SAVMAP,GOTLU,FOPEN
-      INTEGER ADDRESS,DIMS(2),DIM
+      INTEGER DIMS(2),DIM
       DOUBLE PRECISION NUM_ARRAY(1),DUMMY2
       CHARACTER*16 CHAR_ARRAY(2),DUMMY1
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Floating point limits
 C
@@ -261,7 +262,7 @@ C
      :                  STATUS) 
         FAULT=.TRUE.
         GO TO 500
-      ENDIF
+      END IF
 C
 C     Try for .X information
 C
@@ -271,15 +272,12 @@ C
 C
 C     Try to map the .X data array
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                                    SLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,SLOT,STATUS)
       XIMAP=.TRUE.
 C
 C     Map the .Z data
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      ZPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ZPTR,SLOT,STATUS)
       ZMAP=.TRUE.
 C
 C     Get Z data information (units and label)
@@ -293,9 +291,7 @@ C     value of factor for point rejection on basis of errors ( ERR )
 C
       CALL DSA_SEEK_ERRORS('SPECT',ERRUSE,STATUS)
       IF (ERRUSE) THEN
-         CALL DSA_MAP_ERRORS('SPECT','READ','FLOAT',ADDRESS,SLOT,
-     :                                                         STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS('SPECT','READ','FLOAT',EPTR,SLOT,STATUS)
          ERR=1
          EMAP=.TRUE.
       ELSE 
@@ -421,7 +417,7 @@ C
 C     Get XSTART and XEND, unless WHOLE was
 C     specified, in which case use all of the spectrum.
 C
-      CALL GEN_RANGEF(DYNAMIC_MEM(XPTR),1,NX,XMAX,XMIN)
+      CALL GEN_RANGEF(%VAL(CNF_PVAL(XPTR)),1,NX,XMAX,XMIN)
       WID=ABS((XMAX-XMIN)/REAL(NX-1))
       CALL PAR_RDKEY('WHOLE',.FALSE.,WHOLE)
       IF (PAR_ABORT()) GO TO 500
@@ -443,12 +439,12 @@ C
          IF (IXST.LE.0) THEN
            IXST=1
            XVST=XMIN
-         ENDIF
+         END IF
          IXEN=NINT((XVEN-XMIN)/WID) + 1
          IF (IXEN.LE.0.OR.IXEN.GT.NX) THEN
            IXEN=NX
            XVEN=XMAX
-         ENDIF
+         END IF
          IF (IXST.GT.IXEN) THEN
             ITEMP=IXST
             IXST=IXEN
@@ -469,9 +465,9 @@ C
 C     Specified or not, find out the scale range 
 C
       IF (ERRUSE) THEN
-         CALL GEN_RANGEF(DYNAMIC_MEM(EPTR),IXST,IXEN,RMAX,RMIN)
+         CALL GEN_RANGEF(%VAL(CNF_PVAL(EPTR)),IXST,IXEN,RMAX,RMIN)
       END IF
-      CALL GEN_RANGEF(DYNAMIC_MEM(ZPTR),IXST,IXEN,VMAX,VMIN)
+      CALL GEN_RANGEF(%VAL(CNF_PVAL(ZPTR)),IXST,IXEN,VMAX,VMIN)
 C
 C     Was AUTOSCALE specified?
 C
@@ -529,18 +525,19 @@ C     Copy the mapped data into the local arrays - XVALS,ZVALS and ERRORS
 C
       IF (XIMAP.AND.ZMAP) THEN
         IF (.NOT.ERRUSE) THEN
-          CALL MAPSPEC(NX,DYNAMIC_MEM(XPTR),DYNAMIC_MEM(ZPTR),IXST,NNX,
-     :                 XVALS,ZVALS,STATUS)
+          CALL MAPSPEC(NX,%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(ZPTR)),
+     :                 IXST,NNX,XVALS,ZVALS,STATUS)
         END IF
         IF (ERRUSE) THEN
-          CALL MAPSPECE(NX,DYNAMIC_MEM(XPTR),DYNAMIC_MEM(ZPTR),
-     :           DYNAMIC_MEM(EPTR),IXST,NNX,XVALS,ZVALS,ERRORS,STATUS)
+          CALL MAPSPECE(NX,%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(ZPTR)),
+     :                  %VAL(CNF_PVAL(EPTR)),IXST,NNX,XVALS,ZVALS,
+     :                  ERRORS,STATUS)
         END IF
         IF (STATUS.NE.0) THEN
           CALL PAR_WRUSER('Error copying data',STAT)
           GO TO 500 
         END IF
-      ENDIF
+      END IF
 C
 C     Open PGPLOT on the selected device. Check status. If OK, plot data.
 C
@@ -619,7 +616,7 @@ C
         END DO
         SAVE=.FALSE.
         SAVEF=.TRUE.
-      ENDIF
+      END IF
 C
 C     If another continuum section to analyse return to delineating
 C     continuum. If PGPLOT not closed, then do so.
@@ -646,11 +643,9 @@ C
       IF (.NOT.LSECT.AND.SAVEF) THEN
          CALL DSA_OUTPUT('GAUFIT','GAUFIT','SPECT',0,0,STATUS)
          IF (STATUS.NE.0) GOTO 500
-         CALL DSA_MAP_DATA('GAUFIT','UPDATE','FLOAT',ADDRESS,SLOT,
-     :                                                        STATUS)
-         GPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('GAUFIT','UPDATE','FLOAT',GPTR,SLOT,STATUS)
          SAVMAP=.TRUE.
-         CALL MAPSPECG(NX,GAUFT,DYNAMIC_MEM(GPTR),STATUS)
+         CALL MAPSPECG(NX,GAUFT,%VAL(CNF_PVAL(GPTR)),STATUS)
       END IF
 C
 C     Close down the soft plot

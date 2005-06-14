@@ -48,8 +48,8 @@ C
 C     Output data -
 C
 C     IMAGE is created with the same structure as CUBE
-C     except that main data array will only have 1 or 2 dimensions, and any
-C     AXIS sub-structures that CUBE has will be deleted/renamed
+C     except that main data array will only have 1 or 2 dimensions, and
+C     any AXIS sub-structures that CUBE has will be deleted/renamed
 C     as appropriate. If a spectrum is produced the errors (derived from
 C     the cycle to cycle statistics) are generated.
 C     
@@ -68,78 +68,94 @@ C                    .X.WIDTH now calculated and added to output.
 C     27th Jun 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT' when
-C                    mapping input data. Now uses DSA_SET_WIDTH to set axis
-C                    width value. Added STATUS checks to support user
-C                    requested aborts.
-C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs removed.
+C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT' 
+C                    when mapping input data. Now uses DSA_SET_WIDTH to
+C                    set axis width value. Added STATUS checks to
+C                    support user requested aborts.
+C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
+C                    removed.
 C     13th Mar 1996  HME / UoE, Starlink.  Fixed broken-up format string
 C                    in WRITE.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
       INTEGER DSA_TYPESIZE
       LOGICAL PAR_ABORT
 C
 C     Local variables
 C
-      LOGICAL   ADD          ! True if data are to be added
-      INTEGER   ADDRESS      ! Virtual address for data array
-      LOGICAL   BACK         ! True if background only required
-      INTEGER   BYTES        ! Bytes required for an array
-      REAL      CHOPS        ! No. of chops per recorded spectrum
-      CHARACTER CITEMS(2)*32 ! Axis character items retrieved
-      CHARACTER COMENT*16    ! Comment associated with FITS items
-      CHARACTER COMMAND*8    ! Figaro command name
-      INTEGER   CUPTR        ! Dynamic memory element for CUBE data
-      REAL      CUTOFF       ! Sigma level at which a point will be ignored (FIGS321 only)
-      REAL      DETSP        ! The detector spacing in steps.
-      INTEGER   DIMS(10)     ! Image dimensions
-      INTEGER   EPTR         ! Dynamic memory element for error array
-      INTEGER   EXPTR        ! Dynamic memory element for workspace
-      REAL      FACTOR       ! Integration time in seconds per element.
-      LOGICAL   FAULT        ! True if non_DSA problem found
-      INTEGER   FSTAT        ! Status for FIG routines
-      REAL      GAIN         ! The gain factor of the system
-      REAL      GRATORD      ! Grating order.
-      REAL      GRATS        ! Grating start step.  
-      REAL      GRATSP       ! Number of grating positions used.
-      REAL      GRATSW       ! No. of grating sweeps per recorded spectrum
-      REAL      GRT0ORD      ! Grating step position at 0th order.
-      REAL      GRTA2S       ! Grating arc sec per halfstep.
-      REAL      GRTPCH       ! Grating pitch.
-      LOGICAL   GSPECT       ! True if a spectrum (not an image) to be generated
-      REAL      INT          ! No. of msec for each such integration
-      INTEGER   LENGTH       ! Spectrum length
-      INTEGER   MODE         ! Cube data grating mode
-      INTEGER   NCITEMS      ! Number of axis character items retrieved
-      INTEGER   NDIM         ! Number of image dimensions
-      INTEGER   NELM         ! Number of elements in image - ignored
-      DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
-      INTEGER   NNITEMS      ! Number of axis numeric items retrieved
-      LOGICAL   NORM         ! True if normalising required
-      INTEGER   NSPECT       ! No. of spectra added per cycle
-      INTEGER   NT           ! Second dimension of CUBE
-      INTEGER   NUMPTR       ! Dynamic memory element for workspace
-      INTEGER   NX           ! First dimension of CUBE
-      INTEGER   NY           ! Second dimension of CUBE
-      INTEGER   OPTR         ! Dynamic memory element for OUTPUT data
-      INTEGER   OXPTR        ! Dynamic memory element for AXIS(1) data
-      REAL      POINTS       ! No. of integrations performed at each grating setting
-      INTEGER   PSTAT        ! Status for PAR routines
-      REAL      SECS         ! Total integration time in seconds.
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   STATUS       ! Running status for DSA routines
-      REAL      STEP         ! Grating step value.  
-      INTEGER   SWPERC       ! No. of sweeps per chop
-      INTEGER   VECTOR(416)  ! Sort vector
-      REAL      WAVES(416)   ! Returned with the wavelength values
-      REAL      WIDTH        ! The width of a detector in wavelength terms.
-      REAL      WORK(416)    ! Workspace.
-      INTEGER   WPTR         ! Dynamic memory element for workspace
+      LOGICAL   ADD              ! True if data are to be added
+      LOGICAL   BACK             ! True if background only required
+      INTEGER   BYTES            ! Bytes required for an array
+      REAL      CHOPS            ! No. of chops per recorded spectrum
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      CHARACTER COMENT*16        ! Comment associated with FITS items
+      CHARACTER COMMAND*8        ! Figaro command name
+      INTEGER   CUPTR            ! Dynamic memory element for CUBE data
+      REAL      CUTOFF           ! Sigma level at which a point will be 
+                                 ! ignored (FIGS321 only)
+      REAL      DETSP            ! The detector spacing in steps
+      INTEGER   DIMS(10)         ! Image dimensions
+      INTEGER   EPTR             ! Dynamic-memory pointer for error 
+                                 ! array
+      INTEGER   EXPTR            ! Dynamic-memory pointer for workspace
+      REAL      FACTOR           ! Integration time in seconds per 
+                                 ! element
+      LOGICAL   FAULT            ! True if non_DSA problem found
+      INTEGER   FSTAT            ! Status for FIG routines
+      REAL      GAIN             ! The gain factor of the system
+      REAL      GRATORD          ! Grating order.
+      REAL      GRATS            ! Grating start step.  
+      REAL      GRATSP           ! Number of grating positions used
+      REAL      GRATSW           ! No. of grating sweeps per recorded 
+                                 ! spectrum
+      REAL      GRT0ORD          ! Grating step position at 0th order
+      REAL      GRTA2S           ! Grating arc sec per halfstep
+      REAL      GRTPCH           ! Grating pitch
+      LOGICAL   GSPECT           ! Spectrum (not an image) to be 
+                                 ! generated?
+      REAL      INT              ! No. of msec for each such integration
+      INTEGER   LENGTH           ! Spectrum length
+      INTEGER   MODE             ! Cube data grating mode
+      INTEGER   NCITEMS          ! Number of axis character items 
+                                 ! retrieved
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   NNITEMS          ! Number of axis numeric items 
+                                 ! retrieved
+      LOGICAL   NORM             ! True if normalising required
+      INTEGER   NSPECT           ! No. of spectra added per cycle
+      INTEGER   NT               ! Second dimension of CUBE
+      INTEGER   NUMPTR           ! Dynamic-memory pointer for workspace
+      INTEGER   NX               ! First dimension of CUBE
+      INTEGER   NY               ! Second dimension of CUBE
+      INTEGER   OPTR             ! Dynamic-memory pointer for OUTPUT 
+                                 ! data
+      INTEGER   OXPTR            ! Dynamic-memory pointer for AXIS(1)
+                                 ! data
+      REAL      POINTS           ! No. of integrations performed at each
+                                 ! grating setting
+      INTEGER   PSTAT            ! Status for PAR routines
+      REAL      SECS             ! Total integration time in seconds.
+      INTEGER   SLOT             ! Slot number for mapped data 
+      INTEGER   SLOT1            ! Slot number for mapped workspace
+      INTEGER   SLOT2            ! Slot number for mapped workspace
+      INTEGER   STATUS           ! Running status for DSA routines
+      REAL      STEP             ! Grating step value.  
+      INTEGER   SWPERC           ! No. of sweeps per chop
+      INTEGER   VECTOR(416)      ! Sort vector
+      REAL      WAVES(416)       ! Returned with the wavelength values
+      REAL      WIDTH            ! The width of a detector in wavelength
+                                 ! terms
+      REAL      WORK(416)        ! Workspace
+      INTEGER   WPTR             ! Dynamic-memory pointer for workspace
 C
 C     Grating mode parameter values
 C
@@ -150,10 +166,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -262,7 +274,7 @@ C
       IF (GSPECT) THEN
          CALL PAR_RDKEY('NORM',.FALSE.,NORM)
          IF (PAR_ABORT()) GOTO 500
-      ENDIF
+      END IF
 C
 C     Work out how many signal spectra we are going to be adding
 C
@@ -400,45 +412,43 @@ C
 C
 C     Map the input and output data 
 C
-      CALL DSA_MAP_DATA('CUBE','READ','INT',ADDRESS,SLOT,STATUS)
-      CUPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('CUBE','READ','INT',CUPTR,SLOT,STATUS)
 
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
 C
 C     Map the error array
 C
       IF (GSPECT) THEN
-         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
-     :                        STATUS)
-         EPTR=DYN_ELEMENT(ADDRESS)
-      ENDIF
+         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR,SLOT,STATUS)
+      END IF
 C
 C     Create workspace array
 C
       IF (GSPECT) THEN
          BYTES = DSA_TYPESIZE('FLOAT',STATUS)*(NX*NT + NX*NT + NX)
-         CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-         WPTR=DYN_ELEMENT(ADDRESS)
-         IF(STATUS.NE.0)GOTO 500
-         EXPTR=WPTR+DSA_TYPESIZE('FLOAT',STATUS)*NX*NT
-         NUMPTR=EXPTR+DSA_TYPESIZE('FLOAT',STATUS)*NX*NT
-      ENDIF
-      IF(STATUS.NE.0)GOTO 500
+         CALL DSA_GET_WORK_ARRAY(NX*NT,'FLOAT',WPTR,SLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY(NX*NT,'FLOAT',EXPTR,SLOT1,STATUS)
+         CALL DSA_GET_WORK_ARRAY(NT,'FLOAT',NUMPTR,SLOT2,STATUS)
+         IF(STATUS.NE.0) GOTO 500
+      END IF
+      IF(STATUS.NE.0) GOTO 500
 
 C
 C     Perform the basic processing of the cube down to either
 C     an image or a spectrum.
 C
       IF (GSPECT) THEN
-         CALL FIG_FIGS321(DYNAMIC_MEM(CUPTR),NX,NY,NT,VECTOR,ADD,BACK,
-     :      FACTOR,NORM,CUTOFF,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(EXPTR),
-     :      DYNAMIC_MEM(NUMPTR),
-     :      DYNAMIC_MEM(OPTR),DYNAMIC_MEM(EPTR))
+         CALL FIG_FIGS321(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,VECTOR,ADD,
+     :                    BACK,FACTOR,NORM,CUTOFF,%VAL(CNF_PVAL(WPTR)),
+     :                    %VAL(CNF_PVAL(EXPTR)),%VAL(CNF_PVAL(NUMPTR)),
+     :                    %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)))
       ELSE
-         CALL FIG_FIGS322(DYNAMIC_MEM(CUPTR),NX,NY,NT,VECTOR,ADD,BACK,
-     :      FACTOR,DYNAMIC_MEM(OPTR))
+         CALL FIG_FIGS322(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,VECTOR,ADD,
+     :                    BACK,FACTOR,%VAL(CNF_PVAL(OPTR)))
       END IF
+      CALL DSA_FREE_WORKSPACE(SLOT2,STATUS)
+      CALL DSA_FREE_WORKSPACE(SLOT1,STATUS)
+      CALL DSA_FREE_WORKSPACE(SLOT,STATUS)
 C
 C     If the original cube had a .T  structure, then 
 C     this may need renaming.
@@ -456,20 +466,19 @@ C     copied to the output AXIS(2) structure.
       CALL DSA_RESHAPE_AXIS('OUTPUT',1,'CUBE',1,1,NX,STATUS)
       IF(.NOT.GSPECT)THEN
          CALL DSA_RESHAPE_AXIS('OUTPUT',2,'CUBE',3,1,NT,STATUS)
-      ENDIF
-      IF(STATUS.NE.0)GOTO 500
+      END IF
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Force a wavelength array - this code rather assumes that there
 C     isn't one at present in the input structure.
 C
       CALL GEN_FVSORT(VECTOR,NX,1,WORK,WAVES)
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','FLOAT',ADDRESS,SLOT,
-     :                        STATUS)
-      OXPTR=DYN_ELEMENT(ADDRESS)
-      IF(STATUS.NE.0)GOTO 500
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','FLOAT',OXPTR,SLOT,
+     :                       STATUS)
+      IF(STATUS.NE.0) GOTO 500
 
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL GEN_MOVE(BYTES,WAVES,DYNAMIC_MEM(OXPTR))
+      CALL GEN_MOVE(BYTES,WAVES,%VAL(CNF_PVAL(OXPTR)))
 
       CITEMS(1)='Microns      '
       CITEMS(2)='Wavelength   '
@@ -623,11 +632,11 @@ C
                   IF (.NOT. EXCLUDE(IX,IT)) THEN
                      SUM=SUM+IMAGE(IX,IT)
                      NSUM=NSUM+1
-                  ENDIF
+                  END IF
                END DO
             END DO
             SUM=SUM/NSUM
-         ENDIF
+         END IF
          CALL GEN_FILL(NX*4,0,SPECT)
          CALL GEN_FILL(NX*4,0,NUM_CYCLES)
          DO IT=1,NT
@@ -635,7 +644,7 @@ C
                IF (.NOT. EXCLUDE(IX,IT)) THEN
                   SPECT(IX)=SPECT(IX)+IMAGE(IX,IT)
                   NUM_CYCLES(IX)=NUM_CYCLES(IX)+1
-               ENDIF
+               END IF
             END DO
          END DO
          DO IX=1,NX
@@ -654,7 +663,7 @@ C
                      IF (.NOT. EXCLUDE(IX,IT)) THEN
                         NF=NF+IMAGE(IX,IT)
                         NSUM = NSUM+1
-                     ENDIF
+                     END IF
                   END DO
                   NF=NF/NSUM
                   DO IX=1,NX
@@ -666,15 +675,15 @@ C
                      IF (.NOT. EXCLUDE(IX,IT)) THEN
                         X=IMAGE(IX,IT)-SPECT(IX)
                         ERRORS(IX)=ERRORS(IX)+X*X
-                     ENDIF
+                     END IF
                   END DO
-               ENDIF
+               END IF
             END DO
             DO IX=1,NX
                ERRORS(IX)=SQRT(ERRORS(IX)/NUM_CYCLES(IX)/
-     :                     (NUM_CYCLES(IX)-1))
+     :                    (NUM_CYCLES(IX)-1))
             END DO
-         ENDIF
+         END IF
 C
 C     Check for points to exclude - if there are any, set FINISHED to
 C     false to repeat calculation of spectrum and error
@@ -691,12 +700,12 @@ C
                         WRITE(OUTMES,'('' Point'',I4,'' Cycle'',I4,'//
      :                       ''' Excluded'')') IX,IT
                         CALL PAR_WRUSER(OUTMES,STATUS)
-                     ENDIF
-                  ENDIF
-               ENDDO     
-            ENDDO
-         ENDIF
-      ENDDO
+                     END IF
+                  END IF
+               END DO     
+            END DO
+         END IF
+      END DO
       END
 C+
       SUBROUTINE FIG_FIGS322(CUBE,NX,NY,NT,VECTOR,ADD,BACK,FACTOR,IMAGE)

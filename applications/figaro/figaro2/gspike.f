@@ -7,10 +7,10 @@ C     Generates a 'spiketrum' from a table of X and Z values, given a
 C     spectrum to use as a template for the X range to be used.  The
 C     resulting spiketrum will be a spectrum with the same .X structure
 C     as the template spectrum, and a .Z structure that has zeros 
-C     everywhere except at the points given in the table.  The table file
-C     can include SET commands that set individual item values in the
-C     resulting file, but the item names need to have been defined in the
-C     file SPIKETRUM.DEF.
+C     everywhere except at the points given in the table.  The table
+C     file can include SET commands that set individual item values in 
+C     the resulting file, but the item names need to have been defined 
+C     in the file SPIKETRUM.DEF.
 C
 C     Command parameters -
 C
@@ -28,64 +28,68 @@ C
 C                                           KS / CIT 7th May 1984
 C     Modified:
 C
-C     29th May 1986.  KS / AAO.  Use of DTA_MRVAR to map Z data for
-C                     write access corrected.
-C      3rd Sep 1987.  DJA/ AAO.  Revised DSA_ routines - some specs changed.
-C                     Now uses DYN routines for dynamic memory handling
-C     29th Aug 1988.  JM/ RAL.  Conversion to DSA completed.
-C     13th Oct 1988.  KS / AAO. Processing order for object specs changed
-C                     to bypass bug if .TABLE specified.  Now sets X axis
-C                     units and label properly.
-C     25th Mar 1991.  KS / AAO. Modify to use FIGX_SETOBJ so that now SET
-C                     commands in the file have to be supported by EQUATES
-C                     in the SPIKETRUM.DEF file (but can now be used for
-C                     any file format that the .DEF file supports).  More
-C                     testing for '!!' abort requests added.
-C     24th Sep 1992.  HME / UoE, Starlink.  Lowercase file extension TAB.
-C                     INCLUDE changed. TABs removed. FIGX_SETOBJ is now
-C                     DSA_SETOBJ. Lowercase file name spiketrum (.def).
-C     18th Jul 1996.  MJCL / Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
+C     29th May 1986  KS / AAO.  Use of DTA_MRVAR to map Z data for
+C                    write access corrected.
+C      3rd Sep 1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                    changed. Now uses DYN routines for dynamic-memory
+C                    handling.
+C     29th Aug 1988  JM/ RAL.  Conversion to DSA completed.
+C     13th Oct 1988  KS / AAO. Processing order for object specs changed
+C                    to bypass bug if .TABLE specified.  Now sets X axis
+C                    units and label properly.
+C     25th Mar 1991  KS / AAO. Modify to use FIGX_SETOBJ so that now SET
+C                    commands in the file have to be supported by 
+C                    EQUATES in the SPIKETRUM.DEF file (but can now be 
+C                    used for any file format that the .DEF file
+C                    supports).  More testing for '!!' abort requests
+C                    added.
+C     24th Sep 1992  HME / UoE, Starlink.  Lowercase file extension TAB.
+C                    INCLUDE changed. TABs removed. FIGX_SETOBJ is now
+C                    DSA_SETOBJ. Lowercase file name spiketrum (.def).
+C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+C                    file names to 132 chars.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL    PAR_ABORT
-      INTEGER    ICH_LEN,DYN_ELEMENT,DSA_TYPESIZE
+      INTEGER    ICH_LEN,DSA_TYPESIZE
       CHARACTER  ICH_CI*5
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    AXINFO(2)*64 ! X-axis units and label.
-      INTEGER      BYTES        !
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      DOUBLE PRECISION DUMMY    ! Dummy argument for axis information
-      INTEGER      DXPTR        ! Dynamic-memory pointer to input axis data
-      INTEGER      DXSLOT       ! Map slot number of input axis data
-      LOGICAL      FAULT        !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      LUTAB        ! Logical unit number for table data
-      CHARACTER    NAME*132     !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      OXPTR        ! Dynamic-memory pointer to output axis data
-      INTEGER      OXSLOT       ! Map slot number of output axis data
-      CHARACTER    SPIKE*80     !
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    TABLE*132    !
-      LOGICAL      TABOPN       !
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    AXINFO(2)*64  ! X-axis units and label.
+      INTEGER      BYTES         !
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      DOUBLE PRECISION DUMMY     ! Dummy argument for axis information
+      INTEGER      DXPTR         ! Dynamic-memory pointer to input axis
+                                 ! data
+      INTEGER      DXSLOT        ! Map slot number of input axis data
+      LOGICAL      FAULT         !
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      LUTAB         ! Logical unit number for table data
+      CHARACTER    NAME*132      !
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      OXPTR         ! Dynamic-memory pointer to output axis
+                                 ! data
+      INTEGER      OXSLOT        ! Map slot number of output axis data
+      CHARACTER    SPIKE*80      !
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    TABLE*132     !
+      LOGICAL      TABOPN        !
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
 C
 C     Logical unit for table file
 C
@@ -140,25 +144,21 @@ C
 C
 C     Map the X-axis data and the main data array
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,DXSLOT,
-     :                                                        STATUS)
-      DXPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',DXPTR,DXSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
-      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'WRITE','FLOAT',ADDRESS,OXSLOT,
-     :                                                        STATUS)
-      OXPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'WRITE','FLOAT',OXPTR,OXSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(DXPTR),DYNAMIC_MEM(OXPTR))
+      CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(DXPTR)),%VAL(CNF_PVAL(OXPTR)))
 C
-      CALL DSA_MAP_DATA('SPIKE','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPIKE','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Grab space for the work array used
 C
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORKSPACE(BYTES,WPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Set the X-axis label and units
@@ -169,8 +169,8 @@ C
 C
 C     Fill in the data for the spiketrum.
 C
-      CALL FIG_FSPIKE(NX,DYNAMIC_MEM(OXPTR),LUTAB,DYNAMIC_MEM(WPTR),
-     :                                    DYNAMIC_MEM(OPTR),STATUS)
+      CALL FIG_FSPIKE(NX,%VAL(CNF_PVAL(OXPTR)),LUTAB,
+     :                %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)),STATUS)
       IF (STATUS.NE.0) FAULT=.TRUE.
 C
 C     Tidy up

@@ -3,25 +3,26 @@ C+
 C
 C     I R F L A T
 C
-C     Figaro function that produces a "flatfield" ripple 
-C     spectrum from a infrared  spectrum, by averaging the data from 
-C     regions of the spectrum uncontaminated with spectral features
-C     (i.e. assumed flat) to determine the relative response of each
-C     detector or scan. The output spectrum can be divided into the original
+C     Figaro function that produces a "flatfield" ripple spectrum
+C     from a infrared spectrum, by averaging the data from regions
+C     of the spectrum uncontaminated with spectral features (i.e.
+C     assumed flat) to determine the relative response of each detector
+C     or scan. The output spectrum can be divided into the original
 C     spectrum using IDIV to flat field the data.
 C
 C     The program is used to remove two kinds of ripple from spectra.
 C     In instruments which interleave a number of scan positions to give
-C     a fully sampled spectrum (such as CGS3 and CGS4), the program removes 
-C     ripple which results from seeing or transparency fluctuations between
-C     scan positions. In an instrument such as CGS2 it can remove the ripple
-C     which results from the fact that the flatfield (i.e. relative detector
-C     responses) is different for extended and point sources. In the case of
-C     CGS2 data it makes use of a .MORE.PIXELS extension in the data which
-C     specifies the detector and scan position corresponding to each pixel.
-C     If this structure is not present it prompts for a period and assumes
-C     a periodic ripple. The period will normally be the oversampling factor,
-C     typically 2 or 3 for CGS4 or CGS3 data.
+C     a fully sampled spectrum (such as CGS3 and CGS4), the program 
+C     removes ripple which results from seeing or transparency
+C     fluctuations between scan positions. In an instrument such as
+C     CGS2 it can remove the ripple which results from the fact that the
+C     flatfield (i.e. relative detector responses) is different for 
+C     extended and point sources. In the case of CGS2 data it makes use 
+C     of a .MORE.PIXELS extension in the data which specifies the 
+C     detector and scan position corresponding to each pixel.  If this 
+C     structure is not present it prompts for a period and assumes a
+C     periodic ripple. The period will normally be the oversampling
+C     factor, typically 2 or 3 for CGS4 or CGS3 data.
 C
 C     If the program is run in batch only one region can be specified.
 C     Multiple regions can only be specified in interactive mode.
@@ -30,8 +31,8 @@ C     Command parameters -
 C
 C     SPECTRUM    (Character) The name of the file containing the
 C                 spectrum to be used.
-C     CGS2        (Logical) Flag indicating whether to operate in 'CGS 2'
-C                 mode.
+C     CGS2        (Logical) Flag indicating whether to operate in 
+C                 'CGS 2' mode.
 C     PERIOD      (Real) The period of the ripple (in pixels).
 C     OUTPUT      (Character) The name of the resulting ripple spectrum.
 C     XSTART      (Real) First X value for region to be used.
@@ -39,8 +40,8 @@ C     XEND        (Real) Second X value for region to be used.
 C
 C     Command keywords -
 C
-C     MORE        If TRUE the prompts for XSTART and XEND are repeated for
-C                 another region.
+C     MORE        If TRUE the prompts for XSTART and XEND are repeated 
+C                 for another region.
 C
 C     10th Dec 1990 - JAB / JAC
 C
@@ -48,81 +49,85 @@ C     Modified:
 C        15 May 1991  Add handling for seeing ripple in CGS4 data.
 C        04 Sep 1992  TAB removed, INCLUDE changed. HME/UoE.
 C        21 Jul 1993  HME / UoE, Starlink. Swap the statements that ask
-C                     for and cancel the MORE parameter: Now cancels after
-C                     asking, thus command line argument is actually used.
+C                     for and cancel the MORE parameter: Now cancels 
+C                     after asking, thus command-line argument is
+C                     actually used.
 C        28 Jun 1993  PND / JAC.  Output file not same as input file.
 C                     This change incorporated into Portable Figaro by
 C                     HME on 20 Jan 1994. But use PAR_WRUSER instead of
 C                     DSA_WRUSER.
 C        13 Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
-C                     Avoid _NAMED_ routines.
-C                     No map access with DTA. Get work array and read/write
-C                     instead.
-C        18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
+C                     Avoid _NAMED_ routines.  No map access with DTA.
+C                     Get work array and read/write instead.
+C        18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage 
+C                     of file names to 132 chars.
 C        19 Jul 1996  MJC / Starlink.  Extend the number of scan
 C                     positions to ensure the scan-position array is
 C                     filled.
 C        29 Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
-C        11 Jul 2001  ACD  / Starlink, UoE.  Suppressed the error messages
-C                     issued in the case where the CGS2 'PIXELS' structure
-C                     could not be found in the input data file.
+C        11 Jul 2001  ACD  / Starlink, UoE.  Suppressed the error
+C                     messages issued in the case where the CGS2
+C                     'PIXELS' structure could not be found in the input 
+C                     data file.
 C        13 Jul 2001  ACD  / Starlink, UoE.  Made to check whether a
 C                     valid value for 'PERIOD' is available prior to
 C                     checking for the CGS2 'PIXELS' structure.  These
 C                     changes supercede those of 11 Jul 2001.
 C        17 Jul 2001  ACD  / Starlink, UoE.  Improved the prologue
 C                     comments.
+C       2005 June 14  MJC / Starlink  Use CNF_PVAL for pointers to
+C                     mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
-      INTEGER ICH_ENCODE, ICH_LEN, DYN_ELEMENT
+      INTEGER ICH_ENCODE, ICH_LEN
       INTEGER DSA_TYPESIZE
       LOGICAL PAR_BATCH
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      LOGICAL      CGS2         ! True for CGS2 data
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to detector numbers
-      INTEGER      EPTR         ! Dynamic-memory pointer to error array
-      CHARACTER*80 ERR          ! Error string
-      CHARACTER*132 SPECTRUM    ! The input spectrum name
-      CHARACTER*132 OUTPUT      ! The output spectrum name
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      IXST         ! start pixel for flatfielding
-      INTEGER      IXEN         ! end pixel for flatfielding
-      INTEGER      LEN          ! Length of PIXNAME
-      LOGICAL      MORE         ! TRUE if more ranges
-      INTEGER      ND           ! Number of pixels
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NPTR         ! Dynamic-memory pointer to NUM array
-      INTEGER      NS           ! Number of scan positions
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      REAL         PERIOD       ! Ripple period
-      CHARACTER*132 PIXNAME     ! Name of Pixels structure
-      CHARACTER*132 PNAME       ! Name of .PIXEL array
-      CHARACTER*132 PONAME      ! Name of .POSITION array
-      INTEGER      QPTR         ! Dynamic-memory pointer to quality array
-      INTEGER      SLOT         ! Map slot number outputdata array
-      INTEGER      SPTR         ! Dynamic-memory pointer to scan positions
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER*80 STRING       ! Output string
-      INTEGER      SUMPTR       ! Dynamic-memory pointer to SUM array
-      INTEGER      UPTR         ! Dynamic-memory pointer to USES array
-      REAL         XS           ! Starting X value
-      REAL         XE           ! Ending X value
-C    
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL      CGS2          ! True for CGS2 data
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to detector
+                                 ! numbers
+      INTEGER      EPTR          ! Dynamic-memory pointer to error array
+      CHARACTER*80 ERR           ! Error string
+      CHARACTER*132 SPECTRUM     ! The input spectrum name
+      CHARACTER*132 OUTPUT       ! The output spectrum name
+      INTEGER      I             !
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      IXST          ! Start pixel for flatfielding
+      INTEGER      IXEN          ! End pixel for flatfielding
+      INTEGER      LEN           ! Length of PIXNAME
+      LOGICAL      MORE          ! TRUE if more ranges
+      INTEGER      ND            ! Number of pixels
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NPTR          ! Dynamic-memory pointer to NUM array
+      INTEGER      NS            ! Number of scan positions
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+                                 ! data array
+      REAL         PERIOD        ! Ripple period
+      CHARACTER*132 PIXNAME      ! Name of Pixels structure
+      CHARACTER*132 PNAME        ! Name of .PIXEL array
+      CHARACTER*132 PONAME       ! Name of .POSITION array
+      INTEGER      QPTR          ! Dynamic-memory pointer to quality 
+                                 ! array
+      INTEGER      SLOT          ! Map slot number outputdata array
+      INTEGER      SPTR          ! Dynamic-memory pointer to scan 
+                                 ! positions
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER*80 STRING        ! Output string
+      INTEGER      SUMPTR        ! Dynamic-memory pointer to SUM array
+      INTEGER      UPTR          ! Dynamic-memory pointer to USES array
+      REAL         XS            ! Starting X value
+      REAL         XE            ! Ending X value
 C
 C     Initialisation of DSA_ routines
 C
@@ -147,12 +152,10 @@ C
          ND = NINT(PERIOD)
          NS=NX/ND
          IF ( NS * ND .LT. NX ) NS = NS + 1
-         CALL DSA_GET_WORK_ARRAY(NX,'INT',ADDRESS,SLOT,STATUS)
-         SPTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_GET_WORK_ARRAY(NX,'INT',ADDRESS,SLOT,STATUS)
-         DPTR=DYN_ELEMENT(ADDRESS)
-         CALL IRFLAT_FILL(NX,ND,NS,DYNAMIC_MEM(SPTR),
-     :      DYNAMIC_MEM(DPTR))
+         CALL DSA_GET_WORK_ARRAY(NX,'INT',SPTR,SLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY(NX,'INT',DPTR,SLOT,STATUS)
+         CALL IRFLAT_FILL(NX,ND,NS,%VAL(CNF_PVAL(SPTR)),
+     :                    %VAL(CNF_PVAL(DPTR)))
       ELSE
 C
 C     Find and map PIXEL and POSITIONS arrays
@@ -173,19 +176,17 @@ C
      :     CALL DTA_RDVARI(PIXNAME(1:LEN)//'.PIXELS.NPOSITIONS',1,NS,
      :        STATUS)
 C
-         CALL DSA_GET_WORK_ARRAY(NX,'INT',ADDRESS,SLOT,STATUS)
-         DPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY(NX,'INT',DPTR,SLOT,STATUS)
          IF (STATUS .EQ. 0)
-     :      CALL DTA_RDVARI(PNAME,NX,DYNAMIC_MEM(DPTR),STATUS)
-         CALL DSA_GET_WORK_ARRAY(NX,'INT',ADDRESS,SLOT,STATUS)
-         SPTR=DYN_ELEMENT(ADDRESS)
+     :      CALL DTA_RDVARI(PNAME,NX,%VAL(CNF_PVAL(DPTR)),STATUS)
+         CALL DSA_GET_WORK_ARRAY(NX,'INT',SPTR,SLOT,STATUS)
          IF (STATUS .EQ. 0)
-     :      CALL DTA_RDVARI(PONAME,NX,DYNAMIC_MEM(SPTR),STATUS)
+     :      CALL DTA_RDVARI(PONAME,NX,%VAL(CNF_PVAL(SPTR)),STATUS)
          IF (STATUS .NE. 0) THEN
              CALL PAR_WRUSER('Error Reading PIXELS Structure',IGNORE)
              GOTO 500
-         ENDIF
-      ENDIF
+         END IF
+      END IF
 C
 C     Get name of resulting output spectrum
 C
@@ -201,17 +202,14 @@ C
 C
 C     Force creation of error array by mapping it, then zero it
 C
-      CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      EPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',EPTR,SLOT,STATUS)
       CALL GEN_FILL(NX*DSA_TYPESIZE('FLOAT',STATUS),0,
-     :     DYNAMIC_MEM(EPTR))
+     :              %VAL(CNF_PVAL(EPTR)))
 C
 C     Map data  and quality array
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',ADDRESS,SLOT,STATUS)
-      QPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
+      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',QPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Select initial region
@@ -223,23 +221,20 @@ C
 C
 C     Get workspace arrays
 C
-      CALL DSA_GET_WORK_ARRAY(NS,'INT',ADDRESS,SLOT,STATUS)
-      UPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(ND,'FLOAT',ADDRESS,SLOT,STATUS)
-      SUMPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(ND,'INT',ADDRESS,SLOT,STATUS)
-      NPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NS,'INT',UPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(ND,'FLOAT',SUMPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(ND,'INT',NPTR,SLOT,STATUS)
       CALL GEN_FILL(ND*DSA_TYPESIZE('FLOAT',STATUS),0,
-     :    DYNAMIC_MEM(SUMPTR))
+     :              %VAL(CNF_PVAL(SUMPTR)))
       CALL GEN_FILL(ND*DSA_TYPESIZE('INT',STATUS),0,
-     :    DYNAMIC_MEM(NPTR))
+     :              %VAL(CNF_PVAL(NPTR)))
 C
 C     Operate on data
 C
-      CALL IRFLAT_FOLD(DYNAMIC_MEM(OPTR),DYNAMIC_MEM(QPTR),NX,
-     :    IXST,IXEN,DYNAMIC_MEM(DPTR),
-     :    DYNAMIC_MEM(SPTR),DYNAMIC_MEM(UPTR),NS,ND,DYNAMIC_MEM(SUMPTR),
-     :    DYNAMIC_MEM(NPTR))
+      CALL IRFLAT_FOLD(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(QPTR)),NX,
+     :                 IXST,IXEN,%VAL(CNF_PVAL(DPTR)),
+     :                 %VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(UPTR)),NS,ND,
+     :                 %VAL(CNF_PVAL(SUMPTR)),%VAL(CNF_PVAL(NPTR)))
 C
 C     Repeat for more ranges if necessary (if not in batch)
 C
@@ -252,18 +247,20 @@ C
               CALL PAR_CNPAR('XEND')
               CALL DSA_AXIS_RANGE('SPECT',1,' ',.FALSE.,XS,XE,
      :             IXST,IXEN,STATUS)
-              CALL IRFLAT_FOLD(DYNAMIC_MEM(OPTR),
-     :            DYNAMIC_MEM(QPTR),NX,
-     :            IXST,IXEN,DYNAMIC_MEM(DPTR),DYNAMIC_MEM(SPTR),
-     :            DYNAMIC_MEM(UPTR),NS,ND,DYNAMIC_MEM(SUMPTR),
-     :            DYNAMIC_MEM(NPTR))
-          ENDIF
-      ENDDO
+              CALL IRFLAT_FOLD(%VAL(CNF_PVAL(OPTR)),
+     :                         %VAL(CNF_PVAL(QPTR)),NX,IXST,IXEN,
+     :                         %VAL(CNF_PVAL(DPTR)),
+     :                         %VAL(CNF_PVAL(SPTR)),
+     :                         %VAL(CNF_PVAL(UPTR)),NS,ND,
+     :                         %VAL(CNF_PVAL(SUMPTR)),
+     :                         %VAL(CNF_PVAL(NPTR)))
+          END IF
+      END DO
 C
 C     Make the flat field spectrum
 C
-      CALL IRFLAT_WORK(ND,DYNAMIC_MEM(SUMPTR),DYNAMIC_MEM(NPTR),NX,
-     :    DYNAMIC_MEM(DPTR),DYNAMIC_MEM(OPTR))
+      CALL IRFLAT_WORK(ND,%VAL(CNF_PVAL(SUMPTR)),%VAL(CNF_PVAL(NPTR)),
+     :                 NX,%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(OPTR)))
 C
 C     Tidy up
 C
@@ -274,7 +271,7 @@ C
 C     IF (CGS2) THEN
 C        CALL DTA_FRVAR(PNAME,IGNORE)
 C        CALL DTA_FRVAR(PONAME,STATUS)
-C     ENDIF
+C     END IF
       CALL DSA_CLOSE(STATUS)
 C
       END
@@ -313,16 +310,16 @@ C     Set USES array to TRUE
 C
       DO IS=1,NS
           USES(IS) = .TRUE.
-      ENDDO
+      END DO
 C
 C     Set USES array to FALSE for all positions partially outside range
 C
       DO IX=1,IXST
           USES(SC(IX))=.FALSE.
-      ENDDO
+      END DO
       DO IX=IXEN,NX
           USES(SC(IX))=.FALSE.
-      ENDDO
+      END DO
 C
 C     Fold remaining data
 C
@@ -331,8 +328,8 @@ C
               ID = DETS(IX)
               SUM(ID) = SUM(ID)+DATA(IX)
               NUM(ID) = NUM(ID)+1
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       END
 
 
@@ -356,16 +353,16 @@ C
               SUM(ID)=SUM(ID)/NUM(ID)
               SS=SS+SUM(ID)
               NS=NS+1
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       SS=SS/NS
       DO ID=1,ND
           SUM(ID)=SUM(ID)/SS
           CALL PAR_WRUSER(ICH_CI(ID)//ICH_CF(SUM(ID)),IGNORE)
-      ENDDO
+      END DO
       DO IX=1,NX
           DATA(IX)=SUM(DETS(IX))
-      ENDDO
+      END DO
       END
 
 
@@ -381,12 +378,12 @@ C
             D(IX)=ID
             S(IX)=IS
             IX=IX+1
-         ENDDO
-      ENDDO
+         END DO
+      END DO
 
       DO IS = IX, NX
          D(IS)=IS-IX+1
          S(IS)=NS
-      ENDDO
+      END DO
 
       END

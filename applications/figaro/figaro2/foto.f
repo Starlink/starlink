@@ -75,13 +75,17 @@ C                    file names to 132 chars.
 C     6th  Aug 1997  MJCL / Starlink, UCL.  Explicit typecast of
 C                    the fourth argument to PGPOINT due to Solaris
 C                    problem.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_LEN,DYN_ELEMENT,DSA_TYPESIZE,DYN_INCREMENT
+      INTEGER ICH_LEN
 C
 C     Maximum number of radii - note: more than 7 will cause problems
 C     with the formatting of the output file (which is messy as it is).
@@ -96,49 +100,47 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         BAD          !
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      LOGICAL      FAULT        ! Flags any non-DSA errors
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      CHARACTER    IMAGE*132    ! The actual name of the image file
-      INTEGER      IOUT         !
-      INTEGER      ISTAT        ! Status variable for non-DSA use
-      INTEGER      MSKY         !
-      REAL         MZERO        !  
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NI           !
-      INTEGER      NR           !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      REAL         PEAK(MAXR+2) !
-      REAL         PHOTON       !
-      REAL         QEAK(MAXR+2) !
-      REAL         RA1          !
-      REAL         RA2          !
-      REAL         READNS       !
-      REAL         RLIM         !
-      REAL         RR(MAXR)     !
-      INTEGER      RPTR         ! Dynamic-memory pointer to workspace1
-      CHARACTER    SOFT*64      ! PGPLOT spec for plotting device
-      INTEGER      SPTR         ! Dynamic-memory pointer to workspace2
-      INTEGER      STATUS       ! DSA_ routines running error code
-      CHARACTER    STRING*80    !
-      CHARACTER    TODAY*20     ! 
-      REAL         VALUE        ! Temporary real number
-      INTEGER      WSLOT        ! Map slot number for workspace
-      REAL         WW(MAXR)     !
-      CHARACTER    CDAY*9, CHOUR*12
-      INTEGER      LDAY, LDATE, LHOUR
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL         BAD           !
+      CHARACTER    CDAY*9 
+      CHARACTER    CHOUR*12
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      LOGICAL      FAULT         ! Flags any non-DSA errors
+      INTEGER      I             !
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      CHARACTER    IMAGE*132     ! The actual name of the image file
+      INTEGER      IOUT          !
+      INTEGER      ISTAT         ! Status variable for non-DSA use
+      INTEGER      LDATE
+      INTEGER      LDAY
+      INTEGER      LHOUR
+      INTEGER      MSKY          !
+      REAL         MZERO         !  
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NI            !
+      INTEGER      NR            !
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      REAL         PEAK(MAXR+2)  !
+      REAL         PHOTON        !
+      REAL         QEAK(MAXR+2)  !
+      REAL         RA1           !
+      REAL         RA2           !
+      REAL         READNS        !
+      REAL         RLIM          !
+      REAL         RR(MAXR)      !
+      INTEGER      RPTR          ! Dynamic-memory pointer to workspace1
+      CHARACTER    SOFT*64       ! PGPLOT spec for plotting device
+      INTEGER      SPTR          ! Dynamic-memory pointer to workspace2
+      INTEGER      STATUS        ! DSA_ routines running error code
+      CHARACTER    STRING*80     !
+      CHARACTER    TODAY*20      ! 
+      REAL         VALUE         ! Temporary real number
+      INTEGER      WSLOT         ! Map slot number for workspace
+      INTEGER      WSLOT2        ! Map slot number for workspace
+      REAL         WW(MAXR)      !
 C
 C     Initial values
 C
@@ -168,8 +170,7 @@ C
 C
 C     Map image data
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
 C
 C     Get the rest of the parameters
 C
@@ -207,10 +208,8 @@ C
 C
 C     Get workspace
 C
-      BYTES=(MSKY+NI)*DSA_TYPESIZE('FLOAT',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
-      RPTR=DYN_INCREMENT(SPTR,'FLOAT',MSKY)
+      CALL DSA_GET_WORK_ARRAY(MSKY,'FLOAT',SPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NI,'FLOAT',RPTR,WSLOT2,STATUS)
 C
 C     Open output file and write headings - messy use of run-time
 C     formatting (STRING) is because of uncertainty about value of NR.
@@ -234,9 +233,10 @@ C
 C
 C     Now let PHOTSUB do the work
 C
-      CALL PHOTSUB(DYNAMIC_MEM(DPTR),NX,NY,RA1,RA2,RR,NR,NI,MSKY,
-     :        BAD,PHOTON,READNS,MZERO,SOFT,IOUT,DYNAMIC_MEM(SPTR),
-     :        DYNAMIC_MEM(RPTR),WW,PEAK,QEAK)
+      CALL PHOTSUB(%VAL(CNF_PVAL(DPTR)),NX,NY,RA1,RA2,RR,NR,NI,MSKY,
+     :             BAD,PHOTON,READNS,MZERO,SOFT,IOUT,
+     :             %VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(RPTR)),WW,PEAK,
+     :             QEAK)
       IF (PAR_ABORT()) GO TO 500
 C
 C     Tell user output file name
@@ -244,7 +244,7 @@ C
       INQUIRE (UNIT=IOUT,NAME=STRING)
       CALL PAR_WRUSER(' ',IGNORE)
       CALL PAR_WRUSER('Results written to '//STRING(:ICH_LEN(STRING)),
-     :                                                         IGNORE)
+     :                IGNORE)
 C
 C     Finally, tidy up.
 C

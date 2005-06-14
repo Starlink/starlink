@@ -14,11 +14,11 @@ C
 C     Command parameters -
 C
 C     IDATA       (Character) The data structure containing the array
-C                 that is to form the imaginary part of the complex data.
-C                 That is, the data array of IDATA becomes the 
-C                 imaginary data array of the output complex structure.  
-C     CDATA       (Character) The resulting complex data structure.  Note
-C                 that this is an already existing structure.
+C                 that is to form the imaginary part of the complex
+C                 data.  That is, the data array of IDATA becomes the 
+C                 imaginary data array of the output complex structure.
+C     CDATA       (Character) The resulting complex data structure.  
+C                 Note that this is an already existing structure.
 C
 C                                             KS / AAO 8th Sept 1986
 C     Modified:
@@ -44,28 +44,32 @@ C                    padding to do.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                    Input read-only. Use DSA_INPUT_UPDATE for CDATA
 C                    Map complex in single call.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
       LOGICAL DSA_SAME_DATA
-      CHARACTER GEN_NTH*2        ! Returns 'st','th','rd' etc appropriate to N
-      CHARACTER ICH_CI*12        ! Return an integer as a character string.
-      INTEGER  ICH_LEN           !Position of last non-blank char in string.
+      CHARACTER GEN_NTH*2        ! Returns 'st','th','rd' etc .
+                                 ! appropriate to N
+      CHARACTER ICH_CI*12        ! Return an integer as a character
+                                 ! string
+      INTEGER  ICH_LEN           ! Position of last non-blank char in
+                                 ! string
       INTEGER ICH_ENCODE
       INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Virtual address for data array
-      INTEGER   ADDRESS2         ! Virtual address for data array
-      INTEGER   BYTES            ! Number of bytes per item of type 'DOUBLE'
       INTEGER   DIMS(10)         ! Image dimensions
-      INTEGER   IPTR             ! Dynamic memory element for image data
+      INTEGER   IPTR             ! Dynamic-memory pointer for imag. data
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   RPTR             ! Dynamic-memory pointer for real data
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   STATUS           ! Running status for DSA routines
 C
@@ -82,10 +86,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -173,16 +173,14 @@ C
 C
 C     Map the input array.
 C
-      CALL DSA_MAP_DATA('IDATA','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IIPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IDATA','READ','FLOAT',IIPTR,SLOT,STATUS)
 C
 C     Map the output real and imaginary arrays.
 C
-C     CALL DSA_MAP_IMAGINARY('CDATA','UPDATE','DOUBLE',ADDRESS,SLOT,
+C     CALL DSA_MAP_IMAGINARY('CDATA','UPDATE','DOUBLE',IPTR,SLOT,
 C    :                        STATUS)
-      CALL DSA_MAP_COMPLEX('CDATA','UPDATE','DOUBLE',
-     :   ADDRESS2,ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_COMPLEX('CDATA','UPDATE','DOUBLE',RPTR,IPTR,SLOT,
+     :                     STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Copy the data from the input array into the imaginary array.
@@ -191,11 +189,11 @@ C     Otherwise, the data has to be re-dimensioned as well.
 C
       IF (CHANGE) THEN
          CALL FIG_CHCOPY(NDIM,DIMS0,DIMS,NELM0,NELM,
-     :                   DYNAMIC_MEM(IIPTR),DYNAMIC_MEM(IPTR))
+     :                   %VAL(CNF_PVAL(IIPTR)),%VAL(CNF_PVAL(IPTR)))
       ELSE
          IGNORE=0
-         CALL VEC_RTOD(.FALSE.,NELM,DYNAMIC_MEM(IIPTR),
-     :      DYNAMIC_MEM(IPTR),IERR,NBAD,IGNORE)
+         CALL VEC_RTOD(.FALSE.,NELM,%VAL(CNF_PVAL(IIPTR)),
+     :                  %VAL(CNF_PVAL(IPTR)),IERR,NBAD,IGNORE)
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
       END IF
 

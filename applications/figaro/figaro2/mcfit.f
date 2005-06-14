@@ -24,26 +24,31 @@ C
 C                                    KS / CIT 8th April 1984
 C     Modified:
 C
-C     28th Feb 1985.  KS / AAO.  Now operates on a 2D image as well
-C                     as on a 1D spectrum.  - But MASK is always a
-C                     1D spectrum.
-C     27th Mar 1985.  KS / AAO. Workspace usage and call to FIG_
-C                     MCFIT modified for NAG version of FIG_MCFIT.
-C     11th Aug 1987.  DJA/ AAO. Revised DSA_ routines - some specs changed.
-C                     Now uses DYN_ routines for dynamic memory handling
-C     31st Dec 1987.  KS / AAO. RMS calculation added.  Check on match of
-C                     dimensions between SPECT and MASK revised to allow
-C                     for case where SPECT is 2D but MASK is 1D.  MASK
-C                     can now be 2D.
-C     29th Sep 1992.  HME / UoE, Starlink.  TABs removed, INCLUDE
-C                     changed. Map output data for update access.
-C      5th Apr 1995.  HME / UoE, Starlink.  No longer use NAG.
+C     28th Feb 1985  KS / AAO.  Now operates on a 2D image as well
+C                    as on a 1D spectrum.  - But MASK is always a
+C                    1D spectrum.
+C     27th Mar 1985  KS / AAO. Workspace usage and call to FIG_
+C                    MCFIT modified for NAG version of FIG_MCFIT.
+C     11th Aug 1987  DJA/ AAO. Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN_ routines for dynamic-memory
+C                    handling.
+C     31st Dec 1987  KS / AAO. RMS calculation added.  Check on match of
+C                    dimensions between SPECT and MASK revised to allow
+C                    for case where SPECT is 2D but MASK is 1D.  MASK
+C                    can now be 2D.
+C     29th Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
+C                    changed. Map output data for update access.
+C      5th Apr 1995  HME / UoE, Starlink.  No longer use NAG.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used 
 C
-      INTEGER DYN_INCREMENT,DYN_ELEMENT,DSA_TYPESIZE,ICH_ENCODE,ICH_LEN
+      INTEGER DSA_TYPESIZE,ICH_ENCODE,ICH_LEN
 C
 C     Maximum number of points to be used
 C
@@ -52,39 +57,41 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
-      INTEGER      DIMS(2)      ! Sizes of dimensions of data
-      DOUBLE PRECISION DUMMY    ! Dummy numeric value for data info
-      INTEGER      IAX          ! Index through axes
-      INTEGER      IGNORE       ! Ignored status value
-      INTEGER      INVOKE       ! Dummy function value
-      INTEGER      IY           ! Index through spectra in 2D data
-      INTEGER      MDIM         ! Number of MASK dimensions
-      INTEGER      MDIMS(2)     ! MASK dimensions
-      INTEGER      MPTR         ! Dynamic-memory pointer to mask data array
-      INTEGER      MSKELM       ! Elements in MASK data
-      INTEGER      MSLOT        ! Map slot number of mask data array
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NEXT         ! Next character in STRING
-      INTEGER      NSPL         ! Number of splines
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number output data array
-      REAL         RMS          ! RMS value for fits
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! Used to format RMS values
-      CHARACTER    UNITS*32     ! Data units
-      REAL         VALUE        ! Temporary real number
+      INTEGER      BYTES         ! Number of bytes of workspace required
+      INTEGER      DIMS(2)       ! Sizes of dimensions of data
+      DOUBLE PRECISION DUMMY     ! Dummy numeric value for data info
+      INTEGER      IAX           ! Index through axes
+      INTEGER      IGNORE        ! Ignored status value
+      INTEGER      INVOKE        ! Dummy function value
+      INTEGER      IY            ! Index through spectra in 2D data
+      LOGICAL      ISNEWM        ! Is MPTR address new to CNF?
+      LOGICAL      ISNEWO        ! Is OPTR address new to CNF?
+      INTEGER      MDIM          ! Number of MASK dimensions
+      INTEGER      MDIMS(2)      ! MASK dimensions
+      INTEGER      MPTR          ! Dynamic-memory pointer to mask data
+                                 ! array
+      INTEGER      MSKELM        ! Elements in MASK data
+      INTEGER      MSLOT         ! Map slot number of mask data array
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NEXT          ! Next character in STRING
+      INTEGER      NSPL          ! Number of splines
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number output data array
+      LOGICAL      PISNM         ! Previous CNF MPTR pointer new?
+      LOGICAL      PISNO         ! Previous CNF OPTR pointer new?
+      REAL         RMS           ! RMS value for fits
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*64     ! Used to format RMS values
+      INTEGER      TPTR          ! Temporary dynamic mem pointer
+      CHARACTER    UNITS*32      ! Data units
+      REAL         VALUE         ! Temporary real number
       DOUBLE PRECISION WORK(8*MAXSPL+40) ! Workspace for NAG
       DOUBLE PRECISION X(MAXSPL+2)       !     "      "   "
       DOUBLE PRECISION Y(MAXSPL+2)       !     "      "   "
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialisation of DSA_ routines
 C
@@ -134,11 +141,9 @@ C
 C
 C     Map the data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      CALL DSA_MAP_DATA('MASK','READ','FLOAT',ADDRESS,MSLOT,STATUS)
-      MPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('MASK','READ','FLOAT',MPTR,MSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get data units (for RMS output)
@@ -147,9 +152,11 @@ C
 C
 C     Generate the fitted spectrum
 C
+      PISNM = .FALSE.
+      PISNO = .FALSE.
       DO IY=1,NY
-         CALL FIG_MCFIT(NX,DYNAMIC_MEM(OPTR),DYNAMIC_MEM(MPTR),NSPL,
-     :                  X,Y,WORK,DYNAMIC_MEM(OPTR),RMS)
+         CALL FIG_MCFIT(NX,%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(MPTR)),
+     :                  NSPL,X,Y,WORK,%VAL(CNF_PVAL(OPTR)),RMS)
          IF (NY.EQ.1) THEN
             STRING='RMS for fit'
             NEXT=12
@@ -161,8 +168,18 @@ C
          INVOKE=ICH_ENCODE(STRING,RMS,NEXT+3,4,NEXT)
          STRING(NEXT:)=' '//UNITS
          CALL PAR_WRUSER(STRING(:ICH_LEN(STRING)),IGNORE)
-         OPTR=DYN_INCREMENT(OPTR,'FLOAT',NX)
-         IF (MDIM.GT.1) MPTR=DYN_INCREMENT(MPTR,'FLOAT',NX)
+
+         CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEWO,STATUS)
+         IF (PISNO) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
+         PISNO = ISNEWO
+
+         IF (MDIM.GT.1) THEN
+            CALL DYN_INCAD(MPTR,'FLOAT',NX,TPTR,ISNEWM,STATUS)
+            IF (PISNM) CALL CNF_UNREGP(MPTR)
+            MPTR = TPTR
+            PISNM = ISNEWM
+         END IF
       END DO
 C
 C     Tidy up

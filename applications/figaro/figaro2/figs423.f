@@ -33,54 +33,51 @@ C     AXIS(4) sub-structures that HCUBE has will be deleted.
 C     
 C                                     KS / AAO 19th May 1986
 C
-C     11th July 1989.  JM / RAL. Modified to use DSA_ routines
-C                      Dynamic memory handling changed to use
-C                      DYN_ routines
-C     29th Mar. 1991.  JMS / AAO. Changed type from 'INTEGER' to 'INT' when
-C                      mapping input data. Added STATUS checks to support
-C                      user requested aborts.
-C     28th Sep  1992.  HME / UoE, Starlink.  INCLUDE changed.
+C     11th July 1989 JM / RAL. Modified to use DSA_ routines
+C                    Dynamic-memory handling changed to use
+C                    DYN_ routines
+C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT'
+C                    when mapping input data. Added STATUS checks to 
+C                    support user-requested aborts.
+C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS   ! Virtual address for data array
-      CHARACTER COMENT*16 ! Comment associated with FITS items
-      INTEGER   CUPTR     ! Dynamic memory element for HCUBE data
-      INTEGER   CYCLES    ! No. of cycles to be used
-      INTEGER   DIMS(10)  ! Image dimensions
-      LOGICAL   EXIST     ! True if axis structure exists
-      LOGICAL   FAULT     ! True if non-DSA problem occurs
-      INTEGER   ICYEN     ! First cycle number to be used
-      INTEGER   ICYST     ! Last cycle number to be used
-      INTEGER   MODE      ! Mode of hypercube data
-      INTEGER   NAXIS     ! Axis number
-      INTEGER   NDIM      ! Number of image dimensions
-      INTEGER   NELM      ! Number of elements in image - ignored
-      INTEGER   NT        ! Third dimension of HCUBE
-      INTEGER   NU        ! Fourth dimension of HCUBE
-      INTEGER   NX        ! First dimension of HCUBE
-      INTEGER   NY        ! Second dimension of HCUBE
-      INTEGER   OPTR      ! Dynamic memory element for OUTPUT data
-      INTEGER   PSTAT     ! Status for PAR routines
-      INTEGER   SFLAG     ! Test for sorted data
-      INTEGER   SLOT      ! Slot number for mapped data - ignored
-      INTEGER   STATUS    ! Running status for DSA routines
-      REAL      VALUE     ! Used by PAR_ calls to read in parameters  
+      CHARACTER COMENT*16        ! Comment associated with FITS items
+      INTEGER   CUPTR            ! Dynamic-memory pointer for HCUBE data
+      INTEGER   CYCLES           ! No. of cycles to be used
+      INTEGER   DIMS(10)         ! Image dimensions
+      LOGICAL   EXIST            ! True if axis structure exists
+      LOGICAL   FAULT            ! True if non-DSA problem occurs
+      INTEGER   ICYEN            ! First cycle number to be used
+      INTEGER   ICYST            ! Last cycle number to be used
+      INTEGER   MODE             ! Mode of hypercube data
+      INTEGER   NAXIS            ! Axis number
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NT               ! Third dimension of HCUBE
+      INTEGER   NU               ! Fourth dimension of HCUBE
+      INTEGER   NX               ! First dimension of HCUBE
+      INTEGER   NY               ! Second dimension of HCUBE
+      INTEGER   OPTR             ! Dynamic-memory pointer for OUTPUT
+                                 ! data
+      INTEGER   PSTAT            ! Status for PAR routines
+      INTEGER   SFLAG            ! Test for sorted data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   STATUS           ! Running status for DSA routines
+      REAL      VALUE            ! Used by PAR_ calls to read in
+                                 ! parameters  
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Image mode parameter value
 C
@@ -165,9 +162,8 @@ C
 C
 C     Map the input data
 C
-      CALL DSA_MAP_DATA('HCUBE','READ','INT',ADDRESS,SLOT,STATUS)
-      CUPTR=DYN_ELEMENT(ADDRESS)
-      IF(STATUS.NE.0)GOTO 500
+      CALL DSA_MAP_DATA('HCUBE','READ','INT',CUPTR,SLOT,STATUS)
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Now map the output data structure
 C
@@ -179,9 +175,8 @@ C
 C
 C     Map the output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
-      IF(STATUS.NE.0)GOTO 500
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Copy the first three input axis structures to the output.
 C     The AXIS(4) structure is lost.
@@ -191,15 +186,15 @@ C
          IF(EXIST)THEN
             CALL DSA_AXIS_SIZE('HCUBE',NAXIS,10,NDIM,DIMS,NELM,STATUS)
             CALL DSA_RESHAPE_AXIS('OUTPUT',1,'HCUBE',1,NDIM,DIMS,STATUS)
-         ENDIF
-      ENDDO
+         END IF
+      END DO
       IF(STATUS.NE.0)GOTO 500
 C
 C     Perform the basic processing of the hypercube down to 
 C     a cube.
 C
-      CALL FIG_FIGS423(DYNAMIC_MEM(CUPTR),NX,NY,NT,NU,ICYST,ICYEN,
-     :                 DYNAMIC_MEM(OPTR))
+      CALL FIG_FIGS423(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NU,ICYST,ICYEN,
+     :                 %VAL(CNF_PVAL(OPTR)))
 
   500 CONTINUE
 C

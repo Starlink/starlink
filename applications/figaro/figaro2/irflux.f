@@ -15,7 +15,8 @@ C               image data.
 C
 C     TEMP      The temperature of the black body to be used.
 C
-C     CALTYPE   The type of calibration data. A single character as follows:
+C     CALTYPE   The type of calibration data. A single character as 
+C               follows:
 C                  'J','H','K','L','M' - magnitude in a standard band
 C                  'F' - Flux at specified wavelength
 C
@@ -33,80 +34,94 @@ C
 C                                          JAB / JAC  19th Sep 1990
 C     Modified:
 C
-C     25th Feb 1990.  JAB / JAC.  Adapted from FIGSFLUX.
-C     19th Sep 1990.  JAB / JAC.  Add additional methods of specifying
+C     25th Feb 1990  JAB / JAC.  Adapted from FIGSFLUX.
+C     19th Sep 1990  JAB / JAC.  Add additional methods of specifying
 C                                    calibration.
-C     30th Nov 1990.  JAB / JAC.  Correct Flux zero points and effective
+C     30th Nov 1990  JAB / JAC.  Correct Flux zero points and effective
 C                                    wavelengths.
-C      8th Dec 1990.  JAB / JAC.  Use data quality.
-C     15th Feb 1991.  HME / UoE.  Reshuffle DSA_ calls. Map output for
-C                     update rather than write. Remove FIG_ prefix.
-C                     Revise (FIG_)FLUX subroutine. If SAME, output is model
-C                     flux density, errors are zero, but bad pixels remain bad.
-C     8th Mar. 1991.  JMS / AAO. Added IRFLUX_ prefix to all subroutine names.
-C     22nd Sep 1992.  HME / UoE, Starlink.  TABs removed, INCLUDE changed.
-C                     Lowercase file name. Don't tread LIB$GET_LUN as logical.
-C     21st Jul 1993.  HME / UoE, Starlink.  Use DSA_*_LU.
-C     28th Jul 1993.  HME / UoE, Starlink. Disuse STR$UPCASE.
-C     29th Jul 1996.  MJCL / Starlink, UCL.  Added PAR_ABORT checks.
-C      5th Feb 1998.  BLY / RAL, Starlink.  Added type definitions for
-C                     ICH_ENCODE and ICH_FOLD functions, a type definition
-C                     for INVOKE to keep the Linux compiler happy.
-C      5th Mar 1998.  ACD / UoE, Starlink.  Fixed a bug in the call to
-C                     PAR_RDVAL to get variable FLAM where the default
-C                     was incorrectly specified as INTEGER instead of REAL.
+C      8th Dec 1990  JAB / JAC.  Use data quality.
+C     15th Feb 1991  HME / UoE.  Reshuffle DSA_ calls. Map output for
+C                    update rather than write. Remove FIG_ prefix.
+C                    Revise (FIG_)FLUX subroutine. If SAME, output is
+C                    model flux density, errors are zero, but bad pixels
+C                    remain bad.
+C     8th Mar. 1991  JMS / AAO. Added IRFLUX_ prefix to all subroutine
+C                    names.
+C     22nd Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
+C                    changed. Lowercase file name. Don't tread
+C                    LIB$GET_LUN as logical.
+C     21st Jul 1993  HME / UoE, Starlink.  Use DSA_*_LU.
+C     28th Jul 1993  HME / UoE, Starlink. Disuse STR$UPCASE.
+C     29th Jul 1996  MJCL / Starlink, UCL.  Added PAR_ABORT checks.
+C      5th Feb 1998  BLY / RAL, Starlink.  Added type definitions for
+C                    ICH_ENCODE and ICH_FOLD functions, a type 
+C                    definition for INVOKE to keep the Linux compiler
+C                    happy.
+C      5th Mar 1998  ACD / UoE, Starlink.  Fixed a bug in the call to
+C                    PAR_RDVAL to get variable FLAM where the default
+C                    was incorrectly specified as INTEGER instead of
+C                    REAL.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL DSA_SAME_DATA
       INTEGER DSA_TYPESIZE
-      INTEGER DYN_ELEMENT
       INTEGER ICH_ENCODE, ICH_FOLD
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      DOUBLE PRECISION  DUMMY   ! Used to pass dummy double precision value
-      LOGICAL      ERROR1       ! TRUE if spectrum has an error structure
-      LOGICAL      ERROR2       ! TRUE if standard has an error structure
-      INTEGER      ESPTR        ! Dynamic-memory pointer to standard errors
-      INTEGER      ESSLOT       ! Map slot number of standard errors
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      CHARACTER*1  CALTYPE      ! Type of calibration data
-      REAL         MAG          ! Magnitude value of standard
-      REAL         FLAM         ! Flux at calibration wavelength
-      REAL         WAVE         ! Calibration wavelength
-      REAL         KDEF         ! Default value for K magnitude
-      CHARACTER*64 OBJECT       ! Object name
-      REAL         TEMP         ! Temperature of standard
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OEPTR        ! Dynamic-memory pointer to output errors
-      INTEGER      OESLOT       ! Map slot number of output errors
-      INTEGER      OPTR         ! Dynamic-memory pointer to data array
-      INTEGER      OSLOT        ! Map slot number of input data array
-      INTEGER      OQPTR        ! Dynamic-memory pointer to output quality array
-      INTEGER      OQSLOT       ! Map slot number of output quality array
-      LOGICAL      SAME         ! TRUE if standard is the same as the spectrum
-      INTEGER      SPTR         ! Dynamic-memory pointer to standard data array
-      INTEGER      SSLOT        ! Map slot number of standard data array
-      INTEGER      SQPTR        ! Dynamic memory pointer to standard quality
-      INTEGER      SQSLOT       ! Map slot number of standard quality array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRINGS(2)*16! Units and label information for new data
-      INTEGER      XPTR         ! Dynamic-memory pointer to output x-axis data
-      INTEGER      XSLOT        ! Map slot number for output x-axis data
-      CHARACTER*12 STR          ! String buffer for K mag
-      INTEGER      NP           ! Needed for ICH_ENCODE
-      INTEGER      INVOKE       ! Dummy for ICH_ENCODE, ICH_FOLD
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER*1  CALTYPE       ! Type of calibration data
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      DOUBLE PRECISION  DUMMY    ! Dummy value
+      LOGICAL      ERROR1        ! Spectrum has an error structure?
+      LOGICAL      ERROR2        ! Standard has an error structure?
+      INTEGER      ESPTR         ! Dynamic-memory pointer to standard
+                                 ! errors
+      INTEGER      ESSLOT        ! Map slot number of standard errors
+      REAL         FLAM          ! Flux at calibration wavelength
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INVOKE        ! Dummy for ICH_ENCODE, ICH_FOLD
+      REAL         KDEF          ! Default value for K magnitude
+      REAL         MAG           ! Magnitude value of standard
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NP            ! Needed for ICH_ENCODE
+      INTEGER      NX            ! Size of 1st dimension
+      CHARACTER*64 OBJECT        ! Object name
+      INTEGER      OEPTR         ! Dynamic-memory pointer to output
+                                 ! errors
+      INTEGER      OESLOT        ! Map slot number of output errors
+      INTEGER      OPTR          ! Dynamic-memory pointer to data array
+      INTEGER      OQPTR         ! Dynamic-memory pointer to output 
+                                 ! quality array
+      INTEGER      OQSLOT        ! Map slot number of output quality
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number of input data array
+      LOGICAL      SAME          ! Standard is the same as the spectrum?
+      INTEGER      SPTR          ! Dynamic-memory pointer to standard
+                                 ! data array
+      INTEGER      SSLOT         ! Map slot number of standard data
+                                 ! array
+      INTEGER      SQPTR         ! Dynamic-memory pointer to standard
+                                 ! quality
+      INTEGER      SQSLOT        ! Map slot number of standard quality
+                                 ! array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER*12 STR           ! String buffer for K mag
+      CHARACTER    STRINGS(2)*16 ! Units and label information for new
+                                 ! data
+      REAL         TEMP          ! Temperature of standard
+      REAL         WAVE          ! Calibration wavelength
+      INTEGER      XPTR          ! Dynamic-memory pointer to output
+                                 ! x-axis data
+      INTEGER      XSLOT         ! Map slot number for output x-axis
+                                 ! data
 C
 C     Initialisation of DSA_ routines
 C
@@ -151,7 +166,7 @@ C
              CALL PAR_SDVAL('KMAG',KDEF,IGNORE)
              INVOKE = ICH_ENCODE(STR,KDEF,1,2,NP)
              CALL PAR_WRUSER('Standard has K magnitude '//STR,STATUS)
-         ENDIF
+         END IF
       END IF
       STATUS=0
 C
@@ -179,14 +194,14 @@ C
           ELSE IF (CALTYPE .EQ. 'M') THEN
               FLAM = 17E4*10**(-0.4*MAG)
               WAVE = 4.8
-          ENDIF
+          END IF
       ELSE IF (CALTYPE .EQ. 'F') THEN
           CALL PAR_RDVAL('FLUX',-1.0E30,1.0E30,1.0E0,' ',FLAM)
           CALL PAR_RDVAL('WAVE',1.0E-6,1.0E6,2.2E0,' ',WAVE)
       ELSE
           CALL PAR_WRUSER('CALTYPE must be J, H, K, L, M or F',STATUS)
           GO TO 500
-      ENDIF
+      END IF
 C
 C     Get output structure.
 C
@@ -211,58 +226,49 @@ C     model spectrum, which is perfect data. So write an error array
 C     with zeroes and prevent the FLUX subroutine from propagating errors.
 C
       IF ( SAME ) THEN
-         CALL DSA_MAP_ERRORS( 'OUTPUT', 'WRITE', 'FLOAT', ADDRESS,
-     :      OESLOT, STATUS )
-         OEPTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS( 'OUTPUT', 'WRITE', 'FLOAT', OEPTR,
+     :                        OESLOT, STATUS )
          CALL GEN_FILL( NX*DSA_TYPESIZE('FLOAT',STATUS), 0,
-     :      DYNAMIC_MEM(OEPTR) )
+     :                  %VAL(CNF_PVAL(OEPTR)) )
          ERROR1 = .FALSE.
-      ENDIF
+      END IF
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',ADDRESS,OQSLOT,
-     :   STATUS)
-      OQPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
+      CALL DSA_MAP_QUALITY('OUTPUT','UPDATE','BYTE',OQPTR,OQSLOT,STATUS)
       CALL DSA_SEEK_ERRORS('SPECT',ERROR1,STATUS)
       IF (ERROR1) THEN
-         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',ADDRESS,OESLOT,
-     :                                                       STATUS)
-         OEPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_ERRORS('OUTPUT','UPDATE','FLOAT',OEPTR,OESLOT,
+     :                       STATUS)
       END IF
 C
 C     Map wavelength array
 C
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                         STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',XPTR,XSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Map standard data
 C
       IF (.NOT.SAME) THEN
-         CALL DSA_MAP_DATA('STAND','READ','FLOAT',ADDRESS,SSLOT,STATUS)
-         SPTR=DYN_ELEMENT(ADDRESS)
-         CALL DSA_MAP_QUALITY('STAND','READ','BYTE',ADDRESS,SQSLOT,
+         CALL DSA_MAP_DATA('STAND','READ','FLOAT',SPTR,SSLOT,STATUS)
+         CALL DSA_MAP_QUALITY('STAND','READ','BYTE',SQPTR,SQSLOT,
      :        STATUS)
-         SQPTR=DYN_ELEMENT(ADDRESS)
 
          IF (ERROR1) THEN
 C
 C     Get an error array for the standard, will be zero if not found in
 C     data file. Thus ERROR2 is not needed in FLUX.
 C
-            CALL DSA_MAP_ERRORS('STAND','READ','FLOAT',ADDRESS,
-     :                                              ESSLOT,STATUS)
-            ESPTR=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_ERRORS('STAND','READ','FLOAT',ESPTR,
+     :                          ESSLOT,STATUS)
             IF ( .NOT. ERROR2 ) THEN
                CALL PAR_WRUSER('No error information on standard data',
      :                                                          IGNORE)
                CALL PAR_WRUSER('Will assume errors of zero',IGNORE)
             END IF
-         ENDIF
+         END IF
       ELSE
          SPTR=OPTR
          ESPTR=OEPTR
@@ -275,13 +281,15 @@ C
 C     Operate on the quality arrays
 C
       IF ( .NOT. SAME )
-     :   CALL IRFLUX_IRFLUXQ(NX,DYNAMIC_MEM(OQPTR),DYNAMIC_MEM(SQPTR))
+     :   CALL IRFLUX_IRFLUXQ(NX,%VAL(CNF_PVAL(OQPTR)),
+     :                       %VAL(CNF_PVAL(SQPTR)))
 C
 C     Operate on the images
 C
-      CALL IRFLUX_FLUX(ERROR1,NX,FLAM,WAVE,TEMP,DYNAMIC_MEM(OPTR),
-     :         DYNAMIC_MEM(OEPTR),DYNAMIC_MEM(OQPTR),DYNAMIC_MEM(SPTR),
-     :         DYNAMIC_MEM(ESPTR),DYNAMIC_MEM(XPTR))
+      CALL IRFLUX_FLUX(ERROR1,NX,FLAM,WAVE,TEMP,%VAL(CNF_PVAL(OPTR)),
+     :                 %VAL(CNF_PVAL(OEPTR)),%VAL(CNF_PVAL(OQPTR)),
+     :                 %VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(ESPTR)),
+     :                 %VAL(CNF_PVAL(XPTR)))
 C
 C     Set the units and label for the output data
 C
@@ -347,15 +355,15 @@ C
                   ESTAR(I) = F * SQRT(
      :               ESTAR(I)*ESTAR(I) / (STAN(I)*STAN(I))
      :             + ESTAN(I)*ESTAN(I) * STAR(I)*STAR(I)/STAN(I)**4 )
-               ENDIF
+               END IF
 C
 C     Divide star by standard and convert to flux.
 C
                STAR(I) = STAR(I) / STAN(I) * F
             ELSE
                QUALITY(I) = 1
-            ENDIF
-         ENDIF
+            END IF
+         END IF
     1 CONTINUE
       END
 
@@ -571,6 +579,6 @@ C     Set quality bad in output if it is bad in either spectrum or standard
       DO IX=1,NX
           IF ( ST(IX) .NE. 0 ) THEN
               OUT(IX) = 1
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       END

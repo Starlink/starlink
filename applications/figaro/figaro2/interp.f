@@ -44,46 +44,42 @@ C     25th Sep 1992  HME / UoE, Starlink. INCLUDE changed.
 C                    Lowercase file name spiketrum (.def).
 C     18th May 1995  HME / UoE, Starlink. FIG_ISPIKE now needs a longer
 C                    work space. Make DWPTR 11*NX+24.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
-C
-C     Functions
-C
-      INTEGER DYN_ELEMENT
- 
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS    ! Virtual address for data array
-      INTEGER   BFLOAT     ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BYTES      ! Bytes required for an array
-      CHARACTER COMMAND*8  ! Figaro command name
-      INTEGER   DIMS(5)    ! Spiketrum dimensions
-      CHARACTER DNAME*72   ! DTA name of data component
-      INTEGER   DSTAT      ! Status for DTA routines
-      INTEGER   DWPTR      ! Dynamic memory element for workspace
-      REAL      ENDS(4)    ! End values
-      LOGICAL   LINEND     ! True if linear interp. used at ends of data
-      LOGICAL   LOGFIT     ! True if interpolation performed on log of data
-      INTEGER   NDIM       ! Number of dimensions
-      INTEGER   NELM       ! Number of elements in Spiketrum
-      INTEGER   NP         ! No. points used for fitting in Spiketrum
-      INTEGER   NX         ! No. of elements in Spiketrum axis(1) array
-      INTEGER   ORDER      ! Polynomial order (SPIFIT only).
-      INTEGER   SLOT       ! Slot number for mapped data - ignored
-      INTEGER   SPTR       ! Dynamic memory element for data
-      INTEGER   STATUS     ! Running status for DSA routines
-      REAL      VALUE      ! Polynomial order (SPIFIT only).
-      INTEGER   XPTR       ! Dynamic memory element for axis(1) data
+      CHARACTER COMMAND*8        ! Figaro command name
+      INTEGER   DIMS(5)          ! Spiketrum dimensions
+      CHARACTER DNAME*72         ! DTA name of data component
+      INTEGER   DSTAT            ! Status for DTA routines
+      INTEGER   DWPTR            ! Dynamic-memory pointer for workspace
+      REAL      ENDS(4)          ! End values
+      LOGICAL   LINEND           ! Linear interp. used at ends of data?
+      LOGICAL   LOGFIT           ! Interpolation performed on log of
+                                 ! data?
+      INTEGER   NDIM             ! Number of dimensions
+      INTEGER   NELM             ! Number of elements in Spiketrum
+      INTEGER   NP               ! No. points used for fitting in
+                                 ! Spiketrum
+      INTEGER   NX               ! No. of elements in Spiketrum axis(1)
+                                 ! array
+      INTEGER   ORDER            ! Polynomial order (SPIFIT only).
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for data
+      INTEGER   STATUS           ! Running status for DSA routines
+      REAL      VALUE            ! Polynomial order (SPIFIT only).
+      INTEGER   XPTR             ! Dynamic-memory pointer for axis(1)
+                                 ! data
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -131,14 +127,11 @@ C
 C     Open output file and map data for update
 C
       CALL DSA_OUTPUT('SPECT','SPECTRUM','SPIKE',0,0,STATUS)
-      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','UPDATE','FLOAT',SPTR,SLOT,STATUS)
 C
 C     Map SPIKETRUM axis data
 C
-      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'READ','FLOAT',ADDRESS,SLOT,
-     :                        STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPIKE',1,'READ','FLOAT',XPTR,SLOT,STATUS)
 C
 C     Look for any 'end' values. These are located with the aid of the
 C     structure definition file SPIKETRUM.DEF. Failure to find these
@@ -180,24 +173,23 @@ C     is because the NAG version of FIG_ISPIKE may add up to 2 more
 C     dummy points to the spiketrum.)
 C
       IF (COMMAND.NE.'LINTERP') THEN
-         CALL FIG_NPSPIK(NX,DYNAMIC_MEM(SPTR),ENDS,NP)
+         CALL FIG_NPSPIK(NX,%VAL(CNF_PVAL(SPTR)),ENDS,NP)
          NP=NP+2
-         BYTES=(NP*11+24)*8
-         CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-         DWPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_GET_WORK_ARRAY(NP*11+24,'DOUBLE',DWPTR,SLOT,STATUS)
          IF(STATUS.NE.0)GOTO 500
 C
 C        Operate on the data.
 C
-         CALL FIG_ISPIKE (NX,DYNAMIC_MEM(XPTR),ENDS,LOGFIT,LINEND,
-     :                    ORDER,NP,DYNAMIC_MEM(DWPTR),
-     :                    DYNAMIC_MEM(SPTR),STATUS)
+         CALL FIG_ISPIKE (NX,%VAL(CNF_PVAL(XPTR)),ENDS,LOGFIT,LINEND,
+     :                    ORDER,NP,%VAL(CNF_PVAL(DWPTR)),
+     :                    %VAL(CNF_PVAL(SPTR)),STATUS)
 C
       ELSE
 C
 C        Linear interpolation is much simpler..
 C
-         CALL FIG_LSPIKE (NX,DYNAMIC_MEM(XPTR),ENDS,DYNAMIC_MEM(SPTR))
+         CALL FIG_LSPIKE (NX,%VAL(CNF_PVAL(XPTR)),ENDS,
+     :                    %VAL(CNF_PVAL(SPTR)))
       END IF
 
   500 CONTINUE

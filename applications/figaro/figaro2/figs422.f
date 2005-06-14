@@ -3,7 +3,7 @@ C+
 C
 C     F I G S 4 2 2
 C
-C     Given a FIGS image mode data hypercube, either sorted into
+C     Given a FIGS image-mode data hypercube, either sorted into
 C     wavelength order (eg by FIGS424) or not, sums all the cycles
 C     and wavelength planes within a specified wavelength range
 C     to produce an image.
@@ -11,7 +11,8 @@ C
 C     Command parameters -
 C
 C     'HCUBE'    (Character) The name of the hypercube to be processed.
-C     'XSTART'   (Real) The start of the wavelength range to be included.
+C     'XSTART'   (Real) The start of the wavelength range to be 
+C                included.
 C     'XEND'     (Real) The end of the wavelength range to be included.
 C     'CYSTART'  (Integer) The first cycle to be included.
 C     'CYEND'    (Integer) The last cycle to be included.
@@ -33,16 +34,16 @@ C
 C     This routine assumes that the first axis of the cube data
 C     represents wavelength, that the second and third represent the
 C     X and Y dimensions of the image (this is an unfortunate,
-C     since it means that the AXIS(1) structure of the hypercube represents
-C     wavelength, the AXIS(2) represents the image X axis and so forth)
-C     and the fourth axis represents scan cycle number.
+C     since it means that the AXIS(1) structure of the hypercube
+C     represents wavelength, the AXIS(2) represents the image X axis and
+C     so forth) and the fourth axis represents scan cycle number.
 C
 C     Output data -
 C
-C     IMAGE is created with the same structure as HCUBE
-C     except that the main data array will only have 2 dimensions, and any
-C     AXIS sub-structures that HCUBE has will be 
-C     deleted/renamed as appropriate. 
+C     IMAGE is created with the same structure as HCUBE except that the
+C     main data array will only have 2 dimensions, and any AXIS
+C     sub-structures that HCUBE has will be deleted/renamed as 
+C     appropriate. 
 C     
 C                                     KS / AAO 6th Jan 1985
 C
@@ -53,46 +54,52 @@ C                    e.g. as produced by FIGS423.
 C     27th Jun 1989  JM / RAL. Modified to use DSA_ routines
 C                    Dynamic memory handling changed to use
 C                    DYN_ routines
-C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT' when
-C                    mapping input data. Added STATUS checks to support
-C                    user requested aborts.
+C     29th Mar 1991  JMS / AAO. Changed type from 'INTEGER' to 'INT'
+C                    when mapping input data. Added STATUS checks to
+C                    support user-requested aborts.
 C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapted to the FDA library.
 C                    Re-shape data before axes.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      INTEGER ICH_LEN              ! Position of last non-blank char in string.
+      INTEGER ICH_LEN            ! Position of last non-blank char in 
+                                 ! string
       INTEGER ICH_ENCODE
       INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   BFLOAT             ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BYTES              ! Bytes required for an array
-      CHARACTER CITEMS(2)*32       ! Axis character items retrieved
-      INTEGER   NCITEMS            ! Number of axis character items retrieved
-      DOUBLE PRECISION NITEMS(1)   ! Axis numeric items retrieved
-      INTEGER   NNITEMS            ! Number of axis numeric items retrieved
-      INTEGER   DIMS(10)           ! Image dimensions
-      INTEGER   IPTR               ! Dynamic memory element for image data
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   NU                 ! Fourth dimension of image
-      INTEGER   NT                 ! Third dimension of image
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   SLOTO              ! Slot number for succesive output data
-      INTEGER   HXPTR              ! Dynamic memory element for axis data
-      INTEGER   STATUS             ! Running status for DSA routines
-      INTEGER   PSTAT              ! Status for PAR routines
-      INTEGER   FSTAT              ! Status for FIG routines
+      INTEGER   BFLOAT           ! Number of bytes per item of type
+                                 ! 'FLOAT'
+      INTEGER   BYTES            ! Bytes required for an array
       CHARACTER COMENT*32
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      INTEGER   FSTAT            ! Status for FIG routines
+      INTEGER   HXPTR            ! Dynamic memory element for axis data
+      INTEGER   NCITEMS          ! Number of axis character items
+                                 ! retrieved
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   NNITEMS          ! Number of axis numeric items
+                                 ! retrieved
+      INTEGER   DIMS(10)         ! Image dimensions
+      INTEGER   IPTR             ! Dynamic memory element for image data
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   NU               ! Fourth dimension of image
+      INTEGER   NT               ! Third dimension of image
+      INTEGER   PSTAT            ! Status for PAR routines
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SLOTO            ! Slot number for succesive output data
+      INTEGER   STATUS           ! Running status for DSA routines
      
 C
 C     Local variables
@@ -119,10 +126,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -198,11 +201,10 @@ C        It is sorted data. Get the wavelength array directly from
 C        the hypercube structure.  The sorted array will be the same
 C        as the wavelength array.
 C
-         CALL DSA_MAP_AXIS_DATA('HCUBE',1, 'READ','FLOAT',ADDRESS,
-     :                           SLOT,STATUS)
-         HXPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_AXIS_DATA('HCUBE',1, 'READ','FLOAT',HXPTR,
+     :                          SLOT,STATUS)
          BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
-         CALL GEN_MOVE(BYTES,DYNAMIC_MEM(HXPTR),WAVES)
+         CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(HXPTR)),WAVES)
          DO IX=1,NX
             VECTOR(IX)=IX
          END DO
@@ -320,8 +322,7 @@ C
 C
 C     Map the input data
 C
-      CALL DSA_MAP_DATA('HCUBE','READ','INT',ADDRESS,SLOT,STATUS)
-      CUPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('HCUBE','READ','INT',CUPTR,SLOT,STATUS)
 C
 C     The following loop is repeated as many times as there are
 C     output files to be created.  The loop will be stopped by REPEAT
@@ -383,16 +384,14 @@ C
 C
 C        Map the output data
 C
-         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOTO,
-     :                      STATUS)
-         OPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOTO,STATUS)
          IF(STATUS.NE.0)GOTO 500
 C
 C        Perform the basic processing of the hypercube down to 
 C        an image.
 C
-         CALL FIG_FIGS422(DYNAMIC_MEM(CUPTR),NX,NY,NT,NU,CY1,CY2,SELECT,
-     :                    DYNAMIC_MEM(OPTR))
+         CALL FIG_FIGS422(%VAL(CNF_PVAL(CUPTR)),NX,NY,NT,NU,CY1,CY2,
+     :                    SELECT,%VAL(CNF_PVAL(OPTR)))
 C
 C        Close down the output file
 C

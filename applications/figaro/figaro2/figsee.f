@@ -4,10 +4,11 @@ C
 C     F I G S E E
 C
 C     Figaro function that attempts to produce a seeing ripple spectrum
-C     from a Figs spectrum, averaging the data from one or more detectors,
-C     normalising the result to unity, and generating a spectrum in
-C     which the normalised data from these detectors (ideally ones not
-C     contaminated by spectral features) are repeated for each detector.
+C     from a Figs spectrum, averaging the data from one or more
+C     detectors, normalising the result to unity, and generating a
+C     spectrum in which the normalised data from these detectors
+C     (ideally ones not contaminated by spectral features) are repeated 
+C     for each detector.
 C
 C     Command parameters -
 C
@@ -19,21 +20,25 @@ C     OUTPUT      (Character) The name of the resulting ripple spectrum.
 C
 C     Command keywords -  None
 C
-C                                                  KS / AAO 11th Feb 1987
+C                                                KS / AAO 11th Feb 1987
 C     Modified:
 C
-C     5th  Aug 1987.  Revised DSA_ routines - some specs changed. Now
-C                     uses DYN_ routines for dynamic memory handling
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     28th Sep 1992.  HME / UoE, Starlink.  INCLUDE changed. TABs
-C                     removed.
+C     5th  Aug 1987  Revised DSA_ routines - some specs changed. Now
+C                    uses DYN_ routines for dynamic memory handling
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected 
+C                    in mapping calls.
+C     28th Sep 1992  HME / UoE, Starlink.  INCLUDE changed. TABs
+C                    removed.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
-      INTEGER ICH_ENCODE, ICH_LEN, DYN_ELEMENT
+      INTEGER ICH_ENCODE, ICH_LEN
 C
 C     Number of FIGS detectors
 C
@@ -42,29 +47,25 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      LOGICAL   DUSED(DETECTORS)!
-      REAL      DVALS(DETECTORS)!
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      INVOKE       ! Used to invoke functions
-      INTEGER      J            !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NDET         ! The number of detectors to be used
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NEXT         !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number outputdata array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER*80 STRING       ! Output string
-      LOGICAL      UFLAG        !
-      REAL         VALUE        ! Temporary real number
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER  DIMS(10)          ! Sizes of dimensions of data
+      LOGICAL  DUSED(DETECTORS)  !
+      REAL     DVALS(DETECTORS)  !
+      INTEGER  I                 !
+      INTEGER  IGNORE            ! Used to pass ignorable status
+      INTEGER  INVOKE            ! Used to invoke functions
+      INTEGER  J                 !
+      INTEGER  NDIM              ! Number of dimensions in data
+      INTEGER  NDET              ! The number of detectors to be used
+      INTEGER  NELM              ! Total number of elements in data
+      INTEGER  NEXT              !
+      INTEGER  NX                ! Size of 1st dimension
+      INTEGER  OPTR              ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER  OSLOT             ! Map slot number output data array
+      INTEGER  STATUS            ! Running status for DSA_ routines
+      CHARACTER*80 STRING        ! Output string
+      LOGICAL  UFLAG             !
+      REAL     VALUE             ! Temporary real number
 C
 C     Initialisation of DSA_ routines
 C
@@ -82,7 +83,7 @@ C
       CALL DSA_DATA_SIZE('SPECT',1,NDIM,DIMS,NX,STATUS)
       IF (MOD(NX,DETECTORS).NE.0) THEN
          CALL PAR_WRUSER('Spectrum length is not a multiple of the '//
-     :                                   'number of detectors.',IGNORE)
+     :                   'number of detectors.',IGNORE)
          GO TO 500
       END IF
 C
@@ -94,7 +95,7 @@ C
          DVALS(I)=0.0
       END DO
       CALL PAR_RDARY('DETECTORS',0.0,FLOAT(DETECTORS),'N',' ',NDET,
-     :                                               DETECTORS,DVALS)
+     :               DETECTORS,DVALS)
 C
 C     List the detectors used
 C
@@ -132,14 +133,12 @@ C
 C
 C     Map data array
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',optr,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Operate on data
 C
-      CALL FIG_FIGSEE(DYNAMIC_MEM(OPTR),NX,DUSED,DETECTORS)
+      CALL FIG_FIGSEE(%VAL(CNF_PVAL(OPTR)),NX,DUSED,DETECTORS)
 C
 C     Tidy up
 C

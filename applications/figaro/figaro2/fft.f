@@ -97,6 +97,8 @@
 *        No saving and restoring of axes. The forward transform will still
 *        change the axes to Nyquist frequency. The backward transform
 *        will delete these.
+*     2005 June 14 (MJC):
+*         Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,38 +107,41 @@
 *-
 
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      CHARACTER GEN_NTH*2    ! Returns 'st','th','rd' etc appropriate to N
-      CHARACTER ICH_CI*12    ! Return an integer as a character string.
-      INTEGER ICH_CLEAN      ! Clip a string at first non-printing character.
-      INTEGER  ICH_LEN       ! Position of last non-blank char in string.
-      INTEGER  DSA_TYPESIZE  ! Returns byte size of data type  
+      CHARACTER GEN_NTH*2        ! Returns 'st','th','rd' etc.
+                                 ! appropriate to N
+      CHARACTER ICH_CI*12        ! Return an integer as a 
+                                 ! character string
+      INTEGER ICH_CLEAN          ! Clip a string at first non-printing 
+                                 ! character
+      INTEGER  ICH_LEN           ! Position of last non-blank char in
+                                 ! string
+      INTEGER  DSA_TYPESIZE      ! Returns byte size of data type  
 C
 C     Local variables
 C
-      INTEGER   ADDRESS            ! Virtual address for data array
-      INTEGER   ADDRESS2           ! Virtual address for data array
-      INTEGER   BDOUB              ! Number of bytes per item of type 'DOUBLE'
-      INTEGER   BYTES              ! Bytes required for an array
-      CHARACTER CITEMS(2)*32       ! Axis character items retrieved
-      DOUBLE PRECISION NITEMS(1)   ! Axis numeric items retrieved
-      INTEGER   DIMS(2)            ! Image dimensions
-      INTEGER   IPTR               ! Dynamic memory element for image data
-      INTEGER   NDIM               ! Number of image dimensions
-      INTEGER   NELM               ! Number of elements in image - ignored
-      INTEGER   NX                 ! First dimension of image
-      INTEGER   NY                 ! Second dimension of image
-      INTEGER   SLOT               ! Slot number for mapped data - ignored
-      INTEGER   SPTR               ! Dynamic memory element for spectrum data
-      INTEGER   STATUS             ! Running status for DSA routines
+      INTEGER   BDOUB            ! Number of bytes per item of type 'DOUBLE'
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   DIMS(2)          ! Image dimensions
+      INTEGER   IPTR             ! Dynamic-memory pointer for image data
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum 
+                                 ! data
+      INTEGER   STATUS           ! Running status for DSA routines
 
       LOGICAL CHANGE, FAULT, FORWARD, IMAP
       LOGICAL RFLAG
-      INTEGER  DIMS2(10), DPTR, I, IDIM
-      INTEGER  MAXDIM, NDIM2, NEXT
+      INTEGER DIMS2(10), DPTR, I, IDIM
+      INTEGER MAXDIM, NDIM2, NEXT
       INTEGER NPTR, NWORK, PREV, ROTS(10), FSTAT, WPTR
       CHARACTER AXIS*7, COMMAND*8
       CHARACTER STRING*80, TYPE*16
@@ -145,10 +150,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -216,15 +217,11 @@ C
 C     Map the output data array.
 C     Map the real and imaginary arrays.
 C
-C     CALL DSA_MAP_DATA('OUTPUT','UPDATE','DOUBLE',ADDRESS,SLOT,STATUS)
-C     DPTR=DYN_ELEMENT(ADDRESS)
-C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',ADDRESS,SLOT,
+C     CALL DSA_MAP_DATA('OUTPUT','UPDATE','DOUBLE',DPTR,SLOT,STATUS)
+C     CALL DSA_MAP_IMAGINARY('OUTPUT','UPDATE','DOUBLE',IPTR,SLOT,
 C    :                        STATUS)
-C     IPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_COMPLEX('OUTPUT','UPDATE','DOUBLE',
-     :   ADDRESS,ADDRESS2,SLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
-      IPTR=DYN_ELEMENT(ADDRESS2)
+      CALL DSA_MAP_COMPLEX('OUTPUT','UPDATE','DOUBLE',DPTR,IPTR,SLOT,
+     :                     STATUS)
 C
 C     Work out how much workspace is needed and grab it.  The FFT
 C     routines need a) for 1D data, an array the same size as the
@@ -238,10 +235,9 @@ C
          NWORK=6*MAXDIM+15
       END IF
       NWORK=MAX(NWORK,NELM)
+
       BDOUB=DSA_TYPESIZE('DOUBLE',STATUS)
-      BYTES=BDOUB*NWORK
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NWORK,'DOUBLE',WPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     For BFFT, re-order the data so the zero frequency term is at
@@ -251,19 +247,22 @@ C
          DO I=1,NDIM
             ROTS(I)=-(DIMS(I)-1)/2
          END DO
-         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,DYNAMIC_MEM(DPTR),
-     :                   DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(NELM*BDOUB,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(DPTR))
-         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,DYNAMIC_MEM(IPTR),
-     :                   DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(NELM*BDOUB,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(IPTR))
+         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,%VAL(CNF_PVAL(DPTR)),
+     :                   %VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(NELM*BDOUB,%VAL(CNF_PVAL(WPTR)),
+     :                 %VAL(CNF_PVAL(DPTR)))
+         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(NELM*BDOUB,%VAL(CNF_PVAL(WPTR)),
+     :                 %VAL(CNF_PVAL(IPTR)))
       END IF
 C
 C     Perform the FFT
 C
       RFLAG=.FALSE.
-      CALL FIG_BFFT(NDIM,DIMS,FORWARD,RFLAG,DYNAMIC_MEM(DPTR),
-     :              DYNAMIC_MEM(IPTR),DYNAMIC_MEM(WPTR),NWORK,FSTAT)
+      CALL FIG_BFFT(NDIM,DIMS,FORWARD,RFLAG,%VAL(CNF_PVAL(DPTR)),
+     :              %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(WPTR)),NWORK,
+     :              FSTAT)
       IF (FSTAT.NE.0) THEN
          FAULT=.TRUE.
          GO TO 500
@@ -276,12 +275,14 @@ C
          DO I=1,NDIM
             ROTS(I)=(DIMS(I)-1)/2
          END DO
-         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,DYNAMIC_MEM(DPTR),
-     :                   DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(NELM*BDOUB,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(DPTR))
-         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,DYNAMIC_MEM(IPTR),
-     :                   DYNAMIC_MEM(WPTR))
-         CALL GEN_MOVE(NELM*BDOUB,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(IPTR))
+         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,%VAL(CNF_PVAL(DPTR)),
+     :                   %VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(NELM*BDOUB,%VAL(CNF_PVAL(WPTR)),
+     :                 %VAL(CNF_PVAL(DPTR)))
+         CALL GEN_DROTND(NELM,NDIM,DIMS,ROTS,%VAL(CNF_PVAL(IPTR)),
+     :                   %VAL(CNF_PVAL(WPTR)))
+         CALL GEN_MOVE(NELM*BDOUB,%VAL(CNF_PVAL(WPTR)),
+     :                 %VAL(CNF_PVAL(IPTR)))
       END IF
 C
 C     If this is a forward transform, then any .X etc structures are 
@@ -293,15 +294,13 @@ C
          DO I=1,NDIM
 C           CALL DSA_SAVE_AXIS('OUTPUT',I,STATUS)
             CALL DSA_COERCE_AXIS_DATA('OUTPUT',I,'FLOAT',1,DIMS(I),
-     :                                                         STATUS)
+     :                                STATUS)
             CALL DSA_MAP_AXIS_DATA('OUTPUT',I,'WRITE','FLOAT',
-     :                                            ADDRESS,SLOT,STATUS)
-            WPTR=DYN_ELEMENT(ADDRESS)
-            CALL FIG_NQVALS(DIMS(I),DYNAMIC_MEM(WPTR))
+     :                             WPTR,SLOT,STATUS)
+            CALL FIG_NQVALS(DIMS(I),%VAL(CNF_PVAL(WPTR)))
             CITEMS(1)='Nyquist units  '
             CITEMS(2)='Frequency      '
-            CALL DSA_SET_AXIS_INFO('OUTPUT',I,2,CITEMS,0,
-     :                                                 NITEMS,STATUS)
+            CALL DSA_SET_AXIS_INFO('OUTPUT',I,2,CITEMS,0,NITEMS,STATUS)
          END DO
       ELSE
          DO I=1,NDIM

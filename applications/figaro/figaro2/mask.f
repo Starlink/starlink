@@ -27,14 +27,19 @@ C                                          KS / CIT 4th April 1984
 C     Modified:
 C   
 C     Summer 1987    DJA/AAO.  Rewritten to use DSA routines.
-C     7th  Sep 1988  KS/AAO. Comments about search path for table modified.
+C     7th  Sep 1988  KS/AAO. Comments about search path for table
+C                    modified.
 C     29th Sep 1992  HME / UoE, Starlink.  Lowercase extension .msk.
 C                    INCLUDE changed, TABs removed. Map output data for
 C                    update access instead of write.
 C     18 Jul 1996    MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Maximum number of masked areas
 C
@@ -43,36 +48,34 @@ C
 C     
 C     Functions
 C
-      INTEGER ICH_LEN, DYN_ELEMENT, DSA_TYPESIZE
+      INTEGER ICH_LEN
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      DOUBLE PRECISION DUMMY    ! Dummy flag for magnitude
-      LOGICAL      FAULT        ! TRUE if there was an error reading mask table
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      MASKED       ! Actual number of masked areas
-      INTEGER      MPTR         ! Dynamic-memory pointer to mask data array
-      INTEGER      MSLOT        ! Map slot number of mask data array
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NWAVES       !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    TABLE*132    ! The name of the mask table file
-      INTEGER      TABLU        ! Table logical unit number
-      LOGICAL      TBOPEN       ! TRUE if the mask table file was opened OK
-      CHARACTER    TUNITS*16    ! Units of mask table values
-      CHARACTER    UNITS*16     ! Units of input spectrum
-      REAL     WAVES(2,MAXWAVES)!
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data array
-      INTEGER      XSLOT        ! Map slot number of x-axis data array
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      DOUBLE PRECISION DUMMY     ! Dummy flag for magnitude
+      LOGICAL      FAULT         ! TRUE if there was an error reading
+                                 ! mask table
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      MASKED        ! Actual number of masked areas
+      INTEGER      MPTR          ! Dynamic-memory pointer to mask data
+                                 ! array
+      INTEGER      MSLOT         ! Map slot number of mask data array
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NWAVES        !
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    TABLE*132     ! The name of the mask table file
+      INTEGER      TABLU         ! Table logical unit number
+      LOGICAL      TBOPEN        ! Mask table file was opened OK?
+      CHARACTER    TUNITS*16     ! Units of mask table values
+      CHARACTER    UNITS*16      ! Units of input spectrum
+      REAL     WAVES(2,MAXWAVES) !
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
+                                 ! array
+      INTEGER      XSLOT         ! Map slot number of x-axis data array
 C
 C     Logical unit for mask table
 C
@@ -116,8 +119,7 @@ C
 C
 C     Map the mask data
 C
-      CALL DSA_MAP_DATA('MSK','UPDATE','FLOAT',ADDRESS,MSLOT,STATUS)
-      MPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('MSK','UPDATE','FLOAT',MPTR,MSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Check on the units and map values for the X data - note: we don't
@@ -126,9 +128,7 @@ C     to use this routine for something sneaky.  However, if there
 C     are no X values at all, we won't go so far as to generate
 C     dummy ones.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
       CALL DSA_GET_AXIS_INFO('MSK',1,1,UNITS,0,DUMMY,STATUS)
       IF (STATUS.NE.0) GOTO 500
       CALL ICH_FOLD(TUNITS)
@@ -146,14 +146,13 @@ C
 C
 C     Get workspace for FIG_GMASK
 C
-      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',WPTR,WSLOT,STATUS)
 C
 C     Blank out the unmasked parts of the spectrum.  (This is where
 C     the real work gets done.)
 C
-      CALL FIG_GMASK(NX,DYNAMIC_MEM(XPTR),NWAVES,WAVES,
-     :               DYNAMIC_MEM(WPTR),DYNAMIC_MEM(MPTR),MASKED)
+      CALL FIG_GMASK(NX,%VAL(CNF_PVAL(XPTR)),NWAVES,WAVES,
+     :               %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(MPTR)),MASKED)
       IF (MASKED.LE.0) THEN
          CALL PAR_WRUSER('Warning - No spectral ranges masked.',IGNORE)
       END IF

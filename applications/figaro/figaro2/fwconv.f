@@ -23,60 +23,67 @@ C     User variables used - None
 C
 C     History -
 C
-C     4th  Feb 1991.  SMH/ AAO.  Original version, based on ABCONV code,
-C                     but performing a larger number of possible conversions.
-C     5th  Apr 1991.  KS / AAO.  Some minor cosmetic changes prior to release.
-C     22nd Sep 1992.  HME / UoE, Starlink. TABs removed, INCLUDE changed.
-C     3rd  Jul 2001.  VGG / RAL. Error propagation included.
-C     7th  Jul 2001.  ACD / UoE. Tidied up.
+C     4th  Feb 1991  SMH/ AAO.  Original version, based on ABCONV code,
+C                    but performing a larger number of possible
+C                    conversions.
+C     5th  Apr 1991  KS / AAO.  Some minor cosmetic changes prior to
+C                    release.
+C     22nd Sep 1992  HME / UoE, Starlink. TABs removed, INCLUDE changed.
+C     3rd  Jul 2001  VGG / RAL. Error propagation included.
+C     7th  Jul 200.  ACD / UoE. Tidied up.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_CLEAN, ICH_FOLD, ICH_LEN, DYN_ELEMENT
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_LEN
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    COMMAND*64   ! The actual Figaro command entered
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      LOGICAL      FAULT        ! Set if a non-DSA error is deteccted
-      LOGICAL      FLCO         ! TRUE if the Figaro command was FLCONV
-      INTEGER      I            ! General loop variable
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      NCH          ! Index of a substring in a string
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      INTYPE       ! Type of input units, used to index ULEN/UNITAB
-      INTEGER      OUTYPE       ! Type of output units 
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      INTEGER      ULEN(5)      ! Length in characters of the different units
-      CHARACTER    UNITAB(5)*14 ! The names of the different units
-      CHARACTER    UNITS*64     ! The units of the data
-      INTEGER      VAR          ! Flags a variance array 
-      LOGICAL      VEXIST       ! TRUE if a variance array exists   
-      INTEGER      VPTR         ! Dynamic-memory pointer to input variance array 
-      INTEGER      VSLOT        ! Map slot number for input variance array
-      INTEGER      XDIMS(10)    ! X-axis data array dimensions
-      LOGICAL      XEXIST       ! TRUE if an x-axis array exists
-      INTEGER      XNDIM        ! Number of x-axis data array dimensions
-      INTEGER      XNELM        ! Number of elements in X-axis array
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data
-      INTEGER      XSLOT        ! Map slot number of x-axis data
-      CHARACTER    XUNITS*64    ! The units of the x-axis data
-C
-      DOUBLE PRECISION DUMMY      ! Dummy arguement
-      DOUBLE PRECISION MAGNITUDES ! Indicates TRUE if data to be in magnitudes
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    COMMAND*64    ! The actual Figaro command entered
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      DOUBLE PRECISION DUMMY     ! Dummy argument
+      LOGICAL      FAULT         ! Set if a non-DSA error is deteccted
+      LOGICAL      FLCO          ! TRUE if the Figaro command was FLCONV
+      INTEGER      I             ! General loop variable
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INTYPE        ! Type of input units, used to index
+                                 ! ULEN/UNITAB
+      DOUBLE PRECISION MAGNITUDES ! Indicates TRUE if data to be in
+                                 ! magnitudes
+      INTEGER      NCH           ! Index of a substring in a string
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      OUTYPE        ! Type of output units 
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      INTEGER      ULEN(5)       ! Length in characters of the different
+                                 ! units
+      CHARACTER    UNITAB(5)*14  ! The names of the different units
+      CHARACTER    UNITS*64      ! The units of the data
+      INTEGER      VAR           ! Flags a variance array 
+      LOGICAL      VEXIST        ! TRUE if a variance array exists   
+      INTEGER      VPTR          ! Dynamic-memory pointer to input 
+                                 ! variance array 
+      INTEGER      VSLOT         ! Map slot number for input variance
+                                 ! array
+      INTEGER      XDIMS(10)     ! X-axis data array dimensions
+      LOGICAL      XEXIST        ! TRUE if an x-axis array exists
+      INTEGER      XNDIM         ! Number of x-axis data array
+                                 ! dimensions
+      INTEGER      XNELM         ! Number of elements in X-axis array
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
+      INTEGER      XSLOT         ! Map slot number of x-axis data
+      CHARACTER    XUNITS*64     ! The units of the x-axis data
 C
       DATA UNITAB/'Janskys','Milli-Janskys','Micro-Janskys',
-     : 'Ergs/s/cm**2/A','AB magnitudes'/
+     :            'Ergs/s/cm**2/A','AB magnitudes'/
       DATA ULEN/7,13,13,14,13/
 C
 C     Initialisation of DSA_ routines
@@ -187,23 +194,21 @@ C
 C
 C     Map output data
 C
-      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Also map the X data.
 C
-      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',ADDRESS,        
-     :                                               XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA ('SPECT',1,'READ','FLOAT',XPTR,
+     :                        XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 
 C
 C     Operate on the data. Note that FIG_FWCONV can operate
 C     on data in situ.
 C 
-      CALL FIG_FWCONV(DYNAMIC_MEM(OPTR),NELM,INTYPE,OUTYPE,
-     :                  DYNAMIC_MEM(OPTR),DYNAMIC_MEM(XPTR),XNELM)
+      CALL FIG_FWCONV(%VAL(CNF_PVAL(OPTR)),NELM,INTYPE,OUTYPE,
+     :                %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(XPTR)),XNELM)
       UNITS=UNITAB(OUTYPE)(:ULEN(OUTYPE))
 C
 C
@@ -213,12 +218,12 @@ C
       VEXIST = .FALSE.
       CALL DSA_SEEK_VARIANCE ('SPECT',VEXIST,STATUS)
       IF (VEXIST) THEN
-         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',ADDRESS,
-     :     VSLOT, STATUS)
-         VPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_VARIANCE ('OUTPUT','UPDATE','FLOAT',VPTR,
+     :                          VSLOT, STATUS)
 C
-        CALL FIG_FWCONV_VAR(DYNAMIC_MEM(VPTR),NELM,INTYPE,OUTYPE,   
-     :    DYNAMIC_MEM(VPTR),DYNAMIC_MEM(XPTR),XNELM)
+        CALL FIG_FWCONV_VAR(%VAL(CNF_PVAL(VPTR)),NELM,INTYPE,OUTYPE,   
+     :                      %VAL(CNF_PVAL(VPTR)),%VAL(CNF_PVAL(XPTR)),
+     :                      XNELM)
       END IF
 C
 C     Say what we did
