@@ -4672,6 +4672,113 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SUN123@
           ><code>STAR_XML_DOCUMENTATION</code></ref> macro, which is
           closely analogous to the &latex; one.</p>
 
+<subsubsect indexkey="documentation!docs-only components">
+<subhead>
+<title>Components containing only documentation</title>
+</subhead>
+
+<p>Though most applications and libraries have some documentation
+associated with them, some documentation is not associated with any
+particular software, and so lives in a component by itself.  These
+components are principally the various cookbooks and system notes,
+though there are a few SUNs in this category as well.  Though the
+correct way to handle such components should be fairly clear from the
+discussion above, it seems worth while to make a few remarks here to
+clear up some ambiguities.</p>
+
+<p>Like any other component, a documentation-only component must have
+a bootstrap file, and <code>Makefile.am</code>,
+<code>configure.ac</code> and <code>component.xml.in</code> files, as
+described in <ref id="autoconfingexample"/>; however these will
+typically be rather simple.</p>
+
+<p>We can look at the SC/3 configuration files for an example.</p>
+
+<p>The <code>configure.ac</code> file, shorn of most of its comments,
+looks like this:
+<verbatim>
+dnl    Process this file with autoconf to produce a configure script
+AC_INIT(sc3, 2, ussc@star.rl.ac.uk)
+AC_PREREQ(2.50)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+AC_CONFIG_SRCDIR(sc3.tex)
+
+STAR_DEFAULTS(docs-only)
+
+STAR_LATEX_DOCUMENTATION(sc3)
+
+AC_CONFIG_FILES(Makefile component.xml)
+
+AC_OUTPUT
+</verbatim>
+Note the <code>docs-only</code> option to the
+<code>STAR_DEFAULTS</code> macro (see <ref id="macro-defaults"/> for
+discussion).  This particular <code>configure.ac</code> file is to
+handle document SC/3.2 -- this second edition of the document is
+represented by the <code>AC_INIT</code> macro having a `version'
+number of `2'.</p>
+
+<p>The <code>Makefile.am</code> file has some mild complications:
+<verbatim>
+## Process this file with automake to produce Makefile.in
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+starexamples_DATA = $(distdir)-scripts.tar
+
+sc3.htx_tar: sc3-scripts.tex
+
+# sc3-scripts.tex is an appendix to the HTML version of the document,
+# comprising the scripts contained in the scripts/ directory.  These are
+# also bundled in the htx tarball by virtue of being listed in the
+# sc3.htx_tar.extras file.
+sc3-scripts.tex: scripts
+	cd scripts; \
+	for f in *; do if test -f $$f; then \
+	    echo $$f | sed 's/\([a-z0-9_]*\).*/\\subsection{\\label{se_\1_source}\\xlabel{\1}\1}/'; \
+	    echo "\htmladdnormallink{Download $$f}{$$f}"; \
+	    echo ''; \
+	    echo '\begin{verbatim}'; \
+	    cat $$f; \
+	    echo '\end{verbatim}'; \
+	fi; done > ../$@
+
+$(distdir)-scripts.tar: scripts
+	DN=$(distdir)-scripts; \
+	    mkdir $$DN; \
+	    for f in scripts/*; do if test -f $$f; then cp $$f $$DN; fi; done;\
+	    tar cf $@ $$DN; \
+	    rm -Rf $$DN
+</verbatim>
+This is the complete SC/3 file.  The only thing that is always
+required in these docs-only <code>Makefile.am</code> files is the
+<code>stardocs_DATA = @STAR_LATEX_DOCUMENTATION@</code> line, which
+has exactly the same function described in <ref
+id="autoconfing-docs"/> above.  However cookbooks like SC/3 often have
+both sets of examples (in this case, example scripts) and some
+automatically generated documentation, and this example illustrates
+how to describe both of these.  The <code>starexamples_DATA</code>
+line specifies a file which is to be installed in the examples
+directory (typically <code>/star/examples</code>; see <ref
+id="variable-starxxxdata"/>), and the <code>Makefile.am</code>
+therefore provides the rule for generating that tarball of
+scripts.</p>
+
+<p>In addition, the <code>sc3.tex</code> file includes (in the &tex;
+sense) a generated file <code>sc3-scripts.tex</code>, which documents
+these various scripts, and so we include in this
+<code>Makefile.am</code> the rule for generating this file from the
+contents of the <code>scripts/</code> directory.  We must also
+indicate that the <code>sc3.htx_tar</code> file depends on this
+generated file, and we do this by including that dependency (without
+the build rule, which is generated automatically) in this
+<code>Makefile.am</code> file.</p>
+
+<p>Finally, note that this SC/3 directory uses the
+<code>.htx_tar.extra</code> mechanism which is described rather in
+passing in <ref id="macro-latex-documentation"/>.</p>
+
+</subsubsect>
+
       </subsect>
 
       <subsect id="autoconfing-final" export="export">
@@ -6503,16 +6610,16 @@ LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
             <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
             suppresses building documenation.</p>
 
-          <p>It is occasionally necessary to add extra files to the
-            <code>.htx</code> tarball -- for example <code>.gif</code>
-            images, or other files referenced by the HTML version of
-            the documentation.  To request that extra files should be
-            added to the <code>starnnn.htx_tar</code> archive, you
-            should create a file <code>starnnn.htx_tar.extras</code>
-            listing the filenames which should be included, separated
-            by whitespace (spaces, tabs or newlines).  Though this
-            works, it is an unsightly mechanism, which we hope will
-            disappear in future.</p>
+<p>It is occasionally necessary to add extra files to the
+<code>.htx</code> tarball -- for example <code>.gif</code> images, or
+other files referenced by the HTML version of the documentation.  To
+request that extra files should be added to the
+<code>starnnn.htx_tar</code> archive, you should create a file
+<code>starnnn.htx_tar.extras</code><index>documentation!extra HTX
+files</index> listing the filenames which should be included,
+separated by whitespace (spaces, tabs or newlines).  Though this
+works, it is an unsightly mechanism, which we hope will disappear in
+future.</p>
 
         </subsect>
 
@@ -7033,9 +7140,12 @@ indexkey="starconf!variables!starxxx_DATA">
 </subhead>
 
 <p>There are several makefile variables which help you install files
-in special directories<index>directories!special</index>.  These are
-the variables <code>stardocs_DATA</code><index>documentation</index>,
-<code>staretc_DATA</code>, <code>starexamples_DATA</code>,
+in special
+directories<index>directories!special</index><index>installation</index>.
+These are the variables
+<code>stardocs_DATA</code><index>documentation</index>,
+<code>staretc_DATA</code>,
+<code>starexamples_DATA</code><index>example files</index>,
 <code>starhelp_DATA</code><index>help files</index> and
 <code>starnews_DATA</code><index>news files</index> (there is also
 <code>starfacs_DATA</code>, for facility files, but this is handled
