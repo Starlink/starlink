@@ -25,15 +25,15 @@ fpp_CPPFLAGS = $(ENABLENAN) -DDOUBLEPRECISION=0
 dfpp_SOURCES = fpp.c bytesex.h
 dfpp_CPPFLAGS = $(ENABLENAN) -DDOUBLEPRECISION=1
 
-timewaster_SOURCES = timewaster.f p1.f p2.f p3.f
-timewaster_FFLAGS = $(PROFILINGOPTION) $(AM_FFLAGS)
+timewaster_SOURCES = p1.f p2.f p3.f
+timewaster_FCFLAGS = $(PROFILINGOPTION) $(AM_FCFLAGS)
 timewaster_LDFLAGS = $(PROFILINGOPTION)
-p1_FFLAGS = $(PROFILING) $(AM_FFLAGS)
-p2_FFLAGS = $(PROFILING) $(AM_FFLAGS)
-p3_FFLAGS = $(PROFILING) $(AM_FFLAGS)
+p1_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
+p2_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
+p3_FCFLAGS = $(PROFILING) $(AM_FCFLAGS)
 
 mixed_SOURCES = mixed-f.f mixed-c.c
-mixed_f_FFLAGS = $(NOUNDERSCORES) $(AM_FFLAGS)
+mixed_f_FCFLAGS = $(NOUNDERSCORES) $(AM_FCFLAGS)
 
 bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
@@ -43,9 +43,9 @@ BUILT_SOURCES = bytesex.h
 
 
 # The following are maintenance targets only.
-# Create SGML-ised versions of the example programs (with < and & escaped)
-%.sgml: %
+# Create XML-ised versions of the example programs (with < and & escaped)
+%.xml: %
 	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
 
-sgmlexamples: $(EXAMPLES:=.sgml)
+xmlexamples: $(EXAMPLES:=.xml)
 
