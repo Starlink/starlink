@@ -31,6 +31,8 @@
 *           Set the AST error status and report an error message.
 *        astReporting
 *           Controls the reporting of error messages.
+*        astAssert
+*           Acts as an assertion error
 
 *  Macros Defined:
 *     Public:
@@ -50,6 +52,8 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S Berry (Starlink)
+*     NG: Norman Gray (Starlink)
 
 *  History:
 *     2-JAN-1996 (RFWS):
@@ -67,12 +71,22 @@
 *        graphics interfaces, etc.
 *     27-NOV-2002 (DSB):
 *        Added astReporting.
+*     14-MAR-2005 (NG):
+*        Added astAssert
+*     20-MAY-2005 (DSB):
+*        Modified astAssert so that it does nothing if the AST error
+*        status is already set, and also so that does nothing unless 
+*        the DEBUG macro is defined.
 *-
 */
 
 /* Macros. */
 /* ======= */
-/* Define a facility number that is unique to this library. */
+/* Define a facility number that is unique to this library.  The number here
+ * is the facility code assigned to the AST library, but it doesn't have to
+ * be this number -- it only has to be probably unique.  If that code were
+ * ever to change, then you can update this number if you feel it's tidier
+ * that way. */
 #if defined(astCLASS)            /* Protected */
 #define AST__FAC (1521)
 #endif
@@ -93,6 +107,18 @@ void astAt_( const char *, const char *, int, int );
 void astError_( int, const char *, ... );
 int astReporting_( int );
 #endif
+
+#ifdef DEBUG
+#define astAssert(assertion,rval)                                       \
+    if ( astOK && ! (assertion) ) {                                     \
+        astAt(__func__, __FILE__, __LINE__);                            \
+        astError(AST__ASSERTION, "Assertion <" #assertion "> failed");  \
+        return rval;                                                    \
+    }
+#else
+#define astAssert(assertion,rval)                                       
+#endif
+
 
 /* Function interfaces. */
 /* ==================== */

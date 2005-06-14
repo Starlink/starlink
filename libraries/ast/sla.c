@@ -515,6 +515,17 @@ void slaDtf2r ( int ihour, int imin, double sec, double *rad, int *j ) {
    *j = J;
 }
 
+F77_DOUBLE_FUNCTION(sla_dt)( DOUBLE(EPOCH) );
+
+double slaDt ( double epoch ) 
+{
+    DECLARE_DOUBLE(EPOCH);
+    double result;
+    EPOCH = epoch;
+    result = F77_CALL(sla_dt)( DOUBLE_ARG(&EPOCH) );
+    return result;
+}
+
 F77_SUBROUTINE(sla_dvn)( DOUBLE_ARRAY(V),
                          DOUBLE_ARRAY(UV),
                          DOUBLE(VM) );

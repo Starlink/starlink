@@ -6824,15 +6824,30 @@ double astReadDateTime_( const char *value ) {
 /* If the day number was read as an integer, convert it to double. */
             if ( match ) day = (double) iday;
 
-/* Identify the seconds field. */
-/* --------------------------- */
+/* If no match, see if we can get a match without a trailing seconds field. */
+            if( !match ) {
+               match =
+                  ( nc = 0, ( 4 == astSscanf( v,
+                                        " %2d%*1[ ] %2d %1[:/-] %2d %n",
+                                        &iday, &hour, sep3, &minute, &nc ) && 
+                                        ( nc == l ) ) );
+               match = match ||
+                  ( nc = 0, ( 4 == astSscanf( v, " %2d%*1[ ] %2d%1[ ] %2d %n",
+                                        &iday, &hour, sep3, &minute, &nc ) &&
+                                        ( nc == l ) ) );
+
+/* If the day number was read as an integer, convert it to double. */
+               if ( match ) day = (double) iday;
+
+/* Otherwise, identify the seconds field. */
+/* -------------------------------------- */
 /* If hours and minutes fields have been matched, now look for the
    final seconds (and fractions of seconds) field. This is similar to
    the day/fraction field (see earlier) in that we first check that it
    has the correct form before reading its value. */
 
 /* Adjust the string pointer and remaining string length. */
-            if ( match ) {
+            } else {
                v += nc;
                l -= nc;
 
@@ -12427,6 +12442,10 @@ f     reason.
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Initialise. */
    result = NULL;
 
@@ -12452,8 +12471,14 @@ f     reason.
    element, so the earlier string is effectively replaced by the new
    one.) */
    if ( astOK ) {
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
       strings[ istr ] = astStore( strings[ istr ], fvalue,
                                   strlen( fvalue ) + (size_t) 1 );
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to

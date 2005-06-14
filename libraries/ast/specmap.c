@@ -55,8 +55,8 @@ c     following function may also be applied to all SpecMaps:
 f     In addition to those routines applicable to all Mappings, the
 f     following routine may also be applied to all SpecMaps:
 *
-c     - astSpecAdd: Add a celestial coordinate conversion to an SpecMap
-f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
+c     - astSpecAdd: Add a spectral coordinate conversion to an SpecMap
+f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -2527,7 +2527,7 @@ f        A character string which identifies the
 *        those available.
 c     args
 f     ARGS( * ) = DOUBLE PRECISION (Given)
-*        An array containing argument values for the celestial
+*        An array containing argument values for the spectral
 *        coordinate conversion. The number of arguments required, and
 *        hence the number of array elements used, depends on the
 *        conversion specified (see the "Available Conversions"
