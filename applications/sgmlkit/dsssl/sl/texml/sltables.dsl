@@ -140,18 +140,19 @@ first.
                 (literal "p")
                 (make element gi: "group"
                       (parse-colwidth colwidth)))
-	      (literal (if align
-                           (case align
-                             (("left" "center" "justify") "l")
-                             (("right") "r")
-                             (("center") "c")
-                             (("char")
-                              (error "colspec: align=char not supported"))
-                             (else
-                              (error (string-append
-                                      "colspec: unrecognised alignment type ("
-                                      align ")"))))
-                           (car def))))
+	      (if align
+                  (literal 
+                   (case align
+                     (("left" "center" "justify") "l")
+                     (("right") "r")
+                     (("center") "c")
+                     (("char")
+                      (error "colspec: align=char not supported"))
+                     (else
+                      (error (string-append
+                              "colspec: unrecognised alignment type ("
+                              align ")")))))
+                   (car def)))
 	  (if colsep
 	      (if (= (string->number colsep) 0)
 		  ""
@@ -198,13 +199,13 @@ first.
 				   def-align-att ")"))))
 			"l")))		;default
 	 ;; form a list of pairs of (colspec-sosofo . "| or nothing")
-	 (def-colspec (let loop ((n colno)
-				 (res '()))
-			(if (<= n 0)
-                            (reverse res)
-			    (loop (- n 1)
-				  (cons (cons def-align def-colsep)
-                                        res)))))
+	 (def-colspec  (let loop ((n colno)
+                                  (res '()))
+                            (if (<= n 0)
+                                (reverse res)
+                              (loop (- n 1)
+                                (cons (cons def-align def-colsep)
+                                      res)))))
          (colspec-l-tmp (let loop ((res '()) ;result list of sosofos
                                    (def-l def-colspec) ;list of spec to process
                                    (cs-l	;list of colspecs
