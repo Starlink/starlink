@@ -370,6 +370,11 @@ if [ ! -d $PACKAGEDIR ]; then
     exit 1
 fi
 
+# BSTINPUTS and BIBINPUTS set here
+BSTINPUTS=$LIBDIR:$BSTINPUTS
+BIBINPUTS=$SRCDIR:$BIBINPUTS
+export BSTINPUTS BIBINPUTS
+
 if $DEBUGGING; then
     echo "$PROGNAME:I: JADE=$JADE"
     echo "$PROGNAME:I: SGMLNORM=$SGMLNORM"
@@ -379,6 +384,8 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: dvi2bitmap version is $d2bv"
     echo "$PROGNAME:I: LATEX=$LATEX"
     echo "$PROGNAME:I: BIBTEX=$BIBTEX"
+    echo "$PROGNAME:I: BSTINPUTS=$BSTINPUTS
+    echo "$PROGNAME:I: BIBINPUTS=$BIBINPUTS"
     echo "$PROGNAME:I: PYTHON=$PYTHON"
     echo "$PROGNAME:I: WORKDIR=$WORKDIR"
     echo "$PROGNAME:I: JADEFLAGS=$JADEFLAGS"
@@ -481,11 +488,6 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate backmatter.  Don't fail if no .aux file was generated
     if [ -r "$ROOT.htmlbib.aux" ]; then
 	$VERBOSE && echo "$PROGNAME:I: Backmatter..."
-        # BSTINPUTS and BIBINPUTS set here
-        BSTINPUTS=$LIBDIR:$BSTINPUTS
-        BIBINPUTS=$SRCDIR:$BIBINPUTS
-        export BSTINPUTS BIBINPUTS
-        $DEBUG && echo "sgml2docs:I: BSTINPUTS=$BSTINPUTS BIBINPUTS=$BIBINPUTS"
         $run $BIBTEX $ROOT.htmlbib
         $run $BIBTEX $ROOT.htmlbib
 	$runn sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
@@ -552,7 +554,7 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 
     # If there was no backmatter, then don't invoke BibTeX
     if [ -r $ROOT.latexbib.aux ]; then
-	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.latexbib
+	$run $BIBTEX $ROOT.latexbib
     fi
 
     # Generate the final file
@@ -591,7 +593,8 @@ elif [ $TARGETFORMAT -eq 2 ]; then
 
     # If there was no backmatter, then don't invoke BibTeX
     if [ -r $ROOT.texmlbib.aux ]; then
-	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.texmlbib
+	$DEBUGGING && echo $BIBTEX $ROOT.texmlbib
+	$run $BIBTEX $ROOT.texmlbib
     fi
 
     # Generate the XML file
