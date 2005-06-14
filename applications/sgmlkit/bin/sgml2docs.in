@@ -484,6 +484,8 @@ if [ $TARGETFORMAT -eq 0 ]; then
         # BSTINPUTS and BIBINPUTS set here
         BSTINPUTS=$LIBDIR:$BSTINPUTS
         BIBINPUTS=$SRCDIR:$BIBINPUTS
+        export BSTINPUTS BIBINPUTS
+        $DEBUG && echo "sgml2docs:I: BSTINPUTS=$BSTINPUTS BIBINPUTS=$BIBINPUTS"
         $run $BIBTEX $ROOT.htmlbib
         $run $BIBTEX $ROOT.htmlbib
 	$runn sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
