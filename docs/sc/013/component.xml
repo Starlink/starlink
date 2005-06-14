@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc13">
+  <version>2-5</version>
+  <path>docs/sc/013</path>
+  <description>Theory and Modelling Resources Cookbook</description>
+  <abstract><p>This cookbook is intended to assemble references to
+      resources likely to be of interest to theorists and modellers.
+      It's not a collection of standard recipes, but instead a
+      repository of brief introductions to facilities.  It includes
+      references to sources of authoritative information, including
+      those Starlink documents most likely to be of interest to
+      theorists.</p>
+
+    <p>Although the topics are chosen for their
+      relevance to theoretical work, a good proportion of the
+      information should be of interest to all of the astronomical
+      computing community.</p></abstract>
+  <dependencies >
+    <sourceset>sgmlkit</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sc13</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1999, 2001--2003</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
