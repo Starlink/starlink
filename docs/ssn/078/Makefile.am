@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-stardocs_DATA = @STAR_XML_DOCUMENTATION@ $(EPSFILES)
+stardocs_DATA = @STAR_XML_DOCUMENTATION@ ssn78.pdf $(EPSFILES)
 
 METAPOST=@METAPOST@
 # pstoimg is a bit creaky, but it should be available, since it's installed
