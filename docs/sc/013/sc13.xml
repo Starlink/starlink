@@ -2,100 +2,39 @@
 
 <!DOCTYPE sc PUBLIC 
              "-//Starlink//DTD Starlink SC 0.7 (XML)//EN" 
-             "sc-xml-0.7.dtd" [
+             "dtd/sc-xml-0.7.dtd" [
   <!-- Figures -->
   <!ENTITY gausssine-gnuplot.eps
-			SYSTEM "sc13_gausssine-gnuplot.eps"
+			SYSTEM "sc13-gausssine-gnuplot.eps"
 			NDATA eps>
   <!ENTITY gausssine-gnuplot.gif
-			SYSTEM "sc13_gausssine-gnuplot.gif"
+			SYSTEM "sc13-gausssine-gnuplot.gif"
 			NDATA gif89a>
   <!ENTITY gausssine-idl.eps
-			SYSTEM "sc13_gausssine-idl.eps"
+			SYSTEM "sc13-gausssine-idl.eps"
 			NDATA eps>
   <!ENTITY gausssine-idl.gif
-			SYSTEM "sc13_gausssine-idl.gif"
+			SYSTEM "sc13-gausssine-idl.gif"
 			NDATA gif89a>
 
   <!-- Local text files included -->
-  <!ENTITY release.notes SYSTEM "ReleaseNotes">
   <!ENTITY version SYSTEM "VERSION">
 
-  <!ENTITY ex-p1-f		SYSTEM "examples/p1.f.sgml">
-  <!ENTITY ex-p2-f		SYSTEM "examples/p2.f.sgml">
-  <!ENTITY ex-p3-f		SYSTEM "examples/p3.f.sgml">
-  <!ENTITY ex-fpdemo-c		SYSTEM "examples/fpdemo.c.sgml">
-  <!ENTITY ex-fpp-c		SYSTEM "examples/fpp.c.sgml">
-  <!ENTITY ex-islittleendian-c	SYSTEM "examples/islittleendian.c.sgml">
-  <!ENTITY ex-crash-c		SYSTEM "examples/crash.c.sgml">
-  <!ENTITY ex-mixed-c-c		SYSTEM "examples/mixed-c.c.sgml">
-  <!ENTITY ex-mixed-f-f		SYSTEM "examples/mixed-f.f.sgml">
-  <!ENTITY ex-maple-ms		SYSTEM "examples/maple.ms.sgml">
-  <!ENTITY ex-idl-functions-pro	SYSTEM "examples/idl-functions.pro.sgml">
+  <!ENTITY ex-p1-f		SYSTEM "examples/p1.f.xml">
+  <!ENTITY ex-p2-f		SYSTEM "examples/p2.f.xml">
+  <!ENTITY ex-p3-f		SYSTEM "examples/p3.f.xml">
+  <!ENTITY ex-fpdemo-c		SYSTEM "examples/fpdemo.c.xml">
+  <!ENTITY ex-fpp-c		SYSTEM "examples/fpp.c.xml">
+  <!ENTITY ex-islittleendian-c	SYSTEM "examples/islittleendian.c.xml">
+  <!ENTITY ex-crash-c		SYSTEM "examples/crash.c.xml">
+  <!ENTITY ex-mixed-c-c		SYSTEM "examples/mixed-c.c.xml">
+  <!ENTITY ex-mixed-f-f		SYSTEM "examples/mixed-f.f.xml">
+  <!ENTITY ex-maple-ms		SYSTEM "examples/maple.ms.xml">
+  <!ENTITY ex-idl-functions-pro	SYSTEM "examples/idl-functions.pro.xml">
 
-<!-- Entity declarations for referenced documents -->
-
-<!-- these were all subdoc references -->
-   <!ENTITY mud30  PUBLIC "-//Starlink//DOCUMENT Summary MUD/30//EN">
-   <!ENTITY mud48  PUBLIC "-//Starlink//DOCUMENT Summary MUD/48//EN">
-   <!ENTITY mud52  PUBLIC "-//Starlink//DOCUMENT Summary MUD/52//EN">
-   <!ENTITY mud55  PUBLIC "-//Starlink//DOCUMENT Summary MUD/55//EN">
-   <!ENTITY mud56  PUBLIC "-//Starlink//DOCUMENT Summary MUD/56//EN">
-   <!ENTITY mud57  PUBLIC "-//Starlink//DOCUMENT Summary MUD/57//EN">
-   <!ENTITY mud58  PUBLIC "-//Starlink//DOCUMENT Summary MUD/58//EN">
-   <!ENTITY mud72  PUBLIC "-//Starlink//DOCUMENT Summary MUD/72//EN">
-   <!ENTITY mud121 PUBLIC "-//Starlink//DOCUMENT Summary MUD/121//EN">
-   <!ENTITY mud122 PUBLIC "-//Starlink//DOCUMENT Summary MUD/122//EN">
-   <!ENTITY mud123 PUBLIC "-//Starlink//DOCUMENT Summary MUD/123//EN">
-   <!ENTITY mud128 PUBLIC "-//Starlink//DOCUMENT Summary MUD/128//EN">
-   <!ENTITY mud137 PUBLIC "-//Starlink//DOCUMENT Summary MUD/137//EN">
-   <!ENTITY mud138 PUBLIC "-//Starlink//DOCUMENT Summary MUD/138//EN">
-   <!ENTITY mud139 PUBLIC "-//Starlink//DOCUMENT Summary MUD/139//EN">
-   <!ENTITY mud159 PUBLIC "-//Starlink//DOCUMENT Summary MUD/159//EN">
-   <!ENTITY mud160 PUBLIC "-//Starlink//DOCUMENT Summary MUD/160//EN">
-   <!ENTITY sc2    PUBLIC "-//Starlink//DOCUMENT Summary SC/2//EN">
-   <!ENTITY sc9    PUBLIC "-//Starlink//DOCUMENT Summary SC/9//EN">
-   <!ENTITY sc12   PUBLIC "-//Starlink//DOCUMENT Summary SC/12//EN">
-   <!ENTITY sg6    PUBLIC "-//Starlink//DOCUMENT Summary SG/6//EN">
-   <!ENTITY sg8    PUBLIC "-//Starlink//DOCUMENT Summary SG/8//EN">
-   <!ENTITY sgp4   PUBLIC "-//Starlink//DOCUMENT Summary SGP/4//EN">
-   <!ENTITY sgp16  PUBLIC "-//Starlink//DOCUMENT Summary SGP/16//EN">
-   <!ENTITY sgp28  PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN">
-   <!ENTITY sgp47  PUBLIC "-//Starlink//DOCUMENT Summary SGP/47//EN">
-   <!ENTITY sgp50  PUBLIC "-//Starlink//DOCUMENT Summary SGP/50//EN">
-   <!ENTITY sug    PUBLIC "-//Starlink//DOCUMENT Summary SUG//EN">
-   <!ENTITY sun1   PUBLIC "-//Starlink//DOCUMENT Summary SUN/1//EN">
-   <!ENTITY sun9   PUBLIC "-//Starlink//DOCUMENT Summary SUN/9//EN">
-   <!ENTITY sun11  PUBLIC "-//Starlink//DOCUMENT Summary SUN/11//EN">
-   <!ENTITY sun12  PUBLIC "-//Starlink//DOCUMENT Summary SUN/12//EN">
-   <!ENTITY sun15  PUBLIC "-//Starlink//DOCUMENT Summary SUN/15//EN">
-   <!ENTITY sun28  PUBLIC "-//Starlink//DOCUMENT Summary SUN/28//EN">
-   <!ENTITY sun33  PUBLIC "-//Starlink//DOCUMENT Summary SUN/33//EN">
-   <!ENTITY sun55  PUBLIC "-//Starlink//DOCUMENT Summary SUN/55//EN">
-   <!ENTITY sun73  PUBLIC "-//Starlink//DOCUMENT Summary SUN/73//EN">
-   <!ENTITY sun92  PUBLIC "-//Starlink//DOCUMENT Summary SUN/92//EN">
-   <!ENTITY sun93  PUBLIC "-//Starlink//DOCUMENT Summary SUN/93//EN">
-   <!ENTITY sun107 PUBLIC "-//Starlink//DOCUMENT Summary SUN/107//EN">
-   <!ENTITY sun127 PUBLIC "-//Starlink//DOCUMENT Summary SUN/127//EN">
-   <!ENTITY sun136 PUBLIC "-//Starlink//DOCUMENT Summary SUN/136//EN">
-   <!ENTITY sun145 PUBLIC "-//Starlink//DOCUMENT Summary SUN/145//EN">
-   <!ENTITY sun160 PUBLIC "-//Starlink//DOCUMENT Summary SUN/160//EN">
-   <!ENTITY sun162 PUBLIC "-//Starlink//DOCUMENT Summary SUN/162//EN">
-   <!ENTITY sun167 PUBLIC "-//Starlink//DOCUMENT Summary SUN/167//EN">
-   <!ENTITY sun168 PUBLIC "-//Starlink//DOCUMENT Summary SUN/168//EN">
-   <!ENTITY sun170 PUBLIC "-//Starlink//DOCUMENT Summary SUN/170//EN">
-   <!ENTITY sun172 PUBLIC "-//Starlink//DOCUMENT Summary SUN/172//EN">
-   <!ENTITY sun174 PUBLIC "-//Starlink//DOCUMENT Summary SUN/174//EN">
-   <!ENTITY sun181 PUBLIC "-//Starlink//DOCUMENT Summary SUN/181//EN">
-   <!ENTITY sun193 PUBLIC "-//Starlink//DOCUMENT Summary SUN/193//EN">
-   <!ENTITY sun194 PUBLIC "-//Starlink//DOCUMENT Summary SUN/194//EN">
-   <!ENTITY sun199 PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN">
-   <!ENTITY sun203 PUBLIC "-//Starlink//DOCUMENT Summary SUN/203//EN">
-   <!ENTITY sun209 PUBLIC "-//Starlink//DOCUMENT Summary SUN/209//EN">
-
-   <!-- abbreviations/abstrations -->
-   <!ENTITY ctan "http://www.tex.ac.uk">
-   <!ENTITY sc13webpage "http://www.astro.gla.ac.uk/users/norman/star/sc13/">
+  <!-- abbreviations/abstractions -->
+  <!ENTITY ctan "http://www.tex.ac.uk">
+  <!ENTITY sc13webpage "http://www.astro.gla.ac.uk/users/norman/star/sc13/">
 
 ]>
 
@@ -249,7 +188,7 @@
       <subhead><title>Computing</title></subhead>
 
       <p>Everyone should start with the
-        <docxref doc="sug" text="Starlink User's Guide" />, which should be
+        <docxref doc="SUG" text="Starlink User's Guide" />, which should be
         available at your site, and is on the web at
         <url>http://star-www.rl.ac.uk/star/docs/sug.htx/sug.html</url>.
       </p>
@@ -267,7 +206,7 @@
         </p>
 
         <p>Your first source of information might be <docxref
-          doc="sun145" text="SUN/145" />, Starlink's Unix
+          doc="SUN/145" text="SUN/145" />, Starlink's Unix
           introduction.  This covers the basics of logging on, moving
           around, issuing commands, creating files, and starting
           programming.  It also includes references to other Starlink
@@ -338,7 +277,7 @@
           <ref id="s.progs"/>).
         </p>
 
-        <p><docxref doc="sun170" text="SUN/170" />, <cite>Editors on
+        <p><docxref doc="SUN/170" text="SUN/170" />, <cite>Editors on
           Unix</cite>, is an overview of some of the available
           options, listing their good and bad points.  In addition to
           this, Brian McIlwrath wrote an overview of available text
@@ -402,7 +341,7 @@
         <p>For VMS fans, there's <code>jed</code>, which is a simple
           and fairly sane editor which includes an emulation of the
           EDT editor of old.  It's available on Starlink systems, and
-          documented in <docxref doc="sun168" text="SUN/168" />.
+          documented in <docxref doc="SUN/168" text="SUN/168" />.
         </p>
 
         <p>Finally, there's <code>pico</code>, the editor used
@@ -1235,7 +1174,7 @@ C     process array element a(i+3)
           <p>An important deficiency in Fortran is its lack of any
             standard way of dynamically allocating memory (as opposed
             to allocating arrays to be a fixed size at compile time).
-            The Starlink CNF library, <docxref doc="sun209"
+            The Starlink CNF library, <docxref doc="SUN/209"
             loc="xref_pointers" >SUN/209</docxref> is intended to make
             this reasonably easy, and includes a brief discussion of
             the underlying mechanism.  This is rather a can of worms,
@@ -1266,7 +1205,7 @@ C     process array element a(i+3)
           <p>There is a large number of introductions to Fortran, but not, I
             believe, a single preeminent one.  The
             <cite>Starlink application programming standard</cite>,
-            <docxref doc="sgp16" text="SGP/16" />,
+            <docxref doc="SGP/16" text="SGP/16" />,
             is a collection of programming style guidelines for Fortran,
             and includes further references.
           </p>
@@ -1434,7 +1373,7 @@ C     process array element a(i+3)
             <cite>The Elements of C Programming Style</cite> by Jay
             Renade and Alan Nash as its principal C programming
             standard, as well as producing a compact collection of
-            programming style suggestions in <docxref doc="sgp4"
+            programming style suggestions in <docxref doc="SGP/4"
             text="SGP/4" />.
           </p>
 
@@ -2529,7 +2468,7 @@ at line 12 in file "crash.c"
           </p>
 
           <p>For a detailed overview of such `mixed language
-            programming', see <docxref doc="sun209" text="SUN/209" />,
+            programming', see <docxref doc="SUN/209" text="SUN/209" />,
             <cite>CNF and F77 Mixed Language Programming</cite>, which
             gives a detailed introduction to calling each language
             from the other, as well as a set of C macros to help
@@ -2642,7 +2581,7 @@ at line 12 in file "crash.c"
               rarely need to do this.  On those occasions when you do
               need such a facility, you can use a library of
               conversion routines such as those described in <docxref
-              doc="sun209" text="SUN/209" />.
+              doc="SUN/209" text="SUN/209" />.
             </p>
 
           </subsubsubsect>
@@ -3013,8 +2952,8 @@ star:nxg&gt; maple
 
         <p>Leave Maple by giving the command <code>quit</code>.</p>
 
-        <p><docxref doc="sun107" text="SUN/107" /> provides an
-          introduction to Maple, and <docxref doc="sgp47"
+        <p><docxref doc="SUN/107" text="SUN/107" /> provides an
+          introduction to Maple, and <docxref doc="SGP/47"
           text="SGP/47" /> is a comparison of Maple and Mathematica.
           Also, the Maple manual and tutorial are very clear.  There
           is help within Maple (type <code>?intro</code>), and this
@@ -3035,8 +2974,7 @@ star:nxg&gt; maple
 
       </subsect>
 
-      <subsect id="s.visualisation"
-export="export">
+      <subsect id="s.visualisation" export="export">
 
         <subhead><title>Data visualisation</title></subhead>
 
@@ -3050,7 +2988,7 @@ export="export">
           available at all sites, but mostly because if gnuplot runs
           out of steam, you might as well go straight to IDL, which is
           easily available through Starlink.  </p><p><docxref
-          doc="sg8" text="SG/8" />, <cite>An Introduction to
+          doc="SG/8" text="SG/8" />, <cite>An Introduction to
           Visualisation Software for Astronomy</cite>, is an overview
           of visualisation systems, which mentions both IDL and
           DX.</p>
@@ -3217,7 +3155,7 @@ m=s2*a3</verbatim>
             the IDL prompt.
           </p>
 
-          <p>See appendix B of <docxref doc="sun55" text="SUN/55" />
+          <p>See appendix B of <docxref doc="SUN/55" text="SUN/55" />
             for a description of how to import data in the Starlink
             NDF format into IDL.
           </p>
@@ -3229,14 +3167,14 @@ m=s2*a3</verbatim>
 
           <p>IBM's Data Explorer is also available on some Starlink
             machines.  I don't have personal experience of it, but
-            there is a Starlink manual for it in <docxref doc="sun203"
+            there is a Starlink manual for it in <docxref doc="SUN/203"
             text="SUN/203" />, <cite>SX and DX -- IBM data explorer
             for data visualisation</cite> and a Starlink DX cookbook
-            in <docxref doc="sc2" text="SC/2" />.
+            in <docxref doc="SC/2" text="SC/2" />.
           </p>
 
           <p>In his overview of visualisation systems in <docxref
-            doc="sg8" text="SG/8" />, Clive Davenhall says of DX:
+            doc="SG/8" text="SG/8" />, Clive Davenhall says of DX:
             <blockquote><px>IBM Data Explorer (DX) is a
             general-purpose software package for data visualisation
             and analysis. It employs a data-flow driven client-server
@@ -3250,7 +3188,7 @@ m=s2*a3</verbatim>
             DX. If you are using DX at a Starlink site then these
             enhancements should be available automatically. The use of
             DX at Starlink sites and the Starlink enhancements to DX
-            are documented in <docxref doc="sun203" text="SUN/203"
+            are documented in <docxref doc="SUN/203" text="SUN/203"
             />.</px></blockquote>
           </p>
 
@@ -3270,7 +3208,7 @@ m=s2*a3</verbatim>
             applications, consists of a collection of high-level
             routines for producing plots, maps and images either
             on-screen or as Postscript to a file.  Refer to <docxref
-            doc="sun15" text="SUN/15" />, <cite>PGPLOT --- Graphics
+            doc="SUN/15" text="SUN/15" />, <cite>PGPLOT --- Graphics
             Subroutine Library</cite> for further details, or to the
             PGPLOT home page at &lt;<url></url>&gt;.
           </p>
@@ -3504,7 +3442,7 @@ m=s2*a3</verbatim>
           non-trivial) work of building it for your architecture has already
           been done, leaving you able to simply link against the library.  The
           collection is fully documented in
-          <docxref doc="sun194" text="SUN/194" />.
+          <docxref doc="SUN/194" text="SUN/194" />.
         </p>
 
         <p>The remaining libraries are typically free.</p>
@@ -3630,15 +3568,15 @@ m=s2*a3</verbatim>
             the <webref
             url="http://star-www.rl.ac.uk/bulletin/98sep/node12.html">Starlink
             Bulletin</webref>.  This covered reading and writing using
-            the IMG library (<docxref doc="sun160" text="SUN/160" />),
+            the IMG library (<docxref doc="SUN/160" text="SUN/160" />),
             using NDF files and the HDS files they are a special case
-            of (<docxref doc="sun33" text="SUN/33" /> and <docxref
-            doc="sun92" text="SUN/92" /> respectively), and reading
-            and writing FITS files (<docxref doc="sun136"
+            of (<docxref doc="SUN/33" text="SUN/33" /> and <docxref
+            doc="SUN/92" text="SUN/92" /> respectively), and reading
+            and writing FITS files (<docxref doc="SUN/136"
             text="SUN/136" />).</p>
 
           <p>You can convert between different data formats using the
-            CONVERT package, documented in <docxref doc="sun55"
+            CONVERT package, documented in <docxref doc="SUN/55"
             text="SUN/55" />.  CONVERT is extremely easy to use, and
             converting a FITS file, say, to an NDF is as easy as
             <verbatim>fits2ndf myfile.fits myfile</verbatim></p>
@@ -3843,14 +3781,14 @@ which breaks Windows Acroread 5 at least).</p>
 
         <p>Starlink has produced several documents concerned with LaTeX.
 The LaTeX user's guide,
-<docxref doc="sun9" text="SUN/9" />,
+<docxref doc="SUN/9" text="SUN/9" />,
 concentrates on the practical details of LaTeXing your document and
 ultimately transforming it into PostScript.  You should also refer to
-<docxref doc="sc9" text="SC/9" />, the LaTeX cookbook.
-However, <docxref doc="sgp28" text="SGP/28" />, <cite>How to write good
+<docxref doc="SC/9" text="SC/9" />, the LaTeX cookbook.
+However, <docxref doc="SGP/28" text="SGP/28" />, <cite>How to write good
 documents for 
-Starlink</cite>, <docxref doc="sun199" text="SUN/199" />, <em>Star2HTML</em> and
-<docxref doc="sgp50" text="SGP/50" />, <cite>Starlink Document Styles</cite> are
+Starlink</cite>, <docxref doc="SUN/199" text="SUN/199" />, <em>Star2HTML</em> and
+<docxref doc="SGP/50" text="SGP/50" />, <cite>Starlink Document Styles</cite> are
 primarily intended for those writing Starlink
           documentation.</p>
 
@@ -3930,7 +3868,7 @@ primarily intended for those writing Starlink
       <p>The <webref url="http://cdsads.u-strasbg.fr/">Astrophysics
         Data System</webref> (ADS) is a NASA project, providing an
         abstract service, along with a subsidiary data service.
-        Further to this, <docxref doc="sun174" text="SUN/174" />,
+        Further to this, <docxref doc="SUN/174" text="SUN/174" />,
         <cite>An Astronomer's Guide to On-line Bibliographic Databases
         and Information Services</cite>, describes bibliographic and
         other resources of interest to astronomers.
@@ -3961,11 +3899,11 @@ primarily intended for those writing Starlink
         <p>If you're using such catalogues, you might want to take a
           look at CAT, the Starlink <cite>Catalogue and table
           manipulation library</cite>, documented in <docxref
-          doc="sun181" text="SUN/181" />.  This is a subroutine
+          doc="SUN/181" text="SUN/181" />.  This is a subroutine
           library for manipulating astronomical catalogues and similar
-          tabular datasets.  See also <docxref doc="sun127"
+          tabular datasets.  See also <docxref doc="SUN/127"
           text="SUN/127" />, <cite>The EXOSAT Database System</cite>,
-          and more generally <docxref doc="sun162" text="SUN/162" />,
+          and more generally <docxref doc="SUN/162" text="SUN/162" />,
           <cite>A Guide to Astronomical Catalogues, Databases and
           Archives available through Starlink</cite>.
         </p>
@@ -4209,7 +4147,7 @@ section of this document.
 </p>
 
         <p>An overall reference for all Starlink users is the
-<docxref doc="sug" text="Starlink User's Guide" />.
+<docxref doc="sug/" text="Starlink User's Guide" />.
 </p>
 
         <p>
@@ -4231,149 +4169,149 @@ section of this document.
                                                rowsep="1"><entry>Code</entry><entry>Title</entry><entry>Sect. </entry></row>
 
                 <row><entry><docxref
-                      doc="sun1" text="SUN/1"
+                      doc="SUN/1" text="SUN/1"
                       /></entry><entry>Starlink software collection
                   </entry></row>
 
-                <row><entry><docxref doc="sun9"
+                <row><entry><docxref doc="SUN/9"
                       text="SUN/9" /></entry><entry>LaTeX -- Document
                     preparation system v2e User's
                     Guide</entry><entry><ref id="s.latex"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun11"
+                <row><entry><docxref doc="SUN/11"
                       text="SUN/11" /></entry><entry>ARY --
                     Subroutines for accessing ARRAY data structures
                   </entry></row>
 
-                <row><entry><docxref doc="sun12"
+                <row><entry><docxref doc="SUN/12"
                       text="SUN/12" /></entry><entry>LaTeX --
                     Cook-book</entry><entry><ref id="s.latex"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun15"
+                <row><entry><docxref doc="SUN/15"
                       text="SUN/15" /></entry><entry>PGPLOT --
                     Graphics subroutine library</entry><entry><ref
                       id="s.pgplot"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun28"
+                <row><entry><docxref doc="SUN/28"
                       text="SUN/28" /></entry><entry>NAG -- Numerical
                     and Graphical Libraries Mk 16/4
                     UG</entry><entry><ref id="s.lib"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun33"
+                <row><entry><docxref doc="SUN/33"
                       text="SUN/33" /></entry><entry>NDF -- Routines
                     for accessing extensible n-D data
                     1.3</entry><entry><ref id="s.rwdata"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun55"
+                <row><entry><docxref doc="SUN/55"
                       text="SUN/55" /></entry><entry>CONVERT -- A
                     format-conversion package 1.1,
                     UM</entry><entry><ref id="s.vis-idl"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun73"
+                <row><entry><docxref doc="SUN/73"
                       text="SUN/73" /></entry><entry>FORCHECK --
                     Fortran verifier and programming
                     aid</entry><entry><ref id="s.fortran77"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun92"
+                <row><entry><docxref doc="SUN/92"
                       text="SUN/92" /></entry><entry>HDS --
                     Hierarchical data system 4.2,
                     PG</entry><entry><ref id="s.rwdata"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun93"
+                <row><entry><docxref doc="SUN/93"
                       text="SUN/93" /></entry><entry>TeX -- Superior
                     document preparation system</entry><entry><ref
                       id="s.latex"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun107"
+                <row><entry><docxref doc="SUN/107"
                       text="SUN/107" /></entry><entry>MAPLE --
                     Mathematical manipulation
                     language</entry><entry><ref id="s.maple"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun127"
+                <row><entry><docxref doc="SUN/127"
                       text="SUN/127" /></entry><entry>EXOSAT database
                     system</entry><entry><ref id="s.obs"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun136"
+                <row><entry><docxref doc="SUN/136"
                       text="SUN/136" /></entry><entry>FITSIO -- Disk
                     FITS I/O routines 5.03</entry><entry><ref
                       id="s.rwdata"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun145"
+                <row><entry><docxref doc="SUN/145"
                       text="SUN/145" /></entry><entry>UNIX -- An
                     introduction</entry><entry><ref id="s.unix"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun160"
+                <row><entry><docxref doc="SUN/160"
                       text="SUN/160" /></entry><entry>IMG -- Simple
                     image data access 1.2</entry><entry><ref
                       id="s.rwdata"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun162"
+                <row><entry><docxref doc="SUN/162"
                       text="SUN/162" /></entry><entry>A guide to
                     astronomical
                     catalogues/databases/archives</entry><entry><ref
                       id="s.obs"/> </entry></row>
 
                 <row><entry><docxref
-                      doc="sun167" text="SUN/167"
+                      doc="SUN/167" text="SUN/167"
                       /></entry><entry>PERIOD -- A time-series
                     analysis package
                   </entry></row>
 
-                <row><entry><docxref doc="sun170"
+                <row><entry><docxref doc="SUN/170"
                       text="SUN/170" /></entry><entry>Editors on
                     Unix</entry><entry><ref id="s.unix"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun172"
+                <row><entry><docxref doc="SUN/172"
                       text="SUN/172" /></entry><entry>FTNCHEK -- A
                     Fortran 77 source-code checker</entry><entry><ref
                       id="s.fortran77"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun174"
+                <row><entry><docxref doc="SUN/174"
                       text="SUN/174" /></entry><entry>Guide to on-line
                     bibliographies and information
                   </entry></row>
 
-                <row><entry><docxref doc="sun181"
+                <row><entry><docxref doc="SUN/181"
                       text="SUN/181" /></entry><entry>CAT -- Catalogue
                     and table manipulation library
                     5.1</entry><entry><ref id="s.obs"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun193"
+                <row><entry><docxref doc="SUN/193"
                       text="SUN/193" /></entry><entry>PERL --
                     Practical Extraction and Report
                     Language</entry><entry><ref id="s.otherlang"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun194"
+                <row><entry><docxref doc="SUN/194"
                       text="SUN/194" /></entry><entry>PDA -- Public
                     domain algorithms library 0.4,
                     PM</entry><entry><ref id="s.lib"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun203"
+                <row><entry><docxref doc="SUN/203"
                       text="SUN/203" /></entry><entry>SX and DX -- IBM
                     data explorer for data
                     visualisation</entry><entry><ref id="s.dx"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sun209"
+                <row><entry><docxref doc="SUN/209"
                       text="SUN/209" /></entry><entry>CNF and F77
                     Mixed Language Programming v3.1:
                     PM.</entry><entry><ref
@@ -4398,20 +4336,20 @@ section of this document.
 
               <tbody>
                 <row>
-                  <entry><docxref doc="sgp4"
+                  <entry><docxref doc="SGP/4"
                       text="SGP/4" /></entry>
                   <entry>Starlink C
                     programming standard</entry>
                   <entry><ref id="s.c"/>
                   </entry>
                 </row>
-                <row><entry><docxref doc="sgp16"
+                <row><entry><docxref doc="SGP/16"
                       text="SGP/16" /></entry><entry>Starlink
                     application programming
                     standard</entry><entry><ref id="s.fortran77"/>
                   </entry></row>
 
-                <row><entry><docxref doc="sgp47"
+                <row><entry><docxref doc="SGP/47"
                       text="SGP/47" /></entry><entry>Computer Algebra
                     Software</entry><entry><ref
                       id="s.maple"/></entry></row>
@@ -4430,13 +4368,13 @@ section of this document.
               <thead><row rowsep="1"><entry namest="col0" nameend="col2" colsep="1" align="center">Starlink Cookbooks
 </entry></row></thead>
 
-              <tbody><row><entry><docxref doc="sc2"
+              <tbody><row><entry><docxref doc="SC/2"
                       text="SC/2" /></entry><entry>The DX
                     cookbook</entry><entry><ref id="s.dx"/>
-                  </entry></row><row><entry><docxref doc="sc9"
+                  </entry></row><row><entry><docxref doc="SC/9"
                       text="SC/9" /></entry><entry>LaTeX
                     Cookbook</entry><entry><ref id="s.latex"/>
-                  </entry></row><row><entry><docxref doc="sc12"
+                  </entry></row><row><entry><docxref doc="SC/12"
                       text="SC/12" /></entry><entry>Writing your own
                     data reduction
                     software</entry></row></tbody>
@@ -4454,10 +4392,10 @@ section of this document.
                   </entry></row>
               </thead>
 
-              <tbody><row><entry><docxref doc="sg6" text="SG/6"
+              <tbody><row><entry><docxref doc="SG/6" text="SG/6"
               /></entry><entry>ADAM -- Programmer's facilities and
               documentation guide </entry></row><row><entry><docxref
-              doc="sg8" text="SG/8" /></entry><entry>Introduction to
+              doc="SG/8" text="SG/8" /></entry><entry>Introduction to
               Visualisation Software for Astronomy</entry><entry><ref
               id="s.visualisation"/></entry></row></tbody>
             </tgroup>
@@ -4481,88 +4419,88 @@ section of this document.
 
               <tbody>
                 <row>
-                  <entry><docxref doc="mud30" text="MUD/30" /></entry>
+                  <entry><docxref doc="MUD/30" text="MUD/30" /></entry>
                   <entry>IDL -- User's guide</entry>
                   <entry><ref id="s.vis-idl"/> </entry>
 
                 </row>
 
-                <row><entry><docxref doc="mud48" text="MUD/48"
+                <row><entry><docxref doc="MUD/48" text="MUD/48"
                       /></entry><entry>LATEX -- User's guide and
                     reference manual</entry><entry><ref id="s.latex"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud52" text="MUD/52"
+                <row><entry><docxref doc="MUD/52" text="MUD/52"
                       /></entry><entry>MAPLE --
                     Introduction</entry><entry><ref id="s.maple"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud55" text="MUD/55"
+                <row><entry><docxref doc="MUD/55" text="MUD/55"
                       /></entry><entry>NAG -- Fortran library manual:
                     Mk 15 (10 vols)</entry><entry><ref id="s.lib"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud56" text="MUD/56"
+                <row><entry><docxref doc="MUD/56" text="MUD/56"
                       /></entry><entry>NAG -- A beginners guide
                     (Book)</entry><entry><ref id="s.lib"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud57" text="MUD/57"
+                <row><entry><docxref doc="MUD/57" text="MUD/57"
                       /></entry><entry>NAG -- Newsletters, Error
                     bulletins</entry><entry><ref id="s.lib"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud58" text="MUD/58"
+                <row><entry><docxref doc="MUD/58" text="MUD/58"
                       /></entry><entry>NAG -- Graphical library
                     supplement: Mk 3 (2 vols</entry><entry><ref
                       id="s.lib"/> </entry></row>
 
-                <row><entry><docxref doc="mud72" text="MUD/72"
+                <row><entry><docxref doc="MUD/72" text="MUD/72"
                       /></entry><entry>TEX -- The TeXbook
                     (Book)</entry><entry><ref id="s.latex"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud121" text="MUD/121"
+                <row><entry><docxref doc="MUD/121" text="MUD/121"
                       /></entry><entry>Unix for
                     beginners</entry><entry><ref id="s.unix"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud122" text="MUD/122"
+                <row><entry><docxref doc="MUD/122" text="MUD/122"
                       /></entry><entry>An introduction to display
                     editing with Vi</entry><entry><ref
                       id="s.editors"/> </entry></row>
 
-                <row><entry><docxref doc="mud123" text="MUD/123"
+                <row><entry><docxref doc="MUD/123" text="MUD/123"
                       /></entry><entry>Vi -- Quick reference
                     card</entry><entry><ref id="s.editors"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud128" text="MUD/128"
+                <row><entry><docxref doc="MUD/128" text="MUD/128"
                       /></entry><entry>NAG -- Fortran Library,
                     Introductory Guide (Mk 15)</entry><entry><ref
                       id="s.lib"/> </entry></row>
 
-                <row><entry><docxref doc="mud137" text="MUD/137"
+                <row><entry><docxref doc="MUD/137" text="MUD/137"
                       /></entry><entry>MAPLE V -- Language reference
                     manual</entry><entry><ref id="s.maple"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud138" text="MUD/138"
+                <row><entry><docxref doc="MUD/138" text="MUD/138"
                       /></entry><entry>MAPLE V -- Library reference
                     manual</entry><entry><ref id="s.maple"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud139" text="MUD/139"
+                <row><entry><docxref doc="MUD/139" text="MUD/139"
                       /></entry><entry>MAPLE V -- A tutorial
                     introduction</entry><entry><ref id="s.maple"/>
                   </entry></row>
 
-                <row><entry><docxref doc="mud159" text="MUD/159"
+                <row><entry><docxref doc="MUD/159" text="MUD/159"
                       /></entry><entry>SM -- Interactive plotting
                     program 2.3.1</entry><entry><ref
                       id="s.visualisation"/> </entry></row>
 
-                <row><entry><docxref doc="mud160" text="MUD/160"
+                <row><entry><docxref doc="MUD/160" text="MUD/160"
                       /></entry><entry>SM -- The SM
                     tutorial</entry><entry><ref
                       id="s.visualisation"/></entry></row>
@@ -4572,23 +4510,56 @@ section of this document.
         </p>
       </sect>
 
-      <sect id="s.relnotes" export="export">
-        <subhead><title>Release notes</title></subhead>
+<sect id="s.relnotes" export="export">
+<subhead><title>Release notes</title></subhead>
         
-&release.notes;
+<subsect id="rel-2.2" export="export">
+<subhead><title>Release 2.2</title></subhead>
 
-      </sect>
+<p><ul>
+<li><p>Enhanced the coverage of Java (though it's still rather brief).</p></li>
+<li><p>Added pointers to stellar atmosphere codes (thanks to Barry
+Smalley, Ann Sansom, Simon Jeffery).</p></li>
+<li><p>A few additions to the TeX/LaTeX coverage.</p></li>
+</ul></p>
+</subsect>
 
-    </appendices>
+<subsect id="rel-2.1" export="export">
+<subhead><title>Release 2.1</title></subhead>
 
-    <backmatter bibliography="sc13"/>
+<p>More detail about NaNs, compilers, largely incorporating the suggestions
+I received after the previous edition.  Packaged set of examples.</p>
+</subsect>
+
+<subsect id="rel-2.0" export="export">
+<subhead><title>Version 2</title></subhead>
+
+<p>Assorted enhancements and additions.  Expanded the section on model
+atmospheres.  Links checked, and a couple of broken ones restored.</p>
+
+<p>I haven't been able to incorporate all the suggestions I received
+after the previous edition.</p>
+</subsect>
+
+<subsect id="rel-1.2" export="export">
+<subhead><title>Release 1.2</title></subhead>
+
+<p>No significant changes as yet.  Merely a conversion from the
+original &latex; source.</p>
+</subsect>
+
+</sect>
+
+</appendices>
+
+<backmatter bibliography="sc13"/>
 
 
 <!--
 Link checking by doing:
 
 SGML_CATALOG_FILES=/home/norman/s/src/docs/document-summaries/CATALOG:/home/norman/s/src/sgml/w/sgml/dtd/CATALOG \
-    nsgmls -wall $STARLINK_SGML_DIR/dtd/starlink.decl sc13.sgml >sc13.parse
+    nsgmls -wall $STARLINK_SGML_DIR/dtd/starlink.decl sc13.xml >sc13.parse
 grep 'Aurl ' sc13.parse |awk '{print $3}'>sc13.urllist
 sed -n '/^(url/ {n;s/^[^-]*- *\(.*\)/\1/p;}' sc13.parse >>sc13.urllist 
 mkdir testres
