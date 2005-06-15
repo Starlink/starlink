@@ -49,8 +49,8 @@
 *
 *     (>) COFILE        (Character) The name of the coefficient file.
 *                       Default SDIST.
-*     (>) PERISCOPE     (Keyword) Whether or not the periscope is fitted.
-*                       Default TRUE.
+*     (>) PERISCOPE     (Keyword) Whether or not the periscope is
+*                       fitted. Default TRUE.
 *     (>) OBJWIDTH      (Integer) The number of rows to be extracted on
 *                       behalf of the object per order.  If PERISCOPE is
 *                       TRUE then object and sky are not distinguished
@@ -105,18 +105,22 @@
 *  Version date: 31-May-88
 *-
 *  History:
-*    06 Jun 1988  WFL.  Add S* parameters and change EXWIDTH to be
-*                 OBJWIDTH.
-*    04 Aug 1988  WFL.  Remove SDIST.DAT-reading code to FIG_READSDIST.
-*    25 Sep 1992  HME.  Lowercase default file name sdist.dat.
-*                 Lowercase default mask file mask and lowercase
-*                 extension .dst.
-*    03 Aug 1993  HME.  Convert to DSA, use PAR_ABORT.
-*    15 Feb 1996  HME.  Change access for output from update to write.
-*    18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
-*                 file names to 132 chars.
+*     06 Jun 1988  WFL.  Add S* parameters and change EXWIDTH to be
+*                  OBJWIDTH.
+*     04 Aug 1988  WFL.  Remove SDIST.DAT-reading code to FIG_READSDIST.
+*     25 Sep 1992  HME.  Lowercase default file name sdist.dat.
+*                  Lowercase default mask file mask and lowercase
+*                  extension .dst.
+*     03 Aug 1993  HME.  Convert to DSA, use PAR_ABORT.
+*     15 Feb 1996  HME.  Change access for output from update to write.
+*     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+*                  file names to 132 chars.
+*     2005 June 14 MJC / Starlink  Use CNF_PVAL for pointers to
+*                  mapped data.
 *+
+      IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *
 *     Constant parameters
 *
@@ -125,7 +129,7 @@
 *                             
 *     Local variables
 *
-      INTEGER ADDRESS,SLOT
+      INTEGER SLOT
       INTEGER NTRACKS,TRACK,DIMS(2),NX,NY,START(MAXTRACKS)
       INTEGER END(MAXTRACKS),MSTART,MDELTA,OBJWIDTH,S1WIDTH,S2WIDTH
       INTEGER MPTR,STATUS,IGNORE
@@ -137,11 +141,6 @@
 *     Functions
 *
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
-*
-*     Dynamic memory include file
-*
-      INCLUDE 'DYNAMIC_MEMORY'
 *
 *     Open DSA
 *
@@ -170,10 +169,10 @@
          CALL PAR_WRUSER('Number of tracks is zero. Not much point '//
      :                                    'in writing a mask!',IGNORE)
          GOTO 9999
-      ENDIF
+      END IF
       DO TRACK=1,NTRACKS
          COEFF(1,TRACK) = COEFF(1,TRACK) + YAVE(TRACK)
-      ENDDO                                  
+      END DO                                  
       CALL GEN_REVR8(COEFF,11,NTRACKS,.TRUE.,COEFF)
 *          
 *     Determine whether the periscope is mounted. If it is then each
@@ -212,13 +211,13 @@
             VALUE = (WIDTH(1) + WIDTH(2)) / 2.0
          ELSE
             VALUE = WIDTH(1)
-         ENDIF
+         END IF
          VALUE = VALUE - 2.0 * OBJOFFSET
          OBJWIDTH = NINT(VALUE)
          WRITE(CHARS,'(A,I2,A)') '*** Will use an OBJWIDTH of ',
      :                                        OBJWIDTH,' pixels'
          CALL PAR_WRUSER(CHARS,IGNORE)
-      ENDIF
+      END IF
 *
 *     Set the initial default values of zero for all the sky widths and
 *     offsets. Only get values if PERISCOPE is false and stop at the
@@ -242,9 +241,9 @@
                CALL PAR_RDVAL('S2OFFSET',-MAXWIDTH,MAXWIDTH,0.0,' ',
      :                                                     S2OFFSET)
                IF (PAR_ABORT()) GOTO 9999
-            ENDIF
-         ENDIF
-      ENDIF
+            END IF
+         END IF
+      END IF
 *
 *     Check that the object and sky regions do not overlap and that the
 *     total width being extracted does not exceed the maximum
@@ -256,15 +255,15 @@
      :                                                           THEN
             CALL PAR_WRUSER('Object and sky region 1 overlap',IGNORE)
             GOTO 9999
-         ENDIF
-      ENDIF
+         END IF
+      END IF
       IF (S2WIDTH.GT.0) THEN
          IF (ABS(S2OFFSET)-FLOAT(S2WIDTH)/2.0.LT.FLOAT(OBJWIDTH)/2.0)
      :                                                           THEN
             CALL PAR_WRUSER('Object and sky region 2 overlap',IGNORE)
             GOTO 9999
-         ENDIF
-      ENDIF
+         END IF
+      END IF
       IF (S1WIDTH.GT.0.AND.S2WIDTH.GT.0) THEN
          IF ((S1OFFSET.GT.S2OFFSET.AND.
      :        S1OFFSET-FLOAT(S1WIDTH)/2.0.LT.
@@ -274,8 +273,8 @@
      :        S1OFFSET+FLOAT(S1WIDTH)/2.0))   THEN
             CALL PAR_WRUSER('Sky regions 1 and 2 overlap',IGNORE)
             GOTO 9999
-         ENDIF
-      ENDIF
+         END IF
+      END IF
 *
 *     Get number of first order in range.
 *
@@ -301,18 +300,14 @@
 *
 *     Map the mask data array.
 *
-      CALL DSA_MAP_DATA('MASK','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      MPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('MASK','WRITE','FLOAT',MPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 9999
 *
 *     Call the routine that actually writes the mask.
 *
-      CALL FIG_ECHMASK(NX,NY,NTRACKS,
-     :                 PERISCOPE,OBJWIDTH,OBJOFFSET,
-     :                 S1WIDTH,S1OFFSET,S2WIDTH,S2OFFSET,
-     :                 MSTART,MDELTA,
-     :                 START,END,COEFF,
-     :                 DYNAMIC_MEM(MPTR))
+      CALL FIG_ECHMASK(NX,NY,NTRACKS,PERISCOPE,OBJWIDTH,OBJOFFSET,
+     :                 S1WIDTH,S1OFFSET,S2WIDTH,S2OFFSET,MSTART,
+     :                 MDELTA,START,END,COEFF,%VAL(CNF_PVAL(MPTR)))
 *
 *     Always jump here prior to exit. Close the coefficient file and then
 *     close down DSA.
@@ -437,8 +432,8 @@
       DO I=1,NY
          DO J=1,NX
             MASK(J,I) = 0.0
-         ENDDO
-      ENDDO
+         END DO
+      END DO
 *
 *     Fill in the mask values. Simply cycle through each track being very
 *     careful to extract exactly the requested number of rows of object
@@ -454,7 +449,7 @@
             ORDER = 10 * (MSTART + MDELTA * ((TRACK+1)/2 - 1))
          ELSE
             ORDER = 10 * (MSTART + MDELTA * (TRACK - 1))
-         ENDIF
+         END IF
          FORDER = FLOAT(ORDER)
 *
 *        Only fill in values in those rows that were successfully tracked.
@@ -483,12 +478,12 @@
                IF (PERISCOPE) THEN
                   DO J = FIRST,LAST
                      MASK(I,J) = FORDER + 1.0 + MOD(TRACK,2)
-                  ENDDO
+                  END DO
                ELSE
                   DO J = FIRST,LAST
                      MASK(I,J) = FORDER + 1.0
-                  ENDDO
-               ENDIF
+                  END DO
+               END IF
             ELSE
                CENTRE = NINT(MID+DBLE(OBJOFFSET)-0.5D0)
                FIRST = MAX(1,CENTRE+1-OBJWIDTH/2)
@@ -496,13 +491,13 @@
                IF (PERISCOPE) THEN
                   DO J = FIRST,LAST
                      MASK(I,J) = FORDER + 1.0 + MOD(TRACK,2)
-                  ENDDO
+                  END DO
                ELSE
                   DO J = FIRST,LAST
                      MASK(I,J) = FORDER + 1.0
-                  ENDDO
-               ENDIF
-            ENDIF
+                  END DO
+               END IF
+            END IF
 *
 *           Now the two sky regions are each handled inexactly the same
 *           way. If PERISCOPE is TRUE the sky widths will be zero and note
@@ -516,30 +511,30 @@
                LAST = MIN(NY,CENTRE+S1WIDTH/2)
                DO J = FIRST,LAST
                   MASK(I,J) = FORDER + 2.0
-               ENDDO
+               END DO
             ELSE
                CENTRE = NINT(MID+DBLE(S1OFFSET)-0.5D0)
                FIRST = MAX(1,CENTRE+1-S1WIDTH/2)
                LAST = MIN(NY,CENTRE+S1WIDTH/2)
                DO J = FIRST,LAST
                   MASK(I,J) = FORDER + 2.0
-               ENDDO
-            ENDIF
+               END DO
+            END IF
             IF (MOD(S2WIDTH,2).EQ.1) THEN
                CENTRE = NINT(MID+DBLE(S2OFFSET))
                FIRST = MAX(1,CENTRE-S2WIDTH/2)
                LAST = MIN(NY,CENTRE+S2WIDTH/2)
                DO J = FIRST,LAST
                   MASK(I,J) = FORDER + 2.0
-               ENDDO
+               END DO
             ELSE
                CENTRE = NINT(MID+DBLE(S2OFFSET)-0.5D0)
                FIRST = MAX(1,CENTRE+1-S2WIDTH/2)
                LAST = MIN(NY,CENTRE+S2WIDTH/2)
                DO J = FIRST,LAST
                   MASK(I,J) = FORDER + 2.0
-               ENDDO
-            ENDIF
-         ENDDO
-      ENDDO
+               END DO
+            END IF
+         END DO
+      END DO
       END

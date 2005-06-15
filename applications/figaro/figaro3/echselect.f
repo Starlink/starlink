@@ -77,77 +77,86 @@ C     (Note that this program cannot cope with zeroth order!).  This
 C     file is also that read if PREVIOUS is specified.
 C
 C  History:
-C     13th Feb 1989.  KS / AAO.  Original version.
-C     3rd  Sep 1992.  HME / UoE, Starlink.  INCLUDE changed.
-C                     Open output file without CARRIAGECONTROL.
-C                     Read from or write to echselect.lis (lowercase).
-C                     Open help file with lowercase name.
-C                     PGASK is banned from ADAM, commented out.
-C     25th Jan 1993.  HME / UoE, Starlink.  Put PGASK back in.
-C     20th Jul 1993.  HME / UoE, Starlink.  Before reading a previous
-C                     selection, the array was not initialised properly.
-C                     Fixed.  Also, if opening the output echselect.lis
-C                     fails, try to delete an existing file of that name
-C                     and then try again to open a new one.
-C     27th Jul 1993.  HME / UoE, Starlink.  Disuse GKD_* except
-C                     GKD_WRITE_LINE. Disuse PAR_Q*, use PAR_ABORT.
-C                     Added parameters DISNCHAN, MOVETOX, ORDER, LOW,
-C                     HIGH, ADD, CLEAR, QUITSEL.
-C     26th Sep 2001.  ACD / UoE, Starlink.  Removed unused variable CARRYON.
+C     13th Feb 1989  KS / AAO.  Original version.
+C     3rd  Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C                    Open output file without CARRIAGECONTROL.
+C                    Read from or write to echselect.lis (lowercase).
+C                    Open help file with lowercase name.
+C                    PGASK is banned from ADAM, commented out.
+C     25th Jan 1993  HME / UoE, Starlink.  Put PGASK back in.
+C     20th Jul 1993  HME / UoE, Starlink.  Before reading a previous
+C                    selection, the array was not initialised properly.
+C                    Fixed.  Also, if opening the output echselect.lis
+C                    fails, try to delete an existing file of that name
+C                    and then try again to open a new one.
+C     27th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* except
+C                    GKD_WRITE_LINE. Disuse PAR_Q*, use PAR_ABORT.
+C                    Added parameters DISNCHAN, MOVETOX, ORDER, LOW,
+C                    HIGH, ADD, CLEAR, QUITSEL.
+C     26th Sep 2001  ACD / UoE, Starlink.  Removed unused variable
+C                    CARRYON.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       SUBROUTINE ECHSELECT
 C
       IMPLICIT NONE
-C
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+CC
 C     Functions used
 C
       LOGICAL   PAR_ABORT
-      INTEGER   DSA_TYPESIZE, DYN_ELEMENT, PGBEGIN
-C
-C     Dynamic memory include file - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DSA_TYPESIZE, PGBEGIN
 C
 C     Local variables
 C
-      INTEGER   ADDRESS       ! Used for all virtual memory addresses
-      CHARACTER CHARS(2)*16   ! Units and label for axis
-      INTEGER   CODE          ! Status returned by file I/O routines
-      INTEGER   CPTR          ! Dynamic mem element for collapsed data
-      CHARACTER DEVICE*32     ! Plot device specification
-      INTEGER   DIMS(2)       ! Image, then collapsed echellogram dimensions
+      CHARACTER CHARS(2)*16      ! Units and label for axis
+      INTEGER   CODE             ! Status returned by file I/O routines
+      INTEGER   CPTR             ! Dynamic-memory pointer for collapsed 
+                                 ! data
+      CHARACTER DEVICE*32        ! Plot device specification
+      INTEGER   DIMS(2)          ! Image, then collapsed echellogram 
+                                 ! dimensions
       DOUBLE    PRECISION DUMMY  ! Numeric array for DSA-SET_AXIS_INFO
-      LOGICAL   FAULT         ! Flags a non-DSA system fault
-      INTEGER   IGNORE        ! Used for don't care status returns
-      INTEGER   IPTR          ! Dynamic mem element for image data
-      INTEGER   IXEN          ! Last cross-section used in collapse
-      INTEGER   IXST          ! First cross-section used in collapse
-      INTEGER   MAXORD        ! Highest order number selected
-      INTEGER   MINORD        ! Lowest order number selected
-      INTEGER   NDIM          ! Number of image dimensions
-      INTEGER   NELM          ! Number of image elements - ignored
-      INTEGER   NORD          ! Number of orders selected
-      INTEGER   NX            ! First dimension of image
-      INTEGER   NY            ! Second dimension of image
-      INTEGER   MDELTA        ! Value of MDELTA parameter
-      INTEGER   MSTART        ! Value of MSTART parameter
-      INTEGER   OPTR          ! Dynamic mem element for order number array
-      LOGICAL   PGOPEN        ! Indicates PGPLOT was opened
-      INTEGER   PG_STATUS     ! Status from PGBEGIN call
-      LOGICAL   PREV          ! Value of PREVIOUS keyword
-      LOGICAL   SKY           ! Indicates SKY orders were selected
-      INTEGER   SLOT          ! Used for all DSA system slots - ignored
-      INTEGER   SPTR          ! Dynamic mem element for spectrum data
-      INTEGER   STATUS        ! Inherited status for DSA routines
-      CHARACTER STRUCTURE*128 ! Full name of image data structure
-      REAL      VALUE         ! Real value obtained from parameter system
-      INTEGER   VAR_STATUS    ! Status for VAR routines
-      LOGICAL   WHOLE         ! Value of WHOLE keyword
-      INTEGER   WPTR          ! Dynamic mem element for orders array
-      REAL      XEND          ! Last axis value used in collapse
-      INTEGER   XPTR          ! Dynamic mem element for image Y-axis data
-      REAL      XSTART        ! First axis value used in collapse
-      INTEGER   YPTR          ! Dynamic mem element for output Y-axis data
+      LOGICAL   FAULT            ! Flags a non-DSA system fault
+      INTEGER   IGNORE           ! Used for don't care status returns
+      INTEGER   IPTR             ! Dynamic-memory pointer for image data
+      INTEGER   IXEN             ! Last cross-section used in collapse
+      INTEGER   IXST             ! First cross-section used in collapse
+      INTEGER   MAXORD           ! Highest order number selected
+      INTEGER   MINORD           ! Lowest order number selected
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of image elements - ignored
+      INTEGER   NORD             ! Number of orders selected
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   MDELTA           ! Value of MDELTA parameter
+      INTEGER   MSTART           ! Value of MSTART parameter
+      INTEGER   OPTR             ! Dynamic-memory pointer for order
+                                 ! number array
+      LOGICAL   PGOPEN           ! Indicates PGPLOT was opened
+      INTEGER   PG_STATUS        ! Status from PGBEGIN call
+      LOGICAL   PREV             ! Value of PREVIOUS keyword
+      LOGICAL   SKY              ! Indicates SKY orders were selected
+      INTEGER   SLOT             ! Used for all DSA system slots - 
+                                 ! ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
+                                 ! data
+      INTEGER   STATUS           ! Inherited status for DSA routines
+      CHARACTER STRUCTURE*128    ! Full name of image data structure
+      REAL      VALUE            ! Real value obtained from parameter
+                                 ! system
+      INTEGER   VAR_STATUS       ! Status for VAR routines
+      LOGICAL   WHOLE            ! Value of WHOLE keyword
+      INTEGER   WPTR             ! Dynamic-memory pointer for orders
+                                 ! array
+      REAL      XEND             ! Last axis value used in collapse
+      INTEGER   XPTR             ! Dynamic-memory pointer for image
+                                 ! Y-axis data
+      REAL      XSTART           ! First axis value used in collapse
+      INTEGER   YPTR             ! Dynamic-memory pointer for output
+                                 ! Y-axis data
 C
 C     Flag values for DSA_OUTPUT
 C
@@ -182,8 +191,7 @@ C
 C
 C     Get workspace for the orders array (pointed to by WPTR)
 C
-      CALL DSA_GET_WORK_ARRAY (NY,'INT',ADDRESS,SLOT,STATUS)
-      WPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (NY,'INT',WPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Do we want to use data from a previous run?
@@ -191,7 +199,8 @@ C
       CALL PAR_RDKEY('PREVIOUS',.FALSE.,PREV)
       IF (PAR_ABORT()) GO TO 500
       IF (PREV) THEN
-         CALL FIG_ECS_READ ('echselect.lis',NY,DYNAMIC_MEM(WPTR),CODE)
+         CALL FIG_ECS_READ ('echselect.lis',NY,%VAL(CNF_PVAL(WPTR)),
+     :                      CODE)
          IF (CODE.GT.2) PREV=.FALSE.
       END IF
 C
@@ -209,25 +218,22 @@ C     Map the data array, get workspace for the collapsed data,
 C     and collapse it along the spectral direction, scaling it by
 C     the number of cross-sections involved.
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR = DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY (NY,'FLOAT',ADDRESS,SLOT,STATUS)
-      SPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NY,'FLOAT',SPTR,SLOT,STATUS)
       CALL PAR_RDKEY ('WHOLE',.FALSE.,WHOLE)
       CALL DSA_AXIS_RANGE ('IMAGE',1,' ',WHOLE,XSTART,XEND,IXST,
-     :                                                    IXEN,STATUS)
+     :                     IXEN,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      CALL FIG_YTRACT (DYNAMIC_MEM(IPTR),NX,NY,IXST,IXEN,
-     :                                              DYNAMIC_MEM(SPTR))
-      CALL GEN_MULCAF (DYNAMIC_MEM(SPTR),NY,1./(IXEN-IXST+1),
-     :                                              DYNAMIC_MEM(SPTR))
+      CALL FIG_YTRACT (%VAL(CNF_PVAL(IPTR)),NX,NY,IXST,IXEN,
+     :                 %VAL(CNF_PVAL(SPTR)))
+      CALL GEN_MULCAF (%VAL(CNF_PVAL(SPTR)),NY,1./(IXEN-IXST+1),
+     :                 %VAL(CNF_PVAL(SPTR)))
 C
 C     Get an axis array to display the spectrum against
 C
-      CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',ADDRESS,
-     :                                                 SLOT,STATUS)
-      XPTR = DYN_ELEMENT(ADDRESS)
-C
+      CALL DSA_MAP_AXIS_DATA ('IMAGE',2,'READ','FLOAT',XPTR,
+     :                        SLOT,STATUS)
+
 C     Get the parameters for the orders
 C
       CALL PAR_RDVAL ('MSTART',0.0,1000.0,0.0,'Order number',VALUE)
@@ -240,8 +246,9 @@ C     FIG_ESDISP runs an interactive loop that continues until the user
 C     indicates that he is happy with the selection.  Note that WPTR
 C     points to the array called ORDERS in all the subroutines.
 C
-      CALL FIG_ESDISP (DYNAMIC_MEM(SPTR),DYNAMIC_MEM(XPTR),NY,PREV,
-     :          MSTART,MDELTA,MINORD,MAXORD,SKY,DYNAMIC_MEM(WPTR))
+      CALL FIG_ESDISP (%VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(XPTR)),NY,
+     :                 PREV,MSTART,MDELTA,MINORD,MAXORD,SKY,
+     :                 %VAL(CNF_PVAL(WPTR)))
       IF (PAR_ABORT()) GO TO 500     ! User requested abort
 C
 C     Quit now if no selections were made
@@ -251,15 +258,15 @@ C
 C     Write out the selections to a new version of the file
 C
       CALL DSA_GET_ACTUAL_NAME ('IMAGE',STRUCTURE,STATUS)
-      CALL FIG_ECS_WRITE ('echselect.lis',STRUCTURE,DYNAMIC_MEM(WPTR),
-     :                                                          NY,CODE)
+      CALL FIG_ECS_WRITE ('echselect.lis',STRUCTURE,
+     :                    %VAL(CNF_PVAL(WPTR)),NY,CODE)
 C
 C     Once the selection has been made, the output structures can
-C     be created.  
+C     be created.
 C
       NORD=MAXORD-MINORD+1
       CALL DSA_OUTPUT ('OBJOUT','OBJOUT','IMAGE',NO_DATA,NEW_FILE,
-     :                                                       STATUS)
+     :                 STATUS)
       DIMS(1) = NX
       DIMS(2) = NORD
       CALL DSA_RESHAPE_DATA ('OBJOUT','IMAGE',2,DIMS,STATUS)
@@ -268,16 +275,14 @@ C
 C     Get workspace for the orders array and fill it, then create
 C     the orders axis structure for the output.
 C
-      CALL DSA_GET_WORK_ARRAY (NORD,'FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (NORD,'FLOAT',OPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      CALL FIG_FILL_ORDS (MINORD,NORD,MDELTA,DYNAMIC_MEM(OPTR))
-      CALL DSA_MAP_AXIS_DATA ('OBJOUT',2,'WRITE','FLOAT',ADDRESS,SLOT,
-     :                                                          STATUS)
-      YPTR = DYN_ELEMENT(ADDRESS)
+      CALL FIG_FILL_ORDS (MINORD,NORD,MDELTA,%VAL(CNF_PVAL(OPTR)))
+      CALL DSA_MAP_AXIS_DATA ('OBJOUT',2,'WRITE','FLOAT',YPTR,SLOT,
+     :                        STATUS)
       IF (STATUS.NE.0) GO TO 500
       CALL GEN_MOVE (NORD*DSA_TYPESIZE('FLOAT',STATUS),
-     :                             DYNAMIC_MEM(OPTR),DYNAMIC_MEM(YPTR))
+     :               %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(YPTR)))
       CHARS(1) = ' '
       CHARS(2) = 'Order number'
       CALL DSA_SET_AXIS_INFO ('OBJOUT',2,2,CHARS,0,DUMMY,STATUS)
@@ -285,11 +290,11 @@ C
 C     Now create the collapsed object echellogram in the output
 C     structure data array
 C
-      CALL DSA_MAP_DATA ('OBJOUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      CPTR = DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('OBJOUT','WRITE','FLOAT',CPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      CALL FIG_ECS_OBJ (DYNAMIC_MEM(IPTR),NX,NY,MINORD,NORD,MDELTA,
-     :                   .TRUE.,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(CPTR))
+      CALL FIG_ECS_OBJ (%VAL(CNF_PVAL(IPTR)),NX,NY,MINORD,NORD,MDELTA,
+     :                  .TRUE.,%VAL(CNF_PVAL(WPTR)),
+     :                   %VAL(CNF_PVAL(CPTR)))
 C
 C     If any sky cross-sections were selected, repeat for the sky
 C     collapsed echellogram.  Note that some of the work has already
@@ -298,22 +303,20 @@ C     element OPTR, and CHARS is already set up.
 C
       IF (SKY) THEN
          CALL DSA_OUTPUT ('SKYOUT','SKYOUT','IMAGE',NO_DATA,NEW_FILE,
-     :                                                         STATUS)
+     :                    STATUS)
          CALL DSA_RESHAPE_DATA ('SKYOUT','IMAGE',2,DIMS,STATUS)
          CALL DSA_RESHAPE_AXIS ('SKYOUT',1,'IMAGE',1,1,NX,STATUS)
          CALL DSA_MAP_AXIS_DATA ('SKYOUT',2,'WRITE','FLOAT',
-     :                                            ADDRESS,SLOT,STATUS)
-         YPTR = DYN_ELEMENT(ADDRESS)
+     :                           YPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
          CALL GEN_MOVE (NORD*DSA_TYPESIZE('FLOAT',STATUS),
-     :                             DYNAMIC_MEM(OPTR),DYNAMIC_MEM(YPTR))
+     :                  %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(YPTR)))
          CALL DSA_SET_AXIS_INFO ('SKYOUT',2,2,CHARS,0,DUMMY,STATUS)
-         CALL DSA_MAP_DATA ('SKYOUT','WRITE','FLOAT',ADDRESS,SLOT,
-     :                                                          STATUS)
-         CPTR = DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA ('SKYOUT','WRITE','FLOAT',CPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
-         CALL FIG_ECS_OBJ (DYNAMIC_MEM(IPTR),NX,NY,MINORD,NORD,MDELTA,
-     :                     .FALSE.,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(CPTR))
+         CALL FIG_ECS_OBJ (%VAL(CNF_PVAL(IPTR)),NX,NY,MINORD,NORD,
+     :                     MDELTA,.FALSE.,%VAL(CNF_PVAL(WPTR)),
+     :                     %VAL(CNF_PVAL(CPTR)))
       END IF
 C
 C     Exit

@@ -68,9 +68,10 @@
 *
 *     (>) IMAGE         (File) The name of the raw echelle image.
 *     (>) YSTART        (Integer) The starting and ending Y positions to
-*     (>) YEND          (Integer) search for orders. Default entire image.
-*     (>) PERISCOPE     (Keyword) Whether or not the periscope is fitted.
-*                       Default TRUE.
+*     (>) YEND          (Integer) search for orders. Default entire 
+*                       image.
+*     (>) PERISCOPE     (Keyword) Whether or not the periscope is
+*                       fitted. Default TRUE.
 *     (>) MSTART        (Integer) The order number of the first
 *                       "spectrum" in the coefficient file. Default 1.
 *     (>) MDELTA        (Integer) +1 if order numbers increase as
@@ -107,26 +108,34 @@
 *  Version date: 23-Nov-89
 *-
 *  History:
-*    31 May 1988 WFL.  Original version.
-*    14 Sep 1988 WFL.  Add comments to main routine
-*    23 Nov 1989 KS.  Change use of DIMS as arguments to FIG_FINDTRACK,
-*                since new version of Fortran compiler no longer
-*                allows variables used in dummy array declarators 
-*                to be array elements.  (I think this is a bug!)
-*    24 Sep 1992 HME.  Lowercase file names. Replace call to
-*                discontinued M01AAF by call to M01DAF. Change CALL EXIT
-*                into RETURN. (!) Output default lowercase, output
-*                lowercase extension (mask.dst). Input lowercase
-*                extension. SDIST file sdist.dat, OPEN statements
-*                without CARRIAGECONTROL keyword.
-*    03 Aug 1993 HME.  Convert to DSA, use PAR_ABORT.
-*    18 Apr 1995 HME.  No longer use NAG, need more workspace for
-*                FIG_DXYFIT.
-*    20 Mar 1996 HME.  Fixed broken format string (the line just broke in
-*                the middle of the string, now two strings are concatenated.)
-*    18 Jul 1996 MJCL / Starlink, UCL.  Set variables for storage of
-*                file names to 132 chars.
+*     31 May 1988  WFL.  Original version.
+*     14 Sep 1988  WFL.  Add comments to main routine
+*     23 Nov 1989  KS.  Change use of DIMS as arguments to 
+*                  FIG_FINDTRACK, since new version of Fortran compiler 
+*                  no longer allows variables used in dummy array 
+*                  declarators to be array elements.  (I think this is a
+*                  bug!)
+*     24 Sep 1992  HME.  Lowercase file names. Replace call to
+*                  discontinued M01AAF by call to M01DAF. Change CALL
+*                  EXIT into RETURN. (!) Output default lowercase,
+*                  output lowercase extension (mask.dst). Input
+*                  lowercase extension. SDIST file sdist.dat, OPEN 
+*                  statements without CARRIAGECONTROL keyword.
+*     03 Aug 1993  HME.  Convert to DSA, use PAR_ABORT.
+*     18 Apr 1995  HME.  No longer use NAG, need more workspace for
+*                  FIG_DXYFIT.
+*     20 Mar 1996  HME.  Fixed broken format string (the line just broke
+*                  in the middle of the string, now two strings are 
+*                  concatenated.)
+*     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+*                  file names to 132 chars.
+*     2005 June 14 MJC / Starlink  Use CNF_PVAL for pointers to
+*                  mapped data.
 *+
+
+      IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
       INTEGER MAXDIMS
       PARAMETER (MAXDIMS=2)
@@ -134,8 +143,6 @@
 *     Functions and local variables.
 *
       LOGICAL PAR_ABORT
-      INTEGER DYN_ELEMENT
-      INTEGER ADDRESS
       INTEGER INPTR,NDIMS,DIMS(2),YSTART,YEND,MSTART
       INTEGER MDELTA,MINHW
       INTEGER NELM
@@ -146,10 +153,6 @@
       REAL THRESH,VALUE
       CHARACTER OUTFILE*132
 *
-*     Dynamic memory include file.
-*
-      INCLUDE 'DYNAMIC_MEMORY'
-*
 *     Open DSA.
 *
       STATUS=0
@@ -159,8 +162,7 @@
 *
       CALL DSA_INPUT('IMAGE','IMAGE',STATUS)
       CALL DSA_DATA_SIZE('IMAGE',MAXDIMS,NDIMS,DIMS,NELM,STATUS)
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      INPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',INPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 9999
 *
 *     Determine whether the periscope is mounted. If it then each order
@@ -203,7 +205,7 @@
          CALL PAR_RDCHAR('OUTFILE',' ',OUTFILE)
          IF (PAR_ABORT()) GO TO 9999
          OPEN(UNIT=10,FILE=OUTFILE,STATUS='NEW')
-      ENDIF
+      END IF
 
       CALL PAR_RDVAL('THRESH',0.0,1.0E37,1000.0,' ',THRESH)
       IF (PAR_ABORT()) GO TO 9999
@@ -229,16 +231,14 @@
 *
 *        Map the output data array
 *
-         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',
-     :      ADDRESS,SLOT,STATUS)
-         OUTPTR=DYN_ELEMENT(ADDRESS)
+         CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OUTPTR,
+     :                     SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 9999
-      ENDIF
+      END IF
 
-      CALL FIG_FINDTRACK(DYNAMIC_MEM(INPTR),DIMS(1),DIMS(2),
-     :   PERISCOPE,YSTART,
-     :   YEND,MSTART,MDELTA,SDIST,THRESH,MINHW,DOMASK,
-     :   DYNAMIC_MEM(OUTPTR))
+      CALL FIG_FINDTRACK(%VAL(CNF_PVAL(INPTR)),DIMS(1),DIMS(2),
+     :                   PERISCOPE,YSTART,YEND,MSTART,MDELTA,SDIST,
+     :                   THRESH,MINHW,DOMASK,%VAL(CNF_PVAL(OUTPTR)))
 
 
 9999  CONTINUE
@@ -281,14 +281,14 @@
          XCUT(I) = 0.0
          DO J = -XAVE,+XAVE
             XCUT(I) = XCUT(I) + IMAGE(IMID+J,I)
-         ENDDO
+         END DO
          XCUT(I) = XCUT(I) / FLOAT(XAVE+1+XAVE)
 *        DO J = -XMED,+XMED
 *           XSLICE(J) = IMAGE(IMID+J,I)
-*        ENDDO        
+*        END DO        
 *        CALL GEN_QFSORT(XSLICE,XMED+1+XMED)
 *        XCUT(I) = XSLICE(0)
-      ENDDO
+      END DO
 
       CALL PAR_WRUSER('Finding orders...',STATUS)
       CALL FIND_ORDERS(XCUT(YSTART),YEND-YSTART+1,MINHW,THRESH,START,
@@ -297,7 +297,7 @@
          START(ITRACK) = START(ITRACK) + YSTART - 1
          END(ITRACK) = END(ITRACK) + YSTART - 1
          CENTRE(ITRACK) = CENTRE(ITRACK) + YSTART - 1
-      ENDDO
+      END DO
 
       WRITE(CHARS,'(''Found'',I3,'' tracks'')') NUM
       CALL PAR_WRUSER(CHARS,STATUS)
@@ -307,12 +307,12 @@
          WRITE(10,'(''Found'',I3,'' tracks'')') NUM
          WRITE(10,'(2I5,1PG14.6))') (START(ITRACK),END(ITRACK),
      +                             CENTRE(ITRACK),ITRACK=1,NUM)
-      ENDIF
+      END IF
 
       IF(NUM.GT.0)THEN
          DO ITRACK = 1,NUM
             WIDTH(ITRACK) = END(ITRACK) - START(ITRACK)
-         ENDDO                          
+         END DO                          
          CALL GEN_QFSORT(WIDTH,NUM)
          IF(NUM.GT.2)THEN
             ORHWID = WIDTH(NUM-2) / 2.0
@@ -320,17 +320,17 @@
             ORHWID = (WIDTH(1) + WIDTH(2)) / 4.0
          ELSE
             ORHWID = WIDTH(1) / 2.0
-         ENDIF
-      ENDIF
+         END IF
+      END IF
 
       IF(DOMASK)THEN
          CALL PAR_WRUSER('Clearing output array...',STATUS)
          DO I=1,DIMS(2)
             DO J=1,DIMS(1)
                OUTPUT(J,I) = 0.0
-            ENDDO
-         ENDDO
-      ENDIF
+            END DO
+         END DO
+      END IF
 
       CALL PAR_WRUSER('Tracking orders...',STATUS)
       DO ITRACK=1,NUM
@@ -339,13 +339,13 @@
      +                                                 MOD(ITRACK,2)
          ELSE
             IORD = 10 * (MSTART + MDELTA * (ITRACK - 1))
-         ENDIF
+         END IF
 
          WRITE(CHARS,'(''Tracking order '',I5)') IORD
          CALL PAR_WRUSER(CHARS,STATUS)
          IF(.NOT.SDIST)THEN
             WRITE(10,'(''Tracking order '',I5)') IORD
-         ENDIF
+         END IF
 
          NP=0
          IHWID=(END(ITRACK)-START(ITRACK))/2
@@ -365,8 +365,8 @@
                  DO M=J-XAVE,J+XAVE
                    RMAX=RMAX+IMAGE(M,L)
                    TMAX=TMAX+IMAGE(M,L)*L
-                 ENDDO
-               ENDDO
+                 END DO
+               END DO
 
                IF(RMAX.GT.20.0)THEN
                   CEN=TMAX/RMAX
@@ -377,22 +377,22 @@
                   J=J+JD
                ELSE
                   J=J+ISIGN(1,JD)
-               ENDIF          
+               END IF          
 
-            ENDDO
+            END DO
             JS=IMID-1
             JE=1
             JD=-IRES
-         ENDDO
+         END DO
 
          IF(.NOT.SDIST)THEN
             WRITE(10,'(''Fitting with '',I5,'' points'')') NP
-         ENDIF
+         END IF
          CALL GEN_QFISORT(MIDX,NP,IP)
          DO I=1,NP
             SMIDX(I)=MIDX(IP(I))
             SMIDY(I)=MIDY(IP(I))
-         ENDDO
+         END DO
          CALL FIG_DXYFIT (SMIDX,SMIDY,NP,IDEG,IW,W,W1,AK,ADEG)
 
          IF(SDIST)THEN
@@ -405,7 +405,7 @@
             WRITE(10,'(5I5,<ADEG+1>(1PG14.6))') IORD,(END(ITRACK)-
      +             START(ITRACK)+1),NINT(SMIDX(1)),NINT(SMIDX(NP)),
      +                                      ADEG,(AK(I),I=1,ADEG+1)
-         ENDIF
+         END IF
 *
 *     If requested, fill in the output array.
 *
@@ -416,10 +416,10 @@
                DO J=MAX(YSTART,NINT(MID-ORHWID)),
      +              MIN(YEND,NINT(MID+ORHWID))
                   OUTPUT(I,J)=FLOAT(IORD)
-               ENDDO
-            ENDDO
-         ENDIF
-      ENDDO
+               END DO
+            END DO
+         END IF
+      END DO
 
       CLOSE(UNIT=10)
 
@@ -439,7 +439,7 @@
          STATUS=FIND_ORDER(VALS,NV,W,THRESH,IST,START(NUM+1),END(NUM+1),
      +                             CENTRE(NUM+1))
          IF(STATUS.EQ.0) NUM=NUM+1
-      ENDDO
+      END DO
       RETURN
       END
 
@@ -457,13 +457,13 @@
       DO WHILE(MED.GE.THRESH.AND.IP.LE.NV-W)
          CALL MEDIAN(VALS(IP-W),2*W+1,MED)
          IP=IP+1
-      ENDDO
+      END DO
       IF(MED.LT.THRESH)THEN
          IP=IP-1
       ELSE
          FIND_ORDER=1
          RETURN
-      ENDIF
+      END IF
 *
 *    We are definitely in an inter-order gap now so start looking
 *    for the rising edge of the next order profile
@@ -471,13 +471,13 @@
       DO WHILE(MED.LT.THRESH.AND.IP.LE.NV-W)
          CALL MEDIAN(VALS(IP-W),2*W+1,MED)
          IP=IP+1
-      ENDDO
+      END DO
       IF(MED.GE.THRESH)THEN
          IP=IP-1
       ELSE
          FIND_ORDER=1
          RETURN
-      ENDIF
+      END IF
       START=IP
 *
 *    Now search for the falling edge at the other side of the profile
@@ -485,13 +485,13 @@
       DO WHILE(MED.GE.THRESH.AND.IP.LE.NV-W)
          CALL MEDIAN(VALS(IP-W),2*W+1,MED)
          IP=IP+1
-      ENDDO
+      END DO
       IF(MED.LT.THRESH)THEN
          IP=IP-1
       ELSE
          FIND_ORDER=1
          RETURN
-      ENDIF
+      END IF
       END=IP-1
 *
 *    Having found the two edges of the order we can calculate the
@@ -502,14 +502,14 @@
       DO I=START,END
          SUMP=SUMP+VALS(I)
          SUMM=SUMM+VALS(I)*I
-      ENDDO
+      END DO
       IF(SUMM.NE.0.0)THEN
          CENTRE=SUMM/SUMP
       ELSE
          CENTRE=(START+END)/2.0
-      ENDIF
+      END IF
       FIND_ORDER=0
-      RETURN
+
       END
 
       SUBROUTINE MEDIAN(VALS,NV,MED)
@@ -521,8 +521,7 @@
 *  Must use a duplicate, because GEN_QFMED rearranges the array.
       DO I=1,NV
          DVALS(I)=VALS(I)
-      ENDDO
+      END DO
       MED=GEN_QFMED(DVALS,NV)
 
-      RETURN
       END
