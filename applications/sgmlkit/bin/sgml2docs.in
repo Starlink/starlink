@@ -384,7 +384,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: dvi2bitmap version is $d2bv"
     echo "$PROGNAME:I: LATEX=$LATEX"
     echo "$PROGNAME:I: BIBTEX=$BIBTEX"
-    echo "$PROGNAME:I: BSTINPUTS=$BSTINPUTS
+    echo "$PROGNAME:I: BSTINPUTS=$BSTINPUTS"
     echo "$PROGNAME:I: BIBINPUTS=$BIBINPUTS"
     echo "$PROGNAME:I: PYTHON=$PYTHON"
     echo "$PROGNAME:I: WORKDIR=$WORKDIR"
