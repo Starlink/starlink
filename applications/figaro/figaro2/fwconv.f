@@ -145,7 +145,7 @@ C
       IF (INTYPE.EQ.OUTYPE) THEN
          CALL PAR_WRUSER('Input and output units identical',IGNORE)
          GOTO 500
-      ENDIF
+      END IF
 C
 C     Check on the units of the X data array, and on the
 C     dimensions of the array - we can only handle the simpler cases here,

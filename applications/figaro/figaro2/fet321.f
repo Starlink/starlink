@@ -4,8 +4,8 @@ C
 C     F E T 3 2 1
 C
 C     Given a FIGS data cube as produced by the FIGS data acquisition
-C     system running in one of the etalon modes, processes it to produce 
-C     a single spectrum, for one of the detectors only.
+C     system running in one of the etalon modes, processes it to 
+C     produce a single spectrum, for one of the detectors only.
 C
 C     Command parameters -
 C
@@ -63,7 +63,8 @@ C                    status from LIB$... as logical.
 C     21st Jul 1993  HME / UoE, Starlink.  Don't call GEN_ERRMSG any
 C                    more if LIB$GET/FREE_VM fail.
 C     28th Jul 1993  HME / UoE, Starlink.  Use DSA_ to get workspaces.
-C      3rd Aug 1993  HME / UoE, Starlink.  Convert to DSA, use PAR_ABORT.
+C      3rd Aug 1993  HME / UoE, Starlink.  Convert to DSA, use 
+C                    PAR_ABORT.
 C     13th Mar 1996  HME / UoE, Starlink.  Adapt to FDA library.
 C                    No error messages from DTA. Call PAR_WRUSER instead
 C                    of FIG_DTAERR.
@@ -310,7 +311,7 @@ C
       ELSE
          EXPTR=WPTR+4*NELM*NT
          NUMPTR=EXPTR+4*NELM*NT
-      ENDIF
+      END IF
 C
 C     Perform the basic processing of the cube down to either
 C     an image or a spectrum.
@@ -480,11 +481,11 @@ C
                   IF (.NOT. EXCLUDE(IX,IT)) THEN
                      SUM=SUM+IMAGE(IX,IT)
                      NSUM=NSUM+1
-                  ENDIF
+                  END IF
                END DO
             END DO
             SUM=SUM/NSUM
-         ENDIF
+         END IF
          CALL GEN_FILL(NELM*4,0,SPECT)
          CALL GEN_FILL(NELM*4,0,NUM_CYCLES)
          DO IT=1,NT
@@ -492,7 +493,7 @@ C
                IF (.NOT. EXCLUDE(IX,IT)) THEN
                    SPECT(IX)=SPECT(IX)+IMAGE(IX,IT)
                    NUM_CYCLES(IX)=NUM_CYCLES(IX)+1
-               ENDIF
+               END IF
             END DO
          END DO
          DO IX=1,NELM
@@ -511,7 +512,7 @@ C
                      IF (.NOT. EXCLUDE(IX,IT)) THEN
                          NF=NF+IMAGE(IX,IT)
                          NSUM = NSUM+1
-                     ENDIF
+                     END IF
                   END DO
                   NF=NF/NSUM
                   DO IX=1,NELM
@@ -523,15 +524,15 @@ C
                      IF (.NOT. EXCLUDE(IX,IT)) THEN
                         X=IMAGE(IX,IT)-SPECT(IX)
                         ERRORS(IX)=ERRORS(IX)+X*X
-                     ENDIF
+                     END IF
                   END DO
-               ENDIF
+               END IF
             END DO
             DO IX=1,NELM
                ERRORS(IX)=SQRT(ERRORS(IX)/NUM_CYCLES(IX)/
      :                     (NUM_CYCLES(IX)-1))
             END DO
-         ENDIF
+         END IF
 C
 C     Check for points to exclude - if there are any, set FINISHED to
 C     false to repeat calculation of spectrum and error
@@ -549,10 +550,10 @@ C
      :                     '('' Point'',I4,'' Cycle'',I4,'//
      :                     ' '' Excluded'')') IX,IT
                         CALL PAR_WRUSER(OUTMES,STATUS)
-                     ENDIF
-                  ENDIF
-               ENDDO     
-            ENDDO
-         ENDIF
-      ENDDO
+                     END IF
+                  END IF
+               END DO     
+            END DO
+         END IF
+      END DO
       END

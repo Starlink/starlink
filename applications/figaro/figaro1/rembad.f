@@ -218,6 +218,6 @@ C
               X2(I2)=X1(I1)
               IF (ERRUSE) E2(I2)=E1(I1)
               I2=I2+1
-          ENDIF
-      ENDDO
+          END IF
+      END DO
       END

@@ -417,7 +417,7 @@ C
                   IB(X,Y)=INVALB
                 ELSE
                   IB(X,Y)=IA(XCEN,YCEN)
-                ENDIF
+                END IF
 C
 C FOR LINEAR INTERPOLATION, OUTPUT PIXEL IS INVALID IF NEAREST INPUT
 C ------------------------
@@ -452,38 +452,38 @@ C
                         WT=(1.0-DX)*(1.0-DY)
                         SUM=SUM+IA(I,J)*WT
                         WTSUM=WTSUM+WT
-                      ENDIF
-                    ENDIF
+                      END IF
+                    END IF
                     IF(I+1.LE.NPIXA) THEN
                       IF(IA(I+1,J).NE.INVALA) THEN
                         WT=DX*(1.0-DY)
                         SUM=SUM+IA(I+1,J)*WT
                         WTSUM=WTSUM+WT
-                      ENDIF
-                    ENDIF
-                  ENDIF
+                      END IF
+                    END IF
+                  END IF
                   IF(J+1.LE.NLINEA) THEN
                     IF(I.GE.1) THEN
                       IF(IA(I,J+1).NE.INVALA) THEN
                         WT=(1.0-DX)*DY
                         SUM=SUM+IA(I,J+1)*WT
                         WTSUM=WTSUM+WT
-                      ENDIF
-                    ENDIF
+                      END IF
+                    END IF
                     IF(I+1.LE.NPIXA) THEN
                       IF(IA(I+1,J+1).NE.INVALA) THEN
                         WT=DX*DY
                         SUM=SUM+IA(I+1,J+1)*WT
                         WTSUM=WTSUM+WT
-                      ENDIF
-                    ENDIF
-                  ENDIF
+                      END IF
+                    END IF
+                  END IF
 C
 C ASSIGN WEIGHTED MEAN TO OUTPUT PIXEL (WTSUM CANNOT BE ZERO, SINCE
 C AT LEAST 1 INPUT PIXEL MUST BE VALID)
 C
                   IB(X,Y)=SUM/WTSUM
-                ENDIF
+                END IF
 C
 C FOR CONSTANT NOISE INTERPOLATION (OUTPUT NOISE INDEPENDENT OF
 C --------------------------------
@@ -535,20 +535,20 @@ C
                             WT=WX(ISHIFT)*WY(JSHIFT)
                             SUM=SUM+IA(II,JJ)*WT
                             WTSUM=WTSUM+WT
-                          ENDIF
-                        ENDIF
+                          END IF
+                        END IF
    21                 CONTINUE
-                    ENDIF
+                    END IF
    22             CONTINUE
 C
 C ASSIGN THE INTERPOLATED VALUE TO THE OUTPUT PIXEL
 C
                   IB(X,Y)=SUM/WTSUM
-                ENDIF
-              ENDIF
-            ENDIF
+                END IF
+              END IF
+            END IF
    11     CONTINUE
    12   CONTINUE
-      ENDIF
-      RETURN
+      END IF
+
       END

@@ -117,7 +117,7 @@ C
          CALL FIG_CMPCHK ('IDATA',10,NDIM,DIMS,FAULT)
       ELSE
          CALL FIG_CMPCHK ('CDATA',10,NDIM,DIMS,FAULT)
-      ENDIF
+      END IF
       IF (FAULT.OR.STATUS.NE.0) GO TO 500
 C
 C     We are going to force each dimension of the input data to match

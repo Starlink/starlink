@@ -110,7 +110,7 @@ C
       IF (VIEXIST.AND.VFEXIST) THEN 
          VEXIST=.TRUE.
          CALL PAR_WRUSER('Variances will be propagated',STATUS)
-      ENDIF
+      END IF
 C
 C     Get order for fit
 C
@@ -124,7 +124,7 @@ C
       IF (VEXIST) THEN
           CALL DSA_MAP_VARIANCE('OUTPUT','UPDATE','FLOAT',VOPTR,
      :                          VSLOT,STATUS)
-      ENDIF
+      END IF
       IF (STATUS.NE.0) GO TO 500
 C
 C
@@ -134,7 +134,7 @@ C
       IF (VEXIST) THEN
           CALL DSA_MAP_VARIANCE ('FLAT','READ','FLOAT',VFPTR,
      :                            VFSLOT,STATUS)
-      ENDIF
+      END IF
       IF (STATUS.NE.0) GO TO 500
 C
 C     Get workspace for flattening routine
