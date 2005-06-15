@@ -23,46 +23,46 @@ C     (<) SHIFT   (Numeric) The shift of the peak relative to the
 C                 center of the first element, in pixels.
 C     (<) WIDTH   (Numeric) The width of the peak, again in pixels.
 C
-C                                                 KS / AAO 29th Sept 1986
+C                                               KS / AAO 29th Sept 1986
 C
 C     Modified:
 C
-C     20th July 1987    DJA / AAO . Revised DSA_ routines - some
-C                       specifications changed.
-C     22nd July 1987    DJA / AAO . Modified dynamic memory handling -
-C                       now uses DYN_ routines.
-C     23rd Sep  1992    HME / UoE, Starlink.  TABs removed, INCLUDE changed.
-C                       Changed WXYFIT to FIG_WXYFIT.
+C     20th July 1987  DJA / AAO . Revised DSA_ routines - some
+C                     specifications changed.
+C     22nd July 1987  DJA / AAO . Modified dynamic memory handling -
+C                     now uses DYN_ routines.
+C     23rd Sep  1992  HME / UoE, Starlink.  TABs removed, INCLUDE
+C                     changed.  Changed WXYFIT to FIG_WXYFIT.
+C     2005 June 14    MJC / Starlink  Use CNF_PVAL for pointers to
+C                     mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER ICH_ENCODE, ICH_LEN , DYN_ELEMENT
+      INTEGER ICH_ENCODE, ICH_LEN
 C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Address of dynamic memory element
-      INTEGER   DIMS(10)            ! The sizes of the dimensions of the data
-      INTEGER   DPTR                ! Dynamic-memory pointer to data array
-      INTEGER   DSLOT               ! Map slot number used for data
-      REAL      DUMMY               ! REAL dummy arguement
-      INTEGER   IGNORE              ! Used to ignore status codes
-      INTEGER   INVOKE              ! Used to invoke functions
-      INTEGER   NDIM                ! Dimensionality of input data
-      INTEGER   NEXT                ! Dummy arguement for ICH_ routines
-      INTEGER   NX                  ! Number of elements in 1D array
-      INTEGER   NELM                ! Total number of elements in x-axis
-      REAL      PARSH               ! Starting shift for parabola fit
-      REAL      SHIFT               ! Distance of highest peak from 1st pixel
-      INTEGER   STATUS              ! Status return from DSA_xxx routines
-      CHARACTER STRING*80           ! Output message string
-      REAL      VALUE               ! Temporary REAL
-      REAL      WIDTH               ! Width of highest peak
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER   DIMS(10)         ! Sizes of the dimensions of the data
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number used for data
+      REAL      DUMMY            ! REAL dummy arguement
+      INTEGER   IGNORE           ! Used to ignore status codes
+      INTEGER   INVOKE           ! Used to invoke functions
+      INTEGER   NDIM             ! Dimensionality of input data
+      INTEGER   NEXT             ! Dummy arguement for ICH_ routines
+      INTEGER   NX               ! Number of elements in 1D array
+      INTEGER   NELM             ! Total number of elements in x-axis
+      REAL      PARSH            ! Starting shift for parabola fit
+      REAL      SHIFT            ! Distance of highest peak from 1st 
+                                 ! pixel
+      INTEGER   STATUS           ! Status return from DSA_xxx routines
+      CHARACTER STRING*80        ! Output message string
+      REAL      VALUE            ! Temporary REAL
+      REAL      WIDTH            ! Width of highest peak
 C
 C     Initialisation of DSA_ routines
 C
@@ -82,13 +82,12 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Determine position of peak.
 C
-      CALL FIG_FITPEAK(NX,DYNAMIC_MEM(DPTR),SHIFT,WIDTH,STATUS)
+      CALL FIG_FITPEAK(NX,%VAL(CNF_PVAL(DPTR)),SHIFT,WIDTH,STATUS)
       IF (STATUS.NE.0) THEN
          CALL PAR_WRUSER('Unable to fit peak',STATUS)
          GO TO 500
@@ -97,11 +96,11 @@ C
 C     Use parabolic analysis as starting point for gaussian convolution
 C
       PARSH=SHIFT
-      CALL FIG_GCPEAK(NX,DYNAMIC_MEM(DPTR),SHIFT,WIDTH,STATUS)
+      CALL FIG_GCPEAK(NX,%VAL(CNF_PVAL(DPTR)),SHIFT,WIDTH,STATUS)
       IF (STATUS.NE.0) THEN
          CALL PAR_WRUSER(
      :     'Failed to apply Gaussian convolution algorithm to data',
-     :                                                       STATUS)
+     :     STATUS)
          CALL PAR_WRUSER('Will use result from parabola fit.',STATUS)
          SHIFT=PARSH
       END IF

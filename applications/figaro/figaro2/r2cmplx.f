@@ -47,6 +47,7 @@
 *     ks: Keith Shortridge (AAO)
 *     jm: Jo Murray (RAL, Starlink)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     MJC: MAlcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,9 @@
 *     13 Mar 1996 (hme):
 *        Adapt to the FDA library.
 *        Map complex in single call.
+*     2005 June 14 (MJC):
+*        Use CNF_PVAL for pointers to mapped data.
+
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,68 +83,76 @@
 *-
 
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER   DSA_TYPESIZE! Number of bytes in element of given type
-      INTEGER   DYN_ELEMENT ! Dynamic memory element for give address
-      LOGICAL   FIG_SCRCHK  ! True if data array is linearly spaced
-      LOGICAL   GEN_CHKNSF  ! True if array is values 1..N
-      REAL      GEN_ELEMF   ! Gets a value from an array
-      CHARACTER GEN_NTH*2   ! Returns 'st','th','rd' etc appropriate to N
-      CHARACTER ICH_CI*12   ! Return an integer as a character string.
-      INTEGER   ICH_ENCODE  ! Encodes a value into a character string.
-      INTEGER   ICH_LEN     ! Position of last non-blank char in string.
+      INTEGER   DSA_TYPESIZE     ! Number of bytes in element of given 
+                                 ! type
+      LOGICAL   FIG_SCRCHK       ! Data array is linearly spaced?
+      LOGICAL   GEN_CHKNSF       ! Array is values 1..N?
+      REAL      GEN_ELEMF        ! Gets a value from an array
+      CHARACTER GEN_NTH*2        ! Returns 'st','th','rd' etc.
+                                 ! appropriate to N
+      CHARACTER ICH_CI*12        ! Convert integer to character string
+      INTEGER   ICH_ENCODE       ! Encodes a value into a string
+      INTEGER   ICH_LEN          ! Position of last non-blank char in 
+                                 ! string
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
-      INTEGER   ADDRESS2     ! Virtual address for data array
-      INTEGER   APTR         ! Dynamic memory element for axis data
-      INTEGER   BDOUBP       ! Number of bytes per item of type 'DOUBLE'
-      INTEGER   BFLOAT       ! Number of bytes per item of type 'FLOAT'
-      INTEGER   BYTES        ! Bytes required for an array
-      LOGICAL   CHANGE       ! True if change of shape is required
-      INTEGER   COPYDATA     ! Indicates data arrays to be copied to new file
-      INTEGER   DIMS(10)     ! Image dimensions
-      INTEGER   DIMS0(10)    ! Original data dimensions
-      LOGICAL   EXIST        ! Used to check for existence of axis structures
-      INTEGER   I            ! Do loop variable
-      INTEGER   IERR         ! Returned by VEC_
-      INTEGER   IGNORE       ! Status for VEC_
-      INTEGER   INVOKE       ! Dummy function value
-      INTEGER   IRPTR        ! Dynamic memory element for input real data
-      INTEGER   IPTR         ! Dynamic memory element for output imaginary data
-      LOGICAL   JUSTNS       ! True if axis structure contains just 1...n
-      LOGICAL   LINEAR       ! True if axis co-ords are linear
-      INTEGER   NBAD         ! Bad format conversions - ignored
-      INTEGER   NCH          ! Number of characters in a string
-      INTEGER   NDIM         ! Number of image dimensions
-      INTEGER   NELM         ! Number of elements in output real data
-      INTEGER   NELM0        ! Number of elements in input real data
-      INTEGER   NPTR         ! Next character to use in string
-      INTEGER   PREV         ! Lower acceptable dimension for NAG routines
-      INTEGER   RPTR         ! Dynamic memory element for real output data
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   SLOT1        ! Slot number for mapped data - ignored
-      LOGICAL   SPACED       ! Used to format user messages
-      INTEGER   SPTR         ! Dynamic memory element for spectrum data
-      INTEGER   STATUS       ! Running status for DSA routines
-      CHARACTER STRING*80    ! Used to format user messages
-      REAL      VEND         ! First data element in an axis array
-      REAL      VSTART       ! Last data element in an extrapolated axis array
-      DOUBLE PRECISION XY1   ! First data element in an axis array
-      DOUBLE PRECISION XYDEL ! Increment between axis data array elements
-      DOUBLE PRECISION XYLST ! Last data element in an input axis array
+      INTEGER   APTR             ! Dynamic-memory pointer for axis data
+      INTEGER   BDOUBP           ! Number of bytes per item of type
+                                 ! 'DOUBLE'
+      INTEGER   BYTES            ! Bytes required for an array
+      LOGICAL   CHANGE           ! True if change of shape is required
+      INTEGER   COPYDATA         ! Indicates data arrays to be copied to
+                                 ! new file
+      INTEGER   DIMS(10)         ! Image dimensions
+      INTEGER   DIMS0(10)        ! Original data dimensions
+      LOGICAL   EXIST            ! Axis structures exist?
+      INTEGER   I                ! Do loop variable
+      INTEGER   IERR             ! Returned by VEC_
+      INTEGER   IGNORE           ! Status for VEC_
+      INTEGER   INVOKE           ! Dummy function value
+      INTEGER   IRPTR            ! Dynamic-memory pointer for input real
+                                 ! data
+      INTEGER   IPTR             ! Dynamic-memory pointer for output
+                                 ! imaginary data
+      LOGICAL   JUSTNS           ! Axis structure contains just 1...n?
+      LOGICAL   LINEAR           ! Axis co-ords are linear?
+      INTEGER   NBAD             ! Bad format conversions - ignored
+      INTEGER   NCH              ! Number of characters in a string
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in output real
+                                 ! data
+      INTEGER   NELM0            ! Number of elements in input real data
+      INTEGER   NPTR             ! Next character to use in string
+      INTEGER   PREV             ! Lower acceptable dimension for NAG
+                                 ! routines
+      INTEGER   RPTR             ! Dynamic-memory pointer for real 
+                                 ! output data
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SLOT1            ! Slot number for mapped data - ignored
+      LOGICAL   SPACED           ! Used to format user messages
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
+                                 ! data
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER STRING*80        ! Used to format user messages
+      REAL      VEND             ! First data element in an axis array
+      REAL      VSTART           ! Last data element in an extrapolated
+                                 ! axis array
+      DOUBLE PRECISION XY1       ! First data element in an axis array
+      DOUBLE PRECISION XYDEL     ! Increment between axis data array
+                                 ! elements
+      DOUBLE PRECISION XYLST     ! Last data element in an input axis
+                                 ! array
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE
       PARAMETER (NEW_FILE=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C     
 C     Initial values
 C
@@ -202,7 +214,7 @@ C
          COPYDATA=1
       ELSE
          COPYDATA=0
-      ENDIF
+      END IF
       CALL DSA_OUTPUT('CDATA','CDATA','RDATA',COPYDATA,NEW_FILE,STATUS)
 C
 C     In the case where the array shape has been changed the data 
@@ -213,7 +225,7 @@ C     the data quality array.
 C
       IF(CHANGE)THEN
          CALL DSA_RESHAPE_DATA('CDATA','RDATA',NDIM,DIMS,STATUS)
-      ENDIF
+      END IF
 C
 C     The data array is now forced to be of type 'DOUBLE'.
 C
@@ -222,30 +234,25 @@ C
 C     Warn if the input data was already a complex structure.
 C
       CALL DSA_SEEK_IMAGINARY('RDATA',EXIST,STATUS)
-      IF(STATUS.NE.0)GOTO 500
+      IF(STATUS.NE.0) GOTO 500
       IF(EXIST)THEN
          CALL PAR_WRUSER(
      :      ' Warning: Input structure had an imaginary array',INVOKE)
-      ENDIF
+      END IF
 C
 C     Map the input real array.
 C
-      CALL DSA_MAP_DATA('RDATA','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IRPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('RDATA','READ','FLOAT',IRPTR,SLOT,STATUS)
 C
 C     Map the output real and imaginary arrays.  Note that the imaginary
 C     is mapped first to avoid possible problems with some data formats.
 C
-C     CALL DSA_MAP_IMAGINARY('CDATA','WRITE','DOUBLE',ADDRESS,SLOT,
+C     CALL DSA_MAP_IMAGINARY('CDATA','WRITE','DOUBLE',IPTR,SLOT,
 C    :                        STATUS)
-C     IPTR=DYN_ELEMENT(ADDRESS)
-C     CALL DSA_MAP_DATA('CDATA','WRITE','DOUBLE',ADDRESS,SLOT,STATUS)
-C     RPTR=DYN_ELEMENT(ADDRESS)
+C     CALL DSA_MAP_DATA('CDATA','WRITE','DOUBLE',RPTR,SLOT,STATUS)
       CALL DSA_MAP_COMPLEX('CDATA','WRITE','DOUBLE',
-     :   ADDRESS,ADDRESS2,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS2)
-      RPTR=DYN_ELEMENT(ADDRESS)
-      IF(STATUS.NE.0)GOTO 500
+     :                     RPTR,IPTR,SLOT,STATUS)
+      IF(STATUS.NE.0) GOTO 500
 C
 C     Copy the real data from the input array into the output array.
 C     If no format change is involved, then this is a simple type
@@ -254,21 +261,21 @@ C     well.  If no real input data is used, just zero the array.
 C
       IF (CHANGE) THEN
          CALL FIG_CHCOPY(NDIM,DIMS0,DIMS,NELM0,NELM,
-     :                 DYNAMIC_MEM(IRPTR),DYNAMIC_MEM(RPTR))
+     :                 %VAL(CNF_PVAL(IRPTR)),%VAL(CNF_PVAL(RPTR)))
       ELSE
          IGNORE=0
-         CALL VEC_RTOD(.FALSE.,NELM,DYNAMIC_MEM(IRPTR),
-     :      DYNAMIC_MEM(RPTR),IERR,NBAD,IGNORE)
+         CALL VEC_RTOD(.FALSE.,NELM,%VAL(CNF_PVAL(IRPTR)),
+     :                  %VAL(CNF_PVAL(RPTR)),IERR,NBAD,IGNORE)
          IF (IGNORE.NE.0) CALL ERR_ANNUL(IGNORE)
-C        CALL CNV_FMTCNV('FLOAT','DOUBLE',DYNAMIC_MEM(IRPTR),
-C    :                 DYNAMIC_MEM(RPTR),NELM,NBAD)
+C        CALL CNV_FMTCNV('FLOAT','DOUBLE',%VAL(CNF_PVAL(IRPTR)),
+C    :                   %VAL(CNF_PVAL(RPTR)),NELM,NBAD)
       END IF
 C
 C     Clear out the imaginary data
 C
       BDOUBP=DSA_TYPESIZE('DOUBLE',STATUS)
-      IF(STATUS.NE.0)GOTO 500
-      CALL GEN_FILL(NELM*BDOUBP,0,DYNAMIC_MEM(IPTR))
+      IF(STATUS.NE.0) GOTO 500
+      CALL GEN_FILL(NELM*BDOUBP,0,%VAL(CNF_PVAL(IPTR)))
 C
 C     Any axis structures may need to be extrapolated, if this is 
 C     possible.
@@ -280,23 +287,24 @@ C        Loop through the various axis structures.
 C
          DO I=1,MIN(NDIM,6)
             CALL DSA_SEEK_AXIS('RDATA',I,EXIST,STATUS)
-            IF(STATUS.NE.0)GOTO 500
+            IF(STATUS.NE.0) GOTO 500
             IF(EXIST)THEN
 C
 C           Map the existing data array.  
 C
-               CALL DSA_MAP_AXIS_DATA('RDATA',I,'READ','FLOAT',ADDRESS,
+               CALL DSA_MAP_AXIS_DATA('RDATA',I,'READ','FLOAT',APTR,
      :                                 SLOT1,STATUS)
-               APTR=DYN_ELEMENT(ADDRESS)
-               IF(STATUS.NE.0)GOTO 500
+               IF(STATUS.NE.0) GOTO 500
 C
 C              Having mapped it, get enough data from it to be able
 C              to create the new array, if it is linear.
 C
-               LINEAR=FIG_SCRCHK(DIMS0(I),DYNAMIC_MEM(APTR))
-               IF (LINEAR) JUSTNS=GEN_CHKNSF(DYNAMIC_MEM(APTR),DIMS0(I))
-               XY1=GEN_ELEMF(DYNAMIC_MEM(APTR),1)
-               XYLST=GEN_ELEMF(DYNAMIC_MEM(APTR),DIMS0(I))
+               LINEAR=FIG_SCRCHK(DIMS0(I),%VAL(CNF_PVAL(APTR)))
+               IF (LINEAR) THEN
+                  JUSTNS=GEN_CHKNSF(%VAL(CNF_PVAL(APTR)),DIMS0(I))
+               END IF
+               XY1=GEN_ELEMF(%VAL(CNF_PVAL(APTR)),1)
+               XYLST=GEN_ELEMF(%VAL(CNF_PVAL(APTR)),DIMS0(I))
 C
 C              Unmap array 
 C
@@ -329,21 +337,20 @@ C
      :                                   STATUS)
                   
                   CALL DSA_MAP_AXIS_DATA('CDATA',I,'UPDATE','FLOAT',
-     :                                    ADDRESS,SLOT,STATUS)
-                  APTR=DYN_ELEMENT(ADDRESS)
-                  IF(STATUS.NE.0)GOTO 500
+     :                                    APTR,SLOT,STATUS)
+                  IF(STATUS.NE.0) GOTO 500
 C
 C                 Now fill the new array.  Treat the case of the numbers
 C                 1..N separately, for accuracy.
                   
                   IF (JUSTNS) THEN
-                     CALL GEN_NFILLF(DIMS(I),DYNAMIC_MEM(APTR))
+                     CALL GEN_NFILLF(DIMS(I),%VAL(CNF_PVAL(APTR)))
                   ELSE
                      XYDEL=(XYLST-XY1)/DBLE(DIMS0(I)-1)
                      VSTART=XY1
                      VEND=XY1+XYDEL*(DIMS(I)-1)
                      CALL FIG_WFILL(VSTART,VEND,.FALSE.,DIMS(I),
-     :                              DYNAMIC_MEM(APTR))
+     :                              %VAL(CNF_PVAL(APTR)))
                   END IF
                   CALL DSA_UNMAP(SLOT1,STATUS)
                END IF

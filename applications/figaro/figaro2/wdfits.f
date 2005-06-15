@@ -19,8 +19,8 @@ C     appropriate CDELTn, CRPIXn and CRVALn keywords.  Non-linear axis
 C     data will be ignored. The only other information written into
 C     the FITS header will be taken from the FITS-specific data 
 C     structure, should the structure contain one.  Any entries in this 
-C     structure that can reasonably be output as header quantities (arrays 
-C     of data cannot) will be.  
+C     structure that can reasonably be output as header quantities 
+C     (arrays of data cannot) will be.  
 C
 C     If the end of the tape is reached while the data is being written,
 C     the tape is backspaced to the start of the image data and an
@@ -60,61 +60,68 @@ C                     into CRVALn etc. keywords.
 C     29th May 1985.  KS / AAO. Integer values now output as integers,
 C                     instead of in floating point format.
 C     10th June 1985. KS / AAO. Comments now allowed for axis values.
-C     20th Sept 1985. KS / AAO. 16BIT added.  'DBLE' changed to 'DOUBLE'
-C                     in all type tests.  WIFITS can never have worked
-C                     on double precision data!
-C     17th June 1986. KS / AAO. WDFITS added.  LIB$GET_LUN used to get
-C                     disk logical unit number.
-C     9th Oct 1987.   KS / AAO. Now allows .FITS.x to be a structure 
-C                     with .DATA and .DESCRIPTION elements. Length of
-C                     filenames increased.
-C     5th Nov 1987.   KS / AAO. Will now retry with a new tape if end
-C                     of tape reached while writing image.
-C     30th Jan 1990.  KS / AAO. Substantially reworked to use DSA routines.
-C                     BSCALE, BZERO now calculated in double precision in
-C                     all cases. Blocked output now supported, through the
-C                     new `BLOCKED' parameter.  Support for 'USHORT' data
-C                     added.  Actions when end-of-tape hit revised slightly,
-C                     and termination after last image made optional. FITS
-C                     'COMMENT', 'HISTORY' and blank items treated as
-C                     comments instead of character strings (no quotation
-C                     marks in header).  Axis keywords now written before
-C                     keywords taken from the FITS substructure and so take
-C                     priority in case they have different values in the
-C                     FITS substructure.  Fault signalled if tape reaches
-C                     end and 'continue on new tape' option not taken -
-C                     so a procedure can abort cleanly.
-C      5th Mar 1993.  KS/AAO. Added NOTERM keyword. 
-C     26th Apr 1993.  KS/AAO. Introduced use of FIT_DFOPEN to get around
-C                     system-dependent OPEN keywords.
-C     20th Jul 1993.  HME/UoE, Starlink.  Reduce code to WDFITS (and
-C                     WJT) to avoid tape-specific calls to FIT_ and thus
-C                     to avoid TIO calls altogether.  The removed code
-C                     is commented with asterisks and can be reinstated
-C                     easily.
-C                     Also fixed the bug when deciding if a "double" can
-C                     be written as integer. There a test between the
-C                     unrelated float VALUE and the provisional double
-C                     INT(DVALUE) was made.
-C     11th Aug 1993.  HME/UoE, Starlink.  Had forgotten one IF clause
+C     20th Sept 1985  KS / AAO. 16BIT added.  'DBLE' changed to 'DOUBLE'
+C                    in all type tests.  WIFITS can never have worked
+C                    on double precision data!
+C     17th June 1986 KS / AAO. WDFITS added.  LIB$GET_LUN used to get
+C                    disk logical unit number.
+C     9th Oct 1987   KS / AAO. Now allows .FITS.x to be a structure 
+C                    with .DATA and .DESCRIPTION elements. Length of
+C                    filenames increased.
+C     5th Nov 1987   KS / AAO. Will now retry with a new tape if end
+C                    of tape reached while writing image.
+C     30th Jan 1990  KS / AAO. Substantially reworked to use DSA
+C                    routines.
+C                    BSCALE, BZERO now calculated in double precision in
+C                    all cases. Blocked output now supported, through
+C                    the new `BLOCKED' parameter.  Support for 'USHORT' 
+C                    data added.  Actions when end-of-tape hit revised 
+C                    slightly, and termination after last image made 
+C                    optional. FITS 'COMMENT', 'HISTORY' and blank 
+C                    items  treated as comments instead of character
+C                    strings (no quotation marks in header).  Axis
+C                    keywords now written before keywords taken from 
+C                    the FITS substructure and so take priority in case 
+C                    they have different values in the FITS
+C                    substructure.  Fault signalled if tape reaches
+C                    end and 'continue on new tape' option not taken -
+C                    so a procedure can abort cleanly.
+C      5th Mar 1993  KS/AAO. Added NOTERM keyword. 
+C     26th Apr 1993  KS/AAO. Introduced use of FIT_DFOPEN to get around
+C                    system-dependent OPEN keywords.
+C     20th Jul 1993  HME/UoE, Starlink.  Reduce code to WDFITS (and
+C                    WJT) to avoid tape-specific calls to FIT_ and thus
+C                    to avoid TIO calls altogether.  The removed code
+C                    is commented with asterisks and can be reinstated
+C                    easily.
+C                    Also fixed the bug when deciding if a "double" can
+C                    be written as integer. There a test between the
+C                    unrelated float VALUE and the provisional double
+C                    INT(DVALUE) was made.
+C     11th Aug 1993  HME/UoE, Starlink.  Had forgotten one IF clause
 C                     for tapes that made link with TIO_CLOSE necessary.
-C      6th Jul 1994.  HME/UoE, Starlink.  Rename 16BIT parameter to BIT16.
-C     20th Mar 1996.  HME/UoE, Starlink.  Added initial values for BLOCK
-C                     and NOTERM.
-C     21st Jun 1996.  MJC/Starlink, RAL.  Fixed bug that could
-C                     generate a second END card in the FITS header.
-C     18th Jul 1996.  MJCL/Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
+C      6th Jul 1994  HME/UoE, Starlink.  Rename 16BIT parameter to
+C                    BIT16.
+C     20th Mar 1996  HME/UoE, Starlink.  Added initial values for BLOCK
+C                    and NOTERM.
+C     21st Jun 1996  MJC/Starlink, RAL.  Fixed bug that could
+C                    generate a second END card in the FITS header.
+C     18th Jul 1996  MJCL/Starlink, UCL.  Set variables for storage of
+C                    file names to 132 chars.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       SUBROUTINE WIFITS
 C
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       LOGICAL   FIG_KEYCHK, FIG_SCRCHK, FIT_QEOT
       LOGICAL   PAR_ABORT, PAR_GIVEN, PAR_BATCH, PAR_QUEST
-      INTEGER   DYN_ELEMENT, ICH_CLEAN, ICH_LEN
+      INTEGER   ICH_CLEAN, ICH_LEN
       REAL      GEN_ELEMF
       CHARACTER GEN_NTH*2, ICH_CI*1
 C
@@ -124,76 +131,79 @@ C
 C
 C     Local variables
 C
-      CHARACTER ACCESS*1             ! Indicates type to use for FITS item
-      INTEGER   ADDRESS              ! Virtual memory address of mapped array
-      LOGICAL   AEXIST               ! Indicates axis data exists
-      INTEGER   AXDIM                ! Number of axis array dimensions
-      INTEGER   AXELM                ! Number of elements in axis array
-      INTEGER   AXPTR                ! Dynamic mem element for axis data
-      INTEGER   AXSIZE               ! Length of axis data array
-      DOUBLE    PRECISION AXVAL1     ! Value of first axis data element
-      DOUBLE    PRECISION AXVALN     ! Value of last axis data element
-      LOGICAL   BIT16                ! Value of BIT16 keyword
-      INTEGER   BITPIX               ! Bits per pixel for tape array
-      INTEGER   BLOCK                ! Value of BLOCKED parameter
-      DOUBLE    PRECISION BSCALD     ! Calculated value for BSCALE keyword
-      DOUBLE    PRECISION BZEROD     ! Calculated value for BZERO keyword
-      CHARACTER CHAR_ARRAY(2)*32     ! Used to get axis label and units
-      REAL      CHECK(80)            ! Record of keyword values
-      CHARACTER COMMAND*16           ! Command being serviced
-      CHARACTER COMMENT*64           ! Comment associated with keyword
-      LOGICAL   CURRENT              ! Value of CURRENT keyword
-      DOUBLE    PRECISION DELTA      ! Increment in linear axis values
-      INTEGER   DIMS(10)             ! Dimensions of main data array
-      INTEGER   DSA_STATUS           ! Inherited status used by DSA routines
-      DOUBLE    PRECISION DUMMY      ! Dummy numeric parameter for axis info
-      DOUBLE    PRECISION DVALUE     ! General double precision variable
-      CHARACTER ERROR*64             ! Text for error status value
-      REAL      ERRORS(3)            ! Maximum error for BITPIX values
-      DOUBLE    PRECISION ERRORD(3)  ! Maximum error for BITPIX values
-      LOGICAL   EXIST                ! True while there are more FITS items
-      LOGICAL   FAULT                ! Indicates non-DSA error detected
-      CHARACTER FILE*132             ! Name of output file
-      LOGICAL   FINISHED             ! Indicates data written OK to tape
-      INTEGER   I                    ! General loop index
-      INTEGER   IDIM                 ! Axis being processed
-      INTEGER   IGNORE               ! Don't care status variable
-      INTEGER   INVOKE               ! Don't care function value
-      LOGICAL   IOERR                ! Indicates a non-EOT I/O error
-      INTEGER   IPTR                 ! Dynamic mem element for data array
-      INTEGER   LU                   ! Logical unit for output disk file
-      INTEGER   N                    ! General temporary integer
-      CHARACTER NAME*32              ! Name of FITS structure item
-      CHARACTER NAMECK(80)*8         ! List of names of keywords used
-      CHARACTER NCHAR*1              ! Used as '1', '2', etc axis ids.
-      INTEGER   NDIM                 ! Number of data dimensions
-      INTEGER   NELM                 ! Number of elements in data array
-      LOGICAL   NOTERM               ! Value of 'NOTERM' keyword
-      INTEGER   NKEY                 ! Counter through keyword check tables
-      INTEGER   OBJPTR               ! Counter through FITS items in structure
-      INTEGER   OBELM                ! Number of elements in a FITS item
-      LOGICAL   POSIT                ! Value of the POSITION keyword
-      CHARACTER POSN*6               ! String controlling tape positioning
-      LOGICAL   REWIND               ! Value of the REWIND keyword
-      DOUBLE    PRECISION SCALED(3)  ! Calculated BSCALE values for BITPIXes
-      INTEGER   SLOT                 ! Marker for DSA mapping reference
-      CHARACTER STRING*40            ! Used for axis label and units
-      INTEGER   STRLEN               ! Length of FITS character item - ignored
-      LOGICAL   STRUCT               ! Indicates data array is structured
-      LOGICAL   SWAP                 ! Indicates output is to be byte-swapped
-      INTEGER   STATUS               ! General non-DSA status variable
-      CHARACTER TAPE*16              ! Name of tape drive to use
-      LOGICAL   TIDYUP               ! Indicates tape should be tidied on EOT
-      LOGICAL   TOPEN                ! Indicated tape was opened
-      LOGICAL   TOTAPE               ! Indicates output is to tape
-      CHARACTER TYPE*16              ! Type of main data array
-      LOGICAL   USEINT               ! Can output keyword as an integer
-      REAL      VALUE                ! General floating point temporary
-      REAL      VMAX                 ! Maximum value in data
-      REAL      VMIN                 ! Minimum value in data
-      DOUBLE    PRECISION VMAXD      ! Maximum value in 'DOUBLE' data
-      DOUBLE    PRECISION VMIND      ! Minimum value in 'DOUBLE' data
-      DOUBLE    PRECISION ZEROD(3)   ! Calculates BZERO values for BITPIXes
+      CHARACTER ACCESS*1         ! Indicates type to use for FITS item
+      LOGICAL   AEXIST           ! Indicates axis data exists
+      INTEGER   AXDIM            ! Number of axis array dimensions
+      INTEGER   AXELM            ! Number of elements in axis array
+      INTEGER   AXPTR            ! Dynamic mem element for axis data
+      INTEGER   AXSIZE           ! Length of axis data array
+      DOUBLE PRECISION AXVAL1    ! Value of first axis data element
+      DOUBLE PRECISION AXVALN    ! Value of last axis data element
+      LOGICAL   BIT16            ! Value of BIT16 keyword
+      INTEGER   BITPIX           ! Bits per pixel for tape array
+      INTEGER   BLOCK            ! Value of BLOCKED parameter
+      DOUBLE PRECISION BSCALD    ! Calculated value for BSCALE keyword
+      DOUBLE PRECISION BZEROD    ! Calculated value for BZERO keyword
+      CHARACTER CHAR_ARRAY(2)*32 ! Used to get axis label and units
+      REAL      CHECK(80)        ! Record of keyword values
+      CHARACTER COMMAND*16       ! Command being serviced
+      CHARACTER COMMENT*64       ! Comment associated with keyword
+      LOGICAL   CURRENT          ! Value of CURRENT keyword
+      DOUBLE PRECISION DELTA     ! Increment in linear axis values
+      INTEGER   DIMS(10)         ! Dimensions of main data array
+      INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
+      DOUBLE PRECISION DUMMY     ! Dummy numeric parameter for axis info
+      DOUBLE PRECISION DVALUE    ! General double precision variable
+      CHARACTER ERROR*64         ! Text for error status value
+      REAL      ERRORS(3)        ! Maximum error for BITPIX values
+      DOUBLE PRECISION ERRORD(3) ! Maximum error for BITPIX values
+      LOGICAL   EXIST            ! True while there are more FITS items
+      LOGICAL   FAULT            ! Indicates non-DSA error detected
+      CHARACTER FILE*132         ! Name of output file
+      LOGICAL   FINISHED         ! Indicates data written OK to tape
+      INTEGER   I                ! General loop index
+      INTEGER   IDIM             ! Axis being processed
+      INTEGER   IGNORE           ! Don't care status variable
+      INTEGER   INVOKE           ! Don't care function value
+      LOGICAL   IOERR            ! Indicates a non-EOT I/O error
+      INTEGER   IPTR             ! Dynamic mem element for data array
+      INTEGER   LU               ! Logical unit for output disk file
+      INTEGER   N                ! General temporary integer
+      CHARACTER NAME*32          ! Name of FITS structure item
+      CHARACTER NAMECK(80)*8     ! List of names of keywords used
+      CHARACTER NCHAR*1          ! Used as '1', '2', etc axis ids.
+      INTEGER   NDIM             ! Number of data dimensions
+      INTEGER   NELM             ! Number of elements in data array
+      LOGICAL   NOTERM           ! Value of 'NOTERM' keyword
+      INTEGER   NKEY             ! Counter through keyword check tables
+      INTEGER   OBJPTR           ! Counter through FITS items in 
+                                 ! structure
+      INTEGER   OBELM            ! Number of elements in a FITS item
+      LOGICAL   POSIT            ! Value of the POSITION keyword
+      CHARACTER POSN*6           ! String controlling tape positioning
+      LOGICAL   REWIND           ! Value of the REWIND keyword
+      DOUBLE PRECISION SCALED(3) ! Calculated BSCALE values for BITPIXes
+      INTEGER   SLOT             ! Marker for DSA mapping reference
+      CHARACTER STRING*40        ! Used for axis label and units
+      INTEGER   STRLEN           ! Length of FITS character item -
+                                 ! ignored
+      LOGICAL   STRUCT           ! Indicates data array is structured
+      LOGICAL   SWAP             ! Indicates output is to be 
+                                 ! byte-swapped
+      INTEGER   STATUS           ! General non-DSA status variable
+      CHARACTER TAPE*16          ! Name of tape drive to use
+      LOGICAL   TIDYUP           ! Indicates tape should be tidied on 
+                                 ! EOT
+      LOGICAL   TOPEN            ! Indicated tape was opened
+      LOGICAL   TOTAPE           ! Indicates output is to tape
+      CHARACTER TYPE*16          ! Type of main data array
+      LOGICAL   USEINT           ! Can output keyword as an integer
+      REAL      VALUE            ! General floating point temporary
+      REAL      VMAX             ! Maximum value in data
+      REAL      VMIN             ! Minimum value in data
+      DOUBLE PRECISION VMAXD     ! Maximum value in 'DOUBLE' data
+      DOUBLE PRECISION VMIND     ! Minimum value in 'DOUBLE' data
+      DOUBLE PRECISION ZEROD(3)  ! Calculates BZERO values for BITPIXes
 C
 C     Initial values
 C
@@ -220,8 +230,8 @@ C
 *           CALL PAR_WRUSER(
 *    :       'The output tape to be used has not been defined',STATUS)
 *           CALL PAR_WRUSER(
-*    :       'Use the TAPEO command, eg "TAPEO MTA0" to correct this.',
-*    :                                                        STATUS)
+*    :        'Use the TAPEO command, eg "TAPEO MTA0" to correct this.',
+*    :        STATUS)
 *           FAULT=.TRUE.
 *           GO TO 500
 *        END IF
@@ -232,7 +242,7 @@ C
 *        IF (STATUS.NE.0) THEN
 *           CALL FIT_ERROR(STATUS,ERROR)
 *           CALL PAR_WRUSER('Unable to open tape drive '//
-*    :                                   TAPE(:ICH_LEN(TAPE)),STATUS)
+*    :                      TAPE(:ICH_LEN(TAPE)),STATUS)
 *           CALL PAR_WRUSER(ERROR,STATUS)
 *           FAULT=.TRUE.
 *           GO TO 500
@@ -343,9 +353,8 @@ C
          FAULT=.TRUE.
          GO TO 500
       END IF
-      CALL DSA_MAP_DATA ('IMAGE','READ',TYPE,ADDRESS,SLOT,DSA_STATUS)
+      CALL DSA_MAP_DATA ('IMAGE','READ',TYPE,IPTR,SLOT,DSA_STATUS)
       IF (DSA_STATUS.NE.0) GO TO 500
-      IPTR=DYN_ELEMENT(ADDRESS)
 C
 C     If data was one of the real types, calculate the scaling and
 C     zero factors required.  Note, real data written to JT's format
@@ -355,8 +364,8 @@ C
       BSCALD=0.
       BZEROD=0.
       IF (TYPE.EQ.'FLOAT') THEN
-         CALL FIT_SCALCD (DYNAMIC_MEM(IPTR),NELM,.FALSE.,VMIN,VMAX,
-     :                                            SCALED,ZEROD,ERRORS)
+         CALL FIT_SCALCD (%VAL(CNF_PVAL(IPTR)),NELM,.FALSE.,VMIN,VMAX,
+     :                    SCALED,ZEROD,ERRORS)
          IF (COMMAND.NE.'WJT') THEN
             CALL PAR_RDKEY('BIT16',.FALSE.,BIT16)
             IF (PAR_ABORT()) GO TO 500
@@ -375,8 +384,8 @@ C
             BZEROD=0.
          END IF
       ELSE IF (TYPE.EQ.'DOUBLE') THEN
-         CALL FIT_SCALD (DYNAMIC_MEM(IPTR),NELM,.FALSE.,VMIND,VMAXD,
-     :                                          SCALED,ZEROD,ERRORD)
+         CALL FIT_SCALD (%VAL(CNF_PVAL(IPTR)),NELM,.FALSE.,VMIND,VMAXD,
+     :                   SCALED,ZEROD,ERRORD)
          IF (COMMAND.NE.'WJT') THEN
             CALL PAR_RDKEY('BIT16',.FALSE.,BIT16)
             IF (PAR_ABORT()) GO TO 500
@@ -435,7 +444,7 @@ C
          END IF
          IF (BLOCK.GT.1) THEN
             CALL FIT_WLOG('BLOCKED',.TRUE.,'May use blocked records',
-     :                                                          STATUS)
+     :                    STATUS)
             IF (STATUS.NE.0) GO TO 450
          END IF
 C   
@@ -447,8 +456,8 @@ C        restriction to 9 axes is an artificial one that happens to make
 C        the formatting easier (only needs one digit).
 C   
          IF (NDIM.GT.9) THEN
-            CALL PAR_WRUSER('Cannot handle calibration data '//
-     :             'properly for more than 9 dimensions',STATUS)
+            CALL PAR_WRUSER('Cannot handle calibration data properly '//
+     :                      'for more than 9 dimensions',STATUS)
          END IF
          DO IDIM=1,MIN(NDIM,9)
             CALL DSA_SEEK_AXIS ('IMAGE',IDIM,AEXIST,DSA_STATUS)
@@ -460,7 +469,7 @@ C              if the dimensions are more than 1.  We then reset the bad
 C              status it will return and treat the axis array as non-existent.
 C
                CALL DSA_AXIS_SIZE ('IMAGE',IDIM,1,AXDIM,AXSIZE,AXELM,
-     :                                                     DSA_STATUS)
+     :                             DSA_STATUS)
                IF (DSA_STATUS.NE.0) THEN
                   DSA_STATUS=0
                   AEXIST=.FALSE.
@@ -468,35 +477,36 @@ C
             END IF
             IF (AEXIST) THEN
                CALL DSA_MAP_AXIS_DATA ('IMAGE',IDIM,'READ','FLOAT',
-     :                                        ADDRESS,SLOT,DSA_STATUS)
+     :                                 AXPTR,SLOT,DSA_STATUS)
                IF (DSA_STATUS.NE.0) GO TO 500
-               AXPTR=DYN_ELEMENT(ADDRESS)
-               IF (FIG_SCRCHK(AXSIZE,DYNAMIC_MEM(AXPTR))) THEN
-                  AXVAL1=GEN_ELEMF(DYNAMIC_MEM(AXPTR),1)
-                  AXVALN=GEN_ELEMF(DYNAMIC_MEM(AXPTR),AXSIZE)
+               IF (FIG_SCRCHK(AXSIZE,%VAL(CNF_PVAL(AXPTR)))) THEN
+                  AXVAL1=GEN_ELEMF(%VAL(CNF_PVAL(AXPTR)),1)
+                  AXVALN=GEN_ELEMF(%VAL(CNF_PVAL(AXPTR)),AXSIZE)
                   IF (AXSIZE.GT.1) THEN
                      DELTA=(AXVALN-AXVAL1)/DBLE(AXSIZE-1)
                   ELSE
                      DELTA=0.
                   END IF
                   CALL DSA_GET_AXIS_INFO ('IMAGE',IDIM,2,CHAR_ARRAY,
-     :                                              0,DUMMY,DSA_STATUS)
+     :                                    0,DUMMY,DSA_STATUS)
                   STRING=CHAR_ARRAY(2)     ! Label
                   INVOKE=ICH_CLEAN(STRING)
                   NCHAR=ICH_CI(IDIM)
-                  CALL FIT_WDBLE('CRVAL'//NCHAR,AXVAL1,STRING,
-     :                                                       STATUS)
+                  CALL FIT_WDBLE('CRVAL'//NCHAR,AXVAL1,STRING,STATUS)
                   IF (STATUS.NE.0) GO TO 450
+
                   NKEY=MIN(NKEY+1,80)
                   NAMECK(NKEY)='CRVAL'//NCHAR
                   CHECK(NKEY)=AXVAL1
                   CALL FIT_WDBLE('CDELT'//NCHAR,DELTA,' ',STATUS)
                   IF (STATUS.NE.0) GO TO 450
+
                   NKEY=MIN(NKEY+1,80)
                   NAMECK(NKEY)='CDELT'//NCHAR
                   CHECK(NKEY)=DELTA
                   CALL FIT_WREAL('CRPIX'//NCHAR,1.0,' ',STATUS)
                   IF (STATUS.NE.0) GO TO 450
+
                   NKEY=MIN(NKEY+1,80)
                   NAMECK(NKEY)='CRPIX'//NCHAR
                   CHECK(NKEY)=1.0
@@ -519,7 +529,7 @@ C
                   CALL DSA_WRUSER('Warning - '//ICH_CI(IDIM)//
      :                     GEN_NTH(IDIM)//' axis data is not linear,')
                   CALL DSA_WRUSER(' and so cannot be output in terms '
-     :                                        //'of FITS keywords.\N')
+     :                            //'of FITS keywords.')
                END IF
                CALL DSA_UNMAP (SLOT,DSA_STATUS)
             END IF
@@ -534,7 +544,7 @@ C
          DO WHILE (EXIST)
             OBJPTR=OBJPTR+1
             CALL DSA_NTH_FITS_ITEM ('IMAGE',OBJPTR,EXIST,NAME,ACCESS,
-     :                                        OBELM,STRLEN,DSA_STATUS)
+     :                              OBELM,STRLEN,DSA_STATUS)
             IF (STATUS.NE.0) GO TO 500
             IF (EXIST.AND.(ACCESS.NE.' ').AND.
      :          (NAME(1:8).NE.'END     ')) THEN
@@ -547,7 +557,7 @@ C
                IF ((ACCESS.EQ.'I').OR.(ACCESS.EQ.'S')) THEN
                   IF (OBELM.EQ.1) THEN
                      CALL DSA_GET_FITS_I ('IMAGE',NAME,1,N,COMMENT,
-     :                                                      DSA_STATUS)
+     :                                    DSA_STATUS)
                      IF (DSA_STATUS.NE.0) GO TO 500
                      IF (FIG_KEYCHK(NKEY,NAMECK,NAME,CHECK,DBLE(N)))
      :                                                            THEN
@@ -565,7 +575,7 @@ C
                IF (OBELM.EQ.1) THEN
                   IF (ACCESS.EQ.'F') THEN
                      CALL DSA_GET_FITS_F ('IMAGE',NAME,1,VALUE,COMMENT,
-     :                                                      DSA_STATUS)
+     :                                    DSA_STATUS)
                      IF (DSA_STATUS.NE.0) GO TO 500
                      USEINT=.FALSE.
                      IF (ABS(VALUE).LT.1.0E8) THEN
@@ -586,7 +596,7 @@ C
                   END IF
                   IF (ACCESS.EQ.'D') THEN
                      CALL DSA_GET_FITS_D ('IMAGE',NAME,1,DVALUE,COMMENT,
-     :                                                       DSA_STATUS)
+     :                                    DSA_STATUS)
                      IF (DSA_STATUS.NE.0) GO TO 500
                      USEINT=.FALSE.
                      IF (ABS(DVALUE).LT.1.0E8) THEN
@@ -595,7 +605,7 @@ C
                      IF (FIG_KEYCHK(NKEY,NAMECK,NAME,CHECK,DVALUE)) THEN
                         IF (USEINT) THEN
                            CALL FIT_WINT(NAME,INT(DVALUE),COMMENT,
-     :                                                          STATUS)
+     :                                   STATUS)
                         ELSE
                            CALL FIT_WDBLE(NAME,DVALUE,COMMENT,STATUS)
                         END IF
@@ -613,15 +623,15 @@ C
                   DO I=1,OBELM
                      STRING=' '
                      CALL DSA_GET_FITS_C ('IMAGE',NAME,I,STRING,COMMENT,
-     :                                                       DSA_STATUS)
+     :                                    DSA_STATUS)
                      IF (DSA_STATUS.NE.0) GO TO 500
                      IF ((NAME.EQ.' ').OR.(NAME.EQ.'HISTORY').OR.
-     :                                       (NAME.EQ.'COMMENT')) THEN
+     :                   (NAME.EQ.'COMMENT')) THEN
                         CALL FIT_WCMT(NAME,STRING(:ICH_CLEAN(STRING)),
-     :                                                   COMMENT,STATUS)
+     :                                COMMENT,STATUS)
                      ELSE
                         CALL FIT_WSTR(NAME,STRING(:ICH_CLEAN(STRING)),
-     :                                                   COMMENT,STATUS)
+     :                                COMMENT,STATUS)
                      END IF
                      IF (STATUS.NE.0)  GO TO 450
                   END DO
@@ -642,25 +652,25 @@ C        BITPIX=16 normally means that the input was 2 byte integer, but
 C        in WJT it is also used for FLOAT data.
 C   
          IF (BITPIX.EQ.8) THEN
-            CALL FIT_WRAYB(DYNAMIC_MEM(IPTR),NELM,STATUS)
+            CALL FIT_WRAYB(%VAL(CNF_PVAL(IPTR)),NELM,STATUS)
          ELSE IF (BITPIX.EQ.16) THEN
             IF (TYPE.EQ.'FLOAT') THEN
-               CALL FIT_WRAYFD(DYNAMIC_MEM(IPTR),NELM,BITPIX,
-     :                                         BSCALD,BZEROD,STATUS)
+               CALL FIT_WRAYFD(%VAL(CNF_PVAL(IPTR)),NELM,BITPIX,
+     :                         BSCALD,BZEROD,STATUS)
             ELSE IF (TYPE.EQ.'USHORT') THEN
-               CALL FIT_WRAYU(DYNAMIC_MEM(IPTR),NELM,STATUS)
+               CALL FIT_WRAYU(%VAL(CNF_PVAL(IPTR)),NELM,STATUS)
             ELSE
-               CALL FIT_WRAYS(DYNAMIC_MEM(IPTR),NELM,STATUS)
+               CALL FIT_WRAYS(%VAL(CNF_PVAL(IPTR)),NELM,STATUS)
             END IF
          ELSE IF (BITPIX.EQ.32) THEN
             IF (TYPE.EQ.'INT') THEN
-               CALL FIT_WRAYI(DYNAMIC_MEM(IPTR),NELM,STATUS)
+               CALL FIT_WRAYI(%VAL(CNF_PVAL(IPTR)),NELM,STATUS)
             ELSE IF (TYPE.EQ.'FLOAT') THEN
-               CALL FIT_WRAYFD(DYNAMIC_MEM(IPTR),NELM,BITPIX,
-     :                                        BSCALD,BZEROD,STATUS)
+               CALL FIT_WRAYFD(%VAL(CNF_PVAL(IPTR)),NELM,BITPIX,
+     :                         BSCALD,BZEROD,STATUS)
             ELSE IF (TYPE.EQ.'DOUBLE') THEN
-               CALL FIT_WRAYD(DYNAMIC_MEM(IPTR),NELM,BITPIX,
-     :                                          BSCALD,BZEROD,STATUS)
+               CALL FIT_WRAYD(%VAL(CNF_PVAL(IPTR)),NELM,BITPIX,
+     :                        BSCALD,BZEROD,STATUS)
             END IF
          END IF
 C
@@ -852,20 +862,20 @@ C
             FIG_KEYCHK=.FALSE.      
             IF (ABS(CHECK(KEY)-VALUE)/VALUE.GT.0.000001) THEN
                CALL DSA_WRUSER(
-     :            'Warning: the FITS-specific structure of the file ')
+     :           'Warning: the FITS-specific structure of the file ')
                CALL DSA_WRUSER('contains a value of ')
                STRING=ICH_CF(REAL(VALUE))
                CALL DSA_WRUSER(STRING(:ICH_LEN(STRING)))
                CALL DSA_WRUSER(' for the keyword "'//
-     :                                         KNAME(:ICH_LEN(KNAME)))
+     :                         KNAME(:ICH_LEN(KNAME)))
                CALL DSA_WRUSER(
-     :                '", which conflicts with a previous value of ')
+     :           '", which conflicts with a previous value of ')
                STRING=ICH_CF(CHECK(KEY))
                CALL DSA_WRUSER(STRING(:ICH_LEN(STRING)))
                CALL DSA_WRUSER(
-     :                      ' obtained from the file''s actual data.')
+     :           ' obtained from the file''s actual data.')
                CALL DSA_WRUSER(' The value from the FITS-specific '//
-     :                                 'structure will be ignored.\N')
+     :                         'structure will be ignored.')
             END IF
             GO TO 500          ! Break out of loop on match
          END IF

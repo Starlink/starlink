@@ -12,7 +12,8 @@ C     FILE    (Character) The name of the container file
 C     OBS     (Numeric) The observation number to be read from 
 C             the container file.
 C     SCAN    (Numeric) The scan number to be read from the observation
-C             (Only used if TWOD is not set) use zero to read the coadded data.
+C             (Only used if TWOD is not set) use zero to read the
+C             coadded data.
 C     OUTPUT  (Character) The name of the Figaro file to be created.
 C
 C     Command keywords -
@@ -32,23 +33,27 @@ C      5 Oct 1992  HME/UoE, Starlink. INCLUDEs changed.
 C     13 Mar 1996  HME / UoE, Starlink.  Adapt to the FDA library.
 C                  No map access with DTA. Get work array and read/write
 C                  instead.
-C                  No error messages from DTA. Call PAR_WRUSER instead of
-C                  DTA_ERROR
+C                  No error messages from DTA. Call PAR_WRUSER instead
+C                  of DTA_ERROR.
 C     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                  file names to 132 chars.
 C     11 Dec 1997  ACD / UoE, Starlink. Fixed bug so that locator SLOC
 C                  is checked for validity prior to the final call to
-C                  annull it.
+C                  annul it.
+C     2005 June 14 MJC / Starlink  Use CNF_PVAL for pointers to
+C                  mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       CHARACTER*12 ICH_CI
-      INTEGER DYN_ELEMENT
+      INTEGER ICH_LEN
 C
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 C
 C     Local variables
 C
@@ -67,8 +72,6 @@ C
       INTEGER DIM
       INTEGER LEN
       INTEGER NDIM,NDIM2
-      INTEGER ZADD,XADD,EADD,QADD,CADD
-      INTEGER OZADD,OXADD,OEADD,OQADD,OPADD,OSADD
       INTEGER ZPTR,XPTR,EPTR,QPTR,CPTR
       INTEGER OZPTR,OXPTR,OEPTR,OQPTR,OPPTR,OSPTR
       INTEGER ZSLOT,XSLOT,ESLOT,QSLOT,SLOT
@@ -78,12 +81,6 @@ C
       LOGICAL FOPEN
       LOGICAL TWOD
       INTEGER NSCANS
-C
-      INTEGER ICH_LEN
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initialization of DSA routines
 C
@@ -102,7 +99,7 @@ C
           GOTO 500
       ELSE
           FOPEN = .TRUE.
-      ENDIF
+      END IF
 C
 C     Get observation number
 C     
@@ -113,7 +110,7 @@ C
           CALL PAR_WRUSER('No observation number '//ICH_CI(OBS),
      :        IGNORE)
           GOTO 500
-      ENDIF
+      END IF
 C
 C     Get TWOD keyword
 C
@@ -127,7 +124,7 @@ C
           SCAN = NINT(VALUE)
       ELSE
           SCAN = 1
-      ENDIF
+      END IF
       IF (SCAN .EQ. 0 .AND. (.NOT. TWOD)) THEN
           CALL DAT_FIND(OLOC,'DATA_ARRAY',ZLOC,STATUS)
           CALL DAT_FIND(OLOC,'DATA_ERROR',ELOC,STATUS)
@@ -140,17 +137,17 @@ C
               CALL PAR_WRUSER('No scan number '//ICH_CI(OBS),
      :            IGNORE)
               GOTO 500
-          ENDIF
+          END IF
           CALL DAT_FIND(SLOC,'DATA_ARRAY',ZLOC,STATUS)
           CALL DAT_FIND(SLOC,'DATA_ERROR',ELOC,STATUS)
           CALL DAT_FIND(SLOC,'DATA_QUALITY',QLOC,STATUS)
           CALL DAT_FIND(SLOC,'AXIS1_DATA',XLOC,STATUS)
           CALL DAT_FIND(OLOC,'CGS2_CROSSREF',CLOC,STATUS)
-      ENDIF
+      END IF
       IF (STATUS .NE. 0) THEN
           CALL PAR_WRUSER('Component not found ',IGNORE)
           GOTO 500
-      ENDIF
+      END IF
 C
 C     Get number of scans
 C
@@ -160,7 +157,7 @@ C
           CALL DAT_ANNUL(LOC,STATUS)
       ELSE
           NSCANS = 1
-      ENDIF
+      END IF
       DIMS(2) = NSCANS
 C
 C     Get dimensions of data
@@ -169,21 +166,21 @@ C
       IF (NDIM .NE. 1) THEN
           CALL PAR_WRUSER('Not 1 Dimensional Data',IGNORE)
           GOTO 500
-      ENDIF
+      END IF
       DIMS(1) = DIM
 C
 C     Map input data
 C
-      CALL DAT_MAPR(ZLOC,'READ',NDIM,DIM,ZADD,STATUS)
-      CALL DAT_MAPR(XLOC,'READ',NDIM,DIM,XADD,STATUS)
-      CALL DAT_MAPR(ELOC,'READ',NDIM,DIM,EADD,STATUS)
-      CALL DAT_MAPI(QLOC,'READ',NDIM,DIM,QADD,STATUS)
+      CALL DAT_MAPR(ZLOC,'READ',NDIM,DIM,ZPTR,STATUS)
+      CALL DAT_MAPR(XLOC,'READ',NDIM,DIM,XPTR,STATUS)
+      CALL DAT_MAPR(ELOC,'READ',NDIM,DIM,EPTR,STATUS)
+      CALL DAT_MAPI(QLOC,'READ',NDIM,DIM,QPTR,STATUS)
       CALL DAT_SHAPE(CLOC,2,DIMS2,NDIM2,STATUS)
-      CALL DAT_MAPI(CLOC,'READ',NDIM2,DIMS2,CADD,STATUS)
+      CALL DAT_MAPI(CLOC,'READ',NDIM2,DIMS2,CPTR,STATUS)
       IF (STATUS .NE. 0) THEN
           CALL PAR_WRUSER('Error mapping input data',IGNORE)
           GOTO 500
-      ENDIF
+      END IF
 C
 C     Create output structure
 C
@@ -193,7 +190,7 @@ C
       ELSE
          NDIMO=1
          DIMS(2)=1
-      ENDIF
+      END IF
       CALL DSA_SIMPLE_OUTPUT('OUTPUT','D,A1,E,Q','FLOAT',NDIMO,DIMS,
      :           STATUS)
 C
@@ -235,108 +232,94 @@ C
 C
 C     Map output arrays
 C
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OZADD,ZSLOT,STATUS)
-      CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',OEADD,ESLOT,STATUS)
-      CALL DSA_MAP_QUALITY('OUTPUT','WRITE','BYTE',OQADD,QSLOT,STATUS)
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','FLOAT',OXADD,XSLOT,
-     :     STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OZPTR,ZSLOT,STATUS)
+      CALL DSA_MAP_ERRORS('OUTPUT','WRITE','FLOAT',OEPTR,ESLOT,STATUS)
+      CALL DSA_MAP_QUALITY('OUTPUT','WRITE','BYTE',OQPTR,QSLOT,STATUS)
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','FLOAT',OXPTR,XSLOT,
+     :                       STATUS)
       CALL DTA_CRNAM(PIXNAM(1:LEN)//'.PIXELS','PIXEL',0,0,PNAME,
-     :     STATUS)
+     :               STATUS)
       CALL DTA_CRNAM(PIXNAM(1:LEN)//'.PIXELS','POSITION',0,0,
-     :     PONAME,STATUS)
-C     CALL DTA_MUVARI(PNAME,DIMS(1),OPADD,STATUS)
-C     CALL DTA_MUVARI(PONAME,DIMS(1),OSADD,STATUS)
-      CALL DSA_GET_WORK_ARRAY(DIMS(1),'INT',OPADD,SLOT,STATUS)
-      CALL DSA_GET_WORK_ARRAY(DIMS(1),'INT',OSADD,SLOT,STATUS)
+     :               PONAME,STATUS)
+C     CALL DTA_MUVARI(PNAME,DIMS(1),OPPTR,STATUS)
+C     CALL DTA_MUVARI(PONAME,DIMS(1),OSPTR,STATUS)
+      CALL DSA_GET_WORK_ARRAY(DIMS(1),'INT',OPPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(DIMS(1),'INT',OSPTR,SLOT,STATUS)
       IF (STATUS .NE. 0) THEN
-          CALL PAR_WRUSER('Error accessing output arrays.',IGNORE)
-          GOTO 500
-      ENDIF
+         CALL PAR_WRUSER('Error accessing output arrays.',IGNORE)
+         GOTO 500
+      END IF
 C
 C     Copy data to output arrays
 C
       IF (STATUS .EQ. 0) THEN
-          ZPTR = DYN_ELEMENT(ZADD)
-          OZPTR = DYN_ELEMENT(OZADD)
-          XPTR = DYN_ELEMENT(XADD)
-          OXPTR = DYN_ELEMENT(OXADD)
-          EPTR = DYN_ELEMENT(EADD)
-          OEPTR = DYN_ELEMENT(OEADD)
-          QPTR = DYN_ELEMENT(QADD)
-          OQPTR = DYN_ELEMENT(OQADD)
-          CPTR = DYN_ELEMENT(CADD)
-          OPPTR = DYN_ELEMENT(OPADD)
-          OSPTR = DYN_ELEMENT(OSADD)
-          CALL RCGS2_COPY2(DIM,NSCANS,1,DYNAMIC_MEM(ZPTR),
-     :              DYNAMIC_MEM(OZPTR))
-          CALL RCGS2_COPY(DIM,DYNAMIC_MEM(XPTR),DYNAMIC_MEM(OXPTR))
-          CALL RCGS2_COPY2(DIM,NSCANS,1,DYNAMIC_MEM(EPTR),
-     :              DYNAMIC_MEM(OEPTR))
-          CALL RCGS2_COPYQ(DIM,NSCANS,1,DYNAMIC_MEM(QPTR),
-     :              DYNAMIC_MEM(OQPTR))
-          CALL RCGS2_COPYP(DIM,DIMS2(1),DIMS2(2),
-     :        DYNAMIC_MEM(CPTR),DYNAMIC_MEM(OPPTR),DYNAMIC_MEM(OSPTR))
-      ENDIF
+         CALL RCGS2_COPY2(DIM,NSCANS,1,%VAL(CNF_PVAL(ZPTR)),
+     :                    %VAL(CNF_PVAL(OZPTR)))
+         CALL RCGS2_COPY(DIM,%VAL(CNF_PVAL(XPTR)),
+     :                   %VAL(CNF_PVAL(OXPTR)))
+         CALL RCGS2_COPY2(DIM,NSCANS,1,%VAL(CNF_PVAL(EPTR)),
+     :                    %VAL(CNF_PVAL(OEPTR)))
+         CALL RCGS2_COPYQ(DIM,NSCANS,1,%VAL(CNF_PVAL(QPTR)),
+     :                    %VAL(CNF_PVAL(OQPTR)))
+         CALL RCGS2_COPYP(DIM,DIMS2(1),DIMS2(2),%VAL(CNF_PVAL(CPTR)),
+     :                    %VAL(CNF_PVAL(OPPTR)),%VAL(CNF_PVAL(OSPTR)))
+      END IF
 C
 C     If two-d copy remaining scans
 C
       IF (TWOD) THEN
-        CALL DAT_ANNUL(ZLOC,STATUS)
-        CALL DAT_ANNUL(ELOC,STATUS)
-        CALL DAT_ANNUL(QLOC,STATUS)
-        CALL DAT_ANNUL(SLOC,STATUS)
-        DO SCAN = 2,NSCANS
-          CALL DAT_FIND(OLOC,'SCAN_'//ICH_CI(SCAN),SLOC,STATUS)
-          IF (STATUS .NE. 0) THEN
-              CALL PAR_WRUSER('No scan number '//ICH_CI(OBS),
-     :            IGNORE)
-              GOTO 500
-          ENDIF
-          CALL DAT_FIND(SLOC,'DATA_ARRAY',ZLOC,STATUS)
-          CALL DAT_FIND(SLOC,'DATA_ERROR',ELOC,STATUS)
-          CALL DAT_FIND(SLOC,'DATA_QUALITY',QLOC,STATUS)
-          CALL DAT_MAPR(ZLOC,'READ',NDIM,DIM,ZADD,STATUS)
-          CALL DAT_MAPR(ELOC,'READ',NDIM,DIM,EADD,STATUS)
-          CALL DAT_MAPI(QLOC,'READ',NDIM,DIM,QADD,STATUS)
-          IF (STATUS .EQ. 0) THEN
-              ZPTR = DYN_ELEMENT(ZADD)
-              EPTR = DYN_ELEMENT(EADD)
-              QPTR = DYN_ELEMENT(QADD)
-              CALL RCGS2_COPY2(DIM,NSCANS,SCAN,DYNAMIC_MEM(ZPTR),
-     :              DYNAMIC_MEM(OZPTR))
-              CALL RCGS2_COPY2(DIM,NSCANS,SCAN,DYNAMIC_MEM(EPTR),
-     :              DYNAMIC_MEM(OEPTR))
-              CALL RCGS2_COPYQ(DIM,NSCANS,SCAN,DYNAMIC_MEM(QPTR),
-     :              DYNAMIC_MEM(OQPTR))
-          ENDIF
-          CALL DAT_ANNUL(ZLOC,STATUS)
-          CALL DAT_ANNUL(ELOC,STATUS)
-          CALL DAT_ANNUL(QLOC,STATUS)
-          CALL DAT_ANNUL(SLOC,STATUS)
-        ENDDO
-      ENDIF
+         CALL DAT_ANNUL(ZLOC,STATUS)
+         CALL DAT_ANNUL(ELOC,STATUS)
+         CALL DAT_ANNUL(QLOC,STATUS)
+         CALL DAT_ANNUL(SLOC,STATUS)
+         DO SCAN = 2,NSCANS
+            CALL DAT_FIND(OLOC,'SCAN_'//ICH_CI(SCAN),SLOC,STATUS)
+            IF (STATUS .NE. 0) THEN
+               CALL PAR_WRUSER('No scan number '//ICH_CI(OBS),IGNORE)
+               GOTO 500
+            END IF
+           CALL DAT_FIND(SLOC,'DATA_ARRAY',ZLOC,STATUS)
+           CALL DAT_FIND(SLOC,'DATA_ERROR',ELOC,STATUS)
+           CALL DAT_FIND(SLOC,'DATA_QUALITY',QLOC,STATUS)
+           CALL DAT_MAPR(ZLOC,'READ',NDIM,DIM,ZPTR,STATUS)
+           CALL DAT_MAPR(ELOC,'READ',NDIM,DIM,EPTR,STATUS)
+           CALL DAT_MAPI(QLOC,'READ',NDIM,DIM,QPTR,STATUS)
+           IF (STATUS .EQ. 0) THEN
+              CALL RCGS2_COPY2(DIM,NSCANS,SCAN,%VAL(CNF_PVAL(ZPTR)),
+     :                         %VAL(CNF_PVAL(OZPTR)))
+              CALL RCGS2_COPY2(DIM,NSCANS,SCAN,%VAL(CNF_PVAL(EPTR)),
+     :                         %VAL(CNF_PVAL(OEPTR)))
+              CALL RCGS2_COPYQ(DIM,NSCANS,SCAN,%VAL(CNF_PVAL(QPTR)),
+     :                         %VAL(CNF_PVAL(OQPTR)))
+           END IF
+           CALL DAT_ANNUL(ZLOC,STATUS)
+           CALL DAT_ANNUL(ELOC,STATUS)
+           CALL DAT_ANNUL(QLOC,STATUS)
+           CALL DAT_ANNUL(SLOC,STATUS)
+         END DO
+      END IF
 C
 C     Tidy up.  Note that SLOC may or may not be valid.  Therefore it
 C     is checked for validity prior to annulling it.
 C
 500   IF (FOPEN) THEN
-C         CALL DTA_FRVAR(PNAME,IGNORE)
-C         CALL DTA_FRVAR(PONAME,IGNORE)
-          CALL DTA_WRVARI(PNAME,DIMS(1),DYNAMIC_MEM(OPPTR),STATUS)
-          CALL DTA_WRVARI(PONAME,DIMS(1),DYNAMIC_MEM(OSPTR),STATUS)
-          CALL DAT_ANNUL(XLOC,STATUS)
+C        CALL DTA_FRVAR(PNAME,IGNORE)
+C        CALL DTA_FRVAR(PONAME,IGNORE)
+         CALL DTA_WRVARI(PNAME,DIMS(1),%VAL(CNF_PVAL(OPPTR)),STATUS)
+         CALL DTA_WRVARI(PONAME,DIMS(1),%VAL(CNF_PVAL(OSPTR)),STATUS)
+         CALL DAT_ANNUL(XLOC,STATUS)
 C
-          CALL DAT_VALID(SLOC,SLOCV,STATUS)
-          IF (SLOCV) THEN
-             CALL DAT_ANNUL(SLOC,STATUS)
-          END IF
+         CALL DAT_VALID(SLOC,SLOCV,STATUS)
+         IF (SLOCV) THEN
+            CALL DAT_ANNUL(SLOC,STATUS)
+         END IF
 C
-          CALL DAT_ANNUL(CLOC,STATUS)
-          CALL DAT_ANNUL(OLOC,STATUS)
+         CALL DAT_ANNUL(CLOC,STATUS)
+         CALL DAT_ANNUL(OLOC,STATUS)
 C
-          STAT = 0
-          CALL HDS_CLOSE(FLOC,STAT)
-      ENDIF
+         STAT = 0
+         CALL HDS_CLOSE(FLOC,STAT)
+      END IF
       CALL DSA_CLOSE(STATUS)
       END
 
@@ -350,8 +333,8 @@ C
       REAL XA(NX),XB(NX)
       INTEGER I
       DO I=1,NX
-          XB(I) = XA(I)
-      ENDDO
+         XB(I) = XA(I)
+      END DO
       END
 
 
@@ -364,8 +347,8 @@ C
       REAL XA(NX),XB(NX,NY)
       INTEGER I
       DO I=1,NX
-          XB(I,IY) = XA(I)
-      ENDDO
+         XB(I,IY) = XA(I)
+      END DO
       END
 
 
@@ -379,8 +362,8 @@ C
       BYTE XB(NX,NY)
       INTEGER I
       DO I=1,NX
-          XB(I,IY) = XA(I)
-      ENDDO
+         XB(I,IY) = XA(I)
+      END DO
       END
 
 
@@ -395,9 +378,9 @@ C
       INTEGER P,S,SC
 
       DO P=1,NP
-          DO S=1,NS
-               PIX(IN(P,S)) = P
-               SCAN(IN(P,S)) = S
-          ENDDO
-      ENDDO
+         DO S=1,NS
+            PIX(IN(P,S)) = P
+            SCAN(IN(P,S)) = S
+         END DO
+      END DO
       END

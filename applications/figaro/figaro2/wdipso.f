@@ -19,61 +19,63 @@ C
 C                                               KS / AAO 10th Oct 1986
 C     Modified:  
 C
-C     24th Oct 1986.  KS / AAO.  Format code 2 data now written one pair
-C                     of values to a line.
-C     27th Aug 1987.  DJA/ AAO.  Revised DSA_ routines - some specs changed.
-C                     Now uses DYN_ routines for dynamic memory handling
-C     21st Oct 1992.  HME / UoE, Starlink.  INCLUDE changed, TABs removed.
-C     27th Jun 1993.  KS / AAO. Now uses DSA_OPEN_TEXT_FILE if possible and
-C                     uses DSA_GET_LU instead of VMS routines. Unused variables
-C                     removed.
-C     18th Jul 1996.  MJCL / Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
-C     17th Jul 1996.  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     24th Oct 1986  KS / AAO.  Format code 2 data now written one pair
+C                    of values to a line.
+C     27th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                    changed.  Now uses DYN_ routines for 
+C                    dynamic-memory handling.
+C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs 
+C                    removed.
+C     27th Jun 1993  KS / AAO. Now uses DSA_OPEN_TEXT_FILE if possible
+C                    and uses DSA_GET_LU instead of VMS routines. Unused 
+C                    variables removed.
+C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+C                    file names to 132 chars.
+C     17th Jul 1996  MJCL / Starlink, UCL.  PAR_ABORT checking.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL GEN_CHKNSF
-      INTEGER ICH_LEN,DYN_ELEMENT
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      INTEGER ICH_LEN
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    COMMENT*80   ! 
-      CHARACTER    DATE*20      ! The current date
-      CHARACTER    DAY*9        ! The current day
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      CHARACTER    ERROR*64     ! An error message
-      LOGICAL      FAULT        ! TRUE if an erro occurs
-      CHARACTER    FILE*132     ! The output file name
-      LOGICAL      FOPEN        ! TRUE if the output was opened OK
-      CHARACTER    HOUR*12      ! The current hour
-      INTEGER      ICODE        ! The output code to use - see above
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      LDATE        ! Length of the date string
-      INTEGER      LDAY         ! Length of the day string
-      INTEGER      LHOUR        ! Length of the hour string
-      INTEGER      LU           ! The output's logical unit number
-      CHARACTER    NAME*132     ! The actual name of the input file
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NXX          ! Size of x-axis data
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*80    ! Holds the name of the object name
-      INTEGER      STYLE        ! The output style in DIPSO format
-      REAL         VALUE        ! Temporary real number
-      LOGICAL      XEXIST       ! TRUE if the input has an x-axis data array
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data
-      INTEGER      XSLOT        ! Map slot number of x-axis data
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    COMMENT*80    ! 
+      CHARACTER    DATE*20       ! The current date
+      CHARACTER    DAY*9         ! The current day
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      DSLOT         ! Map slot number of input data array
+      CHARACTER    ERROR*64      ! An error message
+      LOGICAL      FAULT         ! TRUE if an error occurs
+      CHARACTER    FILE*132      ! The output file name
+      LOGICAL      FOPEN         ! TRUE if the output was opened OK
+      CHARACTER    HOUR*12       ! The current hour
+      INTEGER      ICODE         ! The output code to use - see above
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      LDATE         ! Length of the date string
+      INTEGER      LDAY          ! Length of the day string
+      INTEGER      LHOUR         ! Length of the hour string
+      INTEGER      LU            ! The output's logical unit number
+      CHARACTER    NAME*132      ! The actual name of the input file
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NXX           ! Size of x-axis data
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*80     ! Holds the name of the object name
+      INTEGER      STYLE         ! The output style in DIPSO format
+      REAL         VALUE         ! Temporary real number
+      LOGICAL      XEXIST        ! TRUE if the input has an x-axis data
+                                 ! array
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis data
+      INTEGER      XSLOT         ! Map slot number of x-axis data
 C
 C     Initialisation of DSA_ routines
 C
@@ -99,16 +101,13 @@ C
 C
 C     Map data array
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Check that there is an X array.  
 C
       CALL DSA_SEEK_AXIS('SPECT',1,XEXIST,STATUS)
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,XSLOT,
-     :                                                       STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
       IF (XEXIST) THEN
 C
@@ -122,7 +121,7 @@ C
             FAULT=.TRUE.
             GO TO 500
          END IF
-         IF (GEN_CHKNSF(DYNAMIC_MEM(XPTR),NX)) THEN
+         IF (GEN_CHKNSF(%VAL(CNF_PVAL(XPTR)),NX)) THEN
             CALL PAR_WRUSER(
      :        '***Warning*** Data is not wavelength calibrated',IGNORE)
          END IF
@@ -211,8 +210,8 @@ C
 C     Now write out the data arrays.  This has be a subroutine call
 C     because of the use of mapped arrays.
 C
-      CALL FIG_DIPOUT(LU,NX,ICODE,DYNAMIC_MEM(XPTR),
-     :                     DYNAMIC_MEM(DPTR),STATUS)
+      CALL FIG_DIPOUT(LU,NX,ICODE,%VAL(CNF_PVAL(XPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)),STATUS)
       IF (STATUS.NE.0) THEN
          CALL GEN_FORTERR(STATUS,.FALSE.,ERROR)
          CALL PAR_WRUSER('Error writing data to output file',IGNORE)

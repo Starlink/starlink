@@ -43,9 +43,9 @@ C     20th Mar 1988  KS / AAO. Conversion to DSA_ routines completed,
 C                    and modified for GKS version of PGPLOT.
 C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
 C                    mapping calls.
-C     3rd  Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Avoid GEN_SWOP.
-C                    PGASK is banned from ADAM, commented out.
-C                    Changed case of file SPIKETRUM.
+C     3rd  Sep 1992  HME / UoE, Starlink.  INCLUDE changed. Avoid 
+C                    GEN_SWOP.  PGASK is banned from ADAM, commented
+C                    out.  Changed case of file SPIKETRUM.
 C     25th Jan 1993  HME / UoE, Starlink.  Put PGASK back in.
 C     27th Jul 1993  HME / UoE, Starlink.  Disuse GKD_* except
 C                    GKD_WRITE_LINE. Disuse PAR_Q* and PAR_RDUSER, use
@@ -59,26 +59,25 @@ C                    cause the DOUBLE workspace to be misaligned
 C                    (memory address and odd multiple of 4).
 C     18th May 1995  HME / UoE, Starlink. FIG_ISPIKE now needs a longer
 C                    work space. Make DWPTR 11*NX+24.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions 
 C
       LOGICAL PAR_ABORT
       INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
-      INTEGER DYN_ELEMENT, DYN_INCREMENT, DSA_TYPESIZE
       REAL    GEN_ELEMF
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Local variables
 C
       LOGICAL FAULT, REV, REVRL
-      INTEGER ADDRESS, BYTES, CKEY, DIMS, DTA_STATUS, DWPTR, IGNORE
+      INTEGER CKEY, DIMS, DTA_STATUS, DWPTR, IGNORE
       INTEGER INVOKE, NDIM, NEXT
-      INTEGER NX, OPTR, SLOT, STATUS, WPTR, XPTR, ZPTR
+      INTEGER NX, OPTR, SLOT, STATUS, WPTR, WSLOT1, WSLOT2, XPTR, ZPTR
       REAL    ENDS(4), TEMP
       CHARACTER COLOUR*16, NAME*64, PGDEV*64
 C
@@ -116,15 +115,11 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,SLOT,
-     :                                                     STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,SLOT,STATUS)
 C
 C     Map the X data
 C
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',ADDRESS,
-     :                                                  SLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'READ','FLOAT',XPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500       ! Error exit
 C
 C     Read the spiketrum structure definition
@@ -159,11 +154,13 @@ C     The FIG_EDSPI algorithm requires that the data be in ascending
 C     order of X.  The easiest way to do this is to swop it round if
 C     necessary.
 C
-      REV=GEN_ELEMF(DYNAMIC_MEM(XPTR),1).GT.GEN_ELEMF(DYNAMIC_MEM(XPTR)
-     :                                                             ,NX)
+      REV=GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),1).GT.
+     :    GEN_ELEMF(%VAL(CNF_PVAL(XPTR)),NX)
       IF (REV) THEN 
-         CALL GEN_REV2D(DYNAMIC_MEM(XPTR),NX,1,.TRUE.,DYNAMIC_MEM(XPTR))
-         CALL GEN_REV2D(DYNAMIC_MEM(OPTR),NX,1,.TRUE.,DYNAMIC_MEM(OPTR))
+         CALL GEN_REV2D(%VAL(CNF_PVAL(XPTR)),NX,1,.TRUE.,
+     :                  %VAL(CNF_PVAL(XPTR)))
+         CALL GEN_REV2D(%VAL(CNF_PVAL(OPTR)),NX,1,.TRUE.,
+     :                  %VAL(CNF_PVAL(OPTR)))
       END IF
       REVRL=ENDS(1).GT.ENDS(3)
       IF (REVRL) THEN
@@ -198,26 +195,26 @@ C
 C
 C     Get workspace (needed for the fitting routines)
 C
-      BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)+
-     :      (NX*11+24)*DSA_TYPESIZE('DOUBLE',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,SLOT,STATUS)
-C      WPTR=DYN_ELEMENT(ADDRESS)
-C      DWPTR=DYN_INCREMENT(WPTR,'FLOAT',NX)
-      DWPTR=DYN_ELEMENT(ADDRESS)
-      WPTR =DYN_INCREMENT(DWPTR,'DOUBLE',NX*11+24)
+      CALL DSA_GET_WORK_ARRAY(NX*11+24,'DOUBLE',DWPTR,WSLOT1,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',WPTR,WSLOT2,STATUS)
       IF (STATUS.NE.0) GO TO 500       ! Error exit
 C
 C     Edit the spiketrum
 C
-      CALL FIG_EDSPI(PGDEV,NX,DYNAMIC_MEM(XPTR),CKEY,DYNAMIC_MEM(WPTR),
-     :                     DYNAMIC_MEM(DWPTR),ENDS,DYNAMIC_MEM(OPTR))
+      CALL FIG_EDSPI(PGDEV,NX,%VAL(CNF_PVAL(XPTR)),CKEY,
+     :               %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(DWPTR)),
+     :               ENDS,%VAL(CNF_PVAL(OPTR)))
+      CALL DSA_FREE_WORKSPACE(WSLOT2,STATUS)
+      CALL DSA_FREE_WORKSPACE(WSLOT1,STATUS)
       IF (PAR_ABORT()) GO TO 500
 C
 C     Reverse back if necessary
 C
       IF (REV) THEN 
-         CALL GEN_REV2D(DYNAMIC_MEM(XPTR),NX,1,.TRUE.,DYNAMIC_MEM(XPTR))
-         CALL GEN_REV2D(DYNAMIC_MEM(OPTR),NX,1,.TRUE.,DYNAMIC_MEM(OPTR))
+         CALL GEN_REV2D(%VAL(CNF_PVAL(XPTR)),NX,1,.TRUE.,
+     :                  %VAL(CNF_PVAL(XPTR)))
+         CALL GEN_REV2D(%VAL(CNF_PVAL(OPTR)),NX,1,.TRUE.,
+     :                  %VAL(CNF_PVAL(OPTR)))
       END IF
       IF (REVRL) THEN
          TEMP = ENDS(1)

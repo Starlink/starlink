@@ -4,13 +4,15 @@ C
 C     R D I P S O
 C
 C     Reads a file in DIPSO/IUEDR format and creates a Figaro file from
-C     the data in it.  The file can have been written in any of what IUEDR 
-C     calls SPECTRUM type 0, type 1 or type 2 format.
+C     the data in it.  The file can have been written in any of what 
+C     IUEDR calls SPECTRUM type 0, type 1 or type 2 format.
 C
 C     Command parameters -
 C
-C     FILE      (Character) The name of the DIPSO format file to be read.
-C     CODE      (Numeric) The SPECTRUM type code for the format (0,1 or 2).
+C     FILE      (Character) The name of the DIPSO format file to be 
+C               read.
+C     CODE      (Numeric) The SPECTRUM type code for the format (0,1 or
+C                2).
 C     SPECTRUM  (Character) The name of the Figaro file to be created.
 C
 C     Command keywords -  None
@@ -19,52 +21,56 @@ C                                               KS / AAO 13th Oct 1986
 C
 C     Modified:
 C
-C      2nd Sep 1987  DJA/ AAO. Revised DSA_ routines - some specs changed. Now
-C                    uses DYN routines for dynamic memory handling
-C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs removed.
-C     26th Jun 1993  KS/AAO. Removed READONLY from OPEN statements in interests
-C                    of portability. Changed to use DSA_GET_LU instead of
-C                    VMS routines. Removed unused variables. Made the 
-C                    name of the structure definition file lower case.
+C      2nd Sep 1987  DJA/ AAO. Revised DSA_ routines - some specs
+C                    changed. Now uses DYN routines for dynamic-memory 
+C                    handling.
+C     21st Oct 1992  HME / UoE, Starlink.  INCLUDE changed, TABs
+C                    removed.
+C     26th Jun 1993  KS/AAO. Removed READONLY from OPEN statements in
+C                    interests of portability. Changed to use
+C                    DSA_GET_LU instead of VMS routines. Removed unused 
+C                    variables. Made the name of the 
+C                    structure-definition file lower case.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
 C     29th Jul 1996  MJCL / Starlink UCL.  PAR_ABORT checking.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER   ICH_ENCODE, ICH_TIDY,DYN_ELEMENT
+      INTEGER   ICH_ENCODE, ICH_TIDY
       CHARACTER ICH_CI*5
-      LOGICAL PAR_ABORT         ! (F)PAR abort flag
+      LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      CHARACTER    COMMENT*80   !
-      CHARACTER    ERROR*64     ! Error message text
-      LOGICAL      FAULT        ! TRUE if an error occurred
-      CHARACTER    FILE*132     ! The input file name
-      LOGICAL      FOPEN        ! TRUE if the input file was opened OK
-      INTEGER      ICODE        ! The input mode
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      INVOKE       ! Used to invoke functions
-      INTEGER      LENGTH       ! Length of a string
-      INTEGER      LU           ! The input's logical unit number
-      INTEGER      NEXT         ! String index position
-      INTEGER      NX           ! Size of 1st dimension
-      CHARACTER    OBJECT*80    ! The name of the object
-      INTEGER      OPTR         ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT        ! Map slot number for output data array
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*80    ! Output message text
-      REAL         VALUE        ! Temporary real number
-      INTEGER      XPTR         ! Dynamic-memory pointer to output axis data
-      INTEGER      XSLOT        ! Map slot number of output axis data
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      CHARACTER    COMMENT*80    !
+      CHARACTER    ERROR*64      ! Error message text
+      LOGICAL      FAULT         ! TRUE if an error occurred
+      CHARACTER    FILE*132      ! The input file name
+      LOGICAL      FOPEN         ! TRUE if the input file was opened OK
+      INTEGER      ICODE         ! The input mode
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INVOKE        ! Used to invoke functions
+      INTEGER      LENGTH        ! Length of a string
+      INTEGER      LU            ! The input's logical unit number
+      INTEGER      NEXT          ! String index position
+      INTEGER      NX            ! Size of 1st dimension
+      CHARACTER    OBJECT*80     ! The name of the object
+      INTEGER      OPTR          ! Dynamic-memory pointer to output 
+                                 ! data array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*80     ! Output message text
+      REAL         VALUE         ! Temporary real number
+      INTEGER      XPTR          ! Dynamic-memory pointer to output axis
+                                 ! data
+      INTEGER      XSLOT         ! Map slot number of output axis data
 C
 C     Initialisation of DSA_ routines
 C
@@ -157,19 +163,17 @@ C
 C
 C     Map the data arrays
 C
-      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','WRITE','FLOAT',OPTR,OSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'WRITE','FLOAT',ADDRESS,XSLOT,
-     :                                                        STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'WRITE','FLOAT',XPTR,XSLOT,
+     :                       STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Now read in the data arrays.  This has be a subroutine call
 C     because of the use of mapped arrays.
 C
-      CALL FIG_DIPIN(LU,NX,ICODE,DYNAMIC_MEM(XPTR),DYNAMIC_MEM(OPTR),
-     :                                                        STATUS)
+      CALL FIG_DIPIN(LU,NX,ICODE,%VAL(CNF_PVAL(XPTR)),
+     :               %VAL(CNF_PVAL(OPTR)),STATUS)
       IF (STATUS.NE.0) THEN
          CALL GEN_FORTERR(STATUS,.FALSE.,ERROR)
          CALL PAR_WRUSER('Error reading data from output file',IGNORE)
