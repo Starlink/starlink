@@ -13,10 +13,11 @@ C     If the SDIST analysis was for more than one spectrum, the
 C     correction is what might be termed '1.5-dimensional' - the 
 C     data is only redistributed within columns, but the amount of
 C     shift varies along each column in a manner determined by fitting
-C     a low order polynomial to the results of evaluating the polynomials
-C     that SDIST fitted to each spectrum.  The 1.5D algorithm actually
-C     reduces to the 1D case when there is only one spectrum, but it
-C     simplifies things to think of them as distinct cases.
+C     a low order polynomial to the results of evaluating the
+C     polynomials that SDIST fitted to each spectrum.  The 1.5D 
+C     algorithm actually reduces to the 1D case when there is only one
+C     spectrum, but it simplifies things to think of them as distinct
+C     cases.
 C
 C     Command parameters -
 C
@@ -40,8 +41,9 @@ C     Command keywords -
 C
 C     ROTATE   If specified, the image to be corrected will be rotated
 C              prior to the application of the correction.  This
-C              minimises the number of page faults during the correction,
-C              but at the expense of the overheads of the rotation itself.
+C              minimises the number of page faults during the
+C              correction, but at the expense of the overheads of the
+C              rotation itself.
 C
 C     User variables - None
 C 
@@ -66,34 +68,40 @@ C
 C                                              KS / CIT 6th Feb 1984
 C     Modified:
 C
-C     11th Nov 1986.  KS / AAO.  ROTATE keyword and supporting code added.
-C      7th Aug 1987.  DJA/ AAO.  Revised DSA_ routines - some specs changed.
-C                     Now uses DYN_ routines for dynamic memory handling
-C      5th May 1988.  KS / AAO.  FLOAT replaced by DBLE in one call to 
-C                     GEN_EPOLYD.  Bug pointed out by CKL/CIT.
-C     26th Mar 1991.  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
-C                     mapping calls.
-C     29th Mar 1991.  KS / AAO. Fixed bug that was messing up the result 
-C                     image outside the Y bounds specified (ie if only
-C                     a subset wqas corrected) if ROTATE was specified.
-C                     Maximum number of spectra increased to 50 to match
-C                     SDIST.
-C     11th Sep 1992   HME / UoE, Starlink. Changed INCLUDE. TABs removed.
-C                     Open input file with lowercase name, and get a
-C                     free unit from DSA for it.
-C                     Disable ROTATE option. Re-enable ROTATE.
-C     12th Aug 1993.  HME / UoE, Starlink.  FIG_CDIS2D still did not
-C                     allow more than 20 spectra. Fixed that.
-C     20th Mar 1996.  HME / UoE, Starlink.  Add END= keywords to the READ
-C                     statements. Before there were only ERR= keywords,
-C                     but too short a file is not an error in that sense.
+C     11th Nov 1986  KS / AAO.  ROTATE keyword and supporting code
+C                    added.
+C      7th Aug 1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                    changed.  Now uses DYN_ routines for dynamic-memory
+C                    handling.
+C      5th May 1988  KS / AAO.  FLOAT replaced by DBLE in one call to 
+C                    GEN_EPOLYD.  Bug pointed out by CKL/CIT.
+C     26th Mar 1991  KS / AAO.  Use of 'UPDATE' and 'WRITE' corrected in
+C                    mapping calls.
+C     29th Mar 1991  KS / AAO. Fixed bug that was messing up the result 
+C                    image outside the Y bounds specified (ie if only
+C                    a subset wqas corrected) if ROTATE was specified.
+C                    Maximum number of spectra increased to 50 to match
+C                    SDIST.
+C     11th Sep 1992  HME / UoE, Starlink. Changed INCLUDE. TABs removed.
+C                    Open input file with lowercase name, and get a
+C                    free unit from DSA for it.
+C                    Disable ROTATE option. Re-enable ROTATE.
+C     12th Aug 1993  HME / UoE, Starlink.  FIG_CDIS2D still did not
+C                    allow more than 20 spectra. Fixed that.
+C     20th Mar 1996  HME / UoE, Starlink.  Add END= keywords to the READ
+C                    statements. Before there were only ERR= keywords,
+C                    but too short a file is not an error in that sense.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
       INTEGER ICH_ENCODE, ICH_LEN
-      INTEGER DYN_ELEMENT, DYN_INCREMENT, DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
 C
 C     Maximum number of spectra that can be used
 C
@@ -102,51 +110,45 @@ C
 C    
 C     Local variables
 C
-      INTEGER      ADDRESS         ! Address of dynamic memory element
-      INTEGER      BYTES           ! Number of bytes of workspace required
-      INTEGER      DEGREES(MAXSPEC)! 
-      INTEGER      DIMS(10)        ! Sizes of dimensions of data
-      INTEGER      DPTR            ! Dynamic-memory pointer to data array
-      INTEGER      FILE            ! The logical unit number of the input file
-      LOGICAL      FOPEN           ! Logical unit number for input data
-      INTEGER      I               ! 
-      INTEGER      IGNORE          ! Used to pass ignorable status
-      INTEGER      INVOKE          ! Used to invoke functions
-      INTEGER      ISPECT          ! 
-      INTEGER      IYEN            ! 
-      INTEGER      IYST            ! 
-      INTEGER      J               !
-      INTEGER      MAXD            ! Maximum degree of polynomial to fit
-      INTEGER      NDIM            ! Number of dimensions in data
-      INTEGER      NBYTES          ! Number of bytes taken by 1 x-section
-      INTEGER      NELM            ! Total number of elements in data
-      INTEGER      NEXT            ! 
-      INTEGER      NPIX            ! 
-      INTEGER      NSPECT          !
-      INTEGER      NX              ! Size of 1st dimension
-      INTEGER      NY              ! Size of 2nd dimension (if present)
-      INTEGER      OPTR            ! Dynamic-memory pointer to output data array
-      INTEGER      OSLOT           ! Map slot number for output data array
-      INTEGER      PPTR            ! Dynamic memory pointer to workspace
-      LOGICAL      ROTATE          ! TRUE if ROTATE keyword was TRUE
-      INTEGER      RPTR            ! Dynamic memory pointer to workspace
-      INTEGER      SPTR            ! Dynamic memory pointer to workspace
-      INTEGER      STATUS          ! Running status for DSA_ routines
-      CHARACTER    STRING*64       ! Holds the output text
-      REAL         VALUE           ! Temporary real number
-      REAL         VMAX            ! Maximum value in Y data - not used
-      REAL         VMIN            ! Minumum   "   "  "   "     "    "
-      INTEGER      WPTR            ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT           ! Map slot number of workspace
-      REAL         YBEST(MAXSPEC)  !
-      REAL         YPOSNS(MAXSPEC) !
-      INTEGER      YPTR            ! Dynamic memory pointer to workspace
-C
       DOUBLE PRECISION COEFFS(11,MAXSPEC) !
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DEGREES(MAXSPEC)! 
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      INTEGER      DPTR          ! Dynamic-memory pointer to data array
+      INTEGER      FILE          ! Logical unit number of the input file
+      LOGICAL      FOPEN         ! Logical unit number for input data
+      INTEGER      I             ! 
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INVOKE        ! Used to invoke functions
+      INTEGER      ISPECT        ! 
+      INTEGER      IYEN          ! 
+      INTEGER      IYST          ! 
+      INTEGER      J             !
+      INTEGER      MAXD          ! Maximum degree of polynomial to fit
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NBYTES        ! Number of bytes taken by 1 x-section
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NEXT          ! 
+      INTEGER      NPIX          ! 
+      INTEGER      NSPECT        !
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      NY            ! Size of 2nd dimension (if present)
+      INTEGER      OPTR          ! Dynamic-memory pointer to output data
+                                 ! array
+      INTEGER      OSLOT         ! Map slot number for output data array
+      INTEGER      PPTR          ! Dynamic-memory pointer to workspace
+      LOGICAL      ROTATE        ! TRUE if ROTATE keyword was TRUE
+      INTEGER      RPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      SPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*64     ! Holds the output text
+      REAL         VALUE         ! Temporary real number
+      REAL         VMAX          ! Maximum value in Y data - not used
+      REAL         VMIN          ! Minumum   "   "  "   "     "    "
+      INTEGER      WPTR          ! Dynamic-memory pointer to workspace
+      INTEGER      WSLOT         ! Map slot number of workspace
+      REAL         YBEST(MAXSPEC)!
+      REAL         YPOSNS(MAXSPEC) !
+      INTEGER      YPTR          ! Dynamic-memory pointer to workspace
 C
 C     Initialisation of DSA_ routines
 C
@@ -247,8 +249,7 @@ C
 C
 C     Map the output data
 C
-      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',ADDRESS,OSLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('OUTPUT','UPDATE','FLOAT',OPTR,OSLOT,STATUS)
 C
 C     Get workspace required.  The workspace varies depending on
 C     the number of spectra analysed by SDIST.  In the 1D case,
@@ -256,44 +257,41 @@ C     a shift array NX elements long is needed, together with
 C     a work array with twice as many elements as there are pixels
 C     in the range YSTART through YEND.  In the 1.5D case, no shift
 C     array is needed, but another work array of the same size as
-C     the other is needed, as well as yet another double precision
+C     the other is needed, as well as yet another double-precision
 C     array with the same number of elements.  If rotation is used,
 C     enough workspace for the rotated image is also required.
 C
       NPIX=IYEN-IYST+1
-      IF (NSPECT.EQ.1) THEN
-         BYTES=(NPIX*2+NX)*DSA_TYPESIZE('FLOAT',STATUS)
-      ELSE
-         BYTES=(NPIX*2*2)*DSA_TYPESIZE('FLOAT',STATUS)+
-     :         2*NPIX*DSA_TYPESIZE('DOUBLE',STATUS)
-      END IF
       NBYTES=NELM*DSA_TYPESIZE('FLOAT',STATUS)
-      IF (ROTATE) BYTES=BYTES+NBYTES
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
-      SPTR=DYN_INCREMENT(WPTR,'DOUBLE',NPIX)
+
+      CALL DSA_GET_WORK_ARRAY(NPIX,'DOUBLE',WPTR,WSLOT,STATUS)
+
       IF (NSPECT.EQ.1) THEN
-         IF (ROTATE) RPTR=DYN_INCREMENT(SPTR,'FLOAT',NX)
+         CALL DSA_GET_WORK_ARRAY(NX,'FLOAT',SPTR,WSLOT,STATUS)
       ELSE
-         PPTR=DYN_INCREMENT(SPTR,'DOUBLE',NPIX)
-         IF (ROTATE) RPTR=DYN_INCREMENT(PPTR,'DOUBLE',NPIX*2)
+         CALL DSA_GET_WORK_ARRAY(NPIX,'DOUBLE',SPTR,WSLOT,STATUS)
+         CALL DSA_GET_WORK_ARRAY(NPIX*2,'DOUBLE',PPTR,WSLOT,STATUS)
+      END IF
+      IF (ROTATE) THEN
+         CALL DSA_GET_WORK_ARRAY(NELM,'FLOAT',RPTR,WSLOT,STATUS)
       END IF
 C
-C     If the data is to be rotated, do that now.  Note that the routines
-C     FIG_CDIS1D, FIG_CDIS2D have separate input and output arrays, and
-C     they do not copy data that they don't correct (outside the Y range
-C     specified) from input to output.  If we want something sensible
-C     to appear in the uncorrected range - if we are not correcting the
-C     whole range - we should make sure that the output array contains
-C     a copy of the input we are going to give it. (This only affects
-C     the rotated case - in the non-rotated case the input and output 
-C     arrays are the same.)
+C     If the data array is to be rotated, do that now.  Note that the
+C     routines FIG_CDIS1D, FIG_CDIS2D have separate input and output
+C     arrays, and they do not copy data that they don't correct
+C     (outside the Y range specified) from input to output.  If we want 
+C     something sensible to appear in the uncorrected range - if we are 
+C     not correcting the whole range - we should make sure that the 
+C     output array contains a copy of the input we are going to give it.
+C     (This only affects the rotated case - in the non-rotated case the
+C     input and output arrays are the same.)
 C
       IF (ROTATE) THEN
-         CALL GEN_ROT2D(DYNAMIC_MEM(OPTR),NX,NY,DYNAMIC_MEM(RPTR))
+         CALL GEN_ROT2D(%VAL(CNF_PVAL(OPTR)),NX,NY,%VAL(CNF_PVAL(RPTR)))
          DPTR=RPTR
          IF ((IYST.NE.1).OR.(IYEN.NE.NY)) THEN
-            CALL GEN_MOVE(NBYTES,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(OPTR))
+            CALL GEN_MOVE(NBYTES,%VAL(CNF_PVAL(RPTR)),
+     :                    %VAL(CNF_PVAL(OPTR)))
          END IF
       ELSE
          DPTR=OPTR
@@ -308,12 +306,13 @@ C
 C        Fill up the shift array, using the coefficients from the
 C        distortion file.
 C
-         CALL FIG_DISFIL(COEFFS,DEGREES(1),NX,DYNAMIC_MEM(SPTR))
+         CALL FIG_DISFIL(COEFFS,DEGREES(1),NX,%VAL(CNF_PVAL(SPTR)))
 C
 C        Perform the distortion correction
 C
-         CALL FIG_CDIS1D(DYNAMIC_MEM(DPTR),NX,NY,ROTATE,IYST,IYEN,
-     :           DYNAMIC_MEM(SPTR),DYNAMIC_MEM(WPTR),DYNAMIC_MEM(OPTR))
+         CALL FIG_CDIS1D(%VAL(CNF_PVAL(DPTR)),NX,NY,ROTATE,IYST,IYEN,
+     :                   %VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(WPTR)),
+     :                   %VAL(CNF_PVAL(OPTR)))
       ELSE
 C
 C        --- 1.5D CASE ---
@@ -326,10 +325,10 @@ C
 C 
 C        Now perform the correction
 C
-         CALL FIG_CDIS2D(DYNAMIC_MEM(DPTR),NX,NY,ROTATE,IYST,IYEN,
+         CALL FIG_CDIS2D(%VAL(CNF_PVAL(DPTR)),NX,NY,ROTATE,IYST,IYEN,
      :                   NSPECT,COEFFS,DEGREES,YPOSNS,YBEST,MAXD,
-     :                   DYNAMIC_MEM(WPTR),DYNAMIC_MEM(SPTR),
-     :                   DYNAMIC_MEM(PPTR),DYNAMIC_MEM(OPTR))
+     :                   %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(SPTR)),
+     :                   %VAL(CNF_PVAL(PPTR)),%VAL(CNF_PVAL(OPTR)))
       END IF
 C
 C     If data was rotated, rotate it back.  Note that the correction
@@ -339,8 +338,8 @@ C     needs to be copied back into the output data array (the rotate
 C     does not work on data in situ).
 C
       IF (ROTATE) THEN
-         CALL GEN_ROT2D(DYNAMIC_MEM(OPTR),NY,NX,DYNAMIC_MEM(RPTR))
-         CALL GEN_MOVE(NBYTES,DYNAMIC_MEM(RPTR),DYNAMIC_MEM(OPTR))
+         CALL GEN_ROT2D(%VAL(CNF_PVAL(OPTR)),NY,NX,%VAL(CNF_PVAL(RPTR)))
+         CALL GEN_MOVE(NBYTES,%VAL(CNF_PVAL(RPTR)),%VAL(CNF_PVAL(OPTR)))
       END IF
 C
 C     Tidy up
@@ -352,8 +351,7 @@ C
       IF (FOPEN) THEN
          CLOSE (UNIT=FILE,IOSTAT=STATUS)
          IF (STATUS.NE.0) THEN
-            CALL PAR_WRUSER('Error closing down distortion file',
-     :                                                    IGNORE)
+            CALL PAR_WRUSER('Error closing down distortion file',IGNORE)
          END IF
       END IF
       CALL DSA_CLOSE(STATUS)

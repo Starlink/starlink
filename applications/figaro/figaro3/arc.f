@@ -28,7 +28,8 @@ C     OUTPUT     If the final fit obtained is to be used, it is
 C                used to reset the x-axis structure in the arc spectrum,
 C                giving a new output file.  OUTPUT is the name of
 C                output file, which can be the same as SPECTRUM, in
-C                which case the x-axis structure of SPECTRUM is replaced.
+C                which case the x-axis structure of SPECTRUM is
+C                replaced.
 C     DISNCHAN   Length of displayed sections.
 C     MOVETOX    New plot centre x value.
 C     CMD        Command in main menu.
@@ -122,27 +123,29 @@ C                    Now uses GKD_ routines for the interactive graphics
 C                    dialogue.
 C     7th Sept  1988 KS/AAO Now uses DSA_OPEN_TEXT_FILE to search for 
 C                    and open .ARC files.  Blank for ARCTYPE now treated
-C                    the same as 'NONE'.  Parameters for AREAD have changed.
-C                    Warning now output if fit is not monotonic.
-C     15th Sept 1988 KS/AAO Error messages improved if errors occur when
-C                    reading arc files.  Arc file names logged.
-C     18th Feb  1991 KS/AAO Rounding error check on `line already specified'
-C                    improved.
-C     20th Mar  1991 KS/AAO.Arc file name now included in ARLINES.LIS.
+C                    the same as 'NONE'.  Parameters for AREAD have 
+C                    changed. Warning now output if fit is not
+C                    monotonic.
+C     15th Sept 1988 KS/AAO  Error messages improved if errors occur
+C                    when reading arc files.  Arc file names logged.
+C     18th Feb  1991 KS/AAO  Rounding error check on `line already
+C                    specified' improved.
+C     20th Mar  1991 KS/AAO. Arc file name now included in ARLINES.LIS.
 C                    XCORR keyword added and calculation of shift from 
 C                    previous arc added.  Assumes wavelength values less
 C                    than 100 are microns, not angstroms. Precision used
-C                    for wavelength values modified. Number of possible arc 
-C                    lines increased to accomodate the THAR line list. Number
-C                    of possible identified lines also increased.
+C                    for wavelength values modified. Number of possible
+C                    arc lines increased to accomodate the THAR line
+C                    list. Number of possible identified lines also 
+C                    increased.
 C     30th July 1991 HME/UoE. Calculate HIGH properly.
 C     3rd  Sept 1992 HME/UoE, Starlink. INCLUDE changed, TABs removed.
-C                    Changed declaration to not contain MAX/MIN functions.
-C                    GKD_QNUM was CALLed in ARSLCT though it is declared
-C                    as LOGICAL. Now assign its value to IGNORE.
-C                    PGPOINT was called with a single character string
-C                    instead of the ASCII code of that character. Now
-C                    call with ICHAR(...).
+C                    Changed declaration to not contain MAX/MIN 
+C                    functions. GKD_QNUM was CALLed in ARSLCT though it 
+C                    is declared as LOGICAL. Now assign its value to
+C                    IGNORE.  PGPOINT was called with a single character
+C                    string instead of the ASCII code of that character.
+C                    Now call with ICHAR(...).
 C                    Open ARC files with lowercase extension. Removed
 C                    the testing of ARFILE for "]" and "."
 C                    ARLINES.LIS is lowercase now. ARCTEMP.LIS is
@@ -155,35 +158,40 @@ C                    WXYFIT changed to FIG_WXYFIT.
 C                    FIGX_SHIFT changed to FIG_SHIFT.
 C                    PGASK is banned from ADAM, commented out.
 C                    HME / UoE, Starlink.
-C     25 Jan 1993    Put PGASK back. HME / UoE, Starlink.
-C     07 Apr 1993    Call PAR_ABORT after reading parameters.
-C                    HME / UoE, Starlink.
-C     21 Jul 1993    Hardcopy of arc only if arc has been applied to output
-C                    data.  Use DSA_*_LU to get free Fortran unit.
-C                    HME / UoE, Starlink.
-C     23 Jul 1993    Disuse GKD_* apart from GKD_WRITE_LINE. Disuse PAR_Q*.
-C                    Add parameters WRITEARC, HARDARC, HARDISP, QUITSEL,
-C                    DISNCHAN, MOVETOX, LINEOK, CMD, LINENO, WAVELEN,
+C     25 Jan 1993    HME / UoE, Starlink.  Put PGASK back.
+C     07 Apr 1993    HME / UoE, Starlink. Call PAR_ABORT after reading 
+C                    parameters.
+C     21 Jul 1993    HME / UoE, Starlink.  Hardcopy of arc only if arc
+C                    has been applied to output data.  Use DSA_*_LU to
+C                    get free Fortran unit.
+C     23 Jul 1993    HME / UoE, Starlink.  Disuse GKD_* apart from
+C                    GKD_WRITE_LINE. Disuse PAR_Q*. Add parameters 
+C                    WRITEARC, HARDARC, HARDISP, QUITSEL, DISNCHAN,
+C                    MOVETOX, LINEOK, CMD, LINENO, WAVELEN,
 C                    RESOLVE, CHFACT, SIGFACT.  Get abortion to work
 C                    in spite of loops and lack of inherited status.
-C                    HME / UoE, Starlink.
-C     14 Jan 1994    If ARCTYPE folds to 'NONE', use the folded string.
-C                    This is to make 'none', 'None' etc. acceptable
-C                    under Unix, where (F)PAR does not fold strings.
-C                    HME / UoE, Starlink.
-C     15 Feb 1995    In the big workspace move the DOUBLE workspace to
-C                    the front. Otherwise the odd number of FLOAT
-C                    workspaces combined with an odd number of channels
-C                    in the input spectrum cause the DOUBLE workspace to
-C                    be misaligned (memory address and odd multiple of
-C                    4). HME / UoE, Starlink.
-C     19 Jul 1995    Allow ARGETL to cause abortion if arlines.lis
-C                    cannot be opened for output.
+C     14 Jan 1994    HME / UoE, Starlink.  If ARCTYPE folds to 'NONE', 
+C                    use the folded string. This is to make 'none', 
+C                    'None' etc. acceptable under Unix, where (F)PAR
+C                    does not fold strings.
+C     15 Feb 1995    HME / UoE, Starlink.  In the big workspace move 
+C                    the DOUBLE workspace to the front. Otherwise the
+C                    odd number of FLOAT workspaces combined with an
+C                    odd number of channels in the input spectrum cause 
+C                    the DOUBLE workspace to be misaligned (memory 
+C                    address and odd multiple of 4).
+C     19 Jul 1995    HME / UoE, Starlink. Allow ARGETL to cause 
+C                    abort if arlines.lis cannot be opened for output.
 C     18 Jul 1996    MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
-C     24 Jul 1996    MJCL / Starlink, UCL.  Corrected type of DSA_SAME_DATA
+C     24 Jul 1996    MJCL / Starlink, UCL.  Corrected type of
+C                    DSA_SAME_DATA.
+C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters -  array sizes for arc lines and identified lines.
 C
@@ -194,101 +202,104 @@ C     Functions
 C
       LOGICAL PAR_ABORT
       INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,PGBEGIN
-      INTEGER DYN_ELEMENT,DYN_INCREMENT,DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
       LOGICAL DSA_SAME_DATA
       DOUBLE PRECISION GEN_ELEMD, GEN_EPOLYD
       CHARACTER ICH_CF*16
 C
 C     Local variables
 C
-      INTEGER   ADDRESS             ! Address of dynamic memory element
-      LOGICAL   APPLY               ! TRUE if fits are to be applied to data
-      REAL      ARC1(NLARCS)        ! Arc lines in first arc list
-      REAL      ARC2(NLARCS)        ! Arc lines in second arc list
-      REAL      ARC3(NLARCS)        ! Arc lines in third arc list
-      CHARACTER ARCS*132            ! Name of file of arc spectrum
-      CHARACTER ARCTST*132          ! To check ARCS against 'NONE'
-      CHARACTER ARFILE*132          ! The name of the file containing fit info
-      INTEGER   BYTES               ! Amount of workspace required
-      REAL      CHANS(NLMAX)        ! Channel positions of identified lines
-      CHARACTER CHAR*80             ! General string used for messages
-      INTEGER   CLASS(NLMAX)        ! Indentified line `class' (auto or manual)
-      DOUBLE PRECISION  COEFFS(NC)  ! Polynomial coefficients for fit
-      LOGICAL   COMPLETE            ! TRUE when user selects QUIT option
-      LOGICAL   DBL                 ! TRUE if forcing x data to DOUBLE 
-      DOUBLE PRECISION  DELTAX      ! Average increment in wavelength array
-      CHARACTER DEVICE*32           ! PGPLOT device specification
-      CHARACTER DLAB*64             ! Plot data axis label
-      INTEGER   DOUBLE_SIZ          ! Size in bytes of a Figaro DOUBLE
-      INTEGER   DPTR                ! Dynamic memopry pointer to input data
-      INTEGER   DSLOT               ! Map slot number of input data
-      DOUBLE PRECISION   DUMMY      ! Dummy arguement for magnitude flag
-      CHARACTER ERROR*64            ! Error message text
-      CHARACTER FILE*132            ! Full name of arc spectrum file
-      LOGICAL   FITTED              ! Set once wavelength fit is obtained
-      INTEGER   FLOAT_SIZ           ! Size in bytes of a Figaro FLOAT
-      INTEGER   FORDER              ! Fit order as given in ARLINES file
-      REAL      FSIGMA              ! Sigma as given in ARLINES file
-      LOGICAL   HARD                ! True if the arc is to be hard plotted
-      REAL      HIGH                ! Maximum data-value for a plot
-      LOGICAL   HPLOT               ! TRUE if hard plot is requested
-      INTEGER   IDUMMY              ! Integer dummy arguement
-      INTEGER   IGNORE              ! Used to ignore status codes
-      INTEGER   INVOKE              ! Used to invoke functions
-      INTEGER   IOUT                ! Logical unit for output
-      INTEGER   ISTAT               ! Status returned by ARGETL
-      INTEGER   ITEMP               ! Temporary integer storage
-      INTEGER   IVALUE              ! Dummy integer argument
-      INTEGER   IXEN                ! Last element to be plotted in x-axis
-      INTEGER   IXST                ! First element to be plotted in x-axis
-      INTEGER   IYEN                ! Last element to be plotted in y-axis
-      INTEGER   IYST                ! First element to be plotted in y-axis
-      REAL      LOW                 ! Minimum data-value for a plot
-      LOGICAL   MICRONS             ! True if wavelengths seem to be in microns
-      INTEGER   NCENT               ! Central pixel number
-      INTEGER   NCHAN               ! Number of pixels to display at once
-      INTEGER   NDIM                ! Dimensionality of input data structure
-      INTEGER   NELM                ! Total number of elements in the data
-      INTEGER   NEXT                ! Next available character position
-      INTEGER   NLID                ! Number of arc lines identified
-      INTEGER   NX                  ! Length of the spectrum in pixels
-      INTEGER   OXPTR               ! Pointer to output x-axis data
-      INTEGER   ORDER               ! Initial order of polynomial fit
-      INTEGER   OXSLOT              ! Map slot number for output x-axis data
-      REAL      PARMS(2)            ! Parameters used to control auto finder
-      INTEGER   PPTR                ! Dynamic memory element for prev arc data
-      INTEGER   PSLOT               ! Map slot number for previous arc data
-      LOGICAL   REPEAT              ! Used to control selection loop
-      LOGICAL   PREV                ! Value of PREVIOUS keyword
-      CHARACTER PREVFILE*132        ! Name of arc file used for previous fit
-      LOGICAL   SAME                ! TRUE if output is to be same as input data
-      LOGICAL   SHOWRMS             ! Set once RMS can be displayed
-      REAL      SHIFT               ! Shift between arc and previous arc
-      REAL      SIGMA               ! Initial value for line-width
-      INTEGER   STATUS              ! Status return from DSA_xxx routines
-      CHARACTER STRINGS(2)*64       ! Receives data and axis information
-      INTEGER   SXPTR               ! Origin of output axis data, XFPTR or XDPTR
-      CHARACTER TYPE*8              ! The type of the output x-axis array
-      REAL      VALUE               ! Temporary REAL
-      REAL      WAVES(NLMAX)        ! Wavelengths of identified lines
-      REAL      WEIGHTS(NLMAX)      ! Weights for identified lines
-      INTEGER   WPTR                ! Pointer to 'float' workspace
-      INTEGER   WPTR2               ! Pointer to 'float' workspace
-      INTEGER   WSLOT               ! Map slot number used for workspace
-      INTEGER   XBYTES              ! Size in bytes of the output x-axis data
-      LOGICAL   XCORR               ! Value of XCORR keyword
-      INTEGER   XDPTR               ! Pointer to axis 'double' workspace
-      INTEGER   XFPTR               ! Pointer to axis 'float' workspace
-      CHARACTER XLAB*64             ! X-axis label for plot
-      INTEGER   XPTR                ! Dynamic-memory pointer to x-axis data
-      INTEGER   XSLOT               ! Map slot number used for x-axis info
-      LOGICAL   XS                  ! Indicates lines to be shown using 'X's.
-      REAL      XVEN                ! Last X-axis value to be plotted
-      REAL      XVST                ! First X-axis value to be plotted
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL   APPLY            ! |Fits are to be applied to data?
+      REAL      ARC1(NLARCS)     ! Arc lines in first arc list
+      REAL      ARC2(NLARCS)     ! Arc lines in second arc list
+      REAL      ARC3(NLARCS)     ! Arc lines in third arc list
+      CHARACTER ARCS*132         ! Name of file of arc spectrum
+      CHARACTER ARCTST*132       ! To check ARCS against 'NONE'
+      CHARACTER ARFILE*132       ! Name of the file containing fit info
+      REAL      CHANS(NLMAX)     ! Channel positions of identified lines
+      CHARACTER CHAR*80          ! General string used for messages
+      INTEGER   CLASS(NLMAX)     ! Indentified line `class' (auto or
+                                 ! manual)
+      DOUBLE PRECISION COEFFS(NC)! Polynomial coefficients for fit
+      LOGICAL   COMPLETE         ! TRUE when user selects QUIT option
+      LOGICAL   DBL              ! TRUE if forcing x data to DOUBLE 
+      DOUBLE PRECISION DELTAX    ! Average increment in wavelength array
+      CHARACTER DEVICE*32        ! PGPLOT device specification
+      CHARACTER DLAB*64          ! Plot data axis label
+      INTEGER   DOUBLE_SIZ       ! Size in bytes of a Figaro DOUBLE
+      INTEGER   DPTR             ! Dynamic-memory pointer to input data
+      INTEGER   DSLOT            ! Map slot number of input data
+      DOUBLE PRECISION DUMMY     ! Dummy arguement for magnitude flag
+      CHARACTER ERROR*64         ! Error message text
+      CHARACTER FILE*132         ! Full name of arc spectrum file
+      LOGICAL   FITTED           ! Set once wavelength fit is obtained
+      INTEGER   FLOAT_SIZ        ! Size in bytes of a Figaro FLOAT
+      INTEGER   FORDER           ! Fit order as given in ARLINES file
+      REAL      FSIGMA           ! Sigma as given in ARLINES file
+      LOGICAL   HARD             ! True if the arc is to be hard plotted
+      REAL      HIGH             ! Maximum data-value for a plot
+      LOGICAL   HPLOT            ! TRUE if hard plot is requested
+      INTEGER   IDUMMY           ! Integer dummy arguement
+      INTEGER   IGNORE           ! Used to ignore status codes
+      INTEGER   INVOKE           ! Used to invoke functions
+      INTEGER   IOUT             ! Logical unit for output
+      INTEGER   ISTAT            ! Status returned by ARGETL
+      INTEGER   ITEMP            ! Temporary integer storage
+      INTEGER   IVALUE           ! Dummy integer argument
+      INTEGER   IXEN             ! Last element to be plotted in x-axis
+      INTEGER   IXST             ! First element to be plotted in x-axis
+      INTEGER   IYEN             ! Last element to be plotted in y-axis
+      INTEGER   IYST             ! First element to be plotted in y-axis
+      REAL      LOW              ! Minimum data-value for a plot
+      LOGICAL   MICRONS          ! Wavelengths seem to be in microns?
+      INTEGER   NCENT            ! Central pixel number
+      INTEGER   NCHAN            ! Number of pixels to display at once
+      INTEGER   NDIM             ! Dimensionality of input data 
+                                 ! structure
+      INTEGER   NELM             ! Total number of elements in the data
+      INTEGER   NEXT             ! Next available character position
+      INTEGER   NLID             ! Number of arc lines identified
+      INTEGER   NX               ! Length of the spectrum in pixels
+      INTEGER   OXPTR            ! Pointer to output x-axis data
+      INTEGER   ORDER            ! Initial order of polynomial fit
+      INTEGER   OXSLOT           ! Map slot number for output x-axis
+                                 ! data
+      REAL      PARMS(2)         ! Parameters used to control auto 
+                                 ! finder
+      INTEGER   PPTR             ! Dynamic-memory pointer for previous
+                                 ! arc data
+      INTEGER   PSLOT            ! Map slot number for previous arc data
+      LOGICAL   REPEAT           ! Used to control selection loop
+      LOGICAL   PREV             ! Value of PREVIOUS keyword
+      CHARACTER PREVFILE*132     ! Name of arc file used for previous 
+                                 ! fit
+      LOGICAL   SAME             ! Output is to be same as input data?
+      LOGICAL   SHOWRMS          ! Set once RMS can be displayed
+      REAL      SHIFT            ! Shift between arc and previous arc
+      REAL      SIGMA            ! Initial value for line-width
+      INTEGER   STATUS           ! Status return from DSA_xxx routines
+      CHARACTER STRINGS(2)*64    ! Receives data and axis information
+      INTEGER   SXPTR            ! Origin of output axis data, XFPTR or 
+                                 ! XDPTR
+      CHARACTER TYPE*8           ! The type of the output x-axis array
+      REAL      VALUE            ! Temporary REAL
+      REAL      WAVES(NLMAX)     ! Wavelengths of identified lines
+      REAL      WEIGHTS(NLMAX)   ! Weights for identified lines
+      INTEGER   WPTR             ! Pointer to 'float' workspace
+      INTEGER   WPTR2            ! Pointer to 'float' workspace
+      INTEGER   WSLOT            ! Map slot number used for workspace
+      INTEGER   XBYTES           ! Size in bytes of the output x-axis
+                                 ! data
+      LOGICAL   XCORR            ! Value of XCORR keyword
+      INTEGER   XDPTR            ! Pointer to axis 'double' workspace
+      INTEGER   XFPTR            ! Pointer to axis 'float' workspace
+      CHARACTER XLAB*64          ! X-axis label for plot
+      INTEGER   XPTR             ! Dynamic-memory pointer to x-axis data
+      INTEGER   XSLOT            ! Map slot number used for x-axis info
+      LOGICAL   XS               ! Indicates lines to be shown using 
+                                 ! 'X's.
+      REAL      XVEN             ! Last X-axis value to be plotted
+      REAL      XVST             ! First X-axis value to be plotted
 C
 C     Initialisation of DSA_ routines
 C
@@ -334,8 +345,7 @@ C
 C
 C     Map in the data
 C
-      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Try for x-axis information and construct label
@@ -348,26 +358,19 @@ C
       CALL DSA_GET_DATA_INFO ('SPECT',2,STRINGS,0,DUMMY,STATUS)
       CALL FIG_MAKE_AXIS_LABEL(STRINGS(2),STRINGS(1),DLAB)
 C
-C     Get workspace for the dispersion plots (two real arrays, each NX long)
-C     and for the X arrays (one float,one double precision, each NX long)
+C     Get workspace for the dispersion plots (two real arrays, each NX 
+C     long) and for the X arrays (one float,one double precision, each
+C     NX long).
 C
-      BYTES=NX*3*FLOAT_SIZ + NX*DOUBLE_SIZ
-      CALL DSA_GET_WORKSPACE (BYTES,ADDRESS,WSLOT,STATUS)
-C      WPTR=DYN_ELEMENT(ADDRESS)
-C      WPTR2=DYN_INCREMENT(WPTR,'FLOAT',NX)
-C      XFPTR=DYN_INCREMENT(WPTR2,'FLOAT',NX)
-C      XDPTR=DYN_INCREMENT(XFPTR,'FLOAT',NX)
-      XDPTR=DYN_ELEMENT(ADDRESS)
-      WPTR =DYN_INCREMENT(XDPTR,'DOUBLE',NX)
-      WPTR2=DYN_INCREMENT(WPTR, 'FLOAT', NX)
-      XFPTR=DYN_INCREMENT(WPTR2,'FLOAT', NX)
+      CALL DSA_GET_WORK_ARRAY (NX,'DOUBLE',XDPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',WPTR2,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',WPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',XFPTR,WSLOT,STATUS)
 C
 C     Map the input's x-axis data and copy it to the workspace.
 C     (The double array is just used for the final output into the file.
 C
-      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',ADDRESS,
-     :                                             XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('SPECT',1,'READ','FLOAT',XPTR,XSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Initialise the graphics device 
@@ -423,20 +426,20 @@ C
          IF (XCORR) THEN
             CALL DSA_NAMED_INPUT('PREV',PREVFILE,STATUS)
             CALL DSA_MATCH_SIZES('PREV','SPECT',STATUS)
-            CALL DSA_MAP_DATA('PREV','READ','FLOAT',ADDRESS,PSLOT,
-     :                                                       STATUS)
-            PPTR=DYN_ELEMENT(ADDRESS)
+            CALL DSA_MAP_DATA('PREV','READ','FLOAT',PPTR,PSLOT,STATUS)
             IF (STATUS.NE.0) GO TO 500
-            CALL FIG_SHIFT(DYNAMIC_MEM(DPTR),DYNAMIC_MEM(PPTR),NX,
-     :                                                     SHIFT,STATUS)
+
+            CALL FIG_SHIFT(%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(PPTR)),NX,
+     :                     SHIFT,STATUS)
             IF (STATUS.NE.0) GO TO 500
+
             CHAR='Current arc seems to be shifted by '//ICH_CF(SHIFT)
             NEXT=ICH_LEN(CHAR)+1
             CHAR(NEXT:)=' pixels. '
             CALL PAR_WRUSER(CHAR,IGNORE)
             CALL PAR_WRUSER('Will redetermine line centers',IGNORE)
-            CALL ARSHIFT (NX,DYNAMIC_MEM(DPTR),SIGMA,SHIFT,NLMAX,CHANS,
-     :                                        WAVES,WEIGHTS,CLASS,NLID)
+            CALL ARSHIFT (NX,%VAL(CNF_PVAL(DPTR)),SIGMA,SHIFT,NLMAX,
+     :                    CHANS,WAVES,WEIGHTS,CLASS,NLID)
             CALL PAR_WRUSER('Line centers redetermined',IGNORE)
          END IF
       END IF
@@ -473,14 +476,14 @@ C
 C
 C           Display
 C
-            CALL ARPLOT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),NX,IXST,
-     :                  IXEN,XLAB,DLAB,COEFFS,ORDER,XS,CHANS,WAVES,
+            CALL ARPLOT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),NX,
+     :                  IXST,IXEN,XLAB,DLAB,COEFFS,ORDER,XS,CHANS,WAVES,
      :                  CLASS,NLID,HIGH,LOW)
 C
 C           Line selection
 C
-            CALL ARSLCT(DYNAMIC_MEM(XPTR),DYNAMIC_MEM(DPTR),NX,ARC1,
-     :                  ARC2,ARC3,NLARCS,HIGH,LOW,SIGMA,NLMAX,ARCS,
+            CALL ARSLCT(%VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(DPTR)),NX,
+     :                  ARC1,ARC2,ARC3,NLARCS,HIGH,LOW,SIGMA,NLMAX,ARCS,
      :                  IXST,IXEN,NCHAN,COEFFS,ORDER,FITTED,SHOWRMS,
      :                  XS,CHANS,WAVES,WEIGHTS,CLASS,NLID,COMPLETE)
             IF (PAR_ABORT()) GO TO 500
@@ -497,10 +500,10 @@ C        editing etc and refitting the line.  This is all controlled
 C        by the routine ARMENU, which will return with REPEAT reset
 C        if the program is to be exited.
 C
-         CALL ARMENU(DYNAMIC_MEM(DPTR),FILE,ARC1,ARC2,ARC3,ARCS,NLARCS,
-     :               NX,NC,IOUT,SIGMA,NLMAX,CHANS,WAVES,WEIGHTS,CLASS,
-     :               NLID,FITTED,ORDER,PARMS,DYNAMIC_MEM(WPTR),
-     :               DYNAMIC_MEM(WPTR2),REPEAT,COEFFS)
+         CALL ARMENU(%VAL(CNF_PVAL(DPTR)),FILE,ARC1,ARC2,ARC3,ARCS,
+     :               NLARCS,NX,NC,IOUT,SIGMA,NLMAX,CHANS,WAVES,WEIGHTS,
+     :               CLASS,NLID,FITTED,ORDER,PARMS,%VAL(CNF_PVAL(WPTR)),
+     :               %VAL(CNF_PVAL(WPTR2)),REPEAT,COEFFS)
          IF (PAR_ABORT()) GO TO 500
 C
       END DO
@@ -533,8 +536,8 @@ C
 C           Set the X data (both single and double) to the wavelength 
 C           values
 C
-            CALL ARSETX(NX,COEFFS,ORDER,DYNAMIC_MEM(XFPTR))
-            CALL ARSETXD(NX,COEFFS,ORDER,DYNAMIC_MEM(XDPTR))
+            CALL ARSETX(NX,COEFFS,ORDER,%VAL(CNF_PVAL(XFPTR)))
+            CALL ARSETXD(NX,COEFFS,ORDER,%VAL(CNF_PVAL(XDPTR)))
             IF (MICRONS) THEN
                XLAB='Wavelength in microns'
             ELSE
@@ -546,26 +549,25 @@ C           (if one exists at all) is suitable for the X data to be
 C           written to it.  It certainly will need to be FLOAT,
 C           and may even need to be DOUBLE.
 C
-            DELTAX=GEN_ELEMD(DYNAMIC_MEM(XDPTR),NCENT)
-     :                      -GEN_ELEMD(DYNAMIC_MEM(XDPTR),NCENT+1)
-            DBL=((GEN_ELEMD(DYNAMIC_MEM(XDPTR),NCENT)/
-     :                                     ABS(DELTAX)).GT.50000.)
+            DELTAX=GEN_ELEMD(%VAL(CNF_PVAL(XDPTR)),NCENT)
+     :             -GEN_ELEMD(%VAL(CNF_PVAL(XDPTR)),NCENT+1)
+            DBL=((GEN_ELEMD(%VAL(CNF_PVAL(XDPTR)),NCENT)/
+     :          ABS(DELTAX)).GT.50000.)
             IF (DBL) THEN
 C
 C              Create a new X-axis data array.  Note that since this may
 C              extend the file and so invalidate the data array mapping,
-C              the data array will have to be unmapped and remapped again if
-C              the input is the same as the output. The X-axis data will 
-C              definitely need to be remapped.
+C              the data array will have to be unmapped and remapped 
+C              again if the input is the same as the output. The X-axis 
+C              data will definitely need to be remapped.
 C
                IF (SAME) CALL DSA_UNMAP(DSLOT,STATUS)
                CALL DSA_UNMAP(XSLOT,STATUS)
                CALL DSA_COERCE_AXIS_DATA('OUTPUT',1,'DOUBLE',1,NX,
      :                                                     STATUS)
                IF (SAME) THEN
-                  CALL DSA_MAP_DATA('SPECT','READ','FLOAT',
-     :                                       ADDRESS,DSLOT,STATUS)
-                  DPTR=DYN_ELEMENT(ADDRESS)
+                  CALL DSA_MAP_DATA('SPECT','READ','FLOAT',DPTR,
+     :                              DSLOT,STATUS)
                END IF
                XBYTES=NX*DOUBLE_SIZ
                SXPTR=XDPTR
@@ -575,10 +577,10 @@ C
                SXPTR=XFPTR
                TYPE='FLOAT'
             END IF
-            CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE',TYPE,ADDRESS,
-     :                                               OXSLOT,STATUS)
-            OXPTR=DYN_ELEMENT(ADDRESS)
-            CALL GEN_MOVE(XBYTES,DYNAMIC_MEM(SXPTR),DYNAMIC_MEM(OXPTR))
+            CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE',TYPE,OXPTR,
+     :                             OXSLOT,STATUS)
+            CALL GEN_MOVE(XBYTES,%VAL(CNF_PVAL(SXPTR)),
+     :                    %VAL(CNF_PVAL(OXPTR)))
          END IF
       END IF
       IF (STATUS.NE.0) GOTO 500
@@ -603,9 +605,10 @@ C
                      IXEN=NX
                      IXST=NX-NCHAN+1
                   END IF
-                  CALL ARPLOT(DYNAMIC_MEM(XFPTR),DYNAMIC_MEM(DPTR),NX,
-     :                           IXST,IXEN,XLAB,DLAB,COEFFS,ORDER,XS,
-     :                           CHANS,WAVES,CLASS,NLID,HIGH,LOW)
+                  CALL ARPLOT(%VAL(CNF_PVAL(XFPTR)),
+     :                        %VAL(CNF_PVAL(DPTR)),NX,IXST,IXEN,XLAB,
+     :                        DLAB,COEFFS,ORDER,XS,CHANS,WAVES,CLASS,
+     :                        NLID,HIGH,LOW)
                   IXST=IXST+NCHAN
                   COMPLETE=IXST.GE.NX
                END DO
@@ -624,16 +627,16 @@ C
          CALL AHOPEN(1,STATUS)
          IF (STATUS.EQ.0) THEN
             CALL ARDISC(CHANS,WAVES,WEIGHTS,CLASS,NLID,COEFFS,ORDER,
-     :                      NX,DYNAMIC_MEM(WPTR),DYNAMIC_MEM(WPTR2))
+     :                  NX,%VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(WPTR2)))
             CALL PGEND
             CALL PAR_WRUSER('Plot file created',IGNORE)
             IF (HPLOT) THEN
                CALL PAR_WRUSER(
-     :             'Note that two hard copy files have been created,',
-     :                                                        IGNORE)
+     :           'Note that two hard copy files have been created,',
+     :           IGNORE)
                CALL PAR_WRUSER(
-     :             'One for the arc data and one for the dispersion.',
-     :                                                        IGNORE)
+     :           'One for the arc data and one for the dispersion.',
+     :           IGNORE)
              END IF
          END IF
       END IF
