@@ -148,7 +148,7 @@ C                  data.
          CALL DSA_NAMED_INPUT('IMAGE1',IMAGE1,STATUS)
          IF (STATUS.NE.0) GOTO 500
          I1OPEN=.TRUE.
-      ENDIF
+      END IF
 *
 *     Check that the first input image is 1D or 2D.
 *
@@ -157,10 +157,10 @@ C                  data.
       IF (INDIM.LT.1.OR.INDIM.GT.2) THEN
          CALL PAR_WRUSER('First input image is not 1D or 2D',STATUS)
          GOTO 500
-      ENDIF
+      END IF
       IF (INDIM.EQ.1) THEN
          IDIMS(2) = 1
-      ENDIF
+      END IF
 *
 *     If we are using two input images, check that their X sizes tally ...
 *
@@ -170,15 +170,15 @@ C                  data.
          IF (I1NDIM.LT.1.OR.I1NDIM.GT.2) THEN
             CALL PAR_WRUSER('Second input image is not 1D or 2D',STATUS)
             GOTO 500
-         ENDIF
+         END IF
          IF (IDIMS(1).NE.I1DIMS(1)) THEN
             CALL PAR_WRUSER('First and second input images have '//
      :                                  'different X sizes',STATUS)
             GOTO 500
-         ENDIF
+         END IF
          IF (I1NDIM.EQ.1) THEN
             I1DIMS(2) = 1
-         ENDIF
+         END IF
 *
 *        ... that their X units are the same and are known wavelength units ...
 *
@@ -190,7 +190,7 @@ C                  data.
             CALL PAR_WRUSER('First image does not have X units of '//
      :                                 'Angstroms or microns',STATUS)
             GOTO 500
-         ENDIF
+         END IF
          CALL DSA_GET_AXIS_INFO('IMAGE1',1,2,CITEMS,1,DITEMS,STATUS)
          I1XUNITS=CITEMS(1)
          IGNORE = ICH_FOLD(I1XUNITS)
@@ -199,12 +199,12 @@ C                  data.
             CALL PAR_WRUSER('Second image does not have X units of '//
      :                                  'Angstroms or microns',STATUS)
             GOTO 500
-         ENDIF
+         END IF
          IF (IXUNITS.NE.I1XUNITS) THEN
             CALL PAR_WRUSER('First and second images have different '//
      :                                                'X units',STATUS)
             GOTO 500
-         ENDIF
+         END IF
 *
 *        ... that their X.DATA arrays are 1D, are the same size as each
 *        other and are the same size as the .Z.DATA arrays ...
@@ -215,7 +215,7 @@ C                  data.
             CALL PAR_WRUSER('First input image .X.DATA is not 1D',
      :                                                     STATUS)
             GOTO 500
-         ENDIF
+         END IF
          CALL DSA_AXIS_SIZE('IMAGE1',1,MAXDIMS,
      :      I1XNDIM,I1XDIMS,NELM,STATUS)
          IF (STATUS.NE.0) GOTO 500
@@ -223,17 +223,17 @@ C                  data.
             CALL PAR_WRUSER('Second input image .X.DATA is not 1D',
      :                                                      STATUS)
             GOTO 500
-         ENDIF
+         END IF
          IF (IXDIMS(1).NE.I1XDIMS(1)) THEN
             CALL PAR_WRUSER('First and second input images have '//
      :                            'different .X.DATA sizes',STATUS)
             GOTO 500
-         ENDIF
+         END IF
          IF (IXDIMS(1).NE.IDIMS(1)) THEN
             CALL PAR_WRUSER('Input images have different .Z.DATA and '//
      :                                           '.X.DATA sizes',STATUS)
             GOTO 500
-         ENDIF
+         END IF
 *
 *        ... and that their .X.DATA arrays are the same to within a reasonably
 *        small tolerance.
@@ -243,8 +243,8 @@ C                  data.
             CALL PAR_WRUSER('First and second input images have '//
      :                           'different .X.DATA arrays',STATUS)
             GOTO 500
-         ENDIF
-      ENDIF
+         END IF
+      END IF
 *
 *     Now that the input images are successfully checked we can read the
 *     parameters controlling the size of the median filter that is passed
@@ -281,7 +281,7 @@ C                  data.
 *
       IF (.NOT.I1OPEN) THEN
          I1DIMS(2) = IDIMS(2)
-      ENDIF
+      END IF
       CALL FIG_ECHMERGE(IDIMS(1),IDIMS(2),I1DIMS(2),
      :                  %VAL(CNF_PVAL(IPTR)),I1OPEN,
      :                  %VAL(CNF_PVAL(I1PTR)),BOX,CUTOFF,OIDENT,
@@ -376,8 +376,8 @@ C                  data.
       IF (OIDENT.EQ.'OUTPUT') THEN
          DO I = 1,NX
             OUTPUT(I) = 0.0
-         ENDDO
-      ENDIF
+         END DO
+      END IF
 *
 *     For each of the input images that is not the same as the output image,
 *     add in the orders from that input image. Recall that there may not be
@@ -385,10 +385,10 @@ C                  data.
 *
       IF (OIDENT.NE.'IMAGE') THEN
          CALL FIG_ECHADDIN(NX,INY,IMAGE,BOX,CUTOFF,OUTPUT)
-      ENDIF
+      END IF
       IF (I1OPEN.AND.OIDENT.NE.'IMAGE1') THEN
          CALL FIG_ECHADDIN(NX,I1NY,IMAGE1,BOX,CUTOFF,OUTPUT)
-      ENDIF
+      END IF
       END
 
 *+
@@ -486,7 +486,7 @@ C                  data.
             ELSE
                OUTPUT(J) = (IWEIGHT*IMAGE(J,I) + OWEIGHT*OUTPUT(J)) /
      :                                (IWEIGHT + OWEIGHT)
-            ENDIF
-         ENDDO
-      ENDDO
+            END IF
+         END DO
+      END DO
       END

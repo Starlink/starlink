@@ -675,7 +675,7 @@
                      IYLOW = MAX(  1, INT(YS)-HYWID+1 )
                      IYTOP = MIN( NY, INT(YS)+HYWID   )
                      IYS   = INT(YS)
-                  ENDIF
+                  END IF
 
 *              Fine adjustment to centre.
                   IF ( SMRAY(I,IYS) .LT. SMRAY(I,IYS-1) ) THEN
@@ -868,7 +868,7 @@
             NOFIB      = NOFIB + 1
             FIBOK(NOK) = .FALSE.
             GO TO 28
-         ENDIF
+         END IF
 
 
 *     Fill in the rejected fibre traces.
@@ -906,7 +906,7 @@
 *           this compressed bin.
                DO IFIB = 1, NUMFIB
                   Y(IFIB) = YY(I,IFIB)
-               ENDDO
+               END DO
 
 *           Fit a polynomial of degree 4 for y(i) where y is the
 *           vertical position of the fibre in the current x bin and
@@ -964,7 +964,7 @@
                END IF
  36         CONTINUE
 
-         ENDIF
+         END IF
 
 *     Ask user's confirmation. There is now the option to return to the
 *     start of the rejection loop. But the rejected and interpolated
