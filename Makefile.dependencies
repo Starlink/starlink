@@ -1557,6 +1557,12 @@ $(MANIFESTS)/sae: \
 	cd libraries/sae \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sc13: \
+		$(MANIFESTS)/dvi2bitmap \
+		$(MANIFESTS)/sgmlkit
+	cd docs/sc/013 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sc3: \
 		$(MANIFESTS)/star2html
 	cd docs/sc/003 \
@@ -1822,6 +1828,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/polpack \
 	$(MANIFESTS)/prm \
 	$(MANIFESTS)/rv \
+	$(MANIFESTS)/sc13 \
 	$(MANIFESTS)/sc3 \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgs \
