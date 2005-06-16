@@ -13,7 +13,8 @@ C
 C     (>) MTCHN   (Integer) TIO_ channel number for the input tape.
 C                 The tape must have been opened using TIO_OPEN
 C                 and FITIN assumes the tape is positioned at the start
-C                 of the header record(s). MTCHN is ignored if LU is non-zero.
+C                 of the header record(s). MTCHN is ignored if LU is
+C                 non-zero.
 C     (>) LU      (Integer) Logical unit for the disk file, if one
 C                 is to be used instead of tape.  The file should
 C                 have been opened already.  If LU is zero, the
@@ -26,31 +27,33 @@ C                 disk files either swap option is acceptable.
 C     (>) BLOCK   (Integer) A code for how blocked data is to be 
 C                 handled.  0 => Data always starts in the actual
 C                 tape record following the last one used for header 
-C                 information.  1 => Data starts in the 2880-byte logical
-C                 block following the header information, and this
-C                 will often be in the same physical record used for the
-C                 header information.  BLOCK=0 is used by JT's FITS-like
-C                 tape format, BLOCK=1 is needed by AIPS and similar
-C                 systems.  See below.
+C                 information.  1 => Data starts in the 2880-byte
+C                 logical block following the header information, and
+C                 this will often be in the same physical record used
+C                 for the header information.  BLOCK=0 is used by JT's
+C                 FITS-like tape format, BLOCK=1 is needed by AIPS and
+C                 similar systems.  See below.
 C     (>) ENAME   (Character) The name of the structure to be
-C                 created.  A file called ENAME//'.ext' where 'ext' is the
-C                 default Figaro file extension will be created for the
-C                 structure.
+C                 created.  A file called ENAME//'.ext' where 'ext' is
+C                 the default Figaro file extension will be created for 
+C                 the structure.
 C     (>) FLOAT   (Logical) False if data is to be maintained in
 C                 the integer form read from tape, as opposed to being
 C                 converted to Floating point by use of the BZERO and
 C                 BSCALE keyword values.  If the tape actually contains
-C                 values for BSCALE and BZERO other than 1.0 and 0.0 then
-C                 this will override a false value of FLOAT and floating
-C                 point data will be created anyway.  (The special case of
-C                 BSCALE = 1.0, BZERO = 32768.0 and BITPIX=16 is trapped
-C                 and causes unsigned short data to be generated if FLOAT
+C                 values for BSCALE and BZERO other than 1.0 and 0.0
+C                 then this will override a false value of FLOAT and
+C                 floating point data will be created anyway.  (The
+C                 special case of BSCALE = 1.0, BZERO = 32768.0 and
+C                 BITPIX=16 is trapped and causes unsigned short data
+C                 to be generated if FLOAT.
 C                 is false.)
-C     (<) STATUS  (Integer) A status code for the read. 0 => OK, 1 => error.
+C     (<) STATUS  (Integer) A status code for the read. 0 => OK,
+C                 1 => error.
 C     (<) ERROR   (Character) Returns with a message describing
 C                 the error, should one occur.  Note that FIG_FITIN does
-C                 generate quite detailed error messages itself, and this
-C                 will just be a summary.
+C                 generate quite detailed error messages itself, and
+C                 this will just be a summary.
 C
 C     Prior requirements:
 C
@@ -76,8 +79,8 @@ C
 C     Output -
 C
 C     The data structure created depends on the default file format
-C     being used by the DSA routines.  If CRVALn, CRPIXn and CRDELTn axis
-C     keywords are included, axis arrays are generated.  Standard
+C     being used by the DSA routines.  If CRVALn, CRPIXn and CRDELTn
+C     axis keywords are included, axis arrays are generated.  Standard
 C     keywords such as NAXIS, BITPIX, BSCALE, BZERO, etc are trapped
 C     and used by the program, all keywords the program does not
 C     understand are put into a FITS-specific structure.
@@ -88,11 +91,11 @@ C
 C     Notes:
 C
 C     1) It is believed that this program can handle any valid FITS tape
-C     that conforms to the description in Wells et al (Astron. Astrophys.
-C     Suppl. Ser. 44 (1981) 363-370), and it also supports the blocked FITS
-C     extension described in Grosbol et al (Astron. Astrophys. Suppl. Ser.
-C     73, (1988) 359-364).  It does not support other extensions such as
-C     uv-FITS or tables.
+C     that conforms to the description in Wells et al.
+C     (Astron. Astrophys. Suppl. Ser. 44 (1981) 363-370), and it also
+C     supports the blocked FITS extension described in Grosbol et al.
+C     (Astron. Astrophys. Suppl. Ser. 73, (1988) 359-364).  It does not 
+C     support other extensions such as uv-FITS or tables.
 C     
 C     2) This program can handle tapes with records whose sizes are
 C     multiples of 2880 bytes.  There are two ways you can block data
@@ -109,15 +112,16 @@ C     it starts in the logical record following the header data, and so
 C     may be in the same physical record as the header data.  BLOCK=0
 C     and BLOCK=1 correspond to these two cases.
 C
-C     3) Unsigned short data. Some FITS tape writers (like Figaro's WIFITS)
-C     treat the special case of unsigned 16-bit integer data - which is 
-C     quite common in astronomy - by writing it with a BZERO value of 
-C     32768.0 and a BSCALE of 1.0.  In this case, the signed 16bit data that 
-C     is written to tape is just the original unsigned values with the sign
-C     bits flipped (a sneaky way of subtracting 32768).  This is quite legal,
-C     and this routine can trap that case and reverse the operation (although
-C     it only does this in the special case where BSCALE and BZERO and BITPIX
-C     have the values 32768.0, 1.0, and 16, and where FLOAT was set false).
+C     3) Unsigned short data. Some FITS tape writers (like Figaro's
+C     WIFITS) treat the special case of unsigned 16-bit integer data - 
+C     which is  quite common in astronomy - by writing it with a BZERO
+C     value of 32768.0 and a BSCALE of 1.0.  In this case, the signed
+C     16-bit data that is written to tape is just the original unsigned 
+C     values with the sign bits flipped (a sneaky way of subtracting
+C     32768).  This is quite legal, and this routine can trap that case
+C     and reverse the operation (although it only does this in the
+C     special case where BSCALE and BZERO and BITPIX have the values
+C     32768.0, 1.0, and 16, and where FLOAT was set false).
 C
 C     Subroutines / functions called -
 C
@@ -125,19 +129,19 @@ C     ICH_NUMBR    Decode number from string
 C     ICH_NUMBD    Like ICH_NUMBR, but double prec.
 C     ICH_VERIF    Position of next character not in given list.
 C     ICH_DELIM    Position of next character in given list.
+C     CNF_PVAL     Full pointer to dynamically allocated memory.
 C     DSA_OPEN     Initialise DSA system.
 C     DSA_NAMED_OUTPUT Open named file for output by DSA routines.
 C     DSA_PUT_FITS_x   Write out a FITS keyword of given type.
 C     DSA_SET_OBJECT   Write out the name of the observed object.
 C     DSA_SET_AXIS_INFO      Set units and label strings for axis.
-C     DSA_COERCE_DATA_ARRAY  Force existence of array of given size & type.
+C     DSA_COERCE_DATA_ARRAY  Force existence of array of given size &
+C                            type.
 C     DSA_MAP_AXIS_DATA      Map axis data array in structure.
 C     DSA_MAP_DATA     Map main data array in structure.
 C     DSA_UNMAP    Close down mapping of data array.
 C     DSA_CLOSE    Shut down DSA system.
 C     DSA_WRUSER   Buffered output of message strings (flushed by '\N')
-C     DYN_ELEMENT  DYNAMIC_MEM element corresponding to address.
-C     DYN_INCREMENT Increment element allowing for type & number.
 C     TIO_READ     Read record from tape
 C     TIO_EOF      See if a TIO status code indicates end of file.
 C     TIO_ERR      See if a TIO status code indicates an error or not.
@@ -157,52 +161,59 @@ C
 C                                       KS / CIT  13th April 1984
 C     Modified:
 C
-C     1st May 1985.  KS / AAO.  .OBS,.X,.Y (etc.) structures added.
-C     1st May 1986.  KS / AAO.  SWABYT,SWAWRD replaced by calls to
+C     1st May 1985   KS / AAO.  .OBS,.X,.Y (etc.) structures added.
+C     1st May 1986   KS / AAO.  SWABYT,SWAWRD replaced by calls to
 C                    GEN_BSWAP and GEN_WBSWAP.
-C     17th Jun 1986. KS / AAO.  SWAP parameter added.
-C     1st July 1986. KS / AAO.  Test for SIMPLE=T corrected.  Now
+C     17th Jun 1986  KS / AAO.  SWAP parameter added.
+C     1st July 1986  KS / AAO.  Test for SIMPLE=T corrected.  Now
 C                    produces an error message, but tries to read.
-C     17th Oct 1988. KS / AAO.  BLOCK parameter added.  BUFSIZ increased.
-C     21st Mar 1989. KS / AAO.  PWH (ST-AND)'s mod to handle HISTORY and
-C                    COMMENT correctly added.  (Eventually, this will all
-C                    use DSA, which will simplify things a lot.)
-C     4th  May 1990. KS / AAO.  Re-worked to use the DSA routines
+C     17th Oct 1988  KS / AAO.  BLOCK parameter added.  BUFSIZ
+C                    increased.
+C     21st Mar 1989  KS / AAO.  PWH (ST-AND)'s mod to handle HISTORY and
+C                    COMMENT correctly added.  (Eventually, this will 
+C                    all use DSA, which will simplify things a lot.)
+C     4th  May 1990  KS / AAO.  Re-worked to use the DSA routines
 C                    instead of direct calls to DTA routines to create
 C                    the output file.  This is a substantial recoding.
 C                    FLOAT=.FALSE. is no longer regarded as forcing, if
 C                    the data really does need to be scaled up by
 C                    BSCALE.  COMMENT, HISTORY and blank keywords are
-C                    now recorded properly.  Trap for USHORT data added.
+C                   now recorded properly.  Trap for USHORT data added.
 C                    Some attempt made to tidy up comments.
-C     7th Aug 1990.  KS/AAO.  A previous fix that corrected a problem if
+C     7th Aug 1990   KS/AAO.  A previous fix that corrected a problem if
 C                    a tape was blocked and the header exactly filled a
 C                    number of logical records got lost and has now been
-C                    reinstalled.  Also, a new bug connected with blocked 
-C                    tapes where the data all fits into the first physical 
-C                    record has been fixed.
-C     21st Aug 1990. KS/AAO. FIG_DFITS routines now used to read disk FITS
-C                    files.  This allows a greater range of file types
-C                    (including UNIX files) to be handled.
-C     22nd Mar 1991. KS/AAO. Amazingly, the previous mod removed the non-
-C                    standard equivalence between HEADER and BUFFER and so
-C                    managed to break the tape reading version, and this
-C                    remained unnoticed.  BUFFER is now copied into HEADER.
-C     24th Feb 1993. KS/AAO (and BDC/UNSW). Replaced use of STL_FMTCON
+C                    reinstalled.  Also, a new bug connected with
+C                    blocked tapes where the data all fits into the
+C                    first physical record has been fixed.
+C     21st Aug 1990  KS/AAO. FIG_DFITS routines now used to read disk
+C                    FITS files.  This allows a greater range of file
+C                    types (including UNIX files) to be handled.
+C     22nd Mar 1991  KS/AAO. Amazingly, the previous mod removed the 
+C                    non-standard equivalence between HEADER and BUFFER 
+C                    and so managed to break the tape-reading version, 
+C                    and this remained unnoticed.  BUFFER is now copied 
+C                    into HEADER.
+C     24th Feb 1993  KS/AAO (and BDC/UNSW). Replaced use of STL_FMTCON
 C                    with use of DSA_FMTCON.
-C     5th  Mar 1993. KS/AAO. Changed MTPCKG calls for TIO package calls.
-C     9th  Mar 1993. KS/AAO. Added support for BITPIX=-32.
-C     18th Mar 1993. KS/AAO. Should now handle tapes with NAXIS set to zero,
-C                    and skips over file if tape has been moved.
-C      2nd Jun 1993. KS/AAO. Corrected bug in tape moved test.
-C      5th Jul 1993. KS/AAO. Removed unused variables.
-C      6th Jul 1994. HME/UoE, Starlink. Disabled BITPIX=-32. GEN_IEEETOR
-C                    does not work properly, at least not on all machines.
-C      1st Jul 1996. MJC/Starlink, UCL.  Added call to DSA_SIMPLE_OUTPUT
+C     5th  Mar 1993  KS/AAO. Changed MTPCKG calls for TIO package calls.
+C     9th  Mar 1993  KS/AAO. Added support for BITPIX=-32.
+C     18th Mar 1993  KS/AAO. Should now handle tapes with NAXIS set to
+C                    zero, and skips over file if tape has been moved.
+C      2nd Jun 1993  KS/AAO. Corrected bug in tape moved test.
+C      5th Jul 1993  KS/AAO. Removed unused variables.
+C      6th Jul 1994  HME/UoE, Starlink. Disabled BITPIX=-32. GEN_IEEETOR
+C                    does not work properly, at least not on all
+C                    machines.
+C      1st Jul 1996  MJC/Starlink, UCL.  Added call to DSA_SIMPLE_OUTPUT
 C                    prior to trying to save the FITS header.
-C     
+C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
+C
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Parameters -
 C
@@ -215,14 +226,10 @@ C
       INTEGER BUFSIZ
       PARAMETER (BUFSIZ=28800)
 C
-C     Dynamic memory include file - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
-C
 C     Functions used
 C
       LOGICAL TIO_EOF,TIO_ERR
-      INTEGER ICH_NUMBD,ICH_NUMBR,DYN_ELEMENT,DYN_INCREMENT
+      INTEGER ICH_NUMBD,ICH_NUMBR
       INTEGER ICH_VERIF,ICH_DELIM
 C
 C     Format codes for DSA_FMTCON
@@ -232,73 +239,91 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS           ! Virtual memory address for data array
-      LOGICAL   BITP              ! True once BITPIX found in header
-      INTEGER   BITPIX            ! Value of BITPIX keyword
-      DOUBLE PRECISION BSCALE     ! Value of BSCALE keyword
-      BYTE      BUFFER(BUFSIZ)    ! Main input buffer
-      INTEGER   BYTES             ! Byte count - in all data,then in one record
-      INTEGER   BYTPIX            ! Number of bytes per image pixel
-      DOUBLE PRECISION BZERO      ! Value of BZERO keyword
-      REAL      CDELTS(6)         ! Values of CRDELTn keywords
-      CHARACTER CHARS(2)*64       ! Used to set unit and label strings for axis
-      CHARACTER CHR               ! General single character
-      REAL      COEFF(2)          ! Coefficients for axis data values
-      CHARACTER COMMENT*80        ! Comment for keyword
-      INTEGER   COUNT             ! Bad conversion count for one buffer
-      INTEGER   CRDMAX            ! Maximum number of header 'cards' in header
-      REAL      CRPIX(6)          ! Values of CRPIXn keywords
-      REAL      CRVALS(6)         ! Values of CRVALn keywords
-      INTEGER   DIMS(9)           ! Value of NAXISn keywords 
-      INTEGER   DPTR              ! Dynamic memory element for axis data array
-      INTEGER   DSA_STATUS        ! Inherited status used by DSA routines
-      DOUBLE PRECISION DVALUE     ! Temporary double precision value
-      INTEGER   ERRLEN            ! Length of TIO error message
-      CHARACTER HEADER*(BUFSIZ)   ! Input buffer treated as character string
-      INTEGER   I                 ! General loop index
-      INTEGER   IAX               ! Index through axes
-      INTEGER   ICMTST            ! Star character number for comment
-      LOGICAL   IEEE_FPT          ! Input data is IEEE floating point format
-      INTEGER   IEND              ! Number of header record with END keyword
-      INTEGER   IENSTR            ! Character position of end of string value
-      INTEGER   IGNORE            ! Status value we don't care about
-      INTEGER   IPT               ! Character position of start of 'card'
-      INTEGER   IREC              ! Counter through input records
-      INTEGER   ISLSH             ! Position of '/' character -delimits comment
-      INTEGER   IST               ! Start character when decoding keywords
-      INTEGER   ISTAT             ! Status from numeric decoding from string
-      INTEGER   ISTART            ! `Card' number we start at in header
-      INTEGER   ITEMS             ! Number of array elements in buffer
-      LOGICAL   KNOWN             ! Indicates a keyword is recognised
-      CHARACTER LABELS(6)*64      ! Labels for each axis
-      INTEGER   LASTCH            ! Position of last character for this 'card'
-      INTEGER   LENGTH            ! Length of input record from tape
-      LOGICAL   MOVED             ! True if tape has been moved
-      INTEGER   NAXIS             ! Value of NAXIS keyword
-      CHARACTER NAXISN*6          ! Strings 'NAXIS1'..'NAXIS6'
-      INTEGER   NBAD              ! Total number of bad IEEE conversions
-      INTEGER   NCH               ! Number of characters in string
-      INTEGER   NEXT              ! Next character following number in string
-      INTEGER   NSFIG             ! Number of significant figures in number
-      CHARACTER ONAME*64          ! Name of keyword read from 'card'
-      INTEGER   OPTR              ! Dynamic memory element in main data array
-      INTEGER   PIXELS            ! Number of pixels in data array
-      INTEGER   PIXRC1            ! Number of data pixels in header record
-      INTEGER   PIXREC            ! Number of pixels in an input record
-      INTEGER   RECLEN            ! Length of input record
-      INTEGER   SLOT              ! DSA mapped slot number
-      INTEGER   SRCFMT            ! Code for input data type used
-      INTEGER   STBYTE            ! First data byte in header record
-      CHARACTER TYPE*8            ! Primitive type to use for output data
-      LOGICAL   USED(36)          ! Flags header lines as already used.
-      REAL      VALUE             ! Temporary real value
+      INTEGER   ADDRESS          ! Virtual memory address for data array
+      LOGICAL   BITP             ! True once BITPIX found in header
+      INTEGER   BITPIX           ! Value of BITPIX keyword
+      DOUBLE PRECISION BSCALE    ! Value of BSCALE keyword
+      BYTE      BUFFER(BUFSIZ)   ! Main input buffer
+      INTEGER   BYTES            ! Byte count - in all data,then in one 
+                                 ! record
+      INTEGER   BYTPIX           ! Number of bytes per image pixel
+      DOUBLE PRECISION BZERO     ! Value of BZERO keyword
+      REAL      CDELTS(6)        ! Values of CRDELTn keywords
+      CHARACTER CHARS(2)*64      ! Unit and label strings for axis
+      CHARACTER CHR              ! General single character
+      REAL      COEFF(2)         ! Coefficients for axis data values
+      CHARACTER COMMENT*80       ! Comment for keyword
+      INTEGER   COUNT            ! Bad conversion count for one buffer
+      INTEGER   CRDMAX           ! Maximum number of header 'cards' in
+                                 ! header
+      REAL      CRPIX(6)         ! Values of CRPIXn keywords
+      REAL      CRVALS(6)        ! Values of CRVALn keywords
+      INTEGER   DIMS(9)          ! Value of NAXISn keywords 
+      INTEGER   DPTR             ! Dynamic-memory pointer for axis data 
+                                 ! array
+      INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
+      DOUBLE PRECISION DVALUE    ! Temporary double precision value
+      INTEGER   ERRLEN           ! Length of TIO error message
+      CHARACTER HEADER*(BUFSIZ)  ! Input buffer treated as character
+                                 ! string
+      INTEGER   I                ! General loop index
+      INTEGER   IAX              ! Index through axes
+      INTEGER   ICMTST           ! Star character number for comment
+      LOGICAL   IEEE_FPT         ! Input data is IEEE floating point 
+                                 ! format
+      INTEGER   IEND             ! Number of header record with END
+                                 ! keyword
+      INTEGER   IENSTR           ! Character position of end of string
+                                 ! value
+      INTEGER   IGNORE           ! Status value we don't care about
+      INTEGER   IPT              ! Character position of start of 'card'
+      INTEGER   IREC             ! Counter through input records
+      INTEGER   ISLSH            ! Position of '/' character -delimits
+                                 ! comment
+      LOGICAL   ISNEW            ! Is address new to CNF?
+      INTEGER   IST              ! Start character when decoding
+                                 ! keywords
+      INTEGER   ISTAT            ! Status from numeric decoding from
+                                 ! string
+      INTEGER   ISTART           ! `Card' number we start at in header
+      INTEGER   ITEMS            ! Number of array elements in buffer
+      LOGICAL   KNOWN            ! Indicates a keyword is recognised
+      CHARACTER LABELS(6)*64     ! Labels for each axis
+      INTEGER   LASTCH           ! Position of last character for this
+                                 ! 'card'
+      INTEGER   LENGTH           ! Length of input record from tape
+      LOGICAL   MOVED            ! True if tape has been moved
+      INTEGER   NAXIS            ! Value of NAXIS keyword
+      CHARACTER NAXISN*6         ! Strings 'NAXIS1'..'NAXIS6'
+      INTEGER   NBAD             ! Total number of bad IEEE conversions
+      INTEGER   NCH              ! Number of characters in string
+      INTEGER   NEXT             ! Next character following number in
+                                 ! string
+      INTEGER   NSFIG            ! Number of significant figures in
+                                 ! number
+      CHARACTER ONAME*64         ! Name of keyword read from 'card'
+      INTEGER   OPTR             ! Dynamic-memory pointer in main data
+                                 ! array
+      LOGICAL   PISNEW           ! Previous CNF pointer to data new?
+      INTEGER   PIXELS           ! Number of pixels in data array
+      INTEGER   PIXRC1           ! Number of data pixels in header
+                                 ! record
+      INTEGER   PIXREC           ! Number of pixels in an input record
+      INTEGER   RECLEN           ! Length of input record
+      INTEGER   SLOT             ! DSA mapped slot number
+      INTEGER   SRCFMT           ! Code for input data type used
+      INTEGER   STBYTE           ! First data byte in header record
+      INTEGER   TPTR             ! Temporary dynamic mem pointer
+      CHARACTER TYPE*8           ! Primitive type to use for output data
+      LOGICAL   USED(36)         ! Flags header lines as already used
+      REAL      VALUE            ! Temporary real value
 C
 C     Note that this is actually the first ever Figaro routine written!
-C     And it's been messed about quite a bit in its time.  As a result, it 
-C     isn't quite as pristine a piece of code as one might like.  In 
+C     And it's been messed about quite a bit in its time.  As a result,
+C     it isn't quite as pristine a piece of code as one might like.  In 
 C     particular, the way it handles errors is a bit of a mess - some 
-C     causing messages to be output by this routine, some just setting STATUS 
-C     and ERROR.  I'd like to tidy that up sometime.
+C     causing messages to be output by this routine, some just setting
+C     STATUS and ERROR.  I'd like to tidy that up sometime.
 C
 C     Initial values
 C
@@ -518,7 +543,7 @@ C              as a character keyword, but don't bother trying to split
 C              up the record into value and comment.
 C
                CALL DSA_PUT_FITS_C ('OUTPUT',ONAME,HEADER(IPT+8:IPT+63),
-     :                                                   ' ',DSA_STATUS)
+     :                              ' ',DSA_STATUS)
                IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
             ELSE
 C
@@ -758,11 +783,9 @@ C     Now we create the data array in the output structure, and map it.
 C
       IF (NAXIS.GT.0) THEN
          CALL DSA_COERCE_DATA_ARRAY ('OUTPUT',TYPE,NAXIS,DIMS,
-     :                                                 DSA_STATUS)
-         CALL DSA_MAP_DATA ('OUTPUT','WRITE',TYPE,ADDRESS,SLOT,
-     :                                                 DSA_STATUS)
+     :                               DSA_STATUS)
+         CALL DSA_MAP_DATA ('OUTPUT','WRITE',TYPE,OPTR,SLOT,DSA_STATUS)
          IF (DSA_STATUS.NE.0) GO TO 500       ! Error exit
-         OPTR=DYN_ELEMENT(ADDRESS)
       END IF
 C
 C     Right.  By this stage we have the whole structure set up
@@ -802,26 +825,28 @@ C
             ITEMS=MIN(PIXELS,PIXRC1)
             IF (TYPE.NE.'FLOAT') THEN
                BYTES=ITEMS*(BITPIX/8)
-               CALL GEN_MOVE (BYTES,BUFFER(STBYTE),DYNAMIC_MEM(OPTR))
+               CALL GEN_MOVE (BYTES,BUFFER(STBYTE),%VAL(CNF_PVAL(OPTR)))
                IF (TYPE.EQ.'USHORT') THEN
-                  CALL GEN_SFLIP(DYNAMIC_MEM(OPTR),ITEMS)
+                  CALL GEN_SFLIP(%VAL(CNF_PVAL(OPTR)),ITEMS)
                END IF
             ELSE
 *               IF (IEEE_FPT) THEN
-*                  CALL GEN_IEEETOR(BUFFER(STBYTE),
-*     :                            DYNAMIC_MEM(OPTR),ITEMS,COUNT)
+*                  CALL GEN_IEEETOR(BUFFER(STBYTE),%VAL(CNF_PVAL(OPTR)),
+*    :                              ITEMS,COUNT)
 *                  NBAD=NBAD+COUNT
 *               ELSE
                   CALL DSA_FMTCON(.FALSE.,SRCFMT,REALF,BUFFER(STBYTE),
-     :                                 DYNAMIC_MEM(OPTR),ITEMS,IGNORE)
-                  CALL GEN_MULCAF(DYNAMIC_MEM(OPTR),ITEMS,REAL(BSCALE),
-     :                                              DYNAMIC_MEM(OPTR))
-                  CALL GEN_ADDCAF(DYNAMIC_MEM(OPTR),ITEMS,REAL(BZERO),
-     :                                              DYNAMIC_MEM(OPTR))
+     :                            %VAL(CNF_PVAL(OPTR)),ITEMS,IGNORE)
+                  CALL GEN_MULCAF(%VAL(CNF_PVAL(OPTR)),ITEMS,
+     :                            REAL(BSCALE),%VAL(CNF_PVAL(OPTR)))
+                  CALL GEN_ADDCAF(%VAL(CNF_PVAL(OPTR)),ITEMS,
+     :                            REAL(BZERO),%VAL(CNF_PVAL(OPTR)))
 *               END IF
             END IF
             PIXELS=PIXELS-PIXRC1
-            OPTR=DYN_INCREMENT(OPTR,TYPE,ITEMS)
+            CALL DYN_INCAD(OPTR,TYPE,ITEMS,TPTR,ISNEW,STATUS)
+            IF (ISNEW) CALL CNF_UNREGP(OPTR)
+            OPTR = TPTR
          END IF
       END IF
 C
@@ -829,6 +854,7 @@ C     So long as there are pixels left to be read in, read in
 C     a record and work out which pixel of the data it starts
 C     with
 C
+      PISNEW = .FALSE.
       IREC=0
       DO WHILE (PIXELS.GT.0)
          IF (LU.EQ.0) THEN
@@ -866,27 +892,31 @@ C        to the data object.  Otherwise, it must be converted first.
 C
          IF (TYPE.NE.'FLOAT') THEN
             BYTES=ITEMS*(BITPIX/8)
-            CALL GEN_MOVE (BYTES,BUFFER,DYNAMIC_MEM(OPTR))
+            CALL GEN_MOVE (BYTES,BUFFER,%VAL(CNF_PVAL(OPTR)))
             IF (TYPE.EQ.'USHORT') THEN
-               CALL GEN_SFLIP(DYNAMIC_MEM(OPTR),ITEMS)
+               CALL GEN_SFLIP(%VAL(CNF_PVAL(OPTR)),ITEMS)
             END IF
          ELSE
 *            IF (IEEE_FPT) THEN
-*               CALL GEN_IEEETOR(BUFFER,
-*     :                            DYNAMIC_MEM(OPTR),ITEMS,COUNT)
+*               CALL GEN_IEEETOR(BUFFER,%VAL(CNF_PVAL(OPTR)),ITEMS,
+*    :                           COUNT)
 *               NBAD=NBAD+COUNT
 *            ELSE
                CALL DSA_FMTCON(.FALSE.,SRCFMT,REALF,BUFFER,
-     :                                 DYNAMIC_MEM(OPTR),ITEMS,IGNORE)
-               CALL GEN_MULCAF(DYNAMIC_MEM(OPTR),ITEMS,REAL(BSCALE),
-     :                                               DYNAMIC_MEM(OPTR))
-               CALL GEN_ADDCAF(DYNAMIC_MEM(OPTR),ITEMS,REAL(BZERO),
-     :                                               DYNAMIC_MEM(OPTR))
+     :                         %VAL(CNF_PVAL(OPTR)),ITEMS,IGNORE)
+               CALL GEN_MULCAF(%VAL(CNF_PVAL(OPTR)),ITEMS,REAL(BSCALE),
+     :                         %VAL(CNF_PVAL(OPTR)))
+               CALL GEN_ADDCAF(%VAL(CNF_PVAL(OPTR)),ITEMS,REAL(BZERO),
+     :                         %VAL(CNF_PVAL(OPTR)))
 *            END IF
          END IF
          PIXELS=PIXELS-PIXREC
-         OPTR=DYN_INCREMENT(OPTR,TYPE,ITEMS)
+         CALL DYN_INCAD(OPTR,TYPE,ITEMS,TPTR,ISNEW,STATUS)
+         IF (PISNEW) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
+         PISNEW = ISNEW
       END DO
+      IF (ISNEW) CALL CNF_UNREGP(OPTR)
 C
 C     If there were any bad conversions from IEEE floating point there will be
 C     flagged error values in the data. Indicate this.
@@ -903,17 +933,16 @@ C
             CHARS(1)=' '
             CHARS(2)=LABELS(IAX)
             CALL DSA_SET_AXIS_INFO ('OUTPUT',IAX,2,CHARS,0,DVALUE,
-     :                                                      DSA_STATUS)
+     :                              DSA_STATUS)
             IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
          END IF
          IF (CDELTS(IAX).NE.0.) THEN
             CALL DSA_MAP_AXIS_DATA ('OUTPUT',IAX,'WRITE','FLOAT',
-     :                                       ADDRESS,SLOT,DSA_STATUS)
+     :                              DPTR,SLOT,DSA_STATUS)
             IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
-            DPTR=DYN_ELEMENT(ADDRESS)
             COEFF(1)=CDELTS(IAX)
             COEFF(2)=CRVALS(IAX)-CRPIX(IAX)*CDELTS(IAX)
-            CALL FIG_WAVSET(DIMS(IAX),COEFF,2,DYNAMIC_MEM(DPTR))
+            CALL FIG_WAVSET(DIMS(IAX),COEFF,2,%VAL(CNF_PVAL(DPTR)))
             CALL DSA_UNMAP (SLOT,DSA_STATUS)
             IF (DSA_STATUS.NE.0) GO TO 500     ! Error exit
          END IF
