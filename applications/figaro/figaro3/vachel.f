@@ -41,51 +41,52 @@ C
 C                                      JGR  July 1985
 C     Modified:
 C
-C     22nd April 1986.  KS / AAO.  EXTRACT routine name changed to 
-C                       avoid conflict with Figaro routine of same name.
-C     7 th Aug   1987.  DJA/ AAO.  Revised DSA_ routines - some specs
-C                       changed. Now uses DYN_ routines for dynamic
-C                       memory handling.
-C     3rd  Feb   1988.  KS / AAO.  Modified to work properly with data
-C                       of any dimensions.
-C     20th April 1989.  KS / AAO.  Now maps axis data array for update and
-C                       not for write - was mapping arrays of zeros if the
-C                       array was not of the type mapped. Also changed
-C                       to work internally in double precision.
-C     23rd Sep 1992.    HME / UoE, Starlink.  TABs removed. INCLUDE changed.
+C     22nd April 1986  KS / AAO.  EXTRACT routine name changed to 
+C                      avoid conflict with Figaro routine of same name.
+C     7 th Aug   1987  DJA/ AAO.  Revised DSA_ routines - some specs
+C                      changed. Now uses DYN_ routines for dynamic-
+C                      memory handling.
+C     3rd  Feb   1988  KS / AAO.  Modified to work properly with data
+C                      of any dimensions.
+C     20th April 1989  KS / AAO.  Now maps axis data array for update 
+C                      and not for write - was mapping arrays of zeros 
+C                      if the array was not of the type mapped. Also 
+C                      changed to work internally in double precision.
+C     23rd Sep 1992    HME / UoE, Starlink.  TABs removed. INCLUDE
+C                      changed.
+C     2005 June 15     MJC / Starlink  Use CNF_PVAL for pointers to
+C                      mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used
 C
-      INTEGER DYN_ELEMENT, ICH_ENCODE
+      INTEGER ICH_ENCODE
       REAL EXTRCT2
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      LOGICAL      FAULT        ! Indicates fault in processing
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      INVOKE       ! Dummy function value
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NEXT         ! Next character in STRING
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! Used to format result details
-      REAL         XEND         ! Last resulting wavelength
-      LOGICAL      XEXIST       ! TRUE if there is a valid x-axis structure
-      INTEGER      XPTR         ! Dynamic-memory pointer to x-axis data array
-      INTEGER      XSLOT        ! Map slot number x-axis data array
-      REAL         XST          ! First resulting wavelength
-      LOGICAL      VACLG        ! Vacuum correction is to be made
-      REAL         VEL          ! Value of VEL parameter
-      LOGICAL      VELLG        ! Velocity correction is to be made
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      INTEGER      DIMS(10)      ! Sizes of dimensions of data
+      LOGICAL      FAULT         ! Indicates fault in processing
+      INTEGER      IGNORE        ! Used to pass ignorable status
+      INTEGER      INVOKE        ! Dummy function value
+      INTEGER      NDIM          ! Number of dimensions in data
+      INTEGER      NELM          ! Total number of elements in data
+      INTEGER      NEXT          ! Next character in STRING
+      INTEGER      NX            ! Size of 1st dimension
+      INTEGER      STATUS        ! Running status for DSA_ routines
+      CHARACTER    STRING*64     ! Used to format result details
+      REAL         XEND          ! Last resulting wavelength
+      LOGICAL      XEXIST        ! There is a valid x-axis structure?
+      INTEGER      XPTR          ! Dynamic-memory pointer to x-axis 
+                                 ! data array
+      INTEGER      XSLOT         ! Map slot number x-axis data array
+      REAL         XST           ! First resulting wavelength
+      LOGICAL      VACLG         ! Vacuum correction is to be made
+      REAL         VEL           ! Value of VEL parameter
+      LOGICAL      VELLG         ! Velocity correction is to be made
 C
 C     Initial values
 C
@@ -144,16 +145,15 @@ C
 C
 C     Map data
 C
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','DOUBLE',ADDRESS,
-     :                                                XSLOT,STATUS)
-      XPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'UPDATE','DOUBLE',XPTR,
+     :                       XSLOT,STATUS)
 C
 C     Call VCHLCON to do calculation of wavelength values.
 C     Report new start and end wavelengths to user.
 C
-      CALL VCHLCON(DYNAMIC_MEM(XPTR),NX,VEL,VELLG,VACLG)
-      XST = EXTRCT2(DYNAMIC_MEM(XPTR),NX,1)
-      XEND = EXTRCT2(DYNAMIC_MEM(XPTR),NX,NX)
+      CALL VCHLCON(%VAL(CNF_PVAL(XPTR)),NX,VEL,VELLG,VACLG)
+      XST = EXTRCT2(%VAL(CNF_PVAL(XPTR)),NX,1)
+      XEND = EXTRCT2(%VAL(CNF_PVAL(XPTR)),NX,NX)
       STRING='Output X-array has '
       INVOKE=ICH_ENCODE(STRING,FLOAT(NX),20,0,NEXT)
       STRING(NEXT:)=' elements, start wavelength = '

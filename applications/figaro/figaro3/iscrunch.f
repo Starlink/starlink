@@ -48,10 +48,11 @@ C                value represents a velocity in km/sec.  These
 C                assumptions can be controlled directly by the keywords
 C                INCREMENT and FINAL, if they will not give the desired
 C                effect.
-C     BINS       (Numeric) The number of bins for the resulting spectrum.
-C     OUTPUT     (Character) Name of resulting image.  Note that an image
-C                cannot be scrunched into itself, so a new output file
-C                will always be created.
+C     BINS       (Numeric) The number of bins for the resulting
+C                spectrum.
+C     OUTPUT     (Character) Name of resulting image.  Note that an
+C                image cannot be scrunched into itself, so a new output 
+C                file will always be created.
 C
 C     Command keywords -
 C
@@ -68,28 +69,30 @@ C
 C                                         KS / CIT 22nd June 1984
 C     Modified:
 C
-C     20th Dec 1984 KS/AAO Now creates an AXIS(1) structure if one doesn't
-C                   exist.  Bug causing 2D AXIS(1) arrays to be created now
-C                   fixed.
+C     20th Dec 1984 KS/AAO Now creates an AXIS(1) structure if one 
+C                   doesn't exist.  Bug causing 2D AXIS(1) arrays to be 
+C                   created now fixed.
 C     13th Aug 1985 KS/AAO Bug in 'LOG' mode fixed.  AXIS(1) units and 
 C                   label now generated in output file.
 C     30th Mar 1987 KS/AAO Now works internally in double precision,
 C                   to improve results at high dispersion.  Use of WEND 
-C                   as an increment value introduced, along with INCREMENT
-C                   and FINAL keywords - same as for SCRUNCH.   Keywords
-C                   MEAN and FLUX (always confusing) replaced by DENSITY
-C                   - which program now tries to guess at - this is the
-C                   same scheme as that used by FSCRUNCH.
-C     12th Sep 1989 JM / RAL. Modified to use DSA_ routines.  Dynamic
+C                   as an increment value introduced, along with
+C                   INCREMENT and FINAL keywords - same as for SCRUNCH.
+C                   Keywords MEAN and FLUX (always confusing) replaced 
+C                   by DENSITY - which program now tries to guess at - 
+C                   this is the same scheme as that used by FSCRUNCH.
+C     12th Sep 1989 JM / RAL. Modified to use DSA_ routines.  Dynamic-
 C                   memory handling changed to use DYN_ routines.
-C     23rd Nov 1989 KS/AAO. Long term bug in ISCRUNI (was using same file for
-C                   both coefficient sets) fixed.  Introduced use of DYN_-
-C                   INCREMENT to tidy up dynamic memory handling slightly.
-C                   FIG_RD2DRC removed from this file - now in separate library.
-C                   PAR_ABORT calls scattered about the code as well.
-C     17th Dec 1990 KS/AAO. Somewhere, the speed of light had got lost! Now
-C                   set to the correct value.  Also, SJM's bug fix for the
-C                   declaration of GEN_EPOLYD incorporated in FIG_WGEN/2.
+C     23rd Nov 1989 KS/AAO. Long term bug in ISCRUNI (was using same 
+C                   file for both coefficient sets) fixed.  Introduced 
+C                   use of DYN_INCREMENT to tidy up dynamic-memory 
+C                   handling slightly. FIG_RD2DRC removed from this file
+C                   - now in separate library.  PAR_ABORT calls 
+C                   scattered about the code as well.
+C     17th Dec 1990 KS/AAO. Somewhere, the speed of light had got lost!
+C                   Now set to the correct value.  Also, SJM's bug fix 
+C                   for the declaration of GEN_EPOLYD incorporated in 
+C                   FIG_WGEN/2.
 C     23nd Sep 1992 HME / UoE, Starlink.  INCLUDE changed. Lowercase
 C                   extension .iar.
 C     28th Jul 1993 HME / UoE, Starlink.  Increase declared length of
@@ -97,13 +100,15 @@ C                   file name(s) to 132. Disuse STR$UPCASE.
 C     10th Jan 1995 HME / UoE, Starlink.  Change output map access from
 C                   update to write.  In the case of logarithmic
 C                   binning, set the output axis flags accordingly.
+C     2005 June 15  MJC / Starlink  Use CNF_PVAL for pointers to
+C                   mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT
-      INTEGER DYN_INCREMENT
       INTEGER DSA_TYPESIZE
       INTEGER ICH_CLEAN     
       INTEGER ICH_LEN      
@@ -114,73 +119,92 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS      ! Virtual address for data array
-      INTEGER   BYTES        ! Size of wavelength array in bytes
-      DOUBLE PRECISION C     ! Speed of light
-      CHARACTER CITEMS(2)*32 ! Axis character items retrieved
-      CHARACTER COMMAND*8    ! Figaro command name
-      INTEGER   CPTR1        ! Dynamic memory element for workspace
-      INTEGER   CPTR2        ! Dynamic memory element for workspace
-      LOGICAL   DEFDEN       ! If true, assume data units flux/unit wavelength
-      DOUBLE PRECISION DELTA ! Wavelength increment
-      DOUBLE PRECISION DWEND ! Final wavelength
-      DOUBLE PRECISION DWSTART ! Start wavelength
-      INTEGER   DIMS(2)      ! Image dimensions
-      LOGICAL   FAULT        ! True if non-DSA fault occurs
-      CHARACTER FILE*132     ! File containing IARC results
-      CHARACTER FILE2*132    ! Second file containing IARC results (ISCRUNI)
-      LOGICAL   FINAL        ! True if  WEND is a final value
-      LOGICAL   FLUX         ! True if the program is to conserve flux.  
-      LOGICAL   FLUXDEN      ! True if mean value of data to be conserved
-      REAL      FRACT        ! Fractional weight give to first .IAR file
-      INTEGER   FSTAT        ! Status for FIG routines
-      INTEGER   I            ! Loop variable
-      INTEGER   IBRACK       ! Used to format strings
-      INTEGER   IDOT         ! Used to format strings
-      INTEGER   IMPTR        ! Dynamic memory element for image data
-      LOGICAL   INCREM       ! If true,  WEND is an increment value
-      INTEGER   INVOKE       ! Used to format character strings
-      INTEGER   IRPT         ! No of .IAR files used
-      INTEGER   IY           ! Loop variable
-      LOGICAL   LINEAR       ! If true, use linear interp.for rebinning
-      LOGICAL   LOGW         ! True if wavelengths in WAVES are logarithmic
-      LOGICAL   LOGWR        ! If true, data is rebinned logarithmically
-      INTEGER   IMODE        ! Selects mode of transfer for input bins 
-      INTEGER   IQUAD        ! Equals 0 for lin. interp. non-zero for quadratic
-      INTEGER   NADD         ! No. of input bins added to form one output bin
-      CHARACTER NAME*132     ! Filename
-      INTEGER   NBINR        ! Number of elements (bins) in rebinned data
-      INTEGER   NCITEMS      ! Number of axis character items retrieved
-      INTEGER   NDIM         ! Number of image dimensions
-      INTEGER   NELM         ! Number of elements in image - ignored
-      INTEGER   NELEMD       ! Number of 'DOUBLE' workspace array elements.
-      DOUBLE PRECISION NITEMS(1)! Axis numeric items retrieved
-      INTEGER   NNITEMS      ! Number of axis numeric items retrieved
-      INTEGER   NX           ! First dimension of image
-      INTEGER   NY           ! Second dimension of image
-      INTEGER   OUPTR        ! Dynamic memory element for OUTPUT data
-      INTEGER   OXPTR        ! Dynamic memory element for axis data
-      CHARACTER PNAME*6      ! Parameter name to get file name
-      INTEGER   PSTAT        ! Status for PAR routines
-      LOGICAL   QUAD         ! If true, use quadratic interp.for rebinning
-      REAL      RESET        ! Reset value for real parameter
-      LOGICAL   SCRUNI       ! True if Figaro command is ISCRUNI
-      INTEGER   SLOT         ! Slot number for mapped data - ignored
-      INTEGER   SPTR         ! Dynamic memory element for spectrum data
-      REAL      SSKEW        ! No. of bins the input array is to be shifted 
-      INTEGER   STATUS       ! Running status for DSA routines
-      CHARACTER STRING*64    ! Used to format user messages
-      CHARACTER TYPE*16      ! Data type
-      REAL      VALUE        ! Accomodates value of some real parameters
-      REAL      WEND         ! End wavelength
-      INTEGER   WIPTR        ! Dynamic memory element for workspace
-      REAL      WMAX         ! Maximum wavelength of first .IAR file
-      REAL      WMAX2        ! Maximum wavelength of second .IAR file
-      REAL      WMIN         ! Minimum wavelength of first .IAR file
-      REAL      WMIN2        ! Minimum wavelength of second .IAR file
-      INTEGER   WOPTR        ! Dynamic memory element for workspace
-      REAL      WSTART       ! Start wavelength
-      CHARACTER ZUNITS*32    ! Data units
+      INTEGER   BYTES            ! Size of wavelength array in bytes
+      DOUBLE PRECISION C         ! Speed of light
+      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
+      CHARACTER COMMAND*8        ! Figaro command name
+      INTEGER   CPTR1            ! Dynamic-memory pointer for workspace
+      INTEGER   CPTR2            ! Dynamic-memory pointer for workspace
+      LOGICAL   DEFDEN           ! Assume data units flux/unit 
+                                 ! wavelength?
+      DOUBLE PRECISION DELTA     ! Wavelength increment
+      DOUBLE PRECISION DWEND     ! Final wavelength
+      DOUBLE PRECISION DWSTART     ! Start wavelength
+      INTEGER   DIMS(2)          ! Image dimensions
+      LOGICAL   FAULT            ! True if non-DSA fault occurs
+      CHARACTER FILE*132         ! File containing IARC results
+      CHARACTER FILE2*132        ! Second file containing IARC results 
+                                 ! (ISCRUNI)
+      LOGICAL   FINAL            ! True if  WEND is a final value
+      LOGICAL   FLUX             ! Conserve flux?
+      LOGICAL   FLUXDEN          ! Mean value of data to be conserved?
+      REAL      FRACT            ! Fractional weight give to first .IAR 
+                                 ! file
+      INTEGER   FSTAT            ! Status for FIG routines
+      INTEGER   I                ! Loop variable
+      INTEGER   IBRACK           ! Used to format strings
+      INTEGER   IDOT             ! Used to format strings
+      INTEGER   IMPTR            ! Dynamic-memory pointer for image data
+      LOGICAL   INCREM           ! If true,  WEND is an increment value
+      INTEGER   INVOKE           ! Used to format character strings
+      INTEGER   IRPT             ! No of .IAR files used
+      LOGICAL   ISNEWI           ! Is IMPTR address new to CNF?
+      LOGICAL   ISNEWO           ! Is OUPTR address new to CNF?
+      INTEGER   IY               ! Loop variable
+      LOGICAL   LINEAR           ! Use linear interp.for rebinning?
+      LOGICAL   LOGW             ! Wavelengths in WAVES are logarithmic?
+      LOGICAL   LOGWR            ! Data are rebinned logarithmically?
+      INTEGER   IMODE            ! Selects mode of transfer for input 
+                                 ! bins 
+      INTEGER   IQUAD            ! Equals 0 for lin. interp. non-zero 
+                                 ! for quadratic
+      INTEGER   NADD             ! No. of input bins added to form one 
+                                 ! output bin
+      CHARACTER NAME*132         ! Filename
+      INTEGER   NBINR            ! Number of elements (bins) in rebinned
+                                 ! data
+      INTEGER   NCITEMS          ! Number of axis character items
+                                 ! retrieved
+      INTEGER   NDIM             ! Number of image dimensions
+      INTEGER   NELM             ! Number of elements in image - ignored
+      INTEGER   NELEMD           ! Number of 'DOUBLE' workspace array
+                                 ! elements
+      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
+      INTEGER   NNITEMS          ! Number of axis numeric items 
+                                 ! retrieved
+      INTEGER   NX               ! First dimension of image
+      INTEGER   NY               ! Second dimension of image
+      INTEGER   OUPTR            ! Dynamic-memory pointer for OUTPUT
+                                 ! data
+      INTEGER   OXPTR            ! Dynamic-memory pointer for axis data
+      CHARACTER PNAME*6          ! Parameter name to get file name
+      LOGICAL   PISNI            ! Previous CNF IMPTR pointer new?
+      LOGICAL   PISNO            ! Previous CNF OUPTR pointer new?
+      INTEGER   PSTAT            ! Status for PAR routines
+      LOGICAL   QUAD             ! Use quadratic interp.for rebinning?
+      REAL      RESET            ! Reset value for real parameter
+      LOGICAL   SCRUNI           ! True if Figaro command is ISCRUNI
+      INTEGER   SLOT             ! Slot number for mapped data - ignored
+      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
+                                 ! data
+      REAL      SSKEW            ! No. of bins the input array is to be
+                                 ! shifted 
+      INTEGER   STATUS           ! Running status for DSA routines
+      CHARACTER STRING*64        ! Used to format user messages
+      INTEGER   TPTR             ! Temporary dynamic mem pointer
+      CHARACTER TYPE*16          ! Data type
+      REAL      VALUE            ! Work variable
+      REAL      WEND             ! End wavelength
+      INTEGER   WIPTR            ! Dynamic-memory pointer for workspace
+      REAL      WMAX             ! Maximum wavelength of first .IAR file
+      REAL      WMAX2            ! Maximum wavelength of second .IAR 
+                                 ! file
+      REAL      WMIN             ! Minimum wavelength of first .IAR file
+      REAL      WMIN2            ! Minimum wavelength of second .IAR
+                                 ! file
+      INTEGER   WOPTR            ! Dynamic-memory pointer for workspace
+      REAL      WSTART           ! Start wavelength
+      CHARACTER ZUNITS*32        ! Data units
 C
 C     Real value limits
 C
@@ -191,10 +215,6 @@ C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
-C
-C     Dynamic memory common - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Velocity of light in Km/sec
 C
@@ -279,23 +299,22 @@ C     arrays, each NY*11.
 C
       NELEMD=NX+NBINR+NY*11
       IF (SCRUNI) NELEMD=NELEMD+NY*11
-      CALL DSA_GET_WORK_ARRAY(NELEMD,'DOUBLE',ADDRESS,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,'DOUBLE',WIPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NBINR,'DOUBLE',WOPTR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NY*11,'DOUBLE',CPTR1,SLOT,STATUS)
+      IF (SCRUNI) 
+     :  CALL DSA_GET_WORK_ARRAY(NY*11,'DOUBLE',CPTR2,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
-C      
-      WIPTR=DYN_ELEMENT(ADDRESS)
-      WOPTR=DYN_INCREMENT(WIPTR,'DOUBLE',NX)
-      CPTR1=DYN_INCREMENT(WOPTR,'DOUBLE',NBINR)
-      CPTR2=DYN_INCREMENT(CPTR1,'DOUBLE',NY*11)
 C
 C     Read the coefficients from the fit files produced by IARC
 C
-      CALL FIG_RD2DRC(FILE,NX,NY,DYNAMIC_MEM(CPTR1),WMIN,WMAX,FSTAT)
+      CALL FIG_RD2DRC(FILE,NX,NY,%VAL(CNF_PVAL(CPTR1)),WMIN,WMAX,FSTAT)
       IF (FSTAT.NE.0) THEN
          FAULT=.TRUE.
          GO TO 500
       END IF
       IF (SCRUNI) THEN
-         CALL FIG_RD2DRC(FILE2,NX,NY,DYNAMIC_MEM(CPTR2),WMIN2,WMAX2,
+         CALL FIG_RD2DRC(FILE2,NX,NY,%VAL(CNF_PVAL(CPTR2)),WMIN2,WMAX2,
      :                   FSTAT)
          IF (FSTAT.NE.0) THEN
             FAULT=.TRUE.
@@ -425,21 +444,18 @@ C
          TYPE='FLOAT'
       END IF
       CALL DSA_COERCE_AXIS_DATA('OUTPUT',1,TYPE,1,DIMS,STATUS)
-      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','DOUBLE',ADDRESS,SLOT,
+      CALL DSA_MAP_AXIS_DATA('OUTPUT',1,'WRITE','DOUBLE',OXPTR,SLOT,
      :                        STATUS)
-      OXPTR=DYN_ELEMENT(ADDRESS)
 C
 C     Map the input and output arrays
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IMPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      OUPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',IMPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA('OUTPUT','WRITE','FLOAT',OUPTR,SLOT,STATUS)
       IF(STATUS.NE.0)GOTO 500
 C
 C     Now generate the wavelength values for the output data
 C
-      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,DYNAMIC_MEM(WOPTR))
+      CALL FIG_WFILLD(DWSTART,DWEND,LOGWR,NBINR,%VAL(CNF_PVAL(WOPTR)))
 C
 C     Loop through each cross-section of the image, generating the
 C     input wavelength array and then scrunching the data accordingly.
@@ -452,26 +468,38 @@ C
       NADD=1
       SSKEW=0.
       FLUX=.NOT.FLUXDEN
+      PISNI = .FALSE.
+      PISNO = .FALSE.
       DO IY=1,NY
          IF (SCRUNI) THEN
-            CALL FIG_WGEN2(IY,NX,NY,FRACT,DYNAMIC_MEM(CPTR1),
-     :                     DYNAMIC_MEM(CPTR2),DYNAMIC_MEM(WIPTR))
+            CALL FIG_WGEN2(IY,NX,NY,FRACT,%VAL(CNF_PVAL(CPTR1)),
+     :                     %VAL(CNF_PVAL(CPTR2)),%VAL(CNF_PVAL(WIPTR)))
          ELSE
-            CALL FIG_WGEN(IY,NX,NY,DYNAMIC_MEM(CPTR1),
-     :                    DYNAMIC_MEM(WIPTR))
+            CALL FIG_WGEN(IY,NX,NY,%VAL(CNF_PVAL(CPTR1)),
+     :                    %VAL(CNF_PVAL(WIPTR)))
          END IF
-         CALL FIG_REBIND(IMODE,IQUAD,DYNAMIC_MEM(IMPTR),NX,
-     :                   DYNAMIC_MEM(OUPTR),NBINR,NADD,SSKEW,FLUX,
-     :                   DYNAMIC_MEM(WIPTR),DYNAMIC_MEM(WOPTR),
+         CALL FIG_REBIND(IMODE,IQUAD,%VAL(CNF_PVAL(IMPTR)),NX,
+     :                   %VAL(CNF_PVAL(OUPTR)),NBINR,NADD,SSKEW,FLUX,
+     :                   %VAL(CNF_PVAL(WIPTR)),%VAL(CNF_PVAL(WOPTR)),
      :                   LOGW,LOGWR)
-         IMPTR=DYN_INCREMENT(IMPTR,'FLOAT',NX)
-         OUPTR=DYN_INCREMENT(OUPTR,'FLOAT',NBINR)
+
+         CALL DYN_INCAD(IMPTR,'FLOAT',NX,TPTR,ISNEWI,STATUS)
+         IF (PISNI) CALL CNF_UNREGP(IMPTR)
+         IMPTR = TPTR
+         PISNI = ISNEWI
+
+         CALL DYN_INCAD(OUPTR,'FLOAT',NBINR,TPTR,ISNEWO,STATUS)
+         IF (PISNO) CALL CNF_UNREGP(OUPTR)
+         OUPTR = TPTR
+         PISNO = ISNEWO
       END DO
+      IF (ISNEWI) CALL CNF_UNREGP(IMPTR)
+      IF (ISNEWO) CALL CNF_UNREGP(OUPTR)
 C
 C     Now write the output wavelengths into the output X array.
 C
       BYTES=NBINR*DSA_TYPESIZE('DOUBLE',STATUS)
-      CALL GEN_MOVE(BYTES,DYNAMIC_MEM(WOPTR),DYNAMIC_MEM(OXPTR))
+      CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(WOPTR)),%VAL(CNF_PVAL(OXPTR)))
 C
 C     Change the x- label and units
 C     If binning was logarithmic, also set the numeric items accordingly
@@ -483,7 +511,7 @@ C
          NITEMS(1)=1D0
       END IF
       CALL DSA_SET_AXIS_INFO('OUTPUT',1,NCITEMS,CITEMS,NNITEMS,NITEMS,
-     :                        STATUS)
+     :                       STATUS)
   500 CONTINUE
 C
 C     Close down everything

@@ -38,6 +38,8 @@ C     History -
 C
 C     29th May 1988  KS/AAO.  Original version.
 C     29th Sep 1992  HME / UoE, Starlink.  INCLUDE changed.
+C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C-
 C     Note -
 C   
@@ -45,45 +47,38 @@ C     This version is an interim one - it really needs re-writing
 C     using DSA_RESHAPE_DATA and DSA_RESHAPE_AXIS.
 C+ 
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Local variables
 C
-      INTEGER   ADDRESS                ! Address of mapped data
-      CHARACTER AXIS_INFO(2)*16        ! Label & units for order axis
-      INTEGER   DIMS(2)                ! Dimensions of data array
-      DOUBLE PRECISION DUMMY           ! Axis numeric data - unused
-      LOGICAL   FAULT                  ! Indicates non-DSA error detected
-      INTEGER   IPTR                   ! Dynamic mem element for image data
-      INTEGER   MPTR                   ! Dynamic mem element for mask data
-      INTEGER   MEND                   ! Last order number to extract
-      INTEGER   MSTART                 ! First order number to extract
-      INTEGER   NDIM                   ! Number of data dimensions
-      INTEGER   NELM                   ! Number of image elements
-      INTEGER   NX                     ! First dimension of data
-      INTEGER   NY                     ! Second dimension of data
-      INTEGER   NYOUT                  ! Number of output orders
-      INTEGER   OPTR                   ! Dynamic mem element for output data
-      INTEGER   PSTAT                  ! Parameter system status - ignored
-      LOGICAL   REVERSE                ! Orders go from high to low if true
-      INTEGER   SLOT                   ! Map slot value - ignored
-      INTEGER   STATUS                 ! Running status for DSA_ routines
-      INTEGER   SUBORD                 ! Sub-order number to extract
-      REAL      VALUE                  ! Temporary real value
-      INTEGER   WPTR                   ! Dynamic mem element for work array
-      INTEGER   YPTR                   ! Dynamic mem element for Y axis
+      CHARACTER AXIS_INFO(2)*16  ! Label & units for order axis
+      INTEGER   DIMS(2)          ! Dimensions of data array
+      DOUBLE PRECISION DUMMY     ! Axis numeric data - unused
+      LOGICAL   FAULT            ! Indicates non-DSA error detected
+      INTEGER   IPTR             ! Dynamic-mem pointer for image data
+      INTEGER   MPTR             ! Dynamic-mem pointer for mask data
+      INTEGER   MEND             ! Last order number to extract
+      INTEGER   MSTART           ! First order number to extract
+      INTEGER   NDIM             ! Number of data dimensions
+      INTEGER   NELM             ! Number of image elements
+      INTEGER   NX               ! First dimension of data
+      INTEGER   NY               ! Second dimension of data
+      INTEGER   NYOUT            ! Number of output orders
+      INTEGER   OPTR             ! Dynamic-mem pointer for output data
+      INTEGER   PSTAT            ! Parameter system status - ignored
+      LOGICAL   REVERSE          ! Orders go from high to low if true
+      INTEGER   SLOT             ! Map slot value - ignored
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      INTEGER   SUBORD           ! Sub-order number to extract
+      REAL      VALUE            ! Temporary real value
+      INTEGER   WPTR             ! Dynamic-mem pointer for work array
+      INTEGER   YPTR             ! Dynamic-mem pointer for Y axis
 C
 C     Parameters for DSA_OUTPUT
 C
       INTEGER NO_COPY_DATA, NEW_FILE
       PARAMETER (NO_COPY_DATA=1,NEW_FILE=1)
-C
-C     Functions used
-C
-      INTEGER DYN_ELEMENT
-C
-C     Dynamic memory support - defines DYNAMIC_MEM.
-C
-      INCLUDE 'DYNAMIC_MEMORY'
 C
 C     Initial values
 C
@@ -122,7 +117,7 @@ C
       CALL PAR_RDVAL ('MLOW',1.0,1000.0,1.0,'Order #',VALUE)
       MSTART=VALUE
       CALL PAR_RDVAL ('MHIGH',FLOAT(MSTART),1000.0,FLOAT(MSTART),
-     :                                             'Orders',VALUE)
+     :                'Orders',VALUE)
       MEND=VALUE
       CALL PAR_RDVAL ('SUBORD',0.0,9.0,0.0,'Sub order #',VALUE)
       SUBORD=VALUE
@@ -131,7 +126,7 @@ C
 C     Open output image
 C
       CALL DSA_OUTPUT ('OUTPUT','OUTPUT','IMAGE',NO_COPY_DATA,
-     :                                           NEW_FILE,STATUS)
+     :                 NEW_FILE,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Force data size in output - this is naughty - it should be
@@ -145,35 +140,30 @@ C
 C
 C     Set the Y-axis array to the order numbers
 C
-      CALL DSA_MAP_AXIS_DATA ('OUTPUT',2,'WRITE','FLOAT',ADDRESS,
-     :                                                  SLOT,STATUS)
+      CALL DSA_MAP_AXIS_DATA ('OUTPUT',2,'WRITE','FLOAT',YPTR,
+     :                        SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      YPTR=DYN_ELEMENT(ADDRESS)
-      CALL FIG_ORDVAL (DYNAMIC_MEM(YPTR),NYOUT,MSTART,MEND,REVERSE)
+      CALL FIG_ORDVAL (%VAL(CNF_PVAL(YPTR)),NYOUT,MSTART,MEND,REVERSE)
       AXIS_INFO(1)=' '
       AXIS_INFO(2)='Order number'
       CALL DSA_SET_AXIS_INFO ('OUTPUT',2,2,AXIS_INFO,0,DUMMY,STATUS)
 C
 C     Map all three data arrays
 C
-      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      IPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('MASK','READ','FLOAT',ADDRESS,SLOT,STATUS)
-      MPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',ADDRESS,SLOT,STATUS)
-      OPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA ('IMAGE','READ','FLOAT',IPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('MASK','READ','FLOAT',MPTR,SLOT,STATUS)
+      CALL DSA_MAP_DATA ('OUTPUT','WRITE','FLOAT',OPTR,SLOT,STATUS)
 C
 C     Get the workspace needed by FIG_EXTMSK 
 C
-      CALL DSA_GET_WORK_ARRAY (NYOUT,'FLOAT',ADDRESS,SLOT,STATUS)
-      WPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_GET_WORK_ARRAY (NYOUT,'FLOAT',WPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
 C
 C     Create the extracted image
 C
-      CALL FIG_EXTMSK (DYNAMIC_MEM(IPTR),DYNAMIC_MEM(MPTR),NX,NY,NYOUT,
-     :                    MSTART,MEND,SUBORD,REVERSE,DYNAMIC_MEM(WPTR),
-     :                                               DYNAMIC_MEM(OPTR))
+      CALL FIG_EXTMSK (%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(MPTR)),NX,NY,
+     :                 NYOUT,MSTART,MEND,SUBORD,REVERSE,
+     :                 %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)))
 C
 C     Close down
 C

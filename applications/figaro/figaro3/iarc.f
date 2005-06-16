@@ -34,8 +34,8 @@ C               are to be written.  If an extension is not given, .IAR
 C               will be used.
 C     SIGMIN    (Numeric) The minimum acceptable value for the sigma of
 C               an arc line found in the locking process.  Sigma here is
-C               the height of the line relative to the square root of the
-C               continuum.  Only used if LOCK specified.
+C               the height of the line relative to the square root of
+C               the continuum.  Only used if LOCK specified.
 C     
 C     Command keywords -  
 C
@@ -47,15 +47,16 @@ C               to refine the fit.  If NOSPREAD is specified, the search
 C               is just with the specified sigma value.
 C     DETAIL    Indicates that full details of the fits are to be output
 C               (This is mainly a diagnostic tool.)
-C     XCORR     If specified, IARC will attempt to determine a linear shift
-C               between successive spectra using cross-correlation. This
-C               is particularly applicable to fibre data, where such linear 
-C               shifts may occur. It is probably not useful for cases such
-C               as image tube distortion, where the spectra should change
-C               in a constant manner.
-C     WEIGHT    Indicates whether the least-squares fit is to be weighted
-C               using the peak intensity of each line (so that more weight
-C               is given to strong lines).
+C     XCORR     If specified, IARC will attempt to determine a linear 
+C               shift between successive spectra using 
+C               cross-correlation. This is particularly applicable to 
+C               fibre data, where such linear shifts may occur. It is
+C               probably not useful for cases such as image-tube 
+C               distortion, where the spectra should change in a 
+C               constant manner.
+C     WEIGHT    Indicates whether the least-squares fit is to be
+C               weighted using the peak intensity of each line (so that 
+C               more weight is given to strong lines).
 C     CHANSHIFT A constant shift which is added to all the input channel
 C               positions read from the arlines.lis file.  Shifts in the
 C               range -1000.0 to 1000.0 are permitted.  If no value is
@@ -64,17 +65,19 @@ C               `units' of pixels.
 C
 C     User variables used -  
 C
-C     (<) IARC_WMAX   (Numeric) Maximum wavelength for any of the spectra.
+C     (<) IARC_WMAX   (Numeric) Maximum wavelength for any of the 
+C                     spectra.
 C     (<) IARC_WMIN   (Numeric) Minimum     "       "   "  "   "    "
-C     (<) NOFITS      (Numeric) The number of rows that could not be fitted.
+C     (<) NOFITS      (Numeric) The number of rows that could not be 
+C                     fitted.
 C     (<) ORDER       (Numeric) The order of the original fit.
 C     (<) RMSMAX      (Numeric) Maximum RMS error from the fits.
 C
 C     Input files -
 C
-C     ARLINES.LIS   Contains the details of the starting fit.  For format
-C                   details see comments for subroutine ARGETL, or the
-C                   ARC command.
+C     ARLINES.LIS   Contains the details of the starting fit.  For 
+C                   format details see comments for subroutine ARGETL,
+C                   or the ARC command.
 C
 C     Output files -
 C
@@ -91,57 +94,63 @@ C
 C                                    KS / CIT  15th June 1984
 C     Modified:
 C
-C     4th  Feb 1985.  KS / AAO.  IARC_WMAX and IARC_WMIN now set.
-C     15th Mar 1985.  KS / AAO.  DETAIL and RSIGMA added.
-C     1st  May 1985.  KS / AAO. GAP added.
-C     29th Aug 1985.  KS / AAO. SPREAD added. Excessive line deleted messages
-C                     bug fixed.  SPR on V4.2 Fortran compiler submitted,
-C                     and VOLATILE IR1 included to bypass it.  Output
-C                     format for linear fits is now correct.
-C     24th Sep 1985.  KS / AAO. GAP may now be set to zero.
-C     30th Dec 1985.  KS / AAO.  Fortran 4.3 compiler now available, so the
-C                     VOLATILE IR1 statement has been removed.
-C     24th Jun 1987.  KS / AAO.  Now will accept 3 lines in a cross-section
-C                     instead of insisting on at least 4.
-C     26th Aug 1987.  DJA / AAO. Revised DSA_ routines - some specs changed.
-C                     Now uses DYN routines for dynamic memory handling
-C     26th Mar 1991.  KS / AAO.  XCORR keyword added, controlling automatic
-C                     shift analysis of successive spectra. PAR_ABORT tests
-C                     added.
-C     21st Jul 1992.  HME / UoE, Starlink.  Make file name string 64 char.
-C     22nd Sep 1992.  HME / UoE, Starlink.  TABs removed, INCLUDE changed.
-C                     Lowercase file name. Lowercase extension .iar.
-C                     Changed FIGX_SHIFT to FIG_SHIFT, LINES to
-C                     JTY_LINES, XYFIT to FIG_XYFIT.
-C     21st Jul 1993.  HME / UoE, Starlink.  Use dsa_*_lu.
-C     16th Feb 1995.  HME / UoE, Starlink. In the big workspace move
-C                     the DOUBLE workspace to the front. Otherwise the
-C                     odd number of FLOAT workspaces combined with an
-C                     odd number of channels in the input spectrum
-C                     cause the DOUBLE workspace to be misaligned
-C                     (memory address and odd multiple of 4).
-C     19th Jul 1995.  HME / UoE, Starlink.  Change open status for .iar
-C                     file from new to unknown. Hopefully we can then
-C                     overwrite files.
-C     18th Jul 1996.  MJCL / Starlink, UCL.  Set variables for storage of
-C                     file names to 132 chars.
-C     24th Jul 1996.  MJCL / Starlink, UCL.  Corrected type of SPBYTES.
-C                     Catenations changed for Linux port.
-C     9th  Jun 1999.  TCDA / Starlink, RAL. Removed unsupported keywords
-C                     from OPEN statements.
-C     23rd May 2002.  ACD / UoE, Starlink.  Add an option for a weighted
-C                     fit (in addition to the original unweighted fit) and
-C                     output some of the results as ADAM parameters.
-C     31st Mar 2003.  ACD / UoE, Starlink.  Add an option to add a constant
-C                     shift to all the channel positions input in
-C                     arlines.lis.
+C     4th  Feb 1985  KS / AAO.  IARC_WMAX and IARC_WMIN now set.
+C     15th Mar 1985  KS / AAO.  DETAIL and RSIGMA added.
+C     1st  May 1985  KS / AAO. GAP added.
+C     29th Aug 1985  KS / AAO. SPREAD added. Excessive line-deleted 
+C                    messages bug fixed.  SPR on V4.2 Fortran compiler 
+C                    submitted, and VOLATILE IR1 included to bypass it.
+C                    Output format for linear fits is now correct.
+C     24th Sep 1985  KS / AAO. GAP may now be set to zero.
+C     30th Dec 1985  KS / AAO.  Fortran 4.3 compiler now available, so
+C                    the VOLATILE IR1 statement has been removed.
+C     24th Jun 1987  KS / AAO.  Now will accept 3 lines in a 
+C                    cross-section instead of insisting on at least 4.
+C     26th Aug 1987  DJA / AAO. Revised DSA_ routines - some specs 
+C                    changed. Now uses DYN routines for dynamic-memory 
+C                    handling.
+C     26th Mar 1991  KS / AAO.  XCORR keyword added, controlling
+C                    automatic shift analysis of successive spectra. 
+C                    PAR_ABORT tests added.
+C     21st Jul 1992  HME / UoE, Starlink.  Make file name string 64
+C                    characters.
+C     22nd Sep 1992  HME / UoE, Starlink.  TABs removed, INCLUDE
+C                    changed. Lowercase file name. Lowercase extension 
+C                    .iar.  Changed FIGX_SHIFT to FIG_SHIFT, LINES to
+C                    JTY_LINES, XYFIT to FIG_XYFIT.
+C     21st Jul 1993  HME / UoE, Starlink.  Use dsa_*_lu.
+C     16th Feb 1995  HME / UoE, Starlink. In the big workspace move
+C                    the DOUBLE workspace to the front. Otherwise the
+C                    odd number of FLOAT workspaces combined with an
+C                    odd number of channels in the input spectrum
+C                    cause the DOUBLE workspace to be misaligned
+C                    (memory address and odd multiple of 4).
+C     19th Jul 1995  HME / UoE, Starlink.  Change open status for .iar
+C                    file from new to unknown. Hopefully we can then
+C                    overwrite files.
+C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
+C                    file names to 132 chars.
+C     24th Jul 1996  MJCL / Starlink, UCL.  Corrected type of SPBYTES.
+C                    Catenations changed for Linux port.
+C     9th  Jun 1999  TCDA / Starlink, RAL. Removed unsupported keywords
+C                    from OPEN statements.
+C     23rd May 2002  ACD / UoE, Starlink.  Add an option for a weighted
+C                    fit (in addition to the original unweighted fit)
+C                    and output some of the results as ADAM parameters.
+C     31st Mar 2003  ACD / UoE, Starlink.  Add an option to add a
+C                    constant shift to all the channel positions input
+C                    in arlines.lis.
+C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_LEN,DYN_ELEMENT,DYN_INCREMENT,DSA_TYPESIZE
+      INTEGER ICH_LEN,DSA_TYPESIZE
 C
 C     Maximum number of arc lines
 C
@@ -150,77 +159,74 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      INTEGER      BYTES        ! Number of bytes of workspace required
       DOUBLE PRECISION COEFFS(11)!
-      REAL         CHANS(NLMAX) !
-      REAL         CHANSN(NLMAX)!
-      REAL         CHANSO(NLMAX)!
-      REAL         CHANPK(NLMAX)! Peak intensity of line.
-      INTEGER      CPTR         ! Dynamic-memory pointer to workspace
-      LOGICAL      DETAIL       ! See above
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      LOGICAL      FAULT        ! TRUE if an error occurs
-      CHARACTER    FILE*132     ! The filename for the output
-      LOGICAL      FIRST        !
-      INTEGER      FLAGS(NLMAX) !
-      INTEGER      GAP          ! See above
-      INTEGER      I            !
-      INTEGER      IBRACK       !
-      INTEGER      IDOT         !
-      INTEGER      IGNORE       ! Used to pass ignorable status
-      INTEGER      IL           !
-      INTEGER      IRST         !
-      INTEGER      IR1          !
-      INTEGER      IR1ST        !
-      INTEGER      IR2          !
-      INTEGER      IRWID        ! See above
-      INTEGER      LAST         !
-      LOGICAL      LOCK         ! See above
-      LOGICAL      MORE         !
-      CHARACTER    NAME*132     ! The actual name of the image
-      INTEGER      NCOEFF       !
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NL           !
-      INTEGER      NLID         !
-      INTEGER      NOFITS       !
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension (if present)
-      INTEGER      ORDER        !
-      REAL         RMS          !
-      REAL         RMSMAX       !
-      REAL         RSIGMA       ! See above
-      INTEGER      SCRPTR       ! Dynamic-memory pointer to workspace
-      REAL         SIGMA        !
-      REAL         SIGMIN       !
-      INTEGER      SPBYTES      ! Bytes in a single spectrum
-      LOGICAL      SPREAD       !
-      INTEGER      SPTR         ! Dynamic-memory pointer to spectrum
-      INTEGER      S2PTR        ! Dynamic-memory pointer to previous spectrum
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! Output message string
-      REAL         VALUE        ! Temporary real number
-      REAL         WAVES(NLMAX) !
-      REAL         WMAX         !
-      REAL         WMIN         !
-      INTEGER      WSLOT        ! Map slot number of workspace
-      REAL         WWMAX        !
-      REAL         WWMIN        !
-      REAL         X(NLMAX)     !
-      LOGICAL      XCORR        ! True if cross-correlation is to be used
-      REAL         Y(NLMAX)     !
-      REAL         W(NLMAX)     ! Weight for fit.
-      LOGICAL      WEIGHT       ! Flag: .TRUE. for a weighted fit.
-      REAL         CHNSFT       ! Optional shift added to channel positions
-      CHARACTER    CHNBUF*75    ! Message buffer for channel shift.
-      INTEGER      CHNPOS       ! Length of CHNBUF (excl. trail. blanks)
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      REAL      CHANS(NLMAX)     !
+      REAL      CHANSN(NLMAX)    !
+      REAL      CHANSO(NLMAX)    !
+      REAL      CHANPK(NLMAX)    ! Peak intensity of line.
+      CHARACTER CHNBUF*75        ! Message buffer for channel shift.
+      INTEGER   CHNPOS           ! Length of CHNBUF (excl. trail.
+                                 ! blanks)
+      REAL      CHNSFT           ! Optional shift added to channel 
+                                 ! positions
+      INTEGER   CPTR             ! Dynamic-memory pointer to workspace
+      LOGICAL   DETAIL           ! See above
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number of input data array
+      LOGICAL   FAULT            ! TRUE if an error occurs
+      CHARACTER FILE*132         ! The filename for the output
+      LOGICAL   FIRST            !
+      INTEGER   FLAGS(NLMAX)     !
+      INTEGER   GAP              ! See above
+      INTEGER   I                !
+      INTEGER   IBRACK           !
+      INTEGER   IDOT             !
+      INTEGER   IGNORE           ! Used to pass ignorable status
+      INTEGER   IL               !
+      INTEGER   IRST             !
+      INTEGER   IR1              !
+      INTEGER   IR1ST            !
+      INTEGER   IR2              !
+      INTEGER   IRWID            ! See above
+      INTEGER   LAST             !
+      LOGICAL   LOCK             ! See above
+      LOGICAL   MORE             !
+      CHARACTER NAME*132         ! The actual name of the image
+      INTEGER   NCOEFF           !
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NELM             ! Total number of elements in data
+      INTEGER   NL               !
+      INTEGER   NLID             !
+      INTEGER   NOFITS           !
+      INTEGER   NX               ! Size of 1st dimension
+      INTEGER   NY               ! Size of 2nd dimension (if present)
+      INTEGER   ORDER            !
+      REAL      RMS              !
+      REAL      RMSMAX           !
+      REAL      RSIGMA           ! See above
+      INTEGER   SCRPTR           ! Dynamic-memory pointer to workspace
+      REAL      SIGMA            !
+      REAL      SIGMIN           !
+      INTEGER   SPBYTES          ! Bytes in a single spectrum
+      LOGICAL   SPREAD           !
+      INTEGER   SPTR             ! Dynamic-memory pointer to spectrum
+      INTEGER   S2PTR            ! Dynamic-memory pointer to previous
+                                 ! spectrum
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      CHARACTER STRING*64        ! Output message string
+      REAL      VALUE            ! Temporary real number
+      REAL      W(NLMAX)         ! Weight for fit.
+      REAL      WAVES(NLMAX)     !
+      LOGICAL   WEIGHT           ! Flag: .TRUE. for a weighted fit.
+      REAL      WMAX             !
+      REAL      WMIN             !
+      INTEGER   WSLOT            ! Map slot number of workspace
+      REAL      WWMAX            !
+      REAL      WWMIN            !
+      REAL      X(NLMAX)         !
+      LOGICAL   XCORR            ! Cross-correlation is to be used?
+      REAL      Y(NLMAX)         !
 C
 C     Initialisation of DSA_ routines
 C
@@ -341,8 +347,7 @@ C
 C
 C     Map the data array
 C
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get the necessary workspace - one array to hold the arc
@@ -351,18 +356,12 @@ C     hold the previous spectrum (used for cross-correlation), all
 C     three NX long), and one array for the polynomial fits, NY*11 
 C     long, in double precision.
 C
-      BYTES=(NX*3)*DSA_TYPESIZE('FLOAT',STATUS)+
-     :                   (NY*11)*DSA_TYPESIZE('DOUBLE',STATUS)
-      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS) 
-C      SPTR=DYN_ELEMENT(ADDRESS)
-C      S2PTR=DYN_INCREMENT(SPTR,'FLOAT',NX)
-C      SCRPTR=DYN_INCREMENT(S2PTR,'FLOAT',NX)
-C      CPTR=DYN_INCREMENT(SCRPTR,'FLOAT',NX)
+      CALL DSA_GET_WORK_ARRAY (11*NY,'DOUBLE',CPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',SPTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',S2PTR,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY (NX,'FLOAT',SCRPTR,WSLOT,STATUS)
+
       IF (STATUS.NE.0) GO TO 500
-      CPTR=DYN_ELEMENT(ADDRESS)
-      SPTR=DYN_INCREMENT(CPTR,'DOUBLE',11*NY)
-      S2PTR=DYN_INCREMENT(SPTR,'FLOAT',NX)
-      SCRPTR=DYN_INCREMENT(S2PTR,'FLOAT',NX)
 C
 C     Set flags array (used to indicate that a line could not
 C     be found).
@@ -386,8 +385,8 @@ C
 C
 C        Form the single arc spectrum
 C
-         CALL FIG_XTRACT(DYNAMIC_MEM(DPTR),NX,NY,IR1,IR2,
-     :                                  DYNAMIC_MEM(SPTR))
+         CALL FIG_XTRACT(%VAL(CNF_PVAL(DPTR)),NX,NY,IR1,IR2,
+     :                   %VAL(CNF_PVAL(SPTR)))
 C
          IF (FIRST) THEN
 C
@@ -396,8 +395,9 @@ C           if required, and copy search line list (CHANS) into work line
 C           list (CHANSO).
 C
             IF (LOCK) THEN
-               CALL IRLOCK(DYNAMIC_MEM(SPTR),NX,NLMAX,SIGMA,SIGMIN,
-     :          NCOEFF,COEFFS,DYNAMIC_MEM(SCRPTR),NLID,CHANS,WAVES)
+               CALL IRLOCK(%VAL(CNF_PVAL(SPTR)),NX,NLMAX,SIGMA,SIGMIN,
+     :                     NCOEFF,COEFFS,%VAL(CNF_PVAL(SCRPTR)),
+     :                     NLID,CHANS,WAVES)
             END IF
             DO I=1,NLID
                CHANSO(I)=CHANS(I)
@@ -409,26 +409,25 @@ C           correlation to determine the shift, and if so, use this
 C           shift to modify the channel numbers.
 C
             IF (XCORR) THEN
-               CALL IRSHIFT (DYNAMIC_MEM(SPTR),DYNAMIC_MEM(S2PTR),NX,
-     :                                                 CHANSO,NLID)
+               CALL IRSHIFT (%VAL(CNF_PVAL(SPTR)),
+     :                       %VAL(CNF_PVAL(S2PTR)),NX,CHANSO,NLID)
             END IF
          END IF
 C
 C        Find the line centers
 C
-         CALL IREFIT(DYNAMIC_MEM(SPTR),NX,CHANSO,NLID,SIGMA,SPREAD,
-     :                                               CHANSN,CHANPK)
+         CALL IREFIT(%VAL(CNF_PVAL(SPTR)),NX,CHANSO,NLID,SIGMA,SPREAD,
+     :               CHANSN,CHANPK)
 C
 C        Sort out the lines ready for the next section, deleting
 C        any previously flagged as missing
 C
-         CALL IRLFIX(NLID,WAVES,CHANSN,CHANPK,GAP,CHANSO,FLAGS,
-     :                                                    X,Y,W,NL)
+         CALL IRLFIX(NLID,WAVES,CHANSN,CHANPK,GAP,CHANSO,FLAGS,X,Y,W,NL)
 C
 C        Fit the lines and output the results
 C
          CALL IRFITL(WEIGHT,NL,X,Y,W,NX,NY,IR1,IR2,DETAIL,LAST,ORDER,
-     :                               DYNAMIC_MEM(CPTR),RMS,WMAX,WMIN)
+     :               %VAL(CNF_PVAL(CPTR)),RMS,WMAX,WMIN)
          IF (RMS.GT.RMSMAX) RMSMAX=RMS
          IF (LAST.NE.IR1) NOFITS=NOFITS+IR2-IR1+1
          IF (FIRST) THEN
@@ -444,7 +443,8 @@ C        If we are using cross-correlation for shift analysis, copy
 C        the current spectrum so that it becomes the new previous spectrum.
 C
          IF (XCORR) THEN
-            CALL GEN_MOVE(SPBYTES,DYNAMIC_MEM(SPTR),DYNAMIC_MEM(S2PTR))
+            CALL GEN_MOVE(SPBYTES,%VAL(CNF_PVAL(SPTR)),
+     :                    %VAL(CNF_PVAL(S2PTR)))
          END IF
 C
 C        And carry on until all the cross-sections are done
@@ -466,19 +466,18 @@ C
       LAST=0
       FIRST=.TRUE.
       DO WHILE (MORE)
-         CALL FIG_XTRACT(DYNAMIC_MEM(DPTR),NX,NY,IR1,IR2,
-     :                                 DYNAMIC_MEM(SPTR))
+         CALL FIG_XTRACT(%VAL(CNF_PVAL(DPTR)),NX,NY,IR1,IR2,
+     :                   %VAL(CNF_PVAL(SPTR)))
          IF (XCORR.AND.(.NOT.FIRST)) THEN
-            CALL IRSHIFT (DYNAMIC_MEM(SPTR),DYNAMIC_MEM(S2PTR),NX,
-     :                                                 CHANSO,NLID)
+            CALL IRSHIFT (%VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(S2PTR)),NX,
+     :                    CHANSO,NLID)
          END IF
          FIRST=.FALSE.
-         CALL IREFIT(DYNAMIC_MEM(SPTR),NX,CHANSO,NLID,SIGMA,
-     :                                 SPREAD,CHANSN,CHANPK)
-         CALL IRLFIX(NLID,WAVES,CHANSN,CHANPK,GAP,CHANSO,FLAGS,
-     :                                                X,Y,W,NL)
+         CALL IREFIT(%VAL(CNF_PVAL(SPTR)),NX,CHANSO,NLID,SIGMA,
+     :                    SPREAD,CHANSN,CHANPK)
+         CALL IRLFIX(NLID,WAVES,CHANSN,CHANPK,GAP,CHANSO,FLAGS,X,Y,W,NL)
          CALL IRFITL(WEIGHT,NL,X,Y,W,NX,NY,IR1,IR2,DETAIL,LAST,ORDER,
-     :                               DYNAMIC_MEM(CPTR),RMS,WMAX,WMIN)
+     :               %VAL(CNF_PVAL(CPTR)),RMS,WMAX,WMIN)
          IF (RMS.GT.RMSMAX) RMSMAX=RMS
          IF (LAST.NE.IR1) NOFITS=NOFITS+IR2-IR1+1
          IF (WWMAX.LT.WMAX) WWMAX=WMAX
@@ -486,15 +485,16 @@ C
          IR2=IR1-1
          IR1=MAX(1,IR1-IRWID)
          IF (XCORR) THEN
-            CALL GEN_MOVE(SPBYTES,DYNAMIC_MEM(SPTR),DYNAMIC_MEM(S2PTR))
+            CALL GEN_MOVE(SPBYTES,%VAL(CNF_PVAL(SPTR)),
+     :                    %VAL(CNF_PVAL(S2PTR)))
          END IF
          MORE=IR2.GE.1
       END DO
 C
 C     Output results
 C
-      CALL IROUTP(FILE,NAME,NX,NY,DYNAMIC_MEM(CPTR),NLID,ORDER,
-     :                                     NOFITS,RMSMAX,STATUS)
+      CALL IROUTP(FILE,NAME,NX,NY,%VAL(CNF_PVAL(CPTR)),NLID,ORDER,
+     :            NOFITS,RMSMAX,STATUS)
       IF (STATUS.NE.0) FAULT=.TRUE.
 C
 C     Set user variables
@@ -513,7 +513,7 @@ C
       END
 C+
       SUBROUTINE IRGETL (NLMAX,CHANS,WAVES,NLID,NCOEFF,COEFFS,
-     :                                               SIGMA,STATUS)
+     :                   SIGMA,STATUS)
 C
 C     I R G E T L
 C
@@ -553,11 +553,12 @@ C     ARLINES.LIS   File containing the lines used in the arcline fit.
 C                   Format is as follows -
 C                   Number of lines used in fit (I5)
 C                   1 blank record, then one header record.
-C                   Then one record for each line, giving channel number,
-C                   wavelength, calculated wavelength and wavelength
-C                   discrepancy.  (4F13.4)
+C                   Then one record for each line, giving channel
+C                   number, wavelength, calculated wavelength and
+C                   wavelength discrepancy.  (4F13.4)
 C                   Then one blank record, then a record giving the RMS
-C                   error and the value of SIGMA used (12X,F10.2,19X,F5.2)
+C                   error and the value of SIGMA used 
+C                   (12X,F10.2,19X,F5.2).
 C                   Then one blank record, then one record giving the
 C                   order of fit (ie 1 less than number of coefficients)
 C                   (15X,I3), then one blank record, then one or more
@@ -625,10 +626,10 @@ C     IARC utility.  Refits a spectrum, given a table of expected
 C     arc line channel numbers, to produce a new table of
 C     channel numbers for each line.  The program looks for a centroid
 C     in the data for each line in the table, and uses the new center
-C     if it finds one.  The search is performed twice, once with a larger
-C     sigma - in order to stand more chance of catching the lines - then
-C     with the original sigma - to refine the centering.  This feature can
-C     be disabled.
+C     if it finds one.  The search is performed twice, once with a
+C     larger sigma - in order to stand more chance of catching the 
+C     lines - then with the original sigma - to refine the centering.
+C     This feature can be disabled.
 C
 C     Parameters -   (">" input, "<" output)
 C
@@ -642,7 +643,8 @@ C     (>) SIGMA    (Real) The line width used for the previous search.
 C     (>) SPREAD   (Logical) True if initial is to be made at increased
 C                  sigma.
 C     (<) CHANSN   (Real array CHANSN(NLID)) The new channel numbers for
-C                  the lines.  If a line cannot be found, it is set to zero.
+C                  the lines.  If a line cannot be found, it is set to
+C                  zero.
 C     (<) CHANPK   (Real array CHANPK(NLID)) The peak intensity for the
 C                  lines.  If a line cannot be found, it is set to zero.
 C

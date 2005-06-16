@@ -17,10 +17,10 @@ C     COLUMNS    (Numeric) The number of columns to be added
 C                together when tracing the spectra.
 C     TRACE      (Character) Controls the algorithm used to follow
 C                the spectra.  Only the first character is significant.
-C                'E' (Edges) Indicates that the data profile is a 'top-hat'
-C                shape - as you might get from a continuum source
-C                through a dekker.  If EDGES is specified, an edge
-C                locating algorithm is used, and the width of the
+C                'E' (Edges) Indicates that the data profile is a 
+C                'top-hat'shape - as you might get from a continuum 
+C                source through a dekker.  If EDGES is specified, an 
+C                edge-locating algorithm is used, and the width of the
 C                top hat is assumed to be approximately WIDTH*2.
 C                'C' is the same as 'E', except that the center is
 C                taken as the center of gravity of the data within the
@@ -76,16 +76,18 @@ C                    Workspace used, and call to FIG_GETDIS changed.
 C      7th Aug 1987  DJA/AAO.  Rewritten to use DSA_ routines.
 C                    Now uses DYN_ routines for dynamic memory handling
 C     22nd Mar 1988  KS / AAO. Modified for GKS version of PGPLOT.  
-C                    Workspace usage corrected, use of STATUS made uniform.
+C                    Workspace usage corrected, use of STATUS made 
+C                    uniform.
 C     26th May 1988  KS/AAO. Maximum number of spectra increased to 50.
 C                    TRACE parameter added.  
 C     31st May 1988  KS/AAO. DIAG keyword added. Image dimensions and
 C                    spectrum width added to output format.
 C     16th Aug 1988  KS/AAO. WIDTH limit increased.  Number of records
 C                    for coefficients (4) corrected in comments.
-C     31st Oct 1992  HME / UoE, Starlink.  Lower case file name sdist.dat.
-C                    INCLUDE changed, TABs removed. DISPLAY always false,
-C                    no TVP calls. SOFT parameter becomes SOFTD.
+C     31st Oct 1992  HME / UoE, Starlink.  Lower case file name 
+C                    sdist.dat. INCLUDE changed, TABs removed. DISPLAY 
+C                    always false, no TVP calls. SOFT parameter becomes 
+C                    SOFTD. 
 C     27th Jul 1993  HME / UoE, Starlink.  Disuse PAR_Q*, use
 C                    PAR_ABORT. Added parameter NEXT.
 C     16th Feb 1995  HME / UoE, Starlink. In the big workspace move
@@ -100,21 +102,26 @@ C                    separate calls and use DSA_GET_WORK_ARRAY.
 C     26th Jul 1995  HME / UoE, Starlink.  Implement the changes
 C                    contained in AAO's version 4.2:
 C                    KS/AAO. Increased tolerance to allow for larger
-C                    detectors (now varies with WIDTH, was just 2 pixels).
-C                    Introduced the 'BALANCE' algorithm.
-C                    KS/AAO. Changes as determined by SJM for the portable
-C                    Figaro version made to this newer version of SDIST.
+C                    detectors (now varies with WIDTH, was just 2 
+C                    pixels).  Introduced the 'BALANCE' algorithm.
+C                    KS/AAO. Changes as determined by SJM for the 
+C                    portable Figaro version made to this newer version 
+C                    of SDIST.
 C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                    file names to 132 chars.
 C     9th  Jun 1999  TDCA / Starlink, RAL. Removed unsupported keywords
 C                    from OPEN statements.
+C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
+C                    mapped data.
 C+
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
 C     Functions used 
 C
       LOGICAL PAR_BATCH, PAR_ABORT
-      INTEGER ICH_FOLD, ICH_LEN, DYN_ELEMENT, DYN_INCREMENT
+      INTEGER ICH_FOLD, ICH_LEN
       INTEGER DSA_TYPESIZE
 C
 C     Maximum number of spectra
@@ -124,54 +131,49 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS      ! Address of dynamic memory element
-      REAL         ARRAY(10)    !
+      REAL      ARRAY(10)        !
       DOUBLE PRECISION COEFFS(11,MAXSPEC) !
-      LOGICAL      DIAG         ! Flags diagnostics required
-      INTEGER      DIMS(10)     ! Sizes of dimensions of data
-      LOGICAL      DISPLY       ! See above
-      INTEGER      DPTR         ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT        ! Map slot number of input data array
-      INTEGER      FILE         ! Logical unit of output file
-      LOGICAL      FOPEN        ! TRUE if the output file was opened
-      INTEGER      FSTATUS      ! Status from I/O operations
-      INTEGER      I            !
-      INTEGER      IGNORE       ! Used to pass ignorable status value
-      CHARACTER    IMAGE*132    ! The actual name of the image
-      INTEGER      INVOKE       ! Dummy function value
-      INTEGER      IWPTR        ! Dynamic memory pointer to workspace
-      INTEGER      IX1(MAXSPEC) !
-      INTEGER      IX2(MAXSPEC) !
-      INTEGER      J            !
-      LOGICAL      LSOFT        ! See above
-      INTEGER      MAXD         ! See above
-      INTEGER      NCOL         ! See above
-      INTEGER      NDIM         ! Number of dimensions in data
-      INTEGER      NELM         ! Total number of elements in data
-      INTEGER      NX           ! Size of 1st dimension
-      INTEGER      NY           ! Size of 2nd dimension 
-      INTEGER      NXYS         !
-      CHARACTER    SOFT*32      ! The name of the current soft device
-      INTEGER      SPTR         ! Dynamic memory pointer to workspace
-      INTEGER      STATUS       ! Running status for DSA_ routines
-      CHARACTER    STRING*64    ! String used to hold output text
-      CHARACTER    TRACE*16     ! Trace mode.
-      INTEGER      TVSTATUS     ! Status from TVPCKG routines
-      REAL         VALUE        ! Temporary real number
-      INTEGER      VSTATUS      ! Status from VAR_ routines
-      REAL         WIDTH        ! See above
-      REAL         WIDTHS(MAXSPEC) ! Widths of the spectra fitted
-      INTEGER      WPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      WSLOT        ! Map slot number of workspace
-      REAL         XVS(MAXSPEC) !
-      INTEGER      XWPTR        ! Dynamic memory pointer to workspace
-      REAL         YAVS(MAXSPEC)!
-      REAL         YVS(MAXSPEC) !
-      INTEGER      YWPTR        ! Dynamic memory pointer to workspace
-C
-C     Dynamic memory support - defines DYNAMIC_MEM
-C
-      INCLUDE 'DYNAMIC_MEMORY'
+      LOGICAL   DIAG             ! Flags diagnostics required
+      INTEGER   DIMS(10)         ! Sizes of dimensions of data
+      LOGICAL   DISPLY           ! See above
+      INTEGER   DPTR             ! Dynamic-memory pointer to data array
+      INTEGER   DSLOT            ! Map slot number of input data array
+      INTEGER   FILE             ! Logical unit of output file
+      LOGICAL   FOPEN            ! TRUE if the output file was opened
+      INTEGER   FSTATUS          ! Status from I/O operations
+      INTEGER   I                !
+      INTEGER   IGNORE           ! Used to pass ignorable status value
+      CHARACTER IMAGE*132        ! The actual name of the image
+      INTEGER   INVOKE           ! Dummy function value
+      INTEGER   IWPTR            ! Dynamic-memory pointer to workspace
+      INTEGER   IX1(MAXSPEC)     !
+      INTEGER   IX2(MAXSPEC)     !
+      INTEGER   J                !
+      LOGICAL   LSOFT            ! See above
+      INTEGER   MAXD             ! See above
+      INTEGER   NCOL             ! See above
+      INTEGER   NDIM             ! Number of dimensions in data
+      INTEGER   NELM             ! Total number of elements in data
+      INTEGER   NX               ! Size of 1st dimension
+      INTEGER   NY               ! Size of 2nd dimension 
+      INTEGER   NXYS             !
+      CHARACTER SOFT*32          ! The name of the current soft device
+      INTEGER   SPTR             ! Dynamic-memory pointer to workspace
+      INTEGER   STATUS           ! Running status for DSA_ routines
+      CHARACTER STRING*64        ! String used to hold output text
+      CHARACTER TRACE*16         ! Trace mode.
+      INTEGER   TVSTATUS         ! Status from TVPCKG routines
+      REAL      VALUE            ! Temporary real number
+      INTEGER   VSTATUS          ! Status from VAR_ routines
+      REAL      WIDTH            ! See above
+      REAL      WIDTHS(MAXSPEC)  ! Widths of the spectra fitted
+      INTEGER   WPTR             ! Dynamic-memory pointer to workspace
+      INTEGER   WSLOT            ! Map slot number of workspace
+      REAL      XVS(MAXSPEC)     !
+      INTEGER   XWPTR            ! Dynamic-memory pointer to workspace
+      REAL      YAVS(MAXSPEC)    !
+      REAL      YVS(MAXSPEC)     !
+      INTEGER   YWPTR            ! Dynamic-memory pointer to workspace
 C
 C     I/O Logical unit
 C
@@ -198,8 +200,7 @@ C
       END IF
       NX=DIMS(1)
       NY=DIMS(2)
-      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',ADDRESS,DSLOT,STATUS)
-      DPTR=DYN_ELEMENT(ADDRESS)
+      CALL DSA_MAP_DATA('IMAGE','READ','FLOAT',DPTR,DSLOT,STATUS)
       IF (STATUS.NE.0) GOTO 500
 C
 C     Get X and Y positions.
@@ -209,7 +210,7 @@ C
          NXYS=MIN(MAXSPEC,INT(VALUE))
          IF (NXYS.LE.0) THEN
             CALL PAR_WRUSER('Zero or -ve number of pixels selected',
-     :                                                       IGNORE)
+     :                      IGNORE)
             VSTATUS=-1
          ELSE
             CALL VAR_GETARY('XPIXELS',NXYS,XVS,VSTATUS)
@@ -315,46 +316,31 @@ C     X and Y values to be fitted.  Soft plots also require extra space
 C     (under pointer SPTR). See FIG_GETDIS for details. 
 C
       CALL DSA_GET_WORK_ARRAY(5*NX+3*(MAXD+1),
-     :                            'DOUBLE',ADDRESS,WSLOT,STATUS)
+     :                            'DOUBLE',WPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      WPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX,    'INT',ADDRESS,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX,    'INT',IWPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      IWPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX, 'DOUBLE',ADDRESS,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX, 'DOUBLE',XWPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      XWPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(NX, 'DOUBLE',ADDRESS,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NX, 'DOUBLE',YWPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      YWPTR=DYN_ELEMENT(ADDRESS)
-      CALL DSA_GET_WORK_ARRAY(2*NX,'FLOAT',ADDRESS,WSLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(2*NX,'FLOAT',SPTR,WSLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      SPTR=DYN_ELEMENT(ADDRESS)
-C      BYTES=NX*DSA_TYPESIZE('INT',STATUS)+(NX+NX+(NX*4))*
-C     :                    DSA_TYPESIZE('DOUBLE',STATUS)
-C      IF (LSOFT) BYTES=BYTES+2*NX*DSA_TYPESIZE('FLOAT',STATUS)
-C      CALL DSA_GET_WORKSPACE(BYTES,ADDRESS,WSLOT,STATUS)
-C      WPTR=DYN_ELEMENT(ADDRESS)
-C      IWPTR=DYN_INCREMENT(WPTR,'DOUBLE',NX*4)
-C      XWPTR=DYN_INCREMENT(IWPTR,'INT',NX)
-C      YWPTR=DYN_INCREMENT(XWPTR,'DOUBLE',NX)
-C      SPTR=DYN_INCREMENT(YWPTR,'DOUBLE',NX)
 C
 C     Now perform the fitting
 C
-      CALL FIG_GETDIS(DYNAMIC_MEM(DPTR),NX,NY,NXYS,XVS,YVS,NCOL,WIDTH,
-     :       TRACE(1:1),MAXD,DISPLY,SOFT,ARRAY,DIAG,DYNAMIC_MEM(IWPTR),
-     :       DYNAMIC_MEM(WPTR),DYNAMIC_MEM(XWPTR),DYNAMIC_MEM(YWPTR),
-     :       DYNAMIC_MEM(SPTR),IX1,IX2,YAVS,WIDTHS,COEFFS)
+      CALL FIG_GETDIS(%VAL(CNF_PVAL(DPTR)),NX,NY,NXYS,XVS,YVS,NCOL,
+     :                WIDTH,TRACE(1:1),MAXD,DISPLY,SOFT,ARRAY,DIAG,
+     :                %VAL(CNF_PVAL(IWPTR)),%VAL(CNF_PVAL(WPTR)),
+     :                %VAL(CNF_PVAL(XWPTR)),%VAL(CNF_PVAL(YWPTR)),
+     :                %VAL(CNF_PVAL(SPTR)),IX1,IX2,YAVS,WIDTHS,COEFFS)
       IF (PAR_ABORT()) GO TO 500
 C
 C     Output results of fit
 C
-      OPEN (UNIT=FILE,FILE='sdist.dat',STATUS='NEW',
-     :                  IOSTAT=FSTATUS)
+      OPEN (UNIT=FILE,FILE='sdist.dat',STATUS='NEW',IOSTAT=FSTATUS)
       IF (FSTATUS.NE.0) THEN
-         CALL PAR_WRUSER('Unable to open output file SDIST.DAT',
-     :                                                    IGNORE)
+         CALL PAR_WRUSER('Unable to open output file SDIST.DAT',IGNORE)
          GO TO 500
       END IF
       FOPEN=.TRUE.
@@ -443,7 +429,8 @@ C     (>) ARRAY   (Real array ARRAY(10)) Contains the display parameters
 C                 for the current image.  See IMAGE for details.
 C     (>) DIAG    (Logical) True if detailed diagnostics required.
 C     (W) IWORK   (Integer array IWORK(NX)) Workspace.
-C     (W) WORK    (Double precision array WORK(5*NX+3*(MAXD+1))) Workspace.
+C     (W) WORK    (Double precision array WORK(5*NX+3*(MAXD+1))) 
+C                  Workspace.
 C     (W) XWORK   (Double precision array XWORK(NX)) Workspace.
 C     (W) YWORK   (Double precision array YWORK(NX)) Workspace.
 C     (W) SWORK   (Real array SWORK(2*NX)) Workspace.  May be a
@@ -476,8 +463,8 @@ C                     workspace for FIG_DXYFIT.
 C     26th Jul 1995.  KS/AAO. Added Balance algorithm, made tolerance on
 C                     closeness of centre vary with WIDTH.
 C     26th Feb 1997.  MJCL / Starlink.  Changed zero-out of COEFFS to
-C                     run over NXYS spectra, was previously (unintialised)
-C                     ISPECT.
+C                     run over NXYS spectra, was previously
+C                     (uninitialised) ISPECT.
 C+
       IMPLICIT NONE
 C
