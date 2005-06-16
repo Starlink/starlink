@@ -785,33 +785,57 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
         ],
        [dnl second arg empty -- use defaults
         if $_star_build_docs; then
+            do_the_build=  # blank if we're to go ahead, string expl. otherwise
             AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
             AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
             if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM; then
                 if $_star_docs_only; then
                     # Building documentation is all we're supposed to do,
                     # and we can't, so suppress further building.
-                    STAR_SUPPRESS_BUILD_IF(:,
-                        [This docs-only component requires both Jade
+                    do_the_build="This docs-only component requires both Jade
                          and sgmlnorm.  All I could find were $JADE for Jade,
                          and $SGMLNORM for sgmlnorm.  Your system may have
                          a way to install them as a package, in which case
-                         you should re-run configure and make.])
+                         you should re-run configure and make."
                 else
                     AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
                 fi
             else
-                AC_FOREACH([DocCode], [$1],
+                # Test Jade version
+## The sgmlkit DSSSL script for building the TeXML documentation crashes
+## on openjade 1.3.1 (and presumably earlier), but not on 1.3.2 (and presumably
+## later.  The HTML DSSSL script doesn't, and it's not clear what it is in the
+## TeXML script that causes it.  Fixing the latter would be ideal, but 
+## unless we do that (and it would be messy working out just where the
+## problem is), we have to just spot the old version and suppress the build
+## in that case.
+                AC_MSG_CHECKING([version of $JADE (need 1.3.2 or better)])
+                $JADE -v </dev/null >conftest.version 2>&1
+                JADEVERS=[`sed -n '/:.*jade.*version/{
+    s/.*:I://
+    s/[^0-9][^0-9]*/ /gp
+}' conftest.version`]
+                # The following converts space-separated integers to a single
+                # one.  It's perhaps a leeettle funkier than necessary...
+                VERSINT=[`echo "[Ss[z0<a]x]sa $JADEVERS 0 0 0 lax Ls100* Ls+100* Ls+p" | dc`]
+                if test $VERSINT -ge 10302; then
+                  AC_MSG_RESULT([ok])
+                  AC_FOREACH([DocCode], [$1],
                    [m4_if(m4_bregexp(DocCode,[/]), -1,
                           [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar DocCode.pdf"
 ],
                           [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
                            STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
                            AC_SUBST(STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
+                else
+                    AC_MSG_RESULT([too old])
+                    do_the_build="Your openjade is version $JADEVERS; need 1.3.2 or better"
+                fi
                 STAR_CHECK_PROGS([sgml2docs sgmlnorm])
                 SGMLKIT_HOME=$prefix/lib/sgmlkit
                 AC_SUBST(SGMLKIT_HOME)
             fi
+            STAR_SUPPRESS_BUILD_IF(test -n "$do_the_build", [$do_the_build])
         fi
         STAR_DECLARE_DEPENDENCIES([sourceset], [sgmlkit])
        ])
