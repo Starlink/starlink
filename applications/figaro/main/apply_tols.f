@@ -61,7 +61,6 @@
       integer line,nreject,ilen,chr_len,lst,ind
       logical par_given
       character*72 chars
-      include 'DYNAMIC_MEMORY'
       character*5 tolnam(maxtol+1)
       character*11 dict(MAXREJ+1)
       character*2 bss,bsn
