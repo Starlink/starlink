@@ -94,7 +94,7 @@
 *                         clone mode. Otherwise it simply maps the data
 *                         file with some checking.
 *    TWO_OPEN           : Open input file and get its dimensions etc.
-*    GETVM              : Get virtual memory
+*    DSA_GET_WORK_ARRAY : Get virtual memory
 *    IROUTP             : this outputs the results of the fitting by
 *                         arcfit to a file for use by ISCRUNCH, and
 *                         also a summary to the terminal. This was
@@ -159,9 +159,10 @@
 * to coeffs of poly fits in channel direction
 
       integer coptr
-      integer slot, slot2
+      integer slot,slot2,slot3,slot4,slot5,slot6,slot7,slot8,slot9
+      integer slot10,slot11,slot12,slot13,slotco
       integer w1ptr,w2ptr,w3ptr,w4ptr,w5ptr,w6ptr,w7ptr,w8ptr,w9ptr
-      integer w10ptr,w11ptr,w12ptr,nbytes,nels,w13ptr
+      integer w10ptr,w11ptr,w12ptr,w13ptr
 
       real rmsmax
       integer nfits
@@ -250,24 +251,34 @@
 *     COPTR (11*SPDIM1)
 *     W13PTR(LINE_COUNT) (l)
 
-          nels = (7*line_count+ MAX_KPLUS1*MAX_KPLUS1 + MAX_KPLUS1*2
-     :             + spdim1*11) * VAL__NBD
-     :             + (VAL__NBR*2+BYTES_LOGICAL)*line_count
-          call getvm(nels,w1ptr,slot,status)
+          call dsa_get_work_array(line_count,'double',w1ptr,slot,status)
+          call dsa_get_work_array(line_count,'double',w2ptr,slot2,
+     :                            status)
+          call dsa_get_work_array(line_count,'double',w3ptr,slot3,
+     :                            status)
+          call dsa_get_work_array(MAX_KPLUS1,'double',w4ptr,slot4,
+     :                            status)
+          call dsa_get_work_array(MAX_KPLUS1*MAX_KPLUS1,'double',w5ptr,
+     :                            slot5,status)
+          call dsa_get_work_array(MAX_KPLUS1,'double',w6ptr,slot6,
+     :                            status)
+          call dsa_get_work_array(line_count,'double',w7ptr,slot7,
+     :                            status)
+          call dsa_get_work_array(line_count,'double',w8ptr,slot8,
+     :                            status)
+          call dsa_get_work_array(line_count,'double',w9ptr,slot9,
+     :                            status)
+          call dsa_get_work_array(line_count,'float',w10ptr,slot10,
+     :                            status)
+          call dsa_get_work_array(line_count,'float',w11ptr,slot11,
+     :                            status)
+          call dsa_get_work_array(line_count,'double',w12ptr,slot12,
+     :                            status)
+          call dsa_get_work_array(11*spdim1,'double',coptr,slotco,
+     :                            status)
+          call dsa_get_work_array(line_count,'logical',w13ptr,slot13,
+     :                            status)
           if(status.ne.SAI__OK) goto 500
-          w2ptr = w1ptr + line_count*VAL__NBD
-          w3ptr = w2ptr + line_count*VAL__NBD
-          w4ptr = w3ptr + line_count*VAL__NBD
-          w5ptr = w4ptr + MAX_KPLUS1*VAL__NBD
-          w6ptr = w5ptr + MAX_KPLUS1*MAX_KPLUS1*VAL__NBD
-          w7ptr = w6ptr + MAX_KPLUS1*VAL__NBD
-          w8ptr = w7ptr + line_count*VAL__NBD
-          w9ptr = w8ptr + line_count*VAL__NBD
-          w10ptr = w9ptr + line_count*VAL__NBD
-          w11ptr = w10ptr + line_count*VAL__NBR
-          w12ptr = w11ptr + line_count*VAL__NBR
-          coptr = w12ptr + line_count*VAL__NBD
-          w13ptr = coptr + 11*spdim1*VAL__NBD
 
 * fit polynomials
 
@@ -297,6 +308,19 @@
 
 * Free workspace
 
+          call dsa_free_workspace(slot13,status)
+          call dsa_free_workspace(slotco,status)
+          call dsa_free_workspace(slot12,status)
+          call dsa_free_workspace(slot11,status)
+          call dsa_free_workspace(slot10status)
+          call dsa_free_workspace(slot9,status)
+          call dsa_free_workspace(slot8,status)
+          call dsa_free_workspace(slot7status)
+          call dsa_free_workspace(slot6,status)
+          call dsa_free_workspace(slot5,status)
+          call dsa_free_workspace(slot4,status)
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
 
         else if(iopt.eq.7) then
@@ -327,15 +351,20 @@
 *         W2PTR(2,LINE_COUNT)  (d):
 *         W3PTR(LINE_COUNT)    (l):
 
-          nbytes = line_count * (VAL__NBD*(22)+BYTES_LOGICAL)
-          call getvm(nbytes,w1ptr,slot,status)
+          call dsa_get_work_array(20*line_count,'double',w1ptr,slot,
+     :                            status)
+          call dsa_get_work_array(2*line_count,'double',w2ptr,slot2,
+     :                            status)
+          call dsa_get_work_array(line_count,'logical',w3ptr,slot3,
+     :                            status)
           if(status.ne.SAI__OK) goto 500
-          w2ptr = w1ptr + 20*VAL__NBD*line_count
-          w3ptr = w2ptr + VAL__NBD*line_count*2
 
           call contin_corr(%VAL(CNF_PVAL(w1ptr)),%VAL(CNF_PVAL(w2ptr)),
-     :         %VAL(CNF_PVAL(w3ptr)),polydata,status,athree,maxnpts)
+     :                     %VAL(CNF_PVAL(w3ptr)),polydata,status,
+     :                     athree,maxnpts)
 
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
         end if
       end do
