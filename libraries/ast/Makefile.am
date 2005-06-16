@@ -58,6 +58,8 @@ GRP_C_ROUTINES = \
     fspecfluxframe.c \
     fspecframe.c \
     fspecmap.c \
+    ftimeframe.c \
+    ftimemap.c \
     fsphmap.c \
     ftranmap.c \
     funitmap.c \
@@ -95,6 +97,8 @@ GRP_C_ROUTINES = \
     specframe.c \
     specmap.c \
     sphmap.c \
+    timeframe.c \
+    timemap.c \
     tranmap.c \
     unit.c \
     unitmap.c \
@@ -136,6 +140,7 @@ AST_H_FILES = \
           slamap.h \
           specmap.h \
           sphmap.h \
+          timemap.h \
           tranmap.h \
           unitmap.h \
           wcsmap.h \
@@ -160,6 +165,7 @@ AST_H_FILES = \
                 pointlist.h \
                 polygon.h \
                 prism.h \
+             timeframe.h \
        channel.h \
           fitschan.h \
           xmlchan.h 

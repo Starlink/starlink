@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.19}
+\newcommand{\stardocnumber}    {211.20}
 c-
 f+
-\newcommand{\stardocnumber}    {210.19}
+\newcommand{\stardocnumber}    {210.20}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {21st April 2005}
+\newcommand{\stardocdate}      {16th June 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -977,6 +977,8 @@ SlaMap).
 \item Conversions between various spectral coordinate systems (the
 SpecMap and GrismMap).
 
+\item Conversions between various time systems (the TimeMap).
+
 \item Conversion between 2-dimensional spherical celestial coordinates
 (longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
 
@@ -1247,10 +1249,10 @@ specific physical domain. This ranges from tasks such as formatting axis
 values, to complex tasks such as determining the transformation between
 any pair of related coordinate systems. For instance, the SkyFrame
 (Figure~\ref{fig:frames}b,c), represents celestial coordinate systems,
-and the SpecFrame represents spectral coordinate systems. Both provide a
-wide range of different systems for describing positions within their
-associated physical domain, and these may be selected by setting appropriate 
-attributes.  
+the SpecFrame represents spectral coordinate systems, and the TimeFrame 
+represents time coordinate systems. All these provide a wide range of 
+different systems for describing positions within their associated physical 
+domain, and these may be selected by setting appropriate attributes.  
 
 \begin{latexonly}
    As with compound Mappings (\secref{ss:cmpmapoverview}), it is possible
@@ -1307,7 +1309,7 @@ f-
 {\bf{Further reading:}} For a more complete description of Frames see
 \secref{ss:frames}, for SkyFrames see \secref{ss:skyframes} and for 
 SpecFrames see \secref{ss:specframes}.  Also see the Frame, SkyFrame,
-SpecFrame and CmpFrame entries in \appref{ss:classdescriptions}.
+SpecFrame, TimeFrame and CmpFrame entries in \appref{ss:classdescriptions}.
 
 \subsection{Networks of Coordinate Systems}
 
@@ -2448,8 +2450,9 @@ headers, then a different approach is necessary. In this case, you should
 first create a Frame describing pixel coordinates, and store this Frame
 in a new FrameSet. You should then create a new Frame describing the
 world coordinate system. This Frame may be a specific subclass of Frame such
-as a SkyFrame for celestial coordinates, or a SpecFrame for spectral
-coordinates, or a CmpFrame for a combination of different coordinates.
+as a SkyFrame for celestial coordinates, a SpecFrame for spectral
+coordinates, a Timeframe for time coordinates, or a CmpFrame for a combination 
+of different coordinates.
 You also need to create a suitable Mapping which transforms pixel
 coordinates into world coordinates. AST provides many different types of
 Mappings, all of which can be combined together in arbitrary fashions to
@@ -5219,6 +5222,7 @@ as a whole and some of the sub-classes it contains:
       PolyMap
       SlaMap
       SpecMap
+      TimeMap
       UnitMap
       WcsMap
       ZoomMap
@@ -6749,7 +6753,7 @@ to describe positions within the physical domain represented by the Frame.
 For a simple Frame, this attribute currently has a fixed value of 
 ``Cartesian'', but could in principle be extended to include options such
 as ``Polar'', ``Cylindrical'', {\em{etc}}. More specialised Frames such
-as the SkyFrame and the SpecFrame, re-define the allowed values to be
+as the SkyFrame, TimeFrame  and SpecFrame, re-define the allowed values to be
 appropriate to the domain which they describe. For instance, the SkyFrame
 allows values such as ``FK4'' and ``Galactic'', and the SpecFrame allows
 values such as ``frequency'' and ``wavelength''. 
@@ -8125,6 +8129,12 @@ class describes positions within this domain, allowing a wide range of
 different coordinate systems to be used (frequency, wavelength,
 {\em{etc}}). The default Domain value for a SpecFrame is SPECTRUM.
 
+\item[TIME]\mbox{}\\
+Identifies the domain used to describe moments in time. The AST TimeFrame 
+class describes positions within this domain, allowing a wide range of
+different coordinate systems and timescales to be used. The default Domain 
+value for a TimeFrame is TIME.
+
 \end{description}
 \end{quote}
 
@@ -8173,9 +8183,9 @@ c-
 f+
 routines AST\_SETACTIVEUNIT and AST\_GETACTIVEUNIT
 f-
-allow this default behaviour to be changed. The SpecFrame class (also
-introduced in version 2.0) \emph{always} has an active Unit attribute
-(attempts to change this are ignored).
+allow this default behaviour to be changed. The SpecFrame and TimeFrame
+classes \emph{always} have an active Unit attribute (attempts to change this 
+are ignored).
 
 For instance, consider the above example of two 1-dimensional Frames
 describing velocity. These Frames can be created as follows:
@@ -8595,7 +8605,15 @@ attributes, each of which has a default appropriate to
 ({\em{i.e.}}\ defined by) the setting of the main System
 attribute. Each of these {\em{qualifying attributes}} may, however, be
 assigned an explicit value so as to select a particular coordinate
-system.
+system. Note, it is usually best to assign explicit
+values whenever possible rather than relying on defaults. Attribute
+should only be left at their default value if you ``don't care'' what
+value is used. In certain circumstances (particularly, when aligning two
+Frames), a default value for an attribute may be replaced by the value
+from another similar Frame. Such value replacement can be prevented by 
+assigning an explicit value to the attribute, rather than simply relying on 
+the default.
+
 
 The main SkyFrame attributes which qualify the System attribute are:
 
@@ -9213,7 +9231,7 @@ c+
 \begin{quote}
 \small
 \begin{verbatim}
-skyframe = astSpecFrame( "System=Energy" );
+specframe = astSpecFrame( "System=Energy" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -9251,7 +9269,15 @@ attributes, each of which has a default appropriate to
 ({\em{i.e.}}\ defined by) the setting of the main System
 attribute. Each of these {\em{qualifying attributes}} may, however, be
 assigned an explicit value so as to select a particular coordinate
-system.
+system. Note, it is usually best to assign explicit
+values whenever possible rather than relying on defaults. Attribute
+should only be left at their default value if you ``don't care'' what
+value is used. In certain circumstances (particularly, when aligning two
+Frames), a default value for an attribute may be replaced by the value
+from another similar Frame. Such value replacement can be prevented by 
+assigning an explicit value to the attribute, rather than simply relying on 
+the default.
+
 
 The main SpecFrame attributes which qualify the System attribute are:
 
@@ -9631,6 +9657,164 @@ value for IF indicates that the DSBCentre value is in the lower sideband
 
 
 \cleardoublepage
+\section{\xlabel{ss_timeframes}\label{ss:timeframes}Time Systems (TimeFrames)}
+
+The TimeFrame is a Frame which is specialised for representing moments in
+time. In this section we examine the additional properties and behaviour of a 
+TimeFrame that distinguish it from a basic Frame (\secref{ss:frames}).
+
+\subsection{The TimeFrame Model}
+
+As for a SkyFrame, a TimeFrame is a Frame (\secref{ss:frames}) and also a
+Mapping (\secref{ss:mappings}), so it inherits all the properties and
+behaviour of these two ancestral classes.  When used as a Mapping, a
+TimeFrame implements a unit transformation, exactly like a basic Frame
+(\secref{ss:frameasmapping}) or a UnitMap, so this aspect of its
+behaviour is not of great importance.
+
+When used as a Frame, however, a TimeFrame represents a wide range of
+different 1-dimensional coordinate system which can be used to describe
+moments in time. Absolute times and relative (i.e. elapsed) times are
+supported (attribute TimeOrigin), as are a range of different time scales
+(attribute TimeScale). An absolute or relative value in any time scale can 
+be represented in different forms such as Modified Julian Date, Julian Epoch, 
+\emph{etc} (attribute System). AST extends the definition of these systems to
+allow them to be used with any unit of time (attribute Unit). The TimeFrame 
+class also allows times to formatted as either a simple floating point value 
+or as a Gregorian date and time of day (attribute Format).
+
+\subsection{Creating a TimeFrame}
+
+The TimeFrame constructor function is particularly simple and a
+TimeFrame with default attributes is created as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include "ast.h"
+AstTimeFrame *timeframe;
+
+...
+
+timeframe = astTimeFrame( "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INCLUDE 'AST_PAR'
+      INTEGER TIMEFRAME, STATUS
+
+      STATUS = 0
+
+      ...
+
+      TIMEFRAME = AST_TIMEFRAME( ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Such a TimeFrame would represent the default coordinate system which is 
+Modified Julian Date (with the usual units of days) in the International 
+Atomic Time (TAI) time scale.
+
+\subsection{Specifying a Particular Time System}
+By setting the System attribute appropriately, the TimeFrame can represent 
+Julian Date, Modified Julian Date, Julian Epoch or Besselian Epoch (the
+time scale is specified by a separate attribute called TimeScale).
+
+Selection of a particular coordinate system is performed simply by
+setting a value for the TimeFrame's (character string) System
+attribute. This setting is most conveniently done when the TimeFrame is
+created. For example, a TimeFrame representing Julian Epoch would be created 
+by:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+timeframe = astTimeFrame( "System=JEPOCH" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      TIMEFRAME = AST_TIMEFRAME( 'System=JEPOCH', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Note that specifying ``System$=$JEPOCH'' also changes the associated
+default Unit (from days to years). This is because the default value
+of the TimeFrame's Unit attribute depends on the System attribute setting.
+
+You may change the System value at any time, although this is not
+usually needed.  The values supported are set out in the attribute's
+description in \appref{ss:attributedescriptions}.
+
+\subsection{Attributes which Qualify Time Coordinate Systems}
+
+Time coordinate systems require some additional free parameters to identify 
+a particular coordinate system from amongst a broader class of related 
+coordinate systems. For example, all TimeFrames are qualified by the time 
+scale (that is, the physical process used to define the flow of time),
+and some require the position of the observer's clock.
+
+In AST, these free parameters are represented by additional TimeFrame
+attributes, each of which has a default appropriate to ({\em{i.e.}}\ defined 
+by) the setting of the main System attribute. Each of these {\em{qualifying 
+attributes}} may, however, be assigned an explicit value so as to select a 
+particular coordinate system. Note, it is usually best to assign explicit
+values whenever possible rather than relying on defaults. Attribute
+should only be left at their default value if you ``don't care'' what
+value is used. In certain circumstances (particularly, when aligning two
+Frames), a default value for an attribute may be replaced by the value
+from another similar Frame. Such value replacement can be prevented by 
+assigning an explicit value to the attribute, rather than simply relying on 
+the default.
+
+The main TimeFrame attributes which qualify the System attribute are:
+
+\begin{quote}
+\begin{description}
+
+\item[TimeScale]\mbox{}\\
+This specifies the time scale.
+
+\item[TimeOrigin]\mbox{}\\
+This specifies the zero point from which time values are measured, within
+the system specified by the System attribute. Thus, a value ofzero (the
+default) indicates that time values represent absolute times. Non-zero
+values may be used to indicate that the TimeFrame represents elapsed time
+since the specified origin.
+
+\item[ClockLon]\mbox{}\\
+Specifies the longitude of the observer's clock (assumed to be on the surface 
+of the earth). This is needed when converting between certain time scales.
+
+\item[ClockLat]\mbox{}\\
+Specifies the latitude of the observer's clock. Use in conjunction with
+ClockLon.
+
+\end{description}
+\end{quote}
+
+For further details of these attributes you should consult their
+descriptions in \appref{ss:attributedescriptions} and for details of
+the System settings for which they are relevant, see the description
+of the System attribute (also in \appref{ss:attributedescriptions}).
+
+Note that it does no harm to assign values to qualifying attributes
+which are not relevant to the main System or TimeScale value. Any such 
+values are stored, but are not used unless the System and/or TimeScale 
+value is later set so that they become relevant.
+
+\cleardoublepage
 \section{\label{ss:cmpframes}Compound Frames (CmpFrames)}
 
 We now turn to a rather special form of Mapping, the CmpFrame. The
@@ -9779,9 +9963,9 @@ which recognises the attribute have the attribute value cleared.
 In this section, we start to look at techniques for converting between
 different coordinate systems.  At this stage, the tools we have available
 are Frames (\secref{ss:frames}), SkyFrames (\secref{ss:skyframes}),
-SpecFrames (\secref{ss:specframes}) and various Mappings
-(\secref{ss:mappings}). These are sufficient to allow us to begin
-examining the problem, but more sophisticated approaches will also emerge
+SpecFrames (\secref{ss:specframes}), TimeFrames (\secref{ss:timeframes}) and 
+various Mappings (\secref{ss:mappings}). These are sufficient to allow us to 
+begin examining the problem, but more sophisticated approaches will also emerge
 later (\secref{ss:framesetconverting}).
 
 \subsection{\label{ss:convertingskyframes}Converting between Celestial Coordinate Systems}
@@ -10291,6 +10475,11 @@ f+
 The radio velocity values are returned in the VEL array.
 f-
 
+\subsection{Converting between Time Coordinate Systems}
+All the principles outlined in the previous section about aligning
+spectral cocordinate systems (SpecFrames) can be applied directly to the 
+problem of aligning time coordinate systems (TimeFrames).
+
 \subsection{\label{ss:convertingpermutedaxes}Handling SkyFrame Axis Permutations}
 
 c+
@@ -10588,6 +10777,8 @@ SpecFrame, the default is wavelength (or equivalently, frequency)
 since this is the system in which observations are usually made. The
 SpecFrame class also has an attribute called AlignStdOfRest which
 allows the standard of rest of the alignment system to be specified.
+Similarly, the TimeFrame class has an attribute called AlignTimeScale
+which allows the time scale of the alignment system to be specified.
 Currently, the SkyFrame uses ICRS as the default for AlignSystem, since
 this is a close approximation to an inertial frame of rest.
 
@@ -18506,6 +18697,7 @@ Object             - Base class for all AST Objects
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
             DSBSpecFrame - Dual sideband spectral coordinate system description
+         TimeFrame - Time coordinate system description
       GrismMap     - Models the spectral dispersion produced by a grism
       IntraMap     - Map points using a private transformation function
       LutMap       - Transform 1-dimensional coordinates using a lookup table
@@ -18519,6 +18711,7 @@ Object             - Base class for all AST Objects
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
       SphMap       - Map 3-d Cartesian to 2-d spherical coordinates
+      TimeMap      - Sequence of time coordinate conversions
       TranMap      - Combine fwd. and inv. transformations from two Mappings
       UnitMap      - Unit (null) Mapping
       WcsMap       - Implement a FITS-WCS sky projection
@@ -20735,12 +20928,10 @@ keywords to be changed or added.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.6}
+\subsection{Changes Introduced in V3.6}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V3.5 and V3.6 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V3.5 and V3.6:
 
 \begin{enumerate}
 
@@ -20770,6 +20961,28 @@ A new option ``-fsla'' has been introduced which forces linking with the
 external full Fortran SLALIB library.
 
 \end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.7}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.6 and V3.7 (the
+current version):
+
+\begin{enumerate}
+
+\item Support for time coordinate systems has been introduced
+throught the addition of two new classes, TimeFrame and TimeMap.
+The TimeFrame is a 1-dimensional Frame which can be used to describe
+moments in time (either absolute or relative) in various systems (MJD, 
+Julian Epoch, \emph{etc.}) and referred to various time scales (TAI, UTC, 
+UT1, GMST, \emph{etc}). The TimeMap is a Mapping which can transform time
+values between these various systems and time scales. Note,
+FitsChans which have a foreign encoding (\emph{i.e.} any encoding other
+than NATIVE) are not able to read or write these new classes.
+
+\end{enumerate}
+
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

@@ -53,6 +53,8 @@
 *        Added all initial Region classes.
 *     19-NOV-2004 (DSB):
 *        Added KeyMap.
+*     16-JUN-2005 (DSB):
+*        Added TimeMap and TimeFrame.
 *-
 
 *  Length of character string returned by a character function.
@@ -462,5 +464,13 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_RATEMAP
       LOGICAL AST_ISARATEMAP
 
+*  TimeFrame class.
+      INTEGER AST_TIMEFRAME
+      LOGICAL AST_ISATIMEFRAME
+      DOUBLE PRECISION AST_CURRENTTIME
+
+*  TimeMap class.
+      INTEGER AST_TIMEMAP
+      LOGICAL AST_ISATIMEMAP
 
 

@@ -1672,9 +1672,10 @@ static CurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const ch
 static TickInfo **CleanGrid( TickInfo ** );
 static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char * );
 static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char * );
-static char **CheckLabels2( AstFrame *, int, double *, int, char **, double );
+static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
+static const char *FormatValue( AstPlot *, AstFrame *, int, double );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
@@ -1686,15 +1687,15 @@ static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
 static int CGAttrWrapper( AstPlot *, int, double, double *, int );
-static int CGScalesWrapper( AstPlot *, float *, float * );
+static int CGCapWrapper( AstPlot *, int, int );
 static int CGFlushWrapper( AstPlot * );
 static int CGLineWrapper( AstPlot *, int, const float *, const float * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
-static int CGCapWrapper( AstPlot *, int, int );
 static int CGQchWrapper( AstPlot *, float *, float * );
+static int CGScalesWrapper( AstPlot *, float *, float * );
 static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
-static int CheckLabels( AstFrame *, int, double *, int, int, char **, double );
+static int CheckLabels( AstPlot *, AstFrame *, int, double *, int, int, char **, double );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
 static int Compared( const void *, const void * );
@@ -1703,11 +1704,12 @@ static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
+static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
 static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
-static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FullForm( const char *, const char *, const char *, const char *, const char * );
+static int GCap( AstPlot *, int, int );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
 static int GetUseColour( AstPlot *, int );
 static int GetUseFont( AstPlot *, int );
@@ -1717,6 +1719,7 @@ static int IdFind( int, int *, int * );
 static int Inside( int, float *, float *, float, float);
 static int IsASkyFrame( AstObject * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
+static int PopGat( AstPlot *, float *, const char *, const char * );
 static int TestUseColour( AstPlot *, int );
 static int TestUseFont( AstPlot *, int );
 static int TestUseSize( AstPlot *, int );
@@ -1743,12 +1746,11 @@ static void DrawText( AstPlot *, int, int, const char *, float, float, const cha
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char * );
-static void GScales( AstPlot *, float *, float *, const char *, const char *  );
 static void GFlush( AstPlot *, const char *, const char * );
 static void GLine( AstPlot *, int, const float *, const float *, const char *, const char * );
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
 static void GQch( AstPlot *, float *, float *, const char *, const char *  );
-static int GCap( AstPlot *, int, int );
+static void GScales( AstPlot *, float *, float *, const char *, const char *  );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GenCurve( AstPlot *, AstMapping * );
@@ -1772,9 +1774,8 @@ static void Norm1( AstMapping *, int, int, double *, double, double );
 static void Opoly( AstPlot *, const char *, const char * );
 static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
 static void PolyCurve( AstPlot *, int, int, int, const double * );
-static void PushGat( AstPlot *, float, const char *, const char * );
-static int PopGat( AstPlot *, float *, const char *, const char * );
 static void PurgeCdata( CurveData * );
+static void PushGat( AstPlot *, float, const char *, const char * );
 static void RemoveFrame( AstFrameSet *, int );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char * );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
@@ -5363,8 +5364,9 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
    return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( alpha, beta );
 }
 
-static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-                        int force, char **list, double refval ){
+static int CheckLabels( AstPlot *this, AstFrame *frame, int axis, 
+                        double *ticks, int nticks, int force, char **list, 
+                        double refval ){
 /*
 *  Name:
 *     CheckLabels
@@ -5377,8 +5379,8 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-*                      int force, char **list, double refval )
+*     int CheckLabels( AstPlot *this, AstFrame *frame, int axis, double *ticks,
+*                      int nticks, int force, char **list, double refval )
 
 *  Class Membership:
 *     Plot member function.
@@ -5392,6 +5394,8 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 *     that adjacent labels are all different and the labels are returned.
 
 *  Parameters:
+*     this
+*        Pointer to the Plot.
 *     frame
 *        Pointer to the Frame.
 *     axis
@@ -5448,7 +5452,7 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
    val[ axis ] = ticks[ 0 ];
    val[ 1 - axis ] = refval;
    astNorm( frame, val );
-   label = astFormat( frame, axis, val[ axis ] );
+   label = FormatValue( this, frame, axis, val[ axis ] );
 
 /* Allocate memory holding a copy of the formatted value, and store a
    pointer to this copy in the list of labels. */
@@ -5464,7 +5468,7 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
       val[ axis ] = ticks[ i ];
       val[ 1 - axis ] = refval;
       astNorm( frame, val );
-      label = astFormat( frame, axis, val[ axis ] );
+      label = FormatValue( this, frame, axis, val[ axis ] );
       if( label ){
 
 /* Unless checks have been supressed, compare this label with the previous 
@@ -5500,8 +5504,9 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 
 }
 
-static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks, 
-                            char **old_list, double refval ){
+static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis, 
+                            double *ticks, int nticks, char **old_list, 
+                            double refval ){
 /*
 *  Name:
 *     CheckLabels2
@@ -5514,8 +5519,9 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
 
 *  Synopsis:
 *     #include "plot.h"
-*     char **CheckLabels2( AstFrame *frame, int axis, double *ticks, 
-*                          int nticks, char **old_list, double refval )
+*     char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis, 
+*                          double *ticks, int nticks, char **old_list, 
+*                          double refval )
 
 *  Class Membership:
 *     Plot member function.
@@ -5533,6 +5539,8 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
 *     adjacent labels.
 
 *  Parameters:
+*     this
+*        Pointer to the Plot.
 *     frame
 *        Pointer to the Frame.
 *     axis
@@ -5592,7 +5600,7 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
          val[ axis ] = ticks[ i ];
          val[ 1 - axis ] = refval;
          astNorm( frame, val );
-         label = astFormat( frame, axis, val[ axis ] );
+         label = FormatValue( this, frame, axis, val[ axis ] );
          if( label ){
 
 /* Get the length of the new label. */
@@ -11864,6 +11872,134 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
    return ret;
 }
 
+
+static const char *FormatValue( AstPlot *this, AstFrame *frm, int axis, 
+                                double value ) {
+/*
+*  Name:
+*     FormatValue
+
+*  Purpose:
+*     Format a coordinate value for a Frame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "timeframe.h"
+*     const char *FormatValue( AstPlot *this, AstFrame *frm, int axis, 
+*                              double value )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     This function provides the same functionality as the Frame
+*     astFormat method, with the addition that long formatted values (such
+*     as the date/time format produced by the TimeFrame class) are split 
+*     if possible onto two line sby inclusion of Plot escape sequences.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     frm
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which formatting is to be
+*        performed.
+*     value
+*        The coordinate value to be formatted, in radians.
+
+*  Returned Value:
+*     A pointer to a null-terminated string containing the formatted value.
+
+*  Notes:
+*     -  A NULL pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   char *d;    
+   const char *result;    
+   int i;
+   int id;
+   int idmin;
+   int imin;
+   int l;
+   int lead_spaces;
+   int linelen;
+   int naft;
+   int nbef;
+   static char buf[ 200 ];
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Format the value using the astFormat method. */
+   result = astFormat( frm, axis, value );
+
+/* Do nothing more if the formatted value already contains graphical
+   escape sequences, or if graphical escapes sequences are not being
+   interpreted. */
+   if( result && astGetEscape( this ) && !HasEscapes( result ) ) {
+
+/* Find a space close to the centre of the formatted string. */
+      l = strlen( result );
+      idmin = 2*l;
+      imin = -1;
+      for( i = 0; i < l; i++ ) {
+         if( isspace( result[ i ] ) ) {
+            id = abs( i - l/2 );
+            if( id < idmin ) {
+               idmin = id;
+               imin = i;
+            }
+         }
+      }
+
+/* Do nothing if no spaces were found */
+      if( imin != -1 ) {
+
+/* How many characters before and after the space? */
+         nbef = imin;
+         naft = l - imin - 1;         
+
+/* Find the length of the longer line (top or bottom). */
+         linelen = ( nbef > naft ) ? nbef : naft;
+
+/* Copy the top line into the buffer, centering it by padding with spaces. */
+         for( i = 0; i < linelen; i++ ) buf[ i ] = ' ';
+         lead_spaces = ( linelen - nbef )/2;
+         for( i = 0; i < nbef; i++ ) buf[ i + lead_spaces ] = result[ i ];
+
+/* Add an escape sequence which moves the pen down 1 character height. */
+         d = buf + linelen;
+         d += sprintf( d, "%%v100+" );
+
+/* Add an escape sequence which moves the pen backwards 1 line length (this 
+   is approximate). */         
+         d += sprintf( d, "%%<%d+", (int) ( 60.0*linelen + 0.5 ) );
+
+/* Copy the bottom line into the buffer, centering it by padding with spaces. */
+         for( i = 0; i < linelen; i++ ) d[ i ] = ' ';
+         lead_spaces = ( linelen - naft )/2;
+         for( i = 0; i < naft; i++ ) d[ i + lead_spaces ] = result[ i + nbef + 1 ];
+
+/* Terminate it. */
+         d[ linelen ] = 0;         
+
+/* Return a pointer to the buffer. */
+         result = buf;         
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = NULL;
+
+/* Return the result. */
+   return result;
+}
+
 static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 /*
 *  Name:
@@ -13934,10 +14070,13 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    double maxv;              /* Max axis value */
    double minv;              /* Min axis value */
    double new_used_gap;      /* New value for the used gap size */
+   double old_used_gap;      /* Old value for the used gap size */
    double test_gap;          /* Trial gap size */
    double used_cen;          /* Used value of cen */
    double used_gap;          /* The used gap size */
    int findcen;              /* Find a new centre value? */
+   int gap_too_small;        /* Test gap too small? */
+   int gap_too_large;        /* Test gap too large? */
    int i;                    /* Axis index */
    int ihi;                  /* Highest tick mark index */
    int ilo;                  /* Lowest tick mark index */
@@ -14231,6 +14370,10 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
          test_gap = defgaps[ axis ];
          used_gap = 0.0;
 
+/* Initialise flags saying the test gap is too large or too small */
+         gap_too_large = 0;
+         gap_too_small = 0;
+
 /* Loop round until a gap size is found which gives an acceptable number
    of tick marks. Upto 10 gap sizes are tried. */
          for( i = 0; i < 10 && astOK; i++ ){
@@ -14245,6 +14388,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    otherwise we just retain the values created from the previous run with
    this gap size. */
             if( new_used_gap != used_gap ) {
+               old_used_gap = used_gap;
                used_gap = new_used_gap;
                if( *ticks ) *ticks = astFree( *ticks );
                if( cen ) *cen = cen0;
@@ -14261,16 +14405,44 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    gap was too large to produce any ticks, try using half the gap size. */
             if( *nmajor == 0 ) {
                test_gap *= 0.5;
+               gap_too_large = 1;
+               gap_too_small = 0;
 
-/* If there were some ticks, but not enough, decrease the gap size in
-   proportion to the shortfall. */
+/* If there were some ticks, but not enough... */
             } else if( *nmajor < mintick ){
-               test_gap *= (double)( *nmajor )/(double)( mintick );
 
-/* If there were too many ticks, increase the gap size in proportion to the 
-   excess. */
+/* If the previous test gap produced too many ticks, use the current gap
+   size. */
+               if( gap_too_small ) {
+                  break;
+
+/* Otherwise, decrease the gap size in proportion to the shortfall. */
+               } else {
+                  test_gap *= (double)( *nmajor )/(double)( mintick );
+                  gap_too_large = 1;
+                  gap_too_small = 0;
+               }
+
+/* If there were too many ticks... */
             } else if( *nmajor > maxticks ){
-               test_gap *= (double)( *nmajor )/(double)( maxticks );
+
+/* If the previous test gap produced too few ticks, use the previous gap
+   size. */
+               if( gap_too_large ) {
+                  used_gap = old_used_gap;
+                  if( *ticks ) *ticks = astFree( *ticks );
+                  if( cen ) *cen = cen0;
+                  *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ], 
+                                          used_gap, cen, ngood[ axis ], 
+                                          ptr[ axis ], ticks );
+                  break;
+
+/* Otherwise, increase the gap size in proportion to the excess. */
+               } else {
+                  test_gap *= (double)( *nmajor )/(double)( maxticks );
+                  gap_too_small = 1;
+                  gap_too_large = 0;
+               }
 
 /* If the number of ticks is acceptable, break out of the loop early.*/
             } else {
@@ -23363,7 +23535,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Not all subclasses of Frame support this format specifier, so format a 
    test value, and see if it has two fields, the first of which is "10".
    If not, we cannot use log labels so re-instate the original format. */
-      nf = astFields( frame, axis, "%&g", astFormat( frame, axis, 1.0E4 ),
+      nf = astFields( frame, axis, "%&g", FormatValue( this, frame, axis, 1.0E4 ),
                       MAXFLD, fields, nc, &junk );
       if( nf != 2 || nc[ 0 ] != 2 || strncmp( fields[ 0 ], "10", 2 ) ) {
          if( old_format ) {
@@ -23411,11 +23583,11 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    in order not to foil the users choice of format. That is, "ok" is set
    non-zero by the call to CheckLabels, even if some identical adjacent
    labels are found. */
-      ok = CheckLabels( frame, axis, ticks, nmajor, 1, labels, refval );
+      ok = CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval );
 
 /* Note the format used. */
       fmt = astGetFormat( frame, axis );
-      used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
+      if( fmt ) used_fmt = (char *) astStore( used_fmt, (void *) fmt, strlen( fmt ) + 1 );
 
 /* If no precision has been specified for the axis, we need to find a
    Digits value which gives different labels, but without using any more 
@@ -23427,7 +23599,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
       labels = (char **) astMalloc( sizeof(char *)*(size_t)nmajor );
 
 /* Produce these default labels. */
-      CheckLabels( frame, axis, ticks, nmajor, 1, labels, refval );
+      CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval );
 
 /* The first task is to decide what the smallest usable number of digits 
    is. Starting at the default number of digits used above to produce the
@@ -23444,7 +23616,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    and compares them with the old labels in "labels". If any of the new labels
    are longer than the corresponding old labels, then a null pointer is
    returned. Otherwise, a pointer is returned to the new set of labels. */
-         newlabels = CheckLabels2( frame, axis, ticks, nmajor, oldlabels, refval );
+         newlabels = CheckLabels2( this, frame, axis, ticks, nmajor, oldlabels, refval );
 
 /* Free the old labels unless they are the orignal labels (which are
    needed below). */
@@ -23481,7 +23653,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    in all adjacent labels being different. Note the format used (we know 
    the Format attribute is currently unset, but the default Format string
    reflects the current value of the Digits attribute). */
-         if( CheckLabels( frame, axis, ticks, nmajor, 0, labels, refval ) ) {
+         if( CheckLabels( this, frame, axis, ticks, nmajor, 0, labels, refval ) ) {
             ok = 1;
             fmt = astGetFormat( frame, axis );
             used_fmt = (char *) astStore( NULL, (void *) fmt, strlen( fmt ) + 1 );

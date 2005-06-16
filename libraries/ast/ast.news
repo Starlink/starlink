@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V3.6) of the Starlink AST (astrometry) library is
+   A new release (V3.7) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,18 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- Support for time coordinate systems has been introduced throught the
+addition of two new classes, TimeFrame and TimeMap. The TimeFrame is a
+1-dimensional Frame which can be used to describe moments in time (either
+absolute or relative) in various systems (MJD, Julian Epoch, etc.) and
+referred to various time scales (TAI, UTC, UT1, GMST, etc). The TimeMap
+is a Mapping which can transform time values between these various
+systems and time scales.
+
+
+Main Changes in Version 3.6
+---------------------------
 
 - If the Format attribute associated with an axis of a SkyFrame starts
 with a percent character (%), then axis values are now formatted and
@@ -48,7 +60,7 @@ used. Various sub-classes of Region are also now available which provide
 means of creating Regions of specific shape. Facilities provided by the
 Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
-coordinate system to another \emph{etc}.
+coordinate system to another, etc.
 
 - A new class of 1-dimensional Frame called FluxFrame has been added which 
 can be used to describe various systems for describing ovserved value at a 

@@ -192,6 +192,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Correct error checking in Clear/Get/Set/TestAttrib.
 *     12-MAY-2005 (DSB):
 *        Added astNormBox method.
+*     16-JUN-2005 (DSB):
+*        Added documentation for the TimeFrame class.
 *class--
 */
 
@@ -2376,6 +2378,9 @@ f        it by specifying its domain in the DOMAINLIST string, or (b)
 *     SpecFrame
 *        Alignment occurs within the spectral system and standard of rest 
 *        given by attributes AlignSystem and AlignStdOfRest.
+*     TimeFrame
+*        Alignment occurs within the time system and time scale given by 
+*        attributes AlignSystem and AlignTimeScale.
 
 *  Examples:
 c     cvt = astConvert( a, b, "" );
@@ -9744,6 +9749,18 @@ MAKE_TEST(Direction)
 *
 *        See the description of the System attribute for details of which
 *        qualifying attributes apply to each celestial coordinate system.
+*     TimeFrame
+*        A TimeFrame describes a general time axis and so cannot be completely 
+*        characterised by a single Epoch value. For this reason the TimeFrame 
+*        class makes no use of the Epoch attribute. However, user code can 
+*        still make use of the attribute if necessary to represent a "typical" 
+*        time spanned by the TimeFrame. The default Epoch value for a TimeFrame
+*        will be the TDB equivalent of the current value of the TimeFrame's 
+*        TimeOrigin attribute. If no value has been set for TimeOrigin,
+*        then the default Epoch value is J2000.0.
+
+
+The coordinates of sources within a SkyFrame can changed with time
 *att--
 */
 /* Clear the Epoch value by setting it to AST__BAD. */
@@ -9892,6 +9909,11 @@ c        this.
 *        of its current Frame (as specified by the Current
 *        attribute). Note that the syntax of the Format string is also
 *        determined by the current Frame.
+*     TimeFrame
+*        The TimeFrame class extends the syntax of the Format string to 
+*        allow the formatting of TimeFrame axis values as Gregorian calendar
+*        dates and times. The syntax of TimeFrame Format strings is described 
+*        (below) in the "TimeFrame Formats" section.
 
 *  SkyFrame Formats:
 *     The Format string supplied for a SkyFrame should contain zero or
@@ -9960,6 +9982,36 @@ c        this.
 *     the Frame class, and the axis values is formated as a decimal
 *     radians value.
 
+*  TimeFrame Formats:
+*     The Format string supplied for a TimeFrame should either use the
+*     syntax defined by the base Frame class (i.e. a C "printf" format
+*     string), or the extended "iso" syntax described below (the default
+*     value is inherited from the Frame class):
+*
+*     - C "printf" syntax: If the Format string is a C "printf" format
+*     description such as "%1.7G", the TimeFrame axis value will be
+*     formatted without change as a floating point value using this format.
+*     The formatted string will thus represent an offset from the zero point 
+*     specified by the TimeFrame's TimeOrigin attribute, measured in
+*     units given by the TimeFrame's Unit attribute.
+*
+*     - "iso" syntax: This is used to format a TimeFrame axis value as a
+*     Gregorian date followed by an optional time of day. If the Format
+*     value commences with the string "iso" then the TimeFrame axis value
+*     will be converted to an absolute MJD, including the addition of the 
+*     current TimeOrigin value, and then formatted as a Gregorian date 
+*     using the format "yyyy-mm-dd". Optionally, the Format value may
+*     include an integer precision following the "iso" specification (e.g. 
+*     "iso.2"), in which case the time of day will be appended to the 
+*     formatted date (if no time of day is included, the date field is
+*     rounded to the nearest day). The integer value in the Format string 
+*     indicates the number of decimal places to use in the seconds field. For 
+*     instance, a Format value of "iso.0" produces a time of day of the form 
+*     "hh:mm:ss", and a Format value of "iso.2" produces a time of day of the 
+*     form "hh:mm:ss.ss". The date and time fields will be separated by a 
+*     space. The value of the Digits attribute is ignored when using this 
+*     "iso" format. 
+
 *  Notes:
 *     - When specifying this attribute by name, it should be
 *     subscripted with the number of the Frame axis to which it
@@ -10003,6 +10055,9 @@ MAKE_TEST(Format)
 *        (e.g. to "Right ascension" or "Galactic latitude") as
 *        appropriate for the particular celestial coordinate system
 *        being represented.
+*     TimeFrame
+*        The TimeFrame class re-defines the default Label value as
+*        appropriate for the particular time system being represented.
 *     FrameSet
 *        The Label attribute of a FrameSet axis is the same as that of
 *        its current Frame (as specified by the Current attribute).
@@ -10063,6 +10118,9 @@ MAKE_TEST(Label)
 *        The SkyFrame class re-defines the default Symbol value
 *        (e.g. to "RA" or "Dec") as appropriate for the particular
 *        celestial coordinate system being represented.
+*     TimeFrame
+*        The TimeFrame class re-defines the default Symbol value as
+*        appropriate for the particular time system being represented.
 *     FrameSet
 *        The Symbol attribute of a FrameSet axis is the same as that
 *        of its current Frame (as specified by the Current attribute).
@@ -10131,7 +10189,13 @@ f        the AST_FORMAT function when formatting coordinate values.
 *     SpecFrame
 *        The SpecFrame class re-defines the default Unit value so that it
 *        is appropriate for the current System value. See the System
-*        attribute for details.
+*        attribute for details. An error will be reported if an attempt
+*        is made to use an inappropriate Unit.
+*     TimeFrame
+*        The TimeFrame class re-defines the default Unit value so that it
+*        is appropriate for the current System value. See the System
+*        attribute for details. An error will be reported if an attempt
+*        is made to use an inappropriate Unit (e.g. "km").
 *     FrameSet
 *        The Unit attribute of a FrameSet axis is the same as that of
 *        its current Frame (as specified by the Current attribute).
@@ -10193,6 +10257,9 @@ f     Frame axis (e.g. using AST_FORMAT). Its value may be set either
 *        The default Digits value used by the Plot class when drawing
 *        annotated axis labels is the smallest value which results in all 
 *        adjacent labels being distinct.
+*     TimeFrame
+*        The Digits attribute is ignored when a TimeFrame formats a value
+*        as a date and time string (see the Format attribute).
 *att--
 */
 /* Clear the Digits value by setting it to -INT_MAX. */
@@ -10443,6 +10510,9 @@ f     used (by AST_FINDFRAME) as a template to match another (target)
 *     SpecFluxFrame
 *        The FluxFrame class re-defines the default Domain value to be
 *        "SPECTRUM-FLUX".
+*     TimeFrame
+*        The TimeFrame class re-defines the default Domain value to be
+*        "TIME".
 
 *  Notes:
 *     - All Domain values are converted to upper case and white space
@@ -10627,7 +10697,8 @@ f     The Mapping returned by astFindFrame or astConvert will use the
 *     SpecFrame
 *        The default AlignSystem attribute for a SpecFrame is "Wave"
 *        (wavelength).
-
+*     TimeFrame
+*        The default AlignSystem attribute for a TimeFrame is "MJD".
 *att--
 */
 /* Clear the AlignSystem value by setting it to AST__BADSYSTEM. */
@@ -10793,6 +10864,39 @@ f        is .TRUE.
 *        its enclosing FrameSet in order to reflect the change in units
 c        (see astSetActiveUnit function for further information).
 f        (see AST_SETACTIVEUNIT routine for further information).
+*     TimeFrame
+*        The TimeFrame class supports the following System values and
+*        associated coordinate systems (the default is "MJD"):
+*
+*        - "MJD": Modified Julian Date (d)
+*        - "JD": Julian Date (d)
+*        - "JEPOCH": Julian epoch (yr)
+*        - "BEPOCH": Besselian (yr)
+*
+*        The default value for the Unit attribute for each system is shown
+*        in parentheses. Strictly, these systems should not allow changes
+*        to be made to the units. For instance, the usual definition of
+*        "MJD" and "JD" include the statement that the values will be in
+*        units of days. However, AST does allow the use of other units
+*        with all the above supported systems (except BEPOCH), on the 
+*        understanding that conversion to the "correct" units involves 
+*        nothing more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 
+*        1 h = 60 min, 1 min = 60 s). Besselian epoch values are defined
+*        in terms of tropical years of 365.2422 days, rather than the
+*        usual Julian year of 365.25 days. Therefore, to avoid any
+*        confusion, the Unit attribute is automatically cleared to "yr" when 
+*        a System value of BEPOCH System is selected, and an error is
+*        reported if any attempt is subsequently made to change the Unit 
+*        attribute.
+*
+*        Note that the default value for the ActiveUnit flag
+c        is non-zero
+f        is .TRUE.
+*        for a TimeFrame, meaning that changes to the Unit attribute for
+*        a TimeFrame will result in the TimeFrame being re-mapped within
+*        its enclosing FrameSet in order to reflect the change in units
+c        (see astSetActiveUnit function for further information).
+f        (see AST_SETACTIVEUNIT routine for further information).
 *     FluxFrame
 *        The FluxFrame class supports the following System values and
 *        associated systems for measuring observed value:
@@ -10849,18 +10953,13 @@ astMAKE_TEST(Frame,System,( this->system != AST__BADSYSTEM ))
 *     "Galactic Coordinates".
 *
 *     If a Title value has not been set for a Frame, then a suitable
-*     default is supplied.
+*     default is supplied, depending on the class of the Frame.
 
 *  Applicability:
 *     Frame
 *        The default supplied by the Frame class is "<n>-d coordinate
 *        system", where <n> is the number of Frame axes (Naxes
 *        attribute).
-*     SkyFrame
-*        The SkyFrame class re-defines the default Title value
-*        (e.g. to "FK5 equatorial coordinates, mean equinox J2000.0")
-*        as appropriate to the particular celestial coordinate system
-*        being represented.
 *     CmpFrame
 *        The CmpFrame class re-defines the default Title value to be
 *        "<n>-d compound coordinate system", where <n> is the number

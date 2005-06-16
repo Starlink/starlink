@@ -42,6 +42,8 @@
 #include "specframe.h"
 #include "specmap.h"
 #include "sphmap.h"
+#include "timemap.h"
+#include "timeframe.h"
 #include "tranmap.h"
 #include "unitmap.h"
 #include "wcsmap.h"
@@ -127,6 +129,8 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(SpecFrame);
    LOAD(SpecMap);
    LOAD(SphMap);
+   LOAD(TimeMap);
+   LOAD(TimeFrame);
    LOAD(TranMap);
    LOAD(UnitMap);
    LOAD(WcsMap);

@@ -74,10 +74,6 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        zero.
 *     23-MAR-2005 (DSB):
 *        - Added missing rest frames to SorEqual.
-*     15-JUN-2005 (DSB):
-*        - Corrected MakeSpecMapping, SorConvert and EqualSor so that the
-*        AlignStdOfRest and AlignSystem attributes are used from the 
-*        alignment Frame, rather than attributes StdOfRest and System.
 *class--
 */
 
@@ -200,11 +196,11 @@ static const char *StdOfRestString( AstStdOfRestType );
 static const char *SystemLabel( AstSystemType );
 static const char *SystemString( AstFrame *, AstSystemType );
 static double ConvertSourceVel( AstSpecFrame *, AstStdOfRestType );
-static int EqualSor( AstSpecFrame *, AstSpecFrame *, int );
+static int EqualSor( AstSpecFrame *, AstSpecFrame * );
 static int GetActiveUnit( AstFrame * );
 static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSpecFrame *, int, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int SorConvert( AstSpecFrame *, AstSpecFrame *, AstSpecMap *, int );
+static int SorConvert( AstSpecFrame *, AstSpecFrame *, AstSpecMap * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int TestActiveUnit( AstFrame * );
 static void ClearUnit( AstFrame *, int );
@@ -614,7 +610,7 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
 
 /* Now add a conversion from frequency in the SourveVRF standard of rest to 
    frequency in the required rest frame. */
-      SorConvert( from, to, specmap, 0 );
+      SorConvert( from, to, specmap );
 
 /* Finally, add a conversion from frequency back to velocity. Note, the
    value of the rest frequency does not affect the overall conversion. */
@@ -725,7 +721,7 @@ static const char *DefUnit( AstSystemType system, const char *method,
    return result;
 }
 
-static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) {
+static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
 /*
 *  Name:
 *     EqualSor
@@ -738,7 +734,7 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) {
 
 *  Synopsis:
 *     #include "specframe.h"
-*     int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) 
+*     int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) 
 
 *  Class Membership:
 *     SpecFrame member function 
@@ -752,12 +748,6 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) {
 *        Pointer to the first SpecFrame.
 *     that
 *        Pointer to the second SpecFrame.
-*     align
-*        If zero, use the StdOfRest attribute from both SpecFrames.
-*        If positive, use the StdOfRest attribute from this, and the
-*        AlignStdOfRest attribute from that. If negative, use the 
-*        AlignStdOfRest attribute from this, and the StdOfRest attribute 
-*        from that.
 
 *  Returned Value:
 *     Non-zero if the two SpecFrames use the same standard of rest. Zero
@@ -767,7 +757,6 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) {
 
 /* Local Variables: */
    AstStdOfRestType sor;             /* Standard of rest */
-   AstStdOfRestType that_sor;        /* Comparison standard of rest */
    int result;                       /* Value to return */
 
 /* Check the global error status. */
@@ -777,9 +766,8 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int align ) {
    result = 1;
 
 /* Compare StdOfRest attributes. */
-   sor = align > 0 ? astGetAlignStdOfRest( this ) : astGetStdOfRest( this );
-   that_sor = align > 0 ? astGetAlignStdOfRest( that ) : astGetStdOfRest( that );
-   if( that_sor != sor ) {
+   sor = astGetStdOfRest( this );
+   if( astGetStdOfRest( that ) != sor ) {
       result = 0;
 
 /* If the standards of rest are equal we need to check the the attributes
@@ -2163,7 +2151,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
    target_system = astGetSystem( target );
    result_system = astGetSystem( result );
-   align_system = astGetAlignSystem( align_frm );
+   align_system = astGetSystem( align_frm );
 
 /* Define text for error messages.*/
    vmess = "convert between spectral systems";
@@ -2223,11 +2211,11 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Step 2 is not necessary if the alignment SOR is the same as the target 
    SOR. */
-   if( EqualSor( target, align_frm, 1 ) ) step2 = 0;
+   if( EqualSor( target, align_frm ) ) step2 = 0;
 
 /* Step 5 is not necessary if the alignment SOR is the same as the result
    SOR. */
-   if( EqualSor( result, align_frm, 1 ) ) step5 = 0;
+   if( EqualSor( result, align_frm ) ) step5 = 0;
 
 /* Step 6 is not necessary if the result system is frequency. */
    if( result_system == AST__FREQ ) step6 = 0;
@@ -2238,13 +2226,13 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Steps 2 and 5 are not necessary if steps 3 and 4 are not necessary, and
    the target sor equals the result sor. */
-   if( !step3 && !step4 && EqualSor( target, result, 0 ) ) step2 = step5 = 0;
+   if( !step3 && !step4 && EqualSor( target, result ) ) step2 = step5 = 0;
 
 /* Steps 1 and 6 are not necessary if steps 2, 3, 4, 5 are not necessary, and
    the target sor equals the result sor, and the target and results systems 
    are equal (if the systems are relative they must also have equal rest 
    frequencies). */
-   if( !step2 && !step3 && !step4 && !step5 && EqualSor( target, result, 0 ) &&
+   if( !step2 && !step3 && !step4 && !step5 && EqualSor( target, result ) &&
        target_system == result_system ) {
       if( !ABS_SYSTEM( target_system ) || result_rf == target_rf ) step1 = step6 = 0;
    }
@@ -2296,7 +2284,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Step 2: frequency in target rest frame to frequency in alignment rest
    frame. */
-   if( step2 ) match = SorConvert( target, align_frm, specmap, 1 );
+   if( step2 ) match = SorConvert( target, align_frm, specmap );
 
 /* Step 3: frequency in alignment rest frame to alignment system in alignment 
    rest frame. The alignment will be either relativistic velocity or
@@ -2320,7 +2308,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Step 5: frequency in alignment rest frame to frequency in result rest 
    frame. */
-   if( step5 ) match = SorConvert( align_frm, result, specmap, -1 );
+   if( step5 ) match = SorConvert( align_frm, result, specmap );
 
 /* Step 6: frequency in result rest frame to result system in result rest
    frame. */
@@ -3450,7 +3438,7 @@ static void SetUnit( AstFrame *this_frame, int axis, const char *value ) {
 }
 
 static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
-                       AstSpecMap *specmap, int align ) {
+                       AstSpecMap *specmap ) {
 /*
 *  Name:
 *     SorConvert
@@ -3465,7 +3453,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 *  Synopsis:
 *     #include "specframe.h"
 *     int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
-*                     AstSpecMap *specmap, int align )
+*                     AstSpecMap *specmap )
 
 *  Class Membership:
 *     SpecFrame member function.
@@ -3484,12 +3472,6 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 *        The SpecFrame which defines the output rest frame.
 *     specmap
 *        The SpecMap to which the conversion is to be added.
-*     align
-*        If zero, use the StdOfRest attribute from both SpecFrames.
-*        If positive, use the StdOfRest attribute from this, and the
-*        AlignStdOfRest attribute from that. If negative, use the 
-*        AlignStdOfRest attribute from this, and the StdOfRest attribute 
-*        from that.
 
 *  Returned Value:
 *     Zero is returned if the conversion could not be performed. One is 
@@ -3519,7 +3501,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
    if ( !astOK ) return result;
 
 /* No conversion is required if the rest frames are equal. */
-   if( !EqualSor( this, that, align ) ) {
+   if( !EqualSor( this, that ) ) {
 
 /* Define local macros as shorthand for adding spectral coordinate
    conversions to the SpecMap.  Each macro simply stores details of
@@ -3549,7 +3531,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       vmess = "convert between different standards of rest";
 
 /* Get the required values from "this". */
-      from = align < 0 ? astGetAlignStdOfRest( this ) : astGetStdOfRest( this );
+      from = astGetStdOfRest( this );
       ra = astGetRefRA( this );
       dec = astGetRefDec( this );
       lon = astGetGeoLon( this );
@@ -3591,7 +3573,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       }
    
 /* Now go from heliocentric to the "to" frame. */  
-      to = align > 0 ? astGetAlignStdOfRest( that ) : astGetStdOfRest( that );
+      to = astGetStdOfRest( that );
       ra = astGetRefRA( that );
       dec = astGetRefDec( that );
       lon = astGetGeoLon( that );
