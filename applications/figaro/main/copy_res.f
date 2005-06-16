@@ -92,9 +92,6 @@
       include 'fit_coding_inc'
       include 'PRM_PAR'
       logical ifarc
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       character*14 string
       character*7 newnam(3)
       character*9 oldnam(3)
@@ -150,7 +147,7 @@
 
 * Read rest_wave array
 
-      call accres(' ','rest_wave','RF',nyp,%VAL( CNF_PVAL(d_wptr) ),
+      call accres(' ','rest_wave','RF',nyp,%VAL(CNF_PVAL(d_wptr)),
      :            ' ', status)
 
 * Read ids array
@@ -160,25 +157,25 @@
 
 * Read traml array
 
-      call accres(' ','traml','RF',nyp,%VAL( CNF_PVAL(d_tlptr) ),' ',
+      call accres(' ','traml','RF',nyp,%VAL(CNF_PVAL(d_tlptr)),' ',
      :            status)
 
 * Read tramr array
 
-      call accres(' ','tramr','RF',nyp,%VAL( CNF_PVAL(d_trptr) ),' ',
+      call accres(' ','tramr','RF',nyp,%VAL(CNF_PVAL(d_trptr)),' ',
      :            status)
 
 * Read mask array
 
       call accres(' ','mask','RS',nyp*nxp*spdim2,
-     :            %VAL( CNF_PVAL(d_mptr) ),' ',status)
+     :            %VAL(CNF_PVAL(d_mptr)),' ',status)
 
 * Read template structure
 
       call accres(' ','template.data_array','RF',wavdim,
-     :     dynamic_mem(tdptr),' ',status)
+     :            %VAL(CNF_PVAL(tdptr)),' ',status)
       call accres(' ','template.axis[1].data_array','RF',wavdim,
-     :     dynamic_mem(tadptr),' ',status)
+     :            %VAL(CNF_PVAL(tadptr)),' ',status)
 
 * Read tols array
 
@@ -199,13 +196,13 @@
 *  Unmap template arrays
 
       call accres(' ','more.twodspec.template.data_array','UM',wavdim,
-     :     dynamic_mem(tdptr),' ',status)
-      call accres(' ','more.twodspec.template.axis[1].data_array','UM'
-     :     ,wavdim,dynamic_mem(tadptr),' ',status)
+     :             %VAL(CNF_PVAL(tdptr)),' ',status)
+      call accres(' ','more.twodspec.template.axis[1].data_array','UM',
+     :            wavdim,%VAL(CNF_PVAL(tadptr)),' ',status)
 
 * Start by getting number of lines
 
-      call get_lincnt(%VAL( CNF_PVAL(d_tlptr) ),line_count,nyp)
+      call get_lincnt(%VAL(CNF_PVAL(d_tlptr)),line_count,nyp)
 
 * Now copy over results and control arrays
 

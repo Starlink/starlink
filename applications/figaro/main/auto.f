@@ -5,6 +5,7 @@
 
 * Invocation:
 *    CALL AUTO(STATUS)
+*
 * Purpose:
 *  Determine locations of comb spectra over frame.
 
@@ -34,7 +35,6 @@
       integer xstart,xend
       integer nbls,ptr1,ptr2,slot
       real value,value1
-      include 'DYNAMIC_MEMORY'
       include 'PRM_PAR'
 *
 *
@@ -44,13 +44,15 @@
       nbls = wavdim/nwindow
 
       call dsa_axis_range('data',1,' ',.false.,value,value1,xstart,xend,
-     :      status)
+     :                    status)
 
       call getwork(line_count*2,'float',ptr1,slot,status)
       if(status.ne.SAI__OK) return
       ptr2 = ptr1 + line_count*VAL__NBR
-      call comb_window(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),nbls,
-     :      nwindow,%VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
-     :      xstart,xend,dynamic_mem(ptr1),dynamic_mem(ptr2))
+      call comb_window(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),
+     :                 nbls,nwindow,%VAL(CNF_PVAL(d_tlptr)),
+     :                 %VAL(CNF_PVAL(d_trptr)),xstart,xend,
+     :                 %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)))
       call dsa_free_workspace(slot,status)
+
       end

@@ -27,8 +27,8 @@
 *        If line used
 
 * Author:
-*     TNW: T.N.Wilkins. Manchester until 1/89, Cambridge until 9/92, then
-*     Durham.
+*     TNW: T.N.Wilkins. Manchester until 1/89, Cambridge until 9/92,
+*     then Durham.
 *     ACD: A C Davenhall. Edinburgh.
 
 * History:
@@ -65,8 +65,9 @@
       double precision a3all(3*maxnpts2+3*max_kplus1,line_count)
       integer npts
       integer nused
-      integer cpxptr,w2ptr,cpyptr,ptr1,ptr3,nels
-      integer slot,ptr2
+      integer cpxptr,w2ptr,cpyptr,ptr1,ptr3
+      integer ptr2
+      integer slot,slot2,slot3,slot4,slot5,slot6,slot7
       integer kp1
       character*70 chars
       logical used(line_count)
@@ -79,7 +80,7 @@
       character dumc
       character*20 dict(3)
       include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
+
       data dict/
      :     'ACCEPT : Accept fits',
      :     'RETRY  : Try again',
@@ -95,18 +96,19 @@
 *  NPTS    LINE_COUNT     (i)       P         P         P
 *
 
-      nels = (nxp*4+nxp*line_count*4+440)*VAL__NBD
-     :            + line_count*VAL__NBI
-      call getvm(nels,cpxptr,slot,status)
+      call dsa_get_work_array(nxp*line_count,'double',cpxptr,slot,
+     :                        status)
+      call dsa_get_work_array(nxp*line_count,'double',cpyptr,slot2,
+     :                        status)
+      call dsa_get_work_array(nxp*line_count,'double',w2ptr,slot3,
+     :                        status)
+      call dsa_get_work_array(nxp,'double',ptr1,slot4,status)
+      call dsa_get_work_array(400,'double',ptr2,slot5,status)
+      call dsa_get_work_array(nxp*3+40,'double',ptr3,slot6,status)
+      call dsa_get_work_array(line_count,'int',npts,slot7,status)
       if(status.ne.SAI__OK) then
         go to 550
       end if
-      cpyptr = nxp*VAL__NBD*line_count + cpxptr
-      w2ptr = cpyptr + nxp*VAL__NBD*line_count
-      ptr1 = w2ptr + nxp*VAL__NBD*line_count
-      ptr2 = ptr1 + nxp*VAL__NBD
-      ptr3 = ptr2 + 400*VAL__NBD
-      npts = ptr3 + (nxp*3+40)*VAL__NBD
 
       if(ifcomb) then
         name = 'comb.gmc'
@@ -128,28 +130,32 @@
 * handle. N.B. PTR1-3 are for workspace only within the routines called
 * here, the values of the arrays on entry are not used anywhere.
 
-      call extr_pos(%VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
-     :      %VAL( CNF_PVAL(staptr) ),dynamic_mem(cpxptr),
-     :      dynamic_mem(cpyptr), dynamic_mem(npts),ylim,
-     :      %VAL( CNF_PVAL(d_aptr) ),dynamic_mem(w2ptr),
-     :      dynamic_mem(d_xptr),notherax,dynamic_mem(ptr1))
+      call extr_pos(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+     :              %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(cpxptr)),
+     :              %VAL(CNF_PVAL(cpyptr)), %VAL(CNF_PVAL(npts)),ylim,
+     :              %VAL(CNF_PVAL(d_aptr)),%VAL(CNF_PVAL(w2ptr)),
+     :              %VAL(CNF_PVAL(d_xptr)),notherax,
+     :              %VAL(CNF_PVAL(ptr1)))
       if(batch) then
         call gr_hard(status)
       else
         call gr_soft(status)
       end if
-      call plot_sdist(wavdim,spdim1,dynamic_mem(npts),nxp,
-     :   dynamic_mem(ax2pos),dynamic_mem(ax1pos),line_count)
+      call plot_sdist(wavdim,spdim1,%VAL(CNF_PVAL(npts)),nxp,
+     :                %VAL(CNF_PVAL(ax2pos)),%VAL(CNF_PVAL(ax1pos)),
+     :                line_count)
 
 * Fit polynomials in X-Sect direction.
 
       go = .true.
       do while(go)
-        call control_cpoly(dynamic_mem(cpyptr), dynamic_mem(cpxptr),
-     :    dynamic_mem(npts), nxp, line_count, aa, MAX_KPLUS1, kp1,
-     :    label1, label2, dynamic_mem(w2ptr), dynamic_mem(ptr1), 
-     :    used, batch, dynamic_mem(ptr2), dynamic_mem(ptr3),
-     :    athree, a3all)      
+         call control_cpoly(%VAL(CNF_PVAL(cpyptr)),
+     :                      %VAL(CNF_PVAL(cpxptr)),
+     :                      %VAL(CNF_PVAL(npts)), nxp, line_count, aa,
+     :                      MAX_KPLUS1, kp1,label1, label2,
+     :                      %VAL(CNF_PVAL(w2ptr)), %VAL(CNF_PVAL(ptr1)),
+     :                      used, batch, %VAL(CNF_PVAL(ptr2)),
+     :                      %VAL(CNF_PVAL(ptr3)),athree, a3all)
 
 *     Do we accept the fits?
 

@@ -70,12 +70,12 @@
 * Note that the last entry ("EXIT") is only used in SET_TOLS
 
       data tolnam/'V_TOL','V_MAX','V_MIN','W_TOL','W_MAX','W_MIN',
-     :'W_S_N','H_MAX','H_MIN','H_S_N','C_TOL','S_TOL','H_TOL','EXIT'/
+     :  'W_S_N','H_MAX','H_MIN','H_S_N','C_TOL','S_TOL','H_TOL','EXIT'/
 
 * rejection criteria
 
       data dict/'HEIGHT','CENTRE','WIDTH','ERRORS','S/N','SHAPE',
-     :            'SEPARATIONS','APPLY'/
+     :          'SEPARATIONS','APPLY'/
 
       if(batch) then
 

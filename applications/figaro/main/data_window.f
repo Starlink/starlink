@@ -130,9 +130,6 @@
 
       integer istarty,iendy,windowy
       include 'gr_inc'
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 *
 * ---------------------------------------------------------------
 
@@ -224,16 +221,16 @@
 *
 *     get integral over the window
 *
-           call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,
-     :            istartx,iendx,istarty,iendy,dynamic_mem(d_vsptr))
+           call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,
+     :            istartx,iendx,istarty,iendy,%VAL(CNF_PVAL(d_vsptr)))
 
 *     loop over the lines
 
           do line=1,line_count
-            call one_line(nwindow,%VAL( CNF_PVAL(d_tlptr) ),
-     :         %VAL( CNF_PVAL(d_trptr) ),istartx,iendx,nfit,
-*     :         dynamic_chars(idsptr:idsend),%VAL( CNF_PVAL(d_cptr) ),line,
-     :         idstring,%VAL( CNF_PVAL(d_cptr) ),line,
+            call one_line(nwindow,%VAL(CNF_PVAL(d_tlptr)),
+     :         %VAL(CNF_PVAL(d_trptr)),istartx,iendx,nfit,
+*    :         dynamic_chars(idsptr:idsend),%VAL(CNF_PVAL(d_cptr)),line,
+     :         idstring,%VAL(CNF_PVAL(d_cptr)),line,
      :         nnew,nold,nfailed,maskedout,.true.,.false.,dummy,
      :         istarty,iendy,status)
             if(status.ne.SAI__OK) return
@@ -242,14 +239,15 @@
 
           enddo
 
-*      Increment accumulators and print out some diagnostics over masked range
+*      Increment accumulators and print out some diagnostics over 
+*      masked range.
 
           nfailsum   = nfailsum + nfailed
           noldsum    = noldsum  + nold
           nnewsum    = nnewsum  + nnew
           sgnowdgsum = sgnowdgsum + sgnowdg
 
-*     write out how many fits have been added ,converted or deleted
+*     Write out how many fits have been added ,converted or deleted.
 
           if(prfits) then
             write(chars,'(2x,3(a,i4))')'BLOCK :',iblock,'  - New fits :'

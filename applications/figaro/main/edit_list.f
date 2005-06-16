@@ -90,7 +90,6 @@
       integer OPT_AD, OPT_CH, OPT_PU, OPT_BO, OPT_RE, OPT_LI, OPT_EX
       parameter (OPT_AD = 1, OPT_CH = 2, OPT_PU = 3, OPT_BO = 4,
      :     OPT_LI = 5, OPT_RE = 6, OPT_EX = 7)
-      include 'DYNAMIC_MEMORY'
 *
 * data statments
 *

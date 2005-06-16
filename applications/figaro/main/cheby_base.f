@@ -45,7 +45,6 @@
       logical seek,plot
       integer ptr0,ptr1,ptr2,weightptr,cnv_fmtcnv,nbad,len1,pstat,ptr3
       character*30 chars
-      include 'DYNAMIC_MEMORY'
 
       if(status.ne.SAI__OK) return
 
@@ -65,18 +64,18 @@
 
 * Transfer base to double precision array for fitting
 
-      status = cnv_fmtcnv('float','double',dynamic_mem(d_vsptr),
-     :       work(ptr0),wavdim,nbad)
+      status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(d_vsptr)),
+     :                    work(ptr0),wavdim,nbad)
       if(status.ne.SAI__OK) goto 500
-      status = cnv_fmtcnv('float','double',dynamic_mem(d_xptr),
-     :       work(ptr2),wavdim,nbad)
+      status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(d_xptr)),
+     :                    work(ptr2),wavdim,nbad)
       if(status.ne.SAI__OK) goto 500
 
 * Set weights inside tram lines to 1.0e-6
 
       call tram_weights(line_count,%VAL( CNF_PVAL(d_tlptr) ),
-     :          %VAL( CNF_PVAL(d_trptr) ),dynamic_mem(d_xptr),wavdim,
-     :          work(weightptr))
+     :                  %VAL( CNF_PVAL(d_trptr) ),
+     :                  %VAL(CNF_PVAL(d_xptr)),wavdim,work(weightptr))
 
 * Perform fitting and get user to decide on order
 

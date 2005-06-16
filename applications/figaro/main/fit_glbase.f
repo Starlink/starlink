@@ -42,7 +42,7 @@
 *                   only). Only used for Spline model.
 *    PTR0 = INTEGER (Given)
 *        Pointer to workspace:
-*                       DECCNTR(BACK_MODEL)        ELEMENTS (double precision)
+*                       DECCNTR(BACK_MODEL)  ELEMENTS (double precision)
 *                        2          WAVDIM*2+M
 *                        3          WAVDIM*6+460
 *    DECCNTR(BACK_MODEL) = INTEGER ARRAY (Given and returned)
@@ -76,6 +76,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'status_inc'
@@ -92,10 +93,8 @@
       integer xin,yin,dbase,nbad,cnv_fmtcnv,ptr0
       integer e_cpolyrl,fstat
       double precision chbcfs(MAX_KPLUS1)
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
-      call zero_real(dynamic_mem(vbase),m)
+      call zero_real(%VAL(CNF_PVAL(vbase)),m)
       if(deccntr(back_model).eq.4) then
 
 *  Previously stored fit
@@ -127,7 +126,7 @@
 *   Evaluate polynomials
 
           fstat = e_cpolyrl(sdata(1),sdata(wavdim),sdata1(ileft),
-     :                  chbcfs,kp1,m,.true.,dynamic_mem(vbase))
+     :                      chbcfs,kp1,m,.true.,%VAL(CNF_PVAL(vbase)))
         end do
       else if(deccntr(back_model).eq.3) then
 
@@ -144,12 +143,12 @@
         end if
 
         call cheby_base(MAX_KPLUS1,chbcfs,kp1,ifseek,
-     :            dynamic_mem(ptr0),status)
+     :                  %VAL(CNF_PVAL(ptr0)),status)
 
 *   Evaluate polynomials
 
         fstat = e_cpolyrl(sdata(1),sdata(wavdim),sdata1(ileft),
-     :            chbcfs,kp1,m,.false.,dynamic_mem(vbase))
+     :                    chbcfs,kp1,m,.false.,%VAL(CNF_PVAL(vbase)))
         deccntr(back_order) = kp1 - 1
       else if (deccntr(back_model).eq.2) then
 
@@ -159,12 +158,14 @@
         xin = ptr0
         yin = xin + wavdim*val__nbd
         dbase = yin + wavdim*val__nbd
-        call spline_base(wavdim,sdata,dynamic_mem(d_vsptr),line_count,
-     :        %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),m,
-     :        adata,dynamic_mem(dbase),status,dynamic_mem(xin),
-     :        dynamic_mem(yin),dynamic_mem(d_xptr))
-        status = cnv_fmtcnv('double','real',dynamic_mem(dbase),
-     :               dynamic_mem(vbase),m,nbad)
+        call spline_base(wavdim,sdata,%VAL(CNF_PVAL(d_vsptr)),
+     :                   line_count,%VAL(CNF_PVAL(d_tlptr)),
+     :                   %VAL(CNF_PVAL(d_trptr)),m,adata,
+     :                   %VAL(CNF_PVAL(dbase)),status,
+     :                   %VAL(CNF_PVAL(xin)),%VAL(CNF_PVAL(yin)),
+     :                   %VAL(CNF_PVAL(d_xptr)))
+        status = cnv_fmtcnv('double','real',%VAL(CNF_PVAL(dbase)),
+     :                       %VAL(CNF_PVAL(vbase)),m,nbad)
       end if
  500  continue
       end

@@ -95,6 +95,7 @@
 *
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
 *-
       integer status
@@ -117,10 +118,9 @@
       character*(*) ids
       integer count
       logical par_quest,direct
-      integer dyn_element,nelmc
+      integer nelmc
       integer xslot,dslot,clptr
       real value(2),xmin,xmax,gen_elemf
-      include 'DYNAMIC_MEMORY'
 
 * Read in tramlines etc.
 
@@ -181,7 +181,6 @@
 *  Map the data
 *
         call dsa_map_data('clone','READ','float',clptr,dslot,status)
-        clptr = dyn_element(clptr)
 
         call par_wruser('We find the required shifts of the lines '/
      :    /'by comparing data from the 2 files',pstat)
@@ -205,8 +204,7 @@
 *  Map the clone X-array (or Y if comb)
 *
         call dsa_map_axis_data('clone',axis1,'READ','float',x2ptr,xslot,
-     :            status)
-        x2ptr = dyn_element(x2ptr)
+     :                         status)
 
 *   Get limits to extract data from and extract it. Continue looping
 *   until we have a satisfactory match between the 2 data sets
@@ -218,41 +216,43 @@
           ixend=min(nli,imid+10)
           call par_wruser('Current data',pstat)
           call dsa_axis_range('data',axis2,' ',.false.,value(1),
-     :            value(2),ixstart,ixend,status)
+     :                        value(2),ixstart,ixend,status)
           call canaxlim(axis2)
           if(status.ne.SAI__OK)  then
             goto 500
           endif
           if(ifcomb) then
-            call fig_ytract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :                  ixstart,ixend,dynamic_mem(d_vsptr))
+            call fig_ytract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                      ixstart,ixend,%VAL(CNF_PVAL(d_vsptr)))
           else
-            call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :                  ixstart,ixend,dynamic_mem(d_vsptr))
+            call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                      ixstart,ixend,%VAL(CNF_PVAL(d_vsptr)))
           end if
           imid=nlic/2
           ixstart=max(1,imid-10)
           ixend=min(nlic,imid+10)
           call par_wruser('Cloning  data',pstat)
           call dsa_axis_range('clone',axis2,' ',.false.,value(1),
-     :            value(2),ixstart,ixend,status)
+     :                       value(2),ixstart,ixend,status)
           call canaxlim(axis2)
 
           if(ifcomb) then
-            call fig_ytract(dynamic_mem(clptr),ncchannels,ncxsects,
-     :             ixstart,ixend,dynamic_mem(vsptrc))
+            call fig_ytract(%VAL(CNF_PVAL(clptr)),ncchannels,ncxsects,
+     :                      ixstart,ixend,%VAL(CNF_PVAL(vsptrc)))
           else
-            call fig_xtract(dynamic_mem(clptr),ncchannels,ncxsects,
-     :             ixstart,ixend,dynamic_mem(vsptrc))
+            call fig_xtract(%VAL(CNF_PVAL(clptr)),ncchannels,ncxsects,
+     :                      ixstart,ixend,%VAL(CNF_PVAL(vsptrc)))
           end if
 
 * Get positions of 3 lines on each spectrum
 
           call gr_soft(status)
-          call clone_plot(nil,dynamic_mem(d_xptr),dynamic_mem(d_vsptr)
-     :        ,nilc,dynamic_mem(x2ptr),dynamic_mem(vsptrc),chan1,chan2)
+          call clone_plot(nil,%VAL(CNF_PVAL(d_xptr)),
+     :                    %VAL(CNF_PVAL(d_vsptr)),nilc,
+     :                    %VAL(CNF_PVAL(x2ptr)),%VAL(CNF_PVAL(vsptrc)),
+     :                    chan1,chan2)
 
-*   Interpolate to find positions of other lines, using tram lines from
+* Interpolate to find positions of other lines, using tram lines from
 * clone file.
 
           do i=1,nlinesc
@@ -268,8 +268,8 @@
           call intrpl(3,chan2,chan1,nlines,dright,linposr,status)
 
           call gr_spen(3)
-          xmin = gen_elemf(dynamic_mem(d_xptr),1)
-          xmax = gen_elemf(dynamic_mem(d_xptr),wavdim)
+          xmin = gen_elemf(%VAL(CNF_PVAL(d_xptr)),1)
+          xmax = gen_elemf(%VAL(CNF_PVAL(d_xptr)),wavdim)
           count=0
           do i=1,nlines
             if((real(linposl(i)).gt.xmin).and.

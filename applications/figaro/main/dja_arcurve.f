@@ -96,7 +96,6 @@
       integer pgcurse
       logical loop,iloop
       integer get_parnum,h_pos,w_pos
-      include 'DYNAMIC_MEMORY'
 
 * Divide softcopy base zone into 2 zones
 

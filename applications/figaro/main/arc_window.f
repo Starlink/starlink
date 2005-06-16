@@ -143,7 +143,6 @@
       real diftrm
       integer len1
       include 'opt_cmn'
-      include 'DYNAMIC_MEMORY'
 
 * Get range/blocking
 
@@ -209,8 +208,8 @@
 *
 * get integral over the window
 *
-               call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :              istartx,iendx,dynamic_mem(d_vsptr))
+               call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                         istartx,iendx,%VAL(CNF_PVAL(d_vsptr)))
 
 * loop over the lines
 
@@ -238,7 +237,7 @@
 *
                   if (terminal) then
                      call disp_window(left_r,right_r,line,sdata,
-     :                    dynamic_mem(d_vsptr),wavdim)
+     :                                %VAL(CNF_PVAL(d_vsptr)),wavdim)
                   end if
 *
 *      Set title
@@ -256,14 +255,17 @@
                   nnew  = nnew + 1
                   crash = .false.
                   call profile_fit(sg_parms,sg_error,wavdim,sdata,
-     :                 dynamic_mem(d_vsptr),ixws,ltram,status)
+     :                             %VAL(CNF_PVAL(d_vsptr)),ixws,ltram,
+     :                             status)
                   call opt_release(status)
                   if(status.ne.SAI__OK) return
                   call store_results(sg_parms,sg_error,nnew,nfailed,
-     :                 line,istartx,iendx,default_model,0.0,
-     :                 %VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
-     :                 %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_mptr)),
-     :                 1,1, VAL__BADR)
+     :                               line,istartx,iendx,default_model,
+     :                               0.0,%VAL(CNF_PVAL(d_rptr)),
+     :                               %VAL(CNF_PVAL(d_vptr)),
+     :                               %VAL(CNF_PVAL(staptr)),
+     :                               %VAL(CNF_PVAL(d_mptr)),1,1, 
+     :                               VAL__BADR)
 
 *             Update trams, if the fitting didn't crash, and the answer
 *             is believable (we will not allow the centre to move too

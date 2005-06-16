@@ -31,7 +31,7 @@
 *    Subroutines/functions referenced:
 *      CLONE_IT            : Open clone file
 *      CLONE_MATCH         : Match clone to present file
-*      GETVM               : Get virtual memory
+*      DSA_GET_WORK_ARRAY  : Get virtual memory
 *      GET_LINE_COUNT      : Get the number of lines identified
 *      MAP_DATA            : Map the data arrays
 *      MAP_RES             : Map the arrays in the results structure
@@ -59,14 +59,12 @@
       integer status
       include 'arc_dims'
       logical ifcomb,clopen,nocube,ifarc
-      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,end6,slot
+      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,end6
+      integer slot,slot2,slot3,slot4,slot5,slot6,slot7
       integer nbytes,ndims,dims(1)
       include 'SAE_PAR'
       include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 
       if(status.ne.SAI__OK) return
 
@@ -104,26 +102,29 @@
 *    PTR6 dims(1)*10 (c)
 *    PTR7   dims(1)  (s)
 
-          nbytes = dims(1)
-     :             * (VAL__NBR + 4*VAL__NBD + 10 + VAL__NBW)
-          call getvm(nbytes,ptr1,slot,status)
+          call dsa_get_work_array(dims(1),'double',ptr1,slot,status)
+          call dsa_get_work_array(dims(1),'double',ptr2,slot2,status)
+          call dsa_get_work_array(dims(1),'double',ptr3,slot3,status)
+          call dsa_get_work_array(dims(1),'double',ptr4,slot4,status)
+          call dsa_get_work_array(dims(1),'float',ptr5,slot5,status)
+          call dsa_get_work_array(dims(1)*10-1,'char',ptr6,slot6,status)
+          call dsa_get_work_array(dims(1),'short',ptr7,slot7,status)
           if(status.ne.SAI__OK) return
-          ptr2 = ptr1 + dims(1)*VAL__NBD
-          ptr3 = ptr2 + dims(1)*VAL__NBD
-          ptr4 = ptr3 + dims(1)*VAL__NBD
-          ptr5 = ptr4 + dims(1)*VAL__NBD
-          ptr6 = ptr5 + dims(1)*VAL__NBR
-          end6 = ptr6 + dims(1)*10 - 1
-          ptr7 = end6 + 1
 
-*          call clone_match(dynamic_chars(idsptr:idsend),
           call clone_match(idstring,
-     :      %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
-     :      %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
-     :      dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
-     :      dynamic_mem(ptr5),dynamic_chars(ptr6:end6),ifcomb,
-     :      %VAL( CNF_PVAL(d_aptr) ),dynamic_mem(ptr7),dims(1),status)
+     :      %VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :      %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
+     :      %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :      %VAL(CNF_PVAL(ptr4)),%VAL(CNF_PVAL(ptr5)),
+     :      %VAL(CNF_PVAL(ptr6)),ifcomb,%VAL(CNF_PVAL(d_aptr)),
+     :      %VAL(CNF_PVAL(ptr7)),dims(1),status,%VAL(dims(1)*10 - 1))
 
+          call dsa_free_workspace(slot7,status)
+          call dsa_free_workspace(slot6,status)
+          call dsa_free_workspace(slot5,status)
+          call dsa_free_workspace(slot4,status)
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
 
         end if

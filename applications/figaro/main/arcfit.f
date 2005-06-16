@@ -62,6 +62,7 @@
 *     UNUSED_C(LINE_COUNT) = DOUBLE PRECISION ARRAY (Workspace)
 *     SIGY(LINE_COUNT) = REAL ARRAY (Workspace)
 *     SUCCESS = LOGICAL (Workspace)
+*
 * Global variables:
 *     LINE_COUNT = INTEGER (Given)
 *        Number of lines (include file arc_dims)
@@ -83,8 +84,8 @@
 *    11  - deleted, if undeleted would be ok for original data only
 *
 * Subroutine/functions called
-*   ARCPLOT       : Plot results of fitting, line list, etc. and offer user
-*                   options for this part of program
+*   ARCPLOT       : Plot results of fitting, line list, etc. and offer
+*                   user options for this part of program
 *   COPD2D        : Copy of data from one double precision array to
 *                   another
 *   DJA_ARCURVE   : Produce diagnostic plots
@@ -140,6 +141,7 @@
 * --------------------------------------------------------------------
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
 
@@ -253,11 +255,11 @@
 * force arcplot to display a table (since we don't have any fits yet)
 *
       nag_error = -1
-      call arcplot(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),xc,results
-     :     ,wavein,arc,resvar,xsect,ied,nag_error,weight,order
-*     :     ,dynamic_chars(idsptr:idsend),polydata,polytab,usenagerr
-     :     ,idstring,polydata,polytab,usenagerr
-     :     ,status)
+      call arcplot(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),xc,
+     :             results,wavein,arc,resvar,xsect,ied,nag_error,weight,
+     :             order,dynamic_chars(idsptr:idsend),polydata,
+     :             polytab,usenagerr,idstring,polydata,polytab,
+     :             usenagerr,status)
 
       do while(xsect.le.spdim1)
 
@@ -364,8 +366,8 @@
                call zero_dble(a,MAX_KPLUS1*MAX_KPLUS1)
                call zero_dble(a3new,3*maxnpts2 + 3*max_kplus1)
  
-               nag_error = fit_cpoly(w,lincnt,channel,wavelength,a,ss
-     :              ,kp1,MAX_KPLUS1,dynamic_mem(ptr1),a3new)
+               nag_error = fit_cpoly(w,lincnt,channel,wavelength,a,ss,
+     :                     kp1,MAX_KPLUS1,%VAL(CNF_PVAL(ptr1)),a3new)
                call dsa_free_workspace(slot,status)
 
 * test to see if the Order requested by the user is less or equal
@@ -378,8 +380,8 @@
                   kp1 = order+1
                else
                   call par_wruser(
-     :                 'Not enough data points for requested Order'
-     :                 ,pstat)
+     :                 'Not enough data points for requested Order',
+     :                 pstat)
                   len1 = 0
                   call chr_putc('Maximum order allowed is ',chars,len1)
                   call chr_puti(kp1-1,chars,len1)
@@ -429,10 +431,10 @@
 *
 *   evaluate mean dispersion, etc.
 *
-                  val(1) = gen_elemf(dynamic_mem(d_xptr),1)
-                  val(3) = gen_elemf(dynamic_mem(d_xptr),wavdim)
+                  val(1) = gen_elemf(%VAL(CNF_PVAL(d_xptr)),1)
+                  val(3) = gen_elemf(%VAL(CNF_PVAL(d_xptr)),wavdim)
                   val(2) = (val(3)+val(1))/2.0d0
-                  
+
                   call e_npoly(val,val2,xc,kp1,3)
 
                   minstartw = min(minstartw,val2(1))
@@ -539,11 +541,10 @@
 * exit control
 *
             if(.not.production) then
-               call arcplot(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),xc
-     :              ,results,wavein,arc,resvar,xsect,ied,nag_error
-*     :              ,weight,order,dynamic_chars(idsptr:idsend),polydata
-     :              ,weight,order,idstring,polydata
-     :              ,polytab,usenagerr,status)
+               call arcplot(%VAL(CNF_PVAL(d_xptr)),
+     :                      %VAL(CNF_PVAL(d_vsptr)),xc,results,wavein,
+     :                      arc,resvar,xsect,ied,nag_error,weight,order,
+     :                      idstring,polydata,polytab,usenagerr,status)
 *
 * accept
 *
@@ -579,11 +580,14 @@
                   ptr4 = ptr3 + lincnt * VAL__NBR
                   ptr5 = ptr4 + lincnt * VAL__NBR
                   ptr6 = ptr5 + lincnt * VAL__NBR
-                  call dja_arcurve(results,resvar,lincnt,xc
-     :                 ,wavelength,kp1,xsect,rc
-     :                 ,dynamic_mem(ptr1),dynamic_mem(ptr2)
-     :                 ,dynamic_mem(ptr3),dynamic_mem(ptr4)
-     :                 ,dynamic_mem(ptr5),dynamic_mem(ptr6))
+                  call dja_arcurve(results,resvar,lincnt,xc,
+     :                             wavelength,kp1,xsect,rc,
+     :                             %VAL(CNF_PVAL(ptr1)),
+     :                             %VAL(CNF_PVAL(ptr2)),
+     :                             %VAL(CNF_PVAL(ptr3)),
+     :                             %VAL(CNF_PVAL(ptr4)),
+     :                             %VAL(CNF_PVAL(ptr5)),
+     :                             %VAL(CNF_PVAL(ptr6)))
                   call dsa_free_workspace(slot,status)
                else if(ied.eq.2) then
                   accept = .false.

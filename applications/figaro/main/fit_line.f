@@ -65,7 +65,9 @@
 *     ODENSC = REAL (Returned)
 *        Old value of density scaling factor
 *     STATUS = INTEGER (Returned)
-*        Error status-to abort program, rather than just a fitting error. 0=ok
+*        Error status-to abort program, rather than just a fitting 
+*        error. 0=ok
+*
 * Global variables:
 *     CALRAT = REAL (Given)
 *        Number to multiply default number of iteration in optimisation
@@ -73,15 +75,18 @@
 *     BOUNDS = LOGICAL (Given)
 *        If to bounds fits in BMFIT (include file opt_cmn)
 *     KEEP_ITT = LOGICAL (Given)
-*        If to keep iteration file if a Nag error occurs (include file opt_cmn)
+*        If to keep iteration file if a Nag error occurs (include file
+*        opt_cmn)
 *     PRFITS = LOGICAL (Given)
 *        If to print fits etc. to terminal etc. (include file opt_cmn)
 *     MPARMS = INTEGER (Given)
 *        Maximum number of parameters (include file arc_dims)
 *     USEPEAK = LOGICAL (Given)
-*        use peak as centre for single gaussian fitting (include file arc_dims)
+*        use peak as centre for single gaussian fitting (include file
+*        arc_dims)
 *     GPSCAL = LOGICAL (Given)
-*        If previous results to be scaled (multiples) (include file arc_dims)
+*        If previous results to be scaled (multiples) (include file
+*        arc_dims)
 *     PRVBLK = LOGICAL (Given)
 *        If previous results to be taken from previous block (multiples)
 *         (include file arc_dims)
@@ -131,12 +136,12 @@
 
 * Include files
 
+      include 'SAE_PAR'
       include 'status_inc'
       include 'arc_dims'
       include 'opt_cmn'
       include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'fit_coding_inc'
       include 'gr_inc'
       real EFOLD
@@ -275,29 +280,29 @@
 * We now need to work out how much virtual memory we need
 
       call opt_get_work(deccntr,wavdim,n,MAX_PARS,tmpbas,work,vbase,
-     :     bygues,bystor,resstr,nbaswrk,status)
+     :                  bygues,bystor,resstr,nbaswrk,status)
 
       if(status.ne.SAI__OK) return
 
 * Zero guesses and results/bounds store, if type is MG
 
       if(deccntr(FIT_TYPE).eq.MULTIPLE) then
-        call zero_real(dynamic_mem(guessptr),bygues/VAL__NBR)
-        call zero_real(dynamic_mem(bndptr),bystor/VAL__NBR)
+        call zero_real(%VAL(CNF_PVAL(guessptr)),bygues/VAL__NBR)
+        call zero_real(%VAL(CNF_PVAL(bndptr)),bystor/VAL__NBR)
       end if
 
 *  Weighted fit if we want
 
       mode = deccntr(FIT_WEIGH).eq.VARIANCE
-      call weight_fit(errors,m,dynamic_mem(weightptr),mode)
+      call weight_fit(errors,m,%VAL(CNF_PVAL(weightptr)),mode)
 
 * Copy single precision data passed in X and Y into the
 * double precision arrays ADATA and ADENS
 
       status = cnv_fmtcnv('float','double',x(start),
-     :             dynamic_mem(dataptr),m,nbad)
+     :                    %VAL(CNF_PVAL(dataptr)),m,nbad)
       status = cnv_fmtcnv('float','double',y(start),
-     :             dynamic_mem(densptr),m,nbad)
+     :                    %VAL(CNF_PVAL(densptr)),m,nbad)
 
 *   If Chebyshev base is to be subtracted, then evaluate correction in
 *   this range. Do this for each x-section, subtracting this from the
@@ -306,15 +311,15 @@
 *   by basptr.
 
       call fit_glbase(xsect,nwindow,x,x,deccntr,start,m,vbase,
-     :     .false.,dynamic_mem(dataptr),work,status)
+     :                .false.,%VAL(CNF_PVAL(dataptr)),work,status)
 
       if(deccntr(BACK_MODEL).ge.CUBIC_SPLINE) then
-        status = cnv_fmtcnv('float','double',dynamic_mem(vbase),
-     :         dynamic_mem(tmpbas),m,nbad)
+        status = cnv_fmtcnv('float','double',%VAL(CNF_PVAL(vbase)),
+     :                       %VAL(CNF_PVAL(tmpbas)),m,nbad)
         if(status.ne.SAI__OK) call opt_wruser('Error in cnv_fmtcnv',
-     :       pstat)
-        call gen_subad(m,dynamic_mem(densptr),dynamic_mem(tmpbas),
-     :            dynamic_mem(densptr))
+     :                                        pstat)
+        call gen_subad(m,%VAL(CNF_PVAL(densptr)),%VAL(CNF_PVAL(tmpbas)),
+     :                 %VAL(CNF_PVAL(densptr)))
       end if
 
       xlim(1)=x(start)
@@ -324,7 +329,7 @@
 
 * Scale data.
 
-      call scale_data(dynamic_mem(dataptr),dynamic_mem(densptr))
+      call scale_data(%VAL(CNF_PVAL(dataptr)),%VAL(CNF_PVAL(densptr)))
 
 * Get initial values for guesses to pass to optimisation routines
 * Workspace (WORK):
@@ -337,17 +342,17 @@
 * Copy guesses from input fit parameters
 
         deccntr(FIT_GUES) = deccntr(FIT_GUES) - 90
-        call copy_guess(deccntr,fitpar,dynamic_mem(guessptr))
+        call copy_guess(deccntr,fitpar,%VAL(CNF_PVAL(guessptr)))
       else
-        call get_guess(deccntr,dynamic_mem(work),minht,line,xsect,
-     :        nwindow,iy,fstat,status)
+        call get_guess(deccntr,%VAL(CNF_PVAL(work)),minht,line,xsect,
+     :                 nwindow,iy,fstat,status)
       end if
 
 * Print out values of guesses.
 
       if(prfits) then
-        call opt_prguess(deccntr,dynamic_mem(work))
-      endif
+        call opt_prguess(deccntr,%VAL(CNF_PVAL(work)))
+      end if
       loop = (status.eq.SAI__OK).and.(fstat.eq.SAI__OK)
 
       do while(loop)
@@ -358,13 +363,13 @@
 *   Workspace (WORK) for the following arrays:
 *                                       M (max)   (d) * 3
 *                                       M (max)   (i)
-*                                       M        (r) * 5
+*                                       M         (r) * 5
 *                                       M,MAX_CMP (r)
-*                           N.B. This is an array element of dynamic_mem
 
         if(deccntr(FIT_MAN).eq.MAN_ALTER) then
           call alter_guess(x,y,xlim,start,deccntr,status,fstat,
-     :          dynamic_mem(guessptr),dynamic_mem(work),vbase,diags)
+     :                     %VAL(CNF_PVAL(guessptr)),
+     :                     %VAL(CNF_PVAL(work)),vbase,diags)
         end if
         if(.not.tied) then
           n = deccntr(FIT_NCMP)*parpcmp(deccntr(FIT_MODEL))+1
@@ -387,8 +392,8 @@
 
         crash = .false.
 
-        call opt_fitit(deccntr,n,fitpar,fiterr,dynamic_mem(resstr),
-     :       fstat,status,dynamic_mem(work))
+        call opt_fitit(deccntr,n,fitpar,fiterr,%VAL(CNF_PVAL(resstr)),
+     :                 fstat,status,%VAL(CNF_PVAL(work)))
 
 *   If this fit crashed, then set the fit error status to indicate it.
 
@@ -405,14 +410,14 @@
         if(terminal.and.(fstat.eq.SAI__OK).and.
      :       (deccntr(FIT_NCMP).ge.1)) then
            call opt_plotfit(deccntr,fitpar,x,y,start,nbaswrk,vbase,
-     :          diags,xlim,xsect,nwindow,status,work)
+     :                      diags,xlim,xsect,nwindow,status,work)
         endif
 
 *   Is this to be accepted?
 
-        call opt_checkfit(fitpar,fiterr,dynamic_mem(resstr),minht,
-     :       x(start),y(start),deccntr,loop,bstaic,bestng,n,mstore,aic,
-     :       fstat,status)
+        call opt_checkfit(fitpar,fiterr,%VAL(CNF_PVAL(resstr)),minht,
+     :                    x(start),y(start),deccntr,loop,bstaic,bestng,
+     :                    n,mstore,aic,fstat,status)
         if((status.ne.SAI__OK).or.(fstat.ne.0)) loop = .false.
       end do
 

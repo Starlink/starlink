@@ -1,5 +1,5 @@
-      subroutine comb_window(sdata,sdens,nbls,nwindow,left,right,xstart
-     :      ,xend,left_r,right_r)
+      subroutine comb_window(sdata,sdens,nbls,nwindow,left,right,xstart,
+     :      xend,left_r,right_r)
 *+
 * Name:
 *    COMB_WINDOW
@@ -133,7 +133,6 @@
 
       integer midblock,sblock,eblock,nrun,do_dirn
       real left_r(line_count),right_r(line_count)
-      include 'DYNAMIC_MEMORY'
 *
 *
 *
@@ -201,8 +200,8 @@
 *
 * get integral over the window
 *
-          call fig_ytract(dynamic_mem(d_sptr),wavdim,spdim1,istartx,
-     :             iendx,sdens)
+          call fig_ytract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,istartx,
+     :                    iendx,sdens)
 
 * loop over the lines
 

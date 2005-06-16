@@ -135,7 +135,7 @@
       integer OPT_FIT, OPT_NEXT, OPT_LAST, OPT_GROUP
       parameter (OPT_FIT = 1, OPT_NEXT = 2, OPT_LAST = 3,
      :     OPT_GROUP = 4)
-      include 'DYNAMIC_MEMORY'
+
       data dict_see/
      :     'FIT         : Set fit for this X-section',
      :     'NEXT        : Display next X-section',
@@ -179,14 +179,15 @@
 *
 * get integral over the window
 *
-            call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :           ixstart,ixend,dynamic_mem(d_vsptr))
+            call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                      ixstart,ixend,%VAL(CNF_PVAL(d_vsptr)))
 
 * display the window
 
-            call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
-     :           %VAL( CNF_PVAL(d_trptr) ),line,dynamic_mem(d_xptr),
-     :           dynamic_mem(d_vsptr),wavdim)
+            call disp_window(%VAL(CNF_PVAL(d_tlptr)),
+     :                       %VAL(CNF_PVAL(d_trptr)),line,
+     :                       %VAL(CNF_PVAL(d_xptr)),
+     :                       %VAL(CNF_PVAL(d_vsptr)),wavdim)
 
 *   redraw
 
@@ -213,16 +214,17 @@
      :           ,prvfit,usepeak,bimtst,tyaic,curmcmp,prvpos,mgauss
      :           ,line_count,errpre,inherit,status)
             if(redraw) then
-               call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
-     :              %VAL( CNF_PVAL(d_trptr) ),line,dynamic_mem(d_xptr),
-     :              dynamic_mem(d_vsptr),wavdim)
+               call disp_window(%VAL(CNF_PVAL(d_tlptr)),
+     :                          %VAL(CNF_PVAL(d_trptr)),line,
+     :                          %VAL(CNF_PVAL(d_xptr)),
+     :                          %VAL(CNF_PVAL(d_vsptr)),wavdim)
             end if
 
 * encode into control
 
             call encode_contrl(deccntr,ncntrl,fit_status)
             do i = ixstart,ixend
-               call set_control(%VAL( CNF_PVAL(d_cptr) ),line,i,1,
+               call set_control(%VAL(CNF_PVAL(d_cptr)),line,i,1,
      :                          fit_status)
             end do
             nfit = nfit + 1
@@ -231,10 +233,11 @@
 * proceede with model fit
 
                see_nwindow=ixend-ixstart+1
-               call one_line(see_nwindow,%VAL( CNF_PVAL(d_tlptr) ),
-     :              %VAL( CNF_PVAL(d_trptr) ),ixstart,ixend,nfit,
-     :              line_name,%VAL( CNF_PVAL(d_cptr) ),line,nnew,nold,
-     :              nfailed,maskedout,.false.,.true.,redraw,1,1,status)
+               call one_line(see_nwindow,%VAL(CNF_PVAL(d_tlptr)),
+     :                       %VAL(CNF_PVAL(d_trptr)),ixstart,ixend,nfit,
+     :                       line_name,%VAL(CNF_PVAL(d_cptr)),line,nnew,
+     :                       nold,nfailed,maskedout,.false.,.true.,
+     :                       redraw,1,1,status)
             else
                redraw=.false.
             end if
