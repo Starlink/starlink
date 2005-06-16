@@ -574,6 +574,98 @@ c
 
 
 
+
+
+
+      tf1 = ast_timeframe( 'system=mjd,timescale=tai', status )
+      nc = ast_unformat( tf1, 1, "1977-01-01 00:00:00", xin, status )
+
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=tai,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 35' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1977-01-01 00:00:00.000000' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 36' )
+         end if
+      end if
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=utc,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 37' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1976-12-31 23:59:45.000000' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 38' )
+         end if
+      end if
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=tt,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 39' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1977-01-01 00:00:32.184000' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 40' )
+         end if
+      end if
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=tdb,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 41' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1977-01-01 00:00:32.183935' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 42' )
+         end if
+      end if
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=tcb,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 43' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1977-01-01 00:00:32.184000' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 44' )
+         end if
+      end if
+
+      tf2 = ast_timeframe( 'system=mjd,timescale=tcg,format=iso.6', 
+     :                     status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 45' )
+      else 
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         txt = ast_format( tf2, 1, xout, status )
+         if( txt .ne. '1977-01-01 00:00:32.184000' ) then
+            write(*,*) txt( :chr_len(txt) )
+            call stopit( status, 'error 46' )
+         end if
+      end if
+
+
       call ast_end( status )
 c      call ast_listissued( 'testtime' )
 
