@@ -33,37 +33,41 @@
 *-
       implicit none
       include 'SAE_PAR'
+
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
       integer n
       real x(n),y(n),xerr(n),yerr(n),ticklen
       character*(*) ebar
       character*5 ebar1
       integer emin,emax,slot,status
       include 'bytesdef'
-      include 'DYNAMIC_MEMORY'
 
 * See if x or y error bars, or both are required.
 
       ebar1 = ebar(:(min(5,len(ebar))))
       call chr_ucase(ebar1)
       status = SAI__OK
-      call getwork(n*2,'float',emin,slot,status)
+      call dsa_get_work_array(n*2,'float',emin,slot,status)
       if(status.ne.SAI__OK) return
       emax = emin + n*bytes_float
 
 * X error bars
 
       if(index(ebar1,'X').ne.0) then
-        call gen_subaf(n,x,xerr,dynamic_mem(emin))
-        call gen_addaf(n,x,xerr,dynamic_mem(emax))
-        call pgerrx(n,dynamic_mem(emin),dynamic_mem(emax),y,ticklen)
+        call gen_subaf(n,x,xerr,%VAL(CNF_PVAL(emin)))
+        call gen_addaf(n,x,xerr,%VAL(CNF_PVAL(emax)))
+        call pgerrx(n,%VAL(CNF_PVAL(emin)),%VAL(CNF_PVAL(emax)),y,
+     :              ticklen)
       end if
 
 * Y error bars
 
       if(index(ebar1,'Y').ne.0) then
-        call gen_subaf(n,y,yerr,dynamic_mem(emin))
-        call gen_addaf(n,y,yerr,dynamic_mem(emax))
-        call pgerry(n,x,dynamic_mem(emin),dynamic_mem(emax),ticklen)
+        call gen_subaf(n,y,yerr,%VAL(CNF_PVAL(emin)))
+        call gen_addaf(n,y,yerr,%VAL(CNF_PVAL(emax)))
+        call pgerry(n,x,%VAL(CNF_PVAL(emin)),%VAL(CNF_PVAL(emax)),
+     :              ticklen)
       end if
       call dsa_free_workspace(slot,status)
       end
