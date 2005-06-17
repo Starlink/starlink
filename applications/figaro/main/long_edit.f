@@ -13,10 +13,10 @@
 *     CALL LONG_EDIT(STATUS)
 
 *  Description:
-*     The user is asked which option, and can either look at the elements
-*     of the results and resvar arrays for a given location, move planes
-*     of the results arrays around or sort components into ascending order
-*     of wavelength.
+*     The user is asked which option, and can either look at the
+*     elements of the results and resvar arrays for a given location,
+*     move planes of the results arrays around or sort components into
+*     ascending order of wavelength.
 
 *  Arguments:
 *      STATUS = INTEGER (Given)
@@ -59,7 +59,7 @@
       integer dumi,iopt
       character dumc
       real dumr
-      include 'DYNAMIC_MEMORY'
+
       integer OPT_LOOK, OPT_PLANES, OPT_ASC, OPT_DESC, OPT_EXIT
       parameter (OPT_LOOK = 1, OPT_PLANES = 2, OPT_ASC = 3,
      :     OPT_DESC = 4, OPT_EXIT = NDICT)
@@ -68,6 +68,7 @@
      :     'ASCENDING  : Sort components by wavelength',
      :     'DESCENDING : Sort components by wavelength',
      :     'EXIT       : Return to main menu'/
+
       loop = .true.
       do while(loop)
          call qmenu('Edit options',dict,NDICT,0,dumr,dumc,iopt,dumi,
@@ -75,19 +76,22 @@
          if((iopt.eq.OPT_EXIT).or.(status.ne.SAI__OK)) then
             return
          else if(iopt.eq.OPT_LOOK) then
-            call look(%VAL( CNF_PVAL(d_rptr) ),.false.,
-     :           %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_vptr) ))
+            call look(%VAL(CNF_PVAL(d_rptr)),.false.,
+     :                %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_vptr)))
+
          else if(iopt.eq.OPT_PLANES) then
-            call fit_edit(%VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL(CNF_PVAL(d_vptr) ),status)
+            call fit_edit(%VAL(CNF_PVAL(d_rptr)),
+     :                    %VAL(CNF_PVAL(d_vptr)),status)
+
          else if(iopt.eq.OPT_ASC) then
-            call sort_planes(%VAL( CNF_PVAL(staptr) ),
-     :           %VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),.true.)
+            call sort_planes(%VAL(CNF_PVAL(staptr)),
+     :                       %VAL(CNF_PVAL(d_rptr)),
+     :                       %VAL(CNF_PVAL(d_vptr)),.true.)
+
          else if(iopt.eq.OPT_DESC) then
-            call sort_planes(%VAL( CNF_PVAL(staptr) ),
-     :          %VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),.false.)
-         endif
-      enddo
+            call sort_planes(%VAL(CNF_PVAL(staptr)),
+     :                       %VAL(CNF_PVAL(d_rptr)),
+     :                       %VAL(CNF_PVAL(d_vptr)),.false.)
+         end if
+      end do
       end

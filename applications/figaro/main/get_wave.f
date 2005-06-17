@@ -35,14 +35,16 @@
 *   Revised to use INTRPL 10-Feb-1987
 *   Revised to print out both results 12-Feb-1987
 *   Anthony Holloway 1-9-1998 Manchester
-*     Changed calls to support PDA version of fit_cpoly.f and generation 
-*     of Taylor series polynomial.
+*     Changed calls to support PDA version of fit_cpoly.f and generation
+*     of Taylor-series polynomial.
 *   ACD: 28/9/00 Remove character strings continued across continuation
 *     lines and remove local unused variables.
 *-
       implicit none
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer nid
       double precision cent(nid)
       double precision dline
@@ -67,7 +69,6 @@ C      double precision fit_coeffs(MAX_KPLUS1)
       integer i,order,len1
       character*40 chars
       integer workptr,slot
-      include 'DYNAMIC_MEMORY'
 
       if(nid.gt.1) then
          lim1 = VAL__MAXR
@@ -88,7 +89,7 @@ C      double precision fit_coeffs(MAX_KPLUS1)
             return
          endif
          if(fit_cpoly(w,nid,cent,dwave,a,ss,kp1,MAX_KPLUS1,
-     :        dynamic_mem(workptr)).eq.0) then
+     :                %VAL(CNF_PVAL(workptr))).eq.0) then
 
 
 * Copy chebyshev polynomial coefficients into 1d array

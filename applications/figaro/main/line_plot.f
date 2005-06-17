@@ -12,9 +12,9 @@
 *   To plot a fit to a line profile.
 
 * Description:
-*   If pltdat is true then the line profile itself will be plotted, as well
-*   as a plot of the residuals on the fit. Otherwise a plot of the line profile
-*   is assumed already present.
+*   If pltdat is true then the line profile itself will be plotted, as 
+*   well as a plot of the residuals on the fit. Otherwise a plot of the 
+*   line profile is assumed already present.
 
 * Parameters:-
 *   FITPAR(*) = REAL ARRAY (Given)
@@ -64,6 +64,8 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'status_inc'
       include 'fit_coding_inc'
@@ -81,17 +83,17 @@
       integer wstart
       integer funct
       integer status,nels
-      integer m,vbase
-      integer resptr,hdatptr,hfvptr,ftotptr,slot,adata,nwork,ptr0
+      integer m,m5
+      integer resptr,hdatptr,hfvptr,ftotptr,adata,nwork,ptr0,vbase
+      integer slot,slot2,slot3,slot4,slot5,slot6
       integer nbad,cnv_fmtcnv
       integer rx2chn
       real gaussian, lorentz, skew, cauchy
       external gaussian, lorentz, skew, cauchy
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
       wstart = rx2chn(sdata,wavdim,left(line))
       m = rx2chn(sdata,wavdim,right(line)) - wstart + 1
+      m5 = m*5
 
       if(pltdat) then
 
@@ -117,14 +119,14 @@
       end if
 
 * Get virtual memory:-
-*  ADATA X values to evaluate base (double precision) (M*5) (d)
-*  HDATPTR Expanded X array (5 times X resolution)    (M*5) (r)
+*  ADATA X values to evaluate base (double precision)  (M5) (d)
+*  HDATPTR Expanded X array (5 times X resolution)     (M5) (r)
 *  RESPTR Residuals                                     (M) (r)
-*  FTOTPTR Total values of fit                   (M or M*5) (r)
-*  VBASE Base array                              (M or M*5) (r)
+*  FTOTPTR Total values of fit                    (M or M5) (r)
+*  VBASE Base array                               (M or M5) (r)
 * (multiples only:
 *  HFVPTR Values of individual components (5 times X resolution)
-*                                        (M*DECCNTR(FIT_NCMP)*5) (r)
+*                                   (M*DECCNTR(FIT_NCMP)*5) (r)
 *                                         )
 *  PTR0 Workspace for FIT_GLBASE (d)
 *                DECCNTR(BACK_MODEL) ELEMENTS
@@ -133,33 +135,34 @@
 * Since RESPTR and HDATPTR are not needed at the same time, they have
 * the same value.
 
-      nels = (3*VAL__NBR +  VAL__NBD) * 5 * m
       if(deccntr(FIT_NCMP).gt.1) then
-        nels = nels + 5*deccntr(FIT_NCMP)*m*VAL__NBR
+        nels = 5*deccntr(FIT_NCMP)*m
       end if
       if(deccntr(BACK_MODEL).eq.2)then
-        nwork = 2*wavdim+m*5
+        nwork = 2*wavdim+m5
       else if(deccntr(BACK_MODEL).eq.3)then
         nwork = 6*wavdim+460
       else
         nwork = 0
       end if
-      nwork = nwork*VAL__NBD
-      call getvm(nels+nwork,ptr0,slot,status)
-      if(status.ne.SAI__OK) then
-        return
+
+      if (nwork.gt.0) then
+         call dsa_get_work_array(nwork,'double',ptr0,slot,status)
       end if
-      adata = ptr0 + nwork
-      hdatptr = adata + m*5*VAL__NBD
-      ftotptr = hdatptr + m*5*VAL__NBR
-      vbase = ftotptr + m*5*VAL__NBR
+      call dsa_get_work_array(m5,'double',adata,slot2,status)
+      call dsa_get_work_array(m5,'float',hdatptr,slot3,status)
+      call dsa_get_work_array(m5,'float',ftotptr,slot4,status)
+      call dsa_get_work_array(m5,'float',vbase,slot5,status)
+      call dsa_get_work_array(nels,'float',hfvptr,slot6,status)
+      if(status.ne.SAI__OK) return
       resptr = hdatptr
-      call fill_dat(sdata(wstart),m,dynamic_mem(hdatptr))
-      status = cnv_fmtcnv('real','double',dynamic_mem(hdatptr),
-     :                 dynamic_mem(adata),m*5,nbad)
-      call fit_glbase(xsect,nwindow,sdata,dynamic_mem(hdatptr),
-     :            deccntr,1,m*5,vbase,.false.,dynamic_mem(adata),ptr0,
-     :            status)
+
+      call fill_dat(sdata(wstart),m,%VAL(CNF_PVAL(hdatptr)))
+      status = cnv_fmtcnv('real','double',%VAL(CNF_PVAL(hdatptr)),
+     :                    %VAL(CNF_PVAL(adata)),m5,nbad)
+      call fit_glbase(xsect,nwindow,sdata,%VAL(CNF_PVAL(hdatptr)),
+     :                deccntr,1,m5,vbase,.false.,%VAL(CNF_PVAL(adata)),
+     :                ptr0,status)
 
       funct = deccntr(FIT_MODEL)
       if(deccntr(FIT_NCMP).eq.1) then
@@ -167,54 +170,60 @@
 *   Put contents of array fitpar into array in order as required for
 *   plot_fit, so as to evaluate residuals
 
-        call plot_fit(fitpar,funct,m,dynamic_mem(vbase))
+        call plot_fit(fitpar,funct,m,%VAL(CNF_PVAL(vbase)))
 
 * deccntr(fit_ncmp).gt.1
 
       else
-        hfvptr = vbase + m*5*VAL__NBR
         if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
-          call comp_plot(fitpar,deccntr(FIT_NCMP),m*5,
-     :         dynamic_mem(hfvptr),dynamic_mem(hdatptr),yrange,
-     :         gaussian)
+          call comp_plot(fitpar,deccntr(FIT_NCMP),m5,
+     :                   %VAL(CNF_PVAL(hfvptr)),%VAL(CNF_PVAL(hdatptr)),
+     :                   yrange,gaussian)
         else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
-          call comp_plot(fitpar,deccntr(FIT_NCMP),m*5,
-     :         dynamic_mem(hfvptr),dynamic_mem(hdatptr),yrange,
-     :         lorentz)
-        endif
-        call multi_plot(fitpar,deccntr(FIT_NCMP),m*5,
-     :      dynamic_mem(hfvptr),dynamic_mem(ftotptr),
-     :      dynamic_mem(hdatptr),deccntr(BACK_MODEL),dynamic_mem(vbase)
-     :      ,yrange)
+          call comp_plot(fitpar,deccntr(FIT_NCMP),m5,
+     :                   %VAL(CNF_PVAL(hfvptr)),%VAL(CNF_PVAL(hdatptr)),
+     :                   yrange,lorentz)
+        end if
+        call multi_plot(fitpar,deccntr(FIT_NCMP),m5,
+     :                  %VAL(CNF_PVAL(hfvptr)),%VAL(CNF_PVAL(ftotptr)),
+     :                  %VAL(CNF_PVAL(hdatptr)),deccntr(BACK_MODEL),
+     :                  %VAL(CNF_PVAL(vbase)),yrange)
 
       end if
       if(pltdat) then
         if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
-          call eval_tot(sdata(wstart),m,dynamic_mem(ftotptr),fitpar,
-     :            deccntr(FIT_NCMP),gaussian)
+          call eval_tot(sdata(wstart),m,%VAL(CNF_PVAL(ftotptr)),fitpar,
+     :                  deccntr(FIT_NCMP),gaussian)
         else if(deccntr(FIT_MODEL).eq.SKEW_MODEL) then
-          call eval_tot(sdata(wstart),m,dynamic_mem(ftotptr),fitpar,
-     :            deccntr(FIT_NCMP),skew)
+          call eval_tot(sdata(wstart),m,%VAL(CNF_PVAL(ftotptr)),fitpar,
+     :                  deccntr(FIT_NCMP),skew)
         else if(deccntr(FIT_MODEL).eq.CAUCHY_MODEL) then
-          call eval_tot(sdata(wstart),m,dynamic_mem(ftotptr),fitpar,
-     :            deccntr(FIT_NCMP),cauchy)
+          call eval_tot(sdata(wstart),m,%VAL(CNF_PVAL(ftotptr)),fitpar,
+     :                  deccntr(FIT_NCMP),cauchy)
         else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
-          call eval_tot(sdata(wstart),m,dynamic_mem(ftotptr),fitpar,
-     :            deccntr(FIT_NCMP),lorentz)
-        endif
+          call eval_tot(sdata(wstart),m,%VAL(CNF_PVAL(ftotptr)),fitpar,
+     :                  deccntr(FIT_NCMP),lorentz)
+        end if
         status = cnv_fmtcnv('real','double',sdata(wstart),
-     :                   dynamic_mem(adata),m,nbad)
+     :                      %VAL(CNF_PVAL(adata)),m,nbad)
         call fit_glbase(xsect,nwindow,sdata,sdata,deccntr,wstart,m,
-     :              vbase,.false.,dynamic_mem(adata),ptr0,status)
-        call gen_addaf(m,dynamic_mem(ftotptr),dynamic_mem(vbase),
-     :         dynamic_mem(ftotptr))
+     :                  vbase,.false.,%VAL(CNF_PVAL(adata)),ptr0,status)
+        call gen_addaf(m,%VAL(CNF_PVAL(ftotptr)),%VAL(CNF_PVAL(vbase)),
+     :                 %VAL(CNF_PVAL(ftotptr)))
         call pgvport(0.05,0.97,frac2,0.9)
         call multi_resid(sdata(wstart),sdens(wstart),m,
-     :        dynamic_mem(resptr),dynamic_mem(ftotptr),.true.,.false.
-     :        ,title,legend)
+     :                   %VAL(CNF_PVAL(resptr)),%VAL(CNF_PVAL(ftotptr)),
+     :                   .true.,.false.,title,legend)
       end if
 
-      call dsa_free_workspace(slot,status)
+      call dsa_free_workspace(slot6,status)
+      call dsa_free_workspace(slot5,status)
+      call dsa_free_workspace(slot4,status)
+      call dsa_free_workspace(slot3,status)
+      call dsa_free_workspace(slot2,status)
+      if (nwork.gt.0) then
+         call dsa_get_work_array(nwork,'double',ptr0,slot,status)
+      end if
 
       call gr_spen(1)
       end

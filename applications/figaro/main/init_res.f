@@ -31,6 +31,8 @@
 * must declare everything
 
       implicit none
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
 *-
       logical ifarc
@@ -42,40 +44,35 @@
       parameter (MISSING = 1)
       integer ntemp,ntemp2
 C      integer ptr,slot
-      include 'PRM_PAR'
-      include 'CNF_PAR'          ! For CNF_PVAL function
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       
       
 * Set results cube and variance to bad values
 
       call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-     :           %VAL( CNF_PVAL(d_rptr) ))
+     :               %VAL(CNF_PVAL(d_rptr)))
 
 C     print *,'gen_cfill1'
 
 *      call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-*     :           dynamic_mem(d_rptr))
+*     :               %VAL(CNF_PVAL(d_rptr)))
 
 
 
       call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-     :           %VAL( CNF_PVAL(d_vptr) ))
+     :               %VAL(CNF_PVAL(d_vptr)))
 
 C     print *,'gen_cfill1'
 
 *      call gen_cfill(1,mxpars*spdim1*spdim2*nyp,val__badr,
-*     :           dynamic_mem(d_vptr))
+*     :               %VAL(CNF_PVAL(d_vptr)))
 
 * zero out wavelength and trams arrays
 
-      call zero_real(%VAL( CNF_PVAL(d_tlptr) ),nyp)
+      call zero_real(%VAL(CNF_PVAL(d_tlptr)),nyp)
 C     print *,'zero1'
-      call zero_real(%VAL( CNF_PVAL(d_trptr) ),nyp)
+      call zero_real(%VAL(CNF_PVAL(d_trptr)),nyp)
 C     print *,'zero2'
-      call zero_real(%VAL( CNF_PVAL(d_wptr) ),nyp)
+      call zero_real(%VAL(CNF_PVAL(d_wptr)),nyp)
 C     print *,'zero3'
 * no singles to doubles and no old or new fits either
 
@@ -89,8 +86,8 @@ C     print *,'zero3'
 
 * store the requested operation in CONTROL
 
-      call set_cont(%VAL( CNF_PVAL(d_cptr) ),ncntrl,nxp*nyp*spdim2,
-     :            fit_status)
+      call set_cont(%VAL(CNF_PVAL(d_cptr)),ncntrl,nxp*nyp*spdim2,
+     :              fit_status)
 
 * set the initial values of mask and fit_status for each point
 
@@ -98,16 +95,16 @@ C     print *,'zero3'
 
 * mask in all points
 
-      call set_short(%VAL( CNF_PVAL(d_mptr) ),nxp*nyp*spdim2,ival)
+      call set_short(%VAL(CNF_PVAL(d_mptr)),nxp*nyp*spdim2,ival)
 C     print *,'setshort'
 
 * Set fit status array to zeros
 
-      call zero_int(%VAL( CNF_PVAL(staptr) ),ncntrl*nxp*nyp*spdim2)
+      call zero_int(%VAL(CNF_PVAL(staptr)),ncntrl*nxp*nyp*spdim2)
 c     print *,'zeroint'
 * Set arc usage array to zero
 
-      call zero_short(%VAL( CNF_PVAL(d_aptr) ),nyp*nslct)
+      call zero_short(%VAL(CNF_PVAL(d_aptr)),nyp*nslct)
 C     print *,'zeroshort'
 *set the iteration number: by definition one so far
 
@@ -132,13 +129,13 @@ C     print *,'fillparams'
      :     ,ntemp2,ntemp,' ',status)
 
 C     print *,'axis1'
-      call accres(' ','more.twodspec.template.axis[1].data_array','wf'
-     :     ,ntemp,dynamic_mem(d_xptr),' ',status)
+      call accres(' ','more.twodspec.template.axis[1].data_array','wf',
+     :            ntemp,%VAL(CNF_PVAL(d_xptr)),' ',status)
 C     print *,'axis2'
 * Initialise tolerances
     
-      call init_tols(tolerance,MAXTOL,ifarc,dynamic_mem(d_xptr),
-     :         ntemp)
+      call init_tols(tolerance,MAXTOL,ifarc,%VAL(CNF_PVAL(d_xptr)),
+     :               ntemp)
 
 C     print *,'init_tols'
       gestol(1) = tolerance(5)
@@ -158,8 +155,8 @@ C     print *,'writ tols'
 * fill
 
       if(spdim2.gt.1) then
-        call set_intensity(dynamic_mem(d_sptr),%VAL( CNF_PVAL(totptr) ),
-     :          wavdim,spdim1,spdim2)
+        call set_intensity(%VAL(CNF_PVAL(d_sptr)),
+     :                     %VAL(CNF_PVAL(totptr)),wavdim,spdim1,spdim2)
 
       end if
 
@@ -167,15 +164,15 @@ C     print *,'writ tols'
 * Not currently implemented TNW 1991
 
 *      call getwork(nyp,'short',ptr,slot,status)
-*      call zero_short(dynamic_mem(ptr),nyp)
+*      call zero_short(%VAL(CNF_PVAL(ptr),nyp)
 
 *      call accres(' ','more.twodspec.groups.all.data_array','ws',nyp,
-*     :            dynamic_mem(ptr),' ',status)
+*     :            %VAL(CNF_PVAL(ptr),' ',status)
 
-*      call set_short(dynamic_mem(ptr),nyp,MISSING)
+*      call set_short(%VAL(CNF_PVAL(ptr),nyp,MISSING)
 
 *      call accres(' ','more.twodspec.groups.sky.data_array','ws',nyp,
-*     :            dynamic_mem(ptr),' ',status)
+*     :            %VAL(CNF_PVAL(ptr),' ',status)
 *      call dsa_free_workspace(slot,status)
       end
 

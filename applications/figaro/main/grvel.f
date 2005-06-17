@@ -61,9 +61,9 @@
 *        If to create contour plot rather than greyscale
 *     IFSOFT = LOGICAL (Given)
 *        If plot is to be in softcopy (contour plot only)
+*
 * Subroutines/functions referenced:
 *     GET_GREY             : Select/open greyscale graphics device
-*     GETWORK              : Get work array dynamically
 *     GRYPLT               : Create greyscale image
 *     GR_SELCT             : Select/open graphics device
 *     RX2RCHN = REAL (Given)
@@ -71,6 +71,7 @@
 *
 *     DSA_AXIS_RANGE       : Get range of axis to use
 *     DSA_FREE_WORKSPACE   : Free workspace
+*     DSA_GET_WORK_ARRAY   : Get workspace
 *     FIG_XVALUE = REAL (Given)
 *        Convert real bin number to real "array value"
 *     PAR_GIVEN = LOGICAL (Given)
@@ -80,7 +81,7 @@
 *        Obtain YES/NO response from user
 *     PAR_RDKEY            : Obtain YES/NO parameter from user
 *     PAR_RDVAL            : Obtain numeric (parameter) response from
-* user
+*                            user
 *     PGCONS               : Draw contour map
 *     PGBOX, PGENV, PGLABEL, PGPAGE, PGQCOL, PGQVP, PGVPORT, PGWINDOW
 *
@@ -88,7 +89,9 @@
       implicit none
       include 'SAE_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'gr_inc'
+
       integer nchans,spdim1,vtype,lincnt,line,status
       integer ist,ien,xrange
       logical batch,ifcont,ifsoft
@@ -128,7 +131,7 @@
       parameter (MAXOPT = 3, MAXVAL = 5)
       logical options(MAXOPT)
       real values(MAXVAL)
-      include 'DYNAMIC_MEMORY'
+
       save black,white,first,options,values
       data black,white/0.0,100.0/
       data first/.true./
@@ -147,6 +150,7 @@
      :     'F END    : End cross-section',
      :     'Q PLOT   : Perform next plot',
      :     'Q QUIT   : Stop plotting'/
+
       iyst = 1
       iyen = spdim1
       bs = bss(1:1)
@@ -234,8 +238,8 @@
          if(.not.batch) then
             values(VAL_START) = real(iyst)
             values(VAL_END) = real(iyen)
-            call qcheck(title,dict(dict1),cndict,values,dumc
-     :           ,options(dict1),key,status)
+            call qcheck(title,dict(dict1),cndict,values,dumc,
+     :                  options(dict1),key,status)
             line = nint(values(VAL_LINE))
             iyst = nint(values(VAL_START))
             iyen = nint(values(VAL_END))
@@ -300,7 +304,7 @@
 
          if(batch) then
             call dsa_axis_range('data',2,' ',.false.,dummy1,dummy2,iyst,
-     :           iyen,status)
+     :                          iyen,status)
          endif
          if(status.ne.SAI__OK) return
          if(ifcont) then
@@ -420,11 +424,12 @@
 
 *      Get VM
 
-            call getwork(xrange*yrange,'float',iwork,slot,status)
+            call dsa_get_work_array(xrange*yrange,'float',iwork,slot,
+     :                              status)
             if(status.ne.SAI__OK) return
-            call gryplt(z(1,iyst),dynamic_mem(iwork),nchans,yrange
-     :           ,xrange,ist,nlevs,values(3),values(2),options(OPT_COL)
-     :           ,options(OPT_LOG),slev)
+            call gryplt(z(1,iyst),%VAL(CNF_PVAL(iwork)),nchans,yrange,
+     :                  xrange,ist,nlevs,values(3),values(2),
+     :                  options(OPT_COL),options(OPT_LOG),slev)
             call dsa_free_workspace(slot,status)
          end if
          if(status.ne.SAI__OK) return

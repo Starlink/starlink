@@ -29,7 +29,8 @@
 *        "           "       14-MAY-1990 Checking of array moved to
 *                            MAP_RES
 *        "           "       30-MAY-1991 DSA_WRUSER replaced PAR_WRUSER
-*        "        Durham,    7-APR-1993 Use tnw_index so works on DECStation
+*        "        Durham,    7-APR-1993 Use tnw_index so works on 
+*                            DECStation
 *        "        Durham,    30-APR-1993 Use chr_index
 *-
       implicit none
@@ -39,9 +40,6 @@
       character*10 tmpp
       character*1 bss
       character*2 bsn
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data bss/'\\'/
 
 

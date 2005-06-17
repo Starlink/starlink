@@ -11,7 +11,8 @@
 
 * Description:
 *    To get the line identifications. Either previous identifications
-*  are used, or new ones obtained. This is for use in ARC2D and LONGSLIT.
+*    are used, or new ones obtained. This is for use in ARC2D and
+*    LONGSLIT.
 *
 * Arguments:
 *     IFARC = LOGICAL (Given)
@@ -30,10 +31,12 @@
 *     REFINE = LOGICAL (Given and returned)
 *        If in refine mode
 *     KEEP_ITT = LOGICAL (Returned)
-*        Keep iteration file (LONGSLIT, not ARC2D) (common block opt_cmn)
+*        Keep iteration file (LONGSLIT, not ARC2D) (common block
+*        opt_cmn)
 *     CALRAT = REAL (Returned)
-*        Ratio to multiply default number of iteration during fitting (common
-*        block opt_cmn)
+*        Ratio to multiply default number of iteration during fitting
+*        (common block opt_cmn)
+*
 * Subroutines/functions referenced:
 *     CLONE_MODE      : Clone line ids from another file
 *     MAP_DATA        : Map data arrays
@@ -50,8 +53,8 @@
 
 * History:
 *    TNW: 3/10/88 Original version
-*    TNW: 25/1/89 Addition of bounds & calrat, together with common block
-*         opt_cmn (previously keep_itt_command)
+*    TNW: 25/1/89 Addition of bounds & calrat, together with common 
+*         block opt_cmn (previously keep_itt_command)
 *    TNW: 21/9/89 More moved into this routine
 *    TNW: 26/10/89 Tidied a bit
 *    TNW: 15/11/89 fit_opts moved into here
@@ -59,6 +62,11 @@
 *    AJH: 9/6/98 Map_data mode from 'r' to 'read'
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+      include 'status_inc'
+      include 'opt_cmn'
+
       logical ifarc,clopen,nocube
       integer isfail
       integer pstat
@@ -73,16 +81,9 @@
       integer maxdim
       logical new
       character*28 setup_fail(2)
-      include 'SAE_PAR'
-      include 'CNF_PAR'          ! For CNF_PVAL function
-      include 'status_inc'
-      include 'opt_cmn'
-      character dynamic_chars
       integer dumi
       real dumr
       character dumc
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data setup_fail/'STOP : Give up','RESTART : Get a new template'/
       data dict_arc/'NEW','REPEAT','CLONE'/
       data menlis/
@@ -279,7 +280,7 @@ C             print *,'out setup_arc'
 * information
 
       if((status.eq.SAI__OK).and.(.not.new)) then
-        call list_lines(line_count,%VAL( CNF_PVAL(d_wptr) ),
+        call list_lines(line_count,%VAL(CNF_PVAL(d_wptr)),
 *     :            dynamic_chars(idsptr:idsend))
      :            idstring)
       end if

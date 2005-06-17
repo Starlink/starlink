@@ -58,6 +58,8 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
       include 'fit_coding_inc'
       integer line
@@ -77,13 +79,12 @@
       integer resolution
       integer m
       integer hdatptr,fvalptr,totptr,adata,nbad,cnv_fmtcnv
-      integer nels,slot,status,basewk,ptr0,nwork,narray
+      integer slot,slot2,slot3,slot4,slot5,slot6
+      integer status,basewk,ptr0,narray
       logical highres
       real gaussian, lorentz
       external gaussian, lorentz
       integer rx2chn
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
 *  Get line boundaries
 
@@ -93,8 +94,8 @@
 * Display data if required
 
       if(pltdat) then
-        call disp_window2(left(line),right(line),sdata(wstart)
-     :                       ,sdens(wstart),m,' ',.true.)
+        call disp_window2(left(line),right(line),sdata(wstart),
+     :                    sdens(wstart),m,' ',.true.)
       end if
       highres = pltdat.or.(deccntr(FIT_NCMP).eq.1)
       if(highres) then
@@ -118,17 +119,6 @@
 *
 *  Bug fixed and workspace made to overlap a lot more, TNW 9/11/90
 
-      narray = m*resolution*VAL__NBR
-
-      if(deccntr(FIT_NCMP).gt.1) then
-
-* NELS at this stage includes FVALPTR and TOTPTR if needed
-
-        nels = (1 + deccntr(FIT_NCMP))*narray
-      else
-        nels = 0
-      end if
-
 * BASEWK includes PTR0 and ADATA
 
       if(deccntr(BACK_MODEL).eq.2)then
@@ -138,81 +128,88 @@
       else
         basewk = 0
       end if
-      basewk = basewk + m*resolution
-      basewk = basewk*VAL__NBD
-
-* Get maximum of BASEWK and NELS and allow for VBASE
-
-      nwork = max(basewk,nels)
-      nels = nwork + narray
-
-* Allow for HDATPTR
-
-      if(highres) nels = nels + narray
 
 * Now we can actually get the VM!
+      call dsa_get_work_array(m*resolution,'double',adata,slot,status)
+      if (highres) call dsa_get_work_array(m*resolution,'float',hdatptr,
+     :                                     slot2,status)
+      call dsa_get_work_array(m*resolution,'float',vbase,slot3,status)
+      if(deccntr(FIT_NCMP).gt.1) then
+         call dsa_get_work_array(m*resolution*deccntr(FIT_NCMP),'float',
+     :                           fvalptr,slot4,status)
+         call dsa_get_work_array(m*resolution,'float',totptr,slot5,
+     :                           status)
+      end if
+      if (basewk.ne.0) call dsa_get_work_array(basewk,'double',
+     :                                         ptr0,slot6,status)
 
-      call getvm(nels,adata,slot,status)
       if(status.ne.SAI__OK) return
-      ptr0 = adata + m*VAL__NBD*resolution
-
-      vbase = adata + nwork
-      hdatptr = vbase + narray
-
-      totptr = adata
-      fvalptr = totptr + narray
 
 * Sort out base
 
       if(highres) then
-        call fill_dat(sdata(wstart),m,dynamic_mem(hdatptr))
-        status = cnv_fmtcnv('real','double',dynamic_mem(hdatptr),
-     :                 dynamic_mem(adata),m*resolution,nbad)
-        call fit_glbase(xsect,nwindow,sdata,dynamic_mem(hdatptr),
-     :           deccntr,1,m*resolution,vbase,.false.,dynamic_mem(adata)
-     :           ,ptr0,status)
+        call fill_dat(sdata(wstart),m,%VAL(CNF_PVAL(hdatptr)))
+        status = cnv_fmtcnv('real','double',%VAL(CNF_PVAL(hdatptr)),
+     :                      %VAL(CNF_PVAL(adata)),m*resolution,nbad)
+        call fit_glbase(xsect,nwindow,sdata,%VAL(CNF_PVAL(hdatptr)),
+     :                  deccntr,1,m*resolution,vbase,.false.,
+     :                  %VAL(CNF_PVAL(adata)),ptr0,status)
       else
         status = cnv_fmtcnv('real','double',sdata(wstart),
-     :                   dynamic_mem(adata),m,nbad)
+     :                      %VAL(CNF_PVAL(adata)),m,nbad)
         call fit_glbase(xsect,nwindow,sdata,sdata(wstart),deccntr,1,
-     :            m,vbase,.false.,dynamic_mem(adata),ptr0,status)
+     :                  m,vbase,.false.,%VAL(CNF_PVAL(adata)),ptr0,
+     :                  status)
       end if
       if(deccntr(FIT_NCMP).eq.1) then
 
 * Single component fit
 
-        call plot_fit(fitpar,deccntr(FIT_MODEL),m,dynamic_mem(vbase))
+        call plot_fit(fitpar,deccntr(FIT_MODEL),m,%VAL(CNF_PVAL(vbase)))
 
       else if(deccntr(FIT_NCMP).gt.1) then
 
         if(highres) then
           if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
             call comp_plot(fitpar,deccntr(FIT_NCMP),m*resolution,
-     :           dynamic_mem(fvalptr),dynamic_mem(hdatptr),yrange,
-     :           gaussian)
+     :                     %VAL(CNF_PVAL(fvalptr)),
+     :                     %VAL(CNF_PVAL(hdatptr)),yrange,gaussian)
+
           else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
             call comp_plot(fitpar,deccntr(FIT_NCMP),m*resolution,
-     :           dynamic_mem(fvalptr),dynamic_mem(hdatptr),yrange,
-     :           lorentz)
-          endif
+     :                     %VAL(CNF_PVAL(fvalptr)),
+     :                     %VAL(CNF_PVAL(hdatptr)),yrange,lorentz)
+          end if
           call multi_plot(fitpar,deccntr(FIT_NCMP),m*resolution,
-     :            dynamic_mem(fvalptr),dynamic_mem(totptr),
-     :            dynamic_mem(hdatptr),deccntr(BACK_MODEL),
-     :            dynamic_mem(vbase),yrange)
+     :                    %VAL(CNF_PVAL(fvalptr)),
+     :                    %VAL(CNF_PVAL(totptr)),
+     :                    %VAL(CNF_PVAL(hdatptr)),deccntr(BACK_MODEL),
+     :                    %VAL(CNF_PVAL(vbase)),yrange)
         else
           if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
             call comp_plot(fitpar,deccntr(FIT_NCMP),m,
-     :           dynamic_mem(fvalptr),sdata(wstart),yrange,
-     :           gaussian)
+     :                     %VAL(CNF_PVAL(fvalptr)),sdata(wstart),yrange,
+     :                     gaussian)
+
           else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
             call comp_plot(fitpar,deccntr(FIT_NCMP),m,
-     :           dynamic_mem(fvalptr),sdata(wstart),yrange,
-     :           lorentz)
-          endif
+     :                     %VAL(CNF_PVAL(fvalptr)),sdata(wstart),yrange,
+     :                     lorentz)
+          end if
           call multi_plot(fitpar,deccntr(FIT_NCMP),m,
-     :            dynamic_mem(fvalptr),dynamic_mem(totptr),sdata(wstart)
-     :            ,deccntr(BACK_MODEL),dynamic_mem(vbase),yrange)
+     :                    %VAL(CNF_PVAL(fvalptr)),
+     :                    %VAL(CNF_PVAL(totptr)),sdata(wstart),
+     :                    deccntr(BACK_MODEL),%VAL(CNF_PVAL(vbase)),
+     :                    yrange)
         end if
       end if
+
+      if (basewk.ne.0) call dsa_free_workspace(slot6,status)
+      if(deccntr(FIT_NCMP).gt.1) then
+         call dsa_free_workspace(slot5,status)
+         call dsa_free_workspace(slot4,status)
+      end if
+      call dsa_free_workspace(slot3,status)
+      if (highres) call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
       end

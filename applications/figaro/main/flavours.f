@@ -107,7 +107,8 @@
       real vcorr
       save vcorr,vtype
       integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9
-      integer i,slot,pstat,mark
+      integer i,pstat,mark
+      integer slot,slot2,slot3,slot4,slot5,slot6,slot7,slot8,slot9
       real disper
       integer FL_HARD, FL_TABLE, FL_PLOT
       integer FL_PRINT, FL_RATIO, FL_GREY, FL_CONT, FL_FULL
@@ -218,7 +219,7 @@
          if(par_quest('Is data flux calibrated?',.false.)) then
             disper = 1.0
          else
-            call get_dispers(dynamic_mem(d_xptr),wavdim,disper)
+            call get_dispers(%VAL(CNF_PVAL(d_xptr)),wavdim,disper)
          end if
       end if
 
@@ -226,8 +227,8 @@
 
       if(cur_flav(FL_HARD)) then
          if(whcube) then
-            call plot_all_fits(%VAL( CNF_PVAL(d_rptr) ),nagerr,vcorr,
-     :           vtype,cur_flav(FL_VEL),%VAL( CNF_PVAL(staptr) ))
+            call plot_all_fits(%VAL(CNF_PVAL(d_rptr)),nagerr,vcorr,
+     :           vtype,cur_flav(FL_VEL),%VAL(CNF_PVAL(staptr)))
          else
             call plot_cube(vcorr,vtype,cur_flav(FL_VEL))
          end if
@@ -238,7 +239,7 @@
 
       if(cur_flav(FL_TABLE)) then
          call par_wruser('Printing fits',pstat)
-         call table(%VAL( CNF_PVAL(d_rptr) ),nagerr,.false.,status)
+         call table(%VAL(CNF_PVAL(d_rptr)),nagerr,.false.,status)
       end if
 
 
@@ -265,21 +266,26 @@
 *  Into PTR4 : NXP*MGAUSS (real)
 *  Into PTR5 : LINE_COUNT (int)
 
-         nbytes = nxp*mgauss*4* VAL__NBR
-
 * Extra memory may be needed for plot_av_rot
 
+         call dsa_get_work_array(nxp*mgauss,'float',ptr1,slot,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr2,slot2,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr3,slot3,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr4,slot4,status)
          if(cur_plot(PL_AV).and.(line_count.gt.1)) then
-            nbytes = nbytes + line_count*3*VAL__NBI +
-     :           line_count*mgauss*VAL__NBR*2
+            call dsa_get_work_array(line_count,'int',ptr5,slot5,status)
+            call dsa_get_work_array(line_count,'int',ptr6,slot6,status)
+            call dsa_get_work_array(line_count,'int',ptr7,slot7,status)
+            call dsa_get_work_array(line_count*mgauss,'float',ptr8,
+     :                              slot8,status)
+            call dsa_get_work_array(line_count*mgauss,'float',ptr9,
+     :                              slot9,status)
          end if
 
          if(cur_plot(PL_ALV)) then
-            nbytes = max(nbytes,
-     :           (nxp*mgauss*4*line_count*VAL__NBR
-     :           + line_count*VAL__NBI))
+            call dsa_get_work_array(line_count,'int',ptr5,slot5,status)
          end if
-         call getvm(nbytes,ptr1,slot,status)
+         
          if(status.eq.SAI__OK) then
 
             if(batch) then
@@ -295,73 +301,73 @@
 
                end if
             end if
-            itmp = nxp * mgauss * VAL__NBR
-            ptr2 = ptr1 + itmp
-            ptr3 = ptr2 + itmp
-            ptr4 = ptr3 + itmp
-            ptr5 = ptr4 + itmp
 
             if(cur_plot(PL_VEL)) then
                call par_wruser('Plotting Velocities',pstat)
-               call plotvel(%VAL( CNF_PVAL(d_rptr) ),
-     :             %VAL( CNF_PVAL(d_vptr) ),
-     :              %VAL( CNF_PVAL(staptr) ),line_name,
-     :              %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
-     :              dynamic_mem(ptr2),dynamic_mem(ptr3),
-     :              dynamic_mem(ptr4),cur_flav(FL_VEL),0,vcorr,
-     :              cur_flav(FL_SOFT),nagerr,.false.,mark)
+               call plotvel(%VAL(CNF_PVAL(d_rptr)),
+     :                      %VAL(CNF_PVAL(d_vptr)),
+     :                      %VAL(CNF_PVAL(staptr)),line_name,
+     :                      %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
+     :                      %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                      %VAL(CNF_PVAL(ptr4)),cur_flav(FL_VEL),0,
+     :                      vcorr,cur_flav(FL_SOFT),nagerr,.false.,mark)
             end if
             if((line_count.gt.1).and.cur_plot(PL_AV)) then
                call par_wruser('Plotting average velocities',pstat)
 
-               ptr6 = ptr5 + line_count * VAL__NBI
-               ptr7 = ptr6 + line_count * VAL__NBI
-               ptr8 = ptr7 + line_count * VAL__NBI
-               ptr9 = ptr8 + line_count * mgauss * VAL__NBR
-
-               call plot_av_rot(%VAL( CNF_PVAL(d_rptr) ),
-     :              %VAL( CNF_PVAL(d_vptr) ),
-     :              %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_wptr) ),
-     :              dynamic_mem(ptr1),dynamic_mem(ptr2),
-     :              dynamic_mem(ptr3),dynamic_mem(ptr4),vcorr,nagerr,
-     :              dynamic_mem(ptr5),dynamic_mem(ptr6),
-     :              dynamic_mem(ptr7),dynamic_mem(ptr8),
-     :              dynamic_mem(ptr9),cur_flav(FL_SOFT))
+               call plot_av_rot(%VAL(CNF_PVAL(d_rptr)),
+     :                          %VAL(CNF_PVAL(d_vptr)),
+     :                          %VAL(CNF_PVAL(staptr)),
+     :                          %VAL(CNF_PVAL(d_wptr)),
+     :                          %VAL(CNF_PVAL(ptr1)),
+     :                          %VAL(CNF_PVAL(ptr2)),
+     :                          %VAL(CNF_PVAL(ptr3)),
+     :                          %VAL(CNF_PVAL(ptr4)),vcorr,nagerr,
+     :                          %VAL(CNF_PVAL(ptr5)),
+     :                          %VAL(CNF_PVAL(ptr6)),
+     :                          %VAL(CNF_PVAL(ptr7)),
+     :                          %VAL(CNF_PVAL(ptr8)),
+     :                          %VAL(CNF_PVAL(ptr9)),cur_flav(FL_SOFT))
             end if
             if(cur_plot(PL_FLX)) then
-               call plot_flux(%VAL( CNF_PVAL(d_rptr) ),
-     :              %VAL( CNF_PVAL(d_vptr) ), %VAL( CNF_PVAL(staptr) ),
-     :              line_name,%VAL( CNF_PVAL(d_wptr) ),
-     :              dynamic_mem(ptr1),dynamic_mem(ptr2),
-     :              dynamic_mem(ptr3),dynamic_mem(ptr4),disper,nagerr,
-     :              cur_flav(FL_SOFT))
+               call plot_flux(%VAL(CNF_PVAL(d_rptr)),
+     :                        %VAL(CNF_PVAL(d_vptr)), 
+     :                        %VAL(CNF_PVAL(staptr)),line_name,
+     :                        %VAL(CNF_PVAL(d_wptr)),
+     :                        %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)),
+     :                        %VAL(CNF_PVAL(ptr3)),%VAL(CNF_PVAL(ptr4)),
+     :                        disper,nagerr,cur_flav(FL_SOFT))
             end if
             if(cur_plot(PL_WID)) then
-               call plotvel(%VAL( CNF_PVAL(d_rptr) ),
-     :              %VAL( CNF_PVAL(d_vptr) ),
-     :              %VAL( CNF_PVAL(staptr) ),line_name,
-     :              %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
-     :              dynamic_mem(ptr2),dynamic_mem(ptr3),
-     :              dynamic_mem(ptr4),cur_flav(FL_VEL),1,vcorr,
-     :              cur_flav(FL_SOFT),nagerr,.false.,mark)
+               call plotvel(%VAL(CNF_PVAL(d_rptr)),
+     :                      %VAL(CNF_PVAL(d_vptr)),
+     :                      %VAL(CNF_PVAL(staptr)),line_name,
+     :                      %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
+     :                      %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                      %VAL(CNF_PVAL(ptr4)),cur_flav(FL_VEL),1,
+     :                      vcorr,cur_flav(FL_SOFT),nagerr,.false.,mark)
             end if
 
 *     All lines on 1 plot
 
             if(cur_plot(PL_ALV)) then
-               itmp = nxp * mgauss * line_count * VAL__NBR
-               ptr2 = ptr1 + itmp
-               ptr3 = ptr2 + itmp
-               ptr4 = ptr3 + itmp
-               ptr5 = ptr4 + itmp
-               call plotall(%VAL( CNF_PVAL(d_rptr) ),
-     :              %VAL( CNF_PVAL(d_vptr) ),
-     :              %VAL( CNF_PVAL(staptr) ),line_name,
-     :              %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
-     :              dynamic_mem(ptr2),dynamic_mem(ptr3),
-     :              dynamic_mem(ptr4),vcorr,cur_flav(FL_SOFT),nagerr,
-     :              dynamic_mem(ptr5))
+               call plotall(%VAL(CNF_PVAL(d_rptr)),
+     :                      %VAL(CNF_PVAL(d_vptr)),
+     :                      %VAL(CNF_PVAL(staptr)),line_name,
+     :                      %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
+     :                      %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                      %VAL(CNF_PVAL(ptr4)),vcorr,
+     :                      cur_flav(FL_SOFT),nagerr,
+     :                      %VAL(CNF_PVAL(ptr5)))
             end if
+            call dsa_free_workspace(slot9,status)
+            call dsa_free_workspace(slot8,status)
+            call dsa_free_workspace(slot7,status)
+            call dsa_free_workspace(slot6,status)
+            call dsa_free_workspace(slot5,status)
+            call dsa_free_workspace(slot4,status)
+            call dsa_free_workspace(slot3,status)
+            call dsa_free_workspace(slot2,status)
             call dsa_free_workspace(slot,status)
          end if
       end if
@@ -369,63 +375,72 @@
 * Option to output line ratios (interactive only)
 
       if(cur_flav(FL_RATIO)) then
-         nels = mgauss*4*nxp + 5*mgauss
-         call getwork(nels,'float',ptr1,slot,status)
+         nels = 5*mgauss
+         call dsa_get_work_array(nxp*mgauss,'float',ptr1,slot,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr2,slot2,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr3,slot3,status)
+         call dsa_get_work_array(nxp*mgauss,'float',ptr4,slot4,status)
+         call dsa_get_work_array(mgauss,'float',ptr5,slot5,status)
+         call dsa_get_work_array(2*mgauss,'float',ptr6,slot6,status)
+         call dsa_get_work_array(2*mgauss,'float',ptr7,slot7,status)
          if(status.eq.SAI__OK) then
-            ptr2 = ptr1 + nxp*mgauss*VAL__NBR
-            ptr3 = ptr2 + nxp*mgauss*VAL__NBR
-            ptr4 = ptr3 + nxp*mgauss*VAL__NBR
-            ptr5 = ptr4 + nxp*mgauss*VAL__NBR
-            ptr6 = ptr5 + mgauss*VAL__NBR
-            ptr7 = ptr6 + mgauss*VAL__NBR*2
 
-            call plot_linrat(%VAL( CNF_PVAL(d_rptr) ),dynamic_mem(ptr1),
-     :           dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
-     :           nagerr,line_name,mgauss,dynamic_mem(ptr5),
-     :           dynamic_mem(ptr6),dynamic_mem(ptr7),
-     :           %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(staptr) ))
+            call plot_linrat(%VAL(CNF_PVAL(d_rptr)),
+     :                       %VAL(CNF_PVAL(ptr1)),
+     :                       %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                       %VAL(CNF_PVAL(ptr4)),nagerr,line_name,
+     :                       mgauss,%VAL(CNF_PVAL(ptr5)),
+     :                       %VAL(CNF_PVAL(ptr6)),%VAL(CNF_PVAL(ptr7)),
+     :                       %VAL(CNF_PVAL(d_vptr)),
+     :                       %VAL(CNF_PVAL(staptr)))
+
+            call dsa_free_workspace(slot7,status)
+            call dsa_free_workspace(slot6,status)
+            call dsa_free_workspace(slot5,status)
+            call dsa_free_workspace(slot4,status)
+            call dsa_free_workspace(slot3,status)
+            call dsa_free_workspace(slot2,status)
             call dsa_free_workspace(slot,status)
          end if
       end if
       if(cur_flav(FL_GREY)) then
-         call grvel(dynamic_mem(d_sptr),spdim1,wavdim,
-     :        %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
-     :        line_count,vcorr,vtype,datafile,%VAL( CNF_PVAL(d_wptr) ),
-     :        dynamic_mem(d_xptr),line_name,batch,.false.,.false.,
-     :        status)
+         call grvel(%VAL(CNF_PVAL(d_sptr)),spdim1,wavdim,
+     :              %VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :              line_count,vcorr,vtype,datafile,
+     :              %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(d_xptr)),
+     :              line_name,batch,.false.,.false.,status)
       end if
       if(status.ne.SAI__OK) return
       if(cur_flav(FL_CONT)) then
-         call grvel(dynamic_mem(d_sptr),spdim1,wavdim,
-     :        %VAL( CNF_PVAL(d_tlptr) ),%VAL( CNF_PVAL(d_trptr) ),
-     :        line_count,vcorr,vtype,datafile,%VAL( CNF_PVAL(d_wptr) ),
-     :        dynamic_mem(d_xptr),line_name,batch,.true.
-     :        ,cur_flav(FL_SOFT),status)
+         call grvel(%VAL(CNF_PVAL(d_sptr)),spdim1,wavdim,
+     :        %VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :        line_count,vcorr,vtype,datafile,%VAL(CNF_PVAL(d_wptr)),
+     :        %VAL(CNF_PVAL(d_xptr)),line_name,batch,.true.,
+     :        cur_flav(FL_SOFT),status)
       end if
 
       if(cur_flav(FL_CHK)) then
-         call quick_plot(%VAL( CNF_PVAL(d_rptr) ),
-     :        %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(staptr) ),
-     :        line_name,nagerr,1,cur_flav(FL_SOFT),.true.,status)
+         call quick_plot(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+     :                   %VAL(CNF_PVAL(staptr)),line_name,nagerr,1,
+     :                   cur_flav(FL_SOFT),.true.,status)
       end if
 
       call clgrap
-
 
 
 *   Print rotation curves
 
       if(cur_flav(FL_PRINT)) then
          call par_wruser('Print of velocities',pstat)
-         call prvel(%VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
-     :        %VAL( CNF_PVAL(staptr) ),line_name,
-     :        %VAL( CNF_PVAL(d_wptr) ),vcorr,nagerr,disper,
-     :        dynamic_mem(xptr),dynamic_mem(yptr),
-     :        dynamic_mem(xdptr),.false.)
+         call prvel(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+     :              %VAL(CNF_PVAL(staptr)),line_name,
+     :              %VAL(CNF_PVAL(d_wptr)),vcorr,nagerr,disper,
+     :              %VAL(CNF_PVAL(xptr)),%VAL(CNF_PVAL(yptr)),
+     :              %VAL(CNF_PVAL(xdptr)),.false.)
       end if
       if(cur_flav(FL_FULL)) then
-         call wrtab(%VAL( CNF_PVAL(d_rptr) ),%VAL( CNF_PVAL(d_vptr) ),
-     :        line_name,%VAL( CNF_PVAL(d_wptr) ),vcorr,nagerr,disper,
-     :        %VAL( CNF_PVAL(staptr) ),status)
+         call wrtab(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+     :              line_name,%VAL(CNF_PVAL(d_wptr)),vcorr,nagerr,
+     :              disper,%VAL(CNF_PVAL(staptr)),status)
       end if
       end

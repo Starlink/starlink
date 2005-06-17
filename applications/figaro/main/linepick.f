@@ -12,11 +12,12 @@
 *
 *
 * Description:
-*     None or more tables of possible lines are read in from disc and the
-*     user is asked to identify the lines in the data file, matching them
-*     to the lines is this list. The list can be displayed if required, and the
-*     user can force indentifcations to be of lines not in the list. The
-*     work tables will be increased in size as required.
+*     None or more tables of possible lines are read in from disc and 
+*     the user is asked to identify the lines in the data file, matching
+*     them to the lines is this list. The list can be displayed if
+*     required, and the user can force indentifcations to be of lines 
+*     not in the list. The work tables will be increased in size as
+*     required.
 *
 * Global variables:
 *     LINE_COUNT = INTEGER (Given)
@@ -37,33 +38,43 @@
 *        Error status
 *
 * Authors:
-*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then Durham
+*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then 
+*        Durham
+*
 * History:
 *    TNW: Altered to search in figaro_prog_l and figaro_prog_s for .ids
-*  files, 21-22/1/88
+*         files, 21-22/1/88
 *    TNW: Altered to use OPNFIL 24/3/88
 *    TNW: Altered to use FIG_OPFILE 5/7/88
 *    TNW: Altered to receive work tables as workspace from above 12/8/88
 *    TNW: DSA_OPEN_TEXT_FILE replaced FIG_OPFILE and DSA_GET_LU, 14/7/89
-*    TNW: Some tidying, change to argument list of identify_line 25/10/89
-*    TNWW: Use of QMENU 1/11/89
+*    TNW: Some tidying, change to argument list of identify_line 
+*         25/10/89
+*    TNW: Use of QMENU 1/11/89
 *    TNW: changes to file i/o etc. 17/7/90
 *    TNW: PAR_QUEST not used 15/8/91
-*    TNW: 28/7/93 Increase size of tables if required, rather than editing
-*         out lines, etc.
+*    TNW: 28/7/93 Increase size of tables if required, rather than 
+*         editing out lines, etc.
 *- ---------------------------------------------------------------------
       implicit none
-* integer
-*
-      integer old_lincnt
-      integer status
+
       include 'arc_dims'
       include 'SAE_PAR'
       include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
+*
+* integer
+*
+      integer old_lincnt
+      integer status
       integer n_work
       integer list,in_list
       integer i,lu
+      integer namesst,wavestable
+      integer new_namesst,new_wavestable
+      integer namlen,new_namlen
+      integer worksize,new_worksize
+      integer slot,slot2,slot3,slot4
 *
 * Initial size of work tables
 *
@@ -73,9 +84,6 @@
 * character
 *
       character*(10) line_name(line_count)
-      integer namesst,namesend,wavestable,worksize
-      integer new_namesst,new_namesend,new_wavestable,
-     :     new_worksize,slot,new_slot
       character*50 file
       character*72 chars
 *
@@ -102,9 +110,6 @@
       integer nnums
       real values(2)
       integer chr_len
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 
 * data statements
 *
@@ -126,9 +131,9 @@
 
 * Allocate space for work tables
 
-      call getvm(worksize*(10+VAL__NBR),wavestable,slot,status)
-      namesst = wavestable + worksize*VAL__NBR
-      namesend = namesst + worksize * 10 - 1
+      namlen = worksize * 10
+      call dsa_get_work_array(worksize,'float',wavestable,slot,status)
+      call dsa_get_work_array(namlen,'char',namesst,slot2,status)
 *
 * set wavelength =-1 and name ="unknown" for all the lines.
 *
@@ -218,8 +223,9 @@
           do while(loop)
             loop = .false.
             do while(n_work.lt.worksize)
-              call rdids(lu,dynamic_mem(wavestable),
-     :             dynamic_chars(namesst:namesend),filend,n_work)
+              call rdids(lu,%VAL(CNF_PVAL(wavestable)),
+     :                   %VAL(CNF_PVAL(namesst)),filend,n_work,
+     :                   %VAL(namlen))
               if(filend) goto 1
             end do
 *
@@ -228,29 +234,32 @@
 * Allocate new space for work tables
 
             new_worksize = worksize * 2
-            call getvm(new_worksize*(10+VAL__NBR),new_wavestable,
-     :           new_slot,status)
-            new_namesst = new_wavestable + new_worksize*VAL__NBR
-            new_namesend = new_namesst + new_worksize * 10 - 1
+            new_namlen = new_worksize * 10
+            call dsa_get_work_array(new_worksize,'float',new_wavestable,
+     :                              slot3,status)
+            call dsa_get_work_array(new_namlen,'char',new_namesst,slot4,
+     :                              status)
 
 * Copy lists to new workspace
 
-            call copr2r(n_work,dynamic_mem(wavestable),
-     :           dynamic_mem(new_wavestable))
-            call chr_move(dynamic_chars(namesst:namesend),
-     :           dynamic_chars(new_namesst:new_namesend))
+            call copr2r(n_work,%VAL(CNF_PVAL(wavestable)),
+     :                  %VAL(CNF_PVAL(new_wavestable)))
+            call chr_move(%VAL(CNF_PVAL(namesst)),
+     :                    %VAL(CNF_PVAL(new_namesst)),%VAL(namlen),
+     :                    %VAL(new_namlen))
 
 *  and free old workspace
 
+            call dsa_free_workspace(slot2,status)
             call dsa_free_workspace(slot,status)
 
-*  Now switch to pointing to new array
+*  Now switch to pointing to new arrays
 
             wavestable = new_wavestable
             namesst = new_namesst
-            namesend = new_namesend
             worksize = new_worksize
-            slot = new_slot
+            slot = slot3
+            slot2 = slot4
 
             loop = flag.le.0
 
@@ -285,16 +294,19 @@
 *   Sort wavelengths in look_up table into ascending order
 
         if(n_work.gt.1) then
-          call arsort2(dynamic_mem(wavestable),
-     :          dynamic_chars(namesst:namesend),n_work)
+          call arsort2(%VAL(CNF_PVAL(wavestable)),
+     :                 %VAL(CNF_PVAL(namesst)),n_work,%VAL(namlen))
         end if
 *
 *   Identify lines
 *
-        call identify_line(dynamic_chars(namesst:namesend),
-     :       dynamic_mem(wavestable),line_name,wavelength,n_work,
-     :       dynamic_mem(d_xptr),%VAL( CNF_PVAL(d_tlptr) ),
-     :       %VAL( CNF_PVAL(d_trptr) ),status)
+        call identify_line(%VAL(CNF_PVAL(namesst)),
+     :                     %VAL(CNF_PVAL(wavestable)),line_name,
+     :                     wavelength,n_work,%VAL(CNF_PVAL(d_xptr)),
+     :                     %VAL(CNF_PVAL(d_tlptr)),
+     :                     %VAL(CNF_PVAL(d_trptr)),status)
+
+        call dsa_free_workspace(slot2,status)
         call dsa_free_workspace(slot,status)
 *
 *   Write out current line list

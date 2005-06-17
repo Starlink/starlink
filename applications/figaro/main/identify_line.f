@@ -68,6 +68,11 @@
 * ----------------------------------------------------------------
 *-
       implicit none
+
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+
       integer oldloc,location,istop
       integer ival
       integer it,ip1
@@ -83,7 +88,7 @@
       logical keep,more
       logical par_quest
 
-      integer ptr1,dwaves,ptr3,nels,slot,pstat
+      integer ptr1,dwaves,ptr3,nels,slot,slot2,slot3,slot4,pstat
       integer NLSET,oldj,len1
       parameter (NLSET = 40)
       integer numb(NLSET)
@@ -105,9 +110,6 @@ C      real get_wave
       real qwave
       integer nval,key,ncent,ndef
       logical if_qwave
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
       integer OPT_WAVE, OPT_WIDTH, OPT_NEXT, OPT_DISP, OPT_QUIT, OPT_ID
      :     ,OPT_FORW, OPT_BACK, OPT_NUM
       parameter (OPT_WAVE = 0, OPT_WIDTH = 1, OPT_NEXT = 2,
@@ -146,11 +148,10 @@ C      real get_wave
 *  PTR3     400        (d)
 *  CENT     LINE_COUNT (d)
 
-      nels = line_count*3+400
-      call getwork(nels,'double',ptr1,slot,status)
-      dwaves = ptr1 + VAL__NBD*line_count
-      ptr3 = dwaves + VAL__NBD*line_count
-      cent = ptr3 + VAL__NBD*400
+      call dsa_get_work_array(line_count,'double',ptr1,slot,status)
+      call dsa_get_work_array(line_count,'double',dwaves,slot2,status)
+      call dsa_get_work_array(400,'double',ptr3,slot3,status)
+      call dsa_get_work_array(cent,'double',cent,slot4,status)
       more = status.eq.SAI__OK
 
 * Loop on more lines to identify
@@ -188,17 +189,19 @@ C      real get_wave
 *     If any lines already identified, fill array cent with their peak
 *     positions, to use for guessing wavelengths of newly located lines.
 
-            call fill_cent(dynamic_mem(cent),line_count,sdata,
-     :              dynamic_mem(d_vsptr),wavdim,left,right,line_name
-     :              ,ncent,wavelength,dynamic_mem(dwaves))
+            call fill_cent(%VAL(CNF_PVAL(cent)),line_count,sdata,
+     :                     %VAL(CNF_PVAL(d_vsptr)),wavdim,left,right,
+     :                     line_name,ncent,wavelength,
+     :                     %VAL(CNF_PVAL(dwaves)))
           end if
-          call get_peak(dline,sdata,dynamic_mem(d_vsptr),wavdim,
-     :              left(j),right(j))
+          call get_peak(dline,sdata,%VAL(CNF_PVAL(d_vsptr)),wavdim,
+     :                  left(j),right(j))
           if(ncent.gt.2) then
 
 * AJH Removed in de-nagging
-*            qwave = get_wave(dynamic_mem(cent),ncent,dline,
-*     :         dynamic_mem(ptr1),dynamic_mem(dwaves),dynamic_mem(ptr3))
+*            qwave = get_wave(%VAL(CNF_PVAL(cent),ncent,dline,
+*     :         %VAL(CNF_PVAL(ptr1),%VAL(CNF_PVAL(dwaves)),
+*     :         %VAL(CNF_PVAL(ptr3)))
 *
 *     next line inserted
              qwave = real(dline)
@@ -228,7 +231,7 @@ C      real get_wave
 * See if already satisfactory display on screen
 *
           if (.not.keep) then
-            call display_line(sdata,dynamic_mem(d_vsptr),wavdim,
+            call display_line(sdata,%VAL(CNF_PVAL(d_vsptr)),wavdim,
      :           left(j),right(j),xlabel,xunits,zunits,halfwid)
           endif
           jlast=j
@@ -380,6 +383,9 @@ C      real get_wave
 
       end do
 
+      call dsa_free_workspace(slot4,status)
+      call dsa_free_workspace(slot3,status)
+      call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
 
       end
