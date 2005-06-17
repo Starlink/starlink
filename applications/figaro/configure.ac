@@ -38,7 +38,7 @@ AC_FC_LIBRARY_LDFLAGS
 AC_FC_RECL_UNIT
 
 dnl    Dependences on Starlink packages
-STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi sla], [link])
+STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi shl sla], [link])
 
 dnl     Needs hlib to build the help library.
 STAR_CHECK_PROGS(hlib)
