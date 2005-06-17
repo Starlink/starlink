@@ -9,7 +9,8 @@ nobase_dist_pkglib_DATA = \
 	$(SL_HLP) \
 	$(SL_LIB) \
 	$(SL_HTML) \
-	$(SL_TEXML)
+	$(SL_TEXML) \
+	$(DTD_COLLECTION)
 
 texmldir = $(pkglibdir)/lib/texml
 dist_texml_SCRIPTS = \
@@ -22,27 +23,7 @@ dist_texml_DATA = \
 
 stardocs_DATA = @STAR_XML_DOCUMENTATION@
 
-# The list of DTDs to install is maintained within the dtd/ directory,
-# in file dtd/manifest.  Install them by copying the tree into place.
-install-data-local: dtd/manifest
-	$(mkdir_p) $(DESTDIR)$(pkglibdir)
-	if test -n "$(PAX)"; then \
-	  if $(MANIFEST); then \
-	    $(PAX) -r -w -v $(DESTDIR)$(pkglibdir) \
-		<dtd/manifest 2>&1 | sed 's/^/MANIFEST:/'; \
-	  else \
-	    $(PAX) -r -w $(DESTDIR)$(pkglibdir) \
-		<dtd/manifest; \
-	  fi; \
-	else \
-	    cat dtd/manifest | while read f; do \
-	        $(INSTALL_DATA) $$f $(DESTDIR)$(pkglibdir)/$$f; \
-	    done; \
-	    $(MANIFEST) && sed 's+^+MANIFEST:$(DESTDIR)$(pkglibdir)/+' dtd/manifest || :; \
-	fi
-
-## inclusion of dtd/manifest here ensures that this is built before dist
-EXTRA_DIST = dsssl dtd dtd/manifest
+EXTRA_DIST = dsssl dtd
 
 clean: clean-private
 distclean: distclean-private
@@ -92,6 +73,50 @@ SL_TEXML = \
 	dsssl/sl/texml/slroutines.dsl \
 	dsssl/sl/texml/slsect.dsl \
 	dsssl/sl/texml/sltables.dsl
+DTD_COLLECTION = \
+    dtd/CATALOG dtd/CATALOG-override dtd/ISOent/ISOamsa.sdata		\
+    dtd/ISOent/ISOamsb.sdata dtd/ISOent/ISOamsc.sdata			\
+    dtd/ISOent/ISOamsn.sdata dtd/ISOent/ISOamso.sdata			\
+    dtd/ISOent/ISOamsr.sdata dtd/ISOent/ISObox.sdata			\
+    dtd/ISOent/ISOcyr1.sdata dtd/ISOent/ISOcyr2.sdata			\
+    dtd/ISOent/ISOdia.sdata dtd/ISOent/ISOgrk1.sdata			\
+    dtd/ISOent/ISOgrk2.sdata dtd/ISOent/ISOgrk3.sdata			\
+    dtd/ISOent/ISOgrk4.sdata dtd/ISOent/ISOlat1-ent.ent			\
+    dtd/ISOent/ISOlat1-html.ent dtd/ISOent/ISOlat1-latex.ent		\
+    dtd/ISOent/ISOlat1.sdata dtd/ISOent/ISOlat2.sdata			\
+    dtd/ISOent/ISOnum.sdata dtd/ISOent/ISOpub.sdata			\
+    dtd/ISOent/ISOtech.sdata dtd/ISOent/README dtd/ISOent/catalog	\
+    dtd/ISOent/xml/iso-amsa.ent dtd/ISOent/xml/iso-amsb.ent		\
+    dtd/ISOent/xml/iso-amsc.ent dtd/ISOent/xml/iso-amsn.ent		\
+    dtd/ISOent/xml/iso-amso.ent dtd/ISOent/xml/iso-amsr.ent		\
+    dtd/ISOent/xml/iso-box.ent dtd/ISOent/xml/iso-cyr1.ent		\
+    dtd/ISOent/xml/iso-cyr2.ent dtd/ISOent/xml/iso-dia.ent		\
+    dtd/ISOent/xml/iso-grk1.ent dtd/ISOent/xml/iso-grk2.ent		\
+    dtd/ISOent/xml/iso-grk3.ent dtd/ISOent/xml/iso-grk4.ent		\
+    dtd/ISOent/xml/iso-lat1.ent dtd/ISOent/xml/iso-lat2.ent		\
+    dtd/ISOent/xml/iso-num.ent dtd/ISOent/xml/iso-pub.ent		\
+    dtd/ISOent/xml/iso-tech.ent dtd/dsssl/catalog dtd/dsssl/demo.dsl	\
+    dtd/dsssl/demo.sgm dtd/dsssl/dsssl.dtd dtd/dsssl/fot.dtd		\
+    dtd/dsssl/style-sheet.dtd dtd/dssslcode-0.7.dtd			\
+    dtd/entities-html.ent dtd/entities-latex.ent			\
+    dtd/entities-plain.ent dtd/entities-unicode.ent			\
+    dtd/fortrancode-0.7.dtd dtd/hytime/clause-C.2.txt			\
+    dtd/hytime/hi2mdga.sgm dtd/hytime/hi2mdhyt.sgm-mod			\
+    dtd/hytime/hi2mdps.sgm dtd/hytime/hytime-lextypes.sgm		\
+    dtd/hytime/sgml-lextypes.sgm dtd/img-eqlist.dtd dtd/mud-0.7.dtd	\
+    dtd/mud-xml-0.7.dtd dtd/notations.text				\
+    dtd/oasis-exchange-table-xml.dtd dtd/oasis-exchange-table.dtd	\
+    dtd/paracontent-0.7.dtd dtd/programcode-0.7.dtd dtd/sc-0.2.dtd	\
+    dtd/sc-0.7.dtd dtd/sc-xml-0.7.dtd dtd/scriptcode-0.7.dtd		\
+    dtd/sg-0.7.dtd dtd/sg-xml-0.7.dtd dtd/sgp-0.7.dtd			\
+    dtd/sgp-xml-0.7.dtd dtd/simple-0.7.dtd dtd/sug-0.7.dtd		\
+    dtd/sug-xml-0.7.dtd dtd/summary-0.7.dtd dtd/sun-0.1.dtd		\
+    dtd/sun-0.7.dtd dtd/sun-xml-0.7.dtd dtd/tth-equations.dtd		\
+    dtd/xhtml1/xhtml-lat1.ent dtd/xhtml1/xhtml-special.ent		\
+    dtd/xhtml1/xhtml-symbol.ent dtd/xhtml1/xhtml.soc			\
+    dtd/xhtml1/xhtml1-frameset.dtd dtd/xhtml1/xhtml1-strict.dtd		\
+    dtd/xhtml1/xhtml1-transitional.dtd dtd/xhtml1/xhtml1.dcl		\
+    dtd/xml.decl
 
 # doc/ssn70/ssn70.{htx,texml}_tar are distributed, but their
 # dependencies are not, so arrange that the dependencies are
@@ -132,8 +157,8 @@ bin/sgml2hlp: bin/sgml2hlp.x
 	chmod +x $@.tmp
 	mv $@.tmp $@
 
-dtd/manifest: dtd/CATALOG dtd/manifest-omit
-	cd dtd; make manifest
+dtd/CATALOG-override:
+	cd dtd; make CATALOG-override
 
 dsssl/sl/lib/sllib.dsl:
 	cd dsssl/sl/lib; make sllib.dsl
