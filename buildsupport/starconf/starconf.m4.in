@@ -808,10 +808,13 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
 ## TeXML script that causes it.  Fixing the latter would be ideal, but 
 ## unless we do that (and it would be messy working out just where the
 ## problem is), we have to just spot the old version and suppress the build
-## in that case.
+## in that case.  It's not clear whether James Clark's Jade (1.2.x) has the
+## -v option, so this test might be specific to openjade.  I can't tell
+## whether JC-Jade has the problem, but it's probably not wise for anyone
+## to be using that version anyway.
                 AC_MSG_CHECKING([version of $JADE (need 1.3.2 or better)])
                 $JADE -v </dev/null >conftest.version 2>&1
-                JADEVERS=[`sed -n '/:.*jade.*version/{
+                JADEVERS=[`sed -n '/:I:.*[Jj]ade.*version/{
     s/.*:I://
     s/[^0-9][^0-9]*/ /gp
 }' conftest.version`]
