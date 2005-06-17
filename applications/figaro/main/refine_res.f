@@ -43,7 +43,6 @@
       character*39 chars
       integer pstat
       logical par_given
-      include 'DYNAMIC_MEMORY'
 
 * read the iteration number
 

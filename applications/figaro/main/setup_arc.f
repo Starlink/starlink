@@ -57,6 +57,7 @@
 *  TNW 15/2/90 Template data array filled
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 * include common blocks
 *
@@ -67,7 +68,6 @@
 *
       integer s2,e2,s3,e3
       real dummy1,dummy2
-      include 'DYNAMIC_MEMORY'
 
       s2 = 1
       e2 = spdim1
@@ -86,15 +86,15 @@
      :          status)
         call canaxlim(3)
       end if
-      call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,s2,e2,s3,
-     :         e3,dynamic_mem(d_vsptr))
+      call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,s2,e2,s3,
+     :         e3,%VAL(CNF_PVAL(d_vsptr)))
 
       if(line_count.eq.0) then
 
 * Fill .template.data_array
 
        call accres(' ','more.twodspec.template.data_array','wf',wavdim,
-     :               dynamic_mem(d_vsptr),' ',status)
+     :               %VAL(CNF_PVAL(d_vsptr)),' ',status)
       end if
 
 *  Locate and identify the lines

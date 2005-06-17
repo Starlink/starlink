@@ -14,9 +14,9 @@
 *    To plot the current window of the data
 
 * Description:
-*     The data for the current location is extracted and plotted. If a fit
-*     has already been made at that location (for that blocking), this may
-*     be plotted.
+*     The data for the current location is extracted and plotted. If a
+*     fit has already been made at that location (for that blocking),
+*     this may be plotted.
 
 * Arguments:
 *      D_XPTR = INTEGER (Given)
@@ -89,8 +89,6 @@
       integer istartx,iendx,len2
       integer istarty,iendy,ystart,yend,nwindy,jblock
       logical plot_old_fit,qstat
-      include 'DYNAMIC_MEMORY'
-
 *
 
       if(status.ne.SAI__OK) return
@@ -138,18 +136,19 @@
 *
 * get integral over the window
 *
-      call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,istartx,
-     :     iendx,istarty,iendy,dynamic_mem(d_vsptr))
+      call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,istartx,
+     :           iendx,istarty,iendy,%VAL(CNF_PVAL(d_vsptr)))
 
 * display the window
 
       if(wait) call sla_wait(3.0)
-      call disp_window(%VAL( CNF_PVAL(d_tlptr) ),
-     :     %VAL( CNF_PVAL(d_trptr) ),line,
-     :     dynamic_mem(d_xptr),dynamic_mem(d_vsptr),wavdim)
+      call disp_window(%VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :                 line,%VAL(CNF_PVAL(d_xptr)),
+     :                 %VAL(CNF_PVAL(d_vsptr)),wavdim)
       if(pltold) then
-         qstat = plot_old_fit(%VAL( CNF_PVAL(d_rptr) ),
-     :        %VAL( CNF_PVAL(d_vptr) ),line,istartx,iendx,istarty,
-     :        iendy,samblk,.false.,%VAL( CNF_PVAL(staptr) ))
+         qstat = plot_old_fit(%VAL(CNF_PVAL(d_rptr)),
+     :                        %VAL(CNF_PVAL(d_vptr)),line,istartx,iendx,
+     :                        istarty,iendy,samblk,.false.,
+     :                        %VAL(CNF_PVAL(staptr)))
       end if
       end

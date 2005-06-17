@@ -22,6 +22,7 @@
 *        .true. if called from COMB
 *   STATUS = INTEGER (Given)
 *        Error status, 0=ok
+*
 * Global variables:
 *   D_RPTR    (NZP,NYP,NXP) = REAL ARRAY (Given)
 *        Dynamic_mem(d_rptr) "cube"
@@ -36,6 +37,7 @@
 *
 * Author:
 *   T.N.Wilkins Manchester
+*
 * History:
 *   TNW 29/11/88 Changed to use getwork
 *   TNW/CAVAD 20/7/89 PARAMS passed to PLOTVEL
@@ -49,39 +51,35 @@
       integer status
       include 'arc_dims'
       include 'SAE_PAR'
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       logical ifsoft
       logical ifcomb
 
 * Local
 
-      integer ptr1,ptr2,ptr3,ptr4,slot
+      integer ptr1,ptr2,ptr3,ptr4,slot,slot2,slot3,slot4
       logical par_quest
       logical loop
       integer nels
       integer iopt,get_parnum
       integer NDICT,CENTVCHN,WIDVCHN,ECENVHEI
       parameter (NDICT = 4,
-     :     CENTVCHN = 1,
-     :     WIDVCHN  = 2,
-     :     ECENVHEI = 3)
+     :           CENTVCHN = 1,
+     :           WIDVCHN  = 2,
+     :           ECENVHEI = 3)
       character*35 dict(NDICT)
-      include 'PRM_PAR'
       integer dumi
       real dumr
       character dumc
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data dict/
      :     'C_V_X  : Line centre v. channel',
      :     'W_V_C  : Linewidth v. centre',
      :     'EC_V_H : Error on centre v. height?',
      :     'EXIT   : Exit'/
 *
+
       loop = .true.
-
-
       do while(loop)
         if(ifsoft) call gr_soft(status)
 
@@ -102,56 +100,74 @@
 *   Plot line position v. channel no.
 *
         if(iopt.eq.CENTVCHN) then
-          nels = nxp*4*mgauss
-          call getwork(nels,'float',ptr1,slot,status)
+          call dsa_get_work_array(nxp*mgauss,'float',ptr1,slot,status)
+          call dsa_get_work_array(nxp*mgauss,'float',ptr2,slot2,status)
+          call dsa_get_work_array(nxp*mgauss,'float',ptr3,slot3,status)
+          call dsa_get_work_array(nxp*mgauss,'float',ptr4,slot4,status)
           if(status.ne.SAI__OK) return
-          ptr2=ptr1+nxp*mgauss*VAL__NBR
-          ptr3=ptr2+nxp*mgauss*VAL__NBR
-          ptr4=ptr3+nxp*mgauss*VAL__NBR
-          call plotvel(%VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),
-*     :            dynamic_mem(staptr),dynamic_chars(idsptr:idsend)
-     :           %VAL( CNF_PVAL(staptr) ),idstring,
-     :           %VAL( CNF_PVAL(d_wptr) ),dynamic_mem(ptr1),
-     :           dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
-     :           .false.,0,0.0,ifsoft,
-     :           par_quest('Show fits with NAG errors?',.false.),ifcomb,
-     :           0)
+
+          call plotvel(%VAL(CNF_PVAL(d_rptr)),%VAL(CNF_PVAL(d_vptr)),
+*     :             %VAL(CNF_PVAL(staptr),dynamic_chars(idsptr:idsend)
+     :                %VAL(CNF_PVAL(staptr)),idstring,
+     :                %VAL(CNF_PVAL(d_wptr)),%VAL(CNF_PVAL(ptr1)),
+     :                %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                %VAL(CNF_PVAL(ptr4)),.false.,0,0.0,ifsoft,
+     :                par_quest('Show fits with NAG errors?',.false.),
+     :                ifcomb,0)
+
+          call dsa_free_workspace(slot4,status)
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
 
 * Plot linewidth v. centre
 
         else if(iopt.eq.WIDVCHN) then
-          nels = nyp*4
-          call getwork(nels,'float',ptr1,slot,status)
+          call dsa_get_work_array(nyp,'float',ptr1,slot,status)
+          call dsa_get_work_array(nyp,'float',ptr2,slot2,status)
+          call dsa_get_work_array(nyp,'float',ptr3,slot3,status)
+          call dsa_get_work_array(nyp,'float',ptr4,slot4,status)
           if(status.ne.SAI__OK) return
-          ptr2=ptr1+nyp*VAL__NBR
-          ptr3=ptr2+nyp*VAL__NBR
-          ptr4=ptr3+nyp*VAL__NBR
-          call diagnosis_plt(%VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),
-     :           %VAL( CNF_PVAL(staptr) ),get_parnum('Width_1'),
-     :           get_parnum('Centre_1'),'Linewidth v. centre','Centre'
-     :           ,'Width',.true.,dynamic_mem(ptr1),dynamic_mem(ptr2),
-     :           dynamic_mem(ptr3),dynamic_mem(ptr4),ifsoft)
+
+          call diagnosis_plt(%VAL(CNF_PVAL(d_rptr)),
+     :                       %VAL(CNF_PVAL(d_vptr)),
+     :                       %VAL(CNF_PVAL(staptr)),
+     :                       get_parnum('Width_1'),
+     :                       get_parnum('Centre_1'),
+     :                       'Linewidth v. centre','Centre','Width',
+     :                       .true.,%VAL(CNF_PVAL(ptr1)),
+     :                       %VAL(CNF_PVAL(ptr2)),
+     :                       %VAL(CNF_PVAL(ptr3)),
+     :                       %VAL(CNF_PVAL(ptr4)),ifsoft)
+
+          call dsa_free_workspace(slot4,status)
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
 
 *  Plot error on centre v. height
 
         else if(iopt.eq.ECENVHEI) then
-          nels = nyp*4
-          call getwork(nels,'float',ptr1,slot,status)
+          call dsa_get_work_array(nyp,'float',ptr1,slot,status)
+          call dsa_get_work_array(nyp,'float',ptr2,slot2,status)
+          call dsa_get_work_array(nyp,'float',ptr3,slot3,status)
+          call dsa_get_work_array(nyp,'float',ptr4,slot4,status)
           if(status.ne.SAI__OK) return
-          ptr2=ptr1+nyp*VAL__NBR
-          ptr3=ptr2+nyp*VAL__NBR
-          ptr4=ptr3+nyp*VAL__NBR
-          call diagnosis_plt(%VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),
-     :           %VAL( CNF_PVAL(staptr) ),(-get_parnum('Centre_1')),
-     :           get_parnum('Height_1'),'Error on centre v. height',
-     :           'Height','Error on centre',.false.,dynamic_mem(ptr1),
-     :           dynamic_mem(ptr2),dynamic_mem(ptr3),dynamic_mem(ptr4),
-     :           ifsoft)
+
+          call diagnosis_plt(%VAL(CNF_PVAL(d_rptr)),
+     :                       %VAL(CNF_PVAL(d_vptr)),
+     :                       %VAL(CNF_PVAL(staptr)),
+     :                       (-get_parnum('Centre_1')),
+     :                       get_parnum('Height_1'),
+     :                       'Error on centre v. height',
+     :                       'Height','Error on centre',
+     :                       .false.,%VAL(CNF_PVAL(ptr1)),
+     :                       %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                       %VAL(CNF_PVAL(ptr4)),ifsoft)
+
+          call dsa_free_workspace(slot4,status)
+          call dsa_free_workspace(slot3,status)
+          call dsa_free_workspace(slot2,status)
           call dsa_free_workspace(slot,status)
 
 *   exit

@@ -40,10 +40,10 @@
       double precision w(lincnt)
       integer status
       character*30 chars
-      include 'DYNAMIC_MEMORY'
 
 * get space for a dummy array
       CALL PSX_CALLOC(lincnt, '_DOUBLE', dummy_array, status )
+
 * fill it with `waves'
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL COPD2D( LINCNT, waves, %VAL( CNF_PVAL( dummy_array ) ))

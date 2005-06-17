@@ -74,9 +74,6 @@
       logical par_quest
       integer pstat
       character*19 chars
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 
 * Store value of line_count on entry - for use in adding line to an
 * already existant list
@@ -89,10 +86,10 @@
 *
 * Find the lines
 *
-      call find_lines(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),
-     :         wavdim,%VAL( CNF_PVAL(d_tlptr) ),
-     :         %VAL( CNF_PVAL(d_trptr) ),
-     :         line_count,nyp,batch,xlabel,xunits,zunits,status)
+      call find_lines(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),
+     :                wavdim,%VAL(CNF_PVAL(d_tlptr)),
+     :                %VAL( CNF_PVAL(d_trptr)),line_count,nyp,
+     :                batch,xlabel,xunits,zunits,status)
 *
 * check for error
 *
@@ -104,8 +101,7 @@
 * pick line out of known line list
 *
 *        call linepick(dynamic_chars(idsptr:idsend),
-        call linepick(idstring,
-     :       %VAL( CNF_PVAL(d_wptr) ),noldlines,status)
+        call linepick(idstring,%VAL(CNF_PVAL(d_wptr)),noldlines,status)
 
       end if
       if ( line_count .lt. 1) then
@@ -114,10 +110,9 @@
 * Edit line list if required
 
       else if(par_quest('Edit line list?',.false.)) then
-        call edit_list(%VAL( CNF_PVAL(d_tlptr) ),
-     :                 %VAL( CNF_PVAL(d_trptr) ),
-     :         line_count,%VAL( CNF_PVAL(d_wptr) ),
+        call edit_list(%VAL(CNF_PVAL(d_tlptr)),%VAL(CNF_PVAL(d_trptr)),
+     :                 line_count,%VAL(CNF_PVAL(d_wptr)),
 *     :         dynamic_chars(idsptr:idsend))
-     :         idstring)
+     :                 idstring)
       end if
       end

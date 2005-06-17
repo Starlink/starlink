@@ -31,6 +31,7 @@
 *        Results cube
 *     STATUS = INTEGER (Given and returned)
 *        Error status, 0=okay
+*
 * Global variables:
 *     MXPARS,NYP,NXP,SPDIM2 = INTEGER (Given)
 *        Dimensions of results "cube"
@@ -70,9 +71,10 @@
 *   TNW 29/11/88 Changed to use getwork
 *   TNW 27/1/89 Look-up table removed
 *   Changes to allow variable base and weighting, TNW/CAVAD 21/12/90
-*   TNW Cambridge, 25/3/91 Check for new fits by checking for first xsect
-*                 equal to current xsect
-*    "      "     7/91 Changes for new results structure, it_plus1 removed
+*   TNW Cambridge, 25/3/91 Check for new fits by checking for first
+*                 xsect equal to current xsect
+*    "      "     7/91 Changes for new results structure, it_plus1 
+*                      removed
 *   ACD: 28/9/00 Remove character strings continued across continuation
 *     lines.
 *-
@@ -80,6 +82,7 @@
       implicit none
       include 'SAE_PAR'
       integer status
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'status_inc'
@@ -95,7 +98,6 @@
       integer xsect
       integer istarty
       integer iendy
-      include 'PRM_PAR'
       integer nnew,nfailed,ppos
       logical masked,fit
       real odensc,wratio
@@ -108,8 +110,7 @@
       character*57 chars
       logical dummy
       real aic
-      integer k1,gauss,rx2chn,gsptr,slot2
-      include 'DYNAMIC_MEMORY'
+      integer k1,gauss,rx2chn,gsptr,slot2,slot3
 
       nnew = 0
       nfailed = 0
@@ -126,9 +127,9 @@
 
 *       Get pixel limits of line
 
-          start = rx2chn(dynamic_mem(d_xptr),wavdim,left(line))
-          ltram  = rx2chn(dynamic_mem(d_xptr),wavdim,right(line))-
-     :           start + 1
+          start = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,left(line))
+          ltram  = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,right(line))-
+     :             start + 1
           wratio = wavelength(line)/wavelength(tline)
           do xsect=1,spdim1
 
@@ -153,7 +154,7 @@
               masked = .false.
 
               call check_masking(line,istarty,iendy,1,1,masked,
-     :                  %VAL( CNF_PVAL(d_mptr) ))
+     :                           %VAL(CNF_PVAL(d_mptr)))
 
 * if not masked out check to see if possible to make an improvement
 * on the existing fit
@@ -163,11 +164,11 @@
 
               fit = .false.
               call check_statii(line,fit,d1,control,istarty,iendy,1,1,
-     :                  %VAL( CNF_PVAL(staptr) ))
+     :                          %VAL(CNF_PVAL(staptr)))
 
               if(fit.and.(.not.masked)) then
                 call getres(results,tline,xsect,1,fit_parms,deccntr,
-     :                  odensc,%VAL( CNF_PVAL(staptr) ),fstatus)
+     :                      odensc,%VAL(CNF_PVAL(staptr)),fstatus)
 
 *           If fit not ok to use, getres will have set ftype to 0
 
@@ -188,8 +189,8 @@
                   call chr_putc('Cross-section',chars,len1)
                   call encode_range(' ','s',istarty,iendy,chars,len1)
                   call par_wruser(chars(:len1),pstat)
-                  call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1
-     :                   ,istarty,iendy,dynamic_mem(d_vsptr))
+                  call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                            istarty,iendy,%VAL(CNF_PVAL(d_vsptr)))
 
 *        Correct parameters to this line, rather than one at a
 *        different wavelength (so radial velocities the same).
@@ -219,15 +220,16 @@
 *           same time (if weighted fits used).
 
                   if(deccntr(FIT_WEIGH).eq.1) then
-                    call getwork(wavdim+4*deccntr(FIT_NCMP),'float',
-     :                        ersptr,slot2,status)
+                    call dsa_get_work_array(4*deccntr(FIT_NCMP),'float',
+     :                                      gsptr,slot2,status)
+                    call dsa_get_work_array(wavdim,'float',ersptr,slot3,
+     :                                      status)
                     if(status.ne.SAI__OK) return
-                    gsptr = ersptr + wavdim*val__nbr
-                    call cop_2_1d_err(dynamic_mem(errptr),istarty,iendy
-     :                  ,1,1,dynamic_mem(ersptr))
+                    call cop_2_1d_err(%VAL(CNF_PVAL(errptr)),istarty,
+     :                                iendy,1,1,%VAL(CNF_PVAL(ersptr)))
                   else
-                    call getwork(4*deccntr(FIT_NCMP),'float',gsptr,slot2
-     :                        ,status)
+                    call dsa_get_work_array(4*deccntr(FIT_NCMP),'float',
+     :                                      gsptr,slot2,status)
                     if(status.ne.SAI__OK) return
                   end if
 
@@ -235,18 +237,24 @@
 
                   deccntr(FIT_GUES) = deccntr(FIT_GUES) + 90
 
-                  call fit_line(deccntr,dynamic_mem(d_xptr),
-     :                 dynamic_mem(d_vsptr),start,ltram,line,nwindow,
-     :                 istarty,1,odensc,dynamic_mem(ersptr),fit_parms,
-     :                 fit_error,dummy,aic,status)
+                  call fit_line(deccntr,%VAL(CNF_PVAL(d_xptr)),
+     :                          %VAL(CNF_PVAL(d_vsptr)),start,ltram,
+     :                          line,nwindow,istarty,1,odensc,
+     :                          %VAL(CNF_PVAL(ersptr)),fit_parms,
+     :                          fit_error,dummy,aic,status)
 
                   call opt_release(status)
+                  if(deccntr(FIT_WEIGH).eq.1) 
+     :              call dsa_free_workspace(slot3,status)
                   call dsa_free_workspace(slot2,status)
+
                   nnew=nnew+1
                   call store_results(fit_parms,fit_error,nnew,nfailed,
-     :                line,istarty,iendy,deccntr,odensc,results,resvar,
-     :                %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ),
-     :                1,1,VAL__BADR)
+     :                               line,istarty,iendy,deccntr,odensc,
+     :                               results,resvar,
+     :                               %VAL(CNF_PVAL(staptr)),
+     :                               %VAL(CNF_PVAL(d_mptr)),1,1,
+     :                               VAL__BADR)
 
 *           fit present and ok
 
@@ -281,5 +289,5 @@
 * Update itteration
 
       iteration = iteration + 1
-      call updtmsk(%VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ))
+      call updtmsk(%VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_mptr)))
       end

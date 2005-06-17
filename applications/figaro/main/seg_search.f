@@ -44,28 +44,29 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer nyp
       integer in,line_count
       real x(in),y(in)
 
       real chan1(nyp),chan2(nyp)
       integer status
-      integer work,slot,smd
+      integer work,slot,smd,slot2
       include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
 * Get workspace:
 *   WORK   4000 (r)
 
-      call getwork(4000+in,'float',work,slot,status)
+      call dsa_get_work_array(4000,'float',work,slot,status)
+      call dsa_get_work_array(in,'float',work,slot2,status)
       if(status.ne.SAI__OK) return
-      smd = work + VAL__NBI * 4000
 *
 *  Search for lines.
 *
-      call search(x,y,in,line_count,chan1,chan2,nyp, dynamic_mem(work),
-     :     dynamic_mem(smd),status)
+      call search(x,y,in,line_count,chan1,chan2,nyp,
+     :            %VAL(CNF_PVAL(work)),%VAL(CNF_PVAL(smd)),status)
 
+      call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
 
       end

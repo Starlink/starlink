@@ -49,6 +49,7 @@
 *  Minor tidying, TNW/CAVAD 25/10/89
 *- -----------------------------------------------------------------
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       logical ifchan
       integer dim
       integer pstat
@@ -65,7 +66,6 @@
       integer i
       integer noldlines
       character*19 chars
-      include 'DYNAMIC_MEMORY'
 
 * Store value of line_count on entry - for use in adding line to an
 * already existant list
@@ -88,8 +88,9 @@
 *
 * Find the lines
 *
-      call find_lines(dynamic_mem(d_xptr),dynamic_mem(d_vsptr),dim,
-     :     left,right,line_count,nyp,batch,xlabel,xunits,yunits,status)
+      call find_lines(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),
+     :                dim,left,right,line_count,nyp,batch,xlabel,xunits,
+     :                yunits,status)
 *
 * check for error
 *

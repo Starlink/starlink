@@ -14,10 +14,11 @@
 *   Set fitting options.
 
 * Description:
-*   Change parameters to determine details of fitting. The user can select
-*   the vvarious fits type from menus. There is a main menu (on which are
-*   displayed the current settings), and additional menus called from this
-*   to handle specific area such as which optimisation routines to use.
+*   Change parameters to determine details of fitting. The user can
+*   select the various fits type from menus. There is a main menu (on
+*   which are displayed the current settings), and additional menus called from
+*   this to handle specific area such as which optimisation routines to
+*   use.
 
 * Arguments:
 *     REDRAW = LOGICAL (Given and returned)
@@ -54,8 +55,9 @@
 *        If error array present
 *     INHERIT = INTEGER (Given and returned)
 *        Where to inherit fits from (take guesses from previous fits)
+*
 *  Global variables:
-*     DEFAULT_MODEL(MAX_DECODE_CONTROL) = INTEGER ARRAY (Given and returned)
+*     DEFAULT_MODEL(MAX_DECODE_CONTROL) = INTEGER ARRAY (Given and Returned)
 *        Decoded control  (include file status_inc)
 
 * Authors:
@@ -64,10 +66,12 @@
 
 * History:
 *   TNW: current version 18-APR-1991
-*   TNW: Altered 17,18-SEP-1991 for new FIT_LINE and more easily followed code!
+*   TNW: Altered 17,18-SEP-1991 for new FIT_LINE and more easily
+*        followed code!
 *   TNW: October 1991 More options
 *   TNW: November 1991 More changes!
-*   TNW: 4-5th February 1992 set_fit and fits_menu combined into set_fit_menu.
+*   TNW: 4-5th February 1992 set_fit and fits_menu combined into
+*        set_fit_menu.
 *   TNW: 27-28th February 1992 Made into smaller menus
 *   TNW: 10th June 1992 Bug fixes, re output text
 *   TNW: 31st July 1992 Bug fixes, re absorption/emission
@@ -79,6 +83,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
       include 'fit_coding_inc'
       integer wavdim,tyaic,curmcmp,prvpos,mgauss,line_count,inherit
@@ -91,6 +96,7 @@
       integer NDICT
 * remove blank line
 *      parameter (NDICT = 22)
+
       parameter (NDICT = 19)
       integer nwelm,slot,ptr0
       integer kp1,MAX_KP1
@@ -148,7 +154,6 @@
       character*10 em_abs(0:1)
       integer ncmps(0:5)
 C      character*2 rout(3)
-      include 'DYNAMIC_MEMORY'
       integer menlen(NDICT)
       logical ifpcyg
 
@@ -484,9 +489,9 @@ C      data rout/'N1','N2','LM'/
 *       Get order for Chebyshev fitting
 
               nwelm = max_kp1*max_kp1 + wavdim*6 + max_kp1*3
-              call getwork(nwelm,'double',ptr0,slot,status)
+              call dsa_get_work_array(nwelm,'double',ptr0,slot,status)
               call cheby_base(max_kp1,coeffs,kp1,.true.,
-     :             dynamic_mem(ptr0),status)
+     :                        %VAL(CNF_PVAL(ptr0)),status)
               call dsa_free_workspace(slot,status)
               deccntr(BACK_ORDER) = kp1 - 1
               redraw = .true.

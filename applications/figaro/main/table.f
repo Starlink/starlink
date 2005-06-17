@@ -26,6 +26,7 @@
 *        If hex data
 *    STATUS = INTEGER (Given and returned)
 *        Error status
+*
 * Global variables:
 *    IDSPTR,IDSEND = INTEGER (Given)
 *        "Pointers" to names of lines (in arc_dims)
@@ -45,6 +46,7 @@
 *- ---------------------------------------------------------------------
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real results(mxpars,nyp,spdim1,spdim2)
@@ -61,11 +63,7 @@
       logical indic_fails,ok
       integer get_parnum,len1
       real value
-      include 'PRM_PAR'
       character*41 date,chars*80
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_chars,dynamic_mem)
 
 * Check if fits with NAG errors are to have their fit parameters output
 * (any fit attempted will have its fit_status decoded and the relevant
@@ -114,20 +112,20 @@
                   if(ok) then
                     midy = nint(value)
                     ok = iy.eq.midy
-                  endif
-                endif
-              endif
-            endif
+                  end if
+                end if
+              end if
+            end if
 
             if(ok) then
 
 *         Output fit results to file
 
-              call output_fit(%VAL( CNF_PVAL(staptr) ),results,
-     :             %VAL( CNF_PVAL(d_vptr) ),ix,iy,line,deccntr,lu,
-     :             nagerr,,indic_fails,idstring,
-*     :             ,indic_fails,dynamic_chars(idsptr:idsend),
-     :             %VAL( CNF_PVAL(d_wptr) ),hex)
+              call output_fit(%VAL(CNF_PVAL(staptr)),results,
+     :                        %VAL(CNF_PVAL(d_vptr)),ix,iy,line,deccntr,
+     :                        lu,nagerr,indic_fails,idstring,
+*     :             indic_fails,dynamic_chars(idsptr:idsend),
+     :                        %VAL(CNF_PVAL(d_wptr)),hex)
 
 *     new fit
 
