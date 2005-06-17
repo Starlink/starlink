@@ -37,6 +37,7 @@
 *        "Pointer" to main data array (include file arc_dims)
 *     D_MPTR = INTEGER (Given)
 *        "Pointer" to mask array (include file arc_dims)
+*
 * Note:
 *   The common block in opt_cmn is also used to pass arguments
 *   to routines called by this routine and opt_commands is also
@@ -44,16 +45,18 @@
 *
 * Author:
 *   T.N.Wilkins Manchester
+*
 * History:
 *   Changes to allow variable base and weighting, TNW/CAVAD 21/12/90
-*   TNW Cambridge, 25/3/91 Check for new fits by checking for first xsect
-*     equal to current xsect
+*   TNW Cambridge, 25/3/91 Check for new fits by checking for first
+*   xsect equal to current xsect
 *-
       implicit none
       include 'SAE_PAR'
-      integer status
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
+      integer status
       real results(mxpars,nyp,nxp,spdim2)
       real resvar(mxpars,nyp,nxp,spdim2)
       character*10 line_name(line_count)
@@ -79,8 +82,6 @@
       real aic
       character*52 chars
       include 'status_inc'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
       nnew=0
       nfailed=0
@@ -90,9 +91,9 @@
 
 *  Get pixel start and end of line
 
-        start = rx2chn(dynamic_mem(d_xptr),wavdim,left(line))
-        ltram  = rx2chn(dynamic_mem(d_xptr),wavdim,right(line))-
-     :           start + 1
+        start = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,left(line))
+        ltram  = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,right(line))-
+     :                 start + 1
         do xsect=1,spdim1
 
 *     Check if fit different from previous x-sect
@@ -115,7 +116,7 @@
 *        Get previous results
 
             call getres(results,line,xsect,1,fitpar,deccntr,odensc,
-     :                  %VAL( CNF_PVAL(staptr) ),status)
+     :                  %VAL(CNF_PVAL(staptr)),status)
 
 *        If fit not ok to use, getres will have set fit model to 0
 
@@ -129,8 +130,8 @@
               call chr_putc('Cross-section',chars,len1)
               call encode_range(' ','s',istarty,iendy,chars,len1)
               call par_wruser(chars(:len1),pstat)
-              call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,
-     :            istarty,iendy,dynamic_mem(d_vsptr))
+              call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
+     :                        istarty,iendy,%VAL(CNF_PVAL(d_vsptr)))
 
 *   Copy errors array into 1-d array for use with optimisation routines,
 *   assuming of course that the error array is present.
@@ -138,18 +139,17 @@
 *   time (if weighted fits used).
 
               if(deccntr(fit_weigh).gt.1) then
-                call getwork(wavdim+deccntr(fit_ncmp)*4,'float',
-     :                  ersptr,slot2,status)
+                call dsa_get_work_array(wavdim+deccntr(fit_ncmp)*4,
+     :                                  'float',ersptr,slot2,status)
                 if(status.ne.SAI__OK) return
                 gsptr = ersptr + wavdim*VAL__NBR
-                call cop_2_1d_err(dynamic_mem(errptr),istarty,iendy,1,
-     :                  1,dynamic_mem(ersptr))
+                call cop_2_1d_err(%VAL(CNF_PVAL(errptr)),istarty,iendy,
+     :                            1,1,%VAL(CNF_PVAL(ersptr)))
 
               else
 
-
-                call getwork(deccntr(fit_ncmp)*4,'float',gsptr,slot2,
-     :                  status)
+                call dsa_get_work_array(deccntr(fit_ncmp)*4,'float',
+     :                                  gsptr,slot2,status)
                 if(status.ne.SAI__OK) return
               end if
 
@@ -157,10 +157,11 @@
 
               deccntr(FIT_GUES) = deccntr(FIT_GUES) + 90
 
-              call fit_line(deccntr,dynamic_mem(d_xptr),
-     :                 dynamic_mem(d_vsptr),start,ltram,line,nwindow,
-     :                 istarty,1,odensc,dynamic_mem(ersptr),fitpar,
-     :                  fiterr,dummy,aic,status)
+              call fit_line(deccntr,%VAL(CNF_PVAL(d_xptr)),
+     :                      %VAL(CNF_PVAL(d_vsptr)),start,ltram,line,
+     :                      nwindow,istarty,1,odensc,
+     :                      %VAL(CNF_PVAL(ersptr)),fitpar,
+     :                      fiterr,dummy,aic,status)
 
               call opt_release(status)
               call dsa_free_workspace(slot2,status)
@@ -169,9 +170,9 @@
 *          Store results
 
               call store_results(fitpar,fiterr,nnew,nfailed,line,
-     :            istarty,iendy,deccntr,odensc,results,resvar,
-     :            %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_mptr) ),
-     :            1,1,-1.0e38)
+     :                           istarty,iendy,deccntr,odensc,results,
+     :                           resvar,%VAL(CNF_PVAL(staptr)),
+     :                           %VAL(CNF_PVAL(d_mptr)),1,1,-1.0e38)
 
 *       fit present and ok
 

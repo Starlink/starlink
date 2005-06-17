@@ -63,7 +63,6 @@
 *      DELETE_FIT         : Delete fit
 *      DJA_SEE            : Look at part of window
 *      ENCODE_CONTRL      : Encode fit type etc.
-*      GETWORK            : Get work array
 *      GR_SPEN            : Select graphics pen
 *      HARDCOPY_PLOT      : Produce hardcopy fit of profile+fit
 *      MANUAL_MENU        : Get option from user
@@ -79,15 +78,15 @@
 *      WINDOW_WIDTH       : Get width of window from user
 *
 *      DSA_FREE_WORKSPACE : Free workspace
+*      DSA_GET_WORK_ARRAY : Get work array
 *      FIG_XVALUE         : Convert real number of pixel into real value
-* of
-*                           array element
+*                           of array element
 *      PAR_QNUM           : Obtain number from user
 *      PAR_QUEST          : Obtain yes/no response from user
 *      PAR_WRUSER         : Write character string to user
 *      CHR_FILL           : Fill character string with given character
 *      CHR_PUTC           : Insert character string into character
-* string
+*                           string
 *      CHR_PUTI           : Insert integer into character string
 *
 * Authors:
@@ -106,6 +105,7 @@
 *  TNW: 14-MAR-1994, return values from WIDTH option of menu to here
 *-
       implicit none
+      include 'SAE_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       character*10 line_name(line_count)
@@ -113,7 +113,6 @@
       real right(line_count)
       integer status
       real sdata(wavdim)
-      include 'SAE_PAR'
 *
 * local
       integer nfit
@@ -202,8 +201,6 @@
      :     OPT_SEE = 8, OPT_CHANGE = 9, OPT_SCAN = 10, OPT_OLD = 11,
      :     OPT_DEL = 12, OPT_HARD = 13, OPT_EXIT = 14,
      :     OPT_UP = 15, OPT_DOWN = 16)
-
-      include 'DYNAMIC_MEMORY'
 
 * if fits to be performed instantly
 
@@ -475,12 +472,13 @@
             if(bimtst) then
                chanl = rx2chn(sdata,wavdim,left(line))
                chanr = rx2chn(sdata,wavdim,right(line))
-               call getwork(3*(chanr-chanl+1),'float',ldptr,slot,status)
+               call dsa_get_work_array(3*(chanr-chanl+1),'float',ldptr,
+     :                                 slot,status)
                if(status.eq.SAI__OK) then
  1                continue
-                  bm = bimodf(chanl,chanr,dynamic_mem(ldptr),xbar,xbarl,
-     :                 xbarr,v1,v2,imin,dynamic_mem(d_vsptr),.true.,1.0,
-     :                 -1.0)
+                  bm = bimodf(chanl,chanr,%VAL(CNF_PVAL(ldptr)),xbar,
+     :                        xbarl,xbarr,v1,v2,imin,
+     :                        %VAL(CNF_PVAL(d_vsptr)),.true.,1.0,-1.0)
                   if(imin.lt.0) then
                      write(chars,'(''Error in BIMODF, number = '',i3)'
      :                    )imin
@@ -537,7 +535,7 @@
             call encode_contrl(deccntr,ncntrl,fit_status)
             do j = istarty,iendy
                do i = istartx,iendx
-                  call set_control(%VAL( CNF_PVAL(d_cptr) ),line,i,j,
+                  call set_control(%VAL(CNF_PVAL(d_cptr)),line,i,j,
      :                 fit_status)
                end do
             end do
@@ -550,7 +548,7 @@
 *       Proceede with model fit
 
                call one_line(nwindx,left,right,istartx,iendx,nfit,
-     :              line_name,%VAL( CNF_PVAL(d_cptr) ),line,nnew,nold,
+     :              line_name,%VAL(CNF_PVAL(d_cptr)),line,nnew,nold,
      :              nfailed,maskedout,.false.,.true.,redraw,istarty,
      :              iendy,status)
             else
@@ -619,8 +617,8 @@
             iteration = iteration + 1
             write (chars,'(''Iteration now'',i3)') iteration
             call par_wruser(chars,pstat)
-            call updtmsk(%VAL( CNF_PVAL(staptr) ),
-     :                   %VAL( CNF_PVAL(d_mptr) ))
+            call updtmsk(%VAL(CNF_PVAL(staptr)),
+     :                   %VAL(CNF_PVAL(d_mptr)))
          end if
       end if
       end

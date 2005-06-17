@@ -85,10 +85,11 @@
 *-
       implicit none
       include 'SAE_PAR'
-      integer status
+      include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'opt_cmn'
+      integer status
       real results(mxpars,nyp,spdim1,spdim2)
       real resvar(mxpars,nyp,spdim1,spdim2)
       integer fitsta(ncntrl,nyp,spdim1,spdim2)
@@ -116,8 +117,6 @@
       real xinc,yinc
       real rhnwin,rcen
       integer i1,j1,chr_len,end_line,start_line
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
 
       qplt = batch
 
@@ -216,15 +215,15 @@
 
 *          Extract data
 
-                call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,
-     :               first_ix,last_ix,first_iy,last_iy,
-     :               dynamic_mem(d_vsptr))
+                call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,
+     :                     first_ix,last_ix,first_iy,last_iy,
+     :                     %VAL(CNF_PVAL(d_vsptr)))
 
 *          Find out number of components and put results into fit_parms
 
                 pstat=0
                 call getres(results,line,ix,iy,fit_parms,deccntr,
-     :               odensc,fitsta,pstat)
+     :                      odensc,fitsta,pstat)
                 densc = dble(odensc)
 
 *           Set character height to 0.7 default (cannot be done at start
@@ -238,9 +237,9 @@
 *            Plot profile with fit. first_ix and nwindx passed for
 *            use with fitcont fits only.
 
-                call line_plot_sub(fit_parms,dynamic_mem(d_xptr),
-     :               dynamic_mem(d_vsptr),%VAL( CNF_PVAL(d_tlptr) ),
-     :               %VAL( CNF_PVAL(d_trptr) ),line,wavdim,deccntr,
+                call line_plot_sub(fit_parms,%VAL(CNF_PVAL(d_xptr)),
+     :               %VAL(CNF_PVAL(d_vsptr)),%VAL( CNF_PVAL(d_tlptr)),
+     :               %VAL(CNF_PVAL(d_trptr)),line,wavdim,deccntr,
      :               .true.,first_ix,nwindx,max_parms,status)
 
                 if(status.ne.SAI__OK) goto 500

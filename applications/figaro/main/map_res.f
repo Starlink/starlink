@@ -27,7 +27,8 @@
 *
 * History:
 *  Altered to set descriptor, TNW 23/8/88
-*  Altered to use MAPCHR, TNW 11/10/88, also use of dta_tyvar eliminated.
+*  Altered to use MAPCHR, TNW 11/10/88, also use of dta_tyvar 
+*  eliminated.
 *  Altered to use ACCRES TNW 18/10/88
 *  Spurious call to fig_dtaerr removed, TNW 27/1/89
 *  STATUS added to argument list TNW/CAVAD 25/9/89
@@ -66,10 +67,7 @@ C      character*(DAT__SZLOC) nloc
       integer dumi
       real dumr
       character dumc
-      character dynamic_chars
 C      character*70 dtanam
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data dict/'NEW : New mode','CLONE : Clone mode'/
 
       if(status.ne.SAI__OK) return
@@ -133,7 +131,7 @@ C1001 format(3x, 'mxpars, nxp, nyp, spdim2, d_rptr: ',
 C    :  i4, i4, i4, i4, i20)
 C     print1002
 C1002 format(3x, 'Dump of data array:-')
-C     call arrdump (mxpars, nyp, nxp, 1, %val( CNF_PVAL(d_rptr) ))
+C     call arrdump (mxpars, nyp, nxp, 1, %val(CNF_PVAL(d_rptr)))
 
 
 * Work out maximum number of fit parameters and components
@@ -250,12 +248,12 @@ C     print *,'map_str'
 
         call map_data(ifcomb,'READ',status)
         if(status.ne.SAI__OK) return
-        call copy_res(onpars,dynamic_mem(rptr),dynamic_mem(cptr),
-*     :       dynamic_chars(pptr:pptrend),%VAL( CNF_PVAL(d_rptr) ),
-     :       oldparstr,%VAL( CNF_PVAL(d_rptr) ),
-     :       %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(d_cptr) ),
-     :       %VAL( CNF_PVAL(staptr) ),dynamic_mem(aptr),
-     :       %VAL( CNF_PVAL(d_aptr) ),resnam,ifarc)
+        call copy_res(onpars,%VAL(CNF_PVAL(rptr)),%VAL(CNF_PVAL(cptr)),
+*     :       dynamic_chars(pptr:pptrend),%VAL(CNF_PVAL(d_rptr)),
+     :                oldparstr,%VAL(CNF_PVAL(d_rptr)),
+     :                %VAL(CNF_PVAL(d_vptr)),%VAL( CNF_PVAL(d_cptr)),
+     :                %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(aptr)),
+     :                %VAL(CNF_PVAL(d_aptr)),resnam,ifarc)
 
 *  Unmap old structures
 

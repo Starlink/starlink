@@ -67,6 +67,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       include 'arc_dims'
       real vcorr
@@ -84,13 +85,11 @@
       real dumr
       character dumc
       character*23 dict(3)
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data dict/
      :     'HARD : Plot in hardcopy',
      :     'SOFT : Plot in softcopy',
      :     'DON''T : Don''t plot'/
+
       loop=.true.
       line=1
       ix = 1
@@ -112,11 +111,10 @@
 
 * Output fit results
 
-        call output_fit(%VAL(staptr),%VAL(d_rptr),
-     :       %VAL(d_vptr),ix,iy,line,deccntr,-1,.true.,
+        call output_fit(%VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_rptr)),
+     :                  %VAL(CNF_PVAL(d_vptr)),ix,iy,line,deccntr,-1,
 *     :       .true.,dynamic_chars(idsptr:idsend),
-     :       .true.,idstring,
-     :       %VAL(d_wptr),.false.)
+     :                  .true.,idstring,%VAL(CNF_PVAL(d_wptr)),.false.)
         if((deccntr(FIT_STAT).eq.1).or.(deccntr(FIT_STAT).eq.2)) then
           iplt = 3
           if(deccntr(FIT_NCMP).ge.0) then
@@ -127,8 +125,9 @@
           if(iplt.ne.3) then
             call plot_line(line,(iplt.eq.2),vcorr,%VAL(d_wptr),
 *     :           ix,iy,velplt,vtype,dynamic_chars(idsptr:idsend),
-     :           ix,iy,velplt,vtype,idstring,
-     :           %VAL(d_rptr),%VAL(d_vptr),status)
+     :                     ix,iy,velplt,vtype,idstring,
+     :                     %VAL(CNF_PVAL(d_rptr)),
+     :                     %VAL(CNF_PVAL(d_vptr)),status)
 
 *       plot fit
 

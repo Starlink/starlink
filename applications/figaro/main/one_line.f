@@ -12,7 +12,8 @@
 
 *
 * Purpose:
-*   To control the fitting and storing of results in the program LONGSLIT.
+*   To control the fitting and storing of results in the program
+*   LONGSLIT.
 
 * Description:
 *   The masking and fit status are checked, and then if we are still to
@@ -85,7 +86,8 @@
 *     D_XPTR = INTEGER (Given and returned)
 *        "Pointer" to wavelength array (include file arc_dims)
 *     NCNTRL = INTEGER (Given and returned)
-*        Number of elements in control per position (include file arc_dims)
+*        Number of elements in control per position (include file
+*        arc_dims)
 *     NYP = INTEGER (Given and returned)
 *        Number of line slots (include file arc_dims)
 *     NXP = INTEGER (Given and returned)
@@ -113,7 +115,8 @@
 *      PAR_WRUSER        : Write character string to user
 
 * Author:
-*   T.N.Wilkins Manchester until 1/89, then Cambridge until 9/92, then Durham
+*   T.N.Wilkins Manchester until 1/89, then Cambridge until 9/92, then
+*   Durham
 
 * History:
 *   Original version, TNW
@@ -217,10 +220,6 @@
       logical par_quest
       integer rx2chn
 
-* Trick to pass address to subroutines
-
-      include 'DYNAMIC_MEMORY'
-
 * If status non-zero then something is wrong, so we don't want to
 * continue
 
@@ -233,8 +232,8 @@
       kcrash = line
       nfit   = nfit+1
       legend(2) = line_name(line)
-      start  = rx2chn(dynamic_mem(d_xptr),wavdim,left(line))
-      m  = rx2chn(dynamic_mem(d_xptr),wavdim,right(line)) - start + 1
+      start  = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,left(line))
+      m  = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,right(line)) - start + 1
 *
 *   set title
 *
@@ -255,7 +254,7 @@
       masked = .false.
 
       call check_masking(line,istartx,iendx,istarty,iendy,masked,
-     :       %VAL( CNF_PVAL(d_mptr) ))
+     :                   %VAL(CNF_PVAL(d_mptr)))
 
 * if not masked out check to see if possible to make an improvement
 * on the existing fit
@@ -265,7 +264,7 @@
       if ((.not.masked).or.manual) then
 
         call check_statii(line,fit,nold,control,istartx,iendx,istarty,
-     :            iendy,%VAL( CNF_PVAL(staptr) ))
+     :                    iendy,%VAL(CNF_PVAL(staptr)))
 
 *.............  Fit the line.................
 
@@ -275,8 +274,8 @@
 *      display window
 *
           if ((terminal).and.plotwind) then
-            call disp_window(left,right,line,dynamic_mem(d_xptr),
-     :           dynamic_mem(d_vsptr),wavdim)
+            call disp_window(left,right,line,%VAL(CNF_PVAL(d_xptr)),
+     :                       %VAL(CNF_PVAL(d_vsptr)),wavdim)
           end if
           nnew  = nnew + 1
           crash = .false.
@@ -294,10 +293,10 @@
 *   assuming of course that the error array is present.
 
           if(deccntr(FIT_WEIGH).eq.VARIANCE) then
-            call getwork(wavdim,'float',ersptr,eslot,status)
+            call dsa_get_work_array(wavdim,'float',ersptr,eslot,status)
             if(status.ne.SAI__OK) return
-            call cop_2_1d_err(dynamic_mem(errptr),istartx,iendx,
-     :                  istarty,iendy,dynamic_mem(ersptr))
+            call cop_2_1d_err(%VAL(CNF_PVAL(errptr)),istartx,iendx,
+     :                        istarty,iendy,%VAL(CNF_PVAL(ersptr)))
           else
 
 *        Although not used, this plays safe for systems which don't like
@@ -315,10 +314,10 @@
 
 *     At last the actual fit
 
-          call fit_line(deccntr,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),start,m,line,nwindow,istartx,
-     :         istarty,odensc,dynamic_mem(ersptr),fitpar,fiterr,mstore,
-     :         aic,status)
+          call fit_line(deccntr,%VAL(CNF_PVAL(d_xptr)),
+     :                  %VAL(CNF_PVAL(d_vsptr)),start,m,line,nwindow,
+     :                  istartx,istarty,odensc,%VAL(CNF_PVAL(ersptr)),
+     :                  fitpar,fiterr,mstore,aic,status)
           ok = .true.
           call opt_release(status)
 
@@ -343,9 +342,9 @@
 
           if(stores) then
             call store_results(fitpar,fiterr,nnew,nfailed,line,
-     :           istartx,iendx,deccntr,odensc,%VAL( CNF_PVAL(d_rptr) ),
-     :           %VAL( CNF_PVAL(d_vptr) ),%VAL( CNF_PVAL(staptr) ),
-     :           %VAL( CNF_PVAL(d_mptr) ),istarty,iendy,aic)
+     :           istartx,iendx,deccntr,odensc,%VAL(CNF_PVAL(d_rptr)),
+     :           %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(staptr)),
+     :           %VAL(CNF_PVAL(d_mptr)),istarty,iendy,aic)
           end if
 
           if (manual) then

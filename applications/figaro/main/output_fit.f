@@ -42,6 +42,7 @@
 *        If hex data
 *      DECCNTR(*) = INTEGER ARRAY (Returned)
 *        Profile model of fit
+*
 * Global variables:
 *      MXPARS = INTEGER (Given)
 *        1st dimension of results
@@ -65,11 +66,13 @@
 * Author:
 *   T.N.Wilkins, Cambridge, 19-JUL-1989
 *   A.C. Davenhall, Edinburgh, Starlink
+*
 * History:
 *   T.N.Wilkins, Cambridge, 28-JUL-1989 More lines moved to here.
 *   T.N.Wilkins, Cambridge, 1-AUG-1989 Use of WFT
-*   T.N.Wilkins, Cambridge, 14-DEC-1989 Divided into output_fit and outsub
-*       "            "       JUL-1991 Altered for new results structure
+*   T.N.Wilkins, Cambridge, 14-DEC-1989 Divided into output_fit and
+*                           outsub
+*       "            "      JUL-1991 Altered for new results structure
 *       "            "      3-MAR-1992 Don't show deleted fits.
 *   A.C. Davenhall, 06-SEP-00: Regularised the use of pointer d_vptr
 *         to the Starlink style.
@@ -96,7 +99,6 @@
       integer chr_len
       include 'status_inc'
       real value,value2,px,py,gen_elemf
-      include 'DYNAMIC_MEMORY'
 
 * Get and decode fitsta, with meaningful output
 
@@ -124,17 +126,16 @@
           if(lu.ge.0) write(lu,'(/)')
           call wft(chars,lu,status)
         else
-          px = gen_elemf(dynamic_mem(xptr),ix)
-          if(hex) px = px + gen_elemf(dynamic_mem(xdptr),iy)
-          py = gen_elemf(dynamic_mem(yptr),iy)
-          call morepts(results,%VAL( CNF_PVAL(d_vptr) ),ix,iy,line,lu)
+          px = gen_elemf(%VAL(CNF_PVAL(xptr)),ix)
+          if(hex) px = px + gen_elemf(%VAL(CNF_PVAL(xdptr)),iy)
+          py = gen_elemf(%VAL(CNF_PVAL(yptr)),iy)
+          call morepts(results,%VAL(CNF_PVAL(d_vptr)),ix,iy,line,lu)
           write(chars,'(''Spatial position : '',f8.3,'','',f8.3)')px,py
           call wft(chars,lu,status)
         endif
 
 * Output fit results
 
-        call outsub(fitsta,results,resvar,iy,ix,line,deccntr,lu,
-     :                  nagerr)
+        call outsub(fitsta,results,resvar,iy,ix,line,deccntr,lu,nagerr)
       end if
       end

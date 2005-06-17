@@ -28,6 +28,7 @@
 *        If to use velocity scale for X axis
 *   FITSTA(NCNTRL,NYP,SPDIM1,SPDIM2) = INTEGER ARRAY (Given)
 *        Fit status
+*
 * Global variables:
 *      IDSPTR, IDSEND = INTEGER (Given)
 *        "Pointers" to line names
@@ -86,9 +87,6 @@
       real value
       logical ok
       include 'status_inc'
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_chars,dynamic_mem)
 
 
       status = SAI__OK
@@ -137,10 +135,10 @@
                 title='File '//datafile(:chr_len(datafile))
 
                 call plot_line(line,.false.,vcorr,
-     :               %VAL( CNF_PVAL(d_wptr) ),
+     :               %VAL(CNF_PVAL(d_wptr)),
 *     :               ix,iy,velplt,vtype,dynamic_chars(idsptr:idsend),
      :               ix,iy,velplt,vtype,idstring,
-     :               results,%VAL(d_vptr),status)
+     :               results,%VAL(CNF_PVAL(d_vptr)),status)
 
 *         fit a success or nag error
 

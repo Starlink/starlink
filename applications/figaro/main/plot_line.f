@@ -39,6 +39,7 @@
 *        Results array
 *      RESVAR(MXPARS,NYP,SPDIM1,SPDIM2) = REAL ARRAY (Given)
 *        Results array variance
+*
 * Global variables:
 *      D_SPTR = INTEGER (Given)
 *        Pointer to main file data array
@@ -61,8 +62,10 @@
 *      STATUS = INTEGER (Given and returned)
 *        Error status, 0=ok
 *    Subroutines/functions referenced:
+*
 * Author:
 *   T.N.Wilkins, Cambridge, 17-20-NOV-1989
+*
 * History:
 *   T.N.Wilkins, Cambridge, 24,28-MAY-1991, new fit model arrays
 *       "           "       3-SEP-1991 Changes to workspace handling
@@ -71,6 +74,8 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+      include 'PRM_PAR'
 
 * Common
 
@@ -104,8 +109,6 @@
       character*3 vctype(2)
       character bss*2,bs*1
       include 'status_inc'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
       data vctype/'HEL','LSR'/
       data bss/'\\'/
       bs = bss(1:1)
@@ -118,7 +121,7 @@
       xend = 1
 
       call getres(results,line,ix,iy,fitpars,deccntr,rdensc,
-     :            %VAL(staptr),status)
+     :            %VAL(CNF_PVAL(staptr)),status)
       densc = dble(rdensc)
       call chr_fill(' ',legend(1))
       len1 = 0
@@ -134,7 +137,7 @@
       else
         nwork = wavdim
       end if
-      call getwork(nwork,'float',work1,slot,status)
+      call dsa_get_work_array(nwork,'float',work1,slot,status)
       if(status.ne.SAI__OK) return
 
       call chr_fill(' ',legend(2))
@@ -151,8 +154,8 @@
           ifblocked = value.ne.VAL__BADR
         else
           ifblocked = .false.
-        endif
-      endif
+        end if
+      end if
       if(spdim2.gt.1) then
         ppos2 = get_parnum('Space2_pos')
         if(ppos2.gt.0) then
@@ -160,34 +163,34 @@
           ifblocked = (value.ne.VAL__BADR).and.ifblocked
         else
           ifblocked = .false.
-        endif
-      endif
+        end if
+      end if
 
       if(ifblocked) then
         if(spdim1.gt.1) then
           xwidth = nint(sqrt(resvar(ppos1,line,ix,iy))*2.0)
           xstart = nint(results(ppos1,line,ix,iy)-real(xwidth)*0.5)
           xend = xwidth + xstart - 1
-        endif
+        end if
         if(spdim2.gt.1) then
           ywidth = nint(sqrt(resvar(ppos2,line,ix,iy))*2.0)
           ystart = nint(results(ppos2,line,ix,iy)-real(ywidth)*0.5)
           yend = ywidth + ystart - 1
-        endif
+        end if
 
         if(spdim1.gt.1) then
           call chr_putc('X ',legend(2),len1)
           call encode_range(' ',' ',xstart,xend,legend(2),len1)
-        endif
+        end if
         if(spdim2.gt.1) then
           call chr_putc(',Y ',legend(2),len1)
           call encode_range(' ',' ',ystart,yend,legend(2),len1)
-        endif
+        end if
 
 * Extract data
 
-        call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,xstart,
-     :       xend,ystart,yend,dynamic_mem(work1))
+        call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,xstart,
+     :             xend,ystart,yend,%VAL(CNF_PVAL(work1)))
       else
 
 * If data isn't blocked we will have to check all locations until we've
@@ -205,13 +208,13 @@
           if(ok) then
             px = nint(value)
             ok = px.eq.ix
-          endif
+          end if
           value = results(ppos2,line,jx,jy)
           ok = ok.and.(value.ne.VAL__BADR)
           if(ok) then
             py = nint(value)
             ok = py.eq.iy
-          endif
+          end if
           if(ok) then
             call chr_putc('(',legend(1),len1)
             call chr_puti(jx,legend(1),len1)
@@ -223,19 +226,19 @@
 
             tmpptr = d_sptr
      :           + ((jx - 1) + (jy - 1) * spdim1) * VAL__NBR * wavdim
-            call copy2work(dynamic_mem(work1),wavdim,
-     :           dynamic_mem(tmpptr),add)
+            call copy2work(%VAL(CNF_PVAL(work1)),wavdim,
+     :                     %VAL(CNF_PVAL(tmpptr)),add)
             add = .true.
             npts = npts + 1
-          endif
+          end if
           jx = jx + 1
           if(jx.gt.spdim1) then
             jx = 1
             jy = jy + 1
             if(jy.gt.spdim2) ptsinfit = 0
-          endif
-        enddo
-      endif
+          end if
+        end do
+      end if
 
 * Are we to plot using file axis units for X axis of plot, or velocity?
 
@@ -248,14 +251,17 @@
         else
           xunits = 'km s'//bs//'u-1'//bs//'d'
         end if
-        call line_vplot(fitpars,dynamic_mem(work1),%VAL(d_tlptr)
-     :         ,%VAL(d_trptr),line,ifsoft,vcorr,wavlen,
-     :         dynamic_mem(work2),xstart,xwidth,deccntr,status)
+        call line_vplot(fitpars,%VAL(CNF_PVAL(work1)),
+     :                  %VAL(CNF_PVAL(d_tlptr)),
+     :                  %VAL(CNF_PVAL(d_trptr)),line,ifsoft,vcorr,
+     :                  wavlen,%VAL(CNF_PVAL(work2)),xstart,xwidth,
+     :                  deccntr,status)
         xunits = dxunit
       else
-        call line_plot(fitpars,dynamic_mem(d_xptr),dynamic_mem(work1),
-     :           %VAL(d_tlptr),%VAL(d_trptr),line,
-     :           deccntr,.true.,ifsoft,xstart,xwidth,status)
+        call line_plot(fitpars,%VAL(CNF_PVAL(d_xptr)),
+     :                 %VAL(CNF_PVAL(work1)),%VAL(CNF_PVAL(d_tlptr)),
+     :                 %VAL(CNF_PVAL(d_trptr)),line,deccntr,.true.,
+     :                 ifsoft,xstart,xwidth,status)
       end if
       call dsa_free_workspace(slot,status)
       end

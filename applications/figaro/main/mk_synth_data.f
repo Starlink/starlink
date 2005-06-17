@@ -40,10 +40,9 @@
 
       logical par_qnum,qstat
       real value
-      integer ndim,dims(3),m,rx2chn,start,outptr,slot,dyn_element,line
+      integer ndim,dims(3),m,rx2chn,start,outptr,slot,line
       integer outxptr,slotx,len1
       character*120 string
-      include 'DYNAMIC_MEMORY'
 
 * Which line shall we use?
 
@@ -57,8 +56,8 @@
 
 * Work out dimensions
 
-      start = rx2chn(dynamic_mem(d_xptr),wavdim,left(line))
-      m = rx2chn(dynamic_mem(d_xptr),wavdim,right(line)) - start + 1
+      start = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,left(line))
+      m = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,right(line)) - start + 1
       dims(1) = m
       dims(2) = spdim1
       dims(3) = spdim2
@@ -85,21 +84,19 @@
 
       call dsa_map_data('output','WRITE','float',outptr,slot,status)
       call dsa_map_axis_data('output',1,'WRITE','float',outxptr,slotx,
-     :        status)
+     :                       status)
       if(status.ne.SAI__OK) return
-      outptr = dyn_element(outptr)
-      outxptr = dyn_element(outxptr)
 
 * Zero output data array
 
-      call zero_real(dynamic_mem(outptr),dims(1)*dims(2)*dims(3))
+      call zero_real(%VAL(CNF_PVAL(outptr)),dims(1)*dims(2)*dims(3))
 
 * Fill output file
 
-      call fill_out(dynamic_mem(outptr),dims(1),line,
-     :            %VAL( CNF_PVAL(staptr) ),%VAL( CNF_PVAL(d_rptr) ),
-     :            %VAL( CNF_PVAL(d_vptr) ),dynamic_mem(outxptr),
-     :            left(line),right(line))
+      call fill_out(%VAL(CNF_PVAL(outptr)),dims(1),line,
+     :              %VAL(CNF_PVAL(staptr)),%VAL(CNF_PVAL(d_rptr)),
+     :              %VAL(CNF_PVAL(d_vptr)),%VAL(CNF_PVAL(outxptr)),
+     :              left(line),right(line))
 
 * Unmap arrays and close file
 

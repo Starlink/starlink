@@ -48,6 +48,7 @@
 *   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92 then
 *           Durham
 *   ACD: A C Davenhall Edinburgh
+*
 * History:
 *   TNW: 3-SEP-1991 Use common as much as possible
 *   TNW: 2-AUG-1993 Use rx2chn so works with x axis not 1,2,3,...
@@ -58,6 +59,7 @@
       implicit none
       include 'SAE_PAR'
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer status
       real results(mxpars,nyp,nxp)
       integer*2 arc(nslct,line_count)
@@ -77,13 +79,12 @@
       character*15 chars
       character key,chr_upper,lkey
       logical iloop,loop,edit
-      include 'DYNAMIC_MEMORY'
 
       midpos=max((spdim1/2),1)
       ixstart=max((midpos-5),1)
       ixend=min((midpos+5),spdim1)
-      call fig_xtract(dynamic_mem(d_sptr),wavdim,spdim1,ixstart
-     :     ,ixend,sdens)
+      call fig_xtract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,ixstart,
+     :                ixend,sdens)
 
 * Initialise title to name of data file
 
@@ -94,7 +95,7 @@
       do while(loop)
          do j = 1, nplot
             if(j.eq.2) call gr_soft(status)
-            call plot_spect(wavdim,dynamic_mem(d_xptr),sdens,
+            call plot_spect(wavdim,%VAL(CNF_PVAL(d_xptr)),sdens,
      :           label(:chr_len(label)),xlabel(:chr_len(xlabel)),' ')
 
 * Put wavelengths by lines
@@ -103,7 +104,7 @@
                if(arc(1,i).eq.0) then
                   chan = results(get_parnum('Centre_1'),i,midpos)
                   x1 = chan
-                  ichan = rx2chn(dynamic_mem(d_xptr),wavdim,chan)
+                  ichan = rx2chn(%VAL(CNF_PVAL(d_xptr)),wavdim,chan)
 
 * Check that value of sdens is not higher to one side of fitted peak
 

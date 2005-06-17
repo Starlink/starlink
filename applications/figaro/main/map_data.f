@@ -26,8 +26,7 @@
 * Subroutines/functions referenced:
 *     DSA_MAP_AXIS_DATA  : Map axis data
 *     DSA_MAP_DATA       : Map main data array
-*     DYN_ELEMENT        : Convert address to element of DYNAMIC_MEM
-*     GETWORK            : Get work array
+*     DSA_GET_WORK_ARRAY : Get work array
 *
 * History:
 *   Altered T.N.Wilkins Manchester 8/88 to use dsa routines. Not
@@ -41,11 +40,11 @@
 *-
       implicit none
       include 'arc_dims'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 
       character*5 mode
       logical ifcomb
       integer status
-      integer dyn_element
       integer slot,sptr,nels,naxis
 
 
@@ -60,27 +59,22 @@
 *  Map the X-array (or Y array in COMB)
 *
       call dsa_map_axis_data('data',naxis,'READ','float',d_xptr,slot,
-     :     status)
-      d_xptr = dyn_element(d_xptr)
+     :                       status)
 *
 *  Map the data
 *
       call dsa_map_data('data','READ','float',sptr,slot,status)
-      d_sptr = dyn_element(sptr)
-      call getwork(nels,'float',d_vsptr,slot,status)
+      call dsa_get_work_array(nels,'float',d_vsptr,slot,status)
 
 *  See if there is an error array, and map it if present
 
       call dsa_seek_errors('data',errpre,status)
       if(errpre) then
         call dsa_map_errors('data','READ','float',errptr,slot,status)
-        errptr = dyn_element(errptr)
       end if
       if (spdim2.gt.1) then
         call dsa_map_axis_data('data',2,mode,'float',xptr,slot,status)
-        xptr = dyn_element(xptr)
         call dsa_map_axis_data('data',3,mode,'float',yptr,slot,status)
-        yptr = dyn_element(yptr)
       end if
       end
 

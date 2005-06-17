@@ -15,12 +15,12 @@
 * Subroutines referenced:
 *      COMB_SPACING       : Find positions of comb "teeth"
 *      PLOT_SPECT         : Produce x-y plot, using histogram-type lines
-*      GETWORK            : Get work array
 *      GR_SOFT            : Open/select softcopy graphics device
 *      GR_HARD            : Open/select hardcopy graphics device
 *      GR_CLEAR           : Clear graphics screen/advance one frame
 *      ZERO_REAL          : Zero real array
 *      DSA_FREE_WORKSPACE : Free workspace
+*      DSA_GET_WORK_ARRAY : Get work array
 *      FIG_YTRACT         : Take cut through data parallel to 2nd axis
 *      PAR_QNUM           : Obtain number from user
 *      PAR_RDVAL          : Obtain numeric parameter from user
@@ -36,6 +36,7 @@
 *
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 *  Import
 *
@@ -56,18 +57,17 @@
       real level
       character*29 chars
       integer halfnchan(2)
-      include 'DYNAMIC_MEMORY'
 
       status = SAI__OK
-      call getwork(nyp,'float',ptr1,slot,status)
+      call dsa_get_work_array(nyp,'float',ptr1,slot,status)
       if(status.ne.SAI__OK) return
 *
 *  Loop over crossections
 *
       halfnchan(2)=(wavdim+NAVE)/2
       halfnchan(1)=(wavdim-NAVE)/2
-      call fig_ytract(dynamic_mem(d_sptr),wavdim,spdim1,halfnchan(1)
-     :   ,halfnchan(2),dynamic_mem(d_vsptr))
+      call fig_ytract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,halfnchan(1),
+     :                halfnchan(2),%VAL(CNF_PVAL(d_vsptr)))
       if(batch) then
         call gr_hard(status)
       else
@@ -76,8 +76,8 @@
 *
 *  Display cut
 *
-      call plot_spect(spdim1,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),' ','X-sects',' ')
+      call plot_spect(spdim1,%VAL(CNF_PVAL(d_xptr)),
+     :                %VAL(CNF_PVAL(d_vsptr)),' ','X-sects',' ')
 *
 * Calculate how many tram lines are possible in the spectrum.
 *
@@ -86,9 +86,9 @@
    1  continue
       call zero_real(left,nyp)
       call zero_real(right,nyp)
-      call comb_spacing(spdim1,dynamic_mem(d_xptr),
-     :       dynamic_mem(d_vsptr),level,left,dynamic_mem(ptr1),right,
-     :       line_count,nyp)
+      call comb_spacing(spdim1,%VAL(CNF_PVAL(d_xptr)),
+     :                  %VAL(CNF_PVAL(d_vsptr)),level,left,
+     :                  %VAL(CNF_PVAL(ptr1)),right,line_count,nyp)
       call par_wruser('Boundaries of windows : -',status)
       call par_wruser('  Left          Right',status)
       do k=1,line_count
@@ -97,8 +97,8 @@
       end do
       if(.not.par_quest('OK?',.true.)) then
         call pgpage
-        call plot_spect(spdim1,dynamic_mem(d_xptr),
-     :        dynamic_mem(d_vsptr),' ','X-sects',' ')
+        call plot_spect(spdim1,%VAL(CNF_PVAL(d_xptr)),
+     :        %VAL(CNF_PVAL(d_vsptr)),' ','X-sects',' ')
         qstat = par_qnum('Level?',0.0,1.0,0.3,.true.,' ',level)
         goto 1
       end if

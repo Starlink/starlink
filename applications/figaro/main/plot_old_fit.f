@@ -32,6 +32,7 @@
 *        End cross-section of block
 *     PLOT_IF_DIFF = LOGICAL (Given)
 *        If to plot if the blocking is different
+*
 * Global variables:
 *     D_VSPTR = INTEGER (Given)
 *        Index to Intensity data (include file arc_dims)
@@ -48,7 +49,8 @@
 *     PLOT_OLD_FIT = LOGICAL (Returned)
 *        True if plot made (include file arc_dims)
 *     SAME_BLOCKING = LOGICAL (Returned)
-*        True if the plot was of the same blocking (include file arc_dims)
+*        True if the plot was of the same blocking (include file
+*        arc_dims)
 *
 * Author:
 *  T.N.Wilkins Manchester
@@ -90,9 +92,6 @@
       integer ppos
       integer get_parnum
       character*32 chars
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
 
 * Get and decode fit_status, with meaningful output
 
@@ -218,7 +217,7 @@
         if((cstat.eq.1).or.(cstat.eq.2).or.(cstat.eq.5)) then
           if(deccntr(FIT_NCMP).ge.1) then
             call getres(results,line,ix,iy,fit_parms,deccntr,odensc,
-     :           fitsta,status)
+     :                  fitsta,status)
             densc = dble(odensc)
           end if
           plot_old_fit=.true.
@@ -232,9 +231,9 @@
           if((first_ix.ne.istartx).or.(last_ix.ne.iendx).or.
      :         (first_iy.ne.istarty).or.(last_iy.ne.iendy)) then
             if(plot_if_diff) then
-              call extr3(dynamic_mem(d_sptr),wavdim,spdim1,spdim2,
+              call extr3(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,spdim2,
      :             first_ix,last_ix,first_iy,last_iy,
-     :             dynamic_mem(d_vsptr))
+     :             %VAL(CNF_PVAL(d_vsptr)))
               replot=.true.
             else
               same_blocking=.false.
@@ -264,10 +263,11 @@
 
 *       Perform the plotting
 
-          call line_plot(fit_parms,dynamic_mem(d_xptr),
-     :         dynamic_mem(d_vsptr),%VAL( CNF_PVAL(d_tlptr) ),
-     :         %VAL( CNF_PVAL(d_trptr) ),line,deccntr,replot,.true.,
-     :         first_ix,nwindx,status)
+          call line_plot(fit_parms,%VAL(CNF_PVAL(d_xptr)),
+     :                   %VAL(CNF_PVAL(d_vsptr)),
+     :                   %VAL(CNF_PVAL(d_tlptr)),
+     :                   %VAL(CNF_PVAL(d_trptr)),line,deccntr,replot,
+     :                   .true.,first_ix,nwindx,status)
 
 *   fit a success or nag error
 

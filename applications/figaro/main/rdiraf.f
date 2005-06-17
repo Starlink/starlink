@@ -14,7 +14,8 @@
 * Description:
 *  To read data in from an IRAF format file.
 *  This is a version of iraf_in to work within the FIGARO environment
-*  using dynamic memory allocation. This only deals with the pixel array.
+*  using dynamic-memory allocation. This only deals with the pixel
+*  array.
 *
 * Arguments:
 *      FILE        (c* = INTEGER (Given)
@@ -35,15 +36,16 @@
 *
 *   T.N.Wilkins Cambridge 1/3/89
 *        "          "   FIGARO version 16/3/89
-*        "          "   13/8/91 Changed to use imgs.. (get section) routines
+*        "          "   13/8/91 Changed to use imgs.. (get section)
+*                               routines
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       character*(*) file,datatype
       integer status,im,nstat
       integer dataptr,nelm,slot
       integer axlen(7),dtype,i,naxis
-      include 'DYNAMIC_MEMORY'
 
       status = 0
 
@@ -77,7 +79,7 @@
       else
         datatype = 'float'
       end if
-      call getwork(nelm,datatype,dataptr,slot,status)
+      call dsa_get_work_array(nelm,datatype,dataptr,slot,status)
 
 * Read in data
 
@@ -86,26 +88,26 @@
 
         if(dtype.eq.3) then
           if(naxis.eq.1) then
-            call imgs1s(im,dynamic_mem(dataptr),1,axlen(1),status)
+            call imgs1s(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),status)
           else if(naxis.eq.2) then
-            call imgs2s(im,dynamic_mem(dataptr),1,axlen(1),1,axlen(2),
-     :                  status)
+            call imgs2s(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),1,
+     :                  axlen(2),status)
           else
-            call imgs3s(im,dynamic_mem(dataptr),1,axlen(1),1,axlen(2),1,
-     :                  axlen(3),status)
+            call imgs3s(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),1,
+     :                  axlen(2),1,axlen(3),status)
           end if
         else
 
 *   otherwise read into real array
 
           if(naxis.eq.1) then
-            call imgs1r(im,dynamic_mem(dataptr),1,axlen(1),status)
+            call imgs1r(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),status)
           else if(naxis.eq.2) then
-            call imgs2r(im,dynamic_mem(dataptr),1,axlen(1),1,axlen(2),
-     :                  status)
+            call imgs2r(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),1,
+     :                  axlen(2),status)
           else
-            call imgs3r(im,dynamic_mem(dataptr),1,axlen(1),1,axlen(2),1,
-     :                  axlen(3),status)
+            call imgs3r(im,%VAL(CNF_PVAL(dataptr)),1,axlen(1),1,
+     :                  axlen(2),1,axlen(3),status)
           end if
         end if
 

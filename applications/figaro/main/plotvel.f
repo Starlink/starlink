@@ -42,9 +42,9 @@
 *        If called from COMB
 *   MARK = INTEGER (Given)
 *        How to mark points:
-*                                0 - No mark-error bars indicate position
-*                                1 - Use continuous scale
-*                                2 - Use grading into 3 divisions
+*                              0 - No mark-error bars indicate position
+*                              1 - Use continuous scale
+*                              2 - Use grading into 3 divisions
 *   MIDPOS(*) = REAL ARRAY (Workspace)
 *        Mid-position of fit (in cross-section)
 *   XSECTERR(*) = REAL ARRAY (Workspace)
@@ -53,6 +53,7 @@
 *        Velocity of centre (or width)
 *   VPOSERR(*) = REAL ARRAY (Workspace)
 *        Error on above
+*
 * Global variables:
 *  MXPARS,NYP,NXP = INTEGER (Given)
 *       dimensions of results "cube" (include file arc_dims)
@@ -82,6 +83,8 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       real results(mxpars,nyp,nxp)
       real resvar(mxpars,nyp,nxp)
@@ -106,7 +109,6 @@
       real evelwid
       real rhnwin
       integer line,ppos
-      include 'PRM_PAR'
       integer xsect
       integer slot
       real mid_xsect
@@ -142,7 +144,6 @@
       character bss*2,bs*1
       character*1 number(9)
       include 'status_inc'
-      include 'DYNAMIC_MEMORY'
       data number/'1','2','3','4','5','6','7','8','9'/
       data bss/'\\'/
       bs = bss(1:1)
@@ -295,12 +296,12 @@ C 669     format(5x, 'mark: ', i5)
 
           if(mark.gt.0) then
 C           print668, 'before getwork'
-            call getwork(npts,'float',vmptr,slot,status)
+            call dsa_get_work_array(npts,'float',vmptr,slot,status)
             if(status.ne.SAI__OK) return
 
 C           print668, 'before flux_mark'
             call flux_mark(results,resvar,fitsta,vpos,midpos,npts,
-     :          dynamic_mem(vmptr),line,mark.eq.2)
+     :                     %VAL(CNF_PVAL(vmptr)),line,mark.eq.2)
 C           print668, 'before dsa_free_workspace'
             call dsa_free_workspace(slot,status)
           end if
@@ -308,8 +309,8 @@ C           print668, 'before dsa_free_workspace'
             if(.not.par_quest('Plot for next line?',.true.)) line = 100
           end if
         else
-          call par_wruser('No data for this line - will go onto next'
-     :            ,status)
+          call par_wruser('No data for this line - will go onto next',
+     :                    status)
         end if
         line = line+1
       end do

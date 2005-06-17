@@ -30,8 +30,10 @@
 *   PAR_WRUSER  : Write string to user
 *
 * Author:
-*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then Durham
+*   TNW: T.N.Wilkins Manchester until 1/89, Cambridge until 9/92, then
+*        Durham
 *   ACD: A C Davenhall, Starlink, Edinburgh
+*
 * History:
 *   TNW: 14/7/88 Original version
 *   TNW: 28/11/89 Re-written to use parameter names array.
@@ -41,6 +43,7 @@
 *   ACD: Remove local unused variables 28/9/00
 *-
       implicit none
+      include 'PRM_PAR'
       integer status
       include 'arc_dims'
       integer ix,iy,line,k,len1,tmpst
@@ -49,13 +52,9 @@ C      integer tmpend
       real results(mxpars,nyp,nxp,spdim2),value
       real resvar(mxpars,nyp,nxp,spdim2)
       integer fitsta(ncntrl,nyp,nxp,spdim2),chr_len,len2,len3
-      include 'PRM_PAR'
       logical flag,loop,par_quest,iffibre,qstat,par_qnum,ifer
       include 'status_inc'
       character*79 chars,chars2
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       
       loop = .true.
       ix = 1
@@ -66,17 +65,17 @@ C      integer tmpend
             qstat = par_qnum('Enter X position',1.0,real(spdim1),real(ix
      :           ),.true.,' ',value)
             ix = nint(value)
-            qstat = par_qnum('Enter Y position',1.0,real(spdim2),real(iy
-     :           ),.true.,' ',value)
+            qstat = par_qnum('Enter Y position',1.0,real(spdim2),
+     :                       real(iy),.true.,' ',value)
             iy = nint(value)
          else
-            qstat = par_qnum('Enter xsect number',1.0,real(nxp),real(ix)
-     :           ,.true.,' ',value)
+            qstat = par_qnum('Enter xsect number',1.0,real(nxp),
+     :                       real(ix),.true.,' ',value)
             ix=nint(value)
          end if
          if(line_count.gt.1) then
-            qstat = par_qnum('Enter line number',1.0,real(line_count)
-     :           ,real(line),.true.,' ',value)
+            qstat = par_qnum('Enter line number',1.0,real(line_count),
+     :           real(line),.true.,' ',value)
             line=nint(value)
          endif
 

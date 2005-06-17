@@ -79,6 +79,10 @@
 *
       implicit none
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
+      include 'status_inc'
+      include 'fit_coding_inc'
       integer in
       integer start
       integer m
@@ -103,12 +107,8 @@
       integer ifail
       logical mode
       integer yerrptr,status
-      integer nbytes,ptr1
+      integer nwork,ptr1,slot,slot2
       integer nbad,cnv_fmtcnv
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
-      include 'status_inc'
-      include 'fit_coding_inc'
       integer fit_handler
       external fit_handler,lm_mgf
 
@@ -142,16 +142,17 @@
 * For guesses:
 *     N (r)
 *
-      nbytes = (mpts*n + max((5*n + 2*mpts),(2*n*(n+1)))) * VAL__NBD
-     :       + n * VAL__NBI
-     :     + n * VAL__NBR
-      call get_opt_vm(nbytes,ptr1,status)
+      nwork = (mpts*n + max((5*n + 2*mpts),(2*n*(n+1))))
 
+* Get the ptr1 space below, so pass 0 bytes. ---MJC
+      call get_opt_vm(0,ptr1,status)
+
+      call dsa_get_work_array(nwork,'float',ptr1,slot,status)
+      call dsa_get_work_array(n,'real',guessptr,slot2,status)
       if(status.ne.SAI__OK) return
       crash = .false.
-      guessptr = ptr1 + nbytes - n*VAL__NBR
 
-* dont allow wieghting of indvidual points with current
+* Don't allow weighting of indvidual points with current
 * programme
 
       mode = .false.
@@ -161,26 +162,26 @@
 
       yerrptr = dataptr
 
-      call weight_fit(dynamic_mem(yerrptr),m,dynamic_mem(weightptr),
-     :     mode)
+      call weight_fit(%VAL(CNF_PVAL(yerrptr)),m,
+     :                %VAL(CNF_PVAL(weightptr)),mode)
 
-* copy single precision data passed in SDATA and SDENS into the
-* double precision arrays ADATA and ADENS
+* copy single-precision data passed in SDATA and SDENS into the
+* double-precision arrays ADATA and ADENS
 
       status = cnv_fmtcnv('float','double',sdata(start),
-     :     dynamic_mem(dataptr),m,nbad)
+     :                    %VAL(CNF_PVAL(dataptr)),m,nbad)
       status = cnv_fmtcnv('float','double',sdens(start),
-     :     dynamic_mem(densptr),m,nbad)
+     :                    %VAL(CNF_PVAL(densptr)),m,nbad)
 
 * initial guesses
 
 * scale so that the limits lie between 0 and 1 for optimization.
 
-      call scale_data(dynamic_mem(dataptr),dynamic_mem(densptr))
+      call scale_data(%VAL(CNF_PVAL(dataptr)),%VAL(CNF_PVAL(densptr)))
 *
-      call opt_guess_one(dynamic_mem(guessptr),.false.,
-     :     dynamic_mem(ptr1),dynamic_mem(dataptr),dynamic_mem(densptr)
-     :     ,1)
+      call opt_guess_one(%VAL(CNF_PVAL(guessptr)),.false.,
+     :                   %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(dataptr)),
+     :                   %VAL(CNF_PVAL(densptr)),1)
 
 * print first guesses
 
@@ -196,8 +197,8 @@
 *
 *              D O   G A U S S I A N  F I T
 *
-      call lm_gausid(lm_mgf,dynamic_mem(guessptr),n,deccntr,4,fitpar,
-     :     fiterr,ifail,dynamic_mem(ptr1))
+      call lm_gausid(lm_mgf,%VAL(CNF_PVAL(guessptr)),n,deccntr,4,fitpar,
+     :               fiterr,ifail,%VAL(CNF_PVAL(ptr1)))
 *
 *
       fitpar(2) = abs(fitpar(2))
@@ -207,11 +208,14 @@
 
 *  output graphics
 
-        call zero_real(dynamic_mem(ptr1),m*5)
+        call zero_real(%VAL(CNF_PVAL(ptr1)),m*5)
         do j=1,6
            plot_par(j)=fitpar(j)
         end do
-        call plot_fit(plot_par,1,m,dynamic_mem(ptr1))
+        call plot_fit(plot_par,1,m,%VAL(CNF_PVAL(ptr1)))
       end if
       fitpar(2) = fitpar(2) * EFOLD
+
+      call dsa_free_workspace(slot2,status)
+      call dsa_free_workspace(slot,status)
       end
