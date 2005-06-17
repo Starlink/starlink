@@ -32,8 +32,8 @@ clean-private distclean-private maintainer-clean-private:
 	@target=`echo $@ | sed s/-private//`; \
 	  for d in dtd doc/dtd2sgml doc/ssn70 misc dsssl/sl/lib; do \
 	    if test -d $$d; then \
-	      (echo "In $$d..."; 
-	      cd $$d; test -f Makefile && $(MAKE) $$target); \
+	      (echo "In $$d..."; \
+		cd $$d; test -f Makefile && $(MAKE) $$target); \
 	    fi; \
 	  done; \
 	  $(MAKE) $$target-am
