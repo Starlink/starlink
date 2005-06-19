@@ -25,9 +25,9 @@ commands.
   <description>LaTeX command to format the title
 <parameter keyword default="#t">children
   <type>boolean
-  <description>If true, then invoke <funcname>process-children</>, too. 
+  <description>If true, then invoke <funcname>process-children</funcname>, too. 
   It would be necessary to switch this off if there is some reason why
-  the element contents should <em>not</> be taken to be the section contents.
+  the element contents should <em>not</em> be taken to be the section contents.
 <codebody>
 (define ($latex-section$ section-cmd #!key (children #t))
   (make sequence

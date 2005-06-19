@@ -13,7 +13,7 @@ This section supports the generation of HTML.
 <author id=nw>Norman Walsh
 <authornote>
 The structure of the support in this file, and some of the code, draws
-on file <code>dbhtml.dsl</> from Norm Walsh's 
+on file <code>dbhtml.dsl</code> from Norm Walsh's 
 DocBook Stylesheet distribution.
 
 <copyright>Copyright 1999, Particle Physics and Astronomy Research
@@ -28,10 +28,10 @@ Council.
 <routinename>html-document
 <description>
 <p>Every element which is potentially a chunk should be passed to
-<funcname>html-document</> as its body-sosofo argument.  If it is in fact to
+<funcname>html-document</funcname> as its body-sosofo argument.  If it is in fact to
 be chunked, then this creates a new entity with that body as its
 contents, if not, it evaluates simply to body-sosofo.
-<returnvalue type="sosofo">Either a new entity, or <code>body-sosofo</>,
+<returnvalue type="sosofo">Either a new entity, or <code>body-sosofo</code>,
 depending on whether the element is to be chunked.
 <argumentlist>
 <parameter>title-sosofo
@@ -45,10 +45,10 @@ depending on whether the element is to be chunked.
   <type>string
   <description>If present, this gives the name of the system-id which is too 
   be used for the output file (if a file is in fact output), overriding the
-  name obtained from <funcname>html-file</>.  This is need in the case of those
+  name obtained from <funcname>html-file</funcname>.  This is need in the case of those
   files (such as the notes) which have no associated element.
   <p>If this is present, and chunking has not been turned off
-  completely, then the document <em>will</> be chunked, because it
+  completely, then the document <em>will</em> be chunked, because it
   wouldn't make much sense otherwise.
 <parameter keyword default='#f'>force-chunk?
   <type>boolean
@@ -113,7 +113,7 @@ depending on whether the element is to be chunked.
 been turned off, just return the fragment identifier.
 <p>There can be a number of special cases in the determination of the fragid.
 Each one of these at present consists of a call to a function 
-<funcname>href-to-fragid-giname</>, which returns a fragment not
+<funcname>href-to-fragid-giname</funcname>, which returns a fragment not
 prefixed by `#'.
 <p>HTTP hrefs are described in
 <webref url='http://sunsite.org.uk/rfc/rfc1945.txt'
@@ -121,16 +121,16 @@ prefixed by `#'.
 URLs are described in <webref
 url='http://sunsite.org.uk/rfc/rfc1738.txt' >RFC 1738</webref>.
 <returnvalue type="string">An HTML HREF which can be used to refer to
-the current node.  If the function was called with <code>frag-only</>
-set to <code>#t</> and no fragment ID could be generated, then it
-returns <code>#f</>.  This <code>#f</> return value might well
+the current node.  If the function was called with <code>frag-only</code>
+set to <code>#t</code> and no fragment ID could be generated, then it
+returns <code>#f</code>.  This <code>#f</code> return value might well
 generate an error such as `invalid value for "attributes"
 characteristic' -- it should really be tested for whenever href-to is
 invoked in this way.
 <argumentlist>
 <parameter>target
   <type>node-list
-  <description>The href returned refers to the node passed as <code>target</>
+  <description>The href returned refers to the node passed as <code>target</code>
 <parameter keyword default='#t'>reffrag
   <type>boolean
   <description>If reffrag is true (default), then append the fragid to
@@ -138,16 +138,16 @@ invoked in this way.
 <parameter keyword default='#f'>frag-only
   <type>boolean
   <description>If true, then only the fragment identifier (without the
-  <code>#</> character) is returned.  Calling <funcname>href-to</>
-  with this set to <code>#t</> is the best way of generating IDs within
+  <code>#</code> character) is returned.  Calling <funcname>href-to</funcname>
+  with this set to <code>#t</code> is the best way of generating IDs within
   the stylesheet.
 <parameter keyword default='#f'>full-url
   <type>boolean
   <description>If full-url is true, prefix
-  <code>%starlink-document-server%</> to the returned URL.
+  <code>%starlink-document-server%</code> to the returned URL.
 <parameter keyword default='#f'>force-frag
   <type>string
-  <description>If not <code>#f</>, force the fragment id to be this string.
+  <description>If not <code>#f</code>, force the fragment id to be this string.
 <codebody>
 (define (href-to target #!key (reffrag #t)
 			      (frag-only #f)

@@ -8,7 +8,7 @@
 
   Note that a feature of Jade is that if the argument <code/-V
   variable/ is given on the command line, then that variable is set to
-  <code>#t</>, overriding any setting within the stylesheet.  The
+  <code>#t</code>, overriding any setting within the stylesheet.  The
   parameters which are described as `boolean' below can be set in this
   way.
 
@@ -51,12 +51,12 @@ stylesheet will be written to the file named by '%texml-manifest%'.
 <p>Any definitions which are to be emitted as part of the LaTeX
 preamble.
 
-<p>The <code>\\Url{}</> command in <code>url.sty</> sets URLs much better than
+<p>The <code>\\Url{}</code> command in <code>url.sty</code> sets URLs much better than
 the following does, but we want to avoid requiring non-default packages in
 the LaTeX we emit, so insert the following
 crude (but effective enough) macro to allow `hyphenation' at the
 dots and slashes in machine or file names, URLs, etc.  
-The <code>\\UrlFootnote</> command inserts a URL into a footnote.
+The <code>\\UrlFootnote</code> command inserts a URL into a footnote.
 
 <p>The stylesheet generates relatively high-level LaTeX, rather than emitting
 detailed formatting codes.  This means that any LaTeX hackery that's required
@@ -64,16 +64,16 @@ can be confined to this `style file', and incorporated into the preamble
 rather than being scattered through the stylesheets.
 
 <p>The stylesheet must put all of the following into a
-<code>FrontMatter</> environment.  Within that, it must 
-call <code>\\setTitle</> and <code>\\setAuthorlist</>,
-which contains a <code>fmtAuthorlist</> environment containing a
-sequence of <code>\\fmtAuthor</> commands), <code>\\setDate</>.  It should
-also call <code>\\setDocCode</> with the document code (eg, `SUN/123.4') and
-<code>\\setDocRef</> with the document description (eg, `Starlink User Note
-123.4'), and set the copyright message with <code>\\setCopyright</>.
-After these, it must call <code>\\MakeTitle</>, then create a
-<code>VersoTitlepage</> environment with any additional matter to go 
-on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
+<code>FrontMatter</code> environment.  Within that, it must 
+call <code>\\setTitle</code> and <code>\\setAuthorlist</code>,
+which contains a <code>fmtAuthorlist</code> environment containing a
+sequence of <code>\\fmtAuthor</code> commands), <code>\\setDate</code>.  It should
+also call <code>\\setDocCode</code> with the document code (eg, `SUN/123.4') and
+<code>\\setDocRef</code> with the document description (eg, `Starlink User Note
+123.4'), and set the copyright message with <code>\\setCopyright</code>.
+After these, it must call <code>\\MakeTitle</code>, then create a
+<code>VersoTitlepage</code> environment with any additional matter to go 
+on the verso of the titlepage.  It may then call <code>\\TableOfContents</code>.
 
 <returnvalue type=string>String with the LaTeX preamble in it.
 <codebody>
@@ -478,7 +478,7 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 <description>
 If true, sections will not automatically start a new page (ie, the
 default is that they will).  This can conveniently ve set with
-<code>-V section-samepage</> on the Jade command line. 
+<code>-V section-samepage</code> on the Jade command line. 
 <returnvalue type=boolean>True if sections are to start a new page.
 <codebody>
 (define section-samepage
@@ -489,7 +489,7 @@ default is that they will).  This can conveniently ve set with
 <description>
 If true, appendices will not automatically start a new page (ie, the
 default is that they will).  This can conveniently ve set with
-<code>-V appendix-samepage</> on the Jade command line. 
+<code>-V appendix-samepage</code> on the Jade command line. 
 <returnvalue type=boolean>True if sections are to start a new page.
 <codebody>
 (define appendix-samepage
@@ -502,7 +502,7 @@ If true, the generatex LaTeX will be such that it can be processed in
 a single pass.  This has the side-effect that the table of contents
 is printed last, even though it has the correct page-numbering.
 This can conveniently ve set with
-<code>-V onepass-latex</> on the Jade command line. 
+<code>-V onepass-latex</code> on the Jade command line. 
 <returnvalue type=boolean>True if we are to generate one-pass LaTeX.
 <codebody>
 (define onepass-latex

@@ -1,4 +1,4 @@
-<![ ignore [
+<![ IGNORE [
 
 Title:
   Starlink General DTD -- XML stylesheet for maths

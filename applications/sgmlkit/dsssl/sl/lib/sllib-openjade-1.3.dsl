@@ -1,4 +1,4 @@
-<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.7//EN">
 
 <title>Library code for Starlink DSSSL stylesheets
 
@@ -38,7 +38,10 @@ is preserved.
   <description>List of GIs which indicates which elements are to be
   selected from the node list.
 <authorlist>
-          <authorref id="nw">
+<author id="nw">Norman Walsh
+<authornote>This stylesheet drew heavily on the structure and some of
+the code of version 1.12 of Norm Walsh's DocBook stylesheets.  See
+<url>http://nwalsh.com/docbook/dsssl/</url>.
 </authorlist>
 <codebody>
 (define (node-list-filter-by-gi nodelist gilist)
@@ -225,7 +228,11 @@ Returns the first ancestor of 'nd' whose GI that is a member of 'gilist'.
   <type>list of strings
   <description>List of strings indicating the set of GIs we want to
   select
-<authorlist><authorref id=nw>
+<authorlist>
+<author id=nw>Norman Walsh
+<authornote>This stylesheet drew heavily on the structure and some of
+the code of version 1.12 of Norm Walsh's DocBook stylesheets.  See
+<url>http://nwalsh.com/docbook/dsssl/</url>.
 <codebody>
 (define (ancestor-member nd gilist)
   (if (node-list-empty? nd)

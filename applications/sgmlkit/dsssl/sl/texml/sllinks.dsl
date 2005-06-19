@@ -21,16 +21,16 @@ ignore the HyTime attributes!
 
 <routine>
 <description>REF is a simple reference to another element in the same document.
-Check that the target is a member of the list <funcname>target-element-list</>.
+Check that the target is a member of the list <funcname>target-element-list</funcname>.
 If the `text' attribute is present, then use that as the link text,
 rather than generating it from the link target.  In this case, do not put
 the link text in italics, as it has presumably been chosen to blend in with
 the surrounding text, even though this will make it invisible in a 
 presentation which has no links (the motivation for this was the fact that
-`ref' elements <em>can</> occur within `verbatim' elements, in which a `textit'
+`ref' elements <em>can</em> occur within `verbatim' elements, in which a `textit'
 command stands out somewhat).
 <p>Once we have obtained the element pointed to by the ID,
-check to see if it is a <funcname>mapid</> element, and if it is,
+check to see if it is a <funcname>mapid</funcname> element, and if it is,
 immediately resolve the indirection.
 <codebody>
 (element ref
@@ -98,27 +98,27 @@ immediately resolve the indirection.
 
 
 <routine>
-<description>The <code>docxref</> element has a required attribute
+<description>The <code>docxref</code> element has a required attribute
 giving the document which is to be referred to, and an optional
 attribute giving an ID within that document.  The target of the link
-should be a document marked up according to the <code>documentsummary</>
+should be a document marked up according to the <code>documentsummary</code>
 DTD.  In fact, that DTD is a base architecture of the Starlink General
 DTD, so we could get the same effect by linking to the actual document
-and extracting the <code>documentsummary</> architectural instance.
-However, the <funcname>sgml-parse</> function in DSSSL isn't defined as
+and extracting the <code>documentsummary</code> architectural instance.
+However, the <funcname>sgml-parse</funcname> function in DSSSL isn't defined as
 being able to do that; there is a Jade patch which allows it to do
 that, which I hope to build into a Starlink version of Jade when I
 can.
 
 <p>Once we have obtained the element pointed to by the ID,
-check to see if it is a <funcname>mapid</> element, and if it is,
+check to see if it is a <funcname>mapid</funcname> element, and if it is,
 immediately resolve the indirection.
 
-<p>This rule invokes the <funcname>get-link-policy-target</> function to check
+<p>This rule invokes the <funcname>get-link-policy-target</funcname> function to check
 that the target of the link conforms to the policy -- if it doesn't,
-it produces an <funcname>error</>.
+it produces an <funcname>error</funcname>.
 
-<p>The rule uses the <code>mk-docxref</> mode to process the target element.
+<p>The rule uses the <code>mk-docxref</code> mode to process the target element.
 
 <codebody>
 ;; The code here is adapted from the html version of this, in
@@ -263,9 +263,9 @@ it produces an <funcname>error</>.
 		  (process-node-list dtitle)))))))
 
 <routine>
-<description><code>webref</> elements are simply transformed into 
+<description><code>webref</code> elements are simply transformed into 
 the element content followed by a footnote containing the URL.
-<code>url</> elements have the URL printed.
+<code>url</code> elements have the URL printed.
 <codebody>
 (element url
   (make-latex-command name: "Url"

@@ -24,13 +24,13 @@ ignore the HyTime attributes!
 <routine>
 <description>
 <p>REF is a simple reference to another element in the same document.
-Check that the target is a member of the list <funcname>target-element-list</>.
+Check that the target is a member of the list <funcname>target-element-list</funcname>.
 <p>If the target is a member of the list returned by
-<funcname>section-element-list</>, then make the section reference by
-calling <funcname>make-section-reference</>; otherwise, process the
-target in mode <code>section-reference</>.
+<funcname>section-element-list</funcname>, then make the section reference by
+calling <funcname>make-section-reference</funcname>; otherwise, process the
+target in mode <code>section-reference</code>.
 <p>Once we have obtained the element pointed to by the ID,
-check to see if it is a <funcname>mapid</> element, and if it is,
+check to see if it is a <funcname>mapid</funcname> element, and if it is,
 immediately resolve the indirection.
 <codebody>
 (element ref
@@ -149,14 +149,14 @@ immediately resolve the indirection.
          (car (reverse (tokenise-string descrip))))))
 
 <routine>
-<description>The <code>docxref</> element has a required attribute
+<description>The <code>docxref</code> element has a required attribute
 giving the document which is to be referred to, and an optional
 attribute giving an ID within that document.  The target of the link
-should be a document marked up according to the <code>documentsummary</>
+should be a document marked up according to the <code>documentsummary</code>
 DTD.  In fact, that DTD is a base architecture of the Starlink General
 DTD, so we could get the same effect by linking to the actual document
-and extracting the <code>documentsummary</> architectural instance.
-However, the <funcname>sgml-parse</> function in DSSSL isn't defined as
+and extracting the <code>documentsummary</code> architectural instance.
+However, the <funcname>sgml-parse</funcname> function in DSSSL isn't defined as
 being able to do that; there is a Jade patch which allows it to do
 that, which I hope to build into a Starlink version of Jade when I
 can.
@@ -178,14 +178,14 @@ supported, for (very temporary) backward compatibility, but
 undocumented.
 
 <p>Once we have obtained the element pointed to by the ID,
-check to see if it is a <funcname>mapid</> element, and if it is,
+check to see if it is a <funcname>mapid</funcname> element, and if it is,
 immediately resolve the indirection.
 
-<p>This rule invokes the <funcname>get-link-policy-target</> function to check
+<p>This rule invokes the <funcname>get-link-policy-target</funcname> function to check
 that the target of the link conforms to the policy -- if it doesn't,
-it produces an <funcname>error</>.
+it produces an <funcname>error</funcname>.
 
-<p>The rule uses the <code>mk-docxref</> mode to process the target element.
+<p>The rule uses the <code>mk-docxref</code> mode to process the target element.
 
 <codebody>
 (element docxref
@@ -391,8 +391,8 @@ it produces an <funcname>error</>.
 		  (process-node-list dtitle)))))))
 
 <routine>
-<description><code>webref</> elements are simply transformed into HTML
-<code>A</> elements, and <code>url</> elements into <code>A</> elements with
+<description><code>webref</code> elements are simply transformed into HTML
+<code>A</code> elements, and <code>url</code> elements into <code>A</code> elements with
 the URL as link text
 <codebody>
 (element url

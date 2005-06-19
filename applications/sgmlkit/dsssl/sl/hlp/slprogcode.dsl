@@ -1,4 +1,4 @@
-<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.7//EN" [
 
 <![ IGNORE [   -- These are not currently used --
    <!ENTITY lib.dsl       SYSTEM "../lib/sllib.dsl">

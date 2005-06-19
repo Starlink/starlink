@@ -1,4 +1,4 @@
-<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.7//EN" [
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
   <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
   <!ENTITY params.dsl		SYSTEM "sl-html-parameters">

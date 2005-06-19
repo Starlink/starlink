@@ -34,7 +34,7 @@ $Id$
 <routine>
 <description>
 Support for maths in LaTeX documents.  This is, obviously, very easy!
-Set the inherited characteristic <code>escape-tex?</> to <code>#f</>, so that 
+Set the inherited characteristic <code>escape-tex?</code> to <code>#f</code>, so that 
 raw LaTeX within the environments isn't escaped.
 <codebody>
 (element m

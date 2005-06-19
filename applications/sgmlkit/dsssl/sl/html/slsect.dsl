@@ -17,7 +17,7 @@ $Id$
 <routinename>$html-section-separator$
 <description>If we are not chunking, then we need to separate sections
 visually -- this emits a suitable sosofo.
-<returnvalue type=sosofo>Empty sosofo or <code>HR</>, depending on whether
+<returnvalue type=sosofo>Empty sosofo or <code>HR</code>, depending on whether
 we're chunking or not
 <codebody>
 (define ($html-section-separator$) 
