@@ -1,12 +1,12 @@
-      subroutine fit_mgauss(fitpar,fiterr,guess,n,ibound,bl,bu,ifail
-     :     ,xc,istate,hesd,gc1,grfun)
+      subroutine fit_mgauss(fitpar,fiterr,guess,n,ibound,bl,bu,ifail,
+     :     xc,istate,hesd,gc1,grfun)
 *+
 * Name:
 *    FIT_MGAUSS
 
 * Invocation:
-*    CALL FIT_MGAUSS(FITPAR,FITERR,GUESS,N,IBOUND,BL,BU,IFAIL
-*          ,XC,ISTATE,HESD,GC1,GRFUN)
+*    CALL FIT_MGAUSS(FITPAR,FITERR,GUESS,N,IBOUND,BL,BU,IFAIL,
+*          XC,ISTATE,HESD,GC1,GRFUN)
 
 * Purpose:
 *     Multiple gaussian fitting routine
@@ -58,7 +58,8 @@
 *   JCRASH = INTEGER (Given)
 *      Position of crash (include file opt_cmn)
 *   CALRAT = REAL (Given)
-*      Number to multiply default number of iterations (include file opt_cmn)
+*      Number to multiply default number of iterations (include file
+*      opt_cmn)
 *   STEPRAT = REAL (Given)
 *        Same for STEPMX (include file opt_cmn)
 *   CRASH = LOGICAL (Given and returned)
@@ -72,14 +73,15 @@
 *   E04KDF           : Find mimimum of function
 *   MULTI_RESCALE    : Rescale results
 *   MG_GOOD          : Goodness of fit analysis
-*   GETWORK          : Get workspace
 *   DSA_FREE_WORKSPACE : Free workspace
+*   DSA_GET_WORK_ARRAY : Get workspace
 *   GRFUN            : Evaluate function to minimise
 *   MGMON            : Monitor optimisation
 *
 * Authors:
 *   DJA: D.J.Axon/JDJH(UCL) July 1981.
 *   TNW: T.N.Wilkins, Manchester until 1/89, Cambridge until 9/92
+*
 * History:
 *   DJA/JDJH(UCL) July 1981. Original version
 *   Revised a bit to optimise memory TNW/Manchester 19/2/88, 11/7/88
@@ -95,7 +97,10 @@
       implicit none
 
 * import
+      include 'SAE_PAR'
+      include 'PRM_PAR'
       include 'opt_cmn'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 
 * Number of parameters in gaussian fit
 
@@ -121,7 +126,7 @@
 
       double precision hesd(n)
 
-* state of constriants
+* state of constraints
 
       integer istate(n)
       integer MAX_PARS
@@ -133,7 +138,6 @@
       integer ibound
 
 * Has possible values:-
-
 
 * export
       real fitpar(n)
@@ -189,9 +193,6 @@
       integer wptr,nwork,bptr,gptr,dptr,varptr
       integer k,heslptr,pstat,nfree
       external grfun,mgmon
-      include 'SAE_PAR'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
       integer len1
       character*8 istatus(-3:-1)
       data istatus/'constant','lower','upper'/
@@ -249,37 +250,40 @@
 *  (HESLPTR)(d) (LH)       E04KDF, MG_GOOD : Off diagonal of hessian
 *      (LH = MAX(1,(N*(N-1))/2))
 *      (LW = MAX(8,(7*N+N*(N-1)/2))
-*   Now overlap workspace not required at the same time.
-
-      nwork = lh + max(lw,(2*nplus1*n + n*2))
 
 * Make sure that if somehow the workspace hasn't been released before,
 * it is now.
 
-      if(got_opt_vm2) call dsa_free_workspace(opt_slot2,status)
+      if(got_opt_vm2) then
+         call dsa_free_workspace(opt_slot2,status)
+         call dsa_free_workspace(opt_slot3,status)
+         call dsa_free_workspace(opt_slot4,status)
+         call dsa_free_workspace(opt_slot5,status)
+         call dsa_free_workspace(opt_slot6,status)
+         call dsa_free_workspace(opt_slot7,status)
+      end if
 
-      call getwork(nwork,'double',heslptr,opt_slot2,status)
+      call dsa_get_work_array(lh,'double',heslptr,opt_slot2,status)
+      call dsa_get_work_array(lw,'double',wptr,opt_slot3,status)
+      call dsa_get_work_array(nplus1*n,'double',bptr,opt_slot4,status)
+      call dsa_get_work_array(nplus1*n,'double',gptr,opt_slot5,status)
+      call dsa_get_work_array(n,'double',dptr,opt_slot6,status)
+      call dsa_get_work_array(n,'double',varptr,opt_slot7,status)
       if(status.ne.SAI__OK) then
         ifail=-5
         return
       end if
 
       got_opt_vm2 = .true.
-      wptr = heslptr + lh*VAL__NBD
 
-      bptr = wptr
-      dptr = bptr + nplus1*n*VAL__NBD
-      varptr = dptr + n*VAL__NBD
-      gptr = varptr + n*VAL__NBD
-
-* test function and first derrivatives. This isn't needed now that the
-* function is working, but if any changes are made it can be brought back
-* into action if problems are encountered!
+* test function and first derivatives. This isn't needed now that the
+* function is working, but if any changes are made it can be brought 
+* back into action if problems are encountered!
 *
 *      ifail = 1
 *
 *      call e04hcf(n,grfun,xc,fc1,gc1,iw,LIW,
-*     :       dynamic_mem(wptr),lw,ifail)
+*     :            %VAL(CNF_PVAL(wptr)),lw,ifail)
 *      if(ifail.ne.0) then
 *        write(chars,'(''Nag error, ifail='',i2,'' (e04hcf)'')')ifail
 *        call opt_wruser(chars,pstat)
@@ -300,8 +304,8 @@
 *AJH commented out 30.9.97
 *
 *      call e04kdf(n,grfun,mgmon,iprint,maxcal,eta,xtol,delta,stepmx,
-*     :   ibound,bl,bu,xc,dynamic_mem(heslptr),lh,hesd,istate,fc1,gc1,
-*     :   iw,LIW,dynamic_mem(wptr),lw,ifail)
+*     :   ibound,bl,bu,xc,%VAL(CNF_PVAL(heslptr)),lh,hesd,istate,fc1,
+*     :   gc1,iw,LIW,%VAL(CNF_PVAL(wptr),lw,ifail)
 * ----------------------------------------------------------------
 
 *  if error return from fit then skip goodness of fit
@@ -377,12 +381,18 @@
 
 *  And call goodness of fit analysis.
 
-      call mg_good(mpts,n,fc1,dynamic_mem(bptr),dynamic_mem(dptr),
-     :     nfree+1,dynamic_mem(gptr),dynamic_mem(varptr),hesd,
-     :     dynamic_mem(heslptr),lh,fiterr,opt_lu,keep_itt,istate,nfree)
+      call mg_good(mpts,n,fc1,%VAL(CNF_PVAL(bptr)),%VAL(CNF_PVAL(dptr)),
+     :             nfree+1,%VAL(CNF_PVAL(gptr)),%VAL(CNF_PVAL(varptr)),
+     :             hesd,%VAL(CNF_PVAL(heslptr)),lh,fiterr,opt_lu,
+     :             keep_itt,istate,nfree)
 
 *  Release virtual memory
 
+      call dsa_free_workspace(opt_slot7,status)
+      call dsa_free_workspace(opt_slot6,status)
+      call dsa_free_workspace(opt_slot5,status)
+      call dsa_free_workspace(opt_slot4,status)
+      call dsa_free_workspace(opt_slot3,status)
       call dsa_free_workspace(opt_slot2,status)
       got_opt_vm2 = .false.
       end

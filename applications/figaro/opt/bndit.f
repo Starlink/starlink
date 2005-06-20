@@ -1,5 +1,5 @@
       subroutine bndit(guess_store,bounds,ibound,times,inst,max_cmp,
-     :     max_times,status,deccntr)
+     :                 max_times,status,deccntr)
 *+
 * Name:
 *    BNDIT
@@ -42,17 +42,21 @@
 *        If an error occured this is non-zero
 *
 * History:
-*    Altered T.N.Wilkins Manchester 24/1/89, to remove use of opt include
-*    file, and allow max_cmp to vary with data file
-*    Altered by J.W.Palmer Manchester Nov 1995: added another menu option
-*    to allow bounds in N2 optimization routine to be obtained from
-*    tolerance[] global array. Calls  tol_bounds() which is a 
+*    Altered T.N.Wilkins Manchester 24/1/89, to remove use of opt
+*    include file, and allow max_cmp to vary with data file
+*    Altered by J.W.Palmer Manchester Nov 1995: added another menu
+*    option to allow bounds in N2 optimization routine to be obtained
+*    from tolerance[] global array. Calls  tol_bounds() which is a 
 *    modification of find_bounds().
 *    Modified to provide adequate workspace for PDA routines called in 
 *    lock_comps. JWP Feb 1997
 *-
       implicit none
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
+
 * import
       integer times
       integer max_times
@@ -91,9 +95,6 @@
       real dumr
       character dumc
       character*42 bndmenu(9)
-      include 'PRM_PAR'
-      include 'SAE_PAR'
-      include 'DYNAMIC_MEMORY'
       data bndmenu/
      :     'NONE : No Bounds (unconstrained)',
      :     'EQUAL : All L_bounds/U_bounds same',
@@ -238,8 +239,9 @@
 
         if(status.eq.SAI__OK) then
           call lock_comps(guess_store,times,ngauss,bounds,max_cmp,
-     :        max_times,dynamic_mem(ptr1),dynamic_mem(ptr2),
-     :        dynamic_mem(ptr3), dynamic_mem(ptr4))
+     :                    max_times,%VAL(CNF_PVAL(ptr1)),
+     :                    %VAL(CNF_PVAL(ptr2)),%VAL(CNF_PVAL(ptr3)),
+     :                    %VAL(CNF_PVAL(ptr4)))
 
 *     Free workspace
           CALL PSX_FREE( ptr1, STATUS )

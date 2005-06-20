@@ -13,9 +13,9 @@
 
 * Description:
 *  To alter the guesses manually, before these are used for the
-* optimisation.
+*  optimisation.
 *  The user can add or delete components, and alter the values of the
-* guesses.
+*  guesses.
 *  At this stage the user can also change the routine to be used for the
 *  optimisation.
 
@@ -42,7 +42,7 @@
 *   DIAGS(3) = INTEGER ARRAY (Given and returned)
 *        Plot reference numbers
 *   WORK(MPARMS+M*5+M*MAX_CMP) = REAL ARRAY (Workspace)
-* Global variables:
+*        Global variables:
 *   MAX_TIMES = INTEGER (Given)
 *        Storage capacity of program for attempts (include file opt_cmn)
 *   MAX_CMP = INTEGER (Given)
@@ -84,7 +84,7 @@
 *  GR_OPEN   (GR package) - Assign memory to store info on plot "zone"
 *  GR_SELD   (GR package) - Select plot
 *  GR_ANNUL  (GR package) - Deassign common block slot assigned by
-* GR_OPEN
+*                           GR_OPEN
 *
 *  GEN_SUBAD (GEN package) - subtract double precision arrays
 *  PAR_WRUSER (PAR package) - write string to user
@@ -92,6 +92,7 @@
 *
 * Authors:
 *     TNW: T.N.Wilkins. Manchester/Cambridge/Durham
+*
 * History:
 *     TNW 1986 Original version.
 *     TNW 8/7/88 Bug fix etc.
@@ -101,7 +102,7 @@
 *        2 calls to lib$get_vm/free_vm replaced by 1
 *     TNW 4-5/8/88 Increased use of workspace passed from above
 *        and of zero_real. LIB$GET_VM/FREE_VM replaced by charlib
-* routines
+*        routines
 *     TNW 19/8/88 Pointer to VM passed from above-reduce number of
 *        calls to lib$get_vm.
 *     TNW 10/88 Use of DSA routines, also ACCRES. Change to calls of
@@ -131,6 +132,7 @@
       implicit none
       integer status
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'gr_inc'
       include 'status_inc'
@@ -165,7 +167,6 @@
       parameter (LEFT = 0.05, RIGHT = 0.9)
       real gaussian, lorentz
       external gaussian, lorentz
-      include 'DYNAMIC_MEMORY'
 
       if((status.ne.SAI__OK).or.(fstat.ne.0)) return
       ncomp = 1
@@ -226,18 +227,20 @@
 * Set parameters of component
 
          if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
-            call mguess(inst,guess,x(wstart),y(wstart),xlim,ncomp
-     :           ,deccntr(FIT_NCMP),blank_pen,diags,work(residptr)
-     :           ,work(fvalptr),work(mtotptr),plot_flag,xunits,title
-     :           ,legend,dynamic_mem(basptr),work(sparptr),gaussian,iopt
-     :           ,status)
+            call mguess(inst,guess,x(wstart),y(wstart),xlim,ncomp,
+     :                  deccntr(FIT_NCMP),blank_pen,diags,
+     :                  work(residptr),work(fvalptr),work(mtotptr),
+     :                  plot_flag,xunits,title,legend,
+     :                  %VAL(CNF_PVAL(basptr)),work(sparptr),gaussian,
+     :                  iopt,status)
          else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
-            call mguess(inst,guess,x(wstart),y(wstart),xlim,ncomp
-     :           ,deccntr(FIT_NCMP),blank_pen,diags,work(residptr)
-     :           ,work(fvalptr),work(mtotptr),plot_flag,xunits,title
-     :           ,legend,dynamic_mem(basptr),work(sparptr),lorentz,iopt
-     :           ,status)
-         endif
+            call mguess(inst,guess,x(wstart),y(wstart),xlim,ncomp,
+     :                  deccntr(FIT_NCMP),blank_pen,diags,
+     :                  work(residptr),work(fvalptr),work(mtotptr),
+     :                  plot_flag,xunits,title,legend,
+     :                  %VAL(CNF_PVAL(basptr)),work(sparptr),lorentz,
+     :                  iopt,status)
+         end if
          plot_flag = 0
 
 * add an extra component
@@ -308,8 +311,9 @@
                ncomp = 1
 
                call opt_guess_one(guess(1,ncomp,times),.true.,
-     :              work(gwptr),dynamic_mem(dataptr),
-     :              dynamic_mem(densptr),deccntr(FIT_MODEL))
+     :                            work(gwptr),%VAL(CNF_PVAL(dataptr)),
+     :                            %VAL(CNF_PVAL(densptr)),
+     :                            deccntr(FIT_MODEL))
 
                deccntr(FIT_NCMP) = 1
             end if

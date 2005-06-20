@@ -51,6 +51,7 @@
 *
 *
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
 *
 *-
@@ -85,7 +86,6 @@
 * These are just added to make in compile, unlikely to be right!
 
       double precision start(5),end(5)
-      include 'DYNAMIC_MEMORY'
 
 * ---------------------------------------------------------------------
 * Each line is assumed to have the same REDSHIFT and WIDTH
@@ -110,8 +110,9 @@
 * Perform the work, done in a subroutine to allow use of pointers
 * for large arrays in common.
 
-      call agfun_sub(mpts,n,dynamic_mem(dataptr),fc,
-     :            dynamic_mem(densptr),xc,gc,gc1,dynamic_mem(weightptr)
-     :            ,start,end,ngauss,the_sign)
+      call agfun_sub(mpts,n,%VAL(CNF_PVAL(dataptr)),fc,
+     :               %VAL(CNF_PVAL(densptr)),xc,gc,gc1,
+     :               %VAL(CNF_PVAL(weightptr)),start,end,ngauss,
+     :               the_sign)
       fc1 = fc
       end

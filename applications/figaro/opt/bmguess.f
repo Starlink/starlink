@@ -51,8 +51,10 @@
 *        Pointer to scaled version of ADENS
 *    WEIGHTPTR = INTEGER (Given)
 *        Pointer to weights
+*
 * Author:
 *   T.N.Wilkins Manchester September 1987
+*
 * History:
 *   TNW 26/10/88 PTR1 added
 *   TNW 23/11/88 Changed to no longer use common block
@@ -66,9 +68,10 @@
 *    "  20/9/91 Made single precision almost completely
 *    " 2/12/91 All workspace passed as WORK array (PTR1 removed)
 *    " 9,12/6/92 Minor improvements
-*    " 31/7/92 Now handles all lines as emission, converting at start and
-*              end. This avoids large numbers of if statements.
-*    " 17/8/92 Accept funct as argument, so can deal with different models.
+*    " 31/7/92 Now handles all lines as emission, converting at start 
+*              and end. This avoids large numbers of if statements.
+*    " 17/8/92 Accept funct as argument, so can deal with different 
+*              models.
 *    " 21/8/92 Use opt_cmn/dynamic_mem
 *  TNW: 28th June 1993, reflect changes in opt_cmn
 *  TNW: 29th June 1993, N removed
@@ -77,6 +80,7 @@
       implicit none
       include 'opt_cmn'
       include 'status_inc'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'fit_coding_inc'
       include 'PRM_PAR'
       integer MAX_PARS
@@ -97,7 +101,6 @@
       integer i,left,right,idiff,icentre,pstat,maic,len1
       integer ngauss,cnv_fmtcnv,status,nbad,itmp
       real aic,bstaic,test,factor
-      include 'DYNAMIC_MEMORY'
       data smaxsig,sminht/0.2,0.1/
 
 * Store maximum allowed number of components
@@ -107,8 +110,8 @@
 
 * Get guesses for first gaussian
 
-      call opt_guess_one(sguess,.true.,work,dynamic_mem(dataptr),
-     :     dynamic_mem(densptr),deccntr(FIT_MODEL))
+      call opt_guess_one(sguess,.true.,work,%VAL(CNF_PVAL(dataptr)),
+     :                   %VAL(CNF_PVAL(densptr)),deccntr(FIT_MODEL))
 
       icentre = nint(sguess(4)*real(mpts))
 
@@ -125,13 +128,13 @@
 
 * Put data into work array
 
-      status = cnv_fmtcnv('double','float',dynamic_mem(densptr),
-     :     work(mpts+1),mpts,nbad)
+      status = cnv_fmtcnv('double','float',%VAL(CNF_PVAL(densptr)),
+     :                    work(mpts+1),mpts,nbad)
 
 * Smooth data
 
       call robust_smooth(work(mpts+1),mpts,work,work(2*mpts+1),1,
-     :     status)
+     :                   status)
 
 * Limit peak, first find 60% height levels
 
@@ -351,8 +354,9 @@
       if(deccntr(FIT_STST).eq.PREAIC) then
         bstaic = VAL__MAXR
         do i = 1, ngauss
-          call aic_d(guess,i,dynamic_mem(dataptr),dynamic_mem(densptr),
-     :         mpts,dynamic_mem(weightptr),aic,funct)
+          call aic_d(guess,i,%VAL(CNF_PVAL(dataptr)),
+     :               %VAL(CNF_PVAL(densptr)),mpts,
+     :               %VAL(CNF_PVAL(weightptr)),aic,funct)
           len1 = 0
           call chr_puti(i,chars,len1)
           call chr_putc(' components, AIC = ',chars,len1)

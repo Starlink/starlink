@@ -53,10 +53,10 @@
 *  TNW: 4 Mar 1994, Dimension guess properly
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
-      include 'DYNAMIC_MEMORY'
       integer ifail
       integer n,npc
       external gradfun
@@ -94,21 +94,21 @@
 * inquire for bounds
 
       if(deccntr(FIT_MAN).eq.MAN_ALTER) then
-         call bndit(guess,dynamic_mem(bndptr),ibound,times,inst,max_cmp
-     :        ,max_times,ifail,deccntr)
+         call bndit(guess,%VAL(CNF_PVAL(bndptr)),ibound,times,inst,
+     :              max_cmp,max_times,ifail,deccntr)
          if(ifail.ne.0) return
 
 * pass bounds from store to nag arrays
 
-         call set_bounds(dynamic_mem(bndptr),n,work(blptr),work(buptr),
-     :        times,max_cmp,max_times)
+         call set_bounds(%VAL(CNF_PVAL(bndptr)),n,work(blptr),
+     :                   work(buptr),times,max_cmp,max_times)
          deccntr(FIT_CONSTR) = 1
 
       else if(deccntr(FIT_CONSTR).eq.1) then
 
          ibound = 0
          call bfbnds(work(blptr),work(buptr),dble(minsig)/datsc,
-     :        dble(maxsig)/datsc,n)
+     :               dble(maxsig)/datsc,n)
 
       else
 
@@ -119,7 +119,7 @@
 * perform optimization
 
       call fit_mgauss(fitpar,fiterr,guess,n,ibound,work(blptr),
-     :     work(buptr),ifail,work,work(iwork),work(work1),work(work2)
-     :     ,gradfun)
+     :                work(buptr),ifail,work,work(iwork),
+     :                work(work1),work(work2),gradfun)
 
       end

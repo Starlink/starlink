@@ -7,15 +7,15 @@
 *    CALL FH_FUNC(IFLAG,M,N,XC,RC,AJC,LJC,MIW,LIW,WN,NIW)
 
 * Purpose:
-*  Evaluate the residuals and their first derivatives for double with fixed
-*  height ratio.
+*  Evaluate the residuals and their first derivatives for double with 
+*  fixed height ratio.
 *
 * Description
 *  Routine to evaluate the residuals and their first derivatives
 *  for double with fixed height ratio.
 *  This routine is also suitable for use when E04FCV is used instead
 *  of E04HEV as it can deal with IFLAG=0 as well as IFLAG=2
-*  i.e. NO DERVATRIVES. This removed, 4/10/90.
+*  i.e. NO DERIVATIVES. This removed, 4/10/90.
 *
 * Arguments:-
 *   M = INTEGER (Given)
@@ -42,6 +42,7 @@
 *    TNW 25/10/90 Weighting added (had only applied to SK before!)
 *
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
 *-
       integer m,n,liw,ljc,niw
@@ -49,8 +50,7 @@
       double precision wn(niw),ajc(ljc,n)
       double precision rc(m),xc(n)
       integer miw(liw)
-      include 'DYNAMIC_MEMORY'
 
-      call fh2_fun(m,n,xc,rc,ajc,ratio,dynamic_mem(dataptr),
-     :     dynamic_mem(densptr),dynamic_mem(weightptr))
+      call fh2_fun(m,n,xc,rc,ajc,ratio,%VAL(CNF_PVAL(dataptr)),
+     :             %VAL(CNF_PVAL(densptr)),%VAL(CNF_PVAL(weightptr)))
       end
