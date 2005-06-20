@@ -57,6 +57,7 @@
       integer opt_slot4
       integer opt_slot5
       integer opt_slot6
+      integer opt_slot7
 
 * data weights
 
@@ -199,9 +200,9 @@
       logical keep_itt,prfits,condhand
 
       common /opt_common/ ratio,gc,fc,chi_sq,t99,norm,condit_no,mpts,
-     :       opt_lu,opt_slot,got_opt_vm,absorption,got_opt_vm2,opt_slot2
-     :       opt_slot3,opt_slot4,opt_slot5,opt_slot6,,times,max_cmp,
-     :       wndim,max_times
+     :       opt_lu,opt_slot,got_opt_vm,absorption,got_opt_vm2,
+     :       opt_slot2,opt_slot3,opt_slot4,opt_slot5,opt_slot6,
+     :       opt_slot7,times,max_cmp,wndim,max_times
       common /opt_scale/ densc,datsc,datazero,denszero
       common /opt_pointers/ weightptr,dataptr,densptr,guessptr,bndptr
       common /opt_fail_cm/ crash,icrash,jcrash,kcrash,exception,nagerror
