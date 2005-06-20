@@ -158,7 +158,7 @@
          title = 'Contour plots'
       else
          title = 'Greyscale plots'
-      endif
+      end if
 
       if(status.ne.SAI__OK) return
 
@@ -228,7 +228,7 @@
       else
          dict1 = 2
          cndict = NDICT - 1
-      endif
+      end if
 
       loop = .true.
       do while(loop)
@@ -247,7 +247,7 @@
             iyst = min(iyst,spdim1)
             iyen = max(iyst,iyen)
             iyen = min(iyen,spdim1)
-         endif
+         end if
          if(status.ne.SAI__OK) then
             return
          else if(key.eq.cndict) then
@@ -256,7 +256,7 @@
             
             if(.not.ifcont) call clgrap
             return
-         endif
+         end if
 
 *  Erase plot after first loop
 
@@ -264,7 +264,7 @@
             floop = .false.
          else if(options(OPT_RAT)) then
             call pgpage
-         endif
+         end if
 
 * Get pixel boundaries of line
 
@@ -305,7 +305,7 @@
          if(batch) then
             call dsa_axis_range('data',2,' ',.false.,dummy1,dummy2,iyst,
      :                          iyen,status)
-         endif
+         end if
          if(status.ne.SAI__OK) return
          if(ifcont) then
             ylim(1) = real(iyst)

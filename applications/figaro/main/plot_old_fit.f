@@ -129,7 +129,7 @@
               start(2,nfit)=nint(value - value2 + 0.5)
               nwindow(2,nfit)=nint(value2*2.0)
               location(2,nfit) = j
-            endif
+            end if
             if(nfit.gt.1) then
               if((start(1,nfit-1).eq.start(1,nfit)).and.
      :             (nwindow(1,nfit-1).eq.nwindow(1,nfit))) nfit=nfit-1
@@ -162,7 +162,7 @@
           if(spdim2.gt.1) then
             last_iy = min(spdim2,(start(2,i)+nwindow(2,i)-1))
             call encode_range(' ',' ',start(2,i),last_iy,chars,len1)
-          endif
+          end if
           call par_wruser(chars(:len1),status)
         end do
         if(.not.plot_if_diff) then
@@ -200,7 +200,7 @@
         first_iy = 1
         iy = 1
         nwindy = 1
-      endif
+      end if
 
 * fit present
 
@@ -255,7 +255,7 @@
               call chr_putc(', y=',legend(1),len1)
               call encode_range(' ',' ',first_iy,
      :           (first_iy+nwindy-1),legend(1),len1)
-            endif
+            end if
             call chr_putc(')',legend(1),len1)
           end if
 

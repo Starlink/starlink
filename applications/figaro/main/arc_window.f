@@ -296,7 +296,7 @@
 
 *     ...of inner loop
 
-               enddo
+               end do
 
 *    Increment accumulators and print out some diagnostics range
 
@@ -313,7 +313,7 @@
                   write(chars,'(2(5x,a,i4))')'- Failed fits    :',
      :                 nfailed,'- Already fitted :',nold
                   call opt_wruser(chars,pstat)
-               endif
+               end if
 
 *   ...of main loop
 
@@ -334,7 +334,7 @@
                call par_wruser(
      :' ** Exceptional conditions have occurred (listed in arc.ovf) **'
      :              ,pstat)
-            endif
+            end if
 *
             call underscore
             write(chars,'(2x,a,i6)')

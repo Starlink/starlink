@@ -57,7 +57,7 @@
       IF( STATUS .NE. 0 ) THEN
          write(chars,'(''PDA error '',i1,'' (PDA_DSORT)'')')STATUS
          call par_wruser(chars,status)
-      ENDIF
+      END IF
       CALL PDA_DSORT( %VAL( CNF_PVAL( DUMMY_ARRAY ) ), w, lincnt, 2,
      :                STATUS )
       IF( STATUS .NE. 0 ) THEN

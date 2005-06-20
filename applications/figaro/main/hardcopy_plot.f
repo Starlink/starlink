@@ -102,7 +102,7 @@
       else
         ppos2 = 0
         rceny = 1.0
-      endif
+      end if
       call par_wruser('Previous fits:-',pstat)
       do while(j.le.iendy)
         i=istartx
@@ -117,7 +117,7 @@
             if(ppos2.ne.0) then
               rceny = nint(results(ppos2,line,i,j))
               ceny = nint(rceny)
-            endif
+            end if
 
 *       To simplify matters, we will only accept fits if they are actually
 *       at the current position or outside the range (they are of course
@@ -148,7 +148,7 @@
                 en = nint(rceny+rhnwin)
                 call chr_putc(', Y =',chars,len1)
                 call encode_range(' ',' ',st,en,chars,len1)
-              endif
+              end if
               call par_wruser(chars(:len1),pstat)
               if(nfit.ge.100) then
                 call par_wruser('Too many fits in range-will save 100'
@@ -183,7 +183,7 @@
           iy = location(fit_chosen,2)
         else
           iy = 1
-        endif
+        end if
 
 * Output fit results
 

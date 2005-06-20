@@ -244,7 +244,7 @@ C      data rout/'N1','N2','LM'/
 
         do i = 1, NDICT
           dict(i)(menlen(i)+1:) = ' '
-        enddo
+        end do
 
 *  Test not in transfer mode-in which case coding is completely different!
 
@@ -262,14 +262,14 @@ C      data rout/'N1','N2','LM'/
             ilen = min(ilen,pos1)
           else
             ilen = pos1
-          endif
+          end if
           ilen = chr_len(chars(:ilen-1))
           if(deccntr(BACK_MODEL).eq.CHEBYSHEV) then
             ilen = ilen + 1
             call chr_putc('(order = ',chars,ilen)
             call chr_puti(deccntr(BACK_ORDER),chars,ilen)
             call chr_putc(')',chars,ilen)
-          endif
+          end if
           pos1 = menlen(OPT_BASE) + 1
 
           pos2 = 72 - ilen
@@ -287,7 +287,7 @@ C      data rout/'N1','N2','LM'/
             call chr_appnd('AIC after fits',chars,ilen)
           else
             call chr_appnd('AIC not used',chars,ilen)
-          endif
+          end if
           call chr_putc(' (max cmps ',chars,ilen)
           call chr_puti(curmcmp,chars,ilen)
           call chr_putc(')',chars,ilen)
@@ -335,7 +335,7 @@ C      data rout/'N1','N2','LM'/
              moditm = moditm - 2
           else
              if(moditm.eq.CAUCHY_MODEL) moditm = moditm - 1
-          endif
+          end if
           
           if(moditm.ge.0) moditm = moditm - 1 + OPT_GAUSSIAN
           
@@ -344,7 +344,7 @@ C      data rout/'N1','N2','LM'/
           if((deccntr(FIT_TYPE).eq.MULTIPLE).and.
      :         (deccntr(FIT_MAN).eq.MAN_NOALTER)) then
             typitm = OPT_AUTO
-          endif
+          end if
           if(ifpcyg) typitm = OPT_PCYGN
 
 *  Handle case of no fit defined
@@ -357,7 +357,7 @@ C      data rout/'N1','N2','LM'/
              call chr_fill('.',dict(moditm)(menlen(moditm)+1:67))
              dict(moditm)(69:75) = '*******'
              dict(typitm)(69:75) = '*******'
-          endif
+          end if
           
 *          dict(OPT_OPT)(menlen(OPT_OPT):) = rout(opt_routines(1))//
 *     :         ', Dble - '//rout(opt_routines(2))//', Mult - '//
@@ -375,7 +375,7 @@ C      data rout/'N1','N2','LM'/
           call chr_puti(-deccntr(MAX_DECODE_CONTROL),dict(OPT_TRANSFER)
      :         ,ilen)
           
-       endif
+       end if
 
 *  Display bimodality test before fitting?
 
@@ -436,7 +436,7 @@ C      data rout/'N1','N2','LM'/
             prvfit = .false.
           else if(ib2.eq.OPT_RESCALE) then
             gpscal = .not.gpscal
-          endif
+          end if
 
 *  Items not directly fitting
 
@@ -460,13 +460,13 @@ C      data rout/'N1','N2','LM'/
             if(valid(1,mgauss,ivalue,'Number of components'))
      :           then
               curmcmp = ivalue
-            endif
+            end if
           else if((ib2.eq.OPT_NOAIC).or.(ib2.eq.OPT_POSTAIC).or.
      :           (ib2.eq.OPT_PREAIC)) then
             tyaic = ib2 - OPT_NOAIC
           else if(ib2.eq.OPT_TOLS) then
             call set_guess_tol(status)
-          endif
+          end if
         else if(ib.eq.OPT_OPT) then
 
 *     Optimisation routines to use
@@ -504,7 +504,7 @@ C      data rout/'N1','N2','LM'/
           if(valid(1,line_count,ivalue,'Line')) then
             call zero_int(deccntr,MAX_DECODE_CONTROL)
             deccntr(MAX_DECODE_CONTROL) = -nint(value)
-          endif
+          end if
 
 *   Various fit models, some only available as singles at present.
 
@@ -536,7 +536,7 @@ C      data rout/'N1','N2','LM'/
           else
             deccntr(FIT_MODEL) = GAUSSIAN_MODEL
             deccntr(FIT_TYPE) = DOUBLE_FS + ib - OPT_TSEPARATION
-          endif
+          end if
         else if(ib.eq.OPT_MANUAL) then
           deccntr(FIT_TYPE) = MULTIPLE
           deccntr(FIT_MAN) =  MAN_ALTER
@@ -612,7 +612,7 @@ C      data rout/'N1','N2','LM'/
 *       Tied doubles, only available for E04GBF.
 
           deccntr(FIT_OPT) = 1
-        endif
+        end if
         deccntr(FIT_MAN) = MAN_NOALTER
       end if
       if(deccntr(MAX_DECODE_CONTROL).gt.0) then

@@ -173,14 +173,14 @@
                   else
                      call par_wruser('String too long',status)
                      oldlen = llen
-                  endif
+                  end if
                   call pgsci(1)
                   call pgmtxt('t',2.0,0.5,0.5,label(:llen))
                   lkey = key
-               enddo
+               end do
             else
                call par_wruser('Invalid key hit',status)
-            endif
+            end if
          end do
       end do
       end

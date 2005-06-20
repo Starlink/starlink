@@ -142,7 +142,7 @@
             default_model(FIT_ABS) = 1
           else
             default_model(FIT_ABS) = 0
-          endif
+          end if
         end if
 
 * Shall we weight fitting according to error array
@@ -178,7 +178,7 @@ C         print *,'out map_res',status
 
           if(.not.ifarc) then
              default_model(FIT_NCMP) = mgauss
-          endif
+          end if
           if(nocube) then
             status = SAI__ERROR
           end if

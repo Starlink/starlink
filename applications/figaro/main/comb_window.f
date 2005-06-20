@@ -157,11 +157,11 @@
       do_dirn=-1
       do i = 1, MAX_DECODE_CONTROL
         deccntr(i) = default_model(i)
-      enddo
+      end do
       if(kquick) then
         deccntr(FIT_MODEL) = 4
         deccntr(FIT_OPT) = 0
-      endif
+      end if
 
 * so lines are followed
 
@@ -275,7 +275,7 @@
 
 *     ...of inner loop
 
-          enddo
+          end do
 
 *  Increment accumulators and print out some diagnostics over masked range
 
@@ -292,7 +292,7 @@
             write(chars,'(2(5x,a,i4))')'- Failed   Fits :',nfailed,
      :                    '- Already Fitted :',nold
             call opt_wruser(chars,pstat)
-          endif
+          end if
 
 *   ...of main loop
 
@@ -314,7 +314,7 @@
         call par_wruser(
      :     ' **  Exceptional conditions have occurred **',pstat)
         call par_wruser(' ** at all points listed in ARC.OVF **',pstat)
-      endif
+      end if
 *
       call underscore
       write(chars,'(2x,a,i6)')

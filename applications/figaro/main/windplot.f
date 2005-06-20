@@ -117,16 +117,16 @@
          if(istartx.ne.iendx) then
             call chr_putc('-',legend(1),len2)
             call chr_puti(iendx,legend(1),len2)
-         endif
+         end if
          if(spdim2.gt.1) then
             call chr_putc(', Y = ',legend(1),len2)
             call chr_puti(istarty,legend(1),len2)
             if(istarty.ne.iendy) then
                call chr_putc('-',legend(1),len2)
                call chr_puti(iendy,legend(1),len2)
-            endif
-         endif
-      endif
+            end if
+         end if
+      end if
       len2 = 0
       call chr_fill(' ',legend(2))
       call chr_appnd(line_name(line),legend(2),len2)

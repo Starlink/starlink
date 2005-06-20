@@ -206,7 +206,7 @@
       else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
         minsig = gestol(2)*0.5
         maxsig = gestol(1)*0.5
-      endif
+      end if
       minht = gestol(3)
 
       got_opt_vm2 = .false.
@@ -232,7 +232,7 @@
          call par_wruser('Error, maximum number of components is zero'
      :        ,status)
          return
-      endif
+      end if
 
 * Set the crash flag to false. Although this is set again prior to
 * fitting (to allow the user to try again if looping around to get a
@@ -374,7 +374,7 @@
         if(.not.tied) then
           n = deccntr(FIT_NCMP)*parpcmp(deccntr(FIT_MODEL))+1
           if(deccntr(BACK_MODEL).eq.0) n = n - 1
-        endif
+        end if
 
 * Perform optimisation
 * Workspace (WORK) has to be as follows:
@@ -403,7 +403,7 @@
 
         if(prfits) then
           call opt_wrfit(deccntr,fitpar,fiterr,.true.)
-        endif
+        end if
 
 *   Plot fit if required
 
@@ -411,7 +411,7 @@
      :       (deccntr(FIT_NCMP).ge.1)) then
            call opt_plotfit(deccntr,fitpar,x,y,start,nbaswrk,vbase,
      :                      diags,xlim,xsect,nwindow,status,work)
-        endif
+        end if
 
 *   Is this to be accepted?
 

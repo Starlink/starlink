@@ -134,15 +134,15 @@
             else
                call par_wruser('Nwidth should be in the range 1 to 101'
      :              ,status)
-            endif
+            end if
          else if(iopt.eq.2) then
             siglev = value
          else if(iopt.eq.3) then
             min_lev = value
          else if(iopt.eq.4) then
             ok = .true.
-         endif
-      enddo
+         end if
+      end do
 
 * High-pass filter the data, peaks just used as workspace here
 
@@ -163,7 +163,7 @@
          do j=1,nwidth
             l=i+j-lst
             chans(j)=hpfy(l)
-         enddo
+         end do
 *
 * Do analysis on this block
 * NOK is returned as non-zero if a potential line is found, in which
@@ -180,7 +180,7 @@
             count=hpfy(jc)
             mincnt = min(mincnt,count)
             maxcnt = max(maxcnt,count)
-         enddo
+         end do
 *
          call centrd(chans,nwidth,cent,count,0,nok)
          if (nok.eq.0) then
@@ -192,19 +192,19 @@
                if (abs(cent-peaks(npk)).gt.1) then
                   npk = npk + 1
                   peaks(npk) = cent
-               endif
+               end if
             else
                npk = npk + 1
                peaks(npk) = cent
-            endif
+            end if
 
 *   nok
 
-         endif
+         end if
 
 * i=lst,nl1
 
-      enddo
+      end do
 *
 *  Prepare to indicate line positions
 *
@@ -260,8 +260,8 @@
                      lprod = lprod + log10(hpfy(j))
                   end if
                   nprod = nprod + 1
-               endif
-            enddo
+               end if
+            end do
             if((num_l.gt.0).and.(num_r.gt.0))then
                gmeanl=y_l/num_l
                gmeanr=y_r/num_r
@@ -284,7 +284,7 @@
 
 *     nprod.gt.0
 
-            endif
+            end if
             if(lgmean.lt.38.0) then
                gmean = 10**lgmean
             end if
@@ -309,7 +309,7 @@
                      val = hpfy(j)
                      sum1 = sum1+dist*val
                      sum2 = sum2+val
-                  enddo
+                  end do
 
 *         Centre in pixels
 
@@ -339,19 +339,19 @@
                      if(chan1(numb).lt.chan2(numb-1)) then
                         chan1(numb) = 0.5 * (centre + last_centre)
                         chan2(numb-1) = chan1(numb)
-                     endif
-                  endif
+                     end if
+                  end if
                   last_centre = centre
 
                   if (numb.ge.nyp) then
                      call par_wruser
      :                    ('Maximum number of lines reached',status)
                      go to 255
-                  endif
+                  end if
 
 *       pkcnts.ge.(gmean+siglev*sigg) etc.
 
-               endif
+               end if
 
 *     diff.lt.0.5
 
@@ -359,12 +359,12 @@
 
 *   (enchan-stchan).gt.nwidth
 
-         endif
+         end if
  444     continue
 
 * i=1,npk
 
-      enddo
+      end do
  255  continue
 *
 * Print number of lines found

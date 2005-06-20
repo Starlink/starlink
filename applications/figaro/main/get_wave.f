@@ -87,7 +87,7 @@ C      double precision fit_coeffs(MAX_KPLUS1)
          if(status.ne.SAI__OK) then
             get_wave = VAL__BADR
             return
-         endif
+         end if
          if(fit_cpoly(w,nid,cent,dwave,a,ss,kp1,MAX_KPLUS1,
      :                %VAL(CNF_PVAL(workptr))).eq.0) then
 
@@ -117,7 +117,7 @@ C      double precision fit_coeffs(MAX_KPLUS1)
                CALL PAR_WRUSER('Error during conversion of fit '/
      :           /'co-effs to Taylor series co-effs in get_wave.f',
      :           status)
-            ENDIF
+            end if
 
             dwave1 = gen_epolyd(dline,xc,kp1)
             order = kp1 - 1

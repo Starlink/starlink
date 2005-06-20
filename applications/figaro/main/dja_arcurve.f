@@ -156,7 +156,7 @@
                   idiag = 2
                else
                   idiag = 1
-               endif
+               end if
 
                call pgvstand
                if(idiag.eq.1) then

@@ -368,7 +368,7 @@
 *     work out what window this is
 
                jblock = get_block(ystart,nwindy,ivalue)
-            endif
+            end if
 
 *   Change to given line
 
@@ -431,13 +431,13 @@
                ivalue1 = nint(values(2))
                if((ivalue1.ge.xstart).and.(ivalue1.le.xend)) then
                   ivalue = ivalue1
-               endif
+               end if
             else
                ivalue1 = nint(values(3))
                if((ivalue1.ge.xstart).and.(ivalue1.le.xend)) then
                   ivalue = ivalue1
-               endif
-            endif
+               end if
+            end if
 
 *     work out what window this is
 
@@ -456,12 +456,12 @@
                   ivalue = ivalue1
                else
                   ivalue = real( (istarty+iendy) / 2 )
-               endif
+               end if
 
 *     work out what window this is
 
                jblock = get_block(ystart,nwindy,ivalue)
-            endif
+            end if
 
 *    Fit option
 

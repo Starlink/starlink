@@ -105,7 +105,7 @@
           qstat = par_qnum('Enter Y position',1.0,real(spdim2),real(iy)
      :       ,.true.,' ',value)
           ix=nint(value)
-        endif
+        end if
 
         title='File '//datafile(:chr_len(datafile))
 

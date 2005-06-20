@@ -257,7 +257,7 @@
             else
                ixstart = nint(values(1))
                ixend = nint(values(2))
-            endif
+            end if
 
 * next
 

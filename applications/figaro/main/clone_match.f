@@ -220,7 +220,7 @@
           call canaxlim(axis2)
           if(status.ne.SAI__OK)  then
             goto 500
-          endif
+          end if
           if(ifcomb) then
             call fig_ytract(%VAL(CNF_PVAL(d_sptr)),wavdim,spdim1,
      :                      ixstart,ixend,%VAL(CNF_PVAL(d_vsptr)))
