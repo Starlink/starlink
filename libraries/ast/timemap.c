@@ -87,8 +87,10 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define AST__TDBTOTCB   17       /* TDB to TCB */
 #define AST__UTTOGMST   18       /* UT to GMST */
 #define AST__GMSTTOUT   19       /* GMST to UT */
-#define AST__GMSTTOLAST 20       /* GMST to LAST */
-#define AST__LASTTOGMST 21       /* LAST to GMST */
+#define AST__GMSTTOLMST 20       /* GMST to LMST */
+#define AST__LMSTTOGMST 21       /* LMST to GMST */
+#define AST__LASTTOLMST 22       /* LAST to LMST */
+#define AST__LMSTTOLAST 23       /* LMST to LAST */
 
 /* Maximum number of arguments required by a conversion. */
 #define MAX_ARGS 5
@@ -273,10 +275,14 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 *           Convert a UT MJD to a GMST MJD.
 *        AST__GMSTTOUT( MJDOFF )
 *           Convert a GMST MJD to a UT MJD.
-*        AST__GMSTTOLAST( MJDOFF, CLOCKLON, CLOCKLAT )
-*           Convert a GMST MJD to a LAST MJD.
-*        AST__LASTTOGMST( MJDOFF, CLOCKLON, CLOCKLAT )
-*           Convert a LAST MJD to a GMST MJD.
+*        AST__GMSTTOLMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*           Convert a GMST MJD to a LMST MJD.
+*        AST__LMSTTOGMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*           Convert a LMST MJD to a GMST MJD.
+*        AST__LASTTOLMST( MJDOFF, CLOCKLON, CLOCKLAT )
+*           Convert a LAST MJD to a LMST MJD.
+*        AST__LMSTTOLAST( MJDOFF, CLOCKLON, CLOCKLAT )
+*           Convert a LMST MJD to a LAST MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -536,11 +542,17 @@ static int CvtCode( const char *cvt_string ) {
    } else if ( astChrMatch( cvt_string, "GMSTTOUT" ) ) { 
       result = AST__GMSTTOUT; 
 
-   } else if ( astChrMatch( cvt_string, "GMSTTOLAST" ) ) { 
-      result = AST__GMSTTOLAST; 
+   } else if ( astChrMatch( cvt_string, "GMSTTOLMST" ) ) { 
+      result = AST__GMSTTOLMST; 
 
-   } else if ( astChrMatch( cvt_string, "LASTTOGMST" ) ) { 
-      result = AST__LASTTOGMST; 
+   } else if ( astChrMatch( cvt_string, "LMSTTOGMST" ) ) { 
+      result = AST__LMSTTOGMST; 
+
+   } else if ( astChrMatch( cvt_string, "LASTTOLMST" ) ) { 
+      result = AST__LASTTOLMST; 
+
+   } else if ( astChrMatch( cvt_string, "LMSTTOLAST" ) ) { 
+      result = AST__LMSTTOLAST; 
    }
 
 /* Return the result. */
@@ -806,9 +818,9 @@ static const char *CvtString( int cvt_code, const char **comment,
       arg[ 0 ] = "MJD offset";
       break;
 
-   case AST__GMSTTOLAST:
-      *comment = "Convert GMST to LAST";
-      result = "GMSTTOLAST";
+   case AST__GMSTTOLMST:
+      *comment = "Convert GMST to LMST";
+      result = "GMSTTOLMST";
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
@@ -816,9 +828,29 @@ static const char *CvtString( int cvt_code, const char **comment,
       arg[ 2 ] = "Clock latitude";
       break;
 
-   case AST__LASTTOGMST:
-      *comment = "Convert LAST to GMST";
-      result = "LASTTOGMST";
+   case AST__LMSTTOGMST:
+      *comment = "Convert LMST to GMST";
+      result = "LMSTTOGMST";
+      *nargs = 3;
+      *szargs = 3;
+      arg[ 0 ] = "MJD offset";
+      arg[ 1 ] = "Clock longitude";
+      arg[ 2 ] = "Clock latitude";
+      break;
+
+   case AST__LASTTOLMST:
+      *comment = "Convert LAST to LMST";
+      result = "LASTTOLMST";
+      *nargs = 3;
+      *szargs = 3;
+      arg[ 0 ] = "MJD offset";
+      arg[ 1 ] = "Clock longitude";
+      arg[ 2 ] = "Clock latitude";
+      break;
+
+   case AST__LMSTTOLAST:
+      *comment = "Convert LMST to LAST";
+      result = "LMSTTOLAST";
       *nargs = 3;
       *szargs = 3;
       arg[ 0 ] = "MJD offset";
@@ -1677,7 +1709,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                SWAP_CODES( AST__TDBTOTCB, AST__TCBTOTDB ) 
                SWAP_CODES( AST__TTTOTCG, AST__TCGTOTT ) 
                SWAP_CODES( AST__UTTOGMST, AST__GMSTTOUT ) 
-               SWAP_CODES( AST__GMSTTOLAST, AST__LASTTOGMST ) 
+               SWAP_CODES( AST__GMSTTOLMST, AST__LMSTTOGMST ) 
+               SWAP_CODES( AST__LASTTOLMST, AST__LMSTTOLAST ) 
 
 /* Exchange transformation codes for their inverses, and swap the offset
    values. */
@@ -1762,7 +1795,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Now check for conversions which have three user-supplied arguments. */
                } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ||
                             PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
-                            PAIR_CVT2( AST__GMSTTOLAST, AST__LASTTOGMST ) ) &&
+                            PAIR_CVT2( AST__GMSTTOLMST, AST__LMSTTOGMST ) ||
+                            PAIR_CVT2( AST__LASTTOLMST, AST__LMSTTOLAST ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
                           EQUAL( cvtargs[ istep ][ 1 ], 
@@ -3143,8 +3177,10 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "TCBTOTDB" (MJDOFF): Convert a TCB MJD to a TDB MJD.
 *     - "UTTOGMST" (MJDOFF): Convert a UT MJD to a GMST MJD.
 *     - "GMSTTOUT" (MJDOFF): Convert a GMST MJD to a UT MJD.
-*     - "GMSTTOLAST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LAST MJD.
-*     - "LASTTOGMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LAST MJD to a GMST MJD.
+*     - "GMSTTOLMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOGMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
+*     - "LASTTOLMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOLAST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -3696,10 +3732,45 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                }
                break;
 
-/* GMST to LAST. */
+/* GMST to LMST. */
+/* ------------- */
+            case AST__GMSTTOLMST:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 1 ]/D2PI;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 1 ]/D2PI;
+                     }
+                  }
+               }
+               break;
+
+/* LMST to GMST. */
+/* ------------- */
+            case AST__LMSTTOGMST:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 1 ]/D2PI;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 1 ]/D2PI;
+                     }
+                  }
+               }
+            
+/* LMST to LAST. */
 /* ------------- */
 /* Calculating the equation of the equinoxes required TDB. So we need to
-   convert the given GMST to TDB. We first convert GMST to UT1. UT1 is
+   convert the given LMST to TDB. We first convert LMST to UT1. UT1 is
    equal to UTC to within 1 second. We then add on 32 seconds to get TAI
    (this value is correct since 1999 - for earlier epochs an error of the
    order of a minute will be introduced in the TAI value). We then add on
@@ -3708,13 +3779,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    corresponds to an error of a few tens of microseconds in the equation of
    the equinoxes. The sla precession-nutation model is accurate to around 3 
    mas = 200 us, so the error in TDB will be insignificant. */
-            case AST__GMSTTOLAST:
+            case AST__LMSTTOLAST:
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        tdb = Gmsta( time[ point ], args[ 0 ], 0 ) 
+                        gmstx = time[ point ] + args[ 1 ]/D2PI;
+                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32 + TTOFF)/SPD;
-                        time[ point ] += ( slaEqeqx( tdb ) - args[ 1 ] )/D2PI;
+                        time[ point ] += slaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
@@ -3723,30 +3795,31 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
-                        time[ point ] -= ( slaEqeqx( tdb ) - args[ 1 ] )/D2PI;
+                        time[ point ] -= slaEqeqx( tdb )/D2PI;
                      }
                   }
                }
                break;
 
-/* LAST to GMST. */
+/* LAST to LMST. */
 /* ------------- */
-            case AST__LASTTOGMST:
+            case AST__LASTTOLMST:
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
-                        time[ point ] -= ( slaEqeqx( tdb ) - args[ 1 ] )/D2PI;
+                        time[ point ] -= slaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        tdb = Gmsta( time[ point ], args[ 0 ], 0 ) 
-                              + args[ 0 ] + (32+TTOFF)/SPD;
-                        time[ point ] += ( slaEqeqx( tdb ) - args[ 1 ] )/D2PI;
+                        gmstx = time[ point ] + args[ 1 ]/D2PI;
+                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
+                              + args[ 0 ] + (32 + TTOFF)/SPD;
+                        time[ point ] += slaEqeqx( tdb )/D2PI;
                      }
                   }
                }

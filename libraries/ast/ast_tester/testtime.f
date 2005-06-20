@@ -394,10 +394,14 @@ c
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 20' )
       else 
-         xin = 100.0
+         xin = 100.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 0.2600974092354136D0 ) .gt. 1.0D-10 ) then
             call stopit( status, 'error 21' )
+         end if
+         call ast_tran1( fs, 1, xout, .false., xin, status )
+         if( abs( xin  - 100.0D0 ) .gt. 1.0D-6 ) then
+            call stopit( status, 'error 21b' )
          end if
       end if
 
@@ -428,10 +432,14 @@ c
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 22' )
       else 
-         xin = 100.0
+         xin = 100.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 14.35534169996282 ) .gt. 1.0D-6 ) then
             call stopit( status, 'error 23' )
+         end if
+         call ast_tran1( fs, 1, xout, .false., xin, status )
+         if( abs( xin  - 100.0D0 ) .gt. 1.0D-6 ) then
+            call stopit( status, 'error 23b' )
          end if
       end if
 
@@ -450,6 +458,10 @@ c Julian date offset from 2450000.5 days [TDB, h]
          call ast_tran1( fs, 1, xin, .true., xout, status )
          if( abs( xout - 37933.38284478387D0) .gt. 1.0D-5 ) then
             call stopit( status, 'error 25' )
+         end if
+         call ast_tran1( fs, 1, xout, .false., xin, status )
+         if( abs( xin  - 0.1 ) .gt. 1.0D-10 ) then
+            call stopit( status, 'error 25b' )
          end if
       end if
 
@@ -664,6 +676,35 @@ c
             call stopit( status, 'error 46' )
          end if
       end if
+
+
+
+
+      tf1 = ast_timeframe( 'system=mjd,timescale=gmst,clocklon=90,'//
+     :                     'clocklat=0,timeorigin=53000.0', status )
+      tf2 = ast_timeframe( 'system=mjd,timescale=lmst,clocklon=90,'//
+     :                     'clocklat=0,timeorigin=53000.0', status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 47' )
+      else 
+         xin = 1.0D0
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         if( xout .ne. 0.75D0 ) then
+            write(*,*) xout 
+            call stopit( status, 'error 48' )
+         end if
+         call ast_tran1( fs, 1, xout, .false., xin, status )
+         if( xin .ne. 1.0D0 ) then
+            write(*,*) xin
+            call stopit( status, 'error 48b' )
+         end if
+      end if
+
+
+
+
+
 
 
       call ast_end( status )

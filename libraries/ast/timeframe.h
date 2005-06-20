@@ -57,10 +57,11 @@
 #define AST__UT1          3
 #define AST__GMST         4
 #define AST__LAST         5
-#define AST__TT           6
-#define AST__TDB          7
-#define AST__TCB          8
-#define AST__TCG          9
+#define AST__LMST         6
+#define AST__TT           7
+#define AST__TDB          8
+#define AST__TCB          9
+#define AST__TCG         10
 
 #endif
 

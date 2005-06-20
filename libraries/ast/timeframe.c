@@ -729,7 +729,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
 *     Resolution is one second.
 *     - An error will be reported if the TimeFrame has a TimeScale value
 *     which cannot be converted to TAI (e.g. "angular" systems such as
-*     UT1, GMST and LAST).
+*     UT1, GMST, LMST and LAST).
 *     - Any inaccuracy in the system clock will be reflected in the value
 *     returned by this function.
 *--
@@ -1705,10 +1705,13 @@ static double GetEpoch( AstFrame *this_frame ) {
 */
 
 /* Local Variables: */
-   AstTimeFrame *this;
    AstMapping *map;
-   double result;   
+   AstSystemType sys;
+   AstTimeFrame *this;
+   AstTimeScaleType ts;
+   const char *u;
    double oldval;
+   double result;   
 
 /* Initialise. */
    result = AST__BAD;
@@ -1727,9 +1730,42 @@ static double GetEpoch( AstFrame *this_frame ) {
 /* Otherwise, if the TimeOrigin value is set in the TimeFrame,
    return it, converted to an absolute TDB MJD. */
    } else if( astTestTimeOrigin( this ) ){
-      map = MakeMap( this, astGetSystem( this ), AST__MJD,
-                     astGetTimeScale( this ), AST__TDB, 0.0, 0.0,
-                     DefUnit( astGetSystem( this ), "astGetEpoch", "TimeFrame" ),
+
+/* Get the required properties of the TimeFrame. */
+      oldval = astGetTimeOrigin( this );
+      ts = astGetTimeScale( this );
+      sys = astGetSystem( this );
+      u = DefUnit( sys, "astGetEpoch", "TimeFrame" );
+
+/* Epoch is defined as a TDB value. If the timescale is stored in an angular 
+   timescale such as UT1, then we would not normally be able to convert it
+   to TDB since knowledge of DUT1 is required (the difference between UTC
+   and UT1). Since the default Epoch value is not critical we assume a DUT1 
+   value of zero in this case. We first map the stored value to UT1 then 
+   from UTC to TDB (using the approximation UT1 == UTC). */
+      if( ts == AST__UT1 || ts == AST__GMST || 
+          ts == AST__LAST || ts == AST__LMST ) {
+         map = MakeMap( this, sys, AST__MJD, ts, AST__UT1, 0.0, 0.0, u,
+                        "d", "astGetEpoch" );
+         if( map ) {
+            astTran1( map, 1, &oldval, 1, &result );
+            map = astAnnul( map );
+
+/* Update the values to use when converting to TBD. */
+            oldval = result;
+            ts = AST__UTC;
+            sys = AST__MJD;
+            u = "d";
+
+         } else if( astOK ) {
+            astError( AST__INTER, "astGetEpoch(%s): No Mapping from %s to "
+                      "UT1 (AST internal programming error).", 
+                      astGetClass( this ), TimeScaleString(  ts ) );
+         }
+      }
+
+/* Now convert to TDB */
+      map = MakeMap( this, sys, AST__MJD, ts, AST__TDB, 0.0, 0.0, u,
                      "d", "astGetEpoch" );
       if( map ) {
          oldval = astGetTimeOrigin( this );
@@ -1737,9 +1773,9 @@ static double GetEpoch( AstFrame *this_frame ) {
          map = astAnnul( map );
 
       } else if( astOK ) {
-         astError( AST__INCTS, "astGetEpoch(%s): Cannot convert the "
-                   "TimeOrigin value to a different timescale because of "
-                   "incompatible time scales.", astGetClass( this ) );
+         astError( AST__INTER, "astGetEpoch(%s): No Mapping from %s to "
+                   "TDB (AST internal programming error).", 
+                   astGetClass( this ), TimeScaleString(  ts ) );
       }
 
 /* Otherwise, return the default Epoch value from the parent Frame. */
@@ -2094,7 +2130,7 @@ static AstTimeScaleType GetAlignTimeScale( AstTimeFrame *this ) {
 /* Otherwise, return a default depending on the current TimeScale value */
    } else {
       ts = astGetTimeScale( this );
-      if ( ts == AST__UT1 || ts == AST__LAST || ts == AST__GMST ) {
+      if ( ts == AST__UT1 || ts == AST__LAST || ts == AST__LMST || ts == AST__GMST ) {
          result = AST__UT1;
       } else {
          result = AST__TAI;
@@ -2762,7 +2798,13 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
  
    } else if( ts1 == AST__LAST ) {
       cmn = AST__UT1;
-      astTimeAdd( timemap, "LASTTOGMST", args );
+      astTimeAdd( timemap, "LASTTOLMST", args );
+      astTimeAdd( timemap, "LMSTTOGMST", args );
+      astTimeAdd( timemap, "GMSTTOUT", args );
+
+   } else if( ts1 == AST__LMST ) {
+      cmn = AST__UT1;
+      astTimeAdd( timemap, "LMSTTOGMST", args );
       astTimeAdd( timemap, "GMSTTOUT", args );
    }
 
@@ -2818,7 +2860,15 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
       if( cmn == AST__UT1 ){
          ok = 1;
          astTimeAdd( timemap, "UTTOGMST", args );
-         astTimeAdd( timemap, "GMSTTOLAST", args );
+         astTimeAdd( timemap, "GMSTTOLMST", args );
+         astTimeAdd( timemap, "LMSTTOLAST", args );
+      }
+
+   } else if( ts2 == AST__LMST ) {
+      if( cmn == AST__UT1 ){
+         ok = 1;
+         astTimeAdd( timemap, "UTTOGMST", args );
+         astTimeAdd( timemap, "GMSTTOLMST", args );
       }
    }
 
@@ -4107,6 +4157,9 @@ static AstTimeScaleType TimeScaleCode( const char *ts ) {
    } else if ( astChrMatch( "LAST", ts ) ) {
       result = AST__LAST;
 
+   } else if ( astChrMatch( "LMST", ts ) ) {
+      result = AST__LMST;
+
    } else if ( astChrMatch( "TT", ts ) ) {
       result = AST__TT;
 
@@ -4195,6 +4248,10 @@ static const char *TimeScaleString( AstTimeScaleType ts ) {
 
    case AST__LAST:
       result = "LAST";
+      break;
+
+   case AST__LMST:
+      result = "LMST";
       break;
 
    case AST__TT:
@@ -5450,8 +5507,8 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
 *  Description:
 *     This attribute specifies the geodetic latitude of the observer's
 *     clock, in degrees. It is used only when converting between certain
-*     time scales (TDB, TCB, LAST). The default value for the attribute is 
-*     zero. 
+*     time scales (TDB, TCB, LMST, LAST). The default value for the attribute 
+*     is zero. 
 
 *     The value is stored internally in radians, but is converted to and 
 *     from a degrees string for access. Some example input formats are: 
@@ -5494,7 +5551,7 @@ astMAKE_TEST(TimeFrame,ClockLat,(this->clocklat!=AST__BAD))
 *     This attribute specifies the geodetic (or equivalently, geocentric)
 *     longitude of the observer's clock, in degrees, measured positive 
 *     eastwards. It is used only when converting between certain time 
-*     scales (TDB, TCB, LAST). See also attribute ClockLat. The default 
+*     scales (TDB, TCB, LMST, LAST). See also attribute ClockLat. The default 
 *     value is zero.
 *
 *     The value is stored internally in radians, but is converted to and 
@@ -5621,7 +5678,7 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     to occur. See the TimeScale attribute for a desription of the values 
 *     which may be assigned to this attribute. The default AlignTimeScale 
 *     value depends on the current value of TimeScale: if TimeScale is
-*     UT1, GMST or LAST, the default for AlignTimeScale is UT1, for all
+*     UT1, GMST, LMST or LAST, the default for AlignTimeScale is UT1, for all
 *     other TimeScales the default is TAI.
 *
 c     When astFindFrame or astConvert is used on two TimeFrames (potentially 
@@ -5679,9 +5736,9 @@ astMAKE_SET(TimeFrame,AlignTimeScale,AstTimeScaleType,aligntimescale,(
 *     This attribute identifies the time scale to which the time axis values 
 *     of a TimeFrame refer, and may take any of the values listed in the 
 *     "Time Scales" section (below). Note, conversions which require 
-*     knowledge of DUT1 (the difference between UT1 and UTC) are not 
+*     knowledge of DUT1 (the difference between UT1 and UTC) are not currently
 *     supported. This means that UT1 can only be converted to the other 
-*     angle-based scales such as GMST and LAST. An error will be reported
+*     angle-based scales such as GMST, LMST and LAST. An error will be reported
 *     about "incompatible timescales" if an attempt is made to convert
 *     between an angle-based timescale and any of the other time scales.
 *
@@ -5705,6 +5762,7 @@ astMAKE_SET(TimeFrame,AlignTimeScale,AstTimeScaleType,aligntimescale,(
 *     - "UT1" - Universal Time
 *     - "GMST" - Greenwich Mean Sidereal Time
 *     - "LAST" - Local Apparent Sidereal Time
+*     - "LMST" - Local Mean Sidereal Time
 *     - "TT" - Terrestrial Time
 *     - "TDB" - Barycentric Dynamical Time
 *     - "TCB" - Barycentric Coordinate Time
