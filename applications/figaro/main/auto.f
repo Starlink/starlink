@@ -33,7 +33,7 @@
 *
       integer nwindow
       integer xstart,xend
-      integer nbls,ptr1,ptr2,slot
+      integer nbls,ptr1,ptr2,slot,slot2
       real value,value1
       include 'PRM_PAR'
 *
@@ -46,13 +46,16 @@
       call dsa_axis_range('data',1,' ',.false.,value,value1,xstart,xend,
      :                    status)
 
-      call getwork(line_count*2,'float',ptr1,slot,status)
+      call dsa_get_work_array(line_count,'float',ptr1,slot,status)
+      call dsa_get_work_array(line_count,'float',ptr2,slot2,status)
       if(status.ne.SAI__OK) return
-      ptr2 = ptr1 + line_count*VAL__NBR
+
       call comb_window(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),
      :                 nbls,nwindow,%VAL(CNF_PVAL(d_tlptr)),
      :                 %VAL(CNF_PVAL(d_trptr)),xstart,xend,
      :                 %VAL(CNF_PVAL(ptr1)),%VAL(CNF_PVAL(ptr2)))
+
+      call dsa_free_workspace(slot2,status)
       call dsa_free_workspace(slot,status)
 
       end

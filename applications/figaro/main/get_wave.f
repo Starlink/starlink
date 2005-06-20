@@ -83,7 +83,8 @@ C      double precision fit_coeffs(MAX_KPLUS1)
 * Fit a Chebyshev polynomial to the wavelengths and centres
 
          status = SAI__OK
-         call getwork(nid*3+2*MAX_KPLUS1,'double',workptr,slot,status)
+         call dsa_get_work_array(nid*3+2*MAX_KPLUS1,'double',workptr,
+     :                           slot,status)
          if(status.ne.SAI__OK) then
             get_wave = VAL__BADR
             return

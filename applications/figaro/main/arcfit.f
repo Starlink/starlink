@@ -90,12 +90,12 @@
 *                   another
 *   DJA_ARCURVE   : Produce diagnostic plots
 *   E_NPOLY       : Evaluate polynomial
-*   GETWORK       : Get virtual memory
 *   WEIGHT_FIT    : Set weights for polynomial fitting from errors
 *   SORT3D        : Sort wavelengths etc.
 *   ZERO_DBLE     : Zero double precision array
 *
 *   DSA_FREE_WORKSPACE : Free virtual memory
+*   DSA_GET_WORK_ARRAY : Get virtual memory
 *   GEN_CHB2NO    : Convert Chebyshev polynomials to "normal"
 *   GEN_REVR8     : Reverse double precision array
 *   GEN_SUBAD     : Subtract 2 double precision arrays
@@ -227,7 +227,7 @@
 *     real rrc
       double precision unused_c(line_count)
       logical production
-      integer slot
+      integer slot,slot2,slot3,slot4,slot5,slot6
       integer pstat
       integer cend,cstart,ccopy
       integer len1
@@ -354,8 +354,8 @@
 *     sort into ascending order, needed because lines might not be in
 *     order if additional lines were added at any time.
 
-               call getwork(lincnt*3+2*MAX_KPLUS1,'double',ptr1,slot,
-     :              status)
+               call dsa_get_work_array(lincnt*3+2*MAX_KPLUS1,'double',
+     :                                 ptr1,slot,status)
                if(status.ne.SAI__OK) then
                   return
                end if
@@ -571,15 +571,21 @@
 *    PTR5 LINCNT    (r)
 *    PTR6 LINCNT    (r)
 
-                  call getwork((lincnt*6),'float',ptr1,slot,status)
+                  call dsa_get_work_array(lincnt,'float',ptr1,slot,
+     :                                    status)
+                  call dsa_get_work_array(lincnt,'float',ptr2,slot2,
+     :                                    status)
+                  call dsa_get_work_array(lincnt,'float',ptr3,slot3,
+     :                                    status)
+                  call dsa_get_work_array(lincnt,'float',ptr4,slot4,
+     :                                    status)
+                  call dsa_get_work_array(lincnt,'float',ptr5,slot5,
+     :                                    status)
+                  call dsa_get_work_array(lincnt,'float',ptr6,slot6,
+     :                                    status)
                   if(status.ne.SAI__OK) then
                      return
                   end if
-                  ptr2 = ptr1 + lincnt * VAL__NBR
-                  ptr3 = ptr2 + lincnt * VAL__NBR
-                  ptr4 = ptr3 + lincnt * VAL__NBR
-                  ptr5 = ptr4 + lincnt * VAL__NBR
-                  ptr6 = ptr5 + lincnt * VAL__NBR
                   call dja_arcurve(results,resvar,lincnt,xc,
      :                             wavelength,kp1,xsect,rc,
      :                             %VAL(CNF_PVAL(ptr1)),
@@ -588,7 +594,14 @@
      :                             %VAL(CNF_PVAL(ptr4)),
      :                             %VAL(CNF_PVAL(ptr5)),
      :                             %VAL(CNF_PVAL(ptr6)))
+
+                  call dsa_free_workspace(slot6,status)
+                  call dsa_free_workspace(slot5,status)
+                  call dsa_free_workspace(slot4,status)
+                  call dsa_free_workspace(slot3,status)
+                  call dsa_free_workspace(slot2,status)
                   call dsa_free_workspace(slot,status)
+
                else if(ied.eq.2) then
                   accept = .false.
                   return
