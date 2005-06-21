@@ -142,6 +142,7 @@
       implicit none
       include 'SAE_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
+      include 'PRM_PAR'
       integer status
       include 'arc_dims'
 
@@ -232,14 +233,10 @@
       integer cend,cstart,ccopy
       integer len1
       integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6
-      include 'PRM_PAR'
 *
 * character
 *
       character*79 chars
-      character dynamic_chars
-      include 'DYNAMIC_MEMORY'
-      equivalence (dynamic_mem,dynamic_chars)
       data polytab,usenagerr,weight/.true.,.false.,.true./
 *
       production = .false.
@@ -257,9 +254,8 @@
       nag_error = -1
       call arcplot(%VAL(CNF_PVAL(d_xptr)),%VAL(CNF_PVAL(d_vsptr)),xc,
      :             results,wavein,arc,resvar,xsect,ied,nag_error,weight,
-     :             order,dynamic_chars(idsptr:idsend),polydata,
-     :             polytab,usenagerr,idstring,polydata,polytab,
-     :             usenagerr,status)
+     :             order,idstring,polydata,polytab,usenagerr,idstring,
+     :             polydata,polytab,usenagerr,status)
 
       do while(xsect.le.spdim1)
 
