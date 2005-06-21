@@ -191,6 +191,14 @@ on your machine, or the build will fail when building documentation,
 at an irritatingly late stage of the process.  This and other remarks
 are rehearsed in the <code>README</code>, mentioned above.</p>
 
+<p>The notes below are of the specific type which tends to become either wrong
+or redundant rather promptly.  If they have become wrong by the time
+you read this, please try to get in touch with the project (not
+trivial, since we have been shut down even as I write) to tell the sorry
+maintainer of this document how it should be amended or clarified.
+Ideally, there will be a bugzilla server somewhere near
+<url>http://dev.starlink.ac.uk/</url>.</p>
+
 <subsect id="platform-osx" export="export">
 <subhead>
 <title>Building on OS X</title>
@@ -199,14 +207,19 @@ are rehearsed in the <code>README</code>, mentioned above.</p>
 <p>You need a Fortran compiler: although the system compiler on OS X
 is GCC, Apple don't include g77 in their distribution.</p>
 
-<p>You can get a g77 package from either DarwinPorts or
-Fink. Darwinports is (in Norman's experience) rather more fiddly to
-set up than Fink, but it is possibly to be preferred, since it has a
+<p>You can get a g77 package from either <webref
+url="http://darwinports.opendarwin.org/" >DarwinPorts</webref> or
+<webref url="http://fink.sourceforge.net/" >Fink</webref>.  Darwinports
+is (in Norman's experience) rather more <webref
+url="http://darwinports.opendarwin.org/getdp/" >fiddly to
+set up</webref> than Fink, but it is possibly to be preferred, since it has a
 certain amount of Apple support and contributions from Apple
 employees; it appears to be more deliberately aligned with the GCC
 version in the OS X distribution; and there are suggestions that Apple
 may at some point `bless' it, and make it more easily integrated with
-a standard OS X setup.</p>
+a standard OS X setup.  Since the two projects are now reportedly
+sharing code, the distinction between them should increasingly become
+one of style rather than of quantity.</p>
 
 <p>Once you've installed one of the g77 packages, and put the appropriate binary directory in your PATH, you should be ready to go.</p>
 
@@ -220,10 +233,14 @@ notes about TeX on OS X at
 </verbatim>
 You might also have to install ghostscript from Darwinports or Fink.</p>
 
-<p>You should also install the Apple X11 distribution and also the
-X11-SDK, this should be included on your Mac OS X distribution media,
-but not installed by default. Do not use the Darwinports or Fink
-X11.</p>
+<p>You should also install the Apple X11 distribution, including the
+X11-SDK: this should be included on your Mac OS X distribution media,
+but depending on that distribution's version may or may not installed
+by default.  The OS X development tools (based on <code>gcc</code>)
+may, again, be on your distribution media, but if they are not may be
+found on an inadequately stable URL somewhere near
+<url>http://developer.apple.com/macosx/</url>.  Do not use the
+Darwinports or Fink X11.</p>
 
 </subsect>
 
@@ -240,13 +257,15 @@ the build system with a command like:
 <verbatim>
 % ./configure FC=f77 [other arguments]
 </verbatim>
-where the Tru64 Fortran 77 compiler is called <code>f77</code>. You
+where the Tru64 Fortran 77 compiler is called <code>f77</code>.  You
 can give the path to the compiler also, if the f77 you want isn't the
-first one in your <code>PATH</code>.</p>
+first one in your <code>PATH</code>.  Since this sort of robustness is
+the sort of thing we'll continue to work on, don't do this until you
+have empirically determined that it won't work otherwise.</p>
 
 <p>The Tru64 C and C++ compilers should work fine: if you have more
 than one compiler installed, you can force them with the configure
-arguments <code>CC=cc</code> and <code>CXX=cxx</code>, but this
+arguments <code>CC=cc</code> and <code>CXX=cxx</code>; but this
 shouldn't be necessary.</p>
 
 </subsect>
@@ -266,10 +285,13 @@ installed, you'll have to force the build system with a command like:
 </verbatim>
 where the Solaris Fortran 77 compiler is called <code>f77</code>. You
 can give the path to the compiler also, if the f77 you want isn't the
-first one in your <code>PATH</code>.</p>
+first one in your <code>PATH</code>.  Since this sort of robustness is
+the sort of thing we'll continue to work on, don't do this until you
+have empirically determined that it won't work otherwise.</p>
 
 <p>This dependence on a Fortran 77 compiler is true at present, and
-may be the case indefinitely; at least part of the problem is libtool,
+may be the case indefinitely; at least part of the problem is the
+current repository version of libtool,
 which appears not to understand <code>f95</code> on Solaris, so this
 problem might 
 go away with a libtool update.  As libtool doesn't understand the
@@ -351,7 +373,8 @@ Makefile that refer to (unwritable) <code>$(web2cdir)</code>.</p></li>
 </ol>
 The installation directory <code>PREFIX</code> will have to be in your
 <code>LD_LIBRARY_PATH</code> when you re-configure
-<code>dvi2bitmap</code>.</p>
+<code>dvi2bitmap</code>.  As usual, don't go to all this trouble until
+you've determined that it won't work otherwise.</p>
 
 </subsect>
 </sect>
@@ -364,7 +387,13 @@ The installation directory <code>PREFIX</code> will have to be in your
 <p>The Starlink code set is now built using the standard (or at least,
 conventional) autoconf system, so that you configure the system before
 building using the command <code>./configure</code>. See the sections above
-for more discussion.</p>
+for whatever platform-specific discussion remains necessary.</p>
+
+<p>The Plan is that you need the standard magic
+<verbatim>
+./configure; make; make install
+</verbatim>
+to build and install any of the distributed components.</p>
 
 <p>This is rather different from the old Starlink system, which used a
 <code>mk</code> script, which set up a number of environment variables to
@@ -379,7 +408,7 @@ without such platform-specific customisation.</p>
 <code>mk</code>-based system, you will see little difference in the
 new system, beyond the difference in procedure described above.</p>
 
-<p>If, on the other hand, you have previously developed using the
+<p>If, on the other hand, you have previously <em>developed</em> using the
 <code>mk</code>-based system, there will be a few more changes:
 <ol>
 <li><p><code>mk</code> scripts will no longer work.</p></li>
@@ -413,10 +442,11 @@ the Starlink developers mailing list, at
 </subhead>
 
 <p>mk scripts are now obsolete.  If you have made or modified a
-<code>mk</code> script of your own, you might possibly need to rework
+<code>mk</code> script of your own, you will certainly need to rework
 things to fit in with the new system. SUN/78 describes the new build
 system in detail, along with introductions to the autotools and
-pointers to fuller documentation.</p>
+pointers to fuller documentation.  The new system is an improvement --
+trust me.</p>
 </subsect>
 
 <subsect id="mk-install" export="export">
@@ -438,13 +468,15 @@ variable is now simply ignored.</p>
 
 <p>The <code>INSTALL</code> variable used to specify the installation
 location. This role is now performed by the <code>--prefix...=</code>
-option to the <code>./configure</code> script. This script will,
-however, look at the <code>INSTALL</code> variable and, if it is set,
+option to the <code>./configure</code> script.  There is a major clash
+of conventions here: the generated <code>./configure</code> script
+will look at the <code>INSTALL</code> variable and, if it is set,
 expect it to name a program to use instead of the standard
 <code>/usr/bin/install</code> program, to install the software after
 building.  You should almost certainly <em>not</em> have this variable
 defined, and if it is defined by accident, to anything other than an
-installation program, the buildsystem will probably fail messily.</p>
+installation program, the buildsystem will almost certainly fail very
+messily.</p>
 
 <p>See the top-level <code>README</code> file for further details about
 environment variables which affect the build.</p>
