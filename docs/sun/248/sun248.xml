@@ -33,7 +33,9 @@ deliberately terse, since we have invested effort in making the
 processes involved as easy as possible.</px>
 
 <px>This is at present a draft document, and so you should expect it
-to change relatively frequently.</px>
+to change relatively frequently.  For change details, see the CVS
+change log at
+<url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/sun/248/sun248.xml</url>.</px>
 
 <px><tabular>
 <tgroup cols="1">
