@@ -32,9 +32,11 @@
 *
 * Author:
 *   T.N.Wilkins, Cambridge,  14-OCT-1991 based on lm_mgf
+*
 * History:
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       integer m
       integer n
       double precision xc(n)
@@ -43,13 +45,12 @@
       double precision fjac(ldfjac,n)
       integer iflag
       include 'opt_cmn'
-      include 'DYNAMIC_MEMORY'
 
 *
 
 
 * Calculate residuals or derivative
 
-      call lm_skf_s(iflag,m,n,xc,rc,fjac,ldfjac,dynamic_mem(densptr),
-     :     dynamic_mem(dataptr),dynamic_mem(weightptr))
+      call lm_skf_s(iflag,m,n,xc,rc,fjac,ldfjac,%VAL(CNF_PVAL(densptr)),
+     :              %VAL(CNF_PVAL(dataptr)),%VAL(CNF_PVAL(weightptr)))
       end

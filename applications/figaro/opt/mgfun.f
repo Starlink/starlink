@@ -34,6 +34,7 @@
 *
       implicit none
       include 'opt_cmn'
+      include 'CNF_PAR'          ! For CNF_PVAL function
 *
 *-
 
@@ -52,7 +53,6 @@
       integer iw(liw)
       double precision fc1,gc1(n)
       double precision g(max_parms)
-      include 'DYNAMIC_MEMORY'
 * ---------------------------------------------------------------------
 
 * set gradient vector to zero
@@ -62,6 +62,7 @@
 * Perform the work, done in a subroutine to allow use of pointers
 * for large arrays in common.
 
-      call mgfun_sub(mpts,n,dynamic_mem(dataptr),fc1,
-     :      dynamic_mem(densptr),xc,gc1,dynamic_mem(weightptr),g)
+      call mgfun_sub(mpts,n,%VAL(CNF_PVAL(dataptr)),fc1,
+     :               %VAL(CNF_PVAL(densptr)),xc,gc1,
+     :               %VAL(CNF_PVAL(weightptr)),g)
       end

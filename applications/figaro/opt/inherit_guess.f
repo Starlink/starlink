@@ -7,7 +7,6 @@
 * Invocation:
 *    CALL INHERIT_GUESS(DIRECTION,GUESS,LINE,XSECT,NWINDOW,IY,
 *                       DECCNTR,FSTAT)
-
 *
 * Description:
 *    To obtain previous results from the results array, at the current
@@ -32,6 +31,7 @@
 *        If previous results found
 *     GUESS(*) = REAL ARRAY (Returned)
 *        Guess store
+*
 * Global variables:
 *     D_RPTR = INTEGER (Given)
 *        Pointer to results block (include file arc_dims)

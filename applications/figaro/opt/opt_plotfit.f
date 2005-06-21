@@ -51,13 +51,17 @@
 *
 *      STATUS = INTEGER (Given and returned)
 *        Error status
+*
 * Global variables:
 *      MPTS = INTEGER (Workspace)
-*        Number of elements of X and Y which are used (include file opt_cmn)
+*        Number of elements of X and Y which are used (include file
+*        opt_cmn)
+*
 *  Subroutines/functions referenced:
 *
 * Author:
 *   TNW: T.N.Wilkins, Cambridge, 11-SEP-1991
+*
 * History:
 *    TNW: 11-SEP-1991 Original version
 *    TNW: 9-JUN-1992 More comments
@@ -68,6 +72,8 @@
       implicit none
       include 'status_inc'
       include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       real fitpar(*)
       real x(*)
       real y(*)
@@ -86,10 +92,9 @@
       include 'opt_cmn'
       include 'arc_dims'
       include 'fit_coding_inc'
-      include 'PRM_PAR'
-      include 'DYNAMIC_MEMORY'
       real y1(3),pltpar(6)
       integer vbase5,work2,work3,nbad,cnv_fmtcnv
+      logical isnew1,isnew2,isnew3
 
       if(status.ne.SAI__OK) return
 
@@ -97,56 +102,66 @@
 * base
 
       if(deccntr(FIT_TYPE).eq.SINGLE) then
-        vbase5 = work + 5*mpts*VAL__NBD
-        work2 = vbase5 + 5*mpts*VAL__NBD
-        work3 = work2 + nbaswrk*5
-        call fill_dat(x(start),mpts,dynamic_mem(work3))
-        status = cnv_fmtcnv('real','double',dynamic_mem(work3),
-     :       dynamic_mem(work),mpts*5,nbad)
-        call fit_glbase(xsect,nwindow,x,dynamic_mem(work3),deccntr,
-     :       1,mpts*5,vbase5,.false.,dynamic_mem(work),work2,status)
+
+        call dyn_incad(work,'double',5*mpts,vbase5,isnew1,status)
+        call dyn_incad(vbase5,'double',5*mpts,work2,isnew2,status)
+        call dyn_incad(work2,'byte',5*nbaswrk,work3,isnew3,status)
+
+        call fill_dat(x(start),mpts,%VAL(CNF_PVAL(work3)))
+        status = cnv_fmtcnv('real','double',%VAL(CNF_PVAL(work3)),
+     :                      %VAL(CNF_PVAL(work)),mpts*5,nbad)
+        call fit_glbase(xsect,nwindow,x,%VAL(CNF_PVAL(work3)),deccntr,
+     :                  1,mpts*5,vbase5,.false.,%VAL(CNF_PVAL(work)),
+     :                  work2,status)
         call copr2r(6,fitpar,pltpar)
         call plot_fit(pltpar,deccntr(FIT_MODEL),mpts,
-     :       dynamic_mem(vbase5))
+     :                %VAL(CNF_PVAL(vbase5)))
 
+         if (isnew1) call cnf_unregp(vbase5)
+         if (isnew2) call cnf_unregp(work2)
+         if (isnew3) call cnf_unregp(work3)
       else
 
 * Doubles or multiples, we plot each component, shifted if Y if needed
 * to get on the plot (if Y minimum isn't zero), the sum of the fit, and
 * possibly the residuals
 
-        work2 = work + mpts*VAL__NBR
+        call dyn_incad(work,'float',mpts,work2,isnew2,status)
         if(deccntr(FIT_MAN).eq.MAN_ALTER) then
           call pgpage
           call gr_seld(diags(1),status)
           call disp_window2(xlim(1),xlim(2),x(start),y(start),mpts,
-     :            xunits,.false.)
+     :                      xunits,.false.)
         end if
 
 * Plot components
 
         if(deccntr(FIT_MODEL).eq.GAUSSIAN_MODEL) then
           call comp_plot(fitpar,deccntr(FIT_NCMP),mpts,
-     :         dynamic_mem(work2),x(start),y1,gaussian)
+     :                   %VAL(CNF_PVAL(work2)),x(start),y1,gaussian)
+
         else if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
           call comp_plot(fitpar,deccntr(FIT_NCMP),mpts,
-     :         dynamic_mem(work2),x(start),y1,lorentz)
-        endif
+     :                   %VAL(CNF_PVAL(work2)),x(start),y1,lorentz)
+        end if
 
 * Sum of components (and base)
 
         call multi_plot(fitpar,deccntr(FIT_NCMP),mpts,
-     :       dynamic_mem(work2),dynamic_mem(work),x(start),
-     :       deccntr(BACK_MODEL),dynamic_mem(vbase),y1)
-
+     :                  %VAL(CNF_PVAL(work2)),%VAL(CNF_PVAL(work)),
+     :                  x(start),deccntr(BACK_MODEL),
+     :                  %VAL(CNF_PVAL(vbase)),y1)
 
 * Residuals plot if applicable
 
         if(deccntr(FIT_MAN).eq.MAN_ALTER) then
           call gr_seld(diags(2),status)
-          call multi_resid(x(start),y(start),mpts,dynamic_mem(work2),
-     :         dynamic_mem(work),.true.,.true.,title,legend)
+          call multi_resid(x(start),y(start),mpts,%VAL(CNF_PVAL(work2)),
+     :                     %VAL(CNF_PVAL(work)),.true.,.true.,title,
+     :                     legend)
           call gr_seld(diags(1),status)
         end if
+         if (isnew2) call cnf_unregp(work2)
       end if
+
       end

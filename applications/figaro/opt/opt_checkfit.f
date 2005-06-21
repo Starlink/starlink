@@ -48,6 +48,7 @@
 *        If to store current fit parameters
 *      AIC = REAL (Returned)
 *        AIC
+*
 * Global variables:
 *      MAX_TIMES = INTEGER (Given)
 *        Maximum number of guess/results sets which can be stored
@@ -63,16 +64,17 @@
 *
 * Author:
 *    T.N.Wilkins, Cambridge, 11-SEP-1991
+*
 * History:
 *    TNW 8th Sept 1992 max_cmp passed in common
 *    TNW: 28th June 1993, reflect changes in opt_cmn
 *    TNW: 29th June 1993, Remove mparms
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
-      include 'DYNAMIC_MEMORY'
       real fitpar(*),fiterr(*)
       real res_store(*)
       real x(mpts),y(mpts)
@@ -110,7 +112,7 @@
 
 * Evaluate AIC, and write value to terminal etc.
 
-        call get_aic(fitpar,n,x,y,mpts,dynamic_mem(weightptr),1,aic)
+        call get_aic(fitpar,n,x,y,mpts,%VAL(CNF_PVAL(weightptr)),1,aic)
         write(chars,'(''AIC = '',f12.2)',iostat=ignore)aic
         call opt_wruser(chars,status)
 
@@ -181,9 +183,9 @@
 
         else if(loop) then
 
-          call refit_it(times,dynamic_mem(guessptr),res_store,igauss,
-     :         deccntr(FIT_NCMP),max_cmp,max_times,fitpar,
-     :         deccntr(FIT_MODEL),status)
+          call refit_it(times,%VAL(CNF_PVAL(guessptr)),res_store,igauss,
+     :                  deccntr(FIT_NCMP),max_cmp,max_times,fitpar,
+     :                  deccntr(FIT_MODEL),status)
 
           deccntr(FIT_NCMP) = igauss
           n = 3*deccntr(FIT_NCMP)+1

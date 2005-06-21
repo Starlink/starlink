@@ -44,6 +44,7 @@
 *
 *
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
 *-
       integer m,n,liw,ljc,niw
@@ -51,8 +52,7 @@
       double precision wn(niw),ajc(ljc,n)
       double precision rc(m),xc(n)
       integer miw(liw)
-      include 'DYNAMIC_MEMORY'
 
-      call sk_fun(m,n,xc,rc,ajc,dynamic_mem(dataptr)
-     :            ,dynamic_mem(densptr),dynamic_mem(weightptr) )
+      call sk_fun(m,n,xc,rc,ajc,%VAL(CNF_PVAL(dataptr)),
+     :            %VAL(CNF_PVAL(densptr)),%VAL(CNF_PVAL(weightptr)))
       end

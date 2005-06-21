@@ -28,13 +28,14 @@
 *
 * Author:
 *    T.N.Wilkins, Cambridge,  9-SEP-1991
+*
 * History:
 *    T.N.Wilkins, Cambridge, 8-SEP-1992 MAX_CMP passed in common
 *-
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
       include 'opt_cmn'
-      include 'DYNAMIC_MEMORY'
       real work(*)
       integer npcmp(0:5),ppcmp
       data npcmp/1,4,5,5,4,4/
@@ -42,7 +43,7 @@
 
       ppcmp = npcmp(deccntr(FIT_MODEL))
 
-      call rescale_store(work,dynamic_mem(guessptr),deccntr(FIT_NCMP),
-     :     times,ppcmp)
+      call rescale_store(work,%VAL(CNF_PVAL(guessptr)),
+     :                   deccntr(FIT_NCMP),times,ppcmp)
       call opt_wrfit(deccntr,work,work,.false.)
       end

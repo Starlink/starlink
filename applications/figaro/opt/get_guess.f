@@ -12,8 +12,8 @@
 *   Get the initial guesses for the optimisation
 
 * Description:
-*   This routine calls the required routine to obtain the initial estimates
-*   for the optimisation procedure.
+*   This routine calls the required routine to obtain the initial
+*   estimates for the optimisation procedure.
 
 * Arguments:
 *   MINSIG = REAL (Given)
@@ -49,10 +49,10 @@
 *-
       implicit none
       include 'status_inc'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'arc_dims'
       include 'opt_cmn'
       include 'fit_coding_inc'
-      include 'DYNAMIC_MEMORY'
       include 'SAE_PAR'
       real work(*)
       real minht
@@ -63,7 +63,6 @@
       external lorentz,gaussian
 
 *
-
       integer direction
 
       logical uspk
@@ -78,47 +77,53 @@
      :                   then
 
         uspk = deccntr(FIT_GUES).eq.PEAK
-        call opt_guess_one(dynamic_mem(guessptr),uspk,work,
-     :            dynamic_mem(dataptr),dynamic_mem(densptr),
-     :            deccntr(FIT_MODEL))
+        call opt_guess_one(%VAL(CNF_PVAL(guessptr)),uspk,work,
+     :                     %VAL(CNF_PVAL(dataptr)),
+     :                     %VAL(CNF_PVAL(densptr)),deccntr(FIT_MODEL))
 
       else if(deccntr(FIT_GUES).eq.PEAK) then
 
         if(deccntr(FIT_MODEL).eq.LORENTZ_MODEL) then
-          call bmguess(dynamic_mem(guessptr),work,minht,1.3,deccntr,
-     :          lorentz)
+          call bmguess(%VAL(CNF_PVAL(guessptr)),work,minht,1.3,deccntr,
+     :                 lorentz)
         else
-          call bmguess(dynamic_mem(guessptr),work,minht,1.3,deccntr,
-     :          gaussian)
+          call bmguess(%VAL(CNF_PVAL(guessptr)),work,minht,1.3,deccntr,
+     :                 gaussian)
         endif
 
       else if(deccntr(FIT_GUES).eq.BIMODF) then
 
-        call guess_2(dynamic_mem(densptr),mpts,dynamic_mem(guessptr),
-     :                  work,deccntr(FIT_ABS).eq.1,fstat)
+        call guess_2(%VAL(CNF_PVAL(densptr)),mpts,
+     :               %VAL(CNF_PVAL(guessptr)),work,
+     :               deccntr(FIT_ABS).eq.1,fstat)
+
         if((fstat.eq.0).and.(deccntr(FIT_TYPE).ne.DOUBLE_U)) then
 
 *     This is a tied double, so we need the separation or ratio
 
-          call tied_param(deccntr,datsc,dynamic_mem(guessptr),ratio)
+          call tied_param(deccntr,datsc,%VAL(CNF_PVAL(guessptr)),ratio)
 
         end if
 
-* Vari}us options using previous fits
+* Various options using previous fits
 
       else if((deccntr(FIT_GUES).ge.4).and.(deccntr(FIT_GUES).le.6))
      :                         then
         direction = deccntr(FIT_GUES) - 5
-        call inherit_guess(direction,dynamic_mem(guessptr),line,xsect,
-     :          nwindow,iy,deccntr,fstat)
+        call inherit_guess(direction,%VAL(CNF_PVAL(guessptr)),line,
+     :                     xsect,nwindow,iy,deccntr,fstat)
+
       else if(deccntr(FIT_GUES).eq.7) then
         call region_guess(fstat)
+
       else if(deccntr(FIT_GUES).eq.GUES_HINGE) then
         call robust_guess(fstat)
+
       else if(deccntr(FIT_GUES).eq.9) then
         call model_guess(fstat)
+
       else if(deccntr(FIT_GUES).eq.GUES_PCYG) then
-        call pcyg_guess(dynamic_mem(densptr),mpts,dynamic_mem(guessptr)
-     :       ,work)
+        call pcyg_guess(%VAL(CNF_PVAL(densptr)),mpts,
+     :                  %VAL(CNF_PVAL(guessptr)),work)
       end if
       end

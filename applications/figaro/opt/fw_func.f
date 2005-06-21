@@ -7,8 +7,8 @@
 *    CALL FW_FUNC(IFLAG,M,N,XC,RC,AJC,LJC,MIW,LIW,WN,NIW)
 
 * Purpose:
-*  Evaluate the residuals and their first derivatives for double with fixed
-*  width ratio.
+*  Evaluate the residuals and their first derivatives for double with 
+*  fixed width ratio.
 
 * Description
 *  routine to evaluate the residuals and their first derivatives
@@ -42,6 +42,7 @@
 *    TNW 25/10/90 Weighting added (had only applied to SK before!)
 *
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
 *-
       integer m,n,liw,ljc,niw
@@ -49,8 +50,7 @@
       double precision wn(niw),ajc(ljc,n)
       double precision rc(m),xc(n)
       integer miw(liw)
-      include 'DYNAMIC_MEMORY'
 
-      call fw2_fun(m,n,xc,rc,ajc,ratio,dynamic_mem(dataptr),
-     :     dynamic_mem(densptr),dynamic_mem(weightptr))
+      call fw2_fun(m,n,xc,rc,ajc,ratio,%VAL(CNF_PVAL(dataptr)),
+     :             %VAL(CNF_PVAL(densptr)),%VAL(CNF_PVAL(weightptr)))
       end

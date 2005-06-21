@@ -37,7 +37,7 @@
 *                                + n*n = DOUBLE PRECISION
 *                                + (n+1)*(n+1) = DOUBLE PRECISION ARRAY
 *                                + m*n = DOUBLE PRECISION
-*                                + wndim       (d) (wndim defined as below)
+*                                + wndim   (d) (wndim defined as below)
 *                             For FIT_MGAUSS:
 *                                5 * n = DOUBLE PRECISION
 *                                n = INTEGER
@@ -47,9 +47,10 @@
 * Global variables:
 *   WNDIM = INTEGER (Given)
 *     Dimension of a work array (include file opt_cmn)
+*
 * Subroutines/functions referenced:
 *   FIT_HANDLER      : Condition handler
-*   ESTABLISH     : Establish a condition handler
+*   ESTABLISH        : Establish a condition handler
 
 * Authors:
 *    TNW: T.N.Wilkins, Cambridge until 9/92, then Durham
@@ -65,6 +66,7 @@
 *-
       implicit none
       include 'SAE_PAR'
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'status_inc'
       include 'fit_coding_inc'
       include 'opt_cmn'
@@ -86,7 +88,6 @@
 
       integer fit_handler
       external fit_handler
-      include 'DYNAMIC_MEMORY'
 
 * Return if not ok on entry
 
@@ -97,7 +98,7 @@
       if(condhand) call establish(fit_handler)
 
       call perform_fit(deccntr,n,fitpar,fiterr,resstr,fstat,work,
-     :     dynamic_mem(guessptr))
+     :                 %VAL(CNF_PVAL(guessptr)))
 
 * Set Nag error flag
 

@@ -36,6 +36,7 @@
 *      TNW Cambridge, 1/7/92 GC not used
 *
       implicit none
+      include 'CNF_PAR'          ! For CNF_PVAL function
       include 'opt_cmn'
 *
 *-
@@ -55,7 +56,6 @@
       integer iw(liw)
       double precision fc1,gc1(n)
       double precision g(max_parms)
-      include 'DYNAMIC_MEMORY'
 * ---------------------------------------------------------------------
 
 * set gradient vector to zero
@@ -65,8 +65,9 @@
 * Perform the work, done in a subroutine to allow use of pointers
 * for large arrays in common.
 
-      call mlfun_sub(mpts,n,dynamic_mem(dataptr),fc,
-     :      dynamic_mem(densptr),xc,gc1,dynamic_mem(weightptr),g)
+      call mlfun_sub(mpts,n,%VAL(CNF_PVAL(dataptr)),fc,
+     :               %VAL(CNF_PVAL(densptr)),xc,gc1,
+     :               %VAL(CNF_PVAL(weightptr)),g)
 
       fc1 = fc
       end
