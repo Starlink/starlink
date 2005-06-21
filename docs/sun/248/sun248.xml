@@ -443,7 +443,7 @@ the Starlink developers mailing list, at
 
 <p>mk scripts are now obsolete.  If you have made or modified a
 <code>mk</code> script of your own, you will certainly need to rework
-things to fit in with the new system. SUN/78 describes the new build
+things to fit in with the new system. SSN/78 describes the new build
 system in detail, along with introductions to the autotools and
 pointers to fuller documentation.  The new system is an improvement --
 trust me.</p>
@@ -467,7 +467,7 @@ the basis of the tools and capabilities it dynamically discovers. This
 variable is now simply ignored.</p>
 
 <p>The <code>INSTALL</code> variable used to specify the installation
-location. This role is now performed by the <code>--prefix...=</code>
+location; this role is now performed by the <code>--prefix...=</code>
 option to the <code>./configure</code> script.  There is a major clash
 of conventions here: the generated <code>./configure</code> script
 will look at the <code>INSTALL</code> variable and, if it is set,
