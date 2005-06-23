@@ -7,10 +7,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun213.2}
-\newcommand{\stardocnumber}    {213.2}
-\newcommand{\stardocauthors}   {G. Privett, T. Jenness, H. Matthews}
-\newcommand{\stardocdate}      {22 September 1998}
+\newcommand{\stardocsource}    {sun213.3}
+\newcommand{\stardocnumber}    {213.3}
+\newcommand{\stardocauthors}   {G. Privett, T. Jenness, H. Matthews, V. Barnard}
+\newcommand{\stardocdate}      {22 June 2005}
 \newcommand{\stardoctitle}     {FLUXES\\[1ex]
                                 JCMT Position and Flux Density Calibration}
 \newcommand{\stardocversion}   {Version 1.1}
@@ -722,9 +722,224 @@ as a monolith (specifically as an I-task) the parameter values can
 then be retrieved from the monolith (e.g.\ by using 
 \xref{STARTCL}{sun186}{adam_message_system_extension} ).
 
+\section{How does FLUXES work?}
+\xlabel{howfluxesworks}
+\label{sec:howfluxesworks}
 
+In this section we will discuss the actual calculations performed by FLUXES to produce its position and flux output.  This depends somewhat upon the planet for which information is requested.  For Mars, the following steps are performed:
 
+\begin{itemize}
+\item{Topocentric and Geocentric R.A. and Dec positions, distances and airmass are calculated}
+\item{The solid angle subtended by the planet is calculated}
+\item{The brightness temperature at 350$\mu$m (857 GHz), $T_{b_{857}}$,  is calculated by linear interpolation from 40-day interval values, from either Wright's original model or the rotating cratered asteroid model, depending upon the date (see section \ref{sec:planet})}
+\item{The brightness temperature at 3.3mm (90 GHz), $T_{b_{90}}$, is calculated following the simple relation given by Ulich (1981, {\tt{A.J.}}, 86, 1619)}
+\item{A logarithmic interpolation between $T_{b_{857}}$ and $T_{b_{90}}$ calculates the brightness temperature for each filter wavelength}
+\item{The brightness temperature is converted to integrated and beam-corrected flux densities.}
+\end{itemize}
 
+Alternatively, for Jupiter, Saturn, Neptune and Uranus, the following calculations are performed:
 
+\begin{itemize}
+\item{Topocentric and Geocentric R.A. and Dec positions and airmass are calculated}
+\item{The solid angle subtended by the planet is calculated}
+\item{The brightness temperature for the relevant planet(s) for each filter is given by a look-up table as described in section \ref{sec:freq}}
+\item{The brightness temperature is converted to integrated and beam-corrected flux densities.}
+\end{itemize}
+
+Finally, for Mercury, Venus, the Sun and the Moon, only the first step is performed:
+\begin{itemize}
+\item{Topocentric R.A. and Dec positions, distances and airmass are calculated}
+\end{itemize}
+
+Below we will discuss the individual calculations in more depth.
+
+\subsection{Calculating topocentric and geocentric positions and distances}
+\xlabel{positionsdistances}
+\label{sec:positionsdistances}
+
+The geometry for the calculations of positions and distances to the requested planet is shown in Figure \ref{fig:geom}.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{sun213_fig2.eps}
+\vspace*{-0.5cm}
+\caption{Simplified geometry for planetary calculations}
+\label{fig:geom}
+\end{figure}
+
+The topocentric vector of a planet, $\bf{V_t}$, or the geocentric vector of the planet, $\bf{V_g}$, are calculated with reference to the geocentric vector of the Sun, $\bf{VSG}$, the heliocentric vector of the planet, $\bf{VSP}$, and the geocentric vector of the observer, $\bf{VGO}$.  Also used by the current version of FLUXES are the geocentric vector to the Moon, $\bf{VGM}$, the vector from the Sun to the Earth-Moon barycentre, $\bf{VSE}$, and the knowledge that the geocentric vector of the Earth-Moon barycentre is given by ($0.012150581 \times \bf{VGM}$).
+
+When the directions of these vectors are as shown in Figure \ref{fig:geom}, the geocentric position and velocity vector of the planet is given by
+
+\begin{displaymath}
+\bf{V_g} = - \bf{VSG} + \bf{VSP}
+\end{displaymath}
+
+where the geocentric vector of the Sun, $\bf{VSG}$, may be given as
+
+\begin{displaymath}
+{\bf{VSG}} = {\bf{VSE}} - 0.01215081 ({\bf{VGM}}).
+\end{displaymath}
+
+Similarly, the topocentric position and velocity vector of the planet is given by
+
+\begin{eqnarray*}
+\bf{V_t} & = & \bf{V_g} - \bf{VGO}\\
+& = & \bf{VSP} - \bf{VSG} - \bf{VGO}\\
+& = & {\bf{VSP}} - ({\bf{VSE}} - 0.012150581 ({\bf{VGM}})) - {\bf{VGO}}
+\end{eqnarray*}
+
+All these vector quantities must be precessed to the appropriate date. The prime symbol ($\prime$) will be used in the following equations to indicate precessed positions.
+
+Once the necessary vector is known, the actual distance is calculated as the square root of the summed square of each component, e.g.
+
+\begin{displaymath}
+d_g = \sqrt{{{{V^\prime}_{g_x}}^2} + {{{V^\prime}_{g_y}}^2} + {{{V^\prime}_{g_z}}^2}}
+\end{displaymath}
+
+and hence the light travel time to the planet is given by
+
+\begin{displaymath}
+T_l = \frac{d_g}{c}
+\end{displaymath}
+
+where $c$ is in the appropriate units.  The position vector of the planet as viewed from the Earth should then be corrected for planetary aberration, e.g.
+
+\begin{displaymath}
+{V^\prime}_{g_x, abb.} = {V^\prime}_{g_x} - (T_l \times {V^\prime}_{g_{\dot{x}}})
+\end{displaymath}
+
+where ${V^\prime}_{g_{\dot{x}}}$ is the (uncorrected) velocity vector component in the $x$ direction.  The corrected position vector ${V^\prime}_{g, abb.}$ or ${V^\prime}_{t, abb.}$ can then be converted into standard R.A. and Dec coordinates, and the airmass can be calculated from the topocentric coordinates.
+
+\subsection{Calculating the solid angle subtended by the planet}
+\xlabel{solidangle}
+\label{sec:solidangle}
+
+Several calculations in this section make use of two references in particular; planetary information is mainly taken from the ``Report of the IAU working group on cartographic coordinates and rotational elements of the planets and satellites'', which is periodically updated and published online and in {\tt{Celestial Mechanics and Dynamical Astronomy}}.  Precession formulae come from Lieske (1979, {\tt{A \& A}}, 73, 282).
+
+To calculate the solid angle of the planet in question it is necessary to take account of the ellipticity of the planet, via the direction of its North Pole.  The coordinates of the pole, $RA_{pole}$ and $Dec_{pole}$ are calculated directly from the IAU report formulae for the date given and then precessed according to Lieske's spherical coordinate formulae.  If using J2000.0 for the polar coordinates, the precession parameters $\zeta_A$, $z_A$ and $\theta_A$ (see Lieske's Fig. 1) are defined in arcseconds as
+
+\begin{displaymath}
+\zeta_A = 2306.2181 t + 0.30188 {t^2} + 0.017998 {t^3}\\
+\end{displaymath}
+\begin{displaymath}
+z_A = 2306.2181 t + 1.09468 {t^2} + 0.018203 {t^3}\\
+\end{displaymath}
+\begin{displaymath}
+\theta_A = 2004.3109 t - 0.42665 {t^2} - 0.041833 {t^3}
+\end{displaymath}
+
+and the following quantities can be defined
+
+\begin{eqnarray*}
+C & = & -(\sin Dec_{pole} \sin \theta_A) + (\cos Dec_{pole} \cos \theta_A \cos (\zeta_a + RA_{pole})\\
+S & = & \cos Dec_{pole} \sin (\zeta_a + RA_{pole})\\
+D & = & (\sin Dec_{pole} \cos \theta_A) + (\cos Dec_{pole} \sin \theta_A \cos (\zeta_a + RA_{pole})
+\end{eqnarray*}
+
+The precessed coordinates, ${RA^\prime}_{pole}$ and ${Dec^\prime}_{pole}$ are then calculated as
+
+\begin{eqnarray*}
+{RA^\prime}_{pole} & = & z_A + \arctan(S,C)\\
+{Dec^\prime}_{pole} & = & \arcsin (D)\\
+& = & \arccos (\sqrt{ S^2 + C^2})
+\end{eqnarray*}
+
+where $(S,C)$ is the complex number formed from the quantities $S$ and $C$.  From these precessed coordinates, the planetocentric declination of the Earth can be defined as
+
+\begin{displaymath}
+{Dec^\prime}_{Earth} = \arcsin {(-\sin {Dec^\prime}_{pole} \sin {Dec^\prime}_g - \cos {Dec^\prime}_{pole} \cos {Dec^\prime}_g \cos (RA^\prime}_{pole} - {RA^\prime}_g)
+\end{displaymath}
+
+where ${RA^\prime}_g$ and ${Dec^\prime}_g$ are the precessed geocentric coordinates of the planet.  The polar inclination angle of the planet, $\alpha_{pole}$,  is then given by
+
+\begin{displaymath}
+\alpha_{pole} = {Dec^\prime}_{Earth} + \frac{\pi}{2}
+\end{displaymath}
+
+or, if $Dec_{Earth} > 0$ so the South Pole is facing Earth, 
+
+\begin{displaymath}
+\alpha_{pole} =  \frac{\pi}{2} - {Dec^\prime}_{Earth}. 
+\end{displaymath}
+
+With this calculation performed the semi-major axis of the planet as seen from Earth, $R_{semi-major}$ is given as 
+
+\begin{displaymath}
+R_{semi-major} = \frac{R_{p} (1 - \epsilon_p)}{1 - \epsilon_p \cos \alpha_{pole}}
+\end {displaymath}
+
+where $R_p$ is the planet's radius and $\epsilon_p$ is its ellipticity.  Hence its geometrical mean radius $R_{gm}$ is
+
+\begin{displaymath}
+R_{gm} = \sqrt{R_p \times R_{semi-major}}
+\end{displaymath}
+
+and its semi-diameter as seen from the Earth, $D_{semi}$ is
+
+\begin{displaymath}
+D_{semi} = \frac{R_{gm}}{d_g}
+\end{displaymath}
+
+where $d_g$ is the geocentric distance of the planet from the Earth as calculated in section \ref{sec:positionsdistances}.  Finally, the solid angle subtended by the planet from the Earth, $\Omega_p$, is
+
+\begin{displaymath}
+\Omega_p = \pi {D_{semi}}^2
+\end{displaymath}
+
+\subsection{Calculating Mars' brightness temperatures}
+\xlabel{marsbright}
+\label{sec:marsbright}
+
+For Mars, the brightness temperature at each filter wavelength is calculated via a logarithmic interpolation between brightness temperatures at 350$mu$m (857 GHz), $T_{b_{857}}$, and another at 3.3mm (90 GHz), $T_{b_{90}}$.  The first of these is generated from one of two models both from Wright's work, the results of which are held as an array in FLUXES.  In the array, values for $T_{b_{857}}$ are given at 40-day intervals, and so a linear interpolation is performed to ascertain a value for the given date.
+
+The 3.3mm point is calculated from the relation given by Ulich (1981, {\tt{A.J.}}, 86, 1619):
+
+\begin{displaymath}
+T_{b_{90}} = \frac{206.8}{\sqrt{1.524/d_{hel_{Mars}}}}
+\end{displaymath}
+
+where 1.524 AU is the mean heliocentric distance of Mars and $d_{hel_{Mars}}$ is the heliocentric distance of Mars for the given date, which can be calculated from the precessed geocentric positions and distances of the Sun (${RA^\prime}_{g_{sun}}$, ${Dec^\prime}_{g_{sun}}$, $d_{g_{sun}}$) and Mars (${RA^\prime}_{g_{Mars}}$, ${Dec^\prime}_{g_{Mars}}$, $d_{g_{Mars}}$) by defining the following quantity:
+
+\begin{displaymath}
+\cos E = \sin {Dec^\prime}_{g_{Mars}} \sin {Dec^\prime}_{g_{sun}} + \cos {Dec^\prime}_{g_{sun}} \cos {Dec^\prime}_{g_{sun}} \cos ({RA^\prime}_{g_{sun}} - {RA^\prime}_{g_{Mars}}) 
+\end{displaymath}
+
+so that
+
+\begin{displaymath}
+d_{hel_{Mars}} = \sqrt{{RA^\prime}_{g_{sun}}^2 + {RA^\prime}_{g_{Mars}}^2 - 2 (\cos E){RA^\prime}_{g_{sun}}{RA^\prime}_{g_{Mars}}}.
+\end{displaymath}
+
+Thus the brightness temperature at a given frequency, $\nu$ GHz, is given by a logarithmic interpolation:
+
+\begin{displaymath}
+T_{b_\nu} = T_{b_{90}} + (T_{b_{857}} - T_{b_{90}})\frac{\ln(\nu - 90)}{\ln(857 -90)}
+\end{displaymath}
+
+\subsection{Converting brightness temperatures to flux densities}
+\xlabel{fluxdensities}
+\label{sec:fluxdensities}
+
+Once the brightness temperature is known for each filter frequency, the integrated flux density of the planet in question, $S_{int_\nu}$ is calculated as
+
+\begin{displaymath}
+S_{int_\nu} = \frac{2 h \nu^3}{c^2}\frac{ \Omega_p}{\exp{\frac{h \nu}{k T_{b_\nu}}} - 1}
+\end{displaymath}
+
+Then, with the assumptions that the planet is a flat disk with constant flux distribution across its disk, and that the beam of the telescope is a Gaussian of HPBW $\theta_{beam_\nu}$, the beam-corrected flux density of the planet at Earth, $S_{beam_\nu}$ is given by
+
+\begin{displaymath}
+S_{beam_\nu} = 1.133\ {\theta_{beam_\nu}}^{2/\Omega_p}\ [1 - \exp({\frac{1}{1.133\ {\theta_{beam_\nu}}^{2/\Omega_p} }})]\ S_{int_\nu}.
+\end{displaymath}
+
+The values of the HPBW, $\theta_{beam_\nu}$, are supplied in the same look-up file used for the other planets' brightness temperatures.
+
+The implication of the flat-disk assumption for the planet is that the observed HPBW, $\theta_{obs}$, is Gaussian and given by
+
+\begin{displaymath}
+{\theta_{obs_\nu}}^2 = {\theta_{beam_\nu}}^2 + \frac{\ln 2}{2}\ {(2 D_{semi})}^2
+\end{displaymath}
+
+for $2 D_{semi} < \theta_{beam_\nu}$, as discussed originally by Baars (1973, {\tt{IEEE trans.\ on Antennas and Propogation}}, 21, 461).
 
 \end{document}
