@@ -2393,6 +2393,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 /* Get a pointer to the SpecMap structure. */
    map = (AstSpecMap *) this;
 
+/* Return 1.0 if the SpecMap has no conversions. */
+   if( map->ncvt == 0 ) return 1.0;
+
 /* Store the type of the first conversion.*/
    cvt = map->cvttype[ 0 ];
 

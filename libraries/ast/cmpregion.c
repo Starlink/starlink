@@ -3175,6 +3175,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
       }
       smap = astAnnul( smap );
       map = astAnnul( map );
+      fs = astAnnul( fs );
    }
 
 /* Initialise a Region structure (the parent class) as the first component
@@ -3191,8 +3192,8 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
 /* Initialise the CmpRegion data. */
 /* --------------------------- */
 /* Store pointers to the component Regions. */
-      new->region1 = reg1;
-      new->region2 = reg2;
+      new->region1 = astClone( reg1 );
+      new->region2 = astClone( reg2 );
 
 /* Note the operator used to combine the somponent Regions. */
       new->oper = oper;
@@ -3228,6 +3229,8 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
    }
 
 /* Free resources */
+   reg1 = astAnnul( reg1 );
+   reg2 = astAnnul( reg2 );
    if( frm ) frm = astAnnul( frm );
 
 /* Return a pointer to the new object. */

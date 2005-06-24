@@ -49,7 +49,6 @@
 
       ff2 = ast_Fluxframe( 123.1D0, sf, 'System=flxdnw', status )
 
-*  Note incorrect unit "Angstroms" should now be OK 
       if( ast_getc( ff2, 'unit', status ) .ne. 'W/m^2/Angstrom' )
      :    call stopit( status, 'Error 6B' )
       if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' ) 
@@ -104,7 +103,7 @@
 
 
 
-      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m^2/nm)', 
+      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm)', 
      :                     status )
       if( ast_getc( ff2, 'system', status ) .ne. 'FLXDNW' ) 
      :    call stopit( status, 'error 17' )
@@ -136,7 +135,7 @@
 
 
 
-      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m^2/nm/sr)', 
+      ff2 = ast_Fluxframe( AST__BAD, AST__NULL, 'Unit=log(W/m2/nm/sr)', 
      :                     status )
       if( ast_getc( ff2, 'system', status ) .ne. 'SFCBRW' ) 
      :    call stopit( status, 'error 23' )

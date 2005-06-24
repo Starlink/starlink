@@ -5,7 +5,9 @@
 
       status = sai__ok
 
+c      call ast_SetWatchId( 292567 )
 
+      call ast_begin( status )
       call checkInterval( status )
       call checkEllipse( status )
       call checkPrism( status )
@@ -16,6 +18,10 @@
       call generalChecks( status )
       call checkCmpRegion( status ) 
       call checkPointList( status )
+
+      call ast_end( status )
+
+c      call ast_listissued( 'testregions' )
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All Region tests passed'

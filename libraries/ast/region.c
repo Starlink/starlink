@@ -2954,7 +2954,7 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
             lbnd[ i ] = 0.0;
          }
       }
-      result = (AstRegion *) astBox( bfrm, 0, lbnd, ubnd, NULL, "" );
+      result = (AstRegion *) astBox( bfrm, 1, lbnd, ubnd, NULL, "" );
    }
 
 /* Free resources. */

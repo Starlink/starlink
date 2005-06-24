@@ -25945,18 +25945,17 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* If there were no other axes, replace the supplied Frame with the skyframe. */
             if( j == 0 ) {
                astAnnul( *frm );
-               *frm = (AstFrame *) sfrm;
+               *frm = (AstFrame *) astClone( sfrm );
 
 /* Otherwise pick the other axes from the supplied Frame */               
             } else {
                ofrm = astPickAxes( *frm, j, axes, &map );
 
-/* Replace the suppleid Frame with a CmpFrame made up of this Frame and 
+/* Replace the supplied Frame with a CmpFrame made up of this Frame and 
    the SkyFrame. */
                astAnnul( *frm );
                *frm = (AstFrame *) astCmpFrame( ofrm, sfrm, "" );
                ofrm = astAnnul( ofrm );
-               sfrm = astAnnul( sfrm );
             }
 
 /* Permute the axis order to put the longitude and latitude axes back in
@@ -25977,6 +25976,9 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* Free the axes array. */
             axes= astFree( axes );
          }
+
+/* Free resources. */
+         sfrm = astAnnul( sfrm );
 
 /* Set the units in the supplied IWC Frame for the longitude and latitude
    axes. These are degrees (the conversion from degs to rads is part of
@@ -27298,6 +27300,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    }
 
 /* Annull temporary resources. */
+   reffrm = astAnnul( reffrm );
    iwcfrm = astAnnul( iwcfrm );
    map1 = astAnnul( map1 );
    map2 = astAnnul( map2 );

@@ -818,6 +818,9 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                this->centre[ ic ] += delta;
             }
 
+/* Free resources */
+            bc = astFree( bc );
+
 /* If the centre position was supplied in the base Frame, use the
    supplied "cen" or "ptr" pointer directly to change the coords in the 
    parent Region structure and the cached coords in the Circle structure. */

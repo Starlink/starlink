@@ -1179,7 +1179,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       ps2 = astAnnul( ps2 );
       mem = astFree( mem );
    }
-   map = astFree( map );
+   map = astAnnul( map );
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.

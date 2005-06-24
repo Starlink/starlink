@@ -13,6 +13,8 @@
 
       status = sai__ok
 
+      call ast_begin( status )
+
 *
 *  Create an AST object.
 *
@@ -75,6 +77,8 @@
       end do
 
  20   continue
+
+      call ast_end( status )
 
       if( ok ) then
          write(*,*) 'All XmlChan tests passed'

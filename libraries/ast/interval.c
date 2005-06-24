@@ -2707,7 +2707,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             box = astAnnul( box );
             box2 = astAnnul( box2 );
             sreg = astAnnul( sreg );
-      
+            lbnd = astFree( lbnd );      
+            ubnd = astFree( ubnd );      
          }
       
 /* Free resources */

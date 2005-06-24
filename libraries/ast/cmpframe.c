@@ -994,8 +994,10 @@ static double Angle( AstFrame *this_frame, const double a[],
       PrimaryFrame( this_frame, axis, &pframe, &paxis );
       if( strcmp( astGetClass( pframe ), "Frame" ) ) {
          iscart = 0;
+         pframe = astAnnul( pframe );
          break;
       }
+      pframe = astAnnul( pframe );
    }
 
 /* If the CmpFrame describes a Cartesian coordinate system, we can use the 
@@ -7511,6 +7513,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    transformation maps from external axis indices to internal axis 
    indices. */
       pmap = astPermMap( naxes, inperm, naxes, outperm, NULL, "" );
+      outperm = astFree( outperm );
 
 /* Combine this PermMap with the CmpMap created above, adding it in the
    forward direction at the start and in the inverse direction at the end. */

@@ -1441,9 +1441,11 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->ubnd = NULL;
 
 /* Copy dynamic memory contents */
-   nb = sizeof( double )*astGetNaxes( in );
-   out->lbnd = astStore( NULL, in->lbnd, nb );
-   out->ubnd = astStore( NULL, in->ubnd, nb );
+   if( in->lbnd && in->ubnd ) {
+      nb = sizeof( double )*astGetNaxes( in );
+      out->lbnd = astStore( NULL, in->lbnd, nb );
+      out->ubnd = astStore( NULL, in->ubnd, nb );
+   }
 }
 
 

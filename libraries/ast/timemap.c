@@ -169,20 +169,128 @@ AstTimeMap *astTimeMapId_( int, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ] );
+static double Dat( double, int );
+static double Gmsta( double, double, int );
 static double Rate( AstMapping *, double *, int, int );
+static double Rcc( double, double, double, double, double );
 static int CvtCode( const char * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static void AddArgs( int, double * );
 static void AddTimeCvt( AstTimeMap *, int, const double * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void TimeAdd( AstTimeMap *, const char *, const double[] );
-static double Gmsta( double, double, int );
-static double Dat( double, int );
-static double Rcc( double, double, double, double, double );
 
 /* Member functions. */
 /* ================= */
+
+static void AddArgs( int cvttype, double *cvtargs ) {
+/*
+*  Name:
+*     AddArgs
+
+*  Purpose:
+*     Set values for addition conversion arguments.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "timemap.h"
+*     void AddArgs( int cvttype, double *cvtargs )
+
+*  Class Membership:
+*     TimeMap member function.
+
+*  Description:
+*     This function stores value for additional conversion arguments,
+*     based on the values supplied for the user arguments.
+
+*  Parameters:
+*     cvttype
+*        The conversion type.
+*     cvtargs
+*        The arguments for the conversion.
+
+*/
+
+/* Local Variables: */
+   double r;                     /* Distance from Earth axis (AU) */
+   double z;                     /* Distance from plane of Earth equator (AU) */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Test for each valid code value in turn and assign the appropriate
+   extra values. */
+   switch ( cvttype ) {
+
+   case AST__MJDTOMJD:
+      cvtargs[ 2 ] = cvtargs[ 0 ] - cvtargs[ 1 ];
+      break;
+
+   case AST__MJDTOJD:
+      cvtargs[ 2 ] = cvtargs[ 0 ] - cvtargs[ 1 ] + 2400000.5;
+      break;
+
+   case AST__JDTOMJD:
+      cvtargs[ 2 ] = cvtargs[ 0 ] - cvtargs[ 1 ] - 2400000.5;
+      break;
+
+   case AST__MJDTOBEP:
+      cvtargs[ 2 ] = slaEpb( cvtargs[ 0 ] ) - slaEpb( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = slaEpb2d( cvtargs[ 1 ] ) - slaEpb2d( 0.0 ) - cvtargs[ 0 ];
+      break;
+
+   case AST__BEPTOMJD:
+      cvtargs[ 2 ] = slaEpb2d( cvtargs[ 0 ] ) - slaEpb2d( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = slaEpb( cvtargs[ 1 ] ) - slaEpb( 0.0 ) - cvtargs[ 0 ];
+      break;
+
+   case AST__MJDTOJEP:
+      cvtargs[ 2 ] = slaEpj( cvtargs[ 0 ] ) - slaEpj( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = slaEpj2d( cvtargs[ 1 ] ) - slaEpj2d( 0.0 ) - cvtargs[ 0 ];
+      break;
+
+   case AST__JEPTOMJD:
+      cvtargs[ 2 ] = slaEpj2d( cvtargs[ 0 ] ) - slaEpj2d( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = slaEpj( cvtargs[ 1 ] ) - slaEpj( 0.0 ) - cvtargs[ 0 ];
+      break;
+
+   case AST__TTTOTDB:
+      slaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
+      cvtargs[ 3 ] = 0.001*r*AST__AU;
+      cvtargs[ 4 ] = 0.001*z*AST__AU;
+      break;
+
+   case AST__TDBTOTT:
+      slaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
+      cvtargs[ 3 ] = 0.001*r*AST__AU;
+      cvtargs[ 4 ] = 0.001*z*AST__AU;
+      break;
+
+   case AST__TDBTOTCB:
+      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD) 
+                                        - 43144.0 ) + P0/SPD;
+      break;
+
+   case AST__TCBTOTDB:
+      cvtargs[ 1 ] = LB*( cvtargs[ 0 ] - (TTOFF/SPD) 
+                                        - 43144.0 ) + P0/SPD;
+      break;
+
+   case AST__TTTOTCG:
+      cvtargs[ 1 ] = LG*( cvtargs[ 0 ] - (TTOFF/SPD) - 43144.0 );
+      break;
+
+   case AST__TCGTOTT:
+      cvtargs[ 1 ] = LG*( cvtargs[ 0 ] - (TTOFF/SPD) - 43144.0 );
+      break;
+
+   }         
+}
+
 static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 /*
 *  Name:
@@ -311,8 +419,6 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
    const char *argdesc[ MAX_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
    const char *cvt_string;       /* Pointer to conversion type string */
-   double r;                     /* Distance from Earth axis (AU) */
-   double z;                     /* Distance from plane of Earth equator (AU) */
    int i;                        /* Argument index */
    int nargs;                    /* Number of user-supplied arguments */
    int ncvt;                     /* Number of coordinate conversions */
@@ -361,73 +467,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
          for( i = nargs; i < szargs; i++ ) this->cvtargs[ ncvt ][ i ] = AST__BAD;
          this->ncvt++;
 
-/* Test for each valid code value in turn and assign the appropriate
-   extra values. */
-         switch ( cvttype ) {
-      
-         case AST__MJDTOMJD:
-            this->cvtargs[ ncvt ][ 2 ] = args[ 0 ] - args[ 1 ];
-            break;
-      
-         case AST__MJDTOJD:
-            this->cvtargs[ ncvt ][ 2 ] = args[ 0 ] - args[ 1 ] + 2400000.5;
-            break;
-      
-         case AST__JDTOMJD:
-            this->cvtargs[ ncvt ][ 2 ] = args[ 0 ] - args[ 1 ] - 2400000.5;
-            break;
-      
-         case AST__MJDTOBEP:
-            this->cvtargs[ ncvt ][ 2 ] = slaEpb( args[ 0 ] ) - slaEpb( 0.0 ) - args[ 1 ];
-            this->cvtargs[ ncvt ][ 3 ] = slaEpb2d( args[ 1 ] ) - slaEpb2d( 0.0 ) - args[ 0 ];
-            break;
-      
-         case AST__BEPTOMJD:
-            this->cvtargs[ ncvt ][ 2 ] = slaEpb2d( args[ 0 ] ) - slaEpb2d( 0.0 ) - args[ 1 ];
-            this->cvtargs[ ncvt ][ 3 ] = slaEpb( args[ 1 ] ) - slaEpb( 0.0 ) - args[ 0 ];
-            break;
-      
-         case AST__MJDTOJEP:
-            this->cvtargs[ ncvt ][ 2 ] = slaEpj( args[ 0 ] ) - slaEpj( 0.0 ) - args[ 1 ];
-            this->cvtargs[ ncvt ][ 3 ] = slaEpj2d( args[ 1 ] ) - slaEpj2d( 0.0 ) - args[ 0 ];
-            break;
-      
-         case AST__JEPTOMJD:
-            this->cvtargs[ ncvt ][ 2 ] = slaEpj2d( args[ 0 ] ) - slaEpj2d( 0.0 ) - args[ 1 ];
-            this->cvtargs[ ncvt ][ 3 ] = slaEpj( args[ 1 ] ) - slaEpj( 0.0 ) - args[ 0 ];
-            break;
-
-         case AST__TTTOTDB:
-            slaGeoc( args[ 2 ], 0.0, &r, &z );      
-            this->cvtargs[ ncvt ][ 3 ] = 0.001*r*AST__AU;
-            this->cvtargs[ ncvt ][ 4 ] = 0.001*z*AST__AU;
-            break;
-
-         case AST__TDBTOTT:
-            slaGeoc( args[ 2 ], 0.0, &r, &z );      
-            this->cvtargs[ ncvt ][ 3 ] = 0.001*r*AST__AU;
-            this->cvtargs[ ncvt ][ 4 ] = 0.001*z*AST__AU;
-            break;
-
-         case AST__TDBTOTCB:
-            this->cvtargs[ ncvt ][ 1 ] = LB*( args[ 0 ] - (TTOFF/SPD) 
-                                              - 43144.0 ) + P0/SPD;
-            break;
-
-         case AST__TCBTOTDB:
-            this->cvtargs[ ncvt ][ 1 ] = LB*( args[ 0 ] - (TTOFF/SPD) 
-                                              - 43144.0 ) + P0/SPD;
-            break;
-
-         case AST__TTTOTCG:
-            this->cvtargs[ ncvt ][ 1 ] = LG*( args[ 0 ] - (TTOFF/SPD) - 43144.0 );
-            break;
-
-         case AST__TCGTOTT:
-            this->cvtargs[ ncvt ][ 1 ] = LG*( args[ 0 ] - (TTOFF/SPD) - 43144.0 );
-            break;
-
-         }         
+/* Test for each valid code value in turn and assign the appropriate extra values. */
+         AddArgs( cvttype, this->cvtargs[ ncvt ] );
       }
    }
 }
@@ -1423,7 +1464,7 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
-   mapping->MapMerge = MapMerge; 
+   mapping->MapMerge = MapMerge;  
 
 /* Declare the copy constructor, destructor and class dump
    function. */
@@ -1680,8 +1721,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 #define SWAP_CODES( code1, code2 ) \
             if ( cvttype[ nstep ] == code1 ) { \
                cvttype[ nstep ] = code2; \
+               AddArgs(  code2, cvtargs[ nstep ] ); \
             } else if ( cvttype[ nstep ] == code2 ) { \
                cvttype[ nstep ] = code1; \
+               AddArgs(  code1, cvtargs[ nstep ] ); \
             }
 
 /* Macro to exchange a transformation type code for its inverse (and
@@ -1692,11 +1735,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                tmp = cvtargs[ nstep ][ 0 ]; \
                cvtargs[ nstep ][ 0 ] = cvtargs[ nstep ][ 1 ]; \
                cvtargs[ nstep ][ 1 ] = tmp; \
+               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ] ); \
             } else if ( cvttype[ nstep ] == code2 ) { \
                cvttype[ nstep ] = code1; \
                tmp = cvtargs[ nstep ][ 0 ]; \
                cvtargs[ nstep ][ 0 ] = cvtargs[ nstep ][ 1 ]; \
                cvtargs[ nstep ][ 1 ] = tmp; \
+               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ] ); \
             }
 
 /* Use these macros to apply the changes where needed. */
