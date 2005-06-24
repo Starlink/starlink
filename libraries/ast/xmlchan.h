@@ -41,6 +41,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "channel.h"             /* I/O channels (parent class) */
+#include "keymap.h"              /* Mappings of keys to values */
 #include "xml.h"                 /* AST XML facilities */
 
 /* C header files. */
@@ -78,12 +79,14 @@ typedef struct AstXmlChan {
    AstXmlDocument *readcontext;/* XmlDocument giving context for current read */
    int write_isa;              /* Is the next "isA" really needed? */
    int xmlindent;              /* Indentat output? */
+   int xmlstrict;              /* Abort read on warning? */
    int xmllength;              /* Buffer length */
    int xmlformat;              /* Output format to use when writing */
    int formatdef;              /* Default format */
    char *xmlprefix;            /* Namespace prefix */
    int reset_source;           /* Read a new line from the source ? */
    const char *isa_class;      /* Class being loaded */
+   AstKeyMap *warnings;        /* A list of warning messages */
 } AstXmlChan;
 
 /* Virtual function table. */
@@ -100,10 +103,17 @@ typedef struct AstXmlChanVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   AstKeyMap *(* XmlWarnings)( AstXmlChan * );
+
    int (* GetXmlIndent)( AstXmlChan * );
    int (* TestXmlIndent)( AstXmlChan * );
    void (* ClearXmlIndent)( AstXmlChan * );
    void (* SetXmlIndent)( AstXmlChan *, int );
+
+   int (* GetXmlStrict)( AstXmlChan * );
+   int (* TestXmlStrict)( AstXmlChan * );
+   void (* ClearXmlStrict)( AstXmlChan * );
+   void (* SetXmlStrict)( AstXmlChan *, int );
 
    int (* GetXmlLength)( AstXmlChan * );
    int (* TestXmlLength)( AstXmlChan * );
@@ -167,12 +177,18 @@ AstXmlChan *astLoadXmlChan_( void *, size_t, AstXmlChanVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+AstKeyMap *astXmlWarnings_( AstXmlChan * );
 
 # if defined(astCLASS)           /* Protected */
 int astGetXmlIndent_( AstXmlChan * );
 int astTestXmlIndent_( AstXmlChan * );
 void astClearXmlIndent_( AstXmlChan * );
 void astSetXmlIndent_( AstXmlChan *, int );
+
+int astGetXmlStrict_( AstXmlChan * );
+int astTestXmlStrict_( AstXmlChan * );
+void astClearXmlStrict_( AstXmlChan * );
+void astSetXmlStrict_( AstXmlChan *, int );
 
 int astGetXmlLength_( AstXmlChan * );
 int astTestXmlLength_( AstXmlChan * );
@@ -238,12 +254,19 @@ astINVOKE(O,astLoadXmlChan_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
+#define astXmlWarnings(this) astINVOKE(O,astXmlWarnings_(astCheckXmlChan(this)))
+
 #if defined(astCLASS)            /* Protected */
 
 #define astClearXmlIndent(this) astINVOKE(V,astClearXmlIndent_(astCheckXmlChan(this)))
 #define astGetXmlIndent(this) astINVOKE(V,astGetXmlIndent_(astCheckXmlChan(this)))
 #define astSetXmlIndent(this,xmlindent) astINVOKE(V,astSetXmlIndent_(astCheckXmlChan(this),xmlindent))
 #define astTestXmlIndent(this) astINVOKE(V,astTestXmlIndent_(astCheckXmlChan(this)))
+
+#define astClearXmlStrict(this) astINVOKE(V,astClearXmlStrict_(astCheckXmlChan(this)))
+#define astGetXmlStrict(this) astINVOKE(V,astGetXmlStrict_(astCheckXmlChan(this)))
+#define astSetXmlStrict(this,xmlstrict) astINVOKE(V,astSetXmlStrict_(astCheckXmlChan(this),xmlstrict))
+#define astTestXmlStrict(this) astINVOKE(V,astTestXmlStrict_(astCheckXmlChan(this)))
 
 #define astClearXmlLength(this) astINVOKE(V,astClearXmlLength_(astCheckXmlChan(this)))
 #define astGetXmlLength(this) astINVOKE(V,astGetXmlLength_(astCheckXmlChan(this)))

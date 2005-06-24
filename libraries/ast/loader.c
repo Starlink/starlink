@@ -11,6 +11,8 @@
 #include "ellipse.h"
 #include "fitschan.h"
 #include "fluxframe.h"
+#include "timeframe.h"
+#include "timemap.h"
 #include "frame.h"
 #include "frameset.h"
 #include "grismmap.h"
@@ -42,14 +44,17 @@
 #include "specframe.h"
 #include "specmap.h"
 #include "sphmap.h"
-#include "timemap.h"
-#include "timeframe.h"
 #include "tranmap.h"
 #include "unitmap.h"
 #include "wcsmap.h"
 #include "winmap.h"
 #include "xmlchan.h"
 #include "zoommap.h"
+#include "stc.h"
+#include "stcresourceprofile.h"
+#include "stcsearchlocation.h"
+#include "stccatalogentrylocation.h"
+#include "stcobsdatalocation.h"
 
 #include "error.h"
 #include "ast_err.h"
@@ -129,14 +134,20 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(SpecFrame);
    LOAD(SpecMap);
    LOAD(SphMap);
-   LOAD(TimeMap);
    LOAD(TimeFrame);
+   LOAD(TimeMap);
    LOAD(TranMap);
    LOAD(UnitMap);
    LOAD(WcsMap);
    LOAD(WinMap);
    LOAD(XmlChan);
    LOAD(ZoomMap);
+
+   LOAD(Stc);
+   LOAD(StcResourceProfile);
+   LOAD(StcSearchLocation);
+   LOAD(StcCatalogEntryLocation);
+   LOAD(StcObsDataLocation);
 
    astError( AST__OCLUK, "astGetLoader: Object of unknown class \"%s\" cannot "
                          "be loaded.", class );

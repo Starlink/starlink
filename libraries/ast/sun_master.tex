@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.20}
+\newcommand{\stardocnumber}    {211.21}
 c-
 f+
-\newcommand{\stardocnumber}    {210.20}
+\newcommand{\stardocnumber}    {210.21}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th June 2005}
+\newcommand{\stardocdate}      {24th June 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1397,10 +1397,19 @@ forms of Channel are provided which use text formats more widely
 understood.
 
 An XmlChan is a type of Channel which stores the text in the form of 
-XML markup. Currently, the only form of markup provided by the XmlChan
-class is closely related to the text format produced by the basic Channel 
+XML markup. Currently, two forms of markup are provided by the XmlChan
+class, one is closely related to the text format produced by the basic Channel 
 class (currently, no schema or DTD is available describing this format). 
-It is hoped to add more widely understood formats later. 
+The other is a subset of the IVOA Space-Time-Coordinates (STC) schema
+described at \htmladdnormallink{
+http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
+}{
+http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
+}\footnote{XML documents which use only the subset of the STC schema
+supported by AST can be read by the XmlChan class to produce corresponding 
+AST objects (subclasses of the Stc class). However, the reverse is not
+possible. That is, AST objects can not currently be written out in the 
+form of STC documents.}.
 
 To further facilitate the storage of coordinate system information in
 astronomical datasets, a more specialised form of Channel called a
@@ -14028,12 +14037,13 @@ data. The XmlChan class (a specialised form of Channel) provides
 facilities for storing AST objects externally in the form of XML documents, 
 thus allowing such software to be used.
 
-Currently, there is no DTD or schema defining the structure of data produced 
-by an XmlChan. At the moment, such data is limited to be a fairly close
+The primary XML format used by the XmlChan class is a fairly close
 transliteration of the AST native format produced by the basic Channel
-class. The following is a native AST representation of a simple 1-D Frame
-(including comments and with the Full attribute set to zero so that some
-default attribute values are included as extra comments):
+class. Currently, there is no DTD or schema defining the structure of data 
+produced in this format by an XmlChan. The following is a native AST 
+representation of a simple 1-D Frame (including comments and with the Full 
+attribute set to zero so that some default attribute values are included 
+as extra comments):
 
 \begin{quote}
 \small
@@ -14136,6 +14146,20 @@ Skip is non-zero, then initial text is skipped over without error until
 the start of an AST object is found. this allows an AST object to be
 located within a larger XML document.
 
+\subsection{Reading IVOA Space-Time-Coordinates (STC) Descriptions}
+Note, the XmlChan also provides experimental support for reading XML documents
+which use a restricted subset of the IVOA Space-Time-Coordinates (STC) schema
+described at \htmladdnormallink{
+http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
+}{
+http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
+} (there is currently no facilities for writing such documents). When an
+STC document is read using an XmlChan, the read operation produces an AST
+Object of the Stc class, which is itself a subclass of Region. Specifically, 
+each such Object will be an instance of StcSearchLocation, StcResourceProfile,
+StcCatalogEntryLocation or StcObsDataLocation.
+
+See the description of the XmlFormat attribute for further details.
 
 \cleardoublepage
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
@@ -18694,6 +18718,11 @@ Object             - Base class for all AST Objects
             PointList  - A collection of points in a Frame
             Polygon    - A polygonal region within a 2-dimensional Frame
             Prism  - An extrusion of a Region into orthogonal dimensions
+            Stc    - Represents an generic instance of an IVOA STC description
+               StcResourceProfile - Represents an an IVOA STC ResourceProfile
+               StcSearchLocation  - Represents an an IVOA STC SearchLocation
+               StcCatalogEntryLocation - Represents an an IVOA STC CatalogEntryLocation
+               StcObsDataLocation - Represents an an IVOA STC ObsDataLocation
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
             DSBSpecFrame - Dual sideband spectral coordinate system description
@@ -20962,12 +20991,10 @@ external full Fortran SLALIB library.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.7}
+\subsection{Changes Introduced in V3.7}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V3.6 and V3.7 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V3.6 and V3.7:
 
 \begin{enumerate}
 
@@ -20980,6 +21007,21 @@ UT1, GMST, \emph{etc}). The TimeMap is a Mapping which can transform time
 values between these various systems and time scales. Note,
 FitsChans which have a foreign encoding (\emph{i.e.} any encoding other
 than NATIVE) are not able to read or write these new classes.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.7 and V4.0 (the
+current version):
+
+\begin{enumerate}
+
+\item Experimental support for reading IVOA Space-Time-Coordinates (STC)
+descriptions using the XmlChan class has been added. 
 
 \end{enumerate}
 

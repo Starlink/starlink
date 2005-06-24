@@ -97,6 +97,16 @@ GRP_C_ROUTINES = \
     specframe.c \
     specmap.c \
     sphmap.c \
+    stc.c \
+    stcresourceprofile.c \
+    stcsearchlocation.c \
+    stccatalogentrylocation.c \
+    stcobsdatalocation.c \
+    fstc.c \
+    fstcresourceprofile.c \
+    fstcsearchlocation.c \
+    fstccatalogentrylocation.c \
+    fstcobsdatalocation.c \
     timeframe.c \
     timemap.c \
     tranmap.c \
@@ -165,6 +175,11 @@ AST_H_FILES = \
                 pointlist.h \
                 polygon.h \
                 prism.h \
+                stc.h \
+                    stcresourceprofile.h \
+                    stcsearchlocation.h \
+                    stccatalogentrylocation.h \
+                    stcobsdatalocation.h \
              timeframe.h \
        channel.h \
           fitschan.h \
@@ -182,6 +197,11 @@ GRP_C_INCLUDE_FILES = \
     skyaxis.h \
     slalib.h \
     slamac.h \
+    stc.h \
+    stcresourceprofile.h \
+    stcsearchlocation.h \
+    stccatalogentrylocation.h \
+    stcobsdatalocation.h \
     wcsmath.h \
     wcstrig.h \
     xmlchan.h

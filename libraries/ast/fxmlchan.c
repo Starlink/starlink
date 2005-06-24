@@ -16,6 +16,7 @@
 *  Routines Defined:
 *     AST_XMLCHAN
 *     AST_ISAXMLCHAN
+*     AST_XMLWARNINGS
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -104,3 +105,19 @@ F77_LOGICAL_FUNCTION(ast_isaxmlchan)( INTEGER(THIS),
    )
    return RESULT;
 }
+
+F77_INTEGER_FUNCTION(ast_xmlwarnings)( INTEGER(THIS),
+                                       INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_XMLWARNINGS", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astXmlWarnings( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+
+
+

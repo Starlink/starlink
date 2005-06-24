@@ -68,6 +68,11 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/specframe.c \
             ${srcdir}/specfluxframe.c \
             ${srcdir}/specmap.c \
+            ${srcdir}/stc.c \
+            ${srcdir}/stcresourceprofile.c \
+            ${srcdir}/stcsearchlocation.c \
+            ${srcdir}/stccatalogentrylocation.c \
+            ${srcdir}/stcobsdatalocation.c \
             ${srcdir}/timeframe.c \
             ${srcdir}/timemap.c \
             ${srcdir}/tranmap.c \

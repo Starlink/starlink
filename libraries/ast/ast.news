@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V3.7) of the Starlink AST (astrometry) library is
+   A new release (V4.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,12 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- Experimental support for reading IVOA Space-Time-Coordinates (STC)
+descriptions using the XmlChan class has been added. 
+
+Main Changes in Version 3.7
+---------------------------
 
 - Support for time coordinate systems has been introduced throught the
 addition of two new classes, TimeFrame and TimeMap. The TimeFrame is a
