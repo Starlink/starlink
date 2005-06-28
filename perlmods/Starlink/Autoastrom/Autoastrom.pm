@@ -23,14 +23,16 @@ added on to allow one to pass an NDF and have its astrometry corrected.
 use strict;
 
 use Carp;
-use File::Temp qw/ tempdir /;
 use Data::Dumper;
+use File::Temp qw/ tempdir /;
+
 # We need a wack of other modules.
 #
 # That's right, a WACK.
 use Starlink::AST;
 use Starlink::Astrom;
 use Starlink::Extractor;
+
 use Astro::Coords;
 use Astro::Correlate;
 use Astro::Catalog;
@@ -39,6 +41,7 @@ use Astro::FITS::HdrTrans qw/ translate_from_FITS /;
 use Astro::FITS::Header;
 use Astro::FITS::Header::NDF;
 use Astro::WaveBand;
+
 use NDF;
 
 use vars qw/ $VERSION $DEBUG /;
@@ -565,15 +568,16 @@ sub obsdata {
       }
 
       if( $key eq 'TIME' ) {
-        if( $value !~ /^\d+(\.\d+)?$/ ||
-            $value !~ /^\d+:\d+$/ ||
+        if( $value !~ /^\d+(\.\d+)?$/ &&
+            $value !~ /^\d+:\d+$/ &&
             $value !~ /^\d+:\d+:\d+:\d+:\d+(\.\d*)?$/ ) {
           croak "Could not parse time of $value from obsdata information";
         }
+        $value =~ s/:/ /g;
       }
 
       if( $key eq 'OBS' ) {
-        if( $value !~ /^([\w\.])+$/ ||
+        if( $value !~ /^([\w\.])+$/ &&
             $value !~ /^-?\d+:\d+(\.\d*)?:\d+:\d+(\.\d*)?(:\d+(\.\d*)?)?$/ ) {
           # And who says Perl is line noise? :-)
           croak "Could not parse observatory code of $value from obsdata information";
@@ -614,6 +618,10 @@ Retrieve or set the location of the SkyCat configuration file.
 
 This method checks to see if the file exists, and if it doesn't,
 croaks.
+
+If this file is not set, it will first look in the location pointed
+to by the C<SKYCAT_CFG> environment variable, second in the
+C<$HOME/.skycat/skycat.cfg>, and third in C<$PERLPREFIX/etc/skycat.cfg>.
 
 =cut
 
@@ -717,6 +725,7 @@ sub solve {
 # We need some kind of coordinates to use. Go through the list
 # of sources given in obsdata->{SOURCE} and find the first one
 # that returns.
+  my $merged;
   my $cencoords;
   my $radius;
   my $epoch;
@@ -760,7 +769,7 @@ sub solve {
 # Determine the central coordinates and radius of search from information
 # contained in the frameset and the NDF.
         ( $cencoords, $radius ) = _determine_search_params( frameset => $frameset,
-                                                           ndf => $self->ndf );
+                                                            ndf => $self->ndf );
         $epoch = $frameset->GetC("Epoch");
         if( ! defined( $epoch ) ) {
           carp "Epoch not defined in FITS headers. Defaulting to 2000.0";
@@ -832,6 +841,7 @@ sub solve {
 
 # If we have a user-supplied catalogue, use that. Otherwise, use
 # Starlink::Extractor to extract objects from the NDF.
+
   my $ndfcat;
   if( defined( $self->ccdcatalogue ) ) {
     print "Using " . $self->ccdcatalogue . " as input catalogue for sources in frame.\n" if $self->verbose;
@@ -845,6 +855,7 @@ sub solve {
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
     print "done.\n" if $self->verbose;
+    print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
   }
 
 # We cannot do automated astrometry corrections if we have fewer
@@ -870,26 +881,59 @@ sub solve {
                                                  Dec => "$deccen",
                                                  Radius => $radius,
                                                );
+  if( defined( $self->skycatconfig ) ) {
+    $query->cfg_file( $self->skycatconfig );
+  }
   my $querycat = $query->querydb();
   print "done.\n" if $self->verbose;
+  print "Received " . $querycat->sizeof() . " objects from " . $self->catalogue . ".\n" if $self->verbose;
 
-# Again, croak if we have fewer than 4 objects.
+  # Again, croak if we have fewer than 4 objects.
   if( $querycat->sizeof < 4 ) {
     croak "Only retrieved " . $querycat->sizeof . " objects from " . $self->catalogue . ". Cannot perform automated astrometry corrections with so few objects";
   }
 
-# Add the NDF's WCS to the 2MASS catalogue, allowing us to get
+# Add the NDF's WCS to the retrieved catalogue, allowing us to get
 # X and Y positions for the retrieved objects.
+  my $filter;
   my $allstars = $querycat->allstars;
   foreach my $star ( @$allstars ) {
+    if( ! defined( $filter ) ) {
+      my @filters = $star->what_filters;
+      $filter = $filters[0];
+    }
     $star->wcs( $frameset );
+  }
+
+# Take the top brightest objects from the retrieved catalogue if
+# necessary.
+  if( $self->maxobj && $querycat->sizeof > $self->maxobj ) {
+    my $newquerycat = new Astro::Catalog;
+    my $stars = $querycat->stars;
+
+    my @filteredstars;
+    foreach my $star ( @$stars ) {
+      if( $star->get_magnitude( $filter ) =~ /^[\d\.]+/ ) {
+        push @filteredstars, $star;
+      }
+    }
+
+    @filteredstars = sort { $a->get_magnitude( $filter ) <=> $b->get_magnitude( $filter ) } @filteredstars;
+    my @newstars = @filteredstars[0..($self->maxobj - 1)];
+    $newquerycat->pushstar( @newstars );
+    $querycat = $newquerycat;
   }
 
 # Perform the correlation.
   my $corr = new Astro::Correlate( catalog1 => $ndfcat,
-                                   catalog2 => $querycat );
-  ( my $corrndfcat, my $corrquerycat ) = $corr->correlate( method => 'FINDOFF',
-                                                           verbose => $self->verbose );
+                                   catalog2 => $querycat,
+                                   keeptemps => $self->keeptemps,
+                                   method => 'FINDOFF',
+                                   temp => $self->temp,
+                                   verbose => $self->verbose,
+                                 );
+
+  ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
 
 # And yes, croak if the correlation resulted in fewer than 4 matches.
   if( $corrndfcat->sizeof < 4 ) {
@@ -907,6 +951,10 @@ sub solve {
     $ndfstar = $ndfstar->[0];
     my $querystar = $corrquerycat->popstarbyid( $i );
     $querystar = $querystar->[0];
+
+# Skip over if the stars aren't defined.
+    next if ( ! defined $ndfstar || ! defined $querystar );
+
     my $newstar = new Astro::Catalog::Star( ID => $querystar->id,
                                             Coords => $querystar->coords,
                                             X => $ndfstar->x,
@@ -916,35 +964,48 @@ sub solve {
     $merged->pushstar( $newstar );
   }
 
-# Solve astrometry.
-  my $astrom = new Starlink::Astrom( catalog => $merged );
-  my $newwcs = $astrom->solve;
-
-# Stick the WCS into the NDF.
-  my $STATUS = &NDF::SAI__OK;
-  err_begin($STATUS);
-  ndf_begin();
-  ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
-  ndfPtwcs( $newwcs, $ndf_id, $STATUS );
-  ndf_annul( $ndf_id, $STATUS );
-
-  # extract error messages and annul error status
-
-  ndf_end($STATUS);
-  if( $STATUS != &NDF::SAI__OK ) {
-    my ( $oplen, @errs );
-    do {
-      err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
-      push @errs, $opstr;
-    } until ( $oplen == 1 );
-    err_annul( $STATUS );
-    err_end( $STATUS );
-    croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
+# Output the merged catalogue to disk, if requested.
+  if( 0 && defined( $self->matchcatalogue ) ) {
+    $merged->write_catalog( Format => '', File => $self->matchcatalogue );
   }
 
-  err_end( $STATUS );
+# Solve astrometry.
+  my $astrom = new Starlink::Astrom( catalog => $merged,
+                                     keepfits => $self->keepfits,
+                                     keeptemps => $self->keeptemps,
+                                     obs => { 'time' => $self->obsdata->{TIME},
+                                              'obs' => $self->obsdata->{OBS},
+                                              'met' => $self->obsdata->{MET},
+                                              'col' => $self->obsdata->{COL} },
+                                     temp => $self->temp,
+                                     verbose => $self->verbose );
 
-  print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
+  my $newwcs = $astrom->solve;
+
+# Stick the WCS into the NDF, if requested.
+  if( $self->insert ) {
+    my $STATUS = &NDF::SAI__OK;
+    err_begin($STATUS);
+    ndf_begin();
+    ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
+    ndfPtwcs( $newwcs, $ndf_id, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
+
+    # extract error messages and annul error status
+    ndf_end($STATUS);
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
+      err_end( $STATUS );
+      croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
+    }
+    err_end( $STATUS );
+    print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
+  }
 }
 
 =back
@@ -959,7 +1020,7 @@ The following methods are private and are not exported.
 
 Configures the object.
 
-  $auto->configure( $args );
+  $auto->_configure( $args );
 
 Takes one argument, a hash reference. The hash contains key/value pairs
 that correspond to the various accessor methods of this module.
