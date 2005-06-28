@@ -12832,10 +12832,11 @@ f     affects the behaviour of the AST_WRITE routine  when
 *     - "IVOA": This is an experimental format which uses XML schemas
 *     being developed by the International Virtual Observatory Alliance
 *     (IVOA - see "http://www.ivoa.net/") to describe coordinate systems, 
-*     regions, mappings, etc. Current support is limited to the STC
+*     regions, mappings, etc. Current support is limited to the draft STC
 *     schema described at "http://hea-www.harvard.edu/~arots/nvometa/STC.html".
 *     Note, this format is under active development and is consequently
-*     poorly documented at present and liable to change.
+*     liable to change. The current implementation reflects version 1.2
+*     of the draft STC document.
 
 *  Choice of Default Format;
 *     If the XmlFormat attribute of an XmlChan is not set, the default
@@ -12861,8 +12862,8 @@ f     AST_READ.
 
 *  The IVOA Format:
 *     The IVOA format should be considered experimental. It currently
-*     caters only for certain parts of the Space-Time Coordinate (STC)
-*     schema (see http://hea-www.harvard.edu/~arots/nvometa/STC.html).
+*     caters only for certain parts of V1.20 of the the draft Space-Time 
+*     Coordinate (STC) schema (see http://hea-www.harvard.edu/~arots/nvometa/STC.html)
 *     The following points should be noted when using an XmlChan to read
 *     or write STC information (note, this list is currently incomplete):
 *
