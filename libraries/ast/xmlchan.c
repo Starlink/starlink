@@ -180,6 +180,10 @@ c     - AST_XMLWARNINGS: Return warnings from previous read operation
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
+/* Returns string "an" or "a" depending on whether the first character of
+   the supplied string is a vowel or not. */
+#define ANA(t) (t?(strchr("AaEeIiOoUu",t[0])?"an":"a"):"")
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -1864,7 +1868,7 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
 /* Search the supplied element for the required sub-elements. */
    names[ 0 ] = "JDTime|MJDTime|ISOTime";
    names[ 1 ] = "TimeOffset";
-   names[ 2 ] = "TimeScale";
+   names[ 2 ] = "TimeScale|Timescale";
    min[ 0 ] = 1;
    min[ 1 ] = 0;
    min[ 2 ] = 0;
@@ -8726,6 +8730,7 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
    char key[20];              /* Key buffer */
    char buff[300];            /* Message buffer */
    char *text;                /* Pointer to tformatted element text */
+   const char *name;          /* Element name */
    static int nwarn = 0;      /* Number of warnings issued since last reset */
 
 
@@ -8734,10 +8739,11 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
       nwarn = 0;
 
    } else if( severity == WARNING && astOK ) {
+      name = astXmlGetName( elem );
       if( !this->warnings ) this->warnings = astKeyMap( "" );
       sprintf( key, "Warning_%d", ++nwarn );
-      sprintf( buff, "astRead(%s): Warning whilst reading an %s element: %s",
-               astGetClass( this ), astXmlGetName( elem ), msg );
+      sprintf( buff, "astRead(%s): Warning whilst reading %s %s element: %s",
+               astGetClass( this ), ANA(name), name, msg );
       astMapPut0C( this->warnings, key, buff, "" );
       if( astGetXmlStrict( this ) ) severity = FAILURE;
    }
@@ -10818,7 +10824,7 @@ static AstObject *TimeFrameReader( AstXmlChan *this,
 /* Search the supplied element for the required sub-elements. */
    names[ 0 ] = "Name";
    names[ 1 ] = "TOPOCENTER";
-   names[ 2 ] = "TimeScale";
+   names[ 2 ] = "TimeScale|Timescale";
    min[ 0 ] = 0;
    max[ 0 ] = 1;
    min[ 1 ] = 0;
@@ -12828,7 +12834,7 @@ f     affects the behaviour of the AST_WRITE routine  when
 *     XML into a form which can be read by a standard AST Channel. This
 *     extra information indicates which AST attribute values should be
 *     enclosed in quotes before being passed to a Channel. 
-
+*
 *     - "IVOA": This is an experimental format which uses XML schemas
 *     being developed by the International Virtual Observatory Alliance
 *     (IVOA - see "http://www.ivoa.net/") to describe coordinate systems, 
@@ -12863,7 +12869,7 @@ f     AST_READ.
 *  The IVOA Format:
 *     The IVOA format should be considered experimental. It currently
 *     caters only for certain parts of V1.20 of the the draft Space-Time 
-*     Coordinate (STC) schema (see http://hea-www.harvard.edu/~arots/nvometa/STC.html)
+*     Coordinate (STC) schema (see http://hea-www.harvard.edu/~arots/nvometa/STC.ht$
 *     The following points should be noted when using an XmlChan to read
 *     or write STC information (note, this list is currently incomplete):
 *

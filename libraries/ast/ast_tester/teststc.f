@@ -661,7 +661,7 @@ c      end if
          call stopit( status, 'Error 4' )
 
       else if( value(:l) .ne. 'astRead(XmlChan): Warning whilst '//
-     :         'reading an Position2D element: contains more than '//
+     :         'reading a Position2D element: contains more than '//
      :         'one <Size> element. AST can only use the first' ) then
          call stopit( status, 'Error 5' )
       end if 

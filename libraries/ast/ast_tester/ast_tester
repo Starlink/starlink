@@ -50,6 +50,7 @@ if( -e $STARLINK/include/sae_par ) then
 endif
 if( -e $AST/include/ast_par ) then
    ln -sf $AST/include/ast_par $PWD/AST_PAR
+   ln -sf $AST/include/ast_err $PWD/AST_ERR
    ln -sf $AST/include/grf_par $PWD/GRF_PAR
 endif
 
