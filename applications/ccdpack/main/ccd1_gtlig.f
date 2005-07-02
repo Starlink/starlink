@@ -101,6 +101,9 @@
 *        Added NNOLIS and NLGR arguments.
 *     22-MAY-2001 (MBT):
 *        Added SKIPMT argument.
+*     01-JUL-2005 (BEC):
+*        Replaced MSG_OUT with CCD1_MSG to respect user's preference of
+*        output logging.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,10 +176,10 @@
          CALL MSG_SETI( 'NOPEN', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
          IF ( NRET .EQ. 1 ) THEN 
-            CALL MSG_OUT( ' ',
+            CALL CCD1_MSG( ' ',
      :'  ^NOPEN name accessed using parameter %^PARNAM', STATUS )
          ELSE
-            CALL MSG_OUT( ' ',
+            CALL CCD1_MSG( ' ',
      :'  ^NOPEN names accessed using parameter %^PARNAM', STATUS )
          END IF
       END IF
