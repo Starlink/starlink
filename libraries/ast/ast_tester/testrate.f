@@ -1,4 +1,4 @@
-      program teststc
+      program testrate
       implicit none
       include 'SAE_PAR'
       include 'AST_PAR'
