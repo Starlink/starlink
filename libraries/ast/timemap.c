@@ -436,7 +436,7 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 /* If the coordinate conversion type was not valid, then report an
    error. */
    if ( astOK && !cvt_string ) {
-      astError( AST__SPCIN,
+      astError( AST__TIMIN,
                 "Invalid time coordinate conversion type (%d).",
                 astGetClass( this ), (int) cvttype );
    }
@@ -3265,7 +3265,7 @@ f     AST_TRANSFORM
 
 /* If the string was not recognised, then report an error. */
    if ( astOK && ( cvttype == AST__TIME_NULL ) ) {
-      astError( AST__SPCIN,
+      astError( AST__TIMIN,
                 "%s(%s): Invalid TimeMap time coordinate "
                 "conversion type \"%s\".", "astAddTime", astGetClass( this ), cvt );
    }
@@ -4104,7 +4104,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          sval = CvtString( this->cvttype[ icvt ], &comment, 
                            &nargs, &szargs, argdesc );
          if ( astOK && !sval ) {
-            astError( AST__SPCIN,
+            astError( AST__TIMIN,
                       "astWrite(%s): Corrupt %s contains invalid TimeMap "
                       "time coordinate conversion code (%d).",
                       astGetClass( channel ), astGetClass( this ),

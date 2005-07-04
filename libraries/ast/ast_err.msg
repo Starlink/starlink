@@ -146,8 +146,7 @@ MPIND           <invalid integer index supplied for a KeyMap entry>
 REGCN           <region cannot be re-centred>
 NOVAL           <attribute has no usable value>
 INCTS           <incompatible time scales>
-
-! New codes introduced for V3.6
+TIMIN           <invalid TimeMap>
 STCKEY          <cannot use supplied AstroCoords info>
 STCIND          <invalid AstroCoords index>
 

@@ -3737,14 +3737,16 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    char *new_setting;            /* Pointer value to new attribute setting */
    double dval;                  /* Double atribute value */
    double mjd;                   /* MJD read from setting */
+   double origin;                /* TimeOrigin value */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
-   int ulen;                     /* Used length of setting string */
    int namelen;                  /* Length of attribute name in setting */
    int nc;                       /* Number of characters read by astSscanf */
-   int off;                      /* Offset of attribute value */
    int off2;                     /* Modified offset of attribute value */
+   int off;                      /* Offset of attribute value */
+   int rep;                      /* Original error reporting state */
    int sign;                     /* Sign of longitude value */
+   int ulen;                     /* Used length of setting string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3890,8 +3892,34 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "timeorigin= %lg %n%*s %n", &dval, &off, &nc ) )
         && ( nc >= len ) ) {
-      astSetTimeOrigin( this, ToUnits( this, setting + off, dval,
-                                       "astSetTimeOrigin" ) );
+
+/* Defer error reporting in case a date string was given which starts
+   with a floating point number, then convert the supplied value to the
+   default units for the TimeFrame's System. */
+      rep = astReporting( 0 );
+      origin = ToUnits( this, setting + off, dval, "astSetTimeOrigin" );
+      if( !astOK ) astClearStatus;
+      astReporting( rep );
+
+/* If the origin was converted, store it. */
+      if( origin != AST__BAD ) {
+         astSetTimeOrigin( this, origin );
+
+/* Otherwise, interpret the string as a date. Convert first to MJD then to 
+   default system. */
+      } else if ( nc = 0,
+           ( 0 == astSscanf( setting, "timeorigin=%n%*[^\n]%n", &off, &nc ) )
+           && ( nc >= len ) ) {
+         mjd = astReadDateTime( setting + off );
+         if ( astOK ) {
+            astSetTimeOrigin( this, FromMJD( this, mjd ) );
+
+/* Report contextual information if the conversion failed. */
+         } else {
+            astError( AST__ATTIN, "astSetAttrib(%s): Invalid TimeOrigin value "
+                      "\"%s\" given.", astGetClass( this ), setting + off );
+         }
+      }
 
 /* String (assumed to be a date). Convert first to MJD then to default
    system. */
