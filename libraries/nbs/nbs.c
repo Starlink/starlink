@@ -128,6 +128,7 @@
 *     BKM: Brian McIIwrath (Starlink)
 *     AA: Alasdair Allan (Starlink)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  Version Date:
@@ -285,6 +286,8 @@
 *        Fixed ifdef logic for building under Mac OSX
 *     12-Sep-04 - (TIMJ):
 *        Minimize compiler warnings. Use new style ems calling convention.
+*     04-Jul-05 - (PWD):
+*        Comment out void arglist function prototypes. GCC4 doesn't allow those.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -950,8 +953,8 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 
 /* External function declarations */
 
-   extern char	*NBS_ALLOC();
-   extern char 	*NBS_INIT_ALLOC();
+      /*extern char	*NBS_ALLOC();
+        extern char 	*NBS_INIT_ALLOC();*/
 
 /* Local variable declarations */
 
@@ -1148,7 +1151,7 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
 /* External function declarations */
 
-   extern char	*NBS_ALLOC();
+      /*extern char	*NBS_ALLOC();*/
 
 /* Local variable declarations */
 
@@ -1343,8 +1346,8 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
 /* External function declarations */
 
-   extern char	*NBS_ALLOC();
-   extern char	*NBS_DATA_ALLOC();
+      /*extern char	*NBS_ALLOC();
+        extern char	*NBS_DATA_ALLOC();*/
 
 /* Local variable declarations */
 
@@ -1673,11 +1676,11 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
 
 /* External function declarations */
 
-   extern char	*NBS_CREATE_SECTION();
-   extern char	*NBS_DEINIT_ALLOC();
-   extern char	*NBS_RELOCATE_ADDRESS();
-   extern void	NBS_RELOCATE_POINTERS();
-   extern int	*NBS_WRITE_FILE();
+      /*extern char	*NBS_CREATE_SECTION();
+        extern char	*NBS_DEINIT_ALLOC();
+        extern char	*NBS_RELOCATE_ADDRESS();
+        extern void	NBS_RELOCATE_POINTERS();
+        extern int	*NBS_WRITE_FILE();*/
 
 /* Local variable declarations */
 
@@ -1867,12 +1870,12 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 
 /* External function declarations */
 
-   extern int	NBS_CLOSE_FILE();
-   extern char	*NBS_CREATE_SECTION();
-   extern int	NBS_OPEN_FILE();
-   extern int	NBS_READ_FILE();
-   extern char	*NBS_RELOCATE_ADDRESS();
-   extern int	NBS_UNMAP_SECTION();
+      /*extern int	NBS_CLOSE_FILE();
+        extern char	*NBS_CREATE_SECTION();
+        extern int	NBS_OPEN_FILE();
+        extern int	NBS_READ_FILE();
+        extern char	*NBS_RELOCATE_ADDRESS();
+        extern int	NBS_UNMAP_SECTION();*/
 
 /* Local variable declarations */
 
@@ -2033,12 +2036,12 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 
 /* External function declarations */
 
-   extern int	NBS_CLOSE_FILE();
-   extern char	*NBS_CREATE_SECTION();
-   extern int	NBS_OPEN_FILE();
-   extern int	NBS_READ_FILE();
-   extern char	*NBS_RELOCATE_ADDRESS();
-   extern int	NBS_UNMAP_SECTION();
+      /*extern int	NBS_CLOSE_FILE();
+        extern char	*NBS_CREATE_SECTION();
+        extern int	NBS_OPEN_FILE();
+        extern int	NBS_READ_FILE();
+        extern char	*NBS_RELOCATE_ADDRESS();
+        extern int	NBS_UNMAP_SECTION();*/
 
 /* Local variable declarations */
 
@@ -2178,8 +2181,8 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 
 /* External function declarations */
 
-   extern int	NBS_OPEN_WRITE();
-   extern int	NBS_UPDATE_FILE();
+      /*extern int	NBS_OPEN_WRITE();
+        extern int	NBS_UPDATE_FILE();*/
 
 /* Local variable declarations */
 
@@ -2344,9 +2347,9 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 
 /* External function declarations */
 
-   extern char	*NBS_MAP_SECTION();
-   extern void	NBS_RELOCATE_ITEM();
-   extern int	NBS_UNMAP_SECTION();
+      /*extern char	*NBS_MAP_SECTION();
+        extern void	NBS_RELOCATE_ITEM();
+        extern int	NBS_UNMAP_SECTION();*/
 
 /* Local variable declarations */
 
@@ -2854,7 +2857,7 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
 
 /* External function declarations */
 
-   extern int	NBS_UNMAP_SECTION();
+      /*extern int	NBS_UNMAP_SECTION();*/
 
 /*   extern int	free(); */
 
