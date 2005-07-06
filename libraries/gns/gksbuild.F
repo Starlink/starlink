@@ -154,6 +154,7 @@
       LOGICAL ESCAPE
       INTEGER IND
       CHARACTER*26 UPPER,LOWER
+      INTEGER IERR
 
       DATA UPPER/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
       DATA LOWER/'abcdefghijklmnopqrstuvwxyz'/
@@ -170,7 +171,8 @@
       NP = NP + 1
       IF (NP.GT.128) THEN
          BUFF = ' '
-         READ (UNIT=1,FMT='(A)',END=100) BUFF
+         READ (UNIT=1,FMT='(A)',IOSTAT=IERR) BUFF
+         IF ( IERR .NE. 0 ) GOTO 100
          NP = 1
       END IF
 
