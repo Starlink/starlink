@@ -33,7 +33,7 @@
       INTEGER*2 VAL__ZUW
       PARAMETER ( VAL__ZUW = 0 )
 
-      INTEGER*2 VAL__ZI
+      INTEGER VAL__ZI
       PARAMETER ( VAL__ZI = 0 )
 
       REAL VAL__ZR
