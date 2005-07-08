@@ -1,9 +1,10 @@
 #!perl -w
 
+use Test::More tests => 9;
 use strict;
 no strict "vars";
 
-use NDF;
+use_ok("NDF");
 
 # ================================================================
 #   Test NDF calls to read FITS extension information
@@ -11,46 +12,45 @@ use NDF;
 # ================================================================
 
 # Test file
-$file = "test";
-
-$n=4; # number of tests
-print "1..$n\n";
+my $file = "test";
 
 # initialise global status
-$status = &NDF::SAI__OK;
+my $status = &NDF::SAI__OK;
 
 # Initialise NDF
-ndf_begin;
+ndf_begin();
 
 # Open up the test file
 die "Couldn't find test file: $file\n" unless (-e "$file.sdf");
 
-ndf_find(&NDF::DAT__ROOT, $file, $indf, $status);
+ndf_find(&NDF::DAT__ROOT, $file, my $indf, $status);
+is($status, &NDF::SAI__OK, "Check status");
 
+ndf_xloc($indf, 'FITS', 'READ', my $floc, $status);
+is($status, &NDF::SAI__OK, "Check status");
 
-ndf_xloc($indf, 'FITS', 'READ', $floc, $status);
-dat_get1c($floc, 200, @fits, $nfits, $status);
+my @fits;
+dat_get1c($floc, 200, \@fits, my $nfits, $status);
 
-(($status == &NDF::SAI__OK) && ($nfits == 129)) && (print "ok\n") || 
-  (print "not ok\n");
+is($nfits, 129, "Count FITS array");
+is($status, &NDF::SAI__OK, "Check status");
 
 # Test the fits calls
-$inst = fits_get_item(@fits, 'INSTRUME');
+$inst = fits_get_item(\@fits, 'INSTRUME');
 
-($inst eq 'SCUBA') && (print "ok\n") || (print "not ok\n");
+is($inst, "SCUBA", "Check instrument");
 
 undef $comment;
-($name, $value, $comment) = fits_get_nth_item(@fits, 3);
+($name, $value, $comment) = fits_get_nth_item(\@fits, 3);
 
-(($name eq "ALT-OBS") && ($value == 4092)) && (print "ok\n") || 
-  (print "not ok\n");
+is($name, "ALT-OBS", "Check FITS name");
+is($value, 4092, "Check value");
 
 # Clean up and close the file
 
 ndf_annul($indf, $status);
 ndf_end($status);
-
-($status != &NDF::SAI__OK) && do { print "not ok\n"; exit;} || (print "ok\n");
+is($status, &NDF::SAI__OK, "Check status");
 
 
 

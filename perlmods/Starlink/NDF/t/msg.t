@@ -1,13 +1,12 @@
 #!perl -w
 
+use Test::More tests => 13;
 use strict;
-use Test;
-BEGIN { plan tests => 12 }
-use NDF;
+use_ok( "NDF" );
 
 # ================================================================
 #   Test MSG calls
-#   
+#
 # ================================================================
 
 # initialise global status
@@ -31,7 +30,7 @@ my $pi = 3.141592654;
 msg_fmtr('FMT', 'f4.2', $pi);
 msg_out(' ','# Hello: ^TEST with pi = ^FMT',$status);
 
-ok($status, $good);
+is($status, $good, "Check status");
 
 
 # Set up some tokens and then return the message
@@ -58,7 +57,7 @@ foreach my $tok (keys %tokens) {
   eval "msg_set$tok('$tok', '$tokens{$tok}');";
   die "Error processing msg_set$tok : $@" if $@;
   msg_load($tok, "^$tok", my $opstr, my $oplen, $status);
-  ok($opstr, $tokans{$tok});
+  is($opstr, $tokans{$tok}, "Compare tokens");
 }
 
 # Now try the formatted equivalent
@@ -88,10 +87,10 @@ foreach my $tok (keys %tokens) {
   eval "msg_fmt$tok('$tok', '$tokfmt{$tok}','$tokens{$tok}');";
   die "Error processing msg_fmt$tok : $@" if $@;
   msg_load($tok, "^$tok", my $opstr, my $oplen, $status);
-  ok($opstr, $tokans{$tok});
+  is($opstr, $tokans{$tok},"compare tokens");
 }
 
 # Tuning
 msg_tune('SZOUT', 23, $status);
 msg_tune('SZOUT', 0, $status);
-ok($status, $good);
+is($status, $good, "Check status");

@@ -3,8 +3,7 @@
 # Test FITS header processing
 
 use strict;
-use Test;
-BEGIN { plan tests => 76 }
+use Test::More tests => 76;
 
 use NDF qw/ fits_extract_key_val fits_construct_string /;
 
@@ -34,14 +33,14 @@ my @parts = (
 foreach my $hdr (@parts) {
 
   my $line = &fits_construct_string(@$hdr);
-  ok( length($line), 80);
+  is( length($line), 80, "Check line length");
 
   print "# $line\n";
   my ($key, $val, $com) = fits_extract_key_val($line);
 
-  ok( $key, $hdr->[0]);
-  ok( $val, $hdr->[1]);
-  ok( $com, $hdr->[2]); 
+  is( $key, $hdr->[0], "Key");
+  is( $val, $hdr->[1], "Value");
+  is( $com, $hdr->[2], "Comment"); 
 
 }
 
@@ -63,13 +62,13 @@ foreach my $hdr (@parts) {
 foreach my $hdr (@parts) {
 
   my $line = &fits_construct_string(@$hdr[0..2]);
-  ok( length($line), 80);
+  is( length($line), 80,"Line length");
 
   print "# $line\n";
   my ($key, $val, $com) = fits_extract_key_val($line);
 
-  ok( $key, $hdr->[3]);
-  ok( $val, $hdr->[4]);
-  ok( $com, $hdr->[5]);
+  is( $key, $hdr->[3],"Key");
+  is( $val, $hdr->[4],"Value");
+  is( $com, $hdr->[5],"Comment");
 
 }
