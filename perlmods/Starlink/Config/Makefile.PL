@@ -49,16 +49,16 @@ if (-d $base) {
 unlink 'Config.pm';
 
 # Now open the pm file
-open(PM, ">Config.pm") or die "Could not write Config.pm file";
+open(my $PM, ">Config.pm") or die "Could not write Config.pm file";
 
 print "$pkg - Writing Config.pm\n";
 
 # and write the contents
 while (defined($line = <DATA>)) {
-  print PM $line;
+  print $PM $line;
 }
 # Now print the DATA tag
-print PM "__DATA__\n";
+print $PM "__DATA__\n";
 
 # Now generate the subdirectories
 # Could use File::Spec to do this in future but wait until next release
@@ -66,7 +66,7 @@ print PM "__DATA__\n";
 # Dont like trailing slashes
 $base =~ s,/$,,;
 
-print PM qq|Star =>       $base
+print $PM qq|Star =>       $base
 Star_Inc   => $base/include
 Star_Lib   => $base/lib
 Star_Bin   => $base/bin
@@ -75,7 +75,7 @@ Star_Share => $base/share
 
 
 # And close the file
-close PM or die "Error closing Config.pm: $!";
+close $PM or die "Error closing Config.pm: $!";
 
 
 # Now Write the makefile
@@ -161,6 +161,22 @@ in F</star/share>.
 
 =back
 
+=head1 OVERRIDES
+
+Sometimes you want to try out an alternative Starlink location
+(eg when building a Starlink module) without wanting to install
+it in a system perl. This is possible using the C<:override> import
+tag.
+
+  use Starlink::Config qw/ :override /;
+
+This will then look at $STARLINK or $STARCONF_DEFAULT_STARLINK
+in order to provide a new tree. If you would like a verbose message
+that this is happening (important when building modules) use the
+C<:verbose> switch.
+
+  use Starlink::Config qw/ :override :verbose /;
+
 =head1 IMPLEMENTATION
 
 C<%StarConfig> is implemented as a tied hash primarily to
@@ -174,7 +190,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) Particle Physics and Astronomy Research Council 1999-2004.
+Copyright (C) Particle Physics and Astronomy Research Council 1999-2005.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
@@ -199,17 +215,54 @@ use vars qw/ %StarConfig @ISA @EXPORT $VERSION/;
 @ISA = qw(Exporter);
 @EXPORT = qw(%StarConfig);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # This is populated from <DATA>
 my (%localConfig);
+
+# Allows the hash to be overridden
+my $OVERRIDE;
+
+# Support the :override option
+sub import {
+  my @args = @_;
+
+  # check for verbosity
+  my $verb = 0;
+  $verb = grep { $_ eq ':verbose' } @_;
+
+  if ( grep { $_ eq ':override' } @_) {
+    my $dir;
+
+    for my $try ( qw/ STARCONF_DEFAULT_STARLINK STARLINK /) {
+      if ( exists $ENV{$try} && -d $ENV{$try}) {
+	$OVERRIDE = $ENV{$try};
+
+	warn "Overriding local Starlink configuration using \$$try\n"
+	  if $verb;
+
+	last;
+      }
+    }
+
+  }
+
+  # remove known entries and process remainder
+  @args = grep { $_ !~ /^:(override|verbose)$/} @args;
+  __PACKAGE__->export_to_level(1, @args);
+}
 
 # use a tied hash so that we can enforce read-only
 
 sub TIEHASH { bless \%localConfig; }
 
 sub FETCH {
-  $_[0]->{$_[1]};
+  my $value = $_[0]->{$_[1]};
+  # if overidden remove the old prefix and replace
+  if ( defined $OVERRIDE ) {
+    $value =~ s/$_[0]->{Star}/$OVERRIDE/;
+  }
+  return $value;
 }
 
 sub FIRSTKEY { (each %{$_[0]})[0]; }
