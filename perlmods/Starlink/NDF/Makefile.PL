@@ -5,7 +5,7 @@ use Config;
 $osname = $Config{osname};
 
 # For location of Starlink libraries and incs
-eval "use Starlink::Config;";
+eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
   print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
@@ -14,7 +14,6 @@ if ($@) {
 		 Star_Bin => '/star/bin',
                 );
 }
-
 
 # ------- Install directory
 # This is where the new perl binary will be placed if you 'make perl'
