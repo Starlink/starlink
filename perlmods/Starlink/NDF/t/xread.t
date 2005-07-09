@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 use strict;
 use_ok("NDF");
 
