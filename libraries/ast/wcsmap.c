@@ -577,6 +577,7 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* Local Type Definitions. */
 /* ----------------------- */
@@ -2799,9 +2800,12 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    AstWcsMap *newwcs;         /* Pointer to returned WcsMap */
    AstWcsMap *this;           /* Pointer to WcsMap structure */
    int *result;               /* Pointer to returned array */
+   int *inperm;               /* Input axis permutation array */
+   int *outperm;              /* Output axis permutation array */
    int i;                     /* Loop count */
    int iin;                   /* Mapping input index */
    int ilat;                  /* Index of latitude axis in new WcsMap */
+   int ilatlon;               /* Index of last lat or lon axis */
    int ilon;                  /* Index of longitude axis in new WcsMap */
    int latax;                 /* Index of latitude axis in supplied WcsMap */
    int lonax;                 /* Index of longitude axis in supplied WcsMap */
@@ -2846,8 +2850,10 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
                break;
             } else if( iin == lonax ) {
                ilon = i;
+               ilatlon = i;
             } else if( iin == latax ) {
                ilat = i;
+               ilatlon = i;
             }
             result[ i ] = iin;
          }
@@ -2870,10 +2876,34 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          } else if( ilat == -1 && ilon == -1 ) {
             *map = (AstMapping *) astUnitMap( nin, "" );
 
-/* If only one of the latitude and longitude axes was selected we cannot
-   split the Mapping.*/
+/* If only one of the latitude and longitude axes was selected we remove
+   it from the returned Mapping (a PermMap) and list of outputs */
          } else {
-            result = astFree( result );   
+            
+            for( i = ilatlon; i < nin - 1; i++ ) {
+               result[ i ] = result[ i + 1 ];
+            }
+            result[ i ] = -1;
+
+            inperm = astMalloc( sizeof( int )*(size_t) nin );
+            outperm = astMalloc( sizeof( int )*(size_t) ( nin - 1 ) );
+            if( outperm ) {
+               for( i = 0; i < ilatlon; i++ ) {
+                  inperm[ i ] = i;
+                  outperm[ i ] = i;
+               }
+               inperm[ ilatlon ] = INT_MAX;
+               for( i = ilatlon + 1; i < nin; i++ ) {
+                  inperm[ i ] = i - 1;
+                  outperm[ i - 1 ] = i;
+               }
+
+               *map = (AstMapping *) astPermMap( nin, inperm, nin - 1, outperm, NULL, " " );
+
+            }
+            inperm = astFree( inperm );
+            outperm = astFree( outperm );
+
          }
       }
    }

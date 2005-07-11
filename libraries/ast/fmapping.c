@@ -18,12 +18,14 @@
 *     AST_INVERT
 *     AST_ISAMAPPING
 *     AST_LINEARMAPPING
+*     AST_MAPBOX
+*     AST_MAPSPLIT
+*     AST_RATE
 *     AST_RESAMPLE<X>
 *     AST_SIMPLIFY
 *     AST_TRAN1
 *     AST_TRAN2
 *     AST_TRANN
-*     AST_RATE
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -464,4 +466,28 @@ F77_DOUBLE_FUNCTION(ast_rate)( INTEGER(THIS),
    )
    return RESULT;
 }
+
+
+F77_SUBROUTINE(ast_mapsplit)( INTEGER(THIS),
+                              INTEGER(NIN),
+                              INTEGER_ARRAY(IN),
+                              INTEGER_ARRAY(OUT),
+                              INTEGER(MAP),
+                              INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(NIN)
+   GENPTR_INTEGER_ARRAY(IN)
+   GENPTR_INTEGER_ARRAY(OUT)
+   GENPTR_INTEGER(MAP)
+   AstMapping *map;
+
+   astAt( "AST_MAPSPLIT", NULL, 0 );
+   astWatchSTATUS(
+      astMapSplit( astI2P( *THIS ), *NIN, IN, OUT, &map );
+      *MAP = astP2I( map );
+   )
+}
+
+
+
 

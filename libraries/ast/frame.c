@@ -5808,6 +5808,11 @@ f        The global status.
 *     quantities (such as angles or positions on the sky), coordinates
 *     will typically be wrapped into an appropriate standard range,
 *     such as zero to 2*pi.
+*     - The NormMap class is a Mapping which can be used to normalise a
+*     set of points using the 
+c     astNorm function
+f     AST_NORM routine
+*     of a specified Frame.
 *     - It is intended to be possible to put any set of coordinates
 *     into a form suitable for display by using this function to
 *     normalise them, followed by appropriate formatting

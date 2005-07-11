@@ -34,6 +34,7 @@
 #include "polygon.h"
 #include "polymap.h"
 #include "prism.h"
+#include "normmap.h"
 #include "ratemap.h"
 #include "region.h"
 #include "shiftmap.h"
@@ -124,6 +125,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(PolyMap);
    LOAD(Polygon);
    LOAD(Prism);
+   LOAD(NormMap); 
    LOAD(RateMap); 
    LOAD(Region);
    LOAD(ShiftMap);

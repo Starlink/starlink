@@ -429,10 +429,12 @@ void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[] )
 void astDecompose_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 double astRate_( AstMapping *, double *, int, int );
+int *astMapSplit_( AstMapping *, int, int *, AstMapping ** );
 #else
 void astDecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 double astRateId_( AstMapping *, double *, int, int );
+void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping ** );
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -450,7 +452,6 @@ int astTestReport_( AstMapping * );
 void astClearInvert_( AstMapping * );
 void astClearReport_( AstMapping * );
 int astMapList_( AstMapping *, int, int, int *, AstMapping ***, int ** );
-int *astMapSplit_( AstMapping *, int, int *, AstMapping ** );
 void astReportPoints_( AstMapping *, int, AstPointSet *, AstPointSet * );
 void astSetInvert_( AstMapping *, int );
 void astSetReport_( AstMapping *, int );
@@ -540,6 +541,8 @@ astINVOKE(V,astDecompose_(astCheckMapping(this),(AstMapping **)(map1),(AstMappin
 astINVOKE(V,astMapBox_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
 #define astRate(this,at,ax1,ax2) \
 astINVOKE(V,astRate_(astCheckMapping(this),at,ax1,ax2))
+#define astMapSplit(this,nin,in,map) \
+astINVOKE(V,astMapSplit_(this,nin,in,map))
 #else
 #define astDecompose(this,map1,map2,series,inv1,inv2) \
 astINVOKE(V,astDecomposeId_(astCheckMapping(this),(AstMapping **)(map1),(AstMapping **)(map2),series,inv1,inv2))
@@ -547,6 +550,8 @@ astINVOKE(V,astDecomposeId_(astCheckMapping(this),(AstMapping **)(map1),(AstMapp
 astINVOKE(V,astMapBoxId_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
 #define astRate(this,at,ax1,ax2) \
 astINVOKE(V,astRateId_(astCheckMapping(this),at,ax1,ax2))
+#define astMapSplit(this,nin,in,out,map) \
+astINVOKE(V,astMapSplitId_(astCheckMapping(this),nin,in,out,map))
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -569,8 +574,6 @@ astINVOKE(V,astGetTranForward_(astCheckMapping(this)))
 astINVOKE(V,astGetTranInverse_(astCheckMapping(this)))
 #define astMapList(this,series,invert,nmap,map_list,invert_list) \
 astINVOKE(V,astMapList_(this,series,invert,nmap,map_list,invert_list))
-#define astMapSplit(this,nin,in,map) \
-astINVOKE(V,astMapSplit_(this,nin,in,map))
 #define astMapMerge(this,where,series,nmap,map_list,invert_list) \
 astINVOKE(V,astMapMerge_(astCheckMapping(this),where,series,nmap,map_list,invert_list))
 #define astReportPoints(this,forward,in_points,out_points) \

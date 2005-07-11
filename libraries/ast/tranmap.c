@@ -691,7 +691,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
                   }
                }
 
-/* If so create the requirednew TranMap. */
+/* If so create the required new TranMap. */
                if( ok ) {
                   *map = (AstMapping *) astTranMap( rfmap, rimap, "" );
                   result = out;

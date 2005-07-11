@@ -51,6 +51,7 @@ GRP_C_ROUTINES = \
     frame.c \
     frameset.c \
     fratemap.c \
+    fnormmap.c \
     fregion.c \
     fshiftmap.c \
     fskyframe.c \
@@ -87,6 +88,7 @@ GRP_C_ROUTINES = \
     polygon.c \
     polymap.c \
     prism.c \
+    normmap.c \
     ratemap.c \
     region.c \
     shiftmap.c \
@@ -146,6 +148,7 @@ AST_H_FILES = \
           permmap.h \
           polymap.h \
           ratemap.h \
+          normmap.h \
           shiftmap.h \
           slamap.h \
           specmap.h \

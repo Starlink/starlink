@@ -45,6 +45,7 @@ c     - astDecompose: Decompose a Mapping into two component Mappings
 c     - astInvert: Invert a Mapping
 c     - astLinearApprox: Calculate a linear approximation to a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
+c     - astMapSplit: Split a Mapping up into parallel component Mappings
 c     - astRate: Calculate the rate of change of a Mapping output
 c     - astResample<X>: Resample a region of a data grid
 c     - astSimplify: Simplify a Mapping
@@ -56,6 +57,7 @@ f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_INVERT: Invert a Mapping
 f     - AST_LINEARAPPOX: Calculate a linear approximation to a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
+f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
 f     - AST_SIMPLIFY: Simplify a Mapping
@@ -141,6 +143,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     22-APR-2005 (DSB):
 *        Modified SpecialBounds to handle cases where some irrelevant
 *        output always produces bad values (e.g. a PermMap may do this).
+*     7-JUL-2005 (DSB):
+*        Make MapSplit public rather than protected.
 *class--
 */
 
@@ -6949,6 +6953,12 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
 *     or if it should fail for any reason, then NULL values will be
 *     returned as the function value and for the "map" pointer.
 *- 
+
+*  Implementation Notes:
+*     - This function implements the basic astMapSplit method available
+*     via the protected interface to the Mapping class. The public
+*     interface to this method is provided by the astMapSplitId_
+*     function.
 */
 
 /* Local Variables: */
@@ -13938,6 +13948,7 @@ int astLinearApprox_( AstMapping *this, const double *lbnd,
 void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 double astRateId_( AstMapping *, double *, int, int );
+void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping ** );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
@@ -14098,7 +14109,7 @@ f     AST_MAPBOX
 *     Find a bounding box for a Mapping.
 
 *  Type:
-*     Protected virtual function.
+*     Public virtual function.
 
 *  Synopsis:
 c     #include "mapping.h"
@@ -14382,3 +14393,144 @@ f        calculated.
    decremented. */
    return astRate_( this, at, ax1 - 1, ax2 - 1 );
 }
+
+void astMapSplitId_( AstMapping *this, int nin, int *in, int*out, 
+                            AstMapping **map ){
+/*
+*++
+*  Name:
+c     astMapSplit
+f     AST_MAPSPLIT
+
+*  Purpose:
+*     Split a Mapping up into parallel component Mappings.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astMapSplit( AstMapping *this, int nin, int *in, int *nout,
+c                       AstMapping **map )
+f     CALL AST_MAPSPLIT( THIS, NIN, IN, OUT, MAP, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+c     This function 
+f     This routine
+*     creates a new Mapping which connects specified inputs within a
+*     supplied Mapping to the corresponding outputs of the supplied Mapping. 
+*     This is only possible if the specified inputs correspond to some 
+*     subset of the Mapping outputs. That is, there must exist a subset of 
+*     the Mapping outputs for which each output depends only on the selected 
+*     Mapping inputs, and not on any of the inputs which have not been 
+*     selected. If this condition is not met by the supplied Mapping, then
+c     a NULL 
+f     an AST__NULL 
+*     Mapping pointer is returned.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping to be split.
+c     nin
+f     NIN = INTEGER (Given)
+c        The number of inputs to pick from "this".
+f        The number of inputs to pick from THIS.
+c     in
+f     IN( NIN ) = INTEGER (Given)
+c        Pointer to an 
+f        An
+*        array holding the indices within the supplied Mapping of the inputs 
+*        which are to be picked from the Mapping. 
+c        This array should have "nin" elements. 
+*        If "Nin" is the number of inputs of the supplied Mapping, then each 
+*        element should have a value in the range 1 to Nin.
+c     out
+f     OUT( * ) = INTEGER (Returned)
+c        Pointer to an 
+f        An
+*        array in which to return the indices of the outputs of the supplied 
+*        Mapping which are fed by the picked inputs. A value of one is
+*        used to refer to the first Mapping output. The supplied array should 
+*        have a length at least equal to the number of outputs in the
+*        supplied Mapping. The number of values stored in the array on
+*        exit will equal the number of outputs in the returned Mapping.
+*        The i'th element in the returned array holds the index within
+*        the supplied Mapping which corresponds to the i'th output of 
+*        the returned Mapping.
+c     map
+f     MAP = INTEGER (Returned)
+c        Address of a location at which to return a pointer to the 
+f        The
+*        returned Mapping. This Mapping will have 
+c        "nin" inputs (the number of outputs may be different to "nin"). NULL
+f        NIN inputs (the number of outputs may be different to NIN). AST__NULL
+*        is returned if the supplied Mapping has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Notes:
+*     - If this 
+c     function 
+f     routine
+*     is invoked with the global error status set, or if it should fail for 
+*     any reason, then 
+c     a NULL value
+f     AST__NULL
+*     will be returned for 
+c     the "map" pointer.
+f     MAP.
+*- 
+
+*  Implementation Notes:
+*     - This function implements the astMapSplit method available via the 
+*     public interface to the Mapping class and uses 1-based axis indices. 
+*     The protected interface method is provided by the astMapSplit function
+*     and uses zero-based axis indices. Also, an ID value is returned for
+*     "map" rather than a pointer.
+*/
+
+/* Local Variables: */
+   int *in_zero;           /* Pointer to array of zero-based input indices */
+   int *result;            /* Pointer to array of zero-based output indices*/
+   int i;                  /* Axis index */
+   int nout;               /* No of outputs */
+
+/* Initialise */
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Decrement the axis indices by 1. */
+   in_zero = astMalloc( sizeof( int )*(size_t) nin );
+   if( in_zero ) {
+      for( i = 0; i < nin; i++ ) in_zero[ i ] = in[ i ] - 1;
+
+/* Invoked the protected astMapSplit functon. */
+      result = astMapSplit( this, nin, in_zero, map );
+
+/* If succesful, copy the output axes to the supplied array. */
+      if( result ) {
+         nout = astGetNout( *map );
+         for( i = 0; i < nout; i++ ) out[ i ] = result[ i ] + 1;
+
+/* Free resurces. */
+         result = astFree( result );
+      }
+      in_zero = astFree( in_zero );
+   }
+
+/* Free the returned Mapping if an error has occurred. */
+   if( !astOK ) *map = astAnnul( *map );
+
+/* Return an ID value for the Mapping. */
+   *map = astMakeId( *map );
+}
+
+
+
+
+

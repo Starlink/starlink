@@ -80,8 +80,8 @@ endif
 
 # Run the other test progs
 echo "" 
-foreach prog (teststc testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
-g77 -fno-second-underscore -o $prog $prog.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+foreach prog (testnormmap teststc testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
+g77 -fno-second-underscore -o $prog -g $prog.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 $prog
 rm $prog
 end

@@ -1986,12 +1986,6 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Copy the elements of the current matrix row which correspond to the
    selected inputs into the new matrix. */
                   for( i = 0; i < nin; i++ ) *(pmat++) = prow[ in[ i ] ];
-  
-/* If this output depends on both selected and unselected inputs, we can 
-   not produce the required Mapping.*/
-               } else if( sel ) {
-                  ok = 0;
-                  break;
                }
             }
          }

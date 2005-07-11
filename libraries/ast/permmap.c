@@ -1189,7 +1189,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 /* Local Variables: */
    AstPermMap *this;          /* Pointer to PermMap structure */
-   double *con;               /* Constants array for new PermMap */
+   double *con;               /* Pointer to constants array */
    int *inp;                  /* Input perm array to use with supplied PermMap */
    int *inpm;                 /* Input perm array to use with new PermMap */
    int *outp;                 /* Output perm array to use with supplied PermMap */
@@ -1199,7 +1199,6 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    int iin;                   /* Mapping input index */
    int iout;                  /* Output index */
    int j;                     /* Loop count */
-   int ncon;                  /* No. of constants in the new PermMap */
    int nout;                  /* No. of outputs in the new PermMap */
    int npin;                  /* No. of inputs in the supplied Mapping */
    int npout;                 /* No. of outputs in the supplied Mapping */
@@ -1234,8 +1233,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          }
       }
 
-/* Get pointers to the input and output permutation arrays taking account
-   of whether the PermMap has been inverted. */
+/* Get pointers to the input and output permutation arrays and constant
+   array taking account of whether the PermMap has been inverted. */
       if( astGetInvert( this ) ) {
          outp = this->inperm;
          inp = this->outperm;
@@ -1243,15 +1242,15 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          outp = this->outperm;
          inp = this->inperm;
       }
+      con = this->constant;
 
 /* Allocate memory for the inperm and outperm arrays of the returned
    PermMap. Make these the largest they could possible need to be. */
       inpm = astMalloc( sizeof( int )*(size_t) npin );
       outpm = astMalloc( sizeof( int )*(size_t) npout );
-      con = astMalloc( sizeof( double )*(size_t) ( npout + npin ) );
 
 /* Allocate memory for the returned array of output indices. */
-      result = astMalloc( sizeof( int )*(size_t) nin );
+      result = astMalloc( sizeof( int )*(size_t) npout );
       if( astOK ) {
 
 /* Initialise number of outputs in returned PermMap. */
@@ -1260,24 +1259,30 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Loop round each output of the supplied PermMap. */
          for( iout = 0; iout < npout; iout++ ) {
  
-/* Is this output fed by one of the selected inputs? If so store the
-   input of the returned Mapping which feeds this output and add this
-   output index to the list of returned outputs. */
+/* Is this output fed by one of the selected inputs or a constant? If so 
+   store the input index of the returned Mapping, or constant, which feeds 
+   this output and add this output index to the list of returned outputs. */
             iin = outp ? outp[ iout ] : iout;
-            for( i = 0; i < nin; i++ ) {
-               if( in[ i ] == iin ) {
-                  outpm[ nout ] = i;
-                  result[ nout ] = iout;
-                  nout++;
-                  break;
+            if( iin >= 0 ) {
+               for( i = 0; i < nin; i++ ) {
+                  if( in[ i ] == iin ) {
+                     outpm[ nout ] = i;
+                     result[ nout ] = iout;
+                     nout++;
+                     break;
+                  }
                }
+
+            } else {
+               outpm[ nout ] = iin;
+               result[ nout ] = iout;
+               nout++;
             }
          }
 
 /* We now need to set up the inperm array for the returned PermMap. This
    ensures that the inverse transformation in the returned Mapping provides 
    values for the selected inputs. Loop round all the selected inputs. */
-         ncon = 0;
          for( i = 0; i < nin; i++ ) {
             iin = in[ i ];
  
@@ -1294,8 +1299,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
                   }
                }
             } else {
-               con[ ncon++ ] = this->constant ? this->constant[ (-iout) - 1 ] : AST__BAD;
-               inpm[ i ] = -ncon;
+               inpm[ i ] = iout;
                ok = 1;
             }
 
@@ -1315,7 +1319,6 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Free other resources. */
          inpm = astFree( inpm );
          outpm = astFree( outpm );
-         con = astFree( con );
       }
    }
 

@@ -59,6 +59,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/polygon.c \
             ${srcdir}/polymap.c \
             ${srcdir}/prism.c \
+            ${srcdir}/normmap.c \
             ${srcdir}/ratemap.c \
             ${srcdir}/region.c \
             ${srcdir}/shiftmap.c \
