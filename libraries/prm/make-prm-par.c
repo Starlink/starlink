@@ -589,9 +589,9 @@ int main (int argc, char **argv)
     comment("Machine precision.");
     par_i(1, "VAL__EPSUB", 1);
     par_i(1, "VAL__EPSB", 1);
-    par_i(1, "VAL__EPSUW", 1);
-    par_i(1, "VAL__EPSW", 1);
-    par_i(1, "VAL__EPSI", 1);
+    par_i(2, "VAL__EPSUW", 1);
+    par_i(2, "VAL__EPSW", 1);
+    par_i(4, "VAL__EPSI", 1);
     par_f("VAL__EPSR", FLT_EPSILON);
     par_d("VAL__EPSD", DBL_EPSILON);
 
