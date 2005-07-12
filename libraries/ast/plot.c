@@ -537,6 +537,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        spacing and the other has linear tick spacing.
 *     21-MAR-2005 (DSB):
 *        - Added the Clip attribute.
+*     12-JUL-2005 (DSB):
+*        - Modified AxPlot so that Map1 only normalises if neither axis
+*        is a SkyAxis. Previously it normalised if either axis was not a
+*        SkyAxis.
 *class--
 */
 
@@ -1717,6 +1721,7 @@ static int GetUseStyle( AstPlot *, int );
 static int HasEscapes( const char * );
 static int IdFind( int, int *, int * );
 static int Inside( int, float *, float *, float, float);
+static int IsASkyAxis( AstFrame *, int );
 static int IsASkyFrame( AstObject * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
 static int PopGat( AstPlot *, float *, const char *, const char * );
@@ -4037,7 +4042,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_axis = axis;
 
 /* Decide whether to omit points not in their normal ranges. */
-      Map1_norm = !IsASkyFrame( (AstObject *) Map1_frame );
+      Map1_norm = !IsASkyAxis( Map1_frame, 0 ) && 
+                  !IsASkyAxis( Map1_frame, 1 );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -17534,6 +17540,60 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
       *rise = new_rise;
 
    }
+}
+
+static int IsASkyAxis( AstFrame *frm, int axis ) {
+/*
+*  Name:
+*     IsASkyAxis
+
+*  Purpose:
+*     Checks if a specified axis of the supplied Frame is a SkyAxis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int IsASkyAxis( AstFrame *frm, int axis )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function checks if if a specified axis of the supplied Frame is 
+*     a SkyAxis.
+
+*  Parameters:
+*     frm
+*        The Frame.
+*     axis
+*        The zero-based axis index.
+
+*  Returned Value:
+*     A boolean flag indicating if the axis is a  SkyAxis.
+
+*/
+
+/* Local Variables: */
+   int ret;        
+   AstAxis *ax;
+
+/* initialise */
+   ret = 0;
+
+/* Check the global status. */
+   if( !astOK ) return ret;
+
+/* Extract the required axis from the Frame and test if it is a SkyAxis.
+   Then free the axis memory. */
+   ax = astGetAxis( frm, axis );
+   ret = astIsASkyAxis( ax );
+   ax = astAnnul( ax );
+
+/* Return the answer. */
+   return ret;
+
 }
 
 static int IsASkyFrame( AstObject *obj ) {
