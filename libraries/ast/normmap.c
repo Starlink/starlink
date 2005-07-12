@@ -107,6 +107,8 @@ AstNormMap *astNormMapId_( void *, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double Rate( AstMapping *, double *, int, int);
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static void Copy( const AstObject *, AstObject * );
+static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
@@ -188,9 +190,10 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name ) {
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
 
-/* Declare the class dump function. There is no copy constructor or
-   destructor. */
+/* Declare the copy constructor, destructor and class dump function. */
    astSetDump( vtab, Dump, "NormMap", "Normalise axis values" );
+   astSetCopy( vtab, Copy );
+   astSetDelete( vtab, Delete );
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -334,9 +337,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int cancel;
    int map_inv;      
    int nax;           
-   int old_inv2;     
-   int old_inv;     
-   int old_winv;     
    int result;       
 
 /* Initialise. */
