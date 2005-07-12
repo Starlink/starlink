@@ -1319,7 +1319,7 @@
             WRITE (LUS,'(1X,''For the given observation data,'//
      :                 ' the plate centre ZD is'',F6.1,'' degrees!''/'//
      :                '1X,''Reduction will be in MEAN place.'')') ZD/D2R
-            IF (LUX.GT.0) WRITE (LUX, '(''WARNING 002 Plate centre ZD='',
+            IF (LUX.GT.0) WRITE (LUX,'(''WARNING 002 Plate centre ZD='',
      :           F6.1,'' Reduction in mean place'')') ZD/D2R
             REDOP=.FALSE.
          END IF
@@ -2290,7 +2290,7 @@
      :                 'Date file was written', FTSTAT)
 
                   WRITE (FTWS, '("ASTROM astrometric solution: ",i2,
-     :                 "-component solution")'), NTERMS
+     :                 "-component solution")') NTERMS
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
 
 *               Write a comment, summarising the transformation matrix.
