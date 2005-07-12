@@ -53,12 +53,13 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 	    if test -n "$(PAX)"; then \
 	      if $(MANIFEST); then \
 ## pax -v writes the archive contents to stderr, but it _also_ sends chatter
-## there.  This is a bit mad, but there's nothing we can do about it, so remove
-## lines with 'pax:' in the hope that this matches all and only the chatter.
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r -v 2>&1) | sed '/pax:/d;s+^+MANIFEST:$(DESTDIR)$(stardocsdir)/+'; \
-	      else \
-	        cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r); \
+## there, and in the case of Solaris also writes random remarks about the
+## file format.  This is a bit mad, but there's nothing we can do about it.
+## So avoid it, and instead use pax to read the archive file twice.
+		$(PAX) -f $$d$$p | \
+		  sed 's+^+MANIFEST:$(DESTDIR)$(stardocsdir)/+'; \
 	      fi; \
+	      cat $$d$$p | (cd $(DESTDIR)$(stardocsdir); $(PAX) -r); \
 	    elif test -n "$(TAR)"; then \
 	      if $(MANIFEST); then \
 ## Is xBpf standard enough?
