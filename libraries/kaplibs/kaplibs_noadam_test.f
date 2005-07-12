@@ -1,9 +1,11 @@
       PROGRAM KAPLIBS_NOADAM
 
+      INCLUDE 'DAT_PAR'
+
 *   Exists mainly to test linking of non-ADAM kaplibs
       INTEGER DIMS( 1 )
       INTEGER PNTR
-      INTEGER WKLOC
+      CHARACTER * ( DAT__SZLOC ) WKLOC
       INTEGER STATUS
       STATUS = 0
 
