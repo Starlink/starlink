@@ -219,7 +219,7 @@
                   CALL CAT1_GETLU (TSUNIT, STATUS)
                   TSUNT__CAT6(CIELM) = TSUNIT
 
-                  OPEN(TSUNIT, STATUS='OLD', NAME=CATFIL, IOSTAT=LSTAT)
+                  OPEN(TSUNIT, STATUS='OLD', FILE=CATFIL, IOSTAT=LSTAT)
                   IF (STATUS .EQ. CAT__OK) THEN
                      CALL CAT1_IOERR (LSTAT, STATUS)
                   END IF

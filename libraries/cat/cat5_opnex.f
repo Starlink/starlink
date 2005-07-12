@@ -310,7 +310,7 @@ C    :              1x, 'rows, ttrows, skip: ', i5, i5, i5 )
                      CALL CAT1_GETLU (DFUNIT, STATUS)
                      STUNT__CAT5(CIELM) = DFUNIT
 
-                     OPEN(DFUNIT, STATUS='OLD', NAME=CATFIL,
+                     OPEN(DFUNIT, STATUS='OLD', FILE=CATFIL,
      :                 IOSTAT=LSTAT)
                      IF (STATUS .EQ. CAT__OK) THEN
                         CALL CAT1_IOERR (LSTAT, STATUS)

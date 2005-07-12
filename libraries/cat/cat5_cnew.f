@@ -145,7 +145,7 @@
 *
 *          Now attempt to create the file.
 
-            OPEN(UNIT=DFUNIT, STATUS='NEW', NAME=CATFIL, IOSTAT=LSTAT)
+            OPEN(UNIT=DFUNIT, STATUS='NEW', FILE=CATFIL, IOSTAT=LSTAT)
             CALL CAT1_IOERR (LSTAT, STATUS)
 
             IF (STATUS .EQ. CAT__OK) THEN

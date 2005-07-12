@@ -98,7 +98,7 @@
 *       table file and proceed if ok.
 
          CALL CAT1_GETLU (TSUNIT, STATUS)
-         OPEN(UNIT=TSUNIT, STATUS='OLD', NAME=CDNAME, IOSTAT=LSTAT)
+         OPEN(UNIT=TSUNIT, STATUS='OLD', FILE=CDNAME, IOSTAT=LSTAT)
          CALL CAT1_IOERR (LSTAT, STATUS)
 
          IF (STATUS .EQ. CAT__OK) THEN
