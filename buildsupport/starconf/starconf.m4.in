@@ -157,20 +157,24 @@ AC_SUBST(STARLINK)
 
 # Use the above information: $STARLINK indicates a preexisting
 # Starlink tree.
+#
 # Avoid doing anything if $STARLINK was unset above.
 #
-# Note that we don't use STAR_LDFLAGS for anything (at present), but
-# we nonetheless define it for symmetry.  Add libraries using the
-# non-user variable LIBS.
-STAR_CPPFLAGS=
-STAR_FCFLAGS=
-STAR_FFLAGS=
-STAR_LDFLAGS=
+# Add library search paths using STAR_LDFLAGS.  Do it this way, rather than
+# by defining LIBS (which is also a non-user variable): (a) these are
+# really options to the linker, rather than adjustments to the set of
+# libraries, so this makes sense; also (b) adding them to LIBS is too
+# late, since that adds -L _after_ any -l options found in *_LDADD.
 if test -n "$STARLINK"; then
-    STAR_CPPFLAGS="$STAR_CPPFLAGS -I$STARLINK/include"
-    STAR_FCFLAGS="$STAR_FCFLAGS -I$STARLINK/include"
-    STAR_FFLAGS="$STAR_FFLAGS -I$STARLINK/include"
-    LIBS="$LIBS -L$STARLINK/lib"
+    STAR_CPPFLAGS="-I$STARLINK/include"
+    STAR_FCFLAGS="-I$STARLINK/include"
+    STAR_FFLAGS="-I$STARLINK/include"
+    STAR_LDFLAGS="-L$STARLINK/lib"
+else
+    STAR_CPPFLAGS=
+    STAR_FCFLAGS=
+    STAR_FFLAGS=
+    STAR_LDFLAGS=
 fi
 AC_SUBST(STAR_CPPFLAGS)
 AC_SUBST(STAR_FCFLAGS)
