@@ -38,6 +38,21 @@ AC_CHECK_HEADERS([fpu_control.h])
 # Check availability of [incr Tcl].  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
 # be built.
+#
+# Note: we are checking whether a library has been installed amongst
+# the Starlink libraries, rather than whether it is present elsewhere
+# in the system.  This requires us to temporarily include that
+# location in the LDFLAGS prior to the tests below (and the final
+# argument of AC_CHECK_LIB is for -l options, not -L options).
+# Although the link command which ends up in the Makefile
+# automatically includes this extra path, it's not included in the
+# link commands used by the AC_CHECK_LIB tests here.  STAR_LDFLAGS is
+# not a documented feature of the system, but this whole
+# is-it-or-isn't-it Tcl game is getting a bit like a hack already, so
+# a little more won't hurt.
+my_save_LDFLAGS=$LDFLAGS
+LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
+
 have_itcl=1
 AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl$TCL_VERSION])
 AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk$TCL_VERSION -ltcl$TCL_VERSION])
@@ -50,6 +65,8 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
+
+LDFLAGS=$my_save_LDFLAGS
 
 # Note that the starlink Tcl, Tk and ITcl are required, since we need
 # some somewhat-private include files.  I'm not sure how respectable
