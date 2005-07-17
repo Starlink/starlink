@@ -28,14 +28,7 @@ AC_SUBST(IWIDGETS_VERSION)
 LD_LIBRARY_PATH="${STARLINK}/lib:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
-AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
-AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
-
-dnl   Check for fpu_control.h, this isn't available for all  
-dnl   GCC implementations 
-AC_CHECK_HEADERS([fpu_control.h])
-
-# Check availability of [incr Tcl].  This is declared as a build dependency,
+# Check availability of Tcl and Tk.  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
 # be built.
 #
@@ -52,6 +45,13 @@ AC_CHECK_HEADERS([fpu_control.h])
 # a little more won't hurt.
 my_save_LDFLAGS=$LDFLAGS
 LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
+
+AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
+AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
+
+dnl   Check for fpu_control.h, this isn't available for all  
+dnl   GCC implementations 
+AC_CHECK_HEADERS([fpu_control.h])
 
 have_itcl=1
 AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl$TCL_VERSION])
