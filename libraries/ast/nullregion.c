@@ -92,7 +92,7 @@ static AstMapping *(* parent_simplify)( AstMapping * );
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
+AstNullRegion *astNullRegionId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -1084,7 +1084,8 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstNullRegion *astNullRegionId_( void *frame_void, AstRegion *unc, const char *options, ... ) {
+AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void, 
+                                 const char *options, ... ) {
 /*
 *  Name:
 *     astNullRegionId_
@@ -1125,6 +1126,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, AstRegion *unc, const char *o
 /* Local Variables: */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstNullRegion *new;           /* Pointer to new NullRegion */
+   AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
@@ -1133,6 +1135,10 @@ AstNullRegion *astNullRegionId_( void *frame_void, AstRegion *unc, const char *o
 /* Obtain a Frame pointer from the supplied ID and validate the
    pointer to ensure it identifies a valid Frame. */
    frame = astCheckFrame( astMakePointer( frame_void ) );
+
+/* Obtain a Region pointer from the supplied "unc" ID and validate the
+   pointer to ensure it identifies a valid Region . */
+   unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
 
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */
