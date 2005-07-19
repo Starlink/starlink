@@ -1103,7 +1103,7 @@ f     AST_GETSTCNCOORD
 *     Public virtual function.
 
 *  Synopsis:
-c     #include "specframe.h"
+c     #include "stc.h"
 c     int astGetStcNCoord( AstStc *this )
 f     RESULT = AST_GETSTCNCOORD( THIS, STATUS )
 
@@ -1154,7 +1154,7 @@ f     AST_GETSTCREGION
 
 *  Synopsis:
 c     #include "stc.h"
-c     AstFrame *astGetStcRegion( AstStc *this )
+c     AstRegion *astGetStcRegion( AstStc *this )
 f     RESULT = AST_GETSTCREGION( THIS, STATUS )
 
 *  Class Membership:
