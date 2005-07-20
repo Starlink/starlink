@@ -47,6 +47,7 @@ c     - astLinearApprox: Calculate a linear approximation to a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
 c     - astMapSplit: Split a Mapping up into parallel component Mappings
 c     - astRate: Calculate the rate of change of a Mapping output
+c     - astRebin<X>: Rebin a region of a data grid
 c     - astResample<X>: Resample a region of a data grid
 c     - astSimplify: Simplify a Mapping
 c     - astTran1: Transform 1-dimensional coordinates
@@ -59,6 +60,7 @@ f     - AST_LINEARAPPOX: Calculate a linear approximation to a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
+f     - AST_REBIN<X>: Rebin a region of a data grid
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
 f     - AST_SIMPLIFY: Simplify a Mapping
 f     - AST_TRAN1: Transform 1-dimensional coordinates
@@ -143,6 +145,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     22-APR-2005 (DSB):
 *        Modified SpecialBounds to handle cases where some irrelevant
 *        output always produces bad values (e.g. a PermMap may do this).
+*     30-JUN-2005 (DSB):
+*        Added astRebin.
 *     7-JUL-2005 (DSB):
 *        Make MapSplit public rather than protected.
 *class--
@@ -228,6 +232,8 @@ typedef struct PN {
    double y0;                    /* The y offset to be added to the polynomial value */
 } PN;
 
+/* Convert from floating point to floating point or integer */
+#define CONV(IntType,val) ( ( IntType ) ? (int) ( (val) + (((val)>0)?0.5:-0.5) ) : (val) )
 
 /* Module Variables. */
 /* ================= */
@@ -260,7 +266,11 @@ static void InterpolateBlockAverageLD( int, const int[], const int[], const long
 static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, long double *, long double * );
 static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
 static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
+static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, double, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, long double *, long double *, double *);
+static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double, const double *const *, int, long double, long double *, long double *, double *);
+static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, double *);
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 #endif
 
 static AstMapping *Simplify( AstMapping * );
@@ -315,6 +325,12 @@ static int LinearApprox( AstMapping *, const double *, const double *, double, d
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MaxI( int, int );
 static int MinI( int, int );
+static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
+static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
+static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
+static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
+static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
+static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double *  );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
 static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
@@ -328,6 +344,15 @@ static int ResampleUI( AstMapping *, int, const int [], const int [], const unsi
 static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
 static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
+static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, double * );
+static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, double *);
+static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, double * );
+static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
+static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
+static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
+static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
+static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
+static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
 static int TestAttrib( AstObject *, const char * );
 static int TestInvert( AstMapping * );
 static int TestReport( AstMapping * );
@@ -359,6 +384,7 @@ static void SetReport( AstMapping *, int );
 static void Sinc( double, const double [], int, double * );
 static void SincCos( double, const double [], int, double * );
 static void SincGauss( double, const double [], int, double * );
+static void Gauss( double, const double [], int, double * );
 static void SincSinc( double, const double [], int, double * );
 static int SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static void Tran1( AstMapping *, int, const double [], int, double [] );
@@ -1168,6 +1194,50 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 
 }
 
+static void Gauss( double offset, const double params[], int flags,
+                   double *value ) {
+/*
+*  Name:
+*     Gauss
+
+*  Purpose:
+*     1-dimensional Gaussian spreading kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void Gauss( double offset, const double params[], int flags,
+*                 double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     spreading kernel. The function used is exp(-k*x*x).
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the central output point, measured
+*        in pixels.
+*     params
+*        The first element of this array should give a value for "k"
+*        in the exp(-k*x*x) term.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Calculate the result. */
+   *value = exp( -params[ 0 ] * offset * offset );
+}
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
@@ -2202,6 +2272,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    virtual methods for this class. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
    vtab->ResampleLD = ResampleLD;
+   vtab->RebinLD = RebinLD;
 #endif
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
@@ -2220,6 +2291,9 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->MapSplit = MapSplit;
    vtab->Rate = Rate;
    vtab->ReportPoints = ReportPoints;
+   vtab->RebinD = RebinD;
+   vtab->RebinF = RebinF;
+   vtab->RebinI = RebinI;
    vtab->ResampleB = ResampleB;
    vtab->ResampleD = ResampleD;
    vtab->ResampleF = ResampleF;
@@ -7678,6 +7752,2364 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 #undef MXY
 }
 
+/*
+*++
+*  Name:
+c     astRebin<X>
+f     AST_REBIN<X>
+
+*  Purpose:
+*     Rebin a region of a data grid.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astRebin<X>( AstMapping *this, double wlim, int ndim_in,
+c                      const int lbnd_in[], const int ubnd_in[],
+c                      const <Xtype> in[], const <Xtype> in_var[],
+c                      int spread, const double params[], int flags,
+c                      double tol, int maxpix,
+c                      <Xtype> badval, int ndim_out,
+c                      const int lbnd_out[], const int ubnd_out[],
+c                      const int lbnd[], const int ubnd[],
+c                      <Xtype> out[], <Xtype> out_var[] );
+f     CALL AST_REBIN<X>( THIS, WLIM, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
+f                        SPREAD, PARAMS, FLAGS,
+f                        TOL, MAXPIX, BADVAL,
+f                        NDIM_OUT, LBND_OUT, UBND_OUT,
+f                        LBND, UBND, OUT, OUT_VAR, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This is a set of functions for rebinning gridded data (e.g. an
+*     image) under the control of a geometrical transformation, which
+*     is specified by a Mapping.  The functions operate on a pair of
+*     data grids (input and output), each of which may have any number
+*     of dimensions. Rebinning may be restricted to a specified
+*     region of the input grid. An associated grid of error estimates
+*     associated with the input data may also be supplied (in the form
+*     of variance values), so as to produce error estimates for the
+*     rebined output data. Propagation of missing data (bad pixels)
+*     is supported.
+*
+*     You should use a rebinning function which matches the numerical
+*     type of the data you are processing by replacing <X> in
+c     the generic function name astRebin<X> by an appropriate 1- or
+f     the generic function name AST_REBIN<X> by an appropriate 1- or
+*     2-character type code. For example, if you are rebinning data
+c     with type "float", you should use the function astRebinF (see
+f     with type REAL, you should use the function AST_REBINR (see
+*     the "Data Type Codes" section below for the codes appropriate to
+*     other numerical types).
+*
+*     Rebinning of the grid of input data is performed by transforming
+*     the coordinates of the centre of each input grid element (or pixel)
+*     into the coordinate system of the output grid. The input pixel
+*     value is then divided up and assigned to the output pixels in the
+*     neighbourhood of the central output coordinates. A choice of
+*     schemes are provided for determining how each input pixel value is
+*     divided up between the output pixels. In general, each output pixel 
+*     may be assigned values from more than one input pixel. All 
+*     contributions to a given output pixel are summed to produce the
+*     final output pixel value. Output pixels can be set to the supplied
+*     bad value if they receive contributions from an insufficient number
+*     of input pixels. This is controlled by the 
+c     "wlim" parameter.
+f     WLIM argument.
+*
+*     Input pixel coordinates are transformed into the coordinate
+*     system of the output grid using the forward transformation of the
+*     Mapping which is supplied. This means that geometrical features
+*     in the input data are subjected to the Mapping's forward
+*     transformation as they are transferred from the input to the
+*     output grid.
+*
+*     In practice, transforming the coordinates of every pixel of a
+*     large data grid can be time-consuming, especially if the Mapping
+*     involves complicated functions, such as sky projections. To
+*     improve performance, it is therefore possible to approximate
+*     non-linear Mappings by a set of linear transformations which are
+*     applied piece-wise to separate sub-regions of the data. This
+*     approximation process is applied automatically by an adaptive
+*     algorithm, under control of an accuracy criterion which
+*     expresses the maximum tolerable geometrical distortion which may
+*     be introduced, as a fraction of a pixel.
+*     
+*     This algorithm first attempts to approximate the Mapping with a
+*     linear transformation applied over the whole region of the
+*     input grid which is being used. If this proves to be
+*     insufficiently accurate, the input region is sub-divided into
+*     two along its largest dimension and the process is repeated
+*     within each of the resulting sub-regions. This process of
+*     sub-division continues until a sufficiently good linear
+*     approximation is found, or the region to which it is being
+*     applied becomes too small (in which case the original Mapping is
+*     used directly).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to a Mapping, whose forward transformation will be
+*        used to transform the coordinates of pixels in the input
+*        grid into the coordinate system of the output grid. 
+*
+*        The number of input coordinates used by this Mapping (as
+*        given by its Nin attribute) should match the number of input
+c        grid dimensions given by the value of "ndim_in"
+f        grid dimensions given by the value of NDIM_IN
+*        below. Similarly, the number of output coordinates (Nout
+*        attribute) should match the number of output grid dimensions
+c        given by "ndim_out".
+f        given by NDIM_OUT.
+c     wlim
+f     WLIM = DOUBLE PRECISION (Given)
+*        Gives the required number of input pixel values which must contribute
+*        to an output pixel in order for the output pixel value to be
+*        considered valid. If the sum of the input pixel weights contributing 
+*        to an output pixel is less than the supplied
+c        "wlim"
+f        WLIM
+*        value, then the output pixel value is returned set to the
+*        supplied bad value.
+c     ndim_in
+f     NDIM_IN = INTEGER (Given)
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+c     lbnd_in
+f     LBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd_in
+f     UBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd_in" and "ubnd_in" together define the shape
+f        Note that LBND_IN and UBND_IN together define the shape
+*        and size of the input grid, its extent along a particular
+c        (j'th) dimension being ubnd_in[j]-lbnd_in[j]+1 (assuming the
+c        index "j" to be zero-based). They also define
+f        (J'th) dimension being UBND_IN(J)-LBND_IN(J)+1. They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre.
+c     in
+f     IN( * ) = <Xtype> (Given)
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
+*        input grid, containing the input data to be rebined.  The
+*        numerical type of this array should match the 1- or
+*        2-character type code appended to the function name (e.g. if
+c        you are using astRebinF, the type of each array element
+c        should be "float").
+f        you are using AST_REBINR, the type of each array element
+f        should be REAL).
+*
+*        The storage order of data within this array should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the final dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     in_var
+f     IN_VAR( * ) = <Xtype> (Given)
+c        An optional pointer to a second array with the same size and
+c        type as the "in" array. If given, this should contain a set
+c        of non-negative values which represent estimates of the
+c        statistical variance associated with each element of the "in"
+c        array. If this array is supplied (together with the
+c        corresponding "out_var" array), then estimates of the
+c        variance of the rebined output data will be calculated.
+c
+c        If no input variance estimates are being provided, a NULL
+c        pointer should be given.
+f        An optional second array with the same size and type as the
+f        IN array. If the AST__USEVAR flag is set via the FLAGS
+f        argument (below), this array should contain a set of
+f        non-negative values which represent estimates of the
+f        statistical variance associated with each element of the IN
+f        array. Estimates of the variance of the rebined output data
+f        will then be calculated.
+f
+f        If the AST__USEVAR flag is not set, no input variance
+f        estimates are required and this array will not be used. A
+f        dummy (e.g. one-element) array may then be supplied.
+c     spread
+f     SPREAD = INTEGER (Given)
+c        This parameter specifies the scheme to be used for dividing
+f        This argument specifies the scheme to be used for dividing
+*        each input data value up amongst the corresponding output pixels.
+*        It may be used to select
+*        from a set of pre-defined schemes by supplying one of the
+*        values described in the "Pixel Spreading Schemes"
+*        section below.  If a value of zero is supplied, then the
+*        default linear spreading scheme is used (equivalent to
+*        supplying the value AST__LINEAR).
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
+c        An optional pointer to an array of double which should contain
+f        An optional array which should contain
+*        any additional parameter values required by the pixel
+*        spreading scheme. If such parameters are required, this
+*        will be noted in the "Pixel Spreading Schemes"
+c        section below (you may also use this array to pass values
+c        to your own spread function).
+f        section below (you may also use this array to pass values
+f        to your own spread routine).
+*
+c        If no additional parameters are required, this array is not
+c        used and a NULL pointer may be given.
+f        If no additional parameters are required, this array is not
+f        used. A dummy (e.g. one-element) array may then be supplied.
+c     flags
+f     FLAGS = INTEGER (Given)
+c        The bitwise OR of a set of flag values which may be used to
+f        The sum of a set of flag values which may be used to
+*        provide additional control over the rebinning operation. See
+*        the "Control Flags" section below for a description of the
+*        options available.  If no flag values are to be set, a value
+*        of zero should be given.
+c     tol
+f     TOL = DOUBLE PRECISION (Given)
+*        The maximum tolerable geometrical distortion which may be
+*        introduced as a result of approximating non-linear Mappings
+*        by a set of piece-wise linear transformations. This should be
+*        expressed as a displacement in pixels in the output grid's
+*        coordinate system.
+*
+*        If piece-wise linear approximation is not required, a value
+*        of zero may be given. This will ensure that the Mapping is
+*        used without any approximation, but may increase execution
+*        time.
+c     maxpix
+f     MAXPIX = INTEGER (Given)
+*        A value which specifies an initial scale size (in pixels) for
+*        the adaptive algorithm which approximates non-linear Mappings
+*        with piece-wise linear transformations. Normally, this should
+*        be a large value (larger than any dimension of the region of
+*        the input grid being used). In this case, a first attempt to
+*        approximate the Mapping by a linear transformation will be
+*        made over the entire input region.
+*
+*        If a smaller value is used, the input region will first be
+c        divided into sub-regions whose size does not exceed "maxpix"
+f        divided into sub-regions whose size does not exceed MAXPIX
+*        pixels in any dimension. Only at this point will attempts at
+*        approximation commence.
+*
+*        This value may occasionally be useful in preventing false
+*        convergence of the adaptive algorithm in cases where the
+*        Mapping appears approximately linear on large scales, but has
+*        irregularities (e.g. holes) on smaller scales. A value of,
+*        say, 50 to 100 pixels can also be employed as a safeguard in
+*        general-purpose software, since the effect on performance is
+*        minimal.
+*
+*        If too small a value is given, it will have the effect of
+*        inhibiting linear approximation altogether (equivalent to
+c        setting "tol" to zero). Although this may degrade
+f        setting TOL to zero). Although this may degrade
+*        performance, accurate results will still be obtained.
+c     badval
+f     BADVAL = <Xtype> (Given)
+*        This argument should have the same type as the elements of
+c        the "in" array. It specifies the value used to flag missing
+f        the IN array. It specifies the value used to flag missing
+*        data (bad pixels) in the input and output arrays.
+*
+c        If the AST__USEBAD flag is set via the "flags" parameter,
+f        If the AST__USEBAD flag is set via the FLAGS argument,
+c        then this value is used to test for bad pixels in the "in"
+c        (and "in_var") array(s).
+f        then this value is used to test for bad pixels in the IN
+f        (and IN_VAR) array(s).
+*
+*        In all cases, this value is also used to flag any output
+c        elements in the "out" (and "out_var") array(s) for which
+f        elements in the OUT (and OUT_VAR) array(s) for which
+*        rebined values could not be obtained (see the "Propagation
+*        of Missing Data" section below for details of the
+c        circumstances under which this may occur). The astRebin<X>
+f        circumstances under which this may occur). The AST_REBIN<X>
+*        function return value indicates whether any such values have
+*        been produced.
+c     ndim_out
+f     NDIM_OUT = INTEGER (Given)
+*        The number of dimensions in the output grid. This should be
+*        at least one. It need not necessarily be equal to the number
+*        of dimensions in the input grid.
+c     lbnd_out
+f     LBND_OUT( NDIM_OUT ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_out" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the output grid along each dimension.
+c     ubnd_out
+f     UBND_OUT( NDIM_OUT ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_out" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the output grid along each dimension.
+*
+c        Note that "lbnd_out" and "ubnd_out" together define the
+f        Note that LBND_OUT and UBND_OUT together define the
+*        shape, size and coordinate system of the output grid in the
+c        same way as "lbnd_in" and "ubnd_in" define the shape, size
+f        same way as LBND_IN and UBND_IN define the shape, size
+*        and coordinate system of the input grid.
+c     lbnd
+f     LBND( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the first pixel in the region
+*        of the input grid which is to be included in the rebined output
+*        array.
+c     ubnd
+f     UBND( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the last pixel in the region of
+*        the input grid which is to be included in the rebined output
+*        array.
+*
+c        Note that "lbnd" and "ubnd" together define the shape and
+f        Note that LBND and UBND together define the shape and
+*        position of a (hyper-)rectangular region of the input grid
+*        which is to be included in the rebined output array. This region
+*        should lie wholly within the extent of the input grid (as
+c        defined by the "lbnd_in" and "ubnd_in" arrays). Regions of
+f        defined by the LBND_IN and UBND_IN arrays). Regions of
+*        the input grid lying outside this region will not be used.
+c     out
+f     OUT( * ) = <Xtype> (Returned)
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
+*        output grid, in which the rebined data values will be
+*        returned. The numerical type of this array should match that
+c        of the "in" array, and the data storage order should be such
+f        of the IN array, and the data storage order should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the final dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     out_var
+f     OUT_VAR( * ) = <Xtype> (Returned)
+c        An optional pointer to an array with the same type and size
+c        as the "out" array. If given, this array will be used to
+c        return variance estimates for the rebined data values. This
+c        array will only be used if the "in_var" array has also been
+c        supplied.
+f        An optional array with the same type and size as the OUT
+f        array. If the AST__USEVAR flag is set via the FLAGS argument,
+f        this array will be used to return variance estimates for the
+f        rebined data values.
+*
+*        The output variance values will be calculated on the
+*        assumption that errors on the input data values are
+*        statistically independent and that their variance estimates
+*        may simply be summed (with appropriate weighting factors)
+*        when several input pixels contribute to an output data
+*        value. If this assumption is not valid, then the output error
+*        estimates may be biased. In addition, note that the
+*        statistical errors on neighbouring output data values (as
+*        well as the estimates of those errors) may often be
+*        correlated, even if the above assumption about the input data
+*        is correct, because of the pixel spreading schemes
+*        employed.
+*
+c        If no output variance estimates are required, a NULL pointer
+c        should be given.
+f        If the AST__USEVAR flag is not set, no output variance
+f        estimates will be calculated and this array will not be
+f        used. A dummy (e.g. one-element) array may then be supplied.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Data Type Codes:
+*     To select the appropriate rebinning function, you should
+c     replace <X> in the generic function name astRebin<X> with a
+f     replace <X> in the generic function name AST_REBIN<X> with a
+*     1- or 2-character data type code, so as to match the numerical
+*     type <Xtype> of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - I: int
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+*
+c     For example, astRebinD would be used to process "double"
+c     data, while astRebinS would be used to process "short int"
+c     data, etc.
+f     For example, AST_REBIND would be used to process DOUBLE
+f     PRECISION data, while AST_REBINS would be used to process
+f     short integer data (stored in an INTEGER*2 array), etc.
+f
+f     For compatibility with other Starlink facilities, the code W
+f     is provided as a synonym for S (but only in the Fortran interface 
+f     to AST).
+*
+*     Note that, unlike 
+c     astResample<X>, the astRebin<X>
+f     AST_RESAMPLE<X>, the AST_REBIN<X>
+*     set of functions does not yet support unsigned integer data types
+*     or integers of different sizes.
+
+*  Pixel Spreading Schemes:
+*     The pixel spreading scheme specifies the Point Spread Function (PSF) 
+*     applied to each input pixel value as it is copied into the output 
+*     array. It can be thought of as the inverse of the sub-pixel 
+*     interpolation schemes used by the
+c     astResample<X> 
+f     AST_RESAMPLE<X>
+*     group of functions. That is, in a sub-pixel interpolation scheme the 
+*     kernel specifies the weight to assign to each input pixel when
+*     forming the weighted mean of the input pixels, whereas the kernel in a 
+*     pixel spreading scheme specifies the fraction of the input data value 
+*     which is to be assigned to each output pixel. As for interpolation, the 
+*     choice of suitable pixel spreading scheme involves stricking a balance 
+*     between schemes which tend to degrade sharp features in the data by 
+*     smoothing them, and those which attempt to preserve sharp features but 
+*     which often tend to introduce unwanted artifacts. See the
+c     astResample<X> 
+f     AST_RESAMPLE<X>
+*     documentation for further discussion.
+*
+*     The following values (defined in the 
+c     "ast.h" header file)
+f     AST_PAR include file)
+*     may be assigned to the 
+c     "spread" 
+f     SPREAD 
+*     parameter. See the 
+c     astResample<X> 
+f     AST_RESAMPLE<X>
+*     documentation for details of these schemes including the use of the 
+c     "fspread" and "params" parameters:
+f     FSPREAD and PARAMS arguments:
+*
+*     - AST__NEAREST
+*     - AST__LINEAR
+*     - AST__SINC
+*     - AST__SINCSINC
+*     - AST__SINCCOS
+*     - AST__SINCGAUSS
+*
+*     In addition, the following schemes can be used with 
+f     AST_REBIN<X> but not with AST_RESAMPLE<X>:
+c     astRebin<X> but not with astResample<X>:
+*
+*     - AST__GAUSS: This scheme uses a kernel of the form exp(-k*x*x), with k 
+*     a positive constant determined by the full-width at half-maximum (FWHM).
+*     The FWHM should be supplied in units of output pixels by means of the 
+c     "params[1]"
+f     PARAMS(2) 
+*     value and should be at least 0.1. The 
+c     "params[0]" 
+f     PARAMS(1)
+*     value should be used to specify at what point the Gaussian is truncated 
+*     to zero. This should be given as a number of output pixels on either 
+*     side of the central output point in each dimension (the nearest integer 
+*     value is used).
+
+*  Control Flags:
+c     The following flags are defined in the "ast.h" header file and
+f     The following flags are defined in the AST_PAR include file and
+*     may be used to provide additional control over the rebinning
+*     process. Having selected a set of flags, you should supply the
+c     bitwise OR of their values via the "flags" parameter:
+f     sum of their values via the FLAGS argument:
+*
+*     - AST__USEBAD: Indicates that there may be bad pixels in the
+*     input array(s) which must be recognised by comparing with the
+c     value given for "badval" and propagated to the output array(s).
+f     value given for BADVAL and propagated to the output array(s).
+*     If this flag is not set, all input values are treated literally
+c     and the "badval" value is only used for flagging output array
+f     and the BADVAL value is only used for flagging output array
+*     values.
+f     - AST__USEVAR: Indicates that variance information should be
+f     processed in order to provide estimates of the statistical error
+f     associated with the rebined values. If this flag is not set,
+f     no variance processing will occur and the IN_VAR and OUT_VAR
+f     arrays will not be used. (Note that this flag is only available
+f     in the Fortran interface to AST.)
+
+*  Propagation of Missing Data:
+*     Instances of missing data (bad pixels) in the output grid are
+c     identified by occurrences of the "badval" value in the "out"
+f     identified by occurrences of the BADVAL value in the OUT
+*     array. These are produced if the sum of the weights of the 
+*     contributing input pixels is less than 
+c     "wlim".
+f     WLIM.
+*
+*     An input pixel is considered bad (and is consequently ignored) if 
+*     its
+c     data value is equal to "badval" and the AST__USEBAD flag is
+c     set via the "flags" parameter.
+f     data value is equal to BADVAL and the AST__USEBAD flag is
+f     set via the FLAGS argument.
+*
+*     In addition, associated output variance estimates (if
+c     calculated) may be declared bad and flagged with the "badval"
+c     value in the "out_var" array for similar reasons.
+f     calculated) may be declared bad and flagged with the BADVAL
+f     value in the OUT_VAR array for similar reasons.
+*--
+*/
+/* Define a macro to implement the function for a specific data
+   type. */
+#define MAKE_REBIN(X,Xtype,IntType) \
+static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
+                     const int lbnd_in[], const int ubnd_in[], \
+                     const Xtype in[], const Xtype in_var[], \
+                     int spread, const double params[], int flags, \
+                     double tol, int maxpix, Xtype badval, \
+                     int ndim_out, const int lbnd_out[], \
+                     const int ubnd_out[], const int lbnd[], \
+                     const int ubnd[], Xtype out[], Xtype out_var[] ) { \
+\
+/* Local Variables: */ \
+   AstMapping *simple;           /* Pointer to simplified Mapping */ \
+   Xtype *d;                     /* Pointer to next output data value */ \
+   Xtype *v;                     /* Pointer to next output variance value */ \
+   double *w;                    /* Pointer to next weight value */ \
+   double *work;                 /* Pointer to weight array */ \
+   int idim;                     /* Loop counter for coordinate dimensions */ \
+   int ipix_out;                 /* Index into output array */ \
+   int nin;                      /* Number of Mapping input coordinates */ \
+   int nout;                     /* Number of Mapping output coordinates */ \
+   int npix;                     /* Number of pixels in input region */ \
+   int npix_out;                 /* Number of pixels in output array */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Obtain values for the Nin and Nout attributes of the Mapping. */ \
+   nin = astGetNin( this ); \
+   nout = astGetNin( this ); \
+\
+/* If OK, check that the number of input grid dimensions matches the \
+   number required by the Mapping and is at least 1. Report an error \
+   if necessary. */ \
+   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebin"#X"(%s): Bad number of input grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_in ); \
+      if ( ndim_in != nin ) { \
+         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                   "to specify an input position.", \
+                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* If OK, also check that the number of output grid dimensions matches \
+   the number required by the Mapping and is at least 1. Report an \
+   error if necessary. */ \
+   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebin"#X"(%s): Bad number of output grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_out ); \
+      if ( ndim_out != nout ) { \
+         astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
+                   "value%s for each output position.", astGetClass( this ), \
+                   ( nout < ndim_out ) ? "only " : "", nout, \
+                   ( nout == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* Check that the lower and upper bounds of the input grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
+                      "input grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), \
+                      lbnd_in[ idim ], ubnd_in[ idim ] ); \
+            astError( AST__GBDIN, "Error in input dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Check that the positional accuracy tolerance supplied is valid and \
+   report an error if necessary. */ \
+   if ( astOK && ( tol < 0.0 ) ) { \
+      astError( AST__PATIN, "astRebin"#X"(%s): Invalid positional " \
+                "accuracy tolerance (%.*g pixel).", \
+                astGetClass( this ), DBL_DIG, tol ); \
+      astError( AST__PATIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the initial scale size in pixels supplied is valid and \
+   report an error if necessary. */ \
+   if ( astOK && ( maxpix < 0 ) ) { \
+      astError( AST__SSPIN, "astRebin"#X"(%s): Invalid initial scale " \
+                "size in pixels (%d).", astGetClass( this ), maxpix ); \
+      astError( AST__SSPIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the lower and upper bounds of the output grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
+            astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
+                      "output grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), \
+                      lbnd_out[ idim ], ubnd_out[ idim ] ); \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Similarly check the bounds of the input region. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd[ idim ] > ubnd[ idim ] ) { \
+            astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
+                      "input region (%d) exceeds corresponding upper " \
+                      "bound (%d).", astGetClass( this ), \
+                      lbnd[ idim ], ubnd[ idim ] ); \
+\
+/* Also check that the input region lies wholly within the input \
+   grid. */ \
+         } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
+                      "input region (%d) is less than corresponding " \
+                      "bound of input grid (%d).", astGetClass( this ), \
+                      lbnd[ idim ], lbnd_in[ idim ] ); \
+         } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebin"#X"(%s): Upper bound of " \
+                      "input region (%d) exceeds corresponding " \
+                      "bound of input grid (%d).", astGetClass( this ), \
+                      ubnd[ idim ], ubnd_in[ idim ] ); \
+         } \
+\
+/* Say which dimension produced the error. */ \
+         if ( !astOK ) { \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* If OK, loop to determine how many input pixels are to be binned. */ \
+   simple = NULL; \
+   npix = 1; \
+   npix_out = 1; \
+   unsimplified_mapping = this; \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         npix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
+      } \
+\
+/* Loop to determine how many pixels the output array contains. */ \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+      } \
+\
+/* If there are sufficient pixels to make it worthwhile, simplify the \
+   Mapping supplied to improve performance. Otherwise, just clone the \
+   Mapping pointer. Note we have already saved a pointer to the original \
+   Mapping so that lower-level functions can use it if they need to report \
+   an error. */ \
+      if ( npix > 1024 ) { \
+         simple = astSimplify( this ); \
+      } else { \
+         simple = astClone( this ); \
+      } \
+   } \
+\
+/* Report an error if the forward transformation of this simplified \
+   Mapping is not defined. */ \
+   if ( !astGetTranForward( simple ) && astOK ) { \
+      astError( AST__TRNND, "astRebin"#X"(%s): An forward coordinate " \
+                "transformation is not defined by the %s supplied.", \
+                astGetClass( unsimplified_mapping ), \
+                astGetClass( unsimplified_mapping ) ); \
+   } \
+\
+/* If required, allocate work array to hold the sum of the weights \
+   contributing to each output pixel, and initialise it to zero. */ \
+   if( wlim > 0.0 ) { \
+      work = astMalloc( sizeof( double )*(size_t) npix_out ); \
+      if( work ) { \
+         w = work; \
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++ ) *(w++) = 0.0; \
+      } \
+   } else { \
+      work = NULL; \
+   } \
+\
+/* Initialise the output arrays to hold zeros. */ \
+   d = out; \
+   if( out_var ) { \
+      v = out_var; \
+      for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++ ) { \
+         *d = 0; \
+         *v = 0; \
+      } \
+   } else { \
+      for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++ ) { \
+         *d = 0; \
+      } \
+   } \
+\
+/* Perform the rebinning. Note that we pass all gridded data, the \
+   sprad function and the bad pixel value by means of pointer \
+   types that obscure the underlying data type. This is to avoid \
+   having to replicate functions unnecessarily for each data \
+   type. However, we also pass an argument that identifies the data \
+   type we have obscured. */ \
+   RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
+                    (const void *) in, (const void *) in_var, \
+                    TYPE_##X, spread, \
+                    params, flags, tol, maxpix, \
+                    (const void *) &badval, \
+                    ndim_out, lbnd_out, ubnd_out, \
+                    lbnd, ubnd, \
+                    (void *) out, (void *) out_var, work ); \
+\
+/* If required set output pixels bad if they have a total weight less \
+   than "wlim". */ \
+   if( work ) { \
+      w = work; \
+      d = out; \
+      if( out_var ) { \
+         v = out_var; \
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++, v++ ) { \
+            if( *w < wlim ) { \
+               *d = badval; \
+               *v = badval; \
+            } \
+         } \
+      } else { \
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
+            if( *w < wlim ) *d = badval; \
+         } \
+      } \
+\
+/* Free the work array. */ \
+      work = astFree( work ); \
+   } \
+\
+/* Annul the pointer to the simplified/cloned Mapping. */ \
+   simple = astAnnul( simple ); \
+\
+}
+
+/* Expand the above macro to generate a function for each required
+   data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_REBIN(LD,long double,0)
+#endif
+MAKE_REBIN(D,double,0)
+MAKE_REBIN(F,float,0) 
+MAKE_REBIN(I,int,1)
+
+/* Undefine the macro. */
+#undef MAKE_REBIN
+
+static void RebinAdaptively( AstMapping *this, int ndim_in,
+                            const int *lbnd_in, const int *ubnd_in,
+                            const void *in, const void *in_var,
+                            DataType type, int spread, 
+                            const double *params, int flags, double tol,
+                            int maxpix, const void *badval_ptr,
+                            int ndim_out, const int *lbnd_out,
+                            const int *ubnd_out, const int *lbnd,
+                            const int *ubnd, void *out, void *out_var,
+                            double *work ){
+/*
+*  Name:
+*     RebinAdaptively
+
+*  Purpose:
+*     Rebin a section of a data grid adaptively.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void RebinAdaptively( AstMapping *this, int ndim_in,
+*                          const int *lbnd_in, const int *ubnd_in,
+*                          const void *in, const void *in_var,
+*                          DataType type, int spread, 
+*                          const double *params, int flags, double tol,
+*                          int maxpix, const void *badval_ptr,
+*                          int ndim_out, const int *lbnd_out,
+*                          const int *ubnd_out, const int *lbnd,
+*                          const int *ubnd, void *out, void *out_var,
+*                          double *work )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function rebins a specified section of a rectangular grid of 
+*     data (with any number of dimensions) into another rectangular grid 
+*     (with a possibly different number of dimensions). The coordinate 
+*     transformation used to convert input pixel coordinates into positions 
+*     in the output grid is given by the forward transformation of the 
+*     Mapping which is supplied.  Any pixel spreading scheme may be specified 
+*     for distributing the flux of an input pixel amongst the output
+*     pixels.
+*
+*     This function is very similar to RebinWithBlocking and RebinSection 
+*     which lie below it in the calling hierarchy. However, this function 
+*     also attempts to adapt to the Mapping supplied and to sub-divide the 
+*     section being rebinned into smaller sections within which a linear 
+*     approximation to the Mapping may be used.  This reduces the number of 
+*     Mapping evaluations, thereby improving efficiency particularly when
+*     complicated Mappings are involved.
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose forward transformation may be
+*        used to transform the coordinates of pixels in the input
+*        grid into associated positions in the output grid.
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     in
+*        Pointer to the input array of data to be rebinned (with one
+*        element for each pixel in the input grid). The numerical type
+*        of these data should match the "type" value (below). The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the rebinned data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     type
+*        A value taken from the "DataType" enum, which specifies the
+*        data type of the input and output arrays containing the
+*        gridded data (and variance) values.
+*     spread
+*        A value selected from a set of pre-defined macros to identify
+*        which pixel spread function should be used.
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the pixel spread algorithm, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
+*     flags
+*        The bitwise OR of a set of flag values which provide additional 
+*        control over the resampling operation.
+*     tol
+*        The maximum permitted positional error in transforming input
+*        pixel positions into the output grid in order to rebin
+*        it. This should be expressed as a displacement in pixels in
+*        the output grid's coordinate system. If the Mapping's forward
+*        transformation can be approximated by piecewise linear functions 
+*        to this accuracy, then such functions may be used instead of the 
+*        Mapping in order to improve performance. Otherwise, every input 
+*        pixel position will be transformed individually using the Mapping.
+*
+*        If linear approximation is not required, a "tol" value of
+*        zero may be given. This will ensure that the Mapping is used
+*        without any approximation.
+*     maxpix
+*        A value which specifies the largest scale size on which to
+*        search for non-linearities in the Mapping supplied. This
+*        value should be expressed as a number of pixels in the input
+*        grid. The function will break the input section specified
+*        into smaller sub-sections (if necessary), each no larger than
+*        "maxpix" pixels in any dimension, before it attempts to
+*        approximate the Mapping by a linear function over each
+*        sub-section.
+* 
+*        If the value given is larger than the largest dimension of
+*        the input section (the normal recommendation), the function
+*        will initially search for non-linearity on a scale determined
+*        by the size of the input section.  This is almost always
+*        satisfactory. Very occasionally, however, a Mapping may
+*        appear linear on this scale but nevertheless have smaller
+*        irregularities (e.g. "holes") in it.  In such cases, "maxpix"
+*        may be set to a suitably smaller value so as to ensure this
+*        non-linearity is not overlooked. Typically, a value of 50 to
+*        100 pixels might be suitable and should have little effect on
+*        performance.
+*
+*        If too small a value is given, however, it will have the
+*        effect of preventing linear approximation occurring at all
+*        (equivalent to setting "tol" to zero).  Although this may
+*        degrade performance, accurate results will still be obtained.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which rebinned values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output data grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output data grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output data grid in the same way as "lbnd_in"
+*        and "ubnd_in" define the shape and size of the input grid
+*        (see above).
+*     lbnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the input data grid which is to be rebinned.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the input data grid which is to be rebinned.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the input grid which is to be rebinned. This section 
+*        should lie wholly within the extent of the input grid (as defined 
+*        by the "lbnd_out" and "ubnd_out" arrays). Regions of the input 
+*        grid lying outside this section will be ignored.
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        An optional pointer to a double array with the same size as 
+*        the "out" array. The contents of this array (if supplied) are
+*        incremented by the accumulated weights assigned to each output pixel.
+*        If no accumulated weights are required, a NULL pointer should be 
+*        given.
+
+*/
+                      
+/* Local Variables: */
+   double *flbnd;                /* Array holding floating point lower bounds */
+   double *fubnd;                /* Array holding floating point upper bounds */
+   double *linear_fit;           /* Pointer to array of fit coefficients */
+   int *hi;                      /* Pointer to array of section upper bounds */
+   int *lo;                      /* Pointer to array of section lower bounds */
+   int coord_in;                 /* Loop counter for input coordinates */
+   int dim;                      /* Output section dimension size */
+   int dimx;                     /* Dimension with maximum section extent */
+   int divide;                   /* Sub-divide the output section? */
+   int i;                        /* Loop count */
+   int isLinear;                 /* Is the transformation linear? */
+   int mxdim;                    /* Largest output section dimension size */
+   int npix;                     /* Number of pixels in output section */
+   int npoint;                   /* Number of points for obtaining a fit */
+   int nvertex;                  /* Number of vertices of output section */
+   int toobig;                   /* Section too big (must sub-divide)? */
+   int toosmall;                 /* Section too small to sub-divide? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Further initialisation. */
+   npix = 1;
+   mxdim = 0;
+   dimx = 1;
+   nvertex = 1;
+
+/* Loop through the input grid dimensions. */
+   for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+
+/* Obtain the extent in each dimension of the input section which is
+   to be rebinned, and calculate the total number of pixels it contains. */
+      dim = ubnd[ coord_in ] - lbnd[ coord_in ] + 1;
+      npix *= dim;
+
+/* Find the maximum dimension size of this input section and note which 
+   dimension has this size. */
+      if ( dim > mxdim ) {
+         mxdim = dim;
+         dimx = coord_in;
+      }
+
+/* Calculate how many vertices the output section has. */
+      nvertex *= 2;
+   }
+   
+/* Calculate how many sample points will be needed (by the astLinearApprox 
+   function) to obtain a linear fit to the Mapping's forward transformation. */
+   npoint = 1 + 4 * ndim_in + 2 * nvertex;
+
+/* If the number of pixels in the input section is not at least 4
+   times this number, we will probably not save significant time by
+   attempting to obtain a linear fit, so note that the input section
+   is too small. */
+   toosmall = ( npix < ( 4 * npoint ) );
+
+/* Note if the maximum dimension of the input section exceeds the
+   user-supplied scale factor. */
+   toobig = ( maxpix < mxdim );
+
+/* Assume the Mapping is significantly non-linear before deciding
+   whether to sub-divide the output section. */
+   linear_fit = NULL;
+
+/* If the output section is too small to be worth obtaining a linear
+   fit, or if the accuracy tolerance is zero, we will not
+   sub-divide. This means that the Mapping will be used to transform
+   each pixel's coordinates and no linear approximation will be
+   used. */
+   if ( toosmall || ( tol == 0.0 ) ) {
+      divide = 0;
+
+/* Otherwise, if the largest input section dimension exceeds the
+   scale length given, we will sub-divide. This offers the possibility
+   of obtaining a linear approximation to the Mapping over a reduced
+   range of input coordinates (which will be handled by a recursive
+   invocation of this function). */
+   } else if ( toobig ) {
+      divide = 1;
+
+/* If neither of the above apply, then attempt to fit a linear
+   approximation to the Mapping's forward transformation over the
+   range of coordinates covered by the input section. We need to 
+   temporarily copy the integer bounds into floating point arrays to 
+   use astLinearApprox. */
+   } else {
+
+/* Allocate memory for floating point bounds and for the coefficient array */
+      flbnd = astMalloc( sizeof( double )*(size_t) ndim_in );
+      fubnd = astMalloc( sizeof( double )*(size_t) ndim_in );
+      linear_fit = astMalloc( sizeof( double )*
+                              (size_t) ( ndim_out*( ndim_in + 1 ) ) );
+      if( astOK ) {
+
+/* Copy the bounds into these arrays */
+         for( i = 0; i < ndim_in; i++ ) {
+            flbnd[ i ] = (double) lbnd[ i ];
+            fubnd[ i ] = (double) ubnd[ i ];
+         }
+
+/* Get the linear approximation to the forward transformation. */
+         isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
+
+/* Free the coeff array if the inverse transformation is not linear. */
+         if( !isLinear ) linear_fit = astFree( linear_fit );
+
+      } else {
+         linear_fit = astFree( linear_fit );
+      }
+
+/* Free resources */
+      flbnd = astFree( flbnd );
+      fubnd = astFree( fubnd );
+
+/* If a linear fit was obtained, we will use it and therefore do not
+   wish to sub-divide further. Otherwise, we sub-divide in the hope
+   that this may result in a linear fit next time. */
+      divide = !linear_fit;
+   }
+
+/* If no sub-division is required, perform rebinning (in a
+   memory-efficient manner, since the section we are rebinning might
+   still be very large). This will use the linear fit, if obtained
+   above. */
+   if ( astOK ) {
+      if ( !divide ) {
+         RebinWithBlocking( this, linear_fit,
+                            ndim_in, lbnd_in, ubnd_in,
+                            in, in_var, type, spread, 
+                            params, flags, badval_ptr,
+                            ndim_out, lbnd_out, ubnd_out,
+                            lbnd, ubnd, out, out_var, work );
+
+/* Otherwise, allocate workspace to perform the sub-division. */
+      } else {
+         lo = astMalloc( sizeof( int ) * (size_t) ndim_in );
+         hi = astMalloc( sizeof( int ) * (size_t) ndim_in );
+         if ( astOK ) {
+
+/* Initialise the bounds of a new input section to match the original
+   input section. */
+            for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+               lo[ coord_in ] = lbnd[ coord_in ];
+               hi[ coord_in ] = ubnd[ coord_in ];
+            }
+
+/* Replace the upper bound of the section's largest dimension with the
+   mid-point of the section along this dimension, rounded downwards. */
+            hi[ dimx ] =
+               (int) floor( 0.5 * (double) ( lbnd[ dimx ] + ubnd[ dimx ] ) );
+
+/* Rebin the resulting smaller section using a recursive invocation
+   of this function. */
+            RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in,
+                             in, in_var, type, spread, 
+                             params, flags, tol, maxpix,
+                             badval_ptr, ndim_out,
+                             lbnd_out, ubnd_out,
+                             lo, hi, out, out_var, work );
+
+/* Now set up a second section which covers the remaining half of the
+   original output section. */
+            lo[ dimx ] = hi[ dimx ] + 1;
+            hi[ dimx ] = ubnd[ dimx ];
+
+/* If this section contains pixels, resample it in the same way,
+   summing the returned values. */
+            if ( lo[ dimx ] <= hi[ dimx ] ) {
+               RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in,
+                                in, in_var, type, spread, 
+                                params, flags, tol, maxpix,
+                                badval_ptr,  ndim_out,
+                                lbnd_out, ubnd_out,
+                                lo, hi, out, out_var, work );
+            }
+         }
+
+/* Free the workspace. */
+         lo = astFree( lo );
+         hi = astFree( hi );
+      }
+   }
+
+/* If coefficients for a linear fit were obtained, then free the space
+   they occupy. */
+   if ( linear_fit ) linear_fit = astFree( linear_fit );
+}
+
+static void RebinSection( AstMapping *this, const double *linear_fit,
+                         int ndim_in,
+                         const int *lbnd_in, const int *ubnd_in,
+                         const void *in, const void *in_var,
+                         DataType type, int spread,
+                         const double *params, int flags,
+                         const void *badval_ptr, int ndim_out,
+                         const int *lbnd_out, const int *ubnd_out,
+                         const int *lbnd, const int *ubnd,
+                         void *out, void *out_var, double *work ) {
+/*
+*  Name:
+*     RebinSection
+
+*  Purpose:
+*     Rebin a section of a data grid.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void RebinSection( AstMapping *this, const double *linear_fit,
+*                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
+*                       const void *in, const void *in_var,
+*                       DataType type, int spread,
+*                       const double *params, int flags,
+*                       const void *badval_ptr, int ndim_out,
+*                       const int *lbnd_out, const int *ubnd_out,
+*                       const int *lbnd, const int *ubnd,
+*                       void *out, void *out_var, double *work )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function rebins a specified section of a rectangular grid of 
+*     data (with any number of dimensions) into another rectangular grid 
+*     (with a possibly different number of dimensions). The coordinate 
+*     transformation used to convert input pixel coordinates into positions 
+*     in the output grid is given by the forward transformation of the 
+*     Mapping which is supplied or, alternatively, by a linear approximation 
+*     fitted to a Mapping's forward transformation. Any pixel spreading scheme 
+*     may be specified for distributing the flux of an input pixel amongst 
+*     the output pixels.
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose forward transformation may be
+*        used to transform the coordinates of pixels in the input
+*        grid into associated positions in the output grid.
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     linear_fit
+*        Pointer to an optional array of double which contains the
+*        coefficients of a linear fit which approximates the above
+*        Mapping's forward coordinate transformation. If this is
+*        supplied, it will be used in preference to the above Mapping
+*        when transforming coordinates. This may be used to enhance
+*        performance in cases where evaluation of the Mapping's
+*        forward transformation is expensive. If no linear fit is
+*        available, a NULL pointer should be supplied.
+*
+*        The way in which the fit coefficients are stored in this
+*        array and the number of array elements are as defined by the
+*        astLinearApprox function.
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     in
+*        Pointer to the input array of data to be rebinned (with one
+*        element for each pixel in the input grid). The numerical type
+*        of these data should match the "type" value (below). The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the rebinned data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     type
+*        A value taken from the "DataType" enum, which specifies the
+*        data type of the input and output arrays containing the
+*        gridded data (and variance) values.
+*     spread
+*        A value selected from a set of pre-defined macros to identify
+*        which pixel spread function should be used.
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the pixel spread algorithm, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
+*     flags
+*        The bitwise OR of a set of flag values which provide additional 
+*        control over the resampling operation.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which rebinned values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output data grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output data grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output data grid in the same way as "lbnd_in"
+*        and "ubnd_in" define the shape and size of the input grid
+*        (see above).
+*     lbnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the input data grid which is to be rebinned.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the input data grid which is to be rebinned.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the input grid which is to be rebinned. This section 
+*        should lie wholly within the extent of the input grid (as defined 
+*        by the "lbnd_out" and "ubnd_out" arrays). Regions of the input 
+*        grid lying outside this section will be ignored.
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        An optional pointer to a double array with the same size as 
+*        the "out" array. The contents of this array (if supplied) are
+*        incremented by the accumulated weights assigned to each output pixel.
+*        If no accumulated weights are required, a NULL pointer should be 
+*        given.
+
+*  Notes:
+*     - This function does not take steps to limit memory usage if the
+*     grids supplied are large. To resample large grids in a more
+*     memory-efficient way, the ResampleWithBlocking function should
+*     be used.
+*/
+
+/* Local Variables: */
+   AstPointSet *pset_in;         /* Input PointSet for transformation */
+   AstPointSet *pset_out;        /* Output PointSet for transformation */
+   const double *grad;           /* Pointer to gradient matrix of linear fit */
+   const double *zero;           /* Pointer to zero point array of fit */
+   double **ptr_in;              /* Pointer to input PointSet coordinates */
+   double **ptr_out;             /* Pointer to output PointSet coordinates */
+   double *accum;                /* Pointer to array of accumulated sums */
+   double *p;                    /* Pointer to next axis value */
+   double axmax;                 /* Max output axis value */
+   double axmin;                 /* Min output axis value */
+   double x1;                    /* Interim x coordinate value */
+   double y1;                    /* Interim y coordinate value */
+   int *dim;                     /* Pointer to array of output pixel indices */
+   int *offset;                  /* Pointer to array of output pixel offsets */
+   int *stride;                  /* Pointer to array of output grid strides */
+   int coord_in;                 /* Loop counter for input dimensions */
+   int coord_out;                /* Loop counter for output dimensions */
+   int done;                     /* All pixel indices done? */
+   int i1;                       /* Interim offset into "accum" array */
+   int i2;                       /* Final offset into "accum" array */
+   int idim;                     /* Loop counter for dimensions */
+   int ipoint;                   /* Point index */
+   int ix;                       /* Loop counter for output x coordinate */
+   int iy;                       /* Loop counter for output y coordinate */
+   int neighb;                   /* Number of neighbouring pixels */
+   int npix_out;                 /* Number of modified output pixels */
+   int npoint;                   /* Number of output points (pixels) */
+   int off1;                     /* Interim pixel offset into output array */
+   int off;                      /* Final pixel offset into output array */
+   int point;                    /* Counter for output points (pixels ) */
+   int s;                        /* Temporary variable for strides */
+   const double *par;            /* Pointer to parameter array */
+   double fwhm;                  /* Full width half max. of gaussian */
+   double lpar[ 1 ];             /* Local parameter array */
+   void (* kernel)( double, const double [], int, double * ); /* Kernel fn. */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Further initialisation. */
+   pset_in = NULL;
+   ptr_in = NULL;
+   neighb = 0;
+   kernel = NULL;
+
+/* Calculate the number of input points, as given by the product of
+   the input grid dimensions. */
+   for ( npoint = 1, coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+      npoint *= ubnd[ coord_in ] - lbnd[ coord_in ] + 1;
+   }
+
+/* Allocate workspace. */
+   offset = astMalloc( sizeof( int ) * (size_t) npoint );
+   stride = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   if ( astOK ) {
+
+/* Calculate the stride for each input grid dimension. */
+      off = 0;
+      s = 1;
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         stride[ coord_in ] = s;
+         s *= ubnd_in[ coord_in ] - lbnd_in[ coord_in ] + 1;
+      }
+
+/* A linear fit to the Mapping is available. */
+/* ========================================= */
+      if ( linear_fit ) {
+
+/* If a linear fit to the Mapping has been provided, then obtain
+   pointers to the array of gradients and zero-points comprising the
+   fit. */
+         grad = linear_fit + ndim_in;
+         zero = linear_fit;
+
+/* Create a PointSet to hold the output grid coordinates and obtain an
+   array of pointers to its coordinate data. */
+         pset_out = astPointSet( npoint, ndim_out, "" );
+         ptr_out = astGetPoints( pset_out );
+         if ( astOK ) {
+
+/* Initialise the count of input points. */
+            point = 0;
+
+/* Handle the 1-dimensional case optimally. */
+/* ---------------------------------------- */
+            if ( ( ndim_in == 1 ) && ( ndim_out == 1 ) ) {
+
+/* Loop through the pixels of the input grid and transform their x
+   coordinates into the output grid's coordinate system using the
+   linear fit supplied. Store the results in the PointSet created
+   above. */
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_out[ 0 ][ point ] = zero[ 0 ] + grad[ 0 ] * (double) ix;
+
+/* Calculate the offset of each pixel within the input array. */
+                  offset[ point ] = ix - lbnd_in[ 0 ];
+                  point++;
+               }
+
+/* Handle the 2-dimensional case optimally. */
+/* ---------------------------------------- */
+            } else if ( ( ndim_in == 2 ) && ( ndim_out == 2 ) ) {
+
+/* Loop through the range of y coordinates in the input grid and
+   calculate interim values of the output coordinates using the linear
+   fit supplied. */
+               for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+                  x1 = zero[ 0 ] + grad[ 1 ] * (double) iy;
+                  y1 = zero[ 1 ] + grad[ 3 ] * (double) iy;
+
+/* Also calculate an interim pixel offset into the input array. */
+                  off1 = stride[ 1 ] * ( iy - lbnd_in[ 1 ] ) - lbnd_in[ 0 ];
+
+/* Now loop through the range of input x coordinates and calculate
+   the final values of the input coordinates, storing the results in
+   the PointSet created above. */
+                  for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                     ptr_out[ 0 ][ point ] = x1 + grad[ 0 ] * (double) ix;
+                     ptr_out[ 1 ][ point ] = y1 + grad[ 2 ] * (double) ix;
+
+/* Also calculate final pixel offsets into the input array. */
+                     offset[ point ] = off1 + ix;
+                     point++;
+                  }
+               }
+
+/* Handle other numbers of dimensions. */
+/* ----------------------------------- */               
+            } else {
+
+/* Allocate workspace. */
+               accum = astMalloc( sizeof( double ) *
+                                 (size_t) ( ndim_in * ndim_out ) );
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_in );
+               if ( astOK ) {
+
+/* Initialise an array of pixel indices for the input grid which refer to the 
+   first pixel which we will rebin. Also calculate the offset of this pixel 
+   within the input array. */
+                  off = 0;
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     dim[ coord_in ] = lbnd[ coord_in ];
+                     off += stride[ coord_in ] *
+                            ( dim[ coord_in ] - lbnd_in[ coord_in ] );
+                  }
+
+/* To calculate each output grid coordinate we must perform a matrix
+   multiply on the input grid coordinates (using the gradient matrix)
+   and then add the zero points. However, since we will usually only
+   be altering one input coordinate at a time (the least
+   significant), we can avoid the full matrix multiply by accumulating
+   partial sums for the most significant input coordinates and only
+   altering those sums which need to change each time. The zero points
+   never change, so we first fill the "most significant" end of the
+   "accum" array with these. */
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     accum[ ( coord_out + 1 ) * ndim_in - 1 ] =
+                                                              zero[ coord_out ];
+                  }
+                  coord_in = ndim_in - 1;
+
+/* Now loop to process each input pixel. */
+                  for ( done = 0; !done; point++ ) {
+
+/* To generate the output coordinate that corresponds to the current
+   input pixel, we work down from the most significant dimension
+   whose index has changed since the previous pixel we considered
+   (given by "coord_in"). For each affected dimension, we accumulate
+   in "accum" the matrix sum (including the zero point) for that
+   dimension and all higher input dimensions. We must accumulate a
+   separate set of sums for each output coordinate we wish to
+   produce. (Note that for the first pixel we process, all dimensions
+   are considered "changed", so we start by initialising the whole
+   "accum" array.) */
+                     for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                        i1 = coord_out * ndim_in;
+                        for ( idim = coord_out; idim >= 1; idim-- ) {
+                           i2 = i1 + idim;
+                           accum[ i2 - 1 ] = accum[ i2 ] +
+                                             dim[ idim ] * grad[ i2 ];
+                        }
+
+/* The output coordinate for each dimension is given by the accumulated
+   sum for input dimension zero (giving the sum over all input
+   dimensions). We do not store this in the "accum" array, but assign
+   the result directly to the coordinate array of the PointSet created
+   earlier. */
+                        ptr_out[ coord_out ][ point ] = accum[ i1 ] +
+                                                      dim[ 0 ] * grad[ i1 ];
+                     }
+
+/* Store the offset of the current pixel in the input array. */
+                     offset[ point ] = off;
+
+/* Now update the array of pixel indices to refer to the next input pixel. */
+                     coord_in = 0;
+                     do {
+
+/* The least significant index which currently has less than its maximum 
+   value is incremented by one. The offset into the input array is updated 
+   accordingly. */
+                        if ( dim[ coord_in ] < ubnd[ coord_in ] ) {
+                           dim[ coord_in ]++;
+                           off += stride[ coord_in ];
+                           break;
+
+/* Any less significant indices which have reached their maximum value
+   are returned to their minimum value and the input pixel offset is
+   decremented appropriately. */
+                        } else {
+                           dim[ coord_in ] = lbnd[ coord_in ];
+                           off -= stride[ coord_in ] *
+                                  ( ubnd[ coord_in ] - lbnd[ coord_in ] );
+
+/* All the output pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
+                           done = ( ++coord_in == ndim_in );
+                        }
+                     } while ( !done );
+                  }
+               }
+
+/* Free the workspace. */
+               accum = astFree( accum );
+               dim = astFree( dim );
+            }
+         }
+
+/* No linear fit to the Mapping is available. */
+/* ========================================== */
+      } else {
+
+/* Create a PointSet to hold the coordinates of the input pixels and
+   obtain a pointer to its coordinate data. */
+         pset_in = astPointSet( npoint, ndim_in, "" );
+         ptr_in = astGetPoints( pset_in );
+         if ( astOK ) {
+
+/* Initialise the count of input points. */
+            point = 0;
+
+/* Handle the 1-dimensional case optimally. */
+/* ---------------------------------------- */
+            if ( ndim_in == 1 ) {
+
+/* Loop through the required range of input x coordinates, assigning
+   the coordinate values to the PointSet created above. Also store a
+   pixel offset into the input array. */
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_in[ 0 ][ point ] = (double) ix;
+                  offset[ point ] = ix - lbnd_in[ 0 ];
+
+/* Increment the count of input pixels. */
+                  point++;
+               }
+
+/* Handle the 2-dimensional case optimally. */
+/* ---------------------------------------- */
+            } else if ( ndim_in == 2 ) {
+
+/* Loop through the required range of input y coordinates,
+   calculating an interim pixel offset into the input array. */
+               for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+                  off1 = stride[ 1 ] * ( iy - lbnd_in[ 1 ] ) - lbnd_in[ 0 ];
+
+/* Loop through the required range of input x coordinates, assigning
+   the coordinate values to the PointSet created above. Also store a
+   final pixel offset into the input array. */
+                  for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                     ptr_in[ 0 ][ point ] = (double) ix;
+                     ptr_in[ 1 ][ point ] = (double) iy;
+                     offset[ point ] = off1 + ix;
+
+/* Increment the count of input pixels. */
+                     point++;
+                  }
+               }
+
+/* Handle other numbers of dimensions. */
+/* ----------------------------------- */
+            } else {
+
+/* Allocate workspace. */
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_in );
+               if ( astOK ) {
+
+/* Initialise an array of pixel indices for the input grid which
+   refer to the first pixel to be rebinned. Also calculate the offset 
+   of this pixel within the input array. */
+                  off = 0;
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     dim[ coord_in ] = lbnd[ coord_in ];
+                     off += stride[ coord_in ] *
+                            ( dim[ coord_in ] - lbnd_in[ coord_in ] );
+                  }
+
+/* Loop to generate the coordinates of each input pixel. */
+                  for ( done = 0; !done; point++ ) {
+
+/* Copy each pixel's coordinates into the PointSet created above. */
+                     for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                        ptr_in[ coord_in ][ point ] =
+                                                     (double) dim[ coord_in ];
+                     }
+
+/* Store the offset of the pixel in the input array. */
+                     offset[ point ] = off;
+
+/* Now update the array of pixel indices to refer to the next input
+   pixel. */
+                     coord_in = 0;
+                     do {
+
+/* The least significant index which currently has less than its
+   maximum value is incremented by one. The offset into the input
+   array is updated accordingly. */
+                        if ( dim[ coord_in ] < ubnd[ coord_in ] ) {
+                           dim[ coord_in ]++;
+                           off += stride[ coord_in ];
+                           break;
+
+/* Any less significant indices which have reached their maximum value
+   are returned to their minimum value and the input pixel offset is
+   decremented appropriately. */
+                        } else {
+                           dim[ coord_in ] = lbnd[ coord_in ];
+                           off -= stride[ coord_in ] *
+                                  ( ubnd[ coord_in ] - lbnd[ coord_in ] );
+
+/* All the input pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
+                           done = ( ++coord_in == ndim_in );
+                        }
+                     } while ( !done );
+                  }
+               }
+
+/* Free the workspace. */
+               dim = astFree( dim );
+            }
+
+/* When all the input pixel coordinates have been generated, use the
+   Mapping's forward transformation to generate the output coordinates
+   from them. Obtain an array of pointers to the resulting coordinate
+   data. */
+            pset_out = astTransform( this, pset_in, 1, NULL );
+            ptr_out = astGetPoints( pset_out );
+         }
+
+/* Annul the PointSet containing the input coordinates. */
+         pset_in = astAnnul( pset_in );
+      }
+   }
+
+/* Find the approximate number of output pixels to be modified. */
+   if ( astOK ) {
+      npix_out = 1.0;
+      for( idim = 0; idim < ndim_out; idim++ ) {
+         axmax = -DBL_MAX;
+         axmin = DBL_MAX;
+         p = ptr_out[ idim ];
+         for( ipoint = 0; ipoint < npoint; ipoint++, p++ ) {
+            if( *p != AST__BAD ) {            
+               if( *p < axmin ) axmin = *p;
+               if( *p > axmax ) axmax = *p;
+            }
+         }
+         if( axmax > axmin ) npix_out *= ( axmax - axmin + 1.0 );
+      }
+
+/* Rebin the input grid. */
+/* ------------------------ */
+/* Identify the pixel spreading scheme to be used. */
+
+/* Nearest pixel. */
+/* -------------- */
+      switch ( spread ) {
+         case AST__NEAREST:
+
+/* Define a macro to use a "case" statement to invoke the
+   nearest-pixel spreading function appropriate to a given data
+   type. */
+#define CASE_NEAREST(X,Xtype) \
+               case ( TYPE_##X ): \
+                  SpreadNearest##X( ndim_out, lbnd_out, ubnd_out, \
+                                    (Xtype *) in, (Xtype *) in_var, \
+                                    npoint, offset, \
+                                    (const double *const *) ptr_out, \
+                                    flags, *( (Xtype *) badval_ptr ), \
+                                    (Xtype *) out, (Xtype *) out_var, work ); \
+                  break;
+       
+/* Use the above macro to invoke the appropriate function. */
+            switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+               CASE_NEAREST(LD,long double)
+#endif
+               CASE_NEAREST(D,double)
+               CASE_NEAREST(F,float)
+               CASE_NEAREST(I,int)
+
+               case ( TYPE_L ): break;
+               case ( TYPE_B ): break;
+               case ( TYPE_S ): break;
+               case ( TYPE_UL ): break;
+               case ( TYPE_UI ): break;
+               case ( TYPE_US ): break;
+               case ( TYPE_UB ): break;
+            }
+            break;
+
+/* Undefine the macro. */
+#undef CASE_NEAREST
+               
+/* Linear spreading. */
+/* ----------------- */
+/* Note this is also the default if zero is given. */
+         case AST__LINEAR:
+         case 0:
+
+/* Define a macro to use a "case" statement to invoke the linear
+   spreading function appropriate to a given data type. */
+#define CASE_LINEAR(X,Xtype) \
+               case ( TYPE_##X ): \
+                  SpreadLinear##X( ndim_out, lbnd_out, ubnd_out,\
+                                   (Xtype *) in, (Xtype *) in_var, \
+                                   npoint, offset, \
+                                   (const double *const *) ptr_out, \
+                                   flags, *( (Xtype *) badval_ptr ), \
+                                   (Xtype *) out, (Xtype *) out_var, work ); \
+                  break;
+
+/* Use the above macro to invoke the appropriate function. */
+            switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+               CASE_LINEAR(LD,long double)
+#endif
+               CASE_LINEAR(D,double)
+               CASE_LINEAR(F,float)
+               CASE_LINEAR(I,int)
+
+               case ( TYPE_L ): break;
+               case ( TYPE_B ): break;
+               case ( TYPE_S ): break;
+               case ( TYPE_UL ): break;
+               case ( TYPE_UI ): break;
+               case ( TYPE_US ): break;
+               case ( TYPE_UB ): break;
+            }
+            break;
+
+/* Undefine the macro. */
+#undef CASE_LINEAR
+
+/* Spreading using a 1-d kernel. */
+/* ----------------------------- */
+         case AST__SINC:
+         case AST__SINCCOS:
+         case AST__SINCGAUSS:
+         case AST__GAUSS:
+         case AST__SINCSINC:
+
+/* Obtain a pointer to the appropriate 1-d kernel function (either
+   internal or user-defined) and set up any parameters it may
+   require. */
+            par = NULL;
+            switch ( spread ) {
+
+/* sinc(pi*x) */
+/* ---------- */
+/* Assign the kernel function. */
+               case AST__SINC:
+                  kernel = Sinc;
+
+/* Calculate the number of neighbouring pixels to use. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) {
+                     neighb = 2;
+                  } else {
+                     neighb = MaxI( 1, neighb );
+                  }
+                  break;
+
+/* sinc(pi*x)*cos(k*pi*x) */
+/* ---------------------- */
+/* Assign the kernel function. */
+               case AST__SINCCOS:
+                  kernel = SincCos;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                  break;
+
+/* sinc(pi*x)*exp(-k*x*x) */
+/* ---------------------- */
+/* Assign the kernel function. */
+               case AST__SINCGAUSS:
+                  kernel = SincGauss;
+
+/* Constrain the full width half maximum of the gaussian factor. */
+                  fwhm = MaxD( 0.1, params[ 1 ] );
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 4.0 * log( 2.0 ) / ( fwhm * fwhm );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, use the number of neighbouring pixels required by the width
+   of the kernel (out to where the gaussian term falls to 1% of its
+   peak value). */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = (int) ceil( sqrt( -log( 0.01 ) /
+                                                                lpar[ 0 ] ) );
+                  break;
+
+/* exp(-k*x*x) */
+/* ----------- */
+/* Assign the kernel function. */
+               case AST__GAUSS:
+                  kernel = Gauss;
+
+/* Constrain the full width half maximum of the gaussian. */
+                  fwhm = MaxD( 0.1, params[ 1 ] );
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 4.0 * log( 2.0 ) / ( fwhm * fwhm );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, use the number of neighbouring pixels required by the width
+   of the kernel (out to where the gaussian term falls to 1% of its
+   peak value). */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = (int) ceil( sqrt( -log( 0.01 ) /
+                                                                lpar[ 0 ] ) );
+                  break;
+
+/* sinc(pi*x)*sinc(k*pi*x) */
+/* ----------------------- */
+/* Assign the kernel function. */
+               case AST__SINCSINC:
+                  kernel = SincSinc;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                  break;
+            }
+
+/* Define a macro to use a "case" statement to invoke the 1-d kernel
+   interpolation function appropriate to a given data type, passing it
+   the pointer to the kernel function obtained above. */
+#define CASE_KERNEL1(X,Xtype) \
+               case ( TYPE_##X ): \
+                  SpreadKernel1##X( this, ndim_out, lbnd_out, ubnd_out, \
+                                         (Xtype *) in, (Xtype *) in_var, \
+                                         npoint, offset, \
+                                         (const double *const *) ptr_out, \
+                                         kernel, neighb, par, flags, \
+                                         *( (Xtype *) badval_ptr ), \
+                                         (Xtype *) out, (Xtype *) out_var, work ); \
+                  break;
+
+/* Use the above macro to invoke the appropriate function. */
+            switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+               CASE_KERNEL1(LD,long double)
+#endif
+               CASE_KERNEL1(D,double)
+               CASE_KERNEL1(F,float)
+               CASE_KERNEL1(I,int)
+
+               case ( TYPE_L ): break;
+               case ( TYPE_B ): break;
+               case ( TYPE_S ): break;
+               case ( TYPE_UL ): break;
+               case ( TYPE_UI ): break;
+               case ( TYPE_US ): break;
+               case ( TYPE_UB ): break;
+            }
+            break;
+
+/* Undefine the macro. */
+#undef CASE_KERNEL1
+
+/* Error: invalid pixel spreading scheme specified. */
+/* ------------------------------------------------ */
+         default:
+
+/* Define a macro to report an error message appropriate to a given
+   data type. */
+#define CASE_ERROR(X) \
+            case TYPE_##X: \
+               astError( AST__SISIN, "astRebin"#X"(%s): Invalid " \
+                         "pixel spreading scheme (%d) specified.", \
+                         astGetClass( unsimplified_mapping ), spread ); \
+               break;
+                                 
+/* Use the above macro to report an appropriate error message. */
+            switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+               CASE_ERROR(LD)
+#endif
+               CASE_ERROR(D)
+               CASE_ERROR(F)
+               CASE_ERROR(I)
+
+               case ( TYPE_L ): break;
+               case ( TYPE_B ): break;
+               case ( TYPE_S ): break;
+               case ( TYPE_UL ): break;
+               case ( TYPE_UI ): break;
+               case ( TYPE_US ): break;
+               case ( TYPE_UB ): break;
+            }
+            break;
+
+/* Undefine the macro. */
+#undef CASE_ERROR
+      }
+   }
+
+/* Annul the PointSet used to hold output coordinates. */
+   pset_out = astAnnul( pset_out );
+
+/* Free the workspace. */
+   offset = astFree( offset );
+   stride = astFree( stride );
+}
+
+static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
+                              int ndim_in,
+                              const int *lbnd_in, const int *ubnd_in,
+                              const void *in, const void *in_var,
+                              DataType type, int spread,
+                              const double *params, int flags,
+                              const void *badval_ptr, int ndim_out,
+                              const int *lbnd_out, const int *ubnd_out,
+                              const int *lbnd, const int *ubnd,
+                              void *out, void *out_var, double *work ) {
+/*
+*  Name:
+*     RebinWithBlocking
+
+*  Purpose:
+*     Rebin a section of a data grid in a memory-efficient way.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void RebinWithBlocking( AstMapping *this, const double *linear_fit,
+*                            int ndim_in,
+*                            const int *lbnd_in, const int *ubnd_in,
+*                            const void *in, const void *in_var,
+*                            DataType type, int spread,
+*                            const double *params, int flags,
+*                            const void *badval_ptr, int ndim_out,
+*                            const int *lbnd_out, const int *ubnd_out,
+*                            const int *lbnd, const int *ubnd,
+*                            void *out, void *out_var, double *work )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function rebins a specified section of a rectangular grid of 
+*     data (with any number of dimensions) into another rectangular grid 
+*     (with a possibly different number of dimensions). The coordinate 
+*     transformation used to convert input pixel coordinates into positions 
+*     in the output grid is given by the forward transformation of the 
+*     Mapping which is supplied.  Any pixel spreading scheme may be specified 
+*     for distributing the flux of an input pixel amongst the output
+*     pixels.
+*
+*     This function is very similar to RebinSection, except that in
+*     order to limit memory usage and to ensure locality of reference,
+*     it divides the input grid up into "blocks" which have a limited
+*     extent along each input dimension. Each block, which will not
+*     contain more than a pre-determined maximum number of pixels, is
+*     then passed to RebinSection for resampling.
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose forward transformation may be
+*        used to transform the coordinates of pixels in the input
+*        grid into associated positions in the output grid.
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     linear_fit
+*        Pointer to an optional array of double which contains the
+*        coefficients of a linear fit which approximates the above
+*        Mapping's forward coordinate transformation. If this is
+*        supplied, it will be used in preference to the above Mapping
+*        when transforming coordinates. This may be used to enhance
+*        performance in cases where evaluation of the Mapping's
+*        forward transformation is expensive. If no linear fit is
+*        available, a NULL pointer should be supplied.
+*
+*        The way in which the fit coefficients are stored in this
+*        array and the number of array elements are as defined by the
+*        astLinearApprox function.
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     in
+*        Pointer to the input array of data to be rebinned (with one
+*        element for each pixel in the input grid). The numerical type
+*        of these data should match the "type" value (below). The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the rebinned data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     type
+*        A value taken from the "DataType" enum, which specifies the
+*        data type of the input and output arrays containing the
+*        gridded data (and variance) values.
+*     spread
+*        A value selected from a set of pre-defined macros to identify
+*        which pixel spread function should be used.
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the pixel spread algorithm, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
+*     flags
+*        The bitwise OR of a set of flag values which provide additional 
+*        control over the resampling operation.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which rebinned values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output data grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output data grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output data grid in the same way as "lbnd_in"
+*        and "ubnd_in" define the shape and size of the input grid
+*        (see above).
+*     lbnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the input data grid which is to be rebinned.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the input data grid which is to be rebinned.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the input grid which is to be rebinned. This section 
+*        should lie wholly within the extent of the input grid (as defined 
+*        by the "lbnd_out" and "ubnd_out" arrays). Regions of the input 
+*        grid lying outside this section will be ignored.
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        An optional pointer to a double array with the same size as 
+*        the "out" array. The contents of this array (if supplied) are
+*        incremented by the accumulated weights assigned to each output pixel.
+*        If no accumulated weights are required, a NULL pointer should be 
+*        given.
+
+*/
+
+/* Local Constants: */
+   const int mxpix = 2 * 1024;   /* Maximum number of pixels in a block (this
+                                    relatively small number seems to give best
+                                    performance) */
+
+/* Local Variables: */
+   int *dim_block;               /* Pointer to array of block dimensions */
+   int *lbnd_block;              /* Pointer to block lower bound array */
+   int *ubnd_block;              /* Pointer to block upper bound array */
+   int dim;                      /* Dimension size */
+   int done;                     /* All blocks rebinned? */
+   int hilim;                    /* Upper limit on maximum block dimension */
+   int idim;                     /* Loop counter for dimensions */
+   int lolim;                    /* Lower limit on maximum block dimension */
+   int mxdim_block;              /* Maximum block dimension */
+   int npix;                     /* Number of pixels in block */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Allocate workspace. */
+   lbnd_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   ubnd_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   dim_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   if ( astOK ) {
+
+/* Find the optimum block size. */
+/* ---------------------------- */
+/* We first need to find the maximum extent which a block of input
+   pixels may have in each dimension. We determine this by taking the
+   input grid extent in each dimension and then limiting the maximum
+   dimension size until the resulting number of pixels is sufficiently
+   small. This approach allows the block shape to approximate (or
+   match) the input grid shape when appropriate. */
+
+/* First loop to calculate the total number of input pixels and the
+   maximum input dimension size. */
+      npix = 1;
+      mxdim_block = 0;
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+         npix *= dim;
+         if ( mxdim_block < dim ) mxdim_block = dim;
+      }
+
+/* If the number of input pixels is too large for a single block, we
+   perform iterations to determine the optimum upper limit on a
+   block's dimension size. Initialise the limits on this result. */
+      if ( npix > mxpix ) {
+         lolim = 1;
+         hilim = mxdim_block;
+
+/* Loop to perform a binary chop, searching for the best result until
+   the lower and upper limits on the result converge to adjacent
+   values. */
+         while ( ( hilim - lolim ) > 1 ) {
+
+/* Form a new estimate from the mid-point of the previous limits. */
+            mxdim_block = ( hilim + lolim ) / 2;
+
+/* See how many pixels a block contains if its maximum dimension is
+   limited to this new value. */
+            for ( npix = 1, idim = 0; idim < ndim_in; idim++ ) {
+               dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+               npix *= ( dim < mxdim_block ) ? dim : mxdim_block;
+            }
+
+/* Update the appropriate limit, according to whether the number of
+   pixels is too large or too small. */
+            *( ( npix <= mxpix ) ? &lolim : &hilim ) = mxdim_block;
+         }
+
+/* When iterations have converged, obtain the maximum limit on the
+   dimension size of a block which results in no more than the maximum
+   allowed number of pixels per block. However, ensure that all block
+   dimensions are at least 2. */
+            mxdim_block = lolim;
+      }
+      if ( mxdim_block < 2 ) mxdim_block = 2;
+
+/* Calculate the block dimensions by applying this limit to the output
+   grid dimensions. */
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+         dim_block[ idim ] = ( dim < mxdim_block ) ? dim : mxdim_block;
+
+/* Also initialise the lower and upper bounds of the first block of
+   output grid pixels to be rebinned, ensuring that this does not
+   extend outside the grid itself. */
+         lbnd_block[ idim ] = lbnd[ idim ];
+         ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
+                                    ubnd[ idim ] );
+      }
+
+/* Rebin each block of input pixels. */
+/* --------------------------------- */
+/* Loop to generate the extent of each block of input pixels and to
+   resample them. */
+      done = 0;
+      while ( !done && astOK ) {
+
+/* Rebin the current block, accumulating the sum of bad pixels produced. */
+         RebinSection( this, linear_fit,
+                       ndim_in, lbnd_in, ubnd_in,
+                       in, in_var, type, spread, params,
+                       flags, badval_ptr,
+                       ndim_out, lbnd_out, ubnd_out,
+                       lbnd_block, ubnd_block, out, out_var, work );
+
+/* Update the block extent to identify the next block of input pixels. */
+         idim = 0;
+         do {
+
+/* We find the least significant dimension where the upper bound of
+   the block has not yet reached the upper bound of the region of the
+   input grid which we are rebinning. The block's position is then
+   incremented by one block extent along this dimension, checking that
+   the resulting extent does not go outside the region being rebinned. */
+            if ( ubnd_block[ idim ] < ubnd[ idim ] ) {
+               lbnd_block[ idim ] = MinI( lbnd_block[ idim ] +
+                                          dim_block[ idim ], ubnd[ idim ] );
+               ubnd_block[ idim ] = MinI( lbnd_block[ idim ] +
+                                          dim_block[ idim ] - 1,
+                                          ubnd[ idim ] );
+               break;
+
+/* If any less significant dimensions are found where the upper bound
+   of the block has reached its maximum value, we reset the block to
+   its lowest position. */
+            } else {
+               lbnd_block[ idim ] = lbnd[ idim ];
+               ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
+                                          ubnd[ idim ] );
+
+/* All the blocks have been processed once the position along the most
+   significant dimension has been reset. */
+               done = ( ++idim == ndim_out );
+            }
+         } while ( !done );
+      }
+   }
+
+/* Free the workspace. */
+   lbnd_block = astFree( lbnd_block );
+   ubnd_block = astFree( ubnd_block );
+   dim_block = astFree( dim_block );
+}
+
 static void ReportPoints( AstMapping *this, int forward,
                           AstPointSet *in_points, AstPointSet *out_points ) {
 /*
@@ -11350,6 +13782,1946 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    return result;
 }
 
+/*
+*  Name:
+*     SpreadKernel1<X>
+
+*  Purpose:
+*     Rebin a data grid, using a 1-d interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SpreadKernel1<X>( AstMapping *this, int ndim_out,
+*                           const int *lbnd_out, const int *ubnd_out,
+*                           const <Xtype> *in, const <Xtype> *in_var,
+*                           int npoint, const int *offset, 
+*                           const double *const *coords,
+*                           void (* kernel)( double, const double [], int,
+*                                            double * ),
+*                           int neighb, const double *params, int flags,
+*                           <Xtype> badval,
+*                           <Xtype> *out, <Xtype> *out_var, double *work )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which rebins a rectangular region of an 
+*     input grid of data (and, optionally, associated statistical variance
+*     values) so as to place them into a new output grid. Each input
+*     grid point may be mapped on to a position in the output grid in
+*     an arbitrary way. The input and output grids may have any number
+*     of dimensions, not necessarily equal.
+*
+*     Where the input positions given do not correspond with a pixel centre
+*     in the output grid, the each input pixel value is spread out between the
+*     surrounding output pixels using weights determined by a separable kernel 
+*     which is the product of a 1-dimensional kernel function evaluated along 
+*     each output dimension. A pointer should be supplied to the 1-dimensional 
+*     kernel function to be used.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping being used in the rebinning operation
+*        (this is only used for constructing error messages).
+*     ndim_out
+*        The number of dimensions in the output grid. This should be at
+*        least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output grid, its extent along a particular
+*        (i'th) dimension being ubnd_out[i]-lbnd_out[i]+1 (assuming "i"
+*        is zero-based). They also define the output grid's coordinate
+*        system, with each pixel being of unit extent along each
+*        dimension with integral coordinate values at its centre.
+*     in
+*        Pointer to the array of data to be rebinned. The numerical type
+*        of these data should match the function used, as given by the
+*        suffix on the function name. Note that details of how the input 
+*        grid maps on to this array (e.g. the storage order, number of 
+*        dimensions, etc.) is arbitrary and is specified entirely by means 
+*        of the "offset" array. The "in" array should therefore contain 
+*        sufficient elements to accommodate the "offset" values supplied.  
+*        There is no requirement that all elements of the "in" array 
+*        should be rebinned, and any which are not addressed by the
+*        contents of the "offset" array will be ignored.
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and type as the "in" array), which
+*        represent estimates of the statistical variance associated
+*        with each element of the "in" array. If this second array is
+*        given (along with the corresponding "out_var" array), then
+*        estimates of the variance of the resampled data will also be
+*        returned. It is addressed in exactly the same way (via the 
+*        "offset" array) as the "in" array. 
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     npoint
+*        The number of input points which are to be rebinned.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each input point, this array should contain the zero-based
+*        offset in the input array(s) (i.e. the "in" and, optionally, 
+*        the "in_var" arrays) from which the value to be rebinned should
+*        be obtained.
+*     coords
+*        An array of pointers to double, with "ndim_out" elements. 
+*        Element "coords[coord]" should point at the first element of 
+*        an array of double (with "npoint" elements) which contains the 
+*        values of coordinate number "coord" for each point being
+*        rebinned. The value of coordinate number "coord" for 
+*        rebinning point number "point" is therefore given by
+*        "coords[coord][point]" (assuming both indices are
+*        zero-based).  If any point has a coordinate value of AST__BAD
+*        associated with it, then the corresponding input data (and
+*        variance) value will be ignored.
+*     kernel
+*        Pointer to the 1-dimensional kernel function to be used.
+*     neighb
+*        The number of neighbouring pixels in each dimension (on each
+*        side of the interpolation position) which are to receive
+*        contributions from the input pixel value. This value should be at 
+*        least 1.
+*     params
+*        Pointer to an optional array of parameter values to be passed
+*        to the kernel function. If no parameters are required by this 
+*        function, then a NULL pointer may be supplied.
+*     flags
+*        The bitwise OR of a set of flag values which provide
+*        additional control over the resampling operation.
+*     badval
+*        If the AST__USEBAD flag is set in the "flags" value (above),
+*        this parameter specifies the value which is used to identify
+*        bad data and/or variance values in the input array(s). Its
+*        numerical type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned. The 
+*        storage order should be such that the index of the first grid
+*        dimension varies most rapidly and that of the final dimension 
+*        least rapidly (i.e. Fortran array storage order).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given. The values returned 
+*        are estimates of the statistical variance of the corresponding 
+*        values in the "out" array, on the assumption that all errors in 
+*        input grid values (in the "in" array) are statistically independent 
+*        and that their variance estimates (in the "in_var" array) may 
+*        simply be summed (with appropriate weighting factors).
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        A pointer to an array with the same data type and size as the "out" 
+*        array which is used as work space. The values in the supplied
+*        array are incremented on exit by the sum of the weights used
+*        with each output pixel.
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*/
+/* Define macros to implement the function for a specific data
+   type. */
+#define MAKE_SPREAD_KERNEL1(X,Xtype,IntType) \
+static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
+                              const int *lbnd_out, const int *ubnd_out, \
+                              const Xtype *in, const Xtype *in_var, \
+                              int npoint, const int *offset, \
+                              const double *const *coords, \
+                              void (* kernel)( double, const double [], \
+                                               int, double * ), \
+                              int neighb, const double *params, \
+                              int flags, Xtype badval, \
+                              Xtype *out, Xtype *out_var, double *work ) { \
+\
+/* Local Variables: */ \
+   Xtype in_val;                 /* Input pixel value */ \
+   double error; \
+   double **wtptr;               /* Pointer to array of weight pointers */ \
+   double *filter;               /* Pointer to Nd array of filter values */ \
+   double *kstart;               /* Pointer to next kernel value */ \
+   double *kval;                 /* Pointer to 1d array of kernel values */ \
+   double *wtprod;               /* Accumulated weight value array pointer */ \
+   double **wtptr_last;          /* Array of highest weight pointer values */ \
+   double *xnl;                  /* Pointer to previous ofset array (n-d) */ \
+   double xxn; \
+   double xxl;                   /* Previous X offset */ \
+   double yyl;                   /* Previous Y offset */ \
+   double pixwt;                 /* Weight to apply to individual pixel */ \
+   double x;                     /* x coordinate value */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   double sum;                   /* Sum of all filter values */ \
+   double xx;                    /* X offset */ \
+   double yy;                    /* Y offset */ \
+   double *kp;                   /* Pointer to next weight values */ \
+   int *hi;                      /* Pointer to array of upper indices */ \
+   int *lo;                      /* Pointer to array of lower indices */ \
+   int *jhi;                     /* Pointer to array of filter upper indices */ \
+   int *jlo;                     /* Pointer to array of filter lower indices */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int done;                     /* All pixel indices done? */ \
+   int hi_ix;                    /* Upper output pixel index (x dimension) */ \
+   int hi_iy;                    /* Upper output pixel index (y dimension) */ \
+   int hi_jx;                    /* Upper filter pixel index (x dimension) */ \
+   int hi_jy;                    /* Upper filter pixel index (y dimension) */ \
+   int lo_ix;                    /* Lower output pixel index (x dimension) */ \
+   int lo_iy;                    /* Lower output pixel index (y dimension) */ \
+   int lo_jx;                    /* Lower filter pixel index (x dimension) */ \
+   int lo_jy;                    /* Lower filter pixel index (y dimension) */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ii;                       /* Loop counter for dimensions */ \
+   int ix;                       /* Pixel index in output grid x dimension */ \
+   int jx;                       /* Pixel index in filter grid x dimension */ \
+   int ixn;                      /* Pixel index in input grid (n-d) */ \
+   int ixn0;                     /* First pixel index in input grid (n-d) */ \
+   int iy;                       /* Pixel index in output grid y dimension */ \
+   int jy;                       /* Pixel index in filter grid y dimension */ \
+   int kerror;                   /* Error signalled by kernel function? */ \
+   int nb2;                      /* The total number of neighbouring pixels */ \
+   int nf;                       /* Number of pixels in filter array */ \
+   int off1;                     /* Input pixel offset due to y index */ \
+   int off_in;                   /* Offset to input pixel */ \
+   int off_out;                  /* Offset to output pixel */ \
+   int point;                    /* Loop counter for output points */ \
+   int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
+   int ystride;                  /* Stride along input grid y dimension */ \
+   int jxn; \
+\
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Further initialisation. */ \
+   kerror = 0; \
+   bad = 0; \
+\
+/* Find the total number of pixels in the filter used to spread a single \
+   input pixel into the output image. */ \
+   nb2 = 2*neighb; \
+   nf = 1; \
+   for ( idim = 0; idim < ndim_out; idim++ ) nf *= nb2; \
+\
+/* Allocate workspace to hold the filter values. */ \
+   filter = astMalloc( sizeof( double ) * (size_t) nf ); \
+   if ( astOK ) { \
+\
+/* Determine if we are processing bad pixels or variances. */ \
+      usebad = flags & AST__USEBAD; \
+      usevar = in_var && out_var; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+      if ( ndim_out == 1 ) { \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               KERNEL_1D(X,Xtype,1,1,IntType) \
+            } else { \
+               KERNEL_1D(X,Xtype,1,0,IntType) \
+            } \
+         } else { \
+            if ( usevar ) { \
+               KERNEL_1D(X,Xtype,0,1,IntType) \
+            } else { \
+               KERNEL_1D(X,Xtype,0,0,IntType) \
+            } \
+         } \
+\
+/* Exit point on error in kernel function */ \
+         Kernel_SError_1d: ; \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+      } else if ( ndim_out == 2 ) { \
+\
+/* Calculate the stride along the y dimension of the output grid. */ \
+         ystride = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               KERNEL_2D(X,Xtype,1,1,IntType) \
+            } else { \
+               KERNEL_2D(X,Xtype,1,0,IntType) \
+            } \
+         } else { \
+            if ( usevar ) { \
+               KERNEL_2D(X,Xtype,0,1,IntType) \
+            } else { \
+               KERNEL_2D(X,Xtype,0,0,IntType) \
+            } \
+         } \
+\
+/* Exit point on error in kernel function */ \
+         Kernel_SError_2d: ; \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+      } else { \
+\
+/* Allocate workspace. */ \
+         hi = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+         lo = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+         jhi = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+         jlo = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+         stride = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+         xnl = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+         kval = astMalloc( sizeof( double ) * (size_t) \
+                                           ( nb2 * ndim_out ) ); \
+         wtprod = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+         wtptr = astMalloc( sizeof( double * ) * (size_t) ndim_out ); \
+         wtptr_last = astMalloc( sizeof( double * ) * (size_t) ndim_out ); \
+         if ( astOK ) { \
+\
+/* Calculate the stride along each dimension of the output grid. */ \
+            for ( s = 1, idim = 0; idim < ndim_out; idim++ ) { \
+               stride[ idim ] = s; \
+               s *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+               xnl[ idim ] = AST__BAD; \
+            } \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  KERNEL_ND(X,Xtype,1,1,IntType) \
+               } else { \
+                  KERNEL_ND(X,Xtype,1,0,IntType) \
+               } \
+            } else { \
+               if ( usevar ) { \
+                  KERNEL_ND(X,Xtype,0,1,IntType) \
+               } else { \
+                  KERNEL_ND(X,Xtype,0,0,IntType) \
+               } \
+            } \
+\
+/* Exit point on error in kernel function */ \
+            Kernel_SError_Nd: ;\
+         } \
+\
+/* Free the workspace. */ \
+         hi = astFree( hi ); \
+         lo = astFree( lo ); \
+         jhi = astFree( jhi ); \
+         jlo = astFree( jlo ); \
+         stride = astFree( stride ); \
+         xnl = astFree( xnl ); \
+         kval = astFree( kval ); \
+         wtprod = astFree( wtprod ); \
+         wtptr = astFree( wtptr ); \
+         wtptr_last = astFree( wtptr_last ); \
+      } \
+      filter = astFree( filter ); \
+   }\
+\
+/* If an error occurred in the kernel function, then report a \
+   contextual error message. */ \
+   if ( kerror ) { \
+      astError( astStatus, "astRebin"#X"(%s): Error signalled by " \
+                "user-supplied 1-d interpolation kernel.", \
+                astGetClass( unsimplified_mapping ) ); \
+   } \
+\
+}
+
+
+
+
+#define KERNEL_1D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* We do not yet have a previous filter position. */ \
+   xxl = AST__BAD; \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Obtain the x coordinate of the current point and test if it is bad. */ \
+      x = coords[ 0 ][ point ]; \
+      bad = bad || ( x == AST__BAD ); \
+\
+/* If OK, calculate the lowest and highest indices (in the x \
+   dimension) of the region of neighbouring pixels that will \
+   contribute to the interpolated result. Constrain these values to \
+   lie within the output grid. */ \
+      if ( !bad ) { \
+         ix = (int) floor( x ) - neighb + 1; \
+         lo_ix = MaxI( ix, lbnd_out[ 0 ] ); \
+         hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ] ); \
+\
+/* Skip to the next input point if the current input point makes no \
+   contribution to any output pixel. */ \
+         if( lo_ix <= hi_ix ) { \
+\
+/* Convert these output indices to the corresponding indices \
+   within a box [ 0, 2*neighb ] holding the kernel values. */ \
+            lo_jx = lo_ix - ix; \
+            hi_jx = hi_ix - ix; \
+\
+/* Use the kernel function to fill the work array with weights for all output \
+   pixels whether or not they fall within the output array. At the same \
+   time find the sum of all the factors. */ \
+            xx = (double) ix - x; \
+            if( xx != xxl ) { \
+               xxl = xx; \
+\
+               sum = 0.0; \
+               for ( jx = 0; jx < nb2; jx++ ) { \
+                  ( *kernel )( xx, params, flags, &pixwt ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                  if ( !astOK ) { \
+                     kerror = 1; \
+                     goto Kernel_SError_1d; \
+                  } \
+\
+/* Store the kernel factor and increment the sum of all factors. */ \
+                  filter[ jx ] = pixwt; \
+                  sum += pixwt; \
+                  xx += 1.0; \
+               } \
+\
+/* Ensure we do not divide by zero. */ \
+               if( sum == 0.0 ) sum = 1.0; \
+            } \
+\
+/* Loop round all the output pixels which receive contributions from this \
+   input pixel, calculating the offset \
+   of each pixel from the start of the input array. */ \
+            off_out = lo_ix - lbnd_out[ 0 ]; \
+            for ( jx = lo_jx; jx <= hi_jx; jx++, off_out++ ) { \
+\
+/* Retrieve the weight for the current output pixel and normalise it. */ \
+               pixwt = filter[ jx ]/sum; \
+\
+/* Update the output pixel with the required fraction of the input pixel 
+   value. */ \
+               out[ off_out ] += CONV(IntType,in_val*pixwt); \
+               if( work ) work[ off_out ] += pixwt; \
+               if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]*pixwt*pixwt); \
+            } \
+         } \
+      } \
+   }
+
+
+
+
+#define KERNEL_2D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* We do not yet have a previous filter position. */ \
+   xxl = AST__BAD; \
+   yyl = AST__BAD; \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+      error = 0.0; \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Obtain the x coordinate of the current point and test if it is bad. */ \
+      x = coords[ 0 ][ point ]; \
+      bad = bad || ( x == AST__BAD ); \
+      if ( !bad ) { \
+\
+/* Similarly obtain and test the y coordinate. */ \
+         y = coords[ 1 ][ point ]; \
+         bad = ( y == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If OK, calculate the lowest and highest indices (in each dimension) \
+   of the region of neighbouring output pixels which will receive \
+   contributions from the current input pixel. Constrain these values \
+   to lie within the input grid. */ \
+            ix = (int) floor( x ) - neighb + 1; \
+            lo_ix = MaxI( ix, lbnd_out[ 0 ] ); \
+            hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ] ); \
+            iy = (int) floor( y ) - neighb + 1; \
+            lo_iy = MaxI( iy, lbnd_out[ 1 ] ); \
+            hi_iy = MinI( iy + nb2 - 1, ubnd_out[ 1 ] ); \
+\
+/* Skip to the next input point if the current input point makes no \
+   contribution to any output pixel. */ \
+            if( lo_ix <= hi_ix && lo_iy <= hi_iy ) { \
+\
+/* Convert these output indices to the corresponding indices \
+   within a box [ 0:2*neighb, 0:2*neighb ] holding the kernel values. */ \
+               lo_jx = lo_ix - ix; \
+               hi_jx = hi_ix - ix; \
+               lo_jy = lo_iy - iy; \
+               hi_jy = hi_iy - iy; \
+\
+/* Loop to evaluate the kernel function along the y dimension, storing \
+   the resulting weight values in all elements of each associated row \
+   in the kvar array. The function's argument is the offset of the \
+   output pixel (along this dimension) from the central output \
+   position. */ \
+               yy = (double) iy - y; \
+               xx = (double) ix - x; \
+               if( xx != xxl || yy != yyl ) { \
+                  xxl = xx; \
+                  yyl = yy; \
+\
+                  kp = filter; \
+                  for ( jy = 0; jy < nb2; jy++ ) { \
+                     ( *kernel )( yy, params, flags, &pixwt ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_2d; \
+                     } \
+\
+/* Store the kernel factor in all elements of the current row. */ \
+                     for( jx = 0; jx < nb2; jx++ ) *(kp++) = pixwt; \
+\
+/* Move on to the next row. */ \
+                     yy += 1.0; \
+                  } \
+\
+/* Loop to evaluate the kernel function along the x dimension, multiplying \
+   the resulting weight values by the values already stored in the the \
+   associated column in the kvar array. The function's argument is the \
+   offset of the output pixel (along this dimension) from the central output \
+   position. Also form the total data sum in the filter array. */ \
+                  sum = 0.0; \
+                  for ( jx = 0; jx < nb2; jx++ ) { \
+                     ( *kernel )( xx, params, flags, &pixwt ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                     if ( !astOK ) { \
+                        kerror = 1; \
+                        goto Kernel_SError_2d; \
+                     } \
+\
+/* Multiply the kernel factor by all elements of the current column. */ \
+                     kp = filter + jx; \
+                     for( jy = 0; jy < nb2; jy++, kp += nb2 ) { \
+                        *kp *= pixwt; \
+                        sum += *kp; \
+                     } \
+\
+/* Move on to the next column. */ \
+                     xx += 1.0; \
+                  } \
+\
+/* Ensure we do not divide by zero. */ \
+                  if( sum == 0.0 ) sum = 1.0; \
+               } \
+\
+/* Find the offset into the output array at the first modified output pixel \
+   in the first modified row. */ \
+               off1 = lo_ix - lbnd_out[ 0 ] + ystride * ( lo_iy - lbnd_out[ 1 ] ); \
+\
+/* Loop over the affected output rows again. */ \
+               for ( jy = lo_jy; jy <= hi_jy; jy++, off1 += ystride ) { \
+\
+/* Save the offset of the first output pixel to be modified in the \
+   current row. */ \
+                  off_out = off1; \
+\
+/* Get a pointer to the first weight value which will be used. */ \
+                  kp = filter + lo_jx + jy*nb2; \
+\
+/* Loop over the affected output columns again. */ \
+                  for ( jx = lo_jx; jx <= hi_jx; jx++, off_out++, kp++ ) { \
+\
+/* Calculate the weight for this output pixel and normalise it. */ \
+                     pixwt = *kp / sum; \
+\
+/* Update the output pixel with the required fraction of the input pixel \
+   value. */ \
+                     out[ off_out ] += CONV(IntType,in_val*pixwt); \
+                     if( work ) work[ off_out ] += pixwt; \
+                     if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]*pixwt*pixwt); \
+                  } \
+               } \
+            } \
+         } \
+      } \
+   }
+
+
+
+
+#define KERNEL_ND(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* We do not yet have a normalising factor */ \
+   sum = AST__BAD; \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Initialise offsets into the output array. Then loop to obtain each \
+   coordinate associated with the current output point. Set a flag \
+   indicating if any output pixel will be modified. */ \
+      if( !bad ) { \
+         off_out = 0; \
+         for ( idim = 0; idim < ndim_out; idim++ ) { \
+            xn = coords[ idim ][ point ]; \
+\
+/* Test if the coordinate is bad. If true, the corresponding output pixel \
+   value will be bad, so give up on this point. */ \
+            bad = ( xn == AST__BAD ); \
+            if ( bad ) break; \
+\
+/* Calculate the lowest and highest indices (in the current dimension) \
+   of the region of neighbouring output pixels that will be modified. \
+   Constrain these values to lie within the output grid. */ \
+            ixn = (int) floor( xn ); \
+            ixn0 = ixn - neighb + 1; \
+            lo[ idim ] = MaxI( ixn0, lbnd_out[ idim ] ); \
+            hi[ idim ] = MinI( ixn + neighb, ubnd_out[ idim ] ); \
+            jlo[ idim ] = lo[ idim ] - ixn0; \
+            jhi[ idim ] = hi[ idim ] - ixn0; \
+\
+/* Check there is some overlap with the output array on this axis. */ \
+            if( lo[ idim ] > hi[ idim ] ) { \
+               bad = 1; \
+               break; \
+            } \
+\
+/* Accumulate the offset (from the start of the output array) of the \
+   modified output pixel which has the lowest index in each dimension. */ \
+            off_out += stride[ idim ] * ( lo[ idim ] - lbnd_out[ idim ] ); \
+\
+/* Set up an array of pointers to locate the first filter pixel (stored in the \
+   "kval" array) for each dimension. */ \
+            wtptr[ idim ] = kval + nb2*idim; \
+            wtptr_last[ idim ] = wtptr[ idim ] + nb2 - 1; \
+\
+/* Loop to evaluate the kernel function along each dimension, storing \
+   the resulting values. The function's argument is the offset of the \
+   output pixel (along the relevant dimension) from the central output \
+   point. */ \
+            xxn = (double) ( ixn - neighb + 1 ) - xn; \
+            if( xxn != xnl[ idim ] ) { \
+               sum = AST__BAD; \
+               xnl[ idim ] = xxn; \
+               for ( jxn = 0; jxn < nb2; jxn++ ) { \
+                  ( *kernel )( xxn, params, flags, wtptr[ idim ] + jxn ); \
+\
+/* Check for errors arising in the kernel function. */ \
+                  if ( !astOK ) { \
+                     kerror = 1; \
+                     goto Kernel_SError_Nd; \
+                  } \
+\
+/* Increment the kernel position. */ \
+                  xxn += 1.0; \
+               } \
+            } \
+         } \
+\
+/* If OK... */ \
+         if ( !bad ) { \
+\
+/* We only need to modify the normalising factor if the weight values \
+   have changed. */ \
+            if( sum == AST__BAD ) { \
+\
+/* The kernel value to use for each output pixel is the product of the \
+   kernel values for each individual axis at that point. To conserve \
+   flux we need to make sure that the sum of these kernel products is unity. \
+   So loop over the values now to find the total sum of all kernel values. */ \
+               idim = ndim_out - 1; \
+               wtprod[ idim ] = 1.0; \
+               done = 0; \
+               sum = 0; \
+               do { \
+\
+/* Each modified output pixel has a weight equal to the product of the kernel \
+   weight factors evaluated along each input dimension. However, since \
+   we typically only change the index of one dimension at a time, we \
+   can avoid forming this product repeatedly by retaining an array of \
+   accumulated products for all higher dimensions. We need then only \
+   update the lower elements in this array, corresponding to those \
+   dimensions whose index has changed. We do this here, "idim" being \
+   the index of the most significant dimension to have changed. Note \
+   that on the first pass, all dimensions are considered changed, \
+   causing this array to be initialised. */ \
+                  for ( ii = idim; ii >= 1; ii-- ) { \
+                     wtprod[ ii - 1 ] = wtprod[ ii ] * *( wtptr[ ii ] ); \
+                  } \
+\
+/* Obtain the weight of each pixel from the accumulated product of \
+   weights. Also multiply by the weight for dimension zero, which is not \
+   included in the "wtprod" array). Increment the sum of all weights. */ \
+                  sum += wtprod[ 0 ] * *( wtptr[ 0 ] ); \
+\
+/* Now update the weight value pointers and pixel offset to refer to \
+   the next output pixel to be considered. */ \
+                  idim = 0; \
+                  do { \
+\
+/* The first input dimension whose weight value pointer has not yet \
+   reached its final value has this pointer incremented. */ \
+                     if ( wtptr[ idim ] != wtptr_last[ idim ] ) { \
+                        wtptr[ idim ]++; \
+                        break; \
+\
+/* Any earlier dimensions (which have reached the final pointer value) \
+   have this pointer returned to its lowest value. */ \
+                     } else { \
+                        wtptr[ idim ] -= nb2 - 1; \
+                        done = ( ++idim == ndim_out ); \
+                     } \
+                  } while ( !done ); \
+               } while ( !done ); \
+\
+/* Ensure we do not divide by zero. */ \
+               if( sum == 0.0 ) sum = 1.0; \
+            } \
+\
+/* Re-initialise the weights pointers to refer to the first and last \
+   filter pixels which overlaps the output array. */ \
+            kstart = kval; \
+            for ( idim = 0; idim < ndim_out; idim++ ) { \
+               wtptr[ idim ] = kstart + jlo[ idim ]; \
+               wtptr_last[ idim ] = kstart + jhi[ idim ]; \
+               kstart += nb2; \
+            } \
+\
+/* Initialise, and loop over the neighbouring output pixels to divide up \
+   the input pixel value between them. */ \
+            idim = ndim_out - 1; \
+            wtprod[ idim ] = 1.0; \
+            done = 0; \
+            do { \
+\
+/* Each modified output pixel has a weight equal to the product of the kernel \
+   weight factors evaluated along each input dimension. However, since \
+   we typically only change the index of one dimension at a time, we \
+   can avoid forming this product repeatedly by retaining an array of \
+   accumulated products for all higher dimensions. We need then only \
+   update the lower elements in this array, corresponding to those \
+   dimensions whose index has changed. We do this here, "idim" being \
+   the index of the most significant dimension to have changed. Note \
+   that on the first pass, all dimensions are considered changed, \
+   causing this array to be initialised. */ \
+               for ( ii = idim; ii >= 1; ii-- ) { \
+                  wtprod[ ii - 1 ] = wtprod[ ii ] * *( wtptr[ ii ] ); \
+               } \
+\
+/* Obtain the weight of each pixel from the accumulated \
+   product of weights. Also multiply by the weight for dimension zero, \
+   which is not included in the "wtprod" array). */ \
+               pixwt = ( wtprod[ 0 ] * *( wtptr[ 0 ] ) ) / sum; \
+\
+/* Update the output pixel with the required fraction of the input pixel \
+   value. */ \
+               out[ off_out ] += CONV(IntType,in_val*pixwt); \
+               if( work ) work[ off_out ] += pixwt; \
+               if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]*pixwt*pixwt); \
+\
+/* Now update the weight value pointers and pixel offset to refer to \
+   the next output pixel to be considered. */ \
+               idim = 0; \
+               do { \
+\
+/* The first input dimension whose weight value pointer has not yet \
+   reached its final value has this pointer incremented, and the pixel \
+   offset into the input array is updated accordingly. */ \
+                  if ( wtptr[ idim ] != wtptr_last[ idim ] ) { \
+                     wtptr[ idim ]++; \
+                     off_out += stride[ idim ]; \
+                     break; \
+\
+/* Any earlier dimensions (which have reached the final pointer value) \
+   have this pointer returned to its lowest value. Again, the pixel \
+   offset into the input image is updated accordingly. */ \
+                  } else { \
+                     wtptr[ idim ] -= ( hi[ idim ] - lo[ idim ] ); \
+                     off_out -= stride[ idim ] * \
+                                     ( hi[ idim ] - lo[ idim ] ); \
+                     done = ( ++idim == ndim_out ); \
+                  } \
+               } while ( !done ); \
+            } while ( !done ); \
+         } \
+      } \
+   }
+
+
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_SPREAD_KERNEL1(LD,long double,0)
+#endif     
+MAKE_SPREAD_KERNEL1(D,double,0) 
+MAKE_SPREAD_KERNEL1(F,float,0)
+MAKE_SPREAD_KERNEL1(I,int,1)
+
+/* Undefine the macros used above. */
+#undef KERNEL_ND
+#undef KERNEL_2D
+#undef KERNEL_1D
+#undef MAKE_SPREAD_KERNEL1
+
+/*
+*  Name:
+*     SpreadLinear<X>
+
+*  Purpose:
+*     Rebin a data grid, using the linear spreading scheme.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SpreadLinear<X>( int ndim_out,
+*                           const int *lbnd_out, const int *ubnd_out,
+*                           const <Xtype> *in, const <Xtype> *in_var,
+*                           int npoint, const int *offset, 
+*                           const double *const *coords,
+*                           int flags, <Xtype> badval,
+*                           <Xtype> *out, <Xtype> *out_var, double *work ) 
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which rebins a rectangular region of an 
+*     input grid of data (and, optionally, associated statistical variance
+*     values) so as to place them into a new output grid. Each input
+*     grid point may be mapped on to a position in the output grid in
+*     an arbitrary way. Where the positions given do not correspond
+*     with a pixel centre in the input grid, the spreading scheme
+*     used divides the input pixel value up linearly between the 
+*     nearest neighbouring output pixels in each dimension (there are 2 
+*     nearest neighbours in 1 dimension, 4 in 2 dimensions, 8 in 3 
+*     dimensions, etc.).
+
+*  Parameters:
+*     ndim_out
+*        The number of dimensions in the output grid. This should be at
+*        least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output grid, its extent along a particular
+*        (i'th) dimension being ubnd_out[i]-lbnd_out[i]+1 (assuming "i"
+*        is zero-based). They also define the output grid's coordinate
+*        system, with each pixel being of unit extent along each
+*        dimension with integral coordinate values at its centre.
+*     in
+*        Pointer to the array of data to be rebinned. The numerical type
+*        of these data should match the function used, as given by the
+*        suffix on the function name. Note that details of how the input 
+*        grid maps on to this array (e.g. the storage order, number of 
+*        dimensions, etc.) is arbitrary and is specified entirely by means 
+*        of the "offset" array. The "in" array should therefore contain 
+*        sufficient elements to accommodate the "offset" values supplied.  
+*        There is no requirement that all elements of the "in" array 
+*        should be rebinned, and any which are not addressed by the
+*        contents of the "offset" array will be ignored.
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and type as the "in" array), which
+*        represent estimates of the statistical variance associated
+*        with each element of the "in" array. If this second array is
+*        given (along with the corresponding "out_var" array), then
+*        estimates of the variance of the resampled data will also be
+*        returned. It is addressed in exactly the same way (via the 
+*        "offset" array) as the "in" array. 
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     npoint
+*        The number of input points which are to be rebinned.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each input point, this array should contain the zero-based
+*        offset in the input array(s) (i.e. the "in" and, optionally, 
+*        the "in_var" arrays) from which the value to be rebinned should
+*        be obtained.
+*     coords
+*        An array of pointers to double, with "ndim_out" elements. 
+*        Element "coords[coord]" should point at the first element of 
+*        an array of double (with "npoint" elements) which contains the 
+*        values of coordinate number "coord" for each point being
+*        rebinned. The value of coordinate number "coord" for 
+*        rebinning point number "point" is therefore given by
+*        "coords[coord][point]" (assuming both indices are
+*        zero-based).  If any point has a coordinate value of AST__BAD
+*        associated with it, then the corresponding input data (and
+*        variance) value will be ignored.
+*     flags
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised.  If this flag is not set, all input values are treated 
+*        literally.
+*     badval
+*        If the AST__USEBAD flag is set in the "flags" value (above),
+*        this parameter specifies the value which is used to identify
+*        bad data and/or variance values in the input array(s). Its
+*        numerical type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned. The 
+*        storage order should be such that the index of the first grid
+*        dimension varies most rapidly and that of the final dimension 
+*        least rapidly (i.e. Fortran array storage order).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given. The values returned 
+*        are estimates of the statistical variance of the corresponding 
+*        values in the "out" array, on the assumption that all errors in 
+*        input grid values (in the "in" array) are statistically independent 
+*        and that their variance estimates (in the "in_var" array) may 
+*        simply be summed (with appropriate weighting factors).
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        An optional pointer to a double array with the same size as 
+*        the "out" array. The contents of this array (if supplied) are
+*        incremented by the accumulated weights assigned to each output pixel.
+*        If no accumulated weights are required, a NULL pointer should be 
+*        given.
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*/
+/* Define macros to implement the function for a specific data
+   type. */
+#define MAKE_SPREAD_LINEAR(X,Xtype,IntType) \
+static void SpreadLinear##X( int ndim_out, \
+                            const int *lbnd_out, const int *ubnd_out, \
+                            const Xtype *in, const Xtype *in_var, \
+                            int npoint, const int *offset, \
+                            const double *const *coords, \
+                            int flags, Xtype badval, \
+                            Xtype *out, Xtype *out_var, double *work ) { \
+\
+/* Local Variables: */ \
+   Xtype in_val;                 /* Input value */ \
+   double *frac_hi;              /* Pointer to array of weights */ \
+   double *frac_lo;              /* Pointer to array of weights */ \
+   double *wt;                   /* Pointer to array of weights */ \
+   double *wtprod;               /* Array of accumulated weights pointer */ \
+   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
+   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double f;                     /* Total pixel weight */ \
+   double frac_hi_x;             /* Pixel weight (x dimension) */ \
+   double frac_hi_y;             /* Pixel weight (y dimension) */ \
+   double frac_lo_x;             /* Pixel weight (x dimension) */ \
+   double frac_lo_y;             /* Pixel weight (y dimension) */ \
+   double x;                     /* x coordinate value */ \
+   double xmax;                  /* x upper limit */ \
+   double xmin;                  /* x lower limit */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   double ymax;                  /* y upper limit */ \
+   double ymin;                  /* y lower limit */ \
+   int *dim;                     /* Pointer to array of pixel indices */ \
+   int *hi;                      /* Pointer to array of upper indices */ \
+   int *lo;                      /* Pointer to array of lower indices */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int bad_var;                  /* Output variance bad? */ \
+   int done;                     /* All pixel indices done? */ \
+   int hi_x;                     /* Upper pixel index (x dimension) */ \
+   int hi_y;                     /* Upper pixel index (y dimension) */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ii;                       /* Loop counter for weights */ \
+   int ixn;                      /* Pixel index (n-d) */ \
+   int lo_x;                     /* Lower pixel index (x dimension) */ \
+   int lo_y;                     /* Lower pixel index (y dimension) */ \
+   int off;                      /* Total offset to input pixel */ \
+   int off_in;                   /* Offset to input pixel */ \
+   int off_lo;                   /* Offset to "first" input pixel */ \
+   int off_out;                  /* Offset to output pixel */ \
+   int point;                    /* Loop counter for output points */ \
+   int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
+   int ystride;                  /* Stride along input grid y dimension */ \
+\
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Initialise variables to avoid "used of uninitialised variable" \
+   messages from dumb compilers. */ \
+   bad = 0; \
+   bad_var = 0; \
+\
+/* Determine if we are processing bad pixels or variances. */ \
+   usebad = flags & AST__USEBAD; \
+   usevar = in_var && out_var; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   if ( ndim_out == 1 ) { \
+\
+/* Calculate the coordinate limits of the input grid. */ \
+      xmin = (double) lbnd_out[ 0 ] - 0.5; \
+      xmax = (double) ubnd_out[ 0 ] + 0.5; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+            LINEAR_1D(X,Xtype,1,1,IntType) \
+         } else { \
+            LINEAR_1D(X,Xtype,1,0,IntType) \
+         } \
+      } else { \
+         if ( usevar ) { \
+            LINEAR_1D(X,Xtype,0,1,IntType) \
+         } else { \
+            LINEAR_1D(X,Xtype,0,0,IntType) \
+         } \
+      } \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   } else if ( ndim_out == 2 ) { \
+\
+/* Calculate the stride along the y dimension of the output grid. */ \
+      ystride = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1; \
+\
+/* Calculate the coordinate limits of the output grid in each \
+   dimension. */ \
+      xmin = (double) lbnd_out[ 0 ] - 0.5; \
+      xmax = (double) ubnd_out[ 0 ] + 0.5; \
+      ymin = (double) lbnd_out[ 1 ] - 0.5; \
+      ymax = (double) ubnd_out[ 1 ] + 0.5; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  LINEAR_2D(X,Xtype,1,1,IntType) \
+               } else { \
+                  LINEAR_2D(X,Xtype,1,0,IntType) \
+               } \
+            } else { \
+               if ( usevar ) { \
+                  LINEAR_2D(X,Xtype,0,1,IntType) \
+               } else { \
+                  LINEAR_2D(X,Xtype,0,0,IntType) \
+               } \
+            } \
+         } \
+      } \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+   } else { \
+\
+/* Allocate workspace. */ \
+      dim = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+      frac_hi = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      frac_lo = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      hi = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+      lo = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+      stride = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+      wt = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      wtprod = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      xn_max = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      xn_min = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      if ( astOK ) { \
+\
+/* Calculate the stride along each dimension of the output grid. */ \
+         for ( s = 1, idim = 0; idim < ndim_out; idim++ ) { \
+            stride[ idim ] = s; \
+            s *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+\
+/* Calculate the coordinate limits of the output grid in each \
+   dimension. */ \
+            xn_min[ idim ] = (double) lbnd_out[ idim ] - 0.5; \
+            xn_max[ idim ] = (double) ubnd_out[ idim ] + 0.5; \
+         } \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
+   bad pixels and variances can be eliminated when not required. */ \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               LINEAR_ND(X,Xtype,1,1,IntType) \
+            } else { \
+               LINEAR_ND(X,Xtype,1,0,IntType) \
+            } \
+         } else { \
+            if ( usevar ) { \
+               LINEAR_ND(X,Xtype,0,1,IntType) \
+            } else { \
+               LINEAR_ND(X,Xtype,0,0,IntType) \
+            } \
+         } \
+      } \
+\
+/* Free the workspace. */ \
+      dim = astFree( dim ); \
+      frac_hi = astFree( frac_hi ); \
+      frac_lo = astFree( frac_lo ); \
+      hi = astFree( hi ); \
+      lo = astFree( lo ); \
+      stride = astFree( stride ); \
+      wt = astFree( wt ); \
+      wtprod = astFree( wtprod ); \
+      xn_max = astFree( xn_max ); \
+      xn_min = astFree( xn_min ); \
+   } \
+\
+}
+
+
+
+
+
+
+#define LINEAR_1D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the output grid. Also test if it is bad. */ \
+      x = coords[ 0 ][ point ]; \
+      bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
+\
+/* If OK, obtain the indices along the output grid x dimension of the \
+   two adjacent output pixels which will receive contributions from the \
+   input pixel. Also obtain the fractional weight to be applied to each of \
+   these pixels. */ \
+      if ( !bad ) { \
+         lo_x = (int) floor( x ); \
+         hi_x = lo_x + 1; \
+         frac_lo_x = (double) hi_x - x; \
+         frac_hi_x = 1.0 - frac_lo_x; \
+\
+/* Obtain the offset within the output array of the first pixel to be \
+   updated (the one with the smaller index). */ \
+         off_lo = lo_x - lbnd_out[ 0 ]; \
+\
+/* For each of the two pixels which may be updated, test if the pixel index \
+   lies within the output grid. Where it does, update the output pixel \
+   with the required fraction of the input pixel value. */ \
+         if ( lo_x >= lbnd_out[ 0 ] ) { \
+            out[ off_lo ] += CONV(IntType,in_val*frac_lo_x); \
+            if( work ) work[ off_lo ] += frac_lo_x; \
+            if ( Usevar ) out_var[ off_lo ] += CONV(IntType,in_var[ off_in ]*frac_lo_x*frac_lo_x); \
+         } \
+         if ( hi_x <= ubnd_out[ 0 ] ) { \
+            out[ off_lo + 1 ] += CONV(IntType,in_val*frac_hi_x); \
+            if( work ) work[ off_lo + 1 ] += frac_hi_x; \
+            if ( Usevar ) out_var[ off_lo + 1 ] += CONV(IntType,in_var[ off_in ]*frac_hi_x*frac_hi_x); \
+         } \
+      } \
+   }
+
+
+
+
+#define LINEAR_2D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the output grid. Also test if it is bad. */ \
+      x = coords[ 0 ][ point ]; \
+      bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
+      if ( !bad ) { \
+\
+/* Similarly obtain and test the y coordinate. */ \
+         y = coords[ 1 ][ point ]; \
+         bad = ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If OK, obtain the indices along the output grid x dimension of the \
+   two adjacent pixels which recieve contributions from the input pixel. \
+   Also obtain the fractional weight to be applied to each of \
+   these pixels. */ \
+            lo_x = (int) floor( x ); \
+            hi_x = lo_x + 1; \
+            frac_lo_x = (double) hi_x - x; \
+            frac_hi_x = 1.0 - frac_lo_x; \
+\
+/* Repeat this process for the y dimension. */ \
+            lo_y = (int) floor( y ); \
+            hi_y = lo_y + 1; \
+            frac_lo_y = (double) hi_y - y; \
+            frac_hi_y = 1.0 - frac_lo_y; \
+\
+/* Obtain the offset within the output array of the first pixel to be \
+   updated (the one with the smaller index along both dimensions). */ \
+            off_lo = lo_x - lbnd_out[ 0 ] + ystride * ( lo_y - lbnd_out[ 1 ] ); \
+\
+/* For each of the four pixels which may be updated, test if the pixel indices \
+   lie within the output grid. Where they do, update the output pixel \
+   with the required fraction of the input pixel value. */ \
+            if ( lo_y >= lbnd_out[ 1 ] ) { \
+               if ( lo_x >= lbnd_out[ 0 ] ) { \
+                  f = frac_lo_x * frac_lo_y; \
+                  out[ off_lo ] += CONV(IntType,in_val*f); \
+                  if( work ) work[ off_lo ] += f; \
+                  if ( Usevar ) out_var[ off_lo ] += CONV(IntType,in_var[ off_in ]*f*f); \
+               } \
+               if ( hi_x <= ubnd_out[ 0 ] ) { \
+                  f = frac_hi_x * frac_lo_y; \
+                  off = off_lo + 1; \
+                  out[ off ] += CONV(IntType,in_val*f); \
+                  if( work ) work[ off ] += f; \
+                  if ( Usevar ) out_var[ off ] += CONV(IntType,in_var[ off_in ]*f*f); \
+               } \
+            } \
+            if ( hi_y <= ubnd_out[ 1 ] ) { \
+               if ( lo_x >= lbnd_out[ 0 ] ) { \
+                  f = frac_lo_x * frac_hi_y; \
+                  off = off_lo + ystride; \
+                  out[ off ] += CONV(IntType,in_val*f); \
+                  if( work ) work[ off ] += f; \
+                  if ( Usevar ) out_var[ off ] += CONV(IntType,in_var[ off_in ]*f*f ); \
+               } \
+               if ( hi_x <= ubnd_out[ 0 ] ) { \
+                  f = frac_hi_x * frac_hi_y; \
+                  off = off_lo + ystride + 1; \
+                  out[ off ] += CONV(IntType,in_val*f); \
+                  if( work ) work[ off ] += f; \
+                  if ( Usevar ) out_var[ off ] += CONV(IntType,in_var[ off_in ]*f*f); \
+               } \
+            } \
+         } \
+      } \
+   }
+
+
+#define LINEAR_ND(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+   for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+      off_in = offset[ point ]; \
+      in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+      if ( Usebad ) { \
+         bad = ( in_val == badval ); \
+         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+      } else { \
+         bad = 0; \
+      } \
+\
+/* Initialise offsets into the output array. Then loop to obtain each \
+   coordinate associated with the current output point. */ \
+      if( !bad ) { \
+         off_out = 0; \
+         for ( idim = 0; idim < ndim_out; idim++ ) { \
+            xn = coords[ idim ][ point ]; \
+\
+/* Test if the coordinate lies outside the output grid.  Also test if \
+   it is bad. If either is true, the corresponding output pixel value \
+   will be bad, so give up on this point. */ \
+            bad = ( xn < xn_min[ idim ] ) || ( xn >= xn_max[ idim ] ) || \
+                  ( xn == AST__BAD ); \
+            if ( bad ) break; \
+\
+/* Obtain the indices along the current dimension of the output grid of \
+   the two (usually adjacent) pixels which will be updated. If necessary, \
+   however, restrict each index to ensure it does not lie outside the \
+   input grid. Also calculate the fractional weight to be given to each \
+   pixel in order to divide the input value linearly between them. */ \
+            ixn = (int) floor( xn ); \
+            lo[ idim ] = MaxI( ixn, lbnd_out[ idim ] ); \
+            hi[ idim ] = MinI( ixn + 1, ubnd_out[ idim ] ); \
+            frac_lo[ idim ] = 1.0 - fabs( xn - (double) lo[ idim ] ); \
+            frac_hi[ idim ] = 1.0 - fabs( xn - (double) hi[ idim ] ); \
+\
+/* Store the lower index involved in spreading along each \
+   dimension and accumulate the offset from the start of the output \
+   array of the pixel which has these indices. */ \
+            dim[ idim ] = lo[ idim ]; \
+            off_out += stride[ idim ] * ( lo[ idim ] - lbnd_out[ idim ] ); \
+\
+/* Also store the fractional weight associated with the lower pixel \
+   along each dimension. */ \
+            wt[ idim ] = frac_lo[ idim ]; \
+         } \
+\
+/* If OK, loop over adjacent output pixels to divide up the input value. */ \
+         if ( !bad ) { \
+            idim = ndim_out - 1; \
+            wtprod[ idim ] = 1.0; \
+            done = 0; \
+            do { \
+\
+/* Each pixel pixel to be updated has a total weight equal to the product \
+   of the weights which account for the displacement of its centre from \
+   the required position along each dimension. However, since we typically \
+   only change the index of one dimension at a time, we can avoid forming \
+   this product repeatedly by retaining an array of accumulated weight \
+   products for all higher dimensions. We need then only update the \
+   lower elements in this array, corresponding to those dimensions \
+   whose index has changed. We do this here, "idim" being the index of \
+   the most significant dimension to have changed. Note that on the \
+   first pass, all dimensions are considered changed, causing this \
+   array to be initialised. */ \
+               for ( ii = idim; ii >= 1; ii-- ) { \
+                  wtprod[ ii - 1 ] = wtprod[ ii ] * wt[ ii ]; \
+               } \
+\
+/* Update the relevent output pixel. The pixel weight is formed by including \
+   the weight factor for dimension zero, since this is not included in \
+   the "wtprod" array. */ \
+               f = wtprod[ 0 ] * wt[ 0 ]; \
+               out[ off_out ] += CONV(IntType,in_val*f); \
+               if( work ) work[ off_out ] += f; \
+               if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]*f*f); \
+\
+/* Now update the indices, offset and weight factors to refer to the \
+   next output pixel to be updated. */ \
+               idim = 0; \
+               do { \
+\
+/* The first input dimension which still refers to the pixel with the \
+   lower of the two possible indices is switched to refer to the other \
+   pixel (with the higher index). The offset into the output array and \
+   the fractional weight factor for this dimension are also updated \
+   accordingly. */ \
+                  if ( dim[ idim ] != hi[ idim ] ) { \
+                     dim[ idim ] = hi[ idim ]; \
+                     off_out += stride[ idim ]; \
+                     wt[ idim ] = frac_hi[ idim ]; \
+                     break; \
+\
+/* Any earlier dimensions (referring to the higher index) are switched \
+   back to the lower index, if not already there, before going on to \
+   consider the next dimension. (This process is the same as \
+   incrementing a binary number and propagating overflows up through \
+   successive digits, except that dimensions where the "lo" and "hi" \
+   values are the same can only take one value.) The process stops at \
+   the first attempt to return the final dimension to the lower \
+   index. */ \
+                  } else { \
+                     if ( dim[ idim ] != lo[ idim ] ) { \
+                        dim[ idim ] = lo[ idim ]; \
+                        off_out -= stride[ idim ]; \
+                        wt[ idim ] = frac_lo[ idim ]; \
+                     } \
+                     done = ( ++idim == ndim_out ); \
+                  } \
+               } while ( !done ); \
+            } while ( !done ); \
+         } \
+      } \
+   }
+
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_SPREAD_LINEAR(LD,long double,0)
+#endif     
+MAKE_SPREAD_LINEAR(D,double,0)
+MAKE_SPREAD_LINEAR(F,float,0)
+MAKE_SPREAD_LINEAR(I,int,1)
+
+/* Undefine the macros used above. */
+#undef LINEAR_1D
+#undef LINEAR_2D
+#undef LINEAR_ND
+#undef MAKE_SPREAD_LINEAR
+
+/*
+*  Name:
+*     SpreadNearest<X>
+
+*  Purpose:
+*     Rebin a data grid, using the nearest-pixel spreading scheme.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SpreadNearest<X>( int ndim_out,
+*                           const int *lbnd_out, const int *ubnd_out,
+*                           const <Xtype> *in, const <Xtype> *in_var,
+*                           int npoint, const int *offset, 
+*                           const double *const *coords,
+*                           int flags, <Xtype> badval,
+*                           <Xtype> *out, <Xtype> *out_var, double *work ) 
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which rebins a rectangular region of an 
+*     input grid of data (and, optionally, associated statistical variance
+*     values) so as to place them into a new output grid. Each input
+*     grid point may be mapped on to a position in the output grid in
+*     an arbitrary way. Where the positions given do not correspond
+*     with a pixel centre in the output grid, the spreading scheme
+*     used is simply to select the nearest pixel (i.e. the one whose
+*     bounds contain the supplied position).
+
+*  Parameters:
+*     ndim_out
+*        The number of dimensions in the output grid. This should be at
+*        least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output grid, its extent along a particular
+*        (i'th) dimension being ubnd_out[i]-lbnd_out[i]+1 (assuming "i"
+*        is zero-based). They also define the output grid's coordinate
+*        system, with each pixel being of unit extent along each
+*        dimension with integral coordinate values at its centre.
+*     in
+*        Pointer to the array of data to be rebinned. The numerical type
+*        of these data should match the function used, as given by the
+*        suffix on the function name. Note that details of how the input 
+*        grid maps on to this array (e.g. the storage order, number of 
+*        dimensions, etc.) is arbitrary and is specified entirely by means 
+*        of the "offset" array. The "in" array should therefore contain 
+*        sufficient elements to accommodate the "offset" values supplied.  
+*        There is no requirement that all elements of the "in" array 
+*        should be rebinned, and any which are not addressed by the
+*        contents of the "offset" array will be ignored.
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and type as the "in" array), which
+*        represent estimates of the statistical variance associated
+*        with each element of the "in" array. If this second array is
+*        given (along with the corresponding "out_var" array), then
+*        estimates of the variance of the resampled data will also be
+*        returned. It is addressed in exactly the same way (via the 
+*        "offset" array) as the "in" array. 
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     npoint
+*        The number of input points which are to be rebinned.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each input point, this array should contain the zero-based
+*        offset in the input array(s) (i.e. the "in" and, optionally, 
+*        the "in_var" arrays) from which the value to be rebinned should
+*        be obtained.
+*     coords
+*        An array of pointers to double, with "ndim_out" elements. 
+*        Element "coords[coord]" should point at the first element of 
+*        an array of double (with "npoint" elements) which contains the 
+*        values of coordinate number "coord" for each point being
+*        rebinned. The value of coordinate number "coord" for 
+*        rebinning point number "point" is therefore given by
+*        "coords[coord][point]" (assuming both indices are
+*        zero-based).  If any point has a coordinate value of AST__BAD
+*        associated with it, then the corresponding input data (and
+*        variance) value will be ignored.
+*     flags
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised.  If this flag is not set, all input values are treated 
+*        literally.
+*     badval
+*        If the AST__USEBAD flag is set in the "flags" value (above),
+*        this parameter specifies the value which is used to identify
+*        bad data and/or variance values in the input array(s). Its
+*        numerical type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned. The 
+*        storage order should be such that the index of the first grid
+*        dimension varies most rapidly and that of the final dimension 
+*        least rapidly (i.e. Fortran array storage order).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given. The values returned 
+*        are estimates of the statistical variance of the corresponding 
+*        values in the "out" array, on the assumption that all errors in 
+*        input grid values (in the "in" array) are statistically independent 
+*        and that their variance estimates (in the "in_var" array) may 
+*        simply be summed (with appropriate weighting factors).
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     work
+*        A pointer to an array with the same data type and size as the "out" 
+*        array which is used as work space. The values in the supplied
+*        array are incremented on exit by the sum of the weights used
+*        with each output pixel.
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*/
+/* Define a macro to implement the function for a specific data type. */
+#define MAKE_SPREAD_NEAREST(X,Xtype,IntType) \
+static void SpreadNearest##X( int ndim_out, \
+                             const int *lbnd_out, const int *ubnd_out, \
+                             const Xtype *in, const Xtype *in_var, \
+                             int npoint, const int *offset, \
+                             const double *const *coords, \
+                             int flags, Xtype badval, \
+                             Xtype *out, Xtype *out_var, double *work ) { \
+\
+/* Local Variables: */ \
+   Xtype in_val;                 /* Input data value */ \
+   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
+   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double x;                     /* x coordinate value */ \
+   double xmax;                  /* x upper limit */ \
+   double xmin;                  /* x lower limit */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   double ymax;                  /* y upper limit */ \
+   double ymin;                  /* y lower limit */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ix;                       /* Number of pixels offset in x direction */ \
+   int ixn;                      /* Number of pixels offset (n-d) */ \
+   int iy;                       /* Number of pixels offset in y direction */ \
+   int off_in;                   /* Pixel offset into input array */ \
+   int off_out;                  /* Pixel offset into output array */ \
+   int point;                    /* Loop counter for output points */ \
+   int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
+   int ystride;                  /* Stride along input grid y direction */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Determine if we are processing bad pixels or variances. */ \
+   usebad = flags & AST__USEBAD; \
+   usevar = in_var && out_var; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   if ( ndim_out == 1 ) { \
+\
+/* Calculate the coordinate limits of the output array. */ \
+      xmin = (double) lbnd_out[ 0 ] - 0.5; \
+      xmax = (double) ubnd_out[ 0 ] + 0.5; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated by the compiler when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+            NEAR_1D(X,Xtype,1,1,IntType) \
+         } else { \
+            NEAR_1D(X,Xtype,1,0,IntType) \
+         } \
+      } else { \
+         if ( usevar ) { \
+            NEAR_1D(X,Xtype,0,1,IntType) \
+         } else { \
+            NEAR_1D(X,Xtype,0,0,IntType) \
+         } \
+      } \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   } else if ( ndim_out == 2 ) { \
+\
+/* Calculate the stride along the y dimension of the output grid. */ \
+      ystride = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1; \
+\
+/* Calculate the coordinate limits of the output array in each \
+   dimension. */ \
+      xmin = (double) lbnd_out[ 0 ] - 0.5; \
+      xmax = (double) ubnd_out[ 0 ] + 0.5; \
+      ymin = (double) lbnd_out[ 1 ] - 0.5; \
+      ymax = (double) ubnd_out[ 1 ] + 0.5; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated by the compiler when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+            NEAR_2D(X,Xtype,1,1,IntType) \
+         } else { \
+            NEAR_2D(X,Xtype,1,0,IntType) \
+         } \
+      } else { \
+         if ( usevar ) { \
+            NEAR_2D(X,Xtype,0,1,IntType) \
+         } else { \
+            NEAR_2D(X,Xtype,0,0,IntType) \
+         } \
+      } \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+   } else { \
+\
+/* Allocate workspace. */ \
+      stride = astMalloc( sizeof( int ) * (size_t) ndim_out ); \
+      xn_max = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      xn_min = astMalloc( sizeof( double ) * (size_t) ndim_out ); \
+      if ( astOK ) { \
+\
+/* Calculate the stride along each dimension of the output grid. */ \
+         for ( s = 1, idim = 0; idim < ndim_out; idim++ ) { \
+            stride[ idim ] = s; \
+            s *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+\
+/* Calculate the coordinate limits of the output grid in each \
+   dimension. */ \
+            xn_min[ idim ] = (double) lbnd_out[ idim ] - 0.5; \
+            xn_max[ idim ] = (double) ubnd_out[ idim ] + 0.5; \
+         } \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case we assign constant values \
+   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated by the compiler when not required. */ \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               NEAR_ND(X,Xtype,1,1,IntType) \
+            } else { \
+               NEAR_ND(X,Xtype,1,0,IntType) \
+            } \
+         } else { \
+            if ( usevar ) { \
+               NEAR_ND(X,Xtype,0,1,IntType) \
+            } else { \
+               NEAR_ND(X,Xtype,0,0,IntType) \
+            } \
+         } \
+      } \
+\
+/* Free the workspace. */ \
+      stride = astFree( stride ); \
+      xn_max = astFree( xn_max ); \
+      xn_min = astFree( xn_min ); \
+   } \
+\
+}
+
+
+
+
+
+#define NEAR_1D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+            for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+               off_in = offset[ point ]; \
+               in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+               if ( Usebad ) { \
+                  bad = ( in_val == badval ); \
+                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+               } else { \
+                  bad = 0; \
+               } \
+\
+/* Obtain the output x coordinate corresponding to the centre of the \
+   current input pixel and test if it lies outside the output grid, or \
+   is bad. */ \
+               x = coords[ 0 ][ point ]; \
+               bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
+               if ( !bad ) { \
+\
+/* If not, then obtain the offset within the output grid of the pixel \
+   which contains the current input point. */ \
+                  off_out = (int) floor( x + 0.5 ) - lbnd_out[ 0 ]; \
+\
+/* Increment the value of this output pixel by the value of the input pixel. */ \
+                  out[ off_out ] += CONV(IntType,in_val); \
+                  if( work ) work[ off_out ] += 1.0; \
+\
+/* If required, also increment the variance of this output pixel by the \
+   variance of the input pixel. */ \
+                  if ( Usevar ) { \
+                     out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                  } \
+               } \
+            }
+
+
+
+
+
+
+#define NEAR_2D(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+            for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+               off_in = offset[ point ]; \
+               in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+               if ( Usebad ) { \
+                  bad = ( in_val == badval ); \
+                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+               } else { \
+                  bad = 0; \
+               } \
+\
+/* Obtain the output x coordinate corresponding to the centre of the \
+   current input pixel and test if it lies outside the output grid, or \
+   is bad. */ \
+               x = coords[ 0 ][ point ]; \
+               bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
+               if ( !bad ) { \
+\
+/* Similarly obtain the output y coordinate corresponding to the centre of the \
+   current input pixel and test if it lies outside the output grid, or \
+   is bad. */ \
+                  y = coords[ 1 ][ point ]; \
+                  bad = bad || ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+                  if ( !bad ) { \
+\
+/* Obtain the offsets along each output grid dimension of the output \ 
+   pixel which is to receive the input pixel value. */ \
+                     ix = (int) floor( x + 0.5 ) - lbnd_out[ 0 ]; \
+                     iy = (int) floor( y + 0.5 ) - lbnd_out[ 1 ]; \
+\
+/* Calculate this pixel's offset from the start of the output array. */ \
+                     off_out = ix + ystride * iy; \
+\
+/* Increment the value of this output pixel by the value of the input pixel. */ \
+                     out[ off_out ] += CONV(IntType,in_val); \
+                     if( work ) work[ off_out ] += 1.0; \
+\
+/* If required, also increment the variance of this output pixel by the \
+   variance of the input pixel. */ \
+                     if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                  } \
+               } \
+            }
+
+
+
+
+
+#define NEAR_ND(X,Xtype,Usebad,Usevar,IntType) \
+\
+/* Loop round all input points which are to be rebinned. */ \
+            for( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the input data value which is to be added into the output array. */ \
+               off_in = offset[ point ]; \
+               in_val = in[ off_in ]; \
+\
+/* If necessary, test if the input data value or variance is bad. */ \
+               if ( Usebad ) { \
+                  bad = ( in_val == badval ); \
+                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+               } else { \
+                  bad = 0; \
+               } \
+               if( !bad ) { \
+\
+/* Initialise the offset into the output array. Then loop to obtain \
+   each coordinate associated with the current output point. */ \
+                  off_out = 0; \
+                  for ( idim = 0; idim < ndim_out; idim++ ) { \
+                     xn = coords[ idim ][ point ]; \
+\
+/* Test if the coordinate lies outside the output grid, or is bad. If \
+   either is true, the corresponding input pixel value will be ignored, \
+   so give up on this point. */ \
+                     bad = ( xn < xn_min[ idim ] ) || ( xn >= xn_max[ idim ] ) || \
+                           ( xn == AST__BAD ); \
+                     if ( bad ) break; \
+\
+/* Obtain the offset along the current output grid dimension of the \
+   output pixel which is to receive the input pixel value. */ \
+                     ixn = (int) floor( xn + 0.5 ) - lbnd_out[ idim ]; \
+\
+/* Accumulate this pixel's offset from the start of the output array. */ \
+                     off_out += ixn * stride[ idim ]; \
+                  } \
+                  if( !bad ) { \
+\
+/* Increment the value of this output pixel by the value of the input pixel. */ \
+                     out[ off_out ] += CONV(IntType,in_val); \
+                     if( work ) work[ off_out ] += 1.0; \
+\
+/* If required, also increment the variance of this output pixel by the \
+   variance of the input pixel. */ \
+                     if ( Usevar ) out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                  } \
+               } \
+            }
+
+
+
+
+
+
+
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_SPREAD_NEAREST(LD,long double,0)
+#endif
+
+MAKE_SPREAD_NEAREST(D,double,0)
+MAKE_SPREAD_NEAREST(F,float,0)
+MAKE_SPREAD_NEAREST(I,int,1)
+
+/* Undefine the macros used above. */
+#undef NEAR_ND
+#undef NEAR_2D
+#undef NEAR_1D
+#undef MAKE_SPREAD_NEAREST
+
+
+
+
+
+
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -13877,6 +18249,34 @@ MAKE_RESAMPLE_(B,signed char)
 MAKE_RESAMPLE_(UB,unsigned char)
 #undef MAKE_RESAMPLE_
 
+#define MAKE_REBIN_(X,Xtype) \
+void astRebin##X##_( AstMapping *this, double wlim, int ndim_in, const int *lbnd_in, \
+                    const int *ubnd_in, const Xtype *in, \
+                    const Xtype *in_var, int interp, \
+                    const double *params, \
+                    int flags, double tol, int maxpix, Xtype badval, \
+                    int ndim_out, \
+                    const int *lbnd_out, const int *ubnd_out, \
+                    const int *lbnd, const int *ubnd, Xtype *out, \
+                    Xtype *out_var ) { \
+   if ( !astOK ) return; \
+   (**astMEMBER(this,Mapping,Rebin##X))( this, wlim, ndim_in, lbnd_in, \
+                                         ubnd_in, in, in_var, \
+                                         interp, params, \
+                                         flags, tol, maxpix, \
+                                         badval, ndim_out, \
+                                         lbnd_out, ubnd_out, \
+                                         lbnd, ubnd, \
+                                         out, out_var ); \
+}
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_REBIN_(LD,long double)
+#endif
+MAKE_REBIN_(D,double)
+MAKE_REBIN_(F,float)
+MAKE_REBIN_(I,int)
+#undef MAKE_REBIN_
+
 double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
    if ( !astOK ) return AST__BAD;
 
@@ -14515,7 +18915,7 @@ f     MAP.
 /* If succesful, copy the output axes to the supplied array. */
       if( result ) {
          nout = astGetNout( *map );
-         for( i = 0; i < nout; i++ ) out[ i ] = result[ i ] + 1;
+         for( i = 0; i < nout; i++ ) out[ i ] = result[ i ];
 
 /* Free resurces. */
          result = astFree( result );
@@ -14529,8 +18929,5 @@ f     MAP.
 /* Return an ID value for the Mapping. */
    *map = astMakeId( *map );
 }
-
-
-
 
 
