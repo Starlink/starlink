@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, 
      :                       METHOD, PARAMS, XY1, XY2, ERRLIM, MAXPIX, 
-     :                       STATUS )
+     :                       REBIN, WLIM, STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, METHOD, 
-*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, STATUS )
+*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, REBIN, WLIM,
+*                      STATUS )
 
 *  Description:
 *     This routine first finds the Mapping from the input pixel
@@ -24,10 +25,10 @@
 *     WCS FrameSet is now created for the output NDF. This is a copy of
 *     the reference FrameSet, but modified to take account of any
 *     difference in the pixel origins between the reference and output
-*     NDFs. Finally, the output NDF is resampled using the specified
-*     method. If nearest-neighbour interpolation is the chosen resampling
-*     method, and the input NDF contains a QUALITY array, then this array
-*     is resampled also.
+*     NDFs. Finally, the output NDF is resampled or rebinned using the 
+*     specified method. If nearest-neighbour is the chosen method, and 
+*     the input NDF contains a QUALITY array, then this array is copied 
+*     to the output.
 
 *  Arguments:
 *     NDIM2 = INTEGER (Given)
@@ -67,6 +68,11 @@
 *        The initial scale size, in pixels, for the adaptive algorithm
 *        which approximates non-linear Mappings with piece-wise linear
 *        transformations.
+*     REBIN = LOGICAL (Given)
+*        Calculate output pixel values by rebinning? Otherwise they will
+*        be calculated by resampling.
+*     WLIM = REAL (Given)
+*        The lower weight limit for a valid output pixel.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -90,6 +96,8 @@
 *        Make N-dimensional.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     19-JUL-2005 (DSB):
+*        Add argument REBIN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -121,13 +129,16 @@
       INTEGER XY2( NDIM2 )
       REAL ERRLIM
       INTEGER MAXPIX
+      LOGICAL REBIN
+      REAL WLIM
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER DOMLST*50          ! List of preferred alignment domains
-      CHARACTER TY_IN*(NDF__SZTYP) ! Data type for processing
+      CHARACTER DTYPE*(NDF__SZFTP) ! Data type
+      CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION DUMMY( 1 )  ! Dummy array.
       DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower pixel co-ord bounds in input
       DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower pixel co-ord bounds in output
@@ -311,8 +322,15 @@
 *  Set TOL (DOUBLE) to ERRLIM (REAL)
       TOL = ERRLIM
 
-*  Map the DATA component of the input and output NDF.
-      CALL NDF_TYPE( INDF1, 'DATA', TY_IN, STATUS )
+*  Map the DATA component of the input and output NDF. Rebinning is only
+*  available in _INTEGER, _REAL or _DOUBLE. Resampling can gandle any
+*  numeric data type.
+      IF( .NOT. REBIN ) THEN
+         CALL NDF_TYPE( INDF1, 'DATA', TY_IN, STATUS )
+      ELSE
+         CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF1, INDF1, 'DATA', 
+     :                   TY_IN, DTYPE, STATUS )
+      END IF
 
       CALL NDF_MAP( INDF1, 'DATA', TY_IN, 'READ', IPD1, EL, STATUS )
       CALL NDF_MAP( INDF2, 'DATA', TY_IN, 'WRITE', IPD2, EL, STATUS )
@@ -335,89 +353,134 @@
       IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD 
 
 *  Call the appropriate resampling routine
-      IF ( TY_IN .EQ. '_INTEGER' ) THEN
-         BAD_PIXELS = AST_RESAMPLEI( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADI, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
+      IF( .NOT. REBIN ) THEN
+         IF ( TY_IN .EQ. '_INTEGER' ) THEN
+            BAD_PIXELS = AST_RESAMPLEI( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADI, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
+            BAD_PIXELS = AST_RESAMPLER( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADR, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
+            BAD_PIXELS = AST_RESAMPLED( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADD, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN 
+            BAD_PIXELS = AST_RESAMPLEB( MAP5, NDIM1, LGRID1, UGRID1, 
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADB, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
+            BAD_PIXELS = AST_RESAMPLEUB( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADUB, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_WORD' ) THEN 
+            BAD_PIXELS = AST_RESAMPLEW( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADW, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN 
+            BAD_PIXELS = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1,
+     :                                %VAL( CNF_PVAL( IPD1 ) ), 
+     :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                                AST_NULL, PARAMS, FLAGS, TOL, 
+     :                                MAXPIX, VAL__BADUW, NDIM2, LGRID2, 
+     :                                UGRID2, LGRID2, UGRID2, 
+     :                                %VAL( CNF_PVAL( IPD2 ) ), 
+     :                                %VAL( CNF_PVAL( IPV2 ) ),
+     :                                STATUS )
+         
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'TY', TY_IN )
+            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported'//
+     :             ' resampling data type ''^TY'' (programming error).', 
+     :             STATUS )
+         END IF
 
-      ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
-         BAD_PIXELS = AST_RESAMPLER( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADR, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
+*  Call the appropriate rebinning routine
+      ELSE
+         IF ( TY_IN .EQ. '_INTEGER' ) THEN
+            CALL AST_REBINI( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
+     :                       %VAL( CNF_PVAL( IPD1 ) ), 
+     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADI, 
+     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1, 
+     :                       %VAL( CNF_PVAL( IPD2 ) ), 
+     :                       %VAL( CNF_PVAL( IPV2 ) ),
+     :                       STATUS )
+         
+         ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
+            CALL AST_REBINR( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
+     :                       %VAL( CNF_PVAL( IPD1 ) ), 
+     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADR, 
+     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1, 
+     :                       %VAL( CNF_PVAL( IPD2 ) ), 
+     :                       %VAL( CNF_PVAL( IPV2 ) ),
+     :                       STATUS )
 
-      ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
-         BAD_PIXELS = AST_RESAMPLED( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADD, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
+         ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
+            CALL AST_REBIND( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
+     :                       %VAL( CNF_PVAL( IPD1 ) ), 
+     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADD, 
+     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1, 
+     :                       %VAL( CNF_PVAL( IPD2 ) ), 
+     :                       %VAL( CNF_PVAL( IPV2 ) ),
+     :                       STATUS )
 
-      ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEB( MAP5, NDIM1, LGRID1, UGRID1, 
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADB, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'TY', TY_IN )
+            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported'//
+     :             ' rebinning data type ''^TY'' (programming error).', 
+     :             STATUS )
+         END IF
 
-      ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
-         BAD_PIXELS = AST_RESAMPLEUB( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUB, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
+         BAD_PIXELS = 1
 
-      ELSE IF ( TY_IN .EQ. '_WORD' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEW( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADW, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
-
-      ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( CNF_PVAL( IPD1 ) ), 
-     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUW, NDIM2, LGRID2, 
-     :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( CNF_PVAL( IPD2 ) ), 
-     :                               %VAL( CNF_PVAL( IPV2 ) ),
-     :                               STATUS )
-
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'TY', TY_IN )
-         CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported '//
-     :                 'data type ''^TY'' (programming error).', 
-     :                 STATUS )
       END IF
 
 *  Set the bad pixel flags for the output DATA and VARIANCE arrays.
@@ -428,12 +491,13 @@
 
 *  Resample QUALITY arrays if appropriate
       CALL NDF_STATE( INDF1, 'QUAL', QUAL, STATUS )
-      IF ( ( METHOD .EQ. AST__NEAREST ) .AND. QUAL ) THEN
+      IF ( ( METHOD .EQ. AST__NEAREST ) .AND. QUAL .AND. 
+     :     .NOT. REBIN ) THEN
 
 *  Map the QUALITY component.
-         CALL NDF_MAP( INDF1, 'QUAL', TY_IN, 'READ', IPQ1, EL, 
+         CALL NDF_MAP( INDF1, 'QUAL', '_UBYTE', 'READ', IPQ1, EL, 
      :                 STATUS )
-         CALL NDF_MAP( INDF2, 'QUAL', TY_IN, 'WRITE', IPQ2, EL,
+         CALL NDF_MAP( INDF2, 'QUAL', '_UBYTE', 'WRITE', IPQ2, EL,
      :                 STATUS )
 
 *  Reset FLAGS (QUALITY arrays cannot have bad pixels).
@@ -448,7 +512,7 @@
      :                            LGRID2, UGRID2, 
      :                            %VAL( CNF_PVAL( IPQ2 ) ), DUMMY,
      :                            STATUS )
-      
+
       END IF
 
 *  Tidy up.

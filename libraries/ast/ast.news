@@ -20,6 +20,11 @@ Main Changes in this Version
 descriptions using the XmlChan class has been added. Support is included
 for a subset of V1.20 of the draft STC specification.
 
+
+- A new set of methods (AST_REBIN<X>/astRebin<X>) has been added to 
+the Mapping class. These are flux-conserving alternatives to the existing
+AST_RESAMPLE<X>/astResample<X> methods.
+
 Main Changes in Version 3.7
 ---------------------------
 
@@ -93,6 +98,3 @@ keywords to be changed or added.
 - The parameter list for the astRate method of the Mapping class has been
 modified. It no longer returns a second derivative estimate. Existing
 code which uses the astRate (AST_RATE) method will need to be changed.
-
-
-18/3/2005

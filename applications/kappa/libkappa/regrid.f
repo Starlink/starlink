@@ -29,14 +29,43 @@
 *     they just encompasses all the transformed input data, but they can
 *     be set explicitly using parameters LBOUND and UBOUND.
 *
-*     The data value stored at each output pixel is determined by 
-*     transforming the pixel co-ordinates at the centre of the output 
-*     pixel using the inverse of the supplied Mapping. This gives the
-*     corresponding pixel co-ordinates in the input NDF. In general this
-*     input position will not correspond to a pixel centre, and so the
-*     input data arrays (Data and Variance) must be interpolated to obtain 
-*     the values for the output pixel. The scheme used to perform this
-*     interpolation can be selected using parameter METHOD.
+*     Two algorithms are available for determining the output pixel
+*     values: resampling and rebinning (the method used is determined by
+*     the REBIN parameter). The resampling algorithm steps through every
+*     pixel in the output image, sampling the input image at the corresponding 
+*     position and storing the sampled input value in the output pixel.
+*     The method used for sampling the input image is determined by the 
+*     METHOD parameter. The rebinning algorithm steps through every pixel in 
+*     the input image, dividing the input pixel value up between a group of 
+*     neighbouring output pixels. The way in which the input sample is
+*     divided up between the output pixels is determined by the METHOD
+*     parameter.
+*
+*     The two algorithms behaviour quite differently if the transformation 
+*     from input to output includes any significant change of scale. In
+*     general, resampling will not alter the pixel values associated with
+*     a source, even if the pixel size changes. On the other hand, the 
+*     rebinning algorithm will change the pixel values in order to
+*     correct for a change in pixel size. Thus, rebinning conserves the
+*     total data value within a given region where as resampling does not.
+*    
+*     Resampling is appropriate if the input image represents the spatial
+*     density of some physical value (e.g. surface brightness) because the 
+*     output image will have the same normalisation as the input image. But
+*     rebinning is probably more appropriarte if the image measures (for
+*     instance) flux per pixel, since rebinning takes account of the
+*     change in pixel size.
+*  
+*     Another difference is that resampling guarantees to fill the output
+*     image with good pixel values (assuming the input image is filled with
+*     good input pixel values), whereas holes can be left by the rebinning 
+*     algorithm if the output image has smaller pixels than the input image.
+*     Such holes occur at output pixels which receive no contributions
+*     from any input pixels, and will be filled with the value zero in
+*     the output image. If this problem occurs the solution is probably
+*     to change the width of the pixel spreading function by assigning
+*     a larger value to PARAMS(1) and/or PARAMS(2) (depending on the
+*     specific METHOD value being used).
 *
 *     The Mapping to use can be supplied in several different ways (see
 *     parameter MAPPING). 
@@ -86,40 +115,94 @@
 *        NDF (apart from possible additional scalings as specified by the
 *        SCALE parameter).
 *     METHOD = LITERAL (Read)
-*        The interpolation method used to resample the input array.
-*        The following values are permitted:
+*        The method to use when sampling the input pixel values (if
+*        resampling), or dividing an input pixel value up between a group 
+*        of neighbouring output pixels (if rebinning). For details 
+*        on these schemes, see the descriptions of routines AST_RESAMPLEx
+*        and AST_REBINx in SUN/210. METHOD can take the following 
+*        values:
 *
-*        -  "Nearest"   -- Nearest neighbour sampling.
+*        - "Bilinear" -- When resampling, the output pixel values are 
+*        calculated by bi-linear interpolation among the four nearest pixels 
+*        values in the input NDF. When rebinning, the input pixel value
+*        is divided up bi-linearly between the four nearest output pixels.
+*        Produces smoother output NDFs than the nearest neighbour scheme, but 
+*        is marginally slower.
 *
-*        -  "Linear"    -- Linear interpolation.
+*        - "Nearest" -- When resampling, the output pixel values are assigned 
+*        the value  of the single nearest input pixel. When rebinning,
+*        the input pixel value is assigned completely to the single
+*        nearest output pixel.
 *
-*        -  "Sinc"      -- Sum of surrounding pixels weighted using
-*                          a 1-d sinc(pi*x) kernel.
+*        - "Sinc" -- use the sinc(pi*x) kernel, where x is the pixel
+*        offset from the interpolation point (resampling) or transformed
+*        input pixel centre (rebinning), and sinc(z)=sin(z)/z. Use of this 
+*        scheme is not recommended.
 *
-*        -  "SincSinc"  -- Sum of surrounding pixels weighted using
-*                          a 1-d sinc(pi*x)*sinc(k*pi*x) kernel.
+*        - "SincSinc" -- uses the sinc(pi*x)sinc(k*pi*x) kernel. A
+*        valuable general-purpose scheme, intermediate in its visual effect 
+*        on NDFs between the bilinear and nearest neighbour schemes. 
+*         
+*        - "SincCos" -- uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
+*        similar results to the sincsinc scheme.
 *
-*        -  "SincCos"   -- Sum of surrounding pixels weighted using
-*                          a 1-d sinc(pi*x)*cos(k*pi*x) kernel.
+*        - "SincGauss" -- uses the sinc(pi*x)exp(-k*x*x) kernel. Good 
+*        results can be obtained by matching the FWHM of the
+*        envelope function to the point spread function of the
+*        input data (see parameter PARAMS).
 *
-*        -  "SincGauss" -- Sum of surrounding pixels weighted using
-*                          a 1-d sinc(pi*x)*exp(-k*x*x) kernel.
+*        - "Gauss" -- uses the exp(-k*x*x) kernel. This option is only 
+*        available when rebinning (i.e. if REBIN is set to a TRUE value).
+*        The FWHM of the Gaussian is given by parameter PARAMS(2), and
+*        the point at which to truncate the Gaussian to zero is given by 
+*        parameter PARAMS(1).
 *
-*        -  "BlockAve"  -- Block averaging over all pixels in the 
-*                          surrounding N-dimensional cube.
-*
-*        In the above, sinc(z)=sin(z)/z.  Some of these schemes will 
-*        require additional parameters to be supplied via the PARAMS 
-*        parameter.  A more detailed discussion of these schemes is
-*        given in the "Sub-Pixel Interpolation Schemes" section below.
-*        [current value]
+*        All methods propagate variances from input to output, but the
+*        variance estimates produced by these schemes other than
+*        nearest neighbour need to be treated with care since the spatial 
+*        smoothing produced by these methods introduces 
+*        correlations in the variance estimates. Also, the degree of 
+*        smoothing produced varies across the NDF. This is because a 
+*        sample taken at a pixel centre will have no contributions from the 
+*        neighbouring pixels, whereas a sample taken at the corner of a 
+*        pixel will have equal contributions from all four neighbouring 
+*        pixels, resulting in greater smoothing and lower noise. This 
+*        effect can produce complex Moire patterns in the output 
+*        variance estimates, resulting from the interference of the 
+*        spatial frequencies in the sample positions and in the pixel 
+*        centre positions. For these reasons, if you want to use the 
+*        output variances, you are generally safer using nearest neighbour
+*        interpolation. [current value]
 *     OUT = NDF (Write)
 *        The transformed NDF.
-*     PARAMS( ) = _DOUBLE (Read)
-*        Parameters required to control the resampling scheme.  One or
-*        more values may be required to specify the exact resampling
-*        behaviour, according to the value of the METHOD parameter.
-*        See the section on "Sub-Pixel Interpolation Schemes".
+*     PARAMS( 2 ) = _DOUBLE (Read)
+*        An optional array which consists of additional parameters
+*        required by the Sinc, SincSinc, SincCos, SincGauss and Gauss
+*        methods.
+*
+*        PARAMS( 1 ) is required by all the above schemes.
+*        It is used to specify how many pixels are to contribute to the 
+*        interpolated result on either side of the interpolation or binning 
+*        point in each dimension. Typically, a value of 2 is appropriate and 
+*        the minimum allowed value is 1 ( i.e. one pixel on each side ). A 
+*        value of zero or less indicates that a suitable number of pixels 
+*        should be calculated automatically. [0]
+*
+*        PARAMS( 2 ) is required only by the Gauss, SincSinc, SincCos, and 
+*        SincGauss schemes. For the SincSinc and SincCos 
+*        schemes, it specifies the number of pixels at which the envelope
+*        of the function goes to zero. The minimum value is 1.0, and the
+*        run-time default value is 2.0. For the Gauss and SincGauss scheme, it
+*        specifies the full-width at half-maximum (FWHM) of the Gaussian 
+*        envelope. The minimum value is 0.1, and the run-time default is
+*        1.0. On astronomical NDFs and spectra, good results are often 
+*        obtained by approximately matching the FWHM of the envelope 
+*        function, given by PARAMS(2), to the point spread function of the 
+*        input data. []
+*     REBIN = LOGICAL_ (Read)
+*        Determines the algorithm used to calculate the output pixel
+*        values. If a TRUE value is given, a rebinning algorithm is used.
+*        Otherwise, a resampling algorithm is used [current value]
 *     SCALE( ) = _DOUBLE (Read)
 *        Axis scaling factors which are used to modify the supplied Mapping.
 *        If the number of supplied values is less than the number of output
@@ -154,6 +237,13 @@
 *        NDF.  If a null value is supplied, default bounds will be used 
 *        which are just high enough to fit in all the transformed pixels 
 *        of the input NDF. [!]
+*     WLIM = _REAL (Read)
+*        This parameter is only used if REBIN is set TRUE. It specifies the 
+*        minimum number of good pixels which must contribute to an output pixel
+*        for the output pixel to be valid. Note, fractional values are
+*        allowed. A null (!) value causes a very small positive value to
+*        be used resulting in output pixels being set bad only if they
+*        receive no significant contribution from any input pixel. [!]
 
 *  Examples:
 *     regrid sg28948 sg28948r mapping=rotate.ast
@@ -192,177 +282,6 @@
 *        is forced to be (1:256,-20:172) regardless of the location
 *        of the transformed pixels of a119.
 
-*  Sub-Pixel Interpolation Schemes:
-*     There is no such thing as a perfect sub-pixel interpolation
-*     scheme and, in practice, all resampling will result in some
-*     degradation of gridded data.  A range of schemes is therefore
-*     provided, from which you can choose the one which best suits
-*     your needs.
-*
-*     In general, a balance must be struck between schemes which tend
-*     to degrade sharp features in the data by smoothing them, and
-*     those which attempt to preserve sharp features. The latter will
-*     often tend to introduce unwanted oscillations, typically visible
-*     as "ringing" around sharp features and edges, especially if the
-*     data are under-sampled (i.e. if the sharpest features are less
-*     than about two pixels across). In practice, a good interpolation
-*     scheme is likely to be a compromise and may exhibit some aspects
-*     of both these features.
-*
-*     For under-sampled data, some interpolation schemes may appear to
-*     preserve data resolution because they transform single input
-*     pixels into single output pixels, rather than spreading their
-*     data between several output pixels. While this may look
-*     better cosmetically, it can result in a geometrical shift of
-*     sharp features in the data. You should beware of this if you
-*     plan to use such features (e.g.) for image alignment.
-*
-*     The following are two easy-to-use sub-pixel interpolation
-*     schemes which are generally applicable:
-*
-*     - "Nearest" -- This is the simplest possible scheme, in which
-*     the value of the input pixel with the nearest centre to the
-*     interpolation point is used. This is very quick to execute and
-*     will preserve single-pixel features in the data, but may
-*     displace them by up to half their width along each dimension. It
-*     often gives a good cosmetic result, so is useful for quick-look
-*     processing, but is unsuitable if accurate geometrical
-*     transformation is required.
-*
-*     - "Linear" -- This scheme uses linear interpolation
-*     between the nearest neighbouring pixels in the
-*     input grid (there are two neighbours in one dimension, four
-*     neighbours in two dimensions, eight in three dimensions,
-*     etc.). It is superior to the nearest-pixel scheme (above) in not
-*     displacing features in the data, yet it still executes fairly
-*     rapidly. It is generally a safe choice if you do not have any
-*     particular reason to favour another scheme, since it cannot
-*     introduce oscillations. However, it does introduce some spatial
-*     smoothing which varies according to the distance of the
-*     interpolation point from the neighbouring pixels. This can
-*     degrade the shape of sharp features in the data in a
-*     position-dependent way. It may also show in the output variance
-*     grid (if used) as a pattern of stripes or fringes.
-*
-*     An alternative set of interpolation schemes is based on forming
-*     the interpolated value from the weighted sum of a set of
-*     surrounding pixel values (not necessarily just the nearest
-*     neighbours). This approach has its origins in the theory of
-*     digital filtering, in which interpolated values are obtained by
-*     conceptually passing the sampled data (represented by a grid of
-*     delta functions) through a linear filter which implements a
-*     convolution. Because the convolution kernel is continuous, the
-*     convolution yields a continuous function which may then be
-*     evaluated at fractional pixel positions. The (possibly
-*     multi-dimensional) kernel is usually regarded as "separable" and
-*     formed from the product of a set of identical 1-dimensional
-*     kernel functions, evaluated along each dimension. Different
-*     interpolation schemes are then distinguished by the choice of
-*     this 1-dimensional interpolation kernel. The number of
-*     surrounding pixels which contribute to the result may also be
-*     varied.
-*
-*     From a practical standpoint, it is useful to divide the weighted
-*     sum of pixel values by the sum of the weights when determining
-*     the interpolated value.  Strictly, this means that a true
-*     convolution is no longer being performed. However, the
-*     distinction is rarely important in practice because (for
-*     slightly subtle reasons) the sum of weights is always
-*     approximately constant for good interpolation kernels. The
-*     advantage of this technique, which is used here, is that it can
-*     easily accommodate missing data and tends to minimise unwanted
-*     oscillations at the edges of the data grid.
-*
-*     In the following schemes, which are based on a 1-dimensional
-*     interpolation kernel, the first element of the PARAMS parameter
-*     should be used to specify how many pixels are to contribute to the
-*     interpolated result on either side of the interpolation point in
-*     each dimension (the nearest integer value is used). Execution time
-*     increases rapidly with this number. Typically, a value of 2 is
-*     appropriate and the minimum value used will be 1 (i.e. two pixels
-*     altogether, on on either side of the interpolation point). A value 
-*     of zero or less may be given for PARAMS(1) to indicate that a 
-*     suitable number of pixels should be calculated automatically.
-*
-*     - "Sinc" -- This scheme uses a sinc(pi*x) kernel, where x is the
-*     pixel offset from the interpolation point and sinc(z)=sin(z)/z. This
-*     sometimes features as an "optimal" interpolation kernel in books on
-*     image processing. Its supposed optimality depends on the assumption
-*     that the data are band-limited (i.e. have no spatial frequencies above
-*     a certain value) and are adequately sampled. In practice, astronomical
-*     data rarely meet these requirements. In addition, high spatial
-*     frequencies are often present due (e.g.) to image defects and cosmic
-*     ray events. Consequently, substantial ringing can be experienced with
-*     this kernel. The kernel also decays slowly with distance, so that
-*     many surrounding pixels are required, leading to poor performance.
-*     Abruptly truncating it, by using only a few neighbouring pixels,
-*     improves performance and may reduce ringing (if PARAMS(1) is set to
-*     zero, then only two pixels will be used on either side). However, a
-*     more gradual truncation, as implemented by other kernels, is generally
-*     to be preferred. This kernel is provided mainly so that you can
-*     convince yourself not to use it!
-*
-*     - "SincSinc" -- This scheme uses an improved kernel, of the form
-*     sinc(pi*x).sinc(k*pi*x), with k a constant, out to the point where
-*     sinc(k*pi*x) goes to zero, and zero beyond. The second sinc() factor
-*     provides an "envelope" which gradually rolls off the normal sinc(pi*x)
-*     kernel at large offsets. The width of this envelope is specified by
-*     giving the number of pixels offset at which it goes to zero by means
-*     of the PARAMS(2) value, which should be at least 1.0 (in addition,
-*     setting PARAMS(1) to zero will select the number of contributing
-*     pixels so as to utilise the full width of the kernel, out to where it
-*     reaches zero). The case given by PARAMS(1)=2, PARAMS(2)=2 is typically
-*     a good choice and is sometimes known as the Lanczos kernel. This is a
-*     valuable general-purpose interpolation scheme, intermediate in its
-*     visual effect on images between the "Nearest" and "Linear"
-*     schemes. Although the kernel is slightly oscillatory, ringing is
-*     adequately suppressed if the data are well sampled.
-*
-*     - "SincCos" -- This scheme uses a kernel of the form
-*     sinc(pi*x)*cos(k*pi*x), with k a constant, out to the point where
-*     cos(k*pi*x) goes to zero, and zero beyond. As above, the cos() factor
-*     provides an envelope which gradually rolls off the sinc() kernel
-*     at large offsets. The width of this envelope is specified by giving
-*     the number of pixels offset at which it goes to zero by means
-*     of the PARAMS(2) value, which should be at least 1.0 (in addition,
-*     setting PARAMS(1) to zero will select the number of contributing
-*     pixels so as to utilise the full width of the kernel, out to where it
-*     reaches zero). This scheme gives similar results to the
-*     "SincSinc" scheme, which it resembles.
-*
-*     - "SincGauss" -- This scheme uses a kernel of the form
-*     sinc(pi*x).exp(-k*x*x), with k a positive constant. Here, the sinc()
-*     kernel is rolled off using a Gaussian envelope which is specified by
-*     giving its full-width at half-maximum (FWHM) by means of the PARAMS(2)
-*     value, which should be at least 0.1 (in addition, setting PARAMS(1)
-*     to zero will select the number of contributing pixels so as to utilise
-*     the width of the kernel out to where the envelope declines to 1% of its
-*     maximum value). On astronomical images and spectra, good results are
-*     often obtained by approximately matching the FWHM of the
-*     envelope function, given by PARAMS(2), to the point spread function
-*     of the input data. However, there does not seem to be any theoretical
-*     reason for this.
-*
-*     In addition, the following scheme is provided which is not based
-*     on a 1-dimensional kernel:
-*
-*     - "BlockAve" -- This scheme simply takes an average of all the
-*     pixels on the input grid in a cube centred on the interpolation
-*     point.  The number of pixels in the cube is determined by the
-*     value of the first element of the PARAMS array, which gives
-*     the number of pixels in each dimension on either side of the
-*     central point.  Hence a block of (2 * PARAMS(1))**NDIM_IN
-*     pixels in the input grid will be examined to determine the
-*     value of the output pixel.  If the input NDF has no variance,
-*     then all valid pixels in this cube
-*     will be averaged in to the result with equal weight.
-*     If a variance is present, then each input pixel will be 
-*     weighted proportionally to the reciprocal of its variance; any
-*     pixel without a valid variance will be discarded.  This scheme
-*     is suitable where the output grid is much coarser than the 
-*     input grid; if the ratio of pixel sizes is R then a suitable
-*     value of PARAMS(1) may be R/2.
-
 *  Notes:
 *     - If the input NDF contains a Variance component, a Variance 
 *     component will be written to the output NDF.  It will be 
@@ -377,11 +296,10 @@
 *     above assumption about the input data is correct, because of
 *     the sub-pixel interpolation schemes employed. 
 *
-*     - This task is based on the AST_RESAMPLE<X> routine described in
-*     SUN/210.
+*     - This task is based on the AST_RESAMPLE<X> and AST_REBIN<X> 
+*     routines described in SUN/210.
 
 *  Implementation Status:
-*     -  No flux conservation flag has been implemented.
 *     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
 *     propagated. TITLE is controlled by the TITLE parameter. DATA,
 *     VARIANCE and WCS are propagated after appropriate modification. The
@@ -389,7 +307,9 @@
 *     interpolation is being used. The AXIS components is not propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  All non-complex numeric data types can be handled.
+*     -  All non-complex numeric data types can be handled. If REBIN is
+*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
+*     or _REAL for processing.
 *     -  There can be an arbitrary number of NDF dimensions.
 
 *  Related Applications:
@@ -399,7 +319,6 @@
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     DSB: David Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -416,8 +335,8 @@
 *     6-MAR-2003 (DSB):
 *        Changed the AST_RESAMPLE MAXPIX parameter from a fixed value of
 *        50 to 1 larger than the largest output dimension (for extra speed).
-*     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*     19-JUL-2005 (DSB):
+*        Add REBIN parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -434,7 +353,6 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -501,7 +419,10 @@
       LOGICAL CURENT             ! Resample into current Frame?
       LOGICAL HASQUA             ! Does the input NDF have Quality component?
       LOGICAL HASVAR             ! Does the input NDF have Variance component?
+      LOGICAL MORE               ! Continue looping?
+      LOGICAL REBIN              ! Create output pixels by rebinning?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
+      REAL WLIM                  ! Minimum good output weight
 *.
 
 *  Check the inherited global status.
@@ -611,11 +532,28 @@
 *  Initialise the resampling routine control flags.
       FLAGS = 0
 
+*  Get the algorithm to use.
+      CALL PAR_GET0L( 'REBIN', REBIN, STATUS )
+
 *  Get the method for calculating the output array value from the
 *  input values.
-      CALL PAR_CHOIC( 'METHOD', 'NEAREST', 'NEAREST,LINEAR,SINC,'//
-     :                'SINCSINC,SINCCOS,SINCGAUSS,BLOCKAVE', .FALSE.,
-     :                METHOD, STATUS )
+      MORE = .TRUE.
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
+         CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
+     :                   'Sinc,Gauss,SincSinc,SincCos,SincGauss', 
+     :                   .TRUE., METHOD, STATUS )
+         IF( .NOT. REBIN .AND. METHOD( 1 : 1 ) .EQ. 'G' ) THEN
+            CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
+     :                    'because REBIN is set false.', STATUS )
+            CALL MSG_OUT( ' ', 'Please supply a new value for '//
+     :                    'parameter METHOD.', STATUS )
+            CALL PAR_CANCL( 'METHOD', STATUS )
+         ELSE
+            MORE = .FALSE.
+         END IF
+         CALL MSG_BLANK( STATUS )
+      END DO
+
 
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( METHOD .EQ. 'NEAREST' ) THEN
@@ -626,6 +564,10 @@
          CALL MSG_SETC( 'M', 'Bilinear' )
          INTERP = AST__LINEAR
          NPARAM = 0
+      ELSE IF( METHOD .EQ. 'GAUSS' ) THEN
+         CALL MSG_SETC( 'M', 'Gaussian' )
+         INTERP = AST__GAUSS
+         NPARAM = 2
       ELSE IF ( METHOD .EQ. 'SINC' ) THEN
          CALL MSG_SETC( 'M', 'Sinc' )
          INTERP = AST__SINC
@@ -647,8 +589,13 @@
          INTERP = AST__BLOCKAVE
          NPARAM = 1
       END IF
-      CALL MSG_OUT( 'REGRID_MSG1', '  Using ^M interpolation.', 
-     :              STATUS )
+      IF( REBIN ) THEN
+         CALL MSG_OUT( 'REGRID_MSG1', '  Using ^M binning.', 
+     :                  STATUS )
+      ELSE
+         CALL MSG_OUT( 'REGRID_MSG1', '  Using ^M interpolation.', 
+     :                  STATUS )
+      END IF
 
 *  Get an additional parameter vector if required.
       IF ( NPARAM .GT. 0 ) THEN
@@ -658,6 +605,15 @@
 *  Get the tolerance for Mapping linear approximation.
       CALL PAR_GET0D( 'TOL', TOL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the minimum acceptable output weight
+      IF( STATUS .EQ. SAI__OK .AND. REBIN ) THEN
+         CALL PAR_GET0R( 'WLIM', WLIM, STATUS )      
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            WLIM = 1.0E-10
+         END IF
+      END IF
 
 *  Add an additional scaling factor to the Mapping.
 *  ================================================
@@ -844,9 +800,14 @@
 
 *  Determine a data type which can be used for operations on the
 *  Data and possibly Variance components of the NDF.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
+      IF( REBIN ) THEN
+         CALL NDF_MTYPN( '_INTEGER,_REAL,_DOUBLE', 1, NDFI, 
+     :                   'DATA,VARIANCE', ITYPE, DTYPE, STATUS )
+      ELSE
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
      :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
      :                DTYPE, STATUS )
+      END IF
 
 *  Set the Data and possibly Variance component data types.
       CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
@@ -924,75 +885,93 @@
       MAPHIO = AST_SIMPLIFY( MAPHIO, STATUS )
 
 *  Perform the resampling according to data type.
-      IF ( ITYPE .EQ. '_BYTE' ) THEN
-         NBAD = AST_RESAMPLEB( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
-     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+      IF( .NOT. REBIN ) THEN
+         IF ( ITYPE .EQ. '_BYTE' ) THEN
+            NBAD = AST_RESAMPLEB( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADB, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
      :                         STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         NBAD = AST_RESAMPLEUB( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPDATI ) ), 
-     :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
-     :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
-     :                          VAL__BADUB, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                          %VAL( CNF_PVAL( IPVARO ) ),
-     :                          STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         NBAD = AST_RESAMPLEW( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
-     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+         
+         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+            NBAD = AST_RESAMPLEUB( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADUB, NDIMO, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+         
+         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+            NBAD = AST_RESAMPLEW( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADW, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
      :                         STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         NBAD = AST_RESAMPLEUW( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPDATI ) ), 
-     :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
-     :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
-     :                          VAL__BADUW, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                          %VAL( CNF_PVAL( IPVARO ) ),
-     :                          STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         NBAD = AST_RESAMPLEI( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
-     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+         
+         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+            NBAD = AST_RESAMPLEUW( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADUW, NDIMO, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+         
+         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            NBAD = AST_RESAMPLEI( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADI, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
      :                         STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         NBAD = AST_RESAMPLER( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
-     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+         
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            NBAD = AST_RESAMPLER( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADR, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
      :                         STATUS )
-
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         NBAD = AST_RESAMPLED( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                         %VAL( CNF_PVAL( IPDATI ) ), 
-     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+         
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            NBAD = AST_RESAMPLED( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADD, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
-     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
      :                         STATUS )
+         END IF
+
+
+      ELSE
+         IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL AST_REBINI( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                       %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                       PARAMS, FLAGS, TOL, MAXPIX,
+     :                       VAL__BADI, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                       UBNDI, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                       STATUS )
+         
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL AST_REBINR( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                       %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                       PARAMS, FLAGS, TOL, MAXPIX,
+     :                       VAL__BADR, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                       UBNDI, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                       STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL AST_REBIND( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                       %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                       PARAMS, FLAGS, TOL, MAXPIX,
+     :                       VAL__BADD, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                       UBNDI, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                       STATUS )
+         END IF
+
+         NBAD = 1
+
       END IF
 
 *  We can set the bad pixels flag according to the bad pixel count 
@@ -1017,12 +996,10 @@
 
 *  Do the resampling.
          NBAD = AST_RESAMPLEUB( MAPHIO, NDIMI, LBNDI, UBNDI,
-     :                          %VAL( CNF_PVAL( IPQUAI ) ), 
-     :                          %VAL( CNF_PVAL( IPQUAI ) ), INTERP,
+     :                          %VAL( IPQUAI ), %VAL( IPQUAI ), INTERP,
      :                          AST_NULL, PARAMS, 0, TOL, MAXPIX,
      :                          VAL__BADUB, NDIMO, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( CNF_PVAL( IPQUAO ) ), 
-     :                          %VAL( CNF_PVAL( IPQUAO ) ),
+     :                          UBNDO, %VAL( IPQUAO ), %VAL( IPQUAO ),
      :                          STATUS )
 
       END IF

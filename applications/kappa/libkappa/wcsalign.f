@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This application resamples a group of input NDFs, producing 
+*     This application resamples or rebins a group of input NDFs, producing 
 *     corresponding output NDFs which are aligned pixel-for-pixel
 *     with a specified reference NDF. 
 *
@@ -33,9 +33,43 @@
 *     A message indicating which Frame alignment was achieved in is
 *     displayed.
 *     
-*     The output pixel values are formed by re-sampling the input pixel
-*     values using nearest neighbour, bi-linear, sinc, sincsinc, sinccos,
-*     or sincgauss interpolation (see parameter METHOD). 
+*     Two algorithms are available for determining the output pixel
+*     values: resampling and rebinning (the method used is determined by
+*     the REBIN parameter). The resampling algorithm steps through every
+*     pixel in the output image, sampling the input image at the corresponding 
+*     position and storing the sampled input value in the output pixel.
+*     The method used for sampling the input image is determined by the 
+*     METHOD parameter. The rebinning algorithm steps through every pixel in 
+*     the input image, dividing the input pixel value up between a group of 
+*     neighbouring output pixels. The way in which the input sample is
+*     divided up between the output pixels is determined by the METHOD
+*     parameter.
+*
+*     The two algorithms behaviour quite differently if the transformation 
+*     from input to output includes any significant change of scale. In
+*     general, resampling will not alter the pixel values associated with
+*     a source, even if the pixel size changes. On the other hand, the 
+*     rebinning algorithm will change the pixel values in order to
+*     correct for a change in pixel size. Thus, rebinning conserves the
+*     total data value within a given region where as resampling does not.
+*    
+*     Resampling is appropriate if the input image represents the spatial
+*     density of some physical value (e.g. surface brightness) because the 
+*     output image will have the same normalisation as the input image. But
+*     rebinning is probably more appropriarte if the image measures (for
+*     instance) flux per pixel, since rebinning takes account of the
+*     change in pixel size.
+*  
+*     Another difference is that resampling guarantees to fill the output
+*     image with good pixel values (assuming the input image is filled with
+*     good input pixel values), whereas holes can be left by the rebinning 
+*     algorithm if the output image has smaller pixels than the input image.
+*     Such holes occur at output pixels which receive no contributions
+*     from any input pixels, and will be filled with the value zero in
+*     the output image. If this problem occurs the solution is probably
+*     to change the width of the pixel spreading function by assigning
+*     a larger value to PARAMS(1) and/or PARAMS(2) (depending on the
+*     specific METHOD value being used).
 *
 *     Two methods exist for determining the bounds of the output NDFs.
 *     Firstly, the user can give values for parameters LBND and UBND
@@ -119,41 +153,52 @@
 *        whose size does not exceed MAXPIX pixels in any dimension, and then
 *        attempts will be made at approximation. [1000]
 *     METHOD = LITERAL (Read)
-*        The method to use when sampling the input pixel values, in
-*        order to find the corresponding output pixel value. For details 
-*        on these sub-pixel interpolation schemes, see the description of 
-*        routine AST_RESAMPLEx in SUN/210. METHOD can take the following 
+*        The method to use when sampling the input pixel values (if
+*        resampling), or dividing an input pixel value up between a group 
+*        of neighbouring output pixels (if rebinning). For details 
+*        on these schemes, see the descriptions of routines AST_RESAMPLEx
+*        and AST_REBINx in SUN/210. METHOD can take the following 
 *        values:
 *
-*        - "Bilinear" -- the output pixel values are calculated by 
-*        bi-linear interpolation among the four nearest pixels values 
-*        in the input NDF. Produces smoother output NDFs than
-*        the nearest neighbour scheme, but is marginally slower.
+*        - "Bilinear" -- When resampling, the output pixel values are 
+*        calculated by bi-linear interpolation among the four nearest pixels 
+*        values in the input NDF. When rebinning, the input pixel value
+*        is divided up bi-linearly between the four nearest output pixels.
+*        Produces smoother output NDFs than the nearest neighbour scheme, but 
+*        is marginally slower.
 *
-*        - "Nearest" -- the output pixel values are assigned the value 
-*        of the single nearest input pixel.
+*        - "Nearest" -- When resampling, the output pixel values are assigned 
+*        the value  of the single nearest input pixel. When rebinning,
+*        the input pixel value is assigned completely to the single
+*        nearest output pixel.
 *
 *        - "Sinc" -- use the sinc(pi*x) kernel, where x is the pixel
-*        offset from the interpolation point, and sinc(z)=sin(z)/z.
-*        Use of this scheme is not recommended.
+*        offset from the interpolation point (resampling) or transformed
+*        input pixel centre (rebinning), and sinc(z)=sin(z)/z. Use of this 
+*        scheme is not recommended.
 *
 *        - "SincSinc" -- uses the sinc(pi*x)sinc(k*pi*x) kernel. A
-*        valuable general-purpose interpolation scheme, intermediate
-*        in its visual effect on NDFs between the bilinear and
-*        nearest neighbour schemes. 
+*        valuable general-purpose scheme, intermediate in its visual effect 
+*        on NDFs between the bilinear and nearest neighbour schemes. 
 *         
-*        - "SincCos" -- uses the sinc(pi*x)cos(k*pi*x) kernal. Gives
+*        - "SincCos" -- uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
 *        similar results to the sincsinc scheme.
 *
-*        - "SincGauss" -- uses the sinc(pi*x)exp(-k*x*x). Good 
+*        - "SincGauss" -- uses the sinc(pi*x)exp(-k*x*x) kernel. Good 
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point spread function of the
 *        input data (see parameter PARAMS).
 *
+*        - "Gauss" -- uses the exp(-k*x*x) kernel. This option is only 
+*        available when rebinning (i.e. if REBIN is set to a TRUE value).
+*        The FWHM of the Gaussian is given by parameter PARAMS(2), and
+*        the point at which to truncate the Gaussian to zero is given by 
+*        parameter PARAMS(1).
+*
 *        All methods propagate variances from input to output, but the
-*        variance estimates produced by interpolation schemes other than
+*        variance estimates produced by these schemes other than
 *        nearest neighbour need to be treated with care since the spatial 
-*        smoothing produced by this interpolation methods introduces 
+*        smoothing produced by these methods introduces 
 *        correlations in the variance estimates. Also, the degree of 
 *        smoothing produced varies across the NDF. This is because a 
 *        sample taken at a pixel centre will have no contributions from the 
@@ -197,28 +242,32 @@
 *        a false value.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
-*        required by the Sinc, SincSinc, SincCos, and SincGauss
-*        interpolation schemes. 
+*        required by the Sinc, SincSinc, SincCos, SincGauss and Gauss
+*        methods.
 *
-*        PARAMS( 1 ) is required by all the above interpolation schemes.
+*        PARAMS( 1 ) is required by all the above schemes.
 *        It is used to specify how many pixels are to contribute to the 
-*        interpolated result on either side of the interpolation point 
-*        in each dimension. Typically, a value of 2 is appropriate and the 
-*        minimum allowed value is 1 ( i.e. one pixel on each side ). A value 
-*        of zero or less indicates that a suitable number of pixels should be
-*        calculated automatically. [0]
+*        interpolated result on either side of the interpolation or binning 
+*        point in each dimension. Typically, a value of 2 is appropriate and 
+*        the minimum allowed value is 1 ( i.e. one pixel on each side ). A 
+*        value of zero or less indicates that a suitable number of pixels 
+*        should be calculated automatically. [0]
 *
-*        PARAMS( 2 ) is required only by the SincSinc, SincCos, and 
-*        SincGauss interpolation schemes. For the SincSinc and SincCos 
+*        PARAMS( 2 ) is required only by the Gauss, SincSinc, SincCos, and 
+*        SincGauss schemes. For the SincSinc and SincCos 
 *        schemes, it specifies the number of pixels at which the envelope
 *        of the function goes to zero. The minimum value is 1.0, and the
-*        run-time default value is 2.0. For the SincGauss scheme, it
+*        run-time default value is 2.0. For the Gauss and SincGauss scheme, it
 *        specifies the full-width at half-maximum (FWHM) of the Gaussian 
 *        envelope. The minimum value is 0.1, and the run-time default is
 *        1.0. On astronomical NDFs and spectra, good results are often 
 *        obtained by approximately matching the FWHM of the envelope 
 *        function, given by PARAMS(2), to the point spread function of the 
 *        input data. []
+*     REBIN = LOGICAL_ (Read)
+*        Determines the algorithm used to calculate the output pixel
+*        values. If a TRUE value is given, a rebinning algorithm is used.
+*        Otherwise, a resampling algorithm is used [current value]
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned. If a null 
 *        value is supplied for this parameter, the first NDF supplied for 
@@ -232,6 +281,13 @@
 *        each output NDF which result in the output NDF just encompassing 
 *        the corresponding input NDF. The suggested defaults are the 
 *        upper pixel index bounds from the reference NDF (see parameter REF).
+*     WLIM = _REAL (Read)
+*        This parameter is only used if REBIN is set TRUE. It specifies the 
+*        minimum number of good pixels which must contribute to an output pixel
+*        for the output pixel to be valid. Note, fractional values are
+*        allowed. A null (!) value causes a very small positive value to
+*        be used resulting in output pixels being set bad only if they
+*        receive no significant contribution from any input pixel. [!]
 
 *  Examples:
 *     wcsalign image1 image1_al ref=image2 accept
@@ -256,7 +312,7 @@
 *     -  WCS information (including the current co-ordinate Frame) is 
 *     propagated from the reference NDF to all output NDFs. 
 *     -  QUALITY is propagated from input to output only if parameter
-*     METHOD is set to Nearest.
+*     METHOD is set to Nearest and REBIN is set to FALSE.
 
 *  Related Applications:
 *     KAPPA: WCSFRAME, RESAMPLE; CCDPACK: TRANNDF.
@@ -267,7 +323,9 @@
 *     METHOD parameter for notes on the interpretation of output variances).
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  All non-complex numeric data types can be handled.
+*     -  All non-complex numeric data types can be handled. If REBIN is
+*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
+*     or _REAL for processing.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -288,8 +346,8 @@
 *        Make N-dimensional.
 *     12-NOV-2004 (DSB):
 *        Add INSITU and ABORT parameters.
-*     19-NOV-2004 (DSB):
-*        Corrected AST__BAD to be VAL__BADI.
+*     19-JUL-2005 (DSB):
+*        Add REBIN parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -342,7 +400,10 @@
       LOGICAL ABORT              ! Abort upon first error?
       LOGICAL AUTOBN             ! Determine output bounds automatically?
       LOGICAL INSITU             ! Modify input NDFs in-situ?
+      LOGICAL MORE               ! Continue looping?
+      LOGICAL REBIN              ! Create output pixels by rebinning?
       REAL ERRLIM                ! Positional accuracy in pixels
+      REAL WLIM                  ! Minimum good output weight
 *.
 
 *  Check inherited global status.
@@ -436,24 +497,54 @@
 *  to process remaining inputs. 
       CALL PAR_GET0L( 'ABORT', ABORT, STATUS )
 
-*  Get the interpolation method to be used.
-      CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,Sinc,'//
-     :                'SincSinc,SincCos,SincGauss', .TRUE., METHOD, 
-     :                STATUS )
-      CALL MSG_BLANK( STATUS )
+*  Get the algorithm to use.
+      CALL PAR_GET0L( 'REBIN', REBIN, STATUS )
+
+*  Get the interpolation/spreading method to be used.
+      MORE = .TRUE.
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
+         CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
+     :                   'Sinc,Gauss,SincSinc,SincCos,SincGauss', 
+     :                   .TRUE., METHOD, STATUS )
+         IF( .NOT. REBIN .AND. METHOD( 1 : 1 ) .EQ. 'G' ) THEN
+            CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
+     :                    'because REBIN is set false.', STATUS )
+            CALL MSG_OUT( ' ', 'Please supply a new value for '//
+     :                    'parameter METHOD.', STATUS )
+            CALL PAR_CANCL( 'METHOD', STATUS )
+         ELSE
+            MORE = .FALSE.
+         END IF
+         CALL MSG_BLANK( STATUS )
+      END DO
 
 *  Tell the user what method is being used, and convert value of
 *  METHOD to one of the values expected by AST_RESAMPLE<x>. 
+      IF( REBIN ) THEN
+         CALL MSG_SETC( 'W', 'binning' )
+      ELSE
+         CALL MSG_SETC( 'W', 'interpolation' )
+      END IF
+
+      NPAR = 0
       IF( METHOD( 1 : 1 ) .EQ. 'N' ) THEN
          METHOD_CODE = AST__NEAREST
          CALL MSG_OUT( 'WCSALIGN_MSG1', 
-     :                 '  Using nearest neighbour interpolation.', 
+     :                 '  Using nearest neighbour ^W.', 
      :                 STATUS ) 
 
       ELSE IF( METHOD( 1 : 1 ) .EQ. 'B' ) THEN
          METHOD_CODE = AST__LINEAR
          CALL MSG_OUT( 'WCSALIGN_MSG2', 
-     :                 '  Using bi-linear interpolation.', STATUS ) 
+     :                 '  Using bi-linear ^W.', STATUS ) 
+
+      ELSE IF( METHOD( 1 : 1 ) .EQ. 'G' ) THEN
+         NPAR = 2
+         PARAMS( 1 ) = 0.0
+         PARAMS( 2 ) = 2.0
+         METHOD_CODE = AST__GAUSS
+         CALL MSG_OUT( 'WCSALIGN_MSG2', 
+     :                 '  Using a Gaussian ^W kernel.', STATUS ) 
 
       ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SINC' ) THEN
          NPAR = 2
@@ -463,38 +554,49 @@
          IF ( METHOD( 5 : 5 ) .EQ. 'S' ) THEN
             METHOD_CODE = AST__SINCSINC
             CALL MSG_OUT( 'WCSALIGN_MSG3', 
-     :                    '  Using sincsinc interpolation.', STATUS ) 
+     :                    '  Using sincsinc ^W kernel.', STATUS ) 
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
             METHOD_CODE = AST__SINCCOS
             CALL MSG_OUT( 'WCSALIGN_MSG4', 
-     :                    '  Using sinccos interpolation.', STATUS ) 
+     :                    '  Using sinccos ^W kernel.', STATUS ) 
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'G' ) THEN
             METHOD_CODE = AST__SINCGAUSS
             PARAMS( 2 ) = 1.0
             CALL MSG_OUT( 'WCSALIGN_MSG5', 
-     :                    '  Using sincgauss interpolation.', STATUS ) 
+     :                    '  Using sincgauss ^W kernel.', STATUS ) 
 
          ELSE
             NPAR = 1
             METHOD_CODE = AST__SINC
             CALL MSG_OUT( 'WCSALIGN_MSG6', 
-     :                    '  Using sinc interpolation.', STATUS ) 
+     :                    '  Using sinc ^W kernel.', STATUS ) 
 
          END IF
 
-*  Set the dynamic defaults for PARAMS.
+      END IF
+
+*  If required, set the dynamic defaults for PARAMS.
+      IF( NPAR .GT. 0 ) THEN
          CALL PAR_DEF1D( 'PARAMS', NPAR, PARAMS, STATUS )
 
 *  Get the required number of interpolation parameters.
          CALL PAR_EXACD( 'PARAMS', NPAR, PARAMS, STATUS ) 
-
       END IF
 
 *  Get the positional accuracy required.
       CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )      
       ERRLIM = MAX( 0.0001, ERRLIM )
+
+*  Get the minimum acceptable output weight
+      IF( STATUS .EQ. SAI__OK .AND. REBIN ) THEN
+         CALL PAR_GET0R( 'WLIM', WLIM, STATUS )      
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            WLIM = 1.0E-10
+         END IF
+      END IF
 
 *  Get a value for MAXPIX.
       CALL PAR_GET0I( 'MAXPIX', MAXPIX, STATUS )
@@ -521,9 +623,9 @@
          CALL KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
 
 *  If the input pixel->output pixel Mapping is a shift of origin, we do
-*  not need to do a full resampling. However,if the output bounds have
-*  been specified explcitly, then we cannotm simply shift the input pixel
-*  origin. 
+*  not need to do a full resampling or rebinning. However, if the output 
+*  bounds have been specified explcitly, then we cannot simply shift the 
+*  input pixel origin. 
          IF( ORIGIN( 1 ) .NE. VAL__BADI .AND. AUTOBN ) THEN
 
 *  If the alignment is being performed in-situ, get a clone of the input
@@ -544,8 +646,8 @@
             CALL NDF_SHIFT( NDIMR, SHIFT, INDF2, STATUS )
 
 *  If the input pixel->output pixel Mapping is not just a shift of origin, 
-*  we do a full resampling. We cannot do this if "in-situ" alignment was
-*  requested. 
+*  we do a full resampling or rebinning. We cannot do this if "in-situ" 
+*  alignment was requested. 
          ELSE IF( .NOT. INSITU ) THEN
 
 *  Create the output NDF by propagation from the input NDF. The default
@@ -557,7 +659,7 @@
 *  Process this pair of input and output NDFs.
             CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR, 
      :                       METHOD_CODE, PARAMS, LBND, UBND, ERRLIM, 
-     :                       MAXPIX, STATUS )
+     :                       MAXPIX, REBIN, WLIM, STATUS )
 
 *  Report an error if in-situ alignment was requested but the Mapping is
 *  not a shift of origin.
