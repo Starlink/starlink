@@ -38,6 +38,12 @@
 *
       INTEGER IARRAY(3)         ! ITIME implementation
       CHARACTER *8 CTIME        ! CLOCK implementation
+
+*     These are for DATE_AND_TIME (f90)
+      INTEGER DATARR( 8 )
+      CHARACTER * 8 DATDAT
+      CHARACTER * 10 DATTIM
+      CHARACTER * 5 DATZON
 *
 * -------------------------------------------------------------
 
@@ -52,6 +58,15 @@
  100  FORMAT (A8)
       READ (CTIME,101) IHOURS, IMINS, ISECS
  101  FORMAT (I2,1X,I2,1X,I2)
+
+#elif HAVE_INTRINSIC_DATE_AND_TIME || HAVE_DATE_AND_TIME
+
+* Use array of size 8 to get results.
+      CALL DATE_AND_TIME( DATDAT, DATTIM, DATZON, DATARR )
+      IHOURS = DATARR( 5 )
+      IMINS = DATARR( 6 )
+      ISECS = DATARR( 7 )
+
 #else
  error 'Do not know how to tell the time'
 #endif

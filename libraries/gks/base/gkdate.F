@@ -41,6 +41,12 @@
 
 *     These are for DATE
       CHARACTER *10 CDATE
+
+*     These are for DATE_AND_TIME (f90)
+      INTEGER DATARR( 8 )
+      CHARACTER * 8 DATDAT
+      CHARACTER * 10 DATTIM
+      CHARACTER * 5 DATZON
       
 *
 *-----------------------------------------------------------------------
@@ -106,6 +112,14 @@
       READ (CDATE,101) MONTH, IDAY, IYEAR
  101  FORMAT (I2,1X,I2,1X,I2)
       RETURN
+
+#elif HAVE_INTRINSIC_DATE_AND_TIME || HAVE_DATE_AND_TIME
+
+* Use array of size 8 to get results.
+      CALL DATE_AND_TIME( DATDAT, DATTIM, DATZON, DATARR )
+      IYEAR = DATARR( 1 )
+      MONTH = DATARR( 2 )
+      IDAY = DATARR( 3 )
 
 #else
 
