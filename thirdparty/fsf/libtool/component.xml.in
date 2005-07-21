@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
 <component id="libtool" buildsupport="yes" support="U">
-  <version>1.5.18</version>
+  <version>@VERSION@</version>
   <path>thirdparty/fsf/libtool</path>
   <description>GNU libtool</description>
   <!-- <abstract><p></p></abstract> -->
