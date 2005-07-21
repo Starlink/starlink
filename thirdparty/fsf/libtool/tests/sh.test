@@ -74,4 +74,14 @@ if $EGREP -n -e '"[^`"]*`[^"`]*"[^"`]*".*`[^`"]*"' $scripts | \
   status=1
 fi
 
+for s in "$srcdir/../libtool.m4"
+do
+  if $SED -n '/case \$cc_basename in/,/esac/ {
+	      /^[ 	]*[a-zA-Z][a-zA-Z0-9+]*[^*][ 	]*)/p
+  	      };'  $s | $EGREP .; then
+    echo "\$cc_basename matches should include a trailing \`*' in $s."
+    status=$EXIT_FAILURE
+  fi
+done
+
 exit $status

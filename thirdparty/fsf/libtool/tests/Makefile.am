@@ -45,8 +45,8 @@ COMMON_TESTS = \
 	quote.test sh.test suffix.test pdemo-conf.test \
 	pdemo-make.test pdemo-exec.test pdemo-inst.test \
 	mdemo-conf.test mdemo-make.test mdemo2-conf.test \
-	mdemo2-make.test mdemo2-exec.test
-
+	mdemo2-make.test mdemo2-exec.test \
+	duplicate_members.test link-order.test
 
 if HAVE_CXX
 if HAVE_F77
@@ -76,9 +76,11 @@ FFLAGS = @FFLAGS@
 
 # Be sure to reexport important environment variables.
 TESTS_ENVIRONMENT = MAKE="$(MAKE)" CC="$(CC)" CFLAGS="$(CFLAGS)" \
-	CPPFLAGS="$(CPPFLAGS)" LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
+	CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
 	LIBS="$(LIBS)" LN_S="$(LN_S)" NM="$(NM)" RANLIB="$(RANLIB)" \
-	OBJEXT="$(OBJEXT)" EXEEXT="$(EXEEXT)" FFLAGS="$(FFLAGS)" 
+	OBJEXT="$(OBJEXT)" EXEEXT="$(EXEEXT)" CONFIG_SHELL="$(SHELL)" \
+	CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" CXXCPP="$(CXXCPP)" \
+	F77="$(F77)" FFLAGS="$(FFLAGS)"
 
 EXTRA_DIST = defs $(COMMON_TESTS) $(CXX_TESTS) $(F77_TESTS)
 
@@ -91,4 +93,4 @@ clean-local:
 	-test -f ../mdemo/Makefile && cd ../mdemo && $(MAKE) distclean
 	-test -f ../tagdemo/Makefile && cd ../tagdemo && $(MAKE) distclean
 	-test -f ../f77demo/Makefile && cd ../f77demo && $(MAKE) distclean
-	rm -rf _inst
+	rm -rf _inst .libs

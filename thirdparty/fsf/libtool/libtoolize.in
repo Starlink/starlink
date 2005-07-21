@@ -1,7 +1,7 @@
 #! /bin/sh
 # libtoolize - Prepare a package to use libtool.
 # @configure_input@
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2005
 # Free Software Foundation, Inc.
 # Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # As a special exception to the GNU General Public License, if you
 # distribute this file as part of a program that contains a
@@ -34,6 +34,7 @@ VERSION=@VERSION@
 
 # Directory names.
 prefix=@prefix@
+datarootdir=@datarootdir@
 datadir=@datadir@
 pkgdatadir=@pkgdatadir@
 aclocaldir=@aclocaldir@
@@ -45,8 +46,9 @@ dry_run=no
 help="Try \`$progname --help' for more information."
 rm="rm -f"
 ln_s="@LN_S@"
-cp="cp -f"
+cp="cp -f -p"
 mkdir="mkdir"
+tar="tar"
 
 # Global variables.
 automake=
@@ -81,16 +83,16 @@ You must \`cd' to the top directory of your package before you run
 
 Report bugs to <bug-libtool@gnu.org>.
 EOF
-    exit 0
+    exit $?
     ;;
 
   --version)
     echo "$PROGRAM (GNU $PACKAGE) $VERSION"
     echo
-    echo "Copyright (C) 2003 Free Software Foundation, Inc."
+    echo "Copyright (C) 2005 Free Software Foundation, Inc."
     echo "This is free software; see the source for copying conditions.  There is NO"
     echo "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
-    exit 0
+    exit $?
     ;;
 
   --automake)
@@ -113,6 +115,7 @@ EOF
       test -n "$ln_s" && ln_s="echo $ln_s"
       cp="echo $cp"
       mkdir="echo mkdir"
+      tar="echo $tar"
     fi
     ;;
 
@@ -290,6 +293,8 @@ for file in $ltdlfiles; do
 
   $rm $file
   if test -n "$ln_s" && $ln_s $pkgdatadir/$file $file; then :
+  elif { ( cd $pkgdatadir 2>/dev/null && $tar chf - $file 2> /dev/null; ) \
+      | ( umask 0 && $tar xf - > /dev/null 2>&1; ); } ; then :
   elif $cp $pkgdatadir/$file $file; then :
   else
     echo "$progname: cannot copy \`$pkgdatadir/$file' to \`$file'" 1>&2
@@ -307,7 +312,9 @@ if test "x$ltdl_tar" = x"yes"; then
     $mkdir libltdl
     ltdlfiles=`cd $pkgdatadir && ls libltdl/*`
     for file in $ltdlfiles; do
-      if $cp $pkgdatadir/$file $file; then :
+      if { ( cd $pkgdatadir 2>/dev/null && $tar chf - $file 2> /dev/null; ) \
+          | ( umask 0 && $tar xf - > /dev/null 2>&1; ); } ; then :
+      elif $cp $pkgdatadir/$file $file; then :
       else
 	echo "$progname: cannot copy \`$pkgdatadir/$file' to \`$file'" 1>&2
 	status=1
@@ -315,7 +322,9 @@ if test "x$ltdl_tar" = x"yes"; then
       fi
     done
     for file in $files; do
-      if $cp $pkgdatadir/$file libltdl/$file; then :
+      if { ( cd $pkgdatadir 2>/dev/null && $tar chf - $file 2> /dev/null; ) \
+          | ( umask 0 && cd libltdl 2>/dev/null && $tar xf - > /dev/null 2>&1; ); } ; then :
+      elif $cp $pkgdatadir/$file libltdl/$file; then :
       else
 	echo "$progname: cannot copy \`$pkgdatadir/$file' to \`libltdl/$file'" 1>&2
 	status=1
@@ -342,6 +351,8 @@ for file in $files; do
 
   $rm $file
   if test -n "$ln_s" && $ln_s $pkgdatadir/$file $file; then :
+  elif { ( cd $pkgdatadir 2>/dev/null && $tar chf - $file 2> /dev/null; ) \
+      | ( umask 0 && $tar xf - > /dev/null 2>&1; ); } ; then :
   elif $cp $pkgdatadir/$file $file; then :
   else
     echo "$progname: cannot copy \`$pkgdatadir/$file' to \`$file'" 1>&2

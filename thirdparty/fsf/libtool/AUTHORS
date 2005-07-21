@@ -1,11 +1,24 @@
-Authors of GNU Libtool.  The following people contributed enough in
-order to warrant exchanging legal papers with the Free Software
-Foundation.
+* GNU Libtool was conceived, designed and implemented by:
 
-Gordon Matzigkeit.  Designed and implemented libtool.
-Alexandre Oliva <oliva@dcc.unicamp.br>.  Co-maintainer.
-Thomas Tanner <tanner@ffii.org>.  Co-maintainer.
-Gary V. Vaughan <gvv@techie.com>.  Co-maintainer.
-Ossama Othman <ossama@debian.org>.  Co-maintainer.
-Robert Boehne <rboehne@ricardo-us.com>.  Co-maintainer.
-Bob Friesenhahn <bfriesen@simple.dallas.tx.us>.  Co-maintainer.
+    Gordon Matzigkeit		gord@gnu.org
+
+* GNU Libtool's Dynamic Loader library (libltdl) was conceived,
+  designed and implemented by:
+
+    Thomas Tanner		tanner@ffii.org
+
+* GNU Libtool and libltdl have previously been maintained, enhanced,
+  ported and otherwise advanced by:
+
+    Alexandre Oliva		oliva@dcc.unicamp.br
+    Ossama Othman		ossama@debian.org
+    Robert Boehne		rboehne@ricardo-us.com
+
+* GNU Libtool and libltdl are currently being cajoled, bullied,
+  rewritten and otherwise dragged into the future by:
+
+    Gary V. Vaughan		gary@gnu.org
+    Bob Friesenhahn		bfriesen@simple.dallas.tx.us
+    Peter O'Gorman		peter@pogma.com
+    Scott James Remnant		scott@netsplit.com
+    Ralf Wildenhues		Ralf.Wildenhues@gmx.de

@@ -702,7 +702,8 @@ to link the already-installed libtool library, it will do The Right
 Thing (TM) for you:
 
 @example
-burger$ @kbd{libtool --mode=link gcc -g -O -o test test.o /usr/local/lib/libhello.la}
+burger$ @kbd{libtool --mode=link gcc -g -O -o test \
+                test.o /usr/local/lib/libhello.la}
 gcc -g -O -o @value{objdir}/test test.o -Wl,--rpath
 -Wl,/usr/local/lib /usr/local/lib/libhello.a -lm
 creating test
@@ -884,7 +885,8 @@ help libtool with uninstallation (@pxref{Uninstall mode}) and linking
 Here is the shared library example:
 
 @example
-burger# @kbd{libtool --mode=install install -c libhello.la /usr/local/lib/libhello.la}
+burger# @kbd{libtool --mode=install install -c libhello.la \
+                /usr/local/lib/libhello.la}
 install -c @value{objdir}/libhello.so.0.0 /usr/local/lib/libhello.so.0.0
 install -c libhello.la /usr/local/lib/libhello.la
 install -c @value{objdir}/libhello.a /usr/local/lib/libhello.a
@@ -987,7 +989,8 @@ you could just ignore libtool entirely, and use the old @code{ar} and
 (but you probably don't want to) using libtool:
 
 @example
-burger$ @kbd{libtool --mode=install ./install-sh -c libhello.a /local/lib/libhello.a}
+burger$ @kbd{libtool --mode=install ./install-sh -c libhello.a \
+                /local/lib/libhello.a}
 ./install-sh -c libhello.a /local/lib/libhello.a
 ranlib /local/lib/libhello.a
 burger$
@@ -1839,6 +1842,10 @@ Attempt to guess a canonical system name.
 @pindex config.sub
 Canonical system name validation subroutine script.
 
+@item install-sh
+@pindex install-sh
+BSD-compatible @command{install} replacement script.
+
 @item ltmain.sh
 @pindex ltmain.sh
 A generic script implementing basic libtool functionality.
@@ -1848,7 +1855,10 @@ Note that the libtool script itself should @emph{not} be included with
 your package.  @xref{Configuring}.
 
 You should use the @code{libtoolize} program, rather than manually
-copying these files into your package.
+copying these files into your package.  Note however, that @file{install-sh}
+is not copied by @code{libtoolize}; if you use Automake, it will take care
+of that, otherwise you may obtain a copy from the package data directory
+of the installed Libtool.  This may change in a future Libtool version.
 
 @menu
 * Invoking libtoolize::         @code{libtoolize} command line options.
@@ -3348,7 +3358,8 @@ register_myloader (void)
   dlloader.dlloader_data = (lt_user_data)myloader_function;
 
   /* Add my loader as the default module loader. */
-  if (lt_dlloader_add (lt_dlloader_next (NULL), &dlloader, "myloader") != 0)
+  if (lt_dlloader_add (lt_dlloader_next (NULL), &dlloader, "myloader") \
+                != 0)
     return ERROR;
 
   return OK;
@@ -3547,7 +3558,10 @@ the link flag that you should use to link with libltdl, and
 with programs that include @file{ltdl.h}.  It is up to you to use
 @samp{AC_SUBST} to ensure that this variable will be available in
 @file{Makefile}s, or add them to variables that are @samp{AC_SUBST}ed by
-default, such as @var{LIBS} and @var{CPPFLAGS}.
+default, such as @var{LIBS} and @var{CPPFLAGS}.  Also note that you should
+not include @file{libltdl/Makefile} in the list of files to be configured
+from your toplevel @file{configure.in}; this is done by
+@file{libltdl/configure.ac}.
 
 If you're using the convenience libltdl, @var{LIBLTDL} will be the
 pathname for the convenience version of libltdl and @var{LTDLINCL} will be
@@ -4177,9 +4191,9 @@ Sun's free service area
 server (@url{http://docs.sun.com/}).
 
 @item
-Compaq's Tru64 UNIX online documentation is at
+Compaq's Tru64 UNIX online documentation is at @*
 (@url{http://tru64unix.compaq.com/faqs/publications/pub_page/doc_list.html})
-with C++ documentation at
+with C++ documentation at @*
 (@url{http://tru64unix.compaq.com/cplus/docs/index.htm}).
 
 @item
@@ -4266,7 +4280,7 @@ to listed after those libraries whose symbols they provide.
 Particularly, if a pair of static archives each resolve some of the
 other's symbols, it might be necessary to list one of those archives
 both before and after the other one.  Libtool does not currently cope
-with this situation well, since dupicate libraries are removed from
+with this situation well, since duplicate libraries are removed from
 the link line by default.  Libtool provides the command line option
 @samp{--preserve-dup-deps} to preserve all duplicate dependencies
 in cases where it is necessary.

@@ -11,11 +11,15 @@ fi
 . $srcdir/defs || exit 1
 
 # This doesn't work on hppa
-HOST=`../config.guess`
-case "$HOST" in
+case "$host" in
 hppa*|x86_64*|s390*)
-        echo "Not running on $HOST, it doesn't like non-PIC shared libs" 2>&1
+        echo "Not running on $host, it doesn't like non-PIC shared libs" 2>&1
         exit 77
+	;;
+*-solaris*|*-sunos*)
+	echo "libtool does not build non-PIC shared libs on $host" 2>&1
+	exit 77
+	;;
 esac
 
 # Maybe we have a VPATH build, in which case, create a new subdir.

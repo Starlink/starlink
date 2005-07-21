@@ -10,6 +10,9 @@ if test -z "$srcdir"; then
 fi
 . $srcdir/defs || exit 1
 
+# Extra tools we might need
+: ${DUMPSTABS=dumpstabs}
+
 # Check that things are built.
 if test -f $prefix/lib/libhello.la && cd ../demo; then :
 else
@@ -95,12 +98,22 @@ for file in hc-*; do
   # Discover whether the objdir really was hardcoded.
   hardcoded=no
 
+  # Solaris cc may store the command line in a debugging section,
+  # which leads to false positives.  Unfortunately, Solaris strip
+  # is not capable to remove the section (unlike GNU binutils strip).
+  # So we use dumpstabs if it seems to work.
+  if { $DUMPSTABS -d $file; } >/dev/null 2>&1; then
+    if $DUMPSTABS -d $file 2>/dev/null | $FGREP "$objdir" >/dev/null 2>&1; then
+      hardcoded=yes
+    else
+      hardcoded=no
+    fi
   # At least AIX fgrep doesn't work for binary files, and AIX also
   # doesn't have strings(1), so we need this strange conversion
   # (which only works on ASCII).
   # AIX fgrep also has a limited line length, so we turn unprintable
   # characters into newlines.
-  if cat $file | (tr '\000-\037\200-\377' '\n' || cat) 2>/dev/null \
+  elif cat $file | (tr '\000-\037\200-\377' '\n' || cat) 2>/dev/null \
 	       | $FGREP "$objdir" > /dev/null 2>&1; then
     hardcoded=yes
   elif $FGREP "$objdir" $file > /dev/null 2>&1; then

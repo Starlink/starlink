@@ -24,7 +24,7 @@ CLEANFILES = libtool libtoolize ltmain.shT
 # These are required by libtoolize and must be executable when installed.
 # Since _SCRIPTS gets the program transform applied we make them
 # executable by hand
-pkgdata_DATA = config.guess config.sub ltmain.sh
+pkgdata_DATA = config.guess config.sub install-sh ltmain.sh
 
 # This macro file should be visible to Automake's aclocal.
 aclocal_DATA = $(aclocal_macros)
@@ -75,6 +75,7 @@ install-data-hook:
 	cd libltdl && $(MAKE) local-install-files
 	chmod +x $(DESTDIR)$(pkgdatadir)/config.guess
 	chmod +x $(DESTDIR)$(pkgdatadir)/config.sub
+	chmod +x $(DESTDIR)$(pkgdatadir)/install-sh
 
 # Uninstall libltdl
 uninstall-local:
@@ -86,7 +87,7 @@ uninstall-local:
 ##  not to anybody else (inspiration from automake/Makefile.am).    ##
 ## ---------------------------------------------------------------- ##
 
-TEXI2HTML = texi2html
+MAKEINFO = makeinfo
 
 .PHONY: cvs-release
 cvs-release: version-check prev-tarball cvs-news fetch cvs-commit cvs-dist deltas web-manual
@@ -155,6 +156,8 @@ FETCHFILES = \
 libltdl/config.guess \
 ./config.sub \
 libltdl/config.sub \
+./install-sh \
+libltdl/install-sh \
 doc/texinfo.tex
 
 ## Fetch the latest versions of files we care about.
@@ -165,6 +168,7 @@ fetch:
 ## If a get fails then that is a problem.
 	(cd Fetchdir && \
 	$(WGETSGO)/autoconf/autoconf/INSTALL; \
+	$(WGETSGO)/automake/automake/lib/install-sh; \
 	$(WGETSGO)/config/config/config.guess; \
 	$(WGETSGO)/config/config/config.sub; \
 	$(WGETSGO)/texinfo/texinfo/doc/texinfo.tex )
@@ -266,7 +270,6 @@ delta-xdelta: prev-tarball new-tarball got-xdelta
 
 .PHONY: web-manual
 web-manual:
-	@$(LN_S) $(top_srcdir)/doc/libtool.texi doc/manual.texi
-	$(TEXI2HTML) -I doc -monolithic -number -verbose doc/manual.texi
-	@mv doc/manual.html manual.html
-	@rm -f doc/manual.texi
+	$(MAKEINFO) -I $(top_srcdir)/doc --html --no-split -o manual.html \
+	$(top_srcdir)/doc/libtool.texi
+

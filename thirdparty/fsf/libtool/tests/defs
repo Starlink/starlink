@@ -47,6 +47,9 @@ eval `$libtool --config | grep '^CC='`
 # Extract host from the libtool configuration
 eval `$libtool --config | grep '^host='`
 
+# Extract build from the libtool configuration
+eval `$libtool --config | grep '^build='`
+
 # Disable usage of config.site for autoconf, unless DJGPP is present.
 # The DJGPP port of autoconf requires config.site, to work correctly.
 if test -z "$DJGPP"; then
