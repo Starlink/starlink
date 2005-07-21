@@ -144,6 +144,10 @@ C  EDIT on 950228-1300:
 C      LOGICAL RETREA,TERM,FULNWT,PASSB,NEWBST,NEWOPT,LINPRB
        LOGICAL RETREA,TERM,FULNWT,PASSB,NEWBST,NEWOPT
 
+C Modified PWD. Need to explicitly SAVE for some compilers. This 
+C saves all local variables as the prologue indicates most should
+C be saved
+       SAVE
       DATA IFLAG/0/
 C--PROCEDURES--
 C -NAME------TYPE--------ARGS------CLASS-----
