@@ -12,3 +12,14 @@ import of a new libtool version, is:
     autoreconf --install --symlink
 
 (then ./configure;make;make install should work as usual)
+
+
+This should be kept in sync with FSF automake as much as possible, and
+new releases of that should be imported when convenient.  For example:
+
+% tar xzf libtool-1.5.18.tar.gz
+% cd libtool-1.5.18
+% cvs -d :ext:nxg@cvs.starlink.ac.uk:/cvs import -m "Import Libtool 1.5.18" thirdparty/fsf/libtool FSF libtool-1-5-18
+
+For further discussion on resolving conflicts, see
+thirdparty/fsf/m4/README.Starlink.
