@@ -874,6 +874,8 @@ const char *tolongint(Number *n)
 void par_fp(const int size, const char* name, void* valp)
 {
     const char *type;
+    char dbleconst[2*(double_precision-1+8)];
+    char *p;
     int issingle;
     Number N;
 
@@ -913,14 +915,23 @@ void par_fp(const int size, const char* name, void* valp)
 		"      %s %s\n      PARAMETER ( %s = '%s'X )\n\n",
 		type, name, name, tohex(&N));
 #else /* !FC_HAVE_HEX_NUMBERS */
-	if (issingle)
+	if (issingle) {
 	    fprintf(FortranOutput,
 		    "      %s %s\n      PARAMETER ( %s = %.*E )\n\n",
 		    type, name, name, float_precision, N.v.f);
-	else
+        } else {
+            /* FORTRAN double precision constants use "D" not "E" */
+	    sprintf(dbleconst, "%.*lE", double_precision, N.v.d);
+            for (p = dbleconst; *p != '\0'; p++) {
+                if (*p == 'E') {
+                    *p = 'D';
+                    break;
+                }
+            }
 	    fprintf(FortranOutput,
-		    "      %s %s\n      PARAMETER ( %s = %.*lE )\n\n",
-		    type, name, name, double_precision, N.v.d);
+		    "      %s %s\n      PARAMETER ( %s = %s )\n\n",
+		    type, name, name, dbleconst);
+        }
 #endif /* FC_HAVE_HEX_NUMBERS */
     }
 
