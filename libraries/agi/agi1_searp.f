@@ -43,6 +43,7 @@
 *
 *    Authors :
 *     Nick Eaton  ( DUVAD::NE )
+*     Peter W. Draper ( DUVAD::PWD )
 *
 *    History :
 *     Jul 1988
@@ -52,6 +53,8 @@
 *     Jun 1990  Added MEMID parameter
 *     Aug 1990  Added number of pictures
 *     Jan 1993  Initialise header block if necessary
+*     Jul 2005  Stop nasty jump "GOTO 10" into IF/ELSE/ENDIF block.
+*               Compilers rightly stop accepting this.
 *    endhistory
 *
 *    Type Definitions :
@@ -111,6 +114,7 @@
 
 *    Local variables :
       LOGICAL EMPTY, FOUND, GOTONE, PFOUND, WKSHUT, YESNO
+      LOGICAL NASTY
 
       INTEGER CLEN, I, ID, II, J, JJ, K, POINT, TOTNUM
 
@@ -208,6 +212,7 @@
          GOTONE = .FALSE.
          DO WHILE ( ( I .GE. 1 ) .AND. ( I .LE. TOTNUM ) .AND.
      :              ( .NOT. GOTONE ) )
+            NASTY = .FALSE.
 
 *   Look in the cache first
 *   Obtain the FIFO number by hashing the picture number
@@ -231,7 +236,9 @@
                   ENDDO
 
 *   Note this is a bit naughty since the jump is into the scope of an
-*   IF...ENDIF block.
+*   IF...ENDIF block. PWD: changed to use NASTY variable to control
+*   jump.
+                  NASTY = .TRUE.
                   GOTO 10
                ENDIF
             ENDDO
@@ -266,23 +273,27 @@
             ENDIF
             PICLOC = ' '
             CALL AGI_1FPIC( PSTLOC, I, PICLOC, FOUND, STATUS )
-            IF ( FOUND ) THEN
-
+ 10         CONTINUE
+            IF ( FOUND .OR. NASTY ) THEN
+               IF ( .NOT. NASTY ) THEN
 *   Read the name parameter from the database
-               CALL AGI_1RPARS( PICLOC, PVAL, COMENT, DEVICE, NDC,
-     :                          WORLD, MEMID, PFOUND, STATUS )
-               CALL DAT_ANNUL( PICLOC, STATUS )
-               PICLOC = ' '
+                  CALL AGI_1RPARS( PICLOC, PVAL, COMENT, DEVICE, NDC,
+     :                        WORLD, MEMID, PFOUND, STATUS )
+                  CALL DAT_ANNUL( PICLOC, STATUS )
+                  PICLOC = ' '
 
 *   Enter this picture into the cache
-               CALL AGI_1WCACH( WKNAME, I, PVAL, COMENT, DEVICE, NDC,
-     :                          WORLD, MEMID, POINT, STATUS )
+                  CALL AGI_1WCACH( WKNAME, I, PVAL, COMENT, DEVICE, NDC,
+     :                        WORLD, MEMID, POINT, STATUS )
+               END IF
 
 *   If it matches the input then flag it otherwise annul the locator and go on
 *   Only use a sub-string the length of the name string to test for match.
 *   Note. FORTRAN will extend the shorter string if they are different lengths
 *   Take the first picture if it is an empty name string.
-  10           CONTINUE
+C  Stop jump to this position from GOTO 10 above. Use NASTY value to achieve
+C  same effect.
+C  10           CONTINUE
                IF ( EMPTY .OR. ( PVAL .EQ. TPNAME ) ) THEN
                   GOTONE = .TRUE.
                ENDIF
