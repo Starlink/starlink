@@ -13,18 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# 02111-1307  USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301  USA
 
 
-## FIXME: Is this really new enough? ##
+dnl FIXME: Is this really new enough?
 AC_PREREQ(2.50)
 
 
 ## ------------------------ ##
 ## Autoconf initialisation. ##
 ## ------------------------ ##
-AC_INIT([libtool], [1.5.6], [bug-libtool@gnu.org])
+AC_INIT([libtool], [1.5.18], [bug-libtool@gnu.org])
 AC_CONFIG_SRCDIR([ltmain.in])
 
 
@@ -139,5 +139,5 @@ AC_PROG_LIBTOOL
 ## -------- ##
 ## Outputs. ##
 ## -------- ##
-AC_CONFIG_FILES([Makefile doc/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile tests/Makefile component.xml])
 AC_OUTPUT
