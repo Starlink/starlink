@@ -1,0 +1,20 @@
+
+This is GNU autoconf 2.59 with patches.
+
+The patches are those on the branch dev-nxg-20040116-add-fpp-support,
+which add Fortran preprocessor support to lib/autoconf/fortran.m4
+
+That's the only functional change to autoconf as such, however, it has
+also had component.xml added to it, and it has had its Makefile.in's
+modified by the automake patched for Starlink.  The procedure for that
+is:
+    
+    rm config/missing
+    aclocal -I config           # Important!
+    automake --add-missing      # Adds patched `missing'
+    autoconf
+    ./configure --prefix=/export3/sun/buildsupport
+    make
+    install-manifest
+
+See general notes in thirdparty/fsf/README.Starlink
