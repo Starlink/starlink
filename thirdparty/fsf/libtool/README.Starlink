@@ -1,0 +1,9 @@
+
+This is GNU libtool 1.5 with a couple of patches.
+
+There are no functional changes to libtool as such, however it has
+also had component.xml{,.in} added to it, and it has had its
+Makefile.in files modified by the automake patched for Starlink.  
+
+For discussion of how to import new versions, see
+thirdparty/fsf/README.Starlink
