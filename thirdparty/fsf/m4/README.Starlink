@@ -24,6 +24,14 @@ CVS import, for example, to go from 1.4 to 1.4.1:
 
 At this point, resolve any conflicts that have arisen.
 
+There are general notes on what to do next in
+thirdparty/fsf/README.Starlink.  However m4 appears to be slightly
+more fragile than the others -- which is to say, that it caused me
+more trouble when I was updating m4 versions -- so the more detailed
+notes below might be of some use.
+
+
+
 It's not completely clear what to do next.
 
 I think the best thing to do is to regenerate the config files from
