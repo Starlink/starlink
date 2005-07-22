@@ -31,31 +31,6 @@ $(libltdl_la_OBJECTS) $(libltdlc_la_OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
-## ## This allows us to install libltdl without using ln and without creating
-## ## a world writeable directory.
-## ## FIXME:  Remove this rule once automake can do this properly by itself.
-## ## Starlink: add a trace of the installed files to MANIFEST.
-## local-install-files: $(DISTFILES)
-## 	-rm -rf $(DESTDIR)$(datadir)/libtool/libltdl
-## 	$(mkinstalldirs) $(DESTDIR)$(datadir)/libtool/libltdl
-## 	@for file in $(DISTFILES); do \
-## 	  case $$file in \
-## 	    $(srcdir)/*) file=`echo "$$file" | sed "s|^$(srcdir)/||"`;; \
-## 	  esac; \
-## 	  d=$(srcdir); \
-## 	  if test -d $$d/$$file; then \
-## 	    cp -r $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file; \
-## 	    if $(MANIFEST); then \
-## 	      (cd $$d/$$file; /bin/ls -R . | awk '/^ *$$/{next};BEGIN{p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'"};{if (sub(/:$$/,"")) p="'$(DESTDIR)$(datadir)/libtool/libltdl/$$file'/"$$0; else printf "MANIFEST:%s/%s\n", p, $$0;}'); \
-## 	    fi; \
-## 	  else \
-## 	    test -f $(DESTDIR)$(datadir)/libtool/libltdl/$$file \
-## 	    || cp $$d/$$file $(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
-## 	    $(MANIFEST) && echo MANIFEST:$(DESTDIR)$(datadir)/libtool/libltdl/$$file || :; \
-## 	  fi; \
-## 	done
-
-
 ## These are installed as a subdirectory of pkgdatadir so that
 ## libtoolize --ltdl can find them later:
 ltdldatadir = $(datadir)/libtool/libltdl
@@ -74,7 +49,7 @@ local-install-files: $(ltdldatafiles)
 	if $(MANIFEST); then \
 	  ( cd $(srcdir) && $(AMTAR) chf - $(ltdldatafiles); ) \
 	    | ( umask 0 && cd $(DESTDIR)$(ltdldatadir) && $(AMTAR) xvf -; ) | \
-	  sed 's,^,MANIFEST:$(DESTDIR)/$(ltdldatadir)/,'; \
+	  sed 's,^,MANIFEST:$(DESTDIR)$(ltdldatadir)/,'; \
 	else \
 	  ( cd $(srcdir) && $(AMTAR) chf - $(ltdldatafiles); ) \
 	    | ( umask 0 && cd $(DESTDIR)$(ltdldatadir) && $(AMTAR) xf -; ) \
