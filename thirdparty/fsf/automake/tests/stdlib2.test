@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automake; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
 # Check for AM_LDFLAGS = -module
 # Report from Kevin P. Fleming.
@@ -51,12 +51,14 @@ END
 
 $ACLOCAL
 AUTOMAKE_fails --add-missing --gnu
-grep 'nonstandard.la.*not a standard libtool library name' stderr
+grep 'Makefile.am:2:.*nonstandard.la.*standard libtool library name' stderr
+grep 'Makefile.am:2:.*libnonstandard.la' stderr
 
-# We will use -Wno-gnu to disable the warning about setting LDFLAGS.
+# We will use -Wno-gnu to disable the warning about setting LDFLAGS (below)
 # Make sure nonstandard names are diagnosed anyway.
 AUTOMAKE_fails --add-missing --gnu -Wno-gnu
-grep 'nonstandard.la.*not a standard libtool library name' stderr
+grep 'Makefile.am:2:.*nonstandard.la.*standard libtool library name' stderr
+grep 'Makefile.am:2:.*libnonstandard.la' stderr
 
 # Make sure nonstandard_la_LDFLAGS is read even if LDFLAGS is used.
 cat >Makefile.inc <<'EOF'
@@ -78,6 +80,20 @@ nonstandard_la_LDFLAGS = -lfoo
 AM_LDFLAGS = -module
 EOF
 AUTOMAKE_fails
+grep 'Makefile.am:2:.*nonstandard.la.*standard libtool library name' stderr
+grep 'Makefile.am:2:.*libnonstandard.la' stderr
 
 echo 'AM_LDFLAGS = -module' > Makefile.inc
 $AUTOMAKE
+
+# For module, Automake should not suggest the lib prefix.
+cat > Makefile.am << 'END'
+include Makefile.inc
+lib_LTLIBRARIES = nonstandard
+nonstandard_SOURCES = foo.c
+FOO = -module
+END
+
+AUTOMAKE_fails
+grep "Makefile.am:2:.*nonstandard'.*standard libtool module name" stderr
+grep 'Makefile.am:2:.*`nonstandard.la' stderr

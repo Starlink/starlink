@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003
+## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2005
 ## Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
@@ -14,8 +14,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 RECURSIVE_TARGETS += \
 all-recursive check-recursive installcheck-recursive
@@ -30,7 +30,15 @@ all-recursive check-recursive installcheck-recursive
 # (2) otherwise, pass the desired values on the `make' command line.
 
 $(RECURSIVE_TARGETS):
-	@set fnord $$MAKEFLAGS; amf=$$2; \
+## Using $failcom allows "-k" to keep its natural meaning when running a
+## recursive rule.
+	@failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
 	dot_seen=no; \
 	target=`echo $@ | sed s/-recursive//`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -42,9 +50,7 @@ $(RECURSIVE_TARGETS):
 	    local_target="$$target"; \
 	  fi; \
 	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-## This trick allows "-k" to keep its natural meaning when running a
-## recursive rule.
-	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	  || eval $$failcom; \
 	done; \
 	if test "$$dot_seen" = "no"; then \
 	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
@@ -67,7 +73,15 @@ maintainer-clean-recursive
 ## bombs.
 mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
-	@set fnord $$MAKEFLAGS; amf=$$2; \
+## Using $failcom allows "-k" to keep its natural meaning when running a
+## recursive rule.
+	@failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
 	dot_seen=no; \
 ## For distclean and maintainer-clean we make sure to use the full
 ## list of subdirectories.  We do this so that `configure; make
@@ -93,7 +107,5 @@ maintainer-clean-recursive:
 	    local_target="$$target"; \
 	  fi; \
 	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-## This trick allows "-k" to keep its natural meaning when running a
-## recursive rule.
-	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	  || eval $$failcom; \
 	done && test -z "$$fail"

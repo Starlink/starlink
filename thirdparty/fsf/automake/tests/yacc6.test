@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2001, 2002, 2003  Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -15,21 +15,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automake; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
 # Test to make sure ylwrap put in right location.
 # Report from Tim Van Holder.
 # Also make sure depcomp does not needlessly update headers.
 # Report from Paolo Bonzini.
 
-required='gcc bison'
+required='gcc bison GNUmake'
 . ./defs || exit 1
 
 set -e
 
-cat >> configure.in << 'END'
-AC_CONFIG_AUX_DIR([aux])
+cat > configure.in << 'END'
+AC_INIT([yacc6], [1.0])
+AC_CONFIG_AUX_DIR([aux1])
+AM_INIT_AUTOMAKE
+AC_CONFIG_FILES([Makefile])
 AC_PROG_CC
 AC_PROG_YACC
 AC_CONFIG_FILES([sub/Makefile])
@@ -45,7 +48,7 @@ test-time-changed:
 	test `ls -1t sub/main.$(OBJEXT) z | sed 1q` = sub/main.$(OBJEXT)
 END
 
-mkdir aux sub
+mkdir aux1 sub
 
 cat > sub/Makefile.am << 'END'
 bin_PROGRAMS = foo bar
@@ -84,10 +87,10 @@ EOF
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE -a
-test -f aux/ylwrap
+test -f aux1/ylwrap
 test ! -f ylwrap
 test ! -f sub/ylwrap
-$FGREP '(top_srcdir)/aux/ylwrap' sub/Makefile.in
+$FGREP '(top_srcdir)/aux1/ylwrap' sub/Makefile.in
 ./configure
 $MAKE
 grep '#.*line.*foo.y' sub/foo.c

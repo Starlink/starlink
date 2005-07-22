@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -15,11 +15,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automake; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
-# Make sure it's not ok to install a library under different conditions
-# in different directories.
+# Make sure it's OK to install a library under different conditions
+# in different directories.  PR/285.
 
 required='libtoolize'
 . ./defs || exit 1
@@ -45,7 +45,6 @@ END
 
 libtoolize
 $ACLOCAL
-AUTOMAKE_fails
-grep 'liba\.la.* installed .*lib' stderr
-grep 'Makefile.am:5:' stderr
-grep 'Makefile.am:2:' stderr
+$AUTOMAKE --add-missing
+# am_liba_la_rpath is defined twice, and used once
+test 3 = `grep 'am_liba_la_rpath' Makefile.in | wc -l`

@@ -1,7 +1,7 @@
 # -*- shell-script -*-
 # @configure_input@
 #
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 # Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
@@ -18,8 +18,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with autoconf; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
 # Defines for Automake testing environment.
 # Tom Tromey <tromey@cygnus.com>
@@ -70,7 +70,7 @@ export SHELL
 # User can override various tools used.
 test -z "$PERL" && PERL='@PERL@'
 test -z "$MAKE" && MAKE=make
-test -z "$AUTOCONF" && AUTOCONF="@AUTOCONF@"
+test -z "$AUTOCONF" && AUTOCONF="@am_AUTOCONF@"
 test -z "$AUTOHEADER" && AUTOHEADER="@AUTOHEADER@"
 test -z "$AUTOUPDATE" && AUTOUPDATE=autoupdate
 test -z "$MISSING" && MISSING=`pwd`/../lib/missing
@@ -83,8 +83,11 @@ test -z "$ACLOCAL" && ACLOCAL="aclocal-@APIVERSION@"
 # should use -Wnone or/and -Wno-error
 test -z "$AUTOMAKE" && AUTOMAKE="automake-@APIVERSION@ --foreign -Werror -Wall"
 
-PATH=`pwd`:$PATH
+PATH="`pwd`@PATH_SEPARATOR@$PATH"
 echo $PATH
+# Some shells forget to export modified environment variables.
+# (See note about `export' in the Autoconf manual.)
+export PATH
 
 if test -n "$required"
 then
@@ -113,9 +116,11 @@ then
 	( etags --version -o /dev/null ) || exit 77
 	;;
       GNUmake)
-	# Use --version and -v, because SGI Make doesn't fail on --version.
-	echo "$me: running $MAKE --version -v"
-	( $MAKE --version -v ) || exit 77
+	# Use --version AND -v, because SGI Make doesn't fail on --version.
+	# Also grep for GNU because newer versions of FreeBSD make do
+	# not complain about `--version' (they seem to silently ignore it).
+	echo "$me: running $MAKE --version -v | grep GNU"
+	( $MAKE --version -v | grep GNU ) || exit 77
 	;;
       gcc)
         # When gcc is required, export `CC=gcc' so that ./configure
@@ -139,9 +144,9 @@ then
 	# There is no way to ask *only* the compiler's version.
 	# This tool always want to do something (by default
 	# it will try link *nothing* and complain it cannot find
-	# main(); funny).  -dryrun is a workaround.
-	echo "$me: running $CC -V -dryrun"
-	( $CC -V -dryrun ) || exit 77
+	# main(); funny).  Use -help so it does not try linking anything.
+	echo "$me: running $CC -V -help"
+	( $CC -V -help ) || exit 77
 	;;
       makedepend)
 	echo "$me: running makedepend -f-"

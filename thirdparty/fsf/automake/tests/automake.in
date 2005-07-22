@@ -10,6 +10,6 @@ if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
   alias -g '${1+"$@"}'='"$@"'
 fi
 
-perllibdir=@abs_top_builddir@/lib:@abs_top_srcdir@/lib
+perllibdir="@abs_top_builddir@/lib@PATH_SEPARATOR@@abs_top_srcdir@/lib"
 export perllibdir
 exec @abs_top_builddir@/automake --libdir=@abs_top_srcdir@/lib ${1+"$@"}

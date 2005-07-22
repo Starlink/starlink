@@ -1,4 +1,4 @@
-# Copyright (C) 2003  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,8 +12,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 package Automake::VarDef;
 use strict;
@@ -178,6 +178,16 @@ sub append ($$$)
   $self->{'comment'} .= $comment;
 
   my $val = $self->{'value'};
+
+  # Strip comments from augmented variables.  This is so that
+  #   VAR = foo # com
+  #   VAR += bar
+  # does not become
+  #   VAR = foo # com bar
+  # Furthermore keeping `#' would not be portable if the variable is
+  # output on multiple lines.
+  $val =~ s/ ?#.*//;
+
   if (chomp $val)
     {
       # Insert a backslash before a trailing newline.
@@ -189,6 +199,9 @@ sub append ($$$)
       $val .= ' ';
     }
   $self->{'value'} = $val . $value;
+  # Turn ASIS appended variables into PRETTY variables.  This is to
+  # cope with `make' implementation that cannot read very long lines.
+  $self->{'pretty'} = VAR_PRETTY if $self->{'pretty'} == VAR_ASIS;
 }
 
 =item C<$def-E<gt>value>

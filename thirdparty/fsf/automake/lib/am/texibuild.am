@@ -1,6 +1,6 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-## Free Software Foundation, Inc.
+## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+##   2003, 2004, 2005  Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 
 ?GENERIC_INFO?%SOURCE_SUFFIX%%DEST_SUFFIX%:
@@ -34,16 +34,16 @@
 ##    to fail, the info files are not removed.  (They are needed by the
 ##    developer while he writes documentation.)
 ## *.iNN files are used on DJGPP.  See the comments in install-info-am
-	restore=: && \
-	backupdir="$(am__leading_dot)am$$$$" && \
+	restore=: && backupdir="$(am__leading_dot)am$$$$" && \
 ?INSRC?	am__cwd=`pwd` && cd $(srcdir) && \
 	rm -rf $$backupdir && mkdir $$backupdir && \
-	for f in $@ $@-[0-9] $@-[0-9][0-9] $(@:.info=).i[0-9] $(@:.info=).i[0-9][0-9]; do \
-	  if test -f $$f; then \
-	    mv $$f $$backupdir; \
-	    restore=mv; \
-	  fi; \
-	done; \
+## If makeinfo is not installed we must not backup the files so
+##`missing' can do its job and touch $@ if it exists.
+	if ($(MAKEINFO) --version) >/dev/null 2>&1; then \
+	  for f in $@ $@-[0-9] $@-[0-9][0-9] $(@:.info=).i[0-9] $(@:.info=).i[0-9][0-9]; do \
+	    if test -f $$f; then mv $$f $$backupdir; restore=mv; else :; fi; \
+	  done; \
+	else :; fi && \
 ?INSRC?	cd "$$am__cwd"; \
 	if $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) %MAKEINFOFLAGS% \
 ?!INSRC?	 -o $@ `test -f '%SOURCE_INFO%' || echo '$(srcdir)/'`%SOURCE_INFO%; \
@@ -58,8 +58,7 @@
 ?INSRC?	  cd $(srcdir) && \
 	  $$restore $$backupdir/* `echo "./$@" | sed 's|[^/]*$$||'`; \
 	fi; \
-	rm -rf $$backupdir; \
-	exit $$rc
+	rm -rf $$backupdir; exit $$rc
 
 INFO_DEPS += %DEST_INFO_PREFIX%%DEST_SUFFIX%
 
@@ -85,13 +84,27 @@ INFO_DEPS += %DEST_INFO_PREFIX%%DEST_SUFFIX%
 
 ?GENERIC?%SOURCE_SUFFIX%.html:
 ?!GENERIC?%DEST_PREFIX%.html: %SOURCE% %DEPS% %DIRSTAMP%
-	$(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) %MAKEINFOFLAGS% \
-?GENERIC?	 -o $@ %SOURCE%
-?!GENERIC?	 -o $@ `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%
+## When --split (the default) is used, makeinfo will output a
+## directory.  However it will not update the time stamp of a
+## previously existing directory, and when the names of the nodes
+## in the manual change, it may leave unused pages.  Our fix
+## is to build under a temporary name, and replace the target on
+## success.
+	rm -rf $(@:.html=.htp)
+	if $(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) %MAKEINFOFLAGS% \
+?GENERIC?	 -o $(@:.html=.htp) %SOURCE%; \
+?!GENERIC?	 -o $(@:.html=.htp) `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%; \
+	then \
+	  rm -rf $@; \
 ## Work around a bug in Texinfo 4.1 (-o foo.html outputs files in foo/
 ## instead of foo.html/).
-	if test ! -d $@ && test -d $(@:.html=); then \
-	  mv $(@:.html=) $@; else :; fi
+	  if test ! -d $(@:.html=.htp) && test -d $(@:.html=); then \
+	    mv $(@:.html=) $@; else mv $(@:.html=.htp) $@; fi; \
+	else \
+	  if test ! -d $(@:.html=.htp) && test -d $(@:.html=); then \
+	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
+	  exit 1; \
+	fi
 
 ## If we are using the generic rules, we need separate dependencies.
 ## (Don't wonder about %DIRSTAMP% here, this is used only by non-generic

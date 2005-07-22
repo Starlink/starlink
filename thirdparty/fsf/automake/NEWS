@@ -1,3 +1,380 @@
+Bugs fixed in 1.9.6:
+
+* Longstanding bugs:
+
+  - Correctly diagnose `#' comments following trailing backslash.
+
+  - Preserve backslashes preceding `##' lines.
+
+  - Preserve the order of items conditionally appended (+=) to variables.
+
+  - Fix support of installation directory names with spaces on systems
+    where mkinstalldirs cannot use `mkdir -p'.
+
+  - Avoid infinite loop in mdate-sh when TIME_STYLE is set.
+
+  - Do not output two definitions of SOURCES (an internal variable).
+    One was not formatted and could exceed the maximum line length of
+    some third-party tools (e.g., AIX 5.1 grep, breaking dependency
+    tracking).
+
+  - Do not empty info files when attempting to rebuild them without makeinfo.
+
+  - Be smarter when a Makefile.am references files in both "./dir" and
+    "dir": do not output two rules to create these directories.
+    (PR/461)
+
+  - Do not attempt to recover a missing *.elc file if it cannot be
+    created because emacs does not exist.
+
+  - Several aclocal fixes for issues occuring when configure.ac
+    includes some other m4 files explicitely with m4_include or m4_sinclude.
+    (PR/450)
+
+  - depcomp's cpp mode now understands preprocessors that output either
+    `#line 42 file' or `# 42 file'.  (Only the latter was supported.)
+
+* Other miscellaneous changes:
+
+  - Update the GPL, and the FSF postal address.
+
+  - Anticipate for python2.5 in AM_PATH_PYTHON.
+
+  - The manual should now compile without any warning from TeX.
+
+Bugs fixed in 1.9.5:
+
+* Longstanding bugs:
+
+  - All m4 files have been relicensed under an all-permissive license.
+
+    Previously they used a GPL license, and an all-permissive license
+    was prepended when they were copied into aclocal.m4, leading to
+    some confusion.
+
+  - aclocal now recognizes AU_ALIAS.
+
+  - Improve support for `make -k', it didn't work on cygwin.
+
+  - Fix the definition of FCLINK for preprocessed Fortran.
+
+  - Fixes for auxiliary scripts:
+
+    - depcomp's tru64 mode did not work while compiling libtool libraries
+      with static libraries disabled.
+
+    - mdate-sh now copes with Darwin's non-standard ls output.
+
+    - missing properly emulates makeinfo when neither -o nor
+      @setfilename are used.
+
+  - Don't output long variable definitions.  Automake normally tries
+    to output variable definitions as they are input, bug very long
+    lines in Makefile.in can break some sed and make implementations
+    with a limited line length.  If a line in a variable definition is
+    longer than 1000 characters, automake will wrap the definition
+    around 80 columns.  Other definitions are still output untouched.
+
+* Noteworthy manual updates:
+
+  - Hard-Coded Install Paths: New FAQ entry.
+
+  - How the Linker is Chosen: Rewritten.
+
+Bugs fixed in 1.9.4:
+
+* Longstanding bugs:
+
+  - Portability nits in install-sh and mdata-sh.
+
+  - Don't let `make install' fails if a _JAVA primary becomes empty
+    because of conditionals.
+
+  - Do not confuse CHANGELOG with ChangeLog on case-insensitive
+    case-preserving file systems (likewise for all automatically
+    distributed files).
+
+  - Do not embed $DESTDIR in Python's byte-code files.
+
+  - Work around programs that read stdin when checking for --version
+    and --help options (when the `std-options' is used).
+
+  - Fix AM_PATH_PYTHON to correctly define PYTHON as `:' when no minimum
+    version was supplied and no interpreter is found.
+
+* Noteworthy manual updates:
+
+  - Conditional Subdirectories: more comments about non-distributed
+    subdirectories.
+
+  - Flag Variables Ordering: new FAQ entry.
+
+  - Per-Object Flags: new FAQ entry.
+
+Bugs fixed in 1.9.3:
+
+* Bug introduced by 1.9:
+
+  - Dependency tracking using mode "dashmstdout" or "dashXmstdout" did
+    not work for libtool objects compiled with --tag (i.e., compiled
+    with Libtool 1.5 or later).  The compilation would succeed, but
+    `depcomp' would emit a warning and not output any dependency
+    information.
+
+* Longstanding bugs:
+
+  - Ignore comments from augmented variables, so that
+       FOO = foo # bar
+       FOO += baz
+    no longer results in `FOO = foo # bar baz'.
+
+  - `install-sh -d a/b/' failed to create `a/b/' because of the trailing `/'.
+
+  - _PROGRAMS now always create programs.  Before 1.9 it would
+    mistakenly create a libtool library if the name of the program
+    ended in `.la'.  Between 1.9 and 1.9.2 a program with such a name
+    would fail to build because half the code was assuming a program
+    was being built, while the other half was considering a library...
+
+  - `compile' now handles `*.obj' objects.
+
+  - `aclocal' recognizes AC_DEFUN_ONCE.
+
+* Noteworthy manual updates:
+
+  - LIBOBJS: more documentation and an example setup.
+  - Libtool Convenience Libraries: show how to force the linker selection.
+  - Extending: more comments about install-data-hook vs install-exec-hook.
+  - Clean: document -local targets.
+
+Bugs fixed in 1.9.2 (10th anniversary release):
+
+* Sort rm commands output for mostlyclean-generic, clean-generic,
+  distclean-generic and maintainer-clean-generic, so that the produced
+  Makefile is not sensitive to the way Perl sorts its hashes.
+* Support `+' in the name of directories given to `include'.
+* Preserve spaces in the arguments of `compile'.
+* `missing' will no longer try to emulate a tool that is run
+  with `--version' or `--help' as argument.
+* Noteworthy manual update:
+  - There is a new chapter about the history of Automake.
+
+Bugs fixed in 1.9.1:
+
+This release fixes three longstanding bugs.
+
+* Adjust #line directives in `parser.h' (when ylwrap is not used).
+  (PR/432)
+
+* Fix definition of YLWRAP when ylwrap is installed in a default
+  aux directory found in a parent package.
+
+* Properly recognize AC_CANONICAL_BUILD and AC_CANONICAL_TARGET.
+
+New in 1.9:
+
+* Makefile.in bloat reduction:
+
+  - Inference rules are used to compile sources in subdirectories when
+    the `subdir-objects' option is used and no per-target flags are
+    used.  This should reduce the size of some projects a lot, because
+    Automake used to output an explicit rule for each such object in
+    the past.
+
+  - Automake no longer outputs three rules (.o, .obj, .lo) for each
+    object that must be built with explicit rules.  It just outputs
+    the rules required to build the kind of object considered: either
+    the two .o and .obj rules for usual objects, or the .lo rule for
+    libtool objects.
+
+* Change to Libtool support:
+
+  - Libtool tags are used with libtool versions that support them.
+    (I.e., with Libtool 1.5 or greater.)
+
+  - Automake is now able to handle setups where a libtool library is
+    conditionally installed in different directories, as in
+
+      if COND
+        lib_LTLIBRARIES = liba.la
+      else
+        pkglib_LTLIBRARIES = liba.la
+      endif
+      liba_la_SOURCES = ...
+
+* Changes to aclocal:
+
+  - aclocal now ensures that AC_DEFUNs and AU_DEFUNs it discovers are
+    really evaluated, before it decides to include them in aclocal.m4.
+    This solves nasty problems with conditional redefinitions of
+    Autoconf macros in /usr/share/aclocal/*.m4 files causing extraneous
+    *.m4 files to be included in any project using these macros.
+    (Calls to AC_PROG_EGREP causing libtool.m4 to be included is the
+    most famous instance of this bug.)
+
+  - Do not complain about missing conditionally AC_REQUIREd macros
+    that are not actually used.  In 1.8.x aclocal would correctly
+    determine which of these macros were really needed (and include
+    only these in the package); unfortunately it would also require
+    all of them to be present in order to run.  This created
+    situations were aclocal would not work on a tarball distributing
+    all the macros it uses.  For instance running aclocal on a project
+    containing only the subset of the Gettext macros in use by the
+    project did not work, because gettext conditionally requires other
+    macros.
+
+* Portability improvements:
+
+  - Tar format can be chosen with the new options tar-v7, tar-ustar, and
+    tar-pax.  The new option filename-length-max=99 helps diagnosing
+    filenames that are too long for tar-v7.  (PR/414)
+
+  - Variables aumented with `+=' are now automatically flattened (i.e.,
+    trailing backslashes removed) and then wrapped around 80 colummns
+    (adding trailing backslashes).  In previous versions, a long series
+    of
+      VAR += value1
+      VAR += value2
+      VAR += value3
+      ...
+    would result in a single-line definition of VAR that could possibly
+    exceed the maximum line length of some make implementations.
+
+    Non-augmented variables are still output as they are defined in
+    the Makefile.am.
+
+* Miscellaneous:
+
+  - Support Fortran 90/95 with the new "fc" and "ppfc" languages.
+    Works the same as the old Fortran 77 implementation; just replace
+    F77 with FC everywhere (exception: FFLAGS becomes FCFLAGS).
+    Requires a version of autoconf which provides AC_PROG_FC (>=2.59).
+
+  - Support for conditional _LISP.
+
+  - Support for conditional -hook and -local rules (PR/428).
+
+  - Diagnose AC_CONFIG_AUX_DIR calls following AM_INIT_AUTOMAKE. (PR/49)
+
+  - Automake will not write any Makefile.ins after the first error it
+    encounters.  The previous Makefile.ins (if any) will be left in
+    place.  (Warnings will not prevent output, but remember they can
+    be turned into errors with -Werror.)
+
+  - The restriction that SUBDIRS must contain direct children is gone.
+    Do not abuse.
+
+  - The manual tells more about SUBDIRS vs. DIST_SUBDIRS.
+    It also gives an example of nested packages using AC_CONFIG_SUBDIRS.
+
+Bugs fixed in 1.8.5:
+
+* Long standing bugs:
+
+  - Define DIST_SUBDIRS even when the `no-dist' or `cygnus' options are used
+    so that `make distclean' and `make maintainer-clean' can work.
+
+  - Define AR and ARFLAGS even when only EXTRA_LIBRARIES are defined.
+
+  - Fix many rules to please FreeBSD make, which runs commands with `sh -e'.
+
+  - Polish diagnostic when no input file is found.
+
+Bugs fixed in 1.8.4:
+
+* Long standing bugs:
+
+  - Fix AM_PATH_PYTHON to correctly display $PYTHON when it has been
+    overridden by the user.
+
+  - Honor PATH_SEPARATOR in various places of the Automake package, for
+    the sake of OS/2.
+
+  - Adjust dependency tracking mode detection to ICC 8.0's new output.
+    (PR/416)
+
+  - Fix install-sh so it can install the `mv' binary... using `mv'.
+
+  - Fix tru64 dependency tracking for libtool objects.
+
+  - Work around Exuberant Ctags when creating a TAGS files in a directory
+    without files to scan but with subdirectories to include.
+
+* Bugs introduced by 1.8:
+
+  - Fix an "internal error" when @LIBOBJS@ is used in a variable that is
+    not defined in the same conditions as the _LDADD that uses it.
+
+  - Do not warn when JAVAROOT is overridden, this is legitimate.
+
+Bugs fixed in 1.8.3:
+
+* Long standing bugs:
+
+  - Quote filenames in installation rules, in case $DESTDIR, $prefix,
+    or any of the other *dir variables contain a space.
+
+    Please note that Automake does not and cannot support spaces in
+    filenames that are involved during the build.  This change affects
+    only installation paths, so that `make install' does not bomb out
+    in packages configured with
+      ./configure --prefix '/c/Program Files'
+
+  - Fix the depfiles output so it works with GNU sed (<4.1) even when
+    POSIXLY_CORRECT is set.
+
+  - Do not AC_SUBST(LIBOBJS) in AM_WITH_REGEX.  This macro was unusable
+    since Autoconf 2.54, which defines LIBOBJS itself.
+
+  - Fix a potential (but unlikely) race condition in parallel elisp
+    builds.  (Introduced in 1.7.3.)
+
+  - Do not assume that users override _DEPENDENCIES in all conditions
+    where Automake will try to define them.
+
+  - Do not use `mkdir -p' in mkinstalldirs, unless this is GNU mkdir.
+    Solaris 8's `mkdir -p' is not thread-safe and can break parallel
+    builds.
+
+    This fix also affects the $(mkdir_p) variable defined since
+    Automake 1.8.  It will be set to `mkdir -p' only if mkdir is GNU
+    mkdir, and to `mkinstalldirs' or `install-sh -d' otherwise.
+
+  - Secure temporary directory creation in `make distcheck'. (PR/413)
+
+  - Do not generate two build rules for `parser.h' when the
+    parser appears in two different conditionals.
+
+  - Work around a Solaris 8 /bin/sh bug in the test for dependency
+    checking.  Usually ./configure will not pick this shell; so this
+    fix only helps cases where the shell is forced to /bin/sh.
+
+* Bugs introduced by 1.8:
+
+  - In some situations (hand-written `m4_include's), aclocal would
+    call the `File::Spec->rel2abs' method, which was only introduced
+    in Perl 5.6.  This new version reestablish support Perl 5.005.
+
+    It is likely that the next major Automake releases will require at
+    least Perl 5.6.  Consider upgrading your development environment
+    if you are still using the five-year-old Perl 5.005.
+
+  - Automake would sometimes fail to define rules for targets listed
+    in variables defined in multiple conditions.  For instance on
+      if C1
+	bin_PROGRAMS = a
+      else
+	bin_PROGRAMS = b
+      endif
+    it would define only the `a.$(OBJEXT): a.c' rule and omit the
+    `b.$(OBJEXT): b.c' rule.
+
+* New sections in manual:
+
+  - Third-Party Makefiles: how to interface third party Makefiles.
+  - Upgrading: upgrading packages to newer Automake versions.
+  - Multiple Outputs: handling tools that produce many outputs.
+
 Bug fixed in 1.8.2:
 
 * A (well known) portability bug slipped in the changes made to
@@ -859,8 +1236,8 @@ New in 0.20:
 
 -----
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-Free Software Foundation, Inc.
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Automake.
 
@@ -876,5 +1253,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Automake; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.

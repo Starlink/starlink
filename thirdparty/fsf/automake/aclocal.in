@@ -7,7 +7,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 
 # aclocal - create aclocal.m4 by scanning configure.ac
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 #           Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -22,15 +22,15 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 # Written by Tom Tromey <tromey@redhat.com>.
 
 BEGIN
 {
   my $perllibdir = $ENV{'perllibdir'} || '@datadir@/@PACKAGE@-@APIVERSION@';
-  unshift @INC, (split ':', $perllibdir);
+  unshift @INC, (split '@PATH_SEPARATOR@', $perllibdir);
 }
 
 use Automake::Config;
@@ -41,6 +41,7 @@ use Automake::XFile;
 use Automake::FileUtils;
 use File::Basename;
 use File::stat;
+use Cwd;
 
 # Note that this isn't pkgdatadir, but a separate directory.
 # Note also that the versioned directory is handled later.
@@ -81,6 +82,9 @@ $force_output = 0;
 # Map macro names to file names.
 %map = ();
 
+# Ditto, but records the last definition of each macro as returned by --trace.
+%map_traced_defs = ();
+
 # Map file names to file contents.
 %file_contents = ();
 
@@ -97,13 +101,14 @@ $verbose = 0;
 # When macroname is `['-quoted , we accept any character in the name,
 # except `]'.  Otherwise macroname stops on the first `]', `,', `)',
 # or `\n' encountered.
-$ac_defun_rx = "A[CU]_DEFUN\\((?:\\[([^]]+)\\]|([^],)\n]+))";
+$ac_defun_rx =
+  "(?:AU_ALIAS|A[CU]_DEFUN|AC_DEFUN_ONCE)\\((?:\\[([^]]+)\\]|([^],)\n]+))";
 
 # Matches an AC_REQUIRE line.
 $ac_require_rx = "AC_REQUIRE\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
 
 # Matches an m4_include line
-$m4_include_rx = "(?:m4_)?s?include\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
+$m4_include_rx = "(?:m4_)?(s?)include\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
 
 
 ################################################################
@@ -129,12 +134,12 @@ sub scan_m4_files (@)
 
     # First, scan configure.ac.  It may contain macro definitions,
     # or may include other files that define macros.
-    &scan_file ($configure_ac);
+    &scan_file ($configure_ac, 'aclocal');
 
     # Then, scan acinclude.m4 if it exists.
     if (-f 'acinclude.m4')
     {
-	&scan_file ('acinclude.m4');
+	&scan_file ('acinclude.m4', 'aclocal');
     }
 
     # Finally, scan all files in our search path.
@@ -158,8 +163,8 @@ sub scan_m4_files (@)
 	    # Skip some files when running out of srcdir.
 	    next if $file eq 'aclocal.m4';
 
-	    $fullfile = $m4dir . '/' . $file;
-	    &scan_file ($fullfile);
+	    $fullfile = File::Spec->canonpath ("$m4dir/$file");
+	    &scan_file ($fullfile, 'aclocal');
 	}
 	closedir (DIR);
     }
@@ -185,25 +190,22 @@ sub add_macro ($)
 {
     local ($macro) = @_;
 
-    # We want to ignore AC_ macros.  However, if an AC_ macro is
-    # defined in (eg) acinclude.m4, then we want to make sure we mark
-    # it as seen.
-    return if $macro =~ /^AC_/ && ! defined $map{$macro};
-
-    if (! defined $map{$macro})
-    {
-	warn "aclocal: macro `$macro' required but not defined\n";
-	$exit_code = 1;
-	return;
-    }
+    # Ignore unknown required macros.  Either they are not really
+    # needed (e.g., a conditional AC_REQUIRE), in which case aclocal
+    # should be quiet, or they are needed and Autoconf itself will
+    # complain when we trace for macro usage later.
+    return unless defined $map{$macro};
 
     print STDERR "aclocal: saw macro $macro\n" if $verbose;
     $macro_seen{$macro} = 1;
     &add_file ($map{$macro});
 }
 
-# scan_contents ($file)
-# --------------------------------
+# scan_configure_dep ($file)
+# --------------------------
+# Scan a configure dependency (configure.ac, or separate m4 files)
+# for uses of known macros and AC_REQUIREs of possibly unknown macros.
+# Recursively scan m4_included files.
 my %scanned_configure_dep = ();
 sub scan_configure_dep ($)
 {
@@ -231,7 +233,10 @@ sub scan_configure_dep ($)
 
       while (/$m4_include_rx/go)
 	{
-	  push (@ilist, $1 || $2);
+	  my $ifile = $2 || $3;
+	  # Skip missing `sinclude'd files.
+	  next if $1 eq 's' && ! -f $ifile;
+	  push @ilist, $ifile;
 	}
 
       while (/$ac_require_rx/go)
@@ -246,14 +251,15 @@ sub scan_configure_dep ($)
       if (! &search && /(^|\s+)(AM_[A-Z0-9_]+)($|[^\]\)=A-Z0-9_])/)
 	{
 	  # Macro not found, but AM_ prefix found.
-	  warn "aclocal: $file: $line: macro `$2' not found in library\n";
-	  $exit_code = 1;
+	  # Make this just a warning, because we do not know whether
+	  # the macro is actually used (it could be called conditionally).
+	  warn ("aclocal:$file:$line: warning: "
+		. "macro `$2' not found in library\n");
 	}
     }
 
   add_macro ($_) foreach (@rlist);
-  my $dirname = dirname $file;
-  &scan_configure_dep (File::Spec->rel2abs ($_, $dirname)) foreach (@ilist);
+  &scan_configure_dep ($_) foreach (@ilist);
 }
 
 # Add a file to output.
@@ -271,12 +277,15 @@ sub add_file ($)
 # Point to the documentation for underquoted AC_DEFUN only once.
 my $underquoted_manual_once = 0;
 
-# Scan a single M4 file, and all files it includes.
+# scan_file ($FILE, $WHERE)
+# -------------------------
+# Scan a single M4 file ($FILE), and all files it includes.
 # Return the list of included files.
-sub scan_file ($)
+# $WHERE is the location to use in the diagnostic if the file
+# does not exist.
+sub scan_file ($$)
 {
-  my ($file) = @_;
-  my $base = dirname $file;
+  my ($file, $where) = @_;
 
   # Do not scan the same file twice.
   return @$file_includes{$file} if exists $file_includes{$file};
@@ -285,9 +294,16 @@ sub scan_file ($)
 
   unshift @file_order, $file;
 
+  if (! -e $file)
+    {
+      print STDERR "$where: file `$file' does not exist\n";
+      exit 1;
+    }
+
   my $fh = new Automake::XFile $file;
   my $contents = '';
   my @inc_files = ();
+  my %inc_lines = ();
   while ($_ = $fh->getline)
     {
       # Ignore `##' lines.
@@ -302,7 +318,7 @@ sub scan_file ($)
 	      print STDERR "$file:$.: warning: underquoted definition of $2\n";
 	      print STDERR "  run info '(automake)Extending aclocal'\n"
 		. "  or see http://sources.redhat.com/automake/"
-		. "automake.html#Extending%20aclocal\n"
+		. "automake.html#Extending-aclocal\n"
 		unless $underquoted_manual_once;
 	      $underquoted_manual_once = 1;
 	    }
@@ -327,26 +343,21 @@ sub scan_file ($)
 
       while (/$m4_include_rx/go)
 	{
-	  my $ifile = $1 || $2;
-	  # m4_include is relative to the directory of the file which
-	  # perform the include, but we want paths relative to the
-	  # directory where aclocal is run.  Do not use
-	  # File::Spec->rel2abs, because we want to store relative
-	  # paths (they might be used later of aclocal outputs an
-	  # m4_include for this file, or if the user itself includes
-	  # this file).
-	  $ifile = "$base/$ifile"
-	    unless $base eq '.' || File::Spec->file_name_is_absolute ($ifile);
+	  my $ifile = $2 || $3;
+	  # Skip missing `sinclude'd files.
+	  next if $1 eq 's' && ! -f $ifile;
 	  push (@inc_files, $ifile);
+	  $inc_lines{$ifile} = $.;
 	}
     }
   $file_contents{$file} = $contents;
 
   # For some reason I don't understand, it does not work
-  # to do `map { scan_file ($_) } @inc_files' below.
+  # to do `map { scan_file ($_, ...) } @inc_files' below.
   # With Perl 5.8.2 it undefines @inc_files.
   my @copy = @inc_files;
-  my @all_inc_files = (@inc_files, map { scan_file ($_) } @copy);
+  my @all_inc_files = (@inc_files,
+		       map { scan_file ($_, "$file:$inc_lines{$_}") } @copy);
   $file_includes{$file} = \@all_inc_files;
   return @all_inc_files;
 }
@@ -360,6 +371,12 @@ sub scan_file ($)
 sub strip_redundant_includes (%)
 {
   my %files = @_;
+
+  # Always include acinclude.m4, even if it does not appear to be used.
+  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
+  # File included by $configure_ac are redundant.
+  $files{$configure_ac} = 1;
+
   # Files at the end of @file_order should override those at the beginning,
   # so it is important to preserve these trailing files.  We can remove
   # a file A if it is going to be output before a file B that includes
@@ -375,23 +392,27 @@ sub strip_redundant_includes (%)
 	    if $verbose;
 	}
     }
+
+  # configure.ac is implicitly included.
+  delete $files{$configure_ac};
+
   return %files;
 }
 
 sub trace_used_macros ()
 {
   my %files = map { $map{$_} => 1 } keys %macro_seen;
-  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
   %files = strip_redundant_includes %files;
-  # configure.ac is implicitly included.
-  delete $files{$configure_ac};
 
   my $traces = ($ENV{AUTOM4TE} || 'autom4te');
   $traces .= " --language Autoconf-without-aclocal-m4 ";
   # All candidate files.
   $traces .= join (' ', grep { exists $files{$_} } @file_order) . " ";
   # All candidate macros.
-  $traces .= join (' ', map { "--trace='$_:\$n'" } (keys %macro_seen));
+  $traces .= join (' ', map { "--trace='$_:\$f:\$n:\$1'" } ('AC_DEFUN',
+							    'AC_DEFUN_ONCE',
+							    'AU_DEFUN',
+							    keys %macro_seen));
 
   print STDERR "aclocal: running $traces $configure_ac\n" if $verbose;
 
@@ -402,7 +423,14 @@ sub trace_used_macros ()
   while ($_ = $tracefh->getline)
     {
       chomp;
-      $traced{$_} = 1 if $macro_seen{$_};
+      my ($file, $macro, $arg1) = split (/:/);
+
+      $traced{$macro} = 1 if $macro_seen{$macro};
+
+      $map_traced_defs{$arg1} = $file
+	if ($macro eq 'AC_DEFUN'
+	    || $macro eq 'AC_DEFUN_ONCE'
+	    || $macro eq 'AU_DEFUN');
     }
 
   $tracefh->close;
@@ -428,10 +456,18 @@ sub write_aclocal ($@)
   my ($output_file, @macros) = @_;
   my $output = '';
 
-  my %files = map { $map{$_} => 1 } @macros;
-  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
+  my %files = ();
+  # Get the list of files containing definitions for the macros used.
+  # (Filter out unused macro definitions with $map_traced_defs.  This
+  # can happen when an Autoconf macro is conditionally defined:
+  # aclocal sees the potential definition, but this definition is
+  # actually never processed and the Autoconf implementation is used
+  # instead.)
+  for my $m (@macros)
+    {
+      $files{$map{$m}} = 1 if $map{$m} eq $map_traced_defs{$m};
+    }
   %files = strip_redundant_includes %files;
-  delete $files{$configure_ac};
 
   for $file (grep { exists $files{$_} } @file_order)
     {
@@ -468,8 +504,8 @@ sub write_aclocal ($@)
   # name in the header.
   $output = "# generated automatically by aclocal $VERSION -*- Autoconf -*-
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-# Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+# 2005  Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -570,7 +606,7 @@ sub parse_arguments (@)
 	{
 	  print "aclocal (GNU $PACKAGE) $VERSION\n";
 	  print "Written by Tom Tromey <tromey\@redhat.com>\n\n";
-	  print "Copyright (C) 2004 Free Software Foundation, Inc.\n";
+	  print "Copyright (C) 2005 Free Software Foundation, Inc.\n";
 	  print "This is free software; see the source for copying conditions.  There is NO\n";
 	  print "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n";
 	  exit 0;

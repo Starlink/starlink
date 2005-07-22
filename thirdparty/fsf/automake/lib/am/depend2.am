@@ -1,6 +1,6 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-## Free Software Foundation, Inc.
+## Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+## 2003, 2004  Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 ## This file is read several times:
 ## - once per *extension* (not per language) for generic compilation rules
@@ -56,21 +56,23 @@
 ## compile rules so that they are output on a single line (instead of 5)
 ## would be a good compromise.  Actually we use two line rather than one,
 ## because this way %SOURCE% is always located at the end of the first
-## line and is therefore easier to spot.
+## line and is therefore easier to spot.  (We need an extra line when
+## depbase is used.)
 
+if %?NONLIBTOOL%
 ?GENERIC?%EXT%.o:
 ?!GENERIC?%OBJ%: %SOURCE%
 if %FASTDEP%
 ## In fast-dep mode, we can always use -o.
 ## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
 ?!GENERIC?	if %COMPILE% -MT %OBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %OBJ% `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%; \
+?SUBDIROBJ??GENERIC?	depbase=`echo %OBJ% | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`; \
 ?GENERIC?	if %COMPILE% -MT %OBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %OBJ% %SOURCE%; \
 	then mv -f "%DEPBASE%.Tpo" "%DEPBASE%.Po"; else rm -f "%DEPBASE%.Tpo"; exit 1; fi
 else !%FASTDEP%
 if %AMDEP%
 	source='%SOURCE%' object='%OBJ%' libtool=no @AMDEPBACKSLASH@
-	depfile='%DEPBASE%.Po' tmpdepfile='%DEPBASE%.TPo' @AMDEPBACKSLASH@
-	$(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	DEPDIR=$(DEPDIR) $(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
 endif %AMDEP%
 if %?GENERIC%
 ?-o?	%COMPILE% %-c% %-o% %OBJ% %SOURCE%
@@ -88,13 +90,13 @@ if %FASTDEP%
 ## In fast-dep mode, we can always use -o.
 ## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
 ?!GENERIC?	if %COMPILE% -MT %OBJOBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %OBJOBJ% `if test -f '%SOURCE%'; then $(CYGPATH_W) '%SOURCE%'; else $(CYGPATH_W) '$(srcdir)/%SOURCE%'; fi`; \
+?SUBDIROBJ??GENERIC?	depbase=`echo %OBJ% | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`; \
 ?GENERIC?	if %COMPILE% -MT %OBJOBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %OBJOBJ% `$(CYGPATH_W) '%SOURCE%'`; \
 	then mv -f "%DEPBASE%.Tpo" "%DEPBASE%.Po"; else rm -f "%DEPBASE%.Tpo"; exit 1; fi
 else !%FASTDEP%
 if %AMDEP%
 	source='%SOURCE%' object='%OBJOBJ%' libtool=no @AMDEPBACKSLASH@
-	depfile='%DEPBASE%.Po' tmpdepfile='%DEPBASE%.TPo' @AMDEPBACKSLASH@
-	$(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	DEPDIR=$(DEPDIR) $(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
 endif %AMDEP%
 if %?GENERIC%
 ?-o?	%COMPILE% %-c% %-o% %OBJOBJ% `$(CYGPATH_W) '%SOURCE%'`
@@ -105,6 +107,7 @@ else !%?GENERIC%
 ?!-o?	%COMPILE% %-c% `if test -f '%SOURCE%'; then $(CYGPATH_W) '%SOURCE%'; else $(CYGPATH_W) '$(srcdir)/%SOURCE%'; fi`
 endif !%?GENERIC%
 endif !%FASTDEP%
+endif %?NONLIBTOOL%
 
 if %?LIBTOOL%
 ?GENERIC?%EXT%.lo:
@@ -112,15 +115,14 @@ if %?LIBTOOL%
 if %FASTDEP%
 ## In fast-dep mode, we can always use -o.
 ## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
-?GENERIC?	if %LTCOMPILE% -MT %LTOBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %LTOBJ% %SOURCE%; \
-## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
 ?!GENERIC?	if %LTCOMPILE% -MT %LTOBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %LTOBJ% `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%; \
+?SUBDIROBJ??GENERIC?	depbase=`echo %OBJ% | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`; \
+?GENERIC?	if %LTCOMPILE% -MT %LTOBJ% -MD -MP -MF "%DEPBASE%.Tpo" %-c% -o %LTOBJ% %SOURCE%; \
 	then mv -f "%DEPBASE%.Tpo" "%DEPBASE%.Plo"; else rm -f "%DEPBASE%.Tpo"; exit 1; fi
 else !%FASTDEP%
 if %AMDEP%
 	source='%SOURCE%' object='%LTOBJ%' libtool=yes @AMDEPBACKSLASH@
-	depfile='%DEPBASE%.Plo' tmpdepfile='%DEPBASE%.TPlo' @AMDEPBACKSLASH@
-	$(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	DEPDIR=$(DEPDIR) $(%FPFX%DEPMODE) $(depcomp) @AMDEPBACKSLASH@
 endif %AMDEP%
 ## We can always use `-o' with Libtool.
 ?GENERIC?	%LTCOMPILE% %-c% -o %LTOBJ% %SOURCE%

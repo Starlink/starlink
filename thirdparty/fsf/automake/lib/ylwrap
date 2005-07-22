@@ -1,9 +1,9 @@
 #! /bin/sh
 # ylwrap - wrapper for lex/yacc invocations.
 
-scriptversion=2003-11-18.20
+scriptversion=2005-05-14.22
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003
+# Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005
 #   Free Software Foundation, Inc.
 #
 # Written by Tom Tromey <tromey@cygnus.com>.
@@ -20,7 +20,8 @@ scriptversion=2003-11-18.20
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 # As a special exception to the GNU General Public License, if you
 # distribute this file as part of a program that contains a
@@ -56,11 +57,11 @@ Any number of OUTPUT,DESIRED pairs may be used.
 
 Report bugs to <bug-automake@gnu.org>.
 EOF
-    exit 0
+    exit $?
     ;;
   -v|--v*)
     echo "ylwrap $scriptversion"
-    exit 0
+    exit $?
     ;;
 esac
 
@@ -109,9 +110,9 @@ case $# in
   0) $prog "$input" ;;
   *) $prog "$@" "$input" ;;
 esac
-status=$?
+ret=$?
 
-if test $status -eq 0; then
+if test $ret -eq 0; then
   set X $pairlist
   shift
   first=yes
@@ -177,7 +178,7 @@ if test $status -eq 0; then
             -e 's/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/_/g'`
 
       sed -e "/^#/!b" -e "s,$input_rx,," -e "s,$from,$2," \
-          -e "s,$FROM,$TARGET," "$from" >"$target" || status=$?
+          -e "s,$FROM,$TARGET," "$from" >"$target" || ret=$?
 
       # Check whether header files must be updated.
       if test $first = no; then
@@ -195,7 +196,7 @@ if test $status -eq 0; then
       # is not specified, we don't want an error when the header
       # file is "missing".
       if test $first = yes; then
-        status=1
+        ret=1
       fi
     fi
     shift
@@ -203,14 +204,14 @@ if test $status -eq 0; then
     first=no
   done
 else
-  status=$?
+  ret=$?
 fi
 
 # Remove the directory.
 cd ..
 rm -rf $dirname
 
-exit $status
+exit $ret
 
 # Local Variables:
 # mode: shell-script

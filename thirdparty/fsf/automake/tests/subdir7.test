@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automake; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
 # Naming a subdirectory `obj/' is a bad idea.  Automake should say so.
 
@@ -37,12 +37,13 @@ echo 'SUBDIRS = obj' >Makefile.am
 $ACLOCAL
 
 AUTOMAKE_fails
-grep 'obj.*BSD' stderr
+grep 'Makefile.am:1:.*obj.*BSD' stderr
 
-cat >Makefile.am <<EOF
+cat >Makefile.am <<'EOF'
 SUBDIRS = @STH@
-DIST_SUBDIRS = obj
+FOO = obj
+DIST_SUBDIRS = $(FOO)
 EOF
 
 AUTOMAKE_fails
-grep 'obj.*BSD' stderr
+grep 'Makefile.am:2:.*obj.*BSD' stderr

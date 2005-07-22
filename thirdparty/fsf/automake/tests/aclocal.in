@@ -10,7 +10,7 @@ if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
   alias -g '${1+"$@"}'='"$@"'
 fi
 
-perllibdir=@abs_top_builddir@/lib:@abs_top_srcdir@/lib
+perllibdir="@abs_top_builddir@/lib@PATH_SEPARATOR@@abs_top_srcdir@/lib"
 export perllibdir
 # Most of the files are in $srcdir/../m4.  However amversion.m4 is
 # generated in ../m4, so we include that directory in the search path too.

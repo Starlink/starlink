@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automake; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 
 # For PR 204.
 # Sources derived from nodist_ sources should not be distributed.
@@ -39,6 +39,7 @@ EOF
 # sure Automake match 'nodist_' against the right
 # variable name...
 cat > Makefile.am << 'EOF'
+AM_YFLAGS = -d
 EXTRA_PROGRAMS = foo
 PARSE2 = parse2.y
 nodist_foo_SOURCES = parse.y $(PARSE2)
@@ -62,7 +63,9 @@ $AUTOMAKE -a
 $MAKE distdir
 test -f pr204-0.1/parse.c && exit 1
 test -f pr204-0.1/parse.y && exit 1
+test -f pr204-0.1/parse.h && exit 1
 test -f pr204-0.1/parse2.c && exit 1
 test -f pr204-0.1/parse2.y && exit 1
+test -f pr204-0.1/parse2.h && exit 1
 # Make sure parse.c and parse2.c are still targets.
 $MAKE parse.c parse2.c
