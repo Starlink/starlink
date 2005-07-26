@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 2001, 2002, 2003  Free Software Foundation, Inc.
+## Copyright (C) 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -13,8 +13,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 ## DIST_COMMON comes first so that README can be the very first file.
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -164,15 +164,17 @@ endif %?TOPDIR_P%
 ## us work correctly with an enclosing package.
 ##
 if %?SUBDIRS%
-	list='$(%DIST_SUBDIR_NAME%)'; for subdir in $$list; do \
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d "$(distdir)/$$subdir" \
-	    || mkdir "$(distdir)/$$subdir" \
+	    || $(mkdir_p) "$(distdir)/$$subdir" \
 	    || exit 1; \
+	    distdir=`$(am__cd) $(distdir) && pwd`; \
+	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
 	    (cd $$subdir && \
 	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="../$(top_distdir)" \
-	        distdir="../$(distdir)/$$subdir" \
+	        top_distdir="$$top_distdir" \
+	        distdir="$$distdir/$$subdir" \
 	        distdir) \
 	      || exit 1; \
 	  fi; \
@@ -212,8 +214,14 @@ if %?TOPDIR_P%
 	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
 	  ! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
 	|| chmod -R a+r $(distdir)
+if %?FILENAME_FILTER%
+	@if find $(distdir) -type f -print | \
+	  grep '^%FILENAME_FILTER%' 1>&2; then \
+	  echo 'error: the above filenames are too long' 1>&2; \
+	  exit 1; \
+	else :; fi
+endif %?FILENAME_FILTER%
 endif %?TOPDIR_P%
-
 
 
 
@@ -238,19 +246,19 @@ if %?TOPDIR_P%
 GZIP_ENV = --best
 .PHONY: dist-gzip
 dist-gzip: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
 	$(am__remove_distdir)
 
 ?BZIP2?DIST_ARCHIVES += $(distdir).tar.bz2
 .PHONY: dist-bzip2
 dist-bzip2: distdir
-	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
+	tardir=$(distdir) && $(am__tar) | bzip2 -9 -c >$(distdir).tar.bz2
 	$(am__remove_distdir)
 
 ?COMPRESS?DIST_ARCHIVES += $(distdir).tar.Z
 .PHONY: dist-tarZ
 dist-tarZ: distdir
-	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
+	tardir=$(distdir) && $(am__tar) | compress -c >$(distdir).tar.Z
 	$(am__remove_distdir)
 
 ?SHAR?DIST_ARCHIVES += $(distdir).shar.gz
@@ -281,9 +289,9 @@ if %?TOPDIR_P%
 
 .PHONY: dist dist-all
 dist dist-all: distdir
-?GZIP?	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-?BZIP2?	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
-?COMPRESS?	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
+?GZIP?	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+?BZIP2?	tardir=$(distdir) && $(am__tar) | bzip2 -9 -c >$(distdir).tar.bz2
+?COMPRESS?	tardir=$(distdir) && $(am__tar) | compress -c >$(distdir).tar.Z
 ?SHAR?	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
 ?ZIP?	-rm -f $(distdir).zip
 ?ZIP?	zip -rq $(distdir).zip $(distdir)
@@ -305,13 +313,13 @@ if %?TOPDIR_P%
 distcheck: dist
 	case '$(DIST_ARCHIVES)' in \
 	*.tar.gz*) \
-	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(AMTAR) xf - ;;\
+	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(am__untar) ;;\
 	*.tar.bz2*) \
-	  bunzip2 -c $(distdir).tar.bz2 | $(AMTAR) xf - ;;\
+	  bunzip2 -c $(distdir).tar.bz2 | $(am__untar) ;;\
 	*.tar.Z*) \
-	  uncompress -c $(distdir).tar.Z | $(AMTAR) xf - ;;\
+	  uncompress -c $(distdir).tar.Z | $(am__untar) ;;\
 	*.shar.gz*) \
-	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | unshar ;;\
+	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).shar.gz | unshar ;;\
 	*.zip*) \
 	  unzip $(distdir).zip ;;\
 	esac
@@ -324,8 +332,8 @@ distcheck: dist
 ## Undo the write access.
 	chmod a-w $(distdir)
 ## Compute the absolute path of `_inst'.  Strip any leading DOS drive
-## to allow DESTDIR installations.  Otherwise $(DESTDIR)$(prefix) would
-## expand to c:/temp/am-dc-5668/c:/src/package/package-1.0/_inst.
+## to allow DESTDIR installations.  Otherwise "$(DESTDIR)$(prefix)" would
+## expand to "c:/temp/am-dc-5668/c:/src/package/package-1.0/_inst".
 	dc_install_base=`$(am__cd) $(distdir)/_inst && pwd | sed -e 's,^[^:\\/]:[\\/],/,'` \
 ## We will attemp a DESTDIR install in $dc_destdir.  We don't
 ## create this directory under $dc_install_base, because it would
@@ -357,8 +365,9 @@ distcheck: dist
 ## $(distdir) is).
 	  && ({ \
 ## Build the directory, so we can cd into it even if `make install'
-## didn't create it.
-	       (cd ../.. && $(mkdir_p) "$$dc_destdir") \
+## didn't create it.  Use mkdir, not $(mkdir_p) because we want to
+## fail if the directory already exists (PR/413).
+	       (cd ../.. && umask 077 && mkdir "$$dc_destdir") \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" install \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" uninstall \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" \

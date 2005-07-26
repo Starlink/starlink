@@ -14,9 +14,14 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
+if %?INSTALL%
+if ! %?BASE%
+include inst-vars.am
+endif ! %?BASE%
+endif %?INSTALL%
 
 ## ------------ ##
 ## Installing.  ##
@@ -24,22 +29,20 @@
 
 if %?INSTALL%
 ## if doesn't work properly for Automake variables yet.
-am__installdirs += $(DESTDIR)$(%NDIR%dir)
+am__installdirs += "$(DESTDIR)$(%NDIR%dir)"
 ?BASE?%DIR%SCRIPT_INSTALL = $(INSTALL_SCRIPT)
 ?!BASE?%DIR%SCRIPT_INSTALL = $(install_sh_SCRIPT)
 ?EXEC?.PHONY install-exec-am: install-%DIR%SCRIPTS
 ?!EXEC?.PHONY install-data-am: install-%DIR%SCRIPTS
 install-%DIR%SCRIPTS: $(%DIR%_SCRIPTS)
 	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(%NDIR%dir)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	test -z "$(%NDIR%dir)" || $(mkdir_p) "$(DESTDIR)$(%NDIR%dir)"
+?!BASE?	@$(am__vpath_adj_setup) \
 ## Funny invocation because Makefile variable can be empty, leading to
 ## a syntax error in sh.
 ?!BASE?	list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) p=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	  esac; \
+?!BASE?	  $(am__vpath_adj) p=$$f; \
 ## A file can be in the source directory or the build directory.
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  if test -f $$d$$p; then \
@@ -51,8 +54,8 @@ install-%DIR%SCRIPTS: $(%DIR%_SCRIPTS)
 	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 ## Prepend the directory part if nobase_ is used.
 ?!BASE?	    f=`echo "$$p" | sed 's|[^/]*$$||'`"$$f"; \
-	    echo " $(%DIR%SCRIPT_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
-	    $(%DIR%SCRIPT_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+	    echo " $(%DIR%SCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
+	    $(%DIR%SCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	  else :; fi; \
 	done
@@ -67,18 +70,16 @@ if %?INSTALL%
 .PHONY uninstall-am: uninstall-%DIR%SCRIPTS
 uninstall-%DIR%SCRIPTS:
 	@$(NORMAL_UNINSTALL)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ?!BASE?	list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) p=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	  esac; \
+?!BASE?	  $(am__vpath_adj) p=$$f; \
 ## Remove any leading directory before applying $(transform).
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 ## Prepend the directory part if nobase_ is used.
 ?!BASE?	  f=`echo "$$p" | sed 's|[^/]*$$||'`"$$f"; \
-	  echo " rm -f $(DESTDIR)$(%NDIR%dir)/$$f"; \
-	  rm -f $(DESTDIR)$(%NDIR%dir)/$$f; \
+	  echo " rm -f '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	done
 endif %?INSTALL%
 
@@ -110,7 +111,8 @@ installcheck-%DIR%SCRIPTS: $(%DIR%_SCRIPTS)
 ## Insert the directory back if nobase_ is used.
 ?!BASE?	  f=`echo "$$p" | sed 's|[^/]*$$||'`"$$f"; \
 	  for opt in --help --version; do \
-	    if $(DESTDIR)$(%NDIR%dir)/$$f $$opt > c$${pid}_.out 2> c$${pid}_.err \
+	    if "$(DESTDIR)$(%NDIR%dir)/$$f" $$opt >c$${pid}_.out \
+	         2>c$${pid}_.err </dev/null \
 		 && test -n "`cat c$${pid}_.out`" \
 		 && test -z "`cat c$${pid}_.err`"; then :; \
 	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \

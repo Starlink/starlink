@@ -1,4 +1,4 @@
-# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,8 +12,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 package Automake::Variable;
 use strict;
@@ -190,12 +190,11 @@ my %_silent_variable_override =
    AR => 1,
    ARFLAGS => 1,
    DEJATOOL => 1,
-   JAVAC => 1);
+   JAVAC => 1,
+   JAVAROOT => 1);
 
-# This hash records helper variables used to implement conditional '+='.
-# Keys have the form "VAR:CONDITIONS".  The value associated to a key is
-# the named of the helper variable used to append to VAR in CONDITIONS.
-my %_appendvar = ();
+# Count of helper variables used to implement conditional '+='.
+my $_appendvar;
 
 # Each call to C<Automake::Variable::traverse_recursively> gets an
 # unique label. This is used to detect recursively defined variables.
@@ -317,7 +316,7 @@ other internal data.
 sub reset ()
 {
   %_variable_dict = ();
-  %_appendvar = ();
+  $_appendvar = 0;
   @_var_order = ();
   %_gen_varname = ();
   $_traversal = 0;
@@ -418,6 +417,7 @@ sub _new ($$)
   my ($class, $name) = @_;
   my $self = Automake::Item::new ($class, $name);
   $self->{'scanned'} = 0;
+  $self->{'last-append'} = []; # helper variable for last conditional append.
   $_variable_dict{$name} = $self;
   return $self;
 }
@@ -622,7 +622,7 @@ sub value_as_list_recursive ($;%)
      # Collect results.
      sub {
        my ($var, $parent_cond, @allresults) = @_;
-       return map { my ($cond, @vals) = @$_; return @vals } @allresults;
+       return map { my ($cond, @vals) = @$_; @vals } @allresults;
      },
      %options);
 }
@@ -790,7 +790,7 @@ sub define ($$$$$$$$)
   my ($var, $owner, $type, $cond, $value, $comment, $where, $pretty) = @_;
 
   prog_error "$cond is not a reference"
-    unless ref $where;
+    unless ref $cond;
 
   prog_error "$where is not a reference"
     unless ref $where;
@@ -870,6 +870,7 @@ sub define ($$$$$$$$)
   if ($type eq '+' && ! $new_var)
     {
       $def->append ($value, $comment);
+      $self->{'last-append'} = [];
 
       # Only increase owners.  A VAR_CONFIGURE variable augmented in a
       # Makefile.am becomes a VAR_MAKEFILE variable.
@@ -902,32 +903,39 @@ sub define ($$$$$$$$)
       #     @COND_TRUE@FOO = foo1 bar
       #     @COND_FALSE@FOO = foo2 bar
 
+      my $lastappend = [];
       # Do we need an helper variable?
       if ($cond != TRUE)
         {
-	    # Does the helper variable already exists?
-	    my $key = "$var:" . $cond->string;
-	    if (exists $_appendvar{$key})
-	      {
-		# Yes, let's simply append to it.
-		$var = $_appendvar{$key};
-		$owner = VAR_AUTOMAKE;
-		$self = var ($var);
-		$def = $self->rdef ($cond);
-		$new_var = 0;
-	      }
-	    else
-	      {
-		# No, create it.
-		my $num = 1 + keys (%_appendvar);
-		my $hvar = "am__append_$num";
-		$_appendvar{$key} = $hvar;
-		&define ($hvar, VAR_AUTOMAKE, '+',
-			 $cond, $value, $comment, $where, $pretty);
-		# Now HVAR is to be added to VAR.
-		$comment = '';
-		$value = "\$($hvar)";
-	      }
+	  # Can we reuse the helper variable created for the previous
+	  # append?  (We cannot reuse older helper variables because
+	  # we must preserve the order of items appended to the
+	  # variable.)
+	  my $condstr = $cond->string;
+	  my $key = "$var:$condstr";
+	  my ($appendvar, $appendvarcond) = @{$self->{'last-append'}};
+	  if ($appendvar && $condstr eq $appendvarcond)
+	    {
+	      # Yes, let's simply append to it.
+	      $var = $appendvar;
+	      $owner = VAR_AUTOMAKE;
+	      $self = var ($var);
+	      $def = $self->rdef ($cond);
+	      $new_var = 0;
+	    }
+	  else
+	    {
+	      # No, create it.
+	      my $num = ++$_appendvar;
+	      my $hvar = "am__append_$num";
+	      $lastappend = [$hvar, $condstr];
+	      &define ($hvar, VAR_AUTOMAKE, '+',
+		       $cond, $value, $comment, $where, $pretty);
+
+	      # Now HVAR is to be added to VAR.
+	      $comment = '';
+	      $value = "\$($hvar)";
+	    }
 	}
 
       # Add VALUE to all definitions of SELF.
@@ -958,6 +966,7 @@ sub define ($$$$$$$$)
 		       $where, $pretty);
 	    }
 	}
+      $self->{'last-append'} = $lastappend;
     }
   # 3. first assignment (=, :=, or +=)
   else
@@ -1191,7 +1200,7 @@ sub output_variables ()
   return $res;
 }
 
-=item C<$var-E<gt>traverse_recursively (&fun_item, &fun_collect, [cond_filter =E<gt> $cond_filter], [inner_expand =E<gt> 1])>
+=item C<$var-E<gt>traverse_recursively (&fun_item, &fun_collect, [cond_filter =E<gt> $cond_filter], [inner_expand =E<gt> 1], [skip_ac_subst =E<gt> 1])>
 
 Split the value of the Automake::Variable C<$var> on space, and
 traverse its components recursively.
@@ -1220,9 +1229,12 @@ If C<inner_expand> is set, variable references occuring in filename
 (as in C<$(BASE).ext>) are expansed before the filename is passed to
 C<&fun_item>.
 
+If C<skip_ac_subst> is set, Autoconf @substitutions@ will be skipped,
+i.e., C<&fun_item> will never be called for them.
+
 C<&fun_item> may return a list of items, they will be passed to
-C<&fun_store> later on.  Define C<&fun_item> as C<undef> when it serve
-no purpose, this will speed things up.
+C<&fun_store> later on.  Define C<&fun_item> or @<&fun_store> as
+C<undef> when they serve no purpose.
 
 Once all items of a variable have been processed, the result (of the
 calls to C<&fun_items>, or of recursive traversals of subvariables)
@@ -1256,16 +1268,18 @@ sub traverse_recursively ($&&;%)
   my ($var, $fun_item, $fun_collect, %options) = @_;
   my $cond_filter = $options{'cond_filter'};
   my $inner_expand = $options{'inner_expand'};
+  my $skip_ac_subst = $options{'skip_ac_subst'};
   return $var->_do_recursive_traversal ($var,
 					$fun_item, $fun_collect,
-					$cond_filter, TRUE, $inner_expand)
+					$cond_filter, TRUE, $inner_expand,
+					$skip_ac_subst)
 }
 
 # The guts of Automake::Variable::traverse_recursively.
-sub _do_recursive_traversal ($$&&$$$)
+sub _do_recursive_traversal ($$&&$$$$)
 {
   my ($var, $parent, $fun_item, $fun_collect, $cond_filter, $parent_cond,
-      $inner_expand) = @_;
+      $inner_expand, $skip_ac_subst) = @_;
 
   $var->set_seen;
 
@@ -1332,7 +1346,8 @@ sub _do_recursive_traversal ($$&&$$$)
 							  $fun_collect,
 							  $cond_filter,
 							  $full_cond,
-							  $inner_expand);
+							  $inner_expand,
+							  $skip_ac_subst);
 	      push (@result, @res);
 
 	      pop @_substfroms;
@@ -1377,6 +1392,10 @@ sub _do_recursive_traversal ($$&&$$$)
 	      # We do not know any variable with this name.  Fall through
 	      # to filename processing.
 	    }
+	  elsif ($skip_ac_subst && $val =~ /^\@.+\@$/)
+	    {
+	      next;
+	    }
 
 	  if ($fun_item) # $var is a filename we must process
 	    {
@@ -1402,6 +1421,8 @@ sub _do_recursive_traversal ($$&&$$$)
   # is free to use the same variable several times in the same definition.
   $var->{'scanned'} = -1;
 
+  return ()
+    unless $fun_collect;
   # Make sure you update the doc of Automake::Variable::traverse_recursively
   # if you change the prototype of &fun_collect.
   return &$fun_collect ($var, $parent_cond, @allresults);
@@ -1512,17 +1533,26 @@ sub transform_variable_recursively ($$$$$&;%)
 	   # we are trying to override a user variable.  Delete
 	   # the old variable first.
 	   variable_delete ($varname) if $varname eq $var->name;
-	   # Define for all conditions.  Make sure we define
-	   # an empty variable in condition TRUE otherwise.
+	   # Define an empty variable in condition TRUE if there is no
+	   # result.
 	   @allresults = ([TRUE, '']) unless @allresults;
+	   # Define the rewritten variable in all conditions not
+	   # already covered by user definitions.
 	   foreach my $pair (@allresults)
 	     {
 	       my ($cond, @result) = @$pair;
-	       define ($varname, VAR_AUTOMAKE, '', $cond, "@result",
-		       '', $where, VAR_PRETTY)
-		 unless vardef ($varname, $cond);
-	       rvardef ($varname, $cond)->set_seen;
+	       my $var = var $varname;
+	       my @conds = ($var
+			    ? $var->not_always_defined_in_cond ($cond)->conds
+			    : $cond);
+
+	       foreach (@conds)
+		 {
+		   define ($varname, VAR_AUTOMAKE, '', $_, "@result",
+			   '', $where, VAR_PRETTY);
+		 }
 	     }
+	   set_seen $varname;
 	 }
        return "\$($varname)";
      },

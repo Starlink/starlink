@@ -13,8 +13,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 
 ## ---------- ##
@@ -39,18 +39,18 @@ class%DIR%.stamp: $(%DIR%_JAVA)
 ## ------------ ##
 
 if %?INSTALL%
-am__installdirs += $(DESTDIR)$(%NDIR%dir)
+am__installdirs += "$(DESTDIR)$(%NDIR%dir)"
 ?EXEC?.PHONY install-exec-am: install-%DIR%JAVA
 ?!EXEC?.PHONY install-data-am: install-%DIR%JAVA
 install-%DIR%JAVA: class%DIR%.stamp
 	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(%NDIR%dir)
+	test -z "$(%NDIR%dir)" || $(mkdir_p) "$(DESTDIR)$(%NDIR%dir)"
 ## A single .java file can be compiled into multiple .class files.  So
 ## we just install all the .class files that got built into this
 ## directory.  This is not optimal, but will have to do for now.
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(%NDIR%dir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(%NDIR%dir)/$$p; \
+	@test -z "$(%DIR%_JAVA)" || for p in *.class; do \
+	  echo " $(INSTALL_DATA) '$$p' '$(DESTDIR)$(%NDIR%dir)/$$p'"; \
+	  $(INSTALL_DATA) "$$p" "$(DESTDIR)$(%NDIR%dir)/$$p"; \
 	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$p" || :; \
 	done
 endif %?INSTALL%
@@ -64,9 +64,9 @@ if %?INSTALL%
 .PHONY uninstall-am: uninstall-%DIR%JAVA
 uninstall-%DIR%JAVA:
 	@$(NORMAL_UNINSTALL)
-	@for p in *.class; do \
-	  echo " rm -f $(DESTDIR)$(%NDIR%dir)/$$p"; \
-	  rm -f $(DESTDIR)$(%NDIR%dir)/$$p; \
+	@test -z "$(%DIR%_JAVA)" || for p in *.class; do \
+	  echo " rm -f '$(DESTDIR)$(%NDIR%dir)/$$p'"; \
+	  rm -f "$(DESTDIR)$(%NDIR%dir)/$$p"; \
 	done
 endif %?INSTALL%
 

@@ -10,9 +10,9 @@ if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
   alias -g '${1+"$@"}'='"$@"'
 fi
 
-perllibdir="/tmp/norman/automake-1.9.6/lib:/tmp/norman/automake-1.9.6/lib"
+perllibdir="/tmp/norman/merge/thirdparty/fsf/automake/tests/.././lib:/tmp/norman/merge/thirdparty/fsf/automake/tests/../lib"
 export perllibdir
 # Most of the files are in $srcdir/../m4.  However amversion.m4 is
 # generated in ../m4, so we include that directory in the search path too.
-exec /tmp/norman/automake-1.9.6/aclocal \
-     -I /tmp/norman/automake-1.9.6/m4 --acdir=/tmp/norman/automake-1.9.6/m4 ${1+"$@"}
+exec /tmp/norman/merge/thirdparty/fsf/automake/tests/.././aclocal \
+     -I /tmp/norman/merge/thirdparty/fsf/automake/tests/.././m4 --acdir=/tmp/norman/merge/thirdparty/fsf/automake/tests/../m4 ${1+"$@"}

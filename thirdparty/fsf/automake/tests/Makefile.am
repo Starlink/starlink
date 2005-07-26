@@ -18,6 +18,9 @@ acloca12.test \
 acloca13.test \
 acloca14.test \
 acloca15.test \
+acloca16.test \
+acloca17.test \
+acloca19.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -45,6 +48,7 @@ ansi8.test \
 ansi9.test \
 ansi10.test \
 ar.test \
+ar2.test \
 asm.test \
 autohdr.test \
 autohdr2.test \
@@ -52,6 +56,8 @@ autohdr3.test \
 autohdr4.test \
 auxdir.test \
 auxdir2.test \
+auxdir3.test \
+auxdir4.test \
 backsl.test \
 backsl2.test \
 backsl3.test \
@@ -69,8 +75,10 @@ ccnoco.test \
 check.test \
 check2.test \
 check3.test \
+check4.test \
 checkall.test \
 clean.test \
+clean2.test \
 colneq.test \
 colneq2.test \
 colon.test \
@@ -87,6 +95,11 @@ comment4.test \
 comment5.test \
 comment6.test \
 comment7.test \
+comment8.test \
+comment9.test \
+commen10.test \
+compile.test \
+compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
 cond.test \
 cond2.test \
@@ -120,7 +133,13 @@ cond30.test \
 cond31.test \
 cond32.test \
 cond33.test \
+cond34.test \
+cond35.test \
+cond36.test \
+cond37.test \
+cond38.test \
 condd.test \
+condhook.test \
 condinc.test \
 condinc2.test \
 condlib.test \
@@ -182,6 +201,7 @@ distcom3.test \
 distcom4.test \
 distcom5.test \
 distcom6.test \
+distcom7.test \
 distdir.test \
 distname.test \
 dollar.test \
@@ -192,7 +212,6 @@ empty.test \
 empty2.test \
 empty3.test \
 empty4.test \
-error.test \
 exdir.test \
 exdir2.test \
 exeext.test \
@@ -208,7 +227,9 @@ extra4.test \
 extra5.test \
 extra6.test \
 extra7.test \
+f90only.test \
 flibs.test \
+fn99.test \
 fnoc.test \
 fo.test	\
 fonly.test \
@@ -231,6 +252,7 @@ gnits2.test \
 gnits3.test \
 header.test \
 help.test \
+hfs.test \
 hosts.test \
 implicit.test \
 include.test \
@@ -247,10 +269,12 @@ instexec.test \
 insthook.test \
 instman.test \
 instman2.test \
+instspc.test \
 interp.test \
 interp2.test \
 java.test \
 java2.test \
+java3.test \
 javaprim.test \
 javasubst.test \
 ldadd.test \
@@ -270,6 +294,7 @@ libobj10.test \
 libobj11.test \
 libobj12.test \
 libobj13.test \
+libobj14.test \
 library.test \
 library2.test \
 library3.test \
@@ -280,20 +305,26 @@ libtool4.test \
 libtool5.test \
 libtool6.test \
 libtool7.test \
+libtool8.test \
 license.test \
 link_c_cxx.test	\
 link_dist.test \
+link_f90_only.test \
 link_fc.test \
 link_fccxx.test \
 link_fcxx.test	\
 link_f_only.test \
-lisp.test \
 lisp2.test \
 lisp3.test \
 lisp4.test \
 lisp5.test \
+lisp6.test \
+lisp7.test \
+lisp8.test \
 listval.test \
 location.test \
+longline.test \
+longlin2.test \
 ltcond.test \
 ltcond2.test \
 ltconv.test \
@@ -313,8 +344,10 @@ mdate3.test \
 mdate4.test \
 missing.test \
 missing2.test \
-mkinst2.test \
+missing3.test \
 mkinstall.test \
+mkinst2.test \
+mkinst3.test \
 multlib.test \
 nobase.test \
 nodef.test \
@@ -382,6 +415,7 @@ pr307.test \
 prefix.test \
 primary.test \
 primary2.test \
+primary3.test \
 proginst.test \
 python.test \
 python2.test \
@@ -393,6 +427,8 @@ python7.test \
 python8.test \
 python9.test \
 python10.test \
+python11.test \
+python12.test \
 recurs.test \
 recurs2.test \
 remake.test \
@@ -400,6 +436,7 @@ remake2.test \
 remake3.test \
 remake4.test \
 remake5.test \
+regex.test \
 req.test \
 reqd.test \
 reqd2.test \
@@ -434,6 +471,7 @@ subdir5.test \
 subdir6.test \
 subdir7.test \
 subdir8.test \
+subdir9.test \
 subdirbuiltsources.test \
 subcond.test \
 subcond2.test \
@@ -472,6 +510,9 @@ symlink3.test \
 syntax.test \
 tags.test \
 tagsub.test \
+tar.test \
+tar2.test \
+tar3.test \
 target-cflags.test \
 targetclash.test \
 txinfo.test \
@@ -499,6 +540,7 @@ txinfo26.test \
 txinfo27.test \
 txinfo28.test \
 txinfo29.test \
+txinfo30.test \
 transform.test \
 unused.test \
 vars.test \
@@ -515,6 +557,7 @@ vtexi.test \
 vtexi2.test \
 warnopts.test \
 werror.test \
+werror2.test \
 whoami.test \
 xsource.test \
 yacc.test \

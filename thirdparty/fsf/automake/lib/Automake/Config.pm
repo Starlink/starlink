@@ -31,8 +31,8 @@ use vars qw ($APIVERSION $PACKAGE $VERSION $libdir);
 # VERSION as string so that e.g. version 0.30 will print correctly.
 $APIVERSION = '1.9';
 $PACKAGE = 'automake';
-$VERSION = '1.9.6';
-$libdir = '/home/norman/Scratch/tools/config-tools-2005-07-21/share/automake-1.9';
+$VERSION = '1.9.6-starlink';
+$libdir = '/tmp/norman/merge/STAR/buildsupport/share/automake-1.9';
 
 1;;
 

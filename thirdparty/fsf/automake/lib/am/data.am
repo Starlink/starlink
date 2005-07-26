@@ -14,23 +14,27 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
+
+if %?INSTALL%
+include inst-vars.am
+endif %?INSTALL%
 
 ## ------------ ##
 ## Installing.  ##
 ## ------------ ##
 
 if %?INSTALL%
-am__installdirs += $(DESTDIR)$(%NDIR%dir)
+am__installdirs += "$(DESTDIR)$(%NDIR%dir)"
 ?BASE?%DIR%%PRIMARY%_INSTALL = $(INSTALL_%ONE_PRIMARY%)
 ?!BASE?%DIR%%PRIMARY%_INSTALL = $(install_sh_DATA)
 ?EXEC?.PHONY install-exec-am: install-%DIR%%PRIMARY%
 ?!EXEC?.PHONY install-data-am: install-%DIR%%PRIMARY%
 install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(%NDIR%dir)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	test -z "$(%NDIR%dir)" || $(mkdir_p) "$(DESTDIR)$(%NDIR%dir)"
+?!BASE?	@$(am__vpath_adj_setup) \
 ## Funny invocation because Makefile variable can be empty, leading to
 ## a syntax error in sh.
 ?!BASE?	list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
@@ -40,13 +44,10 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 ## If the _%PRIMARY% variable has an entry like foo/bar, install it as
 ## $(destdir)/bar, not $(destdir)/foo/bar.  The user can make a
 ## new dir variable or use a nobase_ target for the latter case.
-?BASE?	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	    *) f=$$p;; \
-?!BASE?	  esac; \
-	  echo " $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
-	  $(%DIR%%PRIMARY%_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+?BASE?	  f=$(am__strip_dir) \
+?!BASE?	  $(am__vpath_adj) \
+	  echo " $(%DIR%%PRIMARY%_INSTALL) '$$d$$p' '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
+	  $(%DIR%%PRIMARY%_INSTALL) "$$d$$p" "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(%NDIR%dir)/$$f" || :; \
 	done
 endif %?INSTALL%
@@ -60,16 +61,13 @@ if %?INSTALL%
 .PHONY uninstall-am: uninstall-%DIR%%PRIMARY%
 uninstall-%DIR%%PRIMARY%:
 	@$(NORMAL_UNINSTALL)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ?!BASE?	list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
-?BASE?	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	    *) f=$$p;; \
-?!BASE?	  esac; \
-	  echo " rm -f $(DESTDIR)$(%NDIR%dir)/$$f"; \
-	  rm -f $(DESTDIR)$(%NDIR%dir)/$$f; \
+?BASE?	  f=$(am__strip_dir) \
+?!BASE?	  $(am__vpath_adj) \
+	  echo " rm -f '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	done
 endif %?INSTALL%
 
