@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+# Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 # Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 dnl Autoconf 2.58 defines abs_top_builddir incorrectly, so we
 dnl have to require 2.58a, otherwise all our test cases will fail
@@ -34,8 +34,8 @@ dnl  Include the TARNAME field, not because we want to distribute
 dnl  this package, but so that autoconf uses this when building some
 dnl  installation locations rather than the "starlink-automake" it
 dnl  would otherwise construct.
-AC_INIT([Starlink Automake], [1.8.2-starlink], [ussc@star.rl.ac.uk], automake)
-dnl AC_INIT([GNU Automake], [1.8.2-starlink], [bug-automake@gnu.org])
+AC_INIT([Starlink Automake], [1.9.6-starlink], [ussc@star.rl.ac.uk], automake)
+dnl AC_INIT([GNU Automake], [1.9.6], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR(automake.in)
 AC_CONFIG_AUX_DIR(lib)
@@ -47,12 +47,15 @@ AC_CANONICAL_BUILD
 : ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
 AC_SUBST(STAR_MANIFEST_DIR)
 
-# Save the AUTOCONF setting before AM_INIT_AUTOMAKE overrides it;
-# this way we can run Autoconf tests from configure without being
-# bothered by `missing'.
-am_AUTOCONF=${AUTOCONF-autoconf}
+# Save the AUTOCONF setting before AM_INIT_AUTOMAKE overrides it; this
+# way we can run Autoconf tests from configure (or from the test
+# suite) without being bothered by `missing'.
+AC_SUBST([am_AUTOCONF], ["${AUTOCONF-autoconf}"])
 
-AM_INIT_AUTOMAKE([1.6 dist-bzip2])
+AM_INIT_AUTOMAKE([1.8 dist-bzip2])
+dnl Should be as below, but this doesn't work when it's 1.8.2-starlink which
+dnl in the path (as it has to be)
+dnl AM_INIT_AUTOMAKE([1.8a dist-bzip2 filename-length-max=99])
 
 # The API version is the base version.  We must guarantee
 # compatibility for all releases with the same API version.
@@ -65,13 +68,12 @@ APIVERSION=`echo "$VERSION" | sed -e 's/^\([[0-9]]*\.[[0-9]]*[[a-z]]*\).*$/\1/'`
 AC_SUBST(APIVERSION)
 
 # A versioned directory, defined here for convenience.
-pkgvdatadir="\${datadir}/automake-${APIVERSION}"
-AC_SUBST(pkgvdatadir)
+AC_SUBST([pkgvdatadir], ["\${datadir}/$PACKAGE-$APIVERSION"])
 
 # $AUTOMAKE and $ACLOCAL are always run after a `cd $top_srcdir',
 # hence `.' is really what we want for perllibdir, libdir, and acdir.
-ACLOCAL="perllibdir=`pwd`/lib:./lib `pwd`/aclocal --acdir=m4"
-AUTOMAKE="perllibdir=`pwd`/lib:./lib `pwd`/automake --libdir=lib"
+ACLOCAL="perllibdir=`pwd`\"/lib$PATH_SEPARATOR./lib\" `pwd`/aclocal --acdir=m4"
+AUTOMAKE="perllibdir=`pwd`\"/lib$PATH_SEPARATOR./lib\" `pwd`/automake --libdir=lib"
 
 AC_PATH_PROG(PERL, perl)
 if test -z "$PERL"; then
