@@ -1,6 +1,7 @@
 #!/usr/local/bin/perl -w
 # -*- perl -*-
 # Generated from automake.in; do not edit by hand.
+# Starlink version: $Id$
 
 eval 'case $# in 0) exec /usr/local/bin/perl -S "$0";; *) exec /usr/local/bin/perl -S "$0" "$@";; esac'
     if 0;
@@ -31,7 +32,7 @@ package Language;
 
 BEGIN
 {
-  my $perllibdir = $ENV{'perllibdir'} || '/home/norman/Scratch/tools/config-tools-2005-07-21/share/automake-1.9';
+  my $perllibdir = $ENV{'perllibdir'} || '/tmp/norman/merge/STAR/buildsupport/bin/share/automake-1.9';
   unshift @INC, (split ':', $perllibdir);
 
   # Override SHELL.  This is required on DJGPP so that system() uses
@@ -142,6 +143,7 @@ use Automake::Rule;
 use Automake::RuleDef;
 use Automake::Wrap 'makefile_wrap';
 use File::Basename;
+use Cwd qw( cwd );
 use File::Spec;
 use Carp;
 
@@ -220,7 +222,8 @@ my @common_files =
 	COPYING.LESSER ChangeLog INSTALL NEWS README THANKS TODO
 	ansi2knr.1 ansi2knr.c compile config.guess config.rpath config.sub
 	depcomp elisp-comp install-sh libversion.in mdate-sh missing
-	mkinstalldirs py-compile texinfo.tex ylwrap),
+	mkinstalldirs py-compile texinfo.tex ylwrap
+       ),
      @libtool_files, @libtool_sometimes);
 
 # Commonly used files we auto-include, but only sometimes.  This list
@@ -430,6 +433,21 @@ my $automake_will_process_aux_dir = 0;
 
 # The name of the Makefile currently being processed.
 my $am_file = 'BUG';
+
+# If a file name appears as a key in this hash, then it has been seen
+# as a Fortran file to be preprocessed.  This hash is possibly
+# redundant: see the FIXME in lang_ppfc_finish
+my %ppfc_sources = ();
+
+# Extra Starlink features, as found when tracing
+my %starlink_seen_features = ();
+my %starlink_predist_sources = ();
+
+# Override rules file for given prefix_PRIMARY targets.
+# That is, $special_rules_file{share_DATA}='foo' would cause foo.am,
+# rather than data.am, to be the file substituted when generating the
+# Makefile.in fragments for the share_DATA targets and variables.
+my %special_rules_file = ();
 
 
 ################################################################
@@ -670,11 +688,11 @@ register_language ('name' => 'c',
 		   'autodep' => '',
 		   'flags' => ['CFLAGS', 'CPPFLAGS'],
 		   'compiler' => 'COMPILE',
-		   'compile' => '$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)',
+		   'compile' => '$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)',
 		   'lder' => 'CCLD',
 		   'ld' => '$(CC)',
 		   'linker' => 'LINK',
-		   'link' => '$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+		   'link' => '$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
 		   'compile_flag' => '-c',
 		   'libtool_tag' => 'CC',
 		   'extensions' => ['.c'],
@@ -685,10 +703,10 @@ register_language ('name' => 'cxx',
 		   'Name' => 'C++',
 		   'config_vars' => ['CXX'],
 		   'linker' => 'CXXLINK',
-		   'link' => '$(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+		   'link' => '$(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
 		   'autodep' => 'CXX',
 		   'flags' => ['CXXFLAGS', 'CPPFLAGS'],
-		   'compile' => '$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)',
+		   'compile' => '$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)  $(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)',
 		   'compiler' => 'CXXCOMPILE',
 		   'compile_flag' => '-c',
 		   'output_flag' => '-o',
@@ -797,9 +815,9 @@ register_language ('name' => 'asm',
 register_language ('name' => 'f77',
 		   'Name' => 'Fortran 77',
 		   'linker' => 'F77LINK',
-		   'link' => '$(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+		   'link' => '$(F77LD) $(AM_FFLAGS) $(FFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
 		   'flags' => ['FFLAGS'],
-		   'compile' => '$(F77) $(AM_FFLAGS) $(FFLAGS)',
+		   'compile' => '$(F77) $(STAR_FFLAGS) $(AM_FFLAGS) $(FFLAGS)',
 		   'compiler' => 'F77COMPILE',
 		   'compile_flag' => '-c',
 		   'output_flag' => '-o',
@@ -807,70 +825,100 @@ register_language ('name' => 'f77',
 		   'lder' => 'F77LD',
 		   'ld' => '$(F77)',
 		   'pure' => 1,
-		   'extensions' => ['.f', '.for']);
+                   'extensions' => ['.for']
+                   #'extensions' => ['.f', '.for']
+                   # .f made a FC extension -- modification for Starlink
+                  );
 
 # Fortran
 register_language ('name' => 'fc',
-		   'Name' => 'Fortran',
-		   'linker' => 'FCLINK',
-		   'link' => '$(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
-		   'flags' => ['FCFLAGS'],
-		   'compile' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS)',
-		   'compiler' => 'FCCOMPILE',
-		   'compile_flag' => '-c',
-		   'output_flag' => '-o',
-		   'lder' => 'FCLD',
-		   'ld' => '$(FC)',
-		   'pure' => 1,
-		   'extensions' => ['.f90', '.f95']);
-
+                   'Name' => 'Fortran',
+                   'linker' => 'FCLINK',
+                   'link' => '$(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+                   'flags' => ['FCFLAGS'],
+                   'compile' => '$(FC) $(STAR_FCFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compiler' => 'FCCOMPILE',
+                   'compile_flag' => '-c',
+                   'output_flag' => '-o',
+                   'lder' => 'FCLD',
+                   'ld' => '$(FC)',
+                   'pure' => 1,
+                   'extensions' => ['.f', '.f90', '.f95']
+                   # .f made a FC extension -- modification for Starlink
+                   #'extensions' => ['.f90', '.f95']
+                  );
+ 
 # Preprocessed Fortran
+#
+# Some, but not all, Fortran (f77, f90, f95) compilers know how to do
+# preprocessing.  The Autoconf AC_PROG_FPP test determines if the
+# Fortran compiler can do `enough' preprocessing, or finds a
+# standalone preprocessor if necessary (which might just be cpp).  The
+# `ppfc' support here generates build rules which use the results of
+# this test.
+#
+# It's up to Autoconf to decide whether indirect or direct compilation
+# works better; it does this by setting a number of configure-time
+# variables, and the rules we emit here depend on these variables (in
+# some cases becoming no-ops).  See the macros in Autoconf's
+# fortran.m4 for details of these.
+#
+# We specify a list of extensions consisting of '.@FPP_COMPILE_EXT@'
+# ALONE.  We do _not_ want to list the real extensions here, since we
+# don't yet know what they are!  They could be `.fpp' or `.F'
+# (depending on the user's preference), but if we have to resort to
+# indirect compilation, then this FPP_COMPILE_EXT will be set to a
+# dummy value by Autoconf.  Thus the rule we emit
+# and the label we pass around in extension_seen, for example, uses
+# this autoconf variable.
+#
+# That is, overall we want to recognise both .fpp and .F, but in both
+# cases act _as_if_ the extension seen were '.@FPP_COMPILE_EXT@'.
+#
+# We do, however, need to recognise .fpp and .F sources for what they
+# are, and trigger FPP behaviour.  So immediately after registering
+# the language, (a) tell automake that '.fpp' and '.F' are real
+# extensions that it knows about, and (b), add notional suffix rules,
+# so that &derive_suffix maps each of these to `.@FPP_COMPILE_EXT@' at
+# the appropriate point (is this a hack, or is it clever use of
+# available facilities?).  This is therefore doing by hand some of the
+# work of register_language.  NB, `output_extensions' does a different
+# job.
+#
+# That is, overall we want to recognise both .fpp and .F, but in both
+# cases act _as_if_ the extension seen were '.@FPP_COMPILE_EXT@'.
+#
+# The $(FPP_MAKE_FLAGS) argument is set by the AC_PROG_FPP test.
+#
+# A separate .fpp.f or .F.f rule will be emitted by the PPFC block of
+# lang-compile.am.
+#
 register_language ('name' => 'ppfc',
-		   'Name' => 'Preprocessed Fortran',
-		   'config_vars' => ['FC'],
-		   'linker' => 'FCLINK',
-		   'link' => '$(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
-		   'lder' => 'FCLD',
-		   'ld' => '$(FC)',
-		   'flags' => ['FCFLAGS', 'CPPFLAGS'],
-		   'compiler' => 'PPFCCOMPILE',
-		   'compile' => '$(FC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
-		   'compile_flag' => '-c',
-		   'output_flag' => '-o',
-		   'libtool_tag' => 'FC',
-		   'pure' => 1,
-		   'extensions' => ['.F90','.F95']);
+                   'Name' => 'Preprocessed Fortran',
+                   # autoconf support for fortran defines FC,
+                   # rather than older F77
+                   'config_vars' => ['FC'],
+                   'linker' => 'FCLINK',
+                   'link' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+                   'lder' => 'FCLD',
+                   'ld' => '$(FC)',
+                   'flags' => ['FCFLAGS', 'CPPFLAGS'],
 
-# Preprocessed Fortran 77
-#
-# The current support for preprocessing Fortran 77 just involves
-# passing `$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS)
-# $(CPPFLAGS)' as additional flags to the Fortran 77 compiler, since
-# this is how GNU Make does it; see the `GNU Make Manual, Edition 0.51
-# for `make' Version 3.76 Beta' (specifically, from info file
-# `(make)Catalogue of Rules').
-#
-# A better approach would be to write an Autoconf test
-# (i.e. AC_PROG_FPP) for a Fortran 77 preprocessor, because not all
-# Fortran 77 compilers know how to do preprocessing.  The Autoconf
-# macro AC_PROG_FPP should test the Fortran 77 compiler first for
-# preprocessing capabilities, and then fall back on cpp (if cpp were
-# available).
-register_language ('name' => 'ppf77',
-		   'Name' => 'Preprocessed Fortran 77',
-		   'config_vars' => ['F77'],
-		   'linker' => 'F77LINK',
-		   'link' => '$(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
-		   'lder' => 'F77LD',
-		   'ld' => '$(F77)',
-		   'flags' => ['FFLAGS', 'CPPFLAGS'],
-		   'compiler' => 'PPF77COMPILE',
-		   'compile' => '$(F77) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FFLAGS) $(FFLAGS)',
-		   'compile_flag' => '-c',
-		   'output_flag' => '-o',
-		   'libtool_tag' => 'F77',
-		   'pure' => 1,
-		   'extensions' => ['.F']);
+                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compiler' => 'FCCOMPILE',
+#                   'compiler' => 'PPFCCOMPILE', # better?
+                   'compile_flag' => '-c',
+                   'output_flag' => '-o',
+		   'libtool_tag' => 'FC',
+
+                   'pure' => 1,
+
+                   'extensions' => ['.@FPP_COMPILE_EXT@'],
+		   '_finish' => \&lang_ppfc_finish,
+                  );
+accept_extensions ('.fpp', '.F');
+register_suffix_rule (INTERNAL, '.fpp', '.@FPP_COMPILE_EXT@');
+register_suffix_rule (INTERNAL, '.F',   '.@FPP_COMPILE_EXT@');
 
 # Ratfor.
 register_language ('name' => 'ratfor',
@@ -2021,6 +2069,29 @@ sub handle_lib_objects
 	     }
 	   return ();
 	 }
+       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?`$})
+         {
+           # This is a Starlink extension.  It is common for Starlink
+           # libraries to provide a short script, with a name matching
+           # the above pattern, which provides the set of -l options
+           # which are required to link with that library and its
+           # dependencies.  Allow this, and so do not pass this $val
+           # back into the _DEPENDENCIES variable.  It probably isn't
+           # necessary to actually run the script and include the set
+           # of library options.  That may not even be feasible, since
+           # we are quite possibly running automake before the library
+           # in question has been installed.
+           #
+           # We don't want to open the door to any sort of scripts
+           # here, so have a very restrictive regexp.  We allow
+           # `X_link`, `X_link_adam` (where "X" is any sequence of
+           # letters and underscores), and either of these preceded by
+           # precisely "$(srcdir)/", which can be useful for testing targets.
+           #
+           # It is not possible to include any spaces in the value,
+           # since these are parsed away at an earlier stage.
+           return ();
+         }
        elsif ($val !~ /^\@.*\@$/)
 	 {
 	   # Assume we have a file of some sort, and output it into the
@@ -2248,7 +2319,7 @@ sub handle_programs
     var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
   foreach my $pair (@proglist)
-    {
+   {
       my ($where, $one_file) = @$pair;
 
       my $seen_libobjs = 0;
@@ -2304,6 +2375,8 @@ sub handle_programs
 	  $xlink = $linker ? $linker : 'LINK';
 	}
 
+      my $linkmagic = derive_linkmagic ($xlink);
+
       # If the resulting program lies into a subdirectory,
       # make sure this directory will exist.
       my $dirstamp = require_build_directory_maybe ($one_file);
@@ -2314,7 +2387,8 @@ sub handle_programs
 				       XPROGRAM => $xname,
 				       XLINK    => $xlink,
 				       DIRSTAMP => $dirstamp,
-				       EXEEXT   => '$(EXEEXT)');
+				       EXEEXT   => '$(EXEEXT)',
+                                       LINKMAGIC => $linkmagic);
 
       if ($seen_libobjs || $seen_global_libobjs)
 	{
@@ -2329,6 +2403,251 @@ sub handle_programs
 	}
     }
 }
+
+# handle_monoliths ()
+# -------------------
+# Handle Starlink monoliths.  This is very similar to handle_programs.
+# Declarations in Makefile.am look like:
+#   bin_MONOLITHS = sst_mon
+#   sst_mon_SOURCES = \
+# 	sst_mon.f \
+# 	$(sst_mon_TASKS:=.f) \
+# 	blah...
+#   sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
+sub handle_monoliths
+{
+  my @proglist = &am_install_var ('monoliths', 'MONOLITHS',
+                                  'bin', 'check', 'noinst');
+
+  # If there is no monolith support mentioned (bin_MONOLITHS), then do nothing.
+  if (! @proglist)
+    {
+      # We used to warn, here, if STAR_MONOLITHS had been seen in
+      # configure.ac, but there was no bin_MONOLITHS declared in Makefile.am.
+      # Don't do this, however, since if we're processing a Makefile.am in
+      # a subdirectory, then this situation can occur quite legitimately.
+
+      return;
+    }
+
+  # Just to keep the user sane, check that we did see STAR_MONOLITHS in the
+  # configure.ac.
+  $starlink_seen_features{monoliths} || do {
+    err_am("have bin_MONOLITHS, but no STAR_MONOLITHS in configure.ac");
+  };
+  
+
+  my $seen_global_libobjs = var ('LDADD') && &handle_lib_objects ('', 'LDADD');
+
+  # All the .ifc files which are to be generated
+  my @all_ifcs;
+
+  # @task_monolith_pairs is a list of task:monolith pairs, so that
+  # each installed task .ifc file can be linked with the correct
+  # monolith at install time.
+  my @task_monolith_pairs;
+
+  foreach my $pair (@proglist) 
+    {
+      my ($where, $one_file) = @$pair;
+
+      my $seen_libobjs = 0;
+      my $obj = &get_object_extension ($one_file);
+      
+      # Strip any $(EXEEXT) suffix the user might have added, or this
+      # will confuse &handle_source_transform and &check_canonical_spelling.
+      # We'll add $(EXEEXT) back later anyway.
+      $one_file =~ s/\$\(EXEEXT\)$//;
+
+      # Canonicalize names and check for misspellings.
+      my $xname = &check_canonical_spelling ($one_file, 
+                                             '_SOURCES', '_TASKS',
+                                             '_LDADD', '_LDFLAGS',
+                                             '_LIBADD',
+                                             '_OBJECTS', '_DEPENDENCIES');
+
+      $where->push_context ("while processing program `$one_file'");
+      $where->set (INTERNAL->get);
+
+      my $linker = &handle_source_transform ($xname, $one_file, $obj, $where);
+
+      # Ought we to support _LDADD for monoliths?  Might as well, I suppose.
+      if (var ($xname . "_LDADD"))
+        {
+          $seen_libobjs = &handle_lib_objects ($xname, $xname . '_LDADD');
+        }
+      else
+        {
+          # User didn't define prog_LDADD override.  So do it.
+          &define_variable ($xname . '_LDADD', '$(LDADD)', $where);
+      
+          # This does a bit too much work.  But we need it to
+          # generate _DEPENDENCIES when appropriate.
+          if (var ('LDADD'))
+            {
+              $seen_libobjs = &handle_lib_objects ($xname, 'LDADD');
+            }
+        }
+
+      reject_var ($xname . '_LIBADD',
+                  "use `${xname}_LDADD', not `${xname}_LIBADD'");
+
+      set_seen ($xname . '_DEPENDENCIES');
+
+      # If this monolith's LDFLAGS variable is _not_ defined, then define
+      # to be the default @LDFLAGS@ (is this the correct thing to do?
+      # What is it that I've done that means this doesn't happen by default?)
+      my $ldflagsvar = var ($xname . '_LDFLAGS');
+      if (!$ldflagsvar)
+        {
+          Automake::Variable::define ($xname . '_LDFLAGS',
+                                      VAR_CONFIGURE, '', TRUE,
+                                      subst ('LDFLAGS'),
+                                      '', INTERNAL, VAR_ASIS);
+        }
+      set_seen ($xname . '_LDFLAGS');
+
+      # Determine program to use for link -- we just force this
+      # to be `alink', which is the correct value.
+      my $xlink = 'ALINK';
+      # Define ALINK as a configure variable
+      # (define_configure_variable seems not to work)
+      Automake::Variable::define ('ALINK', VAR_CONFIGURE, '', TRUE,
+                                  subst ('ALINK'),
+                                  '', INTERNAL, VAR_ASIS);
+      require_variables ($where,
+                         "Monolith $xname seen -- did you call STAR_MONOLITHS",
+                         TRUE,
+                         'ALINK');
+
+      my $linkmagic = derive_linkmagic ($xlink);
+
+      # If the resulting program lies into a subdirectory,
+      # make sure this directory will exist.
+      my $dirstamp = require_build_directory_maybe ($one_file);
+    
+      $output_rules .= &file_contents ('program',
+                                       $where,
+                                       PROGRAM => $one_file,
+                                       XPROGRAM => $xname,
+                                       XLINK => $xlink,
+                                       DIRSTAMP => $dirstamp,
+                                       EXEEXT => '$(EXEEXT)',
+                                       LINKMAGIC => $linkmagic);
+
+      if ($seen_libobjs || $seen_global_libobjs)
+        {
+          if (var ($xname . '_LDADD'))
+            {
+              &check_libobjs_sources ($xname, $xname . '_LDADD');
+            }
+          elsif (var ('LDADD'))
+            {
+              &check_libobjs_sources ($xname, 'LDADD');
+            }
+        }
+
+      # Set the {compifl} key in %starlink_seen_features, so that
+      # handle_starlink adds the right rules.
+      $starlink_seen_features{compifl} = 1;
+
+      # Now handle the list of tasks associated with this monolith.
+      # We want to express that: (1) there is a .ifl file for each of
+      # the tasks; (2) there is a rule for compiling .ifl to .ifc; (3)
+      # installing the monolith requires these .ifc files, too; and (4) the
+      # .ifl files should be in the distribution.  Some of this is handled
+      # in template monoliths.am rather than here.
+      my $tasklist = var ($xname . '_TASKS');
+      if ($tasklist)
+        {
+          # Define a variable $xname_IFC which contains the names of
+          # each of the .ifc files.  As a side-effect, add each of the
+          # .ifl files to the dist_common list.  $resvar is returned
+          # as the $xname_IFC variable.
+          my $ntasks = 0;
+          my @ifls;
+          my $resvar =
+            transform_variable_recursively
+               ($xname . '_TASKS', $xname . '_IFC', 'star__ifc', 0, $where,
+               # The transform code to run on each filename.
+               sub {
+                 my ($subvar, $task, $cond, $full_cond) = @_;
+                 ($task ne $xname) || do {
+                   # bad -- there should be no mention of a monolith.ifl file
+                   # Perhaps the user wants to make an ATASK and hasn't
+                   # read the documentation.  Also, we mustn't have
+                   # monolith:monolith in task_monolith_pairs, as that would
+                   # cause the monolith to be linked to itself (bad!).
+                   err_am ("${xname}_TASKS includes monolith name (if you are making an ATASK, simply omit this variable)");
+                 };
+                 my @r;
+                 push (@r, $task . '.ifc');
+                 push (@ifls, $task . '.ifl');
+                 push (@task_monolith_pairs, "$task:$xname");
+                 $ntasks++;
+                 return @r;
+               });
+          ($ntasks > 0) || do {
+            err_am ("${xname}_TASKS empty (if you are making an ATASK, simply omit this variable");
+          };
+
+          push (@all_ifcs, $resvar);
+
+          &pretty_print_rule ($xname . '.ifl:', "\t\t", @ifls);
+          $output_rules .= "\trm -f \$\@\n";
+          $output_rules .= "\techo 'monolith $xname' >\$\@\n";
+          $output_rules .= makefile_wrap ("\t", "\t\t",
+                                          ('cat', @ifls, '>>$@'));
+          $output_rules .= "\techo 'endmonolith' >>\$\@\n";
+          $output_rules .= "\n";
+
+          # distribute all task ifls, but not the monolith ifl,
+          # which is generated (using the rule above) at build time
+          push_dist_common (@ifls);
+        }
+      else 
+        {
+          # That's OK -- we're building an ATASK.
+          # Distribute the monolith .ifl
+          push_dist_common ($xname . '.ifl');
+        }
+
+      # Declare that the monolith .ifc file is a dependency of the
+      # monolith.  This may be generated or (more commonly if this is an
+      # ATASK) it will exist already.  Add this to the monolith
+      # dependencies variable (am I misusing this variable?)
+      my $monoifc = $xname . '.ifc';
+      push (@all_ifcs, $monoifc); # include this in the full list of ifc files
+
+      my $gotdeps = var ($xname . '_DEPENDENCIES');
+      Automake::Variable::define ($xname . '_DEPENDENCIES', VAR_MAKEFILE,
+                                  ($gotdeps ? '+' : ''), TRUE,
+                                  $monoifc,
+                                  '', INTERNAL, VAR_ASIS);
+      set_seen ($xname . '_DEPENDENCIES');
+    }
+
+  Automake::Variable::define ('bin_MONOLITH_IFCS', VAR_AUTOMAKE, '', TRUE,
+                              "@all_ifcs",
+                              '', INTERNAL, VAR_PRETTY);
+  # These .ifc files should be built at 'make all' time
+  push (@all, '$(bin_MONOLITH_IFCS)');
+  # The collection of task-monolith pairs is used when installing/linking
+  # .ifc files
+  Automake::Variable::define ('TASK_MONOLITH_PAIRS', VAR_AUTOMAKE, '', TRUE,
+                              "@task_monolith_pairs",
+                              '', INTERNAL, VAR_PRETTY);
+  # Template monoliths.am refers to variables INSTALL_MONOLITH{,_ENV},
+  # so define these to be the same as the corresponding PROGRAM ones.
+  Automake::Variable::define ('INSTALL_MONOLITH', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_PROGRAM)',
+                              '', INTERNAL, VAR_PRETTY);
+  Automake::Variable::define ('INSTALL_MONOLITH_ENV', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_PROGRAM_ENV)',
+                              '', INTERNAL, VAR_PRETTY);
+  
+}
+
 
 
 # handle_libraries ()
@@ -2599,6 +2918,8 @@ sub handle_ltlibraries
 	  $xlink = $linker ? $linker : 'LINK';
 	}
 
+      my $linkmagic = derive_linkmagic ($xlink);
+
       my $rpathvar = "am_${xlib}_rpath";
       my $rpath = "\$($rpathvar)";
       foreach my $rcond ($instconds{$onelib}->conds)
@@ -2645,7 +2966,8 @@ sub handle_ltlibraries
 				       XLTLIBRARY => $xlib,
 				       RPATH      => $rpath,
 				       XLINK      => $xlink,
-				       DIRSTAMP   => $dirstamp);
+				       DIRSTAMP   => $dirstamp,
+                                       LINKMAGIC  => $linkmagic);
       if ($seen_libobjs)
 	{
 	  if (var ($xlib . '_LIBADD'))
@@ -2654,6 +2976,44 @@ sub handle_ltlibraries
 	    }
 	}
     }
+}
+
+
+sub derive_linkmagic ($)
+{
+  # Determine any link magic required.  Return a $(lang_lang_linker_MAGIC)
+  # variable or blank.
+  my ($xlink) = @_;
+  my $linkmagic = '';
+
+  if ($xlink ne 'LINK' && $xlink ne 'ALINK')
+    {
+      # We're about to use a non-C linker.  Do we need any other
+      # linking magic?  In the case of C and Fortran on the Mac,
+      # yes we do.  The following outputs the hooks which allow us to
+      # handle this case, but is quite general in fact.
+      # Make a sorted list of all the
+      # languages uses, and IF there's more than one, make a
+      # variable lang_lang_..._$link_MAGIC (eg C_FC_FCLINK_MAGIC)
+      # and include this in the generated link line.  Only
+      # include those languages which have a linker, thus
+      # excluding languages like `header' which present no link
+      # problems at all.  After this, it is up to the configure.ac
+      # to sort out which, if any, of the ..._MAGIC variables it
+      # needs to define.
+      my @langlist = sort map { my $l = $languages{$extension_map{$_}};
+                                $l->linker ? $l->name : () }
+                                keys %extension_seen;
+
+      if ($#langlist > 0)
+        {
+          $linkmagic = '$('
+            . uc(join('_', @langlist) . '_' . $xlink . '_magic')
+            . ')';
+        }
+    }
+
+  return $linkmagic;
 }
 
 # See if any _SOURCES variable were misspelled.
@@ -3268,11 +3628,58 @@ sub handle_man_pages
 }
 
 # Handle DATA variables.
+# Starlink: the prefixes star{docs,etc,help,examples} are additions here,
+# and must match the similar directories defined in
+# buildsupport/starconf/starconf.m4.in 
 sub handle_data
 {
+    # Starlink extension:
+    my @stardirs = qw( stardocs staretc starexamples starhelp starnews );
+    $special_rules_file{stardocs_DATA} = 'starlink_stardocs';
+    if (defined $starlink_seen_features{'per-package-dirs'})
+      {
+        # Two magic things happen in this case.  Neither of these is a
+        # Good Thing (in Norman's humble opinion), but they're
+        # traditional behaviour in Starlink applications, and
+        # therefore must be preserved.  Reactionary!  Infamy!  All
+        # intellectuals to the fields!  Except for me, obviously, and
+        # people I like, and people with other virtues, and I don't
+        # think I really have the temperament to be a revolutionary.
+        # But aaaaanyway: installing data into .../bin is supported
+        # (because if I don't, the users will do it anyway, and probably
+        # botch it), and version.dat is back.
+
+        # Allow data installs into the bin directory.  bin_DATA is a
+        # user variable, am__bin_DATA is ours (is this the right way
+        # to do this? --  I rather suspect it isn't, but can't work
+        # out what would be preferred)
+        push (@stardirs, 'bin');
+
+        if (var('bin_SCRIPTS') || var('bin_PRORGRAMS') || var('bin_MONOLITHS'))
+          {
+            # Additionally, in this case, cause the magic extra file
+            # version.dat to be (created and) installed in the
+            # binaries directory.  Do this only if the user is already
+            # planning to install programs in this directory.
+            # This will cause version.dat to be installed more than
+            # once, if there happens to be installed binaries in more
+            # than one (sub)directory, but that's harmless.
+            push (@stardirs, 'am__bin');
+            Automake::Variable::define('am__bindir', VAR_MAKEFILE,
+                                       '', TRUE,
+                                       '$(bindir)',
+                                       '', INTERNAL, VAR_ASIS);
+            Automake::Variable::define('am__bin_DATA', VAR_MAKEFILE,
+                                       '', TRUE, # set in all conditions
+                                       'version.dat',
+                                       '', INTERNAL, VAR_ASIS);
+          }
+      }
+
     &am_install_var ('-noextra', '-candist', 'data', 'DATA',
-		     'data', 'sysconf', 'sharedstate', 'localstate',
-		     'pkgdata', 'lisp', 'noinst', 'check');
+                     'data', 'sysconf', 'sharedstate', 'localstate',
+                     'pkgdata', 'lisp', 'noinst', 'check',
+                     @stardirs);
 }
 
 # Handle TAGS.
@@ -3562,12 +3969,43 @@ sub handle_dist ()
   my $flm = option ('filename-length-max');
   my $filename_filter = $flm ? '.' x $flm->[1] : '';
 
+  my $starlink_rules = defined $starlink_seen_features{star_defaults};
+
   $output_rules .= &file_contents ('distdir',
 				   new Automake::Location,
 				   %transform,
 				   FILENAME_FILTER => $filename_filter);
+
+  # Handle extra distribution features required for Starlink code,
+  # but not if the macro STAR_DEFAULTS wasn't seen.  This will be the case
+  # if we're configuring thirdparty code, which we typically do not intend
+  # to distribute.  This might need to become finer-grained.
+  &handle_starlink_dist
+    if $starlink_rules;
 }
 
+
+# handle_starlink_dist
+# --------------------
+# Extra distribution work for Starlink.
+sub handle_starlink_dist ()
+{
+  # Make sure that the DISTFILES files do not include any of the files
+  # mentioned in STAR_PREDIST_SOURCES.
+  my $distfiles = var ('DISTFILES');
+  if ($distfiles)
+    {
+      foreach my $distsrc ($distfiles->value_as_list_recursive())
+        {
+          if (defined($starlink_predist_sources{$distsrc}))
+            {
+              my $where = new Automake::Location;
+              msg ('syntax', $where,
+                   "distributed file $distsrc listed in STAR_PREDIST_SOURCES");
+            }
+        }
+    }
+}
 
 # check_directory ($NAME, $WHERE)
 # -------------------------------
@@ -4069,6 +4507,151 @@ sub handle_headers
     }
 }
 
+# Starlink: handle messgen declarations
+#
+# Declarations in Makefile.am look like:
+#   include_MESSAGES = x_err.h X_ERR
+#   x_err_h_SOURCES = x_err.msg
+# with the sources declaration defaulting obviously.  Since this subroutine 
+# defines starhelp_DATA (or appends to it if it is already defined), it must be
+# called before handle_data.
+sub handle_messgen
+{
+  my @r = &am_install_var ('-defaultdist',
+                           'header', 'MESSAGES',
+                           'include',
+                           'noinst');
+
+  return if ! @r;
+
+  $starlink_seen_features{messgen} || do {
+    err_am("have _MESSAGES primary, but no STAR_MESSGEN in configure.ac");
+  };
+
+  my %messgen_sourcefiles;
+  foreach (@r)
+    {
+      my $loc = $_->[0]->get;
+      my $msgfile = $_->[1];
+      my $normalmsg;
+      ($normalmsg = $msgfile) =~ s/[^a-zA-Z0-9@]/_/;
+      my $sourcesvar = var($normalmsg . '_SOURCES');
+      if ($sourcesvar)
+        {
+          my $srcfile = $sourcesvar ->rdef(TRUE)->value;
+          if (! -f $srcfile)
+            {
+              err_am ($loc . ": file $srcfile does not exist");
+              next;
+            }
+          if (defined $messgen_sourcefiles{$srcfile})
+            {
+              $messgen_sourcefiles{$srcfile} .= " $msgfile ";
+            }
+          else
+            {
+              $messgen_sourcefiles{$srcfile} = " $msgfile ";
+            }
+          set_seen ($sourcesvar->name);
+        }
+      else
+        {
+          # No sources variable -- default it
+          if ($msgfile =~ /^([A-Za-z_]*)(\.h)?$/)
+            {
+              my $srcfile = $1 . '.msg';
+              $srcfile =~ tr{[A-Z]}{[a-z]};
+              if (! -f $relative_dir . '/' . $srcfile)
+                {
+                  err_am($loc . ": no ${normalmsg}_SOURCES variable, and defaulted $relative_dir/$srcfile does not exist");
+                  next;
+                }
+              if (defined $messgen_sourcefiles{$srcfile})
+                {
+                  $messgen_sourcefiles{$srcfile} .= " $msgfile ";
+                }
+              else
+                {
+                  $messgen_sourcefiles{$srcfile} = " $msgfile ";
+                }
+            }
+          else
+            {
+              err_am($loc . ": unrecognised form of msg file $msgfile");
+              next;
+            }
+        }
+    }
+
+  foreach my $msg (keys %messgen_sourcefiles)
+    {
+      my $fac = '';
+      my $code = '';
+      open (MSG, "<$relative_dir/$msg") ||
+        do {
+          print "Eeek! .msg source $msg doesn't exist -- ignored\n";
+          next;
+        };
+      while (<MSG>) 
+        {
+          # The messgen facility requires this line to match
+          # ([A-Z]*),(\d*).  Be (much) more liberal here, so that
+          # it's the messgen facility which objects to bad
+          # formatting, and not us.
+          if (/\.FACILITY\s*(\w*)\D*(\d*)/)
+            {
+              $fac = $1;
+              $code = $2;
+              last;
+            }
+        }
+      close(MSG);
+      my $ERRfile = $fac . '_ERR';
+      my $errfile = $fac . '_err';
+      my $errhfile = $fac . '_err.h';
+      my $facfile = 'fac_' . $code . '_err';
+      $errfile =~ tr[A-Z][a-z]; # force lowercase
+      $ERRfile =~ tr[a-z][A-Z]; # uppercase
+      $errhfile=~ tr[A-Z][a-z]; # force lowercase
+
+      my $reqfiles = $messgen_sourcefiles{$msg};
+      $reqfiles =~ / $ERRfile / || do { $ERRfile = 0; };
+      $reqfiles =~ / $errfile / || do { $errfile = 0; };
+      $reqfiles =~ / $errhfile / || do { $errhfile = 0; };
+
+      $output_rules .= &file_contents ('starlink_messgen',
+                                       new Automake::Location,
+                                       UERRFILE => $ERRfile,
+                                       LERRFILE => $errfile,
+                                       ERRHFILE => $errhfile,
+                                       FACERRFILE => $facfile,
+                                       MSG => $msg,
+                                       );
+
+      my $starfacsdata = var ('starfacs_DATA');
+      # Append the fac_ file to starfacs_DATA if this is defined,
+      # or define if not.
+      Automake::Variable::define ('starfacs_DATA', VAR_MAKEFILE,
+                                  ($starfacsdata ? '+' : ''), TRUE,
+                                  $facfile,
+                                  '', INTERNAL, VAR_ASIS);
+      # ...and distribute it.
+      push_dist_common ('$(srcdir)/' . $facfile);
+
+      $clean_files{$ERRfile}  = MAINTAINER_CLEAN if $ERRfile;
+      $clean_files{$errfile}  = MAINTAINER_CLEAN if $errfile;
+      $clean_files{$errhfile} = MAINTAINER_CLEAN if $errhfile;
+      $clean_files{$facfile}  = MAINTAINER_CLEAN;
+    }
+
+  # The analogous INSTALL_HEADER is defined in lib/header-vars.am,
+  # but it seems neater to define this here.
+  Automake::Variable::define ('INSTALL_MESSAGE', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_DATA)',
+                              '', INTERNAL, VAR_PRETTY);
+}
+  
+
 sub handle_gettext
 {
   return if ! $seen_gettext || $relative_dir ne '.';
@@ -4162,6 +4745,79 @@ sub handle_footer
 # Generate `make install' rules.
 sub handle_install ()
 {
+  # Starlink material -- handle manifests
+  # Get definition of STAR_MANIFEST_DIR.  If this is non-zero, then
+  # this variable was defined, and we do want to include the manifest
+  # support in the generated Makefile.in.
+  my $manifestdir = var ('STAR_MANIFEST_DIR');
+
+  # If macro STAR_SPECIAL_INSTALL_COMMAND was seen, its argument is a command
+  # to use to install the component in a staging directory.
+  my $make_cmd = $starlink_seen_features{'special-install'};
+
+  # If $special_manifest is false, use the standard way of creating and
+  # installing a manifest; if true, use the command in
+  # STAR_SPECIAL_INSTALL_COMMAND.
+  my $special_manifest = 0;
+  if ($make_cmd)
+    {
+      # Substitute prefix _and_ exec_prefix: some older Makefile.in files
+      # don't define the latter using the former.
+      if ($make_cmd =~ s{\$\(MAKE\)}{\$(MAKE) prefix=\$\$prefix exec_prefix=\$\$prefix})
+        {
+          # The macro argument is collapsed onto a single line by the
+          # "autoconf --trace" command within &scan_autoconf_traces.
+          $special_manifest = 1;
+        }
+      else
+        {
+          err_am ("STAR_SPECIAL_INSTALL_COMMAND doesn't include \$(MAKE)");
+          $make_cmd = '';
+        }
+    }
+  else
+    {
+      $make_cmd = '';
+    }
+
+  if ($manifestdir && ! -f 'component.xml.in')
+    {
+      # This is apparently not a component directory (that is, it is
+      # either the child of such a directory or, less likely, the parent of
+      # such a directory and things have got very confused), but
+      # STAR_MANIFEST_DIR is defined, either explicitly, or more likely
+      # implicitly through STAR_DEFAULTS.  We do _not_ wish to make an
+      # install target which installs a manifest, here, since the manifest
+      # will be constructed by the appropriate target in our parent.  The
+      # install-manifest target in lib/am/install.am should guard against
+      # that situation, but it seems safest to avoid having the manifest
+      # code there at all.
+      #
+      # Should we warn about this, however, just in case the user has
+      # forgotten to reread the documentation recently?  No -- that would
+      # be irritating, eventually.
+      $manifestdir = 0;
+    }
+
+  if ($special_manifest && !$manifestdir)
+    {
+      # Ooops.  We're not making a manifest (possibly becaue we've just
+      # turned that off), but the user has asked for a non-standard install,
+      # presumably deliberately.  That's wrong, and we should warn
+      # about this.
+      print STDERR "We are not making a manifest in directory " . cwd() . "\n"
+        . "(probably because there is no component.xml.in file present),\n"
+        . "but macro STAR_SPECIAL_INSTALL_COMMAND was present in configure.ac.\n"
+        . "That's wrong, and the macro has been IGNORED.\n";
+      $special_manifest = 0;
+      $make_cmd = '';
+    }
+
+  my $possibly_suppressed_install
+    = ($starlink_seen_features{suppress_build} || 0);
+
+    
+
   $output_rules .= &file_contents
     ('install',
      new Automake::Location,
@@ -4171,7 +4827,12 @@ sub handle_install ()
 			     : ''),
      'installdirs-local' => (user_phony_rule 'installdirs-local'
 			     ? ' installdirs-local' : ''),
-     am__installdirs => variable_value ('am__installdirs') || '');
+     am__installdirs => variable_value ('am__installdirs') || '',
+     INSTALLMANIFEST => $manifestdir,
+     STANDARDMANIFEST => !$special_manifest,
+     MANIFESTMAKEINSTALL => $make_cmd,
+     POSS_SUPPRESS_INSTALL => $possibly_suppressed_install
+    );
 }
 
 
@@ -4198,7 +4859,23 @@ sub handle_all ($)
     push (@all, "all-local")
       if user_phony_rule "all-local";
 
-    &pretty_print_rule ("all-am:", "\t\t", @all);
+    # If the STAR_SUPPRESS_BUILD_IF macro was present in configure.ac,
+    # then add another step of indirection to the all-am target.
+    # That macro will substitute ALL_TARGET to be one of
+    # all-am-normal, which is the usual all-am target, or
+    # all-am-suppress, which does nothing except write a useful (we
+    # hope) message.
+    if ($starlink_seen_features{suppress_build})
+      {
+        &pretty_print_rule ('all-am:', "\t", '$(ALL_TARGET)');
+        &pretty_print_rule ('all-am-normal:', "\t\t", @all);
+        &depend ('.PHONY', 'all-am-normal', 'all-am-suppress');
+      }
+    else
+      {
+        # the normal case
+        &pretty_print_rule ("all-am:", "\t\t", @all);
+      }
     &depend ('.PHONY', 'all-am', 'all');
 
 
@@ -4542,6 +5219,77 @@ sub handle_minor_options
     }
 }
 
+sub handle_starlink
+{
+    my $havelatex = ($starlink_seen_features{latexdocs} || 0);
+    my $havexml =   ($starlink_seen_features{xmldocs}   || 0);
+    my $suppress_build =   ($starlink_seen_features{suppress_build}   || 0);
+
+    # messgen handled in handle_messgen
+
+    # Enhance the list of maintainer-clean files to include the following,
+    # either installed by starconf or by the 'make world' process.
+    foreach my $fn ( qw( starconf.status make.log configure.log ))
+      {
+        $clean_files{$fn} = MAINTAINER_CLEAN;
+      }
+
+    # Do we need to compile .ifl files?
+    # $starlink_seen_features{compifl} was possibly set in
+    # handle_monoliths.
+    my $want_compifl = 0;
+    if (defined($starlink_seen_features{compifl})
+        && $starlink_seen_features{compifl})
+      {
+        $want_compifl = 1;
+        register_suffix_rule (INTERNAL, '.ifl', '.ifc');
+      }
+
+    my $havesomedocs = 0;
+    if ($havelatex || $havexml)
+      {
+        register_suffix_rule (INTERNAL, '.tex', '.dvi');
+        register_suffix_rule (INTERNAL, '.dvi', '.ps');
+        register_suffix_rule (INTERNAL, '.tex', '.pdf');
+        $havesomedocs = 1;
+      }
+    if ($havelatex) 
+      {
+        # the starlink.am file defines template rules to generate
+        # documentation.  These include a .tex.htx_tar rule, which
+        # isn't picked up as a new suffix unless we declare the suffix
+        # rule here.  Simply adding to the SUFFIXES variable doesn't
+        # work, since that variable is special.  The other two rules
+        # aren't really necessary, but do no harm.
+        register_suffix_rule (INTERNAL, '.tex', '.htx_tar');
+      }
+    if ($havexml)
+      {
+        # ditto, but for the XML rules
+        register_suffix_rule (INTERNAL, '.xml', '.tex');
+        register_suffix_rule (INTERNAL, '.xml', '.htx_tar');
+        register_suffix_rule (INTERNAL, '.xml', '.texml_tar');
+      }
+
+    push_dist_common ('$(stardocs_DATA)')
+      if (var 'stardocs_DATA');
+
+    # Include the rule for version.dat if the per-package-dirs option was seen
+    # (note that the resulting rule is redundant unless version.dat
+    # was added to am__bin_DATA in handle_data above).
+    my $want_version_dat = defined $starlink_seen_features{'per-package-dirs'};
+
+    $output_rules .= &file_contents ('starlink',
+                                     new Automake::Location,
+                                     HAVEDOCS => $havesomedocs,
+                                     LATEXDOCS => $havelatex,
+                                     XMLDOCS => $havexml,
+                                     COMPIFL => $want_compifl,
+                                     VERSIONDAT => $want_version_dat,
+                                     ALL_AM_SUPPRESS => $suppress_build,
+                                    );
+}
+
 ################################################################
 
 # ($OUTPUT, @INPUTS)
@@ -4619,6 +5367,7 @@ sub scan_autoconf_config_files ($$)
 
 # &scan_autoconf_traces ($FILENAME)
 # ---------------------------------
+# Add some of the Starlink macros here
 sub scan_autoconf_traces ($)
 {
   my ($filename) = @_;
@@ -4650,6 +5399,14 @@ sub scan_autoconf_traces ($)
 		m4_include => 1,
 		m4_sinclude => 1,
 		sinclude => 1,
+                STAR_SUPPRESS_BUILD_IF => 2,
+                STAR_DEFAULTS => 0,
+                STAR_LATEX_DOCUMENTATION => 1,
+                STAR_XML_DOCUMENTATION => 1,
+                STAR_MESSGEN => 0,
+                STAR_MONOLITHS => 0,
+                STAR_PREDIST_SOURCES => 1,
+                STAR_SPECIAL_INSTALL_COMMAND => 1,
 	      );
 
   my $traces = ($ENV{AUTOCONF} || 'autoconf') . " ";
@@ -4845,6 +5602,68 @@ sub scan_autoconf_traces ($)
 	      %libtool_tags = (CC => 1, CXX => 1, GCJ => 1, F77 => 1);
 	    }
 	}
+      # Starlink ones here....
+      elsif ($macro eq 'STAR_SUPPRESS_BUILD_IF')
+        {
+          $starlink_seen_features{suppress_build} = 1;
+        }
+      elsif ($macro eq 'STAR_DEFAULTS')
+        {
+            $starlink_seen_features{star_defaults} = 1;
+            if (defined $args[1])
+              {
+                $starlink_seen_features{'per-package-dirs'} = 1
+                  if ($args[1] =~ 'per-package-dirs');
+              }
+        }
+      elsif ($macro eq 'STAR_LATEX_DOCUMENTATION')
+        {
+          if (defined $starlink_seen_features{latexdocs})
+            {
+              $starlink_seen_features{latexdocs} .= ' '.$args[1];
+            }
+          else
+            {
+              $starlink_seen_features{latexdocs} = $args[1];
+            }
+        }
+      elsif ($macro eq 'STAR_MESSGEN')
+        {
+          $starlink_seen_features{messgen} = 1;
+        }
+      elsif ($macro eq 'STAR_MONOLITHS')
+        {
+          $starlink_seen_features{monoliths} = 1;
+        }
+      elsif ($macro eq 'STAR_PREDIST_SOURCES')
+        {
+          foreach my $src (split(' ', $args[1]))
+            {
+              if (defined($starlink_predist_sources{$src}))
+                {
+                  print STDERR "Predist source $src seen twice\n";
+                }
+              else
+                {
+                  $starlink_predist_sources{$src} = 1;
+                }
+            }
+        }
+      elsif ($macro eq 'STAR_SPECIAL_INSTALL_COMMAND')
+        {
+          $starlink_seen_features{'special-install'} = $args[1];
+        }
+      elsif ($macro eq 'STAR_XML_DOCUMENTATION')
+        {
+          if (defined $starlink_seen_features{xmldocs})
+            {
+              $starlink_seen_features{xmldocs} += ' '.$args[1];
+            }
+          else
+            {
+              $starlink_seen_features{xmldocs} = $args[1];
+            }
+        }
     }
 
   $tracefh->close;
@@ -4977,6 +5796,15 @@ sub check_cygnus
 
   err_ac "`AM_MAINTAINER_MODE' required when --cygnus specified"
     if !$seen_maint_mode;
+}
+
+sub check_startree_standards
+{
+  if ($relative_dir eq '.')
+    {
+      # In top level (or only) directory
+      #print "Check startree standards\n";
+    }
 }
 
 # Do any extra checking for GNU standards.
@@ -5156,13 +5984,18 @@ sub lang_fc_rewrite
 # Rewrite a single preprocessed Fortran file.
 sub lang_ppfc_rewrite
 {
-    return LANG_PROCESS;
-}
-
-# Rewrite a single preprocessed Fortran 77 file.
-sub lang_ppf77_rewrite
-{
-    return LANG_PROCESS;
+    my ($directory, $base, $ext) = @_;
+    my $r = &lang_fc_rewrite($directory, $base, $ext);
+    my $pfx = '';
+    if ($r == LANG_SUBDIR)
+      {
+          $pfx = $directory . '/';
+      }
+    # See note at top about this hash
+    $ppfc_sources{$pfx . $base . $ext} = 1;
+    # Cause the Fortran support to be pulled in
+    &saw_extension('.f');
+    return $r;
 }
 
 # Rewrite a single ratfor file.
@@ -5336,6 +6169,22 @@ sub lang_lex_finish
 
   &yacc_lex_finish_helper
     if count_files_for_language ('lex') > 1;
+}
+
+
+# Preprocessed Fortran
+#
+# FIXME: The original version of the routine claimed that to do the
+# overriding in a portable manner, we must write an explicit rule for
+# each .fpp file.  I don't believe this is true with the current
+# version of the generated rules, but if it is, then the ppfc_sources
+# hash contains the list of such source files.  If this is indeed
+# unnecessary, then the ppfc_sources hash is redundant, and should be
+# removed.  In this case, this subroutine is redundant also, and
+# should be removed.
+sub lang_ppfc_finish
+{
+    #print "XXX lang_ppfc_finish\n";
 }
 
 
@@ -6434,7 +7283,7 @@ sub append_exeext ($)
   my ($macro) = @_;
 
   prog_error "append_exeext ($macro)"
-    unless $macro =~ /_PROGRAMS$/;
+    unless $macro =~ /_(PROGRAMS|MONOLITHS)$/;
 
   transform_variable_recursively
     ($macro, $macro, 'am__EXEEXT', 0, INTERNAL,
@@ -6488,6 +7337,7 @@ sub am_primary_prefixes ($$@)
       if ($varname =~ /^(nobase_)?(dist_|nodist_)?(.*)_$primary$/)
 	{
 	  my ($base, $dist, $X) = ($1 || '', $2 || '', $3 || '');
+          
 	  if ($dist ne '' && ! $can_dist)
             {
 	      err_var ($var,
@@ -6644,8 +7494,9 @@ sub am_install_var
 	}
       # A blatant hack: we rewrite each _PROGRAMS primary to include
       # EXEEXT.
+      # Starlink: ...or MONOLITHS
       append_exeext ($one_name)
-	if $primary eq 'PROGRAMS';
+        if $primary eq 'PROGRAMS' or $primary eq 'MONOLITHS';
       # "EXTRA" shouldn't be used when generating clean targets,
       # all, or install targets.  We used to warn if EXTRA_FOO was
       # defined uselessly, but this was annoying.
@@ -6679,7 +7530,12 @@ sub am_install_var
 
       # Singular form of $PRIMARY.
       (my $one_primary = $primary) =~ s/S$//;
-      $output_rules .= &file_contents ($file, $where,
+      # substitute filel '$file', unless there's an overriding entry
+      # in %special_rules_file.
+      $output_rules .= &file_contents (($special_rules_file{$X.'_'.$primary}
+                                        || $file),
+                                       $where,
+
 				       PRIMARY     => $primary,
 				       ONE_PRIMARY => $one_primary,
 				       DIR         => $X,
@@ -6689,7 +7545,7 @@ sub am_install_var
 				       EXEC      => $exec_p,
 				       INSTALL   => $install_p,
 				       DIST      => $dist_p,
- 				       DISTVAR   => $distvar,
+				       DISTVAR   => $distvar,
 				       'CK-OPTS' => $check_options_p);
     }
 
@@ -7160,6 +8016,7 @@ sub generate_makefile ($$)
 
   # Check first, because we might modify some state.
   check_cygnus;
+  check_startree_standards;
   check_gnu_standards;
   check_gnits_standards;
 
@@ -7168,6 +8025,7 @@ sub generate_makefile ($$)
   handle_libraries;
   handle_ltlibraries;
   handle_programs;
+  handle_monoliths;             # Starlink monoliths
   handle_scripts;
 
   # These must be run after all the sources are scanned.  They
@@ -7190,12 +8048,16 @@ sub generate_makefile ($$)
   handle_python;
   handle_java;
   handle_man_pages;
+  handle_messgen;               # must be called before handle_data
   handle_data;
   handle_headers;
   handle_subdirs;
   handle_tags;
   handle_minor_options;
   handle_tests;
+
+  # Handle the Starlink-specific material here
+  handle_starlink;
 
   # This must come after most other rules.
   handle_dist;
@@ -7300,6 +8162,7 @@ Dependency tracking:
 Flavors:
       --cygnus           assume program is part of Cygnus-style tree
       --foreign          set strictness to foreign
+      --startree         set strictness to startree (much like foreign)
       --gnits            set strictness to gnits
       --gnu              set strictness to gnu
 
@@ -7388,7 +8251,7 @@ EOF
 sub parse_arguments ()
 {
   # Start off as gnu.
-  set_strictness ('gnu');
+  set_strictness ('startree'); # ...rather than 'gnu'
 
   my $cli_where = new Automake::Location;
   my %cli_options =
@@ -7398,6 +8261,7 @@ sub parse_arguments ()
      'gnits' 		=> sub { set_strictness ('gnits'); },
      'cygnus' 	        => sub { set_global_option ('cygnus', $cli_where); },
      'foreign'          => sub { set_strictness ('foreign'); },
+     'startree'         => sub { set_strictness ('startree'); },
      'include-deps' 	=> sub { unset_global_option ('no-dependencies'); },
      'i|ignore-deps' 	=> sub { set_global_option ('no-dependencies',
 						    $cli_where); },
@@ -7530,10 +8394,13 @@ exit $exit_code;
 ## perl-brace-imaginary-offset: 0
 ## perl-label-offset: -2
 ## cperl-indent-level: 2
-## cperl-brace-offset: 0
+## cperl-brace-offset: 2
+## xxxcperl-brace-offset: 0
 ## cperl-continued-brace-offset: 0
 ## cperl-label-offset: -2
 ## cperl-extra-newline-before-brace: t
 ## cperl-merge-trailing-else: nil
-## cperl-continued-statement-offset: 2
+## cperl-continued-statement-offset: 0
+## xxcperl-continued-statement-offset: 2
+## cperl-auto-newline: t
 ## End:

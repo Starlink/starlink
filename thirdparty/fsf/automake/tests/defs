@@ -264,7 +264,7 @@ echo "=== Running test $0"
 # Use `-I $srcdir/../m4' in addition to `--acdir=$srcdir/../m4', because the
 # other `-I' directories added for libtool and gettext might contain
 # files from an old version of Automake that we don't want to use.
-aclocaldir='/tmp/norman/merge/STAR/buildsupport/share/aclocal'
+aclocaldir='/tmp/norman/merge/STAR/buildsupport/bin/share/aclocal'
 extra_includes=""
 if [ -f $aclocaldir/dirlist ] ; then
    extra_includes=`(tmp_inc=""
