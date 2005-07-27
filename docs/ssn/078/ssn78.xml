@@ -54,7 +54,10 @@
 <px>First properly public release (revision 1.97)</px>
 </version>
 
-<distribution string="v1.snapshot" date="11-Apr-2005" author="nxg">
+<distribution
+  string="snapshot: $Revision$"
+  date="$Date$"
+  author="nxg">
 <px>This is a post-version-1 snapshot:
 $Revision$,
 $Date$</px>
@@ -75,6 +78,30 @@ Research Councils</p>
 document covers only the configuration and build aspects of
 the system, but it should expand to cover tagging, branching,
 and other source maintenance patterns as well.</px>
+
+<!-- XXX remove or comment this out when preparing a release version -->
+<px>This is an inter-release snapshot:
+<tabular>
+<tgroup cols="1">
+<tbody>
+<row>
+<entry>$Revision$</entry>
+</row>
+<row>
+<entry>$Date$</entry>
+</row>
+</tbody>
+</tgroup>
+</tabular>
+</px>
+
+<px>See
+<span media="print">
+<url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml</url></span>
+<span media='screen'>
+  <webref url="http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/ssn/078/ssn78.xml"
+    >the repository</webref></span>
+for changes and its current status.</px>
 
 </abstract>
 
@@ -1308,7 +1335,7 @@ single platform-independent interface.</p>
 <p>Unfortunately, libtool's library magic introduces a minor
 complication when you wish to run a program under a debugger<index
 >libtool!debugging executables</index><index seealso="libtool,
-debugging executables" >debugging with libtool</index>: plain <kbd>gdb
+debugging executables" >debugging</index>: plain <kbd>gdb
 myprog</kbd> won't work, and you must instead use <kbd>libtool
 --mode=execute gdb myprog</kbd>.  See section `<webref
 url="&libtoolman;#Debugging-executables"
@@ -1475,30 +1502,26 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             variable is indeed set as you wish, and rerun
             <code>./configure</code>.</p>
 
-          <p>You can pass options to the compiler using environment
-            variables, but you will <em>not</em> need to do this in
-            general, other than perhaps to set
-            <code>CFLAGS=-g</code><index>environment
-            variables!CFLAGS</index>
-            to turn on debugging in the code you are building.  The
-            variables <code>CFLAGS</code> and <code>LDFLAGS</code> are
-            variables you might potentially set and export in the
-            environment, for example to point <code>./configure</code>
-            to software installed in non-standard places (perhaps you
-            are on a Mac and have installed Fink in <code>/sw</code>
-            or OpenDarwin in <code>/opt/local</code>, or are on a Sun
-            and have extra software in <code>/opt</code>).  In this
-            case you might set
-            <code>CFLAGS=-I/opt/local/include</code> and
-            <code>LDFLAGS=-L/opt/local/lib</code> in the environment
-            to help configure and the compiler find libraries.  Note
-            that this is rather a blunt instrument, and because you
-            cannot really control where the respective flags appear in
-            generated compiler commands, you can end up picking up
-            inconsistent versions of software.  That is, this is a mechanism
-            for getting yourself out of a fix, not a recommended way
-            of building the software.<index>environment
-            variables!warnings</index></p>
+<p>You can pass options to the compiler using environment variables,
+but you will <em>not</em> need to do this in general, other than
+perhaps to set <code>CFLAGS=-g</code><index>environment
+variables!CFLAGS</index><index>debugging</index> to turn on debugging
+in the code you are building.  The variables <code>CFLAGS</code> and
+<code>LDFLAGS</code> are variables you might potentially set and
+export in the environment, for example to point
+<code>./configure</code> to software installed in non-standard places
+(perhaps you are on a Mac and have installed Fink in <code>/sw</code>
+or OpenDarwin in <code>/opt/local</code>, or are on a Sun and have
+extra software in <code>/opt</code>).  In this case you might set
+<code>CFLAGS=-I/opt/local/include</code> and
+<code>LDFLAGS=-L/opt/local/lib</code> in the environment to help
+configure and the compiler find libraries.  Note that this is rather a
+blunt instrument, and because you cannot really control where the
+respective flags appear in generated compiler commands, you can end up
+picking up inconsistent versions of software.  That is, this is a
+mechanism for getting yourself out of a fix, not a recommended way of
+building the software.<index>environment
+variables!warnings</index></p>
 
           <p>The important point of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
@@ -1510,7 +1533,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             and can be overriden at make time by giving arguments to
             make:
 <verbatim>
-% make CFLAGS=-I/somewhere/else
+% make 'CFLAGS=-g -I/somewhere/else'
 </verbatim></p>
 
         </subsubsect>
