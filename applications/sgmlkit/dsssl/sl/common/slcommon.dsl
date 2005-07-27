@@ -161,14 +161,6 @@ if <code>docnumber</code> isn't defined.
 			   ""))
 	"not released")))
 
-(define (x-getdocdate #!optional (nd (current-node)))
-   (let ((rel (document-release-info)))
-       (if (car rel)
-           (format-date (car rel))
-           "not released")))
-
-
-
 <routine>
 <routinename>getdocauthors
 <description>Return a list of the author names as a sosofo.
@@ -1126,18 +1118,17 @@ with a non-existent file.
 <description>
 <p>Returns a string with the formatted version of the date.  If the
 string is not in the correct format,  
-it returns the input string, and evaluates the <code>(error)</code>
-function.  I'd like to use (error) at the end, rather 
-than silently returning just d, but I cannot work out how to
-evaluate more than one expression one after another!
+it returns <code>#f</code>.
 <returnvalue type="string">Formatted into english</returnvalue>
 <argumentlist>
 <parameter>
   <name>d
   <type>string
   <description>
-  <p>The string should be in the form dd-MMM-yyyy (one- or two-digit day,
+  <p>The string should be either in the form dd-MMM-yyyy (one- or two-digit day,
   3-character month abbreviation, four-digit year), and may include whitespace.
+  Alternatively, it may be in the form of an RCS/CVS date:
+  <code>$Date$</code>
 <history>
 <change author="ng" date="19-MAR-1999">
 <p>Altered from original yyyymmdd format.
@@ -1145,6 +1136,31 @@ evaluate more than one expression one after another!
 </history>
 <codebody>
 (define (format-date d)
+  (or (format-date-ddmmmyyyy d)
+      (format-date-rcs d)))
+
+(define (format-date-rcs d)
+  (and (string=? (substring d 0 6) "$Date:")
+       (let ((date (cadr (tokenise-string d))))
+         (debug (string-append (substring date 8 10)
+                        " "
+                        (case (substring date 5 7)
+                          (("01") "January")
+                          (("02") "February")
+                          (("03") "March")
+                          (("04") "April")
+                          (("05") "May")
+                          (("06") "June")
+                          (("07") "July")
+                          (("08") "August")
+                          (("09") "September")
+                          (("10") "October")
+                          (("11") "November")
+                          (("12") "December"))
+                        " "
+                        (substring date 0 4))))))
+
+(define (format-date-ddmmmyyyy d)
   (let* ((parts (tokenise-string d boundary-char?: (lambda (c)
 						     (or (char=? c #\-)
 							 (char=? c #\space)))))
@@ -1174,10 +1190,12 @@ evaluate more than one expression one after another!
 	(string-append (number->string day) " "
 		       (car month) " "
 		       year)
-	(let ((nothing (error (if (string? d)
-				  (string-append "Malformed date: " d)
-				  "No string for format-date"))))
-	  d))))
+        #f
+;; 	(let ((nothing (error (if (string? d)
+;; 				  (string-append "Malformed date: " d)
+;; 				  "No string for format-date"))))
+;; 	  d)
+        )))
 
 
 <routine>
