@@ -491,13 +491,13 @@ s,@INSTALL_DATA@,${INSTALL} -m 644,;t t
 s,@CYGPATH_W@,echo,;t t
 s,@PACKAGE@,automake,;t t
 s,@VERSION@,1.9.6-starlink,;t t
-s,@ACLOCAL@,perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4,;t t
-s,@AUTOCONF@,${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf,;t t
-s,@AUTOMAKE@,perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib,;t t
-s,@AUTOHEADER@,${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader,;t t
-s,@MAKEINFO@,${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo,;t t
-s,@AMTAR@,${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar,;t t
-s,@install_sh@,/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh,;t t
+s,@ACLOCAL@,perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4,;t t
+s,@AUTOCONF@,${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf,;t t
+s,@AUTOMAKE@,perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib,;t t
+s,@AUTOHEADER@,${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader,;t t
+s,@MAKEINFO@,${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo,;t t
+s,@AMTAR@,${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar,;t t
+s,@install_sh@,/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh,;t t
 s,@STRIP@,,;t t
 s,@ac_ct_STRIP@,,;t t
 s,@INSTALL_STRIP_PROGRAM@,${SHELL} $(install_sh) -c -s,;t t

@@ -71,7 +71,7 @@ export SHELL
 test -z "$PERL" && PERL='/usr/local/bin/perl'
 test -z "$MAKE" && MAKE=make
 test -z "$AUTOCONF" && AUTOCONF="autoconf"
-test -z "$AUTOHEADER" && AUTOHEADER="${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader"
+test -z "$AUTOHEADER" && AUTOHEADER="${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader"
 test -z "$AUTOUPDATE" && AUTOUPDATE=autoupdate
 test -z "$MISSING" && MISSING=`pwd`/../lib/missing
 test -z "$ACLOCAL" && ACLOCAL="aclocal-1.9"

@@ -84,12 +84,12 @@ REAL_INSTALL = install-recursive
 # Set to : to emit manifest lines, too
 # (don't actually do this here -- it's done within install-manifest below).
 MANIFEST = false
-ACLOCAL = perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4
-AMTAR = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar
+ACLOCAL = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4
+AMTAR = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar
 APIVERSION = 1.9
-AUTOCONF = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader
-AUTOMAKE = perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib
+AUTOCONF = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf
+AUTOHEADER = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader
+AUTOMAKE = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib
 AWK = mawk
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"Starlink\ Automake\" -DPACKAGE_TARNAME=\"automake\" -DPACKAGE_VERSION=\"1.9.6-starlink\" -DPACKAGE_STRING=\"Starlink\ Automake\ 1.9.6-starlink\" -DPACKAGE_BUGREPORT=\"ussc@star.rl.ac.uk\" -DPACKAGE=\"automake\" -DVERSION=\"1.9.6-starlink\" 
@@ -106,7 +106,7 @@ LIBOBJS =
 LIBS = 
 LN = ln
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo
+MAKEINFO = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo
 MODIFICATION_DELAY = 2
 PACKAGE = automake
 PACKAGE_BUGREPORT = ussc@star.rl.ac.uk
@@ -136,7 +136,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh
+install_sh = /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -178,7 +178,10 @@ config.sub \
 symlink-tree \
 texinfo.tex
 
-all: all-recursive
+BUILT_SOURCES = checkout-fixup
+MAINTAINERCLEANFILES = checkout-fixup
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 am--refresh:
@@ -495,7 +498,8 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
-check: check-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
@@ -515,7 +519,8 @@ uninstall: uninstall-recursive
 # $(MANIFEST) variable, which will be ':' or 'false', and if it is
 # true, emit a line to stdout, consisting of the string 'MANIFEST:'
 # followed by the full path of the file being installed.
-install:  all-am
+install:  $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 	if test -n "$(STAR_MANIFEST_DIR)" -a $(MANIFEST) = false; then \
 	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
 	else \
@@ -566,9 +571,11 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	-rm -f make.log
 	-rm -f configure.log
 	-rm -f starconf.status
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
 clean-am: clean-generic mostlyclean-am
@@ -868,6 +875,20 @@ fetch:
 	test $$stat = 0 || \
 	  echo "See Fetchdir/update.patch for a log of the changes."; \
 	exit $$stat
+
+checkout-fixup:
+	echo "Fixing up post-checkout timestamps"
+	for f in \
+	  aclocal.m4 \
+	  configure \
+	  Makefile.in m4/Makefile.in doc/Makefile.in \
+	  lib/am/Makefile.in lib/Makefile.in lib/Automake/tests/Makefile.in \
+	  lib/Automake/Makefile.in tests/Makefile.in \
+	  doc/stamp-vti doc/version.texi doc/automake.info \
+	; do \
+	    touch $$f; \
+	  done
+	date >checkout-fixup
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

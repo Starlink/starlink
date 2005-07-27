@@ -57,12 +57,12 @@ REAL_INSTALL = install-am
 # Set to : to emit manifest lines, too
 # (don't actually do this here -- it's done within install-manifest below).
 MANIFEST = false
-ACLOCAL = perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4
-AMTAR = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar
+ACLOCAL = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4
+AMTAR = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar
 APIVERSION = 1.9
-AUTOCONF = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader
-AUTOMAKE = perllibdir=/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib
+AUTOCONF = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf
+AUTOHEADER = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader
+AUTOMAKE = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib
 AWK = mawk
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"Starlink\ Automake\" -DPACKAGE_TARNAME=\"automake\" -DPACKAGE_VERSION=\"1.9.6-starlink\" -DPACKAGE_STRING=\"Starlink\ Automake\ 1.9.6-starlink\" -DPACKAGE_BUGREPORT=\"ussc@star.rl.ac.uk\" -DPACKAGE=\"automake\" -DVERSION=\"1.9.6-starlink\" 
@@ -79,7 +79,7 @@ LIBOBJS =
 LIBS = 
 LN = ln
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo
+MAKEINFO = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo
 MODIFICATION_DELAY = 2
 PACKAGE = automake
 PACKAGE_BUGREPORT = ussc@star.rl.ac.uk
@@ -109,7 +109,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh
+install_sh = /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
