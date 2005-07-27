@@ -1,9 +1,9 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9.6, 9 July 2005), a
-program that creates GNU standards-compliant Makefiles from template
-files.
+   This manual is for GNU Automake (version 1.9.6-starlink, 26 July
+2005), a program that creates GNU standards-compliant Makefiles from
+template files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
 2004, 2005 Free Software Foundation, Inc.
@@ -29,6 +29,135 @@ INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4.
 END-INFO-DIR-ENTRY
+
+
+File: automake.info,  Node: Hard-Coded Install Paths,  Prev: Multiple Outputs,  Up: FAQ
+
+26.9 Installing to Hard-Coded Locations
+=======================================
+
+     My package needs to install some configuration file.  I tried to use
+     the following rule, but `make distcheck' fails.  Why?
+          # Do not do this.
+          install-data-local:
+                  $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+
+     My package needs to populate the installation directory of another
+     package at install-time.  I can easily compute that installation
+     directory in `configure', but if I install files therein,
+     `make distcheck' fails.  How else should I do?
+
+   These two setups share their symptoms: `make distcheck' fails
+because they are installing files to hard-coded paths.  In the later
+case the path is not really hard-coded in the package, but we can
+consider it to be hard-coded in the system (or in whichever tool that
+supplies the path).  As long as the path does not use any of the
+standard directory variables (`$(prefix)', `$(bindir)', `$(datadir)',
+etc.), the effect will be the same: user-installations are impossible.
+
+   When a (non-root) user wants to install a package, he usually has no
+right to install anything in `/usr' or `/usr/local'.  So he does
+something like `./configure --prefix ~/usr' to install package in his
+own `~/usr' tree.
+
+   If a package attempts to install something to some hard-coded path
+(e.g., `/etc/afile'), regardless of this `--prefix' setting, then the
+installation will fail.  `make distcheck' performs such a `--prefix'
+installation, hence it will fail too.
+
+   Now, there are some easy solutions.
+
+   The above `install-data-local' example for installing `/etc/afile'
+would be better replaced by
+
+     sysconf_DATA = afile
+
+by default `sysconfdir' will be `$(prefix)/etc', because this is what
+the GNU Standards require.  When such a package is installed on a FHS
+compliant system, the installer will have to set `--sysconfdir=/etc'.
+As the maintainer of the package you should not be concerned by such
+site policies: use the appropriate standard directory variable to
+install your files so that installer can easily redefine these
+variables to match their site conventions.
+
+   Installing files that should be used by another package, is slightly
+more involved.  Let's take an example and assume you want to install
+shared library that is a Python extension module.  If you ask Python
+where to install the library, it will answer something like this:
+
+     % python -c 'from distutils import sysconfig;
+                  print sysconfig.get_python_lib(1,0)'
+     /usr/lib/python2.3/site-packages
+
+   If you indeed use this absolute path to install your shared library,
+non-root users will not be able to install the package, hence distcheck
+fails.
+
+   Let's do better.  The `sysconfig.get_python_lib()' function actually
+accepts a third argument that will replace Python's installation prefix.
+
+     % python -c 'from distutils import sysconfig;
+                  print sysconfig.get_python_lib(1,0,"${exec_prefix}")'
+     ${exec_prefix}/lib/python2.3/site-packages
+
+   You can also use this new path.  If you do
+   * root users can install your package with the same `--prefix' as
+     Python (you get the behavior of the previous attempt)
+
+   * non-root users can install your package too, they will have the
+     extension module in a place that is not searched by Python but they
+     can work around this using environment variables (and if you
+     installed scripts that use this shared library, it's easy to tell
+     Python were to look in the beginning of your script, so the script
+     works in both cases).
+
+   The `AM_PATH_PYTHON' macro uses similar commands to define
+`$(pythondir)' and `$(pyexecdir)' (*note Python::).
+
+   Of course not all tools are as advanced as Python regarding that
+substitution of PREFIX.  So another strategy is to figure the part of
+the of the installation directory that must be preserved.  For
+instance, here is how `AM_PATH_LISPDIR' (*note Emacs Lisp::) computes
+`$(lispdir)':
+
+     $EMACS -batch -q -eval '(while load-path
+       (princ (concat (car load-path) "\n"))
+       (setq load-path (cdr load-path)))' >conftest.out
+     lispdir=`sed -n
+       -e 's,/$,,'
+       -e '/.*\/lib\/x*emacs\/site-lisp$/{
+             s,.*/lib/\(x*emacs/site-lisp\)$,${libdir}/\1,;p;q;
+           }'
+       -e '/.*\/share\/x*emacs\/site-lisp$/{
+             s,.*/share/\(x*emacs/site-lisp\),${datadir}/\1,;p;q;
+           }'
+       conftest.out`
+
+   I.e., it just picks the first directory that looks like
+`*/lib/*emacs/site-lisp' or `*/share/*emacs/site-lisp' in the search
+path of emacs, and then substitutes `${libdir}' or `${datadir}'
+appropriately.
+
+   The emacs case looks complicated because it processes a list and
+expect two possible layouts, otherwise it's easy, and the benefit for
+non-root users are really worth the extra `sed' invocation.
+
+
+File: automake.info,  Node: History,  Next: Copying This Manual,  Prev: FAQ,  Up: Top
+
+27 History of Automake
+**********************
+
+This chapter presents various aspects of the history of Automake.  The
+exhausted reader can safely skip it; this will be more of interest to
+nostalgic people, or to those curious to learn about the evolution of
+Automake.
+
+* Menu:
+
+* Timeline::                    The Automake story.
+* Dependency Tracking Evolution::  Evolution of Automatic Dependency Tracking
+* Releases::                    Statistics about Automake Releases
 
 
 File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up: History
@@ -1560,7 +1689,7 @@ B.1 Macro Index
 * AC_CONFIG_LINKS:                       Optional.            (line  16)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
 * AC_DEFUN:                              Extending aclocal.   (line  33)
-* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  80)
+* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  86)
 * AC_INIT:                               Public macros.       (line  32)
 * AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
 * AC_LIBOBJ <2>:                         LTLIBOBJS.           (line   6)
@@ -1573,27 +1702,27 @@ B.1 Macro Index
 * AC_PROG_CC_C_O:                        Public macros.       (line  87)
 * AC_PROG_CXX:                           Optional.            (line  71)
 * AC_PROG_F77:                           Optional.            (line  75)
-* AC_PROG_FC:                            Optional.            (line  86)
+* AC_PROG_FC:                            Optional.            (line  80)
 * AC_PROG_LEX <1>:                       Public macros.       (line  92)
-* AC_PROG_LEX:                           Optional.            (line 101)
-* AC_PROG_LIBTOOL:                       Optional.            (line  91)
+* AC_PROG_LEX:                           Optional.            (line 107)
+* AC_PROG_LIBTOOL:                       Optional.            (line  97)
 * AC_PROG_RANLIB:                        Optional.            (line  67)
-* AC_PROG_YACC:                          Optional.            (line  95)
-* AC_SUBST:                              Optional.            (line 105)
+* AC_PROG_YACC:                          Optional.            (line 101)
+* AC_SUBST:                              Optional.            (line 111)
 * AM_C_PROTOTYPES <1>:                   ANSI.                (line  27)
 * AM_C_PROTOTYPES <2>:                   Public macros.       (line   7)
-* AM_C_PROTOTYPES:                       Optional.            (line 116)
+* AM_C_PROTOTYPES:                       Optional.            (line 122)
 * AM_CONDITIONAL:                        Conditionals.        (line   8)
 * AM_CONFIG_HEADER:                      Obsolete macros.     (line  13)
 * AM_DEP_TRACK:                          Private macros.      (line  14)
 * AM_ENABLE_MULTILIB:                    Public macros.       (line  14)
-* AM_GNU_GETTEXT:                        Optional.            (line 120)
+* AM_GNU_GETTEXT:                        Optional.            (line 126)
 * AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Obsolete macros.     (line  18)
 * AM_INIT_AUTOMAKE <1>:                  Public macros.       (line  23)
 * AM_INIT_AUTOMAKE:                      Requirements.        (line   6)
 * AM_MAINTAINER_MODE <1>:                maintainer-mode.     (line  36)
 * AM_MAINTAINER_MODE <2>:                Rebuilding.          (line   9)
-* AM_MAINTAINER_MODE:                    Optional.            (line 126)
+* AM_MAINTAINER_MODE:                    Optional.            (line 132)
 * AM_MAKE_INCLUDE:                       Private macros.      (line  20)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private macros.      (line  15)
 * AM_PATH_LISPDIR:                       Public macros.       (line  67)
@@ -1609,7 +1738,7 @@ B.1 Macro Index
 * AM_WITH_DMALLOC:                       Public macros.       (line 102)
 * AM_WITH_REGEX:                         Public macros.       (line 107)
 * m4_include <1>:                        Dist.                (line  17)
-* m4_include:                            Optional.            (line 134)
+* m4_include:                            Optional.            (line 140)
 
 
 File: automake.info,  Node: Variable Index,  Next: General Index,  Prev: Macro Index,  Up: Indices
@@ -1633,6 +1762,7 @@ B.2 Variable Index
 * _SOURCES <1>:                          Default _SOURCES.    (line   6)
 * _SOURCES:                              Program Sources.     (line  32)
 * _TEXINFOS:                             Texinfo.             (line   6)
+* AC_PROG_FC:                            Optional.            (line  84)
 * ACLOCAL_AMFLAGS <1>:                   Rebuilding.          (line  12)
 * ACLOCAL_AMFLAGS:                       Local Macros.        (line  19)
 * ALLOCA <1>:                            LIBOBJS.             (line   6)
@@ -1642,8 +1772,8 @@ B.2 Variable Index
 * AM_CPPFLAGS:                           Program variables.   (line  15)
 * AM_CXXFLAGS:                           C++ Support.         (line  22)
 * AM_ETAGSFLAGS:                         Tags.                (line  25)
-* AM_FCFLAGS:                            Fortran 9x Support.  (line  22)
-* AM_FFLAGS:                             Fortran 77 Support.  (line  22)
+* AM_FCFLAGS <1>:                        Fortran 9x Support.  (line  22)
+* AM_FCFLAGS:                            Fortran 77 Support.  (line  22)
 * AM_GCJFLAGS:                           Java Support.        (line  24)
 * AM_INSTALLCHECK_STD_OPTIONS_EXEMPT:    Options.             (line 119)
 * AM_JAVACFLAGS:                         Java.                (line  36)
@@ -1723,20 +1853,20 @@ B.2 Variable Index
                                                               (line  53)
 * EXTRA_PROGRAMS:                        Conditional Programs.
                                                               (line  15)
-* F77:                                   Fortran 77 Support.  (line  16)
-* F77COMPILE:                            Fortran 77 Support.  (line  31)
 * F77LINK:                               How the Linker is Chosen.
                                                               (line  14)
-* FC:                                    Fortran 9x Support.  (line  16)
-* FCCOMPILE:                             Fortran 9x Support.  (line  25)
-* FCFLAGS:                               Fortran 9x Support.  (line  19)
+* FC <1>:                                Fortran 9x Support.  (line  16)
+* FC:                                    Fortran 77 Support.  (line  16)
+* FCCOMPILE <1>:                         Fortran 9x Support.  (line  25)
+* FCCOMPILE:                             Fortran 77 Support.  (line  31)
+* FCFLAGS <1>:                           Fortran 9x Support.  (line  19)
+* FCFLAGS:                               Fortran 77 Support.  (line  19)
 * FCLINK <1>:                            Fortran 9x Support.  (line  29)
-* FCLINK:                                How the Linker is Chosen.
+* FCLINK <2>:                            How the Linker is Chosen.
                                                               (line  16)
-* FFLAGS:                                Fortran 77 Support.  (line  19)
-* FLIBS:                                 Mixing Fortran 77 With C and C++.
+* FCLINK:                                Fortran 77 Support.  (line  35)
+* FLIBS:                                 Mixing Fortran With C and C++.
                                                               (line  21)
-* FLINK:                                 Fortran 77 Support.  (line  35)
 * GCJ:                                   Public macros.       (line  97)
 * GCJFLAGS <1>:                          Java Support.        (line  14)
 * GCJFLAGS:                              Public macros.       (line  97)
@@ -1893,7 +2023,7 @@ B.2 Variable Index
 * WITH_DMALLOC:                          Public macros.       (line 102)
 * WITH_REGEX:                            Public macros.       (line 107)
 * XFAIL_TESTS:                           Tests.               (line  33)
-* YACC:                                  Optional.            (line  96)
+* YACC:                                  Optional.            (line 102)
 * YFLAGS:                                Yacc and Lex.        (line  33)
 
 
@@ -1913,7 +2043,7 @@ B.3 General Index
 * --copy:                                Invoking Automake.   (line  63)
 * --cygnus:                              Invoking Automake.   (line  67)
 * --enable-debug, example:               Conditionals.        (line  23)
-* --enable-maintainer-mode:              Optional.            (line 127)
+* --enable-maintainer-mode:              Optional.            (line 133)
 * --force:                               aclocal options.     (line  20)
 * --force-missing:                       Invoking Automake.   (line  72)
 * --foreign:                             Invoking Automake.   (line  78)
@@ -2043,7 +2173,7 @@ B.3 General Index
                                                               (line  20)
 * CFLAGS and AM_CFLAGS:                  Flag Variables Ordering.
                                                               (line  20)
-* cfortran:                              Mixing Fortran 77 With C and C++.
+* cfortran:                              Mixing Fortran With C and C++.
                                                               (line   6)
 * check <1>:                             Extending.           (line  40)
 * check:                                 Tests.               (line   6)
@@ -2145,7 +2275,7 @@ B.3 General Index
 * Example, false and true:               true.                (line   6)
 * Example, GNU Hello:                    Hello.               (line   6)
 * Example, handling Texinfo files:       Hello.               (line  64)
-* Example, mixed language:               Mixing Fortran 77 With C and C++.
+* Example, mixed language:               Mixing Fortran With C and C++.
                                                               (line  36)
 * Example, regression test:              Hello.               (line  72)
 * Executable extension:                  EXEEXT.              (line   6)
@@ -2174,16 +2304,16 @@ B.3 General Index
                                                               (line  20)
 * Flag variables, ordering:              Flag Variables Ordering.
                                                               (line   6)
-* FLIBS, defined:                        Mixing Fortran 77 With C and C++.
+* FLIBS, defined:                        Mixing Fortran With C and C++.
                                                               (line  21)
 * foreign:                               Options.             (line  17)
 * foreign strictness:                    Strictness.          (line  10)
 * Fortran 77 support:                    Fortran 77 Support.  (line   6)
-* Fortran 77, mixing with C and C++:     Mixing Fortran 77 With C and C++.
-                                                              (line   6)
-* Fortran 77, Preprocessing:             Preprocessing Fortran 77.
-                                                              (line   6)
 * Fortran 9x support:                    Fortran 9x Support.  (line   6)
+* Fortran, mixing with C and C++:        Mixing Fortran With C and C++.
+                                                              (line   6)
+* Fortran, Preprocessing:                Preprocessing Fortran.
+                                                              (line   6)
 * GCJFLAGS and AM_GCJFLAGS:              Flag Variables Ordering.
                                                               (line  20)
 * generated files and CVS:               CVS.                 (line  49)
@@ -2279,7 +2409,7 @@ B.3 General Index
 * libtool, introduction:                 Libtool Concept.     (line   6)
 * libtoolize and autoreconf:             Libtool Issues.      (line   9)
 * libtoolize, no longer run by automake: Libtool Issues.      (line   9)
-* Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
+* Linking Fortran with C and C++:        Mixing Fortran With C and C++.
                                                               (line   6)
 * LISP primary, defined:                 Emacs Lisp.          (line   6)
 * LN_S example:                          Extending.           (line  78)
@@ -2310,11 +2440,11 @@ B.3 General Index
 * many outputs, rules with:              Multiple Outputs.    (line   6)
 * mdate-sh:                              Texinfo.             (line  18)
 * missing, purpose:                      maintainer-mode.     (line   9)
-* Mixed language example:                Mixing Fortran 77 With C and C++.
+* Mixed language example:                Mixing Fortran With C and C++.
                                                               (line  36)
-* Mixing Fortran 77 with C and C++:      Mixing Fortran 77 With C and C++.
+* Mixing Fortran with C and C++:         Mixing Fortran With C and C++.
                                                               (line   6)
-* Mixing Fortran 77 with C and/or C++:   Mixing Fortran 77 With C and C++.
+* Mixing Fortran with C and/or C++:      Mixing Fortran With C and C++.
                                                               (line   6)
 * modules, libtool:                      Libtool Modules.     (line   6)
 * mostlyclean:                           Extending.           (line  40)
@@ -2408,7 +2538,7 @@ B.3 General Index
 * pkgincludedir, defined:                Uniform.             (line  19)
 * pkglibdir, defined:                    Uniform.             (line  19)
 * POSIX termios headers:                 Obsolete macros.     (line  24)
-* Preprocessing Fortran 77:              Preprocessing Fortran 77.
+* Preprocessing Fortran:                 Preprocessing Fortran.
                                                               (line   6)
 * Primary variable, DATA:                Data.                (line   6)
 * Primary variable, defined:             Uniform.             (line  11)
@@ -2435,7 +2565,7 @@ B.3 General Index
 * PS output using Texinfo:               Texinfo.             (line   6)
 * ps-local:                              Extending.           (line  40)
 * PYTHON primary, defined:               Python.              (line   6)
-* Ratfor programs:                       Preprocessing Fortran 77.
+* Ratfor programs:                       Preprocessing Fortran.
                                                               (line   6)
 * README-alpha:                          Gnits.               (line  34)
 * readme-alpha:                          Options.             (line 105)
@@ -2493,7 +2623,7 @@ B.3 General Index
 * suffix .lo, defined:                   Libtool Concept.     (line  15)
 * SUFFIXES, adding:                      Suffixes.            (line   6)
 * Support for C++:                       C++ Support.         (line   6)
-* Support for Fortran 77:                Fortran 77 Support.  (line   6)
+* Support for Fortran:                   Fortran 77 Support.  (line   6)
 * Support for Fortran 9x:                Fortran 9x Support.  (line   6)
 * Support for GNU Gettext:               gettext.             (line   6)
 * Support for Java:                      Java Support.        (line   6)

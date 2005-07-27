@@ -71,7 +71,7 @@ export SHELL
 test -z "$PERL" && PERL='/usr/local/bin/perl'
 test -z "$MAKE" && MAKE=make
 test -z "$AUTOCONF" && AUTOCONF="autoconf"
-test -z "$AUTOHEADER" && AUTOHEADER="${SHELL} /tmp/norman/merge/thirdparty/fsf/automake/lib/missing --run autoheader"
+test -z "$AUTOHEADER" && AUTOHEADER="${SHELL} /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader"
 test -z "$AUTOUPDATE" && AUTOUPDATE=autoupdate
 test -z "$MISSING" && MISSING=`pwd`/../lib/missing
 test -z "$ACLOCAL" && ACLOCAL="aclocal-1.9"
@@ -264,7 +264,7 @@ echo "=== Running test $0"
 # Use `-I $srcdir/../m4' in addition to `--acdir=$srcdir/../m4', because the
 # other `-I' directories added for libtool and gettext might contain
 # files from an old version of Automake that we don't want to use.
-aclocaldir='/tmp/norman/merge/STAR/buildsupport/bin/share/aclocal'
+aclocaldir='/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/STAR/buildsupport/share/aclocal'
 extra_includes=""
 if [ -f $aclocaldir/dirlist ] ; then
    extra_includes=`(tmp_inc=""

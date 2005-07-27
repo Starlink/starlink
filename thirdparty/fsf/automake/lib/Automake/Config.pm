@@ -32,7 +32,7 @@ use vars qw ($APIVERSION $PACKAGE $VERSION $libdir);
 $APIVERSION = '1.9';
 $PACKAGE = 'automake';
 $VERSION = '1.9.6-starlink';
-$libdir = '/tmp/norman/merge/STAR/buildsupport/bin/share/automake-1.9';
+$libdir = '/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/STAR/buildsupport/share/automake-1.9';
 
 1;;
 

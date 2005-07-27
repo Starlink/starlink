@@ -29,7 +29,7 @@ eval 'case $# in 0) exec /usr/local/bin/perl -S "$0";; *) exec /usr/local/bin/pe
 
 BEGIN
 {
-  my $perllibdir = $ENV{'perllibdir'} || '/tmp/norman/merge/STAR/buildsupport/bin/share/automake-1.9';
+  my $perllibdir = $ENV{'perllibdir'} || '/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/STAR/buildsupport/share/automake-1.9';
   unshift @INC, (split ':', $perllibdir);
 }
 
@@ -45,7 +45,7 @@ use Cwd;
 
 # Note that this isn't pkgdatadir, but a separate directory.
 # Note also that the versioned directory is handled later.
-$acdir = '/tmp/norman/merge/STAR/buildsupport/bin/share/aclocal';
+$acdir = '/home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/STAR/buildsupport/share/aclocal';
 $default_acdir = $acdir;
 # contains a list of directories, one per line, to be added
 # to the dirlist in addition to $acdir, as if -I had been
