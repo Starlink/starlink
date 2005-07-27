@@ -1142,7 +1142,7 @@ it returns <code>#f</code>.
 (define (format-date-rcs d)
   (and (string=? (substring d 0 6) "$Date:")
        (let ((date (cadr (tokenise-string d))))
-         (debug (string-append (substring date 8 10)
+         (string-append (substring date 8 10)
                         " "
                         (case (substring date 5 7)
                           (("01") "January")
@@ -1158,7 +1158,7 @@ it returns <code>#f</code>.
                           (("11") "November")
                           (("12") "December"))
                         " "
-                        (substring date 0 4))))))
+                        (substring date 0 4)))))
 
 (define (format-date-ddmmmyyyy d)
   (let* ((parts (tokenise-string d boundary-char?: (lambda (c)
