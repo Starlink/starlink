@@ -344,30 +344,6 @@ required.
 	  (empty-sosofo))
       )))
 
-; (define (make-section-reference level #!optional (ts #f))
-;   (let* ((inappendix (have-ancestor? "appendices" (current-node)))
-; 					; (have-ancestor?) 10.2.4.4
-; 	 (hier-list (reverse (section-hierarchy (- level 1))))
-; 	 (hier-nums (hierarchical-number hier-list (current-node)))
-; 					; (hierarchical-number) see 10.2.4.2
-; 	 (hier-strs (map (lambda (n f)
-; 			   (format-number n f))
-; 			 (append hier-nums (list (child-number)))
-; 					; make a list of the hierarchy nos,
-; 					; including current child number
-; 			 (if inappendix	; ...formatted appropriately
-; 			     %appendix-fmts
-; 			     %section-fmts)))
-; 	 (sn (stringlist->string hier-strs "" "." ""))
-; 	 )
-;     (make sequence
-;       (literal ;(if inappendix "Appendix " "Section ")
-; 	       sn
-; 	       " ")
-;       (if ts
-; 	  ts
-; 	  (process-first-descendant 'title)))))
-
 <routine>
 <routinename>display-element-ids
 <description>Called (typically) when show-element-ids is true, this displays
@@ -490,25 +466,6 @@ is in effect.
   (element subhead			; so we _do_ get inside the subhead
     (process-children-trim))
   )
-
-;;; return the title of a section
-;(define (section-title nd)
-;  (let* ((subhead (select-elements (children nd) (normalize "subhead")))
-;	 (title (select-elements (children subhead) (normalize "title"))))
-;    (if (node-list-empty? title)
-;	""
-;	(data (node-list-first title)))))
-;
-;;; Returns the data of the title of the element
-;(define (element-title nd)
-;  (if (node-list-empty? nd)
-;      ""
-;      (cond
-;       ((equal? (gi nd) (normalize "sect")) (section-title nd))
-;       ((equal? (gi nd) (normalize "subsect")) (section-title nd))
-;       ((equal? (gi nd) (normalize "subsubsect")) (section-title nd))
-;       ((equal? (gi nd) (normalize "subsubsubsect")) (section-title nd))
-;       (else (literal "UNKNOWN TITLE!")))))
 
 <routine>
 <routinename>get-caption-details
@@ -948,8 +905,6 @@ different, unknown, reason than this.
 <returnvalue type='list of strings'>List of elements to include in the
 idindex
 <codebody>
-;(define (idindex-element-list)
-;  (list-difference (target-element-list) (list (normalize "routine"))))
 (define (idindex-element-list)
   (target-element-list))
 
@@ -1067,38 +1022,6 @@ with a non-existent file.
   (document-element-from-fsi (string-append "<" "OSFILE>" str)
 			      prepend-decl: prepend-decl))
 
-
-; (define (x-document-element-from-entity str #!key (prepend-decl %starlink-decl-entity%))
-;   (let* ((decl-sysid (and prepend-decl
-; 			  (entity-generated-system-id prepend-decl)))
-; 	 (fsi (if decl-sysid
-; 		  (string-append decl-sysid
-; 				 (entity-generated-system-id str))
-; 		  (if prepend-decl	;should have been able to get sysid
-; 		      (error (string-append "Can't get sysid from entity "
-; 					    prepend-decl))
-; 		      (entity-generated-system-id str)))))
-;     (if fsi
-; 	(document-element (sgml-parse fsi))
-; 	(error (string-append "Can't generate file from entity " str)))))
-; (define (x-document-element-from-sysid str
-; 				     #!key
-; 				     (prepend-decl %starlink-decl-entity%))
-;   (let* ((decl-sysid (and prepend-decl
-; 			  (entity-generated-system-id prepend-decl)))
-; 	 (fsi (if decl-sysid
-; 		  (string-append decl-sysid
-; 				 (string-append "<" "OSFILE>" str))
-; 		  (if prepend-decl	;should have been able to get sysid
-; 		      (error (string-append "Can't get sysid from entity "
-; 					    prepend-decl))
-; 		      (string-append "<" "OSFILE>" str)))))
-;     (if fsi
-; 	(document-element (sgml-parse fsi))
-; 	(error (string-append "Can't generate file from system-id " str)))))
-
-
-
 <routine>
 <routinename>isspace?
 <description>Returns true if the argument is a whitespace character, or if
@@ -1133,13 +1056,17 @@ it returns <code>#f</code>.
 <change author="ng" date="19-MAR-1999">
 <p>Altered from original yyyymmdd format.
 </change>
+<change author="ng" date="20050727">
+<p>Altered/extended to allow dates in multiple formats
 </history>
 <codebody>
 (define (format-date d)
   (or (format-date-ddmmmyyyy d)
-      (format-date-rcs d)))
+      (format-date-rcs d)
+      (format-date-yyyymmdd d)))
 
 (define (format-date-rcs d)
+  ;; $Date$
   (and (string=? (substring d 0 6) "$Date:")
        (let ((date (cadr (tokenise-string d))))
          (string-append (substring date 8 10)
@@ -1161,6 +1088,7 @@ it returns <code>#f</code>.
                         (substring date 0 4)))))
 
 (define (format-date-ddmmmyyyy d)
+  ;; dd-MMM-yyyy (where MMM is a three-character month abbreviation)
   (let* ((parts (tokenise-string d boundary-char?: (lambda (c)
 						     (or (char=? c #\-)
 							 (char=? c #\space)))))
@@ -1190,33 +1118,10 @@ it returns <code>#f</code>.
 	(string-append (number->string day) " "
 		       (car month) " "
 		       year)
-        #f
-;; 	(let ((nothing (error (if (string? d)
-;; 				  (string-append "Malformed date: " d)
-;; 				  "No string for format-date"))))
-;; 	  d)
-        )))
+        #f)))
 
-
-<routine>
-<routinename>format-date-old
-<description>
-<p>Returns a string with the formatted version of the date, which
-should be in the form yyyymmdd.  If the string is not in this format, 
-it returns a string indicating this (if only there were a 
-(warning) primitive.  I'd like to use (error) at the end, rather
-than silently returning just d, but I cannot work out how to
-evaluate more than one expression one after another!
-<p>Replaced by <code>(format-date)</code>, which parses dates in the form
-dd-MMM-yyyy.
-<returnvalue type="string">Formatted into english
-<argumentlist>
-<parameter>d
-  <type>string
-  <description>
-  The string should be in the form yyyymmdd
-<codebody>
-(define (format-date-old d)
+(define (format-date-yyyymmdd d)
+  ;; yyyymmdd
   (let* ((strok (and d
 		     (string? d)
 		     (equal? (string-length d) 8)))
@@ -1240,10 +1145,7 @@ dd-MMM-yyyy.
 	(string-append (number->string day) " "
 		       (car month) " "
 		       year)
-	(let ((nothing (error (if (string? d)
-				  (string-append "Malformed date: " d)
-				  "No string for format-date"))))
-	  d))))
+        #f)))
 
 
 <routine>
@@ -1291,10 +1193,6 @@ dd-MMM-yyyy.
 						 (loop (cdr rest))
 						 rest)))
 				       #f)))
-;			 (isbdy? (lambda (l)
-;				   (if (boundary-char? (car l))
-;				       (cdr l)
-;				       #f)))
 			 (max -1))
   (let loop ((charlist (string->list str))
 	     (wordlist '())
