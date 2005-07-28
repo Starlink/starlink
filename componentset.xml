@@ -3214,7 +3214,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="automake" buildsupport="yes" support="U">
-  <version>1.8.2-starlink</version>
+  <version>1.9.6-starlink</version>
   <path>thirdparty/fsf/automake</path>
   <description>GNU automake, patched</description>
   <dependencies>
@@ -3251,7 +3251,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="libtool" buildsupport="yes" support="U">
-  <version>1.5</version>
+  <version>1.5.18</version>
   <path>thirdparty/fsf/libtool</path>
   <description>GNU libtool</description>
   <dependencies/>
@@ -3265,7 +3265,7 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1996-2004</year>
+    <year>1996-2005</year>
     <name>Free Software Foundation</name>
   </copyright>
   <notes><p>This version of libtool is unpatched -- just the standard
