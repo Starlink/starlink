@@ -102,11 +102,15 @@
 
 *  SOME MARKERS
       MARK = 0
-      DO Y=3.0,2.0,-0.25
+      Y = 3.0
+      DO I = 1, 4
          MARK = MARK + 1
-         DO X=-2.0,-1.0,0.25
+         X = -2.0
+         DO J = 1, 4
             CALL SGS_MARK(X,Y,MARK)
+            X = X + 0.25
          END DO
+         Y = Y - 0.25
       END DO
 
 
