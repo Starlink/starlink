@@ -899,12 +899,12 @@ register_language ('name' => 'ppfc',
                    # rather than older F77
                    'config_vars' => ['FC'],
                    'linker' => 'FCLINK',
-                   'link' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+                   'link' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
                    'lder' => 'FCLD',
                    'ld' => '$(FC)',
                    'flags' => ['FCFLAGS', 'CPPFLAGS'],
 
-                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(STAR_FCFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
                    'compiler' => 'FCCOMPILE',
 #                   'compiler' => 'PPFCCOMPILE', # better?
                    'compile_flag' => '-c',
@@ -5438,6 +5438,7 @@ sub scan_autoconf_traces ($)
 	}
 
       # Alphabetical ordering please.
+      # But all Starlink ones at the end.
       if ($macro eq 'AC_CANONICAL_BUILD')
 	{
 	  if ($seen_canonical <= AC_CANONICAL_BUILD)
