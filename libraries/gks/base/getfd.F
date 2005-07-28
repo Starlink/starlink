@@ -23,24 +23,27 @@
 *       Unix file descriptor. -1 if unknown.
 
 * Notes:
-*     If present, can use the GETFD builtin. If this is not available
-*     attempts to recognize standard Fortran mappings. Will return
-*     -1 for the FD if the lookup can not be associated with a
-*     standard unit (usually this means STDIN, STDOUT or STDERR
-*     can currently only be obtained). If attempting the fallback approach
+*     If present, can use the GETFD or FNUM builtins. If these are not
+*     available attempts to recognize standard Fortran mappings. Will
+*     return -1 for the FD if the lookup can not be associated with a
+*     standard unit (usually this means STDIN, STDOUT or STDERR can
+*     currently only be obtained). If attempting the fallback approach
 *     this routine will fail for logical units associated with an actual
 *     file.
 
 *  Copyright:
-*     Copyright (C) 2004 Particle Physcis and Astronomy Research Council
+*     Copyright (C) 2004 Particle Physics and Astronomy Research Council
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-JUN-2004 (TIMJ):
 *        Original version.
+*     28-JUL-2005 (PWD):
+*        Added FNUM calls. This is available for gfortran and g95.
 
 *  Bugs:
 *     {not_any_bugs_here}
@@ -62,6 +65,10 @@
 
 *     Need to get the unix file descriptor using builtin
       FD = GETFD( LUN )
+#elseif HAVE_INTRINSIC_FNUM || HAVE_FNUM
+
+*     Need to get the unix file descriptor using builtin
+      FD = FNUM( LUN )
 
 #else
 
