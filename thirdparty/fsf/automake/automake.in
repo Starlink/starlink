@@ -28,6 +28,17 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 # Originally written by David Mackenzie <djm@gnu.ai.mit.edu>.
 # Perl reimplementation by Tom Tromey <tromey@redhat.com>.
 
+# STARLINK-MODS: this file is substantially changed in detail from the
+# version in upstream automake, though the _structure_ should be
+# largely unchanged.  As a result, there should be relatively few
+# places where there will be conflicts, if a new upstream automake is
+# imported and merged.  At the same time, however, there are a couple
+# of places where there will not be conflicts where there should be,
+# or where special attention is needed.  These are noted below, and
+# can be found by searching for the string 'STARLINK-MODS'.  The list
+# isn't necessarily exhaustive, and if you do this and find areas
+# which need this attention drawn to them, then add this tag for the future.
+
 package Language;
 
 BEGIN
@@ -893,6 +904,10 @@ register_language ('name' => 'fc',
 # A separate .fpp.f or .F.f rule will be emitted by the PPFC block of
 # lang-compile.am.
 #
+# STARLINK-MODS: in automake 1.9.3,4,5 or thereabouts, automake
+# acquired some simple ppfc capability.  It partly conflicts with the
+# Starlink additions below, so the merge and subsequent conflict
+# resolution in this area should be done with paranoid care.
 register_language ('name' => 'ppfc',
                    'Name' => 'Preprocessed Fortran',
                    # autoconf support for fortran defines FC,
@@ -2343,7 +2358,7 @@ sub handle_programs
 
       if (var ($xname . "_LDADD"))
 	{
-	  $seen_libobjs = &handle_lib_objects ($xname, $xname . '_LDADD');
+          $seen_libobjs = &handle_lib_objects ($xname, $xname . '_LDADD');
 	}
       else
 	{
@@ -2414,21 +2429,24 @@ sub handle_programs
 # 	$(sst_mon_TASKS:=.f) \
 # 	blah...
 #   sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
+#
+# STARLINK-MODS: this function is a close copy of handle_programs, but
+# with additions specific to Starlink monoliths.  Upstream changes to
+# handle_programs will not propagate to this function, so after such
+# an import, you should diff these two functions, and verify that the
+# changes are all down to such additions.  The function has been kept
+# the same as much as possible, right down to tabs, to make this easier.
 sub handle_monoliths
 {
   my @proglist = &am_install_var ('monoliths', 'MONOLITHS',
                                   'bin', 'check', 'noinst');
 
   # If there is no monolith support mentioned (bin_MONOLITHS), then do nothing.
-  if (! @proglist)
-    {
-      # We used to warn, here, if STAR_MONOLITHS had been seen in
-      # configure.ac, but there was no bin_MONOLITHS declared in Makefile.am.
-      # Don't do this, however, since if we're processing a Makefile.am in
-      # a subdirectory, then this situation can occur quite legitimately.
-
-      return;
-    }
+  # We used to warn, here, if STAR_MONOLITHS had been seen in
+  # configure.ac, but there was no bin_MONOLITHS declared in Makefile.am.
+  # Don't do this, however, since if we're processing a Makefile.am in
+  # a subdirectory, then this situation can occur quite legitimately.
+  return if ! @proglist;
 
   # Just to keep the user sane, check that we did see STAR_MONOLITHS in the
   # configure.ac.
@@ -2437,7 +2455,8 @@ sub handle_monoliths
   };
   
 
-  my $seen_global_libobjs = var ('LDADD') && &handle_lib_objects ('', 'LDADD');
+  my $seen_global_libobjs =
+    var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
   # All the .ifc files which are to be generated
   my @all_ifcs;
@@ -2452,7 +2471,7 @@ sub handle_monoliths
       my ($where, $one_file) = @$pair;
 
       my $seen_libobjs = 0;
-      my $obj = &get_object_extension ($one_file);
+      my $obj = get_object_extension '.$(OBJEXT)';
       
       # Strip any $(EXEEXT) suffix the user might have added, or this
       # will confuse &handle_source_transform and &check_canonical_spelling.
@@ -2469,28 +2488,29 @@ sub handle_monoliths
       $where->push_context ("while processing program `$one_file'");
       $where->set (INTERNAL->get);
 
-      my $linker = &handle_source_transform ($xname, $one_file, $obj, $where);
+      my $linker = &handle_source_transform ($xname, $one_file, $obj, $where,
+					     NONLIBTOOL => 1, LIBTOOL => 0);
 
       # Ought we to support _LDADD for monoliths?  Might as well, I suppose.
       if (var ($xname . "_LDADD"))
-        {
+	{
           $seen_libobjs = &handle_lib_objects ($xname, $xname . '_LDADD');
-        }
+	}
       else
-        {
-          # User didn't define prog_LDADD override.  So do it.
-          &define_variable ($xname . '_LDADD', '$(LDADD)', $where);
-      
-          # This does a bit too much work.  But we need it to
-          # generate _DEPENDENCIES when appropriate.
-          if (var ('LDADD'))
-            {
-              $seen_libobjs = &handle_lib_objects ($xname, 'LDADD');
-            }
-        }
+	{
+	  # User didn't define prog_LDADD override.  So do it.
+	  &define_variable ($xname . '_LDADD', '$(LDADD)', $where);
+
+	  # This does a bit too much work.  But we need it to
+	  # generate _DEPENDENCIES when appropriate.
+	  if (var ('LDADD'))
+	    {
+	      $seen_libobjs = &handle_lib_objects ($xname, 'LDADD');
+	    }
+	}
 
       reject_var ($xname . '_LIBADD',
-                  "use `${xname}_LDADD', not `${xname}_LIBADD'");
+		  "use `${xname}_LDADD', not `${xname}_LIBADD'");
 
       set_seen ($xname . '_DEPENDENCIES');
 
@@ -2508,8 +2528,11 @@ sub handle_monoliths
       set_seen ($xname . '_LDFLAGS');
 
       # Determine program to use for link -- we just force this
-      # to be `alink', which is the correct value.
+      # to be `alink'.  This is the correct value, as the alink program,
+      # within the pcs/dtask component, does the correct linking magic
+      # for monoliths.
       my $xlink = 'ALINK';
+
       # Define ALINK as a configure variable
       # (define_configure_variable seems not to work)
       Automake::Variable::define ('ALINK', VAR_CONFIGURE, '', TRUE,
@@ -2525,27 +2548,27 @@ sub handle_monoliths
       # If the resulting program lies into a subdirectory,
       # make sure this directory will exist.
       my $dirstamp = require_build_directory_maybe ($one_file);
-    
+
       $output_rules .= &file_contents ('program',
-                                       $where,
-                                       PROGRAM => $one_file,
-                                       XPROGRAM => $xname,
-                                       XLINK => $xlink,
-                                       DIRSTAMP => $dirstamp,
-                                       EXEEXT => '$(EXEEXT)',
+				       $where,
+				       PROGRAM  => $one_file,
+				       XPROGRAM => $xname,
+				       XLINK    => $xlink,
+				       DIRSTAMP => $dirstamp,
+				       EXEEXT   => '$(EXEEXT)',
                                        LINKMAGIC => $linkmagic);
 
       if ($seen_libobjs || $seen_global_libobjs)
-        {
-          if (var ($xname . '_LDADD'))
-            {
-              &check_libobjs_sources ($xname, $xname . '_LDADD');
-            }
-          elsif (var ('LDADD'))
-            {
-              &check_libobjs_sources ($xname, 'LDADD');
-            }
-        }
+	{
+	  if (var ($xname . '_LDADD'))
+	    {
+	      &check_libobjs_sources ($xname, $xname . '_LDADD');
+	    }
+	  elsif (var ('LDADD'))
+	    {
+	      &check_libobjs_sources ($xname, 'LDADD');
+	    }
+	}
 
       # Set the {compifl} key in %starlink_seen_features, so that
       # handle_starlink adds the right rules.
@@ -3628,7 +3651,7 @@ sub handle_man_pages
 }
 
 # Handle DATA variables.
-# Starlink: the prefixes star{docs,etc,help,examples} are additions here,
+# STARLINK-MODS: the prefixes star{docs,etc,help,examples} are additions here,
 # and must match the similar directories defined in
 # buildsupport/starconf/starconf.m4.in 
 sub handle_data
@@ -4635,13 +4658,19 @@ sub handle_messgen
                                   ($starfacsdata ? '+' : ''), TRUE,
                                   $facfile,
                                   '', INTERNAL, VAR_ASIS);
-      # ...and distribute it.
-      push_dist_common ('$(srcdir)/' . $facfile);
 
-      $clean_files{$ERRfile}  = MAINTAINER_CLEAN if $ERRfile;
-      $clean_files{$errfile}  = MAINTAINER_CLEAN if $errfile;
-      $clean_files{$errhfile} = MAINTAINER_CLEAN if $errhfile;
-      $clean_files{$facfile}  = MAINTAINER_CLEAN;
+      my @messgen_products;
+      push(@messgen_products, $ERRfile) if $ERRfile;
+      push(@messgen_products, $errfile) if $errfile;
+      push(@messgen_products, $errhfile) if $errhfile;
+      push(@messgen_products, $facfile);
+
+      foreach my $f (@messgen_products) {
+        # Each of the generated messgen output files should be both
+        # distributed and listed as maintainer-clean files.
+        push_dist_common ('$(srcdir)/' . $f);
+        $clean_files{$f} = MAINTAINER_CLEAN;
+      }
     }
 
   # The analogous INSTALL_HEADER is defined in lib/header-vars.am,
@@ -7495,7 +7524,7 @@ sub am_install_var
 	}
       # A blatant hack: we rewrite each _PROGRAMS primary to include
       # EXEEXT.
-      # Starlink: ...or MONOLITHS
+      # Starlink: ...same for MONOLITHS
       append_exeext ($one_name)
         if $primary eq 'PROGRAMS' or $primary eq 'MONOLITHS';
       # "EXTRA" shouldn't be used when generating clean targets,
@@ -8049,7 +8078,7 @@ sub generate_makefile ($$)
   handle_python;
   handle_java;
   handle_man_pages;
-  handle_messgen;               # must be called before handle_data
+  handle_messgen;           # STARLINK-MODS: must be called before handle_data
   handle_data;
   handle_headers;
   handle_subdirs;
