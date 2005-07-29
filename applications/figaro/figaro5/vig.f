@@ -348,7 +348,7 @@
         call par_wruser(chars,status)
 
         call contrl_cpoly2(%VAL(CNF_PVAL(iposptr)),
-     :                     %VAL(CNF_PVAL(inti)),,ni,
+     :                     %VAL(CNF_PVAL(inti)),ni,
      :                     %VAL(CNF_PVAL(wi)),coeffi,mord,kp1i,axlabi,
      :                     labeli,1,%VAL(CNF_PVAL(ptr4)),.true.,.true.,
      :                     %VAL(CNF_PVAL(ptr5)))
