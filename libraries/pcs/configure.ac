@@ -24,9 +24,6 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_PATH_PROGS(M4, m4, m4)
 
-AC_FC_CHECK_INTRINSICS([getcwd chdir putenv])
-AC_FC_OPEN_SPECIFIERS([readonly])
-
 dnl    On OSX you need to be root to run mknod
 AC_CHECK_FUNCS([atexit on_exit mkfifo mknod])
 dnl    Extra libraries needed to link against sockets on this system.
@@ -94,9 +91,18 @@ STAR_DECLARE_DEPENDENCIES(build, [cnf ems hds hlp mers psx sae])
 STAR_DECLARE_DEPENDENCIES(build, [chr], link)
 STAR_DECLARE_DEPENDENCIES(link,  [chr ems hds hlp mers psx])
 
+dnl    Look for fortran intrinsics
 
-dnl    All the documentation is in pcs-docs
+# Use Fortran for the remaining function tests
+AC_LANG_PUSH([Fortran])
 
+AC_FC_CHECK_INTRINSICS([getarg get_command_argument iargc command_argument_count])
+AC_CHECK_FUNCS([getarg get_command_argument iargc command_argument_count])
+
+AC_FC_CHECK_INTRINSICS([getcwd chdir putenv])
+AC_FC_OPEN_SPECIFIERS([readonly])
+
+AC_LANG_POP([Fortran])
 
 dnl    There are numerous messgen files, and all should be listed here, so
 dnl    that they are listed as `predist' files.
