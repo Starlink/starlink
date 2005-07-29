@@ -54,7 +54,6 @@
 *
 *  EXTERNAL FUNCTIONS
 *  ------------------
-*     FPUTC   Character output as per C fputc().
 #if HAVE_INTRINSIC_AND
 *     AND     Bitwise AND.
       INTRINSIC AND
@@ -92,6 +91,7 @@
 #endif
 #endif
 *
+*     FPUTC   Character output as per C fputc().
       INTEGER FPUTC
 #if HAVE_INTRINSIC_FPUTC
       INTRINSIC FPUTC

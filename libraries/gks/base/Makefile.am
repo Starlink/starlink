@@ -91,7 +91,7 @@ FPP_ROUTINES = gkdate.F gkdfop.F gkiobi.F gkiobo.F \
 	gkioci.F gkioco.F gkiofo.F gklor.F gkland.F \
 	gktime.F getfd.F
 
-C_ROUTINES = gktset.c gkgtsp.c gkiosb.c
+C_ROUTINES = gktset.c gkgtsp.c gkiosb.c getputc.c
 
 dist_noinst_HEADERS = f77_type.h gkerr.h gkdt.h gkwca.h
 
