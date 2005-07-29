@@ -42,6 +42,7 @@ STAR_MESSGEN(cat_err.msg)
 dnl    Lifted from PRM to determine if the 'xxx'X notation is supported.
 dnl    If not use X'xxx' and keep fingers crossed, one has to work
 dnl    for CAT1_NUL.
+AC_LANG_PUSH([Fortran])
 AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
    [ac_cv_fc_have_hex_numbers],
    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [

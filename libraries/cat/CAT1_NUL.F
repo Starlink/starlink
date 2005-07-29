@@ -62,7 +62,7 @@ C      INCLUDE 'PRM_PAR'
 *    all its bits set to zero) as null.  This value is adopted as the
 *    default for data type CHARACTER.
       LOGICAL CAT1__DNULL
-#if HAVE_HEX_NUMBERS
+#if FC_HAVE_HEX_NUMBERS
       PARAMETER (CAT1__DNULL = 'A55A5AA5'X )
 #else
       PARAMETER (CAT1__DNULL = X'A55A5AA5')
