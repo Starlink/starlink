@@ -27,7 +27,7 @@
 *     25/11/96 (ACD): Incorporated a portable and standard declaration
 *        for CAT1__DNULC from the Linux port of CAT.
 *  Global Constants:
-      INCLUDE 'PRM_PAR'
+C      INCLUDE 'PRM_PAR'
 *-
       
 *
