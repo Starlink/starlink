@@ -65,7 +65,7 @@
 
 *     Need to get the unix file descriptor using builtin
       FD = GETFD( LUN )
-#elseif HAVE_INTRINSIC_FNUM || HAVE_FNUM
+#elif HAVE_INTRINSIC_FNUM || HAVE_FNUM
 
 *     Need to get the unix file descriptor using builtin
       FD = FNUM( LUN )
