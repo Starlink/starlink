@@ -105,13 +105,13 @@
 *  Local Variables:
       INTEGER SYSERR             ! The Fortran I/O status value
       LOGICAL LREC               ! Internal copy of RECLEN
-
+      CHARACTER * ( 6 ) POSITION ! POSITION= value when used 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-#if !HAVE_FC_OPEN_ACCESSAPPEND
+#if !HAVE_FC_OPEN_ACCESSAPPEND  && !HAVE_FC_OPEN_POSITIONAPPEND
 *  ACCESS='APPEND' is attempted but not supported
       IF ( ACCESS .EQ. 'APPEND' ) THEN
          STATUS = FIO__IVFMT
@@ -128,6 +128,16 @@
 #else
 *  RECLEN with sequential files is not supported so bypass code path
       LREC = .FALSE.      
+#endif
+
+*  Check for correct method to append. Prefer POSITION='APPEND' to keep
+*  logic simple.
+      POSITION = 'ASIS'
+#if HAVE_FC_OPEN_POSITIONAPPEND
+      IF ( ACCESS .EQ. 'APPEND' ) THEN
+         ACCESS = 'SEQUENTIAL'
+         POSITION = 'APPEND'
+      END IF
 #endif
 
 *  Check that the carriage control option is valid.
@@ -151,12 +161,18 @@
 #if HAVE_FC_OPEN_READONLY
      :               READONLY, 
 #endif
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :               POSITION=POSITION,
+#endif
      :               RECL=RECSZ )
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
      :               CARRIAGECONTROL=CC, 
+#endif
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :               POSITION=POSITION,
 #endif
      :               RECL=RECSZ)
                END IF
@@ -167,10 +183,16 @@
 #if HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :               POSITION=POSITION,
+#endif
      :               RECL=RECSZ)
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :               POSITION=POSITION,
+#endif
      :               RECL=RECSZ )
                END IF
             END IF
@@ -184,24 +206,37 @@
 #if HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :               POSITION=POSITION,
+#endif
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
-     :               CARRIAGECONTROL=CC, 
+     :                  CARRIAGECONTROL=CC, 
 #endif
-     :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :                  POSITION=POSITION,
+#endif
+     :                  ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
                END IF
             ELSE
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
 #if HAVE_FC_OPEN_READONLY
-     :               READONLY,
+     :                  READONLY,
 #endif
-     :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :                  POSITION=POSITION,
+#endif
+     :                  ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-     :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR )
+     :                  ACCESS=ACCESS, ERR=10, 
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     :                  POSITION=POSITION,
+#endif
+     :                  IOSTAT=SYSERR )
                END IF
             END IF
          END IF
