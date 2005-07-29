@@ -86,6 +86,25 @@ if test $ac_cv_fc_have_hex_numbers = yes; then
               [Define as 1 if the Fortran compiler supports 'xxx'X numbers])
 fi
 
+dnl    Except some compilers (g95) only support the X'xxx' form, but
+dnl    also don't allow integer contants to overflow, so decimal notation
+dnl    fails (for the unsigned types). So test for this and apply changes.
+dnl    Note it does allow typeless boz for floating points too, so make 
+dnl    that part of the test.
+AC_CACHE_CHECK([whether ${FC} supports F95 hex notation for all numbers],
+   [ac_cv_fc_have_f95_hex_numbers],
+   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
+      INTEGER I
+      PARAMETER ( I = X'FF' )
+      DOUBLE PRECISION D
+      PARAMETER ( D = X'FFEFFFFFFFFFFFFF' )
+])],
+        ac_cv_fc_have_f95_hex_numbers=yes,
+        ac_cv_fc_have_f95_hex_numbers=no)])
+if test $ac_cv_fc_have_f95_hex_numbers = yes; then
+    AC_DEFINE([FC_HAVE_F95_HEX_NUMBERS], 1,
+              [Define as 1 if the Fortran compiler supports X'xxx' numbers])
+fi
 
 dnl    Determine whether the Fortran compiler supports the type-kind
 dnl    parameter notation (eg, I=1_4), as described in ISO-1539
