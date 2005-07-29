@@ -98,7 +98,7 @@
 *.
  
  
-D      print *,'mag1_fndtp:  param ', param
+C      print *,'mag1_fndtp:  param ', param
       STATUS = MAG__UNKPA
       DO 100 I = 1, MAG__MXPAR
          IF ( .NOT.PFREE(I) ) THEN
@@ -111,7 +111,7 @@ D      print *,'mag1_fndtp:  param ', param
          END IF
  100  CONTINUE
  1    CONTINUE
-D      print *,'mag1_fndtp:  tp,rtp ', tp,rtp
+C      print *,'mag1_fndtp:  tp,rtp ', tp,rtp
  
       RETURN
       END

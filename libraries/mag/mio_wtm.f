@@ -78,11 +78,11 @@
 *.
  
  
-D      print *,'mio_wtm:status,td',status,td
+C      print *,'mio_wtm:status,td',status,td
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) CALL IOC_WEOF(MAGCN, STATUS)
       END IF
  
-D      print *,'mio_wtm:status',status
+C      print *,'mio_wtm:status',status
       END

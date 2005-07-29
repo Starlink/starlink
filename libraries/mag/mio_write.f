@@ -101,7 +101,7 @@
 *.
  
  
-D     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
+C     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
       NCHAR = 0
       IF ( STATUS.EQ.SAI__OK ) THEN
 *
@@ -139,5 +139,5 @@ D     print *,'mio_write:status,td,bufsiz',status,td,bufsiz
          END IF
       END IF
  
-D      print *,'mio_write:status,nchar',status,nchar
+C      print *,'mio_write:status,nchar',status,nchar
       END

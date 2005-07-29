@@ -96,7 +96,7 @@
 *.
  
  
-D      print *,'mag1_gettp:  param ', param
+C      print *,'mag1_gettp:  param ', param
 *    Get the Tape descriptor
       CALL MAG1_FNDTP(PARAM, TP, RTP, STATUS)
       IF ( STATUS.EQ.SAI__OK ) THEN
@@ -114,6 +114,6 @@ D      print *,'mag1_gettp:  param ', param
  1       CONTINUE
       END IF
  
-D      print *,'mag1_gettp,status:tp,rtp,status ',tp,rtp,status
+C      print *,'mag1_gettp,status:tp,rtp,status ',tp,rtp,status
       RETURN
       END

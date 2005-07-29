@@ -87,12 +87,12 @@
 *.
  
  
-D      print *,'mio_skipv:status,td',status,td
+C      print *,'mio_skipv:status,td',status,td
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) CALL IOC_READ(MAGCN, BUFSIZ, BUFFER, 
      :        ACTVALS, STATUS)
       END IF
  
-D      print *,'mio_skipv:status',status
+C      print *,'mio_skipv:status',status
       END

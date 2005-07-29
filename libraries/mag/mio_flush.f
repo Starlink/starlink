@@ -77,7 +77,7 @@
 *.
  
  
-D      print *,'mio_flush:status,td',status,td
+C      print *,'mio_flush:status,td',status,td
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) THEN
@@ -91,6 +91,6 @@ D      print *,'mio_flush:status,td',status,td
          END IF
       END IF
  
-D      print *,'mio_flush:status,nwrit:',status,nwrit
+C      print *,'mio_flush:status,nwrit:',status,nwrit
       RETURN
       END

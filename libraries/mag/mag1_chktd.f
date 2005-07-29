@@ -94,7 +94,7 @@
 *.
  
  
-D      print *,'mag1_chktd:  td ', td
+C      print *,'mag1_chktd:  td ', td
       STATUS = MAG__UNKPA
       DO 100 I = 1, MAG__MXPAR
          IF ( .NOT.PFREE(I) ) THEN
@@ -107,7 +107,7 @@ D      print *,'mag1_chktd:  td ', td
          END IF
  100  CONTINUE
  1    CONTINUE
-D      print *,'mag1_chktd:  tp,rtp ', tp,rtp
+C      print *,'mag1_chktd:  tp,rtp ', tp,rtp
  
       RETURN
       END

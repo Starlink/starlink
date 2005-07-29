@@ -81,11 +81,11 @@
 *.
  
  
-D      print *,'mio_rew:status,td',status,td
+C      print *,'mio_rew:status,td',status,td
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) CALL IOC_REW(MAGCN, STATUS)
       END IF
  
-D      print *,'mio_rew:status',status
+C      print *,'mio_rew:status',status
       END

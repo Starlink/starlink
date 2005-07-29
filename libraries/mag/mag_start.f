@@ -71,7 +71,7 @@
 *.
  
  
-D      print *,'mag_start:status', status
+C      print *,'mag_start:status', status
 *    Execution allowed ?
       IF ( STATUS.NE.SAI__OK ) RETURN
  
@@ -82,6 +82,6 @@ D      print *,'mag_start:status', status
          PDLOC(I) = ' '
  100  CONTINUE
  
-D      print *,'mag_start:  completed'
+C      print *,'mag_start:  completed'
       RETURN
       END

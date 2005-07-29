@@ -107,15 +107,15 @@
 *.
  
  
-D      print *,'mag_assoc:status,pname,acmode ',status,pname,acmode
+C      print *,'mag_assoc:status,pname,acmode ',status,pname,acmode
 *    Allowed to execute ?
       IF ( STATUS.NE.SAI__OK ) RETURN
  
 *    Initialised ?
-D      print *,'mag_assoc:Magslp ', Magslp
+C      print *,'mag_assoc:Magslp ', Magslp
       IF ( MAGSLP ) THEN
          CALL MAG_ACTIV(STATUS)
-D         print *,'mag_assoc:  mag_activ => status ', status
+C         print *,'mag_assoc:  mag_activ => status ', status
          IF ( STATUS.NE.SAI__OK ) RETURN
       END IF
  
@@ -157,7 +157,7 @@ D         print *,'mag_assoc:  mag_activ => status ', status
  1       CONTINUE
       END IF
  
-D      print *,'mag_assoc:  => status ', status
+C      print *,'mag_assoc:  => status ', status
  
       RETURN
       END

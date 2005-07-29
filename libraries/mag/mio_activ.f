@@ -60,7 +60,7 @@
 *.
  
  
-D      print *,'mio_activ:status', status
+C      print *,'mio_activ:status', status
 *    Execution allowed ?
       IF ( STATUS.NE.SAI__OK ) RETURN
  
@@ -68,7 +68,7 @@ D      print *,'mio_activ:status', status
       CALL MIO_START(STATUS)
  
  
-D      print *,'mio_activ:  completed'
+C      print *,'mio_activ:  completed'
  
       RETURN
       END

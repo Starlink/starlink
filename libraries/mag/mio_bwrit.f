@@ -97,7 +97,7 @@
 *.
  
  
-D      print *,'mio_bwrit:status,td,bufsiz',status,td,bufsiz
+C      print *,'mio_bwrit:status,td,bufsiz',status,td,bufsiz
       IF ( STATUS.EQ.SAI__OK ) THEN
          IF ( CHR_SIMLR(MACMOD(TD),'READ') ) THEN
             STATUS = MIO__ILLAC
@@ -110,5 +110,5 @@ D      print *,'mio_bwrit:status,td,bufsiz',status,td,bufsiz
          END IF
       END IF
  
-D      print *,'mio_bwrit:status,nwrit',status,nwrit
+C      print *,'mio_bwrit:status,nwrit',status,nwrit
       END

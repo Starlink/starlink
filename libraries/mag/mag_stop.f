@@ -69,7 +69,7 @@
 *.
  
  
-D      print *,'mag_stop:  status ', status
+C      print *,'mag_stop:  status ', status
       ISTAT = STATUS
       STATUS = SAI__OK
  
@@ -79,6 +79,6 @@ D      print *,'mag_stop:  status ', status
  
       IF ( ISTAT.NE.SAI__OK ) STATUS = ISTAT
  
-D      print *,'mag_stop:  status ', status
+C      print *,'mag_stop:  status ', status
       RETURN
       END

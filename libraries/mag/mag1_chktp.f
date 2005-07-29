@@ -95,6 +95,6 @@
          STATUS = MAG__NTACT
       END IF
  
-D      print *,'mag1_chktp:tp,rtp,status',tp,rtp,status
+C      print *,'mag1_chktp:tp,rtp,status',tp,rtp,status
       RETURN
       END

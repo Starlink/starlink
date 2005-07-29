@@ -104,7 +104,7 @@
      :                STATUS)
       END IF
  
-D      print *,'mag1_gtmpl:status',status
+C      print *,'mag1_gtmpl:status',status
  
       RETURN
       END

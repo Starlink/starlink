@@ -95,12 +95,12 @@
       INTEGER I                 ! Offset into block buffer
       INTEGER K                 ! Loop index
       INTEGER BUFP              ! Offset into record buffer
-D     character*(MIO__SZBUF) bufcopy
+C     character*(MIO__SZBUF) bufcopy
  
 *.
  
  
-D     print *,'mio_read:status,td,bufsiz',status,td,bufsiz
+C     print *,'mio_read:status,td,bufsiz',status,td,bufsiz
       NCHAR = 0
       IF ( STATUS.EQ.SAI__OK ) THEN
 *

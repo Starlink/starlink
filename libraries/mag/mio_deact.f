@@ -66,6 +66,6 @@
  
       IF ( ISTAT.NE.SAI__OK ) STATUS = ISTAT
  
-D      print *,'mio_deact:  status ', status
+C      print *,'mio_deact:  status ', status
       RETURN
       END

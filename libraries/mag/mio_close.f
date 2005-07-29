@@ -86,7 +86,7 @@
 *.
  
  
-D      print *,'mio_close:status,td',status,td
+C      print *,'mio_close:status,td',status,td
 *    Initialised ?
       IF ( .NOT.MIOINT ) CALL MIO_START(STATUS)
  
@@ -121,5 +121,5 @@ D      print *,'mio_close:status,td',status,td
  
       IF ( STATUS.EQ.SAI__OK ) STATUS = ISTAT
  
-D      print *,'mio_close:status',status
+C      print *,'mio_close:status',status
       END

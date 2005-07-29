@@ -90,7 +90,7 @@
 *.
  
  
-D      print *,'mag1_fxpos:tp,status',tp,status
+C     print *,'mag1_fxpos:tp,status',tp,status
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MAG_POS(TP, FILE, START, BLOCK, MOVED, STATUS)
          IF ( STATUS.NE.SAI__OK ) THEN
@@ -111,6 +111,6 @@ D      print *,'mag1_fxpos:tp,status',tp,status
          END IF
       END IF
  
-D      print *,'mag1_fxpos:status,file,start,block',
-D    :                 status,file,start,block
+C      print *,'mag1_fxpos:status,file,start,block',
+C    :                 status,file,start,block
       END

@@ -89,6 +89,6 @@
          CHAN = MCHAN(TD)
       END IF
  
-D      print *,'mio1_chan:td,chan,status',td,chan,status
+C      print *,'mio1_chan:td,chan,status',td,chan,status
       RETURN
       END

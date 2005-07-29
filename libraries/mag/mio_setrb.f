@@ -81,7 +81,7 @@
 *.
  
  
-D      print *,'mio_setrb:status,td,blksz,recsz',status,td,blksz,recsz
+C      print *,'mio_setrb:status,td,blksz,recsz',status,td,blksz,recsz
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) THEN
@@ -96,6 +96,6 @@ D      print *,'mio_setrb:status,td,blksz,recsz',status,td,blksz,recsz
          END IF
       END IF
  
-D      print *,'mio_setrb:status',status
+C      print *,'mio_setrb:status',status
       RETURN
       END

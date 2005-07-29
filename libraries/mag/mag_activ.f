@@ -87,7 +87,7 @@
 *.
  
  
-D      print *,'mag_activ:status', status
+C      print *,'mag_activ:status', status
 *    Execution allowed ?
       IF ( STATUS.NE.SAI__OK ) RETURN
  
@@ -105,7 +105,7 @@ D      print *,'mag_activ:status', status
  
 *    Declare MAG awake
       MAGSLP = .FALSE.
-D      print *,'mag_activ:  completed'
+C      print *,'mag_activ:  completed'
  
       RETURN
       END

@@ -95,7 +95,7 @@
 *.
  
  
-D      print *,'mio_bread:status,td,bufsiz',status,td,bufsiz
+C      print *,'mio_bread:status,td,bufsiz',status,td,bufsiz
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.EQ.SAI__OK ) THEN
@@ -107,5 +107,5 @@ D      print *,'mio_bread:status,td,bufsiz',status,td,bufsiz
          END IF
       END IF
  
-D      print *,'mio_read:status,nread',status,nread
+C      print *,'mio_read:status,nread',status,nread
       END

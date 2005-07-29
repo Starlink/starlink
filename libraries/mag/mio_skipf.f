@@ -89,7 +89,7 @@
 *.
  
  
-D      print *,'mio_skipf:status,td,nfile',status,td,nfile
+C      print *,'mio_skipf:status,td,nfile',status,td,nfile
       IF ( STATUS.EQ.SAI__OK ) THEN
          CALL MIO1_CHAN(TD, MAGCN, STATUS)
          IF ( STATUS.NE.SAI__OK ) THEN
@@ -110,5 +110,6 @@ D      print *,'mio_skipf:status,td,nfile',status,td,nfile
          END IF
       END IF
  
-D      print *,'mio_skipf:status',status
+C      print *,'mio_skipf:status',status
+
       END

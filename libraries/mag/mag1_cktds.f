@@ -93,7 +93,7 @@
 *     Look-up the parameter name
 *
       CALL SUBPAR_FINDPAR(PARAM, NAMECODE, STATUS)
-D     print *,'SUBPAR_FINDPAR status ',status
+C     print *,'SUBPAR_FINDPAR status ',status
 *
 *     Loop trying to get the name of the graphics device
 *

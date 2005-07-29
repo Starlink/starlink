@@ -89,6 +89,6 @@
       STATUS = MIO__TOOTD
  
  1    CONTINUE
-D      print *,'mio1_gettd:td,status',td,status
+C      print *,'mio1_gettd:td,status',td,status
       RETURN
       END

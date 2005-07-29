@@ -101,7 +101,7 @@
 *.
  
  
-D      print *,'mio_open:status,tape,acmode',status,tape,acmode
+C      print *,'mio_open:status,tape,acmode',status,tape,acmode
       IF ( STATUS.NE.SAI__OK ) RETURN
  
 *    Initialised ?
@@ -109,7 +109,7 @@ D      print *,'mio_open:status,tape,acmode',status,tape,acmode
  
 *    Get a Tape Descriptor
       CALL MIO1_GETTD(TD, STATUS)
-D      print *,'mio_open:td,status',td,status
+C      print *,'mio_open:td,status',td,status
       IF ( STATUS.EQ.SAI__OK ) THEN
 *       Check the access mode
          IF ( CHR_SIMLR(ACMODE,'READ')
@@ -147,5 +147,5 @@ D      print *,'mio_open:td,status',td,status
          END IF
       END IF
  
-D      print *,'mio_open:status',status
+C      print *,'mio_open:status',status
       END
