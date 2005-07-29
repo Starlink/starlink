@@ -70,6 +70,6 @@
 *           processing.
 
       NDF_QMASK( NDF_ARGB1, NDF_ARGB2 ) =
-     :   AND( NDF_ARGB1, NDF_ARGB2 ) .EQ. 0
+     :   IAND( NDF_ARGB1, NDF_ARGB2 ) .EQ. 0
 
 *.
