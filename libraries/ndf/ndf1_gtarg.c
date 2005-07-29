@@ -373,8 +373,8 @@ line used to invoke the current application - ^MESSAGE.", STATUS );
 #elif 1
 
 /* Call the Fortran GETARG system routine to get the argument required.	    */
-         F77_CALL(getarg)( INTEGER_ARG(IARG), CHARACTER_ARG(ARG)
-                           TRAIL_ARG(ARG) );
+         F77_CALL(ndf1_farg)( INTEGER_ARG(IARG), CHARACTER_ARG(ARG)
+                              TRAIL_ARG(ARG) );
 
 /* Determine the argument length by searching for the last non-blank	    */
 /* character.								    */

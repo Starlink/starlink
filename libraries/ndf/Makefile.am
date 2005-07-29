@@ -110,7 +110,8 @@ ndf_qmf.f ndf_reset.f ndf_same.f ndf_sbad.f ndf_sbb.f ndf_sbnd.f       \
 ndf_scopy.f ndf_sect.f ndf_shift.f ndf_size.f ndf_sqmf.f ndf_ssary.f   \
 ndf_state.f ndf_stype.f ndf_temp.f ndf_trace.f ndf_tune.f ndf_type.f   \
 ndf_unmap.f ndf_valid.f ndf_xdel.f ndf_xgt0x.f ndf_xiary.f ndf_xloc.f  \
-ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xpt0x.f ndf_xstat.f ndf1_cvcmd.f
+ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xpt0x.f ndf_xstat.f ndf1_cvcmd.f \
+ndf1_farg.f
 
 #  Additional Fortran routines required for the standalone library.
 
