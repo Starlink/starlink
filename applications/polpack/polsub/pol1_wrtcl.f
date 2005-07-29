@@ -138,7 +138,7 @@
       DOUBLE PRECISION SLA_DRANGE! Normalizes an angle to -PI to +PI
 
 *  Local Constants:
-      DOUBLE PRECISION NRAN      ! No. of positions to use for guessing
+      INTEGER NRAN               ! No. of positions to use for guessing
       PARAMETER ( NRAN = 20 )    ! central RA and DEC, and radius.
 
       DOUBLE PRECISION RTOD      ! Radians to degrees conversion factor
