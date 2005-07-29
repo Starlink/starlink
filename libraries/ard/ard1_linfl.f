@@ -235,7 +235,7 @@
 
 *  Loop round all the pixel boundaries encompassed by the line on this
 *  axis.
-         DO J = PCI, PDI - 1
+         DO J = INT( PCI ), INT( PDI ) - 1
 
 *  Find the value of ALPHA at which the line reaches this pixel
 *  boundary.
