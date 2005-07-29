@@ -212,6 +212,7 @@
 
 *  Local Variables:
       INTEGER IC                 ! Index into STKID
+      INTEGER II                 ! Loop variable
       INTEGER JI                 ! Index of I plane in input arrays
       INTEGER JQ                 ! Index of Q plane in input arrays
       INTEGER JU                 ! Index of U plane in input arrays
@@ -358,18 +359,18 @@
          IF( EQMAP .NE. AST__NULL ) THEN
 
 *  Store the pixel co-ords for each vector.
-            I = 0
+            II = 0
             DO ROW = 1, NROW
                DO PIX = 1, NPIX
-                  I = I + 1
-                  W( I, 1 ) = DBLE( TR( 1 ) + TR( 2 )*REAL( PIX ) )
-                  W( I, 2 ) = DBLE( TR( 3 ) + TR( 4 )*REAL( ROW ) )
+                  II = II + 1
+                  W( II, 1 ) = DBLE( TR( 1 ) + TR( 2 )*REAL( PIX ) )
+                  W( II, 2 ) = DBLE( TR( 3 ) + TR( 4 )*REAL( ROW ) )
                END DO
             END DO
 
             IF( NDIMO .EQ. 3 ) THEN
-               DO I = 1, NEL
-                  W( I, 3 ) = 1.0D0
+               DO II = 1, NEL
+                  W( II, 3 ) = 1.0D0
                END DO
             END IF
 
