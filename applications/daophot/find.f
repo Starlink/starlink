@@ -736,12 +736,12 @@ C
 C ********** IF THE CENTRAL PIXEL IS BAD SKIP THIS TEST. **********
 C
 C
-D     TYPE *, JX, JY
-D     DO 1666 J=1,NBOX
-D1666 TYPE 6661, (JNINT(D(I,JCYLN(J))), 
-D    .     I=MAX0(1,JX-NHALF),MIN0(NCOL,IX+NHALF)),
-D    .     (JNINT(H(I,JCYLN(J))), I=IX-NHALF,IX+NHALF)
-D6661 FORMAT(1X, <NBOX>I6, 1X, <NBOX>I6)
+CD     TYPE *, JX, JY
+CD     DO 1666 J=1,NBOX
+CD1666 TYPE 6661, (JNINT(D(I,JCYLN(J))), 
+CD    .     I=MAX0(1,JX-NHALF),MIN0(NCOL,IX+NHALF)),
+CD    .     (JNINT(H(I,JCYLN(J))), I=IX-NHALF,IX+NHALF)
+CD6661 FORMAT(1X, <NBOX>I6, 1X, <NBOX>I6)
 C
 C As one final nuance, for this and subsequent calculations I propose 
 C to subtract off the modal sky level.  Otherwise, for faint stars on 
@@ -769,7 +769,7 @@ C
  3061 CONTINUE
 C
       SHARP=(D(JX,JCYLN(MIDDLE))-SKYMOD-SHARP/P)/HEIGHT
-D     TYPE *, ' SHARP= ', SHARP
+CD     TYPE *, ' SHARP= ', SHARP
       IF ((SHARP .LT. SHRPLO) .OR. (SHARP .GT. SHRPHI)) GO TO 3200
  3068 CONTINUE
 C
@@ -968,7 +968,7 @@ C
       IF ((YCEN .LT. 0.5) .OR. (YCEN .GT. NROW+0.5)) GO TO 3200
 C
       ROUND=2.*(HX-HY)/(HX+HY)
-D     TYPE *, ' ROUND= ', ROUND
+CD     TYPE *, ' ROUND= ', ROUND
       IF ((ROUND .LT. RNDLO) .OR. (ROUND .GT. RNDHI)) GO TO 3200
 C
 C The fully verified and located star may now be dignified with its own

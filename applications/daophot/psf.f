@@ -677,13 +677,13 @@ C
 C Now compute look-up tables.
 C
  3500 CONTINUE
-D     CALL COPPIC (CASE('junk'), ISTAT)
-D     LX = 1
-D     LY = 1
-D     MX = NCOL
-D     MY = NROW
-D     CALL WRARAY ('copy', LX, LY, MX, MY, NCOL, PIC, ISTAT)
-D     CALL CLPIC ('COPY')
+CD     CALL COPPIC (CASE('junk'), ISTAT)
+CD     LX = 1
+CD     LY = 1
+CD     MX = NCOL
+CD     MY = NROW
+CD     CALL WRARAY ('copy', LX, LY, MX, MY, NCOL, PIC, ISTAT)
+CD     CALL CLPIC ('COPY')
 C
 C MIDDLE is the center of the look-up table, which will correspond to
 C the centroid of the analytic PSF.  MIDSQ is the square of the
@@ -878,27 +878,27 @@ C the area of the frame.  (This, of course, is potentially dangerous for
 C a globular cluster or similar object centered within the frame.  I 
 C have to think about this some more.)
 C
-D     CALL COPPIC (CASE('stuff'), ISTAT)
-D     DO K=1,NCOL
-D        CORNER(K) = 32767
-D     END DO
-D     LX = 1
-D     MX = NCOL
-D     MY = 1
-D     DO K=1,NROW
-D        LY = K
-D        CALL WRARAY ('COPY', LX, LY, MX, MY, NCOL, CORNER, ISTAT)
-D     END DO
+CD     CALL COPPIC (CASE('stuff'), ISTAT)
+CD     DO K=1,NCOL
+CD        CORNER(K) = 32767
+CD     END DO
+CD     LX = 1
+CD     MX = NCOL
+CD     MY = 1
+CD     DO K=1,NROW
+CD        LY = K
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, NCOL, CORNER, ISTAT)
+CD     END DO
 C
-D     DO K=1,NEXP
-D        LX = K-1
-D        LX = LX*NPSF + LX + 1
-D        LY = 1
-D        MX = NPSF
-D        MY = NPSF
-D        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
-D    .        PSF(1,1,K), ISTAT)
-D     END DO
+CD     DO K=1,NEXP
+CD        LX = K-1
+CD        LX = LX*NPSF + LX + 1
+CD        LY = 1
+CD        MX = NPSF
+CD        MY = NPSF
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD    .        PSF(1,1,K), ISTAT)
+CD     END DO
 C
       DO K=2,NEXP
 CD        L = 0
@@ -922,10 +922,10 @@ C
             END DO
          END DO
          DX = PCTILE(CORNER, L, (L+1)/2)
-D        WRITE (6,*) K, L, '     DX =', DX, TERM(K)
+CD        WRITE (6,*) K, L, '     DX =', DX, TERM(K)
          DY = TERM(K) * DX
 C
-D        L = 0
+CD        L = 0
          DO J=1,NPSF
             DO I=1,NPSF
                IF (IN(I,J)) THEN
@@ -940,28 +940,28 @@ CD                 CORNER(L) = PSF(I,J,K)
             END DO
          END DO
 CD        WRITE (6,*) K, ' CORNER =', PCTILE(CORNER, L, (L+1)/2), L
-D        L = 0
-D        DO J=1,NPSF
-D           DO I=1,NPSF
-D              IF (EDGE(I,J)) THEN
-D                 L = L+1
-D                 CORNER(L) = PSF(I,J,K)
-D              END IF
-D           END DO
-D        END DO
-D        WRITE (6,*) K, '   EDGE =', PCTILE(CORNER, L, (L+1)/2), L
-D        WRITE (6,*)
+CD        L = 0
+CD        DO J=1,NPSF
+CD           DO I=1,NPSF
+CD              IF (EDGE(I,J)) THEN
+CD                 L = L+1
+CD                 CORNER(L) = PSF(I,J,K)
+CD              END IF
+CD           END DO
+CD        END DO
+CD        WRITE (6,*) K, '   EDGE =', PCTILE(CORNER, L, (L+1)/2), L
+CD        WRITE (6,*)
       END DO
 C
-D     DO K=1,NEXP
-D        LX = K-1
-D        LX = LX*NPSF + LX + 1
-D        LY = NPSF + 2
-D        MX = NPSF
-D        MY = NPSF
-D        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
-D    .        PSF(1,1,K), ISTAT)
-D     END DO
+CD     DO K=1,NEXP
+CD        LX = K-1
+CD        LX = LX*NPSF + LX + 1
+CD        LY = NPSF + 2
+CD        MX = NPSF
+CD        MY = NPSF
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD    .        PSF(1,1,K), ISTAT)
+CD     END DO
 C
 C Now for each of the higher PSF's, determine the mean volume inside
 C the PSF RADIUS.  Scale the constant part of the PSF as needed and
@@ -981,7 +981,7 @@ C
          END DO
       END DO
       DX = PCTILE(CORNER, L, (L+1)/2)
-D     WRITE (6,*) 1, L, '     DX =', DX
+CD     WRITE (6,*) 1, L, '     DX =', DX
 C
       VOL = 0.0D0
       DO J=1,NPSF
@@ -992,25 +992,25 @@ C
             END IF
          END DO
       END DO
-D     LX = 1
-D     K = 1.5*NPSF + 2
-D     MX = NPSF
-D     MY = 1
-D     DO J=1,NPSF
-D        DY = REAL(J-MIDDLE)/2.
-D        DO I=1,NPSF
-D           DX = REAL(I-MIDDLE)/2.
-D           HJNK(I) = SCALE *
-D    .                 PROFIL(IPSTYP, DX, DY, PAR, DFDX, DFDY, V, 0)
-D           XJNK(I) = HJNK(I) + PSF(I,J,1)
-D        END DO
-D        LY = 3*NPSF + J + 3
-D        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, HJNK, ISTAT)
-D        LY = 3.5*NPSF + J + 4
-D        CALL WRARAY ('COPY', K, LY, MX, MY, MAXPSF, XJNK, ISTAT)
-D     END DO
+CD     LX = 1
+CD     K = 1.5*NPSF + 2
+CD     MX = NPSF
+CD     MY = 1
+CD     DO J=1,NPSF
+CD        DY = REAL(J-MIDDLE)/2.
+CD        DO I=1,NPSF
+CD           DX = REAL(I-MIDDLE)/2.
+CD           HJNK(I) = SCALE *
+CD    .                 PROFIL(IPSTYP, DX, DY, PAR, DFDX, DFDY, V, 0)
+CD           XJNK(I) = HJNK(I) + PSF(I,J,1)
+CD        END DO
+CD        LY = 3*NPSF + J + 3
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, HJNK, ISTAT)
+CD        LY = 3.5*NPSF + J + 4
+CD        CALL WRARAY ('COPY', K, LY, MX, MY, MAXPSF, XJNK, ISTAT)
+CD     END DO
 C
-D     WRITE (6,*) 'VOL =', SNGL(VOL)
+CD     WRITE (6,*) 'VOL =', SNGL(VOL)
 C
 C Now determine the net volume of each of the higher-order PSF 
 C tables, and force it to zero by subtracting a scaled copy of
@@ -1027,34 +1027,35 @@ C
             END DO
          END DO
 C
-D        WRITE (6,*) K, '  SUM =', SUM
-         DX = SNGL(SUM/VOL)
+CD        WRITE (6,*) K, '  SUM =', SUM
+
+        DX = SNGL(SUM/VOL)
          DY = TERM(K)*DX
-D        SUM = 0.0D0
+CD        SUM = 0.0D0
          DO J=1,NPSF
             DO I=1,NPSF
                IF (IN(I,J)) THEN
                   PSF(I,J,K) = PSF(I,J,K) - DX * CON(I,J)
                   PSF(I,J,1) = PSF(I,J,1) + DY * CON(I,J)
-D                 SUM = SUM + PSF(I,J,K)
+CD                 SUM = SUM + PSF(I,J,K)
                END IF
             END DO
          END DO
-D        WRITE (6,*) K, '  SUM =', SUM
-D        WRITE (6,*)
+CD        WRITE (6,*) K, '  SUM =', SUM
+CD        WRITE (6,*)
       END DO
 C
-D     DO K=1,NEXP
-D        LX = K-1
-D        LX = LX*NPSF + LX + 1
-D        LY = 2*NPSF + 3
-D        MX = NPSF
-D        MY = NPSF
-D        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
-D    .        PSF(1,1,K), ISTAT)
-D     END DO
+CD     DO K=1,NEXP
+CD        LX = K-1
+CD        LX = LX*NPSF + LX + 1
+CD        LY = 2*NPSF + 3
+CD        MX = NPSF
+CD        MY = NPSF
+CD        CALL WRARAY ('COPY', LX, LY, MX, MY, MAXPSF, 
+CD    .        PSF(1,1,K), ISTAT)
+CD     END DO
 C
-D     CALL CLPIC ('COPY')
+CD     CALL CLPIC ('COPY')
 C
 C!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 C

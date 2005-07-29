@@ -254,7 +254,7 @@ C
 C
   100 DKEY=DATUM(LIMLO)
       IKEY=INDEX(LIMLO)
-D     TYPE *, 'LO =', LIMLO, '   HI =', LIMHI
+CD     TYPE *, 'LO =', LIMLO, '   HI =', LIMHI
 C
 C Compare all elements in the sub-vector between LIMLO and LIMHI with
 C the current key datum.
@@ -303,11 +303,11 @@ C this is where we stick the key back into the vector.
 C
       DATUM(LO)=DKEY
       INDEX(LO)=IKEY
-D     DO 1666 I=LIMLO,LO-1
-D1666 TYPE *, DATUM(I)
-D     TYPE *, DATUM(LO), ' KEY'
-D     DO 2666 I=LO+1,LIMHI
-D2666 TYPE *, DATUM(I)
+CD     DO 1666 I=LIMLO,LO-1
+CD1666 TYPE *, DATUM(I)
+CD     TYPE *, DATUM(LO), ' KEY'
+CD     DO 2666 I=LO+1,LIMHI
+CD2666 TYPE *, DATUM(I)
 C
 C At this point in the subroutine, all data between LIMLO and LO-1, 
 C inclusive, are less than DATUM(LO), and all data between LO+1 and 
@@ -352,8 +352,8 @@ C
       STKLO(NSTAK)=LIMLO
       STKHI(NSTAK)=LO-1
       LIMLO=LO+1
-D     DO 3666 I=1,NSTAK
-D3666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
+CD     DO 3666 I=1,NSTAK
+CD3666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
       GO TO 100
 C
   300 CONTINUE
@@ -387,8 +387,8 @@ C
       STKLO(NSTAK)=LO+1
       STKHI(NSTAK)=LIMHI
       LIMHI=LO-1
-D     DO 4666 I=1,NSTAK
-D4666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
+CD     DO 4666 I=1,NSTAK
+CD4666 TYPE *, 'STACK: ', I, STKLO(I), STKHI(I)
       GO TO 100
 C
   400 CONTINUE
@@ -397,7 +397,7 @@ C Take the most recent interval from the stack.  If the stack happens
 C to be empty, we are done.
 C
       IF (NSTAK .LE. 0) RETURN                           ! Normal return
-D     TYPE *, 'POP: ', NSTAK, STKLO(NSTAK), STKHI(NSTAK)
+CD     TYPE *, 'POP: ', NSTAK, STKLO(NSTAK), STKHI(NSTAK)
       LIMLO=STKLO(NSTAK)
       LIMHI=STKHI(NSTAK)
       NSTAK=NSTAK-1
@@ -471,7 +471,7 @@ C
       LIMHI=N
 C
   100 DKEY=DATUM(LIMLO)
-D     TYPE *,'LOW=',LIMLO,' HIGH=',LIMHI,' KEY=',DKEY
+CD     TYPE *,'LOW=',LIMLO,' HIGH=',LIMHI,' KEY=',DKEY
 C
 C Compare all elements in the sub-vector between LIMLO and LIMHI with
 C the current key datum.
@@ -516,11 +516,11 @@ C the key and all values above this point are greater than the key,
 C this is where we stick the key back into the vector.
 C
       DATUM(LO)=DKEY
-D     DO 1666 I=LIMLO,LO-1
-D1666 TYPE *,DATUM(I)
-D     TYPE *,DATUM(LO),' KEY'
-D     DO 2666 I=LO+1,LIMHI
-D2666 TYPE *,DATUM(I)
+CD     DO 1666 I=LIMLO,LO-1
+CD1666 TYPE *,DATUM(I)
+CD     TYPE *,DATUM(LO),' KEY'
+CD     DO 2666 I=LO+1,LIMHI
+CD2666 TYPE *,DATUM(I)
 C
 C At this point in the subroutine, all data between LIMLO and LO-1, 
 C inclusive, are less than DATUM(LO), and all data between LO+1 and 
@@ -530,7 +530,7 @@ C values of DATUM from LIMLO to LO-1, inclusive, whereas if NPCT > LO,
 C then we want to sort the values of DATUM from LO+1 to LIMHI, 
 C inclusive.
 C
-D     TYPE *,'NPCT=',NPCT,' LO=',LO
+CD     TYPE *,'NPCT=',NPCT,' LO=',LO
       IF(NPCT-LO)300,900,400
   300 LIMHI=LO-1
       GO TO 100
@@ -1111,7 +1111,7 @@ C
       NTERM = NEXP + NFRAC
       USEPSF = BRIGHT*PROFIL(IPSTYP, DX, DY, PAR, DVDXC, DVDYC, 
      .     JUNK, 0)
-D     TYPE *, USEPSF, ' ANALYTIC '
+CD     TYPE *, USEPSF, ' ANALYTIC '
       DVDXC = BRIGHT*DVDXC
       DVDYC = BRIGHT*DVDYC
       IF (NTERM .LT. 0) RETURN
@@ -1156,7 +1156,7 @@ C
          CORR = BICUBC(PSF(LX-1,LY-1,K), MAXPSF, 
      .        XX-REAL(LX), YY-REAL(LY), DFDX, DFDY)
          USEPSF = USEPSF + JUNK(K)*CORR
-D        TYPE *, USEPSF, ' CORRECTED ', JUNK(K), CORR
+CD        TYPE *, USEPSF, ' CORRECTED ', JUNK(K), CORR
          DVDXC = DVDXC-JUNK(K)*DFDX
          DVDYC = DVDYC-JUNK(K)*DFDY
       END DO

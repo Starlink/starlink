@@ -392,11 +392,11 @@ C stack.
 C
       ITOP=ITOP+1
       JTOP=INDEX(ITOP)
-D     TYPE *, 'ITEST=', ITEST, ' ITOP=', ITOP
-D     DO III=ITOP,ITOP+10
-D       TYPE *, III, ID(INDEX(III)), X(INDEX(III)), Y(III)
-D     END DO
-D     ACCEPT *
+CD     TYPE *, 'ITEST=', ITEST, ' ITOP=', ITOP
+CD     DO III=ITOP,ITOP+10
+CD       TYPE *, III, ID(INDEX(III)), X(INDEX(III)), Y(III)
+CD     END DO
+CD     ACCEPT *
  2120 CONTINUE
 C
 C If ITOP is greater than NTOT, then all stars have been assigned to
