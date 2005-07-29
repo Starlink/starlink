@@ -32,6 +32,7 @@ Files also added from the machine specific system directories:
         + MIPS uses IDATE(MONTH,DAY,YEAR)
         + Cray uses DATE() function which returns different format
           to g77 DATE() builtin
+        + Use DATE_AND_TIME Fortran intrinsic.
   GKS does not want the 4 digit year!
   Now runs with autoconf
   Should just use PSX_LOCALTIME
@@ -108,6 +109,9 @@ to work.
 At least g77 and Sun fortran supply ISATTY(LUN) directly.
 They also supply a GETFD builtin.
 
+g95, gfortran and g77 also have a FNUM function to return the file
+descriptor.
+
 Since we know that STDIN, STDOUT and STDERR are the only units
 that can be a tty, we can simplify things by writing a GETFD
 replacement that uses the builtin GETFD when available, else
@@ -145,7 +149,10 @@ Note also that if fputc and fgetc are not present we will have to
 provide an interface for them. These are posix routines and in
 principal could be added to the PSX library. The real problem is that
 in the case of fputc/fgetc we do need a means of translating Fortran
-unit number to unix file stream.
+unit number to unix file stream. For the present a simple fallback
+set of fputc and fgetc implementations are provided in getputc.c. These
+use raw reads and writes to the file descriptors, avoiding the overhead
+of wrapping into a stream, but beware.
 
 Need to find out what the current status of FPUTC/FGETC/FLUSH 
 intrinsics are. They are built in on g77, Sun Fortran and alpha
