@@ -1,3 +1,4 @@
+#include <config.h>
 *+
 *  Name:
 *     CAT1_NUL
@@ -60,9 +61,12 @@
 *    that the ASCII standard defines a byte with a value of 0 (that is,
 *    all its bits set to zero) as null.  This value is adopted as the
 *    default for data type CHARACTER.
-
       LOGICAL CAT1__DNULL
-      PARAMETER (CAT1__DNULL = 'A55A5AA5'X)
+#if HAVE_HEX_NUMBERS
+      PARAMETER (CAT1__DNULL = 'A55A5AA5'X )
+#else
+      PARAMETER (CAT1__DNULL = X'A55A5AA5')
+#endif
 
       CHARACTER CAT1__DNULC*1
 *     PARAMETER (CAT1__DNULC = CHAR(0) )
