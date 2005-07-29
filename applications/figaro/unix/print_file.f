@@ -31,7 +31,7 @@
       character*(*) filespec
       character*(*) queue
       character*80 quenam,chars
-      external out_routine,system
+      external out_routine
       integer pstat,len1,len2,istat,system,access,rename,count
       logical loop
 
