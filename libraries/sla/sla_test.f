@@ -527,7 +527,8 @@
       INTEGER I, J
       REAL F
       DOUBLE PRECISION D
-      CHARACTER*12 S /'12 34 56.7 |'/
+      CHARACTER*12 S 
+      DATA S/'12 34 56.7 |'/
 
       I = 1
       CALL sla_AFIN (S, I, F, J)
@@ -1770,7 +1771,8 @@
 
       INTEGER I, JA, JB
       DOUBLE PRECISION D
-      CHARACTER*32 S /'  B1950, , J 2000, B1975 JE     '/
+      CHARACTER*32 S 
+      DATA S/'  B1950, , J 2000, B1975 JE     '/
 
       I = 1
       D = 0D0
@@ -3351,7 +3353,8 @@
       INTEGER I, J
       REAL FV
       DOUBLE PRECISION DV
-      CHARACTER*33 S /'  12.345, , -0 1E3-4 2000  E     '/
+      CHARACTER*33 S
+      DATA S /'  12.345, , -0 1E3-4 2000  E     '/
 
       I = 1
       FV = 0.0
@@ -3676,7 +3679,8 @@
 
       INTEGER*4 N
       INTEGER I, J
-      CHARACTER*28 S /'  -12345, , -0  2000  +     '/
+      CHARACTER*28 S   
+      DATA S/'  -12345, , -0  2000  +     '/
 
       I = 1
       N = 0
@@ -3749,7 +3753,8 @@
 
       INTEGER J
       DOUBLE PRECISION E
-      CHARACTER K  /'?'/
+      CHARACTER K   
+      DATA K/'?'/
 
       E = 1950D0
       CALL sla_KBJ ( -1, E, K, J )
