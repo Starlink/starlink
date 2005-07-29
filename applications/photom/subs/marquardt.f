@@ -139,8 +139,10 @@
 	      SVD_U( I, I ) = ALPHA( I, I ) * ( 1.0 + LAMBDA )
 	      INCR_A( I ) = BETA( I )
 	    END DO
-	    CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, SVD_V )
-	    CALL SVD_REC( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, N_TERM )
+	    CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, 
+     :                     SVD_V )
+	    CALL SVD_REC( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, 
+     :                    N_TERM )
 	    DO I = 1, N_TERM
 	      DO J = 1, N_TERM
 		COVAR( I, J ) = SVD_U( I, J )
@@ -159,9 +161,11 @@
 	    SVD_U( I, I ) = ALPHA( I, I ) * ( 1.0 + LAMBDA )
 	    INCR_A( I ) = BETA( I )
 	  END DO
-	  CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, SVD_V )
+	  CALL SVD_COMP( SVD_U, M_PAR, M_PAR, N_TERM, N_TERM, SVD_W, 
+     :                   SVD_V )
 	  CALL SV_BCSB
-     1		( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, N_TERM, INCR_A )
+     1		( SVD_U, SVD_W, SVD_V, M_PAR, M_PAR, N_TERM, N_TERM, 
+     :            INCR_A )
 	END IF
 
 	DO I = 1, N_TERM
