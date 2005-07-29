@@ -1,3 +1,4 @@
+#include <config.h>
       SUBROUTINE ARD1_EVAL( INDEX1, NDIM, LBND, UBND, OPCSIZ, OPNSIZ,
      :                      STKSIZ, MSKSIZ, OPCODE, OPRNDS, STACK, 
      :                      LEXSTK, UEXSTK, LINSTK, UINSTK, MASK, 
@@ -123,6 +124,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +134,8 @@
 *        Modified for ARD version 2.0.
 *     31-AUG-2004 (TIMJ):
 *        Register the %LOC pointer with CNF prior to use..
+*     29-JUL-2005 (PWD):
+*        Make use of %LOC/LOC configurable.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -391,7 +395,11 @@
 
 *  First we need a pointer from the STACK variable. This code is 64bit
 *  friendly, need to translate to an INTEGER and register with CNF
+#if HAVE_INTRINSIC_LOC || HAVE_LOC 
+               IPNTR = CNF_PREG( LOC( STACK( 1, TOS ) ), ISNEWREG )
+#else
                IPNTR = CNF_PREG( %LOC( STACK( 1, TOS ) ), ISNEWREG )
+#endif
                IF (IPNTR .EQ. 0 .OR. CNF_PVAL(IPNTR) .EQ. 0) THEN
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
