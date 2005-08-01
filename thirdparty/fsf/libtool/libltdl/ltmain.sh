@@ -735,15 +735,34 @@ if test -z "$show_help"; then
       esac
     done
 
-    qlibobj=`$echo "X$libobj" | $Xsed -e "$sed_quote_subst"`
-    case $qlibobj in
-      *$quote_scanset* | *]* | *\|* | *\&* | *\(* | *\)* | "")
-	qlibobj="\"$qlibobj\"" ;;
-    esac
-    if test "X$libobj" != "X$qlibobj"; then
-	$echo "$modename: libobj name \`$libobj' may not contain shell special characters."
-	exit $EXIT_FAILURE
-    fi
+# Starlink: The following test fails on (DUX?) ksh, which misparses the 
+# test for the right bracket.  It's written this way in libtool 1.5.18
+# at least, but is rewritten in CVS libtool (as of July 2005), so that
+# the working version will presumably appear in libtool 2.0.  We can't 
+# wait, however, and can't work out how to persuade configure/libtool to 
+# run this script with /bin/sh _and_ a working echo (libtool is both very
+# cunning and very persistent about making its way back to beloved ksh).
+# Since we do not in fact use filenames with special characters, this test
+# is redundant, so we can safely just remove it.  This change will cause a 
+# conflict when a newer version is imported, which is presumably why you're
+# reading it now (hello, lucky person! welcome to a world of pain!), at which
+# point it should be discarded if the replacement is the working version.  
+# Just for your reference, that looks like
+#   test "X$libobj" != "X$func_quote_for_eval_result" \
+#     && $ECHO "X$libobj" | $GREP ['[@:>@~#^*{};<>?"'"'"'       &()|`$@<:@]'] \
+#     && func_warning "libobj name \`$libobj' may not contain shell special characters."
+# If that looks like what's conflicting, then clearly today is going to
+# be a Good Day.
+#
+#    qlibobj=`$echo "X$libobj" | $Xsed -e "$sed_quote_subst"`
+#    case $qlibobj in
+#      *$quote_scanset* | *]* | *\|* | *\&* | *\(* | *\)* | "")
+#	qlibobj="\"$qlibobj\"" ;;
+#    esac
+#    if test "X$libobj" != "X$qlibobj"; then
+#	$echo "$modename: libobj name \`$libobj' may not contain shell special characters."
+#	exit $EXIT_FAILURE
+#    fi
     objname=`$echo "X$obj" | $Xsed -e 's%^.*/%%'`
     xdir=`$echo "X$obj" | $Xsed -e 's%/[^/]*$%%'`
     if test "X$xdir" = "X$obj"; then
