@@ -21,7 +21,8 @@ Starlink automake to include the manifest support code in it.  Beyond this:
 In general, if you make a change which modifies one of the committed
 generated files, then you should commit that generated file later than
 the file it was generated for, to avoid repository timestamp problems
-(see below for more agonising detail).
+(see below for more agonising detail).  However the checkout-fixup
+technique described at the bottom is potentially the most robust of all.
 
 In each case, the changes can be seen with the command
 
@@ -91,13 +92,13 @@ are generated from (configure.{ac,in}, Makefile.am, and so on).  Note
 that CVS appears to use the one-second-resolution _commit_ time as a
 timestamp in the repository.
 
-A more general solution is illustrated in automake/Makefile.am, where
-a checkout-fixup target, mentioned in BUILT_SOURCES is used to
-guarantee that the timestamps on the generated files are as they
-would be if all the generated targets were satisfied.  It might be
-worth adapting this mechanism to autoconf, and possibly libtool and m4,
-in which case the notes above about these staged commits should be
-deleted as terribly confusing.
+A more general solution is illustrated in automake/Makefile.am and
+libtool/Makefile.am, where a checkout-fixup target, mentioned in
+BUILT_SOURCES, is used to guarantee that the timestamps on the
+generated files are as they would be if all the generated targets were
+satisfied.  It might be worth adapting this mechanism to autoconf, and
+possibly m4, in which case the notes above about these staged commits
+should be deleted as terribly confusing.
 
 M4 appears to be slightly more fragile (and indeed peculiar) than the
 others in this respect -- see the separate notes in
