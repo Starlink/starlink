@@ -359,6 +359,7 @@ kpg1_asgrp.f \
 kpg1_asref.f \
 kpg1_asset.f \
 kpg1_assir.f \
+kpg1_astrm.f \
 kpg1_avlut.f \
 kpg1_ccpro.f \
 kpg1_cpntb.f \
@@ -395,6 +396,7 @@ kpg1_incor.f \
 kpg1_lstar.f \
 kpg1_lutky.f \
 kpg1_lutk3.f \
+kpg1_mklut.f \
 kpg1_pacol.f \
 kpg1_pgcls.f \
 kpg1_pgopn.f \

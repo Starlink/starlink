@@ -137,6 +137,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Arguments Given:
       INTEGER INDF
@@ -156,7 +157,6 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
-      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
 
 *  Local Constants:
       INTEGER SZFMT              ! Max. characters in formatted value
@@ -169,27 +169,25 @@
       CHARACTER QAXIS*( VAL__SZI ) ! Buffer for original axis number
       CHARACTER TTL*80             ! NDF title
       DOUBLE PRECISION CONST( NDF__MXDIM )! Constant values for unassigned axes
+      INTEGER DIM                  ! Pixel dimension
       INTEGER FRM                  ! Pointer to a Frame in IWCS
       INTEGER I                    ! Axis index
-      INTEGER IAXIS( NDF__MXDIM )  ! Axes to pick from the old Current Frame
       INTEGER IBASE                ! Index of original Base Frame in IWCS
       INTEGER ICURR                ! Index of original Current Frame in IWCS
       INTEGER INPRM( NDF__MXDIM )  ! Input axis permutation array
-      INTEGER INDFS                ! NDF section identifier
       INTEGER IPIX                 ! Index of original PIXEL Frame in IWCS
-      INTEGER NBAX                 ! Number of axes in GRID Frame
-      INTEGER J                    ! Axis index
+      INTEGER IPWORK               ! Pointer to work space
       INTEGER LBND( NDF__MXDIM )   ! Original NDF bounds
       INTEGER LTTL                 ! Used length of TTL
+      INTEGER MXDIM                ! Largest selected pixel dimension
+      INTEGER NBAX                 ! Number of axes in GRID Frame
       INTEGER NC                   ! No. of characters in text buffer
       INTEGER NCP                  ! No. of characters in PAXIS text buffer
       INTEGER NCQ                  ! No. of characters in QAXIS text buffer
       INTEGER NDIMS                ! No. of genuine axes in the NDF
       INTEGER NEWBAS               ! Pointer to the new Base Frame
-      INTEGER NEWCUR               ! Pointer to the new Current Frame
       INTEGER NEWFS                ! Pointer to a FrameSet with new Base Frame
       INTEGER NEWPIX               ! Pointer to the new PIXEL Frame
-      INTEGER NFC                  ! No. of axes in original Current Frame
       INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array
       INTEGER PMAP                 ! AST pointer to a PermMap
       INTEGER UBND( NDF__MXDIM )   ! Original NDF bounds
@@ -222,10 +220,14 @@
 *  Obtain the bounds of the NDF.  
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
-*  Return the bounds of the chosen pixel axes. 
+*  Return the bounds of the chosen pixel axes. Also find the largest
+*  choisen pixel dimension.
+      MXDIM = 0
       DO I = 1, NDIM
          SLBND( I ) = LBND( SDIM( I ) )
          SUBND( I ) = UBND( SDIM( I ) )
+         DIM = SUBND( I ) - SLBND( I ) + 1
+         IF( DIM .GT. MXDIM ) MXDIM = DIM
       END DO
          
 *  Get a pointer to the WCS FrameSet.
@@ -464,84 +466,20 @@
 
       END IF       
 
+
+
 *  Now modify the Current Frame if required to have exactly NDIM axes.
 *  ===================================================================
       IF( TRIM ) THEN
-
-*  Get the number of axes in the original Current Frame.
-         NFC = MIN( NDF__MXDIM, AST_GETI( IWCS, 'NAXES', STATUS ) )
-
-*  First deal with cases where the Current Frame has too many axes. 
-*  At the moment a PermMap is used to select NDIM axes from those
-*  available in the Current Frame. A value of AST__BAD is assigned to the
-*  other axes by this PermMap. If the selected axes are not independant
-*  of the other axes, then these AST__BAD values will result in bad values
-*  on all axes when points are transformed from the trimmed Current Frame
-*  to the GRID (or any other) Frame. Ideally, the value assigned to the
-*  "non-slected" axes by the PermMap would vary in order to ensure that
-*  points transformed into the GRID Frame reside in the slice selected
-*  above. This may be possible with a future release of AST, which may
-*  include a "SubMap" class for doing this. Until then, the best that we
-*  can do is to assign AST__BAD values to the non-selected axes. At least
-*  this will work in the common cases.
-         IF( NFC .GT. NDIM ) THEN
-
-*  Get the required number of axis selections. A resonable guess should
-*  be to assume a one-to-one correspondance between Current and Base axes.
-*  Therefore, use the significant axes selected above as the defaults to be
-*  used if a null (!) parameter value is supplied.
-            DO I = 1, NDIM
-               IAXIS( I ) = SDIM( I )
-            END DO
-
-            CALL KPG1_GTAXI( 'USEAXIS', IWCS, NDIM, IAXIS, STATUS )
-
-*  Create a new Frame by picking the selected axes from the original
-*  Current Frame. This also returns a PermMap which goes from the 
-*  original Frame to the new one, using AST__BAD values for the
-*  un-selected axes.
-            NEWCUR = AST_PICKAXES( IWCS, NDIM, IAXIS, PMAP, STATUS )
-
-*  If the original Current Frame is a CmpFrame, the Frame created from
-*  the above call to AST_PICKAXES may not have inherited its Title. If
-*  the Frame created above has no Title, but the original Frame had, then
-*  copy the original Frame's Title to the new Frame.
-            IF( AST_TEST( IWCS, 'TITLE', STATUS ) .AND.
-     :          .NOT. AST_TEST( NEWCUR, 'TITLE', STATUS ) ) THEN
-               TTL = AST_GETC( IWCS, 'TITLE', STATUS )
-               LTTL = MAX( 1, CHR_LEN( TTL ) )
-               CALL AST_SETC( NEWCUR, 'TITLE', TTL( : LTTL ), STATUS )
-            END IF
-
-*  Add this new Frame into the FrameSet. It becomes the Current Frame.
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NEWCUR, 
-     :                         STATUS )
-
-*  Now deal with cases where the original Current Frame has too few axes.
-         ELSE IF( NFC .LT. NDIM ) THEN
-
-*  Use zero to indicate the extra axes required.
-            DO I = 1, NFC
-               IAXIS( I ) = I
-            END DO            
-
-            DO I = NFC + 1, NDIM
-               IAXIS( I ) = 0
-            END DO            
-
-*  Create a new Frame by adding the extra default axes to the original
-*  Current Frame. This also returns a PermMap which goes from the 
-*  original Frame to the new one, using AST__BAD values for the
-*  new un-selected axes.
-            NEWCUR = AST_PICKAXES( IWCS, NDIM, IAXIS, PMAP, STATUS )
-
-*  Add this new Frame into the FrameSet. It becomes the Current Frame.
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NEWCUR, 
-     :                         STATUS )
-
-         END IF
-
+         CALL PSX_CALLOC( MXDIM*2, '_DOUBLE', IPWORK, STATUS )
+         CALL KPG1_ASTRM( IWCS, SLBND, SUBND, %VAL( CNF_PVAL(IPWORK) ), 
+     :                    STATUS )
+         CALL PSX_FREE( IPWORK, STATUS )
       END IF
+
+
+*  Tidy up
+*  =======
 
 *  If the Current Frame has no Title, use the Title from the NDF (if any).
       TTL = ' '
@@ -564,7 +502,7 @@
      :                 'co-ordinate Frame is not defined.', STATUS )
 
          CALL NDF_MSG( 'NDF', INDF ) 
-         CALL ERR_REP( 'KPG1_ASGET_2', 'It may be possible to avoid '//
+         CALL ERR_REP( 'KPG1_ASGET_3', 'It may be possible to avoid '//
      :                 'this problem by changing the current '//
      :                 'co-ordinate Frame in ^NDF using WCSFRAME.', 
      :                  STATUS )
