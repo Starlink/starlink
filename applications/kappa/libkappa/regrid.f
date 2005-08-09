@@ -560,7 +560,7 @@
          CALL MSG_SETC( 'M', 'Nearest Neighbour' )
          INTERP = AST__NEAREST
          NPARAM = 0
-      ELSE IF ( METHOD .EQ. 'LINEAR' ) THEN
+      ELSE IF ( METHOD .EQ. 'BILINEAR' ) THEN
          CALL MSG_SETC( 'M', 'Bilinear' )
          INTERP = AST__LINEAR
          NPARAM = 0
