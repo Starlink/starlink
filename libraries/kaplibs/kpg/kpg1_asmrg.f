@@ -68,6 +68,9 @@
 *        - Check current Frames first.
 *        - Issue warning if more than one Frame with the alignment Domain
 *          exists in either FrameSet.
+*     9-AUG-2005 (DSB):
+*        Add warning about differing dimensionalities if no alignment is
+*        possible.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,6 +108,8 @@
       INTEGER IMAT1              ! Index of alignment Frame in IWCS1 
       INTEGER IMAT2              ! Index of alignment Frame in IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
+      INTEGER NAXC1              ! Number of axies in current Frame of IWCS1
+      INTEGER NAXC2              ! Number of axies in current Frame of IWCS2
       INTEGER NFRM1              ! No. of Frames supplied in IWCS1
       INTEGER TEMP               ! AST pointer to a FrameSet
       LOGICAL WARNED             ! Warning of duplicate Frames issued?
@@ -115,6 +120,10 @@
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
+
+*  Note the number of axes in the two current Frames.
+      NAXC1 = AST_GETI( IWCS1, 'NAXES', status )
+      NAXC2 = AST_GETI( IWCS2, 'NAXES', status )
 
 *  Note the indices of the Base and Currrent Frames in the two FrameSets so 
 *  that they can be re-instated after AST_CONVERT has changed them.
@@ -176,6 +185,15 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_ASMRG_2', 'Could not align supplied '//
      :                    'positions.', STATUS )
+         END IF
+
+*  Warn the user about any different dimensionalities in the two current Frames
+         IF( NAXC1 .NE. NAXC2 ) THEN
+            CALL MSG_SETI( 'NC1', NAXC1 )
+            CALL MSG_SETI( 'NC2', NAXC2 )
+            CALL ERR_REP( 'KPG1_ASMRG_2', 'The two current coordinate'//
+     :                    ' Frames have different numbers of axes '//
+     :                    '(^NC1 and ^NC2).', STATUS )
          END IF
 
          GO TO 999
