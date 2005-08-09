@@ -618,6 +618,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Primary OBSGEO-X/Y/Z, MJD-AVG and MJDOBS keywords are associated 
 *        with all axis descriptions and should not have a trailing single 
 *        character indicating an alternate axis set.
+*     9-AUG-2005 (DSB):
+*        In WcsMapFrm, check reffrm is used before annulling it.
 *class--
 */
 
@@ -27300,7 +27302,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    }
 
 /* Annull temporary resources. */
-   reffrm = astAnnul( reffrm );
+   if( reffrm ) reffrm = astAnnul( reffrm );
    iwcfrm = astAnnul( iwcfrm );
    map1 = astAnnul( map1 );
    map2 = astAnnul( map2 );
