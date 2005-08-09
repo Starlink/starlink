@@ -13196,6 +13196,15 @@ iraf! {
             helpkey *
          }
 
+         parameter rebin {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Create output pixel values by rebinning input pixels?}
+            helpkey *
+            default FALSE
+          }
+
          parameter scale {
             type _DOUBLE
             vpath DEFAULT
@@ -13232,6 +13241,15 @@ iraf! {
             prompt {Upper bounds of the output NDF}
             helpkey *
          }
+
+         parameter wlim {
+            type _REAL
+            prompt {Minimum weight for valid output pixels}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
 
       }
 
@@ -15649,6 +15667,15 @@ iraf! {
             helpkey *
           }
 
+         parameter rebin {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Create output pixel values by rebinning input pixels?}
+            helpkey *
+            default FALSE
+          }
+
          parameter ubnd {
             size *
             position 4
@@ -15656,6 +15683,15 @@ iraf! {
             access READ
             ppath DYNAMIC
             prompt {Upper pixel index bounds for output images}
+            helpkey *
+          }
+
+         parameter wlim {
+            type _REAL
+            prompt {Minimum weight for valid output pixels}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
             helpkey *
           }
 
