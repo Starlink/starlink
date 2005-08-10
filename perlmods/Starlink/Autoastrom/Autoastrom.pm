@@ -230,6 +230,47 @@ sub defects {
   return $self->{DEFECTS};
 }
 
+=item B<detected_catalogue>
+
+Retrieve or set a filename that will take the set of objects detected
+by the detection step. The file is formatted in Cluster format
+with 13 columns:
+
+=over 4
+
+=item * a zero
+
+=item * the object ID number
+
+=item * the RA and Dec in space-separated format
+
+=item * the x and y positions of the source on the CCD
+
+=item * an instrumental magnitude
+
+=item * the error in the instrumental magnitude
+
+=item * extraction flags
+
+=back
+
+  my $detected_catalogue = $auto->detected_catalogue;
+  $auto->detected_catalogue( 'detect.cat' );
+
+Defaults to undef, meaning that no such file will be written. If defined,
+it will write the catalogue in the current working directory.
+
+=cut
+
+sub detected_catalogue {
+  my $self = shift;
+  if( @_ ) {
+    my $detected_catalogue = shift;
+    $self->{DETECTED_CATALOGUE} = $detected_catalogue;
+  }
+  return $self->{DETECTED_CATALOGUE};
+}
+
 =item B<insert>
 
 Whether or not to insert the final astrometric fit into the input NDF
@@ -965,8 +1006,8 @@ sub solve {
   }
 
 # Output the merged catalogue to disk, if requested.
-  if( 0 && defined( $self->matchcatalogue ) ) {
-    $merged->write_catalog( Format => '', File => $self->matchcatalogue );
+  if( defined( $self->matchcatalogue ) ) {
+    $merged->write_catalog( Format => 'Cluster', File => $self->matchcatalogue );
   }
 
 # Solve astrometry.
@@ -1006,6 +1047,36 @@ sub solve {
     err_end( $STATUS );
     print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
   }
+
+# Write the detected object catalogue, if requested.
+  if( defined( $self->detected_catalogue ) ) {
+
+# Get the FK5 frameset for the WCS.
+    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+    my $frameset = $newwcs->FindFrame( $template, "" );
+    if( ! defined( $frameset ) ) {
+      croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
+    }
+
+# Modify the RA/Dec for each item.
+    my $items = $ndfcat->stars();
+    my $printed = 0;
+    foreach my $item ( @{$items} ) {
+      my( $ra, $dec ) = $frameset->Tran2( [$item->x],
+                                          [$item->y],
+                                          1 );
+      my $coords = new Astro::Coords( ra    => $ra->[0],
+                                      dec   => $dec->[0],
+                                      type  => 'J2000',
+                                      units => 'radians',
+                                    );
+      $item->coords( $coords );
+    }
+
+# Now dump the catalogue to disk.
+    $ndfcat->write_catalog( Format => 'Cluster', File => $self->detected_catalogue );
+  }
+
 }
 
 =back
