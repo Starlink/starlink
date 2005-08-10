@@ -14886,24 +14886,15 @@ static void SpreadLinear##X( int ndim_out, \
    bad pixels and variances can be eliminated when not required. */ \
       if ( usebad ) { \
          if ( usevar ) { \
-\
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-            if ( usebad ) { \
-               if ( usevar ) { \
-                  LINEAR_2D(X,Xtype,1,1,IntType) \
-               } else { \
-                  LINEAR_2D(X,Xtype,1,0,IntType) \
-               } \
-            } else { \
-               if ( usevar ) { \
-                  LINEAR_2D(X,Xtype,0,1,IntType) \
-               } else { \
-                  LINEAR_2D(X,Xtype,0,0,IntType) \
-               } \
-            } \
+            LINEAR_2D(X,Xtype,1,1,IntType) \
+         } else { \
+            LINEAR_2D(X,Xtype,1,0,IntType) \
+         } \
+      } else { \
+         if ( usevar ) { \
+            LINEAR_2D(X,Xtype,0,1,IntType) \
+         } else { \
+            LINEAR_2D(X,Xtype,0,0,IntType) \
          } \
       } \
 \
