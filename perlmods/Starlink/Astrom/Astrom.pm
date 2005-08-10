@@ -60,6 +60,9 @@ by this option. [undef]
 =item keeptemps - If set to true, keep all temporary files used
 for processing. This includes all output files. [0]
 
+=item obs - A hash containing keys that correspond to the observation
+data keywords as listed in SUN/242: time, obs, met, and col.
+
 =item tempdir - If set, use the named directory as the location
 for all temporary files. If the directory does not exist, it will
 be created. [undef]
@@ -177,6 +180,48 @@ sub keeptemps {
   return $self->{KEEPTEMPS};
 }
 
+=item B<obs>
+
+Retrieve or set observation data.
+
+  my $obs = $auto->obs;
+  $auto->obs( $obs );
+
+This method returns or is set with a hash reference. Keys are those
+as listed in secion 2.4.12 of SUN/242:
+
+=item time - An observation time, given as a Julian epoch (format r),
+or a local sidereal time (format i:i), or UT (format i:i:i:i:r specifying
+four-digit year, month, day, hours and minutes).
+
+=item obs - An observation station, given either as one of the SLALIB
+observatory codes or else in the format i:r:i:r[:r], giving longitude,
+latitude, and optional height. Longitudes are east longitudes - west
+longitudes may be given either as minus degrees or longitudes greater
+than 180.
+
+=item met - Temperature and pressure at the telescope, in degrees Kelvin
+and millibars. The defaults are 278K and a pressure computed from the
+observatory height. Format r[:r].
+
+=item col - The effective colour of the observations as a wavelength
+in nanometres. The default is 500nm, and the format is r.
+
+For the above formats, i represents an integer, r a real, and optional
+entries are in [...], and the separator : may be either a colon or
+whitespace.
+
+=cut
+
+sub obs {
+  my $self = shift;
+  if( @_ ) {
+    my $obs = shift;
+    $self->{OBS} = $obs;
+  }
+  return $self->{OBS};
+}
+
 =item B<temp>
 
 Retrieve or set the directory to be used for temporary files.
@@ -279,6 +324,49 @@ sub solve {
 
   # Write the catalog to the temporary file.
   $catalog->write_catalog( Format => 'Astrom', File => $astrom_input );
+
+  # If we have observation data, then we need to modify the input file.
+  if( defined( $self->obs ) &&
+      ( defined( $self->obs->{'time'} ) ||
+        defined( $self->obs->{'obs'} ) ||
+        defined( $self->obs->{'met'} ) ||
+        defined( $self->obs->{'col'} ) ) ) {
+
+    open( my $old_fh, "< $astrom_input" ) or croak "Could not open $astrom_input to add observation data: $!";
+    ( my $new_fh, my $new ) = tempfile( DIR => $self->temp );
+    my $written = 0;
+    while( <$old_fh> ) {
+      my $line = $_;
+      print $new_fh $line;
+
+      # Add the observation data after the "~ RA DEC" line, but make
+      # sure we only do it once.
+      if( $line =~ /^~ \d/ && ! $written ) {
+
+        # We're at the point in the file where we want to add things.
+        # Do it in this order: time, obs, met, col.
+        if( defined( $self->obs->{'time'} ) ) {
+          print $new_fh "Time " . $self->obs->{'time'} . "\n";
+        }
+        if( defined( $self->obs->{'obs'} ) ) {
+          print $new_fh "Obs " . $self->obs->{'obs'} . "\n";
+        }
+        if( defined( $self->obs->{'met'} ) ) {
+          print $new_fh "Met " . $self->obs->{'met'} . "\n";
+        }
+        if( defined( $self->obs->{'col'} ) ) {
+          print $new_fh "Colour " . $self->obs->{'col'} . "\n";
+        }
+        $written = 1;
+      }
+    }
+    close $old_fh;
+    close $new_fh;
+    rename( $astrom_input, "$astrom_input.orig" );
+    rename( $new, $astrom_input );
+    unlink "$astrom_input.orig";
+  }
+
   print "ASTROM input catalog is in $astrom_input\n" if ( $DEBUG || $self->verbose );
 
   # We need a base filename for the FITS files. ASTROM will automatically
@@ -318,9 +406,14 @@ sub solve {
   my $fits_dir = dirname( $output_fitsbase );
   my $fits_base = basename( $output_fitsbase );
   opendir( my $dir_h, $fits_dir ) or croak "Could not open $fits_dir to read in FITS files: $!";
-  my @fits_files = grep { /$fits_base/ } readdir( $dir_h );
+  my @fits_files = grep { /$fits_base\d\d.fit/ } readdir( $dir_h );
   closedir( $dir_h );
   @fits_files = sort @fits_files;
+
+  if( $#fits_files == -1 ) {
+    croak "ASTROM run resulted in no FITS WCS files";
+  }
+
   my $highest = $fits_files[-1];
   $highest = File::Spec->catfile( $fits_dir, $highest );
 
