@@ -56,6 +56,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        Original version (drawing heavily on specmap.c)
 *     25-MAY-2005 (DSB):
 *        Extensive modifications to make it more AST-like.
+*     10-AUG-2005 (DSB):
+*        Add 2006 leap second.
 *class--
 */
 
@@ -972,8 +974,12 @@ static double Dat( double in, int forward ){
    ------------------------------- */
    if( forward ) {
 
+/* 2006 January 1 */
+      if( in >= 53736.0 ) {
+         result = 33.0;
+
 /* 1999 January 1 */
-      if( in >= 51179.0 ){
+      } else if( in >= 51179.0 ){
          result = 32.0;
 
 /* 1997 July 1 */
@@ -1125,8 +1131,12 @@ static double Dat( double in, int forward ){
    ------------------------------  */
    } else {
 
+/* 2006 January 1 */
+      if( in >= 53736.0 + 33.0/SPD ){
+         result = -33.0;
+
 /* 1999 January 1 */
-      if( in >= 51179.0 + 32.0/SPD ){
+      } else if( in >= 51179.0 + 32.0/SPD ){
          result = -32.0;
 
 /* 1997 July 1 */
