@@ -22,8 +22,12 @@ for a subset of V1.20 of the draft STC specification.
 
 
 - A new set of methods (AST_REBIN<X>/astRebin<X>) has been added to 
-the Mapping class. These are flux-conserving alternatives to the existing
-AST_RESAMPLE<X>/astResample<X> methods.
+the Mapping class. These are accurately flux-conserving alternatives to the 
+existing AST_RESAMPLE<X>/astResample<X> methods.
+
+- A new control flag has been added to the AST_RESAMPLE<X>/astResample<X> 
+functions which produces approximate flux conservation.
+
 
 Main Changes in Version 3.7
 ---------------------------

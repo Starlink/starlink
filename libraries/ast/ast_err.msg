@@ -150,4 +150,7 @@ TIMIN           <invalid TimeMap>
 STCKEY          <cannot use supplied AstroCoords info>
 STCIND          <invalid AstroCoords index>
 
+! New codes introduced for V4.0
+CNFLX           <cannot conserve flux whilst resampling an array of data>
+
 .END

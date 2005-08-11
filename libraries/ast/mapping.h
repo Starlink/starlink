@@ -200,6 +200,8 @@
 *           Flags reserved for user-defined purposes.
 *        AST__USEBAD
 *           Recognise bad pixels?
+*        AST__CONSERVEFLUX
+*           Conserve flux in astResample?
 *
 *     Protected:
 *        AST__USEVAR
@@ -289,6 +291,7 @@
 #define AST__USEVAR (16)         /* Use variance arrays? */
 #endif
 #define AST__USEBAD (32)         /* Recognise bad pixels? */
+#define AST__CONSERVEFLUX (64)   /* Conserve flux? */
 
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's

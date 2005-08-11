@@ -149,6 +149,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added astRebin.
 *     7-JUL-2005 (DSB):
 *        Make MapSplit public rather than protected.
+*     11-AUG-2005 (DSB):
+*        Added the AST__CONSERVEFLUX flag (used by astResampleX).
 *class--
 */
 
@@ -271,13 +273,19 @@ static void SpreadLinearLD( int, const int *, const int *, const long double *, 
 static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, double *);
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+static void ConserveFluxLD( double, int, const int *, long double, long double *, long double * );
 #endif
 
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static PN *FitPN( AstMapping *, double *, int, int, double, double, double * );
+static PN *InterpPN( int, double *, double * );
 static const char *GetAttrib( AstObject *, const char * );
+static double EvaluateDPN( PN *, double );
+static double EvaluatePN( PN *, double );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
+static double MatrixDet( int, const double * );
 static double MaxD( double, double );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
 static double Random( long int * );
@@ -322,15 +330,10 @@ static int InterpolateNearestUI( int, const int *, const int *, const unsigned i
 static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int * );
 static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int * );
 static int LinearApprox( AstMapping *, const double *, const double *, double, double * );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MaxI( int, int );
 static int MinI( int, int );
-static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
-static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
-static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
-static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
-static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
-static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double *  );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
 static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
@@ -338,31 +341,36 @@ static int ResampleF( AstMapping *, int, const int [], const int [], const float
 static int ResampleI( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
 static int ResampleL( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
 static int ResampleS( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
-static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
+static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int ResampleUB( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
 static int ResampleUI( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
 static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
 static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
-static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, double * );
-static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, double *);
-static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, double * );
-static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
-static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
-static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
-static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
-static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
-static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
+static int SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static int TestAttrib( AstObject *, const char * );
 static int TestInvert( AstMapping * );
 static int TestReport( AstMapping * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearInvert( AstMapping * );
 static void ClearReport( AstMapping * );
+static void CombinePN( PN *, PN * );
+static void ConserveFluxB( double, int, const int *, signed char, signed char *, signed char * );
+static void ConserveFluxD( double, int, const int *, double, double *, double * );
+static void ConserveFluxF( double, int, const int *, float, float *, float * );
+static void ConserveFluxI( double, int, const int *, int, int *, int * );
+static void ConserveFluxL( double, int, const int *, long int, long int *, long int * );
+static void ConserveFluxS( double, int, const int *, short int, short int *, short int * );
+static void ConserveFluxUB( double, int, const int *, unsigned char, unsigned char *, unsigned char * );
+static void ConserveFluxUI( double, int, const int *, unsigned int, unsigned int *, unsigned int * );
+static void ConserveFluxUL( double, int, const int *, unsigned long int, unsigned long int *, unsigned long int * );
+static void ConserveFluxUS( double, int, const int *, unsigned short int, unsigned short int *, unsigned short int * );
 static void Copy( const AstObject *, AstObject * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static void FunPN( AstMapping *, double *, int, int, int, double *, double * );
+static void Gauss( double, const double [], int, double * );
 static void GlobalBounds( MapData *, double *, double *, double [], double [] );
 static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * ); 
 static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * ); 
@@ -376,7 +384,12 @@ static void InterpolateBlockAverageUL( int, const int[], const int[], const unsi
 static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
 static void Invert( AstMapping * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
+static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
+static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
+static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
+static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
+static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double *  );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
 static void SetAttrib( AstObject *, const char * );
 static void SetInvert( AstMapping *, int );
@@ -384,20 +397,23 @@ static void SetReport( AstMapping *, int );
 static void Sinc( double, const double [], int, double * );
 static void SincCos( double, const double [], int, double * );
 static void SincGauss( double, const double [], int, double * );
-static void Gauss( double, const double [], int, double * );
 static void SincSinc( double, const double [], int, double * );
-static int SpecialBounds( const MapData *, double *, double *, double [], double [] );
+static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, double * );
+static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, double *);
+static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, double * );
+static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
+static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
+static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
+static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, double *);
+static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, double *);
+static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, double *);
 static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
 static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
 static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
 static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
-static PN *FitPN( AstMapping *, double *, int, int, double, double, double * );
-static double EvaluatePN( PN *, double );
-static double EvaluateDPN( PN *, double );
-static PN *InterpPN( int, double *, double * );
-static void CombinePN( PN *, PN * );
-static void FunPN( AstMapping *, double *, int, int, int, double *, double * );
+
+
 
 /* Member functions. */
 /* ================= */
@@ -535,6 +551,116 @@ static void CombinePN( PN *lo, PN *hi ) {
    for( k = 0; k < n+2; k++ ) lo->coeff[ k ] = cc[ k ];
 
 }
+
+/*
+*  Name:
+*     ConserveFlux<X>
+
+*  Purpose:
+*     Scale the output data and variance values produced by ResampleSection 
+*     by the given flux conservation factor. 
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void ConserveFlux<X>( double factor, int npoint, const int *offset,
+*                           <Xtype> badval, <Xtype> *out, 
+*                           <Xtype> *out_var )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which scale the supplied resampled data 
+*     values by the given flux conservation factor. It also scales any 
+*     variances by the square of the factor.
+
+*  Parameters:
+*     factor
+*        The flux conservation factor. This should be the ratio of the
+*        output pixel size to the input pixel size, in the locality of
+*        the supplied data values.
+*     npoint
+*        The number of points at which the input grid was resampled.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each output point, this array should contain the zero-based
+*        offset in the output array(s) (i.e. the "out" and,
+*        optionally, the "out_var" arrays) at which the resampled
+*        output value(s) is stored.
+*     badval
+*        This parameter specifies the value which is used to identify
+*        bad data and/or variance values in the output array(s).
+*     out
+*        Pointer to an array in which the resampled data is supplied. Note
+*        that details of how the output grid maps on to this array
+*        (e.g. the storage order, number of dimensions, etc.) is
+*        arbitrary and is specified entirely by means of the "offset"
+*        array. The "out" array should therefore contain sufficient
+*        elements to accommodate the "offset" values supplied.  There
+*        is no requirement that all elements of the "out" array should
+*        be assigned values, and any which are not addressed by the
+*        contents of the "offset" array will be left unchanged.
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, in which variance estimates for
+*        the resampled values are supplied. If no output variance estimates 
+*        are available, a NULL pointer should be given.
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*/
+/* Define a macro to implement the function for a specific data
+   type. */
+#define MAKE_CONSERVEFLUX(X,Xtype) \
+static void ConserveFlux##X( double factor, int npoint, const int *offset, \
+                             Xtype badval, Xtype *out, Xtype *out_var ) { \
+\
+/* Local Variables: */ \
+   int off_out;                  /* Pixel offset into output array */ \
+   int point;                    /* Loop counter for output points */ \
+\
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+   for ( point = 0; point < npoint; point++ ) { \
+      off_out = offset[ point ]; \
+      if( out[ off_out ] != badval ) out[ off_out ] *= factor; \
+   } \
+\
+   if( out_var ) { \
+      factor *= factor; \
+      for ( point = 0; point < npoint; point++ ) { \
+         off_out = offset[ point ]; \
+         if( out_var[ off_out ] != badval ) out_var[ off_out ] *= factor; \
+      } \
+   } \
+}
+
+
+/* Expand the macro above to generate a function for each required 
+   data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_CONSERVEFLUX(LD,long double)
+#endif
+MAKE_CONSERVEFLUX(D,double)
+MAKE_CONSERVEFLUX(F,float) 
+MAKE_CONSERVEFLUX(L,long int)
+MAKE_CONSERVEFLUX(I,int)
+MAKE_CONSERVEFLUX(S,short int)
+MAKE_CONSERVEFLUX(B,signed char)
+MAKE_CONSERVEFLUX(UL,unsigned long int)
+MAKE_CONSERVEFLUX(UI,unsigned int)
+MAKE_CONSERVEFLUX(US,unsigned short int)
+MAKE_CONSERVEFLUX(UB,unsigned char)
+
+/* Undefine the macros used above. */
+#undef MAKE_CONSERVEFLUX
 
 static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2, 
                        int *series, int *invert1, int *invert2 ) {
@@ -7134,6 +7260,74 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
    return result;
 }
 
+static double MatrixDet( int ndim, const double *matrix ){
+/*
+*  Name:
+*     MatrixDet
+
+*  Purpose:
+*     Return the determinant of a square matrix.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double MatrixDet( int ndim, const double *matrix )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function returns the determinant of the supplied square matrix.
+
+*  Parameters:
+*     ndim
+*        The number of rows and columns in the matrix.
+*     matrix
+*        The matrix element values. The first row of "ndim" elements
+*        should be supplied first, followed by the second row, etc.
+
+*  Returned Value:
+*     The determinant.
+*/
+
+/* Local Variables: */
+   double result;
+   double *a;
+   double *y;
+   int *iw;
+   int i;
+   int jf;
+
+/* Initialise */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+   if( ndim == 1 ) {
+      result = matrix[ 0 ];
+
+   } else if( ndim == 2 ) {
+      result = matrix[ 0 ]*matrix[ 3 ] - matrix[ 1 ]*matrix[ 2 ];
+
+   } else {
+      a = astStore( NULL, matrix, sizeof( double )*(size_t) (ndim*ndim) );
+      iw = astMalloc( sizeof( int )*(size_t) ndim );
+      y = astMalloc( sizeof( double )*(size_t) ndim );
+      if( y ) {
+         for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
+         slaDmat( ndim, a, y, result, jf, iw );
+      }
+      y = astFree( y );
+      iw = astFree( iw );
+      a = astFree( a );
+   }
+
+   return result;
+}
+
 static double MaxD( double a, double b ) {
 /*
 *  Name:
@@ -7988,6 +8182,12 @@ f     TOL = DOUBLE PRECISION (Given)
 *        of zero may be given. This will ensure that the Mapping is
 *        used without any approximation, but may increase execution
 *        time.
+*        
+*        If the value is too high, discontinuities between the linear
+*        approximations used in adjacent panel will be higher, and may
+*        cause the edges of the panel to be visible when viewing the output 
+*        image at high contrast. If this is a problem, reduce the
+*        tolerance value used.
 c     maxpix
 f     MAXPIX = INTEGER (Given)
 *        A value which specifies an initial scale size (in pixels) for
@@ -8181,6 +8381,17 @@ f     AST_RESAMPLE<X>
 c     astResample<X> 
 f     AST_RESAMPLE<X>
 *     documentation for further discussion.
+*
+*     The binning algorithm used has the ability to introduce artifacts
+*     not seen when using a resampling algorithm. Particularly, when
+*     viewing the output image at high contrast, systems of curves lines
+*     covering the entire image may be visible. These are caused by a
+*     beating effect between the input pixel positions and the output pixels
+*     position, and their nature and strength depend critically upon the
+*     nature of the Mapping and the spreading function being used. In
+*     general, the nearest neighbour spreading function demonstrates this
+*     effect more clearly than the other functions, and for this reason
+*     should be used with caution.
 *
 *     The following values (defined in the 
 c     "ast.h" header file)
@@ -10287,6 +10498,17 @@ f     with type REAL, you should use the function AST_RESAMPLER (see
 *     choice of sub-pixel interpolation schemes is provided, but you
 *     may also implement your own.
 *
+*     This algorithm samples the input data value, it does not integrate 
+*     it. Thus total data value in the input image will not, in general,
+*     be conserved. However, an option is provided (see the "Control Flags"
+*     section below) which can produce approximate flux conservation by 
+*     scaling the output values using the ratio of the output pixel size
+*     to the input pixel size. However, if accurate flux conservation is
+*     important to you, consder using the
+c     astRebin<X> family of functions
+f     AST_REBIN<X> family of routines
+*     instead.
+*
 *     Output pixel coordinates are transformed into the coordinate
 *     system of the input grid using the inverse transformation of the
 *     Mapping which is supplied. This means that geometrical features
@@ -10951,6 +11173,44 @@ f     associated with the resampled values. If this flag is not set,
 f     no variance processing will occur and the IN_VAR and OUT_VAR
 f     arrays will not be used. (Note that this flag is only available
 f     in the Fortran interface to AST.)
+*     - AST__CONSERVEFLUX: Indicates that the output pixel values should
+*     be scaled in such a way as to preserve (approximately) the total data 
+*     value in a feature on the sky. Without this flag, each output pixel 
+*     value represents an instantaneous sample of the input data values at 
+*     the corresponding input position. This is appropriate if the input
+*     data represents the spatial density of some quantity (e.g. surface
+*     brightness in Janskys per square arc-second) because the output
+*     pixel values will have the same normalisation and units as the
+*     input pixel values. However, if the input data values represent
+*     flux (or some other physical quantity) per pixel, then the 
+*     AST__CONSERVEFLUX flag could be used. This causes each output
+*     pixel value to be scaled by the ratio of the output pixel size to
+*     the input pixel size. 
+*
+*     This flag can only be used if the Mapping is succesfully approximated 
+*     by one or more linear transformations. Thus an error will be reported 
+*     if it used when the 
+c     "tol" parameter
+f     TOL argument
+*     is set to zero (which stops the use of linear approximations), or
+*     if the Mapping is too non-linear to be approximated by a piece-wise
+*     linear transformation. The ratio of output to input pixel size is 
+*     evaluated once for each panel of the piece-wise linear approximation to 
+*     the Mapping, and is assumed to be constant for all output pixels in the 
+*     panel. The scaling factors for adjacent panels will in general
+*     differ slightly, and so the joints between panels may be visible when 
+*     viewing the output image at high contrast. If this is a problem,
+*     reduce the value of the 
+c     "tol" parameter
+f     TOL argument
+*     until the difference between adjacent panels is sufficiently small
+*     to be insignificant. 
+*
+*     Flux conservation can only be approximate when using a resampling
+*     algorithm. For accurate flux conservation use the 
+c     astRebin function
+f     AST_REBIN routine
+*     instead.
 
 *  Propagation of Missing Data:
 *     Instances of missing data (bad pixels) in the output grid are
@@ -11139,6 +11399,22 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                       idim + 1 ); \
             break; \
          } \
+      } \
+   } \
+\
+/* If we are conserving flux, check "tol" is not zero. */ \
+   if( ( flags & AST__CONSERVEFLUX ) && astOK ) { \
+      if( tol == 0.0 ) { \
+         astError( AST__CNFLX, "astResample"#X"(%s): Flux conservation was " \
+                   "requested but cannot be performed because zero tolerance " \
+                   "was also specified.", astGetClass( this ) ); \
+\
+/* Also check "nin" and "nout" are equal. */ \
+      } else if( nin != nout ) { \
+         astError( AST__CNFLX, "astResample"#X"(%s): Flux conservation was " \
+                "requested but cannot be performed because the Mapping " \
+                "has different numbers of inputs and outputs.", \
+                astGetClass( this ) ); \
       } \
    } \
 \
@@ -11657,7 +11933,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                             const int *lbnd_in, const int *ubnd_in,
                             const void *in, const void *in_var,
                             DataType type, int interp, void (* finterp)(),
-                            const double *params, int flags,
+                            const double *params, double factor, int flags,
                             const void *badval_ptr, int ndim_out,
                             const int *lbnd_out, const int *ubnd_out,
                             const int *lbnd, const int *ubnd,
@@ -11678,7 +11954,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *                          int ndim_in, const int *lbnd_in, const int *ubnd_in,
 *                          const void *in, const void *in_var,
 *                          DataType type, int interp, void (* finterp)(),
-*                          const double *params, int flags,
+*                          const double *params, double factor, int flags,
 *                          const void *badval_ptr, int ndim_out,
 *                          const int *lbnd_out, const int *ubnd_out,
 *                          const int *lbnd, const int *ubnd,
@@ -11775,6 +12051,11 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        Pointer to an optional array of parameters that may be passed
 *        to the interpolation algorithm, if required. If no parameters
 *        are required, a NULL pointer should be supplied.
+*     factor
+*        A factor by which to scale the resampled output data values before
+*        returning them. If flux is being conserved this should be set to
+*        the ratio of the output pixel size to the input pixel size in the 
+*        section. Otherwise it should be set to 1.0.
 *     flags
 *        The bitwise OR of a set of flag values which provide
 *        additional control over the resampling operation.
@@ -11868,6 +12149,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int *dim;                     /* Pointer to array of output pixel indices */
    int *offset;                  /* Pointer to array of output pixel offsets */
    int *stride;                  /* Pointer to array of output grid strides */
+   int conserve;                 /* Conserve flux? */
    int coord_in;                 /* Loop counter for input dimensions */
    int coord_out;                /* Loop counter for output dimensions */
    int done;                     /* All pixel indices done? */
@@ -11900,6 +12182,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    neighb = 0;
    gifunc = NULL;
    kernel = NULL;
+
+/* See if we are conserving flux */
+   conserve = flags & AST__CONSERVEFLUX; \
 
 /* Calculate the number of output points, as given by the product of
    the output grid dimensions. */
@@ -12088,6 +12373,15 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* No linear fit to the Mapping is available. */
 /* ========================================== */
       } else {
+
+/* If flux conseravtion was requested, report an error, since we can only
+   conserve flux if a linear approximation is available. */
+         if( conserve && astOK ) { 
+            astError( AST__CNFLX, "astResampleSection(%s): Flux conservation "
+                "was requested but cannot be performed because either the Mapping "
+                "is too non-linear, or the requested tolerance is too small.",
+                 astGetClass( this ) ); 
+         } 
 
 /* Create a PointSet to hold the coordinates of the output pixels and
    obtain a pointer to its coordinate data. */
@@ -12568,6 +12862,41 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       }
    }
 
+/* Now scale the output values to conserve flux if required. */
+   if( conserve ) {
+
+/* Define a macro to use a "case" statement to invoke the function 
+   appropriate to a given data type. These simply multiple the output data
+   value by the factor, and the output variance by the square of the
+   factor. */
+#define CASE_CONSERVE(X,Xtype) \
+      case ( TYPE_##X ): \
+         ConserveFlux##X( factor, npoint, offset, *( (Xtype *) badval_ptr ), \
+                          (Xtype *) out, \
+                          (Xtype *) ( usevar ? out_var : NULL ) ); \
+         break;
+       
+/* Use the above macro to invoke the appropriate function. */
+      switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+         CASE_CONSERVE(LD,long double)
+#endif
+         CASE_CONSERVE(D,double)
+         CASE_CONSERVE(F,float)
+         CASE_CONSERVE(L,long int)
+         CASE_CONSERVE(UL,unsigned long int)
+         CASE_CONSERVE(I,int)
+         CASE_CONSERVE(UI,unsigned int)
+         CASE_CONSERVE(S,short int)
+         CASE_CONSERVE(US,unsigned short int)
+         CASE_CONSERVE(B,signed char)
+         CASE_CONSERVE(UB,unsigned char)
+      }
+
+/* Undefine the macro. */
+#undef CASE_CONSERVE
+   }               
+
 /* Annul the PointSet used to hold input coordinates. */
    pset_in = astAnnul( pset_in );
 
@@ -12792,6 +13121,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                     performance) */
 
 /* Local Variables: */
+   double factor;                /* Flux conservation factor */
    int *dim_block;               /* Pointer to array of block dimensions */
    int *lbnd_block;              /* Pointer to block lower bound array */
    int *ubnd_block;              /* Pointer to block upper bound array */
@@ -12884,6 +13214,14 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                     ubnd[ idim ] );
       }
 
+/* Determine the flux conservation constant if needed. */
+/* --------------------------------------------------- */
+   if( ( flags & AST__CONSERVEFLUX ) && linear_fit ) {
+      factor = MatrixDet( ndim_in, linear_fit + ndim_in );
+   } else {
+      factor = 1.0;
+   }
+
 /* Resample each block of output pixels. */
 /* ------------------------------------- */
 /* Loop to generate the extent of each block of output pixels and to
@@ -12896,7 +13234,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
          result += ResampleSection( this, linear_fit,
                                     ndim_in, lbnd_in, ubnd_in,
                                     in, in_var, type, interp, finterp, params,
-                                    flags, badval_ptr,
+                                    factor, flags, badval_ptr,
                                     ndim_out, lbnd_out, ubnd_out,
                                     lbnd_block, ubnd_block, out, out_var );
 
