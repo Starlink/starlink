@@ -48441,6 +48441,19 @@ application.  It needs only read access to an NDF, unlike the former
 version that was an alias to \htmlref{FITSMOD}{FITSMOD}.  It should be
 faster too.
 
+\item The \htmlref{WCSALIGN}{WCSALIGN} and \htmlref{REGRID}{REGRID}
+applications now have options for using a rebinning algorithm rather than
+a resampling algorithm. Rebinning produces accuracte flux conservation.
+See the new REBIN parameter.
+
+\item The WCSALIGN and REGRID applications now have an option to produce
+approximate flux conservation when using the traditional resampling
+algorithm. See the new parameter CONSERVE.
+
+\item The default values for the TOL parameter for REGRID, and the ACC
+parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
+artifacts when transforming large images with flux conservation.
+
 \end{itemize}
 
 

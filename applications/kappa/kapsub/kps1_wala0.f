@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, 
      :                       METHOD, PARAMS, XY1, XY2, ERRLIM, MAXPIX, 
-     :                       REBIN, WLIM, STATUS )
+     :                       REBIN, CONSRV, WLIM, STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, METHOD, 
-*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, REBIN, WLIM,
-*                      STATUS )
+*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, REBIN, 
+*                      CONSRV, WLIM, STATUS )
 
 *  Description:
 *     This routine first finds the Mapping from the input pixel
@@ -71,6 +71,8 @@
 *     REBIN = LOGICAL (Given)
 *        Calculate output pixel values by rebinning? Otherwise they will
 *        be calculated by resampling.
+*     CONSRV = LOGICAL (Given)
+*        Conserve flux whilst resampling?
 *     WLIM = REAL (Given)
 *        The lower weight limit for a valid output pixel.
 *     STATUS = INTEGER (Given and Returned)
@@ -98,6 +100,8 @@
 *        Use CNF_PVAL
 *     19-JUL-2005 (DSB):
 *        Add argument REBIN.
+*     11-AUG-2005 (DSB):
+*        Add argument CONSRV.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,6 +134,7 @@
       REAL ERRLIM
       INTEGER MAXPIX
       LOGICAL REBIN
+      LOGICAL CONSRV
       REAL WLIM
 
 *  Status:
@@ -317,7 +322,11 @@
 *  Do the resampling.
 *  ==================
 
-      FLAGS = 0
+      IF( CONSRV ) THEN
+         FLAGS = AST__CONSERVEFLUX
+      ELSE
+         FLAGS = 0
+      END IF
 
 *  Set TOL (DOUBLE) to ERRLIM (REAL)
       TOL = ERRLIM

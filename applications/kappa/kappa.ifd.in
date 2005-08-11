@@ -13205,6 +13205,15 @@ iraf! {
             default FALSE
           }
 
+         parameter conserve {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Conserve flux whilst resampling?}
+            helpkey *
+            default FALSE
+          }
+
          parameter scale {
             type _DOUBLE
             vpath DEFAULT
@@ -13227,7 +13236,7 @@ iraf! {
             type _DOUBLE
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default 0.2
+            default 0.05
             prompt {Tolerance for linear transformation approximation}
             helpkey *
          }
@@ -15585,9 +15594,18 @@ iraf! {
             type _REAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default 0.5
+            default 0.05
             prompt {Positional accuracy in pixels}
             helpkey *
+          }
+
+         parameter conserve {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Conserve flux whilst resampling?}
+            helpkey *
+            default FALSE
           }
 
          parameter in {

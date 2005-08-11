@@ -1,6 +1,24 @@
-1 KAPPA_Version_1.4-2
+1 KAPPA_Version_1.4-3
 
-   A new release of KAPPA (v1.4-2) has been made. The main changes are:
+   A new release of KAPPA (v1.4-3) has been made. The main changes are:
+
+   o  FITSEXIST is now a self-contained application.  It needs only read 
+   access to an NDF, unlike the former version that was an alias to
+   FITSMOD. It should be faster too.
+
+   o  The WCSALIGN and REGRID applications now have options for using a
+   rebinning algorithm rather than a resampling algorithm. Rebinning
+   produces accuracte flux conservation. See the new REBIN parameter.
+
+   o  The WCSALIGN and REGRID applications now have an option to produce
+   approximate flux conservation when using the traditional resampling
+   algorithm. See the new parameter CONSERVE.
+
+   o  The default values for the TOL parameter for REGRID, and the ACC
+   parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
+   artifacts when transforming large images with flux conservation.
+
+Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 
    each WCS Frame if FULLFRAME is set to YES. Also, the bounds of the NDF 

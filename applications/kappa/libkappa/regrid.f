@@ -30,42 +30,8 @@
 *     be set explicitly using parameters LBOUND and UBOUND.
 *
 *     Two algorithms are available for determining the output pixel
-*     values: resampling and rebinning (the method used is determined by
-*     the REBIN parameter). The resampling algorithm steps through every
-*     pixel in the output image, sampling the input image at the corresponding 
-*     position and storing the sampled input value in the output pixel.
-*     The method used for sampling the input image is determined by the 
-*     METHOD parameter. The rebinning algorithm steps through every pixel in 
-*     the input image, dividing the input pixel value up between a group of 
-*     neighbouring output pixels. The way in which the input sample is
-*     divided up between the output pixels is determined by the METHOD
-*     parameter.
-*
-*     The two algorithms behaviour quite differently if the transformation 
-*     from input to output includes any significant change of scale. In
-*     general, resampling will not alter the pixel values associated with
-*     a source, even if the pixel size changes. On the other hand, the 
-*     rebinning algorithm will change the pixel values in order to
-*     correct for a change in pixel size. Thus, rebinning conserves the
-*     total data value within a given region where as resampling does not.
-*    
-*     Resampling is appropriate if the input image represents the spatial
-*     density of some physical value (e.g. surface brightness) because the 
-*     output image will have the same normalisation as the input image. But
-*     rebinning is probably more appropriarte if the image measures (for
-*     instance) flux per pixel, since rebinning takes account of the
-*     change in pixel size.
-*  
-*     Another difference is that resampling guarantees to fill the output
-*     image with good pixel values (assuming the input image is filled with
-*     good input pixel values), whereas holes can be left by the rebinning 
-*     algorithm if the output image has smaller pixels than the input image.
-*     Such holes occur at output pixels which receive no contributions
-*     from any input pixels, and will be filled with the value zero in
-*     the output image. If this problem occurs the solution is probably
-*     to change the width of the pixel spreading function by assigning
-*     a larger value to PARAMS(1) and/or PARAMS(2) (depending on the
-*     specific METHOD value being used).
+*     values: resampling and rebinning (the algorithm used is determined
+*     by the REBIN parameter). 
 *
 *     The Mapping to use can be supplied in several different ways (see
 *     parameter MAPPING). 
@@ -74,6 +40,22 @@
 *     regrid in out [method]
 
 *  ADAM Parameters:
+*     CONSERVE = _LOGICAL (Read)
+*        Only accessed when using the resampling algorithm (i.e. if REBIN 
+*        is set false). If set true, then the output pixel values will
+*        be scaled in such a way as to preserve (approximately) the total
+*        data value in a feature on the sky. The scaling factor is the ratio 
+*        of the output pixel size to the input pixel size. This option can 
+*        only be used if the Mapping is succesfully approximated by one or 
+*        more linear transformations. Thus an error will be reported if it 
+*        used when the TOL parameter is set to zero (which stops the use of 
+*        linear approximations), or if the Mapping is too non-linear to be 
+*        approximated by a piece-wise linear transformation. The ratio of 
+*        output to input pixel size is evaluated once for each panel of the 
+*        piece-wise linear approximation to the Mapping, and is assumed to be 
+*        constant for all output pixels in the panel. Flux conservation can 
+*        only be approximate when using the resampling algorithm. For accurate 
+*        flux conservation set REBIN to true. [FALSE]
 *     IN = NDF (Read)
 *        The NDF to be transformed.
 *     LBOUND( ) = _INTEGER (Read)
@@ -206,7 +188,8 @@
 *     REBIN = LOGICAL_ (Read)
 *        Determines the algorithm used to calculate the output pixel
 *        values. If a TRUE value is given, a rebinning algorithm is used.
-*        Otherwise, a resampling algorithm is used [current value]
+*        Otherwise, a resampling algorithm is used. See the "Choice of
+*        Algorithm" below.  [current value]
 *     SCALE( ) = _DOUBLE (Read)
 *        Axis scaling factors which are used to modify the supplied Mapping.
 *        If the number of supplied values is less than the number of output
@@ -227,14 +210,13 @@
 *     TOL = _DOUBLE (Read)
 *        The maximum tolerable geometrical distortion which may be
 *        introduced as a result of approximating non-linear Mappings 
-*        by a set of piece-wise linear transforms.  The resampling
-*        algorithm approximates non-linear co-ordinate transformations
+*        by a set of piece-wise linear transforms.  Both
+*        algorithms approximate non-linear co-ordinate transformations
 *        in order to improve performance, and this parameter controls
 *        how inaccurate the resulting approximation is allowed to be,
 *        as a displacement in pixels of the input NDF.  A value of 
 *        zero will ensure that no such approximation is done, at the 
-*        expense of increasing execution time.
-*        [0.2]
+*        expense of increasing execution time. [0.05]
 *     UBOUND( ) = _INTEGER (Read)
 *        The upper pixel-index bounds of the output NDF.  The number of
 *        values must be equal to the number of dimensions of the output
@@ -285,6 +267,81 @@
 *        It uses nearest-neighbour resampling.  The shape of a119s 
 *        is forced to be (1:256,-20:172) regardless of the location
 *        of the transformed pixels of a119.
+
+*  Choice of Algorithm:
+*     The algorithm used to produce the output image is determined by 
+*     the REBIN parameter, and is based either on resampling the output
+*     image or rebinning the input image.
+*
+*     The resampling algorithm steps through every pixel in the output image, 
+*     sampling the input image at the corresponding position and storing the 
+*     sampled input value in the output pixel. The method used for sampling 
+*     the input image is determined by the METHOD parameter. The rebinning 
+*     algorithm steps through every pixel in the input image, dividing the 
+*     input pixel value up between a group of neighbouring output pixels,
+*     incrementing these output pixel values by their allocated share of the
+*     input pixel value. The way in which the input sample is divided up 
+*     between the output pixels is determined by the METHOD parameter.
+
+*     The two algorithms behaviour quite differently if the transformation 
+*     from input to output includes any significant change of scale. In
+*     general, resampling will not alter the pixel values associated with
+*     a source, even if the pixel size changes. On the other hand, the 
+*     rebinning algorithm will change the pixel values in order to
+*     correct for a change in pixel size. Thus, rebinning conserves the
+*     total data value within a given region where as resampling, in
+*     general, does not (but see the discussion of the CONSERVE parameter
+*     below).
+*    
+*     Resampling is appropriate if the input image represents the spatial
+*     density of some physical value (e.g. surface brightness) because the 
+*     output image will have the same normalisation as the input image. But
+*     rebinning is probably more appropriarte if the image measures (for
+*     instance) flux per pixel, since rebinning takes account of the
+*     change in pixel size.
+*  
+*     Another difference is that resampling guarantees to fill the output
+*     image with good pixel values (assuming the input image is filled with
+*     good input pixel values), whereas holes can be left by the rebinning 
+*     algorithm if the output image has smaller pixels than the input image.
+*     Such holes occur at output pixels which receive no contributions
+*     from any input pixels, and will be filled with the value zero in
+*     the output image. If this problem occurs the solution is probably
+*     to change the width of the pixel spreading function by assigning
+*     a larger value to PARAMS(1) and/or PARAMS(2) (depending on the
+*     specific METHOD value being used).
+*
+*     Both algorithms have the capability to introduce artifical
+*     artifacts into the output image. These have various causes:
+*
+*     - particularly sharp features in the input can cause rings round the 
+*     corresponding features in the output image. This can be minimized
+*     by suitable settings for the METHOD and PARAMS parameters. In general
+*     such rings can be minimised by using a wider interpolation kernel
+*     (if resampling) or spreading function (if rebining), at the cost of
+*     degraded resolution.
+*
+*     - regular patterns of curvy lines covering the whole output image
+*     can be created when using the rebinning algorithm.  These are caused 
+*     by a beating effect between the input pixel positions and the output
+*     pixels position, and their nature and strength depend critically upon
+*     the nature of the Mapping and the spreading function being used. In
+*     general, the nearest neighbour spreading function demonstrates this
+*     effect more clearly than the other functions, and for this reason
+*     should be used with caution. Again, wider spreading functions
+*     reduce the effect at the cost of degraded resolution. Note, the
+*     resampling algorithm is not subject to these artifacts. For this
+*     reason, you may prefer to use the resampling algorithm, with the
+*     CONSERVE parameter set true. This causes the resampling algorithm
+*     to perform approximate flux conservation.
+*
+*     - the approximation of the Mapping using a piece-wise linear
+*     transformation (controlled by paremeter TOL) can produce artifacts at 
+*     the joints between the panels of the approximation. These can occur
+*     when using the rebinning algorithm, or when using the resampling
+*     algorithm with CONSERVE set true. They are caused by the discontinuities 
+*     between the adjacent panels of the approximation, and can be minimised 
+*     by reducing the value assigned to the TOL parameter.
 
 *  Notes:
 *     - If the input NDF contains a Variance component, a Variance 
@@ -424,6 +481,7 @@
       INTEGER WCSI               ! WCS FrameSet of input NDF
       INTEGER WCSO               ! WCS FrameSet of the output NDF
       LOGICAL BAD                ! May there be bad pixels?
+      LOGICAL CONSRV             ! Conserve flux whilst resampling?
       LOGICAL CURENT             ! Resample into current Frame?
       LOGICAL HASQUA             ! Does the input NDF have Quality component?
       LOGICAL HASVAR             ! Does the input NDF have Variance component?
@@ -868,6 +926,12 @@
 *  bad values, record this fact.
       IF ( BAD ) THEN
          FLAGS = FLAGS + AST__USEBAD
+      END IF
+
+*  See if flux is to be conserved.
+      IF( .NOT. REBIN ) THEN
+         CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
+         IF( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
       END IF
 
 *  Perform the resampling.
