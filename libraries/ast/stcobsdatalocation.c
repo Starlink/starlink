@@ -576,8 +576,10 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
 */
 
 /* Local Variables: */
+   AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcObsDataLocation *new;     /* Pointer to new StcObsDataLocation */
+   int icoord;                     /* Keymap index */
    va_list args;                   /* Variable argument list */
 
 /* Check the global status. */
@@ -587,11 +589,23 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
    pointer to ensure it identifies a valid Region. */
    region = astCheckRegion( astMakePointer( region_void ) );
 
+/* Obtain pointer from the supplied KeyMap ID's and validate the
+   pointers to ensure it identifies a valid KeyMap. */
+   keymaps = astMalloc( sizeof( AstKeyMap * )*(size_t) ncoords );
+   if( keymaps ) {
+      for( icoord = 0; icoord < ncoords; icoord++ ) {
+         keymaps[ icoord ] = astCheckKeyMap( astMakePointer( coords[ icoord ] ) );
+      }
+   }
+
 /* Initialise the StcObsDataLocation, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitStcObsDataLocation( NULL, sizeof( AstStcObsDataLocation ), !class_init,
                                     &class_vtab, "StcObsDataLocation", region,
-                                    ncoords, coords );
+                                    ncoords, keymaps );
+
+/* Free resources. */
+   keymaps = astFree( keymaps );
 
 /* If successful, note that the virtual function table has been initialised. */
    if ( astOK ) {

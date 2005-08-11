@@ -416,8 +416,10 @@ AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *region_void, in
 */
 
 /* Local Variables: */
+   AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
-   AstStcCatalogEntryLocation *new;     /* Pointer to new StcCatalogEntryLocation */
+   AstStcCatalogEntryLocation *new;/* Pointer to new StcCatalogEntryLocation */
+   int icoord;                     /* Keymap index */
    va_list args;                   /* Variable argument list */
 
 /* Check the global status. */
@@ -427,11 +429,23 @@ AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *region_void, in
    pointer to ensure it identifies a valid Region. */
    region = astCheckRegion( astMakePointer( region_void ) );
 
+/* Obtain pointer from the supplied KeyMap ID's and validate the
+   pointers to ensure it identifies a valid KeyMap. */
+   keymaps = astMalloc( sizeof( AstKeyMap * )*(size_t) ncoords );
+   if( keymaps ) {
+      for( icoord = 0; icoord < ncoords; icoord++ ) {
+         keymaps[ icoord ] = astCheckKeyMap( astMakePointer( coords[ icoord ] ) );
+      }
+   }
+
 /* Initialise the StcCatalogEntryLocation, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitStcCatalogEntryLocation( NULL, sizeof( AstStcCatalogEntryLocation ), !class_init,
                                     &class_vtab, "StcCatalogEntryLocation", region,
-                                    ncoords, coords );
+                                    ncoords, keymaps );
+
+/* Free resources. */
+   keymaps = astFree( keymaps );
 
 /* If successful, note that the virtual function table has been initialised. */
    if ( astOK ) {

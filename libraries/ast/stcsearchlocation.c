@@ -414,8 +414,10 @@ AstStcSearchLocation *astStcSearchLocationId_( void *region_void, int ncoords,
 */
 
 /* Local Variables: */
+   AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcSearchLocation *new;      /* Pointer to new StcSearchLocation */
+   int icoord;                     /* Keymap index */
    va_list args;                   /* Variable argument list */
 
 /* Check the global status. */
@@ -425,11 +427,23 @@ AstStcSearchLocation *astStcSearchLocationId_( void *region_void, int ncoords,
    pointer to ensure it identifies a valid Region. */
    region = astCheckRegion( astMakePointer( region_void ) );
 
+/* Obtain pointer from the supplied KeyMap ID's and validate the
+   pointers to ensure it identifies a valid KeyMap. */
+   keymaps = astMalloc( sizeof( AstKeyMap * )*(size_t) ncoords );
+   if( keymaps ) {
+      for( icoord = 0; icoord < ncoords; icoord++ ) {
+         keymaps[ icoord ] = astCheckKeyMap( astMakePointer( coords[ icoord ] ) );
+      }
+   }
+
 /* Initialise the StcSearchLocation, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitStcSearchLocation( NULL, sizeof( AstStcSearchLocation ), !class_init, 
                                    &class_vtab, "StcSearchLocation", region,
-                                   ncoords, coords );
+                                   ncoords, keymaps );
+
+/* Free resources. */
+   keymaps = astFree( keymaps );
 
 /* If successful, note that the virtual function table has been initialised. */
    if ( astOK ) {
