@@ -5327,6 +5327,13 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* A quick check for a common simple case: if the two strings are 
+   identical, return a UnitMap.*/
+   if( !strcmp( in, out ) ) {
+      if( in_lab ) *out_lab = astStore( NULL, in_lab, strlen( in_lab ) + 1 );
+      return astUnitMap( 1, "" );
+   }   
+
 /* More initialisation. */
    in_tree = NULL;
    out_tree = NULL;
