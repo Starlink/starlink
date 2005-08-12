@@ -49,8 +49,6 @@ f     AST_TIMEFRAME
 *     TimeFrame also has the following attributes:
 *
 *     - AlignTimeScale: Time scale in which to align TimeFrames
-*     - ClockLat: Geodetic latitude of observer/clock
-*     - ClockLon: Geodetic longitude of observer/clock
 *     - TimeOrigin: The zero point for TimeFrame axis values
 *     - TimeScale: The timescale used by the TimeFrame
 *
@@ -85,6 +83,12 @@ f     - AST_CURRENTTIME: Return the current system time
 *       Extensive modifications to add extra timescales, unit support,
 *       support for relative times, etc, and to make it more like the
 *       other AST Frame classes.
+*     12-AUG-2005 (DSB):
+*        - Remove ClockLon and ClockLat attributes. Use the new ObsLon and
+*        ObsLat attributes in the parent Frame class instead. Note, for
+*        backward compatibility the public attribute accessors and the 
+*        astLoadTimeFrame functions still recogonise ClockLon and ClockLat,
+*        but use the ObsLat/ObsLon attributes internally.
 *class--
 */
 
@@ -259,16 +263,6 @@ static AstTimeScaleType GetTimeScale( AstTimeFrame * );
 static int TestTimeScale( AstTimeFrame * );
 static void ClearTimeScale( AstTimeFrame * );
 static void SetTimeScale( AstTimeFrame *, AstTimeScaleType );
-
-static double GetClockLat( AstTimeFrame * );
-static int TestClockLat( AstTimeFrame * );
-static void ClearClockLat( AstTimeFrame * );
-static void SetClockLat( AstTimeFrame *, double );
-
-static double GetClockLon( AstTimeFrame * );
-static int TestClockLon( AstTimeFrame * );
-static void ClearClockLon( AstTimeFrame * );
-static void SetClockLon( AstTimeFrame *, double );
 
 /* Member functions. */
 /* ================= */
@@ -552,14 +546,18 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
       astClearAlignTimeScale( this );
 
 /* ClockLat. */
-/* ------- */
+/* --------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   TimeFrame had ClockLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "clocklat" ) ) {
-      astClearClockLat( this );
+      astClearAttrib( this, "obslat" );
 
 /* ClockLon. */
-/* ------- */
+/* --------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   TimeFrame had ClockLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "clocklon" ) ) {
-      astClearClockLon( this );
+      astClearAttrib( this, "obslon" );
 
 /* TimeOrigin. */
 /* ---------- */
@@ -1451,42 +1449,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ClockLat. */
 /* ------- */
    } else if ( !strcmp( attrib, "clocklat" ) ) {
-      dval = astGetClockLat( this );
-      if ( astOK ) {
-
-/* Display absolute value preceeded by "N" or "S" as appropriate. */
-         if( dval < 0 ) {         
-            (void) sprintf( buff, "S%s",  astFormat( skyframe, 1, -dval ) );
-         } else {
-            (void) sprintf( buff, "N%s",  astFormat( skyframe, 1, dval ) );
-         }
-         result = buff;
-      }
+      result = astGetAttrib( this, "obslat" );
 
 /* ClockLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "clocklon" ) ) {
-      dval = astGetClockLon( this );
-      if ( astOK ) {
-
-/* Put into range +/- PI. */
-         dval = slaDrange( dval );
-
-/* Temporarily make the SkyFrame use degrees for longitude axis. */
-         astSetAsTime( skyframe, 0, 0 );
-
-/* Display absolute value preceeded by "E" or "W" as appropriate. */
-         if( dval < 0 ) {         
-            (void) sprintf( buff, "W%s",  astFormat( skyframe, 0, -dval ) );
-         } else {
-            (void) sprintf( buff, "E%s",  astFormat( skyframe, 0, dval ) );
-         }
-         result = buff;
-
-/* Make the SkyFrame use hours for longitude axis again. */
-         astSetAsTime( skyframe, 0, 1 );
-
-      }
+      result = astGetAttrib( this, "obslon" );
 
 /* TimeOrigin. */
 /* ----------- */
@@ -2544,16 +2512,6 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name ) {
    vtab->GetAlignTimeScale = GetAlignTimeScale;
    vtab->SetAlignTimeScale = SetAlignTimeScale;
 
-   vtab->ClearClockLat = ClearClockLat;
-   vtab->TestClockLat = TestClockLat;
-   vtab->GetClockLat = GetClockLat;
-   vtab->SetClockLat = SetClockLat;
-
-   vtab->ClearClockLon = ClearClockLon;
-   vtab->TestClockLon = TestClockLon;
-   vtab->GetClockLon = GetClockLon;
-   vtab->SetClockLon = SetClockLon;
-
    vtab->ClearTimeOrigin = ClearTimeOrigin;
    vtab->TestTimeOrigin = TestTimeOrigin;
    vtab->GetTimeOrigin = GetTimeOrigin;
@@ -2832,8 +2790,8 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
    argument. In general, the clock longitude and latitude are also
    needed. */
       args[ 0 ] = args[ 1 ];
-      args[ 1 ] = astGetClockLon( this );
-      args[ 2 ] = astGetClockLat( this );
+      args[ 1 ] = astGetObsLon( this );
+      args[ 2 ] = astGetObsLat( this );
 
 /* If the input and output timescales differ, now add a conversion from the 
    input timescale to TAI or UT1 (note which is used). */
@@ -3108,8 +3066,8 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    on the clock position. If either of these 2 conditions is not met,
    then the alignment frame can be ignored, and the simpler MakeMap function
    can be called. See if the clock positions differ. */
-   clkdiff = ( astGetClockLon( target ) != astGetClockLon( result ) ||
-               astGetClockLat( target ) != astGetClockLat( result ) );
+   clkdiff = ( astGetObsLon( target ) != astGetObsLon( result ) ||
+               astGetObsLat( target ) != astGetObsLat( result ) );
 
 /* See if the Mapping from target to alignment frame depends on the clock
    position. */
@@ -3673,8 +3631,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
    for SourceVel would be changed from the default SourceVRF to the specified
    SourceVRF when SourceVRF was overlayed. */
       OVERLAY(AlignTimeScale)
-      OVERLAY(ClockLat)
-      OVERLAY(ClockLon)
       OVERLAY(TimeOrigin)
       OVERLAY(TimeScale)
    }
@@ -3738,14 +3694,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    double dval;                  /* Double atribute value */
    double mjd;                   /* MJD read from setting */
    double origin;                /* TimeOrigin value */
-   int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int namelen;                  /* Length of attribute name in setting */
    int nc;                       /* Number of characters read by astSscanf */
-   int off2;                     /* Modified offset of attribute value */
    int off;                      /* Offset of attribute value */
    int rep;                      /* Original error reporting state */
-   int sign;                     /* Sign of longitude value */
    int ulen;                     /* Used length of setting string */
 
 /* Check the global error status. */
@@ -3814,67 +3767,26 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
               ( 0 == astSscanf( setting, "clocklat=%n%*s %n", &off, &nc ) )
               && ( nc >= 7 ) ) {
-
-/* If the first character in the value string is "N" or "S", remember the
-   sign of the value and skip over the sign character. Default is north
-   (+ve). */
-      off2 = off;
-      if( setting[ off ] == 'N' || setting[ off ] == 'n' ) {
-         off2++;
-         sign = +1;
-      } else if( setting[ off ] == 'S' || setting[ off ] == 's' ) {
-         off2++;
-         sign = -1;
-      } else {
-         sign = +1;
-      } 
-
-/* Convert the string to a radians value before use. */
-      ival = astUnformat( skyframe, 1, setting + off2, &dval );
-      if ( ival == ulen - off2  ) {
-         astSetClockLat( this, dval*sign );
-
-/* Report an error if the string value wasn't recognised. */
-      } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "ClockLat (observers latitude) \"%s\".", astGetClass( this ), 
-                   setting + off );
-      }
+      new_setting = astMalloc( sizeof( char )*(size_t) len + 1 );
+      new_setting[ 0 ] = 'o';
+      new_setting[ 1 ] = 'b';
+      new_setting[ 2 ] = 's';
+      strcpy( new_setting + 3, setting + 5 );
+      astSetAttrib( this, new_setting );
+      new_setting = astFree( new_setting );
 
 /* ClockLon. */
 /* ------- */
    } else if ( nc = 0,
               ( 0 == astSscanf( setting, "clocklon=%n%*s %n", &off, &nc ) )
               && ( nc >= 7 ) ) {
-
-/* If the first character in the value string is "E" or "W", remember the
-   sign of the value and skip over the sign character. Default is east
-   (+ve). */
-      off2 = off;
-      if( setting[ off ] == 'E' || setting[ off ] == 'e' ) {
-         off2++;
-         sign = +1;
-      } else if( setting[ off ] == 'W' || setting[ off ] == 'w' ) {
-         off2++;
-         sign = -1;
-      } else {
-         sign = +1;
-      } 
-
-/* Convert the string to a radians value before use (temporarily make the 
-   SkyFrame use degrees for longitude axis). */
-      astSetAsTime( skyframe, 0, 0 );
-      ival = astUnformat( skyframe, 0, setting + off2, &dval );
-      astSetAsTime( skyframe, 0, 1 );
-      if ( ival == ulen - off2  ) {
-         astSetClockLon( this, dval*sign );
-
-/* Report an error if the string value wasn't recognised. */
-      } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "ClockLon (observers longitude) \"%s\".", astGetClass( this ), 
-                   setting + off );
-      }
+      new_setting = astMalloc( sizeof( char )*(size_t) len + 1 );
+      new_setting[ 0 ] = 'o';
+      new_setting[ 1 ] = 'b';
+      new_setting[ 2 ] = 's';
+      strcpy( new_setting + 3, setting + 5 );
+      astSetAttrib( this, new_setting );
+      new_setting = astFree( new_setting );
 
 /* TimeOrigin */
 /* ---------- */
@@ -5003,12 +4915,12 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ClockLat. */
 /* ------- */
    } else if ( !strcmp( attrib, "clocklat" ) ) {
-      result = astTestClockLat( this );
+      result = astTestAttrib( this, "obslat" );
 
 /* ClockLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "clocklon" ) ) {
-      result = astTestClockLon( this );
+      result = astTestAttrib( this, "obslon" );
 
 /* TimeOrigin. */
 /* --------- */
@@ -5586,12 +5498,12 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
    value, and a string describing the attribute.*/
                if( len > 0 ) {
 
-                  if( !strncmp( "ClockLat", a, len ) ) {
-                     set = astTestClockLat( this );
+                  if( !strncmp( "ObsLat", a, len ) ) {
+                     set = astTestObsLat( this );
                      desc = "clock latitude";
 
-                  } else if( !strncmp( "ClockLon", a, len ) ) {
-                     set = astTestClockLon( this );
+                  } else if( !strncmp( "ObsLon", a, len ) ) {
+                     set = astTestObsLon( this );
                      desc = "clock longitude";
 
                   } else if( !strncmp( "TimeOrigin", a, len ) ) {
@@ -5632,92 +5544,6 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
 
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
-/*
-*att++
-*  Name:
-*     ClockLat
-
-*  Purpose:
-*     The geodetic latitude of the observer/clock
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     String.
-
-*  Description:
-*     This attribute specifies the geodetic latitude of the observer's
-*     clock, in degrees. It is used only when converting between certain
-*     time scales (TDB, TCB, LMST, LAST). The default value for the attribute 
-*     is zero. 
-
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311", 
-*     "-45.6", "S45.6". As indicated, the sign of the latitude can 
-*     optionally be indicated using characters "N" and "S" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]dd:mm:ss" is used, when "[s]" is "N" or "S".
-
-*  Applicability:
-*     TimeFrame
-*        All TimeFrames have this attribute.
-
-*att--
-*/
-/* The geodetic latitude of the observer (radians). Clear the ClockLat value by
-   setting it to AST__BAD, returning zero as the default value. Any value is 
-   acceptable. */
-astMAKE_CLEAR(TimeFrame,ClockLat,clocklat,AST__BAD)
-astMAKE_GET(TimeFrame,ClockLat,double,0.0,((this->clocklat!=AST__BAD)?this->clocklat:0.0))
-astMAKE_SET(TimeFrame,ClockLat,double,clocklat,value)
-astMAKE_TEST(TimeFrame,ClockLat,(this->clocklat!=AST__BAD))
-
-
-/*
-*att++
-*  Name:
-*     ClockLon
-
-*  Purpose:
-*     The geodetic longitude of the observer/clock
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     String.
-
-*  Description:
-*     This attribute specifies the geodetic (or equivalently, geocentric)
-*     longitude of the observer's clock, in degrees, measured positive 
-*     eastwards. It is used only when converting between certain time 
-*     scales (TDB, TCB, LMST, LAST). See also attribute ClockLat. The default 
-*     value is zero.
-*
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311", 
-*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
-*     optionally be indicated using characters "E" and "W" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]ddd:mm:ss" is used, when "[s]" is "E" or "W" and the 
-*     numerical value is chosen to be less than 180 degrees.
-
-*  Applicability:
-*     TimeFrame
-*        All TimeFrames have this attribute.
-
-*att--
-*/
-/* The geodetic longitude of the observer (radians). Clear the ClockLon value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
-   acceptable. */
-astMAKE_CLEAR(TimeFrame,ClockLon,clocklon,AST__BAD)
-astMAKE_GET(TimeFrame,ClockLon,double,0.0,((this->clocklon!=AST__BAD)?this->clocklon:0.0))
-astMAKE_SET(TimeFrame,ClockLon,double,clocklon,value)
-astMAKE_TEST(TimeFrame,ClockLon,(this->clocklon!=AST__BAD))
 
 /*
 *att++
@@ -6052,18 +5878,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Write out the value. */
    astWriteString( channel, "ATmScl", set, 0, sval, "Alignment time scale" );
 
-/* ClockLat. */
-/* --------- */
-   set = TestClockLat( this );
-   dval = set ? GetClockLat( this ) : astGetClockLat( this );
-   astWriteDouble( channel, "ClLat", set, 0, dval, "Observers geodetic latitude (rads)" );
-
-/* ClockLon. */
-/* --------- */
-   set = TestClockLon( this );
-   dval = set ? GetClockLon( this ) : astGetClockLon( this );
-   astWriteDouble( channel, "ClLon", set, 0, dval, "Observers geodetic longitude (rads)" );
-
 /* TimeOrigin. */
 /* ----------- */
    set = TestTimeOrigin( this );
@@ -6261,8 +6075,6 @@ AstTimeFrame *astInitTimeFrame_( void *mem, size_t size, int init,
 /* Initialise the TimeFrame data. */
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
-      new->clocklat = AST__BAD;
-      new->clocklon = AST__BAD;
       new->timeorigin = AST__BAD;
       new->timescale = AST__BADTS;
       new->aligntimescale = AST__BADTS;
@@ -6350,6 +6162,8 @@ AstTimeFrame *astLoadTimeFrame_( void *mem, size_t size,
 /* Local Variables: */
    AstTimeFrame *new;            /* Pointer to the new TimeFrame */
    char *sval;                   /* Pointer to string value */
+   double obslat;                /* Value for ObsLat attribute */
+   double obslon;                /* Value for ObsLon attribute */
 
 /* Initialise. */
    new = NULL;
@@ -6441,14 +6255,22 @@ AstTimeFrame *astLoadTimeFrame_( void *mem, size_t size,
        }
 
 /* ClockLat. */
-/* ------- */
-      new->clocklat = astReadDouble( channel, "cllat", AST__BAD );
-      if ( TestClockLat( new ) ) SetClockLat( new, new->clocklat );
+/* --------- */
+/* Retained for backward compatibility with older versions of AST in
+   which TimeFrame had a ClockLat attribute (now ObsLat is used instead). */
+      if( !astTestObsLat( new ) ) {
+         obslat = astReadDouble( channel, "cllat", AST__BAD );
+         if ( obslat != AST__BAD ) astSetObsLat( new, obslat );
+      }
 
 /* ClockLon. */
 /* ------- */
-      new->clocklon = astReadDouble( channel, "cllon", AST__BAD );
-      if ( TestClockLon( new ) ) SetClockLon( new, new->clocklon );
+/* Retained for backward compatibility with older versions of AST in
+   which TimeFrame had a ClockLon attribute (now ObsLon is used instead). */
+      if( !astTestObsLon( new ) ) {
+         obslon = astReadDouble( channel, "cllon", AST__BAD );
+         if ( obslon != AST__BAD ) astSetObsLon( new, obslon );
+      }
 
 /* TimeOrigin. */
 /* --------- */

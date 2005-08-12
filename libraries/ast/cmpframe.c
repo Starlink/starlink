@@ -119,6 +119,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Correct error checking in Clear/Get/Set/TestAttrib.
 *     12-MAY-2005 (DSB):
 *        Override astNormBox method.
+*     12-AUG-2005 (DSB):
+*        Override astSetObsLat/Lon and astClearObslat/Lon by implementations 
+*        which propagate the changed value to the component Frames.
 *class--
 */
 
@@ -517,15 +520,21 @@ static const char *(* parent_getdomain)( AstFrame * );
 static const char *(* parent_gettitle)( AstFrame * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[] );
 static double (* parent_getepoch)( AstFrame * );
+static double (* parent_getobslat)( AstFrame * );
+static double (* parent_getobslon)( AstFrame * );
 static int (* parent_getactiveunit)( AstFrame * );
 static int (* parent_getusedefs)( AstObject * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_clearepoch)( AstFrame * );
+static void (* parent_clearobslat)( AstFrame * );
+static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setactiveunit)( AstFrame *, int );
 static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setepoch)( AstFrame *, double );
+static void (* parent_setobslat)( AstFrame *, double );
+static void (* parent_setobslon)( AstFrame *, double );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -564,9 +573,6 @@ static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
-static double GetEpoch( AstFrame * );
-static void ClearEpoch( AstFrame * );
-static void SetEpoch( AstFrame *, double );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
@@ -624,6 +630,19 @@ static const char *GetAttrib( AstObject *, const char * );
 static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void SetAttrib( AstObject *, const char * );
+
+static double GetEpoch( AstFrame * );
+static void ClearEpoch( AstFrame * );
+static void SetEpoch( AstFrame *, double );
+
+static double GetObsLon( AstFrame * );
+static void ClearObsLon( AstFrame * );
+static void SetObsLon( AstFrame *, double );
+
+static double GetObsLat( AstFrame * );
+static void ClearObsLat( AstFrame * );
+static void SetObsLat( AstFrame *, double );
+
 
 /* Member functions. */
 /* ================= */
@@ -1266,6 +1285,98 @@ static void ClearEpoch( AstFrame *this_frame ) {
 /* Now clear the Epoch attribute in the two component Frames. */
    astClearEpoch( this->frame1 );
    astClearEpoch( this->frame2 );
+}
+
+static void ClearObsLat( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearObsLat
+
+*  Purpose:
+*     Clear the value of the ObsLat attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearObsLat( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearObsLat method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the ObsLat value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame ObsLat. */
+   (*parent_clearobslat)( this_frame );
+
+/* Now clear the ObsLat attribute in the two component Frames. */
+   astClearObsLat( this->frame1 );
+   astClearObsLat( this->frame2 );
+}
+
+static void ClearObsLon( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearObsLon
+
+*  Purpose:
+*     Clear the value of the ObsLon attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearObsLon( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearObsLon method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the ObsLon value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame ObsLon. */
+   (*parent_clearobslon)( this_frame );
+
+/* Now clear the ObsLon attribute in the two component Frames. */
+   astClearObsLon( this->frame1 );
+   astClearObsLon( this->frame2 );
 }
 
 static void ClearMaxAxes( AstFrame *this_frame ) {
@@ -2566,6 +2677,154 @@ static double GetEpoch( AstFrame *this_frame ) {
    return result;
 }
 
+static double GetObsLat( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetObsLat
+
+*  Purpose:
+*     Get a value for the ObsLat attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetObsLat( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetObsLat method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the ObsLat attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The ObsLat attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an ObsLat attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestObsLat( this ) ) {
+      result = (*parent_getobslat)( this_frame );
+
+/* Otherwise, if the ObsLat value is set in the first component Frame,
+   return it. */
+   } else if( astTestObsLat( this->frame1 ) ){
+      result = astGetObsLat( this->frame1 );
+
+/* Otherwise, if the ObsLat value is set in the second component Frame,
+   return it. */
+   } else if( astTestObsLat( this->frame2 ) ){
+      result = astGetObsLat( this->frame2 );
+
+/* Otherwise, return the default ObsLat value from the first component
+   Frame. */
+   } else {
+      result = astGetObsLat( this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static double GetObsLon( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetObsLon
+
+*  Purpose:
+*     Get a value for the ObsLon attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetObsLon( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetObsLon method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the ObsLon attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The ObsLon attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an ObsLon attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestObsLon( this ) ) {
+      result = (*parent_getobslon)( this_frame );
+
+/* Otherwise, if the ObsLon value is set in the first component Frame,
+   return it. */
+   } else if( astTestObsLon( this->frame1 ) ){
+      result = astGetObsLon( this->frame1 );
+
+/* Otherwise, if the ObsLon value is set in the second component Frame,
+   return it. */
+   } else if( astTestObsLon( this->frame2 ) ){
+      result = astGetObsLon( this->frame2 );
+
+/* Otherwise, return the default ObsLon value from the first component
+   Frame. */
+   } else {
+      result = astGetObsLon( this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int GetNaxes( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -3084,6 +3343,24 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_clearepoch = frame->ClearEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   parent_getobslon = frame->GetObsLon;
+   frame->GetObsLon = GetObsLon;
+
+   parent_setobslon = frame->SetObsLon;
+   frame->SetObsLon = SetObsLon;
+
+   parent_clearobslon = frame->ClearObsLon;
+   frame->ClearObsLon = ClearObsLon;
+
+   parent_getobslat = frame->GetObsLat;
+   frame->GetObsLat = GetObsLat;
+
+   parent_setobslat = frame->SetObsLat;
+   frame->SetObsLat = SetObsLat;
+
+   parent_clearobslat = frame->ClearObsLat;
+   frame->ClearObsLat = ClearObsLat;
 
    parent_angle = frame->Angle;
    frame->Angle = Angle;
@@ -6297,6 +6574,102 @@ static void SetEpoch( AstFrame *this_frame, double val ) {
 /* Now set the Epoch attribute in the two component Frames. */
    astSetEpoch( this->frame1, val );
    astSetEpoch( this->frame2, val );
+}
+
+static void SetObsLat( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetObsLat
+
+*  Purpose:
+*     Set the value of the ObsLat attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetObsLat( AstFrame *this, double val )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetObsLat method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the ObsLat value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New ObsLat value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame ObsLat. */
+   (*parent_setobslat)( this_frame, val );
+
+/* Now set the ObsLat attribute in the two component Frames. */
+   astSetObsLat( this->frame1, val );
+   astSetObsLat( this->frame2, val );
+}
+
+static void SetObsLon( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetObsLon
+
+*  Purpose:
+*     Set the value of the ObsLon attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetObsLon( AstFrame *this, double val )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetObsLon method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the ObsLon value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New ObsLon value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame ObsLon. */
+   (*parent_setobslon)( this_frame, val );
+
+/* Now set the ObsLon attribute in the two component Frames. */
+   astSetObsLon( this->frame1, val );
+   astSetObsLon( this->frame2, val );
 }
 
 static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {

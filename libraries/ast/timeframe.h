@@ -81,8 +81,6 @@ typedef struct AstTimeFrame {
    AstFrame frame;               /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double clocklat;              /* Geodetic latitude of observer */
-   double clocklon;              /* Geodetic longitude of observer */
    double timeorigin;            /* Zero point for time axis */
    AstTimeScaleType timescale;   /* Time scale */
    AstTimeScaleType aligntimescale; /* Alignment time scale */
@@ -103,16 +101,6 @@ typedef struct AstTimeFrameVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    double (* CurrentTime)( AstTimeFrame * );
-
-   double (* GetClockLon)( AstTimeFrame * );
-   int (* TestClockLon)( AstTimeFrame * );
-   void (* ClearClockLon)( AstTimeFrame * );
-   void (* SetClockLon)( AstTimeFrame *, double );
-
-   double (* GetClockLat)( AstTimeFrame * );
-   int (* TestClockLat)( AstTimeFrame * );
-   void (* ClearClockLat)( AstTimeFrame * );
-   void (* SetClockLat)( AstTimeFrame *, double );
 
    double (* GetTimeOrigin)( AstTimeFrame * );
    int (* TestTimeOrigin)( AstTimeFrame * );
@@ -165,16 +153,6 @@ AstTimeFrame *astLoadTimeFrame_( void *, size_t, AstTimeFrameVtab *,
 double astCurrentTime_( AstTimeFrame * );
 
 #if defined(astCLASS)            /* Protected */
-
-double astGetClockLon_( AstTimeFrame * );
-int astTestClockLon_( AstTimeFrame * );
-void astClearClockLon_( AstTimeFrame * );
-void astSetClockLon_( AstTimeFrame *, double );
-
-double astGetClockLat_( AstTimeFrame * );
-int astTestClockLat_( AstTimeFrame * );
-void astClearClockLat_( AstTimeFrame * );
-void astSetClockLat_( AstTimeFrame *, double );
 
 double astGetTimeOrigin_( AstTimeFrame * );
 int astTestTimeOrigin_( AstTimeFrame * );
@@ -246,16 +224,6 @@ astINVOKE(O,astLoadTimeFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astCurrentTime(this) astINVOKE(V,astCurrentTime_(astCheckTimeFrame(this)))
 
 #if defined(astCLASS)            /* Protected */
-
-#define astGetClockLon(this) astINVOKE(V,astGetClockLon_(astCheckTimeFrame(this)))
-#define astTestClockLon(this) astINVOKE(V,astTestClockLon_(astCheckTimeFrame(this)))
-#define astClearClockLon(this) astINVOKE(V,astClearClockLon_(astCheckTimeFrame(this)))
-#define astSetClockLon(this,value) astINVOKE(V,astSetClockLon_(astCheckTimeFrame(this),value))
-
-#define astGetClockLat(this) astINVOKE(V,astGetClockLat_(astCheckTimeFrame(this)))
-#define astTestClockLat(this) astINVOKE(V,astTestClockLat_(astCheckTimeFrame(this)))
-#define astClearClockLat(this) astINVOKE(V,astClearClockLat_(astCheckTimeFrame(this)))
-#define astSetClockLat(this,value) astINVOKE(V,astSetClockLat_(astCheckTimeFrame(this),value))
 
 #define astGetTimeOrigin(this) astINVOKE(V,astGetTimeOrigin_(astCheckTimeFrame(this)))
 #define astTestTimeOrigin(this) astINVOKE(V,astTestTimeOrigin_(astCheckTimeFrame(this)))

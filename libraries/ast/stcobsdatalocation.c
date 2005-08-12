@@ -31,7 +31,7 @@ f     AST_STCOBSDATALOCATION
 *     system positions. Therefore, the provision for returning observatory 
 *     location as an Stc is not yet available. However, for terrestrial
 *     observations, the position of the observatory can still be recorded 
-*     using the GeoLon and GeoLat attributes of the SpecFrame encapsulated 
+*     using the ObsLon and ObsLat attributes of the Frame encapsulated 
 *     within the Stc representing the observation location (this assumes
 *     the observatory is located at sea level).
 

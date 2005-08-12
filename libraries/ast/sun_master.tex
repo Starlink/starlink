@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.21}
+\newcommand{\stardocnumber}    {211.22}
 c-
 f+
-\newcommand{\stardocnumber}    {210.21}
+\newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {24th June 2005}
+\newcommand{\stardocdate}      {12th August 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -6774,6 +6774,16 @@ observation. The Epoch value is important in cases where coordinates
 systems move with respect to each other over time. An example of two such
 coordinate systems are the FK4 and FK5 celestial coordinate systems.
 
+\item[ObsLon]\mbox{}\\
+Specifies the longitude of the observer (assumed to be on the surface of
+the earth). The basic Frame class does not use this value, but
+specialised sub-classes may. For instance, the SpecFrame class uses it to
+calculate the relative velocity of the observer and the centre of the
+earth for use in converting between standards of rest.
+
+\item[ObsLat]\mbox{}\\
+Specifies the latitude of the observer. Use in conjunction with ObsLon.
+
 \end{description}
 \end{quote}
 
@@ -9321,15 +9331,6 @@ component of the relative velocity of the two standards of rest is taken.
 Specifies the Dec (FK5 J2000) of the source. Used in conjunction with
 REFRA.
 
-\item[GeoLon]\mbox{}\\
-Specifies the longitude of the observer (assumed to be on the surface of
-the earth). This allows the relative velocity of the observer and the
-centre of the earth to be calculated for use in converting between
-standards of rest.
-
-\item[GeoLat]\mbox{}\\
-Specifies the latitude of the observer. Use in conjunction with GeoLon.
-
 \item[SourceVel]\mbox{}\\
 This defines the ``source'' standard of rest. This is a rest frame which
 is moving towards the position given by RefRA and RefDec, at a velocity
@@ -9801,14 +9802,6 @@ the system specified by the System attribute. Thus, a value ofzero (the
 default) indicates that time values represent absolute times. Non-zero
 values may be used to indicate that the TimeFrame represents elapsed time
 since the specified origin.
-
-\item[ClockLon]\mbox{}\\
-Specifies the longitude of the observer's clock (assumed to be on the surface 
-of the earth). This is needed when converting between certain time scales.
-
-\item[ClockLat]\mbox{}\\
-Specifies the latitude of the observer's clock. Use in conjunction with
-ClockLon.
 
 \end{description}
 \end{quote}
@@ -10333,8 +10326,8 @@ specframe1 = astSpecFrame( "" );
 astSet( specframe1, "System=vradio" );
 astSet( specframe1, "Unit=km/s" );
 astSet( specframe1, "Epoch=1996-Oct-2 12:13:56.985" );
-astSet( specframe1, "GeoLon=W155:28:18" );
-astSet( specframe1, "GeoLat=N19:49:34" );
+astSet( specframe1, "ObsLon=W155:28:18" );
+astSet( specframe1, "ObsLat=N19:49:34" );
 astSet( specframe1, "RefRA=18:14:50.6" );
 astSet( specframe1, "RefDec=-4:40:49" );
 astSet( specframe1, "RestFreq=230.538 GHz" );
@@ -10364,8 +10357,8 @@ f+
       CALL AST_SETC( SPECFRAME1, 'Unit=km/s', STATUS )
       CALL AST_SETC( SPECFRAME1, 'Epoch=1996-Oct-2 12:13:56.985', 
      :               STATUS )
-      CALL AST_SETC( SPECFRAME1, 'GeoLon=W155:28:18', STATUS )
-      CALL AST_SETC( SPECFRAME1, 'GeoLat=N19:49:34', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'ObsLon=W155:28:18', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'ObsLat=N19:49:34', STATUS )
       CALL AST_SETC( SPECFRAME1, 'RefRA=18:14:50.6', STATUS )
       CALL AST_SETC( SPECFRAME1, 'RefDec=-4:40:49', STATUS )
       CALL AST_SETC( SPECFRAME1, 'RestFreq=230.538 GHz', STATUS )
@@ -10383,7 +10376,7 @@ f-
 Note, the fact that a SpecFrame has only a single axis means that we were
 able to refer to the Unit attribute without an axis index. The other
 attributes are: the time of of observation (Epoch), the geographical
-position of the telescope (GeoLat \& GeoLon), the position of the source
+position of the telescope (ObsLat \& ObsLon), the position of the source
 on the sky (RefRA \& RefDec), the rest frequency (RestFreq) and the
 standard of rest (StdOfRest).
 
@@ -19224,10 +19217,10 @@ set explicitly.}
 
 \fitskey{SSYSOBS\emph{a}}{Ignored.}{Never written.}
 
-\fitskey{OBSGEO-X/Y/Z}{Used to set the GeoLon and
-GeoLat attributes of the SpecFrame (the observers
-height above sea level is ignored).}{Set from the GeoLon and GeoLat 
-attributes of the SpecFrame, if they have been set explicitly (it is
+\fitskey{OBSGEO-X/Y/Z}{Used to set the ObsLon and
+ObsLat attributes of the Frame (the observers
+height above sea level is ignored).}{Set from the ObsLon and ObsLat 
+attributes of the Frame, if they have been set explicitly (it is
 assumed that the observer is at sea level).}
 
 \fitskey{MJD-AVG}{Used to set the Epoch attributes of
@@ -21011,12 +21004,10 @@ than NATIVE) are not able to read or write these new classes.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.0}
+\subsection{Changes Introduced in V4.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V3.7 and V4.0 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V3.7 and V4.0:
 
 \begin{enumerate}
 
@@ -21028,8 +21019,31 @@ for a subset of V1.20 of the draft STC specification.
 the Mapping class. These are flux-conserving alternatives to the existing
 AST\_RESAMPLE<X>/astResample<X> methods.
 
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.0 and V4.1 (the
+current version):
+
+\begin{enumerate}
+
 \item A new control flag has been added to the AST\_RESAMPLE<X>/astResample<X> 
 functions which produces approximate flux conservation.
+
+\item The Frame class now has attributes ObsLon and ObsLat to specify
+the geodetic longitude and latitude of the observer.
+
+\item The ClockLon and ClockLat attributes have been removed from the
+TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been 
+removed from the SpecFrame class. Both classes now use the ObsLon and
+ObsLat attributes of the parent Frame class instead. However, the old
+attribute names can be used as synonyms for ObsLat and ObsLon. Also,
+dumps created using the old scheme can be read succesfully by AST V4.1
+and converted to the new form.
 
 \end{enumerate}
 

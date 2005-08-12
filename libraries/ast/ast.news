@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V4.0) of the Starlink AST (astrometry) library is
+   A new release (V4.1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,17 +16,31 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A new control flag has been added to the AST_RESAMPLE<X>/astResample<X> 
+functions which produces approximate flux conservation.
+
+- The Frame class now has attributes ObsLon and ObsLat to specify
+the geodetic longitude and latitude of the observer.
+
+- The ClockLon and ClockLat attributes have been removed from the
+TimeFrame class. Likewise, the GeoLon and GeoLat attributes have been 
+removed from the SpecFrame class. Both classes now use the ObsLon and
+ObsLat attributes of the parent Frame class instead. However, the old
+attribute names can be used as synonyms for ObsLat and ObsLon. Also,
+dumps created using the old scheme can be read succesfully by AST V4.1
+and converted to the new form.
+
+
+Main Changes in Version 4.0
+---------------------------
+
 - Experimental support for reading IVOA Space-Time-Coordinates (STC)
 descriptions using the XmlChan class has been added. Support is included
 for a subset of V1.20 of the draft STC specification.
 
-
 - A new set of methods (AST_REBIN<X>/astRebin<X>) has been added to 
 the Mapping class. These are accurately flux-conserving alternatives to the 
 existing AST_RESAMPLE<X>/astResample<X> methods.
-
-- A new control flag has been added to the AST_RESAMPLE<X>/astResample<X> 
-functions which produces approximate flux conservation.
 
 
 Main Changes in Version 3.7

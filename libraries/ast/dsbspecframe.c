@@ -1583,7 +1583,7 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 
 /* Make a SpecFrame and then overlay the SpecFrame attributes of this 
    DSBSpecFrame onto the new SpecFrame. This means it inherits the current 
-   values of things like GeoLon and GeoLat. */
+   values of things like ObsLon and ObsLat. */
    tf1 = astSpecFrame( "" );
    template_axis = 0;
    (*parent_overlay)( (AstFrame *) this, &template_axis, (AstFrame *) tf1 );
@@ -1942,7 +1942,7 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
 *     - The attributes which define the transformation to or from topocentric 
 *     frequency should be assigned their correct values before accessing
 *     this attribute. These potentially include System, Unit, StdOfRest, 
-*     GeoLon, GeoLat, Epoch, RefRA, RefDec and RestFreq.
+*     ObsLon, ObsLat, Epoch, RefRA, RefDec and RestFreq.
 
 *att--
 */

@@ -1532,12 +1532,10 @@ c      end if
      :      call stopit( status, 'Error 16' )
       if( abs( ubnd(4) - 4800 ) .gt. 0.0001 ) 
      :      call stopit( status, 'Error 17' )
-
-      if( ast_getc( obj, 'Geolon', status ) .ne. 'W111:35:40' ) 
+      if( ast_getc( obj, 'ObsLon', status ) .ne. 'W111:35:40' ) 
      :      call stopit( status, 'Error 18' )
-      if( ast_getc( obj, 'Geolat', status ) .ne. 'N31:57:31' ) 
+      if( ast_getc( obj, 'ObsLat', status ) .ne. 'N31:57:31' ) 
      :      call stopit( status, 'Error 19' )
-
 
       unc = ast_getunc( obj, .false., status )
       if( unc .eq. AST__NULL ) call stopit( status, 'Error 20' )

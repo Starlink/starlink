@@ -5706,8 +5706,8 @@ static AstObject *ObsDataLocationReader( AstXmlChan *this,
 /* Read the observatory location, returning a Pointlist describing the
    observatory position (if possible), and modifiying the observation
    Region by (if possible) assigning the observatory location to the 
-   GeoLon and GeoLat attributes of any SpecFrames in the Region, and the
-   ClockLon and ClockLat attributes of any TimeFrames in the Region. */
+   ObsLon and ObsLat attributes of any SpecFrames in the Region, and the
+   ObsLon and ObsLat attributes of any TimeFrames in the Region. */
       obs = ObservatoryLocationReader( this, scan->el[ 0 ][ 0 ], stc );
       if( obs ) {
          astStcSetObs( stc, obs );
@@ -5747,7 +5747,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 *  Description:
 *     This function makes a new AST PointList from the supplied IVOA
 *     ObservatoryLocationReader element, and also modifies the supplied
-*     StcObsDataLocation so that the GeoLon and GeoLat attributes hold
+*     StcObsDataLocation so that the ObsLon and ObsLat attributes hold
 *     the observatory position (if appropriate).
 
 *  Parameters:
@@ -5825,8 +5825,8 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
    }
 
 /* If possible, we use the observatory location to set the value of the
-   GeoLon and GeoLat attributes of any SpecFrames, and the ClockLon and
-   ClockLat attributes of any TimeFrames, in the supplied ObsDataLocation. 
+   ObsLon and ObsLat attributes of any SpecFrames, and the ObsLon and
+   ObsLat attributes of any TimeFrames, in the supplied ObsDataLocation. 
    For this to be possible, the PointList being returned must represent 
    either geodetic or geocentric longitude/latitude. If it is geocentric, 
    the values need to be converted to geodetic. */
@@ -5869,14 +5869,14 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
          for( i = 0; i < nax; i++ ) {
             astPrimaryFrame( obs_frm, i, &pfrm, &paxis );
             if( astIsASpecFrame( pfrm ) ) {
-               sprintf( setting, "GeoLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
+               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
-               sprintf( setting, "GeoLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
+               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
             } else if( astIsATimeFrame( pfrm ) ) {
-               sprintf( setting, "ClockLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
+               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
-               sprintf( setting, "ClockLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
+               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
             }
             pfrm = astAnnul( pfrm );

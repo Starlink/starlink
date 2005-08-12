@@ -22156,10 +22156,10 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    spectral system. Only store values which have been explicitly set in
    the SpecFrame, which are different to the default values defined by
    FITS-WCS paper III (if any), and which are not bad. */
-               if( astTestGeoLon( specfrm ) && astTestGeoLat( specfrm ) &&
+               if( astTestObsLon( specfrm ) && astTestObsLat( specfrm ) &&
                    s == ' ' ) {
-                  geolon = astGetGeoLon( specfrm );
-                  geolat = astGetGeoLat( specfrm );
+                  geolon = astGetObsLon( specfrm );
+                  geolat = astGetObsLat( specfrm );
                   if( geolat != AST__BAD && geolon != AST__BAD ) {
                      slaGeoc( geolat, 0.0, &r, &z );
                      r *= AST__AU;
@@ -28938,7 +28938,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 /* Observer's position (from primary axis descriptions). Get the OBSGEO-X/Y/Z 
    keywords, convert to geodetic longitude and latitude and store as the 
-   SpecFrame's GeoLat and GeoLon attributes (we ignore the height of the observer above sea level ). */
+   SpecFrame's ObsLat and ObsLon attributes (we ignore the height of the observer above sea level ). */
             obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, ' ', NULL, method, class );
             obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, ' ', NULL, method, class );
             obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, ' ', NULL, method, class );
@@ -28946,8 +28946,8 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
                 obsgeo[ 1 ] != AST__BAD && 
                 obsgeo[ 2 ] != AST__BAD ) {
                Geod( obsgeo, &geolat, &h, &geolon );
-               astSetGeoLat( specfrm, geolat );
-               astSetGeoLon( specfrm, geolon );
+               astSetObsLat( specfrm, geolat );
+               astSetObsLon( specfrm, geolon );
             }         
 
 /* Source velocity rest frame */
@@ -31063,7 +31063,7 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     This encoding is similar to FITS-AIPS with the following restrictions:
 *
 *     - When a SpecFrame is created by reading a FITS-CLASS header, the 
-*       attributes describing the observers position (GeoLat and GeoLon)
+*       attributes describing the observers position (ObsLat and ObsLon)
 *       are left unset because the CLASS encoding does not specify these
 *       values. Conversions to or from the topocentric standard of rest 
 *       will therefore be inaccurate (typically by up to about 0.5 km/s)

@@ -192,6 +192,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *       Override astResolvePoints.
 *     12-MAY-2005 (DSB):
 *        Override astNormBox method.
+*     12-AUG-2005 (DSB):
+*        Override ObsLat and ObsLon accessor methods.
 *class--
 */
 
@@ -875,6 +877,16 @@ static double GetEpoch( AstFrame * );
 static int TestEpoch( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void SetEpoch( AstFrame *, double );
+
+static double GetObsLat( AstFrame * );
+static int TestObsLat( AstFrame * );
+static void ClearObsLat( AstFrame * );
+static void SetObsLat( AstFrame *, double );
+
+static double GetObsLon( AstFrame * );
+static int TestObsLon( AstFrame * );
+static void ClearObsLon( AstFrame * );
+static void SetObsLon( AstFrame *, double );
 
 static int GetUseDefs( AstObject * );
 
@@ -4682,6 +4694,16 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->SetAlignSystem = SetAlignSystem;
    frame->TestAlignSystem = TestAlignSystem;
    frame->ClearAlignSystem = ClearAlignSystem;
+
+   frame->ClearObsLat = ClearObsLat;
+   frame->TestObsLat = TestObsLat;
+   frame->GetObsLat = GetObsLat;
+   frame->SetObsLat = SetObsLat;
+
+   frame->ClearObsLon = ClearObsLon;
+   frame->TestObsLon = TestObsLon;
+   frame->GetObsLon = GetObsLon;
+   frame->SetObsLon = SetObsLon;
 
 /* Declare the copy constructor, destructor and class dump
    functions. */
@@ -8868,6 +8890,16 @@ MAKE_GET(Epoch,double)
 MAKE_SET(Epoch,double)
 MAKE_TEST(Epoch)
 MAKE_CLEAR(Epoch)
+
+MAKE_GET(ObsLon,double)
+MAKE_SET(ObsLon,double)
+MAKE_TEST(ObsLon)
+MAKE_CLEAR(ObsLon)
+
+MAKE_GET(ObsLat,double)
+MAKE_SET(ObsLat,double)
+MAKE_TEST(ObsLat)
+MAKE_CLEAR(ObsLat)
 
 /* Clear, Get, Set and Test axis-dependent Frame attributes. */
 MAKE_CLEAR_AXIS(Direction)

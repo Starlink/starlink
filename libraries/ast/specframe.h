@@ -87,8 +87,6 @@ typedef struct AstSpecFrame {
 /* Attributes specific to objects in this class. */
    AstStdOfRestType alignstdofrest;/* Code identifying alignment StdOfRest */
    AstStdOfRestType stdofrest;   /* Standard of rest */
-   double geolat;                /* Geodetic latitude of observer */
-   double geolon;                /* Geodetic longitude of observer */
    double refdec;                /* Dec (FK5 J2000) of source */
    double refra;                 /* RA (FK5 J2000) of source */
    double restfreq;              /* Rest frequency (Hz)*/
@@ -134,16 +132,6 @@ typedef struct AstSpecFrameVtab {
    int (* TestRestFreq)( AstSpecFrame * );
    void (* ClearRestFreq)( AstSpecFrame * );
    void (* SetRestFreq)( AstSpecFrame *, double );
-
-   double (* GetGeoLon)( AstSpecFrame * );
-   int (* TestGeoLon)( AstSpecFrame * );
-   void (* ClearGeoLon)( AstSpecFrame * );
-   void (* SetGeoLon)( AstSpecFrame *, double );
-
-   double (* GetGeoLat)( AstSpecFrame * );
-   int (* TestGeoLat)( AstSpecFrame * );
-   void (* ClearGeoLat)( AstSpecFrame * );
-   void (* SetGeoLat)( AstSpecFrame *, double );
 
    double (* GetRefRA)( AstSpecFrame * );
    int (* TestRefRA)( AstSpecFrame * );
@@ -219,16 +207,6 @@ double astGetRestFreq_( AstSpecFrame * );
 int astTestRestFreq_( AstSpecFrame * );
 void astClearRestFreq_( AstSpecFrame * );
 void astSetRestFreq_( AstSpecFrame *, double );
-
-double astGetGeoLon_( AstSpecFrame * );
-int astTestGeoLon_( AstSpecFrame * );
-void astClearGeoLon_( AstSpecFrame * );
-void astSetGeoLon_( AstSpecFrame *, double );
-
-double astGetGeoLat_( AstSpecFrame * );
-int astTestGeoLat_( AstSpecFrame * );
-void astClearGeoLat_( AstSpecFrame * );
-void astSetGeoLat_( AstSpecFrame *, double );
 
 double astGetRefRA_( AstSpecFrame * );
 int astTestRefRA_( AstSpecFrame * );
@@ -322,16 +300,6 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestRestFreq(this) astINVOKE(V,astTestRestFreq_(astCheckSpecFrame(this)))
 #define astClearRestFreq(this) astINVOKE(V,astClearRestFreq_(astCheckSpecFrame(this)))
 #define astSetRestFreq(this,value) astINVOKE(V,astSetRestFreq_(astCheckSpecFrame(this),value))
-
-#define astGetGeoLon(this) astINVOKE(V,astGetGeoLon_(astCheckSpecFrame(this)))
-#define astTestGeoLon(this) astINVOKE(V,astTestGeoLon_(astCheckSpecFrame(this)))
-#define astClearGeoLon(this) astINVOKE(V,astClearGeoLon_(astCheckSpecFrame(this)))
-#define astSetGeoLon(this,value) astINVOKE(V,astSetGeoLon_(astCheckSpecFrame(this),value))
-
-#define astGetGeoLat(this) astINVOKE(V,astGetGeoLat_(astCheckSpecFrame(this)))
-#define astTestGeoLat(this) astINVOKE(V,astTestGeoLat_(astCheckSpecFrame(this)))
-#define astClearGeoLat(this) astINVOKE(V,astClearGeoLat_(astCheckSpecFrame(this)))
-#define astSetGeoLat(this,value) astINVOKE(V,astSetGeoLat_(astCheckSpecFrame(this),value))
 
 #define astGetRefRA(this) astINVOKE(V,astGetRefRA_(astCheckSpecFrame(this)))
 #define astTestRefRA(this) astINVOKE(V,astTestRefRA_(astCheckSpecFrame(this)))

@@ -48,6 +48,8 @@ f     AST_FRAME
 *     - MaxAxes: Maximum number of Frame axes to match
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
+*     - ObsLat: Geodetic latitude of observer
+*     - ObsLon: Geodetic longitude of observer
 *     - Permute: Permute axis order?
 *     - PreserveAxes: Preserve axes?
 *     - Symbol(axis): Axis symbol
@@ -194,6 +196,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added astNormBox method.
 *     16-JUN-2005 (DSB):
 *        Added documentation for the TimeFrame class.
+*     12-AUG-2005 (DSB):
+*        Added ObsLat and ObsLon attributes.
 *class--
 */
 
@@ -595,6 +599,7 @@ int astTest##attribute##_( AstFrame *this, int axis ) { \
 #include "cmpmap.h"              /* Compound Mappings */
 #include "axis.h"                /* Coordinate Axis */
 #include "skyaxis.h"             /* Sky coordinate axes */
+#include "skyframe.h"            /* Celestial coordinate frames */
 #include "channel.h"             /* I/O channels */
 #include "frame.h"               /* Interface definition for this class */
 #include "frameset.h"            /* Collections of Frames */
@@ -633,6 +638,10 @@ static int (* parent_equal)( AstObject *, AstObject * );
 static char label_buff[ LABEL_BUFF_LEN + 1 ]; /* Default Label string buffer */
 static char symbol_buff[ SYMBOL_BUFF_LEN + 1 ]; /* Default Symbol buffer */
 static char title_buff[ TITLE_BUFF_LEN + 1 ]; /* Default Title string buffer */
+
+/* Define a variable to hold a SkyFrame which will be used for formatting
+   and unformatting ObsLat and ObsLon values. */
+static AstSkyFrame *skyframe;      
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -699,6 +708,16 @@ static double GetEpoch( AstFrame * );
 static int TestEpoch( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void SetEpoch( AstFrame *, double );
+
+static double GetObsLat( AstFrame * );
+static int TestObsLat( AstFrame * );
+static void ClearObsLat( AstFrame * );
+static void SetObsLat( AstFrame *, double );
+
+static double GetObsLon( AstFrame * );
+static int TestObsLon( AstFrame * );
+static void ClearObsLon( AstFrame * );
+static void SetObsLon( AstFrame *, double );
 
 static int GetActiveUnit( AstFrame * );
 static int TestActiveUnit( AstFrame * );
@@ -1838,6 +1857,16 @@ L1:
                ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearUnit( this, axis - 1 );
+
+/* ObsLat. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslat" ) ) {
+      astClearObsLat( this );
+
+/* ObsLon. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslon" ) ) {
+      astClearObsLon( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -3963,6 +3992,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int used;                     /* Could the setting string be used? */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
+
+
 /* Initialise. */
    result = NULL;
 
@@ -4198,6 +4233,76 @@ L1:
                ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetUnit( this, axis - 1 );
+
+/* ObsLat. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslat" ) ) {
+      dval = astGetObsLat( this );
+      if ( astOK ) {
+
+/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+   for formatting and unformatting ObsLon and ObsLat values. */
+         if( !skyframe ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
+            skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+         }
+
+/* Display absolute value preceeded by "N" or "S" as appropriate. */
+         if( dval < 0 ) {         
+            (void) sprintf( buff, "S%s",  astFormat( skyframe, 1, -dval ) );
+         } else {
+            (void) sprintf( buff, "N%s",  astFormat( skyframe, 1, dval ) );
+         }
+         result = buff;
+      }
+
+/* ObsLon. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslon" ) ) {
+      dval = astGetObsLon( this );
+      if ( astOK ) {
+
+/* Put into range +/- PI. */
+         dval = slaDrange( dval );
+
+/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+   for formatting and unformatting ObsLon and ObsLat values. */
+         if( !skyframe ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
+            skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+         }
+
+/* Temporarily make the SkyFrame use degrees for longitude axis. */
+         astSetAsTime( skyframe, 0, 0 );
+
+/* Display absolute value preceeded by "E" or "W" as appropriate. */
+         if( dval < 0 ) {         
+            (void) sprintf( buff, "W%s",  astFormat( skyframe, 0, -dval ) );
+         } else {
+            (void) sprintf( buff, "E%s",  astFormat( skyframe, 0, dval ) );
+         }
+         result = buff;
+
+/* Make the SkyFrame use hours for longitude axis again. */
+         astSetAsTime( skyframe, 0, 1 );
+
+      }
 
 /* Other axis attributes. */
 /* ---------------------- */
@@ -4809,6 +4914,16 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->SetEpoch = SetEpoch;
    vtab->TestEpoch = TestEpoch;
 
+   vtab->ClearObsLat = ClearObsLat;
+   vtab->TestObsLat = TestObsLat;
+   vtab->GetObsLat = GetObsLat;
+   vtab->SetObsLat = SetObsLat;
+
+   vtab->ClearObsLon = ClearObsLon;
+   vtab->TestObsLon = TestObsLon;
+   vtab->GetObsLon = GetObsLon;
+   vtab->SetObsLon = SetObsLon;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -4839,6 +4954,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "Frame", "Coordinate system description" );
+
 }
 
 static int IsUnitFrame( AstFrame *this ){
@@ -6242,6 +6358,8 @@ static void Overlay( AstFrame *template, const int *template_axes,
    OVERLAY(Domain);
    OVERLAY(Epoch);
    OVERLAY(Title);
+   OVERLAY(ObsLat)
+   OVERLAY(ObsLon)
 
 /* Transfer the ActiveUnit flag. */
    astSetActiveUnit( result, astGetActiveUnit( template ) );
@@ -7754,21 +7872,29 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int format;                   /* Offset of axis Format string */
    int free_axis_setting;        /* Should axis_setting be freed? */
    int has_axis;                 /* Does setting include an axis specifier? */
+   int ival;                     /* Integer attribute value */
    int label;                    /* Offset of axis Label string */
    int len;                      /* Length of setting string */
    int match_end;                /* Match final axes of target? */
    int max_axes;                 /* Maximum number of axes matched */
    int min_axes;                 /* Minimum number of axes matched */
    int nc;                       /* Number of characters read by astSscanf */
+   int off2;                     /* Modified offset of attribute value */
+   int off;                      /* Offset of attribute value */
    int oldrep;                   /* Original error reporting state */
    int paxis;                    /* Axis index within primary frame */
    int permute;                  /* Permute axes in order to match? */
    int preserve_axes;            /* Preserve matched target axes? */
+   int sign;                     /* Sign of longitude value */
    int symbol;                   /* Offset of axis Symbol string */
    int system;                   /* Offset of System string */
    int title;                    /* Offset of Title string */
    int unit;                     /* Offset of axis Unit string */
    int used;                     /* Could the setting string be used? */
+
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
   
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -7986,6 +8112,102 @@ L1:
                & ( nc >= len ) ) {
       astSetUnit( this, axis - 1, setting + unit );
 
+/* ObsLat. */
+/* ------- */
+   } else if ( nc = 0,
+              ( 0 == astSscanf( setting, "obslat=%n%*s %n", &off, &nc ) )
+              && ( nc >= 7 ) ) {
+
+/* If the first character in the value string is "N" or "S", remember the
+   sign of the value and skip over the sign character. Default is north
+   (+ve). */
+      off2 = off;
+      if( setting[ off ] == 'N' || setting[ off ] == 'n' ) {
+         off2++;
+         sign = +1;
+      } else if( setting[ off ] == 'S' || setting[ off ] == 's' ) {
+         off2++;
+         sign = -1;
+      } else {
+         sign = +1;
+      } 
+
+/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+   for formatting and unformatting ObsLon and ObsLat values. */
+      if( !skyframe ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
+         skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+      }
+
+/* Convert the string to a radians value before use. */
+      ival = astUnformat( skyframe, 1, setting + off2, &dval );
+      if ( ival == astChrLen( setting ) - off2  ) {
+         astSetObsLat( this, dval*sign );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
+                   "ObsLat (observers latitude) \"%s\".", astGetClass( this ), 
+                   setting + off );
+      }
+
+/* ObsLon. */
+/* ------- */
+   } else if ( nc = 0,
+              ( 0 == astSscanf( setting, "obslon=%n%*s %n", &off, &nc ) )
+              && ( nc >= 7 ) ) {
+
+/* If the first character in the value string is "E" or "W", remember the
+   sign of the value and skip over the sign character. Default is east
+   (+ve). */
+      off2 = off;
+      if( setting[ off ] == 'E' || setting[ off ] == 'e' ) {
+         off2++;
+         sign = +1;
+      } else if( setting[ off ] == 'W' || setting[ off ] == 'w' ) {
+         off2++;
+         sign = -1;
+      } else {
+         sign = +1;
+      } 
+
+/* If not already created, create an FK5 J2000 SkyFrame which will be used 
+   for formatting and unformatting ObsLon and ObsLat values. */
+      if( !skyframe ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
+         skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+      }
+
+/* Convert the string to a radians value before use (temporarily make the 
+   SkyFrame use degrees for longitude axis). */
+      astSetAsTime( skyframe, 0, 0 );
+      ival = astUnformat( skyframe, 0, setting + off2, &dval );
+      astSetAsTime( skyframe, 0, 1 );
+      if ( ival == astChrLen( setting ) - off2  ) {
+         astSetObsLon( this, dval*sign );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
+                   "ObsLon (observers longitude) \"%s\".", astGetClass( this ), 
+                   setting + off );
+      }
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -8971,6 +9193,16 @@ L1:
                ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestUnit( this, axis - 1 );
+
+/* ObsLat. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslat" ) ) {
+      result = astTestObsLat( this );
+
+/* ObsLon. */
+/* ------- */
+   } else if ( !strcmp( attrib, "obslon" ) ) {
+      result = astTestObsLon( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -10998,6 +11230,116 @@ astMAKE_SET(Frame,Title,const char *,title,astStore( this->title, value,
 /* The Title value is set if the pointer to it is not NULL. */
 astMAKE_TEST(Frame,Title,( this->title != NULL ))
 
+/*
+*att++
+*  Name:
+*     ObsLat
+
+*  Purpose:
+*     The geodetic latitude of the observer 
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the geodetic latitude of the observer, in
+*     degrees. The basic Frame class makes no use of this attribute, but
+*     specialised subclasses of Frame may use it. For instance, the
+*     SpecFrame, SkyFrame and TimeFrame classes use it. The default value
+*     is zero.
+*
+*     The value is stored internally in radians, but is converted to and 
+*     from a degrees string for access. Some example input formats are: 
+*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311", 
+*     "-45.6", "S45.6". As indicated, the sign of the latitude can 
+*     optionally be indicated using characters "N" and "S" in place of the 
+*     usual "+" and "-". When converting the stored value to a string, the 
+*     format "[s]dd:mm:ss" is used, when "[s]" is "N" or "S".
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+*     SpecFrame
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
+*        it defines the Doppler shift introduced by the observers diurnal 
+*        motion around the earths axis, which is needed when converting to 
+*        or from the topocentric standard of rest. The maximum velocity
+*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        default value for the attribute is zero.
+*     TimeFrame
+*        Together with the ObsLon attribute, it is used when converting
+*        between certain time scales (TDB, TCB, LMST, LAST)
+
+*att--
+*/
+/* The geodetic latitude of the observer (radians). Clear the ObsLat value by 
+   setting it to AST__BAD, returning zero as the default value. Any value is 
+   acceptable. */
+astMAKE_CLEAR(Frame,ObsLat,obslat,AST__BAD)
+astMAKE_GET(Frame,ObsLat,double,0.0,((this->obslat!=AST__BAD)?this->obslat:0.0))
+astMAKE_SET(Frame,ObsLat,double,obslat,value)
+astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
+
+
+/*
+*att++
+*  Name:
+*     ObsLon
+
+*  Purpose:
+*     The geodetic longitude of the observer 
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the geodetic (or equivalently, geocentric)
+*     longitude of the observer, in degrees, measured positive eastwards. 
+*     See also attribute ObsLat. The basic Frame class makes no use of this 
+*     attribute, but specialised subclasses of Frame may use it. For instance, 
+*     the SpecFrame, SkyFrame and TimeFrame classes use it. The default value
+*     is zero.
+*
+*     The value is stored internally in radians, but is converted to and 
+*     from a degrees string for access. Some example input formats are: 
+*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311", 
+*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
+*     optionally be indicated using characters "E" and "W" in place of the 
+*     usual "+" and "-". When converting the stored value to a string, the 
+*     format "[s]ddd:mm:ss" is used, when "[s]" is "E" or "W" and the 
+*     numerical value is chosen to be less than 180 degrees.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+*     SpecFrame
+*        Together with the ObsLon, Epoch, RefRA and RefDec attributes, 
+*        it defines the Doppler shift introduced by the observers diurnal 
+*        motion around the earths axis, which is needed when converting to 
+*        or from the topocentric standard of rest. The maximum velocity
+*        error which can be caused by an incorrect value is 0.5 km/s. The 
+*        default value for the attribute is zero.
+*     TimeFrame
+*        Together with the ObsLon attribute, it is used when converting
+*        between certain time scales (TDB, TCB, LMST, LAST)
+
+*att--
+*/
+/* The geodetic longitude of the observer (radians). Clear the ObsLon value by 
+   setting it to AST__BAD, returning zero as the default value. Any value is 
+   acceptable. */
+astMAKE_CLEAR(Frame,ObsLon,obslon,AST__BAD)
+astMAKE_GET(Frame,ObsLon,double,0.0,((this->obslon!=AST__BAD)?this->obslon:0.0))
+astMAKE_SET(Frame,ObsLon,double,obslon,value)
+astMAKE_TEST(Frame,ObsLon,(this->obslon!=AST__BAD))
+
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -11529,6 +11871,18 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                    ival ? "Match final target axes" :
                           "Match initial target axes" );
 
+/* ObsLat. */
+/* ------- */
+   set = TestObsLat( this );
+   dval = set ? GetObsLat( this ) : astGetObsLat( this );
+   astWriteDouble( channel, "ObsLat", set, 0, dval, "Observers geodetic latitude (rads)" );
+
+/* ObsLon. */
+/* ------- */
+   set = TestObsLon( this );
+   dval = set ? GetObsLon( this ) : astGetObsLon( this );
+   astWriteDouble( channel, "ObsLon", set, 0, dval, "Observers geodetic longitude (rads)" );
+
 /* ActiveUnit. */
 /* ----------- */
       if( astTestActiveUnit( this ) ) {
@@ -11807,6 +12161,8 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->system = AST__BADSYSTEM;
          new->alignsystem = AST__BADSYSTEM;
          new->active_unit = -INT_MAX;
+         new->obslat = AST__BAD;
+         new->obslon = AST__BAD;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
@@ -12138,6 +12494,16 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 /* --------- */
          new->match_end = astReadInt( channel, "mchend", -INT_MAX );
          if ( TestMatchEnd( new ) ) SetMatchEnd( new, new->match_end );
+
+/* ObsLat. */
+/* ------- */
+      new->obslat = astReadDouble( channel, "obslat", AST__BAD );
+      if ( TestObsLat( new ) ) SetObsLat( new, new->obslat );
+
+/* ObsLon. */
+/* ------- */
+      new->obslon = astReadDouble( channel, "obslon", AST__BAD );
+      if ( TestObsLon( new ) ) SetObsLon( new, new->obslon );
 
 /* ActiveUnit. */
 /* ----------- */

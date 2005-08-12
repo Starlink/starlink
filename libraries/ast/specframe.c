@@ -28,8 +28,6 @@ f     AST_SPECFRAME
 *     SpecFrame also has the following attributes:
 *
 *     - AlignStdOfRest: Standard of rest in which to align SpecFrames
-*     - GeoLat: Geodetic latitude of observer
-*     - GeoLon: Geodetic longitude of observer
 *     - RefDec: Declination of the source (FK5 J2000)
 *     - RefRA: Right ascension of the source (FK5 J2000)
 *     - RestFreq: Rest frequency
@@ -74,6 +72,12 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        zero.
 *     23-MAR-2005 (DSB):
 *        - Added missing rest frames to SorEqual.
+*     12-AUG-2005 (DSB):
+*        - Remove GeoLon and GeoLat attributes. Use the new ObsLon and
+*        ObsLat attributes in the parent Frame class instead. Note, for
+*        backward compatibility the public attribute accessors and the 
+*        astLoadSpecFrame functions still recogonise GeoLon and GeoLat,
+*        but use the ObsLat/ObsLon attributes internally.
 *class--
 */
 
@@ -234,16 +238,6 @@ static int TestStdOfRest( AstSpecFrame * );
 static void ClearStdOfRest( AstSpecFrame * );
 static void SetStdOfRest( AstSpecFrame *, AstStdOfRestType );
 
-static double GetGeoLat( AstSpecFrame * );
-static int TestGeoLat( AstSpecFrame * );
-static void ClearGeoLat( AstSpecFrame * );
-static void SetGeoLat( AstSpecFrame *, double );
-
-static double GetGeoLon( AstSpecFrame * );
-static int TestGeoLon( AstSpecFrame * );
-static void ClearGeoLon( AstSpecFrame * );
-static void SetGeoLon( AstSpecFrame *, double );
-
 static double GetRestFreq( AstSpecFrame * );
 static int TestRestFreq( AstSpecFrame * );
 static void ClearRestFreq( AstSpecFrame * );
@@ -352,13 +346,15 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* GeoLat. */
 /* ------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   SpecFrame had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "geolat" ) ) {
-      astClearGeoLat( this );
+      astClearAttrib( this, "obslat" );
 
 /* GeoLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "geolon" ) ) {
-      astClearGeoLon( this );
+      astClearAttrib( this, "obslon" );
 
 /* RefDec. */
 /* ---------- */
@@ -795,8 +791,8 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
    same */
       } else if( sor == AST__TPSOR ){
          if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
-             !EQUAL( astGetGeoLon( this ), astGetGeoLon( that ) ) ||
-             !EQUAL( astGetGeoLat( this ), astGetGeoLat( that ) ) ) result = 0;
+             !EQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
+             !EQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
       
       } else if( sor != AST__LKSOR && sor != AST__LDSOR &&
                  sor != AST__GLSOR && sor != AST__LGSOR && astOK ) {
@@ -962,43 +958,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* GeoLat. */
 /* ------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   SpecFrame had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "geolat" ) ) {
-      dval = astGetGeoLat( this );
-      if ( astOK ) {
-
-/* Display absolute value preceeded by "N" or "S" as appropriate. */
-         if( dval < 0 ) {         
-            (void) sprintf( buff, "S%s",  astFormat( skyframe, 1, -dval ) );
-         } else {
-            (void) sprintf( buff, "N%s",  astFormat( skyframe, 1, dval ) );
-         }
-         result = buff;
-      }
+      result = astGetAttrib( this, "obslat" );
 
 /* GeoLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "geolon" ) ) {
-      dval = astGetGeoLon( this );
-      if ( astOK ) {
-
-/* Put into range +/- PI. */
-         dval = slaDrange( dval );
-
-/* Temporarily make the SkyFrame use degrees for longitude axis. */
-         astSetAsTime( skyframe, 0, 0 );
-
-/* Display absolute value preceeded by "E" or "W" as appropriate. */
-         if( dval < 0 ) {         
-            (void) sprintf( buff, "W%s",  astFormat( skyframe, 0, -dval ) );
-         } else {
-            (void) sprintf( buff, "E%s",  astFormat( skyframe, 0, dval ) );
-         }
-         result = buff;
-
-/* Make the SkyFrame use hours for longitude axis again. */
-         astSetAsTime( skyframe, 0, 1 );
-
-      }
+      result = astGetAttrib( this, "obslon" );
 
 /* RefDec. */
 /* ------- */
@@ -1888,16 +1856,6 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
    vtab->GetSourceVRF = GetSourceVRF;
    vtab->SetSourceVRF = SetSourceVRF;
 
-   vtab->ClearGeoLat = ClearGeoLat;
-   vtab->TestGeoLat = TestGeoLat;
-   vtab->GetGeoLat = GetGeoLat;
-   vtab->SetGeoLat = SetGeoLat;
-
-   vtab->ClearGeoLon = ClearGeoLon;
-   vtab->TestGeoLon = TestGeoLon;
-   vtab->GetGeoLon = GetGeoLon;
-   vtab->SetGeoLon = SetGeoLon;
-
    vtab->ClearRefDec = ClearRefDec;
    vtab->TestRefDec = TestRefDec;
    vtab->GetRefDec = GetRefDec;
@@ -2745,8 +2703,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
    for SourceVel would be changed from the default SourceVRF to the specified
    SourceVRF when SourceVRF was overlayed. */
       OVERLAY(AlignStdOfRest)
-      OVERLAY(GeoLat)
-      OVERLAY(GeoLon)
       OVERLAY(RefDec)
       OVERLAY(RefRA)
       OVERLAY(RestFreq)
@@ -2820,8 +2776,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int namelen;                  /* Length of attribute name in setting */
    int nc;                       /* Number of characters read by astSscanf */
    int off;                      /* Offset of attribute value */
-   int off2;                     /* Modified offset of attribute value */
-   int sign;                     /* Sign of longitude value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2886,70 +2840,29 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* GeoLat. */
 /* ------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   SpecFrame had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( nc = 0,
               ( 0 == astSscanf( setting, "geolat=%n%*s %n", &off, &nc ) )
               && ( nc >= 7 ) ) {
-
-/* If the first character in the value string is "N" or "S", remember the
-   sign of the value and skip over the sign character. Default is north
-   (+ve). */
-      off2 = off;
-      if( setting[ off ] == 'N' || setting[ off ] == 'n' ) {
-         off2++;
-         sign = +1;
-      } else if( setting[ off ] == 'S' || setting[ off ] == 's' ) {
-         off2++;
-         sign = -1;
-      } else {
-         sign = +1;
-      } 
-
-/* Convert the string to a radians value before use. */
-      ival = astUnformat( skyframe, 1, setting + off2, &dval );
-      if ( ival == ulen - off2  ) {
-         astSetGeoLat( this, dval*sign );
-
-/* Report an error if the string value wasn't recognised. */
-      } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "GeoLat (observers latitude) \"%s\".", astGetClass( this ), 
-                   setting + off );
-      }
+      new_setting = astStore( NULL, setting, len + 1 );
+      new_setting[ 0 ] = 'o';
+      new_setting[ 1 ] = 'b';
+      new_setting[ 2 ] = 's';
+      astSetAttrib( this, new_setting );
+      new_setting = astFree( new_setting );
 
 /* GeoLon. */
 /* ------- */
    } else if ( nc = 0,
               ( 0 == astSscanf( setting, "geolon=%n%*s %n", &off, &nc ) )
               && ( nc >= 7 ) ) {
-
-/* If the first character in the value string is "E" or "W", remember the
-   sign of the value and skip over the sign character. Default is east
-   (+ve). */
-      off2 = off;
-      if( setting[ off ] == 'E' || setting[ off ] == 'e' ) {
-         off2++;
-         sign = +1;
-      } else if( setting[ off ] == 'W' || setting[ off ] == 'w' ) {
-         off2++;
-         sign = -1;
-      } else {
-         sign = +1;
-      } 
-
-/* Convert the string to a radians value before use (temporarily make the 
-   SkyFrame use degrees for longitude axis). */
-      astSetAsTime( skyframe, 0, 0 );
-      ival = astUnformat( skyframe, 0, setting + off2, &dval );
-      astSetAsTime( skyframe, 0, 1 );
-      if ( ival == ulen - off2  ) {
-         astSetGeoLon( this, dval*sign );
-
-/* Report an error if the string value wasn't recognised. */
-      } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid value for "
-                   "GeoLon (observers longitude) \"%s\".", astGetClass( this ), 
-                   setting + off );
-      }
+      new_setting = astStore( NULL, setting, len + 1 );
+      new_setting[ 0 ] = 'o';
+      new_setting[ 1 ] = 'b';
+      new_setting[ 2 ] = 's';
+      astSetAttrib( this, new_setting );
+      new_setting = astFree( new_setting );
 
 /* RefDec. */
 /* ------- */
@@ -3534,8 +3447,8 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       from = astGetStdOfRest( this );
       ra = astGetRefRA( this );
       dec = astGetRefDec( this );
-      lon = astGetGeoLon( this );
-      lat = astGetGeoLat( this );
+      lon = astGetObsLon( this );
+      lat = astGetObsLat( this );
       epoch = astGetEpoch( this );
 
 /* Verify that the reference RA and DEC can be used (they are needed by all 
@@ -3544,7 +3457,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 
 /* Convert from the "this" rest frame to heliographic. */
       if( from == AST__TPSOR ) {
-         VerifyAttrs( this, vmess, "GeoLon GeoLat Epoch", "astMatch" );
+         VerifyAttrs( this, vmess, "ObsLon ObsLat Epoch", "astMatch" );
          TRANSFORM_5( "TPF2HL", lon, lat, epoch, ra, dec )
       
       } else if( from == AST__GESOR ) {
@@ -3576,13 +3489,13 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
       to = astGetStdOfRest( that );
       ra = astGetRefRA( that );
       dec = astGetRefDec( that );
-      lon = astGetGeoLon( that );
-      lat = astGetGeoLat( that );
+      lon = astGetObsLon( that );
+      lat = astGetObsLat( that );
       epoch = astGetEpoch( that );
       VerifyAttrs( that, vmess, "RefRA RefDec", "astMatch" );
 
       if( to == AST__TPSOR ) {
-         VerifyAttrs( that, vmess, "GeoLon GeoLat Epoch", "astMatch" );
+         VerifyAttrs( that, vmess, "ObsLon ObsLat Epoch", "astMatch" );
          TRANSFORM_5( "HLF2TP", lon, lat, epoch, ra, dec )
    
       } else if( to == AST__GESOR ) {
@@ -4556,13 +4469,15 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* GeoLat. */
 /* ------- */
+/* Retained for backward compatibility with older versions of AST in which 
+   SpecFrame had GeoLon/Lat attributes (now ObsLon/Lat are used instead). */
    } else if ( !strcmp( attrib, "geolat" ) ) {
-      result = astTestGeoLat( this );
+      result = astTestAttrib( this, "obslat" );
 
 /* GeoLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "geolon" ) ) {
-      result = astTestGeoLon( this );
+      result = astTestAttrib( this, "obslon" );
 
 /* RefDec. */
 /* ------- */
@@ -4754,12 +4669,12 @@ static void VerifyAttrs( AstSpecFrame *this, const char *purp,
    value, and a string describing the attribute.*/
                if( len > 0 ) {
 
-                  if( !strncmp( "GeoLat", a, len ) ) {
-                     set = astTestGeoLat( this );
+                  if( !strncmp( "ObsLat", a, len ) ) {
+                     set = astTestObsLat( this );
                      desc = "observatory latitude";
 
-                  } else if( !strncmp( "GeoLon", a, len ) ) {
-                     set = astTestGeoLon( this );
+                  } else if( !strncmp( "ObsLon", a, len ) ) {
+                     set = astTestObsLon( this );
                      desc = "observatory longitude";
 
                   } else if( !strncmp( "RefRA", a, len ) ) {
@@ -4851,13 +4766,13 @@ f     When AST_FindFrame or AST_CONVERT is used on two SpecFrames (potentially
 *     AlignSystem attribute, using the target's rest frequency if necessary.
 *
 *     - Map these values from the target's standard of rest to the standard of
-*     rest specified by the AlignStdOfRest attribute, using the Epoch, GeoLat, 
-*     GeoLon, RefDec and RefRA attributes of the target to define the two
+*     rest specified by the AlignStdOfRest attribute, using the Epoch, ObsLat, 
+*     ObsLon, RefDec and RefRA attributes of the target to define the two
 *     standards of rest.
 *
 *     - Map these values from the standard of rest specified by the 
 *     AlignStdOfRest attribute, to the template's standard of rest, using the 
-*     Epoch, GeoLat, GeoLon, RefDec and RefRA attributes of the template to 
+*     Epoch, ObsLat, ObsLon, RefDec and RefRA attributes of the template to 
 *     define the two standards of rest.
 *
 *     - Map these values from the system specified by the AlignSystem 
@@ -4887,95 +4802,6 @@ astMAKE_SET(SpecFrame,AlignStdOfRest,AstStdOfRestType,alignstdofrest,(
 
 /* Leave the value unchanged on error. */
                                             this->alignstdofrest ) ) )
-
-/*
-*att++
-*  Name:
-*     GeoLat
-
-*  Purpose:
-*     The geodetic latitude of the observer 
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     String.
-
-*  Description:
-*     This attribute specifies the geodetic latitude of the observer, in
-*     degrees. Together with the GeoLon, Epoch, RefRA and RefDec attributes, 
-*     it defines the Doppler shift introduced by the observers diurnal 
-*     motion around the earths axis, which is needed when converting to 
-*     or from the topocentric standard of rest. The maximum velocity
-*     error which can be caused by an incorrect value is 0.5 km/s. The 
-*     default value for the attribute is zero.
-
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "22:19:23.2", "22 19 23.2", "22:19.387", "22.32311", "N22.32311", 
-*     "-45.6", "S45.6". As indicated, the sign of the latitude can 
-*     optionally be indicated using characters "N" and "S" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]dd:mm:ss" is used, when "[s]" is "N" or "S".
-
-*  Applicability:
-*     SpecFrame
-*        All SpecFrames have this attribute.
-
-*att--
-*/
-/* The geodetic latitude of the observer (radians). Clear the GeoLat value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
-   acceptable. */
-astMAKE_CLEAR(SpecFrame,GeoLat,geolat,AST__BAD)
-astMAKE_GET(SpecFrame,GeoLat,double,0.0,((this->geolat!=AST__BAD)?this->geolat:0.0))
-astMAKE_SET(SpecFrame,GeoLat,double,geolat,value)
-astMAKE_TEST(SpecFrame,GeoLat,(this->geolat!=AST__BAD))
-
-
-/*
-*att++
-*  Name:
-*     GeoLon
-
-*  Purpose:
-*     The geodetic longitude of the observer 
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     String.
-
-*  Description:
-*     This attribute specifies the geodetic (or equivalently, geocentric)
-*     longitude of the observer, in degrees, measured positive eastwards. 
-*     See also attribute GeoLat. The default value is zero.
-*
-*     The value is stored internally in radians, but is converted to and 
-*     from a degrees string for access. Some example input formats are: 
-*     "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311", "E155.32311", 
-*     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
-*     optionally be indicated using characters "E" and "W" in place of the 
-*     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]ddd:mm:ss" is used, when "[s]" is "E" or "W" and the 
-*     numerical value is chosen to be less than 180 degrees.
-
-*  Applicability:
-*     SpecFrame
-*        All SpecFrames have this attribute.
-
-*att--
-*/
-/* The geodetic longitude of the observer (radians). Clear the GeoLon value by 
-   setting it to AST__BAD, returning zero as the default value. Any value is 
-   acceptable. */
-astMAKE_CLEAR(SpecFrame,GeoLon,geolon,AST__BAD)
-astMAKE_GET(SpecFrame,GeoLon,double,0.0,((this->geolon!=AST__BAD)?this->geolon:0.0))
-astMAKE_SET(SpecFrame,GeoLon,double,geolon,value)
-astMAKE_TEST(SpecFrame,GeoLon,(this->geolon!=AST__BAD))
-
 
 /*
 *att++
@@ -5265,7 +5091,7 @@ astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
 *     to be on the surface of the earth). Spectra recorded in this standard of 
 *     rest suffer a Doppler shift which varies over the course of a day
 *     because of the rotation of the observer around the axis of the earth.
-*     This standard of rest must be qualified using the GeoLat, GeoLon, Epoch, 
+*     This standard of rest must be qualified using the ObsLat, ObsLon, Epoch, 
 *     RefRA and RefDec attributes. 
 *
 *     - "Geocentric", "Geocentr" or "Geo": The rest-frame of the earth centre. 
@@ -5578,18 +5404,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    dval = set ? GetRefDec( this ) : astGetRefDec( this );
    astWriteDouble( channel, "RefDec", set, 0, dval, "Reference Dec (rads, FK5 J2000)" );
 
-/* GeoLat. */
-/* ------- */
-   set = TestGeoLat( this );
-   dval = set ? GetGeoLat( this ) : astGetGeoLat( this );
-   astWriteDouble( channel, "GeoLat", set, 0, dval, "Observers geodetic latitude (rads)" );
-
-/* GeoLon. */
-/* ------- */
-   set = TestGeoLon( this );
-   dval = set ? GetGeoLon( this ) : astGetGeoLon( this );
-   astWriteDouble( channel, "GeoLon", set, 0, dval, "Observers geodetic longitude (rads)" );
-
 /* RestFreq. */
 /* --------- */
    set = TestRestFreq( this );
@@ -5834,8 +5648,6 @@ AstSpecFrame *astInitSpecFrame_( void *mem, size_t size, int init,
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
       new->alignstdofrest = AST__BADSOR;    
-      new->geolat = AST__BAD;
-      new->geolon = AST__BAD;
       new->refdec = AST__BAD;
       new->refra = AST__BAD;
       new->restfreq = AST__BAD;
@@ -5929,6 +5741,8 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
    AstSpecFrame *new;            /* Pointer to the new SpecFrame */
    char buff[ 20 ];              /* Buffer for item name */
    char *sval;                   /* Pointer to string value */
+   double obslat;                /* Value for ObsLat attribute */
+   double obslon;                /* Value for ObsLon attribute */
    int i;                        /* Loop count */
    int j;                        /* Loop count */
    int nc;                       /* String length */
@@ -6025,13 +5839,21 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
 
 /* GeoLat. */
 /* ------- */
-      new->geolat = astReadDouble( channel, "geolat", AST__BAD );
-      if ( TestGeoLat( new ) ) SetGeoLat( new, new->geolat );
+/* Retained for backward compatibility with older versions of AST in
+   which SpecFrame had a GeoLat attribute (now ObsLat is used instead). */
+      if( !astTestObsLat( new ) ) {
+         obslat = astReadDouble( channel, "geolat", AST__BAD );
+         if ( obslat != AST__BAD ) astSetObsLat( new, obslat );
+      }
 
 /* GeoLon. */
 /* ------- */
-      new->geolon = astReadDouble( channel, "geolon", AST__BAD );
-      if ( TestGeoLon( new ) ) SetGeoLon( new, new->geolon );
+/* Retained for backward compatibility with older versions of AST in
+   which SpecFrame had a GeoLon attribute (now ObsLon is used instead). */
+      if( !astTestObsLon( new ) ) {
+         obslon = astReadDouble( channel, "geolon", AST__BAD );
+         if ( obslon != AST__BAD ) astSetObsLon( new, obslon );
+      }
 
 /* RefRA. */
 /* ------ */

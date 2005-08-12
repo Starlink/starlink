@@ -2889,8 +2889,8 @@ f     AST_TEST
 *        the UseDefs value of its encapsulated Frame.
 *     Frame
 *        If UseDefs is zero, an error is reported when aligning Frames if the 
-*        Epoch attribute is required but has not been assigned a value 
-*        explicitly.
+*        Epoch, ObsLat or ObsLon attribute is required but has not been 
+*        assigned a value explicitly.
 *     SkyFrame
 *        If UseDefs is zero, an error is reported when aligning SkyFrames 
 *        if any of the following attributes are required but have not been 
@@ -2898,8 +2898,8 @@ f     AST_TEST
 *     SpecFrame
 *        If UseDefs is zero, an error is reported when aligning SpecFrames 
 *        if any of the following attributes are required but have not been 
-*        assigned a value explicitly: Epoch, RefRA, RefDec, GeoLon, GeoLat, 
-*        RestFreq, SourceVel, StdOfRest.
+*        assigned a value explicitly: Epoch, RefRA, RefDec, RestFreq, 
+*        SourceVel, StdOfRest.
 *     DSBSpecFrame
 *        If UseDefs is zero, an error is reported when aligning DSBSpecFrames 
 *        or when accessing the ImagFreq attribute if any of the following 

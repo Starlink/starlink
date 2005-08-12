@@ -28,13 +28,13 @@ c
          call stopit( status, 'error 2' )
       endif
 
-      if( ast_getc( tf, 'ClockLon', status ) .ne. 'E0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLon', status )
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3' )
       endif
 
-      if( ast_getc( tf, 'ClockLat', status ) .ne. 'N0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLat', status )
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4' )
       endif
 
@@ -105,13 +105,13 @@ c
          call stopit( status, 'error 2b' )
       endif
 
-      if( ast_getc( tf, 'ClockLon', status ) .ne. 'E0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLon', status )
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3b' )
       endif
 
-      if( ast_getc( tf, 'ClockLat', status ) .ne. 'N0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLat', status )
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4b' )
       endif
 
@@ -181,13 +181,13 @@ c
          call stopit( status, 'error 2c' )
       endif
 
-      if( ast_getc( tf, 'ClockLon', status ) .ne. 'E0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLon', status )
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3c' )
       endif
 
-      if( ast_getc( tf, 'ClockLat', status ) .ne. 'N0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLat', status )
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4c' )
       endif
 
@@ -256,13 +256,13 @@ c
          call stopit( status, 'error 2d' )
       endif
 
-      if( ast_getc( tf, 'ClockLon', status ) .ne. 'E0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLon', status )
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3d' )
       endif
 
-      if( ast_getc( tf, 'ClockLat', status ) .ne. 'N0:00:00' ) then
-         write(*,*)  ast_getc( tf, 'ClockLat', status )
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+         write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4d' )
       endif
 
@@ -680,10 +680,10 @@ c
 
 
 
-      tf1 = ast_timeframe( 'system=mjd,timescale=gmst,clocklon=90,'//
-     :                     'clocklat=0,timeorigin=53000.0', status )
-      tf2 = ast_timeframe( 'system=mjd,timescale=lmst,clocklon=90,'//
-     :                     'clocklat=0,timeorigin=53000.0', status )
+      tf1 = ast_timeframe( 'system=mjd,timescale=gmst,ObsLon=90,'//
+     :                     'ObsLat=0,timeorigin=53000.0', status )
+      tf2 = ast_timeframe( 'system=mjd,timescale=lmst,ObsLon=90,'//
+     :                     'ObsLat=0,timeorigin=53000.0', status )
       fs = ast_convert( tf1, tf2, ' ', status )
       if( fs .eq. AST__NULL ) then
          call stopit( status, 'error 47' )
@@ -771,10 +771,10 @@ c      call ast_listissued( 'testtime' )
      :    ast_getd( result, 'timeorigin', status ) .or.
      :    ast_getc( obj, 'timescale', status ) .ne.
      :    ast_getc( result, 'timescale', status ) .or.
-     :    ast_getc( obj, 'clocklon', status ) .ne.
-     :    ast_getc( result, 'clocklon', status ) .or.
-     :    ast_getc( obj, 'clocklat', status ) .ne.
-     :    ast_getc( result, 'clocklat', status ) ) then
+     :    ast_getc( obj, 'ObsLon', status ) .ne.
+     :    ast_getc( result, 'ObsLon', status ) .or.
+     :    ast_getc( obj, 'ObsLat', status ) .ne.
+     :    ast_getc( result, 'ObsLat', status ) ) then
          call ast_Show( obj, status )
          call ast_Show( result, status )
          write(*,*) text

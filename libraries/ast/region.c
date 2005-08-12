@@ -129,6 +129,8 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *        Original version.
 *     12-MAY-2005 (DSB):
 *        Override astNormBox method.
+*     12-AUG-2005 (DSB):
+*        Override ObsLat and ObsLon accessor methods.
 *class--
 
 *  Implementation Notes:
@@ -921,6 +923,16 @@ static double GetEpoch( AstFrame * );
 static int TestEpoch( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void SetEpoch( AstFrame *, double );
+
+static double GetObsLat( AstFrame * );
+static int TestObsLat( AstFrame * );
+static void ClearObsLat( AstFrame * );
+static void SetObsLat( AstFrame *, double );
+
+static double GetObsLon( AstFrame * );
+static int TestObsLon( AstFrame * );
+static void ClearObsLon( AstFrame * );
+static void SetObsLon( AstFrame *, double );
 
 static AstSystemType GetSystem( AstFrame * );
 static int TestSystem( AstFrame * );
@@ -3981,6 +3993,16 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    frame->SetEpoch = SetEpoch;
    frame->TestEpoch = TestEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   frame->ClearObsLat = ClearObsLat;
+   frame->TestObsLat = TestObsLat;
+   frame->GetObsLat = GetObsLat;
+   frame->SetObsLat = SetObsLat;
+
+   frame->ClearObsLon = ClearObsLon;
+   frame->TestObsLon = TestObsLon;
+   frame->GetObsLon = GetObsLon;
+   frame->SetObsLon = SetObsLon;
 
    frame->GetSystem = GetSystem;
    frame->SetSystem = SetSystem;
@@ -10005,6 +10027,16 @@ MAKE_GET(Epoch,double)
 MAKE_SET(Epoch,double,D)
 MAKE_TEST(Epoch)
 MAKE_CLEAR(Epoch)
+
+MAKE_GET(ObsLon,double)
+MAKE_SET(ObsLon,double,D)
+MAKE_TEST(ObsLon)
+MAKE_CLEAR(ObsLon)
+
+MAKE_GET(ObsLat,double)
+MAKE_SET(ObsLat,double,D)
+MAKE_TEST(ObsLat)
+MAKE_CLEAR(ObsLat)
 
 /* Clear, Get, Set and Test axis-dependent Frame attributes. */
 MAKE_CLEAR_AXIS(Direction)

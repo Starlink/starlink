@@ -506,6 +506,8 @@
 *        from AstFrameVtab structure.
 *     9-NOV-2004 (DSB):
 *        Added protected astIsAUnitFrame method.
+*     12-AUG-2005 (DSB):
+*        Added ObsLat and ObsLon attributes.
 *-
 */
 
@@ -556,6 +558,8 @@ typedef struct AstFrame {
    char *domain;                 /* Pointer to Domain string */
    char *title;                  /* Pointer to Title string */
    double epoch;                 /* Epoch as Modified Julian Date */
+   double obslat;                /* Geodetic latitude of observer */
+   double obslon;                /* Geodetic longitude of observer */
    int *perm;                    /* Pointer to axis permutation array */
    int digits;                   /* Default digits of precision */
    int match_end;                /* Match final axes of target? */
@@ -727,6 +731,16 @@ typedef struct AstFrameVtab {
    int (* TestActiveUnit)( AstFrame * );
    int (* GetActiveUnit)( AstFrame * );
    void (* SetActiveUnit)( AstFrame *, int );
+
+   double (* GetObsLon)( AstFrame * );
+   int (* TestObsLon)( AstFrame * );
+   void (* ClearObsLon)( AstFrame * );
+   void (* SetObsLon)( AstFrame *, double );
+
+   double (* GetObsLat)( AstFrame * );
+   int (* TestObsLat)( AstFrame * );
+   void (* ClearObsLat)( AstFrame * );
+   void (* SetObsLat)( AstFrame *, double );
 
 } AstFrameVtab;
 
@@ -907,6 +921,16 @@ double astGetEpoch_( AstFrame * );
 int astTestEpoch_( AstFrame * );
 void astClearEpoch_( AstFrame * );
 void astSetEpoch_( AstFrame *, double );
+
+double astGetObsLon_( AstFrame * );
+int astTestObsLon_( AstFrame * );
+void astClearObsLon_( AstFrame * );
+void astSetObsLon_( AstFrame *, double );
+
+double astGetObsLat_( AstFrame * );
+int astTestObsLat_( AstFrame * );
+void astClearObsLat_( AstFrame * );
+void astSetObsLat_( AstFrame *, double );
 
 int astTestActiveUnit_( AstFrame * );
 #endif
@@ -1207,6 +1231,24 @@ astINVOKE(V,astGetEpoch_(astCheckFrame(this)))
 astINVOKE(V,astSetEpoch_(astCheckFrame(this),value))
 #define astTestEpoch(this) \
 astINVOKE(V,astTestEpoch_(astCheckFrame(this)))
+
+#define astGetObsLon(this) \
+astINVOKE(V,astGetObsLon_(astCheckFrame(this)))
+#define astTestObsLon(this) \
+astINVOKE(V,astTestObsLon_(astCheckFrame(this)))
+#define astClearObsLon(this) \
+astINVOKE(V,astClearObsLon_(astCheckFrame(this)))
+#define astSetObsLon(this,value) \
+astINVOKE(V,astSetObsLon_(astCheckFrame(this),value))
+
+#define astGetObsLat(this) \
+astINVOKE(V,astGetObsLat_(astCheckFrame(this)))
+#define astTestObsLat(this) \
+astINVOKE(V,astTestObsLat_(astCheckFrame(this)))
+#define astClearObsLat(this) \
+astINVOKE(V,astClearObsLat_(astCheckFrame(this)))
+#define astSetObsLat(this,value) \
+astINVOKE(V,astSetObsLat_(astCheckFrame(this),value))
 
 #define astTestActiveUnit(this) \
 astINVOKE(V,astTestActiveUnit_(astCheckFrame(this)))
