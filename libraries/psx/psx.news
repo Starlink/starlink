@@ -5,6 +5,7 @@ v0.5:
      Added PSX_REMOVE
      Added PSX__ERRNO to PSX_ERR
      Added TEST_REMOVE
+     Added PSX_ACCESS (a portable replacement for the ACCESS intrinsic)
      Many portability fixes (including 64bit time_t)
 
 v0.4:

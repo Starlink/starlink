@@ -1,3 +1,4 @@
+make.log.err
 PSX_ERR
 config.h
 config.h.in
@@ -23,6 +24,8 @@ test_uname
 Makefile
 Makefile.in
 configure
+sun*.pdf
+sun*.ps
 sun*.log
 ssn*.log
 *.toc

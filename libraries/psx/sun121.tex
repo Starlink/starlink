@@ -945,7 +945,8 @@ PSX\_\_NOALL & Null pointer returned on memory allocation \\
 PSX\_\_NOENV & No translation of an environment variable \\
 PSX\_\_NOGMT & Could not get GMT with gmtime() \\
 PSX\_\_NOTIM & Could not get current time with time() \\
-PSX\_\_NOMEM & Could not get required memory
+PSX\_\_NOMEM & Could not get required memory \\
+PSX\_\_ERRNO & System error during POSIX call
 \end{tabular}
 \end{center}
 
@@ -955,6 +956,8 @@ PSX\_\_NOMEM & Could not get required memory
 % List of routines:
 % =================
 \begin{description}
+\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
+            {Check file accessibility}
 \noteroutine{PSX\_ASCTIME}{PSX_ASCTIME}{( TSTRCT, STRING, STATUS )}
             {Convert a time structure to a character string}
 \noteroutine{PSX\_CALLOC}{PSX_CALLOC}{( NMEMB, TYPE, PNTR, STATUS )}
@@ -1048,6 +1051,8 @@ PSX\_\_NOMEM & Could not get required memory
 
 \subsection{\xlabel{file_system_support}File System Support}
 \begin{description}
+\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
+            {Check file accessibility}
 \noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
             {Remove a file or empty directory}
 \end{description}
@@ -1098,6 +1103,68 @@ PSX\_\_NOMEM & Could not get required memory
 
 % Routine descriptions:
 % =====================
+
+\sstroutine{
+   PSX\_ACCESS
+}{
+   Check file accessibility
+}{
+   \sstdescription{
+      Provides a FORTRAN interface to the C library function access() to
+      determine the existence of a file for a specified type of access.
+   }
+   \sstinvocation{
+      I = ACCESS( NAME, MODE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the file to test.
+      }
+      \sstsubsection{
+         MODE = CHARACTER$*$($*$) (Given)
+      }{
+         The access mode - either a {\tt '} {\tt '} (space) to merely check
+         for file existence or one or more of the letters R,W,X.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Inherited status.
+      }
+   }
+   \sstnotes{
+      Some FORTRAN compilers have an ACCESS intrinsic, but not all.
+      This PSX routine is provided for portability.
+   }
+   \sstdiytopic{
+      Function value
+   }{
+        PSX\_ACCESS = INTEGER
+
+       Zero if the routine has succeeded. Otherwise the value of errno.
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX Standard ISO/IEC 9945-1:1990
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1995 CCLRC,
+      Copyright (C) 2005 Particle Physics and Astronomy Research Council
+   }
+   \sstimplementationstatus{
+      Has not been converted to use CNF.
+   }
+}
+
 
 \sstroutine{
    PSX\_ASCTIME

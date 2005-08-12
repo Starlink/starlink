@@ -26,6 +26,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 C_ROUTINES = \
 	psx1_init_rtl.c \
 	psx1_rep_c.c \
+	psx_access.c \
 	psx_asctime.c \
 	psx_calloc.c \
 	psx_ctime.c \
@@ -57,11 +58,11 @@ BUILT_SOURCES = $(noinst_MESSAGES) $(include_MESSAGES)
 
 TESTS = psx_test test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
-	test_remove
+	test_remove test_access
 
 check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
-	test_remove
+	test_remove test_access
 
 psx_test_SOURCES = psx_test.f
 psx_test_LDADD = `$(srcdir)/psx_link`
@@ -98,6 +99,9 @@ test_time_LDADD = `$(srcdir)/psx_link`
 
 test_uname_SOURCES = test_uname.f
 test_uname_LDADD = `$(srcdir)/psx_link`
+
+test_access_SOURCES = test_access.f
+test_access_LDADD = `$(srcdir)/psx_link`
 
 dist_starnews_DATA = psx.news
 
