@@ -55,6 +55,12 @@
 *        Important for testing purposes so that A-task tests can run
 *        from a libtool/autoconf build. Should be harmless unless an
 *        A-task really does start with lt- !
+*     11-AUG-2005 (TIMJ):
+*        Not all fortran compilers have the ACCESS intrinsic and not
+*        all compilers allow an intrinsic to be marked as EXTERNAL.
+*        To remove these portability concerns, now call PSX_ACCESS
+*        rather than the ACCESS intrinsic. A version was present in
+*        pcs/misc/access.c but it was not being used on all compilers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,8 +89,8 @@
       INTEGER CHR_LEN            ! Used lenth of string
       EXTERNAL STRING_IANYR
       INTEGER STRING_IANYR       ! Index search backwards
-      EXTERNAL ACCESS
-      INTEGER ACCESS             ! File access
+      EXTERNAL PSX_ACCESS
+      INTEGER PSX_ACCESS         ! File access
 
 *  Local Variables:
       CHARACTER*(256) ARGV0      ! Argument 0 of command
@@ -166,13 +172,14 @@
 
 *           First annul the error messages from _FIFIL
                CALL EMS_ANNUL ( STATUS )
-               IF ( ACCESS( EXENAM(1:ENDNM)//'.ifc','r') .EQ. 0 ) THEN
+               IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifc',
+     :                          'r') .EQ. 0 ) THEN
 *              An IFC is found
                   IFC = .TRUE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifc'
 
-               ELSE IF ( ACCESS( EXENAM(1:ENDNM)//'.ifl','r') .EQ. 0 )
-     :         THEN
+               ELSE IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifl',
+     :                   'r') .EQ. 0 ) THEN
 *              An IFL is found
                   IFC = .FALSE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifl'
