@@ -5,8 +5,11 @@
 /* Support routines for terminal I/O. This module defines the following
    Fortran-callable routines: GROTER, GRCTER, GRWTER, GRPTER. */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <termios.h>
+#include <string.h>
+#include <fcntl.h>
 
 #ifdef PG_PPU
 #define GROTER groter_
