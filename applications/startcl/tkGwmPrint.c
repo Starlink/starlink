@@ -44,6 +44,8 @@ static void handle_plane(FILE*, int, int[MAXX_BYTES]);
 static int encode(int[MAXX_BYTES], int, int[MAXRLE]);
 static void send_plane(FILE*, int, int, int, int[MAXX_BYTES]);
 
+
+#if !HAVE_ROUND
 static double round( double x )
 {
 if ( x >= 0 )
@@ -51,7 +53,7 @@ if ( x >= 0 )
 else
    return ( ceil(x) - x < 0.5 ? ceil(x) : floor(x) );
 }
-
+#endif
 
 /*
 **  Macros used by the ink jet printing code

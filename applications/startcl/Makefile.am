@@ -59,7 +59,7 @@ pubobjdir=$(libdir)
 
 # Dependencies.
 
-AM_CFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
+AM_CFLAGS = $(X_CFLAGS) @TCL_CFLAGS@ @TK_CFLAGS@
 
 # Backwards compatibility problem. We can not call this library libgwm
 # and the actual GWM shared library libgwm since the linker will not know

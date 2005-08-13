@@ -20,6 +20,8 @@ AC_FC_LIBRARY_LDFLAGS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+AC_CHECK_FUNCS(round)
+
 AC_CHECK_HEADERS([jpeglib.h])
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
