@@ -69,7 +69,7 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
     int status;
     char *prop_name, *real_name;
     Atom atom, actual_type;
-    Window *win_ptr;
+    Window *win_ptr = NULL;
     int actual_format;
     unsigned long nitems, bytes_after;
     int (*prev_handler)();
@@ -91,9 +91,10 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 	&bytes_after, (unsigned char**)(&win_ptr));
     if ( status || (nitems == 0) ) 
     {
-	XFree( win_ptr );
+	if (win_ptr != NULL) XFree( win_ptr );
 	return GWM_WIN_NOEXIST;
     }
+
 /*    
 **  Now check that the window is an GWM window
 **
