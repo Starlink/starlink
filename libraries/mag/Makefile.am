@@ -10,8 +10,8 @@ tapecreate_SOURCES = \
 # There is only one task and that is the same as the monolith name
 # no variable tapecreate_TASKS -- tapecreate is an ATASK
 
-# Alink needs to know about libtool so that we can use libmag.la etc
-tapecreate_LDADD = $(LDADD) .libs/libmag_adam.a .libs/libmag.a
+# Needs the mag libraries
+tapecreate_LDADD = $(LDADD) libmag_adam.la libmag.la
 
 lib_LTLIBRARIES = libmag.la libmag_adam.la
 
