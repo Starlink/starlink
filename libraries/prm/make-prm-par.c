@@ -50,11 +50,15 @@
 
  *  Authors:
  *     NXG: Norman Gray (Starlink, Glasgow)
- *     {enter_new_authors_here_
+ *     PWD: Peter Draper (University of Durham)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
  *  History:
  *     18-Mar-2004 (NXG):
  *        Original version, regenerating files with longer histories.
+ *     11-Aug-2005 (TIMJ):
+ *        Fix compiler warnings.
 
  *  Copyright 2004, 2005, Council for the Central Laboratory of the Research Councils
 
@@ -722,8 +726,8 @@ void comment(const char* comment)
  */
 void par_i(const int size, const char* name, int val)
 {
-    const char *type;
-    int min;
+    const char *type = NULL;
+    int min = 0;
     
     switch (size) {
       case 1:
@@ -890,10 +894,8 @@ const char *tolongint(Number *n)
  */
 void par_fp(const int size, const char* name, void* valp)
 {
-    const char *type;
-    char dbleconst[2*(double_precision-1+8)];
-    char *p;
-    int issingle;
+    const char *type = NULL;
+    int issingle = 0;
     Number N;
 
     switch (size) {
