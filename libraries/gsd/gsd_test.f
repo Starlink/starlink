@@ -30,9 +30,11 @@
 *         Ported to Unix, as tutorial.
 *      15-Dec-1999:
 *         Made into a test routine for the Starlink distribution
+*      12-Aug-2005 (TIMJ):
+*         More portable usage of initialisation of variables
 
 * Copyright:
-*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+*    Copyright (C) 1986-2005 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
 
@@ -58,9 +60,9 @@
       REAL VERSION
       CHARACTER*30 LABEL
       INTEGER NITEM
-      INTEGER STATUS/0/
+      INTEGER STATUS
 *    Arguments for GSD_ITEM
-      INTEGER NUMBER/0/
+      INTEGER NUMBER
       CHARACTER*(GSD__SZNAME) NAME
       CHARACTER*(GSD__SZUNIT) UNIT
       CHARACTER TYPE
@@ -68,7 +70,7 @@
       INTEGER GSDINDEX(GSD__SZINDEX)        ! 5
 *    Arguments for GSD_INQ_SIZE
       INTEGER SIZE
-      INTEGER MAXDIMS/GSD__MXDIM/        ! GSD__MXDIM=5
+      INTEGER MAXDIMS       ! GSD__MXDIM=5
       CHARACTER*(GSD__SZNAME) DIMNAMES(GSD__MXDIM)
       CHARACTER*(GSD__SZUNIT) DIMUNITS(GSD__MXDIM)
       INTEGER DIMVALS(GSD__MXDIM)
@@ -97,10 +99,16 @@
       INTEGER START
       INTEGER END
 *    ADAM message
-      CHARACTER*80 MESSAGE/' '/
+      CHARACTER*80 MESSAGE
 *    Counter
       INTEGER I
-      INTEGER FORCEPROMPT/0/
+      INTEGER FORCEPROMPT
+
+      DATA FORCEPROMPT / 0 /
+      DATA STATUS / 0 /
+      DATA NUMBER / 0 /
+      DATA MAXDIMS / GSD__MXDIM /
+      DATA MESSAGE / ' ' /
 *
 *    Prompt for filename
 *      DO WHILE (FILELEN .LE. 0)
