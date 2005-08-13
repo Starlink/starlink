@@ -26,6 +26,9 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl   We need this for the tests
+AC_FC_LIBRARY_LDFLAGS
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems ary ast psx])
 STAR_DECLARE_DEPENDENCIES([link],  [psx ary hds ems chr prm ast])

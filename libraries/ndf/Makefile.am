@@ -148,7 +148,7 @@ ndf_ctest_SOURCES = ndf_ctest.c
 ndf_ftest_SOURCES = ndf_ftest.f
 
 # LDADD is the expansion of ref_link, with -lref replaced by libref.la
-ndf_ctest_LDADD = libndf.la `$(srcdir)/ndf_link`
+ndf_ctest_LDADD = libndf.la `$(srcdir)/ndf_link` @FCLIBS@
 ndf_ftest_LDADD = libndf.la `$(srcdir)/ndf_link`
 
 dist_starnews_DATA = ndf.news
