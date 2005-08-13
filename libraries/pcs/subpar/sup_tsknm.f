@@ -173,13 +173,13 @@
 *           First annul the error messages from _FIFIL
                CALL EMS_ANNUL ( STATUS )
                IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifc',
-     :                          'r') .EQ. 0 ) THEN
+     :                          'r', STATUS) .EQ. 0 ) THEN
 *              An IFC is found
                   IFC = .TRUE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifc'
 
                ELSE IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifl',
-     :                   'r') .EQ. 0 ) THEN
+     :                   'r', STATUS) .EQ. 0 ) THEN
 *              An IFL is found
                   IFC = .FALSE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifl'
