@@ -69,6 +69,7 @@
  
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -78,6 +79,9 @@
 *        Made bad value generic.
 *     1991 July 23 (MJC):
 *        Added BADVAL argument.
+*     13-AUG-2005 (TIMJ):
+*        Use NUM_ITOD to convert VAL__ constant to DOUBLE.
+*        Some compilers have trouble casting BOZ notation.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -140,8 +144,8 @@
  
       IF ( STATUS .NE. SAI__OK ) RETURN
  
-      UL = DBLE( VAL__MAXI )
-      LL = DBLE( VAL__MINI )
+      UL = NUM_ITOD( VAL__MAXI )
+      LL = NUM_ITOD( VAL__MINI )
       DL = NUM_<T>TOD( LOWER )
       DU = NUM_<T>TOD( UPPER )
  

@@ -74,6 +74,9 @@
 *        Completed and used a more-modern style.
 *     10-NOV-2004 (DSB):
 *        Add USEMSK and MASK arguments.
+*     13-AUG-2005 (TIMJ):
+*        Use NUM_<T>TOD to convert VAL__ constant to DOUBLE.
+*        Some compilers have trouble casting BOZ notation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +126,11 @@
       INTEGER STRID( NDF__MXDIM )! Dimension strides for input array
       REAL MV                    ! Mask value
       <TYPE> IV                  ! Input value
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! Declarations of conversion routines
+      INCLUDE 'NUM_DEF_CVT'    ! Definitions of conversion routines
+
 *.
 
 *  Check the inherited global status.
@@ -218,8 +226,10 @@
                               IF( MV .NE. VAL__BADR .AND.
      :                            IV .NE. VAL__BAD<T> ) THEN
                                  PROD = IV*MV
-                                 IF( PROD .LT. VAL__MAX<T> .AND.
-     :                               PROD .GT. VAL__MIN<T> ) THEN
+                                 IF( PROD .LT. 
+     :                                 NUM_<T>TOD(VAL__MAX<T>) .AND.
+     :                               PROD .GT. 
+     :                                 NUM_<T>TOD(VAL__MIN<T>) ) THEN
                                     OUTARR( IO ) = IV*MV
                                  ELSE
                                     OUTARR( IO ) = VAL__BAD<T>
