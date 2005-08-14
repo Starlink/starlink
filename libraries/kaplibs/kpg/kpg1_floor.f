@@ -21,7 +21,7 @@
 *        The value.
 
 *  Function Value:
-*     KPG1_CEIL = INTEGER
+*     KPG1_FLOOR = INTEGER
 *        The largest integer smaller than or equal to the supplied value.
 
 *  Authors:
