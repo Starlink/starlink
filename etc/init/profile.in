@@ -46,6 +46,13 @@ if test -f @bindir@/kappa/kappa.sh; then
    export KAPPA_HELP=@starhelpdir@/kappa/kappa
 fi
 
+#  HDSTOOLS
+
+if test -f @bindir@/hdstools/hdstools.sh; then
+   export HDSTOOLS_DIR=@bindir@/hdstools
+   export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
+fi
+
 #  JPL
 
 if test -f @staretcdir@/jpleph.dat; then
@@ -110,6 +117,16 @@ if test -f @bindir@/kappa/kappa.sh; then
 else
   kappa () { @staretcdir@/notinst kappa; }
   kappasetup () { @staretcdir@/notinst kappa; }
+fi
+
+# HDSTOOLS
+
+if test -f @bindir@/hdstools/hdstools.sh; then
+  hdstools () { . $HDSTOOLS_DIR/hdstools.sh; }
+  hdstoolssetup () { . $HDSTOOLS_DIR/hdstools.sh; }
+else
+  hdstools () { @staretcdir@/notinst hdstools; }
+  hdstoolssetup () { @staretcdir@/notinst hdstools; }
 fi
 
 # SURF
