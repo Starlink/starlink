@@ -99,6 +99,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.6  2005/08/15 07:15:52  timj
+*     use standards compliant negation
+*
 *     Revision 1.5  1999/08/03 19:34:41  timj
 *     Add copyright message to header.
 *     Convert old header style to new.
@@ -259,8 +262,8 @@
                
 *     The left beam is always behind the right so have to invert the offset
                IF (BEAM .EQ. 'L') THEN
-                  MAP_X = MAP_X * -1.0D0
-                  MAP_Y = MAP_Y * -1.0D0
+                  MAP_X = -MAP_X
+                  MAP_Y = -MAP_Y
                END IF
                
 *     Add on the tangent plane offset (can not simply ADD the 
@@ -292,8 +295,8 @@
             
 *     Invert the offset if we are in the right beam
             IF (BEAM .EQ. 'R') THEN
-               MAP_X = MAP_X * -1.0D0
-               MAP_Y = MAP_Y * -1.0D0
+               MAP_X = -MAP_X
+               MAP_Y = -MAP_Y
             END IF
 
 *     Add on the offset and convert back to apparent RA/Dec
