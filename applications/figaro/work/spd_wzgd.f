@@ -54,6 +54,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        Adapted from SPAAV.
 *     27 Jan 1995 (hme):
 *        Renamed from SPACR.
+*     15 Aug 2005 (timj):
+*        ** -LOGDIFF is not standards compliant. Use parentheses
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,7 +133,7 @@
                LOGDIF = ABS( FITDAT(I) - FITVAL )
                FITDAT(I) = MAX( FITDAT(I),  FITVAL )
                IF ( LOGDIF .LT. 8. )
-     :            FITDAT(I) = FITDAT(I) + LOG10( 1. + 10. ** -LOGDIF )
+     :            FITDAT(I) = FITDAT(I) + LOG10( 1. + 10. ** (-LOGDIF) )
  2          CONTINUE
  3       CONTINUE
       END IF

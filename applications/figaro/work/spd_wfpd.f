@@ -147,6 +147,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -159,6 +160,8 @@
 *        Replace E04DGF/E04DKF with PDA_UNCMND.
 *     2005 June 2 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     15 Aug 2005 (timj):
+*        ** -LOGDIF is not standards compliant. Use parentheses
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -292,7 +295,7 @@
             LOGDIF = ABS( FI - FJ(J) )
             FI = MAX( FI, FJ(J) )
             IF ( LOGDIF .LT. 15D0 )
-     :         FI = FI + LOG10( 1D0 + 1D1 ** -LOGDIF )
+     :         FI = FI + LOG10( 1D0 + 1D1 ** (-LOGDIF) )
  11      CONTINUE
 
 *     Add contribution from f(x_i) into F.

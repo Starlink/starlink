@@ -75,6 +75,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +89,8 @@
 *        ignore status.
 *     21 Nov 1995 (hme):
 *        Use PDA instead of NAG
+*     15 Aug 2005 (timj):
+*        ** -LOGDIF is not standards compliant. Use parentheses
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,7 +242,7 @@
             LOGDIF = ABS( FI - FJ(J) )
             FI = MAX( FI, FJ(J) )
             IF ( LOGDIF .LT. 15D0 )
-     :         FI = FI + LOG10( 1D0 + 1D1 ** -LOGDIF )
+     :         FI = FI + LOG10( 1D0 + 1D1 ** (-LOGDIF) )
  9       CONTINUE
 
 *     Now add to each Hesse matrix element the contribution of this data
