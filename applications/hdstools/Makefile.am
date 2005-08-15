@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = hdstools.csh hdstools.icl
+dist_bin_SCRIPTS = hdstools.csh hdstools.icl hdstools.sh
 
 dist_noinst_SCRIPTS = hdstools_link_adam
 
@@ -66,14 +66,14 @@ hdstools.hlp: $(hdstools_mon_TASKS:=.f) hdstools_master.hlp
 	@HLIB@ $<
 
 # Rule for creating various components from the ifd file.
-hdstools.csh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
+hdstools.csh hdstools.sh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
 	@IFD2STAR@ hdstools
 
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) $(PUBLIC_INCLUDES) htest.in
 
 ##  Need to add generated files as BUILT_SOURCES.
-BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
+BUILT_SOURCES = hdstools.csh hdstools.sh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
 
 ##  Simple check.
 edit = sed \
