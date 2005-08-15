@@ -49,6 +49,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  2005/08/15 07:34:29  timj
+*     loop counter should be INTEGER
+*
 *     Revision 1.1  2004/07/14 02:04:36  timj
 *     autoconfed
 *
@@ -98,7 +101,7 @@
       INTEGER FILTRAD_SQ                 ! RADIUS squared
       REAL SCULIB_BESSJ1                 ! J1(X)
       REAL ISTOP                         ! End of cosine
-      REAL ISTART                        ! Start of cosine
+      INTEGER ISTART                     ! Start of cosine
 
 *-
 
