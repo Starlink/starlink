@@ -19,11 +19,24 @@
 
 # Define the Starlink environment first
 
+#  ATOOLS
+
+if test -f @bindir@/atools/atools.sh; then
+   export ATOOLS_DIR=@bindir@/atools
+   export ATOOLS_HELP=@starhelpdir@/atools/atools
+fi
+
 #  CCDPACK
 
 if test -f @bindir@/ccdpack/ccdpack.sh; then
-   export KAPPA_DIR=@bindir@/ccdpack
-   export KAPPA_HELP=@starhelpdir@/ccdpack/ccdpack
+   export CCDPACK_DIR=@bindir@/ccdpack
+   export CCDPACK_HELP=@starhelpdir@/ccdpack/ccdpack
+fi
+
+#  Fluxes
+
+if test -f @bindir@/fluxes/fluxes.csh; then
+   export FLUXES_DIR=@bindir@/fluxes
 fi
 
 #  Kappa
@@ -33,6 +46,12 @@ if test -f @bindir@/kappa/kappa.sh; then
    export KAPPA_HELP=@starhelpdir@/kappa/kappa
 fi
 
+#  JPL
+
+if test -f @staretcdir@/jpleph.dat; then
+   export JPL_DIR=@staretcdir@
+fi
+
 #  Polpack
 
 if test -f @bindir@/polpack/polpack.sh; then
@@ -40,9 +59,27 @@ if test -f @bindir@/polpack/polpack.sh; then
    export POLPACK_HELP=@starhelpdir@/polpack/polpack
 fi
 
+#  SURF
+
+if test -f @bindir@/surf/surf.sh; then
+   export SURf_DIR=@bindir@/surf
+   export SURF_HELP=@starhelpdir@/surf/surf
+fi
+
+
 # Aliases
 # Use sh functions rather than bash aliases for improved
 # portability. Use 'declare -F' in bash to list all the functions.
+
+# ATOOLS
+
+if test -f @bindir@/ccdpack/ccdpack.sh; then
+  atools () { . $ATOOLS_DIR/atools.sh; }
+  atools () { . $ATOOLS_DIR/atools.sh; }
+else
+  atools () { @staretcdir@/notinst atools; }
+  atoolssetup () { @staretcdir@/notinst atools; }
+fi
 
 # CCDPACK
 
@@ -54,6 +91,17 @@ else
   ccdpacksetup () { @staretcdir@/notinst ccdpack; }
 fi
 
+# Fluxes
+
+if test -f @bindir@/fluxes/fluxes; then
+  fluxes () { $FLUXES_DIR/fluxes.csh; }
+  fluxnow () { $FLUXES_DIR/fluxnow.csh; }
+else
+  fluxes () { @staretcdir@/notinst fluxes; }
+  fluxnow () { @staretcdir@/notinst fluxnow; }
+fi
+
+
 # Kappa
 
 if test -f @bindir@/kappa/kappa.sh; then
@@ -62,6 +110,16 @@ if test -f @bindir@/kappa/kappa.sh; then
 else
   kappa () { @staretcdir@/notinst kappa; }
   kappasetup () { @staretcdir@/notinst kappa; }
+fi
+
+# SURF
+
+if test -f @bindir@/surf/surf.sh; then
+  surf () { . $SURF_DIR/surf.sh; }
+  surfsetup () { . $SURF_DIR/surf.sh; }
+else
+  surf () { @staretcdir@/notinst surf; }
+  surfsetup () { @staretcdir@/notinst surf; }
 fi
 
 # Polpack
@@ -73,3 +131,5 @@ else
   polpack () { @staretcdir@/notinst polpack; }
   polpacksetup () { @staretcdir@/notinst polpack; }
 fi
+
+
