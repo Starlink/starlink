@@ -86,8 +86,8 @@
    void ccdPipestcl( int ifd, int ofd );
 
 /* Fortran functions for querying the command line */
-extern F77_INTEGER_FUNCTION(iargc)();
-extern F77_SUBROUTINE(getarg)
+extern F77_INTEGER_FUNCTION(ccd1_iargc)();
+extern F77_SUBROUTINE(ccd1_getarg)
      (INTEGER(k), CHARACTER(argstring) TRAIL(argstring));
 
 /* Release the memory allocated to my_argv */
@@ -132,7 +132,7 @@ extern F77_SUBROUTINE(getarg)
 
 /* Extract the arguments using Fortran functions iargc and getarg,
    putting them into my_argv[0..my_argc-1] */
-      last_arg = F77_CALL(iargc)();
+      last_arg = F77_CALL(ccd1_iargc)();
       my_argc = last_arg + 1;
 
       if (( my_argv = (char**) malloc ( my_argc+1 ) ) == NULL ) {
@@ -140,7 +140,7 @@ extern F77_SUBROUTINE(getarg)
           return 1;
       }
       for ( k=0; k<my_argc; k++ ) {
-          F77_CALL(getarg)(INTEGER_ARG(&k),
+          F77_CALL(ccd1_getarg)(INTEGER_ARG(&k),
                            CHARACTER_ARG(argstr) TRAIL_ARG(argstr));
           if (( my_argv[k] = (char*) malloc( MAX_ARG_LEN + 1 )) == NULL ) {
               fprintf( stderr, "Can't allocate (%d bytes) for arg %d\n", 
