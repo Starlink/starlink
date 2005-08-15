@@ -87,11 +87,11 @@ C Now compute a linear polynomial (SLOPE,CONST) that fits the continuum.
           SLOPE = 0
           CONST = 0
       ELSE
-          VALUEL = (DATA(MINPL+1) + DATA(MINPL-NCONT))/2
-          VALUER = (DATA(MINPR-1) + DATA(MINPR+NCONT))/2
+          VALUEL = (DATA(INT(MINPL)+1) + DATA(INT(MINPL)-NCONT))/2
+          VALUER = (DATA(INT(MINPR)-1) + DATA(INT(MINPR)+NCONT))/2
           DO 30 I = 0,NCONT-1
-          VALUEL = VALUEL + DATA(MINPL-I)
-30        VALUER = VALUER + DATA(MINPR+I)
+          VALUEL = VALUEL + DATA(INT(MINPL)-I)
+30        VALUER = VALUER + DATA(INT(MINPR)+I)
           VALUEL = VALUEL / (NCONT+1)
           VALUER = VALUER / (NCONT+1)
           PIXL = MINPL - 0.5 - (NCONT-3) / 2.
