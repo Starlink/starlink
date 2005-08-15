@@ -58,6 +58,8 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC)
+*     NXG: Norman Gray (Starlink, Glasgow)
+*     PWD: Peter Draper (Univ. of Durham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,8 +73,22 @@
 *        Add a check on the value of the CC argument.
 *     19-FEB-1993 (PMA):
 *        Change the name of include files to upper case.
-*     21-APR-2003 (TIMJ):
+*     21-APR-2004 (TIMJ):
 *        Now uses configure to disable/enable features
+*     22-APR-2004 (NXG):
+*        Replace test for carriagecontrol='NONE' with carriagecontrol='CC',
+*        which is what we actually use.
+*        Replace #ifdef with #if (since undefined preprocessor symbols are
+*        required to be replaced with 0).
+*     23-APR-2004 (NXG):
+*        Note to the hard of thinking: observe the difference between
+*        carriagecontrol='CC' the string and carriagecontrol=CC the
+*        variable.  It's the latter in this file, and carriagecontrol='NONE'
+*        we actually test, and this is what Tim had in the first place.
+*     29-JUL-2005 (PWD):
+*        Add autoconfiguration of POSITION='APPEND' option. This is how f90 opens
+*        a file for append access. The ACCESS='APPEND' form is a F77 extension
+*        (and makes no sense anyway) and should still be usable.
 *     {enter_further_changes_here}
 
 *  Bugs:
