@@ -54,6 +54,7 @@ C     1st  May  1991.   Original version.  KS / AAO.
 C     21st Aug 1992     Automatic portability modifications
 C                       ("INCLUDE" syntax etc) made. KS/AAO
 C     29th Aug 1992     "INCLUDE" filenames now upper case. KS/AAO
+C     15th Aug 2005     Now use PRM for setting BADBITS
 C
 C  Note:
 C     This version supports both the original Figaro data structures
@@ -62,6 +63,10 @@ C+
       SUBROUTINE DSA__GET_BADBITS (REF_SLOT,BADBITS,DTA_STATUS)
 C
       IMPLICIT NONE
+C
+C     Global variables
+C
+      INCLUDE 'PRM_PAR'
 C
 C     Parameters
 C
@@ -116,13 +121,13 @@ C
 C
 C              .QUALITY exists, and is primitive.
 C
-               BADBITS='FF'X
+               BADBITS=NUM__MAXUB
             END IF
          ELSE
 C
 C           .QUALITY doesn't exist at all.
 C
-            BADBITS='FF'X
+            BADBITS=NUM__MAXUB
          END IF
       ELSE
 C
@@ -135,7 +140,7 @@ C
          LENGTH=OBJ_LEN(REF_SLOT)+10
          CALL DTA_STRUC(NAME(:LENGTH),STRUCT,DTA_STATUS)
          IF (DTA_STATUS.NE.0) THEN
-            BADBITS='FF'X
+            BADBITS=NUM__MAXUB
          ELSE
             CALL DTA_RDVARB(NAME(:LENGTH),1,BADBITS,DTA_STATUS)
          END IF
