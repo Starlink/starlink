@@ -10,6 +10,7 @@ C           no brackets. The Sun compiler doesn't like that.
 C         : TDCA (RAL) 18-FEB-1999. Minor style changes.
 C         : TDCA (RAL) 03-MAR-1999. Explictly declared V0, PEAK 
 C           and WIDTH.
+C         : TIMJ (JACH) DO loop must take integer args
 
       REAL VELOCITY(NPT), CFN(NPT)
       REAL LPOLY, SCALE(2)
@@ -17,11 +18,15 @@ C           and WIDTH.
       DOUBLE PRECISION A(3)
       LOGICAL*1 ERROR
       PARAMETER ( PEAKFRAC = .75 )
+      INTEGER NSTART, NEND
 
       ERROR = .FALSE.
       CMAX = 0
 
-      DO I = .1*NPT,.9*NPT
+      NSTART = 0.1 * NPT
+      NEND   = 0.9 * NPT
+
+      DO I = NSTART, NEND
           IF(VELOCITY(I).GT.VMIN.AND.VELOCITY(I).LT.VMAX) THEN
               IF(CFN(I).GT.CMAX) THEN
                   CMAX = CFN(I)
