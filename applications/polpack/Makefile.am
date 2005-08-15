@@ -88,7 +88,7 @@ IFL_FILES = $(POLPACK_IFL_FILES)
 POLPACK_IFL_FILES = $(POLPACK_F_ROUTINES:.f=.ifl) 
 MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
-DYNSCRIPTS = polpack.csh polpack.icl
+DYNSCRIPTS = polpack.csh polpack.sh polpack.icl
 
 $(IFL_FILES) $(DYNSCRIPTS): polpack.ifd
 	$(IFD2STAR) polpack
