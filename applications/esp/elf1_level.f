@@ -144,7 +144,7 @@
                ADD=(Y-1)*PRANGE(1)+X
 
 *            Get its value.
-               VALUE=ARRAY(ADD)
+               VALUE=ARRAY(INT(ADD))
 
 *            Check that the value is not bad.
                IF (VALUE.NE.VAL__BADR) THEN
