@@ -18,8 +18,8 @@ c *** SUPER  does pseudo ls refinement using initial coord list
       ihh=ims+jcount-1
       imlim=10000
       if(jcount.gt.imlim)then
-	write(*,*) '  ****   warning too many pixels for surface modelling'
-	return
+        write(*,*) '**** warning too many pixels for surface modelling'
+        return
       endif
 c *** save starting coordinates
       do 100 i=1,nbit
