@@ -1,3 +1,5 @@
+builddocs
+make.log.err
 AST_ERR
 AST_PAR
 addversion
