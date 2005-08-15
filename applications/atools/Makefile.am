@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = atools.csh atools.icl astshow.tcl
+dist_bin_SCRIPTS = atools.csh atools.sh atools.icl astshow.tcl
 
 dist_noinst_SCRIPTS = atools_link_adam
 
@@ -54,7 +54,7 @@ history.help: atools.news
 	@HLIB@ $<
 
 # Rule for creating various components from the ifd file.
-atools.csh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
+atools.csh atools.sh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
 
 ##  Any misc ATOOLS files that have no where else.
@@ -65,7 +65,7 @@ EXTRA_DIST = $(HELP_SOURCES) atools.star-hlp asttest.sh \
              skyframe.ast
 
 ##  Need to add generated files as BUILT_SOURCES.
-BUILT_SOURCES = atools.csh atools.icl
+BUILT_SOURCES = atools.csh atools.sh atools.icl
 
 ##  Simple check.
 TESTS = asttest.sh
