@@ -219,9 +219,9 @@
       INTEGER IOSTATUS                ! For OPEN command
 
 C For the time
-      integer  tarray(9), time
-      external time
-
+      INTEGER WDAY
+      INTEGER TSTRCT
+      INTEGER YDAY
  
 *  Data:
       DATA SYSMO/'Jan','Feb','Mar','Apr','May','Jun',
@@ -512,20 +512,14 @@ C  The system time in seconds
             CALL PSX_TIME(NTICKS,STATUS)
 
 
-*  We now need the GM time. Can not use PSX_LOCALTIME for this!
-*  Since there is no PSX call for GM time we have to use the gmtime()
-*  system call directly. This is supported on Solaris, DU4 and g77
-C  GET UT in an array
-            call gmtime(NTICKS, tarray)
+*  We now need the GM time.
+            CALL PSX_GMTIME(NTICKS, IS, IM, IH, ID, M, IY,
+     :                      WDAY, YDAY, TSTRCT, STATUS)
 
-            IY = tarray(6) + 1900
-            M =  tarray(5) + 1
-            ID = tarray(4)
-            IH = tarray(3)
-            IM = tarray(2)
-            IS = tarray(1)
-            S = DBLE(tarray(1))
-            cmon=sysmo(m)
+            IY = IY + 1900
+            M  =  M + 1
+            S  = DBLE(IS)
+            CMON=SYSMO(M)
 
 	 ENDIF
 
