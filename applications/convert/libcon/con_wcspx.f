@@ -46,6 +46,8 @@
 *        Original version.
 *      6-AUG-2004 (TIMJ):
 *        Convert to use DSBSpecFrame
+*      14-AUG-2005 (TIMJ):
+*        Minor tweak to multiplication statement to make it standards compliant.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -341,7 +343,7 @@
          ELSE
             SIDEBAND = 'LSB'
          END IF
-         IFFREQ = IFFREQ * -1.0D0
+         IFFREQ = -IFFREQ
 
 *   Set sideband and IF
          CALL AST_SETC(SPCFRM, 'SideBand', SIDEBAND, STATUS)
