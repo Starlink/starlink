@@ -14,10 +14,14 @@
 *    Authors :
 *     R.F. Warren-Smith (DUVAD::RFWS)
 *     BLY: M.J. Bly  (Starlink, RAL)
+*     NXG: Norman Gray (Starlink, Glasgow)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *    History :
 *     16-AUG-1988:  Original version (DUVAD::RFWS)
 *     22-JAN-1997:  System specific versions for Unix (BLY)
+*     21-MAR-2004:  Autoconf (NXG) 
+*     15-AUG-2005:  Should not mark a COMMON as VOLATILE
 *    endhistory
 *
 
@@ -45,7 +49,8 @@
 *   past, however (by AJC in 24-NOV-2002) so presumably there was some
 *   reason for it.
 #if FC_HAVE_KEYWORD_VOLATILE
-      VOLATILE /NUM_CMN/
+*   It is non portable marking the COMMON block as VOLATILE as well as
+*   the contents. Now simply mark the content as VOLATILE.
       VOLATILE NUM_ERROR
 #else
 
