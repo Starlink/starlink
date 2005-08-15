@@ -54,6 +54,7 @@
 *-
 */
 #include <stdlib.h>
+#include <string.h>
 
 char ** tagstrip( char *tagname, char **taglist ) {
 

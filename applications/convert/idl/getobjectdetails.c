@@ -76,6 +76,7 @@
 *     {note_new_bugs_here}
 *-
 */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "export.h"
