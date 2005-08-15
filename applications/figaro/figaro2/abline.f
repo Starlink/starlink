@@ -100,6 +100,7 @@ C     23 Feb 2001  ACD / UoE, Starlink. Removed technically illegal
 C                  jumps into IF blocks.
 C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
 C                  mapped data.
+C     2005 Aug 15  TIMJ / JACH Force integer array indices
 C+
 C+
       IMPLICIT NONE
@@ -841,7 +842,7 @@ C
      :                                                          STATUS)
          CALL PAR_WRUSER(
      :      'Press any key to read cursor position',STATUS)
-         XCUR=XVALS(NSEG/2.)
+         XCUR=XVALS(INT(NSEG/2.))
          YCUR=0.5*(YMAX+YMIN)
          CALL PGCURSE(XCUR,YCUR,CURC)
          XL=XCUR
