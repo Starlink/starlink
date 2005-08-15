@@ -1,0 +1,75 @@
+
+# File: @staretcdir@/profile
+# Version: @VERSION@
+
+# This file must be sourced before Starlink software can be used.
+# This script contains environment and alias definitions and must
+# be sourced rather than executed. It is suitable for use from a bash
+# shell
+
+# This can be achieved by addinf the line:
+#
+#    source @staretcdir@/profile
+#
+# to your .profile file. for the ultra paranoid, add a check for file
+# existence as well.
+
+# Break the file up along the lines of the cshrc and login rather
+# than combining tests into a single block.
+
+# Define the Starlink environment first
+
+#  CCDPACK
+
+if test -f @bindir@/ccdpack/ccdpack.sh; then
+   export KAPPA_DIR=@bindir@/ccdpack
+   export KAPPA_HELP=@starhelpdir@/ccdpack/ccdpack
+fi
+
+#  Kappa
+
+if test -f @bindir@/kappa/kappa.sh; then
+   export KAPPA_DIR=@bindir@/kappa
+   export KAPPA_HELP=@starhelpdir@/kappa/kappa
+fi
+
+#  Polpack
+
+if test -f @bindir@/polpack/polpack.sh; then
+   export POLPACK_DIR=@bindir@/polpack
+   export POLPACK_HELP=@starhelpdir@/polpack/polpack
+fi
+
+# Aliases
+# Use sh functions rather than bash aliases for improved
+# portability. Use 'declare -F' in bash to list all the functions.
+
+# CCDPACK
+
+if test -f @bindir@/ccdpack/ccdpack.sh; then
+  ccdpack () { . $CCDPACK_DIR/ccdpack.sh; }
+  ccdpacksetup () { . $CCDPACK_DIR/ccdpack.sh; }
+else
+  ccdpack () { @staretcdir@/notinst ccdpack; }
+  ccdpacksetup () { @staretcdir@/notinst ccdpack; }
+fi
+
+# Kappa
+
+if test -f @bindir@/kappa/kappa.sh; then
+  kappa () { . $KAPPA_DIR/kappa.sh; }
+  kappasetup () { . $KAPPA_DIR/kappa.sh; }
+else
+  kappa () { @staretcdir@/notinst kappa; }
+  kappasetup () { @staretcdir@/notinst kappa; }
+fi
+
+# Polpack
+
+if test -f @bindir@/polpack/polpack.sh; then
+  polpack () { . $POLPACK_DIR/polpack.sh; }
+  polpacksetup () { . $POLPACK_DIR/polpack.sh; }
+else
+  polpack () { @staretcdir@/notinst polpack; }
+  polpacksetup () { @staretcdir@/notinst polpack; }
+fi

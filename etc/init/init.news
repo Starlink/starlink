@@ -11,6 +11,9 @@
        staretcdir and starhelpdir are defined relative to $prefix and
        not $exec_prefix
 
+       Now installs a profile for bash/sh users. Not all applications have
+       been modified to support bash.
+
     v1.1-25 12-DEC-2003
        Fixed STARJAVA adding to path when /star/bin
        exists.

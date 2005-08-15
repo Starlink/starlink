@@ -2,12 +2,13 @@
 
 ## Scripts which end up in the binary installation directory.
 
-staretc_DATA = not_installed icl_login_sys.icl login cshrc
+staretc_DATA = not_installed icl_login_sys.icl login cshrc profile
 staretc_SCRIPTS = notinst
 
 starhelp_DATA = adam_packages.shl
 
-EXTRA_DIST = cshrc.in notinst not_installed icl_login_sys.icl login.in adam_packages.hlp
+EXTRA_DIST = cshrc.in notinst not_installed icl_login_sys.icl login.in adam_packages.hlp \
+             profile.in
 
 ## Arrange to edit the installation binary directory into script files
 ## which need it.  This cannot be done by autoconf because it needs to
@@ -38,10 +39,15 @@ cshrc:  Makefile $(srcdir)/cshrc.in
 	$(edit) $(srcdir)/cshrc.in >cshrc.tmp
 	mv cshrc.tmp cshrc
 
+profile:  Makefile $(srcdir)/profile.in
+	rm -f profile profile.tmp
+	$(edit) $(srcdir)/profile.in >profile.tmp
+	mv profile.tmp profile
+
 .hlp.shl:
 	@HLIB@ $<
 
-CLEANFILES = adam_packages.shl cshrc login
+CLEANFILES = adam_packages.shl cshrc login profile
 
 dist_starnews_DATA = init.news
 
