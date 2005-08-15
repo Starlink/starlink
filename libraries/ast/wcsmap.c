@@ -2828,6 +2828,9 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Get a pointer to the WcsMap structure. */
       this = (AstWcsMap *) this_map;
 
+/* Prevent compiler warnings. */
+      ilatlon = -1;
+
 /* Allocate memory for the returned array. */
       result = astMalloc( sizeof( int )*(size_t) nin );
       if( astOK ) {

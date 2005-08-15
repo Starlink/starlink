@@ -2554,6 +2554,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 
 /* Local Variables: */
    AstFrameSet *result;          /* Pointer to Mapping to be returned */
+   AstFrame *ftmp;                /* Pointer to returned Frame */
    AstMapping **map1_address;    /* Location of first Mapping pointer */
    AstMapping **map2_address;    /* Location of second Mapping pointer */
    AstMapping *common0;          /* Initial common coordinate system */
@@ -2564,7 +2565,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
    AstMapping *from_map;         /* Pointer to "from" Mapping */
    AstMapping *map;              /* Pointer to conversion Mapping */
    AstMapping *result_map;       /* Pointer to result Mapping */
-   AstMapping *tmp;              /* Temporary Maping pointer */
+   AstMapping *tmp;              /* Temporary Mapping pointer */
    AstMapping *to_map;           /* Pointer to "to" Mapping */
    char *domain;                 /* Pointer to result domain */
    char *domain_end;             /* Pointer to null at end of domain */
@@ -2639,7 +2640,8 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
    possible.  If successful, this results in a new approximation
    ("common1") to the possible common coordinate system. */
             match1 = astMatch( common0, frame1, &axes1, &axes2,
-                               map1_address, &common1 );
+                               map1_address, &ftmp );
+            common1 = (AstMapping *) ftmp;
 
 /* If successful, free memory allocated for the axis association
    arrays, which are not needed. */
@@ -2654,7 +2656,8 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
                map2_address = icom ? &from_map : &to_map;
                astSetPreserveAxes( common1, 0 );
                match2 = astMatch( common1, frame2, &axes1, &axes2,
-                                  map2_address, &common2 );
+                                  map2_address, &ftmp );
+               common2 = (AstMapping *) ftmp;
 
 /* If successful, free memory allocated for the axis association
    arrays, which are not needed. */

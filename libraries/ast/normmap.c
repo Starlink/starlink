@@ -926,12 +926,12 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain and validate pointers to the Frame structures provided. */
    frame = astCheckFrame( frame_void );
-   if( astOK ) {
 
 /* Initialise the NormMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-      new = astInitNormMap( NULL, sizeof( AstNormMap ), !class_init, &class_vtab,
-                            "NormMap", frame );
+   new = astInitNormMap( NULL, sizeof( AstNormMap ), !class_init, &class_vtab,
+                         "NormMap", frame );
+   if( astOK ) {
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1002,27 +1002,25 @@ AstNormMap *astNormMapId_( void *frame_void, const char *options, ... ) {
 
 /* Obtain and validate pointers to the Frame structures provided. */
    frame = astCheckFrame( astMakePointer( frame_void ) );
-   if( astOK ) {
 
 /* Initialise the NormMap, allocating memory and initialising the
    virtual function table as well if necessary. */
-      new = astInitNormMap( NULL, sizeof( AstNormMap ), !class_init, &class_vtab,
-                            "NormMap", frame );
+   new = astInitNormMap( NULL, sizeof( AstNormMap ), !class_init, &class_vtab,
+                         "NormMap", frame );
 
 /* If successful, note that the virtual function table has been
    initialised. */
-      if ( astOK ) {
-         class_init = 1;
+   if ( astOK ) {
+      class_init = 1;
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new NormMap's attributes. */
-         va_start( args, options );
-         astVSet( new, options, args );
-         va_end( args );
+      va_start( args, options );
+      astVSet( new, options, args );
+      va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
-         if ( !astOK ) new = astDelete( new );
-      }
+      if ( !astOK ) new = astDelete( new );
    }
 
 /* Return an ID value for the new NormMap. */

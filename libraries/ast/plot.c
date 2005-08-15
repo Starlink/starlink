@@ -14371,6 +14371,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 /* Try to find a "nice" gap size, so long as the caller has not supplied
    a gap size. The default gap size obtained above is our initial guess. */
       if( gap == AST__BAD ){
+         old_used_gap = AST__BAD;
 
 /* Start of using the default gap found during the initialisation. */
          test_gap = defgaps[ axis ];

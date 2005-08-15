@@ -785,7 +785,7 @@ static void CompileExpression( const char *method, const char *class,
    *code = NULL;
    *con = NULL;
    *stacksize = 0;
-
+   
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -797,6 +797,7 @@ static void CompileExpression( const char *method, const char *class,
    opensym = NULL;
    symlist = NULL;
    sym = 0;
+   ivar = 0;
 
 /* The first symbol to be encountered must not look like an operator
    from the left. It may be a unary + or - operator. */

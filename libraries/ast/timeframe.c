@@ -956,8 +956,11 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
    int ndp;               
    int tlen;
 
+/* Initialise */
+   result = NULL;
+
 /* Check the global error status. */
-   if ( !astOK ) return NULL;
+   if ( !astOK ) return result;
 
 /* Obtain a pointer to the TimeFrame structure. */
    this = (AstTimeFrame *) this_frame;
@@ -2708,6 +2711,9 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
 /* Check the global error status. */
    result = NULL;
    if ( !astOK ) return result;
+
+/* Avoid compiler warnings */
+   cmn = -1;
 
 /* If the timescales are equal... */
    if( ts1 == ts2 ) {
@@ -5472,6 +5478,12 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
 
 /* Check inherited status */
    if( !astOK ) return;
+
+/* Stop compiler warnings about uninitialised variables */
+   a = NULL;
+   desc = NULL;
+   len = 0;
+   set = 0;
 
 /* If the TimeFrame has a non-zero value for its UseDefs attribute, then
    all attributes are assumed to have usable values, since the defaults 

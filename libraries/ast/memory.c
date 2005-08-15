@@ -405,6 +405,7 @@ char **astChrSplit_( const char *str, int *n ) {
 
 /* Initialise. */
    result = NULL;
+   ws = NULL;
    *n = 0;
 
 /* State 0 is "looking for the next non-white character which marks the

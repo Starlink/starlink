@@ -995,6 +995,7 @@ f     function is invoked with STATUS set to an error value, or if it
    AstKeyMap *result;
    AstMapping *map;
    AstMapping *smap;
+   AstObject *obj;
    AstRegion *reg;
    AstRegion *rereg;
    AstRegion *srereg;
@@ -1050,7 +1051,8 @@ f     function is invoked with STATUS set to an error value, or if it
       for( ikey = 0; ikey < NREG; ikey++ ) {
 
 /* If the KeyMap contains a Region for this key, get a pointer to it. */
-         if( astMapGet0A( result, regkey[ ikey ], &reg ) ){
+         if( astMapGet0A( result, regkey[ ikey ], &obj ) ){
+            reg = (AstRegion *) obj;
 
 /* Sets its RegionFS attribute so that the encapsulated FrameSet will be
    included in any dump of the Region. This is needed since the returned
@@ -1689,11 +1691,11 @@ static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *reg, AstKeyMap *coord,
 
 /* Check that the Object pointers are Region pointers. */
                } else if( !astIsARegion( obj ) ){
-                  obj = astAnnul( obj );
                   astError( AST__STCKEY, "astInitStc(%s): The \"%s\" "
                             "value supplied in an AstroCoords list is "
                             "a %s, not a Region. ", class, key,
-                            astGetClass(areg) );
+                            astGetClass(obj) );
+                  obj = astAnnul( obj );
                   break;
 
 /* Check that the Region pointers can be converted to the coordinate
@@ -2165,6 +2167,7 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 
 /* Local Variables: */
    AstKeyMap *keymap;
+   AstObject *obj;
    AstRegion *reg;   
    AstStc *this; 
    char *bset;
@@ -2204,7 +2207,8 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
          for( ikey = 0; ikey < NREG; ikey++ ) {
 
 /* If the KeyMap contains a Region for this key, get a pointer to it. */
-            if( astMapGet0A( keymap, regkey[ ikey ], &reg ) ){
+            if( astMapGet0A( keymap, regkey[ ikey ], &obj ) ){
+               reg = (AstRegion *) obj;
 
 /* Modify it by applying the attribute setting. */
                astRegSetAttrib( reg, bset, NULL );
@@ -2411,6 +2415,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstFrame *frm;                /* Current Frame */
    AstKeyMap *keymap;            /* KeyMap holding stroCoords element */
    AstMapping *map;              /* Base->current Mapping */
+   AstObject *obj;               /* Pointer to object retrieved from keymap */
    AstRegion *newreg;            /* New encapsulated Region */
    AstRegion *reg;               /* AstroCoords Region pointer */
    AstRegion *treg;              /* Temporary Region pointer */
@@ -2510,7 +2515,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          for( ikey = 0; ikey < NREG; ikey++ ) {
    
 /* If the KeyMap contains a Region for this key, get a pointer to it. */
-            if( astMapGet0A( keymap, regkey[ ikey ], &reg ) ){
+            if( astMapGet0A( keymap, regkey[ ikey ], &obj ) ){
+               reg = (AstRegion *) obj;
    
 /* We have two tasks now, firstly to ensure that this AstroCoords Region 
    describes an area in the base Frame of the FrameSet in the parent
@@ -3356,6 +3362,7 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
 
 /* Local Variables: */
    AstFrame *f1;                 /* Base Frame in parent Region */
+   AstObject *obj;               /* Pointer to Object retrieved from KeyMap */
    AstRegion *creg;              /* Pointer to encapsulated Region */
    AstStc *new;                  /* Pointer to the new Stc */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
@@ -3442,7 +3449,8 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
 /* Ensure the Regions within the KeyMap do not have dummy FrameSets. */
          if( new->coord[ ico - 1 ] && !astRegDummyFS( new ) ) {
             for( ikey = 0; ikey < NREG; ikey++ ) {
-               if( astMapGet0A( new->coord[ ico - 1 ], regkey[ ikey ], &creg ) ){
+               if( astMapGet0A( new->coord[ ico - 1 ], regkey[ ikey ], &obj ) ){
+                  creg = (AstRegion *) obj;
                   if( astRegDummyFS( creg ) ) {
                      astSetRegFS( creg, f1 );
                      astMapPut0A( new->coord[ ico - 1 ], regkey[ ikey ], creg, 

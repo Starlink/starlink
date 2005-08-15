@@ -539,6 +539,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    AstFrame *spec_frame;
    AstFrameSet *fs;
    AstMapping *map;
+   AstObject *o;
    AstRegion **red_list;
    AstRegion **spec_list;
    AstRegion **space_list;
@@ -861,7 +862,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
                   text = astFormat( fs, decref, 1 );
                   l = text ? strlen( text ) : 0;
-                  raset = astMalloc( l + 10 );
+                  decset = astMalloc( l + 10 );
                   if( decset ) sprintf( decset, "refdec=%s", text );
 
                   fs = astAnnul( fs );
@@ -895,7 +896,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
                   for( ianc = 0; ianc < nanc; ianc++ ) {
                      for( k = 0; k < 5; k++ ) {
-                        if( astMapGet0A( ancs[ ianc ], key[ k ], &r ) ) {
+                        if( astMapGet0A( ancs[ ianc ], key[ k ], &o ) ) {
+                           r = (AstRegion *) o;
                            astRegSetAttrib( r, raset, NULL );
                            astRegSetAttrib( r, decset, NULL );
                            r = astAnnul( r );
@@ -953,7 +955,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
                for( ianc = 0; ianc < nanc; ianc++ ) {
                   for( k = 0; k < 5; k++ ) {
-                     if( astMapGet0A( ancs[ ianc ], key[ k ], &r ) ) {
+                     if( astMapGet0A( ancs[ ianc ], key[ k ], &o ) ) {
+                        r = (AstRegion *) o;
                         astRegSetAttrib( r, buff, NULL );
                         r = astAnnul( r );
                      }
@@ -980,7 +983,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
                for( ianc = 0; ianc < nanc; ianc++ ) {
                   for( k = 0; k < 5; k++ ) {
-                     if( astMapGet0A( ancs[ ianc ], key[ k ], &r ) ) {
+                     if( astMapGet0A( ancs[ ianc ], key[ k ], &o ) ) {
+                        r = (AstRegion *) o;
                         astRegSetAttrib( r, buff, NULL );
                         r = astAnnul( r );
                      }
@@ -1229,6 +1233,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    AstKeyMap *ranc;              /* KeyMap holding redshift ancillary data */
    AstKeyMap *sanc;              /* KeyMap holding spectral ancillary data */
    AstKeyMap *tanc;              /* KeyMap holding temporal ancillary data */
+   AstObject *o;                 /* Pointer to object retrieved from KeyMap */
    AstRegion *r;                 /* Individual ancillary Region */
    AstRegion *t;                 /* Total extruded ancillary Region */
    AstRegion *tt;                /* Temporary Region pointer */
@@ -1537,7 +1542,8 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    supplied use a zero width Interval as a flag that no information is 
    available. */
             if( pfrm ) {
-               if( panc && astMapGet0A( panc, key[ i ], &t ) ) {
+               if( panc && astMapGet0A( panc, key[ i ], &o ) ) {
+                  t = (AstRegion *) o;
                   use = 1;
                } else {
                   t = (AstRegion *) astInterval( pfrm, &lo, &hi, NULL, "" );
@@ -1548,7 +1554,8 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    of the total Region with the time Frame. If none is supplied use a zero 
    width Interval as a flag that no information is available. */
             if( tfrm ) {
-               if( tanc && astMapGet0A( tanc, key[ i ], &r ) ) {
+               if( tanc && astMapGet0A( tanc, key[ i ], &o ) ) {
+                  r = (AstRegion *) o;
                   use = 1;
                } else {
                   r = (AstRegion *) astInterval( tfrm, &lo, &hi, NULL, "" );
@@ -1571,7 +1578,8 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
       
 /* Do the same for any spectral axis. */
             if( sfrm ) {
-               if( sanc && astMapGet0A( sanc, key[ i ], &r ) ) {
+               if( sanc && astMapGet0A( sanc, key[ i ], &o ) ) {
+                  r = (AstRegion *) o;
                   use = 1;
                } else {
                   r = (AstRegion *) astInterval( sfrm, &lo, &hi, NULL, "" );
@@ -1590,7 +1598,8 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
       
 /* Do the same for any redshift axis. */
             if( rfrm ) {
-               if( ranc && astMapGet0A( ranc, key[ i ], &r ) ) {
+               if( ranc && astMapGet0A( ranc, key[ i ], &o ) ) {
+                  r = (AstRegion *) o;
                   use = 1;
                } else {
                   r = (AstRegion *) astInterval( rfrm, &lo, &hi, NULL, "" );
@@ -5770,6 +5779,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
    AstFrame *pfrm;               /* Pointer to axis primary Frame */
    AstKeyMap *km;                /* KeyMap holding AstroCoords info */
    AstObject *new;               /* Pointer to returned Region */
+   AstObject *o;                 /* Pointer to retrieved Region */
    AstPointSet *ps;              /* Pointer to PointSet holding obs lon/lat */
    AstRegion *err;               /* Pointer to error Region */
    AstStc *stc;                  /* Pointer to Observatory location stc */
@@ -5806,7 +5816,8 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 
 /* Extract any position uncertainty, and store as the uncertainty in the
    value PointList. */
-      } else if( astMapGet0A( km, AST__STCERROR, &err ) ){
+      } else if( astMapGet0A( km, AST__STCERROR, &o ) ){
+         err = (AstRegion *) o;
          astSetUnc( new, err );
 
 /* Free resources */
@@ -5835,6 +5846,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
    if( ptr ){
       nax = astGetNaxes( frm );
       lon = AST__BAD;
+      lat = AST__BAD;
       lambda = AST__BAD;
       for( i = 0; i < nax; i++ ) {
          astPrimaryFrame( frm, i, &pfrm, &paxis );
@@ -7606,6 +7618,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs ){
    AstFrameSet *fs;
    AstMapping *map;
    AstMapping *smap;
+   AstObject *o;
    AstRegion *r2;
    AstRegion *r;
    char orgatt[ 20 ];
@@ -7650,6 +7663,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs ){
    the time axis (if any) in the supplied Region, and get the System and 
    TimeOrigin values for the time axis. */
       time_axis = -1;
+      time_unit = NULL;
       orgatt[ 0 ] = 0;
       sysatt[ 0 ] = 0;
       for( i = 0; i < ndim; i++ ) {
@@ -7715,7 +7729,8 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs ){
 /* Loop round each of the relevant KeyMap elements (skip the "Value"
    element since this should not be re-centred). */
          for( k = 0; k < 5; k++ ) {
-            if( astMapGet0A( ancs[ j ], key[ k ], &r ) ) {
+            if( astMapGet0A( ancs[ j ], key[ k ], &o ) ) {
+               r = (AstRegion *) o;
 
 /* The System and TimeOrigin attributes of the STC Region are set when the 
    AstroCoordArea is read. This occurs after the ancillary Coords Regions are 
@@ -10292,6 +10307,9 @@ static AstObject *StcMetadataReader( AstXmlChan *this,
 /* Check the global error status. */
    if ( !astOK ) return (AstObject *) stc;
 
+/* Avoid compiler warnings. */
+   id = "";
+
 /* Get name of the the STCMetadata subclass represented by the supplied
    element. */
    stc_class = astXmlGetName( elem );
@@ -10818,8 +10836,11 @@ static AstObject *TimeFrameReader( AstXmlChan *this,
    int max[3];                /* Max allowed occurrences of each name */
    int min[3];                /* Min allowed occurrences of each name */
 
+/* Initialise */
+   new = NULL;
+
 /* Check the global error status. */
-   if ( !astOK ) return NULL;
+   if ( !astOK ) return (AstObject *) new;
 
 /* Search the supplied element for the required sub-elements. */
    names[ 0 ] = "Name";

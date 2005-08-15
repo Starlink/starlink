@@ -174,6 +174,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include "cmpmap.h"              /* Compund Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "slalib.h"              /* SLALIB interface */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -2710,6 +2711,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    wtsum = 0; \
    bad = 0; \
    bad_var = 0; \
+   sum = 0.0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
@@ -6363,6 +6365,9 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Further initialise to avoid compiler warnings. */
+   err = 0.0;
+
 /* Allocate workspace. */
    dx = astMalloc( sizeof( double ) * (size_t) mapdata->nin );
 
@@ -6561,6 +6566,10 @@ static void MapBox( AstMapping *this,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialisation to avoid compiler warnings. */
+   lbnd = AST__BAD;
+   ubnd = AST__BAD;
+
 /* Obtain the effective numbers of input and output coordinates for
    the Mapping, taking account of which transformation is to be
    used. */
@@ -6614,8 +6623,6 @@ static void MapBox( AstMapping *this,
 
 /* Initialise the output bounds and corresponding input coordinates to
    "unknown". */
-         lbnd = AST__BAD;
-         ubnd = AST__BAD;
          for ( coord = 0; coord < nin; coord++ ) {
             x_l[ coord ] = AST__BAD;
             x_u[ coord ] = AST__BAD;
@@ -7318,7 +7325,7 @@ static double MatrixDet( int ndim, const double *matrix ){
       y = astMalloc( sizeof( double )*(size_t) ndim );
       if( y ) {
          for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
-         slaDmat( ndim, a, y, result, jf, iw );
+         slaDmat( ndim, a, y, &result, &jf, iw );
       }
       y = astFree( y );
       iw = astFree( iw );
@@ -9370,6 +9377,8 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Further initialisation. */
    pset_in = NULL;
    ptr_in = NULL;
+   ptr_out = NULL;
+   pset_out = NULL;
    neighb = 0;
    kernel = NULL;
 
@@ -12507,6 +12516,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Resample the input grid. */
 /* ------------------------ */
+/* Determine if a variance array is to be processed. */
+   usevar = ( in_var && out_var );
+
 /* If the input coordinates have been produced successfully, identify
    the input grid resampling method to be used. */
    if ( astOK ) {
@@ -12742,9 +12754,6 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* ----------------------------------------- */
          case AST__BLOCKAVE:
          case AST__UINTERP:
-
-/* Determine if a variance array is to be processed. */
-            usevar = ( in_var && out_var );
 
 /* Define a macro to use a "case" statement to invoke the general 
    sub-pixel interpolation function appropriate to a given type and
@@ -14357,6 +14366,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Further initialisation. */ \
    kerror = 0; \
+   sum = 0.0; \
    bad = 0; \
 \
 /* Find the total number of pixels in the filter used to spread a single \

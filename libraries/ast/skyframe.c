@@ -7963,6 +7963,13 @@ static void VerifyMSMAttrs( AstSkyFrame *target, AstSkyFrame *result,
    any checks if UseDefs is zero for either SkyFrame. */
    if( !usedef1 || !usedef2 ) {   
 
+/* Stop compiler warnings about uninitialised variables */
+      a = NULL;
+      desc = NULL;
+      len = 0;
+      set1 = 0;
+      set2 = 0;
+
 /* Loop round the "attrs" string identifying the start and length of each
    non-blank word in the string. */
       state = 0;

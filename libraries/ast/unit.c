@@ -5331,7 +5331,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    identical, return a UnitMap.*/
    if( !strcmp( in, out ) ) {
       if( in_lab ) *out_lab = astStore( NULL, in_lab, strlen( in_lab ) + 1 );
-      return astUnitMap( 1, "" );
+      return (AstMapping *) astUnitMap( 1, "" );
    }   
 
 /* More initialisation. */
