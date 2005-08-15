@@ -22,6 +22,12 @@ AC_PROG_LN_S
 
 AC_FC_CHECK_INTRINSICS([IEEE_FLAGS])
 
+dnl    How to use %LOC function, as LOC or %LOC. Use LOC otherwise
+dnl    assume %LOC.
+AC_FC_CHECK_INTRINSICS([LOC])
+AC_CHECK_FUNCS([LOC])
+
+
 STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( perl )
@@ -36,6 +42,10 @@ dnl    No use dependencies
 
 dnl Documentation
 STAR_LATEX_DOCUMENTATION( sun216/ ssn72/ sc10/ sc11/ )
+
+dnl Ask for a config.h so that we can retain control of when to define
+dnl parameters. And also to simplify the build line
+AC_CONFIG_HEADERS(config.h)
 
 dnl  But we also need to define the docs subdirs
 DOCS_SUBDIRS="hlp sun216 ssn72 sc10 sc11"

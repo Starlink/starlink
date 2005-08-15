@@ -151,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.2  2005/08/15 08:40:03  timj
+*     check for %LOC vs LOC in surf_skydip.F
+*
 *     Revision 1.1  2005/08/15 07:36:24  timj
 *     renamed from surf_skydip.f in order to check for %LOC
 *
@@ -496,6 +499,11 @@ c
 
 *  External functions:
       INCLUDE 'NDF_FUNC'
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 
 *.
 
@@ -1411,9 +1419,13 @@ c
             LABEL = 'Jsky'
             TITLE = 'Skydip'
             BADPIX = .FALSE.  ! I remove all bad data points
+#if HAVE_INTRINSIC_LOC
+            DREF = CNF_PREG(LOC(JSKY), ISDREFREG)
+            AREF = CNF_PREG(LOC(AIRMASS), ISAREFREG)
+#else
             DREF = CNF_PREG(%LOC(JSKY), ISDREFREG)
             AREF = CNF_PREG(%LOC(AIRMASS), ISAREFREG)
-
+#endif
          ELSE
 *     Model parameters and create
             PARAM = 'MODEL_OUT'
@@ -1421,8 +1433,13 @@ c
             LABEL = 'Jsky'
             TITLE = 'Skydip (model)'
             BADPIX = .FALSE.
+#if HAVE_INTRINSIC_LOC
+            DREF = CNF_PREG(LOC(J_THEORETICAL), ISDREFREG) ! Reference to data
+            AREF = CNF_PREG(LOC(AIR_MODEL), ISAREFREG)     ! Reference to axis
+#else
             DREF = CNF_PREG(%LOC(J_THEORETICAL), ISDREFREG) ! Reference to data
             AREF = CNF_PREG(%LOC(AIR_MODEL), ISAREFREG)     ! Reference to axis
+#endif
 
             AIRSTEP = (AIRMASS(NKEPT) - AIRMASS(1)) /
      :           (N_MODEL - 1)
