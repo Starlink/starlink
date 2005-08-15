@@ -40,6 +40,7 @@
 *      T.N.Wilkins 23/11/88
 *      TNW 5/12/88 Altered to use GEN_MOVE, later changed to COPD2D
 *      DJA created from modification of mgfun_sub
+*      TIMJ 15/8/05 Force do loop to use integeres
 *-
 
       implicit none
@@ -87,7 +88,7 @@
 * we need to do this because we must accumualte seperate
 * derviatives for each HEIGHT and BASE
 
-        do i = start(k) , end(k)
+        do i = INT(start(k)) , INT(end(k))
 
           w_sq       = weight(i) * weight(i)
           z_score    = ( data(i) - xc(REDSHIFT) ) / xc(WIDTH)

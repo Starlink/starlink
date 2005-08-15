@@ -61,6 +61,7 @@
 *  TNW Cambridge, 20-JUN-1991 Bug fix re weights
 *  DJA MAN 28-Jun-1991 Created from Fs2_fun
 *  TNW 12-JUL-1991 Made to compile
+*  TIMJ 15/8/05 Force do loop to use integeres
 *-
       implicit none
       integer max_parms
@@ -131,7 +132,7 @@
 * we need to do this because we must accumualte seperate
 * derviatives for each HEIGHT and BASE
 
-        do i = start(k) , end(k)
+        do i = INT(start(k)) , INT(end(k))
 
           z_score    = ( data(i) - xc(REDSHIFT) ) / xc(WIDTH)
           Z_score2   = - 0.5d0 * z_score * z_score
