@@ -46,6 +46,8 @@ C  History:
 C     17th July  1987  Original version.  KS / AAO.
 C     24th April 1989  Support for USHORT type added. KS / AAO.
 C     20th Aug   1992  Avoid LIB$ calls by more robust coding. HME / UoE.
+C     15th Aug   2005  Portability means that IAND arguments must both
+C                      be of the same type. TIMJ / JACH
 C+
       SUBROUTINE DSA_CSTRF (ELEMENTS,BSCALE,BZERO,BASE,ARRAY,ERRORS)
 C
@@ -238,6 +240,11 @@ C
 C
 C     Parameters
 C
+      INTEGER*2 NUM__MINW
+      INTEGER*2 NUM__MAXW
+      PARAMETER ( NUM__MINW = -32768 )
+      PARAMETER ( NUM__MAXW = 32767 )
+
       INTEGER ELEMENTS, ERRORS
       INTEGER*2 BASE(ELEMENTS)
       INTEGER*2 ARRAY(ELEMENTS)
@@ -283,9 +290,9 @@ C
          BZERO=32768.0
          DO I=1,ELEMENTS
             IF (ARRAY(I).LT.0) THEN
-               BASE(I)=IAND(ARRAY(I),32767)
+               BASE(I)=IAND(ARRAY(I),NUM__MAXW)
             ELSE
-               BASE(I)=IOR(ARRAY(I),-32768)
+               BASE(I)=IOR(ARRAY(I),NUM__MINW)
             END IF
          END DO
       END IF
