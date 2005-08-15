@@ -135,6 +135,7 @@
       INTEGER NPIX
       INTEGER NVALS
       INTEGER NCHAR
+      INTEGER IRAD
       REAL ANGLE
       REAL B
       REAL CHANGE
@@ -177,6 +178,7 @@
       FRAC = MAX( NOTZER, CROSS * 0.01 )
       CHANGE = LOG( FRAC )
       COEF1 = -1.0 / GSIGM**2
+
 * -COEF1 needs to be in parentheses to be standards compliant
       COEF2 = SQRT( ABS( -4.0 * CHANGE * ( -COEF1 ) ) )
       RADTHR = GSIGM * SQRT( ABS( -CHANGE ) )
@@ -264,8 +266,11 @@
             LOW = 0.0
             STEP = 10.0 
             NACC = 0
+
 9           CONTINUE
-            DO 4 RAD = LOW, UP, STEP
+            RAD = LOW
+            DO 4 IRAD = 1, INT( ( UP - LOW ) / STEP ) + 1
+               PRINT *, IRAD, RAD
                XINT = COEF1 * RAD * RAD
                FLOR = COMIX / ( 1.0 - XINT / LOG( 2.0 ) )
                IF ( XINT .GE. CHANGE ) THEN
@@ -288,8 +293,12 @@
                   LOW = RAD - STEP  
                   STEP = STEP / 10.0
                   GO TO 9
-               END IF 
+               END IF
+
+*  increment for next loop.
+               RAD = RAD + STEP
 4           CONTINUE
+
 5           CONTINUE ! break out
 
 *  form the ratio of semi-major to psf radius
