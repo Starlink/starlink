@@ -52,12 +52,14 @@
 *     ACD: A C Davenhall (Edinburgh)
 *     AJC: A J Chipperfield (Starlink)
 *     DSB: David S Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     9/7/97  (ACD): Original version.
 *     28/8/97 (ACD): First stable version.
 *      6/2/98 (AJC): Insert missing comma
 *     24/2/03 (DSB): Modified to use a dynamic BUFFER rather than a
 *                    fixed length BUFFER.
+*     14/8/05 (TIMJ): 'NAME' is not a portable synonym 'FILE'
 *  Bugs:
 *     None known
 *-
@@ -98,7 +100,7 @@
 *       Attempt to open the output file and proceed if ok.
 
          CALL FIO_GUNIT (WRUNIT, STATUS)
-         OPEN(UNIT=WRUNIT, NAME=GRIDFL, STATUS='UNKNOWN', IOSTAT=LSTAT)
+         OPEN(UNIT=WRUNIT, FILE=GRIDFL, STATUS='UNKNOWN', IOSTAT=LSTAT)
          CALL FIO_SERR (LSTAT, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
