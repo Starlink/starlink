@@ -154,7 +154,7 @@
                          
 *  Pick the next node on queue.
          NOW = QUEUE( 1 )
-D         write(*,*)'Visting node:',NOW
+C         write(*,*)'Visting node:',NOW
                          
 *  Flag this node as visited and remove it from the queue.
          BEEN( NOW ) = .TRUE.
@@ -167,12 +167,12 @@ D         write(*,*)'Visting node:',NOW
                          
 *  Look for neighbours of node we're currently visiting. Neighbours
 *  are nodes which share an edge.
-D         write(*,*)'Neighbours:'
+C         write(*,*)'Neighbours:'
          DO 5 I = 1, NEDGES
             IF ( GRAPH( 1, I ) .EQ. NOW ) THEN
                          
 *  Node neighbour. If it has not been visited, put on the queue.
-D               write(*,*)graph(2,i)
+C               write(*,*)graph(2,i)
                IF ( .NOT. BEEN( GRAPH( 2, I ) ) ) THEN 
                          
 *  See if this node is already on the queue.
@@ -202,7 +202,7 @@ D               write(*,*)graph(2,i)
             ELSE IF ( GRAPH( 2, I ) .EQ. NOW ) THEN
                          
 *  Neighbour.            
-D               write(*,*)graph(1,i)
+C               write(*,*)graph(1,i)
                IF ( .NOT. BEEN( GRAPH( 1, I ) ) ) THEN 
 
 *  See if this node is already on the queue.
@@ -237,7 +237,7 @@ D               write(*,*)graph(1,i)
       END IF             
                          
 *  Write out which nodes have been visited.
-D      write(*,*)( been( i ), i = fnode, lnode )
+C      write(*,*)( been( i ), i = fnode, lnode )
                          
 *  Confirm that graph is complete. This is true if all node numbers are
 *  flagged as been visited.
