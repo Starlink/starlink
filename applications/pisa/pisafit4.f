@@ -746,7 +746,7 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
          Q = REAL( XC( 3 ))
          CHANGE = LOG( MAX( NOTZER, 0.01 * THRESH ))
          COEF1 = -1.0 / ( MAX( NOTZER, SIGMA**2 ))
-         COEF2 = SQRT( MAX ( 0.0, ( -4.0 * CHANGE * -COEF1) ) )
+         COEF2 = SQRT( MAX ( 0.0, ( -4.0 * CHANGE * (-COEF1)) ) )
          RADTHR = SIGMA * SQRT( MAX( 0.0, -CHANGE ) )
          ITR = NINT( THRESH )
 
