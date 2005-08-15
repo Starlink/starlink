@@ -81,7 +81,7 @@ SCRTASKS = reduce ccdalign xreduce
 #  and environment variables.  They are listed separately from the public
 #  scripts as they are edited by the installation procedure.
 
-STARTUP_SCRIPT = ccdpack.csh
+STARTUP_SCRIPT = ccdpack.csh ccdpack.sh
 ICL_STARTUP_SCRIPT = ccdpack.icl
 IRAF_STARTUP_SCRIPT = ccdpack.cl
 
