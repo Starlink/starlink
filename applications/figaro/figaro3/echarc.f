@@ -291,6 +291,7 @@ C     18 Jul 1996  MJCL / Starlink, UCL.  Set variables for storage of
 C                  file names to 132 chars.
 C     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
 C                  data.
+C     2005 Aug 15  TIMJ / JACH. NAME= should be FILE= in Fortran standard
 C+
       IMPLICIT NONE
 
@@ -889,7 +890,7 @@ C
       CALL PAR_RDKEY('ANALYSIS',.FALSE.,GIVEN)
       IF (PAR_ABORT()) GO TO 500
       IF (GIVEN) THEN
-         OPEN(UNIT=IREC,NAME='echarc.lis',STATUS='NEW',
+         OPEN(UNIT=IREC,FILE='echarc.lis',STATUS='NEW',
      :                                    IOSTAT=STATUS)
          IF (STATUS.NE.0) THEN
             CALL PAR_WRUSER('Unable to open ECHARC.LIS file',
