@@ -47,6 +47,7 @@ C     21st Jul 1993  HME / UoE, Starlink. Use DSA_*_LU.
 C     28th Jul 1993  HME / UoE, Starlink. Disuse STR$UPCASE.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+C     2005 Aug 15    TIMJ / JACH. X ** -Y is not allowed. Use X ** (-Y)
 C+
       IMPLICIT NONE
 
@@ -320,9 +321,9 @@ C
       ELSE IF (L .LT. 1.9) THEN
          F=1.27E-6*(10**(-0.4*K))*(L*L-4.82*L+6.068)
       ELSE IF (L .LT. 2.6) THEN
-         F=6.88E-6*(10**(-0.4*K))*(L**-3.63)
+         F=6.88E-6*(10**(-0.4*K))*(L**(-3.63))
       ELSE
-         F=9.41E-6*(10**(-0.4*K))*(L**-3.91)
+         F=9.41E-6*(10**(-0.4*K))*(L**(-3.91))
       END IF
 C
 C     Convert to mJy
