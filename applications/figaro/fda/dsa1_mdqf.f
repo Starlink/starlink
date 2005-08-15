@@ -42,6 +42,7 @@
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +77,9 @@
 *        data array.  However, the NDF library gives an error.  So to
 *        avoid changing numerous calls in applications the mode is
 *        changed to write access in this case.
+*     2005 Aug 15 (TIMJ):
+*        Use NUM__MAXUB for BADBIT initialiser. This is defined to be FF
+*        whereas 255 is out of range for signed byte.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +94,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
+      INCLUDE 'PRM_PAR'          ! NUM__ constants
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -108,7 +113,7 @@
 
 *  Local Constants:
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 ) ! Bad bit mask for new quality
+      PARAMETER ( BADBIT = NUM__MAXUB ) ! Bad bit mask for new quality
 
 *  Local Variables:
       LOGICAL DTHERE             ! Whether or not there is a data array

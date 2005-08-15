@@ -47,6 +47,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     mjc: Malcolm Currie (RAL, Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -214,6 +215,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -221,6 +223,8 @@
 *        Original version.
 *     2005 May 31 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     2005 Aug 15 (TIMJ):
+*        Use PRM_PAR for BADBIT initialiser
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -236,6 +240,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'PRM_PAR'          ! For NUM__MAXUB
 
 *  Global Variables:
       INCLUDE 'DSA_COMMON'       ! DSA global variables
@@ -255,7 +260,7 @@
 
 *  Local Constants:
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 ) ! Bad bit mask for new quality
+      PARAMETER ( BADBIT = NUM__MAXUB ) ! Bad bit mask for new quality
 
 *  Local Variables:
       LOGICAL EXIST              ! Whether there are bad values

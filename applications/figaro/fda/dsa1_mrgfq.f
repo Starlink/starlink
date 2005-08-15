@@ -39,6 +39,7 @@
 *  Authors:
 *     ks: Keith Shortridge (AAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        mask will flag the pixel as bad.
 *     06 Mar 1996 (hme):
 *        Correct documentation.
+*     15 Aug 2005 (timj):
+*        Use NUM__MAXUB to initialise BADBIT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,7 +126,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -151,7 +154,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -179,7 +182,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -207,7 +210,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -235,7 +238,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -263,7 +266,7 @@
       INTEGER STATUS
 
       BYTE BADBIT
-      PARAMETER ( BADBIT = 255 )
+      PARAMETER ( BADBIT = NUM__MAXUB )
       INTEGER I
 
       IF ( STATUS .NE. SAI__OK ) RETURN
