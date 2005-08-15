@@ -73,6 +73,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +81,8 @@
 *        Original version.
 *     6-MAY-1992 (PDRAPER):
 *        Added PRM_PAR.
+*     14-AUG-2005 (TIMJ):
+*        Fix standards uncompliant SQRT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -174,7 +177,8 @@
       FRAC = MAX( NOTZER, CROSS * 0.01 )
       CHANGE = LOG( FRAC )
       COEF1 = -1.0 / GSIGM**2
-      COEF2 = SQRT( ABS( -4.0 * CHANGE * -COEF1 ) )
+* -COEF1 needs to be in parentheses to be standards compliant
+      COEF2 = SQRT( ABS( -4.0 * CHANGE * ( -COEF1 ) ) )
       RADTHR = GSIGM * SQRT( ABS( -CHANGE ) )
 
 *  Work out the model intensity-peak ratio

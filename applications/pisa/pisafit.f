@@ -202,6 +202,7 @@
 *  Authors:
 *     MIKE: Mike Irwin (APM)
 *     PDRAPER: Peter Draper (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -241,6 +242,8 @@
 *        Removed call to NAG routine E04JAF and replaced with PDA_LMDIF1.     
 *     07-SEP-2004 (PDRAPER):
 *        Changed to use CNF_PVAL.
+*     14-AUG-2005 (TIMJ):
+*        Fix standards uncompliant SQRT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -738,7 +741,10 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
          Q = REAL( XC( 3 ))
          CHANGE = LOG( MAX( NOTZER, 0.01 * THRESH ))
          COEF1 = -1.0 / ( MAX( NOTZER, SIGMA**2 ))
-         COEF2 = SQRT( MAX ( 0.0, ( -4.0 * CHANGE * -COEF1) ) )
+
+*  Note that " * - " is not standards compliant fortran so parentheses
+*  must be used around -COEF1
+         COEF2 = SQRT( MAX ( 0.0, ( -4.0 * CHANGE * ( -COEF1 ) ) ) )
          RADTHR = SIGMA * SQRT( MAX( 0.0, -CHANGE ) )
          ITR = NINT( THRESH )
 
