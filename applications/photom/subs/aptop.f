@@ -458,7 +458,7 @@
          ELSEIF ( ( COMMAND .EQ. 'F' ) .OR. ( COMMAND .EQ. 'f' ) ) THEN
 
 *   Open the positions  file
-            CALL FIO_ASSOC( 'POSFILE', 'READ', 'LIST', 80, FIN, STATUS )
+            CALL FIO_ASSOC( 'POSFILE', 'READ', 'LIST', 0, FIN, STATUS )
 
 *   Abort the command if the user has entered the NULL state
             IF ( STATUS .EQ. PAR__NULL ) THEN
