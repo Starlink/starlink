@@ -372,7 +372,7 @@ C
 C       Open the file in such a way that if it already exists
 C       new records will be appended to it.
 C
-        OPEN(UNIT=LU,NAME=FNAME,STATUS='UNKNOWN',ACCESS='APPEND',
+        OPEN(UNIT=LU,FILE=FNAME,STATUS='UNKNOWN',ACCESS='APPEND',
      :          FORM='FORMATTED',IOSTAT=NOPEN)
         IF (NOPEN.NE.0) THEN
           CALL PAR_WRUSER('Failed to open file',STATUS)

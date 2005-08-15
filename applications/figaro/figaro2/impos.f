@@ -78,9 +78,11 @@
 *     end if
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     9/6/00   (ACD): Original version.
 *     29/10/01 (ACD): Improved the prologue comments.
+*     15/8/05  (TIMJ): OPEN uses FILE= not NAME=
 *  Bugs:
 *     None known.
 *-
@@ -128,7 +130,7 @@
 
          CALL FIO_GUNIT (INUNIT, STATUS)
 
-         OPEN(UNIT=INUNIT, NAME=INPFLE, STATUS='OLD', IOSTAT=LSTAT)
+         OPEN(UNIT=INUNIT, FILE=INPFLE, STATUS='OLD', IOSTAT=LSTAT)
          CALL FIO_SERR (LSTAT, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN

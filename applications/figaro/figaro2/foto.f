@@ -616,7 +616,7 @@ C
 C
       IF (LASTF.NE.0) THEN
          CALL DSA_GET_LU(NFOR,STATUS)
-         OPEN(UNIT=NFOR,NAME='center.dat',STATUS='OLD',IOSTAT=STATUS)
+         OPEN(UNIT=NFOR,FILE='center.dat',STATUS='OLD',IOSTAT=STATUS)
          IF (STATUS.NE.0) THEN
             CALL PAR_WRUSER(
      :            'Unable to open centroid file ("center.dat")',STATUS)
