@@ -41,7 +41,7 @@ scripts/calcflat.pl scripts/polphot.pl scripts/scunoise		       \
 scripts/scuquick scripts/sdip.csh
 
 # Dynamically generated scripts
-DYNSCRIPTS = surf.csh surf.icl
+DYNSCRIPTS = surf.sh surf.csh surf.icl
 
 # IFL files
 IFL_FILES = $(surf_mon_TASKS:=.ifl) surf_mon.ifl
