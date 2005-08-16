@@ -384,7 +384,7 @@
                   TR( 2 ) = SGN * B1( 2 )
                   TR( 3 ) = B1( 3 )
                   TR( 4 ) = B1( 4 )
-                  TR( 5 ) = SGN * -B1( 3 )
+                  TR( 5 ) = SGN * ( -B1( 3 ) )
                   TR( 6 ) = B1( 2 )
                   IF ( I .EQ. 1 ) THEN
                      OLDTR( 1 ) = TR( 1 )
