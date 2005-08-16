@@ -5,6 +5,12 @@
   ATOOLS package at each release.
 
 
+2 V1.8-1
+
+  - New command astellipse. Creates an Ellipse.
+  - New command astpolygon. Creates a Polygon.
+
+
 2 V1.8
 
   - New command astfluxframe. Creates a FluxFrame.
