@@ -91,7 +91,7 @@ fi
 #  SURF
 
 if test -f @bindir@/surf/surf.sh; then
-   export SURf_DIR=@bindir@/surf
+   export SURF_DIR=@bindir@/surf
    export SURF_HELP=@starhelpdir@/surf/surf
 fi
 
