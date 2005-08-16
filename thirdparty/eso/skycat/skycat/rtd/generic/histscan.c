@@ -16,6 +16,10 @@ static char SccsId[] = "%W%  %G%";
 
 #include "histeq.h"
 
+/* Local prototypes */
+static SubrangeLink *get_new_subrange_record();
+static void fill_subrange_record();
+
 /*
  * Subroutine:	scan_histogram_for_peaks
  * Purpose:	Scan the image histogram picking out large cell count values
@@ -36,8 +40,6 @@ void scan_histogram_for_peaks ( subrange, histogram,
   int sr_nzentries;		/* l: number of non-zero entries in subrange */
   int sr_pixel_area;		/* l: number of pixels in current subrange */
   int sr_max_peak;		/* l: highest peak within current  subrange */
-  static SubrangeLink *get_new_subrange_record();
-  static void fill_subrange_record();
 
   /* set initial pixel_count values */
   sr_pixel_area = 0;

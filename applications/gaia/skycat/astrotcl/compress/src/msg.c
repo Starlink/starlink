@@ -227,9 +227,6 @@ MSG	*msgs;
 int	status;
 va_list	args;
 {
-    void	msg_append();
-    static char	*msg_find();
-
     char	*errno_arg;
     char	*format;
     int		i;

@@ -25,6 +25,13 @@ static char SccsId[] = "%W%  %G%";
 #define HDEBUG
 #endif
 
+/* Local prototypes */
+static int equalize_simply();
+#ifdef JIGGLE
+static void adjust_list();
+#endif
+
+
 /*
  * Subroutine:	make_equalized_list
  * Purpose:	Distributing levels for a subrange section of the histogram
@@ -47,10 +54,6 @@ void make_equalized_list ( histogram, list, low_entry, high_entry,
   int best_levels_under;
   int best_average_over = 0;	/* average_area used to get best_levels */
   int best_average_under = 0;
-  static int equalize_simply();
-#ifdef JIGGLE
-  static void adjust_list();
-#endif
 
   /* else allocation distribution must first be determined */
   /* run through histgram section making basic allocation and taking notes */

@@ -17,6 +17,9 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink */
 
+/* Local prototypes */
+static void merge_links();
+
 /*
  * Subroutine:	resolve_zeroes
  * Purpose:	Combine groups with zero alloted levels with adjoining groups
@@ -29,7 +32,6 @@ void resolve_zeroes ( PriorLink, zeroes )
 {
   SubrangeLink *ThisLink, *NextLink;
   int a_count, b_count, z1count, z2count;
-  static void merge_links();
 
   /* if very first entry is a zero allocated link */
   if( PriorLink->color_levels == 0 ) {

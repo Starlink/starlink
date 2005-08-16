@@ -19,6 +19,13 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink, List */
 
+/* Local prototypes */
+static void make_subrange_scalemap();
+static void make_gapped_list();
+static void list_to_map();
+static int first_shortlist_pass();
+static void add_level_to_short_list();
+
 /*
  * Subroutine:	generate_scalemap
  * Purpose:	Make scalemap, applying standard histgoram equalization
@@ -38,7 +45,6 @@ void generate_scalemap ( hist, subrange, scalemap, pixels )
 {
   int baselevel;
   SubrangeLink *trash;
-  static void make_subrange_scalemap();
 
   baselevel = 0;
   while( subrange != 0 ) {
@@ -69,7 +75,6 @@ static void
   unsigned long dispval;
   char *calloc_errchk();
   void make_equalized_list();
-  static void make_gapped_list(), list_to_map();
 
   /* if only one level, make map section */
   if( subrange->color_levels <= 1 ) {
@@ -144,8 +149,6 @@ static void make_gapped_list ( histogram, list, low, high, levels )
 {
   int range_j, max_range;
   int levels_used;
-  static int first_shortlist_pass();
-  static void add_level_to_short_list();
 
   levels_used =
     first_shortlist_pass(histogram, list, low, high, levels,

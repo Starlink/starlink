@@ -18,6 +18,11 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink */
 
+/* Local prototypes */
+static int excess_zgroup();
+static int excess_nzgroup();
+static int range_zgroup();
+
 /*
  * Subroutine:	distribute_levels
  * Purpose:	Distribute the levels among histogram sub-groups
@@ -38,7 +43,6 @@ int distribute_levels ( linklist, pixel_area, color_levels,
 #ifdef DEBUG
   int census = 0;
 #endif
-  static int excess_zgroup(), excess_nzgroup(), range_zgroup();
 
   /* if all one group (no strong peaks), allocation is simple */
   if( linklist->next == 0 ) {
