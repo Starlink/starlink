@@ -27,11 +27,6 @@ extern "C" {
     int RotBox_Init();
     int Tcladam_Init(Tcl_Interp *interp);
     int GaiaCat_Init(Tcl_Interp *interp);
-#ifdef __GNUC__
-    void f_init();
-    int main(int argc, char** argv);
-    int MAIN__(int argc, char** argv) {return main(argc,argv);}
-#endif
 }
 
 //  Generated code for bitmaps used in tcl scripts.
@@ -40,21 +35,12 @@ void defineGaiaBitmaps(Tcl_Interp*);
 //  Generated code for colormaps.
 void defineGaiaColormaps();
 
-#ifdef __GNUC__
-int xargc = 1;
-char* xargv[] = {"gaia", NULL};
-#endif
-
 /*
  * A call to this function is made from the tkAppInit file at startup
  * to initialize this package
  */
 extern "C" int Gaia_Init( Tcl_Interp *interp )
 {
-#ifdef __GNUC__
-    f_init();
-#endif
-
     //  Set up Tcl package.
     if (Tcl_PkgProvide(interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
 	return TCL_ERROR;
