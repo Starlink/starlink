@@ -23,6 +23,8 @@
 #  include "itk.h"
 #endif /* HAVE_ITCL */
 
+#include "tclndf.h"
+
 /* include tclInt.h for access to namespace API */
 #include "tclInt.h"
 
