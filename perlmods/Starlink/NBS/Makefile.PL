@@ -2,11 +2,10 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-use ExtUtils::F77;
 use Config;
 
 # For location of Starlink libraries and incs
-eval "use Starlink::Config;";
+eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
   print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
@@ -20,7 +19,7 @@ $osname = $Config{osname};
  
 # ---- LIBS -------
  
-# This is the list of libraries required to use ems
+# This is the list of libraries required to use NBS
 $nbslibs = qx/nbs_link/;
  
 die "No NDF libraries were found.\n This may imply that the
@@ -54,14 +53,11 @@ if ($osname eq 'dec_osf') {
 
 $optimize = $Config{optimize} . " $linkopts";
 
-
-$fortranlibs = ExtUtils::F77->runtime;
-
 # This is the location of the Starlink NDF libraries
 $starlibs = "-L$StarConfig{Star_Lib}";
  
-$libs = "$starlibs $nbslibs $fortranlibs ";
- 
+$libs = "$starlibs $nbslibs ";
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
