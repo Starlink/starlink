@@ -83,6 +83,10 @@
 
 *.
 
+*  Initialise
+      SCULIB_SECNDS = 0.0
+
+*  Check global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 #if HAVE_INTRINSIC_SECNDS
