@@ -40,10 +40,10 @@ AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
 if test -z "$CC" ; then 
     CC=gcc
 fi
-compiler=`basename $CC`
-if test "$compiler" = "gcc" ; then
-    CC="$CC -fwritable-strings"
-fi
+#compiler=`basename $CC`
+#if test "$compiler" = "gcc" ; then
+#    CC="$CC"
+#fi
 AC_SUBST(CC)
 
 # -----------------------------------------------------------------------

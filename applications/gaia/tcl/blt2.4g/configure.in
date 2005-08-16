@@ -107,7 +107,7 @@ else
 fi
 
 if test "${bltHaveGcc}" = "yes" ; then
-  GCCFLAGS="-fwritable-strings -O"
+  GCCFLAGS="-O"
 else 
   GCCFLAGS=""
 fi

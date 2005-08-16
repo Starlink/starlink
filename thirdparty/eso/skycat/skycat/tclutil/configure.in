@@ -95,16 +95,26 @@ AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
 if test -z "$CC" ; then 
     CC=gcc
 fi
-compiler=`basename $CC`
-if test "$compiler" = "gcc" ; then
-    CC="$CC -fwritable-strings"
-fi
+
+# Special gcc flags if needed. After GCC4 the -fwritable-strings flag
+# if not allowed, so has been removed.
+#compiler=`basename $CC`
+#if test "$compiler" = "gcc" ; then
+#    CC="$CC"
+#fi
 AC_SUBST(CC)
 
 # c++ is a  link to g++ that does not link in -lg++, which we need
 if test "$CXX" = "c++" ; then
     CXX="g++"
 fi
+
+#  Tried of all those warnings...
+compiler=`basename $CXX`
+if test "$CXX" = "g++" ; then
+    CXX="g++ -Wno-deprecated"
+fi
+
 AC_SUBST(CXX)
 
 # -----------------------------------------------------------------------
