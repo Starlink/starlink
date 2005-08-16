@@ -1,5 +1,9 @@
 2005-08-15  Tim Jenness  <tjenness@cpan.org>
 
+        * ADAM.xs: Fix long standing crash in perl side when remote monolith
+        disappears. An unintialiszed value on bad status was being treated
+        as good.
+
 	* Makefile.PL: No longer need fortran libraries in link
 
 2005-03-30  Tim Jenness  <timj@jach.hawaii.edu>

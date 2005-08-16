@@ -24,9 +24,9 @@ extern "C" {
 
 adam_rmnull (char *c, int len) {
   int i;
+  if (c==NULL) return;
+  if (len<=0) return;  /* Do nothing */
 
-  if (len==0) { return;}  /* Do nothing */
- 
   /* Remove all spurious \0  */
   /* and replace them with a new line */  
   i = 0;
@@ -41,7 +41,7 @@ adam_rmnull (char *c, int len) {
   while ((*(c+i-1)==' '||*(c+i-1)=='\0') && i>=0) {
     i--;
   }
- 
+
   if (i<0) {i=0;}
  
   /* Null it */
@@ -195,12 +195,17 @@ ams_getreply(timeout, path, messid, message_status, message_context, message_nam
   char name_len[MSG_NAME_LEN];
   char msg_len[MSG_VAL_LEN];
  CODE:
+  *msg_len = '\0';
+  *name_len = '\0';
+  message_length = 0;
   message_name = name_len;
   message_value = msg_len;
   ams_getreply(timeout, path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
 	       &message_status, &message_context, message_name, 
 	       &message_length, message_value, &status);
-  adam_rmnull(message_value, message_length);
+  if ( status == SAI__OK ) {
+    adam_rmnull(message_value, message_length);
+  }
  OUTPUT:
   message_status
   message_context
@@ -270,12 +275,17 @@ ams_receive(timeout, message_status, message_context, message_name, message_leng
   char name_len[MSG_NAME_LEN];
   char msg_len[MSG_VAL_LEN];
  CODE:
+  message_length = 0;
+  *name_len = '\0';
+  *msg_len = '\0';
   message_name = name_len;
   message_value = msg_len;
   ams_receive(timeout, MSG_NAME_LEN, MSG_VAL_LEN, &message_status,
 	      &message_context, message_name, &message_length, message_value,
 	      &path, &messid, &status);
-  adam_rmnull(message_value, message_length);
+  if (status == SAI__OK) {
+    adam_rmnull(message_value, message_length);
+  }
  OUTPUT:
   message_status
   message_context
