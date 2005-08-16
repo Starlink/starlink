@@ -50,7 +50,7 @@ experience, including the sometimes unexpected benefits and costs.
 The Starlink Software Collection \cite{draper05} is a large set of
 astronomical data-reduction 
 applications, written over about two decades in a variety of
-languages, mostly written in~C, C++ and Fortran.  Until recently the source
+languages, primarily~C, C++ and Fortran.  Until recently the source
 code was managed, and the
 products distributed, using a system that worked, but which was
 rather ad hoc and opaque, and which was correspondingly rather
@@ -58,13 +58,25 @@ expensive to maintain.  For a variety of technical, political, and financial
 reasons we made the decision to overhaul this build system, resulting
 in an CVS-plus-autoconf setup which is much more efficient for the
 developers, as well as more familiar to the users and and the
-community which will have to take a larger role in its maintainance.
+community which will soon have to take a larger role in its maintainance.
 In Section~\ref{s:background} we elaborate the 
 motivations for this and the problems we faced; in
 Section~\ref{s:result} we briefly describe the resulting system; and
 in Section~\ref{s:lessons} we list some of the lessons we learned, in
 the hope that these will be of use to other projects considering the
 same important move.
+
+We intend this article as practical advice from the front line, and
+hope it will be of use to others in the same position of trying to
+rationalise a large existing system.  Our system was not an ideal
+starting point, as it was large, infuriatingly ad hoc in places, and
+had a mass of interface commitments, at levels ranging from library
+interfaces to documentation style conventions.  At the same time, it
+was far from the worst, since the ad hoc features were confined within
+disciplined structures; and once-irksome coding standards documents and
+previous migrations meant that the code was maintainable and
+portable.  This was specifically a build-system migration, not a
+porting project, and we expected to keep code changes to a bare minimum.
 
 
 \section{Background}
@@ -89,7 +101,7 @@ developing new Java applications, in tune with more recent
 developments in astronomical software.  Though it is not now actively
 developed, the classic software is still depended upon by astronomers
 world-wide, as well as being a valuable resource for pipelines
-(\cite{cavanagh03,currie04}) and application engines in the VO
+\cite{cavanagh03,currie04} and application engines in the VO
 \cite{giaretta05}.  For this reason, and because, with further
 enforced dieting, we expect the community will have to take a larger
 role in its curation, we needed to make the classic software as
@@ -116,7 +128,7 @@ but it required discipline and effort to maintain, and worked largely
 because most users obtained their software through pre-built tape, network and
 CD distributions, in many cases installed by system managers who were
 also at that time employed by the Starlink Project (whose complaints
-could therefore be bought off by donations of beer).  As Starlink's
+could therefore be bought off with beer).  As Starlink's
 role changed, it became increasingly important that this software set
 appear more `normal', and be maintainable (without medication) by a
 broader range of developers.  One important source of complication in the
@@ -171,7 +183,10 @@ substantially reduced, with very little cut-and-pasted boilerplate.
 As a result of using the autotools, the entire 2.5\,MSLOC collection
 now builds successfully on Linux (RHEL is our current test platform),
 Solaris, Windows (using Cygwin), and Mac\,OS\,X, even though the
-latter two were not explicit goals of this porting project.  It should
+latter two were not explicit goals of this porting project.  At the
+time of writing, we have some version-skew problems with OS\,X 10.4,
+but, crucially, these will eventually be fixed once as part of the
+buildsystem's maintainance.  It should
 be portable to other Unix-like systems, and in particular
 \textsc{posix} systems which include an X~server.
 
@@ -181,30 +196,41 @@ be portable to other Unix-like systems, and in particular
 \label{s:lessons}
 
 The original plan was to autoconf everything with only necessary code
-changes.  However it was impossible to stop ourselves refactoring and
-tidying, sometimes rather extensively.  This is both a warning to
-other projects that they won't be able to stop developers doing this,
-and a benefit, in the sense that a lot of code-hygiene tasks that have
-been too boring, confusing or risky in the past, become a lot less so
-when you're adjusting everything anyway.  In addition, merely
-gathering all our code into a coherent repository turned out to be a
-non-trivial but valuable exercise.  For historical reasons, including
-the fact that systems like CVS were less common ten years ago, the
-master copies of code were held by the (distributed) developers.  As a
-consequence of the audit, all the code is now in one place, we have
-identified modules of generated code and the sometimes
-developer-specific tools used to produce them, and we rescued some
-code from backup oblivion, as developers retired or left the project.
-This consolidation overlaps with the refactoring work, since the
-consequent perception that code is owned in common means that the
-developers are more willing to criticise each others' code, and with
-appropriate consultation refactor or fix it.
+changes -- in principle, we wanted to touch only makefiles.  However
+it was impossible to stop ourselves refactoring and tidying, sometimes
+rather extensively.  This is both a warning to other projects that
+they won't be able to stop developers doing this, and a benefit, in
+the sense that a lot of code-hygiene tasks that have been too boring,
+confusing or risky in the past, become a lot less so if you are
+committed to adjusting and re-integrating everything anyway.  Doing
+this made it possible to contemplate a fresh look at the way we curate
+our code.  For historical reasons, including the fact that systems
+like CVS were less well-known ten years ago, the master copies of code
+were held by the (distributed) developers.  As a consequence of the
+audit, all the code is now in one repository, we have identified and
+normalised modules of generated code and the sometimes
+developer-private tools used to produce them, and we rescued some code
+from backup oblivion, as developers retired or left the project.  This
+is a non-trivial but obviously valuable exercise.  This consolidation
+overlapped with the refactoring work, since the consequent perception
+that code is owned in common meant that the developers were more
+willing to criticise each others' code, and with appropriate
+consultation refactor or fix it.
+
+That is, the disruption and reorganisation caused by this project was
+by itself paradoxically beneficial.  Beyond the material outcomes of a
+stable repository and more robust build tools, we have the intangible
+but no less real benefits that the current developers have a stake in
+the design of the system, along with a more communitarian attitude to
+the code.
 
 We should have bowed to the inevitable, and started patching the
 autotools earlier, since delaying this meant some functionality had to
 be implemented twice.  Our initial expectation was that we could
 provide all of our extra boilerplate using autoconf macros (using the
-now partly deprecated \texttt{aclocal} extension mechanism).  Autoconf
+now partly deprecated \texttt{aclocal} extension mechanism); while
+this works for relatively simple cases, we discovered the technique
+rapidly ran out of steam.  Autoconf
 works by adjusting pre-existing template files, but as soon as the
 boilerplate consists of extra makefile rules, so that these templates
 themselves have to be significantly adjusted, the scripting involved
@@ -214,15 +240,16 @@ and obviously fragile.
 Patching automake is not a trivial undertaking, but the size of our
 project, the resulting increase in robustness, and the control it gave
 us over the build system, made it worthwhile.  The automake code is
-undeniably complicated, and the bulk of the program logic is in a
-monolithic kernel; however the makefile fragments which it manages are
-probably organised in as modular a way as possible, and the code is
-well written, so that the tool as a whole is reasonably easy to patch.
-Part of the reason for this is that, although many of the details are
-complicated and rather confusing, the overall design of the program is
-relatively simple, so that it is fairly amenable to cautious hacking,
-spotting likely features in existing \texttt{Makefile.in} files, and
-tracing them back to the code which generates them.
+undeniably complicated and rather confusing in detail, and the bulk of
+the program logic is in a monolithic kernel; however that kernel is
+relatively simple in overall design (suck in the input file to create
+a complicated internal state, modify that state, then spit out
+the result), the makefile fragments which it manages are organised in
+as modular a way as seems possible, and the code is well written, so
+that the tool as a whole is reasonably easy to patch.  In particular,
+automake is fairly amenable to cautious hacking, spotting likely
+features in existing \texttt{Makefile.in} files, and tracing them back
+to the code or template which generates them.
 
 Even if we had not patched it, it
 would probably be wise, in a project of this size, to keep a
@@ -241,11 +268,11 @@ As a general point, we can recommend the use of automake.  Though
 there is a rather steep learning curve, and one does naturally suspect
 it of being dangerously clever, this turns out not to be a problem
 \emph{as long as} you are willing to build your project the way
-automake things it ought to be built.  Since the (GNU) coding
+automake thinks it ought to be built.  Since the (GNU) coding
 standards it implements are both conventional and reasonably sensible,
 this is not the imposition it appears.  However it follows that
 adapting a pre-existing makefile to automake can be frustrating and
-hard, and it is better in this case to start again, and produce the
+hard, and we found it much less frustrating to start again, and produce the
 much shorter \texttt{Makefile.am} automake source file from scratch.
 
 The Fortran support in autoconf is rather slim.  A large proportion of the
@@ -271,17 +298,31 @@ even so, while most of our code compiled perfectly happily on OS\,X,
 the linking stage consumed a disproportionate amount of effort.
 
 We couldn't automatically convert our old build system to the new one,
-because it was mostly hand-maintained.  But that turned out not to be
-a problem in fact: disciplined coding in the past meant that packages
-could generally be ported to the new system with little thought, and
-this turned out to be a small part of the effort.
+because, though tidily implemented, it was based on hand-adapted
+template makefiles, with an idiosyncratic collection of build targets
+(I never could remember the difference between \texttt{make export}
+and \texttt{make export-source}), providing much scope for ad hoc
+cleverness, making the conversion impossible to automate.  To the
+surprise of the present author -- much given to 
+delivering phillipics on the eccentricity, future expensiveness, and
+general viciousness of the old system -- this didn't matter.  The
+old-style makefiles had to be changed by hand into new-style
+\texttt{Makefile.am} files, but here the dangerous cleverness and
+eccentric targets proved less important than the presence of the
+organising patterns.  Here, some structure was enough structure, and
+we discovered that the conversion could be done
+package by package without much thought, and that creating the
+\texttt{Makefile.am} file in this way was a useful first step in
+acquianting oneself with the quirks of a package last touched last century.
 
 Starlink is a well-run project with disciplined developers, but we
 were surprised by the number of individually minor hurdles we had
-accumulated over a decade, despite our care, enough that working with
-the code would have been daunting for a non-insider.  Given that we
-last that long, we should probably plan to have another buildsystem
-overhaul in a decade or so.
+accumulated over a decade, despite our best efforts at vigilance, enough that working with
+the code would have been daunting for a non-insider.  Our complete
+build system overhaul was quite expensive, but I speculate that almost
+any similar project-wide development would produce some of the same
+benefits, as a by-product of scanning a large fraction of the
+project's code from a new perspective.
 
 One of our own and others' criticisms of our code base was that, over
 twenty years, it had had plenty time to fall victim to `big sticky
@@ -291,12 +332,22 @@ This was over-optimistic.  Although we did become aware of a few
 easily removed dependencies, in part because this was the first time
 that the network of dependencies was expressed explicitly, doing this
 on a larger scale would have required a more formal analysis we did
-not have the resources to perform.
+not have the resources to perform, identifying refactoring targets we
+had not the resources to attack.
 
 We found dependencies more complicated than we expected, and found at
 least four types in our code base, which had their effects at
-different phases, and had to be handled in different ways.  XXX
-description of dependency types???
+different phases, and had to be handled in different ways.  We discuss
+these in Sect.~\ref{s:deps}.
+
+As a result of teasing out and articulating the sub-projects'
+interdependencies, it became feasible to generate distributable
+components in a much more flexible way than had been possible before.
+We were able to generate and centralise package metadata, and use
+this, in conjunction with the EPM package manager~\cite{epm} to
+generate Debian \texttt{.deb} files, OS\,X \texttt{.mpkg} files, RPMs
+and others.  If further changes are required, changes to the automake
+templates will make it easy to apply them project-wide.
 
 In parallel with this porting project, we worked through the internal
 bureaucracy involved in applying a GPL licence to the code where
@@ -318,6 +369,105 @@ running, and then another six to adapt the bulk of our code to the new
 system, followed by another six months of low-level tinkering to
 remove the wrinkles and have the nightly builds produce relocatable
 and useful distribution tarballs.
+
+\subsection{Dependencies}
+\label{s:deps}
+
+We identified no fewer than five distinct dependency types.
+
+First, \emph{sourceset dependencies} are the components which must be
+installed in order to build the complete set of sources, either for
+building or for distribution.  This means those tools which are used
+to build documentation or generated sources which are included in distributions.
+
+Next, a component's \emph{build dependencies} are the dependencies
+which are required in order to build it.  This most often implies
+files included during compilation, but also refers to project-specific
+tools -- for example to compile message files -- which must be run on
+the build host rather than the host which builds the distribution.
+You may not have two components which have a build dependency on each
+other, since that would mean that each would have to be built before
+the other, which is impossible.
+
+Thirdly, \emph{link dependencies} are the dependencies required to
+link against the libraries in a component. That means all the
+libraries that this component's libraries use. These are not
+necessarily build dependencies, since if you are building a library~$X$,
+which uses functions in library~$Y$, the library~$Y$ does not have to be
+present in order to build library~$X$, only when you subsequently want
+to actually link against it.  Thus you can have two components which
+have mutual link dependencies.  If you are building an application,
+however, all its link dependencies will actually be build dependencies
+and should be declared as such. In other words, the distinction
+between build and link dependencies is important only for library
+components.
+
+\emph{Configure dependencies}
+There are some components which must be installed before the configure
+step, since they must be present in order for other packages to
+configure against them. Components which are listed as a configure
+dependency of some other component are made during the make
+configure-deps stage of the bootstrapping build process.
+
+You should try hard to avoid declaring dependencies of this type,
+since they necessarily subvert the normal build order. Note that
+transitivity implies that any dependencies of a configure dependency
+are also configure dependencies, so that declaring a configure
+dependency on sst for example (an obvious but bad plan), results in
+half the software set being built before configuration. Which is
+crazy. 
+
+You can see the set of configure dependencies by looking at the configure-deps target in Makefile.dependencies.
+
+Use dependencies
+These are the dependencies required in order for the component to be
+used by something else, after it has been built and installed. For
+example a library which called another application as part of its
+functionality would have only a use dependency on the component which
+contained that application. If no use dependencies are declared, we
+take the use dependencies to be the same as the link dependencies. We
+expect that such use dependencies will become more important when we
+start using this dependency information to build distribution
+packages, or to assemble .rpm or .deb packages. You should add any use
+dependencies you are aware of, even though we cannot really debug them
+until a distribution system is in place. 
+
+Test dependencies
+These are required in order to run any regression tests which come
+with the component. It's generally a good idea to avoid making this a
+larger set than the use dependencies, but sometimes this is
+unavoidable. If no test dependencies are declared, we take the test
+dependencies to be the same as the use dependencies. Note that the
+system does not currently make any use of this information.
+
+The point of all this is that different dependencies are required at
+different times. The set of dependencies in the master makefile is
+composed of all the `sourceset' and `build' dependencies, but not
+`link' or `use' dependencies, and since the core Starlink libraries
+are closely interdependent, the set of `build' dependencies needs to
+be kept as small as possible in order to avoid circularities (that is,
+A depending on B, which depends, possibly indirectly, on A).
+
+
+It is because of this intricacy that the dependencies scheme is so
+complicated. In general, it is safe to declare most things to have
+build dependencies, and only refine these into link or use
+dependencies when things won't work otherwise.
+
+
+All these relationships are transitive: if A has a build dependency on
+B, and B has one on C, then A has a build dependency on C. You can
+augment this by using the final `option' argument: if, in component
+A's configure.ac, you say \verb|STAR_DECLARE_DEPENDENCIES(build, B, link)|,
+then you declare that A has a build-time dependency on B, but that
+(presumably because B is a component consisting entirely or mostly of
+libraries) you need to link against B, so component A has a dependency
+on all of B's link dependencies, not just its build dependencies. An
+application component should generally declare such a dependency for
+each of the libraries it depends on. This is (I believe) the only case
+where this `option' attribute is useful, though it is legal for each
+of the dependency types.
+
 
 \section{Conclusions}
 
