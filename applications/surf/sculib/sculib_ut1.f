@@ -36,8 +36,8 @@
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 1995,1996,1997,1998,1999,2005 
+*     Particle Physics and Astronomy Research Council. All Rights Reserved.
 
 
 *  History:
@@ -61,7 +61,7 @@
 *  Status:
 
 *  External references:
-      REAL SECNDS                        ! VMS SECNDS function
+      REAL SCULIB_SECNDS                        ! VMS SECNDS function
 
 *  Global variables:
 
@@ -94,7 +94,7 @@
 
 *  and add number of seconds since midnight onto DJM to give UT1
 
-      SCULIB_UT1 = DJM + DBLE (SECNDS(0.0)) / (3600.0D0 * 24.0D0)
+      SCULIB_UT1 = DJM + DBLE(SCULIB_SECNDS(0.0)) / (3600.0D0 * 24.0D0)
 
       END
 
