@@ -1,3 +1,7 @@
+2005-08-15  Tim Jenness  <tjenness@cpan.org>
+
+	* Makefile.PL: No longer need fortran libraries in link
+
 2005-03-30  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.pm (adam_process_message): Fix problem whereby the obey

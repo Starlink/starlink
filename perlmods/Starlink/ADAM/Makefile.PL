@@ -1,9 +1,8 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::F77;
 use Config;
 
 # For location of Starlink libraries and incs
-eval "use Starlink::Config;";
+eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
   print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
@@ -50,16 +49,10 @@ if ($osname eq 'dec_osf') {
  
 $optimize = $Config{optimize} . " $linkopts";
 
-# Fortran libraries depends on the architecture
-# Use the ExtUtils::F77 module for this
- 
-$fortranlibs = ExtUtils::F77->runtime;
-
-
 # This is the location of the Starlink NDF libraries
 $starlibs = "-L$StarConfig{Star_Lib}";
 
-$libs = "$starlibs $amslibs $fortranlibs";
+$libs = "$starlibs $amslibs";
 
 
 
