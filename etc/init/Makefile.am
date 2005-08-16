@@ -23,6 +23,7 @@ edit = sed -e 's%@bindir\@%$(bindir)%g' \
            -e 's%@libdir\@%$(libdir)%g' \
            -e 's%@datadir\@%$(datadir)%g' \
            -e 's%@sharelibdir\@%$(libdir)%g' \
+           -e 's%@datadir\@%$(datadir)%g' \
            -e 's%@VERSION\@%$(VERSION)%g' \
            -e 's%@mandir\@%$(mandir)%g' \
            -e 's%@starjavadir\@%$(exec_prefix)/starjava%g' \

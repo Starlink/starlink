@@ -53,6 +53,16 @@ if test -f @bindir@/hdstools/hdstools.sh; then
    export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
 fi
 
+#
+#  ICL
+#
+
+if test -x @bindir@/icl; then
+   export ADAM_PACKAGES=@starhelpdir@/adam_packages.shl
+   export ICL_LOGIN_SYS=@staretcdir@/icl_login_sys.icl
+fi
+ 
+
 #  JPL
 
 if test -f @staretcdir@/jpleph.dat; then
@@ -65,6 +75,18 @@ if test -f @bindir@/polpack/polpack.sh; then
    export POLPACK_DIR=@bindir@/polpack
    export POLPACK_HELP=@starhelpdir@/polpack/polpack
 fi
+
+#
+#  PONGO
+#
+
+if test -f @bindir@/pongo/pongo.icl; then
+   export PONGO_BIN=@bindir@/pongo
+   export PONGO_HELP=@starhelpdir@/pongo/pongohelp
+   export PONGO_EXAMPLES=@datadir@/pongo
+fi
+
+
 
 #  SURF
 
@@ -149,4 +171,17 @@ else
   polpacksetup () { @staretcdir@/notinst polpack; }
 fi
 
+#
+#   Pongo
+#
 
+if test -f @bindir@/pongo/pongo.icl; then
+   pongo () { icl $PONGO_BIN/pongo; }
+else
+   pongo () { @staretcdir@/notinst pongo; }
+fi
+
+
+# Done
+
+export STAR_LOGIN=''
