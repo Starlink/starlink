@@ -209,7 +209,7 @@
       GOOD_Y_END = 0
 
 *     Start a timer
-      T0 = SCULIB_SECNDS(0.0)
+      T0 = SCULIB_SECNDS(0.0,STATUS)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process', 
      :     STATUS)
@@ -445,7 +445,7 @@
 
 *     Finish
 
-      T1 = SCULIB_SECNDS(T0)
+      T1 = SCULIB_SECNDS(T0,STATUS)
       CALL MSG_SETR('T1', T1)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV, ' ',

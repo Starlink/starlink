@@ -73,6 +73,7 @@
       INTEGER SLA_STATUS
       INTEGER ID, IM, IY
       DOUBLE PRECISION DJM               ! modified Julian day
+      INTEGER STATUS
 
 *  Internal References:
 
@@ -94,7 +95,9 @@
 
 *  and add number of seconds since midnight onto DJM to give UT1
 
-      SCULIB_UT1 = DJM + DBLE(SCULIB_SECNDS(0.0)) / (3600.0D0 * 24.0D0)
+      STATUS = SAI__OK
+      SCULIB_UT1 = DJM + DBLE(SCULIB_SECNDS(0.0,STATUS)) 
+     :                   / (3600.0D0 * 24.0D0)
 
       END
 

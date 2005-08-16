@@ -160,6 +160,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.10  2005/08/16 06:17:21  timj
+*     add STATUS argument to SCULIB_SECNDS
+*
 *     Revision 1.9  2005/08/16 05:53:54  timj
 *     Factor out SECNDS intrinsic into SCULIB_SECNDS to give us more flexibility
 *
@@ -274,7 +277,7 @@
       END IF
 
 *     Start a timer
-      T0 = SCULIB_SECNDS(0.0)
+      T0 = SCULIB_SECNDS(0.0,STATUS)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Beginning regrid process', 
      :     STATUS)
@@ -299,7 +302,7 @@
 
 *  go through the input datasets coadding them into the convolution
 
-      T1 = SCULIB_SECNDS(T0)
+      T1 = SCULIB_SECNDS(T0,STATUS)
       CALL MSG_SETR('T1', T1)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV,' ','^PKG: Entering second rebin phase'//
@@ -373,7 +376,7 @@
 *  now add the output pixels with zero `total weight' into the
 *  convolution sum and calculate the final result
 
-      T1 = SCULIB_SECNDS(T0)
+      T1 = SCULIB_SECNDS(T0,STATUS)
       CALL MSG_SETR('T1', T1)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Entering third rebin phase '//
@@ -388,7 +391,7 @@
 
 *     Finish
 
-      T1 = SCULIB_SECNDS(T0)
+      T1 = SCULIB_SECNDS(T0,STATUS)
       CALL MSG_SETR('T1', T1)
       CALL MSG_SETC('PKG', TSKNAME)
       CALL MSG_OUTIF(MSG_LEV, ' ',
