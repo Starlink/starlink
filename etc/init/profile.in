@@ -17,6 +17,10 @@
 # Break the file up along the lines of the cshrc and login rather
 # than combining tests into a single block.
 
+# Make ${1+"$@"} portability feature work on zsh, too.
+test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
+
+
 # Define the Starlink environment first
 
 #  ATOOLS
@@ -37,6 +41,12 @@ fi
 
 if test -f @bindir@/fluxes/fluxes.csh; then
    export FLUXES_DIR=@bindir@/fluxes
+fi
+
+#  GAIA
+
+if test -f @bindir@/gaia/gaia.csh; then
+   export GAIA_DIR=@bindir@/gaia
 fi
 
 #  Kappa
@@ -91,7 +101,7 @@ fi
 #  SURF
 
 if test -f @bindir@/surf/surf.sh; then
-   export SURF_DIR=@bindir@/surf
+   export SURf_DIR=@bindir@/surf
    export SURF_HELP=@starhelpdir@/surf/surf
 fi
 
@@ -130,6 +140,17 @@ else
   fluxnow () { @staretcdir@/notinst fluxnow; }
 fi
 
+#
+#   Gaia
+#
+
+if test -f @bindir@/gaia/gaia.csh; then
+   gaia () { $GAIA_DIR/gaia.csh ${1+"$@"}; }
+   gaiadisp () { $GAIA_DIR/gaiadisp.csh ${1+"$@"}; }
+else
+   gaia () { @staretcdir@/notinst gaia; }
+   gaiadisp () { @staretcdir@/notinst gaiadisp; }
+fi
 
 # Kappa
 
