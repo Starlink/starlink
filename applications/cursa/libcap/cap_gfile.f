@@ -43,9 +43,11 @@
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     2/6/94  (ACD): Original version.
 *     13/3/95 (ACD): First stable version.
+*     15/8/05 (TIMJ): OPEN should use FILE= not NAME=
 *  Bugs:
 *     None known
 *-
@@ -89,7 +91,7 @@
 *
 *          Attempt to open the file and proceed if ok.
 
-            OPEN(UNIT=FUNIT, NAME=FLNAME, STATUS='NEW',
+            OPEN(UNIT=FUNIT, FILE=FLNAME, STATUS='NEW',
      :        FORM='FORMATTED', IOSTAT=LSTAT)
             CALL FIO_SERR (LSTAT, STATUS)
 

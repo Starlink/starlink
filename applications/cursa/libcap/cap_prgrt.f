@@ -51,10 +51,12 @@
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     2/8/96  (ACD): Original version.
 *     11/8/96 (ACD): First stable version.
 *     6/6/97  (ACD): Changed the subroutine prefix from CIO to CAP.
+*     15/8/05 (TIMJ): OPEN should not use NAME=. Use FILE= instead
 *  Bugs:
 *     None known
 *-
@@ -100,7 +102,7 @@
 
          CALL FIO_GUNIT (GTUNIT, STATUS)
 
-         OPEN(UNIT=GTUNIT, NAME=GTFILE, STATUS='OLD', IOSTAT=LSTAT)
+         OPEN(UNIT=GTUNIT, FILE=GTFILE, STATUS='OLD', IOSTAT=LSTAT)
          CALL FIO_SERR (LSTAT, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN

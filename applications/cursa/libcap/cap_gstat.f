@@ -68,11 +68,13 @@
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     28/11/96 (ACD): Original version.
 *     4/12/96  (ACD): First stable version.
 *     30/11/98 (ACD): Fixed the display format for displaying individual
 *        statistics to work on Linux.
+*     15/8/05 (TIMJ): OPEN should use FILE= not NAME=
 *  Bugs:
 *     None known
 *-
@@ -213,7 +215,7 @@
                IF (FILE .NE. 'NONE'  .AND.  FILE .NE. ' ') THEN
                   CALL FIO_GUNIT (FUNIT, STATUS)
 
-                  OPEN(UNIT=FUNIT, NAME=FILE, STATUS='NEW',
+                  OPEN(UNIT=FUNIT, FILE=FILE, STATUS='NEW',
      :              FORM='FORMATTED', IOSTAT=LSTAT)
                   CALL FIO_SERR (LSTAT, STATUS)
 

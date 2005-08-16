@@ -34,9 +34,11 @@
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     9/5/97  (ACD): Original version.
 *     7/10/97 (ACD): First stable version.
+*     15/8/05 (TIMJ): Use FILE= in open rather than NAME=
 *  Bugs:
 *     None known
 *-
@@ -67,7 +69,7 @@
 
          CALL FIO_GUNIT (FUNIT, STATUS)
 
-         OPEN(UNIT=FUNIT, NAME=FILNME, STATUS='UNKNOWN',
+         OPEN(UNIT=FUNIT, FILE=FILNME, STATUS='UNKNOWN',
      :     FORM='UNFORMATTED', IOSTAT=LSTAT)
          CALL FIO_SERR (LSTAT, STATUS)
 

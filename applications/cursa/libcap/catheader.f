@@ -110,6 +110,7 @@
 *     Report any error.
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     16/9/94 (ACD): Original version.
 *     19/4/95 (ACD): First stable version.
@@ -117,6 +118,7 @@
 *     5/4/01  (ACD): Added the quiet mode.
 *     2/11/01 (ACD): Revised to allow options about which information is
 *       listed.
+*     15/8/05 (TIMJ): OPEN should use FILE= not NAME=
 *-
 *  Type Definitions:
       IMPLICIT NONE
@@ -217,7 +219,7 @@
                CALL CHR_PUTC (CNAME(1 : LCNAME), OFILE, LOFILE)
                CALL CHR_PUTC ('.lis', OFILE, LOFILE)
 
-               OPEN(UNIT=FLUNIT, NAME=OFILE(1 : LOFILE), STATUS='NEW',
+               OPEN(UNIT=FLUNIT, FILE=OFILE(1 : LOFILE), STATUS='NEW',
      :           IOSTAT=LSTAT)
                CALL FIO_SERR (LSTAT, STATUS)
             END IF
