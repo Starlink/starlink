@@ -678,6 +678,50 @@ sub skycatconfig {
   return $self->{SKYCATCONFIG};
 }
 
+=item B<skycat_catalogue_in>
+
+Retrieve or set a filename that will be used in place of a SkyCat
+query. The file must be formatted in Cluster format as listed in the
+C<detected_catalogue> method.
+
+  my $skycat_catalogue_in = $auto->skycat_catalogue_in;
+  $auto->skycat_catalogue_in( 'skycat.cat' );
+
+If not set, then a network query will be done.
+
+=cut
+
+sub skycat_catalogue_in {
+  my $self = shift;
+  if( @_ ) {
+    my $skycat_catalogue_in = shift;
+    $self->{SKYCAT_CATALOGUE_IN} = $skycat_catalogue_in;
+  }
+  return $self->{SKYCAT_CATALOGUE_IN};
+}
+
+=item B<skycat_catalogue_out>
+
+Retrieve or set a filename that will take the catalogue as downloaded
+from SkyCat. The file is formatted in Cluster format with the same
+columns as listed in the C<detected_catalogue> method.
+
+  my $skycat_cat_out = $auto->skycat_catalogue_out;
+  $auto->skycat_catalogue_out( 'skycat.out' );
+
+If not set, then no catalogue will be written.
+
+=cut
+
+sub skycat_catalogue_out {
+  my $self = shift;
+  if( @_ ) {
+    my $skycat_catalogue_out = shift;
+    $self->{SKYCAT_CATALOGUE_OUT} = $skycat_catalogue_out;
+  }
+  return $self->{SKYCAT_CATALOGUE_OUT};
+}
+
 =item B<temp>
 
 Retrieve or set the directory to be used for temporary files.
@@ -893,6 +937,7 @@ sub solve {
     my $filter = new Astro::WaveBand( Filter => 'unknown' );
     my $ext = new Starlink::Extractor;
     $ext->detect_thresh( 5.0 );
+
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
     print "done.\n" if $self->verbose;
@@ -905,62 +950,113 @@ sub solve {
     croak "Only detected " . $ndfcat->sizeof . " objects in " . $self->ndf . ". Cannot perform automated astrometry corrections with so few objects";
   }
 
+# Check to see if we have a catalogue to read in instead of querying
+# SkyCat.
+  my $querycat;
+  if( defined( $self->skycat_catalogue_in ) &&
+      -e $self->skycat_catalogue_in ) {
+
+# Read in the catalogue.
+    print "Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->verbose;
+    $querycat = new Astro::Catalog( Format => 'Cluster',
+                                    File => $self->skycat_catalogue_in,
+                                  );
+
+  } else {
+
 # Query the SkyCat catalogue.
-  my $racen = $cencoords->ra2000;
-  my $deccen = $cencoords->dec2000;
-  $racen->str_delim(' ');
-  $deccen->str_delim(' ');
+    my $racen = $cencoords->ra2000;
+    my $deccen = $cencoords->dec2000;
+    $racen->str_delim(' ');
+    $deccen->str_delim(' ');
 
-  $racen = "$racen";
-  $deccen = "$deccen";
-  $racen =~ s/^\s+//;
-  $deccen =~ s/^\s+//;
+    $racen = "$racen";
+    $deccen = "$deccen";
+    $racen =~ s/^\s+//;
+    $deccen =~ s/^\s+//;
 
-  print "Querying " . $self->catalogue . "..." if $self->verbose;
-  my $query = new Astro::Catalog::Query::SkyCat( catalog => $self->catalogue,
-                                                 RA => "$racen",
-                                                 Dec => "$deccen",
-                                                 Radius => $radius,
-                                               );
-  if( defined( $self->skycatconfig ) ) {
-    $query->cfg_file( $self->skycatconfig );
+    my $query = new Astro::Catalog::Query::SkyCat( catalog => $self->catalogue,
+                                                   RA => "$racen",
+                                                   Dec => "$deccen",
+                                                   Radius => $radius,
+                                                 );
+    if( defined( $self->skycatconfig ) ) {
+      $query->cfg_file( $self->skycatconfig );
+    }
+    $querycat = $query->querydb();
+
+    if( $self->verbose ) {
+      print "done.\n";
+      print "Received " . $querycat->sizeof() . " objects from "
+            . $self->catalogue . ".\n";
+    }
   }
-  my $querycat = $query->querydb();
-  print "done.\n" if $self->verbose;
-  print "Received " . $querycat->sizeof() . " objects from " . $self->catalogue . ".\n" if $self->verbose;
 
   # Again, croak if we have fewer than 4 objects.
   if( $querycat->sizeof < 4 ) {
-    croak "Only retrieved " . $querycat->sizeof . " objects from " . $self->catalogue . ". Cannot perform automated astrometry corrections with so few objects";
+    croak "Only retrieved " . $querycat->sizeof . " objects from "
+          . $self->catalogue . ". Cannot perform automated astrometry "
+          . "corrections with so few objects";
+  }
+
+# Dump the SkyCat catalogue to disk if requested, but only if
+# either the input SkyCat catalogue isn't defined or it is
+# defined and ( isn't the same as the requested output catalogue
+# or it doesn't exist ).
+  if( defined( $self->skycat_catalogue_out ) ) {
+    if( ! defined( $self->skycat_catalogue_in ) ||
+        ( defined( $self->skycat_catalogue_in ) &&
+          ( ! -e $self->skycat_catalogue_in ||
+            $self->skycat_catalogue_in ne $self->skycat_catalogue_out ) ) ) {
+      $querycat->write_catalog( Format => 'Cluster',
+                                File => $self->skycat_catalogue_out,
+                              );
+      print "Wrote " . $self->skycat_catalogue_out
+            . " to disk, storing SkyCat results.\n" if( $self->verbose );
+    }
   }
 
 # Add the NDF's WCS to the retrieved catalogue, allowing us to get
-# X and Y positions for the retrieved objects.
+# X and Y positions for the retrieved objects. Take the top brightest
+# objects from the retrieved catalogue if necessary.
+  my $take_brightest = 0;
+  if( $self->maxobj && $querycat->sizeof > $self->maxobj ) {
+    $take_brightest = 1;
+  }
+  my @filteredstars;
   my $filter;
   my $allstars = $querycat->allstars;
   foreach my $star ( @$allstars ) {
+
+    # Check to see if we have a filter defined yet. If not, set
+    # it from the first filter for the current object.
     if( ! defined( $filter ) ) {
       my @filters = $star->what_filters;
       $filter = $filters[0];
     }
-    $star->wcs( $frameset );
-  }
 
-# Take the top brightest objects from the retrieved catalogue if
-# necessary.
-  if( $self->maxobj && $querycat->sizeof > $self->maxobj ) {
-    my $newquerycat = new Astro::Catalog;
-    my $stars = $querycat->stars;
-
-    my @filteredstars;
-    foreach my $star ( @$stars ) {
-      if( $star->get_magnitude( $filter ) =~ /^[\d\.]+/ ) {
-        push @filteredstars, $star;
-      }
+    # Hack to get around not being able to write 'undef' values
+    # in Cluster format catalogues. We're making an assumption
+    # here that a star can't be located at (0.000,0.000).
+    if( $star->x eq "0.000" ) {
+      $star->x( undef );
+    }
+    if( $star->y eq "0.000" ) {
+      $star->y( undef );
     }
 
+    # And update the object's WCS.
+    $star->wcs( $frameset );
+
+    if( $take_brightest && $star->get_magnitude( $filter ) =~ /^[\d\.]+/ ) {
+      push @filteredstars, $star;
+    }
+  }
+
+  if( $take_brightest ) {
     @filteredstars = sort { $a->get_magnitude( $filter ) <=> $b->get_magnitude( $filter ) } @filteredstars;
-    my @newstars = @filteredstars[0..($self->maxobj - 1)];
+    my @newstars = @filteredstars[0..( $self->maxobj - 1 )];
+    my $newquerycat = new Astro::Catalog;
     $newquerycat->pushstar( @newstars );
     $querycat = $newquerycat;
   }
