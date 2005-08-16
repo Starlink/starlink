@@ -1282,12 +1282,27 @@ fi
 # macro, if your application doesn't have the link problems which
 # makeit necessary, though of course calling it will make getarg()
 # work where it otherwise wouldn't, which may be an advantage.
+#
+# All was well until g95 (and probably gfortran), these are "gnu" compilers,
+# but use different semantics. In the case of g95 the calling the startup code
+# is not optional (docs say that heap initialisation relies on the startup
+# call).
+#
+# Use simple test for g95 as compiler name for now, but there is surely a
+# better way to do that (testing the --version output). This whole area
+# probably needs rethinking as g95 also has a g95_runtime_stop() function,
+# that should be called. 
+#
 AC_DEFUN([STAR_INITIALISE_FORTRAN],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
        [star_cv_initialise_fortran],
        [AC_REQUIRE([AC_PROG_FC])
         if test "$ac_cv_fc_compiler_gnu" = yes; then
-            star_cv_initialise_fortran=g77-setarg
+            if test "$FC" = "g95"; then
+                star_cv_initialise_fortran=g95-start
+            else
+                star_cv_initialise_fortran=g77-setarg
+            fi
         else
             star_cv_initialise_fortran=
         fi])
@@ -1297,6 +1312,10 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
       g77-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
                   [{extern void f_setarg(int,char**); f_setarg(argc, argv);}])
+        ;;
+      g95-start)
+        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+                  [{extern void g95_runtime_start(int,char**); g95_runtime_start(argc, argv);}])
         ;;
       *) 
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
