@@ -27,11 +27,14 @@
 
 #  Authors:
 #     DJA: D.J. Allan (Jet-X, University of Birmingham)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     7-FEB-1995 (DJA):
 #        Original version.
+#     15-AUG-2005 (TIMJ):
+#        chr isn't required
 #     {enter_changes_here}
 
 #  Bugs:
@@ -59,7 +62,7 @@
 #  followed by the list of options for packages on which NBS depends.
 #  Pass the result through an awk script to remove duplicate library
 #  references.
-      echo "${special}" -lnbs `chr_link` `ems_link` `cnf_link` \
+      echo "${special}" -lnbs `ems_link` `cnf_link` \
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
