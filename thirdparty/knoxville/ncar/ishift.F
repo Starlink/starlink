@@ -19,8 +19,14 @@ C IF N.GT.0, THEN SHIFT LEFT CIRCULAR
 C IF N.LT.0, THEN SHIFT RIGHT ARITHMATIC
 
 C
-
+      INTEGER MASK
+#if HAVE_BOZ
+      DATA MASK/X'FFFFFFFF'/
+#elif HAVE_OLD_TYPELESS_BOZ
       DATA MASK/'FFFFFFFF'X/
+#else
+  Cannot form data mask, no BOZ constants are supported
+#endif
 C
       IF (N.GT.0) THEN
         ISHIFT = IOR(ISHFT(IWORD,N),ISHFT(IWORD,N-32))

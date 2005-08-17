@@ -93,6 +93,7 @@ convrt_SOURCES = $(CONVRT_ROUTINES)
 CONVRT_ROUTINES = convrt.f
 
 pcrbin_SOURCES = $(PWRITX_ROUTINES)
+pcrbin_LDADD = libncar.la
 PWRITX_ROUTINES = pcrbin.f
 
 ezmap.dat: convrt
