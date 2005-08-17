@@ -101,8 +101,8 @@ KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
 calpol cdiv centroid chpix cmult collapse compadd compave compick     \
 convolve copybad creframe csub errclip expon ffclean fillbad	      \
 fitsurface flip fourier gausmooth glitch globals histat histeq	      \
-histogram laplace kstest logar look lucy manic makesurface maths      \
-median mstats mult noglobals nomagic normalize numb outset parget     \
+histogram interleave laplace kstest logar look lucy manic makesurface \
+maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcstran kapversion \

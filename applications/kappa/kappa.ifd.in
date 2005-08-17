@@ -9950,6 +9950,69 @@ package kappa {
 
       }
 
+      action interleave {
+         alias {int(erleave)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter expand {
+            size *
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Expansion factors}
+            helpkey *
+          }
+
+         parameter fill {
+            type LITERAL
+            prompt {Filling value of the output array}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default Bad
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {NDFs to be interleaved}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {NDF after being expanded}
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            default !
+            helpkey *
+          }
+
+         parameter trim {
+            type _LOGICAL
+            prompt {Trim or pad the input NDFs before interleaving?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+      }
+
 iraf! {
 
       action kaphelp {

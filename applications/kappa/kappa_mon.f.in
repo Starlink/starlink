@@ -47,14 +47,17 @@
 *     1997 May 31 (MJC):
 *        Added KSTEST and SUBSTITUTE for V0.10.
 *     7-OCT-1998 (DSB):
-*        Added COPYBAD PROFILE LISTSHOW LISTMAKE WCSALIGN WCSTRAN for V0.13
+*        Added COPYBAD PROFILE LISTSHOW LISTMAKE WCSALIGN WCSTRAN for
+*        V0.13
 *     13-MAY-1999 (DSB):
-*        Changed history application name to incorporate the current version
-*        of KAPPA.
+*        Changed history application name to incorporate the current
+*        version of KAPPA.
 *     30-AUG-1999 (DSB):
 *        Added multiple invocation of applications using LPG looping.
 *     16-MAR-2004 (DSB):
 *        Added call to LPG_REPLA.
+*     2005 August 12
+*        Added INTERLEAVE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,8 +99,8 @@
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Define the current application name for history. The package version
-*  number gets substituted in here when the KAPPA release source tar file 
-*  is contructed.
+*  number gets substituted in here when the KAPPA release source tar
+*  file  is contructed.
       CALL NDF_HAPPN( NAME // ' (KAPPA @PACKAGE_VERSION@)', STATUS )
 
 *  See if NDF names should be reported when looping.
@@ -121,7 +124,8 @@
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
 
-*  Loop round invoking the task for each set of NDFs specified by the user.
+*  Loop round invoking the task for each set of NDFs specified by the
+*  user.
       DO WHILE( LPG_AGAIN( STATUS ) )
 
 *  Check the string against valid A-task names---if matched then call
@@ -265,6 +269,10 @@
 *  Computes an histogram of an NDF's values.
          ELSE IF ( NAME .EQ. 'HISTOGRAM' ) THEN
             CALL HISTOGRAM ( STATUS )
+
+*  Forms a higher-resolution NDF by interleaving a set of NDFs.
+         ELSE IF ( NAME .EQ. 'INTERLEAVE' ) THEN
+            CALL INTERLEAVE ( STATUS )
 
 *  Gives help about KAPPA.
          ELSE IF ( NAME .EQ. 'KAPHELP' ) THEN
