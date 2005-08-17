@@ -31,7 +31,7 @@ ADAM_F_ROUTINES = $(KPG_ADAM_NONGEN) $(ADAM_GEN_F_ROUTINES)
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
-	$(KPG_XL_GEN:.gxl=.f)
+	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f)
 
 ADAM_GEN_F_ROUTINES = $(KPG_ADAM_DR_GEN:.gdr=.f) \
 	$(KPG_ADAM_N_GEN:.gn=.f)
@@ -55,6 +55,9 @@ kpg1_bor2.gn
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
+
+# All except character
+KPG_XC_GEN = kpg1_retv.gxc
 
 # All except unsigned types
 KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw
@@ -428,6 +431,11 @@ KPG_ADAM_N_GEN = kpg1_dara.gn
 	cp $< $(<:.gdr=.gen)
 	$(FGENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
+
+.gxc.f:
+	cp $< $(<:.gxc=.gen)
+	$(FGENERIC)  -t bdilrwWB $(<:.gxc=.gen)
+	rm $(<:.gxc=.gen)
 
 .gxl.f:
 	cp $< $(<:.gxl=.gen)
