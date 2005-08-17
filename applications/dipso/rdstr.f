@@ -97,7 +97,7 @@
 *  character and so isn't displayed).
       FULLPR = ' '
       PRLEN = 3
-D     PRLEN = 4
+C     PRLEN = 4
 
 *  If a command name has been given, append it to the full prompt string
 *  and convert it to upper case.

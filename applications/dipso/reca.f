@@ -96,7 +96,7 @@
 * FIND ITS USEFUL LENGTH
 *
       buffer = string
-D     call chr_ucase(buffer)
+C     call chr_ucase(buffer)
       call chr_ldblk(buffer)
       end=chr_len(buffer)
 
@@ -222,7 +222,7 @@ D     call chr_ucase(buffer)
                   do n=1,DSB_max-1
                      call gtslot(cycle,move(DSB_pw(cycle),-n),text,
      :                           istat)
-D                    call chr_ucase(text)
+C                    call chr_ucase(text)
                      call chr_ldblk(text)
                      if(index(text,parm(:lparm)).eq.1) then
                         pr=move(DSB_pw(cycle),-n)

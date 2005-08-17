@@ -72,18 +72,18 @@
       INCLUDE 'KUSE_COM'   ! Declares common block KUSE holding K1 and K2
  
 *  Initialise control-C handler
-D       EXTERNAL HANDLER
-D       EXTERNAL CTRLC_AST
-D       INTEGER SYS$ASSIGN, SYS$QIOW
-D       INTEGER CTRLCST
-D       STRUCTURE /IOSTAT_BLOCK/
-D          INTEGER*2 IOSTAT
-D          BYTE TRANSMIT, RECEIVE, CRFILL, LFFILL, PARITY, ZERO
-D       ENDSTRUCTURE
-D       RECORD /IOSTAT_BLOCK/IOSB
-D       INTEGER*2 INPUT_CHAN
-D       INTEGER*4 CTRLCODE
-D       INCLUDE '($IODEF)'
+C       EXTERNAL HANDLER
+C       EXTERNAL CTRLC_AST
+C       INTEGER SYS$ASSIGN, SYS$QIOW
+C       INTEGER CTRLCST
+C       STRUCTURE /IOSTAT_BLOCK/
+C          INTEGER*2 IOSTAT
+C          BYTE TRANSMIT, RECEIVE, CRFILL, LFFILL, PARITY, ZERO
+C       ENDSTRUCTURE
+C       RECORD /IOSTAT_BLOCK/IOSB
+C       INTEGER*2 INPUT_CHAN
+C       INTEGER*4 CTRLCODE
+C       INCLUDE '($IODEF)'
 *
 *   Declare additional scratch areas
 *   (Basic scratch area is defined in INCLUDE block)
@@ -412,14 +412,14 @@ D       INCLUDE '($IODEF)'
 *
 *   Initialise Control-C handler
 *
-D       CALL LIB$ESTABLISH(HANDLER)
-D       CTRLCST = SYS$ASSIGN('SYS$INPUT',INPUT_CHAN,,)
-D       IF( .NOT.CTRLCST) CALL LIB$SIGNAL(%VAL(CTRLCST))
-D       CTRLCODE = IO$_SETMODE .OR. IO$M_CTRLCAST
-D       CTRLCST = SYS$QIOW(,%VAL(INPUT_CHAN),%VAL(CTRLCODE),IOSB,,,
-D    :                      CTRLC_AST,,,,,)
-D       IF( .NOT.CTRLCST) CALL LIB$SIGNAL(%VAL(CTRLCST))
-D       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
+C       CALL LIB$ESTABLISH(HANDLER)
+C       CTRLCST = SYS$ASSIGN('SYS$INPUT',INPUT_CHAN,,)
+C       IF( .NOT.CTRLCST) CALL LIB$SIGNAL(%VAL(CTRLCST))
+C       CTRLCODE = IO$_SETMODE .OR. IO$M_CTRLCAST
+C       CTRLCST = SYS$QIOW(,%VAL(INPUT_CHAN),%VAL(CTRLCODE),IOSB,,,
+C    :                      CTRLC_AST,,,,,)
+C       IF( .NOT.CTRLCST) CALL LIB$SIGNAL(%VAL(CTRLCST))
+C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
 *
 *   Miscellaneous variable initialisations
 *
@@ -6016,12 +6016,12 @@ C ----------------------------------------------------------------
 *   SHELL   Spawn the shell
 *
           ELSE IF( SUBCMD .EQ. 'SHELL' ) THEN
-D           IF( sysname .EQ. 'VMS' ) THEN
-D             CALL DECODE('SHELL',PARAMS,0,0,VARRAY,' ',OK)
-D             IHX = LIB$SPAWN(,,,,,,,,,,'shell>$ ',)
-D           ELSE
+C           IF( sysname .EQ. 'VMS' ) THEN
+C             CALL DECODE('SHELL',PARAMS,0,0,VARRAY,' ',OK)
+C             IHX = LIB$SPAWN(,,,,,,,,,,'shell>$ ',)
+C           ELSE
               CALL SYSEXE( PARAMS, 0, STATUS )
-D           END IF 
+C           END IF 
 *
 *   SL(WR) List (or file) stack entries
 *
@@ -6055,23 +6055,23 @@ D           END IF
                 KP2 = I
              END IF
  2820        CONTINUE
-D             CLOSE (6)
+C             CLOSE (6)
              IX=0
              IF( SUBCMD .EQ. 'SLWR' ) THEN
                 OPEN (UNIT=lunit,FILE='stack.lis',STATUS='NEW',
      :                IOSTAT=IX)
               
-D             ELSE
-D                OPEN (UNIT=6,FILE='TT:',STATUS='NEW',IOSTAT=IX)
+C             ELSE
+C                OPEN (UNIT=6,FILE='TT:',STATUS='NEW',IOSTAT=IX)
              END IF
              IF( IX .NE. 0 ) THEN
                 IF( SUBCMD .EQ. 'SLWR' ) THEN
                    WRITE (*,'(''   SLWR:  unable to open stack.lis'')')
                    CLOSE (lunit)
-D                ELSE
-D                   WRITE (*,
-D    :                  '(''   SL:  unable to open TT as FOR006'')')
-D                   CLOSE (6)
+C                ELSE
+C                   WRITE (*,
+C    :                  '(''   SL:  unable to open TT as FOR006'')')
+C                   CLOSE (6)
                 END IF
                 GO TO 5000
              END IF
