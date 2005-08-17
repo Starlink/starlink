@@ -48,7 +48,7 @@
 *   very strongly suspect that this is voodoo.  It has been added in the
 *   past, however (by AJC in 24-NOV-2002) so presumably there was some
 *   reason for it.
-#if FC_HAVE_KEYWORD_VOLATILE
+#if HAVE_KEYWORD_VOLATILE
 *   It is non portable marking the COMMON block as VOLATILE as well as
 *   the contents. Now simply mark the content as VOLATILE.
       VOLATILE NUM_ERROR
