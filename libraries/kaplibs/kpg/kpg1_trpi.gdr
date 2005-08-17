@@ -165,7 +165,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIMI )
          CALL ERR_REP( 'KPG1_TRPIx_INVDIM',
-     :     'Unable to interpolate an array with '/
+     :     'Unable to find vectorised pixel indices for an array with '/
      :     /'dimensionality of ^NDIM. (Programming error.)', STATUS )
          GOTO 999
       END IF
