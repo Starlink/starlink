@@ -5,30 +5,68 @@ Automake branches
 
 automake tree created by the import of automake-1.8.2, on 2004 January 15.
 
+It is best to edit this file only on the HEAD, as there is no point in
+giving details about a branch in a version of this file which is
+visible only on that branch.
+
+
+FSF
+---
+
+Branch tag common to AUTOMAKE AND AUTOCONF (and m4 and libtool, as it
+happens).
+
+Branch FSF is the `vendor' branch, which new releases of automake and
+autoconf are imported onto, and immediately tagged (at present, there
+are tags autoconf-2-59, automake-1-8-2 and automake-1-9-6 here --
+others should be added after the same pattern).
 
 
 dev-nxg-20040116-add-fpp-support
 --------------------------------
 
-Branch tag applied to automake and autoconf. 
+Branch tag applied to AUTOMAKE AND AUTOCONF.  This is a branch off the
+FSF branch.
 
-The patches for adding FPP support, originally announced by Martin Wilck on
+The patches for adding FPP support, originally announced by Martin
+Wilck on
 <http://sources.redhat.com/ml/autoconf-patches/2000-07/msg00287.html>,
-will be added on this branch, and then merged onto the main
-development branch, with an appropriate merge tag added then.  I'll
-keep this branch, however, and when debugging that support, I'll do
-the fixes on this branch and remerge them.  That way, I keep these
-patches separate from the main ones I'll apply, plus it'll be easy to
-generate a patch to 1.8.2 for eventual submission to the
-automake-patches list.
+have been added on this branch, and subsequently developed.  They have
+been merged onto the main development branch (HEAD) multiple times --
+see below.
 
-Both the autoconf and automake trees on this branch were tagged, as
-autoconf-2-59-fpp1 and automake-1-8-2-fpp1 respectively, on
-2004-January-21.  They were then merged onto the trunk, and the
-branches then tagged with dev-nxg-20040116-add-fpp-support-MERGED
+This branch is semi-permanent: any patches to the FSF distributions
+which we intend to submit back to the autoconf/automake mainlines
+should go on this branch.  At present, this means support for
+preprocessable Fortran and a number of extra Fortran-specific macros
+in autoconf, plus the fairly minimal additional support necessary for
+automake.
 
-Similarly for ...-fpp2, -fpp3, -fpp4.
+At various times, we have identified snapshots of this branch.  These
+should be tagged on this branch, for both autoconf and automake, with
+tags of the form dev-nxg-20040116-add-fpp-support-fpp<n>.  This has
+been done inconsistently in the past, with tags of the form
+autoconf-2-59-fpp4 -- don't do that again, because it's less clear
+that these are snapshots of the dev-nxg-20040116-add-fpp-support branch.
 
+Changes on this branch should be merged from time to time onto the
+HEAD -- the Starlink-specific mainline.  Do that merge with a command
+like the following (in a temporary directory -- NB, these commands
+untested (FIXME)):
+
+  % cvs -d xxx co -jdev-nxg-20040116-add-fpp-support-MERGED \
+        -jdev-nxg-20040116-add-fpp-support thirdparty/fsf/autoconf
+  % cvs -d xxx rtag -F -rdev-nxg-20040116-add-fpp-support \
+        dev-nxg-20040116-add-fpp-support-MERGED thirdparty/fsf/autoconf
+
+Then cd to thirdparty/fsf/autoconf, resolve any conflicts, and commit
+the result.  Before doing the commit, you can verify that you will
+commit to the HEAD by doing 'cvs status -v configure.ac' (for
+example), and verifying that the `Sticky Tag' is `(none)'.  Do the
+analogous operation for automake at the same time.  The ...-MERGED tag
+logs that you have done this, makes a command like this possible the
+next time, and makes it clear which edits should and should not be
+expected to be visible on the mainline.
 
 
 DEV-nxg-20040720-special-install
