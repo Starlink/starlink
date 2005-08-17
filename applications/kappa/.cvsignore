@@ -4,10 +4,12 @@ adamMessageRelay
 all.f
 kappa.csh
 kappa.icl
+kappa.sh
 *.shl
 lutedit.tcl
 multiplot.csh
 stardemo.tcl
+kappa_link_adam
 core.*
 kappa.ifd
 kappa_mon
@@ -17,6 +19,7 @@ kapview_mon.f
 ndfpack_mon
 ndfpack_mon.f
 sun221.ps
+sun221.dvi
 version.dat
 *.ifc
 *.ifl
@@ -48,4 +51,8 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
+KAP_ERR
+fac_*_err
+kap_err.h
+make.log.err
 
