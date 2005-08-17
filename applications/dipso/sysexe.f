@@ -54,7 +54,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL SYSTEM
       INTEGER SYSTEM             ! Fortran RTL routine
       INTEGER CHR_LEN            ! Returns used length of a string
 
