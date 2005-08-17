@@ -36,6 +36,7 @@
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+      INTEGER IARGC
 
 *.
       CCD1_IARGC = IARGC()
