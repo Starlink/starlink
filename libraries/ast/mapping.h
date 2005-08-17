@@ -192,6 +192,10 @@
 *           Use sinc(pi*x)*exp(-k*x*x) interpolation.
 *        AST__SINCSINC
 *           Use sinc(pi*x)*sinc(k*pi*x) interpolation.
+*        AST__SOMB
+*           Use somb(pi*x) interpolation.
+*        AST__SOMBCOS
+*           Use somb(pi*x)*cos(k*pi*x) interpolation.
 *        AST__UINTERP
 *           Use general user-defined sub-pixel interpolation algorithm.
 *        AST__UKERN1
@@ -309,6 +313,8 @@
 #define AST__SINCGAUSS (9)       /* sinc(pi*x)*exp(-k*x*x) interpolation */
 #define AST__BLOCKAVE (10)       /* Block averaging interpolation */
 #define AST__GAUSS (11)          /* exp(-k*x*x) spreading */
+#define AST__SOMB (12)           /* somp(pi*x) interpolation */
+#define AST__SOMBCOS (13)        /* somp(pi*x)*cos(k*pi*x) interpolation */
 
 /* Type Definitions. */
 /* ================= */

@@ -151,6 +151,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Make MapSplit public rather than protected.
 *     11-AUG-2005 (DSB):
 *        Added the AST__CONSERVEFLUX flag (used by astResampleX).
+*     17-AUG-2005 (DSB):
+*        Added the AST__SOMBCOS kernel.
 *class--
 */
 
@@ -284,6 +286,7 @@ static PN *InterpPN( int, double *, double * );
 static const char *GetAttrib( AstObject *, const char * );
 static double EvaluateDPN( PN *, double );
 static double EvaluatePN( PN *, double );
+static double J1Bessel( double );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
 static double MatrixDet( int, const double * );
@@ -399,6 +402,8 @@ static void Sinc( double, const double [], int, double * );
 static void SincCos( double, const double [], int, double * );
 static void SincGauss( double, const double [], int, double * );
 static void SincSinc( double, const double [], int, double * );
+static void Somb( double, const double [], int, double * );
+static void SombCos( double, const double [], int, double * );
 static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, double * );
 static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, double *);
 static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, double * );
@@ -5822,6 +5827,96 @@ f        The global status.
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
 }
 
+static double J1Bessel( double x ) {
+/*
+*  Name:
+*     J1Bessel
+
+*  Purpose:
+*     Calculates the first-order Bessel function of the first kind.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double J1Bessel( double x )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of the first-order Bessel function
+*     of the first kind.
+
+*  Parameters:
+*     x
+*        The argument for J1.
+
+*  Returned Value:
+*     The calculated J1(x) value.
+
+*  Notes:
+*     - The algorithm is taken from the SCUBA routine SCULIB_BESSJ1, by 
+*     J.Lightfoot.
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   static double p1 = 1.0;
+   static double p2 = 0.183105E-2;
+   static double p3 = -0.3516396496E-4;
+   static double p4 = 0.2457520174E-5;
+   static double p5 = -0.240337019E-6;
+
+   static double q1 = 0.04687499995;
+   static double q2 = -0.2002690873E-3;
+   static double q3 = 0.8449199096E-5;
+   static double q4 = -0.88228987E-6;
+   static double q5 = 0.105787412E-6;
+
+   static double r1 = 72362614232.0;
+   static double r2 = -7895059235.0;
+   static double r3 = 242396853.1;
+   static double r4 = -2972611.439;
+   static double r5 = 15704.48260;
+   static double r6 = -30.16036606;
+
+   static double s1 = 144725228442.0;
+   static double s2 = 2300535178.0;
+   static double s3 = 18583304.74;
+   static double s4 = 99447.43394;
+   static double s5 = 376.9991397;
+   static double s6 = 1.0;
+
+   double ax;
+   double xx;
+   double z;
+   double y;
+   double value;
+   int s;
+
+/* Calculate the value */
+   ax = fabs( x );
+   if( ax < 8.0 ) {
+      y = x*x;
+      value = x*( r1 + y*( r2 + y*( r3 + y*( r4 + y*( r5 + y*r6 ) ) ) ) ) /
+                       ( s1 + y*( s2 + y*( s3 + y*( s4 + y*( s5 + y*s6 ) ) ) ) );
+   } else {
+      s = ( x >= 0.0 ) ? 1 : -1;
+      z = 8.0 / ax;
+      y = z*z;
+      xx = ax - 2.356194491;
+      value = sqrt ( 0.636619772/ax )*( cos( xx )*( p1 + y*( p2 + y*
+        ( p3 + y*( p4 + y*p5 ) ) ) )-z*sin( xx )*( q1 + y*( q2 + y*( q3 + y*
+        ( q4 + y*q5 ) ) ) ) )*s;
+   }
+
+   return value;
+
+}
+
 static int LinearApprox( AstMapping *this, const double *lbnd, 
                          const double *ubnd, double tol, double *fit ) {
 /*
@@ -8419,6 +8514,7 @@ f     FSPREAD and PARAMS arguments:
 *     - AST__SINCSINC
 *     - AST__SINCCOS
 *     - AST__SINCGAUSS
+*     - AST__SOMBCOS
 *
 *     In addition, the following schemes can be used with 
 f     AST_REBIN<X> but not with AST_RESAMPLE<X>:
@@ -9798,6 +9894,8 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
          case AST__SINCGAUSS:
          case AST__GAUSS:
          case AST__SINCSINC:
+         case AST__SOMB:
+         case AST__SOMBCOS:
 
 /* Obtain a pointer to the appropriate 1-d kernel function (either
    internal or user-defined) and set up any parameters it may
@@ -9810,6 +9908,21 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Assign the kernel function. */
                case AST__SINC:
                   kernel = Sinc;
+
+/* Calculate the number of neighbouring pixels to use. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) {
+                     neighb = 2;
+                  } else {
+                     neighb = MaxI( 1, neighb );
+                  }
+                  break;
+
+/* somb(pi*x) */
+/* ---------- */
+/* Assign the kernel function. */
+               case AST__SOMB:
+                  kernel = Somb;
 
 /* Calculate the number of neighbouring pixels to use. */
                   neighb = (int) floor( params[ 0 ] + 0.5 );
@@ -9886,6 +9999,28 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                   neighb = (int) floor( params[ 0 ] + 0.5 );
                   if ( neighb <= 0 ) neighb = (int) ceil( sqrt( -log( 0.01 ) /
                                                                 lpar[ 0 ] ) );
+                  break;
+
+/* somb(pi*x)*cos(k*pi*x) */
+/* ---------------------- */
+/* Assign the kernel function. */
+               case AST__SOMBCOS:
+                  kernel = SombCos;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
                   break;
 
 /* sinc(pi*x)*sinc(k*pi*x) */
@@ -11076,6 +11211,15 @@ c     envelope function, given by "params[1]", to the point spread function
 f     envelope function, given by PARAMS(2), to the point spread function
 *     of the input data. However, there does not seem to be any theoretical
 *     reason for this.
+*     - AST__SOMB: This scheme uses a somb(pi*x) kernel (a "sombrero"
+*     function), where x is the pixel offset from the interpolation point 
+*     and somb(z)=2*J1(z)/z  (J1 is a Bessel function of the first kind of
+*     order 1). It is similar to the AST__SINC kernel, and has the same 
+*     parameter usage.
+*     - AST__SOMBCOS: This scheme uses a kernel of the form 
+*     somb(pi*x).cos(k*pi*x), with k a constant, out to the point where
+*     cos(k*pi*x) goes to zero, and zero beyond. It is similar to the 
+*     AST__SINCCOS kernel, and has the same parameter usage.
 *
 *     In addition, the following schemes are provided which are not based
 *     on a 1-dimensional kernel:
@@ -12609,6 +12753,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
          case AST__SINCCOS:
          case AST__SINCGAUSS:
          case AST__SINCSINC:
+         case AST__SOMB:
+         case AST__SOMBCOS:
          case AST__UKERN1:       /* User-supplied 1-d kernel function */
 
 /* Obtain a pointer to the appropriate 1-d kernel function (either
@@ -12637,6 +12783,43 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Assign the kernel function. */
                case AST__SINCCOS:
                   kernel = SincCos;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                  break;
+
+/* somb(pi*x) interpolation. */
+/* ------------------------- */
+/* Assign the kernel function. */
+               case AST__SOMB:
+                  kernel = Somb;
+
+/* Calculate the number of neighbouring pixels to use. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) {
+                     neighb = 2;
+                  } else {
+                     neighb = MaxI( 1, neighb );
+                  }
+                  break;
+
+/* somb(pi*x)*cos(k*pi*x) interpolation. */
+/* ------------------------------------- */
+/* Assign the kernel function. */
+               case AST__SOMBCOS:
+                  kernel = SombCos;
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
@@ -13830,6 +14013,142 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Return the result. */
    return result;   
+}
+
+static void Somb( double offset, const double params[], int flags,
+                  double *value ) {
+/*
+*  Name:
+*     Somb
+
+*  Purpose:
+*     1-dimensional somb(pi*x) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void Somb( double offset, const double params[], int flags,
+*                double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is somb(pi*x), where
+*     somb(z)=2*J1(z)/z  (J1 is a Bessel function of the first kind of
+*     order 1). 
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        Not used.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise a local value for pi. Do this
+   only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      init = 1;
+   }
+
+/* Scale the offset. */
+   offset *= pi;
+
+/* Evaluate the function. */
+   *value = ( offset != 0.0 ) ? ( 2.0*J1Bessel( offset ) / offset ) : 1.0;
+}
+
+static void SombCos( double offset, const double params[], int flags,
+                     double *value ) {
+/*
+*  Name:
+*     SombCos
+
+*  Purpose:
+*     1-dimensional somb(pi*x)*cos(k*pi*x) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SombCos( double offset, const double params[], int flags,
+*                   double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is somb(pi*x)*cos(k*pi*x)
+*     out to the point where cos(k*pi*x) = 0, and zero beyond. Here,
+*     somb(z)=2*J1(z)/z  (J1 is a Bessel function of the first kind of
+*     order 1). 
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        The first element of this array should give a value for "k"
+*        in the cos(k*pi*x) term.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   double offset_k;              /* Scaled offset */
+   static double halfpi;         /* Value of pi/2 */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise local values for pi and
+   pi/2. Do this only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      halfpi = 0.5 * pi;
+      init = 1;
+   }
+
+/* Multiply the offset by pi and remove its sign. */
+   offset = pi * fabs( offset );
+
+/* Find the offset scaled by the "k" factor. */
+   offset_k = offset * params[ 0 ];
+
+/* If the cos(k*pi*x) term has not reached zero, calculate the
+   result. */
+   if ( offset_k < halfpi ) {
+      *value = ( ( offset != 0.0 ) ? ( J1Bessel( offset ) / offset ) : 1.0 ) *
+               cos( offset_k );
+
+/* Otherwise, the result is zero. */
+   } else {
+      *value = 0.0;
+   }
 }
 
 static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
