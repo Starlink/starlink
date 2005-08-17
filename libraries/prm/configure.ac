@@ -46,23 +46,8 @@ dnl    Check for SIND as proxy for the other trig functions which take
 dnl    degree arguments, and IZEXT as proxy for related VMS intrinsics.
 AC_FC_CHECK_INTRINSICS([izext nint anint sind])
 
-
-
 dnl    Determine whether the Fortran compiler supports the VOLATILE keyword
-AC_LANG_PUSH([Fortran])
-AC_CACHE_CHECK([whether ${FC} supports VOLATILE],
-               [ac_cv_fc_has_volatile],
-               [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
-      INTEGER X
-      VOLATILE X
-])],
-                                  ac_cv_fc_has_volatile=yes,
-                                  ac_cv_fc_has_volatile=no)])
-if test $ac_cv_fc_has_volatile = yes; then
-    AC_DEFINE([FC_HAVE_KEYWORD_VOLATILE], 1,
-              [Define as 1 if the Fortran compiler supports the VOLATILE keyword])
-fi
-
+AC_FC_HAVE_VOLATILE
 
 dnl    Determine whether the Fortran compiler supports the 'xxx'X notation
 dnl    for integers and reals.  The notation Z"xxx" is the one blessed
@@ -73,38 +58,12 @@ dnl    rather than typeless), and (c) in any case ISO-1539 states
 dnl    that these boz-constants can appear only in DATA statements.
 dnl    If we can't use the 'xxx'X notation, we're therefore better
 dnl    off sticking to ordinary decimal notation.
-AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
-   [ac_cv_fc_have_hex_numbers],
-   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
-      INTEGER I
-      PARAMETER ( I = 'FF'X )
-])],
-        ac_cv_fc_have_hex_numbers=yes,
-        ac_cv_fc_have_hex_numbers=no)])
-if test $ac_cv_fc_have_hex_numbers = yes; then
-    AC_DEFINE([FC_HAVE_HEX_NUMBERS], 1,
-              [Define as 1 if the Fortran compiler supports 'xxx'X numbers])
-fi
+AC_FC_HAVE_OLD_TYPELESS_BOZ()
 
 dnl    Except some compilers (g95) only support the X'xxx' form, but
 dnl    also don't allow integer contants to overflow, so decimal notation
 dnl    fails (for the unsigned types). So test for this and apply changes.
-dnl    Note it does allow typeless boz for floating points too, so make 
-dnl    that part of the test.
-AC_CACHE_CHECK([whether ${FC} supports F95 hex notation for all numbers],
-   [ac_cv_fc_have_f95_hex_numbers],
-   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
-      INTEGER I
-      PARAMETER ( I = X'FF' )
-      DOUBLE PRECISION D
-      PARAMETER ( D = X'FFEFFFFFFFFFFFFF' )
-])],
-        ac_cv_fc_have_f95_hex_numbers=yes,
-        ac_cv_fc_have_f95_hex_numbers=no)])
-if test $ac_cv_fc_have_f95_hex_numbers = yes; then
-    AC_DEFINE([FC_HAVE_F95_HEX_NUMBERS], 1,
-              [Define as 1 if the Fortran compiler supports X'xxx' numbers])
-fi
+AC_FC_HAVE_TYPELESS_BOZ()
 
 dnl    Determine whether the Fortran compiler supports the type-kind
 dnl    parameter notation (eg, I=1_4), as described in ISO-1539
@@ -112,6 +71,8 @@ dnl    section 4.3.1.  Unfortunately, the standard doesn't specify
 dnl    what these parameters are, other than that they are as
 dnl    returned by the KIND intrinsic function.  We'll test for _8 for
 dnl    integers, however, since that's the one we want to use.
+dnl    PWD: note in passing, this test always fails as it does not use
+dnl    Fortran, might be just as well.
 AC_CACHE_CHECK([whether ${FC} supports type-kind notation],
    [ac_cv_fc_type_kind],
    [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
