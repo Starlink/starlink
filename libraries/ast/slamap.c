@@ -76,6 +76,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Added HEEQ and EQHE conversion functions.
 *     2-DEC-2004 (DSB):
 *        - Added J2000H and HJ2000 conversion functions.
+*     15-AUG-2005 (DSB):
+*        - Added H2E and E2H conversion functions.
 *class--
 */
 
@@ -112,6 +114,10 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define AST__EQHE       22       /* Equatorial to helio-ecliptic */
 #define AST__J2000H     23       /* Dynamical J2000 to ICRS */
 #define AST__HJ2000     24       /* ICRS to dynamical J2000 */
+#define AST__SLA_DH2E   25       /* Horizon to equatorial coordinates */
+#define AST__SLA_DE2H   26       /* Equatorial coordinates to horizon */
+#define AST__R2H        27       /* RA to hour angle */
+#define AST__H2R        28       /* Hour to RA angle */
 
 /* Maximum number of arguments required by an SLALIB conversion. */
 #define MAX_SLA_ARGS 4
@@ -316,6 +322,14 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 *           Convert dynamical J2000 to ICRS.
 *        AST__HJ2000( )
 *           Convert ICRS to dynamical J2000.
+*        AST__SLA_DH2E( LAT )
+*           Convert horizon to equatorial coordinates
+*        AST__SLA_DE2H( LAT )
+*           Convert equatorial to horizon coordinates
+*        AST__R2H( LAST )
+*           Convert RA to Hour Angle.
+*        AST__H2R( LAST )
+*           Convert Hour Angle to RA.
 
 *  Notes:
 *     - The specified conversion is appended only if the SlaMap's
@@ -495,6 +509,18 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "HJ2000" ) ) {
       result = AST__HJ2000;
+
+   } else if ( astChrMatch( cvt_string, "H2E" ) ) {
+      result = AST__SLA_DH2E;
+
+   } else if ( astChrMatch( cvt_string, "E2H" ) ) {
+      result = AST__SLA_DE2H;
+
+   } else if ( astChrMatch( cvt_string, "R2H" ) ) {
+      result = AST__R2H;
+
+   } else if ( astChrMatch( cvt_string, "H2R" ) ) {
+      result = AST__H2R;
 
    }
 
@@ -746,6 +772,34 @@ static const char *CvtString( int cvt_code, const char **comment,
       result = "HJ2000";
       *comment = "ICRS to J2000 equatorial (dynamical)";
       *nargs = 0;
+      break;
+
+   case AST__SLA_DH2E:
+      result = "H2E";
+      *comment = "Horizon to equatorial";
+      *nargs = 1;
+      arg[ 0 ] = "Geodetic latitude of observer";
+      break;
+
+   case AST__SLA_DE2H:
+      result = "E2H";
+      *comment = "Equatorial to horizon";
+      *nargs = 1;
+      arg[ 0 ] = "Geodetic latitude of observer";
+      break;
+
+   case AST__R2H:
+      result = "R2H";
+      *comment = "RA to Hour Angle";
+      *nargs = 1;
+      arg[ 0 ] = "Local apparent sidereal time (radians)";
+      break;
+
+   case AST__H2R:
+      result = "H2R";
+      *comment = "Hour Angle to RA";
+      *nargs = 1;
+      arg[ 0 ] = "Local apparent sidereal time (radians)";
       break;
 
    }
@@ -2316,6 +2370,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_ECLEQ, AST__SLA_EQECL )
 
+/* Horizon to equatorial. */
+/* ---------------------- */
+/* Exchange the transformation code for its inverse. */
+               SWAP_CODES( AST__SLA_DH2E, AST__SLA_DE2H )
+
 /* Galactic coordinates to FK5 J2000.0 equatorial. */
 /* ------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
@@ -2350,6 +2409,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* -------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__J2000H, AST__HJ2000 )
+
+/* HA to RA */
+/* -------- */
+/* Exchange the transformation code for its inverse. */
+               SWAP_CODES( AST__H2R, AST__R2H )
 
             }
 
@@ -2467,6 +2531,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   istep++;
                   keep = 0;
 
+/* Eliminate redundant AzEl coordinate conversions. */
+/* ------------------------------------------------ */
+               } else if ( ( PAIR_CVT( AST__SLA_DH2E, AST__SLA_DE2H ) ||
+                             PAIR_CVT( AST__SLA_DE2H, AST__SLA_DH2E ) ) &&
+                           EQUAL( cvtargs[ istep ][ 0 ],
+                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
+                  istep++;
+                  keep = 0;
+
 /* Eliminate redundant galactic coordinate conversions. */
 /* ---------------------------------------------------- */
 /* This is handled as above, except that there are no arguments to
@@ -2527,6 +2600,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ----------------------------------------------------------- */
                } else if ( PAIR_CVT( AST__J2000H, AST__HJ2000 ) ||
                            PAIR_CVT( AST__HJ2000, AST__J2000H ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Eliminate redundant Hour Angle conversions. */
+/* ------------------------------------------- */
+               } else if ( ( PAIR_CVT( AST__R2H, AST__H2R ) ||
+                             PAIR_CVT( AST__H2R, AST__R2H ) ) &&
+                           EQUAL( cvtargs[ istep ][ 0 ],
+                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -2775,6 +2857,10 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "SUPGAL": Convert supergalactic coordinates to galactic.
 *     - "J2000H": Convert dynamical J2000.0 to ICRS.
 *     - "HJ2000": Convert ICRS to dynamical J2000.0.
+*     - "H2E" (LAT): Convert horizon coordinates to equatorial.
+*     - "E2H" (LAT): Convert equatorial coordinates to horizon.
+*     - "R2H" (LAST): Convert RA to Hour Angle.
+*     - "H2R" (LAST): Convert Hour Angle to RA.
 *
 *     For example, to use the "ADDET" conversion, which takes a single
 *     argument EQ, you should consult the documentation for the SLALIB
@@ -3331,6 +3417,41 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 	       }
                break;
 
+/* Convert horizon to equatorial. */
+/* ------------------------------ */
+/* Apply the conversion to each point. */
+	    case AST__SLA_DH2E:
+               if ( forward ) {
+                  TRAN_ARRAY(slaDh2e( alpha[ point ], delta[ point ],
+                                      args[ 0 ],
+                                      alpha + point, delta + point );)
+
+/* The inverse simply uses the inverse SLALIB function. */
+	       } else {
+                  TRAN_ARRAY(slaDe2h( alpha[ point ], delta[ point ],
+                                      args[ 0 ],
+                                      alpha + point, delta + point );)
+	       }
+               break;
+
+/* Convert equatorial to horizon. */
+/* ------------------------------ */
+/* This is the same as above, but with the forward and inverse cases
+   transposed. */
+	    case AST__SLA_DE2H:
+               if ( forward ) {
+                  TRAN_ARRAY(slaDe2h( alpha[ point ], delta[ point ],
+                                      args[ 0 ],
+                                      alpha + point, delta + point );)
+
+/* The inverse simply uses the inverse SLALIB function. */
+	       } else {
+                  TRAN_ARRAY(slaDh2e( alpha[ point ], delta[ point ],
+                                      args[ 0 ],
+                                      alpha + point, delta + point );)
+	       }
+               break;
+
 /* Convert galactic coordinates to J2000.0 equatorial. */
 /* --------------------------------------------------- */
 /* Apply the conversion to each point. */
@@ -3500,6 +3621,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ---------------------------------- */
 	    case AST__HJ2000:
                J2000H( !(forward), npoint, alpha, delta );
+               break;
+
+/* Convert HA to RA, or RA to HA */
+/* ----------------------------- */
+/* The forward and inverse transformations are the same. */
+	    case AST__H2R:
+	    case AST__R2H:
+               TRAN_ARRAY( alpha[ point ] = args[ 0 ] - alpha[ point ]; )
                break;
 
          }

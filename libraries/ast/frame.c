@@ -11003,13 +11003,17 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        The SkyFrame class supports the following System values and
 *        associated celestial coordinate systems:
 *
-*        - "ICRS": The Internation Celestial Reference System, realised
-*        through the Hipparcos catalogue. Whilst not an equatorial system
-*        by definition, the ICRS is very close to the FK5 (J2000) system
-*        and is usually treated as an equatorial system. The distinction
-*        between ICRS and FK5 (J2000) only becomes important when accuracies
-*        of 50 milli-arcseconds or better are required. ICRS need not be
-*        qualified by an Equinox value.
+*        - "AZEL": Horizon coordinates. The longitude axis is azimuth
+*        such that geographic north has an azimuth of zero and geographic 
+*        east has an azimuth of +PI/2 radians. The zenith has elevation
+*        +PI/2. When converting to and from other celestial coordinate 
+*        systems, no corrections are applied for atmospheric refraction,
+*        diurnal aberattion or polar motion. Note, unlike most other
+*        celestial coordinate systems, this system is right handed.
+*
+*        - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
+*        ecliptic and mean equinox specified by the qualifying Equinox
+*        value.
 *
 *        - "FK4": The old FK4 (barycentric) equatorial coordinate system,
 *        which should be qualified by an Equinox value. The underlying
@@ -11025,12 +11029,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        - "FK5" or "EQUATORIAL": The modern FK5 (barycentric) equatorial
 *        coordinate system. This should be qualified by an Equinox value.
 *
-*        - "J2000": An equatorial coordinate system based on the mean
-*        dynamical equator and equinox of the J2000 epoch. The dynamical
-*        equator and equinox differ slightly from those used by the FK5
-*        model, and so a "J2000" SkyFrame will differ slightly from an
-*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be 
-*        qualified by an Equinox value
+*        - "GALACTIC": Galactic coordinates (IAU 1958).
 *
 *        - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
 *        equatorial coordinate system, which gives the apparent positions
@@ -11053,10 +11052,6 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        (larger), and the precession and nutation of the Earth's spin
 *        axis (normally larger still).
 *
-*        - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
-*        ecliptic and mean equinox specified by the qualifying Equinox
-*        value.
-*
 *        - "HELIOECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
 *        ecliptic and mean equinox of J2000.0, in which an offset is added to
 *        the longitude value which results in the centre of the sun being at 
@@ -11064,7 +11059,20 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        set a value for the Equinox attribute will be ignored, since this 
 *        system is always referred to J2000.0.
 *
-*        - "GALACTIC": Galactic coordinates (IAU 1958).
+*        - "ICRS": The Internation Celestial Reference System, realised
+*        through the Hipparcos catalogue. Whilst not an equatorial system
+*        by definition, the ICRS is very close to the FK5 (J2000) system
+*        and is usually treated as an equatorial system. The distinction
+*        between ICRS and FK5 (J2000) only becomes important when accuracies
+*        of 50 milli-arcseconds or better are required. ICRS need not be
+*        qualified by an Equinox value.
+*
+*        - "J2000": An equatorial coordinate system based on the mean
+*        dynamical equator and equinox of the J2000 epoch. The dynamical
+*        equator and equinox differ slightly from those used by the FK5
+*        model, and so a "J2000" SkyFrame will differ slightly from an
+*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be 
+*        qualified by an Equinox value
 *
 *        - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.
 *

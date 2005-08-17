@@ -131,6 +131,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Allow SkyRefIs to be set to "Ignored".
 *     12-MAY-2005 (DSB):
 *        Override astNormBox method.
+*     15-AUG-2005 (DSB):
+*        Added AZEL system.
 *class--
 */
 
@@ -143,7 +145,7 @@ f     The SkyFrame class does not define any new routines beyond those
 
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FK4
-#define LAST_SYSTEM AST__UNKNOWN
+#define LAST_SYSTEM AST__AZEL
 
 /* Define values for the different values of the SkyRefIs attribute. */
 #define BAD_REF 0
@@ -524,6 +526,7 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include "permmap.h"             /* Coordinate permutations */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "slamap.h"              /* SLALIB sky coordinate Mappings */
+#include "timemap.h"             /* Time conversions */
 #include "skyaxis.h"             /* Sky axes */
 #include "frame.h"               /* Parent Frame class */
 #include "matrixmap.h"           /* Matrix multiplication */
@@ -631,6 +634,7 @@ static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *SystemString( AstFrame *, AstSystemType );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
+static double CalcLast( double, double );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetBottom( AstFrame *, int );
@@ -825,6 +829,69 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static double CalcLast( double epoch, double lon ) {
+/*
+*  Name:
+*     CalcLast
+
+*  Purpose:
+*     Calculate the Local Apparent Sidereal Time at a given epoch and
+*     longitude.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double CalcLast( double epoch, double lon ) 
+
+*  Class Membership:
+*     SkyFrame member function 
+
+*  Description:
+*     This function calculates the Local Apparent Sidereal Time at a given
+*     epoch and longitude.
+
+*  Parameters:
+*     epoch
+*        TDB (as a Modified Julian Date).
+*     lon
+*        The geodetic (or, equivalently, geocentric) longitude of the
+*        observer in radians, positive east.
+
+*  Returned Value:
+*     The Local Apparent Sidereal Time in radians.
+*/
+
+/* Local Variables; */
+   double gmst;
+   double result;                
+   double tai;  
+   double utc;
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* We assume that TDB is a close approximation to TT. Convert TT to TAI. */
+   tai = epoch - 32.184/86400.0;
+
+/* Convert TAI to UTC (i.e. include leap seconds). */
+   utc = tai + astDat( tai, 0 )/86400.0;
+
+/* Compute the Greenwich mean sidereal time. Currently, we ignore the 
+   difference between UT1 and UTC. This can be up to a second, corresponding 
+   to 15 arc-seconds. We may need to do something about this later (like 
+   having an attribute to specify the DUT value). */
+   gmst = slaGmst( utc );
+
+/* Add on the east longitude and the equation of equinoxes (no correction
+   is done for polar motion), and return the answer. */
+   return gmst + lon + slaEqeqx( epoch );
 }
 
 static void ClearAsTime( AstSkyFrame *this, int axis ) {
@@ -2289,6 +2356,11 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 	    result = ( axis_p == 0 ) ? "Helio-ecliptic longitude" :
                                        "Helio-ecliptic latitude";
 
+/* AzEl coordinates. */
+         } else if ( system == AST__AZEL ) {
+	    result = ( axis_p == 0 ) ? "Azimuth" :
+                                       "Elevation";
+
 /* Galactic coordinates. */
          } else if ( system == AST__GALACTIC ) {
 	    result = ( axis_p == 0 ) ? "Galactic longitude" :
@@ -2604,6 +2676,10 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
          } else if ( system == AST__HELIOECLIPTIC ) {
 	    result = ( axis_p == 0 ) ? "Lambda" : "Beta";
 
+/* AzEl coordinates. */
+         } else if ( system == AST__AZEL ) {
+	    result = ( axis_p == 0 ) ? "Az" : "El";
+
 /* Galactic coordinates. */
          } else if ( system == AST__GALACTIC ) {
 	    result = ( axis_p == 0 ) ? "l" : "b";
@@ -2909,7 +2985,13 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "ICRS %s", word );
 	    break;
 
-/* Geocentrc apparent equatorial coordinates. */
+/* AzEl coordinates. */
+/* ----------------- */
+	 case AST__AZEL:
+	    pos = sprintf( buff, "Horizon (Azimuth/Elevation) %s", word );
+	    break;
+
+/* Geocentric apparent equatorial coordinates. */
 /* ------------------------------------------ */
 /* Display only the Epoch value. */
 	 case AST__GAPPT:
@@ -3971,6 +4053,9 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    double equinox;               /* Equinox as Modified Julian Date */
    double equinox_B;             /* Besselian equinox as decimal years */
    double equinox_J;             /* Julian equinox as decimal years */
+   double last;                  /* Local Apparent Sidereal Time */
+   double lat;                   /* Observers latitude */
+   double lon;                   /* Observers longitude */
    double result_epoch;          /* Result frame Epoch */
    double result_equinox;        /* Result frame Epoch */
    double target_epoch;          /* Target frame Epoch */
@@ -4112,6 +4197,8 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    system = target_system;
    equinox = target_equinox;
    epoch = target_epoch;
+   lon = astGetObsLon( target );
+   lat = astGetObsLat( target );
    if( astOK && step1 ) {
 
 /* Convert the equinox and epoch values (stored as Modified Julian
@@ -4208,6 +4295,17 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( system == AST__SUPERGALACTIC ) {
          TRANSFORM_0( "SUPGAL" )
          TRANSFORM_0( "GALEQ" )
+
+/* From AzEl. */
+/* ---------- */
+/* Rotate from horizon to equator (H2E), shift hour angle into RA (H2R),
+   go from geocentric apparent to FK5 J2000. */
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
+         last = CalcLast( epoch, lon );
+         TRANSFORM_1( "H2E", lat )
+         TRANSFORM_1( "H2R", last )
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
 
 /* From unknown coordinates. */
 /* ------------------------- */
@@ -4308,6 +4406,17 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
          TRANSFORM_0( "EQGAL" )
          TRANSFORM_0( "GALSUP" )
 
+/* Align in AzEl coordinates. */
+/* -------------------------- */
+/* Go from FK5 J2000 to geocentric apparent (MAP), shift RA into hour angle
+   (R2H), rotate from equator to horizon (E2H). */
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
+         last = CalcLast( epoch, lon );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
+         TRANSFORM_1( "R2H", last )
+         TRANSFORM_1( "E2H", lat )
+
 /* Align in unknown coordinates. */
 /* ------------------------------- */
 /* No conversion is possible. */
@@ -4327,6 +4436,8 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    system = result_system;
    equinox = result_equinox;
    epoch = result_epoch;
+   lon = astGetObsLon( result );
+   lat = astGetObsLat( result );
 
 /* Convert the equinox and epoch values (stored as Modified Julian
    Dates) into the equivalent Besselian and Julian epochs (as decimal
@@ -4428,6 +4539,17 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
          TRANSFORM_0( "SUPGAL" )
          TRANSFORM_0( "GALEQ" )
 
+/* From AzEl. */
+/* ---------- */
+/* Rotate from horizon to equator (H2E), shift hour angle into RA (H2R),
+   go from geocentric apparent to FK5 J2000. */
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
+         last = CalcLast( epoch, lon );
+         TRANSFORM_1( "H2E", lat )
+         TRANSFORM_1( "H2R", last )
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
+
 /* From unknown coordinates. */
 /* ------------------------------- */
 /* No conversion is possible. */
@@ -4526,6 +4648,17 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( system == AST__SUPERGALACTIC ) {
          TRANSFORM_0( "EQGAL" )
          TRANSFORM_0( "GALSUP" )
+
+/* To AzEl */
+/* ------- */
+/* Go from FK5 J2000 to geocentric apparent (MAP), shift RA into hour angle
+   (R2H), rotate from equator to horizon (E2H). */
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
+         last = CalcLast( epoch, lon );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
+         TRANSFORM_1( "R2H", last )
+         TRANSFORM_1( "E2H", lat )
 
 /* To unknown coordinates. */
 /* ----------------------------- */
@@ -7347,6 +7480,9 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
    } else if ( astChrMatch( "ICRS", system ) ) {
       result = AST__ICRS;
 
+   } else if ( astChrMatch( "AZEL", system ) ) {
+      result = AST__AZEL;
+
    } else if ( astChrMatch( "GAPPT", system ) ||
                astChrMatch( "GEOCENTRIC", system ) ||
                astChrMatch( "APPARENT", system ) ) {
@@ -7449,6 +7585,10 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
    case AST__GAPPT:
       result = "GAPPT";
+      break;
+
+   case AST__AZEL:
+      result = "AZEL";
       break;
 
    case AST__ECLIPTIC:
@@ -7998,6 +8138,16 @@ static void VerifyMSMAttrs( AstSkyFrame *target, AstSkyFrame *result,
                      set1 = astTestEpoch( target );
                      set2 = astTestEpoch( result );
                      desc = "epoch of observation";
+
+                  } else if( !strncmp( "ObsLon", a, len ) ) {
+                     set1 = astTestObsLon( target );
+                     set2 = astTestObsLon( result );
+                     desc = "longitude of observer";
+
+                  } else if( !strncmp( "ObsLat", a, len ) ) {
+                     set1 = astTestObsLat( target );
+                     set2 = astTestObsLat( result );
+                     desc = "latitude of observer";
 
                   } else {
                      astError( AST__INTER, "VerifyMSMAttrs(SkyFrame): "

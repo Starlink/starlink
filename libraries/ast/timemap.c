@@ -171,7 +171,6 @@ AstTimeMap *astTimeMapId_( int, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ] );
-static double Dat( double, int );
 static double Gmsta( double, double, int );
 static double Rate( AstMapping *, double *, int, int );
 static double Rcc( double, double, double, double, double );
@@ -907,8 +906,9 @@ static const char *CvtString( int cvt_code, const char **comment,
    return result;
 }
 
-static double Dat( double in, int forward ){
+double astDat_( double in, int forward ){
 /*
+*+
 *  Name:
 *     Dat
 
@@ -916,11 +916,11 @@ static double Dat( double in, int forward ){
 *     Convert between UTC and TAI.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "timemap.h"
-*     double Dat( double in, int forward )
+*     double astDat( double in, int forward )
 
 *  Class Membership:
 *     TimeMap member function 
@@ -962,6 +962,7 @@ static double Dat( double in, int forward ){
 *     announced
 *     - Latest leap second:  1999 January 1
 
+*-
 */
 
 /* Local Variables: */
@@ -3545,14 +3546,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += Dat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] + 
                                               args[ 0 ], 0 )/SPD;
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += Dat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] + 
                                               args[ 0 ], 1 )/SPD;
                      }
                   }
@@ -3565,14 +3566,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += Dat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] + 
                                               args[ 0 ], 1 )/SPD;
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += Dat( time[ point ] + 
+                        time[ point ] += astDat( time[ point ] + 
                                               args[ 0 ], 0 )/SPD;
                      }
                   }
@@ -3625,7 +3626,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
-                        utc = tai + Dat( tai, 0 )/SPD;
+                        utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
                                               args[ 4 ] )/SPD;
                      }
@@ -3635,7 +3636,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
-                        utc = tai + Dat( tai, 0 )/SPD;
+                        utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
                                                 args[ 4 ] )/SPD;
                      }
@@ -3653,7 +3654,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
-                        utc = tai + Dat( tai, 0 )/SPD;
+                        utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
                                                 args[ 4 ] )/SPD;
                      }
@@ -3663,7 +3664,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
-                        utc = tai + Dat( tai, 0 )/SPD;
+                        utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
                                               args[ 4 ] )/SPD;
                      }

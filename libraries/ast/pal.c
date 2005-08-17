@@ -19,9 +19,12 @@
 **    USA.
 **
 **  History:
-**    14-JUN-2004 (DSB):
+**    14-JUN-2005 (DSB):
 **       Corrected slaDsepv to fix bug which caused precisely antipodal
 **       vectors to return zero instead of pi.
+**    16-AUG-2005 (DSB):
+**       Added slaDh2e and slaDe2h by translating the corresponding
+**       fortran routines into C (by hand).
 */
 
 #include "slalib.h"
@@ -1023,5 +1026,16 @@ slaDimxv(Q2,Q1,FOBAR);slaDcc2s(FOBAR,BAZ,q0);*BAZ=slaDranrm(
 float slaVdv(float FOO[3],float BAR[3]){return FOO[0]*BAR[0]
 +FOO[1]*BAR[1]+FOO[2]*BAR[2];}
 
+void slaDh2e(double az,double el,double phi,double *ha,double *dec){
+double sa,ca,se,ce,sp,cp,x,y,z,r; sa=sin(az); ca=cos(az); se=sin(el);
+ce=cos(el); sp=sin(phi); cp=cos(phi); x=-ca*ce*sp+se*cp; y=-sa*ce;
+z=ca*ce*cp+se*sp; r=sqrt(x*x+y*y); if (r==0.0) { *ha=0.0; } else {
+*ha=atan2(y,x); } *dec=atan2(z,r);}
+
+void slaDe2h(double ha,double dec,double phi,double *az,double *el){
+double sh,ch,sd,cd,sp,cp,x,y,z,r,a; sh=sin(ha); ch=cos(ha); sd=sin(dec);
+cd=cos(dec); sp=sin(phi); cp=cos(phi); x=-ch*cd*sp+sd*cp; y=-sh*cd;
+z=ch*cd*cp+sd*sp; r=sqrt(x*x+y*y); if( r == 0.0 ) { a=0.0; } else {
+a=atan2(y,x); } if(a<0.0) a=a+D2PI; *az=a; *el=atan2(z,r); }
 
 

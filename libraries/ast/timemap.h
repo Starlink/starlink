@@ -179,6 +179,10 @@ AstTimeMap *astLoadTimeMap_( void *, size_t, AstTimeMapVtab *,
 /* -------------------------------- */
 void astTimeAdd_( AstTimeMap *, const char *, const double[] );
 
+#if defined(astCLASS)            /* Protected. */
+double astDat_( double, int );
+#endif
+
 /* Function interfaces. */
 /* ==================== */
 /* These macros are wrap-ups for the functions defined by this class
@@ -226,4 +230,7 @@ astINVOKE(O,astLoadTimeMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTimeAdd(this,cvt,args) \
 astINVOKE(V,astTimeAdd_(astCheckTimeMap(this),cvt,args))
 
+#if defined(astCLASS)            /* Protected */
+#define astDat(in,forward) astDat_(in,forward)
+#endif
 #endif

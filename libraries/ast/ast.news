@@ -19,6 +19,9 @@ Main Changes in this Version
 - A new control flag has been added to the AST_RESAMPLE<X>/astResample<X> 
 functions which produces approximate flux conservation.
 
+- The SkyFrame class now supports a System value of "AZEL" corresponding
+to horizon (azimuth/elevation) coordinates.
+
 - The Frame class now has attributes ObsLon and ObsLat to specify
 the geodetic longitude and latitude of the observer.
 

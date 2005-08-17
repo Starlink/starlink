@@ -103,6 +103,7 @@
 #define AST__HELIOECLIPTIC 9
 #define AST__J2000         10
 #define AST__UNKNOWN       11
+#define AST__AZEL          12
 
 #endif
 
