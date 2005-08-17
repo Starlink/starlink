@@ -476,6 +476,10 @@
 *        command WCSADD.
 
 *  Notes:
+*     -  If the horizontal axis is described by a DSBSpecFrame (a
+*     description of the coordinates attached to a dual-sideband spectrum) 
+*     in the NDF's WCS FrameSet, then the unselected sideband will be
+*     annotated along the top edge of the plot.
 *     -  The Title component in the NDF is used as the default title for 
 *     the annotated axes. If the NDF does not have a Title component, then
 *     the default title is taken from current co-ordinate Frame in the NDF. 
