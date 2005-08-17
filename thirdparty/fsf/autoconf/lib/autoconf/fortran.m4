@@ -1851,7 +1851,7 @@ AC_DEFUN([AC_FC_HAVE_BOZ],
       INTEGER I, J, K, L
       PARAMETER ( I = X'FF' )
       PARAMETER ( J = B'1111111111111111' )
-      PARAMETER ( K = O'8888' )
+      PARAMETER ( K = O'7777' )
       PARAMETER ( L = Z'FF' )
 ])],
                           ac_cv_fc_have_boz=yes,
