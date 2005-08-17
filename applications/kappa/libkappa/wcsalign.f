@@ -171,6 +171,15 @@
 *        envelope function to the point spread function of the
 *        input data (see parameter PARAMS).
 *
+*        - "Somb" -- use the somb(pi*x) kernel, where x is the pixel
+*        offset from the interpolation point (resampling) or transformed
+*        input pixel centre (rebinning), and somb(z)=2*J1(z)/z (J1 is the 
+*        first-order Bessel function of the first kind. This scheme is 
+*        similar to the "Sinc" scheme.
+*
+*        - "SombCos" -- uses the somb(pi*x)cos(k*pi*x) kernel. This scheme
+*        is similar to the "SincCos" scheme.
+*
 *        - "Gauss" -- uses the exp(-k*x*x) kernel. This option is only 
 *        available when rebinning (i.e. if REBIN is set to a TRUE value).
 *        The FWHM of the Gaussian is given by parameter PARAMS(2), and
@@ -224,8 +233,8 @@
 *        a false value.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
-*        required by the Sinc, SincSinc, SincCos, SincGauss and Gauss
-*        methods.
+*        required by the Sinc, SincSinc, SincCos, SincGauss, Somb, SombCos
+*        and Gauss methods.
 *
 *        PARAMS( 1 ) is required by all the above schemes.
 *        It is used to specify how many pixels are to contribute to the 
@@ -235,8 +244,8 @@
 *        value of zero or less indicates that a suitable number of pixels 
 *        should be calculated automatically. [0]
 *
-*        PARAMS( 2 ) is required only by the Gauss, SincSinc, SincCos, and 
-*        SincGauss schemes. For the SincSinc and SincCos 
+*        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc, 
+*        SincCos, and SincGauss schemes. For the SombCos, SincSinc and SincCos 
 *        schemes, it specifies the number of pixels at which the envelope
 *        of the function goes to zero. The minimum value is 1.0, and the
 *        run-time default value is 2.0. For the Gauss and SincGauss scheme, it
@@ -406,6 +415,8 @@
 *        Add INSITU and ABORT parameters.
 *     19-JUL-2005 (DSB):
 *        Add REBIN parameter.
+*     11-AUG-2005 (DSB):
+*        Add CONSERVE parameter, and Sombrero function methods.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -563,8 +574,8 @@
       MORE = .TRUE.
       DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
          CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
-     :                   'Sinc,Gauss,SincSinc,SincCos,SincGauss', 
-     :                   .TRUE., METHOD, STATUS )
+     :                   'Sinc,Gauss,SincSinc,SincCos,SincGauss,'//
+     :                   'Somb,SombCos', .TRUE., METHOD, STATUS )
          IF( .NOT. REBIN .AND. METHOD( 1 : 1 ) .EQ. 'G' ) THEN
             CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
      :                    'because REBIN is set false.', STATUS )
@@ -592,7 +603,7 @@
      :                 '  Using nearest neighbour ^W.', 
      :                 STATUS ) 
 
-      ELSE IF( METHOD( 1 : 1 ) .EQ. 'B' ) THEN
+      ELSE IF( METHOD( 1 : 2 ) .EQ. 'BI' ) THEN
          METHOD_CODE = AST__LINEAR
          CALL MSG_OUT( 'WCSALIGN_MSG2', 
      :                 '  Using bi-linear ^W.', STATUS ) 
@@ -630,6 +641,24 @@
             NPAR = 1
             METHOD_CODE = AST__SINC
             CALL MSG_OUT( 'WCSALIGN_MSG6', 
+     :                    '  Using sinc ^W kernel.', STATUS ) 
+
+         END IF
+
+      ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SOMB' ) THEN
+         NPAR = 2
+         PARAMS( 1 ) = 0.0
+         PARAMS( 2 ) = 2.0
+
+         IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
+            METHOD_CODE = AST__SOMBCOS
+            CALL MSG_OUT( 'WCSALIGN_MSG7', 
+     :                    '  Using sombcos ^W kernel.', STATUS ) 
+
+         ELSE
+            NPAR = 1
+            METHOD_CODE = AST__SINC
+            CALL MSG_OUT( 'WCSALIGN_MSG8', 
      :                    '  Using sinc ^W kernel.', STATUS ) 
 
          END IF

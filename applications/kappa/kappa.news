@@ -14,6 +14,10 @@
    approximate flux conservation when using the traditional resampling
    algorithm. See the new parameter CONSERVE.
 
+   o  The WCSALIGN and REGRID applications now have options to use
+   resampling or rebinning kernels based on a sombrero function 2*J1(x)/x,
+   where J1(x) is the first order Bessel function of the first kind.
+
    o  The default values for the TOL parameter for REGRID, and the ACC
    parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
    artifacts when transforming large images with flux conservation.
