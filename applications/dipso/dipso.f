@@ -217,7 +217,7 @@ C       INCLUDE '($IODEF)'
        LOGICAL WARNIT, LUSER
        LOGICAL PUSHW
        LOGICAL BEEP
-       CHARACTER*1 BLEEP/7/
+       CHARACTER*1 BLEEP
        COMMON /BEEP  / BEEP
        COMMON /BLEEP / BLEEP
        LOGICAL ATFCAL
@@ -230,6 +230,8 @@ C       INCLUDE '($IODEF)'
        CHARACTER ENVVAL*256
        INTEGER PRMLEN
        COMMON /ERRCOM/ WARNIT, LUSER
+
+       DATA BLEEP / 7 /
 
 *   Include LABELS for axes
 
@@ -1635,7 +1637,7 @@ c       WRITE(*,*)
              VHHIGH = VARRAY(2)
              IF( .NOT.(OK)) GO TO 5000
              CLOSE (99)
-             OPEN (UNIT=99,NAME='atomic.dat',STATUS='OLD',
+             OPEN (UNIT=99,FILE='atomic.dat',STATUS='OLD',
      :       IOSTAT=IOS1)
              IF( IOS1 .NE. 0 ) THEN
                 CLOSE (99)
@@ -1655,7 +1657,7 @@ c       WRITE(*,*)
                    CALL FINDIT(WAVE,NPOINT,(1.0+VLLOW/C)*WAVE0,I1,1)
                    CALL FINDIT(WAVE,NPOINT,(1.0+VHHIGH/C)*WAVE0,I2,0)
                    CLOSE (98)
-                   OPEN (UNIT=98,NAME=LINNAM//'.DAT',
+                   OPEN (UNIT=98,FILE=LINNAM//'.DAT',
      :             STATUS='NEW')
                    I2 = MAX(I2,I1)
                    WRITE (98,'(A/G20.7,2I5,G20.7/I10)',IOSTAT=IOS1)
