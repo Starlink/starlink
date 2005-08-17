@@ -71,7 +71,7 @@ q8qst4.f r1mach.f reord.f reset.f retsr.f sbytes.f set.f set3.f set3d.f \
 seter.f seti.f setr.f setusv.f srface.f srfgk.f stcntr.f stline.f \
 supcon.f supmap.f tick3.f tick4.f tick43.f ticks.f tr32.f trn32i.f \
 trn32s.f trn32t.f vect3.f vectd.f vector.f velvct.f velvec.f \
-wtstr.f xtch.f zerosc.f zlset.f ishift.f
+wtstr.f xtch.f zerosc.f zlset.f 
 
 BLOCKDATA_ROUTINES = conbd.f conbdn.f dashbd.f hfinit.f gridt.f	       \
 isosrb.f mapbd.f pwrybd.f srfabd.f threbd.f uerrbd.f utilbd.f veldat.f
@@ -79,7 +79,11 @@ isosrb.f mapbd.f pwrybd.f srfabd.f threbd.f uerrbd.f utilbd.f veldat.f
 PRIVATE_INCLUDES = ncar.h
 
 #  List of Fortran sources that must be edited before compilation.
-FPP_ROUTINES = mapint.F pwritx.F
+FPP_ROUTINES = mapint.F pwritx.F ishift.F
+
+#  Not used in most applications. ishift.c requires that ncar.h
+#  is fixed to handle the generic case. This is not yet done.
+C_ROUTINES = ishift.c
 
 # build the data files
 
