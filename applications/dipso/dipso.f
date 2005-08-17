@@ -57,6 +57,9 @@
        CHARACTER*80   sbdir
        INTEGER        plen,p2len,p3len,p4len,sblen
 
+*  Array indices
+       INTEGER PTR1, PTR2, NPT1, NPT2
+
        COMMON /prefix1/ prefix
        COMMON /prefix2/ plen
        COMMON /CLR_COM/ CLR
