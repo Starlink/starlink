@@ -58,12 +58,12 @@ kps1_supev.f kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f	   \
 kps1_susf.f kps1_suskr.f kps1_trdrd.f kps1_trdri.f kps1_trdrr.f	   \
 kps1_trndd.f kps1_trndi.f kps1_trndr.f kps1_trnvd.f kps1_trnvi.f   \
 kps1_trnvr.f kps1_trop1.f kps1_trop2.f kps1_vecky.f kps1_vecpl.f   \
-kps1_vect.f kps1_wala0.f kps1_wala7.f kps1_wieap.f kps1_wiecp.f kps1_wiecs.f	   \
+kps1_vect.f kps1_wala0.f kps1_wala7.f kps1_wieap.f kps1_wiecp.f kps1_wiecs.f \
 kps1_wiefl.f kps1_wiefp.f kps1_wieou.f kps1_wiepw.f kps1_zpdec.f   \
 kps1_zprep.f kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f   \
 kps1_zprgub.f kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f med3d.f \
 medwts.f medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f	   \
-kps1_dnrth.f kps1_pxdpm.f
+kps1_dnrth.f kps1_inmat.f kps1_pxdpm.f
 
 
 C_ROUTINES = kps1_luted.c kps1_tkast.c
@@ -74,20 +74,23 @@ kps1_memou.f kps1_memsa.f kps1_memsy.f kps1_memtr.f opus.f \
 tropus.f uget.f uput.f
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
-	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_R_GEN:.gr=.f)
+                 $(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_R_GEN:.gr=.f) \
+                 $(KPG_GN_GEN:.gn=.f)
 
 ## Generic
 
-KPG_N_GEN = kps1_apad.gen kps1_lapl.gen kps1_prmx.gen kps1_spar.gen \
-	kps1_ardm.gen kps1_stpa.gen kps1_thgt.gen kps1_rs1.gen
+KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
+            kps1_rs1.gen kps1_spar.gen kps1_stpa.gen kps1_thgt.gen 
 
 KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
+KPG_GN_GEN = kps1_inle.gn 
+
 KPG_R_GEN = kps1_pgft.gr
 
-SUFFIXES = .gen .gdr .gr .gbdirw .f
+SUFFIXES = .gen .gdr .gr .gbdirw .gn .f
 
 #  Run generic to get numeric types.
 .gen.f:
@@ -97,6 +100,11 @@ SUFFIXES = .gen .gdr .gr .gbdirw .f
 	cp $< $(<:.gdr=.gen)
 	$(FGENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
+
+.gn.f:
+	cp $< $(<:.gn=.gen)
+	$(FGENERIC)  -t n $(<:.gn=.gen)
+	rm $(<:.gn=.gen)
 
 .gr.f:
 	cp $< $(<:.gr=.gen)
