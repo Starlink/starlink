@@ -48,6 +48,9 @@
 *     20-SEP-2000 (DSB):
 *        If AST_GRID or AST_BORDER fails, suggest that the user changes
 *        current co-ordinate Frame.
+*     17-AUG-2005 (DSB):
+*        Modified to draw a second grid if the current Frame of the Plot
+*        contains a DSBSpecFrame, showing the other side band.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -72,8 +75,19 @@
       INTEGER STATUS               ! Global status
 
 *  Local Variables:
+      CHARACTER AEDGE*8            ! Name of Edge attribute to use
+      CHARACTER AGAP*15            ! Value of TextGap attribute 
+      CHARACTER ASB*8              ! Name of SideBand attribute to use
+      CHARACTER TEXT*250           ! Attribute settings for second plot
+      CHARACTER VEDGE*10           ! Value of Edge attribute 
+      CHARACTER VSB*10             ! Value of SideBand attribute 
+      DOUBLE PRECISION VGAP        ! Value for TitleGap
+      INTEGER AX                   ! Pointer to an axis of Plot's current Frame
+      INTEGER IAT                  ! Used length of TEXT
       INTEGER ICURR                ! Index of original current frame
       INTEGER IPIC0                ! AGI id for original current picture
+      INTEGER IPLOT2               ! Modified Plot
+      INTEGER MAP                  ! Pointer to an unused Mapping
       LOGICAL BOX                  ! Was a simple box drawn?
       REAL A                       ! Scale factor
       REAL AX1                     ! X NDC coord at left of AGI picture
@@ -144,21 +158,108 @@
 
       END IF
 
-*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
-*  the index of the original Current Frame so that it can be re-instated later.
-*  This can help to speed up the drawing, and also avoids the possibility
-*  of the Mapping going via a Frame in which the positions are undefined.
-      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
-      CALL KPG1_ASSIM( IPLOT, STATUS )
+*  Simplify the Plot. This adds a new Current Frame into the Plot, so
+*  take a deep copy of it first. This can help to speed up the drawing, 
+*  and also avoids the possibility of the Mapping going via a Frame in 
+*  which the positions are undefined.
+      IPLOT2 = AST_COPY( IPLOT, STATUS )
+      CALL KPG1_ASSIM( IPLOT2, STATUS )
 
 *  Draw the grid or border within a PGPLOT buffering context.
       IF( STATUS .EQ. SAI__OK ) THEN 
          CALL PGBBUF
 
-         IF( GRID ) THEN
-            CALL AST_GRID( IPLOT, STATUS )
+*  See if the current Frame of the Plot contains a DSBSpecFrame, noting the 
+*  names of the relevant attributes is a DSBSpecFrame is found. If it
+*  does, set the title gap to be equal to twice the textlabelgap.
+         TEXT = ' '
+         IAT = 0
+         CALL CHR_APPND( 'Grid=0,Tickall=0,Title=0,DrawAxes=0,', 
+     :                   TEXT, IAT )
+
+         AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
+         IF( AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+            AEDGE = 'Edge(1)'
+            ASB = 'SideBand(1)'
+            AGAP = 'TextLabGap(1)'
+            CALL CHR_APPND( 'NumLab(2)=0,TextLab(2)=0', TEXT, IAT )
+         
+            VGAP = AST_GETD( IPLOT2, AGAP, status )
+            CALL AST_SETD( IPLOT2, 'TitleGap', 2.5*VGAP, STATUS )
+            CALL AST_SET( IPLOT2, 'TickAll=0', STATUS )
+
          ELSE
-            BOX = AST_BORDER( IPLOT, STATUS )
+            AX = AST_PICKAXES( IPLOT2, 1, 2, MAP, STATUS )
+            IF( AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+               AEDGE = 'Edge(2)'
+               ASB = 'SideBand(2)'
+               AGAP = 'TextLabGap(2)'
+               CALL CHR_APPND( 'NumLab(1)=0,TextLab(1)=0', TEXT, IAT)
+   
+               VGAP = AST_GETD( IPLOT2, AGAP, status )
+               CALL AST_SETD( IPLOT2, 'TitleGap', 2.5*VGAP, STATUS )
+               CALL AST_SET( IPLOT2, 'TickAll=0', STATUS )
+
+            ELSE
+               AEDGE = ' '
+               ASB = ' '
+            END IF
+         END IF
+
+*  Draw the first grid.
+         IF( GRID ) THEN
+            CALL AST_GRID( IPLOT2, STATUS )
+
+*  If a DSBSpecFrame was found, and the labelling is exterior, we will
+*  draw a second grid annotating the other side band. Take a copy 
+*  of the plot so that we do not change it.
+            IF( AEDGE .NE. ' ' .AND. AST_GETC( IPLOT2, 'Labelling', 
+     :                                         STATUS ) 
+     :                               .EQ. 'exterior' ) THEN
+
+*  Switch off drawing off everything to do with the other axis.
+               CALL AST_SET( IPLOT2, TEXT( : IAT ), STATUS )
+
+*  Make room for the title above the upper edge label
+               CALL AST_SETD( IPLOT2, AGAP, 0.5*VGAP, STATUS )
+
+*  Indicate that the opposite edge should be annotated
+               VEDGE = AST_GETC( IPLOT2, AEDGE, STATUS )
+               CALL CHR_LCASE( VEDGE )
+               IF( VEDGE .EQ. 'left' ) THEN
+                  VEDGE = 'right'
+
+               ELSE IF( VEDGE .EQ. 'right' ) THEN
+                  VEDGE = 'left'
+
+               ELSE IF( VEDGE .EQ. 'top' ) THEN
+                  VEDGE = 'bottom'
+
+               ELSE 
+                  VEDGE = 'top'
+               END IF
+
+               CALL AST_SETC( IPLOT2, AEDGE, VEDGE, STATUS )
+
+*  Indicate that values for the opposite side band should be annotated
+               VSB = AST_GETC( IPLOT2, ASB, STATUS )
+               CALL CHR_LCASE( VSB )
+               IF( VSB .EQ. 'usb' ) THEN
+                  VSB = 'lsb'
+               ELSE 
+                  VSB = 'usb'
+               END IF
+
+               CALL AST_SETC( IPLOT2, ASB, VSB, STATUS )
+
+*  Draw a second grid over the first.
+               CALL AST_GRID( IPLOT2, STATUS )
+
+            END IF
+
+*  Draw a border instead of a grid if requested.
+         ELSE
+            BOX = AST_BORDER( IPLOT2, STATUS )
          END IF
 
          IF( STATUS .EQ. AST__VSMAL ) THEN
@@ -170,11 +271,6 @@
          END IF 
          CALL PGEBUF
       END IF
-
-*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
-*  Current Frame.
-      CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
-      CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
 *  Re-instate the original PGPLOT viewport and window if necessary.
       IF( IPIC .NE. -1 .AND. STATUS .EQ. SAI__OK ) THEN
