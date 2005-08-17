@@ -234,8 +234,6 @@ C       INCLUDE '($IODEF)'
        INTEGER PRMLEN
        COMMON /ERRCOM/ WARNIT, LUSER
 
-       DATA BLEEP / 7 /
-
 *   Include LABELS for axes
 
        INCLUDE 'DECLARE_LBLS'
@@ -376,6 +374,9 @@ C       INCLUDE '($IODEF)'
      :      K2/'CENTRE   ','WIDTH    ','NORM. INT','PROFILE  '/
 
        DATA USEHTX / .FALSE. /
+
+*  Bell
+       BLEEP = CHAR( 7 )
 
 *  If this subroutine has been re-entered as a result of a trapped signal
 *  jump to the end of the main loop.
