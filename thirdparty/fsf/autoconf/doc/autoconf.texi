@@ -5991,7 +5991,61 @@ available (there are probably rather few Fortrans which don't have this
 function).
 
 The macro works for both intrinsic functions and intrinsic subroutines.
+@end defmac
 
+@defmac AC_FC_HAVE_PERCENTVAL
+@acindex AC_FC_HAVE_PERCENTVAL
+
+Test whether the Fortran compiler (@code{$FC}) has the @code{%VAL}
+extension.  If so, define the preprocessor variable
+@code{HAVE_PERCENTVAL} to be 1.
+@end defmac
+
+@defmac AC_FC_HAVE_PERCENTLOC
+@acindex AC_FC_HAVE_PERCENTLOC
+
+Test whether the Fortran compiler (@code{$FC}) has the @code{%LOC}
+extension.  If so, define the preprocessor variable
+@code{HAVE_PERCENTLOC} to be 1.
+@end defmac
+
+@defmac AC_FC_HAVE_BOZ
+@acindex AC_FC_HAVE_BOZ
+
+Test whether the Fortran compiler (@code{$FC}) supports BOZ constants in the Fortran
+95 style. These are integer constants written in the format
+@code{X'xxx'}, @code{B'xxx'}, @code{O'xxx'} and @code{Z'xxx'}.
+If so set the preprocessor variable @code{HAVE_BOZ} to be 1. This should
+be true of all Fortran 95, and later, compilers.
+@end defmac
+
+@defmac AC_FC_HAVE_TYPELESS_BOZ
+@acindex AC_FC_HAVE_TYPELESS_BOZ
+
+Test whether the Fortran compiler (@code{$FC}) supports typeless BOZ
+constants in the Fortran 95 style. These are constants written in the
+format @code{X'xxx'} that allow the initialisation of any type of
+variable to a specific bit pattern. If so set the preprocessor variable
+@code{HAVE_TYPELESS_BOZ} to be 1.
+@end defmac
+
+@defmac AC_FC_HAVE_OLD_TYPELESS_BOZ
+@acindex AC_FC_HAVE_OLD_TYPELESS_BOZ
+
+Test whether the Fortran compiler (@code{$FC}) supports typeless BOZ
+constants in the OLD (VMS and g77) Fortran style. These are constants
+written in the format $code{'xxx'X}, which allow the initialisation of
+any type to a specific bit pattern. If so set the preprocessor variable
+@code{HAVE_OLD_TYPELESS_BOZ} to be 1.
+@end defmac
+
+@defmac AC_FC_HAVE_VOLATILE
+@acindex AC_FC_HAVE_VOLATILE
+
+Test whether the Fortran compiler (@code{$FC}) supports the VOLATILE
+statement. VOLATILE is used to stop the optimisation of a variable, so
+that it can be modified outside of the program itself. If supported the 
+preprocessor variable HAVE_VOLATILE is set to be 1.
 @end defmac
 
 @defmac AC_FC_OPEN_SPECIFIERS (@var{specifier}@dots{})
@@ -6133,7 +6187,7 @@ Features can be abbreviated, so that @samp{i}, @samp{in}, @samp{inc} etc. are eq
 Features can be deselected, if the feature is not needed, by prepending
 @samp{no}; for example @samp{nodefine}.
 
-The default for the feature list is 
+The default for the feature list is
 @samp{[include define substitute nowrap nocstyle noCSTYLE]}, and
 feature requirements corresponding to the defaults may be omitted.
 
