@@ -1792,12 +1792,11 @@ AC_DEFUN([AC_FC_CHECK_HEADERS],
 # AC_FC_HAVE_PERCENTVAL
 # ---------------------
 # Test whether the FC compiler has the %VAL extension.  If so, define
-# the preprocessor variable HAVE_PERCENTVAL to be 1.  If the compiler
-# has %VAL, it presumably has %LOC also.
+# the preprocessor variable HAVE_PERCENTVAL to be 1.
 AC_DEFUN([AC_FC_HAVE_PERCENTVAL],
          [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether ${FC} has the %VAL extension],
-                         [ac_cv_fc_have_val],
+                         [ac_cv_fc_have_percentval],
                          [AC_LANG_PUSH([Fortran])
                           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
       i=1
@@ -1819,7 +1818,7 @@ AC_DEFUN([AC_FC_HAVE_PERCENTVAL],
 AC_DEFUN([AC_FC_HAVE_PERCENTLOC],
          [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether ${FC} has the %LOC extension],
-                         [ac_cv_fc_have_loc],
+                         [ac_cv_fc_have_percentloc],
                          [AC_LANG_PUSH([Fortran])
                           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
       INTEGER I, ADDR
