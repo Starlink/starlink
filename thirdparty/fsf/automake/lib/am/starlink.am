@@ -81,11 +81,16 @@ if %?XMLDOCS%
 # .texml, or else Make deletes it as an intermediate, hence the tests within
 # the xml->tex rule (we can't specify .PRECIOUS targets here).
 #
+# The .xml.tex rule is actually very little use: you end up with a
+# .tex file in the current directory, but with any figure files still
+# in the .texml directory.  Much better is to pass around the
+# .texml_tar tarball.
+#
 # Requires JADE, SGMLNORM and SGMLKIT_HOME substitutions, managed by
 # STAR_XML_DOCUMENTATION.
 .xml.tex:
-	test -f $(<:.xml=.texml_tar) || $(MAKE) $(<:.xml=.texml_tar)
-	test -d $(<:.xml=.texml)     || tar xf $(<:.xml=.texml_tar)
+	$(MAKE) $(<:.xml=.texml_tar)
+	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
 	cp $(<:.xml=.texml)/$@ .
 .xml.htx_tar:
 	test "$(JADE)" != NOJADE -a "$(SGMLNORM)" != NOSGMLNORM && \
