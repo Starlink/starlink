@@ -1,3 +1,9 @@
+DCV_FUN
+config.h
+config.h.in
+dcv_ttoub.f
+dcv_ttouw.f
+make.log.err
 core.*
 version.dat
 *.ifc
