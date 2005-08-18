@@ -27,18 +27,8 @@ if %?HAVEDOCS%
 #
 # A few commands are common to both LaTeX and XML sources.  These don't
 # have to be predist-only.
-.tex.dvi:
-	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi ${<:.tex=}
 .dvi.ps:
 	dvips -o $@ $<
-.tex.ps:
-	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi ${<:.tex=}
-	dvips -o $@ $(<:.tex=.dvi)
-.tex.pdf:
-	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi ${<:.tex=}
 endif %?HAVEDOCS%
 if %?LATEXDOCS%
 # Don't express a dependency via the directory .htx, or else Make
@@ -59,6 +49,16 @@ if %?LATEXDOCS%
 # it is rolled up into a tarball.
 #
 # Ignore the exit status of star2html, as it can sometimes fail harmlessly.
+.tex.dvi:
+	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.tex=}
+.tex.ps:
+	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.tex=}
+	dvips -o $@ $(<:.tex=.dvi)
+.tex.pdf:
+	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.tex=}
 .tex.htx_tar:
 	- @STAR2HTML@ $<
 	test -d ${<:.tex=.htx}
@@ -81,18 +81,12 @@ if %?XMLDOCS%
 # .texml, or else Make deletes it as an intermediate, hence the tests within
 # the xml->pdf rule (we can't specify .PRECIOUS targets here).
 # Instead, have the .pdf files listed as depending on the .xml file,
-# mediated within the rule by a make of the .texml_tar file.
+# mediated within the rule by a make of the .texml_tar file.  Avoid
+# having any .tex file in the documentation directory -- this is a
+# generated file, and should be kept out of the way.
 #
 # Requires JADE, SGMLNORM and SGMLKIT_HOME substitutions, managed by
 # STAR_XML_DOCUMENTATION.
-## The .xml.tex rule is actually very little use: you end up with a
-## .tex file in the current directory, but with any figure files still
-## in the .texml directory.  Much better is to pass around the
-## .texml_tar tarball.
-##.xml.tex:
-##	$(MAKE) $(<:.xml=.texml_tar)
-##	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
-##	cp $(<:.xml=.texml)/$@ .
 .xml.htx_tar:
 	test "$(JADE)" != NOJADE -a "$(SGMLNORM)" != NOSGMLNORM && \
 	  JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
