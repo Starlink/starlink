@@ -4645,36 +4645,43 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
           <code>.ps</code> and <code>.htx_tar</code>, but subject to
           change in principle).</p>
 
-        <p>The next simplest case is where the source files are in a
-          different directory from the <code>component.xml</code>.
-          Indicate this by appending a slash to the end of each of the
-          document codes located elsewhere:
+<p>The next simplest case is where the source files are in a different
+directory from the <code>component.xml</code>.  Indicate this by
+appending a slash to the end of each of the document codes located
+elsewhere.  For example:
 <verbatim>
 STAR_LATEX_DOCUMENTATION([sun123/ sc99])
 </verbatim>
-          This will behave as above for the <code>sc99.tex</code>
-          file, but differently for the <code>sun123</code> document.
-          That code, <code>sun123</code> is still included in
-          <code>@STAR_DOCUMENTATION@</code>, but it is the variable
-          <code>@STAR_LATEX_DOCUMENTATION_SUN123@</code> which is set
-          to the default target list, and not
-          <code>@STAR_LATEX_DOCUMENTATION@</code>.  Documentation
-          specified in this way does not -- perhaps contrary to
-          appearances -- have to live in a similarly-named
-          subdirectory of the component directory; instead you specify
-          where the documentation is using the standard mechanisms
-          available to <code>Makefile.am</code> files.  That is, you
-          create a <code>Makefile.am</code> in the documentation
-          directory containing at least
+This will behave as above for the <code>sc99.tex</code> file, but
+differently for the <code>sun123</code> document.  That code,
+<code>sun123</code> is still included in
+<code>@STAR_DOCUMENTATION@</code>, but it is the variable
+<code>@STAR_LATEX_DOCUMENTATION_SUN123@</code> which is set to the
+default target list, and not <code>@STAR_LATEX_DOCUMENTATION@</code>.
+Documentation specified in this way does <em>not</em> -- contrary to
+appearances -- have to live in a similarly-named subdirectory of the
+component directory; instead you will have to separately make sure that the
+documentation is built at build time.</p>
+
+<p>Suppose, for example, you are managing the documentation for
+the package which contains SUN/123, and suppose the source for this is
+in a subdirectory <code>docs/sun-cxxiii</code> (whimsy is a terrible
+thing), then you would still refer to the documentation via
+<code>STAR_LATEX_DOCUMENTATION(sun123/)</code> as above, but in the
+file <code>docs/sun-cxxiii/Makefile.am</code> you would include at
+least the line
 <verbatim>
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SUN123@
 </verbatim>
-          and make sure that that directory is built via the usual
-          method of mentioning the directory in a <code>SUBDIRS =
-          ...</code> specification in the component
-          <code>Makefile.am</code>.  The <code>datacube</code>
-          component uses this mechanism to build its
-          documentation.</p>
+and make sure that directory <code>docs/sun-cxxiii</code> is built,
+and its contents installed when appropriate, by the usual method of
+mentioning the directory in a <code>SUBDIRS</code> declaration in the
+component <code>Makefile.am</code>:
+<verbatim>
+SUBDIRS = docs/sun-cxxiii
+</verbatim>
+The <code>datacube</code> component uses this mechanism to build its
+documentation.</p>
 
         <p>Sometimes you need to do more elaborate things to build
           your documentation -- the <code>ast</code> component is a
@@ -6705,7 +6712,8 @@ LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
             instead; you may not use this latter feature if the second
             argument is non-null.</p>
 
-          <p>See <ref id="autoconfing-docs" /> for more discussion.</p>
+          <p>See <ref id="autoconfing-docs" /> for more discussion of
+          this feature, plus an example.</p>
 
           <p>The configure option
             <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
@@ -7206,11 +7214,12 @@ STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
             used.  The differences are as follows:
             <ul>
               <li>
-                <p>The default list of targets is the same, though
-                  using the second argument (discouraged)
-                  requires you to specify values for the
-                  <code>JADE</code>, <code>SGMLNORM</code> and
-                  <code>SGMLKIT_HOME</code> substitution variables.</p>
+<p>The default list of targets is <code>.texml_tar .htx_tar .ps .pdf</code>,
+though using the second argument (discouraged) requires you to specify
+values for the <code>JADE</code>, <code>SGMLNORM</code> and
+<code>SGMLKIT_HOME</code> substitution variables (the
+<code>.texml_tar</code> tarball contains a <code>.tex</code> file plus
+any required figures).</p>
               </li>
 
               <li>
