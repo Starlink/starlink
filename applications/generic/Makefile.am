@@ -37,7 +37,7 @@ dcv_ttouw.f: dcv_ttouw.gen
 # the filesystem is presumably case-sensitive) or ">$@".
 DCV_FUN: DCV_FUN.F
 	rm -f DCV_FUN
-	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.F $(FPP_OUTPUT)
+	$(FPP) $(FPP_MAKE_FLAGS) -I. DCV_FUN.F $(FPP_OUTPUT)
 	test -f DCV_FUN || mv DCV_FUN.f DCV_FUN
 
 BUILT_SOURCES = DCV_FUN

@@ -25,6 +25,10 @@ AC_PROG_LN_S
 # Check intrinsic zext is available (we rely on iand if it's not)
 AC_FC_CHECK_INTRINSICS(zext)
 
+dnl    Check whether we have X'' or ''X notation
+AC_FC_HAVE_OLD_TYPELESS_BOZ()
+AC_FC_HAVE_TYPELESS_BOZ()
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, prm)
 

@@ -1,4 +1,6 @@
-#include <config.h>
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 *+
 *  Name:
 *     DCV_FUN
@@ -243,7 +245,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOD( DUMMY_UB )  = DBLE( ZEXT( DUMMY_UB ) )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UBTOD( DUMMY_UB )  = DBLE( IAND( DUMMY_UB , '000000FF'X ) )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UBTOD( DUMMY_UB )  = DBLE( IAND( DUMMY_UB , X'000000FF' ) )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
       DCV_DTOD( DUMMY_D )    = DUMMY_D
       DCV_ITOD( DUMMY_I )    = DBLE( DUMMY_I )
@@ -252,7 +262,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOD( DUMMY_UW )  = DBLE( ZEXT( DUMMY_UW ) )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , '0000FFFF'X ) )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , X'0000FFFF' ) )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
  
 *   (4) Routines resulting in INTEGER
@@ -261,7 +279,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOI( DUMMY_UB )  = ZEXT( DUMMY_UB )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UBTOI( DUMMY_UB )  = IAND( DUMMY_UB , '000000FF'X )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UBTOI( DUMMY_UB )  = IAND( DUMMY_UB , X'000000FF' )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
       DCV_DTOI( DUMMY_D )    = NINT( DUMMY_D )
       DCV_ITOI( DUMMY_I )    = DUMMY_I
@@ -270,7 +296,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOI( DUMMY_UW )  = ZEXT( DUMMY_UW )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UWTOI( DUMMY_UW )  = IAND( DUMMY_UW , '0000FFFF'X )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UWTOI( DUMMY_UW )  = IAND( DUMMY_UW , X'0000FFFF' )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
 
 *   (5) Routines resulting in REAL
@@ -279,7 +313,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOR( DUMMY_UB )  = REAL( ZEXT( DUMMY_UB ) )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UBTOR( DUMMY_UB )  = REAL( IAND( DUMMY_UB ,'000000FF'X ) )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UBTOR( DUMMY_UB )  = REAL( IAND( DUMMY_UB ,X'000000FF' ) )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
       DCV_DTOR( DUMMY_D )    = SNGL( DUMMY_D )
       DCV_ITOR( DUMMY_I )    = REAL( DUMMY_I )
@@ -288,7 +330,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOR( DUMMY_UW )  = REAL( ZEXT( DUMMY_UW ) )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UWTOR( DUMMY_UW )  = REAL( IAND( DUMMY_UW ,'0000FFFF'X ) )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UWTOR( DUMMY_UW )  = REAL( IAND( DUMMY_UW ,X'0000FFFF' ) )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
 
 *   (6) Routines resulting in WORD
@@ -297,7 +347,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOW( DUMMY_UB )  = ZEXT( DUMMY_UB )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UBTOW( DUMMY_UB )  = IAND( DUMMY_UB , '000000FF'X )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UBTOW( DUMMY_UB )  = IAND( DUMMY_UB , X'000000FF' )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
       DCV_DTOW( DUMMY_D )    = NINT( DUMMY_D )
       DCV_ITOW( DUMMY_I )    = DUMMY_I                       ! ???
@@ -306,7 +364,15 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOW( DUMMY_UW )  = ZEXT( DUMMY_UW )
 #else
+#  if HAVE_OLD_TYPELESS_BOZ
       DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , '0000FFFF'X )
+#  else
+#    if HAVE_TYPELESS_BOZ
+      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , X'0000FFFF' )
+#    else
+#      error Have no BOZ and no ZEXT.
+#    endif
+#  endif
 #endif
 
 *   (7) Routines resulting in UNSIGNED WORD
