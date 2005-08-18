@@ -25,7 +25,7 @@ if %?HAVEDOCS%
 # LATEX2DVI is a sequence of commands which will run $LATEX plus any other
 # commands (such as bibtex or makeindex) on the file $1.
 #
-# LaTeX commands are common to both LaTeX and XML sources.  These don't
+# A few commands are common to both LaTeX and XML sources.  These don't
 # have to be predist-only.
 .tex.dvi:
 	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
@@ -79,19 +79,20 @@ if %?XMLDOCS%
 #
 # Don't express a dependency via the tarball .texml_tar or the directory
 # .texml, or else Make deletes it as an intermediate, hence the tests within
-# the xml->tex rule (we can't specify .PRECIOUS targets here).
-#
-# The .xml.tex rule is actually very little use: you end up with a
-# .tex file in the current directory, but with any figure files still
-# in the .texml directory.  Much better is to pass around the
-# .texml_tar tarball.
+# the xml->pdf rule (we can't specify .PRECIOUS targets here).
+# Instead, have the .pdf files listed as depending on the .xml file,
+# mediated within the rule by a make of the .texml_tar file.
 #
 # Requires JADE, SGMLNORM and SGMLKIT_HOME substitutions, managed by
 # STAR_XML_DOCUMENTATION.
-.xml.tex:
-	$(MAKE) $(<:.xml=.texml_tar)
-	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
-	cp $(<:.xml=.texml)/$@ .
+## The .xml.tex rule is actually very little use: you end up with a
+## .tex file in the current directory, but with any figure files still
+## in the .texml directory.  Much better is to pass around the
+## .texml_tar tarball.
+##.xml.tex:
+##	$(MAKE) $(<:.xml=.texml_tar)
+##	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
+##	cp $(<:.xml=.texml)/$@ .
 .xml.htx_tar:
 	test "$(JADE)" != NOJADE -a "$(SGMLNORM)" != NOSGMLNORM && \
 	  JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
@@ -102,6 +103,26 @@ if %?XMLDOCS%
 	  JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
 	    SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
 	    $(SGML2DOCS) --texml --tarball=$@ $<
+## Within the following two rules, don't do the obvious thing and
+## replace the $LATEX rule with `cd dir; make -f ../Makefile $(<:.xml=.pdf)'
+## It looks neater, but if any of the figure files are generated --
+## from .mp files for example -- this will fail, as the source files
+## will not have been included in the .texml_tar tarball.
+.xml.pdf:
+	$(MAKE) $(<:.xml=.texml_tar)
+	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
+	cd $(<:.xml=.texml); \
+	  LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.xml=}
+	cp $(<:.xml=.texml)/$@ .
+.xml.ps:
+	$(MAKE) $(<:.xml=.texml_tar)
+	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
+	cd $(<:.xml=.texml); \
+	  LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.tex=}; \
+	  dvips -o $@ $(<:.tex=.dvi)
+	cp $(<:.xml=.texml)/$@ .
 endif %?XMLDOCS%
 
 if %?COMPIFL%
