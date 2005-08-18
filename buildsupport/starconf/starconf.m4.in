@@ -756,11 +756,16 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # -----------------------------------------------
 # Generate the standard makefile targets to handle XML documentation
 # source.  The parameter documentcode should be something like
-# `sun123' -- it should not include any .xml extension.
+# `sun123' -- it should not include any .xml extension.  For each of the
+# documentcodes which does not end with a slash, append
+# <documentcode>.{texml_tar,htx_tar,ps} to STAR_XML_DOCUMENTATION;
+# for each which does end with a slash, define instead the
+# variable STAR_XML_DOCUMENTATION_<documentcode>.  In either case,
+# append the documentcode to STAR_DOCUMENTATION
 #
 # The second, optional, argument gives an explicit list of the targets
 # which are build.  If this is _not_ specified, then a standard list
-# is used (.tex, .ps and .tar_htx) and corresponding rules added to
+# is used (.texml_tar, .ps and .htx_tar) and corresponding rules added to
 # the generated makefile.  If it is specified, it must be non-null,
 # and its value is a list of files which are to be added to the
 # distribution, and no extra Makefile rules are added.  Thus if users need
@@ -829,10 +834,10 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
                   AC_MSG_RESULT([ok])
                   AC_FOREACH([DocCode], [$1],
                    [m4_if(m4_bregexp(DocCode,[/]), -1,
-                          [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar DocCode.pdf"
+                          [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.texml_tar DocCode.htx_tar DocCode.ps DocCode.pdf"
 ],
                           [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
-                           STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
+                           STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.texml_tar _T.htx_tar _T.ps _T.pdf"
                            AC_SUBST(STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
                 else
                     AC_MSG_RESULT([too old])
