@@ -6034,7 +6034,7 @@ variable to a specific bit pattern. If so set the preprocessor variable
 
 Test whether the Fortran compiler (@code{$FC}) supports typeless BOZ
 constants in the OLD (VMS and g77) Fortran style. These are constants
-written in the format $code{'xxx'X}, which allow the initialisation of
+written in the format @code{'xxx'X}, which allow the initialisation of
 any type to a specific bit pattern. If so set the preprocessor variable
 @code{HAVE_OLD_TYPELESS_BOZ} to be 1.
 @end defmac
