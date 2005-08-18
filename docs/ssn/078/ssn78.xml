@@ -5787,9 +5787,78 @@ AC_LANG_POP([Fortran])
 
           <p>Test whether the <code>FC</code> compiler has the
             <code>%VAL</code> extension.  If so, define the preprocessor
-            variable <code>HAVE_PERCENTVAL</code> to be 1.  If the
-            compiler has <code>%VAL</code>, it presumably has
-            <code>%LOC</code> also.</p>
+            variable <code>HAVE_PERCENTVAL</code> to be 1.</p>
+        </subsect>
+
+        <subsect id="ac-fc-have-percentloc" export="export"
+        indexkey="autoconf!macros!AC_FC_HAVE_PERCENTLOC"> 
+          <subhead>
+            <title>AC_FC_HAVE_PERCENTLOC</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_PERCENTLOC</code></strong></p>
+
+          <p>Test whether the <code>FC</code> compiler has the
+            <code>%LOC</code> extension.  If so, define the preprocessor
+            variable <code>HAVE_PERCENTLOC</code> to be 1.</p>
+        </subsect>
+
+        <subsect id="ac-fc-have-boz" export="export"
+        indexkey="autoconf!macros!AC_FC_HAVE_BOZ"> 
+          <subhead>
+            <title>AC_FC_HAVE_BOZ</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_BOZ</code></strong></p>
+
+           <p>Test whether the <code>FC</code> compiler supports BOZ constants
+           in the Fortran 95 style. These are integer constants written in 
+           the format <code>X'xxx'</code>, <code>B'xxx'</code>,
+           <code>O'xxx'</code> and <code>Z'xxx'</code>. If so set the
+           preprocessor variable <code>HAVE_BOZ</code> to be 1. This should 
+           be true of all Fortran 95, and later, compilers.</p>
+        </subsect>
+
+        <subsect id="ac-fc-have-typeless-boz" export="export"
+        indexkey="autoconf!macros!AC_FC_HAVE_TYPELESS_BOZ"> 
+          <subhead>
+            <title>AC_FC_HAVE_TYPELESS_BOZ</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_TYPELESS_BOZ</code></strong></p>
+
+          <p>Test whether the Fortran compiler (<code>FC</code>) supports
+          typeless BOZ constants in the Fortran 95 style. These are constants
+          written in the format <code>X'xxx'</code> that allow the
+          initialisation of any type of variable to a specific bit pattern. If
+          so set the preprocessor variable <code>HAVE_TYPELESS_BOZ</code> to
+          be 1.</p>
+        </subsect>
+
+        <subsect id="ac-fc-have-old-typeless-boz" export="export"
+        indexkey="autoconf!macros!AC_FC_HAVE_OLD_TYPELESS_BOZ"> 
+          <subhead>
+            <title>AC_FC_HAVE_OLD_TYPELESS_BOZ</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_OLD_TYPELESS_BOZ</code></strong></p>
+
+          <p>Test whether the Fortran compiler (<code>FC</code>) supports
+          typeless BOZ constants in the OLD (VMS and g77) Fortran style. These
+          are constants written in the format <code>'xxx'X</code>, which allow
+          the initialisation of any type to a specific bit pattern. If so set
+          the preprocessor variable <code>HAVE_OLD_TYPELESS_BOZ</code> to be
+          1.</p>
+        </subsect>
+
+        <subsect id="ac-fc-have-volatile" export="export"
+        indexkey="autoconf!macros!AC_FC_HAVE_VOLATILE"> 
+          <subhead>
+            <title>AC_FC_HAVE_VOLATILE</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_VOLATILE</code></strong></p>
+
+          <p>Test whether the Fortran compiler (<code>FC</code>) supports the
+          VOLATILE statement. VOLATILE is used to stop the optimisation of a
+          variable, so that it can be modified outside of the program
+          itself. If supported the preprocessor variable
+          <code>HAVE_VOLATILE</code> is set to be 1.</p>
         </subsect>
 
 <subsect id="macro-ac-fc-literal-backslash" export="export"
