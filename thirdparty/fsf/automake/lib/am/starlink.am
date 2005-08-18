@@ -25,13 +25,10 @@ if %?HAVEDOCS%
 # LATEX2DVI is a sequence of commands which will run $LATEX plus any other
 # commands (such as bibtex or makeindex) on the file $1.
 #
-# A few commands are common to both LaTeX and XML sources.  These don't
-# have to be predist-only.
-.dvi.ps:
-	dvips -o $@ $<
+## There are (now) no commands common to both LaTeX and XML sources.
 endif %?HAVEDOCS%
 if %?LATEXDOCS%
-# Don't express a dependency via the directory .htx, or else Make
+# Don't express a dependency via the directory .htx, or else make
 # tries to delete it as an intermediate (we can't specify
 # .PRECIOUS targets within this file).
 #
@@ -52,10 +49,8 @@ if %?LATEXDOCS%
 .tex.dvi:
 	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
 	  latex2dvi ${<:.tex=}
-.tex.ps:
-	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi ${<:.tex=}
-	dvips -o $@ $(<:.tex=.dvi)
+.dvi.ps:
+	dvips -o $@ $<
 .tex.pdf:
 	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
 	  latex2dvi ${<:.tex=}
@@ -114,8 +109,8 @@ if %?XMLDOCS%
 	rm -Rf $(<:.xml=.texml) && tar xf $(<:.xml=.texml_tar)
 	cd $(<:.xml=.texml); \
 	  LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi ${<:.tex=}; \
-	  dvips -o $@ $(<:.tex=.dvi)
+	  latex2dvi ${<:.xml=}; \
+	  dvips -o $@ $(<:.xml=.dvi)
 	cp $(<:.xml=.texml)/$@ .
 endif %?XMLDOCS%
 
