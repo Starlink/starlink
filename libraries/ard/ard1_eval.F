@@ -395,10 +395,10 @@
 
 *  First we need a pointer from the STACK variable. This code is 64bit
 *  friendly, need to translate to an INTEGER and register with CNF
-#if HAVE_INTRINSIC_LOC || HAVE_LOC 
-               IPNTR = CNF_PREG( LOC( STACK( 1, TOS ) ), ISNEWREG )
-#else
+#if HAVE_PERCENTLOC
                IPNTR = CNF_PREG( %LOC( STACK( 1, TOS ) ), ISNEWREG )
+#else
+               IPNTR = CNF_PREG( LOC( STACK( 1, TOS ) ), ISNEWREG )
 #endif
                IF (IPNTR .EQ. 0 .OR. CNF_PVAL(IPNTR) .EQ. 0) THEN
                   IF ( STATUS .EQ. SAI__OK ) THEN

@@ -24,10 +24,8 @@ AC_PROG_LIBTOOL
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl    How to use %LOC function, as LOC or %LOC. Use LOC otherwise
-dnl    assume %LOC.
-AC_FC_CHECK_INTRINSICS([LOC])
-AC_CHECK_FUNCS([LOC])
+dnl    Check for %LOC, if not present assume we have LOC.
+AC_FC_HAVE_PERCENTLOC()
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast cnf grp pcs sae])
