@@ -1,3 +1,9 @@
+CREATEFILE.DAT
+NEWFILE.DAT
+fiotest
+make.log.err
+pgplot.ps
+sun143.dvi
 ERRNO_ERR
 fiotest.ifc
 make-errno-err

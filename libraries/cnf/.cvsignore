@@ -1,9 +1,11 @@
+make.log.err
 CNF_PAR
 c_calls_f
 cnf_test
 f_calls_c
 config.h
 sun209.ps
+sun209.dvi
 *.lo
 *.la
 Makefile
