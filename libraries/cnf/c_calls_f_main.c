@@ -1,6 +1,15 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "f77.h"
+
+/* Some compilers need a dummy main */
+#ifdef FC_MAIN
+void FC_MAIN () {}
+#endif
 
 #define NI 10
 #define NR 10
