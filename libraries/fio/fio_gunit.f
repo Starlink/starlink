@@ -16,7 +16,7 @@
 *     Get an unused Fortran unit number.
 
 *  Arguments:
-*     UNIT = INTEGER (Given)
+*     UNIT = INTEGER (Returned)
 *        A variable to contain the unit number.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
