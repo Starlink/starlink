@@ -10,6 +10,10 @@
 /* -------------------------                                                */
 #include <stdio.h>
 
+#ifdef FC_MAIN
+void FC_MAIN () {}
+#endif
+
 int main( int argc, char *argv[] ) {
 /*+                                                                         */
 /* Name:                                                                    */

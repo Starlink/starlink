@@ -28,6 +28,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests
 AC_FC_LIBRARY_LDFLAGS
+AC_FC_MAIN
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems ary ast psx])
