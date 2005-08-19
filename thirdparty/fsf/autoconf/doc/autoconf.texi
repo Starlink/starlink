@@ -6012,9 +6012,9 @@ extension.  If so, define the preprocessor variable
 @defmac AC_FC_HAVE_BOZ
 @acindex AC_FC_HAVE_BOZ
 
-Test whether the Fortran compiler (@code{$FC}) supports BOZ constants in the Fortran
-95 style. These are integer constants written in the format
-@code{X'xxx'}, @code{B'xxx'}, @code{O'xxx'} and @code{Z'xxx'}.
+Test whether the Fortran compiler (@code{$FC}) supports BOZ constants in
+the Fortran 95 style. These are integer constants written in the format
+@code{B'xxx'}, @code{O'xxx'} and @code{Z'xxx'}.
 If so set the preprocessor variable @code{HAVE_BOZ} to be 1. This should
 be true of all Fortran 95, and later, compilers.
 @end defmac

@@ -5794,10 +5794,10 @@ AC_LANG_POP([Fortran])
 
            <p>Test whether the <code>FC</code> compiler supports BOZ constants
            in the Fortran 95 style. These are integer constants written in 
-           the format <code>X'xxx'</code>, <code>B'xxx'</code>,
-           <code>O'xxx'</code> and <code>Z'xxx'</code>. If so set the
-           preprocessor variable <code>HAVE_BOZ</code> to be 1. This should 
-           be true of all Fortran 95, and later, compilers.</p>
+           the format <code>B'xxx'</code>, <code>O'xxx'</code> and
+           <code>Z'xxx'</code>. If so set the preprocessor variable 
+           <code>HAVE_BOZ</code> to be 1. This should be true of all Fortran 95, 
+           and later, compilers.</p>
 
 <p>See also <ref id="ac-fc-have-typeless-boz"><code>AC_FC_HAVE_TYPELESS_BOZ</code></ref> and
 <ref id="ac-fc-have-old-typeless-boz"><code>AC_FC_HAVE_OLD_TYPELESS_BOZ</code></ref>.</p>

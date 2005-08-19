@@ -1839,7 +1839,7 @@ AC_DEFUN([AC_FC_HAVE_PERCENTLOC],
 # --------------
 # Test whether the FC compiler supports BOZ constants in the Fortran
 # 95 style. These are integer constants written in the format
-# X'xxx', B'xxx', O'xxx' and Z'xxx'. If so set the preprocessor variable
+# B'xxx', O'xxx' and Z'xxx'. If so set the preprocessor variable
 # HAVE_BOZ to be 1.
 AC_DEFUN([AC_FC_HAVE_BOZ],
          [AC_REQUIRE([AC_PROG_FC])dnl
@@ -1848,7 +1848,6 @@ AC_DEFUN([AC_FC_HAVE_BOZ],
                          [AC_LANG_PUSH([Fortran])
                           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
       INTEGER I, J, K, L
-      PARAMETER ( I = X'FF' )
       PARAMETER ( J = B'1111111111111111' )
       PARAMETER ( K = O'7777' )
       PARAMETER ( L = Z'FF' )
