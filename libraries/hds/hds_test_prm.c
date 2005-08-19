@@ -14,12 +14,18 @@
 #include "dat1.h"
 
 #include <prm_par.h>
-#include <config.h>
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 /* Helper function */
 typedef unsigned char byte;
 const char* tohex(const char*, byte* p);
 
+#ifdef FC_MAIN
+void FC_MAIN () { }
+#endif
 
 int main(int argc, char** argv)
 {
