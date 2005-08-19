@@ -270,7 +270,6 @@
 9           CONTINUE
             RAD = LOW
             DO 4 IRAD = 1, INT( ( UP - LOW ) / STEP ) + 1
-               PRINT *, IRAD, RAD
                XINT = COEF1 * RAD * RAD
                FLOR = COMIX / ( 1.0 - XINT / LOG( 2.0 ) )
                IF ( XINT .GE. CHANGE ) THEN
