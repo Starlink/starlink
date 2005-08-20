@@ -37,6 +37,9 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
 
+dnl   ISHIFT intrinsic
+AC_FC_CHECK_INTRINSICS( [ishft ishift ishiftc ishftc] )
+
 dnl   What kind of hexadecimal constants are available.
 AC_FC_HAVE_BOZ
 AC_FC_HAVE_OLD_TYPELESS_BOZ
