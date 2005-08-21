@@ -1,3 +1,11 @@
+sc16.aux
+sc16.dvi
+sc16.htx
+sc16.htx_tar
+sc16.lof
+sc16.log
+sc16.ps
+sc16.toc
 .deps
 .libs
 *.la

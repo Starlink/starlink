@@ -1,3 +1,5 @@
+make.log
+make.log.err
 datacube_mon.ifl
 .deps
 .libs

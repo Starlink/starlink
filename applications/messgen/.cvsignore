@@ -1,3 +1,8 @@
+cremsg
+make.log.err
+messgen
+sun185.dvi
+sun185.ps
 *.lo
 *.la
 Makefile
