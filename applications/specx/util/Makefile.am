@@ -15,6 +15,6 @@ su.f swap2.f swap8.f swap_arr.f tran_date.f tran_time.f uread.f	      \
 uwrite.f vm_hndl.f xcopy.f xsnart.f xsnart8.f xtrans.f xtrans8.f      \
 xtrctq.f xy.f parse_date_obs.f
 
-FPP_ROUTINES = ndlib.fpp
+FPP_ROUTINES = ndlib.F
 
 PRIVATE_INCLUDES = VMTAB.INC LUNTAB.INC
