@@ -1,3 +1,8 @@
+a.out
+config.h
+config.h.in
+make.log.err
+start
 core.*
 sst_mon
 version.dat
