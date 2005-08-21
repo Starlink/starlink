@@ -33,6 +33,7 @@
 {  Authors:
 {    AJC: A J Chipperfield  (Starlink)
 {    BLY: M J Bly (Starlink, RAL)
+{    TIMJ: Tim Jenness (JAC, Hawaii)
 {
 {  History:
 {    12.09.1994 (AJC):
@@ -65,6 +66,8 @@
 {    31.01.2002 (BLY):
 {       Added XRT definitions.
 {       Removed TWODSPEC definitions.
+{    21.08.2005 (TIMJ):
+{       Photom now uses photom.icl
 
 {  Display ICL Version
 VERSION
@@ -297,14 +300,12 @@ endif
 
 {  PHOTOM
 defhelp photom $ADAM_PACKAGES PHOTOM
-if file_exists("$PHOTOM_DIR/photom") 
-   define photom $PHOTOM_DIR/photom
-   define photopt $PHOTOM_DIR/photopt
-   define photgrey $PHOTOM_DIR/photgrey
+if file_exists("$PHOTOM_DIR/photom.icl") 
+   defstring photom load $PHOTOM_DIR/photom.icl
+elseif file_exists("$PHOTOM_DIR/photom.csh")
+   defstring photom notavailable PHOTOM
 else
    defstring photom notinstalled PHOTOM
-   defstring photopt notinstalled PHOTOPT
-   defstring photgrey notinstalled PHOTGREY
 endif
 
 {  PISA
