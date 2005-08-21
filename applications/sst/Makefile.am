@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = start
+dist_bin_SCRIPTS = $(DYNSCRIPTS)
 
 bin_MONOLITHS = sst_mon
 sst_mon_SOURCES = \
@@ -14,6 +14,14 @@ sst_mon_LDADD = $(LDADD) `fio_link_adam` `one_link_adam`
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+IFL_FILES = $(sst_mon_TASKS:=.ifl)
+DYNSCRIPTS = sst.csh sst.sh sst.icl
+
+#  Generate ifl and startup scripts from the ifd file and then do any 
+#  necessary post processing of the generated files to overcome 
+#  deficiencies in ifd2star
+$(IFL_FILES) $(DYNSCRIPTS): sst.ifd
+	$(IFD2STAR) sst
 
 SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
          sst_cntac.f sst_get.f sst_latp.f sst_rdad1.f sst_trhlp.f \
@@ -32,20 +40,11 @@ PRIVATE_INCLUDES = SST_PAR SST_SCB
 # We (oddly) want these data files to go into the same directory as the 
 # binaries.  Since we have STAR_DEFAULTS(per-package-dirs) in configure.ac, 
 # however, we are allowed to use bin_DATA (don't ask).
-bin_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
+dist_bin_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
-# The `start' script needs to have installation locations edited into it
-edit = sed \
-	-e 's,@bindir\@,$(bindir),g' \
-	-e 's,@VERSION\@,$(VERSION),g'
-start: start.in
-	rm -f start.tmp start
-	$(edit) \
-	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
-	    $(srcdir)/start.in >start.tmp
-	mv start.tmp start
 
-EXTRA_DIST = start.in $(bin_DATA)
+EXTRA_DIST = sst.ifd.in $(bin_DATA)
 
 CLEANFILES = forstats.ifc procvt.ifc prohlp.ifc prohtml.ifc prolat.ifc \
-             propak.ifc sst_mon start version.dat sst_mon.ifc sst_mon.ifl
+             propak.ifc sst_mon start version.dat sst_mon.ifc sst_mon.ifl \
+             forstats.ifl procvt.ifl prohlp.ifl prohtml.ifl prolat.ifl

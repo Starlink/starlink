@@ -1,0 +1,556 @@
+package sst {
+   version @PACKAGE_VERSION@
+   prefix sst
+
+   executable sst_mon {
+#+
+#  Name:
+#     FORSTATS.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-AUG-1989 (RFWS):
+#	 Original version.
+#     4-SEP-1990 (RFWS):
+#        Renamed to FORSTATS.
+#     5-SEP-1990 (RFWS):
+#        Added CURRENT to ppath for OUT.
+#     1-OCT-1990 (RFWS):
+#        Converted to use new ADAM help system.
+#     {enter_further_changes_here}
+
+#-
+
+      action forstats {
+
+         helplib {SST_DIR:SST.HLB}
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath GLOBAL DEFAULT
+            default *.f
+            association <->GLOBAL.SST_SOURCE
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter key {
+                        # Whether an explanatory key is required
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Explanatory key required?}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default forstats.lis
+            prompt {Output file}
+            helpkey *
+          }
+
+      }
+# @(#)forstats.ifl   1.2   94/12/05 12:17:50   96/07/05 10:27:38
+#+
+#  Name:
+#     PROCVT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-JAN-1990 (RFWS):
+#	 Original, derived from the PROHLP.IFL file.
+#     5-SEP-1990 (RFWS):
+#        Added global association to the OUT parameter.
+#     5-SEP-1990 (RFWS):
+#        Added CURRENT to ppath of appropriate parameters.
+#     10-SEP-1990 (RFWS):
+#        Added the LANG parameter.
+#     1-OCT-1990 (RFWS):
+#        Converted to use new ADAM help system.
+#     {enter_further_changes_here}
+
+#-
+
+      action procvt {
+
+         helplib {SST_DIR:SST.HLB}
+
+         parameter atask {
+                          # Whether processing A-task prologues
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Processing A-task prologues?}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default *.f
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter lang {
+                         # Programming language
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default {VAX Fortran}
+            prompt {Programming language}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default procvt.for
+            association ->GLOBAL.SST_SOURCE
+            prompt {Output file}
+            helpkey *
+          }
+
+      }
+# @(#)procvt.ifl   1.2   94/12/05 12:18:00   96/07/05 10:27:38
+#+
+#  Name:
+#     PROHLP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-DEC-1989 (RFWS):
+#	 Original version.
+#     22-DEC-1989 (RFWS):
+#	 Added ATASK parameter.
+#     14-AUG-1990 (RFWS):
+#        Added SINGLE parameter.
+#     5-SEP-1990 (RFWS):
+#        Added global association to the IN parameter.
+#     5-SEP-1990 (RFWS):
+#        Added CURRENT to ppath for appropriate parameters.
+#     1-OCT-1990 (RFWS):
+#        Converted to use new ADAM help system.
+#     {enter_further_changes_here}
+
+#-
+
+      action prohlp {
+
+         helplib {SST_DIR:SST.HLB}
+
+         parameter atask {
+                          # Whether processing A-task prologues
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Processing A-task prologues?}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath GLOBAL DEFAULT
+            default *.f
+            association <->GLOBAL.SST_SOURCE
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default prohlp.hlp
+            prompt {Output file}
+            helpkey *
+          }
+
+         parameter single {
+                           # Single prologue per file?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process only a single prologue per input file?}
+            helpkey *
+          }
+
+      }
+# @(#)prohlp.ifl   1.2   94/12/05 12:18:01   96/07/05 10:27:38
+#+
+#  Name:
+#     PROLAT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-JAN-1990 (RFWS):
+#	 Original, derived from the PROHLP.IFL file.
+#     14-AUG-1990 (RFWS):
+#        Added the DOCUMENT and SINGLE parameters.
+#     5-SEP-1990 (RFWS):
+#        Added global association to the IN parameter.
+#     5-SEP-1990 (RFWS):
+#        Added the PAGE parameter.
+#     5-SEP-1990 (RFWS):
+#        Added CURRENT to appropriate ppath specifications.
+#     1-OCT-1990 (RFWS):
+#        Converted to use new ADAM help system.
+#     {enter_further_changes_here}
+
+#-
+
+      action prolat {
+
+         helplib {SST_DIR:SST.HLB}
+
+         parameter atask {
+                          # Whether processing A-task prologues
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Processing A-task prologues?}
+            helpkey *
+          }
+
+         parameter document {
+                             # Whether a full Latex document is required
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Produce a full Latex document?}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath GLOBAL DEFAULT
+            default *.f
+            association <->GLOBAL.SST_SOURCE
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default prolat.tex
+            prompt {Output file}
+            helpkey *
+          }
+
+         parameter page {
+                         # Start each description on a new page?
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Start each description on a new page?}
+            helpkey *
+          }
+
+         parameter single {
+                           # Single prologue per file?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process only a single prologue per input file?}
+            helpkey *
+          }
+
+      }
+# @(#)prolat.ifl   1.2   94/12/05 12:18:01   96/07/05 10:27:38
+#+
+#  Name:
+#     PROPAK.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-OCT-1989 (RFWS):
+#	 Original version.
+#     22-DEC-1989 (RFWS):
+#	 Added HELPFILE parameter.
+#     22-DEC-1989 (RFWS):
+#	 Added help library references.
+#     16-AUG-1990 (RFWS):
+#        Changed HELPFILE to be HELP.
+#     5-SEP-1990 (RFWS):
+#        Added global association to the IN parameter.
+#     5-SEP-1990 (RFWS):
+#        Added CURRENT to ppath for appropriate parameters.
+#     1-OCT-1990 (RFWS):
+#        Converted to use new ADAM help system.
+#     {enter_further_changes_here}
+
+#-
+
+      action propak {
+
+         helplib {SST_HELP}
+
+         parameter help {
+                         # Package help file
+            type LITERAL
+            access READ
+            position 4
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Package help file}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath GLOBAL DEFAULT
+            default *.f
+            association <->GLOBAL.SST_SOURCE
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output package definition file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default propak.lse
+            prompt {Output file}
+            helpkey *
+          }
+
+         parameter pack {
+                         # Name of package
+            type LITERAL
+            access READ
+            position 3
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Package name}
+            helpkey *
+          }
+
+         parameter single {
+                           # Single prologue per file?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process only a single prologue per input file?}
+            helpkey *
+          }
+
+      }
+# @(#)propak.ifl   1.2   94/12/05 12:18:02   96/07/05 10:27:38
+#+
+#  Name:
+#     PROHTML.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     PDRAPER: P.W.Draper (Durham University - STARLINK)
+#     {enter_authors_here}
+
+#  History:
+#     6-DEC-1994 (PDRAPER):
+#        Original version. Based on PROLAT.
+#     {enter_further_changes_here}
+
+#-
+
+      action prohtml {
+
+         helplib {$SST_HELP}
+
+         parameter atask {
+                          # Whether processing A-task prologues
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Processing A-task prologues?}
+            helpkey *
+          }
+
+         parameter inclusion {
+                              # Whether a Latex document is required
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Make suitable for inclusion in LaTeX?}
+            helpkey *
+          }
+     
+         parameter reformat {
+                             # Whether to re-format paragraphs etc.
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Allow re-formatting}
+            helpkey *
+          }
+     
+         parameter separate {
+                             # Whether to separate output into different files.
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Write output to separate files}
+            helpkey *
+          }
+
+         parameter package {
+                            # Name of package
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default <unknown>
+            prompt {Name of package}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input file specifications
+            type LITERAL
+            access READ
+            position 1
+            vpath PROMPT
+            ppath GLOBAL DEFAULT
+            default *.f
+            association <->GLOBAL.SST_SOURCE
+            prompt {Input file(s)}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output file
+            type LITERAL
+            access READ
+            position 2
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default prohtml.html
+            prompt {Output file}
+            helpkey *
+          }
+
+         parameter single {
+                           # Single prologue per file?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process only a single prologue per input file?}
+            helpkey *
+          }
+
+      }
+# @(#)prohtml.ifl   1.6   95/03/06 10:56:42   96/07/05 10:27:39
+   }
+
+   icl { defhelp sst $SST_HELP 0 }
+
+   display {
+
+      SST commands are now available - (Version @PACKAGE_VERSION@)
+
+      See SUN/110 for more information.
+
+   }
+
+}

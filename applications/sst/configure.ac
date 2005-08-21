@@ -29,15 +29,16 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_FUNCS(memcpy)
 
 STAR_MONOLITHS
+STAR_CHECK_PROGS(ifd2star)
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae],
+STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae ifd],
                           [link])
 STAR_DECLARE_DEPENDENCIES([build], [pcs], [use])
 
 STAR_LATEX_DOCUMENTATION(sun110)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml sst.ifd)
 AC_CONFIG_HEADERS(config.h)
 
 AC_OUTPUT
