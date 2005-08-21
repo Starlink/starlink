@@ -446,10 +446,10 @@ endif
 #   Photom
 #
 
-if ( -e @bindir@/photom/photom_init ) then
-   alias photomstart source @bindir@/photom/photom_init
-   alias photom source @bindir@/photom/photom_init
-   alias photomsetup source @bindir@/photom/photom_init
+if ( -e @bindir@/photom/photom.csh ) then
+   alias photomstart source @bindir@/photom/photom.csh
+   alias photom source @bindir@/photom/photom.csh
+   alias photomsetup source @bindir@/photom/photom.csh
 else
    alias photomstart '@staretcdir@/notinst photomstart'
    alias photom '@staretcdir@/notinst photom'

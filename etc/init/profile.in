@@ -1,6 +1,7 @@
 
 # File: @staretcdir@/profile
-# Version: @VERSION@
+# Init Version: @VERSION@
+# From CVS $Revision$
 
 # This file must be sourced before Starlink software can be used.
 # This script contains environment and alias definitions and must
@@ -91,6 +92,14 @@ fi
 if test -f @bindir@/polpack/polpack.sh; then
    export POLPACK_DIR=@bindir@/polpack
    export POLPACK_HELP=@starhelpdir@/polpack/polpack
+fi
+
+#
+#  PHOTOM
+
+if test -f @bindir@/photom/photom.sh; then
+   export PHOTOM_DIR=@bindir@/photom
+   export PHOTOM_HELP=@starhelpdir@/photom/photomhelp
 fi
 
 #
@@ -217,6 +226,20 @@ if test -f @bindir@/polpack/polpack.sh; then
 else
   polpack () { @staretcdir@/notinst polpack; }
   polpacksetup () { @staretcdir@/notinst polpack; }
+fi
+
+#
+#   Photom
+#
+
+if test -f @bindir@/photom/photom.sh; then
+   photomstart () { . $PHOTOM_DIR/photom.sh; }
+   photom () { . $PHOTOM_DIR/photom.sh; }
+   photomsetup () { . $PHOTOM_DIR/photom.sh; }
+else
+   photomstart () { @staretcdir@/notinst photomstart; }
+   photom () { @staretcdir@/notinst photom; }
+   photomsetup () { @staretcdir@/notinst photomsetup; }
 fi
 
 #

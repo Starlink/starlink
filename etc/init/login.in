@@ -1,7 +1,7 @@
 #+
 #  Date: 2003.12.12
 #  File: @staretcdir@/login
-#  Version: @VERSION@
+#  Init Version: @VERSION@
 #
 #  This file must be sourced before Starlink software can be used.
 #  This may be done at login time by adding the command:
@@ -441,7 +441,7 @@ endif
 
 #
 #  PHOTOM
-if ( -e @bindir@/photom/photom_init ) then
+if ( -e @bindir@/photom/photom.csh ) then
    setenv PHOTOM_DIR @bindir@/photom
    setenv PHOTOM_HELP @starhelpdir@/photom/photomhelp
 endif
