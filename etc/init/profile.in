@@ -38,6 +38,13 @@ if test -f @bindir@/ccdpack/ccdpack.sh; then
    export CCDPACK_HELP=@starhelpdir@/ccdpack/ccdpack
 fi
 
+#  Convert
+
+if test -f @bindir@/convert/convert.sh; then
+   export CONVERT_DIR=@bindir@/convert
+   export CONVERT_HELP=@starhelpdir@/convert/convert
+fi
+
 #  Fluxes
 
 if test -f @bindir@/fluxes/fluxes.csh; then
@@ -144,6 +151,16 @@ if test -f @bindir@/ccdpack/ccdpack.sh; then
 else
   ccdpack () { @staretcdir@/notinst ccdpack; }
   ccdpacksetup () { @staretcdir@/notinst ccdpack; }
+fi
+
+# CONVERT
+
+if test -f @bindir@/convert/convert.sh; then
+  convert () { . $CONVERT_DIR/convert.sh; }
+  convertsetup () { . $CONVERT_DIR/convert.sh; }
+else
+  convert () { @staretcdir@/notinst convert; }
+  convertsetup () { @staretcdir@/notinst convert; }
 fi
 
 # DIPSO
