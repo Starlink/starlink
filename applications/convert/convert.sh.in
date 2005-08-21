@@ -1,0 +1,390 @@
+#+
+#  Name:
+#     convert.sh
+#
+#  Purpose:
+#     Starts CONVERT from the UNIX shell.
+#
+#  Type of Module:
+#     Sh-shell script
+#
+#  Invocation:
+#     convert
+#
+#  Description:
+#     This procedure starts CONVERT for use from UNIX by defining the aliases
+#     and environment variables needed to execute each application or command.
+#     It also initialises ADAM, if this has not already been done.
+#
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     AJC: A.J.Chipperfield (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
+#
+#  History:
+#     1993 August 20 (MJC):
+#        Original version.
+#     1993 September 5 (MJC):
+#        Added IRCAM2NDF.
+#     1993 November 5 (MJC):
+#        Removed DIPSO2NDF and NDF2DIPSO.
+#     1995 October 30 (AJC):
+#        Updated to version 0.6.  Organized to be modified at install
+#        time.
+#     1995 November 30 (AJC):
+#        Added TIFF, GIF and PGM.
+#     1997 August 1 (MJC):
+#        Added DA2NDF, FITS2NDF, and NDF2DA tasks.  Added automatic
+#        conversions for STREAM and GZIP.  Added FITS and STREAM synonym
+#        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
+#        used multi-line creation for clarity.  Corrected con_tiff2ndf
+#        and con_ndf2tiff aliases.
+#     1998 January 13 (AJC):
+#        Added AST2NDF and SPECX2NDF
+#     1998 January 30 (AJC):
+#        Added mxhi to NDF_FORMATS_IN
+#     1999 June 10 (AJC):
+#        If IDL_PATH set, add $CONVERT_DIR to it
+#     2000 February 18 (AJC):
+#        Also set IDL_DLM_PATH if IDL_PATH set
+#     2000 July 7 (AJC):
+#        Add ^fxs to convertndf calls (required for NDF_FROM_FITS)
+#     2001 October 31 (AJC):
+#        Add MTFITS2NDF
+#     2004 March 12 (MJC):
+#        Add FITS(.fits) to NDF_FORMATS_OUT.
+#     2005 August 21 (TIMJ):
+#        Create from .csh version
+#     {enter_further_changes_here}
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+#-
+#
+#  Prepare to run ADAM applications if this has not been done already.
+#  ===================================================================
+#
+#  Here look to see if there is ADAM_USER directory.  If there is not
+#  check whether or not there is an adam file that is not a directory.
+#  If there is, issue a warning and exit.  Otherwise create the required
+#  directory.
+#
+if test -d $HOME/adam; then
+   echo -n
+else
+   if test -f $HOME/adam; then
+      echo "You have a file called adam in your home directory."
+      echo "Please rename it since adam must be a directory for ADAM files."
+#      exit
+   else
+      mkdir $HOME/adam
+   fi
+fi
+
+#
+#  Define symbols for the applications. Relies on CONVERT_DIR which is defined
+#  by the init package.
+#  ===========================================================================
+#
+if test -z $CONVERT_DIR; then
+   echo "You have not defined the environment variable CONVERT_DIR."
+   echo "You should do this by sourcing the Starlink initialisation scripts:"
+   echo "   @STARLINK@/etc/profile"
+#  exit
+fi
+
+# Make ${1+"$@"} portability feature work on zsh, too.
+test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
+
+
+ascii2ndf  () { $CONVERT_DIR/ascii2ndf ${1+"$@"}; }
+ast2ndf    () { $CONVERT_DIR/ast2ndf ${1+"$@"}; }
+conhelp    () { $CONVERT_DIR/conhelp ${1+"$@"}; }
+dst2ndf    () { $CONVERT_DIR/dst2ndf ${1+"$@"}; }
+da2ndf     () { $CONVERT_DIR/da2ndf ${1+"$@"}; }
+dst2ndf    () { $CONVERT_DIR/dst2ndf ${1+"$@"}; }
+fits2ndf   () { $CONVERT_DIR/fits2ndf ${1+"$@"}; }
+gif2ndf    () { $CONVERT_DIR/gif2ndf ${1+"$@"}; }
+iraf2ndf   () { $CONVERT_DIR/iraf2ndf ${1+"$@"}; }
+ircam2ndf  () { $CONVERT_DIR/ircam2ndf ${1+"$@"}; }
+mtfits2ndf () { tcsh $CONVERT_DIR/mtfits2ndf.tcsh ${1+"$@"}; }
+specx2ndf  () { $CONVERT_DIR/specx2ndf ${1+"$@"}; }
+tiff2ndf   () { $CONVERT_DIR/tiff2ndf ${1+"$@"}; }
+unf2ndf    () { $CONVERT_DIR/unf2ndf ${1+"$@"}; }
+ndf2ascii  () { $CONVERT_DIR/ndf2ascii ${1+"$@"}; }
+ndf2da     () { $CONVERT_DIR/ndf2da ${1+"$@"}; }
+ndf2dst    () { $CONVERT_DIR/ndf2dst ${1+"$@"}; }
+ndf2fits   () { $CONVERT_DIR/ndf2fits ${1+"$@"}; }
+ndf2gasp   () { $CONVERT_DIR/ndf2gasp ${1+"$@"}; }
+ndf2gif    () { $CONVERT_DIR/ndf2gif ${1+"$@"}; }
+ndf2iraf   () { $CONVERT_DIR/ndf2iraf ${1+"$@"}; }
+ndf2pgm    () { $CONVERT_DIR/ndf2pgm ${1+"$@"}; }
+ndf2tiff   () { $CONVERT_DIR/ndf2tiff ${1+"$@"}; }
+ndf2unf    () { $CONVERT_DIR/ndf2unf ${1+"$@"}; }
+#
+#  Now repeat for the full command names.
+#
+con_ascii2ndf  () { $CONVERT_DIR/ascii2ndf ${1+"$@"}; }
+con_ast2ndf    () { $CONVERT_DIR/ast2ndf ${1+"$@"}; }
+con_conhelp    () { $CONVERT_DIR/conhelp ${1+"$@"}; }
+con_dst2ndf    () { $CONVERT_DIR/dst2ndf ${1+"$@"}; }
+con_da2ndf     () { $CONVERT_DIR/da2ndf ${1+"$@"}; }
+con_dst2ndf    () { $CONVERT_DIR/dst2ndf ${1+"$@"}; }
+con_fits2ndf   () { $CONVERT_DIR/fits2ndf ${1+"$@"}; }
+con_gif2ndf    () { $CONVERT_DIR/gif2ndf ${1+"$@"}; }
+con_iraf2ndf   () { $CONVERT_DIR/iraf2ndf ${1+"$@"}; }
+con_ircam2ndf  () { $CONVERT_DIR/ircam2ndf ${1+"$@"}; }
+con_mtfits2ndf () { tcsh $CONVERT_DIR/mtfits2ndf.tcsh ${1+"$@"}; }
+con_specx2ndf  () { $CONVERT_DIR/specx2ndf ${1+"$@"}; }
+con_tiff2ndf   () { $CONVERT_DIR/tiff2ndf ${1+"$@"}; }
+con_unf2ndf    () { $CONVERT_DIR/unf2ndf ${1+"$@"}; }
+con_ndf2ascii  () { $CONVERT_DIR/ndf2ascii ${1+"$@"}; }
+con_ndf2da     () { $CONVERT_DIR/ndf2da ${1+"$@"}; }
+con_ndf2dst    () { $CONVERT_DIR/ndf2dst ${1+"$@"}; }
+con_ndf2fits   () { $CONVERT_DIR/ndf2fits ${1+"$@"}; }
+con_ndf2gasp   () { $CONVERT_DIR/ndf2gasp ${1+"$@"}; }
+con_ndf2gif    () { $CONVERT_DIR/ndf2gif ${1+"$@"}; }
+con_ndf2iraf   () { $CONVERT_DIR/ndf2iraf ${1+"$@"}; }
+con_ndf2pgm    () { $CONVERT_DIR/ndf2pgm ${1+"$@"}; }
+con_ndf2tiff   () { $CONVERT_DIR/ndf2tiff ${1+"$@"}; }
+con_ndf2unf    () { $CONVERT_DIR/ndf2unf ${1+"$@"}; }
+
+#
+#  Now set the environment variables for NDF automatic conversion.
+#  ===============================================================
+
+#  Define input and output formats recognised.
+#  ==========================================
+
+#  Formats recognised when accessing pre-existing datasets.  There are
+#  numerous products in FITS each uses a different file extension.
+export NDF_FORMATS_IN=\
+'FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz),FITS(.fits)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',FITS(.fts),FITS(.FTS),FITS(.FITS),FITS(.FIT)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',FITS(.lilo),FITS(.lihi),FITS(.silo),FITS(.sihi)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',FITS(.mxlo),FITS(.mxhi),FITS(.rilo),FITS(.rihi),FITS(.vdlo)'
+
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',FITS(.vdhi),STREAM(.str)'
+
+#  Formats recognised when creating new datasets.
+export NDF_FORMATS_OUT=\
+'.,FITS(.fit),,FITS(.fits),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
+
+export NDF_FORMATS_OUT=\
+$NDF_FORMATS_OUT',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
+
+export NDF_FORMATS_OUT=\
+$NDF_FORMATS_OUT',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
+
+#  Define format conversion commands.
+#  =================================
+
+#  FITS conversions.
+#  ----------------
+#  Because NDF2FITS uses HDS_WILD which will only accept container files 
+#  as input, NDF_TEMP_FITS must specify an alternative to the default
+#  HDS scratch file.
+if test -z $HDS_SCRATCH; then
+   export NDF_TEMP_FITS="$HDS_SCRATCH/temp_fits_^name^fxscl"
+else
+   export NDF_TEMP_FITS='temp_fits_^name^fxscl'
+fi
+
+export NDF_FROM_FITS=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_FITS=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  FIGARO conversions.
+#  ------------------
+export NDF_FROM_FIGARO=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_FIGARO=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  IRAF conversions:
+#  ----------------
+export NDF_FROM_IRAF=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_IRAF=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  N.B. deletion of IRAF datasets requires a separate command, since two
+#  files are involved.
+export NDF_DEL_IRAF=\
+'f='\'^dir^name\'';touch "$f.imh" "$f.pix";rm "$f.imh" "$f.pix"'
+
+#  GASP conversions:
+#  ----------------
+export NDF_FROM_GASP=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_GASP=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  N.B. deletion of GASP datasets requires a separate command, since two
+#  files are involved.
+export NDF_DEL_GASP=\
+'f='\'^dir^name\'';touch "$f.hdr" "$f.dat";rm "$f.hdr" "$f.dat"'
+
+#  UNFORMATTED conversions (with FITS headers).
+#  -------------------------------------------
+export NDF_FROM_UNFORMATTED=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_UNFORMATTED=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  UNF0 conversions (no FITS headers).
+#  ----------------------------------
+export NDF_FROM_UNF0=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_UNF0=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  STREAM (direct-access) conversions
+#  ----------------------------------
+export NDF_FROM_STREAM=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_STREAM=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  ASCII conversions (with FITS headers).
+#  -------------------------------------
+export NDF_FROM_ASCII=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_ASCII=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  TEXT conversions (like ASCII but without FITS headers).
+#  ------------------------------------------------------
+export NDF_FROM_TEXT=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_TEXT=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  GIF conversions.
+#  ----------------
+export NDF_FROM_GIF=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_GIF=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  TIFF conversions.
+#  -----------------
+export NDF_FROM_TIFF=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_TIFF=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+#  COMPRESSED conversions.
+#  ----------------------
+#  N.B. These commands sometimes return an error status to the calling
+#  process, even when they appear to have worked OK. It's not clear why.
+export NDF_FROM_COMPRESSED=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_COMPRESSED=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+if test -z $HDS_SCRATCH; then
+   export NDF_TEMP_COMPRESSED="$HDS_SCRATCH/temp_Z_^name"
+else
+   export NDF_TEMP_COMPRESSED='temp_Z_^name'
+fi
+ 
+#  GZIP compression conversions.
+#  -----------------------------
+export NDF_FROM_GZIP=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_GZIP=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+if test -z $HDS_SCRATCH; then
+   export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_Z_^name"
+else
+   export NDF_TEMP_GZIP='temp_Z_^name'
+fi
+ 
+#  DEBUG
+#  -----
+#  Switch off display all conversion operations for debugging.
+export NDF_SHCVT=0
+
+#  Set up IDL_PATH and IDL_DLM_PATH if IDL is activated
+#  ----------------------------------------------------
+if test -z $IDL_PATH; then
+   export IDL_PATH=${IDL_PATH}:$CONVERT_DIR
+   if test -z $IDL_DLM_PATH ; then
+      export IDL_DLM_PATH=${IDL_DLM_PATH}:$CONVERT_DIR
+   else
+      export IDL_DLM_PATH=$CONVERT_DIR
+   fi
+fi
+
+#
+#  Tell the user that CONVERT commands are now available.
+
+echo ""
+echo "   CONVERT commands are now available -- (Version @PACKAGE_VERSION@)"
+echo " "
+echo "   Defaults for automatic NDF conversion are set."
+echo " "
+echo "   Type conhelp for help on CONVERT commands."
+echo '   Type "showme sun55" to browse the hypertext documentation.'
+echo " "
+#
+#  Exit the procedure.
+#
+# end

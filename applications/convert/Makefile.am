@@ -7,7 +7,7 @@ SUBDIRS = @subdirs@ libcoi libcof libcon libaif iraf
 ## fail. 
 FIGLIBS = -ldta -lfigich
 
-bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf
+bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf convert.sh
 
 dist_bin_SCRIPTS = convertndf convertawk mtfits2ndf.tcsh
 
@@ -67,6 +67,12 @@ convert.csh: convert.csh.in Makefile
 	   $(srcdir)/convert.csh.in >convert.csh.tmp
 	mv convert.csh.tmp convert.csh
 
+convert.sh: convert.sh.in Makefile
+	rm -f convert.sh.tmp convert.sh
+	$(edit) \
+	   $(srcdir)/convert.sh.in >convert.sh.tmp
+	mv convert.sh.tmp convert.sh
+
 convert.icl: convert.icl.in Makefile
 	rm -f convert.icl.tmp convert.icl
 	$(edit) \
@@ -91,12 +97,12 @@ tiff2ndf: tiff2ndf.in Makefile
 	   $(srcdir)/tiff2ndf.in >tiff2ndf.tmp
 	mv tiff2ndf.tmp tiff2ndf
 
-EXTRA_DIST = convert.f convert.csh.in convert.icl.in gif2ndf.in \
+EXTRA_DIST = convert.f convert.csh.in convert.sh.in convert.icl.in gif2ndf.in \
              ndf2gif.in tiff2ndf.in $(HELP_SOURCES)
 
 
 MISC_BUILT_FILES = convert.shl version.dat gif2ndf ndf2gif tiff2ndf convert.csh convert.icl \
-convert_mon convert_mon.ifl
+convert_mon convert_mon.ifl convert.sh
 
 IFC_FILES = conhelp.ifc da2ndf.ifc dst2ndf.ifc fits2ndf.ifc gasp2ndf.ifc iraf2ndf.ifc \
 ircam2ndf.ifc ndf2ascii.ifc ndf2da.ifc ndf2dst.ifc ndf2fits.ifc ndf2gasp.ifc \
