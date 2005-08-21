@@ -18,6 +18,8 @@ sun50.aux
 sun50.htx_tar
 sun50.log
 sun50.ps
+sun50.htx
+sun50.dvi
 *.toc
 *.lo
 Makefile.in
