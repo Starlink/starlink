@@ -170,7 +170,7 @@
                CALL LINE(WAVE(NPOINT-1)/DIVX,FLUX(NPOINT-1)/DIVY,
      :                   WAVE(NPOINT)/DIVX,FLUX(NPOINT)/DIVY)
                CALL SGS_FLUSH
-               CALL FLUSH
+               CALL FLUSH( 6 )
             ELSE
                CALL POINTSYM(X1/DIVX,X2/DIVY,ISYMB)
             ENDIF
@@ -223,7 +223,7 @@
                       IF (.NOT.FILEIN)THEN
                         CALL LINE(WORK(1)/divx,WORK(ASIZE1+1)/divy,
      :                            WAVE(I)/divx,FLUX(I)/divy)
-                        CALL FLUSH
+                        CALL FLUSH( 6 )
                         CALL SGS_FLUSH
                       ENDIF
                      ENDDO
@@ -274,7 +274,7 @@
      :                          WAVE(I)/divx,FLUX(I)/divy)
                    ENDIF
                 ENDDO
-                CALL FLUSH
+                CALL FLUSH( 6 )
                 CALL SGS_FLUSH
              ENDIF
           ELSE
