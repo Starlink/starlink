@@ -56,6 +56,13 @@ if test -f @bindir@/kappa/kappa.sh; then
    export KAPPA_HELP=@starhelpdir@/kappa/kappa
 fi
 
+#  Kappa Retirement Home (kaprh)
+
+if test -f @bindir@/kaprh/kaprh.sh; then
+   export KAPRH_DIR=@bindir@/kaprh
+   export KAPRH_HELP=@starhelpdir@/kaprh/kaprh
+fi
+
 #  HDSTOOLS
 
 if test -f @bindir@/hdstools/hdstools.sh; then
@@ -130,6 +137,16 @@ else
   ccdpacksetup () { @staretcdir@/notinst ccdpack; }
 fi
 
+# DIPSO
+
+if test -f @bindir@/dipso/dipsosetup.sh; then
+  dipsosetup () { . @bindir@/dipso/dipsosetup.sh; }
+  dipso () { . @bindir@/dipso/dipsosetup.sh; }
+else
+  dipsosetup () { @staretcdir@/notinst dipsosetup; }
+  dipso () { @staretcdir@/notinst dipso; }
+fi
+
 # Fluxes
 
 if test -f @bindir@/fluxes/fluxes; then
@@ -160,6 +177,16 @@ if test -f @bindir@/kappa/kappa.sh; then
 else
   kappa () { @staretcdir@/notinst kappa; }
   kappasetup () { @staretcdir@/notinst kappa; }
+fi
+
+# Kappa Retirement Home (KAPRH)
+
+if test -f @bindir@/kaprh/kaprh.sh; then
+  kaprh () { . $KAPRH_DIR/kaprh.sh; }
+  kaprhsetup () { . $KAPRH_DIR/kaprh.sh; }
+else
+  kaprh () { @staretcdir@/notinst kaprh; }
+  kaprhsetup () { @staretcdir@/notinst kaprh; }
 fi
 
 # HDSTOOLS
