@@ -51,7 +51,7 @@ IFL_FILES = $(KAPRH_IFL_FILES)
 KAPRH_IFL_FILES = $(KAPRH_F_ROUTINES:.f=.ifl)
 MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
-DYNSCRIPTS = kaprh.csh kaprh.icl
+DYNSCRIPTS = kaprh.csh kaprh.icl kaprh.sh
 
 #  Generate ifl and startup scripts from the ifd file and then do any 
 #  necessary post processing of the generated files to overcome 
@@ -60,6 +60,8 @@ $(IFL_FILES) $(DYNSCRIPTS): kaprh.ifd
 	$(IFD2STAR) kaprh
 	sed -e 's#prefix=""#prefix=\\"\\"#g' kaprh.csh > temp
 	mv temp kaprh.csh
+	sed -e 's#prefix=""#prefix=\\"\\"#g' kaprh.sh > temp
+	mv temp kaprh.sh
 
 
 # Help source file
