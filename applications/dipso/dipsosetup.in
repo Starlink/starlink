@@ -2,6 +2,10 @@
 #
 # v3.3  25.12.95
 #
+
+# Note that sh version is not automatically synchronized with csh version.
+# please propagate changes to both
+
 setenv DIPSODIR @bindir@
 setenv DIPSOLIB @bindir@
 setenv DIPSOSTARBIN @prefix@/bin

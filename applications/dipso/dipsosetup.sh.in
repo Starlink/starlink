@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# v3.3  25.12.95
+#
+# This is the SH startup script.
+# Clone of dipsosetup [csh]. If this is edited for content
+# make sure edits are synchronized with csh version.
+
+export DIPSODIR=@bindir@
+export DIPSOLIB=@bindir@
+export DIPSOSTARBIN=@prefix@/bin
+export SPECDAT=@staretcdir@
+export OWNERDIR=${HOME}
+#
+#
+dipso () { ${DIPSODIR}/dipso; }
+dipso_link () { ${DIPSODIR}/dipso_link; }
+my_dipso () { ${DIPSODIR}/my_dipso; }
+
+echo " "
+echo "Dipso environment setup, type dipso to start task"
+echo " "
+#

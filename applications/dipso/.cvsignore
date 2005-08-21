@@ -10,6 +10,7 @@ autom4te.cache
 configure
 dipso
 dipsosetup
+dipsosetup.sh
 libdipso.la
 libtool
 my_dipso

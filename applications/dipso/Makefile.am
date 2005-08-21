@@ -8,7 +8,7 @@ dipso_SOURCES = run_dipso.c
 dipso_LDADD = libdipso.la `$(srcdir)/dipso_link` @FCLIBS@
 dipso_LDFLAGS =
 
-nodist_bin_SCRIPTS = dipsosetup dipso_link my_dipso
+nodist_bin_SCRIPTS = dipsosetup dipso_link my_dipso dipsosetup.sh
 
 dist_bin_SCRIPTS = dipsotest
 
@@ -86,6 +86,13 @@ dipsosetup: dipsosetup.in
 	   $(srcdir)/dipsosetup.in >dipsosetup.tmp
 	mv dipsosetup.tmp dipsosetup
 
+dipsosetup.sh: dipsosetup.sh.in
+	rm -f dipsosetup.sh.tmp dipsosetup.sh
+	$(edit) \
+	   -e 's,@edited_input\@,dipsosetup: produced from dipsosetup.in by Makefile.am,' \
+	   $(srcdir)/dipsosetup.sh.in >dipsosetup.sh.tmp
+	mv dipsosetup.sh.tmp dipsosetup.sh
+
 ## Files that should be copied into bindir.
 dipsosupportdir = $(bindir)
 dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS user.f \
@@ -101,7 +108,7 @@ staretc_DATA = specdat/*.*
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in \
-             $(dipsosupport_DATA)
+             $(dipsosupport_DATA) dipsosetup.sh.in
 
 ## News file
 
