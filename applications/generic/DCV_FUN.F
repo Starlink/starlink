@@ -128,6 +128,7 @@
 *  Authors:
 *     SMB: Steven Beard (ROE)
 *     PMA: Peter Allan (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -144,6 +145,8 @@
 *        External references transferred to DCV.EXT
 *     12-JAN-1993 (PMA):
 *        Converted prologue to ADAM style.
+*     21-AUG-2005 (TIMJ):
+*        Autoconf for g95. IAND can not take typeless BOZ constants
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +165,29 @@
       REAL DUMMY_R               ! REAL*4 argument
       INTEGER*2 DUMMY_W          ! WORD (INTEGER*2) argument
       INTEGER*2 DUMMY_UW         ! UNSIGNED WORD argument
+
+#if !HAVE_INTRINSIC_ZEXT
+*  Declare the variables needed to enforce type compatibility for systems
+*  that lack ZEXT. Some compilers insist that IAND arguments are the same type
+      BYTE      DCV_UBMASK
+      INTEGER*2 DCV_UWMASK
+
+# if HAVE_TYPELESS_BOZ
+*  Can not used typed BOZ here because some compilers do not like
+*  it when FF is used in a signed type
+      PARAMETER (DCV_UBMASK = X'000000FF' )
+      PARAMETER (DCV_UWMASK = X'0000FFFF' )
+# else
+#   if HAVE_OLD_TYPELESS_BOZ
+      PARAMETER (DCV_UBMASK = '000000FF'X )
+      PARAMETER (DCV_UWMASK = '0000FFFF'X )
+#   else
+#     error Have no BOZ and no ZEXT
+#   endif
+# endif
+
+/* !HAVE_INTRINSIC_ZEXT */
+#endif
 
 *   Declare the types of the functions
 
@@ -245,15 +271,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOD( DUMMY_UB )  = DBLE( ZEXT( DUMMY_UB ) )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UBTOD( DUMMY_UB )  = DBLE( IAND( DUMMY_UB , '000000FF'X ) )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UBTOD( DUMMY_UB )  = DBLE( IAND( DUMMY_UB , X'000000FF' ) )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UBTOD( DUMMY_UB )  = DBLE( IAND( DUMMY_UB , DCV_UBMASK ) )
 #endif
       DCV_DTOD( DUMMY_D )    = DUMMY_D
       DCV_ITOD( DUMMY_I )    = DBLE( DUMMY_I )
@@ -262,15 +280,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOD( DUMMY_UW )  = DBLE( ZEXT( DUMMY_UW ) )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , '0000FFFF'X ) )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , X'0000FFFF' ) )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UWTOD( DUMMY_UW )  = DBLE( IAND( DUMMY_UW , DCV_UWMASK ) )
 #endif
  
 *   (4) Routines resulting in INTEGER
@@ -279,15 +289,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOI( DUMMY_UB )  = ZEXT( DUMMY_UB )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UBTOI( DUMMY_UB )  = IAND( DUMMY_UB , '000000FF'X )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UBTOI( DUMMY_UB )  = IAND( DUMMY_UB , X'000000FF' )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UBTOI( DUMMY_UB )  = IAND( DUMMY_UB , DCV_UBMASK )
 #endif
       DCV_DTOI( DUMMY_D )    = NINT( DUMMY_D )
       DCV_ITOI( DUMMY_I )    = DUMMY_I
@@ -296,15 +298,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOI( DUMMY_UW )  = ZEXT( DUMMY_UW )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UWTOI( DUMMY_UW )  = IAND( DUMMY_UW , '0000FFFF'X )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UWTOI( DUMMY_UW )  = IAND( DUMMY_UW , X'0000FFFF' )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UWTOI( DUMMY_UW )  = IAND( DUMMY_UW , DCV_UWMASK )
 #endif
 
 *   (5) Routines resulting in REAL
@@ -313,15 +307,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOR( DUMMY_UB )  = REAL( ZEXT( DUMMY_UB ) )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UBTOR( DUMMY_UB )  = REAL( IAND( DUMMY_UB ,'000000FF'X ) )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UBTOR( DUMMY_UB )  = REAL( IAND( DUMMY_UB ,X'000000FF' ) )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UBTOR( DUMMY_UB )  = REAL( IAND( DUMMY_UB , DCV_UBMASK ) )
 #endif
       DCV_DTOR( DUMMY_D )    = SNGL( DUMMY_D )
       DCV_ITOR( DUMMY_I )    = REAL( DUMMY_I )
@@ -330,15 +316,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOR( DUMMY_UW )  = REAL( ZEXT( DUMMY_UW ) )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UWTOR( DUMMY_UW )  = REAL( IAND( DUMMY_UW ,'0000FFFF'X ) )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UWTOR( DUMMY_UW )  = REAL( IAND( DUMMY_UW ,X'0000FFFF' ) )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UWTOR( DUMMY_UW )  = REAL( IAND( DUMMY_UW , DCV_UWMASK) )
 #endif
 
 *   (6) Routines resulting in WORD
@@ -347,15 +325,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOW( DUMMY_UB )  = ZEXT( DUMMY_UB )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UBTOW( DUMMY_UB )  = IAND( DUMMY_UB , '000000FF'X )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UBTOW( DUMMY_UB )  = IAND( DUMMY_UB , X'000000FF' )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UBTOW( DUMMY_UB )  = IAND( DUMMY_UB , DCV_UBMASK )
 #endif
       DCV_DTOW( DUMMY_D )    = NINT( DUMMY_D )
       DCV_ITOW( DUMMY_I )    = DUMMY_I                       ! ???
@@ -364,15 +334,7 @@
 #if HAVE_INTRINSIC_ZEXT
       DCV_UWTOW( DUMMY_UW )  = ZEXT( DUMMY_UW )
 #else
-#  if HAVE_OLD_TYPELESS_BOZ
-      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , '0000FFFF'X )
-#  else
-#    if HAVE_TYPELESS_BOZ
-      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , X'0000FFFF' )
-#    else
-#      error Have no BOZ and no ZEXT.
-#    endif
-#  endif
+      DCV_UWTOW( DUMMY_UW )  = IAND( DUMMY_UW , DCV_UWMASK )      
 #endif
 
 *   (7) Routines resulting in UNSIGNED WORD
