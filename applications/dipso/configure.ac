@@ -24,8 +24,13 @@ STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+
+dnl  Need a main and typeless Hex constants
 AC_FC_MAIN
+AC_FC_HAVE_BOZ
+AC_FC_HAVE_OLD_TYPELESS_BOZ
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_LIBRARY_LDFLAGS

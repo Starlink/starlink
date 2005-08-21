@@ -16,7 +16,7 @@ lib_LTLIBRARIES = libdipso.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-libdipso_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(BLOCK_DATA_FILES)
+libdipso_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(C_ROUTINES) $(BLOCK_DATA_FILES)
 
 F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  asterix.f atfit.f atlasrd.f axmat.f badchk.f bbint.f bbody.f calcfx.f \
@@ -37,7 +37,7 @@ F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  mongowr.f move_real.f msgout.f ndfnam.f nebcont.f nebset.f nextk.f \
  ocdraw.f options.f osp0rd.f osp0wr.f parse_env.f pdgfit.f perigram.f \
  pltarr.f pointsym.f poly.f ppalet.f prpage.f putext.f pwritit.f range.f \
- rdkybd.f rdndf.f rdstr.f read.f readvmsrec.f reca.f record.f remap.f \
+ rdkybd.f rdndf.f rdstr.f read.f reca.f record.f remap.f \
  repfrm.f reporting.f rerep.f resint.f resstk.f restore.f reverx.f \
  rinteg.f rlint.f save.f savstk.f sdocont.f setcolours.f sgscurse.f \
  slen.f smatin.f smooth.f snip.f sofar.f sort1i.f sp0rd.f sp0wr.f sp1rd.f \
@@ -49,6 +49,8 @@ F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  user.f gks_gstat.f
 
 C_ROUTINES = handlev.c rdkbd2.c
+
+FPP_ROUTINES = readvmsrec.F
 
 ## Note that we cannot call this variable just BLOCK_DATA, since automake
 ## interprets this as a `primary' DATA
