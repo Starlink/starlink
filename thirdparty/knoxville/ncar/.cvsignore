@@ -22,3 +22,5 @@ pcrbin
 ezmap.dat
 pwritx.dat
 sun88.*
+make.log
+make.log.err
