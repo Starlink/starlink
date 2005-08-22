@@ -22,6 +22,7 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
+AC_PROG_LN_S
 
 dnl    Check if sys/wait.h exists and is POSIX compatible
 AC_HEADER_STDC
@@ -30,6 +31,7 @@ AC_CHECK_FUNCS(memcpy)
 
 STAR_MONOLITHS
 STAR_CHECK_PROGS(ifd2star)
+STAR_CHECK_PROGS(hlib)
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [chr fio hds hlp mers one par pcs psx sae ifd],

@@ -5,7 +5,7 @@ dist_bin_SCRIPTS = $(DYNSCRIPTS)
 bin_MONOLITHS = sst_mon
 sst_mon_SOURCES = \
 	sst_mon.f \
-	$(sst_mon_TASKS:=.f) \
+	$(TASK_ROUTINES) \
 	$(SUBSRC) \
 	$(PRIVATE_INCLUDES)
 
@@ -13,7 +13,9 @@ sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
 sst_mon_LDADD = $(LDADD) `fio_link_adam` `one_link_adam`
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+starhelp_DATA = sst.shl
 
+TASK_ROUTINES = $(sst_mon_TASKS:=.f)
 IFL_FILES = $(sst_mon_TASKS:=.ifl)
 DYNSCRIPTS = sst.csh sst.sh sst.icl
 
@@ -22,6 +24,18 @@ DYNSCRIPTS = sst.csh sst.sh sst.icl
 #  deficiencies in ifd2star
 $(IFL_FILES) $(DYNSCRIPTS): sst.ifd
 	$(IFD2STAR) sst
+
+.hlp.shl:
+	@HLIB@ $<
+
+# Build a help system from the newly built application
+sst.hlp: $(TASK_ROUTINES) prolat.ifl sst_mon sst_master.hlp
+	-rm -f sst.hlp all.f sst_tmp.hlp prohlp
+	cat $(TASK_ROUTINES) > all.f
+	$(LN_S) sst_mon prohlp
+	./prohlp in=all.f atask=yes out=sst_tmp.hlp single=no
+	cat sst_master.hlp sst_tmp.hlp > sst.hlp
+	-rm -f all.hlp all.f prohlp sst_tmp.hlp
 
 SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
          sst_cntac.f sst_get.f sst_latp.f sst_rdad1.f sst_trhlp.f \
@@ -43,7 +57,7 @@ PRIVATE_INCLUDES = SST_PAR SST_SCB
 dist_bin_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
 
-EXTRA_DIST = sst.ifd.in $(bin_DATA)
+EXTRA_DIST = sst.ifd.in $(bin_DATA) sst_master.hlp
 
 CLEANFILES = forstats.ifc procvt.ifc prohlp.ifc prohtml.ifc prolat.ifc \
              propak.ifc sst_mon start version.dat sst_mon.ifc sst_mon.ifl \
