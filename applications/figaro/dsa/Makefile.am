@@ -16,7 +16,7 @@ PRIVATE_INCLUDES = DSA_COMMON DSA_ERRORS DSA_STRUCTURE
 BLOCK_DATA_FILES = dsa_block.f
 
 F_ROUTINES = \
-dyn_element.f dyn_increm.f \
+dyn_increm.f \
  \
 dsa__ary.f dsa__ary_ori.f dsa__axi_dat.f dsa__axi_la.f dsa__axi_lfl.f \
 dsa__axi_nm.f dsa__axi_un.f dsa__axi_wi.f dsa__cl_de.f dsa__cr_ary.f \
@@ -66,4 +66,4 @@ dsa_val_axi.f dsa_var_err.f dsa_var_ty.f dsa_wrflush.f dsa_wrname.f \
 dsa_wruser.f dsa_xcstr.f dsa_zfill.f \
 dsaz_fname.f dsaz_inq_nam.f
 
-FPP_ROUTINES = dsaz_tfopen.F
+FPP_ROUTINES = dsaz_tfopen.F dyn_element.F
