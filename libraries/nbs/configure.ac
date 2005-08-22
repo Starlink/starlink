@@ -18,7 +18,6 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_FC
 AC_PROG_LN_S
 AC_HEADER_STDC
 AC_HEADER_TIME
@@ -36,10 +35,6 @@ AC_CHECK_FUNCS([memcpy ots\$move3])
 AC_CHECK_FUNCS([shmctl])
 AC_CHECK_FUNCS([LIB\$WAIT select])
 AC_PROG_LIBTOOL
-
-STAR_CNF_COMPATIBLE_SYMBOLS
-
-AC_FC_LIBRARY_LDFLAGS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae ems cnf])

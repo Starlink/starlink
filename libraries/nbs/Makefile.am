@@ -5,7 +5,7 @@ dist_bin_SCRIPTS = nbs_link nbs_link_adam
 bin_PROGRAMS = nbtrace
 
 nbtrace_SOURCES = nbtrace.c
-nbtrace_LDADD = `$(srcdir)/nbs_link` @FCLIBS@
+nbtrace_LDADD = `$(srcdir)/nbs_link`
 
 lib_LTLIBRARIES = libnbs.la
 
