@@ -28,3 +28,5 @@ config.*
 .deps
 .libs
 
+make.log
+make.log.err

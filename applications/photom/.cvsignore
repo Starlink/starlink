@@ -32,3 +32,5 @@ sun45.log
 sun45.ps
 sun45.toc
 *.ifc
+make.log
+make.log.err

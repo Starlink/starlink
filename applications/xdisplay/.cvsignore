@@ -34,3 +34,6 @@ stamp-h1
 make.log
 .deps
 
+make.log.err
+sun129.dvi
+sun129.ps

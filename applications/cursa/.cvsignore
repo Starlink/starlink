@@ -47,3 +47,5 @@ config.*
 .deps
 .libs
 geturl
+make.log
+make.log.err

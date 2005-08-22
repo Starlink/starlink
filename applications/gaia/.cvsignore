@@ -50,3 +50,5 @@ version.dat
 wcs2pix
 zoomcutandflip
 
+make.log
+make.log.err

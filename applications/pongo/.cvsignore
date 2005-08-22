@@ -14,3 +14,5 @@ pongohelp.shl
 .libs
 starconf.status
 
+make.log
+make.log.err

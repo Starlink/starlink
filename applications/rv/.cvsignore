@@ -19,3 +19,5 @@ aclocal.m4
 Makefile.in
 Makefile
 
+make.log
+make.log.err

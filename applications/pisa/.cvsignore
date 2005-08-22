@@ -35,3 +35,5 @@ sun109.htx_tar
 sun109.log
 sun109.ps
 sun109.toc
+make.log
+make.log.err

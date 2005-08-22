@@ -43,3 +43,5 @@ ssn73.toc
 starconf.status
 tmp
 
+make.log
+make.log.err
