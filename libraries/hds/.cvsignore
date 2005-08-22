@@ -39,3 +39,5 @@ make.log
 .deps
 
 starconf.status
+hds_test
+make.log.err

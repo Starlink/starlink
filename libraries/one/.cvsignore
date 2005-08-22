@@ -29,3 +29,6 @@ stamp-h1
 make.log
 .deps
 
+config.h
+config.h.in
+make.log.err

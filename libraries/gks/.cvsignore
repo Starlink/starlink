@@ -22,3 +22,7 @@ sun83.htx
 sun83.htx_tar
 sun83.log
 sun83.ps
+config.h
+config.h.in
+dummy_routine.lo
+stamp-h1

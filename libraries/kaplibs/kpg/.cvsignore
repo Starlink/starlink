@@ -106,3 +106,5 @@ stamp-h1
 make.log
 .deps
 starconf.status
+a.out
+xxx

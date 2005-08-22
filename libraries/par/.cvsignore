@@ -28,3 +28,6 @@ make.log
 .deps
 
 starconf.status
+make.log.err
+par_test
+par_test.ifc

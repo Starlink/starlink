@@ -31,3 +31,5 @@ make.log
 
 starconf.status
 auto
+make.log.err
+sun85.dvi

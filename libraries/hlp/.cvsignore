@@ -30,3 +30,5 @@ stamp-h1
 make.log
 .deps
 
+demo.shl
+make.log.err

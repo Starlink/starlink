@@ -27,3 +27,7 @@ make.log
 .deps
 
 starconf.status
+config.h
+config.h.in
+make.log.err
+sun183.dvi

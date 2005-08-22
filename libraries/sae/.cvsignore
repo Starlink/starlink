@@ -26,3 +26,5 @@ make.log
 .deps
 
 starconf.status
+SAI_ERR
+make.log.err

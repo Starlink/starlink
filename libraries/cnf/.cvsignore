@@ -32,3 +32,5 @@ make.log
 
 config.h.in
 starconf.status
+CNF_PAR.processed
+xxx.f

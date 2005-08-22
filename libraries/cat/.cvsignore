@@ -30,3 +30,7 @@ stamp-h1
 make.log
 .deps
 
+CAT1_NUL
+config.h
+config.h.in
+make.log.err

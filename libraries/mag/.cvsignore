@@ -35,3 +35,6 @@ make.log
 .deps
 
 *.ifc
+mag_test
+magtest
+make.log.err

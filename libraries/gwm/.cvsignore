@@ -31,3 +31,5 @@ make.log
 .deps
 
 starconf.status
+make.log.err
+sun130.dvi

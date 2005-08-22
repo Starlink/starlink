@@ -29,3 +29,5 @@ make.log
 starconf.status
 *.ifc
 kaplibs_test
+make.log.err
+sun238.dvi

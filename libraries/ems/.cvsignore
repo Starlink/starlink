@@ -30,3 +30,7 @@ make.log
 
 config.h.in
 starconf.status
+ems_test
+make.log.err
+ssn4.dvi
+test_iostat

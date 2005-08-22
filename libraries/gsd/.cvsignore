@@ -33,3 +33,5 @@ stamp-h1
 make.log
 .deps
 
+a.out
+xxx.f

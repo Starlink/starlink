@@ -38,3 +38,4 @@ make.log
 .deps
 
 starconf.status
+make.log.err

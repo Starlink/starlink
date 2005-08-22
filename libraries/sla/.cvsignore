@@ -27,3 +27,7 @@ make.log
 
 starconf.status
 config.h.in
+make.log.err
+sla_test
+veri.f
+vers.f

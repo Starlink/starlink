@@ -51,3 +51,5 @@ make.log
 .deps
 
 starconf.status
+make.log.err
+sun160.dvi

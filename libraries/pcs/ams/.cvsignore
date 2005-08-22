@@ -24,3 +24,5 @@ make.log
 .deps
 
 starconf.status
+amsmaster
+amsslave

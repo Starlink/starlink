@@ -36,3 +36,5 @@ make.log
 .deps
 
 *.ifc
+inq.f
+t405e.sdf
