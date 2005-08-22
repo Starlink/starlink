@@ -462,7 +462,7 @@
                h2 = 0.0
                h3 = 0.0
                DO i = 1, IDF_COUNT
-                 height = extracted_ref( idf_pos( i ) )
+                 height = extracted_ref( int(idf_pos( i )) )
                  IF ( height .GT. h1 ) THEN
                    IF ( h1 .GT. h2 ) THEN
                      h2 = h1
