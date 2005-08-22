@@ -1508,136 +1508,6 @@ Interface ISCRUNCH
    EndParameter
 
 EndInterface
-Interface ISCRUNI
-
-   helplib 'FIG_HELP:'
-
-   Parameter IMAGE
-      Position  1
-      Type 'NDF'       
-      access 'READ'
-      Vpath 'PROMPT'                        
-      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
-      association '<->GLOBAL.IMAGE'
-      Prompt '(IMage) Image to be scrunched'
-      helpkey '*'
-   EndParameter
-
-   Parameter FILE
-      Position  2
-      Type 'LITERAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(FIle) File containing results of 1st 2D arc fit'
-      helpkey '*'
-   EndParameter
-
-   Parameter FILE2
-      Position  3
-      Type 'LITERAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(FILE2) File containing results of 2nd 2D arc fit'
-      helpkey '*'
-   EndParameter
-
-   Parameter FRACTION
-      Position  4
-      Type '_REAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(FRaction) Used = FILE+(FILE2-FILE)*FRACTION'
-      helpkey '*'
-   EndParameter
-
-   Parameter WSTART
-      Position  5
-      Type '_REAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(WStart) Wavelength of center of first bin'
-      helpkey '*'
-   EndParameter
-
-   Parameter WEND
-      Position  6
-      Type '_REAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(WEnd) Wavelength of center of last bin (or increment)'
-      helpkey '*'
-   EndParameter
-
-   Parameter BINS
-      Position  7
-      Type '_REAL'       
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(BIns) Number of bins for scrunched image'
-      helpkey '*'
-   EndParameter
-
-   Parameter OUTPUT
-      Position  8
-      Type 'NDF'       
-      access 'WRITE'
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(OUtput) Name of resulting scrunched image'
-      helpkey '*'
-   EndParameter
-
-   Parameter INCREMENT
-      Type '_LOGICAL'      
-      Vpath 'DYNAMIC,DEFAULT'               
-      Default FALSE   
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(INCrement) Treat WEND value as an increment value?'
-      helpkey '*'
-   EndParameter
-
-   Parameter FINAL
-      Type '_LOGICAL'      
-      Vpath 'DYNAMIC,DEFAULT'               
-      Default FALSE   
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(FInal) Treat WEND as a final wavelength value?'
-      helpkey '*'
-   EndParameter
-
-   Parameter LOG
-      Type '_LOGICAL'      
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(LOg) Bin into logarithmic wavelength bins?'
-      helpkey '*'
-   EndParameter
-
-   Parameter LINEAR
-      Type '_LOGICAL'      
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(LInear) Use linear interpolation for data?'
-      helpkey '*'
-   EndParameter
-
-   Parameter QUAD
-      Type '_LOGICAL'      
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(Quad) Use quadratic interpolation for data?'
-      helpkey '*'
-   EndParameter
-
-   Parameter DENSITY
-      Type '_LOGICAL'      
-      Vpath 'PROMPT'                        
-      Ppath 'CURRENT,DYNAMIC,DEFAULT'
-      Prompt '(DENsity) Treat data as flux per unit wavelength?'
-      helpkey '*'
-   EndParameter
-
-EndInterface
 Interface MASKEXT
 
    helplib 'FIG_HELP:'
@@ -2221,6 +2091,136 @@ Interface XCOPY
       Vpath 'PROMPT'                        
       Ppath 'CURRENT,DYNAMIC,DEFAULT'
       Prompt '(OUTput) Name of resulting file'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ISCRUNI
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be scrunched'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) File containing results of 1st 2D arc fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE2
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FILE2) File containing results of 2nd 2D arc fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FRACTION
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FRaction) Used = FILE+(FILE2-FILE)*FRACTION'
+      helpkey '*'
+   EndParameter
+
+   Parameter WSTART
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WStart) Wavelength of center of first bin'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEND
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      helpkey '*'
+   EndParameter
+
+   Parameter BINS
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BIns) Number of bins for scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Name of resulting scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter INCREMENT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INCrement) Treat WEND value as an increment value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FINAL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FInal) Treat WEND as a final wavelength value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOg) Bin into logarithmic wavelength bins?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINEAR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LInear) Use linear interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUAD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Quad) Use quadratic interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DENSITY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DENsity) Treat data as flux per unit wavelength?'
       helpkey '*'
    EndParameter
 
