@@ -126,6 +126,7 @@
 *                    (MPF/RGO)
 *     05 Feb 1997  : Modified calls to str$upcase to str_upcase for 
 *                    Linux port (BLY,RAL).
+*     21 Aug 2005  : Use str_len rather than lnblnk to be more portable (TJ,JACH)
 *
 *   Type definitions :
 *
@@ -173,8 +174,10 @@
       character key*20          ! current keyword
       character cval*20         ! current character parameter value
       character toks(MAXTOKS)*20 ! tokens in current line
-      integer lnblnk,start,end
+      integer start,end
       character*80 infile,echdir
+      integer str_len
+      external str_len
 *
 *-----------------------------------------------------------------------
 *
@@ -195,17 +198,17 @@
 *
       if (file .eq. 'ECHWIND_SPECTROGRAPHS') then
          call getenv("ECHWIND_HOME",echdir)
-         infile = echdir(:lnblnk(echdir))//'spectrographs.dat'
+         infile = echdir(:str_len(echdir))//'spectrographs.dat'
       else
-         infile = file(:lnblnk(file))
+         infile = file(:str_len(file))
       endif
 
       lun = 28
-      open(unit=lun, file=infile(:lnblnk(infile)), status='old',
+      open(unit=lun, file=infile(:str_len(infile)), status='old',
      :     iostat=ios)
       if(ios.ne.0)then
          write(*,*) 'Error opening spectrograph parameter file ',
-     :              infile(:lnblnk(infile))
+     :              infile(:str_len(infile))
 	 RETURN
       endif
 

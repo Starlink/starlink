@@ -3,17 +3,20 @@
       integer MAXTOKS
       parameter (MAXTOKS = 20)
 
+      integer str_len
+      external str_len
+
       character*(*) param,value
       character*80  line,key,prompt,default,upline,fname,echdir
       integer       status,ios,lun,ntoks,start,end1,end2
-      integer       lenkey,lendefault,lenprompt,i,lnblnk
+      integer       lenkey,lendefault,lenprompt,i
       character*40  toks(MAXTOKS)
       logical       found,doesit
 
       call getenv("ECHWIND_HOME",echdir)
-      fname = echdir(:lnblnk(echdir))//'echwind.ifl'
+      fname = echdir(:str_len(echdir))//'echwind.ifl'
       lun = 29
-      open(unit = lun, file = fname(:lnblnk(fname)),status = 'old')
+      open(unit = lun, file = fname(:str_len(fname)),status = 'old')
 
       lendefault = 0
       found  = .false.
@@ -64,7 +67,7 @@
          if (value(1:5) .eq. '     ') then
             doesit = .false.
          else
-            inquire(file = value(:lnblnk(value)),exist = doesit)
+            inquire(file = value(:str_len(value)),exist = doesit)
          end if
       end if
       if (.not. doesit) then

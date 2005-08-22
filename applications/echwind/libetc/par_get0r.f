@@ -7,14 +7,16 @@
       real          value
       character*80  line,key,prompt,upline,defread,default,fname,echdir
       integer       status,ios,lun,ntoks,start,end1,end2
-      integer       lenkey,lendefault,lenprompt,i,lnblnk
+      integer       lenkey,lendefault,lenprompt,i
       character*40  toks(MAXTOKS)
       logical       found
+      integer       str_len
+      external       str_len
 
       call getenv("ECHWIND_HOME",echdir)
-      fname = echdir(:lnblnk(echdir))//'echwind.ifl'
+      fname = echdir(:str_len(echdir))//'echwind.ifl'
       lun = 29
-      open(unit = lun, file = fname(:lnblnk(fname)),status = 'old')
+      open(unit = lun, file = fname(:str_len(fname)),status = 'old')
 
       lendefault = 0
       found  = .false.

@@ -126,6 +126,8 @@
 *     05 Feb 1997   : Modified calls to str$upcase and str$trim to str_upcase
 *                     and str_trim respectively for Linux port (BLY,RAL).
 *     28 Feb 1998   : Initialise STATUS to 0.
+*     21 Aug 2005   : Use FPP for ACCESS mode. Replace LNBLNK with internal
+*                     version (str_trim) to be more portable.
 *
 *   Type definitions :
 *
@@ -605,8 +607,9 @@
       include 'SAE_PAR'
       include 'echwind_dets'
 
-      integer status, ios, lun, i, l, lnblnk
+      integer status, ios, lun, i, l, str_len
       character*80 detfile, string,echdir,fname
+      external str_len
 
       ndets = 0
       det_list = ' '
@@ -619,19 +622,19 @@
          if (detfile .ne. ' ') then
             if (i .ne. 1) then
                call getenv("ECHWIND_HOME",echdir)
-               fname = echdir(:lnblnk(echdir))
-     :                 //detfile(:lnblnk(detfile))
+               fname = echdir(:str_len(echdir))
+     :                 //detfile(:str_len(detfile))
             else
-               fname = detfile(:lnblnk(detfile))
+               fname = detfile(:str_len(detfile))
             endif
             if(status.ne.sai__ok)then
                write(*,*) 'Error getting parameter ',detparams(i)
             elseif(fname .ne. ' ')then
-               open(unit=lun, file=fname(:lnblnk(fname)), status='old',
+               open(unit=lun, file=fname(:str_len(fname)), status='old',
      :              iostat=ios)
                if(ios.ne.0)then
                   write(*,*) 'Error opening detector file ',
-     :                 fname(:lnblnk(fname))
+     :                 fname(:str_len(fname))
                   ios=-1
                endif
                do while (ios.eq.0)
@@ -651,7 +654,7 @@
                enddo
                if(ios.gt.0)then
                   write(*,*) 'Error opening detector file ',
-     :                 fname(:lnblnk(fname))
+     :                 fname(:str_len(fname))
                endif
                close(lun, iostat=ios)
             endif
@@ -880,7 +883,7 @@
       include 'echwind_par'
       include 'echwind_orders'
 
-      integer status, lun, ios,lnblnk
+      integer status, lun, ios,str_len
       integer cen_mc, max_mc, min_mc
       logical created
       logical on_echellogram
@@ -892,6 +895,7 @@
       character*80 file, buff, colour
       data created/.false./
       save created, file
+      external str_len
 
       status = sai__ok
       deltheta = ech_thetab - ech_blaze0
@@ -942,18 +946,18 @@
          if(.not.created)then
             status=sai__ok
             call par_get0c('TEXTFILE', file, status)
-            file = file(1:lnblnk(file))//'.txt'
+            file = file(1:str_len(file))//'.txt'
             open(unit=lun, file=file, status='new', iostat=ios)
             if(status.ne.sai__ok.or.ios.ne.0)then
                write(*,*) 'Error creating text file ',
-     :                     file(:lnblnk(file))
+     :                     file(:str_len(file))
             else
-               write(*,*) 'Created text file ',file(:lnblnk(file))
+               write(*,*) 'Created text file ',file(:str_len(file))
                created=.true.
                write(lun,*) 'ECHWIND V3.0'
             endif
          else
-            file = file(1:lnblnk(file))
+            file = file(1:str_len(file))
             open(unit=lun, file=file, status='old',
 #if HAVE_FC_OPEN_POSITIONAPPEND
      :           access='sequential',position='append',
@@ -965,7 +969,7 @@
      :           iostat=ios)
             if(ios.ne.0)then
                write(*,*) 'Error re-opening text file ',
-     :                     file(:lnblnk(file))
+     :                     file(:str_len(file))
             endif
          endif
 *
@@ -1228,8 +1232,9 @@
       include 'SAE_PAR'
       include 'echwind_lines'
 
-      integer status, ios, lun, lnblnk, prefix_pos
+      integer status, ios, lun, str_len, prefix_pos
       character*80 linelist, echdir
+      external str_len
 
       nlines=0
       lun = 27
@@ -1243,18 +1248,18 @@
          prefix_pos = index(linelist,'${ECHWIND_HOME}')
          if (prefix_pos.ne.0) then
             call getenv("ECHWIND_HOME",echdir)
-            linelist = echdir(:lnblnk(echdir))
+            linelist = echdir(:str_len(echdir))
      :              //linelist(prefix_pos+len('${ECHWIND_HOME}')
-     :              :lnblnk(linelist))
+     :              :str_len(linelist))
          endif
            
          write(*,*) 'linelist file =',
-     $                  linelist(:lnblnk(linelist))
-         open(unit=lun, file=linelist(:lnblnk(linelist)),
+     $                  linelist(:str_len(linelist))
+         open(unit=lun, file=linelist(:str_len(linelist)),
      $        status='old', iostat=ios)
          if(ios.ne.0)then
             write(*,*) 'Error opening linelist file ',
-     $                  linelist(:lnblnk(linelist))
+     $                  linelist(:str_len(linelist))
             ios=-1
          endif
          do while (ios.eq.0)
@@ -1264,7 +1269,7 @@
          enddo
          if(ios.gt.0)then
             write(*,*) 'Error reading linelist file ',
-     $                  linelist(:lnblnk(linelist))
+     $                  linelist(:str_len(linelist))
          endif
          close(lun, iostat=ios)
       endif

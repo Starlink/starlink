@@ -1,4 +1,4 @@
-      INTEGER FUNCTION LNBLNK( STRING )
+      INTEGER FUNCTION STR_LEN( STRING )
 *+
 *  Name:
 *     LNBLNK
@@ -20,7 +20,7 @@
 *        The string whose length is to be determined.
 
 *  Returned Value:
-*     LNBLNK = INTEGER
+*     STR_LEN = INTEGER
 *        Returns the used length of the string.
 
 *  Algorithm:
@@ -33,6 +33,7 @@
 *     ACD: A.C. Davenhall (ROE)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     BLY: M.J.Bly (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,11 @@
 *        This version borrwoed form CHR routine CHR_LEN for Linux port
 *           of ECHWIND to provide LNBLNK Fortran Intrinsic not 
 *           available on Linux.
+*     21-AUG-2005 (TIMJ):
+*        It's more portable simply to use our own namespace rather than
+*        guessing whether LNBLNK will exist on the particular compiler.
+*        <sarcasm>Here's a thought: simply use CHR_LEN. 
+*        No, that would never work!</sarcasm>
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +86,6 @@
  10   CONTINUE
  20   CONTINUE
 
-      LNBLNK = IPOSN
+      STR_LEN = IPOSN
 
       END

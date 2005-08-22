@@ -3,10 +3,11 @@
       implicit none
 
       character*(*) dest,source
-      integer length,lnblnk
+      integer length,str_len
       character*(80) temp
+      external str_len
 
-      length = lnblnk(source)
+      length = str_len(source)
       temp = source(1:length)
       dest = temp
 
