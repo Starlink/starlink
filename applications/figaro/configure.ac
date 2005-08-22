@@ -70,5 +70,7 @@ AC_CONFIG_FILES([Makefile component.xml figaro.csh figaro.icl
     fibre/Makefile   fit/Makefile      main/Makefile   util/Makefile
     fig/Makefile     fitres/Makefile   opt/Makefile    work/Makefile])
 
+AC_CONFIG_HEADERS(config.h)
+
 dnl    This is the bit that does the actual work
 AC_OUTPUT
