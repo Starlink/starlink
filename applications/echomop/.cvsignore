@@ -1,3 +1,5 @@
+*.dvi
+make.log*
 *.loT
 *.lo
 *.ifc
