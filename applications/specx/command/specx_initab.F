@@ -19,7 +19,13 @@
 *        Unused ierr in DEFINE_USER_TABLE
 *     25 Jul 2004 (timj)
 *        Be consistent in use of GSD_VAR.INC vs GSD_VAR
+*     22 Aug 2005 (timj)
+*        %LOC is not always available
 *-----------------------------------------------------------------------
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
       SUBROUTINE SPECX_INIT_TABLE
 
