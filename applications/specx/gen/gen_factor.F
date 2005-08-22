@@ -146,7 +146,14 @@ CD      Print *, '     Unary minus flag set - pushing operator stack...'
           form   = 'I'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (string(ist:iend), type, form, ivalue)
-          address = %loc(ivalue)
+          address = 
+#if HAVE_PERCENTLOC
+     :   %loc(ivalue)
+#elif HAVE_INTRINSIC_LOC
+     :   loc(ivalue)
+#else
+    Do not have LOC or %LOC
+#endif
 CD        Print *,'     integer value read'
         ELSE IF (gen_floating (string(ist:iend), idig, fdig)) THEN
           type   = 'R4'
@@ -154,7 +161,14 @@ CD        Print *,'     integer value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1, 
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address = %loc(rvalue)
+          address = 
+#if HAVE_PERCENTLOC
+     :   %loc(rvalue)
+#elif HAVE_INTRINSIC_LOC
+     :   loc(rvalue)
+#else
+    Do not have LOC or %LOC
+#endif
 CD        Print *,'     real*4 value read'
         ELSE IF (gen_eformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R4'
@@ -162,7 +176,14 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address = %loc(rvalue)
+          address = 
+#if HAVE_PERCENTLOC
+     :   %loc(rvalue)
+#elif HAVE_INTRINSIC_LOC
+     :   loc(rvalue)
+#else
+    Do not have LOC or %LOC
+#endif
 CD        Print *,'     real*4 value read'
         ELSE IF (gen_dformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R8'
@@ -170,14 +191,28 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, dvalue)
-          address = %loc(dvalue)
+          address = 
+#if HAVE_PERCENTLOC
+     :   %loc(dvalue)
+#elif HAVE_INTRINSIC_LOC
+     :   loc(dvalue)
+#else
+    Do not have LOC or %LOC
+#endif
 CD        Print *,'     real*8 value read'
         END IF
 
       ELSE IF (strconst) THEN
         CALL gen_hdnorm (string(ist:iend), string(ist:iend), ls, ierr)
         WRITE (type, '(''C'',I3.3)') ls
-        address = %loc(string(ist:ist))
+        address = 
+#if HAVE_PERCENTLOC
+     :   %loc(string(ist:ist))
+#elif HAVE_INTRINSIC_LOC
+     :   loc(string(ist:ist))
+#else
+    Do not have LOC or %LOC
+#endif
 CD      Print *,'     string constant read: length =', ls
 CD      Print *,'     variable type = ', TYPE
 CD      Print *,'     ', string(ist:ist+ls-1)
@@ -234,7 +269,14 @@ CD        Print *,'    symbol -- has an argument -- pushing all stacks'
       ntopnd            = ntopnd + 1
       nopnd(lev)        = nopnd(lev) + 1
       opnd_type(ntopnd) = type
-      opnd_addr(ntopnd) = %LOC(wksp(next_ws))
+      opnd_addr(ntopnd) = 
+#if HAVE_PERCENTLOC
+     :   %LOC(wksp(next_ws))
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(wksp(next_ws))
+#else
+    Do not have LOC or %LOC
+#endif
 
 *     Update the workspace pointer (note: allocate 8 bytes min for 64-bit AXP)
 
