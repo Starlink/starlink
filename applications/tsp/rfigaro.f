@@ -35,6 +35,7 @@ C  History:
 C    Aug/1987   Original Version.   JAB/AAO 
 C    26/2/1988   TSP Monolith version.  JAB/AAO
 C    17/03/2000  Added DOUBLE PRECISION dummy argument DDUMMY.   BLY/RAL
+C    21/08/2005  Fix typo in argument! TIMJ/JACH
 C
 
       IMPLICIT NONE
@@ -115,7 +116,7 @@ C
             
 *  Map .X.DATA if it exists
 
-            CALL DSA_MAP_AXIS_DATA('INPUT',1,'READ','FLOAT',,XPTR,
+            CALL DSA_MAP_AXIS_DATA('INPUT',1,'READ','FLOAT',XPTR,
      :             XSLOT,STATUS)
             CALL DSA_GET_AXIS_INFO('INPUT',1,2,STRINGS,0,DDUMMY,STATUS)
             XLABEL = STRINGS(2)
