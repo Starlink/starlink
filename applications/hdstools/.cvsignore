@@ -1,3 +1,5 @@
+make.log.err
+*.dvi
 hdstools.sh
 hdstools.csh
 hdstools.hlp

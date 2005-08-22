@@ -1,3 +1,12 @@
+creindex.sed
+edhead.sed
+edtail.sed
+gethead.sed
+gettitle.sed
+htxpath
+make.log.err
+sun188.dvi
+sun188.ps
 *.lo
 *.la
 Makefile

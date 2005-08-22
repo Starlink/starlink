@@ -1,3 +1,5 @@
+make.log*
+*.dvi
 news
 news2html
 newsmaint
