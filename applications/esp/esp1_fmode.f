@@ -340,7 +340,7 @@
 
 *      Call the routine that profiles the galaxy and sets up the values
 *      in the results arrays.
-D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
+*         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
          CALL ELF1_PRO(1,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
      :                 PSIZE,RLIM(I),BACKS(I),SIGMA,ELEMS,POINT1,
      :                 PRANGE,XCO,YCO,VALIDP,RESULT,STATUS)
