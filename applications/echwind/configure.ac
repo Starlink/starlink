@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([echwind.f])
+AC_CONFIG_SRCDIR([echwind.F])
 
 STAR_DEFAULTS(per-package-dirs)
 
