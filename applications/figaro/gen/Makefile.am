@@ -20,7 +20,7 @@ gen_exedir.f gen_exist.f gen_ficopy.f gen_fill.f gen_filt3.f \
 gen_forterr.f gen_frangef.f gen_fvsort.f gen_gconv.f gen_growx.f \
 gen_growxt.f gen_growxy.f gen_growy.f gen_growyt.f gen_iconv.f \
 gen_icor16.f gen_idiff.f gen_incchk.f gen_incchkd.f gen_ishift.f \
-gen_ivsort.f gen_log.f gen_alog.f gen_medflt.f gen_move.f \
+gen_ivsort.f gen_log.f gen_alog.f gen_medflt.f \
 gen_mulcad.f gen_mulcaf.f gen_mulcafe.f gen_multaf.f gen_multafe.f \
 gen_nfillf.f gen_nth.f gen_pmax.f gen_poly2d.f gen_power2.f \
 gen_powereq.f gen_qrangef.f gen_rangbf.f gen_rangef.f gen_ref2d.f \
@@ -29,4 +29,4 @@ gen_sortf.f gen_subad.f gen_subaf.f gen_subafe.f gen_subset.f \
 gen_subsetb.f gen_success.f gen_supset.f gen_time.f gen_wait.f \
 gen_xop21.f gen_yop21.f
 
-FPP_ROUTINES =  gen_bswap.F gen_wbswap.F
+FPP_ROUTINES =  gen_bswap.F gen_wbswap.F gen_move.F
