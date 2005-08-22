@@ -26,7 +26,7 @@
 
 /* Dummy main for some compilers */
 #ifdef FC_MAIN
-FC_MAIN () {}
+void FC_MAIN () {}
 #endif
 
 
