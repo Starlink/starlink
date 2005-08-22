@@ -1,0 +1,15 @@
+Makefile
+autoload.tcl
+buildidx.tcl
+dltest.tmp
+help.tmp
+pkgIndex.tcl
+runtest
+runtest.standalone
+runtest.static
+tcl
+tcl.tlib
+tcl.tndx
+tclXtest
+tclx.tcl
+tclxConfig.sh

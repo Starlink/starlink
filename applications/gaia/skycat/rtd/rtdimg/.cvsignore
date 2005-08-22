@@ -2,3 +2,4 @@ Makefile
 Makefile.in.save
 doc
 notinuse
+lib

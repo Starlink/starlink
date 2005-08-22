@@ -1,0 +1,10 @@
+Makefile
+help.tmp
+pkgIndex.tcl
+runtest
+runtest.standalone
+runtest.static
+tclhelp
+tkx.tcl
+tkxConfig.sh
+wishx
