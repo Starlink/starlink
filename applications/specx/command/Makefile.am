@@ -4,7 +4,8 @@ noinst_LTLIBRARIES = libcommand.la
 
 AM_FCFLAGS = -I../inc -I../exprt
 
-libcommand_la_SOURCES = $(F_ROUTINES)
+libcommand_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES)
 
-F_ROUTINES = do_command.f  init_specx.f  initsp.f  specx_initab.f
+F_ROUTINES = do_command.f  init_specx.f  initsp.f
 
+FPP_ROUTINES = specx_initab.F
