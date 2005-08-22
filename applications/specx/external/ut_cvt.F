@@ -3,6 +3,10 @@ C     20 SEP 2000 (AJC):
 C        Unused RARAD, DECRAD
 *-----------------------------------------------------------------------
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
       SUBROUTINE EXTRNL2 (ERROR)
 
 *  Temporary routine to allow you to access the UT in a form that can
