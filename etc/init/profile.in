@@ -121,6 +121,13 @@ fi
 
 
 
+#  SST
+
+if test -f @bindir@/sst/sst.sh; then
+   export SST_DIR=@bindir@/sst
+   export SST_HELP=@starhelpdir@/sst/sst
+fi
+
 #  SURF
 
 if test -f @bindir@/surf/surf.sh; then
@@ -225,16 +232,6 @@ else
   hdstoolssetup () { @staretcdir@/notinst hdstools; }
 fi
 
-# SURF
-
-if test -f @bindir@/surf/surf.sh; then
-  surf () { . $SURF_DIR/surf.sh; }
-  surfsetup () { . $SURF_DIR/surf.sh; }
-else
-  surf () { @staretcdir@/notinst surf; }
-  surfsetup () { @staretcdir@/notinst surf; }
-fi
-
 # Polpack
 
 if test -f @bindir@/polpack/polpack.sh; then
@@ -269,6 +266,25 @@ else
    pongo () { @staretcdir@/notinst pongo; }
 fi
 
+# SST
+
+if test -f @bindir@/sst/sst.sh; then
+  sst () { . $SST_DIR/sst.sh; }
+  sstsetup () { . $SST_DIR/sst.sh; }
+else
+  sst () { @staretcdir@/notinst sst; }
+  sstsetup () { @staretcdir@/notinst sst; }
+fi
+
+# SURF
+
+if test -f @bindir@/surf/surf.sh; then
+  surf () { . $SURF_DIR/surf.sh; }
+  surfsetup () { . $SURF_DIR/surf.sh; }
+else
+  surf () { @staretcdir@/notinst surf; }
+  surfsetup () { @staretcdir@/notinst surf; }
+fi
 
 # Done
 

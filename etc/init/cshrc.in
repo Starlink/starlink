@@ -551,9 +551,9 @@ endif
 #   SST
 #
 
-if ( -e @bindir@/sst/start ) then
-   alias sstsetup source @bindir@/sst/start
-   alias sst source @bindir@/sst/start
+if ( -e @bindir@/sst/sst.csh ) then
+   alias sstsetup source @bindir@/sst/sst.csh
+   alias sst source @bindir@/sst/sst.csh
 else
    alias sstsetup '@staretcdir@/notinst sstsetup'
    alias sst '@staretcdir@/notinst sst'

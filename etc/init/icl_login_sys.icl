@@ -122,9 +122,6 @@ ENDPROC
 defhelp hdstrace $HDSTRACE_HELP HDSTRACE
 define hdstrace $HDSTRACE_DIR/hdstrace
 
-{  Definitions for SST
-defstring sst noport SST
-
 {  Definitions for MISCELLANEOUS bits and bobs
 defstring ikonpaint noport IKONPAINT
 defstring tapedism noport TAPEDISM
@@ -353,6 +350,17 @@ endif
 
 {  SPECX
 defstring specx noticl SPECX
+
+{  Definitions for SST
+defhelp sst $ADAM_PACKAGES SST
+if file_exists("$SST_DIR/sst.icl")
+   defstring sst load $SST_DIR/sst.icl
+elseif file_exists("$SST_DIR/sst.csh")
+   defstring sst notavailable SST
+else
+   defstring sst notinstalled SST
+endif
+
 
 {  STARMAN
 defhelp starman $ADAM_PACKAGES STARMAN

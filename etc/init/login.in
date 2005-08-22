@@ -501,7 +501,7 @@ endif
 
 #
 #  SST
- if (-e @bindir@/sst/start) then
+ if (-e @bindir@/sst/sst.csh) then
     setenv SST_DIR @bindir@/sst
  endif
 
