@@ -26,3 +26,6 @@ make.log
 .deps
 
 starconf.status
+ary_test
+make.log.err
+sun11.dvi
