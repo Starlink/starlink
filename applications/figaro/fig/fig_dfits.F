@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 C+
 C                        F I G _ D F I T S _ O P E N
 C
