@@ -6,6 +6,9 @@
 *      25 Jul 2004 (timj):
 *        Be consistent in capitalisation of include file
 *-----------------------------------------------------------------------
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
       SUBROUTINE gen_factor (string, ils, next, ierr)
 
