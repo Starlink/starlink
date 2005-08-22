@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = tsp.csh tsp.icl
+bin_SCRIPTS = tsp.csh tsp.icl tsp.sh
 
 dist_noinst_SCRIPTS = tsp_link tsp_link_adam
 
