@@ -45,7 +45,7 @@ PRIVATE_INCLUDES = AIO_CMN
 
 
 ##  The on-line help.
-HELP_SOURCES = hdstools.hlp hdstools_master.hlp
+HELP_SOURCES = hdstools.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -70,7 +70,8 @@ hdstools.csh hdstools.sh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
 	@IFD2STAR@ hdstools
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) $(PUBLIC_INCLUDES) htest.in
+EXTRA_DIST = $(HELP_SOURCES) $(PRIVATE_INCLUDES) $(PUBLIC_INCLUDES) htest.in \
+	hdstools_master.hlp
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = hdstools.csh hdstools.sh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
