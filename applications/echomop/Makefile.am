@@ -59,6 +59,7 @@ EXTRA_DIST = echomop.hlp $(PRIVATE_INCLUDES) echomop.csh.in \
 noinst_LTLIBRARIES = libechomop.la
 libechomop_la_SOURCES = \
     $(F_ROUTINES) \
+    $(FPP_ROUTINES) \
     $(C_ROUTINES) \
     $(FIGARO_SUBSTITUTIONS) \
     $(PRIVATE_INCLUDES)
@@ -78,7 +79,7 @@ PRIVATE_INCLUDES = AAA_COMMON.INC ECH_ADAM_SPECIFICS.INC   \
 ## ech_ftrdb.f and ech_scrn2d.f taken out, so as not to cause library
 ## conflicts.  They're now present as explicit dependencies of the
 ## corresponding programs, above.
-F_ROUTINES = aaa_indexing.f ech_2dext_opt.f ech_access_data_file.f \
+F_ROUTINES = aaa_indexing.f ech_2dext_opt.f \
     ech_access_object.f ech_access_reduction_file.f ech_access_workspace.f \
     ech_active_tune.f ech_arc_arfind.f ech_arfit.f \
     ech_calc_meta_ftrs.f \
@@ -116,12 +117,12 @@ F_ROUTINES = aaa_indexing.f ech_2dext_opt.f ech_access_data_file.f \
     ech_model_back.f ech_model_fitvar.f ech_model_flat.f \
     ech_model_profile.f ech_model_scatter.f ech_model_sky.f \
     ech_model_ssky.f ech_module_init.f ech_module_name_index.f \
-    ech_module_props.f ech_module_tidyup.f ech_multi_merge.f \
+    ech_module_props.f ech_module_tidyup.f \
     ech_normal_scrunched.f ech_normal_yblaze.f ech_obj_ind.f \
     ech_object_limits.f ech_objinfo.f ech_open_file.f \
     ech_pack_results.f \
     ech_par_object.f ech_parameter_init.f ech_parse_env.f ech_plot_graph.f \
-    ech_plot_profile.f ech_plot_traces.f ech_plotter.f ech_plotter_smooth.f \
+    ech_plot_profile.f ech_plot_traces.f ech_plotter_smooth.f \
     ech_plotter_rebin.f ech_plotter_rembad.f ech_plotter_style.f \
     ech_plotter_browse_menu.f ech_plotter_main_menu.f ech_plotter_unmap.f \
     ech_poly.f ech_poly_profile.f ech_profile_attrib.f \
@@ -130,16 +131,19 @@ F_ROUTINES = aaa_indexing.f ech_2dext_opt.f ech_access_data_file.f \
     ech_report.f ech_save_ascii.f ech_save_orders.f ech_save_dipstk.f \
     ech_scrunch_2d_order.f ech_scrunch_order.f \
     ech_scrorders.f ech_set_context.f ech_set_parameter.f \
-    ech_setup_graphics.f ech_setup_object_ref.f ech_skyfit_weights.f \
+    ech_setup_graphics.f ech_skyfit_weights.f \
     ech_spatial_avgprof.f ech_spatial_profile.f ech_spline.f \
     ech_test_meta_ftrs.f ech_top_meta_cands.f ech_trace_consistency.f \
     ech_trace_order.f ech_tune_batch.f ech_tune_quick.f ech_typeinfo.f \
     ech_update_object_ref.f \
     ech_wave_consistency.f ech_wave_polyfit.f ech_wavelength_calib.f \
-    ech_word_len.f ech_write_results.f \
+    ech_word_len.f \
     ech_xchng_echarc.f \
     ech_zero_init.f \
     echomop.f
+
+FPP_ROUTINES = ech_access_data_file.F ech_multi_merge.F ech_plotter.F \
+ech_setup_object_ref.F ech_write_results.F
 
 FIGARO_SUBSTITUTIONS = ech_figsubs.f
 
