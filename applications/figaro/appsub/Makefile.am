@@ -6,12 +6,12 @@ AM_FCFLAGS = -I../include
 noinst_LTLIBRARIES = libappsub.la
 
 libappsub_la_SOURCES = \
-     $(F_ROUTINES) 
+     $(F_ROUTINES) $(FPP_ROUTINES)
 
 F_ROUTINES = \
 autofit.f conmenu.f constr.f contfit.f eraser.f fwhmit.f gauf1.f \
 gauf2.f gauf3.f gauf4.f gaumenu.f gaus_record.f gaus_xzplot.f \
-mapspec.f mapspece.f mapspecg.f normi.f rmser.f spd_wfga.f \
+mapspec.f mapspece.f mapspecg.f normi.f rmser.f \
 termwrit.f abgetcom.f ahopen.f araint.f arauto.f arc_ahopen.f \
 arc_araint.f arc_arauto.f arc_arcentr.f arc_ardele.f arc_ardisc.f \
 arc_aredit.f arc_arfind.f arc_arfit.f arc_arfitx.f arc_argetw.f \
@@ -27,3 +27,5 @@ ech_arlist.f ech_armenu.f ech_arplot.f ech_arrecd.f ech_arslct.f \
 ech_atlas.f ech_mxplot.f ech_orinit.f fig_count_ord.f \
 fig_ecs_obj.f fig_ecs_read.f fig_ecs_table.f fig_ecs_write.f \
 fig_esdisp.f fig_fill_ords.f splitsum.f 
+
+FPP_ROUTINES = spd_wfga.F
