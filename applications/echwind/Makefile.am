@@ -7,7 +7,7 @@ bin_SCRIPTS = echwind.csh
 dist_noinst_SCRIPTS = echwind_link
 
 bin_PROGRAMS = echwind
-echwind_SOURCES = echwind.f
+echwind_SOURCES = echwind.F
 echwind_LDADD = libmodel/libmodel.la libplot/libplot.la libetc/libetc.la \
 	`$(srcdir)/echwind_link`
 echwind_FCFLAGS = -Ilibmodel

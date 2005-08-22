@@ -16,7 +16,13 @@ STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+
+dnl    Need to check for ACCESS mode
+AC_FC_OPEN_SPECIFIERS(access='append')
+AC_FC_OPEN_SPECIFIERS(position='append')
+
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
@@ -30,5 +36,7 @@ STAR_LATEX_DOCUMENTATION(sun53)
 
 AC_CONFIG_FILES([Makefile component.xml
     libetc/Makefile libmodel/Makefile libplot/Makefile])
+
+AC_CONFIG_HEADERS(config.h)
 
 AC_OUTPUT
