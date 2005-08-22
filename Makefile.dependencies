@@ -1647,6 +1647,7 @@ $(MANIFESTS)/sst: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/ifd \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \

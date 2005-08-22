@@ -1389,7 +1389,7 @@ UNIX).
       commercial products being freely available on all Starlink
       machines. </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>hds</build><build option='link'>hlp</build><build option='link'>mers</build><build option='link'>one</build><build option='link'>par</build><build option='link'>pcs</build><build option='link'>psx</build><build option='link'>sae</build><build option='use'>pcs</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>hds</build><build option='link'>hlp</build><build option='link'>mers</build><build option='link'>one</build><build option='link'>par</build><build option='link'>pcs</build><build option='link'>psx</build><build option='link'>sae</build><build option='link'>ifd</build><build option='use'>pcs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
