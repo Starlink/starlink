@@ -86,7 +86,7 @@
 *     EXTERNAL TRAPC
 * --------------------
      
-D      PRINT *, '-- do_syscomm --   ierr=', ierr
+CD     PRINT *, '-- do_syscomm --   ierr=', ierr
 
       DO_SYSCOMM = .TRUE.
       IF (IERR.NE.0) RETURN
@@ -110,7 +110,7 @@ D      PRINT *, '-- do_syscomm --   ierr=', ierr
 
         IF (.NOT.EXECUTE) THEN
           IF_SKIP = IF_SKIP + 1
-D         PRINT *,' IF nesting increased -- ', IF_SKIP
+CD        PRINT *,' IF nesting increased -- ', IF_SKIP
           RETURN
         END IF
 
@@ -142,7 +142,7 @@ D         PRINT *,' IF nesting increased -- ', IF_SKIP
 *       current IF block, otherwise wait for the next test.
 
         CALL GEN_GETSTR2 (3, ' ', ' ', ' ', STRING, ISTAT)
-D       Print *, 'Expression to test: ', STRING(:50)
+CD      Print *, 'Expression to test: ', STRING(:50)
         CALL GEN_EVAL_AE (STRING, 'L4', DO_TO_ELSEIF, ISTAT)
 
         EXECUTE = DO_TO_ELSEIF
@@ -179,7 +179,7 @@ D       Print *, 'Expression to test: ', STRING(:50)
 
         ELSE
         CALL GEN_GETSTR2 (3, ' ', ' ', ' ', STRING, ISTAT)
-D       Print *, 'Expression to test: ', STRING(:50)
+CD      Print *, 'Expression to test: ', STRING(:50)
         CALL GEN_EVAL_AE (STRING, 'L4', DO_TO_ELSEIF, ISTAT)
         END IF
 
@@ -240,7 +240,7 @@ D       Print *, 'Expression to test: ', STRING(:50)
 
         IF (IF_SKIP.GT.0) THEN
           IF_SKIP = IF_SKIP - 1
-D         PRINT *,' IF nesting decreased -- ', IF_SKIP
+CD        PRINT *,' IF nesting decreased -- ', IF_SKIP
           RETURN
         END IF
 
@@ -275,7 +275,7 @@ D         PRINT *,' IF nesting decreased -- ', IF_SKIP
 *   we are in the middle of an un-executed IF block. If so just return
 *   (checking also that we are somewhere inside an IF block at all).
 
-D     PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
+CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
       IF (IF_LEVEL.NE.0 .AND. .NOT.DO_TO_ELSEIF) RETURN
 
 *   So now we can check if it was something more mundane,

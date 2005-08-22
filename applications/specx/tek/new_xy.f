@@ -27,13 +27,13 @@ C   in header records in plot file.
         YYEND = YRANGE(2)
       END IF
 
-D     CALL SXGTIDLE()
-D     PRINT *,'Hard plot x-limits:',XST,XEND
-D     PRINT *,'Current x-limits:  ',XST1,XEND1
-D     PRINT *,'Requested x-limits:',P(1),P(2)
-D     PRINT *,'Hard plot y-limits:',YST,YEND
-D     PRINT *,'Current y-limits:  ',YST1,YEND1
-D     PRINT *,'Requested y-limits:',Q(1),Q(2)
+CD    CALL SXGTIDLE()
+CD    PRINT *,'Hard plot x-limits:',XST,XEND
+CD    PRINT *,'Current x-limits:  ',XST1,XEND1
+CD    PRINT *,'Requested x-limits:',P(1),P(2)
+CD    PRINT *,'Hard plot y-limits:',YST,YEND
+CD    PRINT *,'Current y-limits:  ',YST1,YEND1
+CD    PRINT *,'Requested y-limits:',Q(1),Q(2)
 
       IF (OLD_LIMITS) THEN
         IF (P(1).GE.MIN(XST1,XEND1) .AND. P(1).LE.MAX(XST1,XEND1))
@@ -54,8 +54,8 @@ D     PRINT *,'Requested y-limits:',Q(1),Q(2)
       CALL AUTORANGE (XXST, XXEND, NX)
       CALL AUTORANGE (YYST, YYEND, NY)
 
-D     PRINT *,'Revised x-limits:  ',XXST,XXEND
-D     PRINT *,'Revised y-limits:  ',YYST,YYEND
+CD    PRINT *,'Revised x-limits:  ',XXST,XXEND
+CD    PRINT *,'Revised y-limits:  ',YYST,YYEND
 
       CHANGE_SCALES = .TRUE.
 

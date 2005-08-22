@@ -71,8 +71,8 @@
                             ! maps RBLANK on valid pixels the data is
                             ! no good anyway.
 
-D      PRINT *, 'Min map: ', DMIN, '   Max map: ', DMAX
-D      PRINT *, 'Rblank: ', RBLANK
+CD     PRINT *, 'Min map: ', DMIN, '   Max map: ', DMAX
+CD     PRINT *, 'Rblank: ', RBLANK
 
       IF (NBAD .NE. 0) THEN
          DO I=1,NELM

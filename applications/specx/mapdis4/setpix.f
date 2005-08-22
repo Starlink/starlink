@@ -30,7 +30,7 @@
 
 *  Ok, go...
 
-D     Print *, ' -- setpix --'
+CD    Print *, ' -- setpix --'
 
 *     Map axes are implicit arrays with zero at (N+1)/2 points and
 *     CELL_SIZE arcseconds per point from here. Normalize input
@@ -41,7 +41,7 @@ D     Print *, ' -- setpix --'
       X1   = PBEG/CELL_SIZE + PMID
       X2   = PEND/CELL_SIZE + PMID
 
-D     Print *, '    begin and end at map-pts ', X1, X2
+CD    Print *, '    begin and end at map-pts ', X1, X2
 
 *     Now find included pixels. First included pixel is integer 
 *     greater than the smaller of X1 & X2, last pixel is integer
@@ -50,11 +50,11 @@ D     Print *, '    begin and end at map-pts ', X1, X2
       IL = NINT (MIN (X1,X2) + 0.49999)
       IR = NINT (MAX (X1,X2) - 0.49999)
 
-D     Print *, '    limiting included pixels ', IL, IR
+CD    Print *, '    limiting included pixels ', IL, IR
 
       NI = IR - IL + 1
 
-D     Print *, '    total number of pixels remaining = ', NI
+CD    Print *, '    total number of pixels remaining = ', NI
 
 *     Flip IL & IR if input variables in "wrong" order
 
@@ -65,7 +65,7 @@ D     Print *, '    total number of pixels remaining = ', NI
       PL = CELL_SIZE * (FLOAT(IL) - PMID)
       PR = CELL_SIZE * (FLOAT(IR) - PMID)
 
-D     Print *, '    limiting values in array are ', PL, PR
+CD    Print *, '    limiting values in array are ', PL, PR
 
       RETURN
       END

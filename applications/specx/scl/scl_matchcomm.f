@@ -37,7 +37,7 @@
       IF (HASH.LT.0) THEN
         IERR = 81
       ELSE
-D       PRINT *,'Command located in hash table @ ', ICOM
+CD      PRINT *,'Command located in hash table @ ', ICOM
       END IF
 
       RETURN
@@ -110,7 +110,7 @@ D       PRINT *,'Command located in hash table @ ', ICOM
       COUNTER        = 1
       SCL_HASHINSERT = GEN_HASH (SYMBOL, M)
 
-D     PRINT *,'Symbol ', symbol,' hashed to ', scl_hashinsert
+CD    PRINT *,'Symbol ', symbol,' hashed to ', scl_hashinsert
 
       DONE = .FALSE.
 
@@ -166,7 +166,7 @@ D     PRINT *,'Symbol ', symbol,' hashed to ', scl_hashinsert
       COUNT          = 1
       SCL_HASHSEARCH = GEN_HASH (SYMBOL, M)
 
-D     PRINT *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
+CD    PRINT *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
 
       DONE  = .FALSE.
       FOUND = .FALSE.
@@ -174,8 +174,8 @@ D     PRINT *, 'Command ', SYMBOL, ' hashed to', SCL_HASHSEARCH
       DO WHILE (.NOT.DONE .AND. COUNT.LE.M)
         ISYM = TABLE(SCL_HASHSEARCH)
 
-D       PRINT *,'  -- table entry = ', ISYM
-D       PRINT *,'  -- corresponding command is ', COMMS(ISYM)
+CD      PRINT *,'  -- table entry = ', ISYM
+CD      PRINT *,'  -- corresponding command is ', COMMS(ISYM)
 
         IF (ISYM.EQ.0) THEN                             ! Empty position
           DONE = .TRUE.
@@ -194,8 +194,8 @@ D       PRINT *,'  -- corresponding command is ', COMMS(ISYM)
 
       IF (.NOT. FOUND) THEN
         SCL_HASHSEARCH = -1
-D       PRINT *,'-- SCL_hashsearch --'
-D       PRINT *,'Symbol not defined'
+CD      PRINT *,'-- SCL_hashsearch --'
+CD      PRINT *,'Symbol not defined'
       END IF
 
       RETURN

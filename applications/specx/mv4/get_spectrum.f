@@ -55,8 +55,8 @@ C  offsets.
       IY = LINK(2)
       IZ = LINK(3)
 
-D     Print *,'-- Get_spectrum --'
-D     Print *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+CD    Print *,'-- Get_spectrum --'
+CD    Print *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
 *     Make room on the stack for the new spectrum
 
@@ -67,14 +67,14 @@ D     Print *,'Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
       IF (JTOP.EQ.0) JTOP = 1
       XCLEAR = .FALSE.
 
-D     PRINT *, ' -- get_spectrum --'
-D     PRINT *, '    Stack pushed --'
-D     PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+CD    PRINT *, ' -- get_spectrum --'
+CD    PRINT *, '    Stack pushed --'
+CD    PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
 *     Work out offsets in cells if position
 *     in file is not known.
 
-D     PRINT *, '    X, Y, POS: ', X, Y, POS
+CD    PRINT *, '    X, Y, POS: ', X, Y, POS
 
       IPOS = POS
       IF (IPOS.EQ.0) THEN
@@ -82,7 +82,7 @@ D     PRINT *, '    X, Y, POS: ', X, Y, POS
         XOFF = X/CELL_XSIZE
         YOFF = Y/CELL_YSIZE
 
-D       PRINT *, '    XOFF, YOFF =', XOFF, YOFF
+CD      PRINT *, '    XOFF, YOFF =', XOFF, YOFF
 
 *       Locate appropriate bin on map
 *       Both coordinates run + to - (i.e. map starts at top left = NE)
@@ -97,7 +97,7 @@ D       PRINT *, '    XOFF, YOFF =', XOFF, YOFF
         IFRAC = NINT (FRAC)
         YOFF2 = 2 * NINT (YOFF+FRAC*0.5) - IFRAC
 
-D       PRINT *, '    IPOS = 0, M,N =', M, N
+CD      PRINT *, '    IPOS = 0, M,N =', M, N
 
       END IF
 
@@ -127,8 +127,8 @@ D       PRINT *, '    IPOS = 0, M,N =', M, N
         LOCATION = INDEX_ADDRESS + MNOFFSET
         CALL XCOPY (4, %VAL(LOCATION), MNPOS)
 
-D       PRINT *, '    M,N,NDATA;',  M, N, NDATA
-D       PRINT *, '    MNPOS; ', MNPOS
+CD      PRINT *, '    M,N,NDATA;',  M, N, NDATA
+CD      PRINT *, '    MNPOS; ', MNPOS
 
         IF (MNPOS.GE.0) THEN
           LOCATION = CUBE_ADDRESS + MNOFFSET*NPTS(1)
@@ -171,8 +171,8 @@ D       PRINT *, '    MNPOS; ', MNPOS
         CALL POP
       END IF
 
-D     PRINT *, '    Before return: IFAIL = ', IFAIL
-D     PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
+CD    PRINT *, '    Before return: IFAIL = ', IFAIL
+CD    PRINT *, '    Current stack: JTOP,XCLEAR =',JTOP,XCLEAR
 
       RETURN
       END

@@ -53,13 +53,13 @@ C     Find interpolation factors
 
       INX   = (M2-1)/(M1-1)
       INY   = (N2-1)/(N1-1)
-D     PRINT *, 'Interpolating factors: INX, INY = ', INX, INY
+CD    PRINT *, 'Interpolating factors: INX, INY = ', INX, INY
 
 C     How far to interpolate?
 
       IXMAX = 2*INX
       IYMAX = 2*INY
-D     PRINT *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
+CD    PRINT *, 'Interp func. radii: IXMAX,IYMAX = ', IXMAX, IYMAX
 
 C   Check that weights array is small enough
 
@@ -93,13 +93,13 @@ C     Set up the weights array (to save working out lots of trig functions later
         END DO
       END DO
 
-D     IF (IXMAX.LE.10) THEN
-D       PRINT *
-D       PRINT *,'Weights array:'
-D       Type '(<IXMAX+1>(2X,F9.5))',((WEIGHT(I,J),I=0,IXMAX),J=0,IYMAX)
-D     ELSE
-D       PRINT *,'Weights array: too big to type out!'
-D     END IF
+CD    IF (IXMAX.LE.10) THEN
+CD      PRINT *
+CD      PRINT *,'Weights array:'
+CD      Type '(<IXMAX+1>(2X,F9.5))',((WEIGHT(I,J),I=0,IXMAX),J=0,IYMAX)
+CD    ELSE
+CD      PRINT *,'Weights array: too big to type out!'
+CD    END IF
 
 C     Then do the interpolation: M & N are indices in output array.
 C     Mmin and Nmin are indices in output array of first and last sample

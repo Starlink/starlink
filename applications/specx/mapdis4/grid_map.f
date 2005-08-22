@@ -133,10 +133,10 @@ C  Save the existing LINK array and set to 1,2,3 for these maps
 
       CALL PLOT2D_RANGE (QBEG, QEND, PBEG, PEND, 1, 2, 3)
 
-D     TYPE '('' initial axis limits: ''/ 3(1X, I1, 2(2X,F10.4)/))',
-D    &     (I, QBEG(I),  QEND(I),I=1,3)
-D     TYPE '('' final axis limits:   ''/ 3(1X, I1, 2(2X,F10.4)/))',
-D    &     (I, PBEG(I),  PEND(I),I=1,3)
+CD    TYPE '('' initial axis limits: ''/ 3(1X, I1, 2(2X,F10.4)/))',
+CD   &     (I, QBEG(I),  QEND(I),I=1,3)
+CD    TYPE '('' final axis limits:   ''/ 3(1X, I1, 2(2X,F10.4)/))',
+CD   &     (I, PBEG(I),  PEND(I),I=1,3)
 
 *     Now find windowing function for each axis.
 *     Note that NPTS1 is now stored in the map header, but need to page
@@ -176,9 +176,9 @@ D    &     (I, PBEG(I),  PEND(I),I=1,3)
 
 *     Debug info
 
-D     PRINT *, ' -- grid_map --'
-D     PRINT *, '    nax(1),  nax(2)  = ', nax(1), nax(2)
-D     PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
+CD    PRINT *, ' -- grid_map --'
+CD    PRINT *, '    nax(1),  nax(2)  = ', nax(1), nax(2)
+CD    PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
 
 *     Initialize plot device (needed for SET_DISPLAY_SIZE to work)
 

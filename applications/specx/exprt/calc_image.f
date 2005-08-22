@@ -77,31 +77,31 @@
 *     Choose a value of rest frequency applicable to the *observation*.
 *     (value for display comes for free, but is not used...)
 
-D     PRINT *, '-- calc_image --'
-D     PRINT *, '   input value of IQCEN  = ', IQCEN
-D     PRINT *, '   input value of FCEN   = ', FCEN
-D     PRINT *, '   input value of JFCEN  = ', JFCEN
-D     PRINT *, '   input value of JFREST = ', JFREST
-D     PRINT *, '   header value of LOFREQ(1) = ', LOFREQ(NQ)
-D     PRINT *, '   header value of IFFREQ(1) = ', IFFREQ(NQ)
+CD    PRINT *, '-- calc_image --'
+CD    PRINT *, '   input value of IQCEN  = ', IQCEN
+CD    PRINT *, '   input value of FCEN   = ', FCEN
+CD    PRINT *, '   input value of JFCEN  = ', JFCEN
+CD    PRINT *, '   input value of JFREST = ', JFREST
+CD    PRINT *, '   header value of LOFREQ(1) = ', LOFREQ(NQ)
+CD    PRINT *, '   header value of IFFREQ(1) = ', IFFREQ(NQ)
 
       CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
 
-D     PRINT *, '   rest freq used for observation, = ', FROBS
+CD    PRINT *, '   rest freq used for observation, = ', FROBS
 
 *     Convert header centre frequency JFCEN to telluric value,
 *     returned in FCEN_T (GHz).
 
       USE_LOIF = (LOFREQ(NQ) .NE. 0.D0)
-D     PRINT *, '   use_loif = ', use_loif
+CD    PRINT *, '   use_loif = ', use_loif
 
       IF (USE_LOIF) THEN
         FCEN_T = LOFREQ(NQ) + IFFREQ(NQ)
-D       PRINT *, '   telluric centre freq from LO and IF = ', FCEN_T
+CD      PRINT *, '   telluric centre freq from LO and IF = ', FCEN_T
       ELSE
         CALL SETXFTCEN (JFCEN(NQ), VFRAME, VDEF,
      &                  VTE, VES, VSL, VLSR, FCEN_T)
-D     PRINT *, '   telluric centre freq from vels = ', FCEN_T
+CD    PRINT *, '   telluric centre freq from vels = ', FCEN_T
       END IF
 
 *     Calculate LSR velocity (radio def'n) of centre channel while
@@ -129,13 +129,13 @@ D     PRINT *, '   telluric centre freq from vels = ', FCEN_T
 
       CALL SETXDOPP   (DF, 1, VFRAME, VDEF,
      &                 VTE, VES, VSL, VLSR, FCEN_T, FROBS)
-D     PRINT *, '   corrected frequency offset (MHz) (~2*i.f.) = ', DF
+CD    PRINT *, '   corrected frequency offset (MHz) (~2*i.f.) = ', DF
 
 *     Now calculate image_frequency in *source* frame
 *     (cf routine SETXFREQ, with ABS_FREQ = .T. and REST_REL = .T.)
 
       IMAGE_FREQ = 1.D9 * (FROBS + DF/1000.)
-D     PRINT *, '   final image frequency (Hz) = ', image_freq
+CD    PRINT *, '   final image frequency (Hz) = ', image_freq
 
       RETURN
       END

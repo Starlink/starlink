@@ -71,7 +71,7 @@
 
 *  Ok, go..
 
-D     Print *, '-- gen_factor --'
+CD    Print *, '-- gen_factor --'
 
       st   = next
 
@@ -83,10 +83,10 @@ D     Print *, '-- gen_factor --'
 *     Find the start of the first factor - stacking if ( found and 
 *     ignoring space
       DO WHILE (string(st:st).eq.'(' .AND. st.le.ils)
-D       Print *,'   "(" found = pushing stack...'
+CD      Print *,'   "(" found = pushing stack...'
         lev = lev + 1
         st  = st  + 1
-D       Print *,'    level no', lev
+CD      Print *,'    level no', lev
         DO WHILE (string(st:st).eq.' ' .AND. st.le.ils)
           st = st + 1
         END DO
@@ -103,7 +103,7 @@ D       Print *,'    level no', lev
 
       CALL gen_parsename (string, st, ist, iend, numeric, strconst,
      &                    uminus, lbracket, funct, next, ierr)
-D     Print *, '     parsed factor: ', string(ist:iend)
+CD    Print *, '     parsed factor: ', string(ist:iend)
 
       IF (ierr.ne.0) THEN
             PRINT *, '-- gen_factor --'
@@ -114,7 +114,7 @@ D     Print *, '     parsed factor: ', string(ist:iend)
 *     If unary-minus flag set then push unary minus operator (%) on opr stack
 
       IF (uminus) THEN
-D       Print *, '     Unary minus flag set - pushing operator stack...'
+CD      Print *, '     Unary minus flag set - pushing operator stack...'
         nopr(lev)   = nopr(lev) + 1
         ntopr       = ntopr     + 1
         oper(ntopr) = '%'
@@ -144,7 +144,7 @@ D       Print *, '     Unary minus flag set - pushing operator stack...'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (string(ist:iend), type, form, ivalue)
           address = %loc(ivalue)
-D         Print *,'     integer value read'
+CD        Print *,'     integer value read'
         ELSE IF (gen_floating (string(ist:iend), idig, fdig)) THEN
           type   = 'R4'
           form   = 'F'
@@ -152,7 +152,7 @@ D         Print *,'     integer value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
           address = %loc(rvalue)
-D         Print *,'     real*4 value read'
+CD        Print *,'     real*4 value read'
         ELSE IF (gen_eformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R4'
           form   = 'E'
@@ -160,7 +160,7 @@ D         Print *,'     real*4 value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
           address = %loc(rvalue)
-D         Print *,'     real*4 value read'
+CD        Print *,'     real*4 value read'
         ELSE IF (gen_dformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R8'
           form   = 'E'
@@ -168,16 +168,16 @@ D         Print *,'     real*4 value read'
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, dvalue)
           address = %loc(dvalue)
-D         Print *,'     real*8 value read'
+CD        Print *,'     real*8 value read'
         END IF
 
       ELSE IF (strconst) THEN
         CALL gen_hdnorm (string(ist:iend), string(ist:iend), ls, ierr)
         WRITE (type, '(''C'',I3.3)') ls
         address = %loc(string(ist:ist))
-D       Print *,'     string constant read: length =', ls
-D       Print *,'     variable type = ', TYPE
-D       Print *,'     ', string(ist:ist+ls-1)
+CD      Print *,'     string constant read: length =', ls
+CD      Print *,'     variable type = ', TYPE
+CD      Print *,'     ', string(ist:ist+ls-1)
 
       ELSE
         fnc_index = 0
@@ -205,7 +205,7 @@ D       Print *,'     ', string(ist:ist+ls-1)
         END IF
 
         IF (funct) THEN
-D         Print *,'    symbol -- has an argument -- pushing all stacks'
+CD        Print *,'    symbol -- has an argument -- pushing all stacks'
 *         Push symbol on symbol stack
           nsymb = nsymb + 1
           sym_address(nsymb) = address
@@ -235,17 +235,17 @@ D         Print *,'    symbol -- has an argument -- pushing all stacks'
 
 *     Update the workspace pointer (note: allocate 8 bytes min for 64-bit AXP)
 
-D     PRINT *, '     updating next_ws, from ', next_ws
-D     PRINT *, '     (using nbytes = ', nbytes, ')'
+CD    PRINT *, '     updating next_ws, from ', next_ws
+CD    PRINT *, '     (using nbytes = ', nbytes, ')'
       next_ws = next_ws + 2*((nbytes-1)/8 + 1)
-D     PRINT *, '     to next_ws = ', next_ws
+CD    PRINT *, '     to next_ws = ', next_ws
 
-D     Print *, '     ---------------------------'
-D     Print *, '        Operand stack summary'
-D     Print *, '      # operands: ', ntopnd
-D     Print *, '      last operand; type: ', type,' @ ',opnd_addr(ntopnd)
-D     Print *, '      next available workspace @ word ', next_ws
-D     Print *, '     ---------------------------'
+CD    Print *, '     ---------------------------'
+CD    Print *, '        Operand stack summary'
+CD    Print *, '      # operands: ', ntopnd
+CD    Print *, '      last operand; type: ', type,' @ ',opnd_addr(ntopnd)
+CD    Print *, '      next available workspace @ word ', next_ws
+CD    Print *, '     ---------------------------'
 
       IF (funct) THEN
         st = next

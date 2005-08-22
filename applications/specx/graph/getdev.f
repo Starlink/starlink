@@ -45,10 +45,10 @@ C   hardcopy or null) given by IANS
 
 C  Ok, go...
 
-D     print *, '-- getdev --'
-D     print *, '   ians     = ', ians
-D     print *, '   termdev  = ', termdev
-D     print *, '   printdev = ', printdev
+CD    print *, '-- getdev --'
+CD    print *, '   ians     = ', ians
+CD    print *, '   termdev  = ', termdev
+CD    print *, '   printdev = ', printdev
 
       DEVICE_NO = -1
 
@@ -80,7 +80,7 @@ D     print *, '   printdev = ', printdev
         DEVICE_NO = 0
       END IF
 
-D     print *, '   device #   = ', device_no
+CD    print *, '   device #   = ', device_no
 
       IF (DEVICE_NO.LT.0) THEN
         PRINT *, 'Device not known to SXGPGPLOT!'

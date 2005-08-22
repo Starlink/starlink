@@ -23,13 +23,13 @@
 *  Ok, go...
 
       IFAIL = 0
-D     PRINT *, ' -- calc_xysoff --'
+CD    PRINT *, ' -- calc_xysoff --'
 
       ANGLE = 1.74533D-2 * POS_ANGLE
       X_OFFSET = (RAOFF*COS(ANGLE) - DECOFF*SIN(ANGLE))
       Y_OFFSET = (RAOFF*SIN(ANGLE) + DECOFF*COS(ANGLE))
 
-D     PRINT *, '    Total X, Y offsets (arcsecs): ',X_OFFSET,Y_OFFSET
+CD    PRINT *, '    Total X, Y offsets (arcsecs): ',X_OFFSET,Y_OFFSET
 
       RETURN
       END

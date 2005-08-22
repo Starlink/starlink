@@ -77,8 +77,8 @@ C   Formal parameters
       IERR = 0
       STATUS = ADAM__OK
 
-D     WRITE (ILOUT,*) '-- SPECX_GSD_V5_DATA --'
-D     WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
+CD    WRITE (ILOUT,*) '-- SPECX_GSD_V5_DATA --'
+CD    WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
 
 C  Test we are not asking for a scan which is not there
 
@@ -120,9 +120,9 @@ C  Find how many subsystems there are
          END DO
       END IF
 
-D     write (ilout,*) 'nspec ', nspec
-D     write (ilout,*) 'subsys ', (subsys(i), i = 1, nspec)
-D     write (ilout,*) 'bes_spectrum ', (bes_spectrum(i), i = 1, nrc)
+CD    write (ilout,*) 'nspec ', nspec
+CD    write (ilout,*) 'subsys ', (subsys(i), i = 1, nspec)
+CD    write (ilout,*) 'bes_spectrum ', (bes_spectrum(i), i = 1, nrc)
 
 C     Find the total number of output channels from the frontend
 
@@ -171,8 +171,8 @@ C    ..first get x and y offsets in arcsecs
       X_OFFSET = PHIST(1,MAX(1,INDEX))
       Y_OFFSET = PHIST(2,MAX(1,INDEX))
 
-D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
-D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
+CD    WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
+CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
       WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
@@ -263,7 +263,7 @@ C              dimensions of stored data array
                DIMVAL_DATA(2) = 1
                DIMVAL_DATA(3) = INDEX
 
-D              write (ilout,*) 'no_be_o_ch, index ', no_be_o_ch, index
+CD             write (ilout,*) 'no_be_o_ch, index ', no_be_o_ch, index
 
 
 C              section of stored data array that we want
@@ -286,8 +286,8 @@ C              section of stored data array that we want
                IBEGIN(3) = INDEX                 ! spectrum number in file
                IENDS(3) = INDEX
 
-D              write(ilout,*) 'index, nquad, quad, jbeg, jend ', index,
-D    :            nquad, quad, jbeg, jend
+CD             write(ilout,*) 'index, nquad, quad, jbeg, jend ', index,
+CD   :            nquad, quad, jbeg, jend
 
 C              get the data
 

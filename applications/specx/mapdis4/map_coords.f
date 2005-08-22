@@ -107,11 +107,11 @@ C     ... Or, label true RA and Dec
         END IF
         LYT = GEN_ILEN (LABELY)
 
-D       PRINT *, 'Offset for absolute positions:'
-D       PRINT *, '     RDCENX = ', RDCENX
-D       PRINT *, '     RDCENY = ', RDCENY
-D       PRINT *, '     MAPRA  = ', MAP_RA
-D       PRINT *, '     MAPDEC = ', MAP_DEC
+CD      PRINT *, 'Offset for absolute positions:'
+CD      PRINT *, '     RDCENX = ', RDCENX
+CD      PRINT *, '     RDCENY = ', RDCENY
+CD      PRINT *, '     MAPRA  = ', MAP_RA
+CD      PRINT *, '     MAPDEC = ', MAP_DEC
 
         CALL SXGLIMITS   (XRDL, XRDH, YRDL, YRDH)
         IF (LABEL) THEN

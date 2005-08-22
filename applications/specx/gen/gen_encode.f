@@ -83,7 +83,7 @@
         IEND  = START + IEND  - 1
         START = START + INEXT - 1
 
-D       PRINT *,'Next item: ', STRING(IST:IEND)
+CD      PRINT *,'Next item: ', STRING(IST:IEND)
 
 *       Search for hollerith delimiters and throw out if they exist
 *       -- implies this must be a string item though.
@@ -91,8 +91,8 @@ D       PRINT *,'Next item: ', STRING(IST:IEND)
         IF (STRING(IST:IST).EQ.'''' .AND. STRING(IEND:IEND).EQ.'''')THEN
           CALL GEN_HDNORM (STRING(IST:IEND), STRING(IST:IEND), LS ,IERR)
           IEND = LS + IST - 1
-D         Print *, 'Bit of string we want', ist, ' to', iend
-D         Print *, 'Quoted string: ', string(ist:iend)
+CD        Print *, 'Bit of string we want', ist, ' to', iend
+CD        Print *, 'Quoted string: ', string(ist:iend)
 
           OUT_LINE (L:L+IEND-IST) = STRING(IST:IEND)
           L = L + LS - 1
@@ -114,7 +114,7 @@ D         Print *, 'Quoted string: ', string(ist:iend)
 *         then evaluate the expression and print it with its own type
 
           TYPE = ' '
-D         PRINT *,' calling gen_eval_ae on string --> ', string(ist:iend)
+CD        PRINT *,' calling gen_eval_ae on string --> ', string(ist:iend)
           CALL GEN_EVAL_AE (STRING(IST:IEND), TYPE, LVALUE, IERR)
           IF (IERR .EQ. 0) THEN
             READ (TYPE(2:GEN_ILEN(TYPE)), '(I3)', IOSTAT=IERR) NBYTES

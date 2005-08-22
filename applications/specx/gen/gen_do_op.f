@@ -35,7 +35,7 @@
       ierr = 0
 
       IF (operator.eq.'$') THEN
-D       Print *,'     resolving function call'
+CD      Print *,'     resolving function call'
         CALL gen_dofunc (opnd_addr(ntopnd-1),
      &                   opnd_type(ntopnd-1),
      &                   opnd_addr(ntopnd),
@@ -47,7 +47,7 @@ D       Print *,'     resolving function call'
         nsymb      = nsymb      - 1
 
       ELSE IF (operator.eq.'@') THEN
-D       Print *,'     resolving symbol array index'
+CD      Print *,'     resolving symbol array index'
         CALL gen_doarry (opnd_addr(ntopnd-1),
      &                   opnd_type(ntopnd-1),
      &                   opnd_addr(ntopnd),
@@ -59,12 +59,12 @@ D       Print *,'     resolving symbol array index'
         nsymb      = nsymb      - 1
 
       ELSE IF (operator.eq.'%') THEN
-D       Print *,'     calling gen_negate on opnd', ntopnd
+CD      Print *,'     calling gen_negate on opnd', ntopnd
         CALL gen_negate (%val(opnd_addr(ntopnd)),
      &                   opnd_type(ntopnd), ierr)
 
       ELSE
-D       Print *,'     calling exop on opnds', ntopnd-1, ' and', ntopnd
+CD      Print *,'     calling exop on opnds', ntopnd-1, ' and', ntopnd
         opnd_length1 = gen_ilen (opnd_type(ntopnd-1))
         opnd_length2 = gen_ilen (opnd_type(ntopnd))
         READ (opnd_type(ntopnd-1)(2:opnd_length1), '(I3)') nbytes1

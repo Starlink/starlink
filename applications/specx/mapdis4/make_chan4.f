@@ -116,7 +116,7 @@
         GO TO 1000
       END IF
 
-D     PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
+CD    PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
 
       IF (NAX(IX).LE.1 .OR. NAX(IY).LE.1) THEN
         IFAIL = 49

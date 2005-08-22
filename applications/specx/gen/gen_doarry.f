@@ -40,12 +40,12 @@
 *     Determine the length of individual array element
 
       READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I3)') nbytes
-D     Print *,'     offset in bytes =', nbytes*(arg-1)
+CD    Print *,'     offset in bytes =', nbytes*(arg-1)
 
 *     Offset the address to the desired one:
 
       address = address + nbytes*(arg-1)
-D     Print *,'     new address ', address
+CD    Print *,'     new address ', address
 
 *     copy value from this address to reserved part of workspace
 

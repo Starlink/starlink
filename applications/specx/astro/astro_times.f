@@ -45,10 +45,10 @@
       CALL UTCALC2 (JDATE, JTIME, IUTFLG, TIMCOR, UTY, UTD)
       JULIAN_DATE = DFLOAT (JULDA(UTY)) - 0.5D0 + UTD
 
-D     print *, '     jdate ', jdate
-D     print *, '     jtime ', jtime
-D     print *, '     uty   ', uty
-D     print *, '     utd   ', utd
+CD    print *, '     jdate ', jdate
+CD    print *, '     jtime ', jtime
+CD    print *, '     uty   ', uty
+CD    print *, '     utd   ', utd
 
 *     Calculate LST
 

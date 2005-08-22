@@ -27,8 +27,8 @@
 
 *     Ok, go...
 
-D     PRINT *, ' -- get_cube_data --'
-D     PRINT *, '    j, k = ', j, k
+CD    PRINT *, ' -- get_cube_data --'
+CD    PRINT *, '    j, k = ', j, k
 
       SUCCESS = .FALSE.
 

@@ -42,8 +42,8 @@
 
 *  Ok, go...
 
-D     Print *,'-- gen_eval_ae --'
-D     Print *,'  input string =', string(:60)
+CD    Print *,'-- gen_eval_ae --'
+CD    Print *,'  input string =', string(:60)
 
 *     Type of output data requested?
 
@@ -67,8 +67,8 @@ D     Print *,'  input string =', string(:60)
 
       CALL strip_string (string, c1, c2)
 
-D     Print *,'Stripped string: ', string(c1:c2)
-D     Print *,'String length = ', c2-c1+1
+CD    Print *,'Stripped string: ', string(c1:c2)
+CD    Print *,'String length = ', c2-c1+1
 
 *     Actual parsing and evaluation of string - note that the process
 *     continues until the string is exhausted, as indicated by a return
@@ -78,10 +78,10 @@ D     Print *,'String length = ', c2-c1+1
 
       ierr = 0
 
-D     Print *, 'got past ierr ='
-D     Print *, 'string(c1:c2) = ', string(c1:c2)
-D     Print *, 'length c2-c1+1 = ', c2-c1+1
-D     Print *, 'next, ierr = ', next, ierr
+CD    Print *, 'got past ierr ='
+CD    Print *, 'string(c1:c2) = ', string(c1:c2)
+CD    Print *, 'length c2-c1+1 = ', c2-c1+1
+CD    Print *, 'next, ierr = ', next, ierr
 
       CALL gen_factor (string(c1:c2), c2-c1+1, next, ierr)
       DO WHILE (ierr.eq.0)
@@ -95,10 +95,10 @@ D     Print *, 'next, ierr = ', next, ierr
 
 10    CONTINUE
 
-D     PRINT *,'-- gen_eval_ae --'
-D     PRINT *,'   error return from loop: ', ierr
+CD    PRINT *,'-- gen_eval_ae --'
+CD    PRINT *,'   error return from loop: ', ierr
 
-D     PRINT *,'   final call to eval_all: lev =', lev
+CD    PRINT *,'   final call to eval_all: lev =', lev
 
       CALL gen_eval_all (ierr)
       IF (ierr.ne.0) THEN  ! error evaluating ae
@@ -118,7 +118,7 @@ D     PRINT *,'   final call to eval_all: lev =', lev
         READ (type(2:gen_ilen(type)), '(I3)') nbytes2
       END IF
 
-D     PRINT *,'   calling gen_cvt_type with out_type = ', opnd_type(1)
+CD    PRINT *,'   calling gen_cvt_type with out_type = ', opnd_type(1)
       CALL gen_cvt_type (wksp(1), opnd_type(1), nbytes,
      &                   value,   type,         nbytes2, ierr)
 

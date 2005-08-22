@@ -56,22 +56,22 @@ C  same order as data coming from map file).
 C  SETMAX is a function equivalent to SETX to SET Map AXes - generates a
 C  SCALE array containing all values from start to end.
 
-D     PRINT *,'--MWINDO--'
+CD    PRINT *,'--MWINDO--'
       DO I = 1,3
 
         IF (I.EQ.1) THEN
           CALL SETMAX (SCALE, MSTEP, CELL_XSIZE)
           NX = MSTEP
-D         PRINT *,'R.A. calculation'
+CD        PRINT *,'R.A. calculation'
         ELSE IF (I.EQ.2) THEN
           CALL SETMAX (SCALE, NSTEP, CELL_YSIZE)
           NX = NSTEP
-D         PRINT *,'Dec. calculation'
+CD        PRINT *,'Dec. calculation'
         ELSE
           CALL SETXNEW (SCALE, IFAIL)
           PFAC(3) = XFAC(1)
           NX = NPTS
-D         PRINT *,'Vel. calculation'
+CD        PRINT *,'Vel. calculation'
         END IF
 
         IF (IFAIL.NE.0) THEN
@@ -90,14 +90,14 @@ D         PRINT *,'Vel. calculation'
         CBEG(I) = X1
         CEND(I) = X2
 
-D       PRINT *,'MWINDO - calculation for axis ',I
-D       PRINT *,'  plimits return status = ', IFAIL
-D       PRINT *,'  Range:     ', PBEG(I),PEND(I)
-D       PRINT *,'  Intervals: ', N1,N2
-D       PRINT *,'  Fractions: ', PF1(I),PF2(I)
-D       PRINT *,'  Pixel vals:', CBEG(I),CEND(I)
-D       PRINT *,'  #pixels:   ', NAX(I)
-D       PRINT *,'  Offset:    ', IOFF(I)
+CD      PRINT *,'MWINDO - calculation for axis ',I
+CD      PRINT *,'  plimits return status = ', IFAIL
+CD      PRINT *,'  Range:     ', PBEG(I),PEND(I)
+CD      PRINT *,'  Intervals: ', N1,N2
+CD      PRINT *,'  Fractions: ', PF1(I),PF2(I)
+CD      PRINT *,'  Pixel vals:', CBEG(I),CEND(I)
+CD      PRINT *,'  #pixels:   ', NAX(I)
+CD      PRINT *,'  Offset:    ', IOFF(I)
 
       END DO
 
@@ -146,13 +146,13 @@ C     it is actually IN the array or not.
 
       X1 = XLOCATE (X, N, DX, V1, IFAIL)
       IF (IFAIL.NE.0) THEN
-D        PRINT *,'Problem locating first value in range'
+CD       PRINT *,'Problem locating first value in range'
         IFAIL = 0
       END IF
 
       X2 = XLOCATE (X, N, DX, V2, IFAIL)
       IF (IFAIL.NE.0) THEN
-D       PRINT *,'Problem locating second value in range'
+CD      PRINT *,'Problem locating second value in range'
         IFAIL = 0
       END IF
 
@@ -226,10 +226,10 @@ C   x-value XBAR.  Derived from XSNART
         IFAIL  = 26
       END IF
 
-D     PRINT *,'-- XLOCATE --'
-D     PRINT *,'n, dx, xbar: ', n, dx, xbar
-D     PRINT *,'x: ',xscale(1),' ... ',xscale(n)
-D     PRINT *,'xlocate: ', xlocate
+CD    PRINT *,'-- XLOCATE --'
+CD    PRINT *,'n, dx, xbar: ', n, dx, xbar
+CD    PRINT *,'x: ',xscale(1),' ... ',xscale(n)
+CD    PRINT *,'xlocate: ', xlocate
 
       RETURN
       END

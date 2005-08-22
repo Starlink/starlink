@@ -70,8 +70,8 @@ C  the result fine SPXDEF.UNF into SYS_SPECX:
 
       LUN = 6
 
-D     PRINT *, '--- errmess ---'
-D     PRINT *, '    error # = ', IERR
+CD    PRINT *, '--- errmess ---'
+CD    PRINT *, '    error # = ', IERR
        
       IF ( IERR .EQ.  1 ) THEN
          ISEV = 3

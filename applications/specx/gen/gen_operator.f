@@ -31,7 +31,7 @@
 
 *     Local variables:
 
-D      INTEGER*4 j
+CD     INTEGER*4 j
       INTEGER*4 st, ist, iend
       LOGICAL*4 rbracket
 
@@ -41,7 +41,7 @@ D      INTEGER*4 j
 
 *  Ok, go..
 
-D     Print *, '-- gen_operator --'
+CD    Print *, '-- gen_operator --'
 
       st   = next
 
@@ -62,7 +62,7 @@ D     Print *, '-- gen_operator --'
      &                    rbracket, next,ierr)
 
         IF (ierr.eq.0) THEN
-D         PRINT *, '    Parseop returned operator ', string(ist:iend)
+CD        PRINT *, '    Parseop returned operator ', string(ist:iend)
         ELSE IF ( ierr.eq.2 ) THEN
           ierr = 1
           RETURN
@@ -70,23 +70,23 @@ D         PRINT *, '    Parseop returned operator ', string(ist:iend)
         END IF
 
         IF (rbracket) THEN
-D         Print *,'   ")" found: evaluate anything left at level', lev
+CD        Print *,'   ")" found: evaluate anything left at level', lev
           CALL gen_eval_all (ierr)
           IF (ierr.ne.0) RETURN
           lev = lev - 1
-D         Print *,'    ...and pop stack, level =', lev
+CD        Print *,'    ...and pop stack, level =', lev
           st  = next
         END IF
 
       END DO
 
-D     Print *, '     ---------------------------'
-D     Print *, '        Operator stack summary'
-D     Print *, '      total # operators: ', ntopr
-D     Print *, '      operators: ', (oper(j),' ',j=1,ntopr)
-D     Print *, '      priorities: ', (prio(j), j=1,ntopr)
-D     Print *, '      at this level:',(oper(j),j=ntopr-nopr(lev)+1,ntopr)
-D     Print *, '     ---------------------------'
+CD    Print *, '     ---------------------------'
+CD    Print *, '        Operator stack summary'
+CD    Print *, '      total # operators: ', ntopr
+CD    Print *, '      operators: ', (oper(j),' ',j=1,ntopr)
+CD    Print *, '      priorities: ', (prio(j), j=1,ntopr)
+CD    Print *, '      at this level:',(oper(j),j=ntopr-nopr(lev)+1,ntopr)
+CD    Print *, '     ---------------------------'
 
       IF (ierr.eq.0) THEN         ! operator got.
 
@@ -107,7 +107,7 @@ D     Print *, '     ---------------------------'
           nopr(lev)  = nopr(lev)  - 1
           ntopr      = ntopr      - 1
 
-D         PRINT *,'    total # operators decremented by 1, now', ntopr
+CD        PRINT *,'    total # operators decremented by 1, now', ntopr
 
         END DO
 

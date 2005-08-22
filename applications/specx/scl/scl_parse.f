@@ -56,7 +56,7 @@
 
 *  Debug output
 
-D     PRINT *,'input string  --> ', string(i:60)
+CD    PRINT *,'input string  --> ', string(i:60)
 
 *  Parse:
 
@@ -85,7 +85,7 @@ D     PRINT *,'input string  --> ', string(i:60)
 
         CALL SCL_PARSE (STRING, I, IST, IEND, NEXT, IERR)
 
-D       Print *,'Parsed command: ', string(ist:iend)
+CD      Print *,'Parsed command: ', string(ist:iend)
 
         IF (STRING(NEXT:NEXT+1) .EQ. ':=') THEN
           COMMAND = ':='
@@ -114,8 +114,8 @@ D       Print *,'Parsed command: ', string(ist:iend)
 
 *  Debug output
 
-D     PRINT *,'output command --> ', command
-D     PRINT *,'output string  --> ', string(:60)
+CD    PRINT *,'output command --> ', command
+CD    PRINT *,'output string  --> ', string(:60)
 
       RETURN
       END
@@ -163,8 +163,8 @@ D     PRINT *,'output string  --> ', string(:60)
       IST  = ST
       IFIN = ST
 
-D     Print *,'-- scl_parse --'
-D     Print *,'   input string: ', string(st:ils)
+CD    Print *,'-- scl_parse --'
+CD    Print *,'   input string: ', string(st:ils)
 
 *  Suppress leading blanks.
 

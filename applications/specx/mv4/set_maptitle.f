@@ -34,11 +34,11 @@
 
 *     (Choose axis titles)
 
-D     PRINT *, ' -- set_maptitle --'
-D     PRINT *, '    THETA       = ', THETA
-D     PRINT *, '    POS_ANGLE   = ', POS_ANGLE
-D     PRINT *, '    MAP_ROTATED = ', MAP_ROTATED
-D     PRINT *, '    ROTATE_CUBE = ', ROTATE_CUBE
+CD    PRINT *, ' -- set_maptitle --'
+CD    PRINT *, '    THETA       = ', THETA
+CD    PRINT *, '    POS_ANGLE   = ', POS_ANGLE
+CD    PRINT *, '    MAP_ROTATED = ', MAP_ROTATED
+CD    PRINT *, '    ROTATE_CUBE = ', ROTATE_CUBE
 
       IF (           (ROTATE_CUBE .and. POS_ANGLE+THETA.EQ.0.0)
      &     .or. (.NOT.ROTATE_CUBE .and. POS_ANGLE      .EQ.0.0)) THEN

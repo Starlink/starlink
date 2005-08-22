@@ -174,8 +174,8 @@ C       Find velocity frame and velocity law used during observation
 
         CALL VELDECODE (LSRFLG, VFRAME, VDEF)
 
-D       WRITE (ILOUT,*) 'Data obs''d in ',VFRAME,' frame; ',
-D    &         VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
+CD      WRITE (ILOUT,*) 'Data obs''d in ',VFRAME,' frame; ',
+CD   &         VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
 
         IF (CHANGE_FRAME) THEN
           VFRAME2 = VEL_REF
@@ -187,8 +187,8 @@ D    &         VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
           VRAD    = 0.0
         END IF
 
-D       WRITE (ILOUT,*) 'Data displayed in ',VFRAME2,' frame; ',
-D    &         VDEF2, ' velocity law; Vel. = ', VRAD, ' km/s'
+CD      WRITE (ILOUT,*) 'Data displayed in ',VFRAME2,' frame; ',
+CD   &         VDEF2, ' velocity law; Vel. = ', VRAD, ' km/s'
 
 C       Work out sideband sign, for use in generating OSCFREQ
 
@@ -214,8 +214,8 @@ C         and a (possibly) different value to use for *display*. Complicated
 C         dependence on header variables.
 
           CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
-D         PRINT *, 'Rest freq, observed, = ', FROBS
-D         PRINT *, 'Rest freq, display, =  ', FRDIS
+CD        PRINT *, 'Rest freq, observed, = ', FROBS
+CD        PRINT *, 'Rest freq, display, =  ', FRDIS
 
 C         Convert header centre frequency JFCEN to telluric value,
 C         returned in FCEN_T (GHz). (Uses the LO and IF frequencies
@@ -228,7 +228,7 @@ C         if they are available in the header)
             FCEN_T  = LOFREQ(NQ) + IFFREQ(NQ)
           END IF
 
-D         PRINT *, 'Telluric center frequency = ', FCEN_T
+CD        PRINT *, 'Telluric center frequency = ', FCEN_T
 
           IF (IFFREQ(NQ).NE.0.D0) THEN
             OSCFREQ = FCEN_T - IFFREQ(NQ)
@@ -265,7 +265,7 @@ C----------------
           ELSE IF (NXS .EQ. 3) THEN
             CALL SETXVEL (XSCALE8(NOFF), NPTS(NQ), VDEF2, FRDIS,
      &                    XFAC8(NQ), ISTAT)
-D           PRINT *, 'NQ, XFAC8 this quadrant = ', NQ, XFAC8(NQ)
+CD          PRINT *, 'NQ, XFAC8 this quadrant = ', NQ, XFAC8(NQ)
           END IF
 
         END DO
@@ -396,20 +396,20 @@ C       Astronomical positions (RA, Dec, HA)
       APRA =  SNGL(RA*PI/180.D0)              ! ..... and RA in true radians
       HA   = MOD (SNGL(XLST*PI/12. - DBLE(APRA)), SNGL(2.D0*PI)) ! yields HA in radians
 
-D     PRINT *, '--- setx ---'
-D     PRINT *, '     apra (radians):   ', apra
-D     PRINT *, '     apdec (radians):  ', apdec
-D     PRINT *, '     lst (hours):      ', xlst
-D     PRINT *, '     ha (radians):     ', ha
+CD    PRINT *, '--- setx ---'
+CD    PRINT *, '     apra (radians):   ', apra
+CD    PRINT *, '     apdec (radians):  ', apdec
+CD    PRINT *, '     lst (hours):      ', xlst
+CD    PRINT *, '     ha (radians):     ', ha
 
 C     Astronomical radial velocities (sun-lsr, earth-sun, tel-earth)
 
       CALL ASTRO_VELS  (DATJUL, APRA, APDEC, ALAT, HA, VSL, VES, VTE)
 
-D     PRINT *, '     vsl(km/s)         ', vsl
-D     PRINT *, '     ves(km/s)         ', ves
-D     PRINT *, '     vte(km/s)         ', vte
-D     PRINT *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
+CD    PRINT *, '     vsl(km/s)         ', vsl
+CD    PRINT *, '     ves(km/s)         ', ves
+CD    PRINT *, '     vte(km/s)         ', vte
+CD    PRINT *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
 
       RETURN
       END
@@ -453,9 +453,9 @@ D     PRINT *, '     vsl+ves+vte(km/s) ', vsl+ves+vte
         PRINT *, ' -- AOS frequency scale linearization applied --'
       END IF
 
-D     PRINT *, ' -- setxinitx --'
-D     PRINT *, '    XSCALE values - beg, middle and end...'
-D     PRINT *, XSCALE(1), 0.5*(XSCALE(N/2)+XSCALE(N+1-N/2)), XSCALE(N)
+CD    PRINT *, ' -- setxinitx --'
+CD    PRINT *, '    XSCALE values - beg, middle and end...'
+CD    PRINT *, XSCALE(1), 0.5*(XSCALE(N/2)+XSCALE(N+1-N/2)), XSCALE(N)
 
       RETURN
       END 
@@ -545,18 +545,18 @@ C      INTEGER          I
         NCEN = IQCEN
       END IF
 
-D     PRINT *, '-- setxfrest --'
-D     PRINT *, '   centre quadrant = ', NCEN
-D     PRINT *, '   fcen array = ', (fcen(i),i=1,8)
+CD    PRINT *, '-- setxfrest --'
+CD    PRINT *, '   centre quadrant = ', NCEN
+CD    PRINT *, '   fcen array = ', (fcen(i),i=1,8)
 
 *     Set rest frequency assumed to have been applied in observation
 
       IF (JFREST(NCEN).NE.0) THEN
         FROBS = 1.D-6 * DFLOAT(JFREST(NCEN))
-D       PRINT *, '   obs freq from jfrest = ', FROBS
+CD      PRINT *, '   obs freq from jfrest = ', FROBS
       ELSE
         FROBS = 1.D-6 * DFLOAT(JFCEN(NCEN))
-D       PRINT *, '   obs freq from jfcen  = ', FROBS
+CD      PRINT *, '   obs freq from jfcen  = ', FROBS
       END IF
 
       
@@ -576,7 +576,7 @@ D       PRINT *, '   obs freq from jfcen  = ', FROBS
         FRDIS = FROBS
       END IF
 
-D     PRINT *, '   dis frequency = ', FROBS
+CD    PRINT *, '   dis frequency = ', FROBS
 
       RETURN
       END
@@ -616,9 +616,9 @@ D     PRINT *, '   dis frequency = ', FROBS
       CALL UUCASE (VVFRAME)
       CALL UUCASE (VVDEF)
 
-D     PRINT *, ' -- setxftcen --'
-D     PRINT *, '    given velocity frame = ', VVFRAME
-D     PRINT *, '    velocity definition =  ', VVDEF
+CD    PRINT *, ' -- setxftcen --'
+CD    PRINT *, '    given velocity frame = ', VVFRAME
+CD    PRINT *, '    velocity definition =  ', VVDEF
 
 *     First find velocity of frame with respect to the telescope
 
@@ -635,7 +635,7 @@ D     PRINT *, '    velocity definition =  ', VVDEF
         VEL = 0.0
       END IF
  
-D     PRINT *, '    velocity frame/tel  =  ', VEL
+CD    PRINT *, '    velocity frame/tel  =  ', VEL
 
 *     Now apply appropriate doppler correction
 
@@ -718,8 +718,8 @@ C     the sum in a recoverable way.
 
 *     First find velocity of frame with respect to the telescope
 
-D      PRINT *, ' -- setxdopp --'
-D      PRINT *, '    velocity definition = ', VVDEF
+CD     PRINT *, ' -- setxdopp --'
+CD     PRINT *, '    velocity definition = ', VVDEF
 
       IF (VVFRAME.EQ.'TELL') THEN
         VEL = VRAD
@@ -734,7 +734,7 @@ D      PRINT *, '    velocity definition = ', VVDEF
         VEL = 0.0
       END IF
  
-D      PRINT *, '    Velocity of frame = ', VEL
+CD     PRINT *, '    Velocity of frame = ', VEL
 
 *     Calculate appropriate doppler correction (depending on definitions)
 
@@ -749,9 +749,9 @@ D      PRINT *, '    Velocity of frame = ', VEL
         DOPPFAC = (1.D0 - DBLE(VEL)/VC)
       END IF
 
-D      PRINT *, '    doppler factor = ', DOPPFAC
-D      PRINT *, '    sector center freq (GHz)  = ', FCEN_T
-D      PRINT *, '    reference rest freq (GHz) = ', FREST
+CD     PRINT *, '    doppler factor = ', DOPPFAC
+CD     PRINT *, '    sector center freq (GHz)  = ', FCEN_T
+CD     PRINT *, '    reference rest freq (GHz) = ', FREST
 
 *     ... and apply to the XSCALE array
 *     (retain in the form of offsets, but now from display rest frequency)
@@ -761,14 +761,14 @@ D      PRINT *, '    reference rest freq (GHz) = ', FREST
 *     originally at the rest frequency in the source frame will end up back
 *     there in the display despite transforming to and from telluric frame.
 
-D      PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
+CD     PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 
       DO I = 1, N
         OBS_FREQ  = FCEN_T + XSCALE8(I)*1.D-3
         XSCALE8(I) = 1000.D0* (OBS_FREQ/DOPPFAC - FREST)
       END DO
 
-D      PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
+CD     PRINT *, '    first and last channels:', xscale8(1), xscale8(n)
 
       RETURN
       END 
@@ -889,8 +889,8 @@ C      REAL              XMID
 
       FRESTM = 1.0D3 * FREST
 
-D     PRINT *, ' -- setxvel --'
-D     PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
+CD    PRINT *, ' -- setxvel --'
+CD    PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
 
       IF (VVDEF.EQ.'RAD') THEN
         DO I = 1, N
@@ -914,13 +914,13 @@ D     PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
         RETURN
       END IF
 
-D     PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
+CD    PRINT *, '    first and last channels: ', xscale8(1), xscale8(n)
 
 *     Finally, produce an estimate of the average velocity increment
 
       IF (N.GT.1) THEN
         XFAC8 = (XSCALE8(N)-XSCALE8(1)) / DFLOAT(N-1)
-D       PRINT *, '    estimate of XFAC = ', xfac8
+CD      PRINT *, '    estimate of XFAC = ', xfac8
       END IF
 
       RETURN

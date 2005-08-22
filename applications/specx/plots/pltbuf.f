@@ -134,9 +134,9 @@ C   X- and Y-axis labelling
       ILYU    = GEN_ILEN (YAXIS_UNITS)
       YTITLE  = YAXIS_NAME(:ILYN) // '  (' // YAXIS_UNITS(:ILYU) // ')'
 
-D     PRINT *, ' -- pltbuf --'
-D     PRINT *, '    xtitle = ', xtitle
-D     PRINT *, '    ytitle = ', ytitle
+CD    PRINT *, ' -- pltbuf --'
+CD    PRINT *, '    xtitle = ', xtitle
+CD    PRINT *, '    ytitle = ', ytitle
 
 C   Set up plot limits
 

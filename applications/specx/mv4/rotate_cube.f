@@ -82,10 +82,10 @@ C     that was performed previously by setting theta to zero.
 
 C     Sort out titles for X- and Y-axes
 
-D     PRINT *, ' -- rotate_cube --'
-D     PRINT *, '    DO_ROTATE = ', DO_ROTATE
-D     PRINT *, '    THETA     = ', THETA
-D     PRINT *, '    POS_ANGLE = ', POS_ANGLE
+CD    PRINT *, ' -- rotate_cube --'
+CD    PRINT *, '    DO_ROTATE = ', DO_ROTATE
+CD    PRINT *, '    THETA     = ', THETA
+CD    PRINT *, '    POS_ANGLE = ', POS_ANGLE
 
       CALL SET_MAPTITLE (DO_ROTATE, THETA, POS_ANGLE)
 

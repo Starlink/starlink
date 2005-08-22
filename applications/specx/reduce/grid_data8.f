@@ -50,9 +50,9 @@ C  Ok, go..
 
       IERR  = 0
 
-D     PRINT *, ' -- grid_data8 --'
-D     PRINT *, '    ndat, nout  = ', NDAT, NOUT
-D     PRINT *, '    gridn, xmid = ', GRIDN, XMID
+CD    PRINT *, ' -- grid_data8 --'
+CD    PRINT *, '    ndat, nout  = ', NDAT, NOUT
+CD    PRINT *, '    gridn, xmid = ', GRIDN, XMID
 C     PRINT *, '    current x-scale array ='
 C     PRINT *,      (XSCALE(J),J=1,NDAT)
 

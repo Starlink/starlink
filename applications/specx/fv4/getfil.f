@@ -48,9 +48,9 @@ C  Ok, go...
       IFAIL = 0
 
       NF    = NFILE (IFILE, IACCES)
-D     PRINT *, ' -- getfil --'
-D     TYPE '(4X,I2, '' files with access '', A1)', NF, IACCES
-D     PRINT *, '    Proc-mode = ', PROC_MODE
+CD    PRINT *, ' -- getfil --'
+CD    TYPE '(4X,I2, '' files with access '', A1)', NF, IACCES
+CD    PRINT *, '    Proc-mode = ', PROC_MODE
 
       IF(NF.LE.0)   THEN
         IFAIL = 1
@@ -67,8 +67,8 @@ D     PRINT *, '    Proc-mode = ', PROC_MODE
    10   CALL GEN_GETI4 ('File number? (EOF to list)',
      &                    IFILE, FORMAT, IFILE, JDEF)
 
-D       PRINT *, '    gen_geti4 return: ifile = ', ifile
-D       PRINT *, '    gen_geti4 return: jdef  = ', jdef
+CD      PRINT *, '    gen_geti4 return: ifile = ', ifile
+CD      PRINT *, '    gen_geti4 return: jdef  = ', jdef
 
         IF (JDEF.EQ.2 .AND. PROC_MODE.EQ.3) THEN
           CALL LSTFIL
@@ -82,7 +82,7 @@ D       PRINT *, '    gen_geti4 return: jdef  = ', jdef
         ELSE
           IFAIL = 0
         END IF
-D       TYPE '(''    Chosen file = '', I2)', IFILE
+CD      TYPE '(''    Chosen file = '', I2)', IFILE
 
         IF (IACCES.NE.'X')   THEN
           IF (.NOT.CHKACC (IFILE, IACCES)) THEN

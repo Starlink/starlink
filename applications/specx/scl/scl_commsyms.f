@@ -64,7 +64,7 @@
       FREE      = 0
       POSN_FREE = .FALSE.
 
-D     PRINT *, NAME, ' := ', VALUE
+CD    PRINT *, NAME, ' := ', VALUE
 
 *  Look for match with existing symbols:
 

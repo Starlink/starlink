@@ -14,14 +14,14 @@ C   Subroutine to set new limits for current plot.
       INCLUDE  'PLOT2D'
       INCLUDE  'FLAGCOMM'
 
-D     CALL SXGTIDLE
-D     Print *,'Old values of plot box:'
-D     Print *,'X: ',XLIM
-D     Print *,'Y: ',YLIM
-D     Print *,'Values of PQ box:'
-D     Print *,'P: ',P
-D     Print *,'Q: ',Q
-D     CALL SXGTTGRAPH
+CD    CALL SXGTIDLE
+CD    Print *,'Old values of plot box:'
+CD    Print *,'X: ',XLIM
+CD    Print *,'Y: ',YLIM
+CD    Print *,'Values of PQ box:'
+CD    Print *,'P: ',P
+CD    Print *,'Q: ',Q
+CD    CALL SXGTTGRAPH
 
       XINVERT = .FALSE.
       YINVERT = .FALSE.
@@ -80,11 +80,11 @@ C  Which way round should things be?
       IF (YINVERT) CALL SWAP2     (YLIM(1),YLIM(2))
       IF (YMOD)    CALL AUTORANGE (YLIM(1), YLIM(2), NQINT)
 
-D     CALL SXGTIDLE
-D     Print *,'New values of plot box:'
-D     Print *,'X: ',XLIM
-D     Print *,'Y: ',YLIM
-D     CALL SXGTTGRAPH
+CD    CALL SXGTIDLE
+CD    Print *,'New values of plot box:'
+CD    Print *,'X: ',XLIM
+CD    Print *,'Y: ',YLIM
+CD    CALL SXGTTGRAPH
 
 C  Reset the axis lengths: If AX2LEN = 0 then we had automatic selection of
 C  Y-axis size to keep 1:1 aspect ratio. Do not change this unless specifically
@@ -96,14 +96,14 @@ C  (Later mod: preset aspect ratio for AX1LEN = 0. also)
      &                       AXLENX, AXLENY,
      &                       PLOTLIMS(1)+5., PLOTLIMS(3)+8.)
 
-D     CALL SXGTIDLE
-D     PRINT *, ' -- new_scales --'
-D     PRINT *, '    Returned from SET-DISPLAY-SIZE'
-D     PRINT *, '                    a(1),   a(2)   = ', a(1),   a(2)
-D     PRINT *, '                    dxlim,  dylim  = ',
-D    &                      abs(xlim(2)-xlim(1)), abs(ylim(2)-ylim(1))
-D     PRINT *, 'Axis lengths reset: axlenx, axleny = ', axlenx, axleny
-D     CALL SXGTTGRAPH
+CD    CALL SXGTIDLE
+CD    PRINT *, ' -- new_scales --'
+CD    PRINT *, '    Returned from SET-DISPLAY-SIZE'
+CD    PRINT *, '                    a(1),   a(2)   = ', a(1),   a(2)
+CD    PRINT *, '                    dxlim,  dylim  = ',
+CD   &                      abs(xlim(2)-xlim(1)), abs(ylim(2)-ylim(1))
+CD    PRINT *, 'Axis lengths reset: axlenx, axleny = ', axlenx, axleny
+CD    CALL SXGTTGRAPH
       
       CHANGE_PLOT = .TRUE. 
 

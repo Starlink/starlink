@@ -29,17 +29,17 @@
       IF (RAM.ne.0.D0 .or. DECM.ne.0.D0) MCZERO = .FALSE.
 
       IF (MCZERO) THEN
-D       PRINT *, ' Map centre zero; use prototype header'
+CD      PRINT *, ' Map centre zero; use prototype header'
         MAP_RA  = RA
         MAP_DEC = DEC
       ELSE
-D       PRINT *, ' Using map centre in map header'
+CD      PRINT *, ' Using map centre in map header'
         MAP_RA  = RAM
         MAP_DEC = DECM
       END IF
 
-D     PRINT *, ' R.A. = ', MAP_RA
-D     PRINT *, ' Dec. = ', MAP_DEC
+CD    PRINT *, ' R.A. = ', MAP_RA
+CD    PRINT *, ' Dec. = ', MAP_DEC
 
       RETURN
       END

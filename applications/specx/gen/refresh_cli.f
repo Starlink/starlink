@@ -16,7 +16,7 @@ C   Routine to fill an empty command line with the contents of STRING
       ICLIST           = GEN_ICHTOT (ISP-1)+1
       CLILINE(ICLIST:) = ' '
 
-D     print *,'Refresh_CLI...New starting position is ',ICLIST
+CD    print *,'Refresh_CLI...New starting position is ',ICLIST
 
       IF (ISTR.NE.0) THEN
         CLILINE(ICLIST:) = STRING(:ISTR)//' '

@@ -40,7 +40,7 @@
         L22 = L22 - 1
       END DO
 
-D     PRINT *, 'Input strings have lengths: ', L11, L22
+CD    PRINT *, 'Input strings have lengths: ', L11, L22
 
 *     If strings are not same length, equality not satisfied
 

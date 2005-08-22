@@ -103,13 +103,13 @@
      &          ' Def''n)'
       END IF
 
-D     PRINT *, ' -- make_xtitle --'
-D     PRINT *, '    VELOCITY_REF : ', VELOCITY_REF
-D     PRINT *, '    XAXIS_NAME   : ', XAXIS_NAME(:IXN)
-D     PRINT *, '    OFFSETV      : ', OFFSETV(IL1:ILV)
-D     PRINT *, '    XAXIS_UNITS  : ', XAXIS_UNITS(:IXU)
-D     PRINT *, '    VELOCITY_DEF : ', VELOCITY_DEF(:ILD)
-D     PRINT *, '    New X-axis title is: ', XTITLE
+CD    PRINT *, ' -- make_xtitle --'
+CD    PRINT *, '    VELOCITY_REF : ', VELOCITY_REF
+CD    PRINT *, '    XAXIS_NAME   : ', XAXIS_NAME(:IXN)
+CD    PRINT *, '    OFFSETV      : ', OFFSETV(IL1:ILV)
+CD    PRINT *, '    XAXIS_UNITS  : ', XAXIS_UNITS(:IXU)
+CD    PRINT *, '    VELOCITY_DEF : ', VELOCITY_DEF(:ILD)
+CD    PRINT *, '    New X-axis title is: ', XTITLE
 
       RETURN
       END

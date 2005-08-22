@@ -43,8 +43,8 @@ C       to NX (right edge of channel NX), limits XL to XR
 
       XL = X(1)  - 0.5*( X(2) -X(1)    )
       XR = X(NX) + 0.5*( X(NX)-X(NX-1) )
-D     print *, ' -- xsnart --'
-D     print *, '  left and right limits: ', xl, xr
+CD    print *, ' -- xsnart --'
+CD    print *, '  left and right limits: ', xl, xr
 
 *     test that value lies in range of axis...
 
@@ -75,9 +75,9 @@ D     print *, '  left and right limits: ', xl, xr
 
       DX = XRR - XLL
 
-D     print *, '  first guess channel: ', n1
-D     print *, '  channel boundaries xll and xrr: ', xll, xrr
-D     print *, '  channel increment dx: ', dx
+CD    print *, '  first guess channel: ', n1
+CD    print *, '  channel boundaries xll and xrr: ', xll, xrr
+CD    print *, '  channel increment dx: ', dx
 
 *     iterate until we know location to within one channel
 
@@ -102,9 +102,9 @@ C     Can not use this with N1=1 since that uses index=0
 
         DX  = XRR - XLL
 
-D       print *, '  next guess channel: ', n1
-D       print *, '  channel boundaries xll and xrr: ', xll, xrr
-D       print *, '  channel increment dx: ', dx
+CD      print *, '  next guess channel: ', n1
+CD      print *, '  channel boundaries xll and xrr: ', xll, xrr
+CD      print *, '  channel increment dx: ', dx
 
       END DO
 
@@ -116,7 +116,7 @@ D       print *, '  channel increment dx: ', dx
 *     must protect addressing index 0
          XSNART = V/DX
       END IF
-D     print *, '  final value: ', xsnart
+CD    print *, '  final value: ', xsnart
 
       RETURN
       END

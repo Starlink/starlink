@@ -36,12 +36,12 @@
 
       PRINT *,NCUBE,' bytes required for data cube'
 
-D     PRINT *, ' -- make_cube2 --'
+CD    PRINT *, ' -- make_cube2 --'
 
       ISTAT = IGETVM (NCUBE, .FALSE., 'MAKE_CUBE2', CUBE_ADDRESS)
 
-D     PRINT *,
-D    &'    Got ', NCUBE, ' bytes of VM for cube @ ',CUBE_ADDRESS
+CD    PRINT *,
+CD   &'    Got ', NCUBE, ' bytes of VM for cube @ ',CUBE_ADDRESS
       IF (ISTAT.NE.0) THEN
         PRINT *,
      &  ' -- make_cube2 -- Failed to get virtual memory for cube'
@@ -51,8 +51,8 @@ D    &'    Got ', NCUBE, ' bytes of VM for cube @ ',CUBE_ADDRESS
 
       ISTAT = IGETVM (NINDEX, .FALSE., 'MAKE_CUBE2', INDEX_ADDRESS)
 
-D     PRINT *,
-D    &'    Got ',NINDEX,' bytes of VM for index @ ',INDEX_ADDRESS
+CD    PRINT *,
+CD   &'    Got ',NINDEX,' bytes of VM for index @ ',INDEX_ADDRESS
       IF (ISTAT.NE.0) THEN
         PRINT *,' -- make_cube2 -- Failed to get v. memory for index'
         IFAIL = 51
@@ -105,19 +105,19 @@ C  to mark the cube as non-existent.
 
 *  Ok, go...
 
-D     PRINT *, ' -- Release new cube --'
+CD    PRINT *, ' -- Release new cube --'
 
       IF (NEW_CUBE_LOADED .AND. NCUBE.NE.0) THEN
 
-D       PRINT *, '    Releasing ', NCUBE, ' bytes of index @ ',
-D    &               CURRENT_CUBE_ADDRESS
+CD      PRINT *, '    Releasing ', NCUBE, ' bytes of index @ ',
+CD   &               CURRENT_CUBE_ADDRESS
         ISTAT = IFREEVM (CURRENT_CUBE_ADDRESS)
         IF (ISTAT.NE.0) THEN
           PRINT *, '    Error releasing VM for new cube, ISTAT = ',ISTAT
         END IF
 
-D       PRINT *, '    Releasing ',NINDEX,' bytes of index@ ',
-D    &               CURRENT_INDEX_ADDRESS
+CD      PRINT *, '    Releasing ',NINDEX,' bytes of index@ ',
+CD   &               CURRENT_INDEX_ADDRESS
         ISTAT = IFREEVM (CURRENT_INDEX_ADDRESS)
         IF (ISTAT.NE.0) THEN
           PRINT *,

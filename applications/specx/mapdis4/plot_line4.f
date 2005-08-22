@@ -161,8 +161,8 @@ C-----------------------------------------------------------------------
       DX = ABS (AXLENX / NXMAP)
       DY = ABS (AXLENY / NYMAP)
 
-D     PRINT *,'Map area tesselated',NXMAP,' by',NYMAP
-D     PRINT *,'Windows are ',DX,' by',DY,' mm'
+CD    PRINT *,'Map area tesselated',NXMAP,' by',NYMAP
+CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
 
       PLOTLIMS(1) = XMARGIN
       PLOTLIMS(2) = XMARGIN + AXLENX

@@ -160,8 +160,8 @@ C           Need to skip to end of hollerith string
 
       END IF
 
-D     Print *, '--getit3--'
-D     Print *, '  returned item: ', string(ist:ifin)
+CD    Print *, '--getit3--'
+CD    Print *, '  returned item: ', string(ist:ifin)
 
       RETURN
       END

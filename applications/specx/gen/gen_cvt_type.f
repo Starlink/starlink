@@ -48,24 +48,24 @@
       type2 = outtype
       CALL uucase (type2)
 
-D     PRINT *, 'converting from ',type1,' to ',type2
+CD    PRINT *, 'converting from ',type1,' to ',type2
 
       IF (type1.eq.type2) THEN
-D       PRINT *, 'No conversion necessary - copy', nb_in, ' bytes'
+CD      PRINT *, 'No conversion necessary - copy', nb_in, ' bytes'
         CALL xcopy (nb_in, input, output)
 
       ELSE IF (type1(1:1).eq.'C' .AND. type2(1:1).eq.'C') THEN
-D       PRINT *, 'String types - copy', MIN(nb_in,nb_out), ' bytes'
+CD      PRINT *, 'String types - copy', MIN(nb_in,nb_out), ' bytes'
         CALL xcopy (nb_out, %REF(null_str), output)
         CALL xcopy (MIN(nb_in,nb_out), input, output)
 
       ELSE 
 
         CALL xcopy (nb_in, input, logical)
-D       PRINT *, 'Conversion IS necessary'
+CD      PRINT *, 'Conversion IS necessary'
 
         IF (type1 .eq. 'L4') THEN
-D         PRINT *,'Input type is L4'
+CD        PRINT *,'Input type is L4'
 !          IF (type2 .eq. 'I4') THEN
 !            integer = logical
 !          ELSE IF (type2 .eq. 'R4') THEN
@@ -78,12 +78,12 @@ D         PRINT *,'Input type is L4'
           END IF
 
         ELSE IF (type1 .eq. 'I4') THEN
-D         PRINT *,'Input type is I4'
+CD        PRINT *,'Input type is I4'
 !          IF (type2 .eq. 'L4') THEN
 !            logical = integer
 !          ELSE IF (type2 .eq. 'R4') THEN
           IF (type2 .eq. 'R4') THEN
-D           PRINT *,'Output type is R4'
+CD          PRINT *,'Output type is R4'
             real    = integer
           ELSE IF (type2 .eq. 'R8') THEN
             double  = integer
@@ -92,7 +92,7 @@ D           PRINT *,'Output type is R4'
           END IF
 
         ELSE IF (type1 .eq. 'R4') THEN
-D         PRINT *,'Input type is R4'
+CD        PRINT *,'Input type is R4'
 !          IF (type2 .eq. 'L4') THEN
 !            logical = real
 !          ELSE IF (type2 .eq. 'I4') THEN
@@ -105,7 +105,7 @@ D         PRINT *,'Input type is R4'
           END IF
 
         ELSE IF (type1 .eq. 'R8') THEN
-D         PRINT *,'Input type is R8'
+CD        PRINT *,'Input type is R8'
 !          IF (type2 .eq. 'L4') THEN
 !            logical = double
 !          ELSE IF (type2 .eq. 'I4') THEN

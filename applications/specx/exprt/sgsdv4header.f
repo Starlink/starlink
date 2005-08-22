@@ -82,7 +82,7 @@ C     ...scan number
       CALL GSD_FIND  (IFD, 'C1SNO',
      &                NO, UNITS, TYPE, ARRAY, IND_SCAN, STATUS)
       CALL GSD_GET0I (IND_SCAN, SCAN_NO, STATUS)
-D     WRITE (ILOUT,*) source_name,' Scan #',scan_no
+CD    WRITE (ILOUT,*) source_name,' Scan #',scan_no
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C  Date and time of observation
@@ -96,7 +96,7 @@ C     ...Time (UT)
       CALL GSD_FIND  (IFD, 'C3UT',
      &                NO, UNITS, TYPE, ARRAY, IND_UT, STATUS)
       CALL GSD_GET0D (IND_UT, DUT, STATUS)
-D     WRITE (ILOUT,*) ddate,dut
+CD    WRITE (ILOUT,*) ddate,dut
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C  Source position (map centre)
@@ -110,7 +110,7 @@ C     ...Declination
       CALL GSD_FIND  (IFD, 'C4EDEC',
      &                NO, UNITS, TYPE, ARRAY, IND_DEC, STATUS)
       CALL GSD_GET0D (IND_DEC, DECDG, STATUS)
-D     WRITE (ILOUT,*) radg,decdg
+CD    WRITE (ILOUT,*) radg,decdg
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C  Mapping parameters
@@ -144,7 +144,7 @@ C     ...map cell y-size (C6DY, R*8)
       CALL GSD_FIND  (IFD, 'C6DY',
      &                NO, UNITS, TYPE, ARRAY, IND_DY, STATUS)
       CALL GSD_GET0D (IND_DY, DY, STATUS)
-D     WRITE (ILOUT,*) 'map cell size dx,dy ', dx, dy
+CD    WRITE (ILOUT,*) 'map cell size dx,dy ', dx, dy
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C     ...# map x-points  (C6XNP, I*4)
@@ -156,7 +156,7 @@ C     ...# map y-points  (C6YNP, I*4)
       CALL GSD_FIND  (IFD, 'C6YNP',
      &                NO, UNITS, TYPE, ARRAY, IND_YNP, STATUS)
       CALL GSD_GET0I (IND_YNP, IYNP, STATUS)
-D     WRITE (ILOUT,*) 'Number of map x & y points: ', ixnp, iynp
+CD    WRITE (ILOUT,*) 'Number of map x & y points: ', ixnp, iynp
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C     ...Start x  (C6XGC, R*4)
@@ -168,7 +168,7 @@ C     ...Start y  (C6YGC, R*4)
       CALL GSD_FIND  (IFD, 'C6YGC',
      &                NO, UNITS, TYPE, ARRAY, IND_YGC, STATUS)
       CALL GSD_GET0R (IND_YGC, YGC, STATUS)
-D     WRITE (ILOUT,*) 'Map start position, x & y cells', xgc, ygc
+CD    WRITE (ILOUT,*) 'Map start position, x & y cells', xgc, ygc
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C     ...dX positive? (c6xpos, L)
@@ -180,7 +180,7 @@ C     ...dY positive? (c6ypos, L)
       CALL GSD_FIND  (IFD, 'c6ypos',
      &                NO, UNITS, TYPE, ARRAY, IND_YPOS, STATUS)
       CALL GSD_GET0L (IND_YPOS, YPOS, STATUS)
-D     WRITE (ILOUT,*) 'Increments in x & y positive?: ',xpos, ypos
+CD    WRITE (ILOUT,*) 'Increments in x & y positive?: ',xpos, ypos
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 *  Ideally the distinction here would be based on Storage task version
@@ -233,12 +233,12 @@ C     ...Local system coordinate code
         CALL GSD_GET0C (IND_LSC, LOCAL_COSYS, STATUS)
       END IF
 
-D     WRITE (ILOUT,*) 'v2y & x2y', v2y, x2y
-D     WRITE (ILOUT,*) 'map offsets (x,y) ', xmap_off, ymap_off
-D     WRITE (ILOUT,*) 'local coordinate system', '   ', LOCAL_COSYS(1:2)
+CD    WRITE (ILOUT,*) 'v2y & x2y', v2y, x2y
+CD    WRITE (ILOUT,*) 'map offsets (x,y) ', xmap_off, ymap_off
+CD    WRITE (ILOUT,*) 'local coordinate system', '   ', LOCAL_COSYS(1:2)
 
-D     WRITE (ILOUT,*) scan_dir,' ',scan_type,' ',dx,dy
-D     WRITE (ILOUT,*) scan_angle,ixnp,iynp,xgc,ygc,xpos,ypos
+CD    WRITE (ILOUT,*) scan_dir,' ',scan_type,' ',dx,dy
+CD    WRITE (ILOUT,*) scan_angle,ixnp,iynp,xgc,ygc,xpos,ypos
 
 C  Pointing History table
 
@@ -256,9 +256,9 @@ C  Pointing History table
       CALL GSD_GET1R    (IND_PHIST, 2, DIMVALS, START, END,
      &                   PHIST, ACTVALS, STATUS)
       IF (STATUS.NE.ADAM__OK) GO TO 99
-D     WRITE (ILOUT,*) 'Pointing history table'
-D     WRITE (ILOUT,'((1X,I4,2(1X,F8.2)))')
-D    &      (J,(PHIST(I,J),I=1,2),J=1,END(2))
+CD    WRITE (ILOUT,*) 'Pointing history table'
+CD    WRITE (ILOUT,'((1X,I4,2(1X,F8.2)))')
+CD   &      (J,(PHIST(I,J),I=1,2),J=1,END(2))
 
 C  Miscellaneous pars
 
@@ -277,8 +277,8 @@ C     ...elevation
       CALL GSD_FIND  (IFD, 'C4EL',
      &                NO, UNITS, TYPE, ARRAY, IND_ELEV, STATUS)
       CALL GSD_GET0D (IND_ELEV, ELEVATION, STATUS)
-D     WRITE (ILOUT,*) 'vrad, azimuth, elevation ',
-D    &                 vrad, azimuth, elevation
+CD    WRITE (ILOUT,*) 'vrad, azimuth, elevation ',
+CD   &                 vrad, azimuth, elevation
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C  Integration parameters
@@ -295,7 +295,7 @@ C     but if we can't find it, use the old parameter)
      &                  NO, UNITS, TYPE, ARRAY, IND_INTIME, STATUS)
       END IF
       CALL GSD_GET0D (IND_INTIME, INT_TIME, STATUS)
-D     WRITE (ILOUT,*) 'int_time ', int_time
+CD    WRITE (ILOUT,*) 'int_time ', int_time
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 C     Now correct the integration time to comply with the definition
@@ -323,7 +323,7 @@ C     ...# phases measured
       CALL GSD_FIND  (IFD, 'C6NP',
      &                NO, UNITS, TYPE, ARRAY, IND_NP, STATUS)
       CALL GSD_GET0I (IND_NP, NP, STATUS)
-D     WRITE (ILOUT,*) 'ppc,nci,np ', ppc,nci,np
+CD    WRITE (ILOUT,*) 'ppc,nci,np ', ppc,nci,np
       IF (STATUS.NE.ADAM__OK) GO TO 99
 
 *  the following logic only works for discretely sampled maps, I think (JFL).
@@ -391,7 +391,7 @@ C     ...Number of channels per receiver
         CALL GSD_FIND  (IFD, 'c3lspc', 
      &                  NO, UNITS, TYPE, ARRAY, IND_LSPC, STATUS)
         CALL GSD_GET0I (IND_LSPC, LSPC, STATUS)
-D       WRITE (ILOUT,*) 'nrf,nrc,lspc',nrf,nrc,lspc
+CD      WRITE (ILOUT,*) 'nrf,nrc,lspc',nrf,nrc,lspc
 
       ELSE
         IERR = 38  ! Report that no data

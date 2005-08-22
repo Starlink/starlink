@@ -107,7 +107,7 @@
         PRINT *,'   hash table full'
         IERR = 4
       ELSE
-D       PRINT *,'New entry at position ', N, ' in hash table'
+CD      PRINT *,'New entry at position ', N, ' in hash table'
       END IF
 
       RETURN

@@ -65,11 +65,11 @@
 
 *  Ok, go...
 
-D     PRINT *, ' -- maxmap --'
-D     PRINT *, '    Map size (x & y) = ', ix, iy
-D     PRINT *, '    Submap area: x   = ', ix1, ix2
-D     PRINT *, '    Submap area: y   = ', iy1, iy2
-D     PRINT *, '    Bad value        = ', badval
+CD    PRINT *, ' -- maxmap --'
+CD    PRINT *, '    Map size (x & y) = ', ix, iy
+CD    PRINT *, '    Submap area: x   = ', ix1, ix2
+CD    PRINT *, '    Submap area: y   = ', iy1, iy2
+CD    PRINT *, '    Bad value        = ', badval
 
       MMIN = +1.e10
       MMAX = -1.e10

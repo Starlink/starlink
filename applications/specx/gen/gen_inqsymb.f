@@ -64,7 +64,7 @@
         RETURN
       END IF
 
-D     PRINT *,'-- gen_inqsymb --'
+CD    PRINT *,'-- gen_inqsymb --'
 
       IF (C1.NE.ILS) THEN
         CALL GET_SUBEXPR  (INSYMBOL, C1, C2, IERR)
@@ -97,10 +97,10 @@ D     PRINT *,'-- gen_inqsymb --'
           RETURN
 
         ELSE
-D         PRINT *, '   evaluating array index: ', INSYMBOL(C1:C2)
+CD        PRINT *, '   evaluating array index: ', INSYMBOL(C1:C2)
           CALL GEN_EVAL_AE (INSYMBOL(C1:C2), 'I4', ELEMENT, IERR)
           IF (IERR.NE.0) RETURN
-D         PRINT *, '   array index result = ', ELEMENT
+CD        PRINT *, '   array index result = ', ELEMENT
 
         END IF
 
@@ -118,7 +118,7 @@ D         PRINT *, '   array index result = ', ELEMENT
         RETURN
       END IF
 
-D     PRINT *, '   symbol length and element number: ', NCH, ELEMENT
+CD    PRINT *, '   symbol length and element number: ', NCH, ELEMENT
 
       IF (ELEMENT.NE.0) THEN
         ADDRESS = ADDRESS + NCH*(ELEMENT-1)

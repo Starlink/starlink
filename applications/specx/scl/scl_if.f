@@ -22,8 +22,8 @@
 
 * Ok, go..
 
-D     Print *,'-- push_ifstack --'
-D     Print *,'   initial IF_COUNT = ', IF_COUNT
+CD    Print *,'-- push_ifstack --'
+CD    Print *,'   initial IF_COUNT = ', IF_COUNT
 
       IF_COUNT = IF_COUNT + 1
 
@@ -37,7 +37,7 @@ D     Print *,'   initial IF_COUNT = ', IF_COUNT
 
       PUSH_IFSTACK = .TRUE.
 
-D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
+CD    Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       RETURN
       END
@@ -63,8 +63,8 @@ D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
 *  Ok, go..
 
-D     Print *,'-- pull_ifstack --'
-D     Print *,'   initial IF_COUNT = ', IF_COUNT
+CD    Print *,'-- pull_ifstack --'
+CD    Print *,'   initial IF_COUNT = ', IF_COUNT
 
       IF_COUNT = IF_COUNT - 1
 
@@ -82,7 +82,7 @@ D     Print *,'   initial IF_COUNT = ', IF_COUNT
 
       PULL_IFSTACK = .TRUE.
 
-D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
+CD    Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       RETURN
       END
@@ -110,7 +110,7 @@ D     Print *,'     final IF_COUNT = ', IF_COUNT, ' IF_LEVEL = ', ISP
 
       IF_COUNT = 0
 
-D     Print *,'IF stack initialized: IF level = ', IF_COUNT
+CD    Print *,'IF stack initialized: IF level = ', IF_COUNT
 
       IF_LEVEL = 0
       IF_SKIP  = 0

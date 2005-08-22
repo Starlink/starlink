@@ -125,11 +125,11 @@ C *** Calculate radial component of rotation velocity of earth
 
       VTE = 0.465*SIN(HA)*COSDEL*COS(ALAT)
 
-D     PRINT *, ' -- astro_vels --'
-D     PRINT *, '     V(sun-lsr)   = ', VSL
-D     PRINT *, '     V(earth-sun) = ', VES
-D     PRINT *, '     V(tel-earth) = ', VTE
-D     PRINT *, '     (total vel)  = ', VTE + VES + VSL
+CD    PRINT *, ' -- astro_vels --'
+CD    PRINT *, '     V(sun-lsr)   = ', VSL
+CD    PRINT *, '     V(earth-sun) = ', VES
+CD    PRINT *, '     V(tel-earth) = ', VTE
+CD    PRINT *, '     (total vel)  = ', VTE + VES + VSL
 
       RETURN
       END

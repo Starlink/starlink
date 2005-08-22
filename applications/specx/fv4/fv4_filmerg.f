@@ -128,8 +128,8 @@
       END IF
 
 * See if the info is correct
-D      PRINT *, 'File A has : ',NUMSCAN(1)
-D      PRINT *, 'File B has : ',NUMSCAN(2)
+CD     PRINT *, 'File A has : ',NUMSCAN(1)
+CD     PRINT *, 'File B has : ',NUMSCAN(2)
 
 * Now need to read all the relevant information into an array
 

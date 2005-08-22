@@ -54,13 +54,13 @@
 
       IF (type1(1:1).EQ.'C' .OR. type2(1:1).EQ.'C') THEN
         IF (type1(1:1).EQ.type2(1:1)) THEN
-D         print *,'    calling gen_exops'
+CD        print *,'    calling gen_exops'
           CALL gen_exops (opd1, type1, nbytes1,
      &                    opd2, type2, nbytes2, operator, ierr)
-D         print *,'Result of string expression:'
-D         print *,'    type is ', type1
+CD        print *,'Result of string expression:'
+CD        print *,'    type is ', type1
           call xcopy (4, opd1, tlog1)
-D         print *,'    logical value is ', tlog1
+CD        print *,'    logical value is ', tlog1
           IF (ierr.NE.0) GO TO 99
           RETURN
         ELSE
@@ -91,8 +91,8 @@ D         print *,'    logical value is ', tlog1
       END IF
       CALL xcopy (nbytes2, opd2, temp2)
 
-D     Print *,' - operand types are ', types(itype1),'and',types(itype2)
-D     Print *,' - operator is "'//operator(1:2)//'"'
+CD    Print *,' - operand types are ', types(itype1),'and',types(itype2)
+CD    Print *,' - operator is "'//operator(1:2)//'"'
 
       IF (operator(1:1).EQ.'&' .OR. operator(1:1).EQ.'!') THEN
         IF (itype1.EQ.4 .AND. itype2.EQ.4) THEN

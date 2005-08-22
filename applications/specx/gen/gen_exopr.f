@@ -37,27 +37,27 @@
 
 *     Compare the two operands
 
-D     print *,'-- gen_exopr --'
+CD    print *,'-- gen_exopr --'
 
       IF (type.EQ.'I4') THEN
-D       print *,'    operands: ', iop1, iop2
+CD      print *,'    operands: ', iop1, iop2
         less    = iop1.LT.iop2
         equal   = iop1.EQ.iop2
         greater = iop1.GT.iop2
       ELSE IF (type.EQ.'R4') THEN
-D       print *,'    operands: ', rop1, rop2
+CD      print *,'    operands: ', rop1, rop2
         less    = rop1.LT.rop2
         equal   = rop1.EQ.rop2
         greater = rop1.GT.rop2
       ELSE IF (type.EQ.'R8') THEN
-D       print *,'    operands: ', dop1, dop2
+CD      print *,'    operands: ', dop1, dop2
         less    = dop1.LT.dop2
         equal   = dop1.EQ.dop2
         greater = dop1.GT.dop2
       END IF
 
-D     print *,'    common operand type = ', type
-D     print *,'    less, equal, greater = ', less, equal, greater
+CD    print *,'    common operand type = ', type
+CD    print *,'    less, equal, greater = ', less, equal, greater
 
 *     Test the specified conditions
 
@@ -67,8 +67,8 @@ D     print *,'    less, equal, greater = ', less, equal, greater
         IF (test.EQ.'<') result = result.OR.less
         IF (test.EQ.'=') result = result.OR.equal
         IF (test.EQ.'>') result = result.OR.greater
-D       print *,'    test operation: ', test
-D       print *,'    cumulative result: ', result
+CD      print *,'    test operation: ', test
+CD      print *,'    cumulative result: ', result
       END DO
 
 *     Copy the result back

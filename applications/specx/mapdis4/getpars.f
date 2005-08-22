@@ -75,7 +75,7 @@
       CALL SETXNEW (XSCALE, IFAIL)
       IF (IFAIL.ne.0) RETURN
 
-D     PRINT *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
+CD    PRINT *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
 
 *     Get the data sequentially from the file and deposit into the 2-D array.
 
@@ -141,7 +141,7 @@ D     PRINT *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
             VMAP6(IDEP) = WIDTH
 
           ELSE
-D           PRINT *,'Bad pixel: (J,K) = ', J, K
+CD          PRINT *,'Bad pixel: (J,K) = ', J, K
             VMAP1(IDEP) = BADPIX_VAL
             VMAP2(IDEP) = BADPIX_VAL
             VMAP3(IDEP) = BADPIX_VAL

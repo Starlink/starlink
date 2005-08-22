@@ -26,7 +26,7 @@
       INTEGER*4 iresult
       REAL*4    arg
       REAL*4    result
-D      CHARACTER function*4
+CD     CHARACTER function*4
 
       EQUIVALENCE (result, iresult)
 
@@ -51,8 +51,8 @@ D      CHARACTER function*4
       negative = (arg.lt.0.0)
       zero     = (arg.eq.0.0)
 
-D     PRINT *, '-- gen_dofunc --'
-D     PRINT *, '   evaluation of function ', function
+CD    PRINT *, '-- gen_dofunc --'
+CD    PRINT *, '   evaluation of function ', function
 
       IF (fnc_index .eq. 1) THEN
         IF (positive) THEN

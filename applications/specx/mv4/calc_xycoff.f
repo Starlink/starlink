@@ -32,7 +32,7 @@
 *  Ok, go...
 
       IFAIL = 0
-D     PRINT *, ' -- calc_xycoff2 --'
+CD    PRINT *, ' -- calc_xycoff2 --'
 
 *     Check that we won't end up with a divide by zero...
 
@@ -49,7 +49,7 @@ D     PRINT *, ' -- calc_xycoff2 --'
 
       IF (EVEN) THEN
         IXOFF2 = 2*NINT (XOFF - SIGN(XOFF,0.5)) + NINT (SIGN(XOFF,1.0))
-D       PRINT *, '    map has even number of pixels in X'
+CD      PRINT *, '    map has even number of pixels in X'
       ELSE
         IXOFF2 = 2*NINT (XOFF)
       END IF
@@ -61,7 +61,7 @@ D       PRINT *, '    map has even number of pixels in X'
 
       IF (EVEN) THEN
         IYOFF2 = 2*NINT (YOFF - SIGN(YOFF,0.5)) + NINT (SIGN(YOFF,1.0))
-D       PRINT *, '    map has even number of pixels in Y'
+CD      PRINT *, '    map has even number of pixels in Y'
       ELSE
         IYOFF2 = 2*NINT (YOFF)
       END IF
@@ -69,7 +69,7 @@ D       PRINT *, '    map has even number of pixels in Y'
       XCELL = FLOAT(IXOFF2)/2.
       YCELL = FLOAT(IYOFF2)/2.
 
-D     PRINT *, '    Cell X, Y offsets (cells): ', XCELL, YCELL
+CD    PRINT *, '    Cell X, Y offsets (cells): ', XCELL, YCELL
 
       RETURN
       END

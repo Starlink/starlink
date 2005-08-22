@@ -28,16 +28,16 @@
 
       if ( ierr .ne. 0 ) return
 
-D     Print *, '-- gen_eval_all --'
-D     PRINT *, '   lev, nopr(lev), ntopr =', lev, nopr(lev), ntopr
+CD    Print *, '-- gen_eval_all --'
+CD    PRINT *, '   lev, nopr(lev), ntopr =', lev, nopr(lev), ntopr
 
       DO WHILE (nopr(lev).gt.0)
-D       PRINT *, 'calling do_op for operator ', oper(ntopr)
+CD      PRINT *, 'calling do_op for operator ', oper(ntopr)
         CALL gen_do_op (oper(ntopr), ierr)
         IF (ierr.ne.0) RETURN
         nopr(lev)  = nopr(lev)  - 1
         ntopr      = ntopr      - 1
-D       PRINT *, 'do_op completed, new value of ntopr =', ntopr
+CD      PRINT *, 'do_op completed, new value of ntopr =', ntopr
       END DO
 
       RETURN

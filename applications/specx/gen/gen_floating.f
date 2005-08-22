@@ -53,8 +53,8 @@
         END IF
       END IF
 
-D     PRINT *, ' -- gen_floating --'
-D     PRINT *, '    idigits, fdigits = ', idigits, fdigits
+CD    PRINT *, ' -- gen_floating --'
+CD    PRINT *, '    idigits, fdigits = ', idigits, fdigits
 
       RETURN
       END

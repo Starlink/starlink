@@ -135,11 +135,11 @@ C     for any other value...
       CALL GEN_GETI4 ('Number of output channels? ',
      &                 NOUT,  'I5',  NOUT,  ISTAT)
 
-D     PRINT *, ' -- regrid --'
-D     PRINT *, '    First and last XSCALE values: ',
-D    &             XSCALE(1), XSCALE(NPTS(NQ))
-D     PRINT *, '    JFINC, XFACOLD, XFAC8(NQ), GRIDN, GRIDNN'
-D     PRINT *, '    ', JFINC(NQ), XFACOLD, XFAC8(NQ), GRIDN, GRIDNN
+CD    PRINT *, ' -- regrid --'
+CD    PRINT *, '    First and last XSCALE values: ',
+CD   &             XSCALE(1), XSCALE(NPTS(NQ))
+CD    PRINT *, '    JFINC, XFACOLD, XFAC8(NQ), GRIDN, GRIDNN'
+CD    PRINT *, '    ', JFINC(NQ), XFACOLD, XFAC8(NQ), GRIDN, GRIDNN
 
       GRIDN = GRIDNN
 
@@ -156,7 +156,7 @@ C     (Squeeze up data if we have empty spaces, expand it otherwise)
 C     Update frequency interval
 
       JFINC(NQ)   = JFINC(NQ)*(GRIDN/XFACOLD)
-D     PRINT *, '    Final JFINC = ', JFINC(NQ)
+CD    PRINT *, '    Final JFINC = ', JFINC(NQ)
 
 C     Since the centre freq etc may have shifted, fix up header parameters
 C     Give channel shift in units of new channels.

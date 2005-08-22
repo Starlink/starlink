@@ -34,11 +34,11 @@
       MAPLIMITS(2) = GRLIMITS(2)
 
 
-D     PRINT *, ' -- setgscal --'
-D     PRINT *, '    Autogrey flag = ',       AUTOGREY
-D     PRINT *, '    Array min and max:    ', ZMIN, ZMAX
-D     PRINT *, '    Manual limits:        ', GREYLIM
-D     PRINT *, '    Greyscale limits set: ', GRLIMITS
+CD    PRINT *, ' -- setgscal --'
+CD    PRINT *, '    Autogrey flag = ',       AUTOGREY
+CD    PRINT *, '    Array min and max:    ', ZMIN, ZMAX
+CD    PRINT *, '    Manual limits:        ', GREYLIM
+CD    PRINT *, '    Greyscale limits set: ', GRLIMITS
 
       RETURN
       END

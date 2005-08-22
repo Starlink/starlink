@@ -48,8 +48,8 @@ C     XL and XR represent these channel values.
 
       XL = X(1)  - 0.505*( X(2) -X(1)    )
       XR = X(NX) + 0.505*( X(NX)-X(NX-1) )
-D     PRINT *, ' -- xsnart8 --'
-D     PRINT *, '  left and right limits: ', xl, xr
+CD    PRINT *, ' -- xsnart8 --'
+CD    PRINT *, '  left and right limits: ', xl, xr
 
 *     test that input value, V, lies in range of axis...
 
@@ -78,9 +78,9 @@ D     PRINT *, '  left and right limits: ', xl, xr
 
       DX = XRR - XLL
 
-D     PRINT *, '  first guess channel: ', n1
-D     PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
-D     PRINT *, '  channel increment dx: ', dx
+CD    PRINT *, '  first guess channel: ', n1
+CD    PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
+CD    PRINT *, '  channel increment dx: ', dx
 
 *     If V lies outside edges of current channel, iterate until
 *       we know location to within one channel
@@ -110,9 +110,9 @@ D     PRINT *, '  channel increment dx: ', dx
 
         DX  = XRR - XLL
 
-D       PRINT *, '  next guess channel: ', n1
-D       PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
-D       PRINT *, '  channel increment dx: ', dx
+CD      PRINT *, '  next guess channel: ', n1
+CD      PRINT *, '  channel boundaries xll and xrr: ', xll, xrr
+CD      PRINT *, '  channel increment dx: ', dx
 
       END DO
 
@@ -126,7 +126,7 @@ D       PRINT *, '  channel increment dx: ', dx
         XSNART8 = FLOAT(N1) + (V-X(N1))/DX
       END IF
 
-D     PRINT *, '  final value: ', xsnart8
+CD    PRINT *, '  final value: ', xsnart8
 
       RETURN
       END

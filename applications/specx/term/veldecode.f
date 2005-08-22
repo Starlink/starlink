@@ -46,10 +46,10 @@
       VDEF   = VDEFS(IVDEF)
       VFRAME = VFRAMES(IVFRAME)
 
-D     PRINT *, ' -- veldecode --'
-D     PRINT *, '    input value of LSRFLG', LSRFLG
-D     PRINT *, '    vel frame = ', VFRAME
-D     PRINT *, '    vel law   = ', VDEF
+CD    PRINT *, ' -- veldecode --'
+CD    PRINT *, '    input value of LSRFLG', LSRFLG
+CD    PRINT *, '    vel frame = ', VFRAME
+CD    PRINT *, '    vel law   = ', VDEF
 
       RETURN
       END

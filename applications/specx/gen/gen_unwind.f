@@ -35,11 +35,11 @@ C   Routine to unwind the stack when an @file is exhausted
       LUN = ICLI(3,ISP)
       CALL SET_LUN_IN (LUN)
 
-D     print *,'---------------------'
-D     print *,'Stack unwound, new stack pointer ',isp
-D     print *,' new LUN_IN ', icli(3,isp)
-D     print *,'...new length of CLI ',ICLI(2,ISP)
-D     print *,'---------------------'
+CD    print *,'---------------------'
+CD    print *,'Stack unwound, new stack pointer ',isp
+CD    print *,' new LUN_IN ', icli(3,isp)
+CD    print *,'...new length of CLI ',ICLI(2,ISP)
+CD    print *,'---------------------'
 
       RETURN
       END

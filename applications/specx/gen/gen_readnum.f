@@ -38,8 +38,8 @@
 
       GEN_READNUM = 0
 
-D     Print *, ' --- gen_readnum ---'
-D     Print *, '     input format = ', form
+CD    Print *, ' --- gen_readnum ---'
+CD    Print *, '     input format = ', form
 
       ILF   = GEN_ILEN (FORM)
       ILS   = GEN_ILEN (STRING)
@@ -47,16 +47,16 @@ D     Print *, '     input format = ', form
 
       IF (TYPE.EQ.'L4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) LOGICAL
-D       PRINT *, ' Just read logical*4 = ', LOGICAL
+CD      PRINT *, ' Just read logical*4 = ', LOGICAL
       ELSE IF (TYPE.EQ.'I4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) INTEGER
-D       PRINT *, ' Just read integer*4 = ', INTEGER
+CD      PRINT *, ' Just read integer*4 = ', INTEGER
       ELSE IF (TYPE.EQ.'R4') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) REAL
-D       PRINT *, ' Just read real*4 = ', REAL
+CD      PRINT *, ' Just read real*4 = ', REAL
       ELSE IF (TYPE.EQ.'R8') THEN
         READ (STRING(1:ILS), FMT=FORM2(1:ILF+2), IOSTAT=IERR) DOUBLE
-D       PRINT *, ' Just read real*8 = ', DOUBLE
+CD      PRINT *, ' Just read real*8 = ', DOUBLE
       END IF
 
       IF (IERR.NE.0) GO TO 99
@@ -64,7 +64,7 @@ D       PRINT *, ' Just read real*8 = ', DOUBLE
       READ (TYPE(2:GEN_ILEN(TYPE)), '(I3)', IOSTAT=IERR) NBYTES
       IF (IERR.NE.0) GO TO 99
       CALL XCOPY (NBYTES, LOGICAL, VALUE)
-D     PRINT *, ' Just copied ', NBYTES, ' bytes to VALUE'
+CD    PRINT *, ' Just copied ', NBYTES, ' bytes to VALUE'
 
       RETURN
 

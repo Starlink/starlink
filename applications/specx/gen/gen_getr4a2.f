@@ -93,9 +93,9 @@ C  Then read those items that are given
       INEXT = 1
       DO WHILE (N.LT.NSIZ .AND. INEXT.GT.IFIN)
         CALL GEN_GETIT3 (TSTRING(ITS:ILS), 1, IST, IFIN, INEXT, IERR)
-D       print *,'Parsed string: ', tstring(its:ils)
-D       print *,' n, ist, ifin, inext, ierr'
-D       print *,  n, ist, ifin, inext, ierr
+CD      print *,'Parsed string: ', tstring(its:ils)
+CD      print *,' n, ist, ifin, inext, ierr'
+CD      print *,  n, ist, ifin, inext, ierr
         IF (IERR.EQ.0) THEN
           N = N + 1
           IF (      TSTRING(ITS+IST-1:ITS+IFIN-1).NE.'#'

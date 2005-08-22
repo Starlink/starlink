@@ -51,9 +51,9 @@
 *     Read the basic header
 
       READ (UNIT, ERR=999) NMAPS, IMX, IMY
-D     PRINT *, '--- mapimage ---'
-D     PRINT *, '    file contains (# of maps) ', nmaps
-D     PRINT *, '    each has size (x by y) = ', imx, imy
+CD    PRINT *, '--- mapimage ---'
+CD    PRINT *, '    file contains (# of maps) ', nmaps
+CD    PRINT *, '    each has size (x by y) = ', imx, imy
 
 *     Get virtual memory for the data array
 
@@ -65,7 +65,7 @@ D     PRINT *, '    each has size (x by y) = ', imx, imy
         PRINT *, '    IGETVM return status = ', ISTAT
         RETURN
       ELSE
-D       PRINT *, '    virtual memory got (bytes)  = ', NBYTES
+CD      PRINT *, '    virtual memory got (bytes)  = ', NBYTES
       END IF
 
 *     Read the data into the image array

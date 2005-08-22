@@ -89,8 +89,8 @@ C   Formal parameters
       CONNECTED = .FALSE.
       NIF = 0
 
-D     WRITE (ILOUT,*) '-- SPECX_GSD_V5_DATA --'
-D     WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
+CD    WRITE (ILOUT,*) '-- SPECX_GSD_V5_DATA --'
+CD    WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
 
 C  Test we are not asking for a scan which is not there
 
@@ -191,13 +191,13 @@ C  resolution' s that were used in the IFIN and RESIN arrays.
 
       END IF
 
-D     write (ilout,*) 'no_if_per_bes, nrc ', no_if_per_bes, nrc
-D     write (ilout,*) 'bes_conn ', (bes_conn(i), i = 1, 
-D    :   no_if_per_bes*nrc)
-D     write (ilout,*) 'fr_temp ', (fr_temp(i), i = 1, nrc)
-D     write (ilout,*) 'nif ', nif
-D     write (ilout,*) 'ifin, resin ', ((ifin(i,j), i=1,2),
-D    :   resin(j), j=1,nif)
+CD    write (ilout,*) 'no_if_per_bes, nrc ', no_if_per_bes, nrc
+CD    write (ilout,*) 'bes_conn ', (bes_conn(i), i = 1, 
+CD   :   no_if_per_bes*nrc)
+CD    write (ilout,*) 'fr_temp ', (fr_temp(i), i = 1, nrc)
+CD    write (ilout,*) 'nif ', nif
+CD    write (ilout,*) 'ifin, resin ', ((ifin(i,j), i=1,2),
+CD   :   resin(j), j=1,nif)
 
 C  Find indices to all other arrays 
 
@@ -229,8 +229,8 @@ C    ..first get x and y offsets in arcsecs
       X_OFFSET = PHIST(1,MAX(1,INDEX))
       Y_OFFSET = PHIST(2,MAX(1,INDEX))
 
-D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
-D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
+CD    WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
+CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
       WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
@@ -337,7 +337,7 @@ C  Fix up integration time for last spectrum
                DIMVAL_DATA(2) = 1
                DIMVAL_DATA(3) = INDEX
 
-D              write (ilout,*) 'no_be_o_ch, index ', no_be_o_ch, index
+CD             write (ilout,*) 'no_be_o_ch, index ', no_be_o_ch, index
 
 
 *  section of stored data array that we want
@@ -360,8 +360,8 @@ D              write (ilout,*) 'no_be_o_ch, index ', no_be_o_ch, index
                IBEGIN(3) = INDEX                 ! spectrum number in file
                IENDS(3) = INDEX
 
-D              write(ilout,*) 'index, nquad, quad, jbeg, jend ', index,
-D    :            nquad, quad, jbeg, jend
+CD             write(ilout,*) 'index, nquad, quad, jbeg, jend ', index,
+CD   :            nquad, quad, jbeg, jend
 
 *  get the data
 

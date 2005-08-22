@@ -51,12 +51,12 @@
 
       END IF
 
-D     print *
-D     print *, '-- set_display_size --'
-D     print *, '   requested (x,y)     = ', ax1len, ax2len
-D     print *, '   natural sizes (x,y) = ', xaxlen, yaxlen
-D     print *, '   output sizes (x,y)  = ', axlenx, axleny
-D     print *
+CD    print *
+CD    print *, '-- set_display_size --'
+CD    print *, '   requested (x,y)     = ', ax1len, ax2len
+CD    print *, '   natural sizes (x,y) = ', xaxlen, yaxlen
+CD    print *, '   output sizes (x,y)  = ', axlenx, axleny
+CD    print *
 
       RETURN
       END

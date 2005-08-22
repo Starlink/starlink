@@ -82,19 +82,19 @@ C  If CLI line not empty read from CLI line.
 *       Read from the command line and update the pointer to after the
 *       terminating delimiter sequence
 
-D       Print *,'Calling GETIT3 with string = ',cliline(iclist:iclifin)
-D       Print *,'stack pars iclist, iclifin, icli(1,isp), icli(2,isp)'
-D       Print *,            iclist, iclifin, icli(1,isp), icli(2,isp)
+CD      Print *,'Calling GETIT3 with string = ',cliline(iclist:iclifin)
+CD      Print *,'stack pars iclist, iclifin, icli(1,isp), icli(2,isp)'
+CD      Print *,            iclist, iclifin, icli(1,isp), icli(2,isp)
 
         CALL GEN_GETIT3 (CLILINE(ICLIST:ICLIFIN),
      &                   LEVEL, IST, IFIN, INEXT, IERR)
 
-D       Print *,'Returned from GETIT3 with string = ',
-D    &          cliline(iclist+ist-1:iclist+ifin-1)
-D       Print *,'ist, ifin, inext = ', ist, ifin, inext
+CD      Print *,'Returned from GETIT3 with string = ',
+CD   &          cliline(iclist+ist-1:iclist+ifin-1)
+CD      Print *,'ist, ifin, inext = ', ist, ifin, inext
 
         ICLI(1,ISP) = IBEG + INEXT - 1
-D       Print *,'icli(1,isp) updated: ', icli(1,isp)
+CD      Print *,'icli(1,isp) updated: ', icli(1,isp)
 
 *       Error in getting next string
         IF (IERR.EQ.1 .OR. IERR.GT.2) THEN
@@ -121,7 +121,7 @@ D       Print *,'icli(1,isp) updated: ', icli(1,isp)
      &            .OR. STRING(1:2).EQ.'^D'
      &            .OR. STRING(1:2).EQ.'^d') THEN
               JDEF = 2
-D             PRINT *, '<<EOF implied>>'
+CD            PRINT *, '<<EOF implied>>'
               GO TO 200
             END IF
           ELSE
@@ -241,8 +241,8 @@ C  Before return jump back to top of stack
       LUN = ICLI(3,ISP)
       CALL SET_LUN_IN (LUN)
 
-D     PRINT *,'-- gen_input --'
-D     PRINT *,'   chax, istr, jdef: ', chax, istr, jdef
+CD    PRINT *,'-- gen_input --'
+CD    PRINT *,'   chax, istr, jdef: ', chax, istr, jdef
 
       RETURN
       END

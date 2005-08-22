@@ -99,9 +99,9 @@
         IF (NVALS.LT.3) DO_PARS(3) = SIGN (1, DO_PARS(2) - DO_PARS(1))
       END IF
 
-D     PRINT *,'-- DO --'
-D     PRINT *,'Index range'
-D     Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
+CD    PRINT *,'-- DO --'
+CD    PRINT *,'Index range'
+CD    Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
 
 *  Find out what to DO, if DOing from command level
 
@@ -124,7 +124,7 @@ D     Type '((1X,I4,'' to '',I4 '' by '',I4))', (DO_PARS(I),I=1,3)
           RETURN
         END IF
 
-D       PRINT *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
+CD      PRINT *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
 
         WRITE (DO_FILE, '('' do '', A16, 3(1X,I6))')
      &         SYMBOL, (DO_PARS(I),I=1,3)
@@ -143,8 +143,8 @@ D       PRINT *,' Writing temp.spx: n1,n2,n3:',(do_pars(i),i=1,3)
 
             TBUFFER = '@temp;' // BUFFER (IBPTR:MAXLB)   ! (IBPTR:MAXLB) // ' '
             BUFFER  =  TBUFFER
-D           PRINT *, 'Contents of buffer...'
-D           PRINT *,  BUFFER
+CD          PRINT *, 'Contents of buffer...'
+CD          PRINT *,  BUFFER
 
             ILB    = 6 + (ILB-IBPTR+1)
             IBPTR  = 1
@@ -183,8 +183,8 @@ D           PRINT *,  BUFFER
 
       END IF
 
-D     PRINT *, '-- scl_do --     do variable = ', dovals(1,do_depth)
-D     PRINT *, '                 do depth = ', do_depth
+CD    PRINT *, '-- scl_do --     do variable = ', dovals(1,do_depth)
+CD    PRINT *, '                 do depth = ', do_depth
 
       RETURN
 
@@ -249,10 +249,10 @@ D     PRINT *, '                 do depth = ', do_depth
       CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
       LIMIT = DOVALS(2,DO_DEPTH)
       INCRT = DOVALS(3,DO_DEPTH)
-D     PRINT *, '-- scl_enddo --  current do variable = ', ival
-D     PRINT *, '                 limit/increment     = ', limit,incrt
+CD    PRINT *, '-- scl_enddo --  current do variable = ', ival
+CD    PRINT *, '                 limit/increment     = ', limit,incrt
       IVAL  = IVAL + INCRT
-D     PRINT *, '                 updated do variable = ', ival
+CD    PRINT *, '                 updated do variable = ', ival
 
       IF (      INCRT.GT.0 .AND. IVAL.LE.LIMIT
      &     .OR. INCRT.LT.0 .AND. IVAL.GE.LIMIT ) THEN
@@ -260,7 +260,7 @@ D     PRINT *, '                 updated do variable = ', ival
 *       Update the DO variable
         CALL XCOPY (4, IVAL, %VAL(ADDRESS(DO_DEPTH)))
         CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
-D     PRINT *, '                 test put do variable = ', ival
+CD    PRINT *, '                 test put do variable = ', ival
 
 *       Rewind the file the appropriate number of records
 
@@ -272,7 +272,7 @@ D     PRINT *, '                 test put do variable = ', ival
         DO_DEPTH = DO_DEPTH - 1
       END IF
 
-D     PRINT *, '                 do depth = ', do_depth
+CD    PRINT *, '                 do depth = ', do_depth
 
       RETURN
       END
@@ -337,7 +337,7 @@ D     PRINT *, '                 do depth = ', do_depth
       DO WHILE (IF_LEVEL.GT.ISP .AND. STATUS)
         STATUS  = PULL_IFSTACK (IF_LEVEL)
         IF_SKIP = 0
-D       PRINT *, '-- scl_unwind -- if_level: ', if_level
+CD      PRINT *, '-- scl_unwind -- if_level: ', if_level
       END DO
 
       DO_TO_ELSEIF   = .TRUE.

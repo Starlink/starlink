@@ -50,11 +50,11 @@ C  Ok, go..
 
       IERR  = 0
 
-D     PRINT *, ' -- grid_data --'
-D     PRINT *, '    ndat, nout  = ', NDAT, NOUT
-D     PRINT *, '    gridn, xmid = ', GRIDN, XMID
-D     PRINT *, '    current xscale array:'
-D     PRINT *,      (XSCALE(J),J=1,NDAT)
+CD    PRINT *, ' -- grid_data --'
+CD    PRINT *, '    ndat, nout  = ', NDAT, NOUT
+CD    PRINT *, '    gridn, xmid = ', GRIDN, XMID
+CD    PRINT *, '    current xscale array:'
+CD    PRINT *,      (XSCALE(J),J=1,NDAT)
 
 C     Find the centre channel and initialize
 

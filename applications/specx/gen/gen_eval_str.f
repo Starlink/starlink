@@ -38,8 +38,8 @@
 
 *  Ok, go...
 
-D     Print *,'-- gen_eval_str --'
-D     Print *,'  input string  = ', string1(:60)
+CD    Print *,'-- gen_eval_str --'
+CD    Print *,'  input string  = ', string1(:60)
 
       ierr = 0
       ils  = len (string2)
@@ -65,7 +65,7 @@ D     Print *,'  input string  = ', string1(:60)
         CALL xcopy (MIN (nbytes,ils), %val(address), %ref(string2))
       END IF
 
-D     Print *,'  return string = ', string2(:60)
+CD    Print *,'  return string = ', string2(:60)
 
       RETURN
       END

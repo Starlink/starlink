@@ -42,7 +42,7 @@
       IF (LUN_OUT_SET.EQ.1) LUN = LUN_OUT
       WRITE (LUN, *) OUT_LINE(:LOUT)
 
-D     PRINT *, 'Output written to unit # ',LUN
+CD    PRINT *, 'Output written to unit # ',LUN
 
       RETURN
       END

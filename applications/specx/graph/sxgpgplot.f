@@ -115,37 +115,37 @@
           WRITE( FORMAT, '(''(I'', I3, '')'')' ) IFIN-IST+1
 * and read it
           READ (LINE(IST:IFIN),FORMAT,IOSTAT=IOSTAT) FDEV_NO
-D         PRINT *, 'Device # ', FDEV_NO, IOSTAT
+CD        PRINT *, 'Device # ', FDEV_NO, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           FPROMPT = LINE(IST:IFIN)
-D         PRINT *, 'Specx name', FPROMPT, IOSTAT
+CD        PRINT *, 'Specx name', FPROMPT, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           FDEVNAME = LINE(IST:IFIN)
-D         PRINT *, 'Device name', FDEVNAME, IOSTAT
+CD        PRINT *, 'Device name', FDEVNAME, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FTERM
-D         PRINT *, 'Terminal? ', FTERM, IOSTAT
+CD        PRINT *, 'Terminal? ', FTERM, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FDUAL
-D         PRINT *, 'Dual screen? ', FDUAL, IOSTAT
+CD        PRINT *, 'Dual screen? ', FDUAL, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FCOLOUR
-D         PRINT *, 'Colour?      ', FCOLOUR, IOSTAT
+CD        PRINT *, 'Colour?      ', FCOLOUR, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           READ (LINE(IST:IFIN),'(L1)',IOSTAT=IOSTAT) FHARD
-D         PRINT *, 'Hardcopy? ', FHARD, IOSTAT
+CD        PRINT *, 'Hardcopy? ', FHARD, IOSTAT
 
           CALL GEN_GETIT4 (LINE, 1, IST, IFIN, ICHAR, IERR)
           FFILE = ' '
           IF (IERR.EQ.0) THEN
             FFILE = LINE(IST:IFIN)
-D           PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
+CD          PRINT *, 'Output file = ', FFILE(:IFIN-IST+1)
           END IF
 
           CALL SXG_WRDEV( ID, FDEV_NO, FDEVNAME, FPROMPT, FTERM, FDUAL,
@@ -575,13 +575,13 @@ C     Initialize virtual co-ordinates to mm
 
       print *, '-- sxgdevice -- ', devname,' ', 
      :         outfile(:gen_ilen(outfile))
-D      print *, '   idev     = ', idev
-D      print *, '   iterm    = ', iterm
-D      print *, '   dual     = ', dual
-D      print *, '   colour   = ', colour
-D      print *, '   hardcopy = ', hardcopy
-D      print *, '   devname  = ', devname
-D      print *, '   outfile  = ', outfile(:gen_ilen(outfile))
+CD     print *, '   idev     = ', idev
+CD     print *, '   iterm    = ', iterm
+CD     print *, '   dual     = ', dual
+CD     print *, '   colour   = ', colour
+CD     print *, '   hardcopy = ', hardcopy
+CD     print *, '   devname  = ', devname
+CD     print *, '   outfile  = ', outfile(:gen_ilen(outfile))
 
       RETURN
       END

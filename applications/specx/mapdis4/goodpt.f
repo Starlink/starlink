@@ -55,7 +55,7 @@ C  Then check INDEX over range of R.A. and Dec. indices
         END DO
       END DO
 
-D     PRINT *, ' -- goodpt --; ix, iy, goodpt = ', ix, iy, goodpt
+CD    PRINT *, ' -- goodpt --; ix, iy, goodpt = ', ix, iy, goodpt
       RETURN
       END
 

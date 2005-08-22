@@ -373,9 +373,9 @@ C   Close the map file
 
 *  Ok, go...
 
-D     PRINT *, ' -- paneltess --'
-D     PRINT *, '    plot surface area (x*y) = ', xsiz, ysiz
-D     PRINT *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
+CD    PRINT *, ' -- paneltess --'
+CD    PRINT *, '    plot surface area (x*y) = ', xsiz, ysiz
+CD    PRINT *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
 
       maxarea = 0.0
 
@@ -385,7 +385,7 @@ D     PRINT *, '    tesselate with ', n, ' panels, aspect ratio ', ratio
         scal = min (xsiz/float(nx), (ysiz/ratio)/float(ny))
         area = n * ratio * scal**2
 
-D       print *, 'nx, ny, scal, area: ', nx, ny, scal, area
+CD      print *, 'nx, ny, scal, area: ', nx, ny, scal, area
 
         if (area .gt. maxarea) then
           nxmax   = nx
@@ -394,8 +394,8 @@ D       print *, 'nx, ny, scal, area: ', nx, ny, scal, area
         end if
       end do
 
-D     print *, 'final values of nx, ny = ', nxmax, nymax
-D     print *, 'fractional area used = ', maxarea/(xsiz*ysiz)
+CD    print *, 'final values of nx, ny = ', nxmax, nymax
+CD    print *, 'fractional area used = ', maxarea/(xsiz*ysiz)
 
       return
       end

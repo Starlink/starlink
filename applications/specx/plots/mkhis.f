@@ -25,9 +25,9 @@ C     Local variables:
 
 C  Ok, go...
 
-D     CALL SXGTIDLE
-D     PRINT *, ' -- mkhis --'
-D     PRINT *, '    input # points = ', N
+CD    CALL SXGTIDLE
+CD    PRINT *, ' -- mkhis --'
+CD    PRINT *, '    input # points = ', N
 
       XLEFT = X(N) + 0.5*XFAC
 
@@ -49,8 +49,8 @@ D     PRINT *, '    input # points = ', N
 
       N = 2*N
 
-D     PRINT *, '    output # points = ', N
-D     CALL SXGTTGRAPH
+CD    PRINT *, '    output # points = ', N
+CD    CALL SXGTTGRAPH
 
       RETURN
       END

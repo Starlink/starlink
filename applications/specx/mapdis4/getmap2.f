@@ -62,14 +62,14 @@ C  from 3-d file to a 2-d array.
         RETURN
       END IF
 
-D      PRINT *, ' -- getmap2 --'
-D      PRINT *, '    NAX: ',NAX
-D      PRINT *, '    LINK:',LINK
-D      PRINT *, '    IOFF:',IOFF
-D      PRINT *, '    PFAC:',PFAC
-D      PRINT *, '    PF1: ',PF1
-D      PRINT *, '    PF2: ',PF2
-D      PRINT *, '    Invert_axis:',INVERT_AXIS
+CD     PRINT *, ' -- getmap2 --'
+CD     PRINT *, '    NAX: ',NAX
+CD     PRINT *, '    LINK:',LINK
+CD     PRINT *, '    IOFF:',IOFF
+CD     PRINT *, '    PFAC:',PFAC
+CD     PRINT *, '    PF1: ',PF1
+CD     PRINT *, '    PF2: ',PF2
+CD     PRINT *, '    Invert_axis:',INVERT_AXIS
 
 C  Then write data to 2-D array, transposing if necessary. First
 C  work out factors for indexing to output array (VMAP)
@@ -109,11 +109,11 @@ C         is given as NOTJ
         END IF
       END DO
 
-D     PRINT *, '    IX, IY, IZ = ', IX, IY, IZ
-D     IF (.NOT. INTERP) THEN
-D       PRINT *, '    Getting raw data from cube'
-D       PRINT *, '    INDEX @ address: ', INDEX_PTR
-D     END IF
+CD    PRINT *, '    IX, IY, IZ = ', IX, IY, IZ
+CD    IF (.NOT. INTERP) THEN
+CD      PRINT *, '    Getting raw data from cube'
+CD      PRINT *, '    INDEX @ address: ', INDEX_PTR
+CD    END IF
 
 C  Now fetch data (using the windows) and rewrite to VMAP using indexing
 C  worked out above. This also allows for binning across dimension (3).
@@ -206,11 +206,11 @@ C pixel in 3rd axis; if averaging divide by number of pixels added together.
         FAC = 1.0
       END IF
 
-D     PRINT *, '    IZ:  ',IZ
-D     PRINT *, '    NAX: ',NAX(IZ)
-D     PRINT *, '    PF1: ',PF1(IZ),' PF2: ',PF2(IZ)
-D     PRINT *, '    AV:  ',AV
-D     PRINT *, '    Fac: ',FAC
+CD    PRINT *, '    IZ:  ',IZ
+CD    PRINT *, '    NAX: ',NAX(IZ)
+CD    PRINT *, '    PF1: ',PF1(IZ),' PF2: ',PF2(IZ)
+CD    PRINT *, '    AV:  ',AV
+CD    PRINT *, '    Fac: ',FAC
 
 C     (also at this step work out if pixels of map are OK - mark bad otherwise)
 

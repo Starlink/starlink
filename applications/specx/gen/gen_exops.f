@@ -33,26 +33,26 @@
 
       ierr = 0
 
-D     print *, ' --- gen_exops ---'
-D     print *, '     passed operator = ', operator
+CD    print *, ' --- gen_exops ---'
+CD    print *, '     passed operator = ', operator
 
       IF (operator.EQ.'= ') THEN
         result = gen_sequal (opd1, len1, opd2, len2)
         CALL xcopy (4, result, opd1)
         type1 = 'L4'
-D       print *,'equality test? ', result
+CD      print *,'equality test? ', result
 
       ELSE IF (operator.EQ.'<>' .OR. operator.EQ.'><' ) THEN
         result = .NOT. gen_sequal (opd1, len1, opd2, len2)
         CALL xcopy (4, result, opd1)
         type1 = 'L4'
-D       print *,'equality test? ', result
+CD      print *,'equality test? ', result
 
       ELSE IF (operator(1:1).EQ.'+') THEN
         CALL xcopy (len2, opd2, opd1(len1+1))
         WRITE (type1(2:), '(I3.3)') len1+len2
 
-D       print *,'resulting string has type ', type1
+CD      print *,'resulting string has type ', type1
 
       ELSE
         ierr = 3

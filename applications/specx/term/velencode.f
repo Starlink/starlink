@@ -48,9 +48,9 @@
       VFRAMET = VFRAME(1:3)
       CALL UUCASE (VFRAMET)
 
-D     PRINT *, ' -- velencode --'
-D     PRINT *, '    vel frame = ', VFRAMET
-D     PRINT *, '    vel law   = ', VDEFT
+CD    PRINT *, ' -- velencode --'
+CD    PRINT *, '    vel frame = ', VFRAMET
+CD    PRINT *, '    vel law   = ', VDEFT
 
       I = 1
       DO WHILE (I.LE.3 .AND. VDEFT.NE.VDEFS(I))
@@ -68,7 +68,7 @@ D     PRINT *, '    vel law   = ', VDEFT
       DO WHILE (J.LE.6 .AND. VFRAMET.NE.VFRAMES(J)(1:3))
         J = J + 1
       END DO
-D     print *,'J for frame = ',J,' and I', I
+CD    print *,'J for frame = ',J,' and I', I
 
 *     Equate BARYCENTRIC with GEOCENTRIC
       IF (J.EQ.5) J = 4
@@ -84,7 +84,7 @@ D     print *,'J for frame = ',J,' and I', I
 
       LSRFLG = 16*(I-1) + (J-1)
 
-D     PRINT *, '    output value of LSRFLG', LSRFLG
+CD    PRINT *, '    output value of LSRFLG', LSRFLG
 
       RETURN
       END

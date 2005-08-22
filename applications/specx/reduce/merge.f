@@ -169,7 +169,7 @@ C  for now - fix up later
 C  Locate 'centre' channel before start of iteration
 
       ANCEN = FLOAT(NTOT(IQCEN-1))+0.5*(NPTS(IQCEN)+1)  ! channel to which VLSR refers
-D     PRINT *, 'Channel at original centre is ', ANCEN
+CD    PRINT *, 'Channel at original centre is ', ANCEN
 
 C  Set up iteration by quadrant boundary
 
@@ -184,15 +184,15 @@ C  Set up iteration by quadrant boundary
 
 C  Identify points involved in overlap
 
-D       PRINT *, 'NQ, NST1, NEND1, NST2, NEND2 ',
-D    &           NQ, NST1, NEND1, NST2, NEND2 
+CD      PRINT *, 'NQ, NST1, NEND1, NST2, NEND2 ',
+CD   &           NQ, NST1, NEND1, NST2, NEND2 
 
         X1 = XSCALE(NST2)
         X1 = XSNART (XSCALE(NST1),X1,NPTS(NQ),IF1)    ! X1 is fractional points
         X2 = XSCALE(NEND1)                            ! corresponding to XSCALE(NST@)
         X2 = XSNART (XSCALE(NST2),X2,NPTS(NQ+1),IF2)
 
-D       PRINT *, 'X1, X2 = ', X1, X2
+CD      PRINT *, 'X1, X2 = ', X1, X2
 
         IF (IF1+IF2.NE.0)   THEN
           IFAIL = 33
@@ -205,7 +205,7 @@ C       otherwise discard an additional channel.
         N1 = NST1 + IFIX (X1+0.1) -1 ! First channel in XSCALE involved in overlap
         N2 = NST2 + IFIX (X2+0.1)    ! Last channel "
 
-D       PRINT *,'Overlap region channels ',N1,N2
+CD      PRINT *,'Overlap region channels ',N1,N2
 
 C       Interpolate second quadrant onto sampling of first quadrant
 C       using linear interpolation --- F is fraction channels to offset
@@ -215,7 +215,7 @@ C       Beware that "snap" may have pulled spectrum over by 1 channel
 *       F = (X1+0.1) - IFIX(X1+0.1)        ! Even worse?
         F =  X1 - FLOAT(N1+1-NST1)         ! next try
 
-D       PRINT *, 'Fractional channel error = ', F
+CD      PRINT *, 'Fractional channel error = ', F
 
         DO J = 1, NPTS(NQ+1)-1
           K         = NEND2+1-J
@@ -236,7 +236,7 @@ C  to sampling.
 
         IF (NQ.EQ.IQCEN-1) THEN
           CSHIFT = F
-D         PRINT *,'NQ, new CSHIFT',NQ,CSHIFT
+CD        PRINT *,'NQ, new CSHIFT',NQ,CSHIFT
         END IF       
 
 C  Now find the amount by which to shift the second quadrant. Assume a simple
@@ -319,11 +319,11 @@ C  Finally condense into a single spectrum/quadrant with new boundaries
           XSCALE(K) = XSCALE(J)
         END DO
 
-D       PRINT *,'NQ,NOFF',nq,noff
+CD      PRINT *,'NQ,NOFF',nq,noff
  
         IF (NQ.EQ.IQCEN-1) THEN
           CSHIFT = CSHIFT + FLOAT(NST2-N1)
-D         PRINT *,'Total value of CSHIFT',CSHIFT
+CD        PRINT *,'Total value of CSHIFT',CSHIFT
         END IF
 
 C  Update boundaries of "new" quadrant (actually just RH edge of total now)
@@ -338,10 +338,10 @@ C  Before return tidy up header to give data for single quadrant.
       NPTS(1) = NEND2
       CSHIFT   = 0.5*(NPTS(1)+1) - (ANCEN-CSHIFT)
 
-D     PRINT *,'New mid-channel is ',0.5*(NPTS(1)+1)
-D     PRINT *,'CSHIFT',CSHIFT
-D     PRINT *,'ANCEN',ANCEN
-D     PRINT *,'Centre frequency needs shifting by ',CSHIFT,' channels'
+CD    PRINT *,'New mid-channel is ',0.5*(NPTS(1)+1)
+CD    PRINT *,'CSHIFT',CSHIFT
+CD    PRINT *,'ANCEN',ANCEN
+CD    PRINT *,'Centre frequency needs shifting by ',CSHIFT,' channels'
 
       CALL LSRCOR (LSRFLG, VSL, VES, VTE, VLSR,
      &             IDATE, ITIME,IUTFLG, RA, DEC,
@@ -388,10 +388,10 @@ C  Restore common block FREQ
 
       CALL POP
 
-D     PRINT *, '-- merge --'
-D     PRINT *, '   frequency scale code = ', nxs
-D     PRINT *, '   xaxis_name  = ', xaxis_name
-D     PRINT *, '   xaxis_units = ', xaxis_units
+CD    PRINT *, '-- merge --'
+CD    PRINT *, '   frequency scale code = ', nxs
+CD    PRINT *, '   xaxis_name  = ', xaxis_name
+CD    PRINT *, '   xaxis_units = ', xaxis_units
 
       RETURN
       END

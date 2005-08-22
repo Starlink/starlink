@@ -49,8 +49,8 @@
       IST     = ICLI (1,ISP)
       IFIN    = ICLI (2,ISP)
 
-D     Print *, 'Original CLILINE for this stack level:'
-D     Print *,  CLILINE(ICLIST:ICLIFIN)
+CD    Print *, 'Original CLILINE for this stack level:'
+CD    Print *,  CLILINE(ICLIST:ICLIFIN)
 
 *  Then make the substitution: Note that length of new string is
 *  equal to length of original string, less the characters removed,
@@ -69,8 +69,8 @@ D     Print *,  CLILINE(ICLIST:ICLIFIN)
       ICLI(1,ISP) = 1
       ICLI(2,ISP) = ICLIFIN + 1 - ICLIST
 
-D     Print *,'Updated CLILINE for this stack level:'
-D     Print *, CLILINE(ICLIST:ICLIFIN)
+CD    Print *,'Updated CLILINE for this stack level:'
+CD    Print *, CLILINE(ICLIST:ICLIFIN)
 
       RETURN
       END

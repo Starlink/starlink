@@ -39,8 +39,8 @@ C  DATA array with variable sized quadrants catered for.
 
 *  Ok, go...
 
-D     PRINT '('' # of sectors, sort array = '',I4.1,8I3.1)',
-D    &          N, (ISOURCE(K),K=1,N)
+CD    PRINT '('' # of sectors, sort array = '',I4.1,8I3.1)',
+CD   &          N, (ISOURCE(K),K=1,N)
 
 C     First reorder data array
 C     Get virtual memory and take copy of data 
@@ -73,8 +73,8 @@ C        find start, end and length of target section
 
 C        copy target section into output array
 
-D        PRINT *, 'Copy of array segment from: start, end, length = ',
-D    &            DSTART, DEND, LENTGT
+CD       PRINT *, 'Copy of array segment from: start, end, length = ',
+CD   &            DSTART, DEND, LENTGT
 
          CALL XCOPY (4*LENTGT, %VAL(IPTR+ 4*DSTART), DATA(OFFSET))
 
@@ -96,7 +96,7 @@ C     What will happen to IQCEN?
 
 C     Then rearrange quadrant dependent parameters
 
-D     PRINT *, 'Sort of header variables: NQ = 1 to ', N-1
+CD    PRINT *, 'Sort of header variables: NQ = 1 to ', N-1
 
       DO NQ = 1, N-1
 

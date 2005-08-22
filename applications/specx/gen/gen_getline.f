@@ -109,7 +109,7 @@
       END DO
       IF (GEN_ILEN (STRING).EQ.0)   JDEF = 1
 
-D     print *, ' gen_getline --> ', string(:istr)
+CD    print *, ' gen_getline --> ', string(:istr)
 
       RETURN
 

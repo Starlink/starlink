@@ -40,10 +40,10 @@
       B2       = MOD (ASIN (SINB) * 180.0D0 / PI + 90.0D0, 180.D0) -
      &             90.D0
 
-D     PRINT *, ' -- radec_to_l2b2 --'
-D     PRINT *, '     R.A., Dec. = ', RA*12/PI, DEC*180./PI
-D     PRINT *, '     lII,  bII  = ', L2, B2
-D     PRINT *
+CD    PRINT *, ' -- radec_to_l2b2 --'
+CD    PRINT *, '     R.A., Dec. = ', RA*12/PI, DEC*180./PI
+CD    PRINT *, '     lII,  bII  = ', L2, B2
+CD    PRINT *
 
       RETURN
       END

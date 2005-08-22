@@ -64,8 +64,8 @@ C   Formal parameters
       IERR = 0
       STATUS = ADAM__OK
 
-D     WRITE (ILOUT,*) '-- SPECX_GSD_V4_DATA --'
-D     WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
+CD    WRITE (ILOUT,*) '-- SPECX_GSD_V4_DATA --'
+CD    WRITE (ILOUT,*) '    INDEX =',INDEX,' IRX =',IRX
 
 C  Test we are not asking for a scan which is not there
 
@@ -125,8 +125,8 @@ C  (This para is all messed up thanks to indiscriminate changes of data
 C   formats from JACH end. However above code, as suggested by RMP, looks as
 C   though it will do the trick for now!)
 
-D     WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
-D     WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
+CD    WRITE (ILOUT,*) 'x,y cell sizes      ', sngl(dx), sngl(dy)
+CD    WRITE (ILOUT,*) 'x,y offsets (cells) ', x_offset, y_offset
       X_OFFSET = X_OFFSET * DX
       Y_OFFSET = Y_OFFSET * DY
       WRITE (ILOUT,'(10X,''(x,y) offset = ('',F6.1,'','',F6.1,'//
@@ -227,9 +227,9 @@ C  average ChA and ChB data for example)
         IF (IRX.EQ.0) THEN
           IF (NQUAD .GT. 1) THEN
             CALL SPECX_JSORT   (NQUAD, JFCEN, ISOURCE)
-D           WRITE (ILOUT,*) 'I.F. channels reordered'
-D           WRITE (ILOUT,'('' New channel order: '',8(1X,I2))')
-D    &                (ISOURCE(J),J=1,NQUAD)
+CD          WRITE (ILOUT,*) 'I.F. channels reordered'
+CD          WRITE (ILOUT,'('' New channel order: '',8(1X,I2))')
+CD   &                (ISOURCE(J),J=1,NQUAD)
             CALL SPECX_REORDER (NQUAD, ISOURCE)
           END IF
         END IF

@@ -126,15 +126,15 @@ C       Calculate true map centre (get from scan header if necessary)
      &                  RAOFF, DECOFF)
       CALL CALC_XYSOFF (RAOFF, DECOFF, POS_ANGLE,
      &                  X_OFFSET, Y_OFFSET, IFAIL)
-D     PRINT *, '(R,D) offsets (arcsec): ', RAOFF,    DECOFF
-D     PRINT *, '(X,Y) offsets (arcsec): ', X_OFFSET, Y_OFFSET
+CD    PRINT *, '(R,D) offsets (arcsec): ', RAOFF,    DECOFF
+CD    PRINT *, '(X,Y) offsets (arcsec): ', X_OFFSET, Y_OFFSET
       IF (IFAIL.NE.0) GO TO 99
 
 *     Find coordinates of nearest cell to data point
 
       CALL CALC_XYCOFF (X_OFFSET, Y_OFFSET, CELL_XSIZE, CELL_YSIZE,
      &                  MSTEP, NSTEP, XCELL, YCELL, IFAIL)
-D     PRINT *, 'Nearest cell to data point: ', XCELL, YCELL
+CD    PRINT *, 'Nearest cell to data point: ', XCELL, YCELL
       IF (IFAIL.NE.0) GO TO 99
 
 *     Check that scan is "close enough" to a data pixel centre. DMISS
@@ -147,7 +147,7 @@ D     PRINT *, 'Nearest cell to data point: ', XCELL, YCELL
       DELY   = Y_OFFSET - YCELL*CELL_YSIZE
       DMISS  = SQRT ((DELX/CELL_XSIZE)**2 + (DELY/CELL_YSIZE)**2)
 
-D     PRINT *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
+CD    PRINT *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
 
       IF (DMISS .GT. MAP_TOL) THEN
         IFAIL = 70

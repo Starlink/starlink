@@ -89,8 +89,8 @@
 
       CALL VELDECODE (LSRFLG, VFRAME, VDEF)
 
-D     WRITE (ILOUT,*) 'Data obs''d in ',VFRAME,' frame; ',
-D    &       VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
+CD    WRITE (ILOUT,*) 'Data obs''d in ',VFRAME,' frame; ',
+CD   &       VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
 
 *     Save values of JFCEN in temporary storage
 
@@ -104,19 +104,19 @@ D    &       VDEF, ' velocity law; Velocity = ', VLSR, ' km/s'
 *       (value for display comes for free, but is not used...)
 
         CALL SETXFREST (IQCEN, NQ, JFCEN, JFREST, FCEN, FROBS, FRDIS)
-D       PRINT *, 'Rest freq used for observation, = ', FROBS
+CD      PRINT *, 'Rest freq used for observation, = ', FROBS
 
 *       Convert header centre frequency JFCEN to telluric value,
 *       returned in FCEN_T (GHz).
 
         CALL SETXFTCEN (JFCEN(NQ), VFRAME, VDEF,
      &                  VTE, VES, VSL, VLSR, FCEN_T)
-D       PRINT *, 'Telluric centre frequency = ', FCEN_T, ' GHz'
+CD      PRINT *, 'Telluric centre frequency = ', FCEN_T, ' GHz'
 
 *       Correct the telluric frequency to other sideband
 
         IF (USE_LO) THEN
-D         PRINT *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
+CD        PRINT *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
           DF = + 2.D3 * (LOFREQ(NQ)-FCEN_T)
           WRITE (6, '('' Sector '',I2,'': First I.F. = '','//
      &                   'F9.6, '' GHz'')') NQ, DF/2.D3
@@ -134,8 +134,8 @@ D         PRINT *, 'Local oscillator frequency = ', LOFREQ(NQ), ' GHz'
 *       (cf routine SETXFREQ, with ABS_FREQ = .T. and REST_REL = .T.)
 
         JFCEN_TEMP(NQ) = 1.D6 * (FROBS + DF/1000.D0)
-D       PRINT *, 'Observation frame centre freq = ',
-D    &           JFCEN(NQ)/1.D6, ' GHz'
+CD      PRINT *, 'Observation frame centre freq = ',
+CD   &           JFCEN(NQ)/1.D6, ' GHz'
 
 *       Correct the frequency increment (*-1)
 

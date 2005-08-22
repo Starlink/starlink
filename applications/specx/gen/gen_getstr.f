@@ -57,43 +57,43 @@ C     a string expression.
       STRING   = ' '
       EVALUATE = .FALSE.
 
-D     PRINT *, '-- gen_getstr --'
-D     PRINT *, '   passed string is ', STR(:ILS)
+CD    PRINT *, '-- gen_getstr --'
+CD    PRINT *, '   passed string is ', STR(:ILS)
 
       IF (JDEF.EQ.1) THEN
-D       PRINT *, '   JDEF = 1; accepting default'
+CD      PRINT *, '   JDEF = 1; accepting default'
         STRING = STR(:ILS) // ' '
       ELSE IF (JDEF.EQ.2) THEN
-D       PRINT *, '   JDEF = 2; return with ^Z set'
+CD      PRINT *, '   JDEF = 2; return with ^Z set'
         CONTINUE
       ELSE IF (STRING_TEST(STR, LS, IERR)) THEN
-D       PRINT *, '   Good hollerith string; accept it'
+CD      PRINT *, '   Good hollerith string; accept it'
         STRING = STR(:LS) // ' '
       ELSE IF (GEN_ALPHANUM (STR(:ILS))) THEN
-D       PRINT *, '   String is alphanumeric; test for string-symbol'
+CD      PRINT *, '   String is alphanumeric; test for string-symbol'
         CALL GEN_INQSYMB (STR(:ILS), SYM_INDEX, TYPE, LENGTH,
      &                    ADDRESS, READONLY, IERR) 
         IF (SYM_INDEX.EQ.0 .OR. TYPE(1:1).NE.'C') THEN
-D         PRINT *, '   String not a string-symbol name; use as is'
+CD        PRINT *, '   String not a string-symbol name; use as is'
           STRING = STR(:ILS) // ' '
         ELSE
-D         PRINT *, '   String is a string-symbol name; evaluate'
+CD        PRINT *, '   String is a string-symbol name; evaluate'
           EVALUATE = .TRUE.
         END IF
       ELSE
-D       PRINT *, '   String is an expression? - evaluate it'
+CD      PRINT *, '   String is an expression? - evaluate it'
         EVALUATE = .TRUE.
       END IF
 
       IF (EVALUATE) THEN
-D       PRINT *, '   Treat string as expression: evaluate'
+CD      PRINT *, '   Treat string as expression: evaluate'
         WRITE             (TYPE, '(''C'',I3.3)') LEN (STRING)
         CALL GEN_EVAL_AE  (STR(:ILS), TYPE, %REF(STRING), IERR)
       END IF
 
-D     PRINT *, '   nominal string length = ', LEN(STRING)
-D     PRINT *, '   returned string = ', STRING
-D     PRINT *, '   returned length = ', GEN_ILEN(STRING)
+CD    PRINT *, '   nominal string length = ', LEN(STRING)
+CD    PRINT *, '   returned string = ', STRING
+CD    PRINT *, '   returned length = ', GEN_ILEN(STRING)
 
       RETURN
       END

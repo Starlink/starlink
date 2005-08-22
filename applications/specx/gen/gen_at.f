@@ -48,11 +48,11 @@
 
       CALL SET_LUN_IN (LUN)
 
-D     print *,'-------------------'
-D     print *,'Stack pointer incremented ',ISP
-D     print *,'..new input unit ',LUN,' new string pos''n',ICLI(1,ISP)
-D     print *,'..new length of CLI ',ICLI(2,ISP)
-D     print *,'-------------------'
+CD    print *,'-------------------'
+CD    print *,'Stack pointer incremented ',ISP
+CD    print *,'..new input unit ',LUN,' new string pos''n',ICLI(1,ISP)
+CD    print *,'..new length of CLI ',ICLI(2,ISP)
+CD    print *,'-------------------'
 
       RETURN
       END
