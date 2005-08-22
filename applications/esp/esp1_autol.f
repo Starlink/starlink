@@ -118,6 +118,11 @@
       REAL X2                         ! Current estimate X index
       REAL Y                          ! Current Y index
       REAL Y2                         ! Current estimate Y index
+
+      INTEGER IX                      ! Loop counter over X index
+      INTEGER IY                      ! Loop counter over Y index
+      INTEGER IXMAX                   ! Max index in loop X
+      INTEGER IYMAX                   ! Max index in loop Y
  
 *.
  
@@ -272,9 +277,19 @@
          CENTYS=0.0
  
 *      Loop through all pixels nearby to the chosen origin.
-         DO 100 X=XCO-CENRAD,XCO+CENRAD
-            DO 200 Y=YCO-CENRAD,YCO+CENRAD
- 
+*      We go through hoops to force an integer loop
+         IXMAX = INT(XCO + CENRAD) - INT(XCO - CENRAD) + 1
+         IYMAX = INT(YCO + CENRAD) - INT(YCO - CENRAD) + 1
+
+         DO 100 IX = 1, IXMAX
+            DO 200 IY = 1, IYMAX
+
+*            Convert this loop index into an actual position
+*            Note that the loop must increment by 1.0 each time
+*            starting at XCO - CENRAD
+               X = XCO - CENRAD + IX - 1
+               Y = YCO - CENRAD + IY - 1
+
 *            Avoid choosing an off image origin.
                IF ((X.GE.XMIN).AND.(X.LE.XMAX).AND.
      :             (Y.GE.YMIN).AND.(Y.LE.YMAX)) THEN
@@ -438,6 +453,10 @@
       REAL Y                          ! Current Y index
       REAL Y2                         ! Current estimate Y index
 
+      INTEGER IX                      ! Loop counter over X index
+      INTEGER IY                      ! Loop counter over Y index
+      INTEGER IXMAX                   ! Max index in loop X
+      INTEGER IYMAX                   ! Max index in loop Y
 *.
 
 *   Check the inherited global status.
@@ -588,11 +607,21 @@
          VTOTAL=0.0
          CENTXS=0.0
          CENTYS=0.0
- 
+
 *      Loop through all pixels nearby to the chosen origin.
-         DO 100 X=XCO-CENRAD,XCO+CENRAD
-            DO 200 Y=YCO-CENRAD,YCO+CENRAD
- 
+*      We go through hoops to force an integer loop
+         IXMAX = INT(XCO + CENRAD) - INT(XCO - CENRAD) + 1
+         IYMAX = INT(YCO + CENRAD) - INT(YCO - CENRAD) + 1
+
+         DO 100 IX = 1, IXMAX
+            DO 200 IY = 1, IYMAX
+
+*            Convert this loop index into an actual position
+*            Note that the loop must increment by 1.0 each time
+*            starting at XCO - CENRAD
+               X = XCO - CENRAD + IX - 1
+               Y = YCO - CENRAD + IY - 1
+
 *            Avoid choosing an off image origin.
                IF ((X.GE.XMIN).AND.(X.LE.XMAX).AND.
      :             (Y.GE.YMIN).AND.(Y.LE.YMAX)) THEN
@@ -739,6 +768,11 @@
       REAL X                          ! Current X index
       REAL Y                          ! Current Y index
 
+      INTEGER IX                      ! Loop counter over X index
+      INTEGER IY                      ! Loop counter over Y index
+      INTEGER IXMAX                   ! Max index in loop X
+      INTEGER IYMAX                   ! Max index in loop Y
+
 *.
 
 *   Check the inherited global status.
@@ -774,12 +808,24 @@
          CENTYS=0.0
 
 *      Loop through all pixels nearby to the chosen origin.
-         DO 200 Y=YCO(I,1)-CENRAD,YCO(I,1)+CENRAD
+*      We go through hoops to force an integer loop
+         IXMAX = INT(XCO(I,1) + CENRAD) - INT(XCO(I,1) - CENRAD) + 1
+         IYMAX = INT(YCO(I,1) + CENRAD) - INT(YCO(I,1) - CENRAD) + 1
+
+         DO 200 IY = 1, IYMAX
+
+*     Convert this loop index into an actual position
+*     Note that the loop must increment by 1.0 each time
+*     starting at XCO - CENRAD
+            Y = YCO(I,1) - CENRAD + IY - 1
 
 *         Address offset.
             OFFS=(INT(Y)-1)*XMAX
 
-            DO 100 X=XCO(I,1)-CENRAD,XCO(I,1)+CENRAD
+            DO 100 IX = 1, IXMAX
+
+*       Calculate original X position
+               X = XCO(I,1) - CENRAD + IX - 1
 
 *            Avoid choosing an off image origin.
                IF ((X.GE.XMIN).AND.(X.LE.XMAX).AND.
@@ -944,7 +990,10 @@
       REAL WTOTAL                     ! Weighting total
       REAL WEIGHT                     ! Weighting value used when summing the 
                                       ! pixel count values about a given point
-      
+      INTEGER IX                      ! Loop counter over X index
+      INTEGER IY                      ! Loop counter over Y index
+      INTEGER IXMAX                   ! Max index in loop X
+      INTEGER IYMAX                   ! Max index in loop Y      
 *.
 
 *   Check the inherited global status.
@@ -967,10 +1016,19 @@
          NEWY=YCO
          MAX=VAL__MINR
 
-*      Loop through all pixels nearby to the chosen origin.
-         DO 10 X=XCO-5,XCO+5
+*     Looping over +/-5 pixels (or 0..10)
+         IXMAX = 11
+         IYMAX = 11
 
-            DO 15 Y=YCO-5,YCO+5
+*      Loop through all pixels nearby to the chosen origin.
+         DO 10 IX=1,IXMAX
+
+*     Recover the original float
+            X = XCO - ( ( IXMAX - 1 ) / 2 )  + ( IX - 1 )
+
+            DO 15 IY=1,IYMAX
+
+               Y = YCO - ( ( IYMAX - 1 ) / 2 )  + ( IY - 1 )
 
 *            Avoid choosing an off image origin.
                IF ((X.GE.XMIN).AND.(X.LE.XMAX).AND.

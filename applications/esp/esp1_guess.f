@@ -192,7 +192,7 @@
                 ADD=(Y-1)*PRANGE(1)+X
 
 *             Get the pixel value.
-                VALUE=ARRAY(ADD)
+                VALUE=ARRAY(INT(ADD))
 
 *             Check that it was not a BAD pixel.
                 IF (VALUE.NE.VAL__BADR) THEN
@@ -269,7 +269,7 @@
                ADD=(Y-1)*PRANGE(1)+X
 
 *            Get its value.
-               VALUE=ARRAY(ADD)
+               VALUE=ARRAY(INT(ADD))
 
 *            Check that the value is not bad.
                IF (VALUE.NE.VAL__BADR) THEN
@@ -362,7 +362,7 @@
 
 *   Set a value for the ellipticity.
       ELLIP=.5
-      IF ((FOUND(HIGH).NE.0).AND.(FOUND(MIN).LT.MAX)) THEN
+      IF ((FOUND(HIGH).NE.0).AND.(FOUND(INT(MIN)).LT.MAX)) THEN
 
 *      Check that the minimum axis is less that the maximum.
          IF (MIN.LT.MAX) ELLIP=MIN/MAX
@@ -606,7 +606,7 @@
  450        CONTINUE
  
 *         Look along the line.
-            DO 30 DIST=-R,R
+            DO 30 DIST=INT(-R),INT(R)
               
 *            Find the current pixel.
                X=NINT(XCO(I,1)+REAL(DIST)*GX)
@@ -625,7 +625,7 @@
                   ADD=(NINT(Y)-1)*XMAX+NINT(X)
 
 *               Get the pixel value.
-                  VALUE=ARRAY2(ADD)
+                  VALUE=ARRAY2(INT(ADD))
 
 *               Check that it was not a BAD pixel.
                   IF (VALUE.NE.VAL__BADR) THEN
