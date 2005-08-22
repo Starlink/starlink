@@ -1,3 +1,11 @@
+USER_ERR
+fac_350_err
+make.log
+make.log.err
+tsp.csh
+tsp.icl
+tsp.ifd
+tsp.sh
 *.ifl
 *.ifc
 *.lo
