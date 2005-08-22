@@ -1,3 +1,4 @@
+make.log*
 config.h
 config.h.in
 core.*
