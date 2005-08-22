@@ -45,15 +45,50 @@ C        Unused RARAD, DECRAD
 
       IF (.NOT. TSYMS_OK) THEN
         CALL GEN_MAKESYMB ('HOUR_ANGLE',    'R4', 1,
-     &                      %LOC(HOUR_ANGLE),    ISTAT)
+#if HAVE_PERCENTLOC
+     :   %LOC(HOUR_ANGLE),
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(HOUR_ANGLE),
+#else
+    Do not have LOC or %LOC
+#endif
+     :   ISTAT)
         CALL GEN_MAKESYMB ('UT',            'R8', 1,
-     &                      %LOC(UTD),           ISTAT)
+#if HAVE_PERCENTLOC
+     :   %LOC(UTD),
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(UTD),
+#else
+    Do not have LOC or %LOC
+#endif
+     :   ISTAT)
         CALL GEN_MAKESYMB ('JULIAN_DATE',   'R8', 1,
-     &                      %LOC(JULIAN_DATE),   ISTAT)
+#if HAVE_PERCENTLOC
+     :   %LOC(JULIAN_DATE),
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(JULIAN_DATE),
+#else
+    Do not have LOC or %LOC
+#endif
+     :   ISTAT)
         CALL GEN_MAKESYMB ('GLATITUDE',     'R8', 1,
-     &                      %LOC(B2),            ISTAT)
+#if HAVE_PERCENTLOC
+     :   %LOC(B2),
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(B2),
+#else
+    Do not have LOC or %LOC
+#endif
+     :   ISTAT)
         CALL GEN_MAKESYMB ('GLONGITUDE',    'R8', 1,
-     &                      %LOC(L2),            ISTAT)
+#if HAVE_PERCENTLOC
+     :   %LOC(L2),
+#elif HAVE_INTRINSIC_LOC
+     :   LOC(L2),
+#else
+    Do not have LOC or %LOC
+#endif
+     :   ISTAT)
         TSYMS_OK = .TRUE.
       END IF
 
