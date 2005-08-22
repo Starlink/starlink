@@ -22,12 +22,15 @@ C        Unused RARAD, DECRAD
 *     Local variables
 
       INTEGER*4 ISTAT
-      LOGICAL*4 TSYMS_OK  /.FALSE./
+      LOGICAL*4 TSYMS_OK
       REAL*4    HOUR_ANGLE
       REAL*8    AZ8,   EL8
       REAL*8    L2,    B2
       REAL*8    UTD, JULIAN_DATE, SIDEREAL_TIME
-      REAL*8    PI /3.141592654D0/
+      REAL*8    PI
+
+      DATA      TSYMS_OK  /.FALSE./
+      DATA      PI /3.141592654D0/ 
 
       SAVE      HOUR_ANGLE, UTD, JULIAN_DATE, SIDEREAL_TIME, TSYMS_OK
 
