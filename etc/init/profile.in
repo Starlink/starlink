@@ -135,6 +135,11 @@ if test -f @bindir@/surf/surf.sh; then
    export SURF_HELP=@starhelpdir@/surf/surf
 fi
 
+#  TSP
+
+if test -f @bindir@/tsp/tsp.sh; then
+   export TSP_DIR=@bindir@/tsp
+fi
 
 # Aliases
 # Use sh functions rather than bash aliases for improved
@@ -284,6 +289,16 @@ if test -f @bindir@/surf/surf.sh; then
 else
   surf () { @staretcdir@/notinst surf; }
   surfsetup () { @staretcdir@/notinst surf; }
+fi
+
+# TSP
+
+if test -f @bindir@/tsp/tsp.sh; then
+  tsp () { . $TSP_DIR/tsp.sh; }
+  tspsetup () { . $TSP_DIR/tsp.sh; }
+else
+  tsp () { @staretcdir@/notinst tsp; }
+  tspsetup () { @staretcdir@/notinst tsp; }
 fi
 
 # Done
