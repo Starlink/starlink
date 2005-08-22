@@ -13,6 +13,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 AC_FC_LIBRARY_LDFLAGS
@@ -20,6 +21,9 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_PROG_LN_S
 AC_SET_MAKE
+
+AC_FC_HAVE_PERCENTLOC
+AC_FC_CHECK_INTRINSICS(loc)
 
 STAR_MONOLITHS
 
