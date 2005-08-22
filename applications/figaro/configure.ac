@@ -42,12 +42,13 @@ AC_FC_OPEN_SPECIFIERS(position='append')
 
 dnl    How to use %LOC function, as LOC or %LOC. Use LOC otherwise
 dnl    assume %LOC.
-AC_FC_HAVE_PERCENTLOC
+AC_FC_HAVE_PERCENTLOC()
 AC_FC_CHECK_INTRINSICS(LOC)
 
 dnl    Check whether we have X'' or ''X notation
 AC_FC_HAVE_OLD_TYPELESS_BOZ()
 AC_FC_HAVE_TYPELESS_BOZ()
+AC_FC_HAVE_BOZ
 
 dnl    Dependences on Starlink packages
 STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi shl sla], [link])
