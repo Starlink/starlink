@@ -7,18 +7,21 @@ bin_MONOLITHS = figaro2
 
 figaro2_SOURCES = figaro2.f \
                   $(NORMALTASKS:=.f) \
+                  $(NORMAL_FPP_TASKS:=.F) \
                   $(MULTISOURCES)
 
 MULTISOURCES = figs32n.f
 
-figaro2_TASKS = $(NORMALTASKS) $(CODELESSTASKS)
+figaro2_TASKS = $(NORMALTASKS) $(CODELESSTASKS) $(NORMAL_FPP_TASKS)
 
 NORMALTASKS = \
-abconv abline alasin alasout aperture bsmult caldiv centers cmplx2r \
+abconv abline alasin alasout bsmult caldiv centers cmplx2r \
 cmplxadd cmplxconj cmplxfilt cosbell cspike emlt extin fet321 ff \
 ffcross fft figs422 figs423 figs424 figsee figsflux fitset fitskeys \
-foto fwconv gauss gspike i2cmplx impos interp irflat irflux mask \
+foto fwconv gspike i2cmplx impos interp irflat irflux mask \
 mcfit peak r2cmplx rcgs2 rdfits rdipso spflux spied table wdfits wdipso
+
+NORMAL_FPP_TASKS = gauss aperture
 
 # Sometimes a single source file applies to many tasks.  This is
 # a list of those tasks which do not have a corresponding <task>.f.
