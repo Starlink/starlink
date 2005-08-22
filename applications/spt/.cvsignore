@@ -1,3 +1,4 @@
+*.dvi
 config.*
 depcomp
 install-sh

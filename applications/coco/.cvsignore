@@ -1,3 +1,5 @@
+make.log*
+*.dvi
 .libs
 coco
 cocomain

@@ -1,3 +1,4 @@
+*.cache
 Makefile
 config.h
 config.log

@@ -1,3 +1,5 @@
+*.dvi
+make.log.err
 ssn21.ps
 starX_link
 starconf.status

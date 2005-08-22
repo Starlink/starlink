@@ -1,3 +1,13 @@
+aclocal.m4
+config.h
+config.h.in
+config.status
+dvi2bitmap
+dvireport
+libdvi2bitmap.la
+make.log
+make.log.err
+version.h
 *.lo
 autom4te.cache
 config.log

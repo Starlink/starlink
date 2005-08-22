@@ -1,3 +1,6 @@
+*.dvi
+stamp-h1
+make.log.err
 config.*
 *.lo
 *.la

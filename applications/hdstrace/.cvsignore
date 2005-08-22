@@ -1,3 +1,11 @@
+.libs
+dtask_applic.lo
+hdstrace.ifc
+hdstrace.shl
+make.log
+make.log.err
+sun102.dvi
+top_help.shl
 .deps
 hdstrace
 hdstrace_link_adam

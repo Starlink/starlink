@@ -1,3 +1,9 @@
+coi_alogx.f
+coi_chevx.f
+coi_legex.f
+coi_sp1ex.f
+coi_sp3ex.f
+coi_wms5x.f
 starconf.status
 libtool
 Makefile.in

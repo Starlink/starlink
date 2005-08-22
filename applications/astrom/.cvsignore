@@ -1,3 +1,14 @@
+astrom
+make.log.err
+params.f
+starconf.status
+sun5.aux
+sun5.dvi
+sun5.htx
+sun5.htx_tar
+sun5.log
+sun5.ps
+sun5.toc
 .deps
 .libs
 *.shl
