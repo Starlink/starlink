@@ -52,7 +52,7 @@
 
 #include <config.h>
 
-#if defined( sun4_solaris ) || defined( sun4 )
+#if HAVE_FLOATINGPOINT_H
 /* Suns have special floating point support which we can take advantage of */
 #  include <floatingpoint.h>
 #endif
@@ -71,7 +71,7 @@ int FC_MAIN() {
 /*  Local Variables: */
       DECLARE_INTEGER(n);
 
-#if defined( sun4 ) || defined ( sun4_Solaris )
+#if HAVE_IEEE_HANDLER
 /*  Switch off ieee floating point exception handling, so that it doesn't
  *  interfere with the handling set up by the following calls to "signal".
  */
@@ -131,7 +131,7 @@ int FC_MAIN() {
 *     {note_any_bugs_here}
 
 *-
-
+*/
 /*  Entry point: */
 void hand( int sig ){
 

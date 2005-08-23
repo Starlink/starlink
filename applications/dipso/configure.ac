@@ -35,6 +35,10 @@ AC_FC_HAVE_OLD_TYPELESS_BOZ
 STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_LIBRARY_LDFLAGS
 
+dnl    Do some Sun checks
+AC_CHECK_HEADERS([floatingpoint.h])
+AC_CHECK_FUNCS([ieee_handler])
+
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun50)
 
