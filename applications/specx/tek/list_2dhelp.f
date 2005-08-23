@@ -11,8 +11,9 @@ C   Routine to list valid options on character page on VT100 or equivalent
       PARAMETER     (NMAX=30)
       CHARACTER     VALOPT*(*),ICH2*2
       CHARACTER     VOPTS(NMAX)*16, OPTIONS(NMAX)*1
+      INTEGER       IOPT(NMAX)
 
-      DATA OPTIONS / 68, 94, 62, 76, 82, 66, 84, 72, 13, 69, 67,
+      DATA IOPT / 68, 94, 62, 76, 82, 66, 84, 72, 13, 69, 67,
      &               78, 65, 81, 43, 71, 77, 86, 80, 63, 88, 73, 83,
      &               49, 50, 51, 52, 53, 87, 48 /
       DATA VOPTS   / 'Draw last box'    , 'Define height',
@@ -30,6 +31,11 @@ C   Routine to list valid options on character page on VT100 or equivalent
      &               'Colour contours'  , 'Power greyscale',
      &               'Blue->yellow'     , 'MRAO col spiral',
      &               'Change greyscale' , 'Toggle log scales'/
+
+*  Initialise character array
+      DO I = 1, NMAX
+         OPTIONS(I) = CHAR( IOPT(I) )
+      END DO
 
       J=0
       DO I = 1,NMAX

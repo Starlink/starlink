@@ -12,8 +12,9 @@ C   Routine to list valid options on character page on VT100 or equivalent
       PARAMETER     (NMAX=15)
       CHARACTER     VALOPT*(*),ICH2*2
       CHARACTER     VOPTS(NMAX)*16, OPTIONS(NMAX)*1
+      INTEGER       IOPT(NMAX)
 
-      DATA OPTIONS / 68, 76, 82, 66, 84, 72, 13, 69, 67, 78, 65, 
+      DATA IOPT    / 68, 76, 82, 66, 84, 72, 13, 69, 67, 78, 65, 
      &               81, 43, 63, 83  /
       DATA VOPTS   / 'Draw last box'    , 'Mark left bndy',
      &               'Mark right bndy'  , 'Mark bottom bndy',
@@ -24,6 +25,10 @@ C   Routine to list valid options on character page on VT100 or equivalent
      &               'Draw to here'     , 'Query cursor',
      &               'Set new limits' /
 
+*  Initialise character array
+      DO I = 1, NMAX
+         OPTIONS(I) = CHAR( IOPT(I) )
+      END DO
 
       J=0
       DO I=1,NMAX
