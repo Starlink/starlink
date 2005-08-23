@@ -20,7 +20,9 @@
 *        Make TIDY .FALSE. in SET_LIST_FILE for File output (prevents
 *         attempt to return LUN after error with file still open).
 C-----------------------------------------------------------------------
-
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
       SUBROUTINE SPECX_SET
 
 C  ROUTINE FOR INPUT OF USER DEFINED PARAMETERS.
@@ -614,7 +616,13 @@ C----------------
      &                    SAVE_FILE, FORMAT, SAVE_FILE, JDEF)
         ISTAT = IGETLUN (ILOUT, 'specx_set', .FALSE.)
         OPEN (ILOUT, FILE=SAVE_FILE, STATUS='UNKNOWN',
+#if HAVE_FC_OPEN_POSITIONAPPEND
+     &        ACCESS='SEQUENTIAL',POSITION='APPEND',
+#elif HAVE_FC_OPEN_ACCESSAPPEND
      &        ACCESS='APPEND',
+#else
+       Do not know how to append to a file
+#endif
      &        IOSTAT=IERR)
         PRINT_OUTPUT = .FALSE.
 
