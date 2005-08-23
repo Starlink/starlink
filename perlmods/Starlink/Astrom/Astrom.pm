@@ -28,6 +28,7 @@ use File::Spec;
 use File::Temp qw/ tempdir tempfile /;
 
 use Starlink::AST;
+use Starlink::Config qw/ :override /;
 use Astro::Catalog;
 use Astro::FITS::Header::CFITSIO;
 
@@ -296,25 +297,31 @@ sub solve {
   # Get the catalogue we're supposed to be working on.
   my $catalog = $self->catalog;
 
-  # Try to find the ASTROM binary. First, check to see if
-  # the AUTOASTROM_DIR environment variable is sit. If it
-  # hasn't, check in /star/bin/autoastrom, and then in /star/bin.
-  # If those three don't work, croak with an error.
+  # Try to find the ASTROM binary. First, check to see if the
+  # AUTOASTROM_DIR environment variable is sit. If it hasn't, get the
+  # default Starlink directory from Starlink::Config and then try the
+  # autoastrom directory in there, and then try that default Starlink
+  # directory for astrom.x and astrom.
   my $astrom_bin;
   if( defined( $ENV{'AUTOASTROM_DIR'} ) &&
       -d $ENV{'AUTOASTROM_DIR'} &&
       -e File::Spec->catfile( $ENV{'AUTOASTROM_DIR'}, "astrom.x" ) ) {
 
     $astrom_bin = File::Spec->catfile( $ENV{'AUTOASTROM_DIR'}, "astrom.x" );
-
-  } elsif( -d File::Spec->catfile( "star", "bin", "autoastrom" ) &&
-           -e File::Spec->catfile( "star", "bin", "autoastrom", "astrom.x" ) ) {
-    $astrom_bin = File::Spec->catfile( "star", "bin", "autoastrom", "astrom.x" );
-  } elsif( -d File::Spec->catfile( "star", "bin" ) &&
-           -e File::Spec->catfile( "star", "bin", "astrom.x" ) ) {
-    $astrom_bin = File::Spec->catfile( "star", "bin", "astrom.x" );
   } else {
-    croak "Could not find astrom.x binary";
+
+    my $starbin = $StarConfig{'Star_Bin'};
+
+    if( -d File::Spec->catfile( $starbin, "autoastrom" ) &&
+        -e File::Spec->catfile( $starbin, "autoastrom", "astrom.x" ) ) {
+      $astrom_bin = File::Spec->catfile( $starbin, "autoastrom", "astrom.x" );
+    } elsif( -e File::Spec->catfile( $starbin, "astrom.x" ) ) {
+      $astrom_bin = File::Spec->catfile( $starbin, "astrom.x" );
+    } elsif( -e File::Spec->catfile( $starbin, "astrom" ) ) {
+      $astrom_bin = File::Spec->catfile( $starbin, "astrom" );
+    } else {
+      croak "Could not find astrom binary";
+    }
   }
 
   print "astrom.x binary is in $astrom_bin\n" if ( $DEBUG || $self->verbose );
