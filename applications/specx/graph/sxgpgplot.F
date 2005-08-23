@@ -18,6 +18,9 @@
 *    05 Mar 2002 (TIMJ)
 *       SAVE cursor position in SXGCURSOR
 *-----------------------------------------------------------------------
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
       SUBROUTINE SXGINIT
 
@@ -749,8 +752,15 @@ C     Local variables
       REAL      U, V
 
       INTEGER   SXGCTRLC
+#if HAVE_BOZ
+      PARAMETER (SXGCTRLC=Z'08008003')
+#elif HAVE_TYPELESS_BOZ
+      PARAMETER (SXGCTRLC=X'08008003')
+#elif HAVE_OLD_TYPELESS_BOZ
       PARAMETER (SXGCTRLC='08008003'X)
-
+#else
+      BOZ constants not supported
+#endif
 C     Functions
 
       INTEGER   PGCURSE
