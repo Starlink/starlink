@@ -1,5 +1,10 @@
+#include <config.h>
 #include "shl.h"
 #include <stdlib.h>
+
+#ifdef FC_MAIN
+void FC_MAIN() {}
+#endif
 
 int main( int argc, char ** argv )
 {
