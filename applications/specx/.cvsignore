@@ -1,3 +1,5 @@
+config.h*
+stamp-h1
 starconf.status
 libtool
 configure
