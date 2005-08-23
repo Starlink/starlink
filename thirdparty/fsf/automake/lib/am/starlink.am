@@ -51,6 +51,10 @@ if %?LATEXDOCS%
 	  latex2dvi ${<:.tex=}
 .dvi.ps:
 	dvips -o $@ $<
+.tex.ps:
+	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi ${<:.tex=}
+	dvips -o $@ $(<:.tex=.dvi)
 .tex.pdf:
 	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
 	  latex2dvi ${<:.tex=}
