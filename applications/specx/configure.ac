@@ -27,13 +27,28 @@ AC_FC_LIBRARY_LDFLAGS
 AC_FC_CHECK_INTRINSICS([ SH SYSTEM ])
 AC_FC_RECL_UNIT
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(access='append')
+AC_FC_OPEN_SPECIFIERS(position='append')
 STAR_CHECK_PROGS(hlib)
+
+AC_FC_HAVE_PERCENTLOC
+AC_FC_CHECK_INTRINSICS(LOC)
+
+dnl    Check whether we have X'' or ''X notation
+AC_FC_HAVE_OLD_TYPELESS_BOZ()
+AC_FC_HAVE_TYPELESS_BOZ()
+AC_FC_HAVE_BOZ
 
 dnl    In some cases readline requires stdio.h to be pre-loaded
 AC_CHECK_HEADERS([readline/readline.h],,,[#include <stdio.h>])
 AC_CHECK_HEADERS([readline/history.h],,,[#include <stdio.h>])
 AC_CHECK_FUNCS([rindex index strchr strrchr])
 
+dnl    Some checks for Sun/Solaris systems
+AC_CHECK_HEADERS([floatingpoint.h])
+AC_CHECK_FUNCS([ieee_handler])
+
+AC_FC_MAIN
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Need to find readline library
@@ -71,5 +86,6 @@ AC_CONFIG_FILES([Makefile component.xml astro/Makefile command/Makefile exprt/Ma
 
 AC_CONFIG_FILES([src/TITLE misc/specx_welcome.txt])
 AC_CONFIG_FILES([getaline/getaline_link],[chmod +x getaline/getaline_link])
+AC_CONFIG_HEADERS(config.h)
 
 AC_OUTPUT
