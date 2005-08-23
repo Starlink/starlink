@@ -43,6 +43,7 @@
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     rpt: Remo Tilanus (JAC, Hilo)
 *     ajc: Alan Chipperfield (RAL, Starlink)
+*     timj: Tim Jenness (JAC, Hilo)
 *     {enter_new_authors_here}
 
 *  History:
@@ -110,6 +111,9 @@
 *        Remove attempt to print printer output after every command.
 *      9 May 2001 (ajc)
 *        Remove unused IEXIST, FOPEN, ASCII_LUN
+*      22 Aug 2005 (timj)
+*        Blanket SAVE not allowed so SAVE all common blocks explicitly.
+*        Watch out for oddities if the local variables also need saving
 *-----------------------------------------------------------------------
 *     {enter_further_changes_here}
 
@@ -152,7 +156,6 @@
       PARAMETER          (MAXLB=512)
       CHARACTER           BUFFER*(MAXLB)
       COMMON /SCL_BUFFER/ BUFFER, ILB, IBPTR
-      SAVE   /SCL_BUFFER/
 
 *     Common blocks declared here to make them global and established
 *     via include files.
@@ -243,7 +246,7 @@
          COMMON / LINFT /    CMI011(2), CMR008(60)
          COMMON / LOGCOL /   CMR009(2), CML005
          COMMON / LUN_TABLE / CMI012(MAXENT1), CML006(MAXENT1),
-     :      CMC008(MAXENT1)
+     :      CMC008(MAXENT1) 
          COMMON / NOKEEP /   CMI013
          COMMON / PLTDEV /   CMI014
          COMMON / PR_SCAN /  CMI015
@@ -261,7 +264,7 @@
          COMMON / TITLES /   CMC00A(3), CMC00B(3), CMC00C
          COMMON / UMEMORY /  CMI01F(3)
          COMMON / VM_TABLE / CMI020(2*MAXENT2), CML00A(MAXENT2),
-     :      CMC00D(MAXENT2)
+     :      CMC00D(MAXENT2) 
          COMMON / WORK /     CMR00F(LSPMAX+30+LSPMAX)
          COMMON / STACK /    CMD001(8+8+2), CMR010(4+8+4),
      :      CMI021(8*8), CMB002, CMC00E, CMR011(1024+8064+2176*5)
@@ -300,7 +303,49 @@
       INTEGER   STACK_POINTER
 
 *  Keep all variable values between calls to this routine.
-      SAVE
+*  g95/gfortran do not allow a blanket SAVE if the include files already use SAVE
+*  so we have to do this manually
+      SAVE /DO/,
+     :     /IODATA/,
+     :     /JPI/,
+     :     /SCL_BUFFER/,
+     :     /ANM_COLS/,
+     :     /CHANMAP/,
+     :     /CLI/,
+     :     /COLFIVE/,
+     :     /CURSOR/,
+     :     /EDIT/,
+     :     /EVAL_AE/,
+     :     /FORLUNS/,
+     :     /FREQ2/,
+     :     /GEN_JOURNAL/,
+     :     /GEN_SYMBOLS/,
+     :     /GFUNC/,
+     :     /GOOD_PT/,
+     :     / IF /,
+     :     / LABELMAP /,
+     :     / LINFT /,
+     :     / LOGCOL /,
+     :     / LUN_TABLE/,
+     :     / NOKEEP /,
+     :     / PLTDEV /,
+     :     / PR_SCAN /,
+     :     / SINFT /,
+     :     / SMDEV /,
+     :     / SMDSPEC /,
+     :     / SMWINDOW /,
+     :     / SMMISC /,
+     :     / SPECXDO /,
+     :     / SPECX_IF /,
+     :     / STRING /,
+     :     / SUN /,
+     :     / SYMTABS /,
+     :     / TCHEBBFT /,
+     :     / TITLES /,
+     :     / UMEMORY /,
+     :     / VM_TABLE /,
+     :     / WORK /,
+     :     / STACK /   
 
 *.
 
