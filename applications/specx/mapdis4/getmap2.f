@@ -34,7 +34,6 @@ C  from 3-d file to a 2-d array.
 
 *     Local variables
 
-      BYTE      FBYTE     /.FALSE./
       LOGICAL   GOT_DATA
       INTEGER   IFAC(3)
       INTEGER   IX, IY, IZ
