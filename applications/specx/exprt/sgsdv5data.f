@@ -16,6 +16,7 @@ C      Don't split strings across lines
 C      Unused NO_QUADS, NQ, NSEG
 C      Initialised CONNECTED to .FALSE. and NIF to 0 (so Linux behaves
 C       the same as other platforms)
+C   22-AUG-2005 TIMJ: Use DATA for init
 C-
 
       IMPLICIT  NONE
@@ -64,8 +65,8 @@ C   Formal parameters
       INTEGER*4 NO
       CHARACTER UNITS*15
       CHARACTER TYPE*1
-      CHARACTER ALPHABET*8 /'ABCDEFGH'/
-      CHARACTER NUMBERS*8  /'12345678'/
+      CHARACTER ALPHABET*8
+      CHARACTER NUMBERS*8
 
       LOGICAL MATCH
       LOGICAL CONNECTED
@@ -83,6 +84,9 @@ C   Formal parameters
       INTEGER*4 ACTVALS (2)
       DOUBLE PRECISION FR_TEMP (16)
       DOUBLE PRECISION RESIN (16)
+
+      DATA ALPHABET /'ABCDEFGH'/
+      DATA NUMBERS  /'12345678'/
 
       IERR = 0
       STATUS = ADAM__OK

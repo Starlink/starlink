@@ -21,7 +21,8 @@ C  (system) command is not checked
       INTEGER      GEN_KNTWRD
       INTEGER      GEN_ILEN
       CHARACTER*40 COM1, COM2, TITLE, WORD
-      CHARACTER*40 BAR /'----------------------------------------'/
+      CHARACTER*40 BAR
+      DATA         BAR /'----------------------------------------'/
 
       INCLUDE 'COMMAND_TABLE'
 

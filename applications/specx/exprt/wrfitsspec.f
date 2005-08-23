@@ -1,6 +1,7 @@
 *   History:  18/09/00  Define and use TRUBYT to pass to ASTRO_TIMES (AJC)
 *                       Unused I, ISB, DECRAD, RARAD, DEC_TO_RAD
 *              3/05/01  Initialise STATUS  (AJC)
+*             22/08/05  TIMJ: Use DATA for init
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_WRFITSSPEC (IFAIL)
@@ -84,15 +85,18 @@
       REAL               RBLANK
 
       DOUBLE PRECISION   DTEMP
-      DOUBLE PRECISION   C    /299792.0D3/
+      DOUBLE PRECISION   C
       DOUBLE PRECISION   HOUR_ANGLE
       DOUBLE PRECISION   UTD, UTHRS, JULIAN_DATE, SIDEREAL_TIME
       DOUBLE PRECISION   WR_JULIAN_DATE
-      DOUBLE PRECISION   DPI  /3.141592654/
+      DOUBLE PRECISION   DPI
 
 *     TRUE value to pass as IUTFLG to ASTRO_TIMES
       BYTE                TRUBYT
       DATA TRUBYT/1/
+
+      DATA C /299792.0D3/
+      DATA DPI  /3.141592654/
 
 *  Ok, go...
 

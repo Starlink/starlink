@@ -37,13 +37,15 @@
       
       INTEGER*4 itype1,  itype2
 
-      CHARACTER types(ntypes)*4  /'I4', 'R4', 'R8', 'L4'/
+      CHARACTER types(ntypes)*4
 
       LOGICAL*4 tlog1
 
 *     Functions
 
       INTEGER*4 gen_ilen
+
+      DATA TYPES   /'I4', 'R4', 'R8', 'L4'/
 
 * ok, go..
 

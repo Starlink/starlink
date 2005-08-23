@@ -41,7 +41,8 @@ C     Local variables
       INTEGER   NF
       INTEGER   JDEF
       CHARACTER FORMAT*10
-      CHARACTER NUM*10      /'1234567890'/
+      CHARACTER NUM*10
+      DATA      NUM      /'1234567890'/
 
 C  Ok, go...
 

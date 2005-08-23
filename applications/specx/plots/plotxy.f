@@ -21,17 +21,17 @@ C     Formal parameters:
 
 C     Local variables:
       REAL      A0, A1
-      REAL      XW1       /25.0/
-      REAL      YW1       /50.0/
-      REAL      YMARGIN   /70./
-      REAL      XMARGIN   /30./
+      REAL      XW1
+      REAL      YW1
+      REAL      YMARGIN
+      REAL      XMARGIN
       REAL      XSIZED, YSIZED
       INTEGER   IAXIS
       INTEGER   ITIP
       INTEGER   ILYN
       INTEGER   ILYU
       LOGICAL   TOPSCAL
-      CHARACTER PLOT_HEADER(5)*80  /5*' '/
+      CHARACTER PLOT_HEADER(5)*80
 
       INTEGER   NMASK1
       INTEGER   NPTS1
@@ -57,6 +57,11 @@ C     Include files:
 C     Functions:
       INTEGER  GEN_ILEN
 
+      DATA      XW1       /25.0/
+      DATA      YW1       /50.0/
+      DATA      YMARGIN   /70./
+      DATA      XMARGIN   /30./
+      DATA      PLOT_HEADER  /5*' '/
 C  Ok, go...
 
       IFAIL=0

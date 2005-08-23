@@ -46,7 +46,8 @@ C     Local variables
       REAL      T(23)
       REAL      S(23)
 
-      REAL      PI    /3.14157/
+      REAL      PI
+      DATA      PI    /3.14157/
 
 C     Functions
 

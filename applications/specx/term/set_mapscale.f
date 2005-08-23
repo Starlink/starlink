@@ -36,7 +36,8 @@
 
       CHARACTER MAPTIT(3)*11, TEMPT(2)*5,  AXTIT(3)*6,
      &          SUMST(2)*1, PROMPT*256, APROMPT*32
-      CHARACTER BOUNDS(2)*10     /'left,right', 'top,bottom'/
+      CHARACTER BOUNDS(2)*10
+      DATA      BOUNDS      /'left,right', 'top,bottom'/
 
 *     Other common blocks
 

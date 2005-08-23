@@ -98,8 +98,9 @@ CD      PRINT *,'Command located in hash table @ ', ICOM
 
       LOGICAL*4 DONE
       INTEGER*4 COUNTER
-      INTEGER*4 EMPTY     /-1/      ! placeholder for deleted entries
+      INTEGER*4 EMPTY
       INTEGER*4 ISYM
+      DATA      EMPTY     /-1/      ! placeholder for deleted entries
 
 *     Functions
 
@@ -155,7 +156,8 @@ CD    PRINT *,'Symbol ', symbol,' hashed to ', scl_hashinsert
       LOGICAL*4       FOUND
       INTEGER*4       COUNT
       INTEGER*4       ISYM
-      INTEGER*4       EMPTY /-1/
+      INTEGER*4       EMPTY
+      DATA            EMPTY /-1/
 
 *     Functions
 
@@ -217,7 +219,8 @@ CD      PRINT *,'Symbol not defined'
 
 *     Local variables
 
-      INTEGER*4       EMPTY   /-1/
+      INTEGER*4       EMPTY
+      DATA            EMPTY /-1/
       INTEGER*4       VALUE
 
 *     Functions

@@ -29,11 +29,13 @@
       INTEGER*4 ICLIST
       INTEGER*4 ICLIFIN
       INTEGER*4 IST, IFIN
-      CHARACTER BLANK*1     /' '/
+      CHARACTER BLANK*1
 
 *  Functions etc
 
       INTEGER*4 GEN_ICHTOT
+
+      DATA      BLANK      /' '/
 
 *  OK. So do it. Basically what we need to do is to find where in the CLILINE
 *  the item just read ends, and splice in the new bit between there and the

@@ -32,14 +32,18 @@
       INTEGER     IERR
       INTEGER     VELDAT
       CHARACTER   OFFSETV*20
-      CHARACTER   NULL10*10   /' '/
+      CHARACTER   NULL10*10
       CHARACTER   VELOCITY_REF*12
       CHARACTER   VELOCITY_DEF*12
-      CHARACTER   VREF(4)*12   /'Telluric    ', 'LSR         ',
-     &                          'Heliocentric', 'Geocentric  '/
-      CHARACTER   VDEF(3)*12   /'Radio       ', 'Optical     ',
-     &                          'Relativistic'/
+      CHARACTER   VREF(4)*12
+      CHARACTER   VDEF(3)*12
 
+
+      DATA NULL10 / ' ' /
+      DATA VREF  /'Telluric    ', 'LSR         ',
+     &            'Heliocentric', 'Geocentric  '/
+      DATA VDEF  /'Radio       ', 'Optical     ',
+     &            'Relativistic'/
 * Ok, go...
 
       IXN = GEN_ILEN (XAXIS_NAME)

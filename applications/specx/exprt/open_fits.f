@@ -42,9 +42,11 @@
 *     27 Jan 1994 (hme):
 *        Review to support only disk-FITS and to maximise use of FITS
 *        related libraries in Portable Figaro.
-*     03 May 1999 (rpt)
+*     03 May 1999 (rpt):
 *        Since Figaro GEN routines for Byte-swap are now tied to
 *        host type, byte swap can no longer be an option.
+*     22 Aug 2005 (timj):
+*        Initialise variables using data statements
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -66,9 +68,13 @@
 *  Local Variables:
       INTEGER ISTAT
       INTEGER STATUS
-      CHARACTER * ( 64 ) ERROR     /' '/
-      CHARACTER * ( 16 ) FPROMPT   /' '/
-      CHARACTER * ( 80 ) FILENAME  /' '/
+      CHARACTER * ( 64 ) ERROR
+      CHARACTER * ( 16 ) FPROMPT
+      CHARACTER * ( 80 ) FILENAME
+
+      DATA ERROR / ' ' /
+      DATA FPROMPT / ' ' /
+      DATA FILENAME / ' ' /
 
 *  Internal References:
       INTEGER GEN_ILEN

@@ -3,7 +3,8 @@
 *    - common blocks for log grey scales
 *--------------------------------------------------
 
-      real     vref /1.e-4/
+      real     vref
+      parameter ( vref = 1.0e-4 )
 
       real     vmin
       real     vmax

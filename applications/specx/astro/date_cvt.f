@@ -23,8 +23,10 @@
 
 *     Data
 
-      CHARACTER  MONTHS(12)*3/'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      CHARACTER  MONTHS(12)*3
+      DATA MONTHS /'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
      &                        'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'/
+
 
 *  OK, go...
 

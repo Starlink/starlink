@@ -34,8 +34,11 @@
       INTEGER   I, J
       CHARACTER VFRAMET*4
       CHARACTER VDEFT*3
-      CHARACTER VDEFS(3)*3   /'RAD',  'OPT',  'REL'/
-      CHARACTER VFRAMES(6)*4 /'TOPO', 'LSR ', 'HELI',
+      CHARACTER VDEFS(3)*3
+      CHARACTER VFRAMES(6)*4
+
+      DATA      VDEFS   /'RAD',  'OPT',  'REL'/
+      DATA      VFRAMES /'TOPO', 'LSR ', 'HELI',
      &                        'GEO ', 'BARY', 'TELL'/
 
 *  Ok, go...

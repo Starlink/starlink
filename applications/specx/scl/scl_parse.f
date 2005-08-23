@@ -35,7 +35,8 @@
 *     Local variables
 
       INTEGER*4 I, ILS
-      CHARACTER BL*1        /' '/
+      CHARACTER BL*1
+      DATA      BL /' '/
 
       INTEGER*4 IST
       INTEGER*4 IEND

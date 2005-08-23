@@ -53,7 +53,8 @@
 *     Error control
 
       CHARACTER ERR_CHAR*1
-      CHARACTER ERRORS*4   /'IWEF'/
+      CHARACTER ERRORS*4
+      DATA      ERRORS /'IWEF'/
 
       INTEGER             MAX_OK_ERROR
       COMMON /SPX_ERRORS/ MAX_OK_ERROR

@@ -32,7 +32,8 @@ C     Local variables
       REAL      COSKY1, SINKY1
       REAL      ROOTN
 
-      REAL      PI /3.141592654/
+      REAL      PI
+      DATA      PI /3.141592654/
 
 C  Ok, go...
 

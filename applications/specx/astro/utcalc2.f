@@ -29,8 +29,8 @@
       INTEGER          MON
       INTEGER          NLEAP
 
-      INTEGER  LMON(12)    /31,28,31,30,31,30,31,31,30,31,30,31/
-
+      INTEGER  LMON(12)
+      DATA LMON     /31,28,31,30,31,30,31,31,30,31,30,31/
 *  Ok, go...
 
 *     Work out local time (in hours)

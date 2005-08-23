@@ -6,6 +6,7 @@
 *              2/05/01  Remove diagnostic print
 *                       Test ISTAT not STATUS after MAPIMAGE (AJC)
 *                       Initialise STATUS
+*             22/08/05  Init using DATA (TIMJ)
 *-----------------------------------------------------------------------
 
       SUBROUTINE SPECX_WRFITSMAP (IFAIL)
@@ -110,10 +111,10 @@
       CHARACTER          VDEF*3           ! 'OPT', 'RAD', or 'REL'
 
       DOUBLE PRECISION   DTEMP
-      DOUBLE PRECISION   C  /299792.0D3/
+      DOUBLE PRECISION   C
       DOUBLE PRECISION   HOUR_ANGLE
       DOUBLE PRECISION   UTD, UTHRS, JULIAN_DATE, SIDEREAL_TIME
-      DOUBLE PRECISION   DPI  /3.141592654/
+      DOUBLE PRECISION   DPI
       DOUBLE PRECISION   WR_JULIAN_DATE
 
 *     SPECX functions
@@ -123,6 +124,9 @@
 *     TRUE value to pass as IUTFLG to ASTRO_TIMES
       BYTE                TRUBYT
       DATA TRUBYT/1/
+
+      DATA C /299792.0D3/
+      DATA DPI  /3.141592654/
 
 *  Ok, go...
 

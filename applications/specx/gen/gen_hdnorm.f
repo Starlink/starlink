@@ -18,7 +18,9 @@ C   if present, and to convert internal double delimiters to single ones.
 
       INTEGER*4 IFIN
       INTEGER*4 J
-      CHARACTER HD*1 /''''/
+      CHARACTER HD*1
+
+      DATA HD /''''/
       
 *     Functions:
 

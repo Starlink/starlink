@@ -21,8 +21,11 @@
 
       INTEGER   IVDEF
       INTEGER   IVFRAME
-      CHARACTER VDEFS(3)*3   /'RAD',  'OPT',  'REL'/
-      CHARACTER VFRAMES(4)*4 /'TELL', 'LSR ', 'HELI', 'GEO'/
+      CHARACTER VDEFS(3)*3
+      CHARACTER VFRAMES(4)*4
+
+      DATA      VDEFS   /'RAD',  'OPT',  'REL'/
+      DATA      VFRAMES /'TELL', 'LSR ', 'HELI', 'GEO'/
 
 *  Ok, go...
 

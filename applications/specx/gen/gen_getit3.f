@@ -52,9 +52,13 @@ C   comma, comma/blank sequence and pure blank sequence are all also valid.
       INTEGER*4 ILS
       INTEGER*4 J
       CHARACTER CHAR*1
-      CHARACTER HD*1    /''''/
-      CHARACTER LBKT*1  /'('/
-      CHARACTER RBKT*1  /')'/
+      CHARACTER HD*1
+      CHARACTER LBKT*1
+      CHARACTER RBKT*1
+
+      DATA HD    /''''/
+      DATA LBKT  /'('/
+      DATA RBKT  /')'/
 
 
       ILS   = GEN_ILEN (STRING)

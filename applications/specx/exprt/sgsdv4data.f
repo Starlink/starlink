@@ -10,6 +10,7 @@ C   AJC  8 May 2000 - Port to Unix
 C                     Replace TYPE with PRINT
 C                     Don't split string constants across lines
 C                     Unused I
+C   TIMJ 22 Aug 2005 - Init using DATA statements
       IMPLICIT  NONE
 
 C   Formal parameters
@@ -58,8 +59,11 @@ C   Formal parameters
       INTEGER*4 NO
       CHARACTER UNITS*15
       CHARACTER TYPE*1
-      CHARACTER ALPHABET*8 /'ABCDEFGH'/
-      CHARACTER NUMBERS*8  /'12345678'/
+      CHARACTER ALPHABET*8
+      CHARACTER NUMBERS*8
+
+      DATA ALPHABET /'ABCDEFGH'/
+      DATA NUMBERS  /'12345678' /
 
       IERR = 0
       STATUS = ADAM__OK

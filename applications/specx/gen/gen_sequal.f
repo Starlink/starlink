@@ -20,9 +20,11 @@
       INTEGER    I
       INTEGER    L11, L22
 
-      BYTE       BLANK /32/
+      BYTE       BLANK
       BYTE       CHAR1
       BYTE       CHAR2
+
+      DATA       BLANK /32/
 
 *  Ok, go...
 

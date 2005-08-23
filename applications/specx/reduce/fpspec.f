@@ -31,8 +31,8 @@ C     Local variables
       REAL      COSKY,  SINKY
       REAL      COSKY1, SINKY1
 
-      REAL      PI /3.141592654/
-
+      REAL      PI
+      DATA      PI /3.141592654/
 C  Ok, go...
 
       IMOD = 1

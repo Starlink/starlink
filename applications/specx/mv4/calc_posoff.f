@@ -30,7 +30,8 @@
       DOUBLE PRECISION  APRAM       ! apparent R.A. (radians) of map
       DOUBLE PRECISION  APDECM      ! apparent Dec. (radians) of map
 
-      DOUBLE PRECISION  DPI   / 3.141592654D0 /
+      DOUBLE PRECISION  DPI
+      DATA              DPI   / 3.141592654D0 /
 
 *  Ok, go...
 

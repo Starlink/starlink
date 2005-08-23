@@ -14,6 +14,7 @@ C    8-MAY-2000 AJC Port to Linux
 C               Replace TYPE with PRINT
 C               Don't split strings across lines
 C               Unused NO_QUADS, NQ, NSEG, JJ, BES_CONN, CSTART, CEND, CDIMVAL
+C   22-AUG-2005 TIMJ: Init using DATA
 C-
       IMPLICIT  NONE
 
@@ -62,8 +63,8 @@ C   Formal parameters
       INTEGER*4 NO
       CHARACTER UNITS*15
       CHARACTER TYPE*1
-      CHARACTER ALPHABET*8 /'ABCDEFGH'/
-      CHARACTER NUMBERS*8  /'12345678'/
+      CHARACTER ALPHABET*8
+      CHARACTER NUMBERS*8
 
       INTEGER*4 IND_GSD(GSD__SZINDEX)
       INTEGER*4 IND_BESSPEC(GSD__SZINDEX)
@@ -73,6 +74,9 @@ C   Formal parameters
       INTEGER*4 NO_BES_O_CH (16)
       INTEGER*4 SUBSYS (16)
       INTEGER*4 ACTVALS (2)
+
+      DATA ALPHABET /'ABCDEFGH'/
+      DATA NUMBERS  /'12345678'/
 
       IERR = 0
       STATUS = ADAM__OK

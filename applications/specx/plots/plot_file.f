@@ -53,10 +53,10 @@ C  Local variables
       CHARACTER PLOT_HEADER(5)*80
       CHARACTER FNO*3, PLTNAM*40, ICHAR1*76
 
-      REAL      XW1     /25.0/
-      REAL      YW1     /50.0/
-      REAL      XMARGIN /30./
-      REAL      YMARGIN /70./
+      REAL      XW1
+      REAL      YW1
+      REAL      XMARGIN
+      REAL      YMARGIN
 
 C   Functions
 
@@ -79,6 +79,11 @@ C   Common blocks
      &                   NMASK2, XTITLE2, YTITLE2
 
       EQUIVALENCE (PLOTS(1),XLEN1)
+
+      DATA      XW1     /25.0/
+      DATA      YW1     /50.0/
+      DATA      XMARGIN /30./
+      DATA      YMARGIN /70./
 
       IF (IERR.NE.0) RETURN
 

@@ -10,7 +10,8 @@ C--------------------------------------------------------------------------
 
       LOGICAL   REPEAT
       LOGICAL   OFFER
-      LOGICAL   FIRST_BOX/.TRUE./
+      LOGICAL   FIRST_BOX
+      DATA      FIRST_BOX /.TRUE./
       REAL*4    XSCALE(*), DATA(*)
       REAL*4    P(2), PNEW(2), Q(2), QNEW(2)
       REAL*4    YLIMS(2)

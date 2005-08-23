@@ -13,7 +13,7 @@ C-----------------------------------------------------------------------
 
 C   Routine to close off plot file for either batch or on-line plotting
 
-      CHARACTER  FILNAM*40, SEQUENCE*3, TTNAME*4 /'    '/
+      CHARACTER  FILNAM*40, SEQUENCE*3, TTNAME*4
 
       INCLUDE  'SPECX_PARS'
 
@@ -27,6 +27,8 @@ C   Routine to close off plot file for either batch or on-line plotting
 *     Functions
 
       INTEGER IFREELUN
+
+      DATA TTNAME /'    '/
 
 *  Ok, go...
 

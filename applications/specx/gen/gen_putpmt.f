@@ -34,8 +34,8 @@ C   in straightforward calls with single line prompts.
       IMPLICIT NONE
 
       CHARACTER PROMPT*(*), SPROMPT*(*), TPROMPT*255
-      CHARACTER BLANK*1      /' '/
-      CHARACTER QUOT*1       /'"'/
+      CHARACTER BLANK*1
+      CHARACTER QUOT*1
       CHARACTER*512 PSTRING
 
       INCLUDE  'LOGICAL_UNITS.INC'
@@ -45,6 +45,9 @@ C   in straightforward calls with single line prompts.
       INTEGER*4 IERR
       INTEGER*4 ILS, JLS
       INTEGER*4 I
+
+      DATA QUOT / '"' /
+      DATA BLANK / ' ' /
 
 *  Ok..go
       IERR = 0

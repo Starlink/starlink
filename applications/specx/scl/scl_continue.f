@@ -57,7 +57,8 @@ C  the result fine SPXDEF.UNF into SYS_SPECX:
 
       INTEGER*4 ISEV
       CHARACTER MESS*80
-      CHARACTER SCHAR*4 /'IWEF'/
+      CHARACTER SCHAR*4
+      DATA      SCHAR /'IWEF' /
 
       INTEGER*4 GEN_ILEN
 

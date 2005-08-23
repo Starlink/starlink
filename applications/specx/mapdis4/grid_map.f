@@ -69,8 +69,11 @@ C   DEF-MAP and SET-MAP-SCALES
       REAL      XLIMG(2),YLIMG(2)
       REAL      XPOS,   YPOS
       REAL      XAXLEN, YAXLEN
-      REAL      XMARGIN /15./
-      REAL      YMARGIN /40./
+      REAL      XMARGIN
+      REAL      YMARGIN
+
+      DATA      XMARGIN /15.0/
+      DATA      YMARGIN /40.0/
 
       CHARACTER VCHAR*1
 
