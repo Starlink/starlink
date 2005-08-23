@@ -20,7 +20,9 @@ C   then put it out to terminal.
       PARAMETER (NBUF=256)
       BYTE BUF(1)
       BYTE OUTBUF(NBUF)
-      INTEGER*4 IPOINT /0/
+      INTEGER*4 IPOINT
+
+      DATA IPOINT / 0 /
 
       IF(NCHAR+IPOINT.GT.NBUF) THEN
 *        CALL TTBUFOUT(IPOINT,OUTBUF)
@@ -160,11 +162,19 @@ C----------------------------------------------------------------------------
 
 *  Ok, go...
 
-      BYTE T4010_INIT(6)  /27,'[','?','3','8','h'/
+      BYTE T4010_INIT(6)
 
 *     Include files:
 
       INCLUDE  'SXGPGPLOT.INC'
+
+*  Fill in escape character in the T4010 init array
+      T4010_INIT(1) = 27
+      T4010_INIT(2) = ICHAR( '[' )
+      T4010_INIT(3) = ICHAR( '?' )
+      T4010_INIT(4) = ICHAR( '3' )
+      T4010_INIT(5) = ICHAR( '8' )
+      T4010_INIT(6) = ICHAR( 'h' )
 
 *  Ok, go...
 
@@ -191,11 +201,21 @@ C--------------------
 
 *  Ok, go...
 
-      BYTE VT240_EXIT(6)   /27,'[','?','3','8','l'/
+      BYTE VT240_EXIT(6)
 
 *     Include files:
 
       INCLUDE  'SXGPGPLOT.INC'
+
+*  Fill in escape character in the init array
+*  This could be done as a CHARACTER*6
+      VT240_EXIT(1) = 27
+      VT240_EXIT(2) = ICHAR( '[' )
+      VT240_EXIT(3) = ICHAR( '?' )
+      VT240_EXIT(4) = ICHAR( '3' )
+      VT240_EXIT(5) = ICHAR( '8' )
+      VT240_EXIT(6) = ICHAR( 'l' )
+
 
 *  Ok, go...
 
@@ -222,19 +242,47 @@ C--------------------
 
 *  Ok, go...
 
-      BYTE FF /12/, EC /27/, GS /29/, US /31/
+      BYTE FF, EC, GS, US
 
-      BYTE PERICOM_IDLE(1) /24/
-      BYTE CIFERT5_IDLE(6) /27,'[','?','3','8','l'/
-      BYTE GRAPHON_IDLE(1) /24/
-      BYTE SG220_IDLE(6)   /27,'2',27,'[','4','i'/
-      BYTE RETRO_IDLE(3)   /29,32,24/
-      BYTE SELANAR_IDLE(2) /27,'2'/
-      BYTE VT240_IDLE(1)   /31/
+      BYTE PERICOM_IDLE(1)
+      BYTE CIFERT5_IDLE(6)
+      BYTE GRAPHON_IDLE(1)
+      BYTE SG220_IDLE(6)
+      BYTE RETRO_IDLE(3)
+      BYTE SELANAR_IDLE(2)
+      BYTE VT240_IDLE(1)
+
+      DATA FF /12/
+      DATA EC /27/
+      DATA GS /29/
+      DATA US /31/
+
+      DATA PERICOM_IDLE /24/
+      DATA GRAPHON_IDLE /24/
+      DATA RETRO_IDLE   /29,32,24/
+      DATA VT240_IDLE   /31/
 
 *     Include files:
 
       INCLUDE  'SXGPGPLOT.INC'
+
+*     Escape codes are done as byte array rather than string
+      CIFERT5_IDLE(1) = 27
+      CIFERT5_IDLE(2) = ICHAR( '[' )
+      CIFERT5_IDLE(3) = ICHAR( '?' )
+      CIFERT5_IDLE(4) = ICHAR( '3' )
+      CIFERT5_IDLE(5) = ICHAR( '8' )
+      CIFERT5_IDLE(6) = ICHAR( 'l' )
+
+      SG220_IDLE(1) = 27
+      SG220_IDLE(2) = ICHAR( '2' )
+      SG220_IDLE(3) = 27
+      SG220_IDLE(4) = ICHAR( '[' )
+      SG220_IDLE(5) = ICHAR( '4' )
+      SG220_IDLE(6) = ICHAR( 'i' )
+
+      SELANAR_IDLE(1) = 27
+      SELANAR_IDLE(2) = ICHAR( '2' )
 
 *  Ok, go...
 
@@ -283,9 +331,26 @@ C--------------------
 
 *     Local variables:
 
-      BYTE GS                /29/
-      BYTE CIFERT5_GRAPH(6)  /27,'[','?','3','8','h'/
-      BYTE SG220_GRAPH(6)    /27,'[','5','i',27,'1'/
+      BYTE GS
+      BYTE CIFERT5_GRAPH(6)
+      BYTE SG220_GRAPH(6)
+
+      DATA GS                /29/
+
+*     Escape codes are done as byte array rather than string
+      CIFERT5_GRAPH(1) = 27
+      CIFERT5_GRAPH(2) = ICHAR( '[' )
+      CIFERT5_GRAPH(3) = ICHAR( '?' )
+      CIFERT5_GRAPH(4) = ICHAR( '3' )
+      CIFERT5_GRAPH(5) = ICHAR( '8' )
+      CIFERT5_GRAPH(6) = ICHAR( 'h' )
+
+      SG220_GRAPH(1) = 27
+      SG220_GRAPH(2) = ICHAR( '[' )
+      SG220_GRAPH(3) = ICHAR( '5' )
+      SG220_GRAPH(4) = ICHAR( 'i' )
+      SG220_GRAPH(5) = 27
+      SG220_GRAPH(6) = ICHAR( '1' )
 
 *  Ok, go...
 
