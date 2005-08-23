@@ -5,6 +5,8 @@
 *        Change TYPE * to PRINT *
 *        Only check IERR if GEN_PUTPMT is called
 *        Unused GEN_ILEN
+*      22 Aug 2005 (timj):
+*        Use CHAR(9) for TAB init
 *-----------------------------------------------------------------------
 
       SUBROUTINE GEN_GETMORE (PROMPT, STRING, JDEF)
@@ -12,9 +14,10 @@
 C   Routine to interrogate a file for some more input
 
       CHARACTER PROMPT*(*), STRING*(*), SPROMPT*132, TAB
-      DATA      TAB/09/
 
       INCLUDE  'CLI_STACK.INC'
+
+      TAB = CHAR(9)
 
       JDEF = 0
       IF (ISP.eq.0) THEN
