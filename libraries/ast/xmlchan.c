@@ -7743,7 +7743,8 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs ){
                      astRegSetAttrib( r, sysset, NULL );
 
                      old_unit = astGetUnit( r, time_axis );
-                     if( strcmp( old_unit, time_unit ) ) {
+                     if( old_unit && time_unit && 
+                         strcmp( old_unit, time_unit ) ) {
                         if( !astTestUnit( r, time_axis ) ) {
                            old_unit = NULL;
                         } else {
@@ -9237,11 +9238,11 @@ static AstObject *SpaceFrameReader( AstXmlChan *this,
    IVOAScan *scan;               /* Structure holding scan results */
    const char *dom;              /* Domain string for returned SkyFrame */
    const char *eq;               /* Equinox string for returned SkyFrame */
-   const char *names[3];         /* Names of the subelements to be searched for */
+   const char *names[4];         /* Names of the subelements to be searched for */
    const char *sys;              /* System for returned Frame */
    int ignore_h;                 /* Ignore 3rd spherical axis? */
-   int max[3];                   /* Max allowed occurrences of each name */
-   int min[3];                   /* Min allowed occurrences of each name */
+   int max[4];                   /* Max allowed occurrences of each name */
+   int min[4];                   /* Min allowed occurrences of each name */
    int isgeod;                   /* Is the system geodetic lon/lat? */
    int isgeoc;                   /* Is the system geocentric lon/lat? */
    int need_eq;                  /* Does system need an equinox? */
