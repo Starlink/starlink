@@ -33,6 +33,7 @@
  *    dsb: David Berry (STARLINK)
  *    hme: Horst Meyerdierks (UoE, Starlink)
  *    ajc: Alan Chipperfield (RAL, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
  *    {enter_new_authors_here}
 
  * History:
@@ -42,6 +43,8 @@
  *       Copied and adapted from Dipso for use in Specx.
  *    02 Aug 2000 (ajc):
  *       Don't use SIGSYS and SIGEMT if not defined (on Linux)
+ *    22 Aug 2005 (timj):
+ *       Reintegrate the DIPSO changes
  *    {enter_changes_here}
 
  * Bugs:
@@ -50,33 +53,18 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 #include <setjmp.h>
 #include "f77.h"
 
-#if defined (sun4_Solaris)
-
-#include <floatingpoint.h>
-
-
-#elif defined( alpha_OSF1 ) || defined( mips )
-
-#define main MAIN__
-void for_rtl_init_( int*, char **);
-int for_rtl_finish_( void );
-
-
-#elif defined( sun4 )
-
-#include <floatingpoint.h>
-#define main MAIN_
-
-#elif defined( linux )
-
-#define main MAIN__
-
-
+#if HAVE_FLOATINGPOINT_H
+# include <floatingpoint.h>
 #endif
 
 void hand1( int );
@@ -87,29 +75,20 @@ extern F77_SUBROUTINE(scl_main)( INTEGER(n) );
 extern F77_SUBROUTINE(ndf_end)( INTEGER(status) );
 extern F77_SUBROUTINE(hds_stop)( INTEGER(status) );
 
+#ifdef FC_MAIN
+/* void FC_MAIN () {} */
+#endif
 
 /*  Global Variables: */
 jmp_buf here;      
 
-/*  Entry Point: */
-int main( int argc, char *argv[])
-{
+/*  Entry Point: Go straight into fortran main */
+int FC_MAIN () {
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
 
-
-/*  Initialise the fortran run-time-library data structures (OSF + mips). */
-
-#if defined( alpha_OSF1 ) || defined( mips )
-/*      for_rtl_init_( &argc, argv );*/
-      for_rtl_init_( argc, argv );
-
-
-/*  Initialise the fortran run-time-library data structures (sun). */
-
-#elif defined( sun4 ) || defined ( sun4_Solaris )
-      f_init();
+#if HAVE_IEEE_HANDLER
 
 /*  Switch off ieee floating point exception handling, so that it doesn't
  *  interfere with the handling set up by the following calls to "signal".
@@ -194,19 +173,7 @@ int main( int argc, char *argv[])
  *  result of a trapped signal. */
       F77_CALL(scl_main)( INTEGER_ARG( &n )  );
 
-/*  Free the data structures used by the fortran run-time-library */
-
-#if defined( alpha_OSF1 ) || defined( mips )
-
-      for_rtl_finish_();
-
-#elif defined( sun4 ) || defined ( sun4_Solaris )
-
-      f_exit();
-
-#endif
-
-
+      return EXIT_SUCCESS;
 }
 
 
@@ -240,6 +207,7 @@ int main( int argc, char *argv[])
  *    {note_any_bugs_here}
 
 *-
+*/
 
 /*  Entry point: */
 void hand1( int sig )
@@ -317,6 +285,7 @@ void hand1( int sig )
  *    {note_any_bugs_here}
 
 *-
+*/
 
 /*  Entry point: */
 void hand2( int sig )
