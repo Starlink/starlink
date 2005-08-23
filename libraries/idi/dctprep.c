@@ -24,12 +24,6 @@
 # include    "idi_err.h"
 # include    "idifuncs.h"
 
-/* Dummy main for some compilers */
-#ifdef FC_MAIN
-void FC_MAIN () {}
-#endif
-
-
 int main()
 
 {
