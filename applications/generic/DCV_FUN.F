@@ -182,7 +182,7 @@
       PARAMETER (DCV_UBMASK = '000000FF'X )
       PARAMETER (DCV_UWMASK = '0000FFFF'X )
 #   else
-#     error Have no BOZ and no ZEXT
+  error Have no BOZ and no ZEXT
 #   endif
 # endif
 
