@@ -165,6 +165,8 @@
 *        Added option to rotate north to vertical.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     24-AUG-2005 (DSB):
+*        Corrected to work with 1D NDFs.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -309,6 +311,9 @@
 *  Store these in the output bounds.  The two-dimensional rotate plane
 *  will be modified below.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDO, UBNDO, IDIM, STATUS )
+
+*  Ensure we are using at least 2 pixel axes.
+      IF( IDIM .LT. 2 ) IDIM =2
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
