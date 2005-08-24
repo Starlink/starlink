@@ -18,10 +18,9 @@
 *     This routine copies the WCS FrameSet from INDF1, re-mapping the
 *     GRID Frame in the process so that pixel coordinates in the output
 *     NDF are related to pixel coordinates in the input NDF by the 
-*     supplied linear transformation. The two NDFs must have the same 
-*     number of axes (given by argument NDIM). The mapping from pixel 
-*     coordinates in INDF1 ("PIX1") to the corresponding pixel 
-*     coordinates in INDF2 ("PIX2") is:
+*     supplied linear transformation. The mapping from pixel coordinates 
+*     in INDF1 ("PIX1") to the corresponding pixel coordinates in INDF2 
+*     ("PIX2") is:
 *
 *        PIX2 = MATRIX . PIX1 + OFFSET 
 *
@@ -33,12 +32,13 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The number of dimensions. This should be the value returned by
-*        NDF_BOUND, and should be the same for both INDF1 and INDF2.
+*        NDF_BOUND for INDF2.
 *     INDF1 = INTEGER (Given)
-*        An identifier for the source NDF. This should have NDIM axes.
+*        An identifier for the source NDF. If this does not have NDIM pixel 
+*        axes, a NDF section with NDIM axes will be obtained from the
+*        supplied NDF.
 *     INDF2 = INTEGER (Given)
-*        An identifier for the destination NDF. This should also have NDIM 
-*        axes.
+*        An identifier for the destination NDF. This must have NDIM pixel axes.
 *     MATRIX( NDIM, NDIM ) = DOUBLE PRECISION (Given)
 *        The matrix connecting PIX1 and PIX2.
 *     OFFSET( NDIM ) = DOUBLE PRECISION (Given)
@@ -53,6 +53,8 @@
 *  History:
 *     10-JUN-1998 (DSB):
 *        Original version.
+*     24-AUG-2005 (DSB):
+*        Allow the source NDF to have a different number of pixel axes.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,6 +92,7 @@
       INTEGER I                  ! Loop count
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
+      INTEGER INDF1S             ! Identifier for a section of the input NDF
       INTEGER IPIX1              ! Index of PIXEL Frame in input WCS
       INTEGER IPIX2              ! Index of PIXEL Frame in output WCS
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
@@ -107,17 +110,9 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check that the input NDF has the specified number of dimensions.
+*  Ensure that the input NDF has the specified number of dimensions.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, ND, STATUS )
-      IF( ND .NE. NDIM .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF1 ) 
-         CALL MSG_SETI( 'NDIM', NDIM )
-         CALL MSG_SETI( 'ND', ND )
-         CALL ERR_REP( 'KPG1_ASPRP_1', 'KPG1_ASPRP: Programming error'//
-     :                 ' - argument NDIM specifies ^NDIM axes, but '//
-     :                 '''^NDF'' (INDF1) has ^ND axes.', STATUS )
-      END IF
+      CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF1S, STATUS )
 
 *  Check that the output NDF has the specified number of dimensions.
       CALL NDF_BOUND( INDF2, NDF__MXDIM, LBND, UBND, ND, STATUS )
@@ -156,7 +151,7 @@
 *  Get the WCS FrameSet from the input NDF. If no WCS component is
 *  present in the NDF, an attempt is made to create a WCS FrameSet from
 *  any IRAS90 astrometry structure, or FITS extension in the NDF.
-      CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
+      CALL KPG1_GTWCS( INDF1S, IWCS1, STATUS )
 
 *  Loop round Frames in the FrameSet, until the PIXEL Frame is found
 *  with the specified number of axes.
@@ -262,6 +257,9 @@
 
 *  Store the FrameSet as the WCS component in the output NDF.
       CALL NDF_PTWCS( IWCS1, INDF2, STATUS )
+
+*  Free resources.
+      CALL NDF_ANNUL( INDF1S, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
