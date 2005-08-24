@@ -166,7 +166,8 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     24-AUG-2005 (DSB):
-*        Corrected to work with 1D NDFs.
+*        Corrected to work with 1D NDFs. Also treat zero rotation as a
+*        special case.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -404,8 +405,13 @@
       END DO
 
 *  Look for the special cases.
+*  A simple 0-degree rotation...
+      IF ( ABS( ANGLE ) .LT. VAL__SMLR ) THEN
+         NUMRA   =  0
+         NRAFLG  = .FALSE.
+
 *  A simple 90-degree rotation...
-      IF ( ABS( ANGLE - 90.0 ) .LT. VAL__SMLR ) THEN
+      ELSE IF ( ABS( ANGLE - 90.0 ) .LT. VAL__SMLR ) THEN
          NUMRA   =  1
          NRAFLG  = .FALSE.
 
@@ -441,7 +447,7 @@
 
 *  A rotation angle divisible by 90.0 degrees has been requested;
 *  proceed according to the set value of NUMRA.
-         IF ( NUMRA .EQ. 2 ) THEN
+         IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
 
 *  A 180-degree rotation so output dimensions are same as the work (or
 *  input) dimensions.  The array components are copied so the section
@@ -505,10 +511,10 @@
 *  Create a section from the input NDF of the size of the required NDF.
       CALL NDF_SECT( NDFI, IDIM, LBNDO, UBNDO, NDFS, STATUS )
 
-*  Create the output NDF.  One of the special cases (180-degree
+*  Create the output NDF.  Two of the special cases (0 and 180-degree
 *  rotation) needs the array components to be copied.  Axes will be
 *  overwritten later for right-angle multiples.
-      IF ( NUMRA .EQ. 2 ) THEN
+      IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
          CALL LPG_PROP( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS',
      :                   'OUT', NDFO, STATUS )
 
@@ -748,7 +754,7 @@
 *  update access for these.  PSX_CALLOC does not allow one- and two-byte
 *  integers.
             IF ( THERE ) THEN      
-               IF ( NUMRA .EQ. 2 ) THEN
+               IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                   CALL NDF_TYPE( NDFI, COMP( ICOMP ), TYPE, STATUS )
                ELSE
                   CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', NDFI, NDFI,
@@ -758,7 +764,7 @@
                CALL KPG1_MAP( NDFI, COMP( ICOMP ), TYPE, 'READ', PNTRI,
      :                        EL, STATUS )
 
-               IF ( NUMRA .EQ. 2 ) THEN
+               IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                   CALL KPG1_MAP( NDFO, COMP( ICOMP ), TYPE, 'UPDATE',
      :                           PNTRO, EL, STATUS )
                ELSE
@@ -766,8 +772,11 @@
      :                           PNTRO, EL, STATUS )
                END IF
 
+*  Rotation is through 0 degrees - do nothing.
+               IF ( NUMRA .EQ. 0 ) THEN
+
 *  Rotation is through 180 degrees
-               IF ( NUMRA .EQ. 2 ) THEN
+               ELSE IF ( NUMRA .EQ. 2 ) THEN
 
 *  Call the appropriate routine to generate the output array for a
 *  180-degree rotation, depending on its numeric type.
@@ -914,7 +923,7 @@
 *  Output array depends on the rotation angle.  For 180 degrees the
 *  axes are flipped.  For 90 and 270 degrees there is an interchange
 *  as well.
-                  IF ( NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                      CALL NDF_AMAP( NDFO, ACOMP( ICOMP ), SDIM( 1 ),
      :                              TYPE, 'WRITE', PNTRO, EL, STATUS )
                   ELSE
@@ -1035,7 +1044,7 @@
 *  Unmap the input and output axis arrays.
                   CALL NDF_AUNMP( NDFI, ACOMP( ICOMP ), SDIM( 1 ),
      :                            STATUS )
-                  IF ( NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                      CALL NDF_AUNMP( NDFO, ACOMP( ICOMP ), SDIM( 1 ),
      :                               STATUS )
                   ELSE
@@ -1061,7 +1070,7 @@
 *  Output array depends on the rotation angle.  For 180 degrees the
 *  axes are flipped.  For 90 and 270 degrees there is an interchange
 *  as well.
-                  IF ( NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                      CALL NDF_AMAP( NDFO, ACOMP( ICOMP ), SDIM( 2 ),
      :                              TYPE, 'WRITE', PNTRO, EL, STATUS )
                   ELSE
@@ -1182,7 +1191,7 @@
 *  Unmap the input and output axis arrays.
                   CALL NDF_AUNMP( NDFI, ACOMP( ICOMP ), SDIM( 2 ),
      :                            STATUS )
-                  IF ( NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
                      CALL NDF_AUNMP( NDFO, ACOMP( ICOMP ), SDIM( 2 ),
      :                               STATUS )
                   ELSE
