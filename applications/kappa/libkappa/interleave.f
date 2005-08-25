@@ -115,6 +115,11 @@
 *     structure and propagates all extensions. 
 *     -  The AXIS centre, width and variance values in the output are
 *     formed by interleaving the corresponding input AXIS values. 
+*     Each array element is assigned from the first applicable NDF.
+*     For example, for a two-dimensional array with expansion factors of
+*     2 and 3 respectively, the first two NDFs would be used to define
+*     the array elements for the first axis.  The second axis's elements
+*     come from the first, third, and fifth NDFs.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
 
@@ -125,6 +130,8 @@
 *  History:
 *     2005 August 11 (MJC):
 *        Original version.
+*     2005 August 25 (MJC):
+*        Complete axis interleaving.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -148,6 +155,8 @@
 
 *  Local Variables:
       INTEGER ACTVAL             ! Actual number of expansion factors
+      INTEGER AENDF( NDF__MXDIM ) ! Axis expansion indices for current
+                                 ! NDF
       INTEGER AEXPND( NDF__MXDIM ) ! Axis expansion factors
       INTEGER AFIRST( NDF__MXDIM )! Indices in output axis array of the
                                  ! first interleave-axis-array element
@@ -168,6 +177,8 @@
       INTEGER ELO                ! Number of elements in mapped output
                                  ! array
       CHARACTER FILL * ( 4 )     ! Initialize data values: bad or zero
+      LOGICAL FILLAX             ! Fill axis array for the current
+                                 ! NDF and axis?
       INTEGER FIRST( NDF__MXDIM )! Indices in output array of the
                                  ! first interleave-array element
       INTEGER FLBND( NDF__MXDIM )! Minimum indices in output array of
@@ -180,6 +191,7 @@
                                  ! input NDFs
       INTEGER IPNDF( NDF__MXDIM )! Pointer to input NDF identifiers
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
+      INTEGER J                  ! Loop counter for the dimensions
       INTEGER LARR               ! Loop counter for array components
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDM( NDF__MXDIM ) ! Lower bounds of mask NDF
@@ -499,8 +511,8 @@
             ALIST( NARR ) = 'Centre'
 
 *  Test for Axis VARIANCE and WIDTH.
-            CALL NDF_ASTAT( NDFI, 'Variance', AVAR, STATUS )
-            CALL NDF_STATE( NDFI, 'Width', WIDTH, STATUS )
+            CALL NDF_ASTAT( NDFI, 'Variance', 1, AVAR, STATUS )
+            CALL NDF_ASTAT( NDFI, 'Width', 1, WIDTH, STATUS )
 
 *  Append to list of array components as needed.
             IF ( AVAR ) THEN
@@ -522,6 +534,7 @@
                AFIRST( I ) = 1
                AIDIMS( I ) = 1
                AODIMS( I ) = 1
+               AENDF( I ) = 1
             END DO
 
 *  Process each dimension separately.
@@ -532,82 +545,105 @@
                AFLBND( 1 ) = 1
                AIDIMS( 1 ) = IDIMS( IAXIS )
                AODIMS( 1 ) = ODIMS( IAXIS )
+               AFIRST( 1 ) = FIRST( IAXIS )
 
 *  Determine the axis-array `origin' for the current NDF.
 *  ======================================================
 
-*  These cycle from 1 to EXPAND( IAXIS ).
-               CALL KPG1_VEC2N( 1, CNDF, 1, AFLBND( IAXIS ), 
-     :                          AEXPND( IAXIS ), AFIRST, STATUS )
+*  We want to determine the n-dimensional array indices within a box
+*  with dimensions of the expansion factors, and corresponding
+*  to the current NDF.  Recall that the interleaving is in Fortran
+*  order.
+               CALL KPG1_VEC2N( 1, CNDF, NDIM, AFLBND, 
+     :                          AEXPND, AENDF, STATUS )
 
-               DO LARR = 1, NARR
+*  The axis arrays are filled by the first NDF that applies.
+*  The first NDF always fills the axis arrays along each axis.
+*  For others, the axis array is only filled when its indices are
+*  all one except along the current (IAXIS) axis.
+               FILLAX = CNDF .EQ. 1
+               IF ( .NOT. FILLAX ) THEN
+                  FILLAX = .TRUE.
+                  DO J = 1, NDIM
+                     IF ( J .NE. IAXIS ) THEN
+                        FILLAX = FILLAX .AND. AENDF( J ) .EQ. 1
+                     END IF
+                  END DO
+               END IF
+
+*  Fill the axis where needed.
+               IF ( FILLAX ) THEN
+                  DO LARR = 1, NARR
 
 *  Find the data type of the array in the primary NDF.
-                  CALL NDF_ATYPE( NDFP, ALIST( LARR ), IAXIS, ITYPE,
-     :                            STATUS )
+                     CALL NDF_ATYPE( NDFP, ALIST( LARR ), IAXIS, ITYPE,
+     :                               STATUS )
 
 *  Map the full input, and output variance arrays.
-                  CALL NDF_AMAP( NDFI, ALIST( LARR ), IAXIS, ITYPE,
-     :                           'READ', PNTRI, EL, STATUS )
-                  CALL NDF_AMAP( NDFO, ALIST( LARR ), IAXIS, ITYPE,
-     :                           WACCES, PNTRO, ELO, STATUS )
+                     CALL NDF_AMAP( NDFI, ALIST( LARR ), IAXIS, ITYPE,
+     :                              'READ', PNTRI, EL, STATUS )
+                     CALL NDF_AMAP( NDFO, ALIST( LARR ), IAXIS, ITYPE,
+     :                              WACCES, PNTRO, ELO, STATUS )
 
 *  Interleave the axis array, calling the appropriate routine for the
 *  data type.
-                  IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL KPS1_INLER( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     IF ( ITYPE .EQ. '_REAL' ) THEN
+                        CALL KPS1_INLER( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL KPS1_INLEB( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
+                        CALL KPS1_INLEB( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPS1_INLED( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+                        CALL KPS1_INLED( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL KPS1_INLEI( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+                        CALL KPS1_INLEI( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL KPS1_INLEUB( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+                        CALL KPS1_INLEUB( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL KPS1_INLEUW( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+                     ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+                        CALL KPS1_INLEUW( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
 
-                  ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL KPS1_INLEW( AEXPND, AFIRST, IDIMS, EL,
-     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                ODIMS, ELO,
-     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
-                  END IF
+                     ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+                        CALL KPS1_INLEW( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
+                     END IF
 
 *  Tidy the acis arrays.
-                  CALL NDF_AUNMP( NDFI, ALIST( LARR ), IAXIS, STATUS )
-                  CALL NDF_AUNMP( NDFO, ALIST( LARR ), IAXIS, STATUS )
-               END DO
+                     CALL NDF_AUNMP( NDFI, ALIST( LARR ), IAXIS,
+     :                               STATUS )
+                     CALL NDF_AUNMP( NDFO, ALIST( LARR ), IAXIS,
+     :                               STATUS )
+                  END DO
+               END IF
             END DO
          END IF
       END DO
