@@ -86,7 +86,7 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
-KPG_GN_GEN = kps1_inle.gn 
+KPG_GN_GEN = kps1_inle.gn kps1_inli.gn kps1_inls.gn
 
 KPG_R_GEN = kps1_pgft.gr
 
