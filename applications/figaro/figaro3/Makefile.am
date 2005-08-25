@@ -28,7 +28,7 @@ figaro3_LDADD = $(LDADD) \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
 ../ich/libfigich.la \
-`pda_link`  `agp_link_adam` `grp_link_adam` `ndf_link_adam` \
+`pda_link`  `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
 `fio_link_adam` 
 
 IFC_FILES = echselect.ifc findsp.ifc flaircomp.ifc flairext.ifc iarc.ifc \
