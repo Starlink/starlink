@@ -1,0 +1,164 @@
+      SUBROUTINE KPS1_INLI<T>( EXPAND, FIRST, ELI, INARR, ELO,
+     :                        BASE, STATUS )
+*+
+*  Name:
+*     KPG1_INLIx
+ 
+*  Purpose:
+*     Interleaves and interpolates an array into another.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPS1_INLIx( EXPAND, FIRST, ELI, INARR, ELO, BASE, STATUS )
+ 
+*  Description:
+*     This routine interleaves and inerpolates a vector onto another
+*     vector.  Values of the underlying base array are replaced by 
+*     values in the interleaved array.  Between those linear
+*     interpolation fills in the remaining values.  Origin information
+*     is used to situate the interleaved array elements.
+ 
+*  Arguments:
+*     EXPAND = INTEGER (Given)
+*        The interleave enlargement factor.  This must be positive. 
+*     FIRST = INTEGER (Given)
+*        The index of the first input array element in the output
+*        array.  This must be positive and no greater than EXPAND.
+*     ELI = INTEGER (Given)
+*        The number of elements in the array to be interleaved.
+*     INARR( ELI ) = ? (Given)
+*        The vectorised array that will be expanded on the base
+*        array.
+*     ELO = INTEGER (Given)
+*        The number of elements in the base array.
+*     BASE( ELO ) = ? (Given and Returned)
+*        The vectorised base array onto which the input array will be
+*        interleaved.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  Values before the first and last interleaved values are
+*     extrapolated from the interpolation step between the first or
+*     last two interleaved values respectively.
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     base and  arrays supplied to the routine must have the data
+*     type specified.
+*     - An error report is made should arguments EXPAND or FIRST not be
+*     positive, or should FIRST be greater than EXPAND.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     2005 August 23 (MJC):
+*        Original version.
+*     {enter_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+ 
+*  Arguments Given:
+      INTEGER ELI
+      INTEGER EXPAND
+      INTEGER FIRST
+      INTEGER ELO
+      <TYPE> INARR( ELI )
+ 
+*  Arguments Given and Returned:
+      <TYPE> BASE( ELO )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      DOUBLE PRECISION DEXP      ! Expansion factor
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      DOUBLE PRECISION LAST      ! Index of last value filled
+      DOUBLE PRECISION STEP      ! Interpolation step
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+
+*.
+ 
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First validate the expansion factor and the first element.
+      IF ( EXPAND .LT. 1. OR. FIRST .LT. 1 ) THEN
+         CALL MSG_SETI( 'EXPAND', EXPAND )
+         CALL MSG_SETI( 'FIRST', FIRST )
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPS1_INLI_ERR1', 
+     :     'Interleaving with interpolation failed because the  '/
+     :     /'expansion factor ^EXPAND or the index of the first '/
+     :     /'element to assign ^FIRST is not positive.  (Programming '/
+     :     /'error)', STATUS )
+         GOTO 999
+
+      ELSE IF ( FIRST .GT. EXPAND ) THEN
+         CALL MSG_SETI( 'EXPAND', EXPAND )
+         CALL MSG_SETI( 'FIRST', FIRST )
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPS1_INLI_ERR1', 
+     :     'Interleaving with interpolation failed because the  '/
+     :     /'index of the first element to assign ^FIRST is greater '/
+     :     /'than the expansion factor ^EXPAND (Programming error)', 
+     :     STATUS )
+         GOTO 999
+
+      END IF
+      DEXP = DBLE( EXPAND )
+
+*  Extrapolate before the first interleaved datum, using the first
+*  two input values to estimate the linear-interpolation step size.
+      IF ( FIRST .GT. 1 ) THEN
+         STEP = ( NUM_<T>TOD( INARR( 2 ) ) - 
+     :            NUM_<T>TOD( INARR( 1 ) ) ) / DEXP
+         DO I = 1, FIRST - 1
+            BASE( I ) = INARR( 1 ) -
+     :                  NUM_DTO<T>( STEP * DBLE( FIRST - I ) )
+         END DO
+      END IF
+
+*  Interleave and interpolate for the bulk of the elements.
+      DO I = 1, ELI - 1
+         STEP = ( NUM_<T>TOD( INARR( I + 1 ) ) - 
+     :            NUM_<T>TOD( INARR( I ) ) ) / DEXP
+         LAST = FIRST - 1 + ( I - 1 ) * EXPAND
+         DO J = 1, EXPAND
+            BASE( LAST + J ) = INARR( I ) +
+     :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
+         END DO
+      END DO
+
+*  Extrapolate beyond the last interleaved datum, using the last
+*  two input values to estimate the linear-interpolation step size.
+      IF ( FIRST. NE. EXPAND ) THEN
+         STEP = ( NUM_<T>TOD( INARR( ELI ) ) - 
+     :            NUM_<T>TOD( INARR( ELI - 1 ) ) ) / DEXP
+         LAST = FIRST - 1 + ( ELI - 1 ) * EXPAND
+         DO J = 1, EXPAND - FIRST + 1
+            BASE( LAST + J ) = INARR( ELI ) +
+     :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
+         END DO
+      END IF
+
+  999 CONTINUE
+      END
