@@ -1,0 +1,197 @@
+      SUBROUTINE KPS1_INLS<T>( EXPAND, FIRST, IDIMS, ELI, INARR, ODIMS, 
+     :                        ELO, BASE, STATUS )
+*+
+*  Name:
+*     KPG1_INLSx
+ 
+*  Purpose:
+*     Interleaves an array into another scaling the values by the
+*     expansion factors
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPS1_INLSx( EXPAND, FIRST, IDIMS, ELI, INARR, ODIMS, ELO, 
+*                      BASE, STATUS )
+ 
+*  Description:
+*     This routine interleaves an array onto another array.  Values of
+*     the underlying base array are replaced by values in the
+*     interleaved array divided by the product of the expansion factors.
+*     Origin information is used to situate the interleaved array
+*     elements along each axis.
+ 
+*  Arguments:
+*     EXPAND( NDF__MXDIM ) = INTEGER (Given)
+*        The interleave enlargement factors along each axis.  These 
+*        must  be positive.  Unused dimensions up to NDF__MXDIM
+*        should be set to one.
+*     FIRST( NDF__MXDIM ) = INTEGER (Given)
+*        The indices of the first input array element in the output
+*        array for each axis.  These must be positive and no greater
+*        than the corresponding EXPAND.  Unused dimensions up to 
+*        NDF__MXDIM should be set to one.
+*     IDIMS( NDF__MXDIM ) = INTEGER (Given)
+*        The dimensions of the array to be interleaved.  Unused 
+*        dimensions up to NDF__MXDIM should be set to one.
+*     ELI = INTEGER (Given)
+*        The number of elements in the array to be interleaved.
+*     INARR( ELI ) = ? (Given)
+*        The vectorised array that will be interleaved onto the base
+*        array.
+*     ODIMS( NDF__MXDIM ) = INTEGER (Given)
+*        The dimensions of the base array.  Unused dimensions up to
+*        NDF__MXDIM should be set to one.
+*     ELO = INTEGER (Given)
+*        The number of elements in the base array.
+*     BASE( ELO ) = ? (Given and Returned)
+*        The vectorised base array onto which the input array will be
+*        interleaved.  Unvectorised, it should have the dimensions of
+*        the input array multipled by the enlargement factors.
+*        by the factors
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  This routine works in n-D, where n is 1 to 7.  Even if the
+*     array has actually less dimensions there is negligible loss of
+*     efficiency to supply dummy (=1) higher dimensions.  A generic n-D
+*     using striding is likely to be slower.
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     base and  arrays supplied to the routine must have the data
+*     type specified.
+ 
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     2005 August 16 (MJC):
+*        Original version based upon KPG1_INLEx.
+*     {enter_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+ 
+*  Arguments Given:
+      INTEGER ELI
+      INTEGER EXPAND( NDF__MXDIM )
+      INTEGER FIRST( NDF__MXDIM )
+      INTEGER IDIMS( NDF__MXDIM )
+      INTEGER ELO
+      INTEGER ODIMS( NDF__MXDIM )
+      <TYPE> INARR( ELI )
+ 
+*  Arguments Given and Returned:
+      <TYPE> BASE( ELO )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      INTEGER B                  ! Pixel index of the modified array
+      INTEGER I1, I2, I3, I4     ! n-d pixel indices of the array to
+      INTEGER I5, I6, I7         ! interleave
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      INTEGER P                  ! Pixel index of the interleaved array
+      INTEGER STRID( NDF__MXDIM )! Dimension strides for interleaved
+                                 ! pixels
+      INTEGER STRIDO( NDF__MXDIM ) ! Dimension strides for base pixels
+      <TYPE> TOTEXP              ! Product of the expansion factors
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+
+*.
+ 
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Initialise the stride of dimension number 1 for the base array. (The
+*  stride for a dimension is the amount by which the vectorised array
+*  index increases when the n-dimensional array index for that
+*  dimension increases by 1.)
+      STRID( 1 ) = EXPAND( 1 )
+      STRIDO( 1 ) = 1
+ 
+*  Calculate the stride for each remaining dimension.
+      DO J = 2, NDF__MXDIM
+         STRID( J ) = ODIMS( J - 1 ) * EXPAND( J )
+         STRIDO( J ) = STRIDO( J - 1 ) * ODIMS( J - 1 )
+      END DO
+ 
+*  Find the origin within the base array where the input array is going
+*  to be interleaved.
+      B = FIRST( 1 )
+      DO J = 2, NDF__MXDIM
+         B = B + ( FIRST( J ) - 1 ) * STRIDO( J )
+      END DO
+
+*  Obtain the total expansion factor.  This does assume that the
+*  expansion factors will not be larger than the data type
+*  will permit.
+      TOTEXP = 1<CONST>
+      DO I = 1, NDF__MXDIM
+         TOTEXP = TOTEXP * NUM_ITO<T>( EXPAND( I ) )
+      END DO
+
+*  Initialise the pixel index of the interleaved array.
+      P = 1
+ 
+*  Copy the data from the input array to the base array.  As the
+*  values are copied increment the index of the base array accordingly.
+*  There are two processing paths: whether or not bad-pixel testing is
+*  required.
+ 
+*  Interleave the data values regardless of value.
+*  ===============================================
+      DO I7 = 1, IDIMS( 7 )
+         DO I6 = 1, IDIMS( 6 )
+            DO I5 = 1, IDIMS( 5 )
+               DO I4 = 1, IDIMS( 4 )
+                  DO I3 = 1, IDIMS( 3 )
+                     DO I2 = 1, IDIMS( 2 )
+                        DO I1 = 1, IDIMS( 1 )
+ 
+*  Interleavee the input array to the base array.
+                           BASE( B ) = INARR( P ) / TOTEXP
+ 
+*  Move to the next pixel by shifting the input pixel index along by one.
+*  (For the input array the stride of the first dimension is 1 and the
+*  zeroth is 0---see pattern below).  This corresponds to the enlarged
+*  stride in the base array.
+                           B = B + STRID( 1 )
+                           P = P + 1
+                        END DO
+ 
+*  Move to the next input pixel to be interleaved, skipping a stride, less
+*  the number already read from the lower stride each time a dimension's
+*  pixel index is incremented.
+                        B = B + STRID( 2 ) - STRID( 1 ) * IDIMS( 1 )
+                     END DO
+                     B = B + STRID( 3 ) - STRID( 2 ) * IDIMS( 2 )
+                  END DO
+                  B = B + STRID( 4 ) - STRID( 3 ) * IDIMS( 3 )
+               END DO
+               B = B + STRID( 5 ) - STRID( 4 ) * IDIMS( 4 )
+            END DO
+            B = B + STRID( 6 ) - STRID( 5 ) * IDIMS( 5 )
+         END DO
+         B = B + STRID( 7 ) - STRID( 6 ) * IDIMS( 6 )
+      END DO
+ 
+      END
