@@ -74,6 +74,7 @@ C
 C
 C     See if we are to read the old file
 C
+      FILE = ' '
       NLID=0
       IF (PREV) THEN
          FILENAME=ARFILE
