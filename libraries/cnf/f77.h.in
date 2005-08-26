@@ -174,6 +174,8 @@
 *      7-JAN-2000 (AJC):
 *        Correct omission of F77_ASSOC_UBYTE_ARRAY
 *        Correct F77_EXPORT_UWORD_ARRAY
+*      25-AUG-2005 (TIMJ):
+*        Add cnfInitRTL
 *     {enter_further_changes_here}
 *        
 
@@ -933,6 +935,7 @@
 *-
 ------------------------------------------------------------------------------
 */
+void cnfInitRTL( int, char** );
 void *cnfCalloc( size_t, size_t );
 void cnfCopyf( const char *source_f, int source_len, char *dest_f,
                 int dest_len );

@@ -3,9 +3,11 @@
 dist_bin_SCRIPTS = cnf_link cnf_link_adam
 include_HEADERS = CNF_PAR f77.h cnf.h
 
-lib_LTLIBRARIES = libcnf.la
+lib_LTLIBRARIES = libcnf.la libcnfrtl.la
 libcnf_la_SOURCES = \
 	$(C_ROUTINES)
+
+libcnfrtl_la_SOURCES = $(RTL_ROUTINES)
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
@@ -25,6 +27,8 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfImpb.c cnfImpbn.c cnfImpch.c cnfImpla.c cnfImpn.c cnfImprt.c \
     cnfImprta.c cnfImprtap.c cnfLenc.c cnfLenf.c \
     cnfMem.c oldnames.c
+
+RTL_ROUTINES = cnfInitRTL.c
 
 # cnf.h is the old name for f77.h.  cnf.h is now deprecated, but we
 # should continue to install it for the sake of old code.  See f77.h
@@ -55,8 +59,8 @@ TEST_FILES = cnf_test.c \
              f_calls_c_main.f f_calls_c_sub.c \
              c_calls_f_main.c c_calls_f_sub.f
 
-TESTS = cnf_test f_calls_c c_calls_f
-check_PROGRAMS = cnf_test f_calls_c c_calls_f
+TESTS = cnf_test f_calls_c c_calls_f c_calls_f_args
+check_PROGRAMS = cnf_test f_calls_c c_calls_f c_calls_f_args
 
 cnf_test_SOURCES = cnf_test.c
 cnf_test_LDADD = libcnf.la
@@ -66,6 +70,9 @@ f_calls_c_LDADD = libcnf.la
 
 c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f
 c_calls_f_LDADD = libcnf.la @FCLIBS@
+
+c_calls_f_args_SOURCES = c_calls_f_args.c f_receive_args.f
+c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@
 
 dist_starnews_DATA = cnf.news
 

@@ -25,6 +25,7 @@ AC_FC_MAIN
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
+STAR_INITIALISE_FORTRAN
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests
