@@ -63,7 +63,7 @@ write_ndf.pro: convert_idl.la write_ndf.pro.in
 EXTRA_DIST = read_ndf.pro.in  write_ndf.pro.in idl2hds.pro addnames.pro \
              convert_idl.dlm 
 
-MISC_BUILT_FILES = version.dat addnames.pro idl2hds.pro read_ndf.pro write_ndf.pro
+MISC_BUILT_FILES = version.dat read_ndf.pro write_ndf.pro
 
 CLEANFILES = $(MISC_BUILT_FILES)
 
