@@ -644,7 +644,7 @@ sub contactw {
  # system(::Init).
  my $timeout = $Starlink::AMS::Core::TIMEOUT;
  my $err_hide = $Starlink::AMS::Core::err_hide;
- my $stderr   = *Starlink::AMS::Core::ERRHAND;
+ my $stderr   = $Starlink::AMS::Core::ERRHAND;
 
  # Check
  while (! $self->contact) {

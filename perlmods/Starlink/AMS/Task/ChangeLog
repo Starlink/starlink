@@ -1,3 +1,7 @@
+2005-08-29  Tim Jenness <t.jenness@jach.hawaii.edu>
+
+	* Task.pm: Fix ERRHAND reference
+
 1998-07-04  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Task.pm (obeyw): Check to see whether @_ is there before
