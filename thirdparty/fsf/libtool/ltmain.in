@@ -738,7 +738,7 @@ if test -z "$show_help"; then
     qlibobj=`$echo "X$libobj" | $Xsed -e "$sed_quote_subst"`
     case $qlibobj in
       *$quote_scanset* | *]* | *\|* | *\&* | *\(* | *\)* | "")
-	qlibobj="\"$qlibobj\"" ;;
+	qlibobj="$qlibobj" ;;
     esac
     if test "X$libobj" != "X$qlibobj"; then
 	$echo "$modename: libobj name \`$libobj' may not contain shell special characters."

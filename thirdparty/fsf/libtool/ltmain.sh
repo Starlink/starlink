@@ -44,7 +44,7 @@ EXIT_FAILURE=1
 PROGRAM=ltmain.sh
 PACKAGE=libtool
 VERSION=1.5.18
-TIMESTAMP=" (1.1220.2.245 2005/05/16 08:55:27)"
+TIMESTAMP=" (1.1.1.4 2005/07/21 14:39:23)"
 
 # See if we are running on zsh, and set the options which allow our
 # commands through without removal of \ escapes.
@@ -738,7 +738,7 @@ if test -z "$show_help"; then
     qlibobj=`$echo "X$libobj" | $Xsed -e "$sed_quote_subst"`
     case $qlibobj in
       *$quote_scanset* | *]* | *\|* | *\&* | *\(* | *\)* | "")
-	qlibobj="\"$qlibobj\"" ;;
+	qlibobj="$qlibobj" ;;
     esac
     if test "X$libobj" != "X$qlibobj"; then
 	$echo "$modename: libobj name \`$libobj' may not contain shell special characters."
