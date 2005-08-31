@@ -1,0 +1,180 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     grp
+
+#  Purpose:
+#      List the files in a (RCS) repository group.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command lists the contents of a group (or groups) of files in the
+#     repository on the standard output.
+#
+#     Groups of files may be defined in a standard file with a makefile-like
+#     format which resides in the repository and is identified by the
+#     GRP_MAKE environment variable (the file grp.make is used by default
+#     if this variable is not defined). See the "Group Makefile" section for
+#     details of the file format.  Any number of different groups may be
+#     defined with any number of files within them. Groups may also be nested.
+
+#  Invocation:
+#     grp group
+
+#  Parameters:
+#     group
+#        The name of the group whose contents are to be listed (case
+#        insensitive). A space-separated list of groups may also be given.
+
+#  Examples:
+#     grp code
+#        This lists the contents of the group "code", one per line, on the
+#        standard output.
+#
+#     grp fortran_routines c_routines
+#        This lists the combined contents of two groups on the standard output.
+#
+#     fetch `grp documentation`
+#        This executes the "fetch" command on all the elements in the group
+#        "documentation".
+
+#  Notes:
+#     -  Each file appears only once in the output list, even if it is
+#     selected more than once by the group(s) specified.
+#
+#     -  The output list is sorted alphabetically.
+#
+#     -  If output is to a terminal, then each file will be listed on a
+#     separate line. Otherwise, a space-separated list of elements is produced,
+#     suitable for supplying to other commands.
+#
+#     -  Files which appear in the definition of groups need not necessarily
+#     exist within the repository, athough usually they will do so.
+#
+#     -  At present there are no SDT commands for maintaining the contents
+#     of group makefiles. This must be done by editing them with a text
+#     editor.
+
+#  Prior Requirements:
+#     A group makefile (see below) should have been created and stored in the
+#     repository. If this file is not called grp.make, then the environment
+#     variable GRP_MAKE should be defined to hold its name (normally this will
+#     be done in the package's .sdtrc initialisation file).
+
+#  Group Makefile:
+#     This is a text file with the format of a description file for the "make"
+#     utility, which is used in the following way:
+#     
+#        -  The file should contain a make macro definition for each group
+#        required (the name of the macro defines the name of the group, its
+#        value specifies the group contents). Within this file, group names
+#        should all be in upper case.
+#
+#        -  Groups may be nested inside others by substituting their macro
+#        expansions in the definitions of other groups.
+#
+#        -  The file should contain only one target, defined by the
+#        single line:
+#
+#           $(action)
+#
+#        at the end of the file.
+#
+#     The following is an example of a simple group makefile which defines
+#     three groups A, B and C, with C containing both A and B:
+#
+#        A = a b c d
+#        B = p q r s
+#        C = $(A) $(B) x y z
+#        $(action)
+
+#  Notes:
+#     This could probably be implemented using states in RCS.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-DEC-1993 (RFWS):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Obtain the list of groups required.
+      groups="${*}"
+
+#  Exit with an error message if no groups have been given.
+      if test "${groups}" = ""; then
+         echo 'grp: no group(s) given' >&2
+         exit 1
+
+#  Initialise "action" which will contain a rule for make to execute. Use the
+#  .DEFAULT target (to prevent any clash with existing filenames) and have it
+#  execute an "echo" command which will be followed by the list of groups.
+      else
+         action='.DEFAULT:; @ echo'
+
+#  Convert each group name to upper case and append it to the end of the
+#  action target, enclosing it with $(...) so that make will expand it.
+         for group in ${groups}; do
+            group=`echo "${group}" | tr [a-z] [A-Z]`
+            action="${action} \$(${group})"
+
+#  Set any environment variable of the same name to a null string to prevent
+#  accidental use by make.
+            export ${group}
+            eval ${group}=''
+         done
+
+#  Export required environment variables.
+         export GRP_MAKE
+         export MAKEFILE
+
+#  Supply a default for GRP_MAKE if necessary.
+         if test "${GRP_MAKE}" = ""; then
+            GRP_MAKE='grp.make'
+         fi
+
+#  Ensure that the reference copy of the group makefile is up to date.
+         ${SDT_DIR}/refup "${GRP_MAKE}"
+
+#  Get the full group makefile name.
+         MAKEFILE="${PKG_REF}/${GRP_MAKE}"
+
+#  If output is to a terminal, invoke make using the group makefile as its
+#  description file and defining the macro "action" as required. Pipe the
+#  result through tr (to convert spaces to newlines), sort (to sort
+#  alphabetically) and uniq (to remove any duplicate elements). Finally use
+#  awk again to ensure one element on each output line.
+#         if test -t 1; then
+            make -s -r -f "${MAKEFILE}" action="${action}" targ | \
+               tr ' ' '\12' | sort | uniq | awk '{if($0!="")print $0}'
+
+#  If output is not to a terminal, then use the same process except for the
+#  final invocation of awk, which produces a space-separated list.
+#         else
+#            make -s -f "${MAKEFILE}" action="${action}" XXXXX | \
+#               tr ' ' '\12' | sort | uniq | \
+#               awk '{if($0!=""){if(i++)printf" ";printf"%s",$0}}'
+#         fi
+      fi
+
+#  End of script.
+      exit

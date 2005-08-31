@@ -1,0 +1,108 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     purpose
+
+#  Purpose:
+#     Extract the purposes of a list of files and sets their details.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure processes a list of files from an RCS repository, 
+#     extracting their "Purpose:" strings. These strings are then used to
+#     set the "details' of a file (using the "describe" command). It
+#     allows "wild-card" file name expansion based on the complete set
+#     of files in the repository.
+#
+#     The "Purpose:" strings are assumed to start on the next line after 
+#     any occurence of the string "Purpose:" (case sensitive). 
+#     These lines are assumed to be started with a comment character
+#     which is ignored. All lines until the first blank (excluding the
+#     comment delimeter) line is met are used as the routine description.
+
+#  Invocation:
+#     purpose filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to have their descriptions set.
+#        (normally a "wild-card" is given).
+
+#  Examples:
+#     purpose myprog.f
+#        Locates the purpose string of the routine myprog.f and sets 
+#        its details using this value.
+#
+#     res *.f
+#        Sets the purpose of all the file "*.f" in the repository.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     PWD: Peter W. Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-JUL-1994 (PWD):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Supply help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test "${filespec}" = ""; then
+         echo 'purpose: no file specification given' >&2
+         exit 1
+      else
+
+#  Now expand the file specification and fetch each file -- one
+#  at a time.
+         files=`${SDT_DIR}/showel "${filespec}"`
+	 for file in $files ; do 
+
+#  Fetch a copy of the file. This goes into a temporary file named
+#  .sdt_$$.tmp
+            co -q -p $file > .sdt_$$.tmp
+
+#  Now look for a "Purpose:" string.
+            purpose=`cat .sdt_$$.tmp | \
+                      awk '{ if ( $NF == "Purpose:" ) {
+                                while ( NF > 1 ) {
+                                   getline
+                                   for ( i = 2; i <=NF; i++ ) {
+                                      if ( $i != "\n" )  
+			                 printf("%s ",$i)
+			           }
+                                }
+		                printf("\n")
+                             }
+                           }'`
+
+#  And add the description which we've found.
+            describe $file "$purpose"
+
+#  Remove the temporary file.
+            rm -f .sdt_$$.tmp
+         done
+      fi
+
+#  End of script.
+      exit

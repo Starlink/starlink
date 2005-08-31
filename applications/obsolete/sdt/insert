@@ -1,0 +1,110 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     insert
+
+#  Purpose:
+#     Insert files into a (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure creates new entries in the repository for the named
+#     files, which may subsequently be accessed using other SDT repository
+#     commands (e.g. "res", "fetch", etc.). The reference copy directory 
+#     is updated to reflect the new entries.
+
+#  Invocation:
+#     insert filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be inserted into the repository.
+
+#   Examples:
+#      insert *.c
+#         Inserts all the C (.c) files in the current working directory into
+#         the repository. If successful, this command will result in these
+#         files being removed (copies may then be obtained using the "fetch"
+#         or "res" commands).
+
+#   Notes:
+#     When RCS creates new entries for the specified files, a copy of each
+#     file is created in the working directory (called a comma file, with a
+#     comma prefixed to its file name). The "insert" command then obtains a
+#     copy of the file from the repository and compares it with the comma file.
+#     If they are equal, both files are deleted. Otherwise, an error has
+#     occurred, so both files are left in place and a warning is issued.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     PDRAPER: P.W. Draper (Durham University - Starlink)
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-OCT-1993 (PDRAPER):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue. Retrieve file for comparison without keyword
+#        expansion.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS.
+#     23-APR-1998 (RFWS):
+#        Merged with recent developments from the SCCS version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Supply help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test "${filespec}" = ""; then
+         echo 'insert: no file specification given' >&2
+         exit 1
+      else
+
+#  Check that the RCS link is present to the repository.
+         ${SDT_DIR}/rcslink || exit 1
+
+#  Create a comma version for each file.
+         for file in ${filespec}; do
+            ln "${file}" ",${file}"
+
+# Create an entry in the repository.
+            ci -q -i -m"Initial version" -t-"(none)" "${file}"
+
+#  Now check the comma file against the repository one. Obtain a copy
+#  of the repository file (without keyword expansion).
+            co -q -kk "${file}"
+
+#  Compare the two files. If they are the same, remove them and echo
+#  the file name to indicate success.
+            if cmp -s "${file}" ",${file}"; then
+               rm -f "${file}" ",${file}"
+               echo "${file}"
+            else
+
+#  If they differ, something horrible must have happened, so alert the user.
+               echo "insert: file ${file} not inserted into repository \
+correctly (local copy retained)" >&2
+            fi
+         done
+
+#  Keep the reference directory up to date.
+         ${SDT_DIR}/refup "${filespec}"
+      fi
+
+#  End of script.
+      exit

@@ -1,0 +1,173 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     rmk
+
+#  Purpose:
+#     Invoke make on the reference directory makefile.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This command may be used to invoke the "make" utility to build (etc.) a
+#     development version of a software package. It corresponds to the "mk"
+#     script which normally accompanies the released version of such a package,
+#     but runs "make" within the reference copy directory. It also uses a
+#     makefile residing in that directory.
+
+#  Invocation:
+#     rmk target
+
+#  Parameters:
+#     target
+#        The name of the target (or a space-separated list of targets) which
+#        "make" is to bring up to date within the reference copy directory.
+
+#  Examples:
+#     rmk build
+#        Brings the "build" target up to date in the reference copy directory.
+
+#  Prior Requirements:
+#     A suitable makefile, defining the targets and rules to be used within
+#     the reference copy directory, should have been stored in the repository.
+#     The default name for this file is normally "makefile" (i.e. the standard
+#     makefile associated with the package), but this may be changed to allow
+#     a purpose-built makefile to be used for development purposes (this will
+#     normally be the case for development systems initialised by the "newdev"
+#     command, for instance).
+
+#  Specifying a Different Makefile:
+#     An alternative makefile may be specifed by defining the environment
+#     variable REF_MAKE to give its name. This should normally be done in
+#     the package's .sdtrc initialisation file in the working development
+#     directory. If this variable is not defined, then the value ${REL_MAKE}
+#     (specifying the "release" makefile) is used. If REL_MAKE is also not
+#     defined, then "makefile" is used by default.
+#
+#     Note that development systems initialised by the "newdev" command will
+#     normally have REF_MAKE set to "ref.make" in their template .sdtrc file
+#     and a corresponding (dummy) makefile inserted into their repository.
+
+#  Environment Variables:
+#     rmk will invoke "make" with the -e option, so that externally defined
+#     environment variables will override macros defined within the makefile.
+#     Unlike the "mk" scripts which accompany the release versions of
+#     makefiles, however, rmk will not itself define environment variables to
+#     correspond with the standard platform-specific make macros (FFLAGS, FC,
+#     etc.). Instead, these will be inherited directly from the development
+#     setup (they will normally be defined when the "dev" command is used to
+#     log in for development, and possibly re-defined in the package's .sdtrc
+#     file).
+#
+#     Before invoking make, rmk will add MAKEFILE to the environment to
+#     identify the full name (including path) of the makefile being used (this
+#     may be used within the makefile itself to invoke make recursively if
+#     required). It will also ensure that values are defined for the following
+#     environment variables, supplying defaults if necessary:
+#
+#        REL_MAKE
+#           Name of the standard makefile that accompanies a release of the
+#           software package (defaults to "makefile").
+#        REF_MAKE
+#           Name of the reference copy directory makefile - i.e. the makefile
+#           currently being used (defaults to the value of REL_MAKE).
+#
+#     These values can be used within development makefiles along with
+#     other standard SDT environment variables (like PKG) and invocations of
+#     SDT commands. This allows much of the package-dependence to be removed
+#     so that development makefiles can be re-used for other packages.
+
+#  Recommended Use:
+#     To avoid duplicating the standard package makefile, it is recommended
+#     that its targets be used as far as possible during development work (this
+#     also has the advantage of validating these targets to some extent). One
+#     way of doing this is simply to accept the default choice of makefile
+#     (i.e. not to define REL_MAKE), and to let rmk use the standard "release"
+#     makefile as it stands.
+#
+#     However, some targets may need to differ during development work (over
+#     and above the changes that can be affected through the normal use of make
+#     macros) and some additional targets may also be required. This can be
+#     achieved by defining a new makefile for use in the reference copy
+#     directory, storing it in the repository, and setting the environment
+#     variable REF_MAKE (in the .sdtrc file) to identify it. This is the
+#     arrangement produced by the "newdev" command.
+#
+#     The reference directory makefile can be used to define (or re-define)
+#     targets for development work, but can also "inherit" targets from the
+#     release makefile by using .DEFAULT to pass unrecognised targets on to it.
+#     For instance a reference directory makefile like:
+#
+#        grunge:   ; <rules for target grunge>
+#        zappit:   ; <rules for target zappit>
+#        monster:  ; <rules for target monster>
+#        .DEFAULT: ; @ $(MAKE) -e -f $(REL_MAKE) $@
+#
+#     would result in the "build" target being handled by the release version
+#     of the makefile.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-NOV-1993 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Export required environment variables.
+      export MAKEFILE
+      export REL_MAKE
+      export REF_MAKE
+
+#  Supply a default for REL_MAKE if required.
+      if test "${REL_MAKE}" = ""; then
+         REL_MAKE='makefile'
+      fi
+
+#  Supply a default for REF_MAKE if requird.
+      if test "${REF_MAKE}" = ""; then
+         REF_MAKE="${REL_MAKE}"
+      fi
+
+      grp_make=''
+      if test -n "${GRP_MAKE}"; then
+         grp_make="-f ${GRP_MAKE} "
+      fi
+      
+#  Update the reference copy of the makefile(s).
+#      files="${REF_MAKE}"
+#      if test ! "${REF_MAKE}" = "${REL_MAKE}"; then
+#         files="${files} ${REL_MAKE}"
+#      fi
+#      ${SDT_DIR}/refup "${files}"
+
+#  Set MAKEFILE to the full name of the reference directory makefile.
+      cat ${PKG_DIR}/ref/${GRP_MAKE} ${PKG_DIR}/ref/${REF_MAKE} >/tmp/rmk.tmp$$
+      MAKEFILE="/tmp/rmk.tmp$$"
+#      MAKEFILE="${PKG_DIR}/ref/${REF_MAKE}"
+
+#  Dummy "action" for the GRP_MAKE makefile file.
+      action='a_not_very_useful_target:'
+      export action
+
+#  Go to the reference copy directory and invoke make.
+      cd ${PKG_DIR}/ref
+      make -e -f ${MAKEFILE} $*
+      rm -f ${MAKEFILE}
+
+#  End of script.
+      exit

@@ -1,0 +1,113 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     class
+
+#  Purpose:
+#     Create a class reference in the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command takes a snapshot of a set of files in the repository,
+#     recording their current (highest) version numbers and associating
+#     them with a symbolic string. This string can then be used to 
+#     recall copies of all the files at the current time.
+
+#  Invocation:
+#     class tag [filespec]
+
+#  Parameters:
+#     tag
+#        The symbolic string to be used to tag the files. These
+#        can be recalled using the "co -rtag RCS/*" command.
+#     filespec
+#        An optional list of files in the repository whose current highest
+#        version number is to be recorded. If pattern matching characters are
+#        included, they will be expanded using the complete set of files in
+#        the repository. If this is omitted, all files in the respository are
+#        recorded.
+
+#  Examples:
+#     class V4-1-6
+#        Records the most recent version number of every file in the
+#        repository using the tag V4-1-6. Note that the characters
+#        in this string is restricted ("." is definitely not allowed).
+#
+#     class tmp_state *.f
+#        Records the most recent version number of every Fortran (.f) file in
+#        the repository in the file tmp.class.
+#
+#     class docs_class `grp documentation`
+#        Records the most recent version number of all the files in the
+#        "documentation" group in the file docs_class (see the "grp" command
+#        for further details).
+
+#  Recommended Usage:
+#     It is recommended that classes be used to record details of
+#     released versions (etc.) of software systems. 
+
+#  Notes:
+#     A list of all the classes which have been set is available
+#     in the file RCS/.classes. It is not possible to use the same
+#     name twice once any of the files have been changed.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     PWD: P.W. Draper (Durham University - Starlink)
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-NOV-1993 (PWD):
+#        Original version.
+#     2-DEC-1993 (RFWS):
+#        Seriously re-written.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue.
+#     25-MAY-1997 (PWD):
+#        Re-rewritten for RCS usage (no class makefiles, just symbolic tags).
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Get the class tag.
+     if test "${1}" = ""; then 
+        echo "No class tag given"
+        exit 1
+     fi
+     class_tag="${1}"
+     shift     
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Get a list of all the files required in the class.
+      files=`${SDT_DIR}/showel "${filespec}"`
+
+#  And create the class.
+      if ! `rcs -q -n${class_tag}: ${files}`; then
+         echo "Failed to set class tag $class_tag"
+         exit 1
+      fi
+      if ! test -e "RCS/.classes"; then
+         touch RCS/.classes
+      fi
+      echo >> RCS/.classes "${class_tag} set on `date`"
+      echo "${class_tag} set on `date`"
+
+#  End of script.
+      exit

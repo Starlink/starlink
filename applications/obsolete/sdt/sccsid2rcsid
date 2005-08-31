@@ -1,0 +1,40 @@
+#!/bin/csh
+#
+#  Simple script to convert a directory of files to use $Id$ instead
+#  of the known SCCS keywords.
+#
+
+# the quotes surround the dollar signs to fool RCS when I check in this script
+set sccs_keywords = (\
+    '%W%[\ \t]*%G%[\ \t]*%R%'\
+    '%Z%%M%[\ \t]*%I%[\ \t]*%E%[\ \t]*%U%[\ \t]*%D%[\ \t]*%T%')
+set rcs_keywords = (\
+    '$'Id'$'\
+    '$'Id'$')
+
+# create the sed script
+set sedfile = "/tmp/sedfile.$$"
+touch $sedfile
+set i = 1
+while ($i <= $#sccs_keywords)
+    echo "s,$sccs_keywords[$i],$rcs_keywords[$i],g" >> $sedfile
+    @ i = $i + 1
+end
+
+# process every file.
+foreach f (*)
+   echo "Processing file $f"
+
+# add RCS keywords in place of SCCS keywords
+   sed -f $sedfile $f > ${f}.new
+   if ($status != 0) goto ERROR
+   mv $f ${f}.rcs-tmp
+   mv ${f}.new $f
+end
+rm *.rcs-tmp
+rm $sedfile
+exit
+ERROR:
+echo "Failed to convert file ids"
+rm $sedfile
+exit

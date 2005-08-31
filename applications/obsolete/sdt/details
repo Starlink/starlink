@@ -1,0 +1,83 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     details
+
+#  Purpose:
+#     Display descriptive text for files in the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command displays a simple list of files in the repository and the
+#     descriptive test associated with them. It performs "wild-card" file
+#     expansion, based on the set of files in the repository.
+
+#  Invocation:
+#     details [filespec]
+
+#  Parameters:
+#     filespec
+#        An optionl list of the files whose descriptive text is required. If
+#        this is omitted, details are displayed for all the files in the
+#        repository.
+
+#  Examples:
+#     details
+#        Displays descriptive text for all the files in the repository.
+#
+#     details *.f
+#        Displays details of all the Fortran (.f) files in the repository.
+
+#  Notes:
+#     Descriptive text may be associated with a file using the "describe"
+#     command.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1994 (RFWS):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to use RCS instead of SCCS.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Get the file specification.
+      filespec="${*}"
+
+#  Expand the specification and get details for each resulting file.
+      for file in `${SDT_DIR}/showel "${filespec}"`; do
+
+#  Get the descriptive text from RCS.
+         echo -n "${file}: "
+         rlog -t ${file} | \
+            awk '{   if ( /^description:/ ) {
+                        do {
+   		           print
+                           getline
+                        } while ( ! /^===/ ) 
+                     }
+                 }'
+      done
+
+#  Exit the procedure.
+      exit

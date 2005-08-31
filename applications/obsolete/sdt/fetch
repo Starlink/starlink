@@ -1,0 +1,86 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     fetch
+
+#  Purpose:
+#     Fetch read-only copies of files from the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure fetches copies of files from the repository into the
+#     current working directory. It allows "wild-card" file name expansion
+#     based on the complete set of files in the repository. The fetched files
+#     are read-only and are not intended for editing (the "res" command
+#     should be used for this).
+
+#  Invocation:
+#     fetch filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be fetched (normally a "wild-card"
+#        is given).
+
+#  Notes:
+#     The command will not over-write a writable copy of a file with a
+#     read-only copy.
+
+#  Examples:
+#     fetch fred.dat bill.txt
+#        Fetches read-only copies of the files fred.dat and bill.txt from the
+#        repository, and puts them into your working directory.
+#
+#     fetch *.f
+#        Fetches read-only copies of all the Fortran (.f) files in the
+#        repository.
+#
+#     fetch `grp c_routines`
+#        Fetches read-only copies of all the repository files belonging to
+#        the group "c_routines" (see the "grp" command for more details).
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JUN-1993 (RFWS):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test "${filespec}" = ""; then
+         echo 'fetch: no file specification given' >&2
+         exit 1
+
+#  Otherwise, expand the file specification and get the required files
+#  from RCS.
+      else
+         co `${SDT_DIR}/showel "${filespec}"` 2>&1 | sed -n -e 's|^RCS/[^ ]* *--> *\(.*\)$|\1|p'
+      fi
+
+#  End of script.
+      exit

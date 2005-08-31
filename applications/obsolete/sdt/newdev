@@ -1,0 +1,235 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     newdev
+
+#  Purpose:
+#     Initialise a development directory tree for a new package.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command may be used to set up a directory tree for development work
+#     on a new software package using other SDT commands. It:
+#
+#        a) creates the required directories (including one for the CVS
+#           repository),
+#
+#        b) writes a template .sdtrc initialisation file to the new working
+#           development directory (this file may be edited to modify the
+#           development environment),
+#
+#        c) creates a dummy group makefile and inserts it into the repository,
+#
+#        d) creates a dummy reference directory makefile and inserts it into
+#           the repository,
+#
+#        e) sets a soft link from the development directory to the RCS
+#           repository.
+#
+#     Use of this command should be followed by the "dev" command, which logs
+#     you in to use the new development environment. Also see the "dev" command
+#     for details of the directory structure.
+
+#  Invocation:
+#     newdev pkg
+
+#  Parameters:
+#     pkg
+#        Name of the new package (case insensitive).
+
+#  Examples:
+#     newdev ndf
+#         Creates a new development system for the "ndf" package.
+
+#  Notes:
+#     This command does not log you in for development work with the new
+#     package. If you are already logged in to an existing package, you remain
+#     logged in to that package after using the newdev command.
+
+#  Prior Requirements:
+#     An environment variable of the form ${PKG}_SYS (e.g. NDF_SYS) should
+#     previously have been defined to identify the top-level development
+#     directory for the package. This directory need not exist, but if it
+#     does, it must be empty.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JUN-1994 (RFWS):
+#        Original version.
+#     1-JUL-1994 (RFWS):
+#        Fixed bug: insertion of files into the repository was using the
+#        current package environment variable definitions, not those needed
+#        for the new package.
+#     25-MAY-1997 (PWD):
+#        Converted to use RCS instead of SCCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check whether a package name has been supplied.
+      if test "${*}" = ""; then
+         echo 'newdev: no package name given' >&2
+         exit 1
+      fi
+
+#  Obtain an upper case version of the package name and translate the
+#  ${PKG}_SYS environment variable.
+      PKG=`echo "${*}" | tr '[a-z]' '[A-Z]'`
+      dir=`eval echo \$"${PKG}_SYS"`
+
+#  Check that this variable is defined.
+      if test "${dir}" = ""; then
+         echo "newdev: the ${PKG}_SYS environment variable is not defined" >&2
+         exit 1
+      fi
+
+#  See if the top-level directory exists. If not, then create it.
+      if test ! -s "${dir}"; then
+         echo "newdev: creating the directory ${dir}"
+         mkdir "${dir}"
+         cd "${dir}"
+
+#  If the directory exists, check it is really a directory and go to it.
+      else
+         if test -d "${dir}"; then
+            cd "${dir}"
+
+#  Check it is empty.
+            if test "`echo *`" != "*"; then
+               echo "newdev: the directory ${dir} is not empty" >&2
+               exit 1
+            fi
+
+#  Report an error if we have not been given a directory.
+         else
+            echo "newdev: the file ${dir} is not a directory" >&2
+            exit 1
+         fi
+      fi
+
+#  Create the required sub-directories.
+      echo "newdev: creating the RCS directory ${dir}/RCS"
+      mkdir "${dir}/RCS"
+      echo "newdev: creating the working development directory ${dir}/dev"
+      mkdir "${dir}/dev"
+      echo "newdev: creating the softlink ${dir}/dev/RCS"
+      ln -s "${dir}/RCS" "${dir}/dev/RCS"
+      echo "newdev: creating the reference copy directory ${dir}/ref"
+      mkdir "${dir}/ref"
+
+#  Go to the new working development directory.
+      cd "${dir}/dev"
+
+#  Set up environment variables required by subsequent SDT commands.
+      export PKG_DIR
+      export ${PKG}_DEV
+      export PKG_REF
+      export ${PKG}_REF
+      export PROJECTDIR
+      PKG_DIR="${dir}"
+      eval ${PKG}_DEV="${dir}/dev"
+      eval ${PKG}_REF="${dir}/ref"
+      eval PKG_REF="${dir}/ref"
+      PROJECTDIR="${dir}"
+
+#  Write a template .sdtrc initialisation file.
+      echo "newdev: creating the SDT initialisation file ${dir}/dev/.sdtrc"
+      echo >.sdtrc  '#  SDT initialisation file for software development.'
+      echo >>.sdtrc '#  ================================================'
+      echo >>.sdtrc '#  Original created by the SDT newdev command on:'
+      echo >>.sdtrc '#'
+      echo >>.sdtrc "#           `date`"
+      echo >>.sdtrc ''
+      echo >>.sdtrc '# Definitions for makefiles.'
+      echo >>.sdtrc '      setenv DEV_MAKE dev.make'
+      echo >>.sdtrc '      setenv GRP_MAKE grp.make'
+      echo >>.sdtrc '      setenv REF_MAKE ref.make'
+      echo >>.sdtrc '      setenv REL_MAKE makefile'
+      echo >>.sdtrc ''
+      echo >>.sdtrc '# Definitions for the EDSTAR editor.'
+      echo >>.sdtrc \
+         '      setenv EDSTAR_PATH .:${'"${PKG}"'_DEV}:${'"${PKG}"'_REF}'
+      echo >>.sdtrc '      setenv EDSTAR_READONLY ${'"${PKG}"'_REF}'
+
+#  Create a template group makefile.
+      echo "newdev: creating the group makefile ${dir}/dev/grp.make"
+      echo >grp.make \
+         '#  File to define groups for use by the SDT grp command.'
+      echo >>grp.make \
+         '#  ===================================================='
+      echo >>grp.make \
+         '#  This is a description file for the "make" utility.'
+      echo >>grp.make \
+         '#  Original created by the SDT newdev command on:'
+      echo >>grp.make '#'
+      echo >>grp.make \
+         "#           `date`"
+      echo >>grp.make ''
+      echo >>grp.make ''
+      echo >>grp.make '#  Define new groups here...'
+      echo >>grp.make ''
+      echo >>grp.make ''
+      echo >>grp.make '#  Target for use by the grp command.'
+      echo >>grp.make '$(action)'
+      echo >>grp.make ''
+      echo >>grp.make '#  Keyword for use by RCS.'
+      echo >>grp.make '# $Id$ '
+
+#  Insert this file into the repository and add descriptive text.
+      echo 'newdev: inserting the group makefile into the RCS repository'
+      ${SDT_DIR}/insert 'grp.make'
+      ${SDT_DIR}/describe 'grp.make' 'Makefile for use by the SDT grp command'
+
+#  Create a template reference directory makefile.
+      echo \
+      "newdev: creating the reference directory makefile ${dir}/dev/ref.make"
+      echo >ref.make \
+         '#  File to define development targets for the reference directory.'
+      echo >>ref.make \
+         '#  =============================================================='
+      echo >>ref.make \
+         '#  This is a description file for the "make" utility.'
+      echo >>ref.make \
+         '#  Original created by the SDT newdev command on:'
+      echo >>ref.make '#'
+      echo >>ref.make \
+         "#           `date`"
+      echo >>ref.make ''
+      echo >>ref.make ''
+      echo >>ref.make '#  Define new development targets here...'
+      echo >>ref.make ''
+      echo >>ref.make ''
+      echo >>ref.make '#  Pass any unknown targets on to the release makefile.'
+      echo >>ref.make '.DEFAULT: ; @ $(MAKE) -e -f $(REL_MAKE) $@'
+      echo >>ref.make ''
+      echo >>ref.make '#  Keyword for use by RCS.'
+      echo >>ref.make '# $Id$'
+
+#  Insert this file into the repository and add descriptive text.
+      echo \
+'newdev: inserting the reference directory makefile into the RCS repository'
+      ${SDT_DIR}/insert 'ref.make'
+      ${SDT_DIR}/describe 'ref.make' \
+      'Makefile defining development targets for the reference directory'
+
+#  Make the reference copy directory up to date.
+      ${SDT_DIR}/refup
+
+#  End of script.
+      exit

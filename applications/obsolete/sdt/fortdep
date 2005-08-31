@@ -1,0 +1,83 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     fortdep
+
+#  Purpose:
+#     List include file dependencies in Fortran code.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command will create a list of Fortran include file dependencies
+#     suitable for use in a "make" description file. The results are written
+#     to the standard output.
+
+#  Invocation:
+#     fortdep [filespec]
+
+#  Parameters:
+#     filespec
+#        An optional list of the Fortran source files whose include file
+#        dependencies are required. If this is omitted, the specification
+#        '*.f' is used instead.
+
+#  Examples:
+#     fortdep
+#        Lists the include file dependencies for all the .f files in the
+#        working directory on the standard output.
+#
+#     fortdep `grp routines` >>makefile
+#        Assuming a copy of each of the files in the "routines" group exists
+#        in the current working directory, this command will determine their
+#        include file dependencies and append this information to makefile.
+
+#  Limitations:
+#     Nested include files are not allowed for.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1994 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Get the file specification.
+      files="${*}"
+
+#  If no files were specified, supply a default.
+      if test "${files}" = ""; then
+         files='*.f'
+      fi
+
+#  Run grep to identify all the INCLUDE statements in the specified files.
+#  Then use sed to remove everything except the parent and included file
+#  names (convert the parent file type to .o in the process). Sort the
+#  resulting list and remove duplicates. Finally pass the list through awk
+#  to combine lines which refer to the same parent file.
+      grep -i "^ *I *N *C *L *U *D *E *'.*'" ${files} | \
+        sed -e 's#\..*:#\.o:#' \
+            -e 's#[Ii] *[Nn] *[Cc] *[Ll] *[Uu] *[Dd] *[Ee]##' \
+            -e s#\'## \
+            -e s#\'## \
+            -e 's# *!.*##' \
+            -e 's#/.*/##' | sort | uniq | \
+awk '{if($1!=k){if(i++)printf"\n";printf"%s %s",$1,$2}else printf" %s",$2;k=$1} END{printf"\n"}'
+
+#  Exit the procedure.
+      exit

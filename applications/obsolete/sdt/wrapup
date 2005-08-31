@@ -1,0 +1,160 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     wrapup
+
+#  Purpose:
+#     Wrap up files into a shell archive.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command will package up a set of files into a "shell archive",
+#     which is a shell script which will restore the original files when
+#     it is executed. The files in question are passed through "compress"
+#     and "uuencode" to make the resulting archive suitable for transmission
+#     over networks and through electronic mail systems. The archive contains
+#     the commands needed to reverse this process at the other end.
+
+#  Invocation:
+#     wrapup archive files
+
+#  Parameters:
+#     archive
+#        Name of the archive file to be created.
+#      files
+#        A list of the files to be included in the archive.
+
+#  Examples:
+#     wrapup latest.runme *.f *.o *.a
+#        Wraps up all the Fortran (.f), object (.o) and library (.a) files
+#        into the archive file called latest.runme, which is suitable for
+#        (e.g.) e-mailing to a collaborator.
+
+#  Notes:
+#     The invocation of the "tar" command used by wrapup includes the "h"
+#     flag to cause it to follow soft links (i.e. the actual file is included
+#     in the archive, not simply the link).
+
+#  Unpacking the Archive:
+#     To unpack an archive created by wrapup, any extraneous lines added at the
+#     beginning of the script (e.g. by mail systems) must first be removed.
+#     The first line of the script should be:
+#
+#     #!/bin/sh
+#
+#     The script should then be executed. This may be done by giving it execute
+#     permission (if necessary) with the command:
+#
+#        % chmod +x <archive-name>
+#
+#     and then entering the name of the archive file as a command.
+#     Alternatively, the archive file may be passed to the "sh" shell for
+#     execution with the command:
+#
+#        % sh <archive-name>
+
+#  Limitations:
+#     Use of wrapup assumes the availability of the utilities:
+#
+#        tar, compress, uuencode (and sed)
+#
+#     at the sending end, and of the utilities:
+#
+#        tar, uncompress, uudecode (and sed)
+#
+#     at the receiving end.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-JUL-1994 (RFWS):
+#        Original version.
+#     1-JUL-1994 (RFWS):
+#        Fixed bug: full directory name of archive should not appear inside
+#        the archive itself.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Obtain the name of the archive file.
+      archive="${1}"
+
+#  Check that a name was given,. Report an error if necessary.
+      if test "${archive}" = ""; then
+         echo 'wrapup: no archive file specified' >&2
+         exit 1
+      fi
+
+#  Obtain the list of files to be archived.
+      shift
+      files="${*}"
+
+#  Check that at least one file has been specified. Report an error if
+#  necessary.
+      if test "${files}" = ""; then
+         echo 'wrapup: no files to archive' >&2
+      fi
+
+#  Write a header for the archive script, explaining how to unpack it.
+      echo >"${archive}"  '#!/bin/sh'
+      echo >>"${archive}" \
+           '##############################################################'
+      echo >>"${archive}" \
+           '#                                                            #'
+      echo >>"${archive}" \
+           '#  This is a shell archive. To extract the files it          #'
+      echo >>"${archive}" \
+           '#  contains, remove any lines before "#!/bin/sh" above if    #'
+      echo >>"${archive}" \
+           '#  necessary (e.g. with a text editor) and execute the       #'
+      echo >>"${archive}" \
+           '#  resulting file. Alternatively, you may pass the resulting #'
+      echo >>"${archive}" \
+           '#  file to the "sh" shell for execution, as follows:         #'
+      echo >>"${archive}" \
+           '#                                                            #'
+      echo >>"${archive}" \
+           '#     % sh file                                              #'
+      echo >>"${archive}" \
+           '#                                                            #'
+      echo >>"${archive}" \
+           '##############################################################'
+
+#  Write the commands which will unpack the archive (the reverse of what
+#  follows) and will delete the temporary file used in the process.
+      echo >>"${archive}" \
+           "sed -e 's/^ //' << \#end-of-data | uudecode; \\"
+      echo >>"${archive}" \
+           "uncompress -c `basename ${archive}`.Z | tar xvf -; \\"
+      echo >>"${archive}" \
+           "rm -f `basename ${archive}`.Z"
+
+#  Pack the specified files using tar, then compress, then uuencode. Pass the
+#  result through sed to add a space at the start of each line, so the data
+#  produced can be distinguished from the "#end-of-data" flag which follows
+#  (and does not start with a space).
+      tar cvhf - ${files} | compress | uuencode "`basename ${archive}`.Z" \
+         | sed -e 's/^/ /' >>"${archive}"
+
+#  Add the "#end-of-data" flag.
+      echo >>"${archive}" '#end-of-data'
+
+#  Make the archive file executable.
+      chmod +x "${archive}"
+
+#  Exit the procedure.
+      exit

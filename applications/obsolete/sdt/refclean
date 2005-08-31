@@ -1,0 +1,59 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     refclean
+
+#  Purpose:
+#     Clean up the reference copy directory.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command removes all files from the reference copy directory for
+#     which there is an equivalent (or more recent) version stored in the
+#     repository. The most recent copy of files removed by this command can
+#     be restored from the repository using the "refup" command.
+
+#  Invocation:
+#     refclean
+
+#  Parameters:
+#     None
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JUN-1994 (RFWS):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Go to the reference directory.
+      cd ${PKG_REF}
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Remove all files which can be restored from RCS (this should
+#  not remove any reserved files).
+      rcsclean
+
+#  Exit the procedure.
+      exit

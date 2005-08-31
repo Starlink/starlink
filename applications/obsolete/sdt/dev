@@ -1,0 +1,172 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     dev
+
+#  Purpose:
+#     Log in to develop a software package.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command should be used to log in before doing development work
+#     on a software package using other SDT commands. It will define the
+#     necessary environment variables, set the working directory to the
+#     development directory for the package, and then source any startup
+#     (.sdtrc) file contained in that directory.
+
+#  Invocation:
+#     dev pkg
+
+#  Parameters:
+#     pkg
+#        Name of the package to be developed (case insensitive).
+
+#  Examples:
+#     dev ndf
+#         Logs you in to perform development work on the package called "ndf",
+#         assuming you have previously set up a suitable development
+#         environment (see the "newdev" command).
+
+#  Prior Requirements:
+#     -  The SYSTEM environment variable should previously have been defined
+#     to identify the operating system/hardware platform in use (for details
+#     of those supported, see the file ${SDT_DIR}/dev_init.csh).
+#
+#     -  An environment variable of the form ${PKG}_SYS (e.g. NDF_SYS) should
+#     previously have been defined to point at the top-level development
+#     directory for the package. This directory should contain sub-directories
+#     holding the following standard components of a software development
+#     system:
+#
+#        /RCS - the RCS repository
+#        /ref - the reference copy directory (source code, etc.)
+#        /dev  - the working development directory
+#
+#     The "newdev" command may be used to create and initialise a new
+#     directory tree for this purpose.
+
+#  Package-Specific Environment Variables:
+#     The "dev" command defines the following environment variables to
+#     identify the package and directories selected for development:
+#
+#        ${PKG}_DEV
+#           The working development directory.
+#        ${PKG}_REF
+#           The reference copy directory.
+#        PKG
+#           Name of the package (lower case).
+#        PKG_REF
+#           The reference copy directory.
+#        PKG_DIR
+#           The top-level development directory.
+#        PROJECTDIR
+#           The top-level development directory (used to find RCS repository)
+#
+#     The command also un-defines the following environment variables, so that
+#     values, if required, must be specified in the package .sdtrc file:
+#
+#        DEV_MAKE, GRP_MAKE, REF_MAKE and REL_MAKE
+
+#  Platform-Specific Environment Variables:
+#     The set of environment variables used in standard Starlink makefiles
+#     will be defined by "dev" with default values appropriate to the operating
+#     system/hardware platform in use (as determined by the SYSTEM environment
+#     variable).
+#
+#     Values will be defined for:
+#
+#        AR_IN, BLD_SHR, CC, CFLAGS, FC, FFLAGS, LINK, RANLIB, SHARE,
+#        TAR_IN and TAR_OUT
+#
+#     which will generally be more suitable for software development work than
+#     the normal makefile defaults. The values assigned can be determined by
+#     inspecting the ${SDT_DIR}/dev_init.csh file.
+
+#  Initialisation File:
+#     Other environment variable definitions (including values to over-ride
+#     those described above) and any further initialisation required for
+#     software development work should be performed using C shell commands in
+#     the .sdtrc initialisation file contained in the package's working
+#     development directory.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-NOV-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Changed to use ${PKG}_SYS environment variable.
+#     25-MAY-1997 (PWD):
+#       Changed to CVS from SCCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that a package name has been supplied.
+      if test "${1}" = ""; then
+         echo 'dev: no package name specified' >&2
+         exit 1
+      fi
+
+#  Obtain upper and lower-case versions of the package name.
+      PKG=`echo "${1}" | tr [a-z] [A-Z]`
+      pkg=`echo "${1}" | tr [A-Z] [a-z]`
+
+#  Check that the ${PKG}_SYS environment variable has been defined.
+      val=`eval echo \$"${PKG}_SYS"`
+      if test "${val}" = ""; then
+         echo "dev: the ${PKG}_SYS environment variable is not defined" >&2
+         exit 1
+      fi
+
+#  Define a command to set up the PKG environment variable (to identify
+#  the package) and append a command to define the PKG_DIR variable (to
+#  identify its top-level directory).
+      cmd="setenv PKG ${pkg}"
+      cmd="${cmd};setenv PKG_DIR \$${PKG}_SYS"
+
+#  Append commands to define environment variables for the development and
+#  reference copy directories.
+      cmd="${cmd};setenv ${PKG}_DEV \$${PKG}_SYS/dev"
+      cmd="${cmd};setenv ${PKG}_REF \$${PKG}_SYS/ref/"
+      cmd="${cmd};setenv PKG_REF \$${PKG}_SYS/ref/"
+
+#  Similarly append a command to define PROJECTDIR to identify the top-level
+#  development directory (used by all commands, note that RCS does not
+#  use this itself).
+      cmd="${cmd};setenv PROJECTDIR \$${PKG}_SYS"
+
+#  Append a command to make the development directory the default.
+      cmd="${cmd};cd \$${PKG}_DEV"
+
+#  Append a command to source a standard SDT file to define default
+#  environment variables for the current development platform.
+      cmd="${cmd};source \$SDT_DIR/dev_init.csh"
+
+#  Append commands to unset environment variables identifying makefiles.
+      cmd="${cmd};unsetenv DEV_MAKE GRP_MAKE REF_MAKE REL_MAKE"
+
+#  Append a command to source a .sdtrc file if it exists in the development
+#  directory.
+      cmd="${cmd};if -e \$${PKG}_DEV/.sdtrc source \$${PKG}_DEV/.sdtrc"
+
+#  Echo the resulting command string (to be executed by the parent shell).
+      echo "${cmd}"
+
+#  Exit the procedure.
+      exit

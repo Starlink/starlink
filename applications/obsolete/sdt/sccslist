@@ -1,0 +1,63 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     sccslist
+
+#  Purpose:
+#     Lists a RCS repository file.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#   This procedure lists an RCS repository file to the standard 
+#   output. This allows file listings without the need to keep a 
+#   local copy.
+
+#  Invocation:
+#     sccslist filespec
+
+#  Parameters:
+#     filespec
+#	 Specification for the file(s) to be listed.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     PWD: P.W. Draper (Durham University - Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-DEC-1993 (PWD):
+#     	 Original version.
+#     4-JUL-1994 (PWD):
+#        Brought into line with the latest SDT.
+#     25-MAY-1997 (PWD):
+#        Now uses RCS, name is historical.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Need at least on parameter value.
+      filespec="$1"
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Abort if no file specification was given.
+      if test "$filespec" = ""; then
+         echo 'sccslist: no file specification given' >&2
+	 exit 1
+
+#  Otherwise start processing all the files. 
+      else
+         co -q -p `showel $*`
+      fi
+
+#  End of script.
+      exit

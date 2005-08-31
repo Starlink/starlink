@@ -1,0 +1,97 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     unres
+
+#  Purpose:
+#     Unreserve files reserved from the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command unreserves files which have been reserved from the
+#     repository. It discards any changes and removes the reserved file.
+#     "Wild-card" file name expansion is performed, based on the set of
+#     currently reserved files.
+
+#  Invocation:
+#     unres filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be unreserved (normally a
+#        "wild-card" is given).
+
+#  Examples:
+#     unres wrong.f
+#        Unreserves the file wrong.f, discarding any changes and removing the
+#        file. The copy retained in the repository (and reference copy
+#        directory) is that most recently inserted, replaced or flushed.
+#
+#     unres `grp to-do`
+#        Backs out of any changes made to reserved files in the to-do group
+#        (see the "grp" command for further details).
+
+#  WARNING:
+#     Use this command with the care you reserve for the UNIX "rm" command -
+#     you can remove a great deal of work if you accidentally specify files you
+#     didn't intend. THERE IS NO WAY OF RECOVERING THE LOST CHANGES!!
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JUN-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue. Remove read-only copy of original file.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Display help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test "${filespec}" = ""; then
+         echo 'unres: no file specification given' >&2
+         exit 1
+
+#  Otherwise, expand the file specification and unreserve the required
+#  files.
+      else
+         files=`${SDT_DIR}/showres "${filespec}"`
+         rcs -u -q ${files}
+
+#  Remove the read-only copy of each file that remains (for safety, check that
+#  the file is read-only first).
+         for file in ${files}; do
+            if test ! -w "${file}"; then
+               rm -f "${file}"
+            fi
+         done
+
+#  Update the reference copy directory.
+         ${SDT_DIR}/refup "${files}"
+      fi
+
+#  End of script.
+      exit

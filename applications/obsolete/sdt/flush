@@ -1,0 +1,56 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     flush
+
+#  Purpose:
+#     Updates all the reserved files, retaining them for editing.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure updates the entries in a respository that are
+#     currently reserved, retaining them for editing. If no file names
+#     are given it is assumed that all the reserved files are in the 
+#     current directory and these should all be updated.
+
+#  Invocation:
+#     flush [files]
+
+#  Parameters:
+#     files
+#	 Specification for the file(s) to be updated. This is optional
+#        and defaults to all the files that are currently reserved.
+
+#  Authors:
+#     PWD: P.W. Draper (Durham University - Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JUN-1994 (PWD):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS, name now historical.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Check that the RCS link is present to the repository.
+      $SDT_DIR/rcslink || exit 1
+
+      filespec="${*}"
+
+      files="`${SDT_DIR}/showres "${filespec}"`"
+      if test -n "${files}"; then
+         cd "${PKG_DIR}/dev"
+         ci -l -m"Routine update" ${files} 2>&1 \
+            | sed -n -e 's|^RCS/[^ ]* *<-- *\(.*\)$|\1|p'
+      fi
+
+#  End of script.
+      exit

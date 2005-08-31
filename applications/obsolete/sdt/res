@@ -1,0 +1,98 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     res
+
+#  Purpose:
+#     Reserve files from the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure reserves files for editing from the repository. It
+#     allows "wild-card" file name expansion based on the complete set of
+#     files in the repository.
+
+#  Invocation:
+#     res filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be reserved (normally a "wild-card"
+#        is given).
+
+#  Examples:
+#     res myprog.f
+#        Reserves a copy of the file myprog.f for editing (when changes to the
+#        file are complete, it may be returned to the repository using the
+#        "repl" command).
+#
+#     res *.txt
+#        Reserves all the .txt files in the respository for editing.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JUN-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     23-APR-1998 (RFWS):
+#        Merged with recent developments from the SCCS version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Supply help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      ${SDT_DIR}/rcslink || exit 1
+
+#  Obtain the file specification.
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test -z "${filespec}"; then
+         echo 'res: no file specification given' >&2
+         exit 1
+
+#  Otherwise, expand the file specification to give a list of all the
+#  files in the repository and a list of all those reserved.
+      else
+         elfiles="`${SDT_DIR}/showel "${filespec}"`"
+         resfiles="`${SDT_DIR}/showres "${filespec}"`"
+
+#  Merge these lists and remove duplicates, thus giving a list of all
+#  the required files which are not yet reserved.
+         files="`(echo "${elfiles}"; echo "${resfiles}") | sort | uniq -u`"
+
+#  Get writable copies of the required files for editing. Edit the
+#  resulting output to produce a list of the files that were reserved.
+         if test -n "${files}"; then
+            cd "${PKG_DIR}/dev"
+            co -l ${files} 2>&1 | sed -n -e 's|^RCS/[^ ]* *--> *\(.*\)$|\1|p'
+
+#  Create a link in the reference directory to each reserved file, first
+#  removing the existing copy if present.
+            cd "${PKG_DIR}/ref"
+            rm -f ${files}
+            for f in ${files}; do ln -s "${PKG_DIR}/dev/${f}" "${f}"; done
+         fi
+      fi
+
+#  End of script.
+      exit

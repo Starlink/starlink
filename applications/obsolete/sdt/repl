@@ -1,0 +1,91 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     repl
+
+#  Purpose:
+#     Replace reserved files into the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command replaces modified files into the repository from which they
+#     have been reserved.  It allows "wild-card" file name expansion based on
+#     the set of currently reserved files.
+
+#  Invocation:
+#     repl filespec
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be replaced (normally a "wild-card"
+#        is given).
+
+#  Examples:
+#     repl manual.tex
+#        Replaces the reserved file manual.tex into the repository.
+#
+#     repl `grp routines docs` *.h
+#        Replaces all the reserved files in the "routines" and "docs" groups,
+#        as well as all the reserved C include (.h) files (see the "grp"
+#        command for futher details).
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JUN-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      ${SDT_DIR}/rcslink || exit 1
+
+#  Obtain the file specification..
+      filespec="${*}"
+
+#  Abort if no file specification was given.
+      if test -z "${filespec}"; then
+         echo 'repl: no file specification given' >&2
+         exit 1
+
+#  Otherwise, expand the file specification and replace the required
+#  files. Edit the resulting output to produce a list of the files
+#  that were replaced.
+      else
+         files="`${SDT_DIR}/showres "${filespec}"`"
+         if test -n "${files}"; then
+            cd "${PKG_DIR}/dev"
+            ci -m"File replaced by SDT" ${files} </dev/null 2>&1 \
+               | sed -n -e 's|^RCS/[^ ]* *<-- *\(.*\)$|\1|p'
+
+#  Remove the links to the reserved files from the reference copy directory.
+            cd "${PKG_DIR}/ref"
+            rm -f ${files}
+
+#  Keep the reference directory up to date.
+            ${SDT_DIR}/refup ${files} >/dev/null
+         fi
+      fi
+
+#  End of script.
+      exit

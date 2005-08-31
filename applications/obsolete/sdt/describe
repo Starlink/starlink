@@ -1,0 +1,91 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     describe
+
+#  Purpose:
+#     Associate descriptive text with a file in the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command associates a string of descriptive text with a file in
+#     the repository, over-writing any previous text. It may also be used
+#     to remove the descriptive text from a file.
+
+#  Invocation:
+#     describe file [text]
+
+#  Parameters:
+#     file
+#        The name of the file. It should be given exactly (no file name
+#        expansion is performed by this command).
+#     text
+#        The descriptive text to be associated with the file (normally this
+#        should be quoted as it will contain spaces, etc.). If no text is
+#        given, then any existing descriptive text associated with the file
+#        is removed.
+
+#  Examples:
+#     describe read.f 'Read data from the input file'
+#        Associates the text 'Read data...' with the file read.f.
+#
+#     describe junk
+#        Removes any descriptive text from the file junk.
+
+#  Notes:
+#     The descriptive text is associated with the file by RCS - it is not
+#     stored within the file itself.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-DEC-1993 (RFWS):
+#        Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to use RCS instead of SCCS.
+#     23-APR-1998 (RFWS):
+#        Merged with recent developments from the SCCS version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      ${SDT_DIR}/rcslink || exit 1
+
+#  Obtain the file name and the text.
+      file="${1}"
+      text="${2}"
+
+#  Exit with an error message if no file name was given.
+      if test "${file}" = ""; then
+         echo 'describe: no file name given' >&2
+         exit 1
+
+#  If no text was given, then remove any associated descriptive text.
+      else
+         if test "${text}" = ""; then
+            rcs -t-" " "${file}"
+
+#  Otherwise associate it with the element.
+         else
+            rcs -t-"${text}" "${file}"
+         fi
+      fi
+
+#  End of script.
+      exit

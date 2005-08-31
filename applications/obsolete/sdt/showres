@@ -1,0 +1,94 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     showres
+
+#  Purpose:
+#     Produce a list of reservations from the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command writes a list of the files currently reserved from the
+#     repository to the standard output. "Wild-card" file name expansion is
+#     performed if necessary, based on the complete set of files currently
+#     reserved.
+
+#  Invocation:
+#     showres [filespec]
+
+#  Parameters:
+#     filespec
+#        An optional specification for the reservation(s) to be listed
+#        (normally a "wild-card" is given). If this is omitted, all
+#        reservations are listed.
+
+#  Examples:
+#     showres
+#        Lists all the reservations from the repository.
+#
+#     showres n*.c
+#        Lists all the .c files which are reserved from the repository and
+#        whose names begin with "n".
+#
+#     showres `grp include_files`
+#        Lists all files from the include_files group which are currently
+#        reserved (see the "grp" command for further details).
+#
+#     details `showres`
+#        Lists descriptive details of all the files currently reserved from
+#        the repository.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-NOV-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     23-APR-1998 (RFWS):
+#        Merged with recent developments from the SCCS version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Display help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      ${SDT_DIR}/rcslink || exit 1
+
+#  Obtain the file specification, supplying a wild-card default.
+      filespec="${*:-*}"
+
+#  Go to the RCS directory.
+      cd ${PKG_DIR}/RCS
+
+#  Append ",v" to the end of each element of the file specification
+#  and then expand the specification (based on the files in the
+#  directory). Use "ls" to identify which files are present. Suppress
+#  errors (if no files are found).
+      files="`ls \`echo "${filespec}" \
+                   | awk 'BEGIN{RS=\" \"}{printf\"%s,v \",$1}'\` 2>/dev/null`"
+
+#  If files were found, use "rlog" to see which of them are
+#  reserved. Edit the output to leave just the file names.
+      if test ! -z "${files}"; then
+         rlog -L -R -l ${files} | sed -e 's|^RCS/\(.*\),v$|\1|'
+      fi
+
+#  End of script.
+      exit

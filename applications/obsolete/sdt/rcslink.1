@@ -1,0 +1,93 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     rcslink
+
+#  Purpose:
+#     Check that the current directory has a softlink to the RCS repository
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure checks that the current directory contains
+#     a softlink called RCS to the directory named by the PROJECTDIR
+#     variable.
+#
+#     If the necessary softlink does not exists then it will be
+#     created, if an invalid called RCS exists then an error
+#     message will be output.
+
+#  Invocation:
+#     rcslink
+
+#  Parameters:
+#     None
+
+#  Notes:
+#     To test the position of the RCS directory we use /bin/pwd.
+#     This is necessary as some shells (bash) track movement and
+#     will only report where you think you are (even to the extent
+#     that "cd RCS; cd .." will get you back to where you started
+#     even though RCS is a softlink to a directory elsewhere).
+
+#  Authors:
+#     PWD: Peter W. Draper (Starlink, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAY-1997 (PWD):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that PROJECTDIR exists. If not and a file RCS exists
+#  then just continue in good faith, otherwise complain.
+      if test "${PROJECTDIR}" = ""; then
+         if ! test -e RCS; then
+            echo "There is no variable PROJECTDIR set. Are you logged in \
+for developement?"
+            exit 1
+         fi
+      fi
+
+#  See if a file called RCS exists.
+      if test -e RCS; then
+         if test -L RCS || test -d RCS; then
+
+#  File exists. If it's a softlink then check that it points to 
+#  $PROJECTDIR/RCS, other wise it should be $PROJECTDIR/RCS itself.
+             ( cd RCS; 
+               local="`/bin/pwd`";
+               cd $PROJECTDIR/RCS;
+               remote="`/bin/pwd`";
+               if test "$local" != "$remote"; then
+                  echo "RCS directory is not same as $remote";\
+                  exit 1;\
+               else \
+                  exit 0
+                fi;\
+             )
+            if test $? = "1"; then
+               exit 1
+            fi
+         else
+            echo "RCS not a link or directory"
+            exit 1
+         fi
+      else
+
+#  No RCS link so create it.
+         ln -s "${PROJECTDIR}/RCS" ./RCS
+      fi
+
+#  End of script.
+      exit 0

@@ -1,0 +1,123 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     refup
+
+#  Purpose:
+#     Update a reference copy of a file with respect to the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command ensures that the reference copy of any file (stored in the
+#     reference copy directory) is up to date with respect to the most recent
+#     version stored in the repository. It fetches a new reference copy if
+#     necessary. It allows "wild-card" file expansion, based on the set of
+#     files in the respository.
+
+#  Invocation:
+#     refup [filespec]
+
+#  Parameters:
+#     filespec
+#        Specification for the file(s) to be updated (normally a
+#        "wild-card" is given). If this is omitted, all the files in the
+#        repository have their reference copies updated.
+
+#  Examples:
+#     refup
+#        Makes the reference copy of all the files in the repository up to
+#        date.
+#
+#     refup `grp documentation`
+#        Updates the reference copies of all the files in the "documentation"
+#        group (see the "grp" command for further details).
+
+#  Notes:
+#     Files which are reserved will not normally need to be updated by this
+#     command (unless something has gone wrong), since the reference copy will
+#     simply be a link to the reserved file, so it should always be more recent
+#     than the repository version.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1994 (RFWS):
+#        Original version.
+#     1-JUL-1994 (RFWS):
+#        Changed "updating..." message.
+#     25-MAY-1997 (PWD):
+#        Converted to work with RCS.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Obtain the file specification,
+      filespec="${*}"
+
+#  Go to the reference copy directory.
+      cd ${PKG_DIR}/ref
+
+#  Expand the file specification to give a list of all the files in
+#  the repository and a list of all those reserved.
+      elfiles="`${SDT_DIR}/showel "${filespec}"`"
+      resfiles="`${SDT_DIR}/showres "${filespec}"`"
+
+#  Merge these lists and remove duplicates, thus giving a list of all
+#  the files which are not reserved.
+      notresfiles="`(echo "${elfiles}"; echo "${resfiles}") | sort | uniq -u`"
+
+#  Pipe the list of all the files in the repository through awk to
+#  generate a "make" dependency list which makes the "sdt_refup"
+#  target depend on each of the files.
+      (
+         echo "${elfiles}" | awk 'BEGIN{printf"sdt_refup:"}
+                                  {printf"\\\n   %s",$1}
+                                  END{printf"\n\n"}'
+
+#  Now write a dependency for each file which is not reserved, making
+#  it depend on the corresponding file in the RCS directory (the rule
+#  for updating each file being to get it from the RCS library and
+#  then output its name).
+         for f in ${notresfiles}; do
+            echo "${f}:${PKG_DIR}/RCS/${f},v"
+            echo "	@rm -f \"${f}\""
+            echo "	@co \"${f}\" 2>/dev/null"
+            echo "	@echo \"${f}\""
+         done
+
+#  Similarly, create dependencies for the reserved files, restoring
+#  the reference copy by creating a link to the reserved file (or
+#  issuing a warning message if the reserved file cannot be found).
+         for f in ${resfiles}; do
+            echo "${f}:"
+            echo "	@if test ! -f \"${f}\"; then \\"
+            echo "	   if test -w \"${PKG_DIR}/dev/${f}\"; then \\"
+            echo "	      ln -s \"${PKG_DIR}/dev/${f}\" \"${f}\"; \\"
+            echo "	      echo \"${f}\"; \\"
+            echo "	   else \\"
+            echo "	      echo \
+\"refup: WARNING cannot repair reference link to reserved file ${f}\"; \\"
+            echo "	fi; else :; fi"
+         done
+
+#  Pipe the makefile created above into "make".  Use -r to disable any
+#  known rules and suffixes.
+      ) | make -s -r -f - sdt_refup 2>/dev/null
+
+#  Exit the procedure.
+      exit

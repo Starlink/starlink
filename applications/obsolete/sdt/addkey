@@ -1,0 +1,89 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     addkey
+
+#  Purpose:
+#     Add RCS keyword $Id$ to the end of file(s).
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This procedure appends the string
+#
+#        $Id$
+#
+#     into the body of the named files. 
+#
+#     This keyword are replaced by RCS when a copy is extracted using the
+#     fetch command.  
+#
+#     The string is commented by the character "*", or by the value of the
+#     environment variable SDT_COMMENT, if set.
+
+#  Invocation:
+#     addkey filespec
+
+#  Parameters:
+#     filespec
+#	 Specification for the file(s) to be prepared for insertion
+#        into the current RCS repository. This may be a list of filenames.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     PWD: Peter W. Draper (Durham University - Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-JUL-1993 (PWD):
+#     	 Original version.
+#     25-MAY-1997 (PWD):
+#        Converted to RCS from SCCS.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Need at least on parameter value.
+   filespec="$1"
+
+#  Abort if no file specification was given.
+   if test "$filespec" = ""; then
+      echo 'addkey: no file specification given' >&2
+      exit 1
+
+#  Otherwise start processing all the files.
+   else
+
+#  Test the value of the comment character, if set use it, otherwise
+#  assume Fortran and use "*". (Note this is long-winded to work
+#  around * expansion quirks in bash).
+      if test "$SDT_COMMENT" = ""; then
+
+#  Process each file in turn.
+         for f in $*; do
+
+#  Catenate the file into a temporary file and append the required line.
+            (cat $f; echo "* \$Id\$") > .addkey_$$.tmp
+
+#  Remove the current version and replace it with the new one.
+            rm -f -f $f
+            mv .addkey_$$.tmp $f
+         done
+      else 
+         for f in $*; do
+            (cat $f; echo "$SDT_COMMENT \$Id\$") > .addkey_$$.tmp
+            rm -f -f $f
+            mv .addkey_$$.tmp $f
+         done
+      fi
+   fi
+
+#  End of script.
+   exit

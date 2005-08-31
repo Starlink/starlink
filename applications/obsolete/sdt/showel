@@ -1,0 +1,85 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     showel
+
+#  Purpose:
+#     Produce a list of files in the (RCS) repository.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command writes a list of the files in the repository to the
+#     standard output. "Wild-card" file name expansion is performed if
+#     necessary, based on the complete set of files in the repository.
+
+#  Invocation:
+#     showel [filespec]
+
+#  Parameters:
+#     filespec
+#        An optional specification for the files to be listed (normally a
+#        "wild-card" is given). If this is omitted, all files in the
+#        repository are listed.
+
+#  Examples:
+#     showel
+#        Lists all the files in the repository.
+#
+#     showel a*.f
+#        Lists all the Fortran (.f) files in the repository whose names begin
+#        with "a".
+
+#  Notes:
+#     If output is to a terminal, then one file name is listed on each line.
+#     Otherwise, a space separated list is generated which is suitable for
+#     supplying to other commands.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper (STARLINK, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-NOV-1993 (RFWS):
+#        Original version.
+#     14-JUN-1994 (RFWS):
+#        Updated prologue.
+#     25-MAY-1997 (PWD):
+#        Changed to RCS instead of SCCS.
+#     24-APR-1998 (RFWS):
+#        Merged with recent developments from the SCCS version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Display help information if required.
+      . ${SDT_DIR}/sdthelp.sh
+
+#  Check that the RCS link is present to the repository.
+      ${SDT_DIR}/rcslink || exit 1
+
+#  Obtain the file specification, supplying a default if necessary.
+      filespec="${*:-*}"
+
+#  Go to the RCS directory.
+      cd ${PKG_DIR}/RCS
+
+#  Append ",v" to each element of the file specification and then
+#  expand the list of files. Use "ls" to identify which of these files
+#  exist (suppressing error messages if necessary). Sort the resulting
+#  list and remove duplicates. Then remove the ",v" from the end of
+#  each file name.
+      ls `echo "${filespec}" | awk 'BEGIN{RS=" "}{printf"%s,v ",$1}'` \
+         2>/dev/null | sort -u | sed -e 's|,v$||'
+
+#  End of script.
+      exit
