@@ -1,0 +1,247 @@
+  (new-ast-routine "astAddFrame"
+                   "Add a Frame to a FrameSet to define a new coordinate system"
+                   '("this" "iframe"))
+  (new-ast-routine "astAnnul"
+                   "Annul a pointer to an Object"
+                   '("this"))
+  (new-ast-routine "astBegin"
+                   "Begin a new AST context"
+                   nil)
+  (new-ast-routine "astBorder"
+                   "Draw a border around valid regions of a Plot"
+                   '("this"))
+  (new-ast-routine "astChannel"
+                   "Create a Channel"
+                   '("source" "sink" "options" "..."))
+  (new-ast-routine "astClear"
+                   "Clear attribute values for an Object"
+                   '("this" "attrib"))
+  (new-ast-routine "astClearStatus"
+                   "Clear the AST error status"
+                   nil)
+  (new-ast-routine "astClip"
+                   "Set up or remove clipping for a Plot"
+                   '("this" "iframe" "lbnd" "ubnd"))
+  (new-ast-routine "astClone"
+                   "Clone (duplicate) an Object pointer"
+                   '("this"))
+  (new-ast-routine "astCmpFrame"
+                   "Create a CmpFrame"
+                   '("frame1" "frame2" "options" "..."))
+  (new-ast-routine "astCmpMap"
+                   "Create a CmpMap"
+                   '("map1" "map2" "series" "options" "..."))
+  (new-ast-routine "astConvert"
+                   "Determine how to convert between two coordinate systems"
+                   '("from" "to" "domainlist"))
+  (new-ast-routine "astCopy"
+                   "Copy an Object"
+                   '("this"))
+  (new-ast-routine "astCurve"
+                   "Draw a geodesic curve"
+                   '("this" "start" "finish"))
+  (new-ast-routine "astDelFits"
+                   "Delete the current FITS card in a FitsChan"
+                   '("this"))
+  (new-ast-routine "astDelete"
+                   "Delete an Object"
+                   '("this"))
+  (new-ast-routine "astDistance"
+                   "Calculate the distance between two points in a Frame"
+                   '("this" "point1" "point2"))
+  (new-ast-routine "astEnd"
+                   "End an AST context"
+                   nil)
+  (new-ast-routine "astExempt"
+                   "Exempt an Object pointer from AST context handling"
+                   '("this"))
+  (new-ast-routine "astExport"
+                   "Export an Object pointer to an outer context"
+                   '("this"))
+  (new-ast-routine "astFindFits"
+                   "Find a FITS card in a FitsChan by keyword"
+                   '("this" "card" "inc"))
+  (new-ast-routine "astFindFrame"
+                   "Find a coordinate system with specified characteristics"
+                   '("target" "template" "domainlist"))
+  (new-ast-routine "astFitsChan"
+                   "Create a FitsChan"
+                   '("source" "sink" "options" "..."))
+  (new-ast-routine "astFormat"
+                   "Format a coordinate value for a Frame axis"
+                   '("this" "axis" "value"))
+  (new-ast-routine "astFrame"
+                   "Create a Frame"
+                   '("naxes" "options" "..."))
+  (new-ast-routine "astFrameSet"
+                   "Create a FrameSet"
+                   '("frame" "options" "..."))
+  (new-ast-routine "astGetX"
+                   "Get an attribute value for an Object"
+                   '("this" "attrib"))
+  (new-ast-routine "astGetFrame"
+                   "Obtain a pointer to a specified Frame in a FrameSet"
+                   '("this" "iframe"))
+  (new-ast-routine "astGetMapping"
+                   "Obtain a Mapping that converts between two Frames in a FrameSet"
+                   '("this" "iframe1" "iframe2"))
+  (new-ast-routine "astGrid"
+                   "Draw a set of labelled coordinate axes"
+                   '("this"))
+  (new-ast-routine "astGridLine"
+                   "Draw a grid line (or axis) for a Plot"
+                   '("this" "axis" "start" "length"))
+  (new-ast-routine "astIntraMap"
+                   "Create an IntraMap"
+                   '("name" "nin" "nout" "options" "..."))
+  (new-ast-routine "astIntraReg"
+                   "Register a transformation function for use by an IntraMap"
+                   '("name" "nin" "nout" "tran" "flags" "purpose"
+                   "author" "contact"))
+  (new-ast-routine "astInvert"
+                   "Invert a Mapping"
+                   '("this"))
+  (new-ast-routine "astIsAClass"
+                   "Test membership of a class by an Object"
+                   '("this"))
+  (new-ast-routine "astLutMap"
+                   "Create a LutMap"
+                   '("nlut" "lut" "start" "inc" "options" "..."))
+  (new-ast-routine "astMapBox"
+                   "Find a bounding box for a Mapping"
+                   '("this" "lbnd_in" "ubnd_in" "forward" "coord_out"
+                   "lbnd_out" "ubnd_out" "xl" "xu"))
+  (new-ast-routine "astMark"
+                   "Draw a set of markers for a Plot"
+                   '("this" "nmark" "ncoord" "indim" "in" "type"))
+  (new-ast-routine "astMathMap"
+                   "Create a MathMap"
+                   '("nin" "nout" "nfwd" "fwd" "ninv" "inv" "options" "..."))
+  (new-ast-routine "astMatrixMap"
+                   "Create a MatrixMap"
+                   '("nin" "nout" "form" "matrix" "options" "..."))
+  (new-ast-routine "astNorm"
+                   "Normalise a set of Frame coordinates"
+                   '("this" "value"))
+  (new-ast-routine "astOK"
+                   "Test whether AST functions have been successful"
+                   nil)
+  (new-ast-routine "astOffset"
+                   "Calculate an offset along a geodesic curve"
+                   '("this" "point1" "point2" "offset" "point3"))
+  (new-ast-routine "astPcdMap"
+                   "Create a PcdMap"
+                   '("disco" "pcdcen" "options" "..."))
+  (new-ast-routine "astPermAxes"
+                   "Permute the axis order in a Frame"
+                   '("this" "perm"))
+  (new-ast-routine "astPermMap"
+                   "Create a PermMap"
+                   '("nin" "inperm" "nout" "outperm" "constant"
+                   "options" "..."))
+  (new-ast-routine "astPickAxes"
+                   "Create a new Frame by picking axes from an existing one"
+                   '("this" "naxes" "axes" "map"))
+  (new-ast-routine "astPlot"
+                   "Create a Plot"
+                   '("frame" "graphbox" "basebox" "options" "..."))
+  (new-ast-routine "astPolyCurve"
+                   "Draw a series of connected geodesic curves"
+                   '("this" "npoint" "ncoord" "indim" "in"))
+  (new-ast-routine "astPutFits"
+                   "Store a FITS header card in a FitsChan"
+                   '("this" "card" "overwrite"))
+  (new-ast-routine "astRead"
+                   "Read an Object from a Channel"
+                   '("this"))
+  (new-ast-routine "astRemapFrame"
+                   "Modify a Frame's relationship to other Frames in a FrameSet"
+                   '("this" "iframe" "map"))
+  (new-ast-routine "astRemoveFrame"
+                   "Remove a Frame from a FrameSet"
+                   '("this" "iframe"))
+  (new-ast-routine "astResampleX$"
+                   "Resample a region of a data grid"
+                   '("this" "ndim_in" "lbnd_in" "ubnd_in" "in"
+                   "in_var" "interp" "finterp" "params" "flags" "tol"
+                   "maxpix" "badval" "ndim_out" "lbnd_out" "ubnd_out"
+                   "lbnd" "ubnd" "out" "out_var"))
+  (new-ast-routine "astSet"
+                   "Set attribute values for an Object"
+                   '("this" "settings" "..."))
+  (new-ast-routine "astSetX"
+                   "Set an attribute value for an Object"
+                   '("this" "attrib" "value"))
+  (new-ast-routine "astSetStatus"
+                   "Set the AST error status to an explicit value"
+                   '("status"))
+  (new-ast-routine "astShow"
+                   "Display a textual representation of an Object on standard output"
+                   '("this"))
+  (new-ast-routine "astSimplify"
+                   "Simplify a Mapping"
+                   '("this"))
+  (new-ast-routine "astSkyFrame"
+                   "Create a SkyFrame"
+                   '("options" "..."))
+  (new-ast-routine "astSlaAdd"
+                   "Add a celestial coordinate conversion to an SlaMap"
+                   '("this" "cvt" "args"))
+  (new-ast-routine "astSlaMap"
+                   "Create an SlaMap"
+                   '("flags" "options" "..."))
+  (new-ast-routine "astSphMap"
+                   "Create a SphMap"
+                   '("options" "..."))
+  (new-ast-routine "astStatus"
+                   "Obtain the current AST error status value"
+                   nil)
+  (new-ast-routine "astTest"
+                   "Test if an Object attribute value is set"
+                   '("this" "attrib"))
+  (new-ast-routine "astText"
+                   "Draw a text string for a Plot"
+                   '("this" "text" "pos" "up" "just"))
+  (new-ast-routine "astTran1"
+                   "Transform 1-dimensional coordinates"
+                   '("this" "npoint" "xin" "forward" "xout"))
+  (new-ast-routine "astTran2"
+                   "Transform 2-dimensional coordinates"
+                   '("this" "npoint" "xin" "yin" "forward" "xout" "yout"))
+  (new-ast-routine "astTranN"
+                   "Transform N-dimensional coordinates"
+                   '("this" "npoint" "ncoord_in" "indim" "in"
+                   "forward" "ncoord_out" "outdim" "out"))
+  (new-ast-routine "astTranP"
+                   "Transform N-dimensional coordinates held in separate arrays"
+                   '("this" "npoint" "ncoord_in" "ptr_in" "forward"
+                   "ncoord_out" "ptr_out"))
+  (new-ast-routine "astUinterp"
+                   "Perform sub-pixel interpolation on a grid of data"
+                   '("ndim_in" "lbnd_in" "ubnd_in" "in" "in_var"
+                   "npoint" "offset" "coords" "params" "flags"
+                   "badval" "out" "out_var" "nbad"))
+  (new-ast-routine "astUkern1"
+                   "1-dimensional sub-pixel interpolation kernel"
+                   '("offset" "params" "flags" "value"))
+  (new-ast-routine "astUnformat"
+                   "Read a formatted coordinate value for a Frame axis"
+                   '("this" "axis" "string" "value"))
+  (new-ast-routine "astUnitMap"
+                   "Create a UnitMap"
+                   '("ncoord" "options" "..."))
+  (new-ast-routine "astWatch"
+                   "Identify a new error status variable for the AST library"
+                   '("status_address"))
+  (new-ast-routine "astWcsMap"
+                   "Create a WcsMap"
+                   '("ncoord" "type" "lonax" "latax" "options" "..."))
+  (new-ast-routine "astWinMap"
+                   "Create a WinMap"
+                   '("ncoord" "ina" "inb" "outa" "outb" "options" "..."))
+  (new-ast-routine "astWrite"
+                   "Write an Object to a Channel"
+                   '("this" "object"))
+  (new-ast-routine "astZoomMap"
+                   "Create a ZoomMap"
+                   '("ncoord" "zoom" "options" "..."))

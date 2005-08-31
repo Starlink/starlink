@@ -1,0 +1,8 @@
+(defvar text-mode-placeholder-table (make-vector 4095 0))
+(let (sym)
+  (setq sym (intern "WELCOMEX" text-mode-placeholder-table))
+  (set sym "hello")
+
+  (setq sym (intern "WELCOME" text-mode-placeholder-table))
+  (set sym "hello")
+)

@@ -1,0 +1,2 @@
+
+${SDT_DIR}/wrapup $EXPORT/edstar_98.runme *.el starfort-env.elc *.csh *.sh README.edstar

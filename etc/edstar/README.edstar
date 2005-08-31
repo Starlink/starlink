@@ -1,0 +1,710 @@
+EDSTAR - introduction to prototype version (V0.5)
+------   ---------------------------------
+
+Introduction
+============
+EDSTAR is a portable replacement for the LSE-based editor STARLSE. It
+is based on emacs, which is programmable (using Lisp) and can be
+adapted for specialised editing in much the same way as LSE. Raw
+emacs, however, provides somewhat lower-level editing functions than
+LSE (although rather more of them than you could shake a stick at).
+There are also a great may additional "packages" and modes which may
+be loaded or activated within emacs to change its behaviour (so it may
+take some time to discover which combination of these is best suited
+to a programmer's editor).  Despite the underlying power, however,
+considerable work may be required to reproduce LSE/STARLSE
+capabilities in some areas.
+
+The present version of EDSTAR is a prototype and contains many
+limitations when compared with STARLSE (the most important are
+described later). It may be of some use at this stage, however,
+because it will run on platforms where LSE will not and improves on
+the rather basic editing facilities normally provided on UNIX.
+
+I am interested in knowing which of the unimplemented STARLSE
+functions (and there are many) are most missed, so please mail
+me. Although I may not acknowledge all such comments, I will use them
+as a guide when deciding which new features to add, but note that the
+intention is to provide a workable replacement for STARLSE, not
+necessarily to duplicate all its features.
+
+EDSTAR versus emacs functions
+=============================
+"Raw" emacs is a very powerful editor, and you would be well advised
+to obtain a copy of the user manual and learn about at least some of
+its capabilities.  Its user interface, however, (at least to someone
+familiar with EDT-like editors) can be a bit daunting, as there are a
+great many key-based commands activated by instantly forgettable
+sequences of escapes and control characters.
+
+However, there is a bright side to this, because it means that most
+native emacs commands use only the normal alpha-numeric keyboard. In
+contrast, most (STAR)LSE commands make use of the numeric keypad and
+function keys. Although there are a few exceptions, this means that it
+is largely possible to provide both sets of functions simultaneously
+in EDSTAR.
+
+I have therefore adopted the philosophy of preserving existing emacs
+functions as far as possible and of integrating the new STARLSE-like
+ones with them, so that their mutual interactions are reasonably
+sensible. At this early stage, this also means that some STARLSE
+editing functions which are absent can be substituted by similar
+native emacs ones.
+
+Overview of capabilities
+========================
+The current EDSTAR provides EDT/LSE-like editing facilities with
+Fortran 77 language-sensitive features. In particular, it embodies the
+same concepts of "placeholders", "tokens" and "aliases" as LSE, and
+uses these to define the syntax of the same "starlink fortran"
+language as in STARLSE. In EDSTAR, this language is implemented as an
+emacs "major mode" called "Starfort", which is invoked on all files
+with an appropriate file type extension (.f .for .gen plus a few
+others). Starfort includes all the routine prologue templates familiar
+to STARLSE users, as well as the "package definitions" for routines in
+Starlink subroutine libraries.
+
+Installing EDSTAR
+=================
+You will need emacs 19.24 (or a bug-free later version). Martin Bly is
+preparing such a release for Starlink-wide use. You may be able to
+obtain an advance copy from him.
+
+EDSTAR can be found in the file ~rfws/export/edstar05.runme at RAL. Copy
+this file into an empty directory and give it execute permission. Then
+run it, and it will expand into its constituent files. One version
+does for all platforms, and there is no "building" involved.
+
+Make sure your TERM variable is set up to describe your terminal. You
+will probably need a vt-type setting. If using an Xterm, see the man
+pages for what sort of terminal it emulates. Failure to get this right
+will probably mean that emacs can't understand your keyboard.
+
+Enter something like the following into your .login file:
+
+      setenv EDSTAR_DIR <the directory you used>
+      source $EDSTAR_DIR/edstar_setup.csh
+      edstar [f19]
+      bindkey -s '\e[33~' "emacs\n"
+
+The 3rd command logs you in to use EDSTAR, by aliasing "emacs" to be a
+command to run it (much like STARLSE does to lse) and defines the
+"detach key" to be used for suspending editing (see later) to be
+f19. The "bindkey" command (in tcshell) defines the same key to be
+used to (re-)start EDSTAR, so it can be used to toggle in and out of
+the editor. Use of a detach key is optional.
+
+To get going in character-cell mode, press f19 (or whatever) or type
+"emacs". The same command will also re-attach you to a suspended
+EDSTAR session. Use the "exit" command to finally close down (or
+"quit" to discard changes).
+
+At present, when running EDSTAR in X-windows mode, you should run it
+in the background using:
+
+      emacs &
+
+and should avoid re-issuing the "emacs" command while a previous
+invocation is running (it may hang if you do). EDSTAR runs in
+X-windows mode if the DISPLAY environment variable is set. You get
+highlighting and colour in this mode that you don't get with a
+character cell terminal.
+
+If you get errors about not finding files to load, make sure that your
+emacs is installed in the right place. If not, set EMACSLOADPATH to
+include the standard emacs lisp directory (normally /lisp under the
+main emacs directory).
+
+Functions provided
+==================
+EDSTAR currently provides the following STARLSE-like enhancements over
+raw emacs. In each case the key to which the function is bound (if
+any) is given in parentheses:
+
+execute-extended-command ("do" or "menu" key)
+--------------------------------------------
+Allows a "command line" command to be entered, in response to the
+prompt "M-x". This is the equivalent of the LSE "DO" command and is
+used to enter commands which are not bound to keys.
+
+goto-file (GOLD-f)
+------------------
+Finds a file for editing. Similar to the STARLSE equivalent, in that
+it uses a directory search path (specified by the EDSTAR_PATH
+environment variable) to locate files and will accept a relative path
+name (instead of the absolute name normally required by emacs). If an
+absolute file name is given, it will over-ride the search path. Unlike
+STARLSE, EDSTAR supports emacs file name completion facilities within
+the goto-file command. It also handles names like ~rfws/something and
+$A_DIR/something.
+
+To create a new file, use goto-file on a file which does not yet
+exist.
+
+emacs interaction: The standard emacs find-file command (\C-x\C-f) may
+also be used to select files for editing, but note that it does not
+currently provide an "initial string" (e.g. [program_module]) when a
+new file is opened.
+
+edstar-find-place-forward (\C-n)
+--------------------------------
+Moves forward to the next STARLSE-style placeholder.
+
+emacs interaction: Replaces the command to move forward a character
+(this is re-bound to the right arrow key).
+
+edstar-find-place-reverse (\C-p)
+--------------------------------
+Moves backwards to the previous STARLSE-style placeholder.
+
+emacs interaction: Replaces the command to move backwards a character
+(this is re-bound to the left arrow key).
+
+edstar-expand (\C-e)
+--------------------
+Expands the current placeholder or token.
+
+edstar-kill-place (\C-k)
+------------------------
+Deletes the current placeholder, if optional, otherwise asks for
+confirmation.
+
+emacs interaction: Replaces the kill command which has not been
+re-bound.
+
+forward-line (keypad "enter" or 0)
+----------------------------------
+Moves to the start of the next line (or the previous line if in
+reverse mode).
+
+open-line (GOLD- keypad "enter" or 0)
+-------------------------------------
+Inserts a blank line.
+
+edstar-goto-word (keypad 1)
+---------------------------
+The function moves the editing position (point) either forwards or
+backwards to the start of next (or previous) word, or to any other
+non-word character which is not white space. The default direction of
+motion is used.
+
+edstar-search (GOLD- Keypad "+")
+--------------------------------
+Initiates a search for a specified characer sequence - very similar to
+the LSE/EDT-style search.
+
+edstar-delete-line (keypad "-")
+-------------------------------
+Deletes the current line. This is saved in a register and may be
+pasted back, as in LSE.
+
+emacs interaction: the selected text goes to the "l" register.
+
+edstar-undelet-line (GOLD- keypad "-")
+--------------------------------------
+Pastes back the last line to be deleted.
+
+edstar-delete-word (keypad "enter")
+-----------------------------------
+Deletes the next word (and sometimes the one that follows!).
+
+emacs interaction: the selected text goes to the "w" register.
+
+edstar-undelete-word (GOLD- keypad "enter")
+-------------------------------------------
+Pastes back the last word that was deleted.
+
+edstar-delete-character (keypad ",")
+------------------------------------
+Deletes the next character.
+
+emacs interaction: the selected text goes to the "c" register (as also
+does text deleted using the backspace key).
+
+edstar-undelete-character (GOLD- keypad ",")
+--------------------------------------------
+Pastes back the last character deleted (inserts it backwards if it was
+deleted using the backspace key).
+
+edstar-set-selection (keypad ".")
+---------------------------------
+The function sets the current selection marker to the current editing
+position (point) in the current buffer, overriding any previous value.
+This makes the current selection active, the selected text being that
+lying between the selection mark and any subsequent editing position
+(point). In X-windows mode, the selected text is highlighted.
+
+emacs interaction: "transient mark mode" is turned on by EDSTAR and
+used to highlight selected text; the existence of a selection being
+determined by whether the mark is active or not.
+
+edstar-unset-selection (GOLD- keypad ".")
+-----------------------------------------
+The function clears the current selection marker, making the current
+selection inactive and de-selecting any selected text.
+
+emacs interaction: the mark is made inactive.
+
+edstar-save-buffers (GOLD- s) and (f12)
+-------------------
+Flushes all modified buffers back to disk.
+
+exit
+----
+Exits EDSTAR, closing it down after first writing all modified buffers
+back to disk.
+
+quit
+----
+Exits EDSTAR, closing it down without writing any modifications back
+to disk.  Confirmation is sought if any modifications would be lost.
+
+edstar-list-buffers (F8)
+------------------------
+Displays a list of those emacs buffers which are currently visiting
+files.  This list is displayed in the "*Buffer List*" buffer, where
+buffers may be selected, deleted, etc.
+
+emacs interaction: This command is like the native emacs list-buffers
+command (\C-x\C-b), except that it does not list buffers which are not
+visiting files.  The usual native emacs commands may be used to
+interact with the resulting list (but also see the "select" command
+below).
+
+edstar-select-buffer ("select")
+-------------------------------
+When used after edstar-list-buffers (or equivalent), it makes the
+buffer on whose line the cursor is positioned the current buffer and
+displays it in a window for editing.
+
+emacs interaction: Very similar to typing the native commands "1" or
+"2" etc.  in this situation. However, edstar-list-buffers makes a note
+of how many editing windows are displayed before the buffer list is
+put up, and edstar-select-buffer attempts to restore this number once
+the new buffer has been selected.
+
+edstar-toggle-windows (GOLD- "=")
+---------------------------------
+If there is only one window, then it is split horizontally into two
+equal windows. If more than one is visible, then all except the
+current window is deleted, leaving only a single window.
+
+edstar-cut (keypad 6)
+---------------------
+The function cuts the currently-selected text out of the current
+buffer (thus deleting it) and places it into the paste register
+(register "p"). It may later be pasted back elsewhere by using the
+"edstar-paste" function.
+
+edstar-paste (GOLD- keypad 6)
+-----------------------------
+The function pastes back text which has previously been cut (using the
+function "edstar-cut") and stored in the paste register (register
+"p").  The text is interted immediately before the current editing
+position (point).
+
+edstar-toggle-case (GOLD- keypad 1)
+-----------------------------------
+The function processes either the current character or, if a selection
+is active, all the text in the current selection. It toggles its case,
+changing lower case characters to upper case, and vice versa.
+
+res
+---
+The function reserves a file from the (sccs) repository and reads it
+into a buffer for editing. By default the command "sccs edit" is used for
+reserving files. Make the following definition in your .sdtrc file if you
+are using SDT to manage your SCCS repository and want to use its "res" command
+instead:
+
+   setenv EDSTAR_RES '$SDT_DIR/res'
+
+If a buffer of the same name was previously in use, it is
+over-written, but the editing position (point) is preserved.
+
+repl
+----
+The function replaces a file in the (sccs) repository and kills any
+buffer which was previously visiting the file (the buffer is first
+saved if necessary). By default, the command "sccs delta" is used for
+replacing files. Make the following definition in your .sdtrc file if you
+are using SDT to manage your SCCS repository and want to use its "repl" command
+instead:
+
+   setenv EDSTAR_RES '$SDT_DIR/repl'
+
+com
+---
+Compile the current buffer. All modified buffers are flushed to disk,
+and the command:
+
+    $FC -c $FFLAGS <filename>
+
+is used to compile the file being visited by the current buffer (where
+the values of the environment variables FC and FFLAGS are substituted
+as shown).  If FC is not defined, then "fort77" is used. If FFLAGS is
+not defined, then it is omitted entirely. The results of the
+compilation are displayed in a buffer and may be reviewed, either
+using the native emacs facilities or those described below.
+
+If the environment variable EDSTAR_FC is defined, then its value
+replaces that of FC in the compile command. Similarly, if
+EDSTAR_FFLAGS is defined, it replaces "-c $FFLAGS". This allows
+separate compiler options to be specified for use within the editor.
+
+forward-error (\C-f)
+--------------------
+Used to review "errors" from compilation (may also be used to review
+the results of an emacs "grep"). Moves to the next "error", reads in
+the affected file and positions the cursor on the line in error. This
+is similar to the equivalent STARLSE command, except that the source
+is always read in and made ready for editing - no extra command is
+needed to do this. There is only one review buffer in emacs, used both
+for compilation and grep-ping (which is a bit of a limitation).
+
+backward-error (\C-b)
+---------------------
+Same as the above command, except that the previous "error" is
+selected. This can be quite inefficient on long error lists, as it
+re-scans from the start.
+
+edstar-detach ($EDSTAR_DETACH_KEY)
+----------------------------------
+Any modified buffers are first flushed to their associated files and
+the current editing session is then suspended. Control is returned to
+the parent process (the one which activated emacs). Editing may be
+resumed by re-issuing the "emacs" command.
+
+In X-windows mode, emacs cannot be suspended. Buffers are still
+flushed, but the current editing frame is simply iconised, rather than
+actually suspending the editor. (It would be nice if saying "emacs" or
+pressing the attach key again would un-iconise it, but I haven't
+fathomed out how to do that yet.)
+
+The key which is bound to this command depends on the value of the
+EDSTAR_ATTACH_KEY environment variable, which is set by the "edstar"
+command. It should be set to the lisp read syntax for the key required
+(I use the f19 key on my keyboard for EDSTAR and f20 for the old
+STARLSE). If this variable is undefined, then no key is
+bound. (Setting this to be other than a function key requires wizardry
+with escape characters that I have not yet mastered, so I may change
+the way this works in future.)
+
+edstar-insert-comment-line (\C-^)
+--------------------------
+Inserts a comment line (with appropriate padding) in front of the
+current line (if not already a comment line). Provides a quick way to
+add a comment to the current line of code. This function simulates the
+similar feature in STARLSE.
+
+learn (\C-l)
+-----
+Initiates the definition of a keyboard macro (like an LSE "Learn sequence")
+and binds it to a key. This allows you to invoke a whole sequence of commands
+with a single keypress.
+
+emacs interaction: the underlying emacs keyboard macro definition facilities
+are used, so "learn" may be mixed with native emacs commands which handle
+keyboard macros.
+
+colours
+-------
+In X windows mode, you can control the colour of the background used for
+highlighting the placeholder in which the cursor is positioned by putting
+something like the following into your ~/.emacs file:
+
+   (setq edstar-hi-place-background "pink")
+
+Other things
+------------
+Various other cut/paste-with replace type LSE functions have also been
+implemented. They are generally rather obscure, but the intention is
+to make your EDT keypad behave like in EDT as far as possible.
+
+Directory search path
+=====================
+When searching for files using the goto-file command (GOLD-f), EDSTAR
+uses a directory search path. This is defined by the EDSTAR_PATH
+environment variable in the usual UNIX way (separating directories by
+":"). Files contained in directories appearing earlier on this search
+path will then occlude any with the same name in later directories. If
+EDSTAR_PATH is undefined, it defaults to "." (missing fields are also
+interpreted as "."). It is recommended that "."  always appears first,
+otherwise the results can be confusing.
+
+File name completion takes account of the entire search path, except
+that certain files may be excluded if they are unsuitable for editing,
+on the basis of their file type extension. Exclusion is specified
+using the environment variable EDSTAR_IGNORE_FILES, which should be
+set to an emacs regular expression which matches the file type
+extension (excluding the ".") of any file to be excluded. By default,
+the file types excluded are ".o" ".a" ".tar" and ".Z". Files beginning
+with "." are always excluded.
+
+New files are always created in the EDSTAR current directory (see
+below).
+
+Current directory
+=================
+Native emacs associates a "current directory" with each editing
+buffer, which is at variance with the LSE philosophy (adopted by
+EDSTAR) of having only a single current directory for the whole
+editing session. Thus, in any buffer, there may be TWO current
+directories:- the emacs one, and the EDSTAR one (the latter being the
+same for all buffers). Surprisingly, this normally causes no
+confusion. Native emacs commands use the emacs directory and EDSTAR
+ones use the EDSTAR directory (usually they are the same anyway). In
+particular, the EDSTAR current directory dictates where compilations
+are performed.
+
+Initialy, the EDSTAR current directory is inherited from the process
+that starts the editing session. If editing is suspended (using
+edstar-detach) and resumed (using emacs), any intervening change of
+current directory will be inherited by EDSTAR when it resumes.
+
+This behaviour is essentially identical to that of STARLSE.
+
+Readonly Directories
+====================
+When opening a file, EDSTAR inspects the environment variable
+EDSTAR_READONLY which may be defined to contain a list of directories
+(separated by colons) which are to be regarded as "readonly
+directories". Files accessed within these directories will have their
+buffers marked readonly by EDSTAR, so that the files themselves cannot
+be modified without over-riding this feature.
+
+emacs interaction: this feature applies to all files in directories
+designated readonly, regardless of whether they are accessed via
+EDSTAR or native emacs commands. The readonly attribute of buffers may
+be changed using standard emacs commands.
+
+This behaviour simulates the equivalent feature in LSE.
+
+Environment variables
+=====================
+In addition to those described above, EDSTAR supports the same
+environment variables as STARLSE for defining personal names, user
+names and affiliation strings for use in routine prologues (except
+that "STARLSE" should be replaced with "EDSTAR" in the environment
+variable name).
+
+Enhancements:
+============
+The following are notable enhancements which emacs provides, which are
+not available in STARLSE:
+
+Screen scrolling borders: not exactly an enhancement, as LSE has it,
+but emacs doesn't usually ensure that the cursor remains near the
+middle of the screen (avoiding the ends unless near the ends of the
+buffer). EDSTAR simulates this behaviour.
+
+File name completion.
+
+Faster startup (well ...ish - this will probably get very fast once
+the code is stable).
+
+The "undo" command (\C-_) - **VERY** useful, and better than the LSE
+"unkill placeholder" and "unexpand placeholder" commands, which have
+not been implemented.
+
+"Blinking" to show matching parentheses as they are entered. In
+X-windows mode, EDSTAR turns on the "paren" package, which highlights
+matching parentheses near the cursor (X-window mode only).
+
+Automatic lookup of your personal name (can be over-ridden by the
+EDSTAR_PERSONAL_NAME environment variable).
+
+Flagging of long lines: in X-windows mode, lines which exceed 72
+characters in a fortran buffer are flagged in a serious shade of red.
+
+Better line-breaking: EDSTAR will correctly continue a line which is
+too long on the next line, taking account of comments, code, and even
+correctly continuing Fortran string constants.
+
+Better indentation. For example, the command bound to the TAB key will
+adjust the indentation of the current line relative to those that
+precede it, taking account of the language syntax. This facility also
+allows placeholder expansion to produce more reliably indented code.
+
+"electric line number" insertion saves you having to align Fortran
+statement numbers yourself (just type a numeral as the first non-blank
+character on the line).
+
+Mouse avoidance: EDSTAR turns on mouse avoidance mode so that the
+mouse cursor moves away from the editing cursor to stop it getting in
+the way of what you're typing.
+
+Auto display of coordinates: the mode line (at the bottom of the
+editing buffer) displays the cursor coordinates.
+
+When moving vertically over several lines, EDSTAR keeps the cursor on
+the same column throughout (subject to the length of the lines, but
+returning to the correct column after visiting a short line). Neither
+LSE nor emacs does this particularly well on their own.
+ 
+Recent Changes:
+==============
+Version 0.5 of EDSTAR incorporates the following recent changes:
+
+-  Colour highlighting of the placeholder which the cursor is positioned on
+(X windows mode only). The background colour used can be controlled by putting
+something like:
+
+    (setq edstar-hi-place-background "pink")
+
+in your .emacs file.
+
+-  A preliminary implementation of "package definitions" for Starlink
+subroutine libraries.
+
+-  Descriptive information about subroutines should now appear properly when
+they appear in menus.
+
+-  In Xwindows mode, the window displaying the emacs session is now iconised
+if the "detach key" is pressed.
+
+-  EDSTAR now searches forwards (regardless of the current direction of motion)
+to search for the next placeholder after an expand or kill operation.
+
+-  Several program module section placeholders accessed via the "menu" token
+did not expand properly in previous versions. This has been fixed.
+
+-  The starfort message about bug reports is now more sensible and
+cites the author.
+
+-  In previous versions the "res" command did not work unless a file had
+already been visited (the code to prompt for a filename was not being loaded).
+This has now been fixed.
+
+-  What appears to be a bug in v19 of emacs has been worked around (sub-
+processes were running in the directory above that specified by EDSTAR). One
+manifestation was that reserved files appeared in the directory above the
+current one.
+
+-  The details of how EDSTAR interacts with SDT in accessing the SCCS
+repository have changed to make EDSTAR more independent of SDT. By
+default, EDSTAR will now use the commands:
+
+   sccs edit
+   sccs delta
+
+to reserve and replace files. If you are using SDT, you should put the
+following in your .sdtrc file to make EDSTAR use the appropriate SDT
+commands instead:
+
+   setenv EDSTAR_RES '$SDT_DIR/res'
+   setenv EDSTAR_REPL '$SDT_DIR/repl'
+
+(these commands will probably be inserted automatically by newdev in
+future versions of SDT).
+
+-  The "com" command had been broken by emacs v19 - this is now sort of fixed,
+but unfortunately doesn't behave as nicely as before.
+
+-  The "previous-error" command seems to have been broken by emacs v19 (it
+behaves erratically at best). This area of emacs is 'orrible and may take a
+while to sort out.
+
+-  The save-buffers command has been re-named to edstar-save-buffers to avoid
+what appears to be an undocumented name clash in emacs v19. This command is
+now bound to the f12 key (for PWDs benefit, even though there isn't one on my
+keyboard) and also to GOLD-s.
+
+-  The function edstar-goto-page has been added and bound to KP7 to simulate
+the equivalent LSE feature.
+
+-  The function edstar-goto-eol has been added and bound to KP2 to simulate
+the equivalent LSE feature.
+
+-  The expansion for an ADAM monolith is now up to date, a la SUN/144.5.
+
+-  The new function edstar-insert-comment-line has been added and bound to
+\C-^ to insert a new comment line (simulating the old STARLSE feature).
+
+-  The new command "learn" has been added (and bound to \C-l) to simulate the
+"define key/learn" feature of LSE for defining keyboard macros.
+
+- It is now possible to mark directories as "readonly" using the
+EDSTAR_READONLY environment variable (which specifies a colon
+separated list of directories).
+
+- EDSTAR now supports the concept of an "alias" (as used by
+LSE). These are in essence the same as tokens, except that after
+expanding one the cursor stays put instead of advancing to the next
+placeholder (rather like an abbrev in emacs in fact). Several aliases
+were included in STARLSE (e.g. "OK", "CLOC", "BAD" and "ST") and are now
+available in EDSTAR as well.
+
+-  All placeholders which contain "special" characters (like $) should now be
+recognised OK.
+
+-  When expanding placeholders and tokens, descriptive text should now appear
+alongside each item in a menu.
+
+Major deficiencies:
+==================
+
+Some library descriptions probably do not reflect the most recent
+version of the library (e.g. PAR_).
+
+There is no STARLSE-style on-line help.
+
+There is support only for the Fortran 77 language (called Starfort by
+EDSTAR), not the IFL language.
+
+EDSTAR may currently attempt to apply some Fortran editing rules
+(esp. those involving placeholders) to non-Fortran buffers. Hence it
+is probably only suitable for editing Fortran at this stage.
+
+"Line-wrapping" to format paragraphs does not work properly. It makes
+a particular mess of Fortran comment lines - BEWARE!
+
+There isn't a proper LSE-like search/replace command yet. Use the
+native emacs facilities if you're desperate.
+
+Specifying a repeat count with GOLD-nnnn before an EDSTAR command does
+not work. There may be unintended interactions with the similar
+facility which emacs provides.
+
+Cursor positioning on placeholders may sometimes be slightly
+wrong. The cursor may sometimes move to the "wrong" (but not entirely
+unreasonable!) placeholder. Some placeholders and tokens may not get
+recognised if they are right at the beginning of a line or at the
+extreme beginning or end of a buffer.
+
+Some of the EDT-like commands are interim versions and may not
+accurately reproduce the equivalent LSE command, although they are
+normally pretty similar.
+
+There is no highlighting of selected text in character cell mode.
+
+At startup, lots of messages about loading are displayed. These should
+eventually go, and startup time should improve.
+
+EDSTAR has only been used on a very limited selection of keyboards,
+displays, CPUs, etc. Some machine dependencies are likely, especially
+in the area of keyboard mapping.
+
+There is currently little provision to allow EDSTAR to be extended by the
+user.
+
+Entering a numeral as the first text on a line (even in response to a
+prompt) generally causes an error, a beep and the wrong
+indentation. This is because it's working in Fortran mode and thinks
+it's a line number! Adjust the indentation afterwards if necessary.
+
+The "previous-error" command seems to have been broken by emacs v19 (it
+behaves erratically at best). This area of emacs is horrible and may take a
+while to sort out.
+
+When you change directories and return to a resumed EDSTAR session, file name
+completion sometimes doesn't work correctly for the next file you try to
+access (it seems to work OK subsequently).
+
+File name completion doesn't work on absolute file names.
+
+PLEASE LET ME KNOW
+------------------
+Of any deficiencies or problems I haven't listed here.
+
+RFWS 11/7/94
