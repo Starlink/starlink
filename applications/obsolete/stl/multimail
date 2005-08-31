@@ -1,0 +1,15 @@
+
+      message="${1}"
+      addrfile="${2}"
+      subject="${3}"
+
+      addrlist=`cat ${addrfile} | awk '{printf"%s ", $1}' -`
+      for addr in ${addrlist}; do
+         if test ! "${addr}" = "#"; then
+            echo "Sending file ${message} to ${addr}"
+            mail "${addr}" <"${message}"
+            sleep 5
+         fi
+      done
+
+      exit

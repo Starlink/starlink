@@ -1,0 +1,5 @@
+interface pain
+   parameter in
+        type _char
+   endparameter
+endinterface

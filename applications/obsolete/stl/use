@@ -1,0 +1,59 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     use_cmd
+
+#  Purpose:
+#     Generate a C-shell command to place a directory on the search path.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script will write a C-shell command to the standard output
+#     which, when executed, will place a specified directory at the
+#     start of the search path. If a startup file exists in this
+#     directory, the generated command will then source this file.
+
+#  Invocation:
+#     use_cmd directory
+
+#  Arguments:
+#     directory
+#	 Name of the directory which is to be placed at the start of
+#	 the search path (as defined by the PATH environment variable).
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1993 (RFWS):
+#     	 Original version.
+#     14-JUN-1993 (RFWS):
+#        Added "rehash" to the command generated.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Generate the command to update the PATH environment variable.
+      cmd="setenv PATH ${*}:${PATH}"
+
+#  If a startup file exists, append a command to source it.
+      if test -f ${*}/startup; then
+         cmd="${cmd};source ${*}/startup"
+      else :; fi
+
+#  Ensure that any path hash table is re-computed.
+      cmd="${cmd};rehash"
+
+#  Send the resulting command to standard output and quit.
+      echo "$cmd"
+      exit

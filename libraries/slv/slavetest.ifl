@@ -1,0 +1,17 @@
+interface SLAVETEST
+   parameter NDF
+      position 1
+      ppath dynamic
+   endparameter
+
+   parameter MODE
+      position 2
+      ppath dynamic
+   endparameter
+
+   parameter PERCENTILES
+      position 3
+      ppath dynamic
+   endparameter
+
+endinterface

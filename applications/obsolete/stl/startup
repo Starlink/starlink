@@ -1,0 +1,7 @@
+alias use 'eval `\use \!*`'
+
+alias remove 'eval `\remove \!*`'
+
+alias reuse 'remove \!*; use \!*'
+
+#echo '   Path editing commands added to search path'

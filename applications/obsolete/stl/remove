@@ -1,0 +1,63 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     remove_cmd
+
+#  Purpose:
+#     Generate a C-shell command to remove a directory from the search
+#     path.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script will write a C-shell command to the standard output
+#     which, when executed, will remove a specified directory from the
+#     search path. If a closedown file exists in this directory, the
+#     generated command will first source this file.
+
+#  Invocation:
+#     remove_cmd directory
+
+#  Arguments:
+#     directory
+#	 Name of the directory which is to be removed from the search
+#	 path (as defined by the PATH environment variable).
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  If a closedown file exists, generate a command to source it.
+      if test -f ${*}/closedown; then
+         cmd="source ${*}/closedown;"
+      else
+         cmd=''
+      fi
+
+#  Use awk to split up the PATH value into fields and to print only
+#  those fields which do not match the directory to be removed. The new
+#  fields are separated by ':'s, thus giving the new PATH value.
+      newpath=`echo $PATH | \
+awk -F: '{for(i=1;i<=NF;i++)if($i!="'${*}'"){if(l!="")l=l":";l=l$i}print l}'`
+
+#  Add the command to update the PATH environment variable.
+      cmd="${cmd}setenv PATH ${newpath}"
+
+#  Send the resulting command to standard output and quit.
+      echo "$cmd"
+      exit

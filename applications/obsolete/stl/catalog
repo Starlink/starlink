@@ -1,0 +1,61 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     catalog
+
+#  Purpose:
+#     Display the executable files in a directory.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script will display a list of the executable files in a
+#     directory, nicely formatted, on the standard output.
+
+#  Invocation:
+#     catalog directory
+
+#  Arguments:
+#     directory
+#        The name of the directory.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1993 (RFWS):
+#     	 Original version.
+#     25-NOV-1993 (RFWS):
+#     	 Changed to use ls -F because ls -l generates a different format
+#	 on OSF/1 systems.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Go to the specified directory.
+      cd $*
+
+#  Display a heading.
+      echo ''
+      echo "   Executable files in directory $*"
+      echo ''
+
+#  List the directory contents and pipe the result through awk which
+#  prints a list of those files ending in * (indicating they are
+#  executable), but with the * removed. Pass the resulting list back to
+#  ls to produce tidy output.
+      ls `ls -F -L | \
+      awk '{if(substr($0,length($0),1)=="*") print substr($0,1,length($0)-1)}'`
+
+#  Add a final blank line and quit.
+      echo ''
+      exit

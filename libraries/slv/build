@@ -1,0 +1,3 @@
+
+cc -c slv.c -I/star/include
+alink slavetest.f slv.o

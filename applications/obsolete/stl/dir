@@ -1,0 +1,43 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     dir
+
+#  Purpose:
+#     Display the files in a directory.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script will display a list of the files in a directory, nicely
+#     formatted (like on VMS), on the standard output.
+
+#  Invocation:
+#     dir directory
+
+#  Arguments:
+#     directory
+#        The name of the directory.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUN-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  List the directory contents and pass to awk, which separates them with
+#  tabs for neater output. Wrap the result at 72 characters using fmt.
+      ls $* | fmt | tr " " \\011 | fmt

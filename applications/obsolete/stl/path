@@ -1,0 +1,50 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     path
+
+#  Purpose:
+#     Display the contents of the PATH environment variable.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script will display the contents of each field of the PATH
+#     environment variable, nicely formatted, on the standard output.
+
+#  Invocation:
+#     path
+
+#  Arguments:
+#     none
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#.
+
+#  Display a heading.
+      echo ''
+      echo '   Directories on search path:'
+      echo ''
+
+#  Extract the PATH value and pass it to awk to display each field.
+      echo $PATH | awk -F: '{for(i=1;i<=NF;i++)printf"%9d   %s\n",i,$i}'
+
+#  Add a final blank line and quit.
+      echo ''
+      exit
