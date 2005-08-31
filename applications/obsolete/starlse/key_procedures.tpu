@@ -1,0 +1,72 @@
+!  Purpose:
+!     This file contains TPU procedures which are used to re-define the
+!     operation of some of the normal LSE keys. Many of these procedures call
+!     others which reside in separate files since they are also available as
+!     utilities executed by separate LSE commands and/or key definitions.
+
+!*******************************************************************************
+      PROCEDURE STARLSE_NEXT_PLACEHOLDER
+
+      STARLSE1_ALIGN_TRAILING;
+      LSE_NEXT_PLACEHOLDER;
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE;
+!*******************************************************************************
+      PROCEDURE STARLSE_PREVIOUS_PLACEHOLDER
+
+      STARLSE1_ALIGN_TRAILING;
+      LSE_PREVIOUS_PLACEHOLDER;
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE;
+!*******************************************************************************
+      PROCEDURE STARLSE_ERASE_NEXT_PLACEHOLDER
+
+      LOCAL ORIGINAL, NEW;
+
+      ORIGINAL := MARK( NONE );
+      LSE_ERASE_NEXT_PLACEHOLDER( "YES" );
+      NEW := MARK( NONE );
+      POSITION( ORIGINAL );
+      STARLSE1_ALIGN_TRAILING;
+      POSITION( NEW );
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE
+!*******************************************************************************
+      PROCEDURE STARLSE_RESTORE_PLACEHOLDER
+
+      STARLSE1_ALIGN_TRAILING;
+      LSE_RESTORE( "PLACEHOLDER" );
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE;
+!*******************************************************************************
+      PROCEDURE STARLSE1_KEY_EXPAND
+
+      LOCAL ORIGINAL, NEW;
+
+      ORIGINAL := MARK( NONE );
+      LSE$KEY_EXPAND;
+      NEW := MARK( NONE );
+      POSITION( ORIGINAL );
+      STARLSE1_ALIGN_TRAILING;
+      POSITION( NEW );
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE;
+!*******************************************************************************
+      PROCEDURE STARLSE_DELETE_EXPAND
+
+      LOCAL ORIGINAL, NEW;
+
+      ORIGINAL := MARK( NONE );
+      LSE_DELETE_EXPAND;
+      NEW := MARK( NONE );
+      POSITION( ORIGINAL );
+      STARLSE1_ALIGN_TRAILING;
+      POSITION( NEW );
+      STARLSE1_ALIGN_TRAILING;
+
+      ENDPROCEDURE;

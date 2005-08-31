@@ -1,0 +1,30 @@
+#+
+#  Name:
+#     TEST1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-NOV-1992 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TEST1
+
+   helplib ' '
+
+   parameter X
+   endparameter
+
+   message M                     # K
+      text     '{message_text}'
+   endmessage
+
+endinterface

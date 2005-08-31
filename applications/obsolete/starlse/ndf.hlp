@@ -1,0 +1,4417 @@
+1 NDF_ACGET
+Obtain the value of an NDF axis character component.
+
+CALL NDF_ACGET( INDF, COMP, IAXIS, VALUE, STATUS )
+
+Description:
+
+   The routine obtains the value of the specified axis character
+   component of an NDF (i.e. the value of the LABEL or UNITS
+   component for an NDF axis).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis character component whose value is required:
+   'LABEL' or 'UNITS'.
+
+IAXIS = INTEGER (Given)
+   Number of the axis for which a value is required.
+
+VALUE = CHARACTER * ( * ) (Given and Returned)
+   The component's value.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested axis component is in an undefined state and
+VALUE is set to a blank string on entry, then an appropriate
+default value will be returned. If VALUE is not blank on entry,
+then it will be returned unchanged.
+
+-  If the length of the VALUE argument is too short to
+accommodate the returned result without losing significant
+(non-blank) trailing characters, then this will be indicated by
+an appended ellipsis, i.e. '...'. No error will result.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 4-JUL-1990 (RFWS):
+    Original version.
+1 NDF_ACLEN
+Determine the length of an NDF axis character component.
+
+CALL NDF_ACLEN( INDF, COMP, IAXIS, LENGTH, STATUS )
+
+Description:
+
+   The routine returns the length of the specified axis character
+   component of an NDF (i.e. the number of characters in the LABEL
+   or UNITS component of an NDF axis).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis character component whose length is required:
+   'LABEL' or 'UNITS'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis.
+
+LENGTH = INTEGER (Returned)
+   The component's length in characters.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the routine will return the maximum component length
+for all the NDF axes.
+
+-  If the requested axis component is in an undefined state, then
+the length returned will be the number of characters in the
+default value which would be returned by the NDF_ACGET routine.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 4-JUL-1990 (RFWS):
+    Original version.
+
+ 5-JUL-1990 (RFWS):
+    Fixed bug caused by incorrect use of IAX1 instead of IAX.
+1 NDF_ACMSG
+Assign the value of an NDF axis character component to a message
+token.
+
+CALL NDF_ACMSG( TOKEN, INDF, COMP, IAXIS, STATUS )
+
+Description:
+
+   The routine assigns the value of the specified axis character
+   component of an NDF to a message token, for use in constructing
+   messages using the MSG_ or ERR_ routines (see SUN/104).
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   Name of the message token.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis character component whose value is to be used:
+   'LABEL' or 'UNITS'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested axis component is in an undefined state, then
+an appropriate default value will be assigned to the token.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 4-JUL-1990 (RFWS):
+    Original version.
+1 NDF_ACPUT
+Assign a value to an NDF axis character component.
+
+CALL NDF_ACPUT( VALUE, INDF, COMP, IAXIS, STATUS )
+
+Description:
+
+   The routine assigns a value to the specified axis character
+   component of an NDF (i.e. to the LABEL or UNITS component of an
+   NDF axis).
+2 Arguments
+VALUE = CHARACTER * ( * ) (Given)
+   The value to be assigned.
+
+INTEGER = INDF (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis character component whose value is to be
+   assigned: 'LABEL' or 'UNITS'.
+
+IAXIS = INTEGER (Given)
+   Number of the axis to receive the new value.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The entire VALUE string (including trailing blanks if present)
+is assigned to the specified axis component, whose length is
+adjusted to accommodate it.
+
+-  A value of zero may be given for the IAXIS argument, in which
+case the routine will assign the same value to all the NDF axes.
+
+-  This routine may only be used to assign values to the axes of
+a base NDF. If an NDF section is supplied, then it it will return
+without action. No error will result.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 4-JUL-1990 (RFWS):
+    Original version.
+
+ 15-OCT-1990 (RFWS):
+    Changed to pass a DCB index to NDF_$ACRE instead of an ACB
+    index.
+1 NDF_ACRE
+Ensure that an axis coordinate system exists for an NDF.
+
+CALL NDF_ACRE( INDF, STATUS )
+
+Description:
+
+   The routine ensures that an axis coordinate system exists for an
+   NDF. An axis component with default coordinate values is created
+   if necessary.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-JUN-1990 (RFWS):
+    Original version.
+
+ 15-OCT-1990 (RFWS):
+    Changed to pass a DCB index to NDF_$ACRE rather than an ACB
+    index.
+1 NDF_AFORM
+Obtain the storage form of an NDF axis array.
+
+CALL NDF_AFORM( INDF, COMP, IAXIS, FORM, STATUS )
+
+Description:
+
+   The routine returns the storage form of a specified NDF axis
+   array component as an upper case character string (e.g.
+   'PRIMITIVE').
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis array component whose storage form is
+   required: 'CENTRE', 'VARIANCE' or 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis for which information is required.
+
+FORM = CHARACTER * ( * ) (Returned)
+   Storage form of the axis array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant NDF__SZFRM may be used for declaring the
+length of a character variable to hold the storage form of an NDF
+axis array. This constant is defined in the include file NDF_PAR.
+
+-  At present, the NDF_ routines only support "primitive" and
+"simple" arrays, so only the values 'PRIMITIVE' and 'SIMPLE' can
+be returned.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 10-OCT-1990 (RFWS):
+    Original version.
+
+ 15-OCT-1990 (RFWS):
+    Installed support for the axis variance and width arrays.
+1 NDF_AMAP
+Obtain mapped access to an NDF axis array.
+
+CALL NDF_AMAP( INDF, COMP, IAXIS, TYPE, MMOD, PNTR, EL, STATUS )
+
+Description:
+
+   The routine obtains mapped access to an NDF axis array, returning
+   a pointer to the mapped values and a count of the number of
+   elements mapped.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis array component to be mapped: 'CENTRE',
+   'VARIANCE' (or 'ERROR') or 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis whose array is to be mapped.
+
+TYPE = CHARACTER * ( * ) (Given)
+   Numeric type to be used for access (e.g. '_REAL').
+
+MMOD = CHARACTER * ( * ) (Given)
+   Mapping mode for access to the array: 'READ', 'UPDATE' or
+   'WRITE'.
+
+PNTR( * ) = INTEGER (Returned)
+   Pointer(s) to the mapped values (see the Notes section).
+
+EL = INTEGER (Returned)
+   Number of elements mapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of axis array component names may also
+be given, in which case the routine will map all the requested
+axis arrays using the same numeric type and mapping mode.
+Pointers to the values of these mapped arrays will be returned
+(in the specified order) in the elements of the array PNTR, which
+must be of sufficient size to accommodate them.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 9-OCT-1990 (RFWS):
+    Original version.
+
+ 10-OCT-1990 (RFWS):
+    Upgraded to allow a comma-separated list of array names.
+1 NDF_ANNUL
+Annul an NDF identifier.
+
+CALL NDF_ANNUL( INDF, STATUS )
+
+Description:
+
+   The routine annuls the NDF identifier supplied so that it is no
+   longer recognised as a valid identifier by the NDF_ routines.
+   Any resources associated with it are released and made available
+   for re-use. If any NDF components are mapped for access, then
+   they are automatically unmapped by this routine.
+2 Arguments
+INDF = INTEGER (Given and Returned)
+   The NDF identifier to be annulled. A value of NDF__NOID is
+   returned (as defined in the include file NDF_PAR).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances. In particular, it
+will fail if the identifier supplied is not initially valid, but
+this will only be reported if STATUS is set to SAI__OK on entry.
+
+-  An error will result if an attempt is made to annul the last
+remaining identifier associated with an NDF whose DATA component
+has not been defined (unless it is a temporary NDF, in which case
+it will be deleted at this point).
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 6-OCT-1989 (RFWS):
+    Added STATUS check after calling NDF_$IMPID.
+1 NDF_ANORM
+Obtain the logical value of an NDF axis normalisation flag.
+
+CALL NDF_ANORM( INDF, IAXIS, NORM, STATUS )
+
+Description:
+
+   The routine returns a logical value for the normalisation flag
+   associated with an NDF axis.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+IAXIS = INTEGER (Given)
+   Number of the axis whose normalisation flag value is required.
+
+NORM = LOGICAL (Returned)
+   Normalisation flag value.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the routine will return the logical "OR" of the
+normalisation flag values for all the NDF's axes.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-JUL-1990 (RFWS):
+    Original version.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return the logical OR of the results for all axes
+    if an axis number of zero is supplied.
+1 NDF_AREST
+Reset an NDF axis component to an undefined state.
+
+CALL NDF_AREST( INDF, COMP, IAXIS, STATUS )
+
+Description:
+
+   The routine resets an NDF axis component so that its value
+   becomes undefined. It may be used to remove unwanted optional NDF
+   axis components.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis component to be reset: 'LABEL', 'UNITS',
+   'VARIANCE' or 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis to be modified.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of axis component names may also be
+supplied, in which case each component will be reset in turn.
+
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the same component(s) will be reset on all the NDF's
+axes.
+
+-  An axis component name of 'CENTRE' may not be specified for
+this routine because the pixel centre information cannot be reset
+for each axis of an NDF individually. This information may only
+be removed from an NDF by resetting the entire axis component.
+This can be done by calling the routine NDF_RESET and specifying
+a component name of 'AXIS'.
+
+-  This routine may only be used to reset an axis component via a
+base NDF. If an NDF section is supplied, then it will return
+without action. No error will result.
+
+-  An NDF axis array component cannot be reset while it is mapped
+for access, even if this is via another NDF identifier. This
+routine will fail, and set a STATUS value, if this is the case.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 15-OCT-1990 (RFWS):
+    Original version.
+
+ 13-NOV-1990 (RFWS):
+    Revised the prologue.
+
+ 28-NOV-1990 (RFWS):
+    Added error message for EXTENSION components, which are not yet
+    supported.
+1 NDF_ASNRM
+Set a new logical value for an NDF axis normalisation flag.
+
+CALL NDF_ASNRM( NORM, INDF, IAXIS, STATUS )
+
+Description:
+
+   The routine sets a new logical value for the normalisation flag
+   associated with an NDF axis.
+2 Arguments
+NORM = LOGICAL (Given)
+   Normalisation flag value to be set.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis whose normalisation flag value is to be
+   set.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A value of zero may be supplied for the IAXIS component, in
+which case the routine will set the same normalisation flag value
+for all the NDF's axes.
+
+-  This routine may only be used to set an axis normalisation
+flag value for a base NDF. If an NDF section is supplied, then it
+will return without action. No error will result.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-JUL-1990 (RFWS):
+    Original version.
+
+ 1-AUG-1990 (RFWS):
+    Added check on write access being available. Also changed to
+    note whether Data Control Block information is up to date
+    after a new normalisation flag value is set.
+
+ 15-OCT-1990 (RFWS):
+    Changed to pass a DCB index to NDF_$ACRE instead of an ACB
+    index.
+
+ 29-NOV-1990 (RFWS):
+    Changed so that a new axis structure is not created if it
+    doesn't already exist.
+
+ 4-DEC-1990 (RFWS):
+    Improved the creation of the new NORMALISED component.
+1 NDF_ASSOC
+Associate an existing NDF with an ADAM parameter.
+
+CALL NDF_ASSOC( PARAM, MODE, INDF, STATUS )
+
+Description:
+
+   The routine obtains access to an existing NDF through the ADAM
+   parameter system, associates it with the named parameter, and
+   issues an NDF identifier for it.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter.
+
+MODE = CHARACTER * ( * ) (Given)
+   Type of NDF access required: 'READ', 'UPDATE' or 'WRITE'.
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If 'WRITE' access is specified, then all the NDF's components
+will be reset to an undefined state ready to receive new values.
+If 'UPDATE' access is specified, the NDF's components will retain
+their values, which may then be modified.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 3-OCT-1989 (RFWS):
+    Original version.
+
+ 11-OCT-1989 (RFWS):
+    Corrected bug in character string length calculation and
+    improved the error messages.
+
+ 11-OCT-1989 (RFWS):
+    Changed position of call to error tracing routine and added
+    call to annul any error messages which might be generated
+    during cleanup operations before re-prompting.
+
+ 17-OCT-1989 (RFWS):
+    Added initialisation of the INDF argument.
+
+ 29-JAN-1990 (RFWS):
+    Changed handling of re-prompting to avoid looping under
+    parameter system error conditions. Changed error reports to
+    include the parameter name by means of escape characters.
+
+ 20-MAR-1990 (RFWS):
+    Implemented checking of the access mode for validity and
+    resetting of the NDF's component values if write access is
+    required.
+
+ 21-MAR-1990 (RFWS):
+    Re-structured the status testing and added cleanup code for
+    use if the resetting or exporting stages fail.
+1 NDF_ASTAT
+Determine the state of an NDF axis component (defined or
+undefined).
+
+CALL NDF_ASTAT( INDF, COMP, IAXIS, STATE, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether a
+   specified NDF axis component has a defined value (or values).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis component: 'CENTRE', 'LABEL', 'UNITS',
+   'VARIANCE' OR 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis for which information is required.
+
+STATE = LOGICAL (Returned)
+   Whether the specified component is defined.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of axis component names may also be
+given, in which case the routine will return the logical "AND" of
+the states of the specified components (i.e. a .TRUE. result will
+be returned only if all the components have defined values).
+
+-  A value of zero may be given for the IAXIS argument, in which
+case the routine will return the logical "AND" of the results for
+all the NDF's axes.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 17-OCT-1990 (RFWS):
+    Original version.
+
+ 19-OCT-1990 (RFWS):
+    Added an error message for the extension component.
+1 NDF_ASTYP
+Set a new numeric type for an NDF axis array.
+
+CALL NDF_ASTYP( TYPE, INDF, COMP, IAXIS, STATUS )
+
+Description:
+
+   The routine sets a new numeric type for an NDF axis array,
+   causing its data storage type to be changed. If the array's
+   values are defined, they will be converted from from the old type
+   to the new one. If they are undefined, then no conversion will be
+   necessary. Subsequent enquiries will reflect the new numeric
+   type. Conversion may be performed between any numeric types
+   supported by the NDF_ routines.
+2 Arguments
+TYPE = CHARACTER * ( * ) (Given)
+   New numeric type for the axis array (e.g. '_DOUBLE').
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis array component whose numeric type is to be
+   set: 'CENTRE', 'VARIANCE' or 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis whose array is to be modified.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of axis array component names may also
+be supplied, in which case the numeric type of each array will be
+set to the same value in turn.
+
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the routine will set a new numeric type for the
+specified component(s) of all the NDF's axes.
+
+-  This routine may only be used to change the numeric type of an
+axis array via a base NDF. If an NDF section is supplied, then it
+will return without action. No error will result.
+
+-  The numeric type of an axis array component cannot be changed
+while it, or any part of it, is mapped for access (e.g. via
+another NDF identifier). This routine will fail, and set a STATUS
+value, if this is the case.
+
+-  If the numeric type of an axis array component is to be
+changed without its values being retained, then a call to
+NDF_AREST should be made beforehand.  This will avoid the cost of
+converting all the values.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 11-OCT-1990 (RFWS):
+    Original version, derived from the NDF_STYPE routine.
+
+ 15-OCT-1990 (RFWS):
+    Added support for the axis variance and width arrays.
+1 NDF_ATYPE
+Obtain the numeric type of an NDF axis array.
+
+CALL NDF_ATYPE( INDF, COMP, IAXIS, TYPE, STATUS )
+
+Description:
+
+   The routine returns the numeric type of an NDF axis array as an
+   upper-case character string (e.g. '_REAL').
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis array component whose numeric type is
+   required: 'CENTRE', 'VARIANCE' or 'WIDTH'.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis for which information is required.
+
+TYPE = CHARACTER * ( * ) (Returned)
+   Numeric type of the axis array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of axis array component names may also
+be supplied to this routine. In this case the result returned
+will be the lowest precision numeric type to which all the
+specified axis arrays can be converted without unnecessary loss
+of information.
+
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the routine will combine the results for all the NDF's
+axes in the same way as described above.
+
+-  The symbolic constant NDF__SZTYP may be used for declaring the
+length of a character variable which is to hold the numeric type
+of an NDF axis array. This constant is defined in the include
+file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 11-OCT-1990 (RFWS):
+    Original version, derived from the NDF_TYPE routine.
+
+ 15-OCT-1990 (RFWS):
+    Changed argument order in call to NDF_$ATYP.
+1 NDF_AUNMP
+Unmap an NDF axis array.
+
+CALL NDF_AUNMP( INDF, COMP, IAXIS, STATUS )
+
+Description:
+
+   The routine unmaps an NDF axis array which has previously been
+   mapped for READ, UPDATE or WRITE access.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the axis array component to be unmapped: 'CENTRE',
+   'VARIANCE', 'WIDTH' or '*'. The last value acts as a wild
+   card, causing all mapped axis components to be unmapped.
+
+IAXIS = INTEGER (Given)
+   Number of the NDF axis whose array is to be unmapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+
+-  A comma-separated list of axis component names may also be
+given, in which case each component will be unmapped in turn.
+
+-  A value of zero may be supplied for the IAXIS argument, in
+which case the routine will unmap the specified component(s) for
+all the NDF's axes.
+
+-  An error will be reported if a component has not previously
+been mapped for access, except in cases where a wild card
+unmapping operation is specified (either with a component name of
+'*' or an axis number of zero).
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 9-OCT-1990 (RFWS):
+    Original version.
+1 NDF_BAD
+Determine if an NDF array component may contain bad pixels.
+
+CALL NDF_BAD( INDF, COMP, CHECK, BAD, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an array
+   component of an NDF may contain bad pixels for which checks must
+   be made when the array's values are processed. Only if the
+   returned value is .FALSE. can such checks be omitted. If the
+   CHECK argument to this routine is set .TRUE., then it will also
+   perform an explicit check (if necessary) to see whether bad
+   pixels are actually present.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component: 'DATA', 'QUALITY' or
+   'VARIANCE'.
+
+CHECK = LOGICAL (Given)
+   Whether to perform an explicit check to see whether bad pixels
+   are actually present.
+
+BAD = LOGICAL (Returned)
+   Whether it is necessary to check for bad pixels when
+   processing the array's values.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the routine returns the logical "OR" of
+the results for each component.
+
+-  If CHECK is set .FALSE., then the returned value of BAD will
+indicate whether bad pixels might be present and should therefore
+be checked for during subsequent processing. However, even if BAD
+is returned .TRUE. in such circumstances, it is still possible
+that there may not actually be any bad pixels present (for
+instance, in an NDF section, the accessible region of an array
+component might happen to avoid all the bad pixels).
+
+-  If CHECK is set .TRUE., then an explicit check will be made,
+if necessary, to ensure that BAD is only returned .TRUE. if bad
+pixels are actually present.
+
+-  If a component is mapped for access through the identifier
+supplied, then the value of BAD will refer to the actual mapped
+values. It may differ from its original (unmapped) value if
+conversion errors occurred during the mapping process, if an
+initialisation option of '/ZERO' was specified for a component
+whose value was initially undefined, or if the mapped values have
+subsequently been modified.
+
+-  A BAD=.TRUE. result will be returned for any components which
+are in an undefined state, except in the case of the QUALITY
+component for which a .FALSE. result is always returned under
+these circumstances.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-FEB-1990 (RFWS):
+    Original version.
+1 NDF_BASE
+Obtain an identifier for a base NDF.
+
+CALL NDF_BASE( INDF1, INDF2, STATUS )
+
+Description:
+
+   The routine returns an identifier for the base NDF with which an
+   NDF section is associated.
+2 Arguments
+INDF1 = INTEGER (Given)
+   Identifier for an existing NDF section (the routine will also
+   work if this is already a base NDF).
+
+INDF2 = INTEGER (Returned)
+   Identifier for the base NDF with which the section is
+   associated.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 27-NOV-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_BB
+Obtain the bad-bits mask value for the quality component of an
+NDF.
+
+CALL NDF_BB( INDF, BADBIT, STATUS )
+
+Description:
+
+   The routine returns an unsigned byte value representing the
+   bad-bits mask associated with the quality component of an NDF.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+BADBIT = BYTE (Returned)
+   The unsigned byte bad-bits mask.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-FEB-1990 (RFWS):
+    Original version.
+1 NDF_BEGIN
+Begin a new NDF context.
+
+CALL NDF_BEGIN
+
+Description:
+
+   The routine begins a new NDF context. A subsequent call to
+   NDF_END may then be used to annul all the NDF identifiers (and
+   placeholders) issued since the call to NDF_BEGIN was made.
+2 Notes
+Matching pairs of calls to NDF_BEGIN and NDF_END may be nested.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 26-SEP-1989 (RFWS):
+    Original version.
+
+ 10-OCT-1989 (RFWS):
+    Removed all the arguments, which are no longer needed.
+
+ 17-OCT-1989 (RFWS):
+    Improved the prologue description.
+1 NDF_BOUND
+Enquire the pixel-index bounds of an NDF.
+
+CALL NDF_BOUND( INDF, NDIMX, LBND, UBND, NDIM, STATUS )
+
+Description:
+
+   The routine returns the lower and upper pixel-index bounds of
+   each dimension of an NDF, together with the total number of
+   dimensions.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+NDIMX = INTEGER (Given)
+   Maximum number of pixel-index bounds to return (i.e. the
+   declared size of the LBND and UBND arguments).
+
+LBND( NDIMX ) = INTEGER (Returned)
+   Lower pixel-index bounds for each dimension.
+
+UBND( NDIMX ) = INTEGER (Returned)
+   Upper pixel-index bounds for each dimension.
+
+NDIM = INTEGER (Returned)
+   Total number of NDF dimensions.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the NDF has fewer than NDIMX dimensions, then any remaining
+elements of the LBND and UBND arguments will be filled with 1's.
+
+-  If the NDF has more than NDIMX dimensions, then the NDIM
+argument will return the actual number of dimensions. In this
+case only the first NDIMX sets of bounds will be returned, and an
+error will result if the size of any of the remaining dimensions
+exceeds 1.
+
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for all elements of the LBND and UBND arrays and
+for the NDIM argument, although no further processing will occur.
+The same values will also be returned if the routine should fail
+for any reason.
+
+-  The symbolic constant NDF__MXDIM may be used to declare the
+size of the LBND and UBND arguments so that they will be able to
+hold the maximum number of NDF bounds that this routine can
+return. This constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 15-MAR-1990 (RFWS):
+    Added checks on the returned status from ARY_BOUND and updated
+    the prologue to reflect new behaviour if significant
+    dimensions are excluded.
+
+ 16-MAR-1990 (RFWS):
+    Added notes section to prologue.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return "safe" bounds information under error
+    conditions.
+1 NDF_CGET
+Obtain the value of an NDF character component.
+
+CALL NDF_CGET( INDF, COMP, VALUE, STATUS )
+
+Description:
+
+   The routine obtains the value of the specified character
+   component of an NDF (i.e. the value of the LABEL, TITLE or UNITS
+   component).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the character component whose value is required:
+   'LABEL', 'TITLE' or 'UNITS'.
+
+VALUE = CHARACTER * ( * ) (Given and Returned)
+   The component's value.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component is in an undefined state, then the
+VALUE argument will be returned unchanged. A suitable default
+should therefore be established before calling this routine.
+
+-  If the length of the VALUE argument is too short to
+accommodate the returned result without losing significant
+(non-blank) trailing characters, then this will be indicated by
+an appended ellipsis, i.e. '...'. No error will result.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 21-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Minor addition to prologue.
+
+ 2-OCT-1989 (RFWS):
+    Corrected errors in subroutine name and positioning of
+    ellipses.
+
+ 24-JAN-1990 (RFWS):
+    Renamed CCOMP to COMP.
+1 NDF_CINP
+Obtain an NDF character component value via the ADAM parameter
+system.
+
+CALL NDF_CINP( PARAM, INDF, COMP, STATUS )
+
+Description:
+
+   The routine obtains a new value for a character component of an
+   NDF via the ADAM parameter system and uses it to replace any
+   pre-existing value of that component in the NDF.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the character component for which a value is to be
+   obtained: 'LABEL', 'TITLE' or 'UNITS'.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A "null" parameter value is interpreted as indicating that no
+new value should be set for the character component. In this
+event, the routine will return without action (and without
+setting a STATUS value). A suitable default value for the
+character component should therefore be established before this
+routine is called.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-FEB-1990 (RFWS):
+    Original, derived from the NDF_CPUT routine.
+1 NDF_CLEN
+Determine the length of an NDF character component.
+
+CALL NDF_CLEN( INDF, COMP, LENGTH, STATUS )
+
+Description:
+
+   The routine returns the length of the specified character
+   component of an NDF (i.e. the number of characters in the LABEL,
+   TITLE or UNITS component).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the character component whose length is required:
+   'LABEL', 'TITLE' or 'UNITS'.
+
+LENGTH = INTEGER (Returned)
+   Length of the component in characters.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The length of an NDF character component is determined by the
+length of the VALUE string assigned to it by a previous call to
+NDF_CPUT (note that this could include trailing blanks).
+
+-  If the specified component is in an undefined state, then a
+length of zero will be returned.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 21-SEP-1989 (RFWS):
+    Original version.
+
+ 24-JAN-1990 (RFWS):
+    Renamed CCOMP to COMP.
+1 NDF_CLONE
+Clone an NDF identifier.
+
+CALL NDF_CLONE( INDF1, INDF2, STATUS )
+
+Description:
+
+   The routine produces a "cloned" copy of an NDF identifier (i.e.
+   it produces a new identifier describing an NDF with identical
+   attributes to the original).
+2 Arguments
+INDF1 = INTEGER (Given)
+   NDF identifier to be cloned.
+
+INDF2 = INTEGER (Returned)
+   Cloned identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_CMPLX
+Determine whether an NDF array component holds complex values.
+
+CALL NDF_CMPLX( INDF, COMP, CMPLX, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether the
+   specified array component of an NDF holds complex values.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component: 'DATA', 'QUALITY' or
+   'VARIANCE'.
+
+CMPLX = LOGICAL (Returned)
+   Whether the component holds complex values.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of components may also be specified, in
+which case the logical "OR" of the results for each component
+will be returned.
+
+-  The value returned for the QUALITY component is always
+.FALSE..
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 20-OCT-1989 (RFWS):
+    Removed reference to unnecessary DCB data array components.
+
+ 6-DEC-1989 (RFWS):
+    Changed to allow a list of component names to be supplied and
+    to give more specific error messages if inappropriate
+    component names are specified. Also installed support for the
+    VARIANCE component.
+
+ 7-DEC-1989 (RFWS):
+    Added a check that the number of components processed is not
+    zero.
+
+ 1-MAR-1990 (RFWS):
+    Fixed illegal character string concatenation.
+1 NDF_CMSG
+Assign the value of an NDF character component to a message token.
+
+CALL NDF_CMSG( TOKEN, INDF, COMP, STATUS )
+
+Description:
+
+   The routine assigns the value of the specified character
+   component of an NDF to a message token, for use in constructing
+   messages using the MSG_ or ERR_ routines (see SUN/104).
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   Name of the message token.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the character component whose value is to be used:
+   'LABEL', 'TITLE' or 'UNITS'.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the specified NDF component does not have a defined value,
+then the string '<undefined>' is assigned to the token instead.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 21-SEP-1989 (RFWS):
+    Original version.
+
+ 16-JAN-1990 (RFWS):
+    Changed the default string to '<undefined>'.
+1 NDF_COPY
+Copy an NDF to a new location.
+
+CALL NDF_COPY( INDF1, PLACE, INDF2, STATUS )
+
+Description:
+
+   The routine copies an NDF to a new location and returns an
+   identifier for the resulting new base NDF.
+2 Arguments
+INDF1 = INTEGER (Given)
+   Identifier for the NDF (or NDF section) to be copied.
+
+PLACE = INTEGER (Given and Returned)
+   An NDF placeholder (e.g. generated by the NDF_PLACE routine)
+   which indicates the position in the data system where the new
+   NDF will reside. The placeholder is annulled by this routine,
+   and a value of NDF__NOPL will be returned (as defined in the
+   include file NDF_PAR).
+
+INDF2 = INTEGER (Returned)
+   Identifier for the new NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.  In either
+event the placeholder will still be annulled.  The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 12-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 17-OCT-1989 (RFWS):
+    Added support for temporary placeholders.
+
+ 18-OCT-1989 (RFWS):
+    Updated prologue and minor change to error message.
+
+ 1-MAR-1990 (RFWS):
+    Corrected incorrect SAVE statement position.
+1 NDF_CPUT
+Assign a value to an NDF character component.
+
+CALL NDF_CPUT( VALUE, INDF, COMP, STATUS )
+
+Description:
+
+   The routine assigns a value to the specified character component
+   of an NDF (i.e. to the LABEL, TITLE or UNITS component). Any
+   previous value is over-written.
+2 Arguments
+VALUE = CHARACTER * ( * ) (Given)
+   The value to be assigned.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the character component whose value is to be assigned:
+   'LABEL', 'TITLE' or 'UNITS'.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The entire VALUE string (including trailing blanks if present)
+is assigned to the specified component, whose length is adjusted
+to accommodate it.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 21-SEP-1989 (RFWS):
+    Original version.
+
+ 7-FEB-1990 (RFWS):
+    Changed the argument order.
+1 NDF_CREAT
+Create a new simple NDF via the ADAM parameter system.
+
+CALL NDF_CREAT( PARAM, FTYPE, NDIM, LBND, UBND, INDF, STATUS )
+
+Description:
+
+   The routine creates a new simple NDF via the ADAM parameter
+   system, associates it with a parameter, and returns an NDF
+   identifier for it.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter.
+
+FTYPE = CHARACTER * ( * ) (Given)
+   Full data type of the NDF's DATA component (e.g. '_DOUBLE' or
+   'COMPLEX_REAL').
+
+NDIM = INTEGER (Given)
+   Number of NDF dimensions.
+
+LBND( NDIM ) = INTEGER (Given)
+   Lower pixel-index bounds of the NDF.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the NDF.
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine creates a "simple" NDF, i.e. one whose array
+components will be stored in "simple" form by default (see
+SGP/38).
+
+-  The full data type of the DATA component is specified via the
+FTYPE argument and the data type of the VARIANCE component
+defaults to the same value. These data types may be set
+individually with the NDF_STYPE routine if required.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-OCT-1989 (RFWS):
+    Original version.
+
+ 11-OCT-1989 (RFWS):
+    Substantial re-write to implement re-prompting and generation
+    of sensible error messages.
+
+ 17-OCT-1989 (RFWS):
+    Added initialisation of the INDF argument.
+
+ 6-DEC-1989 (RFWS):
+    Changed the name of the NDF_$VFTP routine to NDF_$CHFTP to
+    avoid a name clash.
+
+ 29-JAN-1990 (RFWS):
+    Eliminated re-prompting to avoid looping under parameter system
+    error conditions. Re-prompting is now handled by the parameter
+    system alone. Changed error messages to include the parameter
+    name using escape characters.
+
+ 26-FEB-1990 (RFWS):
+    Changed the NDF placeholder data type to 'NDF'.
+
+ 12-MAR-1990 (RFWS):
+    Added missing argument to prologue.
+
+ 22-MAR-1990 (RFWS):
+    Installed initial file size allocation.
+
+ 23-MAR-1990 (RFWS):
+    Added better security against initial file size allocation not
+    reverting to normal after an error during file creation.
+
+ 23-MAR-1990 (RFWS):
+    Re-structured the routine so that the parameter association is
+    cancelled and the data object deleted (if it has already been
+    created) following errors other than "null" and "abort" status
+    values.
+1 NDF_CREP
+Create a new primitive NDF via the ADAM parameter system.
+
+CALL NDF_CREP( PARAM, FTYPE, NDIM, UBND, INDF, STATUS )
+
+Description:
+
+   The routine creates a new primitive NDF via the ADAM parameter
+   system, associates it with a parameter, and returns an NDF
+   identifier for it.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter.
+
+FTYPE = CHARACTER * ( * ) (Given)
+   Type of the NDF's DATA component (e.g. '_REAL'). Note that
+   complex types are not permitted when creating a primitive NDF.
+
+NDIM = INTEGER (Given)
+   Number of NDF dimensions.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the NDF (the lower bound of each
+   dimension is taken to be 1).
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine creates a "primitive" NDF, i.e. one whose array
+components will be stored in "primitive" form by default (see
+SGP/38).
+
+-  The data type of the DATA component is specified via the FTYPE
+argument and the data type of the VARIANCE component defaults to
+the same value. These data types may be set individually with the
+NDF_STYPE routine if required.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-FEB-1990 (RFWS):
+    Original, derived from the NDF_CREAT routine.
+
+ 26-FEB-1990 (RFWS):
+    Changed the NDF placeholder data type to 'NDF'.
+
+ 12-MAR-1990 (RFWS):
+    Added missing argument to prologue.
+
+ 23-MAR-1990 (RFWS):
+    Installed initial file size allocation.
+
+ 17-APR-1990 (RFWS):
+    Fixed bug in error status checking which caused a spurious
+    error message to appear when no error had occurred.
+1 NDF_DELET
+Delete an NDF.
+
+CALL NDF_DELET( INDF, STATUS )
+
+Description:
+
+   The routine deletes the specified NDF. If this is a base NDF,
+   then the associated data object is erased and all NDF identifiers
+   which refer to it (or to sections derived from it) become
+   invalid. If any NDF components are mapped for access, then they
+   are first unmapped. If an NDF section is specified, then this
+   routine is equivalent to calling NDF_ANNUL, and no other
+   identifiers are affected.
+2 Arguments
+INDF = INTEGER (Given and Returned)
+   Identifier for the NDF to be deleted. A value of NDF__NOID is
+   returned (as defined in the include file NDF_PAR).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-NOV-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 16-MAR-1990 (RFWS):
+    Ensure that the INDF value is reset even if the routine fails.
+1 NDF_DIM
+Enquire the dimension sizes of an NDF.
+
+CALL NDF_DIM( INDF, NDIMX, DIM, NDIM, STATUS )
+
+Description:
+
+   The routine returns the size in pixels of each dimension of an
+   NDF, together with the total number of dimensions (the size of a
+   dimension is the difference between that dimension's upper and
+   lower pixel-index bounds + 1).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+NDIMX = INTEGER (Given)
+   Maximum number of dimension sizes to return (i.e. the declared
+   size of the DIM argument).
+
+DIM( NDIMX ) = INTEGER (Returned)
+   Size of each dimension in pixels.
+
+NDIM = INTEGER (Returned)
+   Total number of NDF dimensions.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the NDF has fewer than NDIMX dimensions, then any remaining
+elements of the DIM argument will be filled with 1's.
+
+-  If the NDF has more than NDIMX dimensions, then the NDIM
+argument will return the actual number of dimensions. In this
+case only the first NDIMX dimension sizes will be returned, and
+an error will result if the size of any of the excluded
+dimensions exceeds 1.
+
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for all elements of the DIM array and for the
+NDIM argument, although no further processing will occur.  The
+same values will also be returned if the routine should fail for
+any reason.
+
+-  The symbolic constant NDF__MXDIM may be used to declare the
+size of the DIM argument so that it will be able to hold the
+maximum number of NDF dimension sizes that this routine can
+return. This constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 15-MAR-1990 (RFWS):
+    Added checks on the returned status from ARY_DIM and updated
+    the prologue to reflect new behaviour if significant dimensions
+    are excluded.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return "safe" dimension information under error
+    conditions.
+1 NDF_END
+End the current NDF context.
+
+CALL NDF_END( STATUS )
+
+Description:
+
+   The routine ends the current NDF context, causing all NDF
+   identifiers and placeholders created within that context (i.e.
+   since a matching call to NDF_BEGIN) to be annulled. Any mapped
+   values associated with these identifiers are unmapped, and any
+   temporary NDFs which no longer have identifiers associated with
+   them are deleted.
+2 Arguments
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Matching pairs of calls to NDF_BEGIN and NDF_END may be
+nested. An error will be reported if NDF_END is called without a
+corresponding call to NDF_BEGIN.
+
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-OCT-1989 (RFWS):
+    Original version.
+
+ 17-OCT-1989 (RFWS):
+    Corrected error in argument list of NDF_$ANNPL.
+
+ 1-DEC-1989 (RFWS):
+    Sorted out error status handling.
+
+ 29-JAN-1990 (RFWS):
+    Corrected bug in test for missing call to NDF_BEGIN.
+1 NDF_EXIST
+See if an existing NDF is associated with an ADAM parameter.
+
+CALL NDF_EXIST( PARAM, MODE, INDF, STATUS )
+
+Description:
+
+   The routine determines if an existing (and accessible) NDF is
+   associated with an ADAM parameter. If it is, then an identifier
+   is returned for it. If not, then the routine returns with an
+   identifier value of NDF__NOID; this then allows the NDF structure
+   to be created (e.g. using NDF_CREAT) if required.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter.
+
+MODE = CHARACTER * ( * ) (Given)
+   Type of NDF access required: 'READ', 'UPDATE' or 'WRITE'.
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If 'WRITE' access is specified, then all the NDF's components
+will be reset to an undefined state ready to receive new values.
+If 'UPDATE' access is specified, the NDF's components will retain
+their values, which may then be modified.
+
+-  The behaviour of this routine is the same as NDF_ASSOC, except
+that in the event of the NDF structure not existing (or being
+inaccessible), control is returned to the application with an
+identifier value of NDF__NOID, rather than re-prompting the user.
+
+-  Note that unlike the DAT_EXIST routine, on which it is
+modelled, this routine does not set a STATUS value if the data
+structure does not exist.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.  The
+NDF__NOID constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 17-OCT-1989 (RFWS):
+    Original version.
+
+ 18-OCT-1989 (RFWS):
+    Minor changes to comments and error message.
+
+ 29-JAN-1990 (RFWS):
+    Changed handling of re-prompts to avoid looping under
+    parameter system error conditions. Changed error messages to
+    include the parameter name using escape characters.
+
+ 20-MAR-1990 (RFWS):
+    Implemented checking of the access mode value for validity and
+    resetting of the NDF's component values if write access is
+    requested.
+
+ 21-MAR-1990 (RFWS):
+    Re-structured status checking.
+1 NDF_FIND
+Find an NDF in an HDS structure and import it into the NDF_
+system.
+
+CALL NDF_FIND( LOC, NAME, INDF, STATUS )
+
+Description:
+
+   The routine finds an NDF within an HDS structure, imports it into
+   the NDF_ system and issues an identifier for it. The imported NDF
+   may then be manipulated by the NDF_ routines.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   Locator to the enclosing HDS structure.
+
+NAME = CHARACTER * ( * ) (Given)
+   Name of the HDS structure component to be imported.
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The value given for the NAME argument may be an HDS path name,
+consisting of several fields separated by '.', so that an NDF can
+be found in a sub-component (or a sub-sub-component...) of the
+structure identified by the locator LOC.  Array subscripts may
+also be used in this component name.  Thus a string such as
+'MYSTRUC.ZONE(2).IMAGE' could be used as a valid NAME value.
+
+-  If a blank value is given for the NAME argument, then the NDF
+to be imported will be the object identified directly by the
+locator LOC.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur.  The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 11-DEC-1990 (RFWS):
+    Changed to allow a compound or blank component name.
+1 NDF_FORM
+Obtain the storage form of an NDF array component.
+
+CALL NDF_FORM( INDF, COMP, FORM, STATUS )
+
+Description:
+
+   The routine returns the storage form of an NDF array component as
+   an upper case character string (e.g. 'SIMPLE').
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component whose storage form is required:
+   'DATA', 'QUALITY' or 'VARIANCE'.
+
+FORM = CHARACTER * ( * ) (Returned)
+   Storage form of the component.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant NDF__SZFRM may be used for declaring the
+length of a character variable to hold the storage form of an NDF
+array component. This constant is defined in the include file
+NDF_PAR.
+
+-  At present, the NDF_ routines only support "primitive" and
+"simple" arrays, so only the values 'PRIMITIVE' and 'SIMPLE' can
+be returned.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-OCT-1989 (RFWS):
+    Original version.
+
+ 6-DEC-1989 (RFWS):
+    Added support for the variance component.
+
+ 7-DEC-1989 (RFWS):
+    Changed to give more specific error messages if an
+    inappropriate component name is specified.
+
+ 30-JAN-1990 (RFWS):
+    Installed support for the quality component.
+1 NDF_FTYPE
+Obtain the full data type of an NDF array component.
+
+CALL NDF_FTYPE( INDF, COMP, FTYPE, STATUS )
+
+Description:
+
+   The routine returns the full data type of one of the array
+   components of an NDF as an upper-case character string (e.g.
+   '_REAL' or 'COMPLEX_BYTE').
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component whose type is required: 'DATA',
+   'QUALITY' or 'VARIANCE'.
+
+FTYPE = CHARACTER * ( * ) (Returned)
+   Full data type of the component.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be supplied
+to this routine. In this case the result returned will be the
+lowest precision full data type to which the values held in all
+the specified components can be converted without unnecessary
+loss of information.
+
+-  The value returned for the QUALITY component is always
+'_UBYTE'.
+
+-  The symbolic constant NDF__SZFTP may be used for declaring the
+length of a character variable to hold the full data type of an
+NDF array component. This constant is defined in the include file
+NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-OCT-1989 (RFWS):
+    Original version.
+
+ 14-NOV-1989 (RFWS):
+    Minor change to prologue.
+
+ 19-MAR-1990 (RFWS):
+    Added support for comma-separated component name lists.
+1 NDF_IMPRT
+Import an NDF into the NDF_ system from HDS.
+
+CALL NDF_IMPRT( LOC, INDF, STATUS )
+
+Description:
+
+   The routine imports an NDF into the NDF_ system from HDS and
+   issues an identifier for it. The NDF may then be manipulated by
+   the NDF_ routines.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   HDS locator to an NDF structure.
+
+INDF = INTEGER (Returned)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The locator supplied as input to this routine may later be
+annulled without affecting the subsequent behaviour of the NDF_
+system.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 26-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ routine.
+
+ 26-SEP-1989 (RFWS):
+    Improved error message.
+1 NDF_ISACC
+Determine whether a specified type of NDF access is available.
+
+CALL NDF_ISACC( INDF, ACCESS, ISACC, STATUS )
+
+Description:
+
+   The routine determines whether a specified type of access to an
+   NDF is available, or whether it has been disabled. If access is
+   not available, then any attempt to access the NDF in this way
+   will fail.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+ACCESS = CHARACTER * ( * ) (Given)
+   The type of NDF access required: 'BOUNDS', 'DELETE', 'SHIFT',
+   'TYPE' or 'WRITE' (see the Notes section for details).
+
+ISACC = LOGICAL (Returned)
+   Whether the specified type of access is available.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+The valid access types control the following operations on the
+NDF:
+
+-  'BOUNDS' permits the pixel-index bounds of a base NDF to be
+altered.
+
+-  'DELETE' permits deletion of the NDF.
+
+-  'SHIFT' permits pixel-index shifts to be applied to a base
+NDF.
+
+-  'TYPE' permits the data types of an NDF's components to be
+altered.
+
+-  'WRITE' permits new values to be written to the NDF, and the
+state of any of its components to be reset.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_ISBAS
+Enquire if an NDF is a base NDF.
+
+CALL NDF_ISBAS( INDF, ISBAS, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether the NDF
+   whose identifier is supplied is a base NDF (as opposed to an NDF
+   section).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+ISBAS = LOGICAL (Returned)
+   Whether the NDF is a base NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_ISTMP
+Enquire if an NDF is temporary.
+
+CALL NDF_ISTMP( INDF, ISTMP, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether the
+   specified NDF is temporary. Temporary NDFs are deleted once the
+   last identifier which refers to them is annulled.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+ISTMP = LOGICAL (Returned)
+   Whether the NDF is temporary.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_MAP
+Obtain mapped access to an array component of an NDF.
+
+CALL NDF_MAP( INDF, COMP, TYPE, MMOD, PNTR, EL, STATUS )
+
+Description:
+
+   The routine obtains mapped access to an array component of an
+   NDF, returning a pointer to the mapped values and a count of the
+   number of elements mapped.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component to be mapped: 'DATA',
+   'QUALITY' or 'VARIANCE' (or 'ERROR').
+
+TYPE = CHARACTER * ( * ) (Given)
+   Numeric type to be used for access (e.g. '_REAL').
+
+MMOD = CHARACTER * ( * ) (Given)
+   Mapping mode for access to the array: 'READ', 'UPDATE' or
+   'WRITE', with an optional initialisation mode '/BAD' or
+   '/ZERO' appended.
+
+PNTR( * ) = INTEGER (Returned)
+   Pointer(s) to the mapped values (see the Notes section).
+
+EL = INTEGER (Returned)
+   Number of elements mapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be given,
+in which case the routine will map all the requested components
+using the same data type and mapping mode. Pointers to the values
+of these mapped components will be returned (in the specified
+order) in the elements of the array PNTR, which must be of
+sufficient size to accommodate them.
+
+-  The result of mapping the QUALITY component with a data type
+other than '_UBYTE' is not defined and should not be used.
+
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for the EL argument, although no further
+processing will occur.  The same value will also be returned if
+the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 12-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 15-JAN-1990 (RFWS):
+    Added pointer array for use when mapping several NDF components
+    at once. Changed ACOMP argument to COMP.
+
+ 23-JAN-1990 (RFWS):
+    Renamed from NDF_MAPV to NDF_MAP.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return a "safe" value of EL under error conditions.
+1 NDF_MAPQL
+Map the quality component of an NDF as an array of logical
+values.
+
+CALL NDF_MAPQL( INDF, PNTR, EL, BAD, STATUS )
+
+Description:
+
+   The routine maps the quality component of an NDF for read access,
+   returning a pointer to an array of logical values. Elements of
+   this array are set to .TRUE. if the bit-wise "AND" of the
+   corresponding quality value and its effective bad-bits mask gives
+   a zero result, indicating that the corresponding NDF pixel may be
+   used in subsequent processing. Other array elements are set to
+   .FALSE., indicating that corresponding NDF pixels should be
+   excluded from subsequent processing.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+PNTR = INTEGER (Returned)
+   Pointer to the mapped array of logical values.
+
+EL = INTEGER (Returned)
+   Number of values mapped.
+
+BAD = LOGICAL (Returned)
+   This argument is set to .TRUE. if any of the mapped values is
+   set to .FALSE. (i.e. if any NDF pixels are to be excluded as a
+   consequence of the associated quality values). Otherwise it is
+   set to .FALSE..
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the quality component's values are undefined, then this
+routine will return a pointer to an array of .TRUE. values.
+
+-  Note that this routine only obtains read access to the quality
+component; changes made to the mapped values will not be
+reflected in changes to the NDF's quality values.
+
+-  This routine disables automatic quality masking, so that
+subsequent access to other NDF array components via the same
+identifier will take no account of the possible presence of
+associated quality values.
+
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for the EL argument, although no further
+processing will occur.  The same value will also be returned if
+the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-FEB-1990 (RFWS):
+    Original version.
+
+ 21-MAR-1990 (RFWS):
+    Minor change to error message.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return a "safe" value of EL under error conditions.
+1 NDF_MAPZ
+Obtain complex mapped access to an array component of an NDF.
+
+CALL NDF_MAPZ( INDF, COMP, TYPE, MMOD, RPNTR, IPNTR, EL,
+STATUS )
+
+Description:
+
+   The routine obtains complex mapped access to an array component
+   of an NDF, returning pointers to the mapped real and imaginary
+   values and a count of the number of elements mapped.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component to be mapped: 'DATA' or
+   'VARIANCE' (or 'ERROR').
+
+TYPE = CHARACTER * ( * ) (Given)
+   Numeric type to be used for access (e.g.  '_REAL').
+
+MMOD = CHARACTER * ( * ) (Given)
+   Mapping mode for access to the array: 'READ', 'UPDATE' or
+   'WRITE', with an optional initialisation mode '/ZERO' or
+   '/BAD' appended.
+
+RPNTR( * ) = INTEGER (Returned)
+   Pointer(s) to the mapped real (i.e. non-imaginary) values (see
+   the Notes section).
+
+IPNTR( * ) = INTEGER (Returned)
+   Pointer(s) to the mapped imaginary values (see the Notes
+   section).
+
+EL = INTEGER (Returned)
+   Number of elements mapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be given,
+in which case the routine will map all the requested components
+using the same data type and mapping mode. Pointers to the values
+of these mapped components will be returned (in the specified
+order) in the elements of the arrays RPNTR and IPNTR, which must
+be of sufficient size to accommodate them.
+
+-  Access to an NDF's QUALITY component is not available using
+this routine.
+
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for the EL argument, although no further
+processing will occur.  The same value will also be returned if
+the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 12-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 15-JAN-1990 (RFWS):
+    Added pointer arrays for use when mapping several NDF
+    components at once. Changed ACOMP argument to COMP.
+
+ 16-JAN-1990 (RFWS):
+    Changed DPNTR to RPNTR.
+
+ 23-JAN-1990 (RFWS):
+    Renamed from NDF_MAPZV to NDF_MAPZ.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return a "safe" value of EL under error conditions.
+1 NDF_MBAD
+Merge the bad-pixel flags of the array components of a pair of
+NDFs.
+
+CALL NDF_MBAD( BADOK, INDF1, INDF2, COMP, CHECK, BAD, STATUS )
+
+Description:
+
+   The routine merges the bad-pixel flag values of an array
+   component (or components) for a pair of NDFs, returning the
+   logical "OR" of the separate values for each NDF. In addition, if
+   bad pixels are found to be present in either NDF but the
+   application indicates that it cannot correctly handle such
+   values, then an error to this effect is reported and a STATUS
+   value is set.
+2 Arguments
+BADOK = LOGICAL (Given)
+   Whether the application can correctly handle NDF array
+   components containing bad pixel values.
+
+INDF1 = INTEGER (Given)
+   Identifier for the first NDF whose bad-pixel flag value is to
+   be merged.
+
+INDF2 = INTEGER (Given)
+   Identifier for the second NDF.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component: 'DATA', 'QUALITY' or
+   'VARIANCE'.
+
+CHECK = LOGICAL (Given)
+   Whether to perform explicit checks to see whether bad pixels
+   are actually present. (This argument performs the same
+   function as in the routine NDF_BAD.)
+
+BAD = LOGICAL (Returned)
+   The combined bad-pixel flag value (the logical "OR" of the
+   values obtained for each NDF).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the routine will take the logical "OR" of
+all the specified components when calculating the combined
+bad-pixel flag value.
+
+-  The effective value of the bad-pixel flag for each NDF array
+component which this routine uses is the same as would be returned
+by a call to the routine NDF_BAD.
+
+-  If this routine detects the presence of bad pixels which the
+application cannot support (as indicated by a .FALSE. value for
+the BADOK argument), then an error will be reported to this
+effect and a STATUS value of NDF__BADNS (bad pixels not
+supported) will be returned.  The value of the BAD argument will
+be set to .TRUE. under these circumstances. The NDF__BADNS
+constant is defined in the include file NDF_ERR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-FEB-1990 (RFWS):
+    Original version.
+1 NDF_MBADN
+Merge the bad-pixel flags of the array components of a number of
+NDFs.
+
+CALL NDF_MBADN( BADOK, N, NDFS, COMP, CHECK, BAD, STATUS )
+
+Description:
+
+   The routine merges the bad-pixel flag values of an array
+   component (or components) for a number of NDFs, returning the
+   logical "OR" of the separate values for each NDF. In addition, if
+   bad pixels are found to be present in any NDF but the application
+   indicates that it cannot correctly handle such values, then an
+   error to this effect is reported and a STATUS value is set.
+2 Arguments
+BADOK = LOGICAL (Given)
+   Whether the application can correctly handle NDF array
+   components containing bad pixel values.
+
+N = INTEGER (Given)
+   Number of NDFs whose bad-pixel flags are to be merged.
+
+NDFS( N ) = INTEGER (Given)
+   Array of identifiers for the NDFs to be merged.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component: 'DATA', 'QUALITY' or
+   'VARIANCE'.
+
+CHECK = LOGICAL (Given)
+   Whether to perform explicit checks to see whether bad pixels
+   are actually present. (This argument performs the same
+   function as in the routine NDF_BAD.)
+
+BAD = LOGICAL (Returned)
+   The combined bad-pixel flag value (the logical "OR" of the
+   values obtained for each NDF).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the routine will take the logical "OR" of
+all the specified components when calculating the combined
+bad-pixel flag value.
+
+-  The effective value of the bad-pixel flag for each NDF array
+component which this routine uses is the same as would be returned
+by a call to the routine NDF_BAD.
+
+-  If this routine detects the presence of bad pixels which the
+application cannot support (as indicated by a .FALSE. value for
+the BADOK argument), then an error will be reported to this
+effect and a STATUS value of NDF__BADNS (bad pixels not
+supported) will be returned.  The value of the BAD argument will
+be set to .TRUE. under these circumstances. The NDF__BADNS
+constant is defined in the include file NDF_ERR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 10-JUL-1990 (RFWS):
+    Original version.
+1 NDF_MBND
+Match the pixel-index bounds of a pair of NDFs.
+
+CALL NDF_MBND( OPTION, INDF1, INDF2, STATUS )
+
+Description:
+
+   The routine matches the pixel-index bounds of a pair of NDFs so
+   that their array components may be compared pixel-for-pixel
+   during subsequent processing. Matching is performed by selecting
+   an appropriate section from each NDF, the method used to define
+   this section being determined by the value given for the OPTION
+   argument.
+2 Arguments
+OPTION = CHARACTER * ( * ) (Given)
+   This argument determines how the section to be selected from
+   each NDF is defined: 'PAD' or 'TRIM' (see the Notes section
+   for details). Its value may be abbreviated to 3 characters.
+
+INDF1 = INTEGER (Given and Returned)
+   Identifier for the first NDF whose pixel-index bounds are to
+   be matched.
+
+INDF2 = INTEGER (Given and Returned)
+   Identifier for the second NDF to be matched.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If OPTION='PAD' is specified, then the NDF bounds will be
+matched by "padding"; i.e. each NDF will be extended by selecting
+the smallest section from it which encompasses all the pixels in
+both NDFs. In effect, the pixel-index bounds of the two NDFs are
+"maximised" and the "union" of the two sets of pixels is
+selected.  Any new pixels introduced into either NDF will be
+padded with the "bad" value.  If the NDFs have different numbers
+of dimensions, then the dimensionality of both the returned
+sections will match the NDF with the higher dimensionality.
+
+-  If OPTION='TRIM' is specified, then the NDF bounds will be
+matched by "trimming"; i.e. each NDF will be restricted in extent
+by selecting a section from it which encompasses only those
+pixels which are present in both NDFs. In effect, the pixel-index
+bounds of the two NDFs are "minimised" and the "intersection" of
+the two sets of pixels is selected. An error will result if the
+two NDFs have no pixels in common. If the NDFs have different
+numbers of dimensions, then the dimensionality of both the
+returned sections will match the NDF with the lower
+dimensionality.
+
+-  Note that the initial NDF identifier values will be annulled
+by this routine and replaced with identifiers describing
+appropriate new sections from the original NDFs. If access to the
+original data is still required, then the initial identifiers may
+be cloned with the routine NDF_CLONE before calling this routine.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-NOV-1989 (RFWS):
+    Original version.
+
+ 6-FEB-1990 (RFWS):
+    Installed 'TRIM' and 'PAD' options.
+
+ 1-MAR-1990 (RFWS):
+    Removed un-referenced include file.
+1 NDF_MBNDN
+Match the pixel-index bounds of a number of NDFs.
+
+CALL NDF_MBNDN( OPTION, N, NDFS, STATUS )
+
+Description:
+
+   The routine matches the pixel-index bounds of a number of NDFs so
+   that their array components may be compared pixel-for-pixel
+   during subsequent processing. Matching is performed by selecting
+   an appropriate section from each NDF, the method used to define
+   this section being determined by the value given for the OPTION
+   argument.
+2 Arguments
+OPTION = CHARACTER * ( * ) (Given)
+   This argument determines how the section to be selected from
+   each NDF is defined: 'PAD' or 'TRIM' (see the Notes section
+   for details). Its value may be abbreviated to 3 characters.
+
+N = INTEGER (Given)
+   Number of NDFs whose pixel-index bounds are to be matched.
+
+NDFS( N ) = INTEGER (Given and Returned)
+   Array of identifiers for the NDFs to be matched.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If OPTION='PAD' is specified, then the NDF bounds will be
+matched by "padding"; i.e. each NDF will be extended by selecting
+the smallest section from it which encompasses all the pixels in
+all the NDFs. In effect, the pixel-index bounds of the NDFs are
+"maximised" and the "union" of all N sets of pixels is selected.
+Any new pixels introduced into an NDF will be padded with the
+"bad" value.  If the NDFs have different numbers of dimensions,
+then the dimensionality of all the returned sections will match
+the NDF with the highest dimensionality.
+
+-  If OPTION='TRIM' is specified, then the NDF bounds will be
+matched by "trimming"; i.e. each NDF will be restricted in extent
+by selecting a section from it which encompasses only those
+pixels which are present in all the NDFs. In effect, the
+pixel-index bounds of the NDFs are "minimised" and the
+"intersection" of all N sets of pixels is selected. An error will
+result if the NDFs have no pixels in common. If the NDFs have
+different numbers of dimensions, then the dimensionality of all
+the returned sections will match the NDF with the lowest
+dimensionality.
+
+-  Note that the initial NDF identifier values will be annulled
+by this routine and replaced with identifiers describing
+appropriate new sections from the original NDFs. If access to the
+original data is still required, then the initial identifiers may
+be cloned with the routine NDF_CLONE before calling this routine.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-NOV-1989 (RFWS):
+    Original version.
+
+ 13-FEB-1990 (RFWS):
+    Finished writing prologue.
+
+ 1-MAR-1990 (RFWS):
+    Remove un-referenced include file.
+1 NDF_MSG
+Assign the name of an NDF to a message token.
+
+CALL NDF_MSG( TOKEN, INDF )
+
+Description:
+
+   The routine assigns the name of an NDF to a message token (in a
+   form which a user will understand) for use in constructing
+   messages with the ERR_ and MSG_ routines (see SUN/104).
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   Name of the message token.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+2 Notes
+-  This routine has no STATUS argument and performs no error
+checking. If it should fail, then no assignment to the message
+token will be made and this will be apparent in the final message.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 25-SEP-1989 (RFWS):
+    Original version.
+
+ 14-NOV-1990 (RFWS):
+    Converted to call NDF_$AMSG.
+1 NDF_MTYPE
+Match the types of the array components of a pair of NDFs.
+
+CALL NDF_MTYPE( TYPLST, INDF1, INDF2, COMP, ITYPE, DTYPE, STATUS )
+
+Description:
+
+   The routine matches the types of the array components of a pair
+   of NDFs, selecting a numeric type which an application may use to
+   process these components. It also returns the type which should
+   be used for storing the result of this processing.
+2 Arguments
+TYPLST = CHARACTER * ( * ) (Given)
+   A comma-separated list of the numeric types which the
+   application can process explicitly; e.g. '_INTEGER,_REAL'. The
+   first type which has sufficient precision will be selected
+   from this list, so they should normally be given in order of
+   increasing computational cost.
+
+INDF1 = INTEGER (Given)
+   Identifier for the first NDF whose type is to be matched.
+
+INDF2 = INTEGER (Given)
+   Identifier for the second NDF.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component whose type is to be
+   considered.
+
+ITYPE = CHARACTER * ( * ) (Returned)
+   Numeric type which the application should use to process the
+   NDF components. This value is returned as an upper case
+   character string of maximum length NDF__SZTYP. Its value is
+   the first entry in the TYPLST list to which the NDF array
+   components may be converted without unnecessary loss of
+   information.
+
+DTYPE = CHARACTER * ( * ) (Returned)
+   Data type required to hold the result of processing the NDF
+   array components. This result is returned as an upper case
+   character string of maximum length NDF__SZFTP. It is intended
+   to be used as input to the NDF_STYPE routine to set the type
+   of the output NDF component into which the result will be
+   written.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the results returned by this routine will
+take account of the types of all the specified components in both
+NDFs.
+
+-  Matching of the type of a single NDF to an application may be
+performed by supplying the same identifier value for both the
+INDF1 and INDF2 arguments. There is no extra cost in doing this.
+
+-  If the TYPLST argument does not specify any type to which the
+NDF components may be converted without loss of information, then
+the routine will return the highest precision type which is
+available. An error will be reported, however, and STATUS will be
+set to NDF__TYPNI (type not implemented).
+
+-  The constants NDF__SZTYP and NDF__SZFTP are defined in the
+include file NDF_PAR. The error code NDF__TYPNI is defined in the
+include file NDF_ERR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-JAN-1990 (RFWS):
+    Original version.
+
+ 13-FEB-1990 (RFWS):
+    Revised the prologue.
+1 NDF_MTYPN
+Match the types of the array components of a number of NDFs.
+
+CALL NDF_MTYPN( TYPLST, N, NDFS, COMP, ITYPE, DTYPE, STATUS )
+
+Description:
+
+   The routine matches the types of the array components of a number
+   of NDFs, selecting a type which an application may use to process
+   these components. It also returns the numeric type which should
+   be used for storing the result of this processing.
+2 Arguments
+TYPLST = CHARACTER * ( * ) (Given)
+   A comma-separated list of the numeric types which the
+   application can process explicitly; e.g. '_INTEGER,_REAL'. The
+   first type which has sufficient precision will be selected
+   from this list, so they should normally be given in order of
+   increasing computational cost.
+
+N = INTEGER (Given)
+   Number of NDFs whose types are to be matched.
+
+NDFS( N ) = INTEGER (Given)
+   Array of identifiers for the NDFs to be matched.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component whose type is to be
+   considered.
+
+ITYPE = CHARACTER * ( * ) (Returned)
+   Numeric type which the application should use to process the
+   NDF components. This value is returned as an upper case
+   character string of maximum length NDF__SZTYP. Its value is
+   the first entry in the TYPLST list to which the NDF array
+   components may be converted without unnecessary loss of
+   information.
+
+DTYPE = CHARACTER * ( * ) (Returned)
+   Data type required to hold the result of processing the NDF
+   array components. This result is returned as an upper case
+   character string of maximum length NDF__SZFTP. It is intended
+   to be used as input to the NDF_STYPE routine to set the type
+   of the output NDF component into which the result will be
+   written.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the results returned by this routine will
+take account of the types of all the specified components in all
+the NDFs.
+
+-  If the TYPLST argument does not specify any type to which the
+NDF components may be converted without loss of information, then
+the routine will return the highest precision type which is
+available. An error will be reported, however, and STATUS will be
+set to NDF__TYPNI (type not implemented).
+
+-  The constants NDF__SZTYP and NDF__SZFTP are defined in the
+include file NDF_PAR. The error code NDF__TYPNI is defined in the
+include file NDF_ERR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-MAR-1990 (RFWS):
+    Original, derived from the NDF_MTYPE routine.
+1 NDF_NEW
+Create a new simple NDF.
+
+CALL NDF_NEW( FTYPE, NDIM, LBND, UBND, PLACE, INDF, STATUS )
+
+Description:
+
+   The routine creates a new simple NDF and returns an identifier
+   for it. The NDF may subsequently be manipulated with the NDF_
+   routines.
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   Full type of the NDF's DATA component (e.g. '_REAL' or
+   'COMPLEX_INTEGER').
+
+NDIM = INTEGER (Given)
+   Number of NDF dimensions.
+
+LBND( NDIM ) = INTEGER (Given)
+   Lower pixel-index bounds of the NDF.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the NDF.
+
+PLACE = INTEGER (Given and Returned)
+   An NDF placeholder (e.g. generated by the NDF_PLACE routine)
+   which indicates the position in the data system where the new
+   NDF will reside. The placeholder is annulled by this routine,
+   and a value of NDF__NOPL will be returned (as defined in the
+   include file NDF_PAR).
+
+INDF = INTEGER (Returned)
+   Identifier for the new NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine creates a "simple" NDF, i.e. one whose array
+components will be stored in "simple" form by default (see
+SGP/38).
+
+-  The full data type of the DATA component is specified via the
+FTYPE argument and the data type of the VARIANCE component
+defaults to the same value. These data types may be set
+individually with the NDF_STYPE routine if required.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. In either
+event, the placeholder will still be annulled. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routines.
+
+ 6-OCT-1989 (RFWS):
+    Corrected error in TSTAT status check.
+
+ 17-OCT-1989 (RFWS):
+    Added support for temporary placeholders.
+
+ 18-OCT-1989 (RFWS):
+    Minor changes to comments.
+
+ 6-DEC-1989 (RFWS):
+    Changed the name of the NDF_$VFTP routine to NDF_$CHFTP to
+    avoid a name clash.
+1 NDF_NEWP
+Create a new primitive NDF.
+
+CALL NDF_NEWP( FTYPE, NDIM, UBND, PLACE, INDF, STATUS )
+
+Description:
+
+   The routine creates a new primitive NDF and returns an identifier
+   for it. The NDF may subsequently be manipulated with the NDF_
+   routines.
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   Data type of the NDF's DATA component (e.g. '_REAL'). Note that
+   complex types are not permitted when creating a primitive NDF.
+
+NDIM = INTEGER (Given)
+   Number of NDF dimensions.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the NDF (the lower bound of each
+   dimension is taken to be 1).
+
+PLACE = INTEGER (Given and Returned)
+   An NDF placeholder (e.g. generated by the NDF_PLACE routine)
+   which indicates the position in the data system where the new
+   NDF will reside. The placeholder is annulled by this routine,
+   and a value of NDF__NOPL will be returned (as defined in the
+   include file NDF_PAR).
+
+INDF = INTEGER (Returned)
+   Identifier for the new NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine creates a "primitive" NDF, i.e. one whose array
+components are stored in "primitive" form by default (see
+SGP/38).
+
+-  The full type of the DATA component is specified via the FTYPE
+argument and the type of the VARIANCE component defaults to the
+same value. These types may be set individually with the
+NDF_STYPE routine if required.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. In either
+event, the placeholder will still be annulled. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 15-FEB-1990 (RFWS):
+    Original, derived from the NDF_NEW routine.
+1 NDF_NOACC
+Disable a specified type of access to an NDF.
+
+CALL NDF_NOACC( ACCESS, INDF, STATUS )
+
+Description:
+
+   The routine disables the specified type of access to an NDF, so
+   that any subsequent attempt to access it in that way will fail.
+   Access restrictions imposed on an NDF identifier by this routine
+   will be propagated to any new identifiers derived from it, and
+   cannot be revoked.
+2 Arguments
+ACCESS = CHARACTER * ( * ) (Given)
+   The type of access to be disabled: 'BOUNDS', 'DELETE',
+   'MODIFY', 'SHIFT', 'TYPE' or 'WRITE'.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+Disabling each type of access imposes the following restrictions
+on an NDF:
+
+-  'BOUNDS' prevents the pixel-index bounds of a base NDF from
+being altered.
+
+-  'DELETE' prevents an NDF from being deleted.
+
+-  'MODIFY' prevents any form of modification to the NDF (i.e. it
+disables all the other access types).
+
+-  'SHIFT' prevents pixel-index shifts from being applied to a
+base NDF.
+
+-  'TYPE' prevents the data type of any NDF components from being
+altered.
+
+-  'WRITE' prevents new values from being written to the NDF, or
+the state of any of its components from being reset.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_PLACE
+Obtain an NDF placeholder.
+
+CALL NDF_PLACE( LOC, NAME, PLACE, STATUS )
+
+Description:
+
+   The routine returns an NDF placeholder. A placeholder is used
+   to identify a position in the underlying data system (HDS) and
+   may be passed to other routines (e.g. NDF_NEW) to indicate where
+   a newly created NDF should be positioned.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   HDS locator to the structure to contain the new NDF.
+
+NAME = CHARACTER * ( * ) (Given)
+   Name of the new structure component (i.e. the NDF).
+
+PLACE = INTEGER (Returned)
+   NDF placeholder identifying the nominated position in the
+   data system.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Placeholders are intended only for local use within an
+application and only a limited number of them are available
+simultaneously. They are always annulled as soon as they are
+passed to another routine to create a new NDF, where they are
+effectively exchanged for an NDF identifier.
+
+-  The value given for the NAME argument may be an HDS path name,
+consisting of several fields separated by '.', so that an NDF can
+be created in a sub-component (or a sub-sub-component...) of the
+structure identified by the locator LOC.  Array subscripts may
+also be used in this component name.  Thus a string such as
+'MYSTRUC.ZONE(2).IMAGE' could be used as a valid NAME value. All
+structures lying above the actual object to be created must
+already exist.
+
+-  Normally, this routine will be used as the basis for creating
+a completely new NDF data structure. However, if the LOC and NAME
+arguments refer to a pre-existing object, then this structure
+will be used as the basis for the new NDF.  An object which is to
+be used in this way must be an empty scalar structure with an HDS
+type of 'NDF'.
+
+-  If a blank value is given for the NAME argument, then the new
+NDF will be the object identified directly by the locator LOC.
+This must be an empty scalar structure of type 'NDF'.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOPL will be returned for the PLACE argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOPL
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 11-OCT-1989 (RFWS):
+    Added support for identifier context levels.
+
+ 17-OCT-1989 (RFWS):
+    Added support for temporary placeholders.
+
+ 18-OCT-1989 (RFWS):
+    Updated prologue.
+
+ 29-JAN-1990 (RFWS):
+    Added check that a standard HDS component name has been
+    supplied.
+
+ 26-FEB-1990 (RFWS):
+    Changed the NDF placeholder data type to 'NDF'.
+
+ 10-DEC-1990 (RFWS):
+    Changed to allow the use of pre-existing structures as
+    placeholder objects and to accept compound component names.
+1 NDF_PROP
+Propagate NDF information to create a new NDF via the ADAM
+parameter system.
+
+CALL NDF_PROP( INDF1, CLIST, PARAM, INDF2, STATUS )
+
+Description:
+
+   The routine creates a new NDF data structure through the ADAM
+   parameter system, associates it with a parameter and returns an
+   identifier for it. The shape, data type, etc. of this new NDF are
+   based on a existing "template" NDF, and the values of components
+   of this template may be selectively propagated to initialise the
+   new data structure.
+2 Arguments
+INDF1 = INTEGER (Given)
+   Identifier for an existing NDF (or NDF section) to act as a
+   template.
+
+CLIST = CHARACTER * ( * ) (Given)
+   A comma-separated list of the NDF components which are to be
+   propagated to the new data structure. By default, the HISTORY,
+   LABEL and TITLE components and all extensions are propagated.
+   See below for further details.
+
+PARAM = CHARACTER * ( * ) (Given)
+   Name of the ADAM parameter for the new NDF.
+
+INDF2 = INTEGER (Returned)
+   Identifier for the new NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Component_Propagation
+   -  The template components whose values are to be propagated to
+   initialise the new data structure are specified via the CLIST
+   argument. Thus CLIST='DATA,QUALITY' would cause the new NDF to
+   inherit its DATA and QUALITY values (if available) from the
+   template structure, in addition to those propagated by default.
+   Component propagation may be suppressed by supplying a component
+   name with the prefix 'NO'. Thus CLIST='DATA,NOHISTORY' would
+   propagate the DATA component, but suppress propagation of
+   HISTORY. If component names appear more than once in the CLIST
+   value, then the last occurrence takes precedence.
+
+   -  Propagation of specific NDF extensions may be suppressed by
+   using 'NOEXTENSION()' as one of the items in the CLIST argument;
+   a list of the extensions to be suppressed should appear between
+   the parentheses. Thus CLIST='AXIS,NOEXTENSION(IRAS,ASTERIX)'
+   would propagate the AXIS component, but suppress propagation of
+   the IRAS and ASTERIX extensions (if present). Propagation of
+   suppressed extensions may be re-enabled by specifying
+   'EXTENSION()' in a similar manner at a later point in the CLIST
+   value.
+
+   -  Component names in the CLIST argument may be abbreviated to 3
+   characters, but extension names must appear in full.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 12-OCT-1989 (RFWS):
+    Original, derived from the NDF_CREAT routine.
+
+ 17-OCT-1989 (RFWS):
+    Added initialisation of the INDF2 argument.
+
+ 29-JAN-1990 (RFWS):
+    Eliminated re-prompting to avoid looping under parameter
+    system error conditions. Re-prompting is now handled by the
+    parameter system alone. Changed error messages to include the
+    parameter name using escape characters.
+
+ 26-FEB-1990 (RFWS):
+    Changed the NDF placeholder data type to 'NDF'.
+
+ 26-MAR-1990 (RFWS):
+    Re-structured status checking.
+1 NDF_QMASK
+Combine an NDF quality value with a bad-bits mask to give a
+logical result.
+
+RESULT = NDF_QMASK( QUAL, BADBIT )
+
+Description:
+
+   This function may be used to combine an NDF quality array value
+   with the associated bad-bits mask value to derive a logical
+   result indicating whether an NDF pixel should be included or
+   excluded from processing by general-purpose software.
+2 Arguments
+QUAL = BYTE (Given)
+   The unsigned byte quality value.
+
+BADBIT = BYTE (Given)
+   The unsigned byte bad-bits mask value.
+2 Returned_Value
+NDF_QMASK = LOGICAL
+   If the function returns a .TRUE. result, then the pixel with
+   quality value QUAL should be included in processing by
+   general-purpose software. If it returns a .FALSE. result, then
+   the pixel should be regarded as "bad" and excluded from
+   processing.
+2 Notes
+-  This function is implemented as a Fortran statement function
+and should be defined in each program unit from which it is
+invoked by means of the include file NDF_FUNC. This file should
+normally be included immediately after any local variable
+declarations.
+
+-  The result of this function is computed by forming the
+bit-wise "AND" between the QUAL and BADBIT values and testing the
+result for equality with zero. Its actual implementation is
+machine-dependent.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-MAR-1990 (RFWS):
+    Original version.
+
+ 2-APR-1990 (RFWS):
+    Changed NDF_DEC and NDF_DEF to NDF_FUNC_DEC and NDF_FUNC_DEF.
+1 NDF_QMF
+Obtain the logical value of an NDF's quality masking flag.
+
+CALL NDF_QMF( INDF, QMF, STATUS )
+
+Description:
+
+   The routine returns the current value of an NDF's logical quality
+   masking flag. This flag determines whether the NDF's quality
+   component (if present) will be used to generate "bad" pixel
+   values for automatic insertion into the data and variance arrays
+   when these are accessed in READ or UPDATE mode. Normally, this
+   automatic quality masking is used to convert quality information
+   into "bad" pixels so that an application need not consider the
+   quality information explicitly.  If the quality masking flag is
+   set to .FALSE., then automatic masking will not occur so that the
+   application can process the quality component by accessing it
+   directly.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+QMF = LOGICAL (Returned)
+   The value of the quality masking flag.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A quality masking flag is associated with each NDF identifier
+and is initially set to .TRUE..  Its value changes to .FALSE.
+whenever the quality component is accessed directly (e.g. using
+NDF_MAP or NDF_MAPQL) and reverts to .TRUE. when access is
+relinquished (e.g. using NDF_UNMAP). This default behaviour may
+also be over-ridden by calling NDF_SQMF to set its value
+explicitly.  NDF_QMF allows the current value to be determined.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-FEB-1990 (RFWS):
+    Original version.
+1 NDF_RESET
+Reset an NDF component to an undefined state.
+
+CALL NDF_RESET( INDF, COMP, STATUS )
+
+Description:
+
+   The routine resets a component of an NDF so that its value
+   becomes undefined. It may be used to remove unwanted optional NDF
+   components. Its use is also advisable before making format
+   changes to an NDF if retention of the existing values is not
+   required (e.g. before changing the data type of an array
+   component with the NDF_STYPE routine); this will avoid the cost
+   of converting the existing values.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF component to be reset; any NDF component name
+   is valid. No error will result if the component is already
+   undefined.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be supplied
+in which case each component will be reset in turn.
+
+-  Specifying a component name of '*' will cause all components,
+except for HISTORY and extensions, to be reset. The former may be
+reset by specifying its name explicitly, while all extensions may
+be removed by specifying a component name of 'EXTENSION'.
+
+-  Individual extensions may be removed from an NDF with the
+NDF_XDEL routine.
+
+-  This routine may only be used to reset components of a base
+NDF. If an NDF section is supplied, then it will return without
+action. No error will result.
+
+-  An array component of an NDF cannot be reset while it is
+mapped for access. Neither can an NDF's axis component be reset
+while any axis array is mapped for access. This routine will fail
+if either of these conditions occurs.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 19-MAR-1990 (RFWS):
+    Derived from earlier version which was renamed as NDF_$RST, now
+    called by this routine.
+1 NDF_SAME
+Enquire if two NDFs are part of the same base NDF.
+
+CALL NDF_SAME( INDF1, INDF2, SAME, ISECT, STATUS )
+
+Description:
+
+   The routine determines whether two NDF identifiers refer to parts
+   of the same base NDF. If so, it also determines whether their
+   transfer windows intersect.
+2 Arguments
+INDF1 = INTEGER (Given)
+   Identifier for the first NDF (or NDF section).
+
+INDF2 = INTEGER (Given)
+   Identifier for the second NDF (or NDF section).
+
+SAME = LOGICAL (Returned)
+   Whether the identifiers refer to parts of the same base NDF.
+
+ISECT = LOGICAL (Returned)
+   Whether their transfer windows intersect.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the transfer windows of the two NDFs (or NDF sections)
+intersect, then (i) they both refer to the same base NDF, and
+(ii) altering values in an array component of one of the NDFs can
+result in the values in the corresponding component of the other
+NDF changing in consequence. Thus, the array components of the
+two NDFs are not mutually independent.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 24-NOV-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_SBAD
+Set the bad-pixel flag for an NDF array component.
+
+CALL NDF_SBAD( BAD, INDF, COMP, STATUS )
+
+Description:
+
+   The routine sets the value of the bad-pixel flag for an NDF array
+   component. A call to this routine with BAD set to .TRUE. declares
+   that the specified component may contain bad pixel values for
+   which checks must be made by algorithms which subsequently
+   process its values. A call with BAD set to .FALSE. declares that
+   there are definitely no bad values present and that subsequent
+   checks for such values may be omitted.
+2 Arguments
+BAD = LOGICAL (Given)
+   Bad-pixel flag value to be set.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component; 'DATA' or 'VARIANCE'.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be
+supplied, in which case the bad-pixel flag will be set to the
+same value for each component in turn.
+
+-  If a component is mapped for access when this routine is
+called, then the bad-pixel flag will be associated with the
+mapped values. This information will only be transferred to the
+actual data object when the component is unmapped (but only if it
+was mapped for UPDATE or WRITE access). The value transferred may
+be modified if conversion errors occur during the unmapping
+process.
+
+-  This routine has no effect on components which are in an
+undefined state; the bad-pixel flag for such components always
+remains set to .TRUE. (or .FALSE. in the case of the QUALITY
+component).
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-NOV-1989 (RFWS):
+    Original version.
+
+ 12-DEC-1989 (RFWS):
+    Installed support for the variance component.
+
+ 11-JAN-1990 (RFWS):
+    Added support for comma-separated component lists.
+
+ 1-MAR-1990 (RFWS):
+    Fixed illegal character string concatenation.
+
+ 21-MAR-1990 (RFWS):
+    Changed to handle the bad pixel flag for mapped data values.
+1 NDF_SBB
+Set a bad-bits mask value for the quality component of an NDF.
+
+CALL NDF_SBB( BADBIT, INDF, STATUS )
+
+Description:
+
+   The routine assigns a new unsigned byte bad-bits mask value to
+   the quality component of an NDF.
+2 Arguments
+BADBIT = BYTE (Given)
+   The unsigned byte bad-bits mask value.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If WRITE access to the NDF is not available, or if an NDF
+section is supplied (as opposed to a base NDF), then no permanent
+change to the data object will be made. In this case, the new
+bad-bits value will be associated with the NDF identifier and
+will subsequently be used by other NDF_ routines which access the
+NDF through this identifier. The new value will also be
+propagated to any new identifiers derived from it.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-FEB-1990 (RFWS):
+    Original version.
+
+ 7-FEB-1990 (RFWS):
+    Extended to set an override value if the NDF is a section or
+    if write access is not available.
+
+ 27-MAR-1990 (RFWS):
+    Extended to use the DCB bad-bits override values.
+1 NDF_SBND
+Set new pixel-index bounds for an NDF.
+
+CALL NDF_SBND( NDIM, LBND, UBND, INDF, STATUS )
+
+Description:
+
+   The routine sets new pixel-index bounds for an NDF (or NDF
+   section). The number of NDF dimensions may also be changed. If a
+   base NDF is specified, then a permanent change is made to the
+   actual data object and this will be apparent through any other
+   NDF identifiers which refer to it. However, if an identifier for
+   an NDF section is specified, then its bounds are altered without
+   affecting other identifiers.
+2 Arguments
+NDIM = INTEGER (Given)
+   New number of NDF dimensions.
+
+LBND( NDIM ) = INTEGER (Given)
+   New lower pixel-index bounds of the NDF.
+
+UBND( NDIM ) = INTEGER (Given)
+   New upper pixel-index bounds of the NDF.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The bounds of an NDF section cannot be altered while any of
+its array components (or any of its axis arrays) is mapped for
+access through the identifier supplied to this routine.
+
+-  The bounds of a base NDF cannot be altered while any part of
+any of its array components (or any of its axis arrays) is mapped
+for access, even through another identifier.
+
+-  The pixel values of any defined NDF array component will be
+retained if those pixels lie within both the old and new bounds.
+Any pixels lying outside the new bounds will be lost and cannot
+later be recovered by further changes to the NDF's bounds. Any
+new pixels introduced where the new bounds extend beyond the old
+ones will be assigned the "bad" value, and subsequent enquiries
+about the presence of bad pixels will reflect this.
+
+-  If the new NDF bounds extend beyond the bounds of the
+associated base NDF and any of the NDF's axis arrays have defined
+values, then these values will be extrapolated as necessary.
+
+-  If the bounds of a base NDF are to be altered and retention of
+the pixel values of any of its components is not required, then a
+call to NDF_RESET should be made before calling this routine.
+This will eliminate any unnecessary processing which might be
+needed to retain the existing values. This step is not necessary
+with an NDF section, as no processing of pixel values takes place
+in this case.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-MAR-1990 (RFWS):
+    Original version.
+
+ 21-MAR-1990 (RFWS):
+    Re-structured the checks on whether NDF components are mapped.
+
+ 19-OCT-1990 (RFWS):
+    Installed support for the axis component.
+
+ 2-NOV-1990 (RFWS):
+    Changed to ensure that default storage form entries in the DCB
+    take correct account of changes in the NDF's bounds.
+
+ 28-NOV-1990 (RFWS):
+    Removed conversion of default array storage form, which new
+    remains fixed at its initial value, regardless of changes to
+    the NDF's bounds.
+1 NDF_SECT
+Create an NDF section.
+
+CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS )
+
+Description:
+
+   The routine creates a new NDF section which refers to a selected
+   region of an existing NDF (or NDF section). The region may be
+   larger or smaller in extent than the initial NDF.
+2 Arguments
+INDF = INTEGER (Given)
+   Identifier for the initial NDF.
+
+NDIM = INTEGER (Given)
+   Number of dimensions for the new section.
+
+LBND( NDIM ) = INTEGER (Given)
+   Lower pixel-index bounds of the section.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the section.
+
+INDF2 = INTEGER (Returned)
+   Identifier for the new section.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The number of section dimensions need not match the number of
+dimensions in the initial NDF. Pixel-index bounds will be padded
+with 1's as necessary to identify the pixels to which the new
+section should refer.
+
+-  The array components of sections which extend beyond the
+pixel-index bounds of the initial NDF will be padded with bad
+pixels.
+
+-  If the section bounds extend beyond the bounds of the
+associated base NDF and any of the NDF's axis arrays have defined
+values, then these values will be extrapolated as necessary.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOID
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 6-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 23-NOV-1989 (RFWS):
+    Changed the routine's name to NDF_SECT.
+1 NDF_SHIFT
+Apply pixel-index shifts to an NDF.
+
+CALL NDF_SHIFT( NSHIFT, SHIFT, INDF, STATUS )
+
+Description:
+
+   The routine applies pixel-index shifts to an NDF. An integer
+   shift is applied to each dimension so that its pixel-index
+   bounds, and the indices of each pixel, change by the amount of
+   shift applied to the corresponding dimension. The NDF's pixels
+   retain their values and none are lost.
+2 Arguments
+NSHIFT = INTEGER (Given)
+   Number of dimensions to which shifts are to be applied. This
+   must not exceed the number of NDF dimensions. If fewer shifts
+   are applied than there are NDF dimensions, then the extra
+   dimensions will not be shifted.
+
+SHIFT( NSHIFT ) = INTEGER (Given)
+   The pixel-index shifts to be applied to each dimension.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Pixel-index shifts applied to a base NDF will affect the
+appearance of that NDF as seen by all base-NDF identifiers
+associated with it. However, NDF sections derived from that base
+NDF will remain unchanged (as regards both pixel-indices and
+array values).
+
+-  Pixel-index shifts applied to an NDF section only affect that
+section itself, and have no effect on other NDF identifiers.
+
+-  Pixel-index shifts cannot be applied to a base NDF while any
+of its components (or any of its axis arrays) is mapped for
+access, even through another identifier.
+
+-  Pixel-index shifts cannot be applied to an NDF section while
+any of its components (or any of its axis arrays) is mapped for
+access through the identifier supplied to this routine.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-MAR-1990 (RFWS):
+    Original version.
+
+ 21-MAR-1990 (RFWS):
+    Re-structured the checks on whether NDF components are mapped.
+
+ 17-OCT-1990 (RFWS):
+    Installed support for the axis component and fixed a bug
+    causing the storage form of undefined array components to
+    remain set to 'PRIMITIVE' after a shift had been applied.
+
+ 2-NOV-1990 (RFWS):
+    Improved handling of default storage form conversions.
+
+ 28-NOV-1990 (RFWS):
+    Removed conversion of the default array storage form, which now
+    remains fixed at its initial value, regardless of changes to
+    the NDF's bounds.
+1 NDF_SIZE
+Determine the size of an NDF.
+
+CALL NDF_SIZE( INDF, NPIX, STATUS )
+
+Description:
+
+   The routine returns the number of pixels in the NDF whose
+   identifier is supplied (i.e. the product of its dimensions).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+NPIX = INTEGER (Returned)
+   Number of pixels in the NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of 1
+will be returned for the NPIX argument, although no further
+processing will occur.  The same value will also be returned if
+the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+
+ 28-MAR-1990 (RFWS):
+    Renamed SIZE to NPIX.
+
+ 4-DEC-1990 (RFWS):
+    Changed to return a "safe" value of NPIX under error
+    conditions.
+1 NDF_SQMF
+Set a new logical value for an NDF's quality masking flag.
+
+CALL NDF_SQMF( QMF, INDF, STATUS )
+
+Description:
+
+   The routine sets a new logical value for an NDF's quality masking
+   flag.  This flag determines whether the NDF's quality component
+   (if present) will be used to generate "bad" pixel values for
+   automatic insertion into the data and variance arrays when these
+   are accessed in READ or UPDATE mode. If this flag is set to
+   .TRUE., then masking will occur, so that an application need not
+   consider the quality information explicitly.  If the flag is set
+   to .FALSE., then automatic masking will not occur, so that the
+   application can process the quality component by accessing it
+   directly.
+2 Arguments
+LOGICAL = QMF (Given)
+   The logical value to be set for the quality masking flag.
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A quality masking flag is associated with each NDF identifier
+and is initially set to .TRUE..  Its value changes to .FALSE.
+whenever the quality component is accessed directly (e.g. using
+NDF_MAP or NDF_MAPQL) and reverts to .TRUE. when access is
+relinquished (e.g. using NDF_UNMAP). This default behaviour may
+also be over-ridden by calling NDF_SQMF to set its value
+explicitly. The routine NDF_QMF allows the current value to be
+determined.
+
+-  The value of the quality masking flag is not propagated to new
+identifiers.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-FEB-1990 (RFWS):
+    Original version.
+1 NDF_SSARY
+Create an array section, using an NDF section as a template.
+
+CALL NDF_SSARY( IARY1, INDF, IARY2, STATUS )
+
+Description:
+
+   The routine creates a "similar section" from an array (whose ARY_
+   system identifier is supplied) using an existing NDF section as a
+   template.  An identifier for the array section is returned and
+   this may subsequently be manipulated using the ARY_ system
+   routines (SUN/11).  The new array section will bear the same
+   relationship to its base array as the NDF template does to its
+   own base NDF.  Allowance is made for any pixel-index shifts which
+   may have been applied, so that the pixel-index system of the new
+   array section matches that of the NDF template.
+
+   This routine is intended for use when an array which must match
+   pixel-for-pixel with an NDF is stored in an NDF extension; if an
+   NDF section is obtained, then this routine may be used to obtain
+   a pixel-by-pixel matching section from the array.
+2 Arguments
+IARY1 = INTEGER (Given)
+   The ARY_ system identifier for the array, or array section,
+   from which the new section is to be drawn.
+
+INDF = INTEGER (Given)
+   NDF_ system identifier for the template NDF section (may also
+   be a base NDF).
+
+IARY2 = INTEGER (Returned)
+   ARY_ system identifier for the new array section.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine will normally generate an array section. However,
+if the input array is a base array and the input NDF is a base
+NDF with the same pixel-index bounds, then there is no need to
+generate a section in order to access the required part of the
+array. In this case, a base array identifier will be returned
+instead.
+
+-  It is the caller's responsibility to annul the ARY_ system
+identifier issued by this routine (e.g. by calling ARY_ANNUL)
+when it is no longer required. The NDF_ system will not perform
+this task itself.
+
+-  The new array generated by this routine will have the same
+number of dimensions as the array from which it is derived. If
+the template NDF has fewer dimensions, then the pixel-index
+bounds of the extra array dimensions are preserved unchanged. If
+the NDF has more dimensions, then the extra ones are ignored.
+
+-  This routine takes account of the transfer windows of the
+array and NDF supplied and will restrict the transfer window of
+the new array section so as not to grant access to regions of the
+base array which were not previously accessible through both the
+input array and the NDF section.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 8-DEC-1989 (RFWS):
+    Original version.
+1 NDF_STATE
+Determine the state of an NDF component (defined or undefined).
+
+CALL NDF_STATE( INDF, COMP, STATE, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an NDF
+   component has a defined value (or values).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the component; any NDF component name is valid.
+
+STATE = LOGICAL (Returned)
+   Whether the specified component is defined.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If a component name of 'EXTENSION' is given, then a .TRUE.
+result will be returned if one or more extensions are present in
+the NDF.
+
+-  A comma-separated list of component names may also be given,
+in which case the routine will return the logical "AND" of the
+states of the specified components (i.e. a .TRUE. result will be
+returned only if all the components have defined values).
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-NOV-1989 (RFWS):
+    Original version.
+
+ 8-DEC-1989 (RFWS):
+    Added support for the variance component.
+
+ 11-JAN-1990 (RFWS):
+    Added support for comma-separated component lists.
+
+ 30-JAN-1990 (RFWS):
+    Installed support for the quality component.
+
+ 1-MAR-1990 (RFWS):
+    Fixed illegal character string concatenation.
+
+ 16-OCT-1990 (RFWS):
+    Installed support for the axis component.
+1 NDF_STYPE
+Set a new type for an NDF array component.
+
+CALL NDF_STYPE( FTYPE, INDF, COMP, STATUS )
+
+Description:
+
+   The routine sets a new full type for an NDF array component,
+   causing its storage type to be changed. If the component's values
+   are defined, they will be converted from from the old type to the
+   new one. If they are undefined, then no conversion will be
+   necessary. Subsequent enquiries will reflect the new type.
+   Conversion may be performed between any types supported by the
+   NDF_ routines, including from a non-complex type to a complex
+   type (and vice versa).
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   The new full type specification for the NDF component (e.g.
+   '_REAL' or 'COMPLEX_INTEGER').
+
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the array component whose type is to be set: 'DATA'
+   or 'VARIANCE'.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The routine may only be used to change the type of a component
+of a base NDF. If it is called for an NDF which is not a base
+NDF, then it will return without action. No error will result.
+
+-  A comma-separated list of component names may also be supplied,
+in which case the type of each component will be set to the same
+value in turn.
+
+-  An error will result if a component being modified, or any
+part of it, is currently mapped for access (e.g. through another
+identifier).
+
+-  If the type of a component is to be changed without its values
+being retained, then a call to NDF_RESET should be made
+beforehand. This will avoid the cost of converting all the
+values.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-NOV-1989 (RFWS):
+    Original version.
+
+ 27-NOV-1989 (RFWS):
+    Changed to check for TYPE access, rather than WRITE.
+
+ 28-NOV-1989 (RFWS):
+    Minor change to prologue and the extension error message.
+
+ 6-DEC-1989 (RFWS):
+    Added support for the variance component.
+
+ 6-DEC-1989 (RFWS):
+    Changed the name of the NDF_$VFTP routine to NDF_$CHFTP to
+    avoid a name clash.
+
+ 7-DEC-1989 (RFWS):
+    Enhanced to accept a comma-separated list of components.
+
+ 19-DEC-1989 (RFWS):
+    Added character string subscripts for COMP, which had been
+    omitted. Also fixed missing argument to NDF_$SIMLR.
+
+ 23-JAN-1990 (RFWS):
+    Renamed from NDF_SFTYP to NDF_STYPE.
+
+ 24-JAN-1990 (RFWS):
+    Changed to call ARY_STYPE instead of ARY_SFTYP.
+
+ 1-MAR-1990 (RFWS):
+    Fixed illegal character string concatenation.
+
+ 21-MAR-1990 (RFWS):
+    Strengthened checks on whether the data component is mapped.
+1 NDF_TEMP
+Obtain a placeholder for a temporary NDF.
+
+CALL NDF_TEMP( PLACE, STATUS )
+
+Description:
+
+   The routine returns an NDF placeholder which may be used to
+   create a temporary NDF (i.e. one which will be deleted
+   automatically once the last identifier associated with it is
+   annulled). The placeholder returned by this routine may be passed
+   to other routines (e.g. NDF_NEW or NDF_COPY) to produce a
+   temporary NDF in the same way as a new permanent NDF would be
+   created.
+2 Arguments
+PLACE = INTEGER (Returned)
+   Placeholder for a temporary NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Placeholders are intended only for local use within an
+application and only a limited number of them are available
+simultaneously. They are always annulled as soon as they are
+passed to another routine to create a new NDF, where they are
+effectively exchanged for an NDF identifier.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOPL will be returned for the PLACE argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The NDF__NOPL
+constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-OCT-1989 (RFWS):
+    Original, derived from the NDF_PLACE routine.
+
+ 26-FEB-1990 (RFWS):
+    Changed the NDF placeholder data type to 'NDF'.
+1 NDF_TRACE
+Set the internal NDF_ system error-tracing flag.
+
+CALL NDF_TRACE( NEWFLG, OLDFLG )
+
+Description:
+
+   The routine sets an internal flag in the NDF_ system which
+   enables or disables error-tracing messages. If this flag is set
+   to .TRUE., then any error occurring within the NDF_ system will
+   be accompanied by error messages indicating which internal
+   routines have exited prematurely as a result. If the flag is set
+   to .FALSE., this internal diagnostic information will not appear
+   and only standard error messages will be produced.
+2 Arguments
+NEWFLG = LOGICAL (Given)
+   The new value to be set for the error-tracing flag.
+
+OLDFLG = LOGICAL (Returned)
+   The previous value of the flag.
+2 Notes
+-  By default, the error-tracing flag is set to .FALSE., so no
+internal diagnostic information will be produced.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 27-NOV-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_TYPE
+Obtain the numeric type of an NDF array component.
+
+CALL NDF_TYPE( INDF, COMP, TYPE, STATUS )
+
+Description:
+
+   The routine returns the numeric type of one of the array
+   components of an NDF as an upper-case character string (e.g.
+   '_REAL').
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * ) (Given)
+   Name of the NDF array component whose type is required:
+   'DATA', 'QUALITY' or 'VARIANCE'.
+
+TYPE = CHARACTER * ( * ) (Returned)
+   Numeric type of the component.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  A comma-separated list of component names may also be supplied
+to this routine. In this case the result returned will be the
+lowest precision numeric type to which all the specified
+components can be converted without unnecessary loss of
+information.
+
+-  The value returned for the QUALITY component is always
+'_UBYTE'.
+
+-  The symbolic constant NDF__SZTYP may be used for declaring the
+length of a character variable which is to hold the numeric type
+of an NDF array component. This constant is defined in the
+include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 16-JAN-1990 (RFWS):
+    Original version.
+1 NDF_UNMAP
+Unmap an NDF or a mapped NDF array.
+
+CALL NDF_UNMAP( INDF, COMP, STATUS )
+
+Description:
+
+   The routine unmaps an NDF, or a individual NDF array which has
+   previously been mapped for READ, UPDATE or WRITE access.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+COMP = CHARACTER * ( * )
+   Name of the NDF component to be unmapped: 'AXIS', 'DATA',
+   'QUALITY', 'VARIANCE' or '*'. The last value acts as a wild
+   card, causing all mapped arrays to be unmapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+
+-  A component name of 'AXIS' will act as a partial wild card,
+unmapping any axis arrays which are mapped, but leaving other
+components unchanged. The routine NDF_AUNMP may be used to unmap
+individual axis arrays.
+
+-  A comma-separated list of component names may also be given, in
+which case each component will be unmapped in turn.
+
+-  An error will be reported if a component has not previously
+been mapped for access, except in the case where a value of '*'
+is given for COMP, or where 'AXIS' is used to unmap axis arrays.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-OCT-1989 (RFWS):
+    Original, derived from the equivalent ARY_ routine.
+
+ 11-JAN-1990 (RFWS):
+    Changed the wild card character description in the routine
+    prologue.
+1 NDF_VALID
+Determine whether an NDF identifier is valid.
+
+CALL NDF_VALID( INDF, VALID, STATUS )
+
+Description:
+
+   The routine determines whether an NDF identifier is valid (i.e.
+   associated with an NDF).
+2 Arguments
+INDF = INTEGER (Given)
+   Identifier to be tested.
+
+VALID = LOGICAL (Returned)
+   Whether the identifier is valid.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 29-SEP-1989 (RFWS):
+    Original, derived from the equivalent ARY_ system routine.
+1 NDF_XDEL
+Delete a specified NDF extension.
+
+CALL NDF_XDEL( INDF, XNAME, STATUS )
+
+Description:
+
+   The routine deletes a named extension in an NDF together with its
+   contents, if any. No error results if the specified extension
+   does not exist.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the extension to be deleted.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Changed so that no error results if the named extension does
+    not exist and finished the prologue.
+
+ 2-OCT-1989 (RFWS):
+    Minor correction to prologue.
+1 NDF_XGT0C
+Read a scalar character value from a component within a named NDF
+extension.
+ 
+CALL NDF_XGT0C( INDF, XNAME, CMPT, VALUE, STATUS )
+ 
+Description:
+ 
+   The routine reads a scalar character value from a component within
+   a named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist (a default value, established beforehand, will be
+   returned if necessary).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   obtained.
+ 
+VALUE = CHARACTER * ( * ) (Given and Returned)
+   The value obtained from the extension component.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component in the extension does not exist,
+then the VALUE argument will be returned unchanged.  A suitable
+default should therefore be established before this routine is
+called.
+ 
+-  If the length of the VALUE argument passed to the routine is
+too short to accommodate the returned result without losing
+significant (non-blank) trailing characters, then this will be
+indicated by an appended ellipsis, i.e. '...'. No error will result.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-OCT-1990 (RFWS):
+    Original version, derived from the NDF_XPT0x routine.
+1 NDF_XGT0D
+Read a scalar double precision value from a component within a
+named NDF extension.
+ 
+CALL NDF_XGT0D( INDF, XNAME, CMPT, VALUE, STATUS )
+ 
+Description:
+ 
+   The routine reads a scalar double precision value from a component
+   within a named NDF extension. The extension must be a scalar HDS
+   structure and must already exist, although the component within the
+   extension need not exist (a default value, established beforehand,
+   will be returned if necessary).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   obtained.
+ 
+VALUE = DOUBLE PRECISION (Given and Returned)
+   The value obtained from the extension component.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component in the extension does not exist,
+then the VALUE argument will be returned unchanged.  A suitable
+default should therefore be established before this routine is
+called.
+ 
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-OCT-1990 (RFWS):
+    Original version, derived from the NDF_XPT0x routine.
+1 NDF_XGT0I
+Read a scalar integer value from a component within a named NDF
+extension.
+ 
+CALL NDF_XGT0I( INDF, XNAME, CMPT, VALUE, STATUS )
+ 
+Description:
+ 
+   The routine reads a scalar integer value from a component within a
+   named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist (a default value, established beforehand, will be
+   returned if necessary).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   obtained.
+ 
+VALUE = INTEGER (Given and Returned)
+   The value obtained from the extension component.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component in the extension does not exist,
+then the VALUE argument will be returned unchanged.  A suitable
+default should therefore be established before this routine is
+called.
+ 
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-OCT-1990 (RFWS):
+    Original version, derived from the NDF_XPT0x routine.
+1 NDF_XGT0L
+Read a scalar logical value from a component within a named NDF
+extension.
+ 
+CALL NDF_XGT0L( INDF, XNAME, CMPT, VALUE, STATUS )
+ 
+Description:
+ 
+   The routine reads a scalar logical value from a component within
+   a named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist (a default value, established beforehand, will be
+   returned if necessary).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   obtained.
+ 
+VALUE = LOGICAL (Given and Returned)
+   The value obtained from the extension component.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component in the extension does not exist,
+then the VALUE argument will be returned unchanged.  A suitable
+default should therefore be established before this routine is
+called.
+ 
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-OCT-1990 (RFWS):
+    Original version, derived from the NDF_XPT0x routine.
+1 NDF_XGT0R
+Read a scalar real value from a component within a named NDF
+extension.
+ 
+CALL NDF_XGT0R( INDF, XNAME, CMPT, VALUE, STATUS )
+ 
+Description:
+ 
+   The routine reads a scalar real value from a component within a
+   named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist (a default value, established beforehand, will be
+   returned if necessary).
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   obtained.
+ 
+VALUE = REAL (Given and Returned)
+   The value obtained from the extension component.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the requested component in the extension does not exist,
+then the VALUE argument will be returned unchanged.  A suitable
+default should therefore be established before this routine is
+called.
+ 
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 30-OCT-1990 (RFWS):
+    Original version, derived from the NDF_XPT0x routine.
+1 NDF_XLOC
+Obtain access to a named NDF extension via an HDS locator.
+
+CALL NDF_XLOC( INDF, XNAME, MODE, LOC, STATUS )
+
+Description:
+
+   The routine returns an HDS locator to a named extension (if
+   present) in an NDF. An error results if the specified extension
+   is not present.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the required extension.
+
+MODE = CHARACTER * ( * ) (Given)
+   Mode of access required to the extension: 'READ', 'UPDATE' or
+   'WRITE'.
+
+LOC = CHARACTER * ( * ) (Returned)
+   Extension locator.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If WRITE access is specified, then any existing extension
+contents or values will be erased or reset, so that the extension
+is ready to receive new values. If UPDATE access is specified,
+then existing values will be retained so that they may be
+modified.
+
+-  It is the caller's responsibility to annul the HDS locator
+issued by this routine (e.g. by calling DAT_ANNUL) when it is no
+longer required. The NDF_ system will not perform this task
+itself.
+
+-  Although this routine will check the access mode value
+supplied against the available access to the NDF, HDS does not
+allow the returned locator to be protected against write access
+in the case where WRITE access to the NDF is available, but only
+READ access was requested.  In this case it is the responsibility
+of the caller to respect the locator access restriction.
+
+-  If this routine is called with STATUS set, then an invalid
+locator will be returned for the LOC argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Initialise LOC to NDF__NOLOC.
+
+ 7-FEB-1990 (RFWS):
+    Changed the argument order.
+
+ 20-MAR-1990 (RFWS):
+    Changed so that write access causes any pre-existing extension
+    components or values to be erased/reset.
+
+ 20-MAR-1990 (RFWS):
+    Changed the argument order back again.
+1 NDF_XNAME
+Obtain the name of the N'th extension in an NDF.
+
+CALL NDF_XNAME( INDF, N, XNAME, STATUS )
+
+Description:
+
+   The routine returns the name of the N'th extension in an NDF. If
+   the requested extension does not exist, then the name is returned
+   blank. The routine may therefore be used to obtain the names of
+   all the extensions present by setting N to 1,2... etc.  until a
+   blank name is returned. Note that the order in which these names
+   are obtained is not defined.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+N = INTEGER (Given)
+   The number of the extension whose name is required.
+
+XNAME = CHARACTER * ( * ) (Returned)
+   The extension name (in upper case).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant NDF__SZXNM is provided to define the
+length of character variables which are to hold an NDF extension
+name. This constant is defined in the include file NDF_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 21-NOV-1989 (RFWS):
+    Original version.
+
+ 24-NOV-1989 (RFWS):
+    Added check on the validity of the N argument.
+
+ 15-MAR-1990 (RFWS):
+    Changed to return a blank name if the requested extension does
+    not exist, rather than an error status.
+1 NDF_XNEW
+Create a new extension in an NDF.
+
+CALL NDF_XNEW( INDF, XNAME, TYPE, NDIM, DIM, LOC, STATUS )
+
+Description:
+
+   The routine creates a new named extension of specified type and
+   shape in an NDF structure, and returns an HDS locator to it.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+XNAME = CHARACTER * ( * ) (Given)
+   Extension name.
+
+TYPE = CHARACTER * ( * ) (Given)
+   HDS data type of the extension.
+
+NDIM = INTEGER (Given)
+   Number of extension dimensions.
+
+DIM( NDIM ) = INTEGER (Given)
+   Extension dimension sizes.
+
+LOC = CHARACTER * ( * ) (Returned)
+   Locator to the newly created extension.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then an invalid
+locator will be returned for the LOC argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Initialise LOC to NDF__NOLOC.
+1 NDF_XNUMB
+Determine the number of extensions in an NDF.
+
+CALL NDF_XNUMB( INDF, XNUMB, STATUS )
+
+Description:
+
+   The routine returns the number of extensions present in the NDF
+   whose identifier is supplied.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+XNUMB = INTEGER (Returned)
+   Number of extensions present.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 24-NOV-1989 (RFWS):
+    Original version.
+1 NDF_XPT0C
+Write a scalar character value to a component within a named NDF
+extension.
+ 
+CALL NDF_XPT0C( VALUE, INDF, XNAME, CMPT, STATUS )
+ 
+Description:
+ 
+   The routine writes a scalar character value to a component within
+   a named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist and will be created if necessary. If a component
+   of the same name already exists within the extension, then it
+   will be deleted and a new component will be created with an HDS
+   primitive type matching the value assigned.
+2 Arguments
+VALUE = CHARACTER * ( * ) (Given)
+   The value to be written to the extension component.
+ 
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   assigned.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-MAY-1990 (RFWS):
+    Original version.
+ 
+ 1-AUG-1990 (RFWS):
+    Changed to perform write access check after validating the
+    extension name.
+ 
+ 30-OCT-1990 (RFWS):
+    Changed to locate the extension component explicitly and to
+    use DAT_PUT instead of CMP_PUT0x (which only exists for the
+    standard Fortran data types).
+1 NDF_XPT0D
+Write a scalar double precision value to a component within a
+named NDF extension.
+ 
+CALL NDF_XPT0D( VALUE, INDF, XNAME, CMPT, STATUS )
+ 
+Description:
+ 
+   The routine writes a scalar double precision value to a component
+   within a named NDF extension. The extension must be a scalar HDS
+   structure and must already exist, although the component within
+   the extension need not exist and will be created if necessary.
+   If a component of the same name already exists within the extension,
+   then it will be deleted and a new component will be created with an
+   HDS primitive type matching the value assigned.
+2 Arguments
+VALUE = DOUBLE PRECISION (Given)
+   The value to be written to the extension component.
+ 
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   assigned.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-MAY-1990 (RFWS):
+    Original version.
+ 
+ 1-AUG-1990 (RFWS):
+    Changed to perform write access check after validating the
+    extension name.
+ 
+ 30-OCT-1990 (RFWS):
+    Changed to locate the extension component explicitly and to
+    use DAT_PUT instead of CMP_PUT0x (which only exists for the
+    standard Fortran data types).
+1 NDF_XPT0I
+Write a scalar integer value to a component within a named NDF
+extension.
+ 
+CALL NDF_XPT0I( VALUE, INDF, XNAME, CMPT, STATUS )
+ 
+Description:
+ 
+   The routine writes a scalar integer value to a component within
+   a named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist and will be created if necessary. If a component
+   of the same name already exists within the extension, then it
+   will be deleted and a new component will be created with an HDS
+   primitive type matching the value assigned.
+2 Arguments
+VALUE = INTEGER (Given)
+   The value to be written to the extension component.
+ 
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   assigned.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-MAY-1990 (RFWS):
+    Original version.
+ 
+ 1-AUG-1990 (RFWS):
+    Changed to perform write access check after validating the
+    extension name.
+ 
+ 30-OCT-1990 (RFWS):
+    Changed to locate the extension component explicitly and to
+    use DAT_PUT instead of CMP_PUT0x (which only exists for the
+    standard Fortran data types).
+1 NDF_XPT0L
+Write a scalar logical value to a component within a named NDF
+extension.
+ 
+CALL NDF_XPT0L( VALUE, INDF, XNAME, CMPT, STATUS )
+ 
+Description:
+ 
+   The routine writes a scalar logical value to a component within a
+   named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist and will be created if necessary. If a component
+   of the same name already exists within the extension, then it
+   will be deleted and a new component will be created with an HDS
+   primitive type matching the value assigned.
+2 Arguments
+VALUE = LOGICAL (Given)
+   The value to be written to the extension component.
+ 
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   assigned.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-MAY-1990 (RFWS):
+    Original version.
+ 
+ 1-AUG-1990 (RFWS):
+    Changed to perform write access check after validating the
+    extension name.
+ 
+ 30-OCT-1990 (RFWS):
+    Changed to locate the extension component explicitly and to
+    use DAT_PUT instead of CMP_PUT0x (which only exists for the
+    standard Fortran data types).
+1 NDF_XPT0R
+Write a scalar real value to a component within a named NDF extension.
+ 
+CALL NDF_XPT0R( VALUE, INDF, XNAME, CMPT, STATUS )
+ 
+Description:
+ 
+   The routine writes a scalar real value to a component within a
+   named NDF extension. The extension must be a scalar HDS structure
+   and must already exist, although the component within the extension
+   need not exist and will be created if necessary. If a component
+   of the same name already exists within the extension, then it
+   will be deleted and a new component will be created with an HDS
+   primitive type matching the value assigned.
+2 Arguments
+VALUE = REAL (Given)
+   The value to be written to the extension component.
+ 
+INDF = INTEGER (Given)
+   NDF identifier.
+ 
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the NDF extension.
+ 
+CMPT = CHARACTER * ( * ) (Given)
+   Name of the component within the extension whose value is to be
+   assigned.
+ 
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 18-MAY-1990 (RFWS):
+    Original version.
+ 
+ 1-AUG-1990 (RFWS):
+    Changed to perform write access check after validating the
+    extension name.
+ 
+ 30-OCT-1990 (RFWS):
+    Changed to locate the extension component explicitly and to
+    use DAT_PUT instead of CMP_PUT0x (which only exists for the
+    standard Fortran data types).
+1 NDF_XSTAT
+Determine if a named NDF extension exists.
+
+CALL NDF_XSTAT( INDF, XNAME, THERE, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether a named
+   extension is present in an NDF.
+2 Arguments
+INDF = INTEGER (Given)
+   NDF identifier.
+
+XNAME = CHARACTER * ( * ) (Given)
+   Name of the extension.
+
+THERE = LOGICAL (Returned)
+   Whether the extension is present in the NDF.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 19-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Completed prologue and corrected minor errors.

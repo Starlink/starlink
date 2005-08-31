@@ -1,0 +1,184 @@
+lse -i build.lse -n d
+177 lines read from file build.lse
+327 lines read from file align_comment.tpu
+Compilation completed without errors
+95 lines read from file comment.tpu
+Compilation completed without errors
+144 lines read from file fix_continuation.tpu
+Compilation completed without errors
+50 lines read from file flush_buffers.tpu
+Compilation completed without errors
+36 lines read from file generic.tpu
+Compilation completed without errors
+68 lines read from file goto_previous_buffer.tpu
+Compilation completed without errors
+45 lines read from file help.tpu
+Compilation completed without errors
+80 lines read from file print.tpu
+Compilation completed without errors
+64 lines read from file show_buffer.tpu
+Compilation completed without errors
+41 lines read from file sort.tpu
+Compilation completed without errors
+89 lines read from file where.tpu
+Compilation completed without errors
+72 lines read from file key_procedures.tpu
+Compilation completed without errors
+41 lines read from file detach.tpu
+Compilation completed without errors
+38 lines read from file do_cli.tpu
+Compilation completed without errors
+5 lines read from file getenv.tpu
+Compilation completed without errors
+50 lines read from file pre_key.tpu
+Compilation completed without errors
+41 lines read from file post_key.tpu
+Compilation completed without errors
+316 lines read from file starlse_initialisation.tpu
+Compilation completed without errors
+58 lines read from file update_default.tpu
+Compilation completed without errors
+50 lines read from file key_definitions.lse
+2267 lines read from file starlink_fortran_a.lse
+2148 lines read from file starlink_fortran_b.lse
+Error opening or locking journal file starlink_fortran_b_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer starlink_fortran_b.lse not being journaled due to error creating journal file
+153 lines read from file starlink_fortran_adjust.lse
+Error opening or locking journal file starlink_fortran_adjust_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer starlink_fortran_adjust.lse not being journaled due to error creating journal file
+20 lines read from file starlink_fortran_alias.lse
+Error opening or locking journal file starlink_fortran_alias_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer starlink_fortran_alias.lse not being journaled due to error creating journal file
+162 lines read from file adam_constructs.lse
+Error opening or locking journal file adam_constructs_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer adam_constructs.lse not being journaled due to error creating journal file
+75 lines read from file starlink_fortran_package.tpu
+Error opening or locking journal file starlink_fortran_package_tpu.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer starlink_fortran_package.tpu not being journaled due to error creating journal file
+Compilation completed without errors
+430 lines read from file ifl.lse
+Error opening or locking journal file ifl_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer ifl.lse not being journaled due to error creating journal file
+515 lines read from file agi.lse
+Error opening or locking journal file agi_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer agi.lse not being journaled due to error creating journal file
+336 lines read from file ary.lse
+Error opening or locking journal file ary_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer ary.lse not being journaled due to error creating journal file
+352 lines read from file chr.lse
+Error opening or locking journal file chr_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer chr.lse not being journaled due to error creating journal file
+146 lines read from file ems.lse
+Error opening or locking journal file ems_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer ems.lse not being journaled due to error creating journal file
+73 lines read from file err.lse
+Error opening or locking journal file err_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer err.lse not being journaled due to error creating journal file
+196 lines read from file fio.lse
+Error opening or locking journal file fio_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer fio.lse not being journaled due to error creating journal file
+1749 lines read from file gks.lse
+Error opening or locking journal file gks_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer gks.lse not being journaled due to error creating journal file
+243 lines read from file grp.lse
+Error opening or locking journal file grp_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer grp.lse not being journaled due to error creating journal file
+68 lines read from file gwm.lse
+Error opening or locking journal file gwm_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer gwm.lse not being journaled due to error creating journal file
+1815 lines read from file hds.lse
+Error opening or locking journal file hds_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer hds.lse not being journaled due to error creating journal file
+629 lines read from file idi.lse
+Error opening or locking journal file idi_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer idi.lse not being journaled due to error creating journal file
+151 lines read from file mag.lse
+Error opening or locking journal file mag_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer mag.lse not being journaled due to error creating journal file
+127 lines read from file msg.lse
+Error opening or locking journal file msg_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer msg.lse not being journaled due to error creating journal file
+839 lines read from file ndf.lse
+Error opening or locking journal file ndf_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer ndf.lse not being journaled due to error creating journal file
+474 lines read from file par.lse
+Error opening or locking journal file par_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer par.lse not being journaled due to error creating journal file
+566 lines read from file pgplot.lse
+Error opening or locking journal file pgplot_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer pgplot.lse not being journaled due to error creating journal file
+4047 lines read from file primdat.lse
+Error opening or locking journal file primdat_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer primdat.lse not being journaled due to error creating journal file
+158 lines read from file psx.lse
+Error opening or locking journal file psx_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer psx.lse not being journaled due to error creating journal file
+1228 lines read from file slalib.lse
+Error opening or locking journal file slalib_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer slalib.lse not being journaled due to error creating journal file
+438 lines read from file sgs.lse
+Error opening or locking journal file sgs_lse.tpu_journal
+ACP file create failed
+No privilege for attempted operation
+Buffer sgs.lse not being journaled due to error creating journal file
+474 lines read from file trn.lse
+Environment written to new_starlse.env
+Compilation completed without errors
+Compilation completed without errors
+Compilation completed without errors
+File new_starlse.tpu_section created
+2613 procedures, 1807 variables, 1125 keys saved
+
+
+Error closing output file align_comment_tpu.tpu_journal
+*** Termination code 132

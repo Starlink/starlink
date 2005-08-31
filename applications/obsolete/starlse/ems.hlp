@@ -1,0 +1,658 @@
+1 EMS_ANNUL
+Annul the contents of the current error context.
+
+CALL EMS_ANNUL( STATUS )
+
+Description:
+
+   Any pending error messages for the current error context are annulled,
+   i.e. deleted. The values of any existing message tokens become
+   undefined, and the value of the status argument is reset to SAI__OK.
+2 Arguments
+STATUS = INTEGER (Returned)
+   The global status: it is set to SAI__OK on return.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 17-Apr-1983 (SLW):
+    Added MARK and RELEASE mods.
+
+ 20-JUN-1989 (RFWS):
+    Updated prologue, comments and layout.
+
+ 11-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_ANNUL.
+1 EMS_ELOAD
+Return error messages from the current error context.
+
+CALL EMS_ELOAD( OPSTR, OPLEN, STATUS )
+
+Description:
+
+   Each pending error message for the current context is copied into a
+   character variable from the error table. The subroutine is invoked
+   repeatedly until all the error messages in the current error context
+   have been copied, indicated by STATUS being reset to SAI__OK. At this
+   point the error table for the current context is annulled.
+2 Arguments
+OPSTR = CHARACTER * ( * ) (Returned)
+   The error message.
+
+OPLEN = INTEGER (Returned)
+   The length of the error message.
+
+STATUS = INTEGER (Given and Returned)
+   The global status: it is set to SAI__OK when the load is complete.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 28-NOV-1989 (PCTR):
+    Original version.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_LOAD.
+
+ 19-DEC-1989 (PCTR):
+    Changed EMS_ELOAD from a LOGICAL FUNCTION to a SUBROUTINE.
+
+ 9-APR-1990 (PCTR):
+    Removed unreferenced declarations and placed the DATA and SAVE
+    statements in the correct order.
+1 EMS_FIOER
+Assign a Fortran I/O error message to a token.
+
+CALL EMS_FIOER( TOKEN, IOSTAT )
+
+Description:
+
+   The text of the error message associated with the Fortran I/O status
+   value, IOSTAT, is assigned to the message token, TOKEN. This token may
+   then be included in an error message.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+IOSTAT = INTEGER (Given)
+   The Fortran I/O status value.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 4-OCT-1989 (PCTR):
+    Original version, based upon code for PONGO.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_FIOER.
+
+ 21-APR-1990 (PCTR):
+    Added more informative message if no decode available.
+1 EMS_FMTC
+Assign a CHARACTER value to a message token (formatted).
+
+CALL EMS_FMTC( TOKEN, FORMAT, CVALUE )
+
+Description:
+
+   This subroutine encodes a CHARACTER value using the supplied Fortran 77
+   format field, and assigns the result to the named message token. If this
+   subroutine fails, then the token remains undefined. This will be apparent
+   in any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+FORMAT = CHARACTER * ( * ) (Given)
+   The Fortran 77 FORMAT field used to encode the supplied value.
+
+CVALUE = CHARACTER * ( * ) (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 6-NOV-1989 (PCTR):
+    Further prologue changes.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_FMTC.
+
+ 19-MAR-1990 (PCTR):
+    Trap zero length tokens.
+
+ 9-APR-1990 (PCTR):
+    Converted to Standard Fortran 77 CHARACTER concatenation.
+1 EMS_FMTD
+Assign a DOUBLE PRECISION value to a message token (formatted).
+
+CALL EMS_FMTD( TOKEN, FORMAT, DVALUE )
+
+Description:
+
+   This subroutine encodes a given DOUBLE PRECISION value using the
+   supplied Fortran 77 format field, and assigns the result to the named
+   message token. If this subroutine fails, then the token remains
+   undefined. This will be apparent in any messages which refer to this
+   token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+FORMAT = CHARACTER * ( * ) (Given)
+   The Fortran 77 FORMAT field used to encode the supplied value.
+
+DVALUE = DOUBLE PRECISION (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_FMTD.
+
+ 9-APR-1990 (PCTR):
+    Converted to Standard Fortran 77 CHARACTER concatenation.
+1 EMS_FMTI
+Assign an INTEGER value to a message token (formatted).
+
+CALL EMS_FMTI( TOKEN, FORMAT, IVALUE )
+
+Description:
+
+   This subroutine encodes a given INTEGER value using the supplied
+   Fortran 77 format field, and assigns the result to the named message
+   token. If this subroutine fails, then the token remains undefined.
+   This will be apparent in any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+FORMAT = CHARACTER * ( * ) (Given)
+   The Fortran 77 FORMAT field used to encode the supplied value.
+
+IVALUE = INTEGER (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_FMTI.
+
+ 9-APR-1990 (PCTR):
+    Converted to Standard Fortran 77 CHARACTER concatenation.
+1 EMS_FMTL
+Assign a LOGICAL value to a message token (formatted).
+
+CALL EMS_FMTL( TOKEN, FORMAT, LVALUE )
+
+Description:
+
+   This subroutine encodes a given LOGICAL value using the supplied
+   Fortran 77 format field, and assigns it to the named message token.
+   If this subroutine fails, then the token remains undefined. This will
+   be apparent in any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+FORMAT = CHARACTER * ( * ) (Given)
+   The Fortran 77 FORMAT field used to encode the supplied value.
+
+LVALUE = LOGICAL (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_FMTL.
+
+ 9-APR-1990 (PCTR):
+    Converted to Standard Fortran 77 CHARACTER concatenation.
+1 EMS_FMTR
+Assign a REAL value to a message token (formatted).
+
+CALL EMS_FMTR( TOKEN, FORMAT, RVALUE )
+
+Description:
+
+   This subroutine encodes a given REAL value using the supplied Fortran 77,
+   format field, and assigns it to the named message token. If this
+   subroutine fails, then the token remains undefined. This will be
+   apparent in any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+FORMAT = CHARACTER * ( * ) (Given)
+   The Fortran 77 FORMAT field used to encode the supplied value.
+
+RVALUE = REAL (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_FMTR.
+
+ 9-APR-1990 (PCTR):
+    Converted to Standard Fortran 77 CHARACTER concatenation.
+1 EMS_MARK
+Start a new error context.
+
+CALL EMS_MARK
+
+Description:
+
+   This subroutine begins a new error context, so that delivery of
+   subsequently reported error messages is deferred and the messages
+   held in the error table. Calls to EMS_ANNUL, EMS_FLUSH and EMS_ELOAD
+   will only flush or annul the contents of the error table within this
+   context.
+2 Authors
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 17-APR-1983 (SLW):
+    Original version.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 12-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_MARK.
+1 EMS_MLOAD
+Expand and return a message.
+
+CALL EMS_MLOAD( PARAM, MSG, OPSTR, OPLEN, STATUS )
+
+Description:
+
+   A message, which may contain message tokens, is expanded into its
+   full form and returned in the character variable supplied. The values
+   of any existing message tokens are left undefined. If the status
+   argument is not set to SAI__OK on entry, then no action is taken.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   The message name.
+
+MSG = CHARACTER * ( * ) (Given)
+   The raw message text.
+
+OPSTR = CHARACTER * ( * ) (Given)
+   The expanded message text.
+
+OPLEN = INTEGER (Given)
+   The length of the expanded message.
+
+STATUS = INTEGER (Given)
+   The global status value.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+AJC: Alan Chipperfield (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 12-NOV-1984 (BDK):
+    Remove call to error system and change name of output routine.
+
+ 2-NOV-1988 (AJC):
+    Remove INCLUDE 'MSG_ERR'.
+
+ 28-NOV-1989 (PCTR):
+    MSG_MLOAD adapted from MSG_OUT.
+
+ 15-DEC-1989 (PCTR):
+    Changed name to EMS_MLOAD, and converted to use EMS_ calls.
+1 EMS_REP
+Report an error message.
+
+CALL EMS_REP( PARAM, MSG, STATUS )
+
+Description:
+
+   This subroutine reports an error message. According to the error context,
+   the error message is either sent to the user or retained in the error 
+   table. The latter case allows the application to take further action before 
+   deciding if the user should receive the message. The values associated 
+   with any existing message tokens are left undefined. On successful 
+   completion, the global status is returned unchanged; if an output error 
+   is encountered, the status argument is returned set to EMS__OPTER. 
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   The error message name.
+
+MSG = CHARACTER * ( * ) (Given)
+   The error message text.
+
+STATUS = INTEGER (Given and Returned)
+   The global status. This variable is left unchanged on successful
+   completion, and is set to EMS__OPTER if an output error is
+   encountered.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 17-APR-1983 (SLW):
+    Added MARK and RELEASE mods.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 12-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_REP.
+
+ 19-MAR-1990 (PCTR):
+    Changed default context level behaviour.
+1 EMS_RLSE
+Release (end) an error context.
+
+CALL EMS_RLSE
+
+Description:
+
+   This subroutine releases a "mark" in the error message table, returning
+   the Error Message Service to the previous error context. Note that
+   any pending error messages will be passed to this context, not
+   annulled.
+2 Authors
+SLW: Sid Wright (UCL)
+
+AJC: Alan Chipperfield (STARLINK)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 17-APR-1983 (SLW):
+    Original version.
+
+ 2-DEC-1988 (AJC):
+    Retain unflushed messages from above the mark.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 2-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_RLSE.
+1 EMS_SETC
+Assign a CHARACTER value to a message token (concise).
+
+CALL EMS_SETC( TOKEN, CVALUE )
+
+Description:
+
+   This subroutine encodes a given CHARACTER value using a concise format
+   and assigns the result to the named message token. If this subroutine
+   fails, then the token remains undefined. This will be apparent in
+   any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+CVALUE = CHARACTER * ( * ) (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-NOV-1984 (BDK):
+    Change name of MSG_STOK.
+
+ 20-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_SETC.
+
+ 19-MAR-1990 (PCTR):
+    Trap zero length token strings.
+1 EMS_SETD
+Assign a DOUBLE PRECISION value to a message token (concise).
+
+CALL EMS_SETD( TOKEN, DVALUE )
+
+Description:
+
+   This subroutine encodes a given DOUBLE PRECISION value using a concise
+   format and assigns the result to the named message token. If this
+   subroutine fails, then the token remains undefined. This will be
+   apparent in any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+DVALUE = DOUBLE PRECISION (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-NOV-1984 (BDK):
+    Change name of MSG_STOK.
+
+ 20-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_SETD.
+1 EMS_SETI
+Assign an INTEGER value to a message token (concise).
+
+CALL EMS_SETI( TOKEN, IVALUE )
+
+Description:
+
+   This subroutine encodes a given INTEGER value using a concise format
+   and assigns the result to the named message token. If this subroutine
+   fails, then the token remains undefined. This will be apparent in
+   any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+IVALUE = INTEGER (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-NOV-1984 (BDK):
+    Change name of MSG_STOK.
+
+ 20-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_SETI.
+1 EMS_SETL
+Assign a LOGICAL value to a message token (concise).
+
+CALL EMS_SETL( TOKEN, LVALUE )
+
+Description:
+
+   This subroutine encodes a given LOGICAL value using a concise format
+   and assigns the result to the named message token. If this subroutine
+   fails, then the token remains undefined. This will be apparent in
+   any messages which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+LVALUE = LOGICAL (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-NOV-1984 (BDK):
+    Change name of MSG_STOK.
+
+ 20-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_SETL.
+1 EMS_SETR
+Assign a REAL value to a message token (concise).
+
+CALL EMS_SETR( TOKEN, RVALUE )
+
+Description:
+
+   This subroutine encodes a given REAL value using a concise format and
+   assigns the result to the named message token. If this subroutine fails,
+   then the token remains undefined. This will be apparent in any messages
+   which refer to this token.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+RVALUE = REAL (Given)
+   The value to be assigned to the message token.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 13-NOV-1984 (BDK):
+    Change name of MSG_STOK.
+
+ 20-SEP-1989 (PCTR):
+    Converted to new prologue and layout.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from MSG_SETR.
+1 EMS_SYSER
+Assign a System error message to a token.
+
+CALL EMS_SYSER( TOKEN, SYSTAT )
+
+Description:
+
+   The text of the error message associated with the Operating System
+   status value, SYSTAT, is assigned to the message token, TOKEN. This
+   token may then be included in an error message.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+SYSTAT = INTEGER (Given)
+   The Operating System status value.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 4-OCT-1989 (PCTR):
+    Original version.
+
+ 13-DEC-1989 (PCTR):
+    EMS_ version adapted from ERR_SYSER.
+
+ 28_MAR-1990 (PCTR):
+    Converted call to LIB$SYS_GETMSG to standard Fortran 77.
+
+ 21-APR-1990 (PCTR):
+    Made no translation message more informative.

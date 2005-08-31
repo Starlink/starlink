@@ -1,0 +1,5 @@
+      PROCEDURE STARLSE1_GETENV( EVAR );
+
+      STARLSE1_GETENV := STARLSE1_DO_CLI( "printenv " + EVAR );
+
+      ENDPROCEDURE;

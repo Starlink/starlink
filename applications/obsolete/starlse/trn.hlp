@@ -1,0 +1,1372 @@
+1 TRN_ANNUL
+Annul compiled mapping.
+
+CALL TRN_ANNUL( ID, STATUS )
+
+Description:
+
+   Annul the compiled mapping associated with the identifier supplied.
+   Resources associated with the compiled mapping are released and the
+   identifier is reset to TRN__NOID. 
+2 Arguments
+ID = INTEGER (Given and Returned)
+   Compiled mapping identifier to be annulled.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The symbolic constant TRN__NOID is defined in the include file
+TRN_PAR. 
+
+-  This routine attempts to execute even if STATUS is set on entry,
+although no error report will be made if it subsequently fails under
+these circumstances. 
+1 TRN_APND
+Append transformation.
+
+CALL TRN_APND( LOCTR1, LOCTR2, STATUS )
+
+Description:
+
+   Concatenate two transformations; the first transformation is altered
+   by appending the second one to it. The second transformation is not
+   altered.
+2 Arguments
+LOCTR1 = CHARACTER * ( * ) (Given)
+   Locator to the first transformation (to be altered).
+
+LOCTR2 = CHARACTER * ( * ) (Given)
+   Locator to the second transformation (to be appended).
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of output variables from the first transformation must
+match the number of input variables to the second transformation.
+
+-  A transformation in which only the forward mapping is defined may
+not be concatenated with another transformation in which only the
+inverse mapping is defined.
+1 TRN_CLOSE
+Close the TRANSFORM facility.
+
+CALL TRN_CLOSE( STATUS )
+
+Description:
+
+   Close the TRANSFORM facility down, annulling all compiled mappings
+   and releasing all resources. No action is taken if the facility is
+   already closed. 
+2 Arguments
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  This routine attempts to execute even if the STATUS value is set on
+entry, although no error report will be made if it subsequently fails
+under these circumstances. 
+1 TRN_CLSIN
+Classification information invalid (error code).
+ 
+Description:
+ 
+   The classification information associated with a transformation is
+   invalid. This may be because conflicting classification properties
+   are being specified (e.g. POSITIVE_DET and NEGATIVE_DET) or because
+   a property is being specified in circumstances where it cannot be
+   adequately defined (because the numbers of input and output
+   variables are unequal, for instance). 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN_CMPER
+Compilation error (error code).
+ 
+Description:
+ 
+   An error has been detected during compilation of the right hand
+   side of a transformation function. The associated error report will
+   give further diagnostic information.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN_COMP
+Compile transformation.
+
+CALL TRN_COMP( LOCTR, FORWD, ID, STATUS )
+
+Description:
+
+   Compile a transformation and return an identifier for the resulting
+   compiled mapping.
+2 Arguments
+LOCTR = CHARACTER * ( * ) (Given)
+   Locator to the transformation.
+
+FORWD = LOGICAL (Given)
+   Specifies which mapping is to be compiled; .TRUE. for forward,
+   .FALSE. for inverse.
+
+ID = INTEGER (Returned)
+   Identifier for the compiled mapping.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_ERR
+TRN__ error code definitions (include file).
+ 
+Description:
+ 
+   This file contains definitions of the TRANSFORM error codes with
+   names of the form TRN__<code>, where <code> identifies the error
+   condition. 
+1 TRN_GTCL
+Get classification.
+
+CALL TRN_GTCL( LOCTR, FORWD, CLASS, STATUS )
+
+Description:
+
+   Obtain an array of logical classification values from a
+   transformation. The classification information is fully validated
+   before it is returned. 
+2 Arguments
+LOCTR = CHARACTER * ( * ) (Given)
+   Locator to the transformation.
+
+FORWD = LOGICAL (Given)
+   Specifies which mapping the information is required for; .TRUE. for
+   forward, .FALSE. for inverse. 
+
+CLASS( TRN__MXCLS ) = LOGICAL (Returned)
+   Classification array.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_GTCLC
+Get compiled classification.
+
+CALL TRN_GTCLC( ID, CLASS, STATUS )
+
+Description:
+
+   Obtain an array of logical classification values from a compiled
+   mapping. 
+2 Arguments
+ID = INTEGER (Given)
+   Identifier for the compiled mapping.
+
+CLASS( TRN__MXCLS ) = LOGICAL (Returned)
+   Classification array.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_GTNV
+Get numbers of variables.
+
+CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
+
+Description:
+
+   Obtain the numbers of input and output variables for a
+   transformation. 
+2 Arguments
+LOCTR = CHARACTER * ( * ) (Given)
+   Locator to the transformation.
+
+NVIN = INTEGER (Returned)
+   Number of input variables.
+
+NVOUT = INTEGER (Returned)
+   Number of output variables.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_GTNVC
+Get numbers of compiled variables.
+
+CALL TRN_GTNVC( ID, NVIN, NVOUT, STATUS )
+
+Description:
+
+   Obtain the numbers of input and output variables for a compiled
+   mapping.
+2 Arguments
+ID = INTEGER (Given)
+   Identifier for the compiled mapping.
+
+NVIN = INTEGER (Returned)
+   Number of input variables.
+
+NVOUT = INTEGER (Returned)
+   Number of output variables.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_INDEP
+"Preserves axis independence" classification element (symbolic
+constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation preserves the independence of the axes (although the
+   axis directions themselves may be interchanged or inverted). For
+   instance:
+
+      IF( CLASS( TRN__INDEP ) ) THEN
+         <axis independence is preserved>
+      ELSE
+         <axis independence may not be preserved>
+      ENDIF
+
+   where CLASS is a logical classification array. See TRN__DIAG for
+   how to test whether the axes themselves are preserved. 
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN_INV
+Invert transformation.
+
+CALL TRN_INV( LOCTR, STATUS )
+
+Description:
+
+   Invert a transformation. This interchanges the definitions of the
+   forward and inverse mappings.
+2 Arguments
+LOCTR = CHARACTER * ( * ) (Given)
+   Locator to the transformation to be inverted.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_JOIN
+Concatenate transformations.
+
+CALL TRN_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCTR, STATUS )
+
+Description:
+
+   Concatenate two transformations to produce a combined
+   transformation which is stored as a new component in an existing
+   HDS structure. The combined transformation may also be assigned to
+   a temporary HDS object if required. 
+2 Arguments
+LOCTR1 = CHARACTER * ( * ) (Given)
+   Locator to the first transformation.
+
+LOCTR2 = CHARACTER * ( * ) (Given)
+   Locator to the second transformation.
+
+ELOC = CHARACTER * ( * ) (Given)
+   Locator to an enclosing structure to contain the new object.
+
+NAME = CHARACTER * ( * ) (Given)
+   HDS name of the new structure component to be created.
+
+LOCTR = CHARACTER * ( * ) (Returned)
+   Locator to the newly created transformation.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  If the enclosing structure locator ELOC is supplied as a blank
+string, then a temporary transformation will be created. The NAME
+argument is then not used and may also be blank.
+
+-  The number of output variables from the first transformation must
+match the number of input variables to the second transformation.
+
+-  It is not permitted to concatenate a transformation for which only
+the forward mapping is defined with another transformation for which
+only the inverse mapping is defined.
+1 TRN_NEW
+Create new transformation.
+
+CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME,
+              LOCTR, STATUS )
+
+Description:
+
+   Create a new transformation and return a locator to it. The
+   transformation is stored as a new component in an existing HDS
+   structure, or may be assigned to a temporary object if required. 
+2 Arguments
+NVIN = INTEGER (Given)
+   Number of input variables.
+
+NVOUT = INTEGER (Given)
+   Number of output variables.
+
+FOR( NVOUT ) = CHARACTER * ( * ) (Given)
+   Array of forward transformation functions.
+
+INV( NVIN ) = CHARACTER * ( * ) (Given)
+   Array of inverse transformation functions.
+
+PREC = CHARACTER * ( * ) (Given)
+   Precision specification.
+
+COMM = CHARACTER * ( * ) (Given)
+   Comment string.
+
+ELOC = CHARACTER * ( * ) (Given)
+   Locator to an enclosing structure to contain the new object.
+
+NAME = CHARACTER * ( * ) (Given)
+   HDS name of the new structure component.
+
+LOCTR = CHARACTER * ( * ) (Returned)
+   Locator to the newly created transformation.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The transformation functions will be fully validated before use.
+
+-  If the enclosing structure locator ELOC is supplied as a blank
+string, then a temporary transformation will be created. The NAME
+argument is then not used and may also be blank. 
+1 TRN_PAR
+TRN__ symbolic constant definitions (include file).
+
+Description:
+ 
+   This file contains definitions of the TRANSFORM symbolic constants
+   with names of the form TRN__<name>, where <name> identifies the 
+   constant. 
+1 TRN_PRFX
+Prefix transformation.
+
+CALL TRN_PRFX( LOCTR1, LOCTR2, STATUS )
+
+Description:
+
+   Concatenate two transformations; the second transformation is
+   altered by prefixing the first one to it. The first transformation
+   is not altered. 
+2 Arguments
+LOCTR1 = CHARACTER * ( * ) (Given)
+   Locator to the first transformation (to be prefixed).
+
+LOCTR2 = CHARACTER * ( * ) (Given)
+   Locator to the second transformation (to be altered).
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of output variables from the first transformation must
+match the number of input variables to the second transformation.
+
+-  It is not permitted to concatenate a transformation for which only
+the forward mapping is defined with another transformation for which
+only the inverse mapping is defined. 
+1 TRN_PTCL
+Put classification.
+
+CALL TRN_PTCL( CLASS, LOCTR, STATUS )
+
+Description:
+
+   Enter classification information into a transformation. The
+   information is supplied as an array of logical values and is
+   validated before use. If the transformation already contains such
+   information, it is over-written by this routine. 
+2 Arguments
+CLASS( TRN__MXCLS ) = LOGICAL (Given)
+   Array containing the classification information.
+
+LOCTR = CHARACTER * ( * ) (Given)
+   Locator to the transformation.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+1 TRN_STOK
+Substitute text for a token in a text string.
+
+CALL TRN_STOK( TOKEN, VALUE, TEXT, NSUBS, STATUS )
+
+Description:
+
+   Substitute a textual value for a token in a text string. The VALUE
+   supplied is used to replace all valid occurrences of the TOKEN
+   sub-string in the TEXT supplied. The substitution is not recursive. 
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The token string.
+
+VALUE = CHARACTER * ( * ) (Given)
+   The textual value to substitute.
+
+TEXT = CHARACTER * ( * ) (Given and Returned)
+   The text to be processed.
+
+NSUBS = INTEGER (Returned)
+   Number of substitutions made.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  To be replaced, a token sub-string within TEXT must be correctly
+delimited (i.e. surrounded by non-alphanumeric characters). It may
+also be enclosed in angle brackets (e.g. <a_token>), in which case the
+brackets will be regarded as part of the token and will also be
+replaced.
+
+-  To be valid, a token must begin with an alphabetic character and
+contain only alphanumeric characters (including underscore). It may be
+of any length. No embedded blanks are allowed. 
+1 TRN_STOKD
+Substitute a double precision value for a token in a text string.
+ 
+CALL TRN_STOKD( TOKEN, VALUE, TEXT, NSUBS, STATUS )
+ 
+Description:
+
+   Substitute a double precision value for a token in a text string.
+   The double precision VALUE supplied is formatted as a character
+   string and used to replace all valid occurrences of the TOKEN
+   sub-string in the TEXT supplied. The substitution is not recursive. 
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The token string.
+ 
+VALUE = DOUBLE PRECISION (Given)
+   The value to substitute.
+ 
+TEXT = CHARACTER * ( * ) (Given and Returned)
+   The text to be processed.
+ 
+NSUBS = INTEGER (Returned)
+   Number of substitutions made.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  If VALUE is a negative quantity, then the token replacement value
+will be enclosed in parentheses before any substitution is made.
+ 
+-  To be replaced, a token sub-string within TEXT must be correctly
+delimited (i.e. surrounded by non-alphanumeric characters). It may
+also be enclosed in angle brackets (e.g. <a_token>), in which case the
+brackets will be regarded as part of the token and will also be
+replaced.
+ 
+-  To be valid, a token must begin with an alphabetic character and
+contain only alphanumeric characters (including underscore). It may be
+of any length. No embedded blanks are allowed.
+1 TRN_STOKI
+Substitute an integer value for a token in a text string.
+ 
+CALL TRN_STOKI( TOKEN, VALUE, TEXT, NSUBS, STATUS )
+ 
+Description:
+
+   Substitute an integer value for a token in a text string. The
+   integer VALUE supplied is formatted as a character string and used
+   to replace all valid occurrences of the TOKEN sub-string in the
+   TEXT supplied. The substitution is not recursive. 
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The token string.
+ 
+VALUE = INTEGER (Given)
+   The value to substitute.
+ 
+TEXT = CHARACTER * ( * ) (Given and Returned)
+   The text to be processed.
+ 
+NSUBS = INTEGER (Returned)
+   Number of substitutions made.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  If VALUE is a negative quantity, then the token replacement value
+will be enclosed in parentheses before any substitution is made.
+ 
+-  To be replaced, a token sub-string within TEXT must be correctly
+delimited (i.e. surrounded by non-alphanumeric characters). It may
+also be enclosed in angle brackets (e.g. <a_token>), in which case the
+brackets will be regarded as part of the token and will also be
+replaced.
+ 
+-  To be valid, a token must begin with an alphabetic character and
+contain only alphanumeric characters (including underscore). It may be
+of any length. No embedded blanks are allowed.
+1 TRN_STOKR
+Substitute a real value for a token in a text string.
+ 
+CALL TRN_STOKR( TOKEN, VALUE, TEXT, NSUBS, STATUS )
+ 
+Description:
+
+   Substitute a real value for a token in a text string. The real
+   VALUE supplied is formatted as a character string and used to
+   replace all valid occurrences of the TOKEN sub-string in the TEXT
+   supplied. The substitution is not recursive. 
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The token string.
+ 
+VALUE = REAL (Given)
+   The value to substitute.
+ 
+TEXT = CHARACTER * ( * ) (Given and Returned)
+   The text to be processed.
+ 
+NSUBS = INTEGER (Returned)
+   Number of substitutions made.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  If VALUE is a negative quantity, then the token replacement value
+will be enclosed in parentheses before any substitution is made.
+ 
+-  To be replaced, a token sub-string within TEXT must be correctly
+delimited (i.e. surrounded by non-alphanumeric characters). It may
+also be enclosed in angle brackets (e.g. <a_token>), in which case the
+brackets will be regarded as part of the token and will also be
+replaced.
+ 
+-  To be valid, a token must begin with an alphabetic character and
+contain only alphanumeric characters (including underscore). It may be
+of any length. No embedded blanks are allowed.
+1 TRN_TR1D
+Transform 1-dimensional double precision data.
+ 
+CALL TRN_TR1D( BAD, NX, XIN, ID, XOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {1-->1} mapping to a set of 1-dimensional points
+   specified by an array of double precision Xin coordinates.
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NX = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NX ) = DOUBLE PRECISION (Given)
+   Array of double precision Xin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {1-->1} mapping to be applied.
+ 
+XOUT( NX ) = DOUBLE PRECISION (Returned)
+   Array to receive the transformed double precision Xout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 1.
+1 TRN_TR1I
+Transform 1-dimensional integer data.
+ 
+CALL TRN_TR1I( BAD, NX, XIN, ID, XOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {1-->1} mapping to a set of 1-dimensional points
+   specified by an array of integer Xin coordinates.
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NX = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NX ) = INTEGER (Given)
+   Array of integer Xin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {1-->1} mapping to be applied.
+ 
+XOUT( NX ) = INTEGER (Returned)
+   Array to receive the transformed integer Xout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 1.
+1 TRN_TR1R
+Transform 1-dimensional real data.
+ 
+CALL TRN_TR1R( BAD, NX, XIN, ID, XOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {1-->1} mapping to a set of 1-dimensional points
+   specified by an array of real Xin coordinates.
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NX = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NX ) = REAL (Given)
+   Array of real Xin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {1-->1} mapping to be applied.
+ 
+XOUT( NX ) = REAL (Returned)
+   Array to receive the transformed real Xout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 1.
+1 TRN_TR2D
+Transform 2-dimensional double precision data.
+ 
+CALL TRN_TR2D( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {2-->2} mapping to a set of 2-dimensional data
+   points specified by separate arrays of double precision Xin and Yin
+   coordinates. 
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NXY = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NXY ) = DOUBLE PRECISION (Given)
+   Array of input double precision Xin coordinates.
+ 
+YIN( NXY ) = DOUBLE PRECISION (Given)
+   Array of input double precision Yin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {2-->2} mapping to be applied.
+ 
+XOUT( NXY ) = DOUBLE PRECISION (Given)
+   Array to receive the transformed double precision Xout coordinates.
+ 
+YOUT( NXY ) = DOUBLE PRECISION (Given)
+   Array to receive the transformed double precision Yout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 2.
+1 TRN_TR2I
+Transform 2-dimensional integer data.
+ 
+CALL TRN_TR2I( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {2-->2} mapping to a set of 2-dimensional data
+   points specified by separate arrays of integer Xin and Yin
+   coordinates. 
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NXY = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NXY ) = INTEGER (Given)
+   Array of input integer Xin coordinates.
+ 
+YIN( NXY ) = INTEGER (Given)
+   Array of input integer Yin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {2-->2} mapping to be applied.
+ 
+XOUT( NXY ) = INTEGER (Given)
+   Array to receive the transformed integer Xout coordinates.
+ 
+YOUT( NXY ) = INTEGER (Given)
+   Array to receive the transformed integer Yout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 2.
+1 TRN_TR2R
+Transform 2-dimensional real data.
+ 
+CALL TRN_TR2R( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
+ 
+Description:
+
+   Apply a compiled {2-->2} mapping to a set of 2-dimensional data
+   points specified by separate arrays of real Xin and Yin
+   coordinates. 
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+NXY = INTEGER (Given)
+   The number of data points to transform.
+ 
+XIN( NXY ) = REAL (Given)
+   Array of input real Xin coordinates.
+ 
+YIN( NXY ) = REAL (Given)
+   Array of input real Yin coordinates.
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {2-->2} mapping to be applied.
+ 
+XOUT( NXY ) = REAL (Given)
+   Array to receive the transformed real Xout coordinates.
+ 
+YOUT( NXY ) = REAL (Given)
+   Array to receive the transformed real Yout coordinates.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The number of input and output variables for the compiled mapping
+must both be equal to 2.
+1 TRN_TRND
+Transform general double precision data.
+ 
+CALL TRN_TRND( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT,
+               RESULT, STATUS )
+ 
+Description:
+
+   Apply a general compiled mapping (with an arbitrary number of
+   input/output variables) to a set of double precision data points. 
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+ND1 = INTEGER (Given)
+   First dimension of the DATA array (as declared in the calling
+   routine).
+ 
+NCIN = INTEGER (Given)
+   Number of coordinates for each input data point.
+ 
+NDAT = INTEGER (Given)
+   Number of data points to transform.
+ 
+DATA( ND1, NCIN ) = DOUBLE PRECISION (Given)
+   Array of double precision coordinates for the input data points;
+   they need not fill the entire array. 
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {NCIN-->NCOUT} mapping to be applied.
+ 
+NR1 = INTEGER (Given)
+   First dimension of the RESULT array (as declared in the calling
+   routine).
+ 
+NCOUT = INTEGER (Given)
+   Number of coordinates for each output data point.
+ 
+RESULT( NR1, NCOUT ) = DOUBLE PRECISION (Returned)
+   Array to receive the (transformed) double precision coordinates of
+   the output data points. 
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The values of the arguments ND1 and NR1 must be at least equal to
+the number of data points NDAT.
+ 
+-  DATA( I, J ) should contain the value of the J'th coordinate for
+the I'th input data point. Coordinate values are returned in the
+RESULT array in the same order.
+ 
+-  The values of the arguments NCIN and NCOUT must match the numbers
+of input and output variables for the compiled mapping being applied.
+1 TRN_TRNI
+Transform general integer data.
+ 
+CALL TRN_TRNI( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT,
+               RESULT, STATUS )
+ 
+Description:
+
+   Apply a general compiled mapping (with an arbitrary number of
+   input/output variables) to a set of integer data points. 
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+ND1 = INTEGER (Given)
+   First dimension of the DATA array (as declared in the calling
+   routine).
+ 
+NCIN = INTEGER (Given)
+   Number of coordinates for each input data point.
+ 
+NDAT = INTEGER (Given)
+   Number of data points to transform.
+ 
+DATA( ND1, NCIN ) = INTEGER (Given)
+   Array of integer coordinates for the input data points; they need
+   not fill the entire array. 
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {NCIN-->NCOUT} mapping to be applied.
+ 
+NR1 = INTEGER (Given)
+   First dimension of the RESULT array (as declared in the calling
+   routine).
+ 
+NCOUT = INTEGER (Given)
+   Number of coordinates for each output data point.
+ 
+RESULT( NR1, NCOUT ) = INTEGER (Returned)
+   Array to receive the (transformed) integer coordinates of the
+   output data points. 
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The values of the arguments ND1 and NR1 must be at least equal to
+the number of data points NDAT.
+ 
+-  DATA( I, J ) should contain the value of the J'th coordinate for
+the I'th input data point. Coordinate values are returned in the
+RESULT array in the same order.
+ 
+-  The values of the arguments NCIN and NCOUT must match the numbers
+of input and output variables for the compiled mapping being applied.
+1 TRN_TRNR
+Transform general real data.
+ 
+CALL TRN_TRNR( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT,
+               RESULT, STATUS )
+ 
+Description:
+
+   Apply a general compiled mapping (with an arbitrary number of
+   input/output variables) to a set of real data points.
+2 Arguments
+BAD = LOGICAL (Given)
+   Whether the input coordinates may be "bad".
+ 
+ND1 = INTEGER (Given)
+   First dimension of the DATA array (as declared in the calling
+   routine).
+ 
+NCIN = INTEGER (Given)
+   Number of coordinates for each input data point.
+ 
+NDAT = INTEGER (Given)
+   Number of data points to transform.
+ 
+DATA( ND1, NCIN ) = REAL (Given)
+   Array of real coordinates for the input data points; they need not
+   fill the entire array. 
+ 
+ID = INTEGER (Given)
+   Identifier for the compiled {NCIN-->NCOUT} mapping to be applied.
+ 
+NR1 = INTEGER (Given)
+   First dimension of the RESULT array (as declared in the calling
+   routine).
+ 
+NCOUT = INTEGER (Given)
+   Number of coordinates for each output data point.
+ 
+RESULT( NR1, NCOUT ) = REAL (Returned)
+   Array to receive the (transformed) real coordinates of the output
+   data points. 
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status.
+2 Notes
+-  The values of the arguments ND1 and NR1 must be at least equal to
+the number of data points NDAT.
+ 
+-  DATA( I, J ) should contain the value of the J'th coordinate for
+the I'th input data point. Coordinate values are returned in the
+RESULT array in the same order.
+ 
+-  The values of the arguments NCIN and NCOUT must match the numbers
+of input and output variables for the compiled mapping being applied.
+1 TRN__CMTOF
+Compiled mapping table overflow (error code).
+ 
+Description:
+ 
+   The maximum number of simultaneously active compiled mappings has
+   been exceeded. This error should not be encountered because the
+   permitted number of compiled mappings is very high.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__CONDT
+"Volume (area) scale factor is constant" classification element
+(symbolic constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation introduces a volume (or area) scale factor which is
+   position-independent. For instance: 
+
+      IF( CLASS( TRN__CONDT ) ) THEN
+         <scale factor does not vary with position>
+      ELSE
+         <scale factor may vary with position>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__CONIN
+Constant syntax invalid (error code).
+ 
+Description:
+ 
+   The right hand side of a transformation function contains a
+   numerical constant whose syntax is invalid.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__DELIN
+Delimiting comma invalid (error code).
+ 
+Description:
+ 
+   The right hand side of a transformation function contains an
+   invalid comma (commas are only used to separate the arguments of
+   built-in functions). 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__DIAG
+"Preserves the axes" classification element (symbolic constant).
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation preserves the axes. For instance: 
+
+      IF( CLASS( TRN__DIAG ) ) THEN
+         <axes are preserved>
+      ELSE
+         <axes may not be preserved>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__DIMIN
+Dimensions invalid (error code).
+ 
+Description:
+ 
+   An HDS object has inappropriate dimensions for its purpose.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__DSTIN
+Definition status invalid (error code).
+ 
+Description:
+ 
+   The FORWARD or INVERSE component of an HDS transformation structure
+   contains an invalid value. Only the values 'DEFINED' and
+   'UNDEFINED' (case insensitive) are allowed.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__DUVAR
+Duplicate variable name (error code).
+ 
+Description:
+ 
+   A variable name is defined (i.e. appears on the left hand side of a
+   transformation function) more than once.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__EXPUD
+Expression undefined (error code).
+ 
+Description:
+ 
+   The expression on the right hand side of a transformation function
+   is missing.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__ICDIR
+Incompatible transformation directions (error code).
+ 
+Description:
+ 
+   An attempt to concatenate two transformation functions has failed
+   because only the forward mapping was defined within one of them and
+   only the inverse mapping was defined within the other. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__ISOT
+"Preserves angles and shapes" classification element (symbolic
+constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation preserves angles and shapes (e.g. circles). For
+   instance:
+
+      IF( CLASS( TRN__ISOT ) ) THEN
+         <angles and shapes are preserved>
+      ELSE
+         <angles and shapes may not be preserved>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__LIN
+"Preserves straight lines" classification element (symbolic constant).
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation is linear (i.e. preserves straight lines). For
+   instance:
+
+      IF( CLASS( TRN__LIN ) ) THEN
+         <mapping is linear>
+      ELSE
+         <mapping may not be linear>
+      ENDIF
+
+   where CLASS is a logical classification array.
+    
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__MAPUD
+Mapping undefined (error code).
+ 
+Description:
+ 
+   The mapping requested from a transformation (either forward of
+   inverse) has not been defined.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MIDIN
+Compiled mapping identifier invalid (error code).
+ 
+Description:
+ 
+   A compiled mapping identifier is not valid (i.e. is not currently
+   associated with a compiled mapping).
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MIOPA
+Missing or invalid operand (error code).
+ 
+Description:
+ 
+   During compilation of the right hand side of a transformation
+   function, an operand (i.e. a constant, variable or expression) was
+   expected but was not found. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MIOPR
+Missing or invalid operator (error code).
+ 
+Description:
+ 
+   During compilation of the right hand side of a transformation
+   function, an operator (or delimiter) was expected but was not
+   found.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MISVN
+Missing variable name (error code).
+ 
+Description:
+ 
+   The variable name is missing from the left hand side of a
+   transformation function.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MLPAR
+Missing left parenthesis (error code).
+ 
+Description:
+ 
+   The right hand side of a transformation function has a left
+   parenthesis missing. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MRPAR
+Missing right parenthesis (error code).
+ 
+Description:
+ 
+   The right hand side of a transformation function has a right
+   parenthesis missing.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__MXCLS
+Maximum number of classification array elements (symbolic constant).
+ 
+Description:
+ 
+   The number of array elements which should be declared in a logical
+   classification array. For instance, a classification array called
+   CLASS might be declared as follows: 
+
+      LOGICAL CLASS( TRN__MXCLS )
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__NDCMM
+Number of data coordinates mis-matched (error code).
+ 
+Description:
+ 
+   The number of input or output coordinates specified for a set of
+   data points does not match the corresponding number of variables
+   associated with the compiled mapping being used to transform the
+   points. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__NEGDT
+"A component of reflection is present" classification element
+(symbolic constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation contains a component of reflection (in 2 dimensions
+   this means it will generate a mirror image). For instance: 
+
+      IF( CLASS( TRN__NEGDT ) ) THEN
+         <a component of reflection is present>
+      ELSE
+         <a component of reflection may not be present>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__NMVMM
+Number of module variables mis-matched (error code).
+ 
+Description:
+ 
+   Two adjacent transformation modules in the MODULE_ARRAY component
+   of an HDS transformation structure are mis-matched because the
+   number of output variables from one module is not equal to the
+   number of input variables for the one which follows. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__NOID
+Null identifier value (symbolic constant).
+ 
+Description:
+ 
+   A value which will never be used as the value of a valid compiled
+   mapping identifier. It may be assigned to a variable to indicate
+   that it is not a valid identifier. 
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__NTVMM
+Number of transformation variables mis-matched (error code).
+ 
+Description:
+ 
+   The number of output variables from the first of two
+   transformations being concatenated is not equal to the number of
+   input variables to the second transformation. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__NVRIN
+Number of variables invalid (error code).
+ 
+Description:
+ 
+   The number of variables specified in the NVAR_IN or NVAR_OUT
+   component of an HDS transformation module (TRN_MODULE) structure is
+   invalid (i.e. it is not positive). 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__OPCIN
+Operation code invalid (error code).
+ 
+Description:
+ 
+   An invalid internal arithmetic operation code has been encountered
+   while evaluating a transformation function which is part of a
+   compiled mapping. This is a serious error indicating internal
+   inconsistency within the TRANSFORM software. It should be reported
+   immediately. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__POSDT
+"A component of reflection is absent" classification element (symbolic
+constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation is free of any component of reflection (in 2
+   dimensions this means it does NOT generate a mirror image). For
+   instance: 
+
+      IF( CLASS( TRN__POSDT ) ) THEN
+         <no component of reflection is present>
+      ELSE
+         <a component of reflection may be present>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__PRCIN
+Precision invalid (error code).
+ 
+Description:
+ 
+   An invalid precision specification has been supplied when creating
+   a new transformation.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__SZPRC
+Size of a TRANSFORM precision string (symbolic constant).
+ 
+Description:
+ 
+   The maximum number of characters which may occur in a TRANSFORM
+   precision string.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__TOKIN
+Token name invalid (error code).
+ 
+Description:
+ 
+   An attempt to substitute a value for a token in a character string
+   has failed because an invalid token name has been specified.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__TRNUD
+Transformation undefined (error code).
+ 
+Description:
+ 
+   A set of transformation functions is incomplete or otherwise
+   insufficient to fully define a transformation. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__TRUNC
+Character string truncated (error code).
+ 
+Description:
+ 
+   A character string has been truncated because the character
+   variable supplied is not of sufficient length to accommodate it.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__TYPIN
+Type invalid (error code).
+ 
+Description:
+ 
+   An HDS object has a type inappropriate for its purpose.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__UNIDT
+"Volumes (areas) are preserved" classification element (symbolic
+constant). 
+ 
+Description:
+ 
+   This constant identifies the element in a logical classification
+   array which indicates whether the associated mapping or
+   transformation preserves volumes (or areas). For instance: 
+
+      IF( CLASS( TRN__UNIDT ) ) THEN
+         <volumes (areas) are preserved>
+      ELSE
+         <volumes (areas) may not be preserved>
+      ENDIF
+
+   where CLASS is a logical classification array.
+ 
+   This symbolic constant is defined in the include file TRN_PAR.
+1 TRN__VARIN
+Variable name invalid (error code).
+ 
+Description:
+ 
+   A variable used in a transformation function has an invalid name.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__VARUD
+Variable name undefined (error code).
+ 
+Description:
+ 
+   A variable used on the right hand side of a transformation function
+   is undefined because it does not appear on the left hand side of
+   one of the transformation functions which define the complementary
+   mapping. 
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__VERMM
+Software version mis-match (error code).
+ 
+Description:
+ 
+   The version number of the TRANSFORM software used to create or last
+   modify an HDS transformation structure exceeds the version number
+   of the software with which the current application is linked.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.
+1 TRN__WRNFA
+Wrong number of function arguments (error code).
+ 
+Description:
+ 
+   An invalid number of arguments has been supplied for a built-in
+   function invoked from the right hand side of a transformation
+   function.
+ 
+   The symbolic name of this error code is defined in the include file
+   TRN_ERR.

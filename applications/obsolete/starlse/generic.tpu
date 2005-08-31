@@ -1,0 +1,36 @@
+      PROCEDURE STARLSE_GENERIC ( QUAL )
+!+
+!  Purpose:
+!     Perform "generic type" replication on all the lines in the current
+!     select range using the Starlink GENERIC utility.  The usual qualifiers
+!     may be specified.
+!-
+
+      LOCAL GENERIC_PROCESS, CMD, SAVE_POSITION, CURRENT_MESSAGE;
+
+   message( "Sorry, GENERIC is not yet implemented on this system" );
+!      IF NOT LSE$SELECT_IN_PROGRESS THEN
+!         MESSAGE( 'No select active' );
+!         RETURN;
+!      ENDIF;
+!
+!      LSE$CREATE_SELECT_RANGE;
+!      WRITE_FILE( LSE$SELECT_RANGE, 'GENERIC_TEMP.GEN' );
+!      
+!      GENERIC_PROCESS := CREATE_PROCESS( MESSAGE_BUFFER, 'SET NOON' );
+!      SEND(
+!'IF F$SEARCH( "GENERIC_TEMP.FOR;*", 1 ) .NES. "" THEN DELETE GENERIC_TEMP.FOR;*',
+!            GENERIC_PROCESS ); 
+!      CMD := 'GENERIC GENERIC_TEMP.GEN '
+!             + SUBSTR( QUAL, 2, LENGTH( QUAL) - 1 ) + ' /NOCOMPILE';
+!      MESSAGE( CMD );
+!      SEND( CMD, GENERIC_PROCESS );
+!
+!      ERASE( LSE$SELECT_RANGE );
+!      READ_FILE( 'GENERIC_TEMP.FOR' );
+!
+!      DELETE( LSE$SELECT_RANGE );
+!      SEND( 'DELETE GENERIC_TEMP.GEN;,GENERIC_TEMP.FOR;', GENERIC_PROCESS );
+!      DELETE( GENERIC_PROCESS );
+
+      ENDPROCEDURE;

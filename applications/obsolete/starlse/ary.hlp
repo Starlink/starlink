@@ -1,0 +1,1721 @@
+1 ARY_ANNUL
+Annul an array identifier.
+
+CALL ARY_ANNUL( IARY, STATUS )
+
+Description:
+
+   The routine annuls the array identifier supplied so that it is no
+   longer recognised as a valid identifier by the ARY_ routines.
+   Any resources associated with it are released and made available
+   for re-use. If the array is mapped for access, then it is
+   automatically unmapped by this routine.
+
+Arguments
+IARY = INTEGER (Given and Returned)
+   The array identifier to be annulled. A value of ARY__NOID is
+   returned (as defined in the include file ARY_PAR).
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+
+Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances. In particular, it
+will fail if the identifier supplied is not initially valid, but
+this will only be reported if STATUS is set to SAI__OK on entry.
+
+-  An error will result if an attempt is made to annul the last
+remaining identifier associated with an array which is in an
+undefined state (unless it is a temporary array, in which case it
+will be deleted at this point).
+
+Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+
+History
+ 1-AUG-1989 (RFWS):
+    Original version.
+
+ 9-OCT-1989 (RFWS):
+    Added STATUS check after call to ARY_$IMPID.
+1 ARY_BAD
+Determine if an array may contain bad pixels.
+
+CALL ARY_BAD( IARY, CHECK, BAD, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an array
+   may contain bad pixels for which checks must be made when its
+   values are processed. Only if the returned value is .FALSE. can
+   such checks be omitted.  If the CHECK argument to this routine is
+   set .TRUE., then it will perform an explicit check (if necessary)
+   to see whether bad pixels are actually present.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+CHECK = LOGICAL (Given)
+   Whether to perform an explicit check to see if bad pixels are
+   actually present.
+
+BAD = LOGICAL (Returned)
+   Whether it is necessary to check for bad pixels when processing
+   the array's values.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If CHECK is set .FALSE., then the returned value of BAD will
+indicate whether bad pixels might be present and should therefore
+be checked for during subsequent processing. However, even if BAD
+is returned .TRUE. in such circumstances, it is still possible
+that there may not actually be any bad pixels present (for
+instance, in an array section, the region of the base array
+accessed might happen to avoid all the bad pixels).
+
+-  If CHECK is set .TRUE., then an explicit check will be made,
+if necessary, to ensure that BAD is only returned .TRUE. if bad
+pixels are actually present.
+
+-  If the array is mapped for access through the identifier
+supplied, then the value of BAD will refer to the actual mapped
+values. It may differ from its original (unmapped) value if
+conversion errors occurred during the mapping process, or if an
+initialisation option of '/ZERO' was specified for an array which
+was initially undefined, or if the mapped values have subsequently
+been modified.
+
+-  The BAD argument will always return a value of .TRUE. if the
+array is in an undefined state.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 12-JUL-1989 (RFWS):
+    Original version.
+
+ 20-OCT-1989 (RFWS):
+    Removed unnecessary call to ARY_$CHMOD.
+
+ 21-NOV-1989 (RFWS):
+    Implemented the CHECK option.
+
+ 7-MAR-1990 (RFWS):
+    Minor change to error message.
+1 ARY_BASE
+Obtain an identifier for a base array.
+
+CALL ARY_BASE( IARY1, IARY2, STATUS )
+
+Description:
+
+   The routine returns an identifier for the base array with which
+   an array section is associated.
+2 Arguments
+IARY1 = INTEGER (Given)
+   Identifier for an existing array section (the routine will also
+   work if this is already a base array).
+
+IARY2 = INTEGER (Returned)
+   Identifier for the base array with which the section is
+   associated.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-OCT-1989 (RFWS):
+    Original version.
+1 ARY_BOUND
+Enquire the pixel-index bounds of an array.
+
+CALL ARY_BOUND( IARY, NDIMX, LBND, UBND, NDIM, STATUS )
+
+Description:
+
+   The routine returns the lower and upper pixel-index bounds of
+   each dimension of an array, together with the total number of
+   dimensions.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+NDIMX = INTEGER (Given)
+   Maximum number of pixel-index bounds to return (i.e. the
+   declared size of the LBND and UBND arguments).
+
+LBND( NDIMX ) = INTEGER (Returned)
+   Lower pixel-index bounds for each dimension.
+
+UBND( NDIMX ) = INTEGER (Returned)
+   Upper pixel-index bounds for each dimension.
+
+NDIM = INTEGER (Returned)
+   Total number of array dimensions.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the array has fewer than NDIMX dimensions, then any
+remaining elements of the LBND and UBND arguments will be filled
+with 1's.
+
+-  If the array has more than NDIMX dimensions, then the NDIM
+argument will return the actual number of dimensions. In this
+case only the first NDIMX sets of bounds will be returned, and an
+error will result if the size of any of the remaining dimensions
+exceeds 1.
+
+-  The symbolic constant ARY__MXDIM may be used to declare the
+size of the LBND and UBND arguments so that they will be able to
+hold the maximum number of array bounds that this routine can
+return. This constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUL-1989 (RFWS):
+    Original version.
+
+ 5-MAR-1990 (RFWS):
+    Added code to pad returned bounds with 1's and to check for
+    significant excluded dimensions.
+1 ARY_CLONE
+Clone an array identifier.
+
+CALL ARY_CLONE( IARY1, IARY2, STATUS )
+
+Description:
+
+   The routine produces a "cloned" copy of an array identifier (i.e.
+   it produces a new identifier describing an array with identical
+   attributes to the original).
+2 Arguments
+IARY1 = INTEGER (Given)
+   Array identifier to be cloned.
+
+IARY2 = INTEGER (Returned)
+   Cloned identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 2-AUG-1989 (RFWS):
+    Original version.
+1 ARY_CMPLX
+Determine whether an array holds complex values.
+
+CALL ARY_CMPLX( IARY, CMPLX, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an array
+   holds complex values.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+CMPLX = LOGICAL (Returned)
+   Whether the array holds complex values.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUN-1989 (RFWS):
+    Original version.
+1 ARY_COPY
+Copy an array to a new location.
+
+CALL ARY_COPY( IARY1, PLACE, IARY2, STATUS )
+
+Description:
+
+   The routine copies an array to a new location and returns an
+   identifier for the resulting new base array.
+2 Arguments
+IARY1 = INTEGER (Given)
+   Identifier for the array (or array section) to be copied.
+
+PLACE = INTEGER (Given and Returned)
+   An array placeholder (e.g. generated by the ARY_PLACE routine)
+   which indicates the position in the data system where the new
+   array will reside. The placeholder is annulled by this
+   routine, and a value of ARY__NOPL will be returned (as defined
+   in the include file ARY_PAR).
+
+IARY2 = INTEGER (Returned)
+   Identifier for the new array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. In either
+event, the placeholder will still be annulled. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 16-AUG-1989 (RFWS):
+    Original version.
+
+ 9-OCT-1989 (RFWS):
+    Converted to use placeholder.
+
+ 20-OCT-1989 (RFWS):
+    Added support for temporary placeholders.
+1 ARY_DELET
+Delete an array.
+
+CALL ARY_DELET( IARY, STATUS )
+
+Description:
+
+   The routine deletes the specified array. If this is a base array,
+   then the associated data object is erased and all array
+   identifiers which refer to it (or to sections derived from it)
+   become invalid. If the array is mapped for access, then it is
+   first unmapped.  If an array section is specified, then this
+   routine is equivalent to calling ARY_ANNUL.
+2 Arguments
+IARY = INTEGER (Given and Returned)
+   Identifier for the array to be deleted. A value of ARY__NOID
+   is returned.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+
+-  A value of ARY__NOID is always returned for the IARY argument,
+even if the routine should fail. This constant is defined in the
+include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 2-AUG-1989 (RFWS):
+    Original version.
+
+ 13-SEP-1989 (RFWS):
+    Added check that DELETE access to the array is available.
+
+ 16-MAR-1990 (RFWS):
+    Ensure that the IARY value is reset even if the routine fails.
+
+ 26-MAR-1990 (RFWS):
+    Improved prologue.
+1 ARY_DIM
+Enquire the dimension sizes of an array.
+
+CALL ARY_DIM( IARY, NDIMX, DIM, NDIM, STATUS )
+
+Description:
+
+   The routine returns the size in pixels of each dimension of an
+   array, together with the total number of dimensions (the size of
+   a dimension is the difference between that dimension's upper and
+   lower pixel-index bounds + 1).
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+NDIMX = INTEGER (Given)
+   Maximum number of dimension sizes to return (i.e. the declared
+   size of the DIM argument).
+
+DIM( NDIMX ) = INTEGER (Returned)
+   Size of each dimension in pixels.
+
+NDIM = INTEGER (Returned)
+   Total number of array dimensions.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the array has fewer than NDIMX dimensions, then any
+remaining elements of the DIM argument will be filled with 1's.
+
+-  If the array has more than NDIMX dimensions, then the NDIM
+argument will return the actual number of dimensions. In this
+case only the first NDIMX dimension sizes will be returned, and
+an error will result if the size of any of the excluded
+dimensions exceeds 1.
+
+-  The symbolic constant ARY__MXDIM may be used to declare the
+size of the DIM argument so that it will be able to hold the
+maximum number of array dimension sizes that this routine can
+return. This constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUL-1989 (RFWS):
+    Original version.
+
+ 5-MAR-1990 (RFWS):
+    Added code to pad dimension sizes with 1's and to check for
+    significant excluded dimensions.
+1 ARY_DUPE
+Duplicate an array.
+
+CALL ARY_DUPE( IARY1, PLACE, IARY2, STATUS )
+
+Description:
+
+   The routine duplicates an array, creating a new base array with
+   the same attributes as an existing array (or array section). The
+   new array is left in an undefined state.
+2 Arguments
+IARY1 = INTEGER (Given)
+   Identifier for the array to be duplicated.
+
+PLACE = INTEGER (Given and Returned)
+   An array placeholder (e.g. generated by the ARY_PLACE routine)
+   which indicates the position in the data system where the new
+   array will reside. The placeholder is annulled by this
+   routine, and a value of ARY__NOPL will be returned (as defined
+   in the include file ARY_PAR).
+
+IARY2 = INTEGER (Returned)
+   Identifier for the new duplicate array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.  In either
+event, the placeholder will still be annulled. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-OCT-1989 (RFWS):
+    Original version.
+
+ 10-NOV-1989 (RFWS):
+    Added status check after call to ARY_$DFRM.
+
+ 27-NOV-1989 (RFWS):
+    Fixed bug causing duplicated array to take its bounds from the
+    DCB entry of the input array, rather than its ACB entry.
+
+ 28-NOV-1989 (RFWS):
+    Re-structured, to create the new ACB entry after the
+    form-dependent part of the routine.
+
+ 13-FEB-1990 (RFWS):
+    Installed support for primitive arrays.
+1 ARY_FIND
+Find an array in an HDS structure and import it into the ARY_
+system.
+
+CALL ARY_FIND( LOC, NAME, IARY, STATUS )
+
+Description:
+
+   The routine finds a named array within an HDS structure, imports
+   it into the ARY_ system and issues an identifier for it. The
+   imported array may then be manipulated by the ARY_ routines.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   Locator to the enclosing HDS structure.
+
+NAME = CHARACTER * ( * ) (Given)
+   Name of the HDS structure component to be imported.
+
+IARY = INTEGER (Returned)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 28-JUL-1989 (RFWS):
+    Original version.
+
+ 14-SEP-1989 (RFWS):
+    Changed to call ARY_$IMP rather than ARY_$DIMP and added
+    missing call to ARY_$EXPID.
+
+ 15-SEP-1989 (RFWS):
+    Added check that a standard component name has been supplied.
+
+ 15-SEP-1989 (RFWS):
+    Fixed bug; wrong locator was being passed to ARY_$IMP.
+1 ARY_FORM
+Obtain the storage form of an array.
+
+CALL ARY_FORM( IARY, FORM, STATUS )
+
+Description:
+
+   The routine returns the storage form of an array as an upper-case
+   character string (e.g. 'SIMPLE').
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+FORM = CHARACTER * ( * ) (Returned)
+   Storage form of the array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant ARY__SZFRM may be used for declaring the
+length of a character variable to hold the storage form of an
+array. This constant is defined in the include file ARY_PAR.
+
+-  At present, the ARY_ routines only support "primitive" and
+"simple" arrays, so only the values 'PRIMITIVE' and 'SIMPLE' can
+be returned.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUN-1989 (RFWS):
+    Original version.
+1 ARY_FTYPE
+Obtain the full data type of an array.
+
+CALL ARY_FTYPE( IARY, FTYPE, STATUS )
+
+Description:
+
+   The routine returns the full data type of an array as an
+   upper-case character string (e.g. '_REAL' or 'COMPLEX_BYTE').
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+FTYPE = CHARACTER * ( * ) (Returned)
+   Full data type of the array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant ARY__SZFTP may be used for declaring the
+length of a character variable to hold the full data type of an
+array. This constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUN-1989 (RFWS):
+    Original version.
+1 ARY_IMPRT
+Import an array into the ARY_ system from HDS.
+
+CALL ARY_IMPRT( LOC, IARY, STATUS )
+
+Description:
+
+   The routine imports an array into the ARY_ system from HDS and
+   issues an identifier for it. The array may then be manipulated by
+   the ARY_ routines.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   HDS locator to an array structure.
+
+IARY = INTEGER (Returned)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The locator supplied as input to this routine may later be
+annulled without affecting the subsequent behaviour of the ARY_
+system.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 28-JUL-1989 (RFWS):
+    Original version.
+
+ 14-SEP-1989 (RFWS):
+    Changed to call ARY_$IMP rather than ARY_$DIMP.
+
+ 9-OCT-1989 (RFWS):
+    Minor change to algorithm description to reflect previous
+    change to routine.
+1 ARY_ISACC
+Determine whether a specified type of array access is available.
+
+CALL ARY_ISACC( IARY, ACCESS, ISACC, STATUS )
+
+Description:
+
+   The routine determines whether a specified type of access to an
+   array is available, or whether it has been disabled. If access is
+   not available, then any attempt to access the array in this way
+   will fail.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+ACCESS = CHARACTER * ( * ) (Given)
+   The type of array access required: 'BOUNDS', 'DELETE',
+   'SHIFT', 'TYPE' or 'WRITE' (see the Notes section for
+   details).
+
+ISACC = LOGICAL (Returned)
+   Whether the specified type of access is available.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+The valid access types control the following operations on the
+array:
+
+-  'BOUNDS' permits the pixel-index bounds of a base array to be
+altered.
+
+-  'DELETE' permits deletion of the array.
+
+-  'SHIFT' permits pixel-index shifts to be applied to a base
+array.
+
+-  'TYPE' permits the data type of the array to be altered.
+
+-  'WRITE' permits new values to be written to the array, or the
+array's state to be reset.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 13-SEP-1989 (RFWS):
+    Original version.
+
+ 9-OCT-1989 (RFWS):
+    Corrected minor prologue spelling error.
+1 ARY_ISBAS
+Enquire if an array is a base array.
+
+CALL ARY_ISBAS( IARY, BASE, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether the array
+   whose identifier is supplied is a base array (as opposed to an
+   array section).
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+BASE = LOGICAL (Returned)
+   Whether the array is a base array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUL-1989 (RFWS):
+    Original version.
+
+ 13-SEP-1989 (RFWS):
+    Changed the name of the routine.
+1 ARY_ISMAP
+Determine if an array is currently mapped.
+
+CALL ARY_ISMAP( IARY, MAPPED, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an array is
+   currently mapped for access through the identifier supplied.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+MAPPED = LOGICAL (Returned)
+   Whether the array is mapped for access through the IARY
+   identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 16-AUG-1989 (RFWS):
+    Original version.
+1 ARY_ISTMP
+Determine if an array is temporary.
+
+CALL ARY_ISTMP( IARY, TEMP, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether the
+   specified array is temporary. Temporary arrays are deleted once
+   the last identifier which refers to them is annulled.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+TEMP = LOGICAL (Returned)
+   Whether the array is temporary.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 15-SEP-1989 (RFWS):
+    Original version.
+1 ARY_MAP
+Obtain mapped access to an array.
+
+CALL ARY_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )
+
+Description:
+
+   The routine obtains mapped access an array, returning a pointer
+   to the mapped values and a count of the number of elements
+   mapped.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+TYPE = CHARACTER * ( * ) (Given)
+   The numerical data type required for access (e.g. '_REAL').
+
+MMOD = CHARACTER * ( * ) (Given)
+   The mapping mode for access to the array: 'READ', 'UPDATE' or
+   'WRITE', with an optional initialisation mode '/BAD' or
+   '/ZERO' appended.
+
+PNTR = INTEGER (Returned)
+   Pointer to the mapped values.
+
+EL = INTEGER (Returned)
+   Number of elements mapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 11-JUL-1989 (RFWS):
+    Original version.
+
+ 7-SEP-1989 (RFWS):
+    Simplified the description of the routine's purpose and the
+    context error message.
+
+ 11-SEP-1989 (RFWS):
+    Changed the order of the arguments.
+
+ 3-OCT-1989 (RFWS):
+    Changed the argument order again.
+
+ 24-JAN-1990 (RFWS):
+    Renamed from ARY_MAPV to ARY_MAP.
+1 ARY_MAPZ
+Obtain complex mapped access to an array.
+
+CALL ARY_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )
+
+Description:
+
+   The routine obtains complex mapped access to an array, returning
+   pointers to the real and imaginary values and a count of the
+   number of elements mapped.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+TYPE = CHARACTER * ( * ) (Given)
+   The numerical data type required for accessing the array (e.g.
+   '_REAL').
+
+MMOD = CHARACTER * ( * ) (Given)
+   The mapping mode for access to the array: 'READ', 'UPDATE' or
+   'WRITE', with an optional initialisation mode '/BAD' or
+   '/ZERO' appended.
+
+RPNTR = INTEGER (Returned)
+   Pointer to the mapped real (i.e. non-imaginary) values.
+
+IPNTR = INTEGER (Returned)
+   Pointer to the mapped imaginary values.
+
+EL = INTEGER (Returned)
+   Number of elements mapped.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 11-JUL-1989 (RFWS):
+    Original version.
+
+ 11-SEP-1989 (RFWS):
+    Changed the order of the arguments.
+
+ 3-OCT-1989 (RFWS):
+    Changed the argument order again.
+
+ 24-JAN-1990 (RFWS):
+    Renamed from ARY_MAPZV to ARY_MAPZ.
+
+ 6-MAR-1990 (RFWS):
+    Renamed DPNTR to RPNTR.
+1 ARY_MSG
+Assign the name of an array to a message token.
+
+CALL ARY_MSG( TOKEN, IARY )
+
+Description:
+
+   The routine assigns the name of an array to a message token (in a
+   form which a user will understand) for use in constructing
+   messages with the MSG_ and ERR_ routines (see SUN/104).
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   Name of the message token.
+
+IARY = INTEGER (Given)
+   Array identifier.
+2 Notes
+-  This routine has no STATUS argument and performs no error
+checking. If it should fail, then no assignment to the message
+token will be made and this will be apparent in the final
+message.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 31-JUL-1989 (RFWS):
+    Original version.
+1 ARY_NDIM
+Enquire the dimensionality of an array.
+
+CALL ARY_NDIM( IARY, NDIM, STATUS )
+
+Description:
+
+   The routine determines the number of dimensions which an array
+   has.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+NDIM = INTEGER (Returned)
+   Number of array dimensions.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-NOV-1990 (RFWS):
+    Original version, derived from the ARY_DIM routine.
+1 ARY_NEW
+Create a new simple array.
+
+CALL ARY_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )
+
+Description:
+
+   The routine creates a new simple array and returns an identifier
+   for it. The array may subsequently be manipulated with the ARY_
+   routines.
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   Full data type of the array.
+
+NDIM = INTEGER (Given)
+   Number of array dimensions.
+
+LBND( NDIM ) = INTEGER (Given)
+   Lower pixel-index bounds of the array.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the array.
+
+PLACE = INTEGER (Given and Returned)
+   An array placeholder (e.g. generated by the ARY_PLACE routine)
+   which indicates the position in the data system where the new
+   array will reside. The placeholder is annulled by this
+   routine, and a value of ARY__NOPL will be returned (as defined
+   in the include file ARY_PAR).
+
+IARY = INTEGER (Returned)
+   Identifier for the new array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. In either
+event, the placeholder will still be annulled. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 2-AUG-1989 (RFWS):
+    Original version.
+
+ 18-SEP-1989 (RFWS):
+    Added check to prevent run time errors resulting from
+    ARY_$DCRE being called when the array bounds are invalid.
+
+ 19-SEP-1989 (RFWS):
+    Converted to use a placeholder to identify the position in the
+    data system where the new array should reside.
+
+ 26-SEP-1989 (RFWS):
+    Implemented error handling for annulling placeholder.
+
+ 2-OCT-1989 (RFWS):
+    Added ERASE variable, for clarity.
+
+ 10-OCT-1989 (RFWS):
+    Added statement to reset IARY under error conditions.
+
+ 20-OCT-1989 (RFWS):
+    Added support for temporary placeholders.
+1 ARY_NEWP
+Create a new primitive array.
+
+CALL ARY_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )
+
+Description:
+
+   The routine creates a new primitive array and returns an
+   identifier for it. The array may subsequently be manipulated with
+   the ARY_ routines.
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   Data type of the array (e.g. '_REAL'). Note that complex types
+   are not allowed for primitive arrays.
+
+NDIM = INTEGER (Given)
+   Number of array dimensions.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds of the array (the lower bound of each
+   dimension is taken to be 1).
+
+PLACE = INTEGER (Given and Returned)
+   An array placeholder (e.g. generated by the ARY_PLACE routine)
+   which indicates the position in the data system where the new
+   array will reside. The placeholder is annulled by this
+   routine, and a value of ARY__NOPL will be returned (as defined
+   in the include file ARY_PAR).
+
+IARY = INTEGER (Returned)
+   Identifier for the new array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. In either
+event, the placeholder will still be annulled. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 13-FEB-1990 (RFWS):
+    Original, derived from the ARY_NEW routine.
+1 ARY_NOACC
+Disable a specified type of access to an array.
+
+CALL ARY_NOACC( ACCESS, IARY, STATUS )
+
+Description:
+
+   The routine disables the specified type of access to an array, so
+   that any subsequent attempt to access it in that way will fail.
+   Access restrictions imposed on an array identifier by this
+   routine will be propagated to any new identifiers derived from
+   it, and cannot be revoked.
+2 Arguments
+ACCESS = CHARACTER * ( * ) (Given)
+   The type of access to be disabled: 'BOUNDS', 'DELETE',
+   'MODIFY', 'SHIFT', 'TYPE' or 'WRITE'.
+
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+Disabling each type of access imposes the following restrictions
+on an array:
+
+-  'BOUNDS' prevents the pixel-index bounds of a base array from
+being altered.
+
+-  'DELETE' prevents the array being deleted.
+
+-  'MODIFY' prevents any form of modification to the array (i.e.
+it disables all the other access types).
+
+-  'SHIFT' prevents pixel-index shifts from being applied to a
+base array.
+
+-  'TYPE' prevents the data type of the array from being altered.
+
+-  'WRITE' prevents new values from being written to the array,
+or the array's state from being reset.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-SEP-1989 (RFWS):
+    Original version.
+1 ARY_OFFS
+Obtain the pixel offset between two arrays.
+
+CALL ARY_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )
+
+Description:
+
+   The routine returns the pixel offset for each requested dimension
+   between two arrays. These values are the offsets which should be
+   added to the pixel indices of the first array to obtain the
+   indices of the corresponding pixel in the second array.
+2 Arguments
+IARY1 = INTEGER (Given)
+   First array identifier.
+
+IARY2 = INTEGER (Given)
+   Second array identifier.
+
+MXOFFS = INTEGER (Given)
+   Maximum number of pixel offsets to return (i.e. the declared
+   size of the OFFS argument).
+
+OFFS( MXOFFS ) = INTEGER (Returned)
+   Array of pixel offsets for each dimension.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The two array identifiers supplied need not refer to the same
+base array (although they may often do so). If they do not, then
+the offset between the pixels in each array is determined by
+matching the pixel indices of their respective base arrays.
+
+-  Note that non-zero pixel offsets may exist even for dimensions
+which exceed the dimensionality of either of the two arrays
+supplied. The symbolic constant ARY__MXDIM may be used to declare
+the size of the OFFS argument so that it will be able to hold the
+maximum number of non-zero offsets that this routine can return.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 9-OCT-1990 (RFWS):
+    Original version.
+1 ARY_PLACE
+Obtain an array placeholder.
+
+CALL ARY_PLACE( LOC, NAME, PLACE, STATUS )
+
+Description:
+
+   The routine returns an array placeholder. A placeholder is used
+   to identify a position in the underlying data system (HDS) and
+   may be passed to other routines (e.g. ARY_NEW) to indicate where
+   a newly created array should be positioned.
+2 Arguments
+LOC = CHARACTER * ( * ) (Given)
+   HDS locator to the structure to contain the new array.
+
+NAME = CHARACTER * ( * ) (Given)
+   Name of the new structure component (i.e. the array).
+
+PLACE = INTEGER (Returned)
+   Array placeholder identifying the nominated position in the
+   data system.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Placeholders are intended only for local use within an
+application and only a limited number of them are available
+simultaneously. They are always annulled as soon as they are
+passed to another routine to create a new array, where they are
+effectively exchanged for an array identifier.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOPL will be returned for the PLACE argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOPL
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 19-SEP-1989 (RFWS):
+    Original version.
+
+ 20-OCT-1989 (RFWS):
+    Added support for the PCB_TMP array controlling temporary
+    placeholders.
+
+ 5-MAR-1990 (RFWS):
+    Added check that a standard HDS component name has been
+    supplied.
+
+ 12-MAR-1990 (RFWS):
+    Changed placeholder type to ARRAY.
+1 ARY_RESET
+Reset an array to an undefined state.
+
+CALL ARY_RESET( IARY, STATUS )
+
+Description:
+
+   The routine resets an array so that its values become undefined.
+   Its use is advisable before making format changes to an array if
+   retention of the existing values is not required (e.g. before
+   changing its data type with the ARY_STYPE routine); this will
+   avoid the cost of converting the existing values.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine may only be used to reset the state of a base
+array. If an array section is supplied, then it will return
+without action. No error will result.
+
+-  An array cannot be reset while it is mapped for access. This
+routine will fail if this is the case.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 2-AUG-1989 (RFWS):
+    Original version.
+
+ 13-SEP-1989 (RFWS):
+    Corrected error in the ARY_$DRST routine name.
+
+ 13-SEP-1989 (RFWS):
+    Added check that WRITE access to the array is permitted.
+
+ 18-SEP-1989 (RFWS):
+    Modified to set the bad pixel flag to .TRUE. after a reset
+    operation.
+
+ 7-MAR-1990 (RFWS):
+    Added checks that the array is not mapped for access.
+1 ARY_SAME
+Enquire if two arrays are part of the same base array.
+
+CALL ARY_SAME( IARY1, IARY2, SAME, ISECT, STATUS )
+
+Description:
+
+   The routine determines whether two array identifiers refer to
+   parts of the same base array.  If so, it also determines whether
+   they intersect.
+2 Arguments
+IARY1 = INTEGER (Given)
+   Identifier for the first array (or array section).
+
+IARY2 = INTEGER (Given)
+   Identifier for the second array (or array section).
+
+SAME = LOGICAL (Returned)
+   Whether the identifiers refer to parts of the same base array.
+
+ISECT = LOGICAL (Returned)
+   Whether the arrays intersect.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Two arrays (or array sections) are counted as intersecting if
+(i) they both refer to the same base array and (ii) altering
+values in one of the arrays can result in the values in the other
+array changing in consequence.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 25-SEP-1989 (RFWS):
+    Original version.
+
+ 26-SEP-1989 (RFWS):
+    Corrected typo in error message.
+1 ARY_SBAD
+Set the bad-pixel flag for an array.
+
+CALL ARY_SBAD( BAD, IARY, STATUS )
+
+Description:
+
+   The routine sets the value of the bad-pixel flag for an array. A
+   call to this routine with BAD set to .TRUE. declares that the
+   specified array may contain bad pixel values for which checks
+   must be made by algorithms which subsequently processes its
+   values.  A call with BAD set to .FALSE. declares that there are
+   definitely no bad values present and that subsequent checks for
+   such values may be omitted.
+2 Arguments
+BAD = LOGICAL (Given)
+   Bad-pixel flag value to be set.
+
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  If the array is mapped for access when this routine is called,
+then the bad-pixel flag will be associated with the mapped
+values. This information will only be transferred to the actual
+data object when the array is unmapped (but only if it was mapped
+for UPDATE or WRITE access). The value transferred may be
+modified if conversion errors occur during the unmapping process.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 11-JUL-1989 (RFWS):
+    Original version.
+
+ 15-SEP-1989 (RFWS):
+    Changed to call ARY_$CHACC to check that WRITE access is
+    available.
+1 ARY_SBND
+Set new pixel-index bounds for an array.
+
+CALL ARY_SBND( NDIM, LBND, UBND, IARY, STATUS )
+
+Description:
+
+   The routine sets new pixel-index bounds for an array (or array
+   section). The number of array dimensions may also be changed.  If
+   a base array is specified, then a permanent change is made to the
+   actual data object and this will be apparent through any other
+   array identifiers which refer to it.  However, if an identifier
+   for an array section is specified, then its bounds are altered
+   without affecting other arrays.
+2 Arguments
+NDIM = INTEGER (Given)
+   New number of array dimensions.
+
+LBND( NDIM ) = INTEGER (Given)
+   New lower pixel-index bounds of the array.
+
+UBND( NDIM ) = INTEGER (Given)
+   New upper pixel-index bounds of the array,
+
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The bounds of an array section cannot be altered while it is
+mapped for access through the identifier supplied to this
+routine.
+
+-  The bounds of a base array cannot be altered while any part of
+it is mapped for access (i.e. even through another identifier).
+
+-  The array's pixel values (if defined) will be retained for
+those pixels which lie within both the old and new bounds. Any
+pixels lying outside the new bounds will be lost (and cannot
+later be recovered by further changes to the array's bounds).
+Any new pixels introduced where the new bounds extend beyond the
+old ones will be assigned the "bad" value, and the subsequent
+value of the bad-pixel flag will reflect this.
+
+-  If the bounds of a base array are to be altered and retention
+of the existing pixel values is not required, then a call to
+ARY_RESET should be made before calling this routine. This will
+eliminate any processing which might otherwise be needed to
+retain the existing values. This step is not necessary with an
+array section, where no processing of pixel values takes place.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 5-DEC-1989 (RFWS):
+    Original version.
+1 ARY_SECT
+Create an array section.
+
+CALL ARY_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )
+
+Description:
+
+   The routine creates a new array section which refers to a
+   selected region of an existing array (or array section). The
+   section may be larger or smaller in extent than the original
+   array.
+2 Arguments
+IARY = INTEGER (Given)
+   Identifier for the initial array.
+
+NDIM = INTEGER (Given)
+   Number of dimensions for new section.
+
+LBND( NDIM ) = INTEGER (Given)
+   Lower pixel-index bounds for the new section.
+
+UBND( NDIM ) = INTEGER (Given)
+   Upper pixel-index bounds for the new section.
+
+IARY2 = INTEGER (Returned)
+   Identifier for the new section.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The number of section dimensions need not match the number of
+dimensions in the initial array. Pixel-index bounds will be
+padded with 1's as necessary to identify the pixels to which the
+new section should refer.
+
+-  Note that sections which extend beyond the pixel-index bounds
+of the initial array will be padded with bad pixels.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY2 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 2-AUG-1989 (RFWS):
+    Original version.
+
+ 15-SEP-1989 (RFWS):
+    Changed LBND and UBND to be assumed size arrays to prevent
+    run-time errors if NDIM is not valid. Also added a check to
+    prevent ARY_$CUT being called under these circumstances.
+
+ 20-OCT-1989 (RFWS):
+    Renamed to ARY_SECT.
+1 ARY_SHIFT
+Apply pixel-index shifts to an array.
+
+CALL ARY_SHIFT( NSHIFT, SHIFT, IARY, STATUS )
+
+Description:
+
+   The routine applies pixel-index shifts to an array. An integer
+   shift is applied to each dimension so that its pixel-index
+   bounds, and the indices of each pixel, change by the amount of
+   shift applied to the corresponding dimension. The array's pixels
+   retain their values and none are lost.
+2 Arguments
+NSHIFT = INTEGER (Given)
+   Number of dimensions to which shifts are to be applied. This
+   must not exceed the number of array dimensions. If fewer
+   shifts are supplied than there are dimensions in the array,
+   then the extra dimensions will not be shifted.
+
+SHIFT( NSHIFT ) = INTEGER (Given)
+   The pixel-index shifts to be applied to each dimension.
+
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Pixel-index shifts applied to a base array will affect the
+appearance of that array as seen by all base-array identifiers
+associated with it. However, array sections derived from that
+base array will remain unchanged (as regards both pixel-indices
+and data content).
+
+-  Pixel-index shifts cannot be applied to a base array while any
+part of it is mapped for access (i.e. even through another
+identifier).
+
+-  Pixel-index shifts applied to an array section only affect
+that section itself, and have no effect on other array
+identifiers.
+
+-  Pixel-index shifts cannot be applied to an array section while
+it is mapped for access through the identifier supplied to this
+routine.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 8-AUG-1989 (RFWS):
+    Original version.
+
+ 15-SEP-1989 (RFWS):
+    Added check that SHIFT access to the array is available.
+1 ARY_SIZE
+Determine the size of an array.
+
+CALL ARY_SIZE( IARY, NPIX, STATUS )
+
+Description:
+
+   The routine returns the number of pixels in the array whose
+   identifier is supplied (i.e. the product of its dimensions).
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+NPIX = INTEGER (Returned)
+   Number of pixels in the array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUL-1989 (RFWS):
+    Original version.
+
+ 7-MAR-1990 (RFWS):
+    Renamed SIZE argument to NPIX.
+1 ARY_SSECT
+Create a similar array section to an existing one.
+
+CALL ARY_SSECT( IARY1, IARY2, IARY3, STATUS )
+
+Description:
+
+   The routine creates a new array section, using an existing
+   section as a template. The new section bears the same
+   relationship to its base array as the template section does to
+   its own base array. Allowance is made for pixel-index shifts
+   which may have been applied so that the pixel-indices of the new
+   section match those of the template.  The number of dimensions of
+   the input and template arrays may differ.
+2 Arguments
+IARY1 = INTEGER (Given)
+   Identifier for the input array from which the section is to be
+   derived. This may be a base array or an array section.
+
+IARY2 = INTEGER (Given)
+   Identifier for the template section (this may also be a base
+   array or an array section).
+
+IARY3 = INTEGER (Returned)
+   Identifier for the new array section.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine normally generates an array section.  However, if
+both input arrays are base arrays with identical pixel-index
+bounds, then there is no need to create a section in order to
+access the required part of the first array. In this case a base
+array identifier will be returned instead.
+
+-  The new section created by this routine will have the same
+number of dimensions as the array (or array section) from which
+it is derived. If the template (IARY2) array has fewer dimensions
+than this, then the bounds of any additional input dimensions are
+preserved unchanged in the new array. If the template (IARY2)
+array has more dimensions, then the excess ones are ignored.
+
+-  This routine takes account of the regions of each base array
+to which the input array sections have access. It may therefore
+restrict the region accessible to the new section (and pad with
+"bad" pixels) so as not to grant access to regions of the base
+array which were not previously accessible through the input
+arrays.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOID will be returned for the IARY3 argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOID
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-NOV-1989 (RFWS):
+    Original version.
+
+ 13-MAR-1990 (RFWS):
+    Added code to account for the extent and possible
+    non-existence of the data transfer window of the template
+    array section.
+1 ARY_STATE
+Determine the state of an array (defined or undefined).
+
+CALL ARY_STATE( IARY, STATE, STATUS )
+
+Description:
+
+   The routine returns a logical value indicating whether an array's
+   pixel values are currently defined.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATE = LOGICAL (Returned)
+   Whether the array's pixel values are defined.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 13-SEP-1989 (RFWS):
+    Original version.
+1 ARY_STYPE
+Set a new type for an array.
+
+CALL ARY_STYPE( FTYPE, IARY, STATUS )
+
+Description:
+
+   The routine sets a new full type for an array, causing its data
+   storage type to be changed. If the array's pixel values are
+   defined, then they will be converted from the old type to the new
+   one.  If they are undefined, then no conversion will be
+   necessary.  Subsequent enquiries will reflect the new type.
+   Conversion may be performed between any types supported by the
+   ARY_ routines, including from a non-complex type to a complex
+   type (and vice versa).
+2 Arguments
+FTYPE = CHARACTER * ( * ) (Given)
+   The new full type specification for the array (e.g.  '_REAL'
+   or 'COMPLEX_INTEGER').
+
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine may only be used to change the type of a base
+array. If it is called with an array which is not a base array,
+then it will return without action. No error will result.
+
+-  An error will result if the array, or any part of it, is
+currently mapped for access (e.g. through another identifier).
+
+-  If the type of an array is to be changed without its pixel
+values being retained, then a call to ARY_RESET should be made
+beforehand. This will avoid the cost of converting all the
+values.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 8-AUG-1989 (RFWS):
+    Original version.
+
+ 15-SEP-1989 (RFWS):
+    Added check that TYPE access is available.
+
+ 24-JAN-1990 (RFWS):
+    Renamed from ARY_SFTYP tp ARY_STYPE.
+1 ARY_TEMP
+Obtain a placeholder for a temporary array.
+
+CALL ARY_TEMP( PLACE, STATUS )
+
+Description:
+
+   The routine returns an array placeholder which may be used to
+   create a temporary array (i.e. one which will be deleted
+   automatically once the last identifier associated with it is
+   annulled). The placeholder returned by this routine may be passed
+   to other routines (e.g. ARY_NEW or ARY_COPY) to produce a
+   temporary array in the same way as a new permanent array would be
+   created.
+2 Arguments
+PLACE = INTEGER (Returned)
+   Placeholder for a temporary array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  Placeholders are intended only for local use within an
+application and only a limited number of them are available
+simultaneously. They are always annulled as soon as they are
+passed to another routine to create a new array, where they are
+effectively exchanged for an array identifier.
+
+-  If this routine is called with STATUS set, then a value of
+ARY__NOPL will be returned for the PLACE argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason. The ARY__NOPL
+constant is defined in the include file ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 20-OCT-1989 (RFWS):
+    Original, derived from the NDF_TEMP routine.
+
+ 12-MAR-1990 (RFWS):
+    Changed placeholder type to ARRAY.
+1 ARY_TRACE
+Set the internal ARY_ system error-tracing flag.
+
+CALL ARY_TRACE( NEWFLG, OLDFLG )
+
+Description:
+
+   The routine sets an internal flag in the ARY_ system which
+   enables or disables error-tracing messages. If this flag is set
+   to .TRUE., then any error occurring within the ARY_ system will
+   be accompanied by error messages indicating which internal
+   routines have exited prematurely as a result. If the flag is set
+   to .FALSE., this internal diagnostic information will not appear
+   and only standard error messages will be produced.
+2 Arguments
+NEWFLG = LOGICAL (Given)
+   The new value to be set for the error-tracing flag.
+
+OLDFLG = LOGICAL (Returned)
+   The previous value of the flag.
+2 Notes
+-  By default, the error tracing flag is set to .FALSE., so
+no internal diagnostic information will be produced.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 22-NOV-1989 (RFWS):
+    Original version.
+1 ARY_TYPE
+Obtain the numeric type of an array.
+
+CALL ARY_TYPE( IARY, TYPE, STATUS )
+
+Description:
+
+   The routine returns the numeric type of an array as an upper-case
+   character string (e.g. '_REAL').
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+TYPE = CHARACTER * ( * ) (Returned)
+   Numeric type of the array.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The symbolic constant ARY__SZTYP may be used for declaring the
+length of a character variable which is to hold the numeric type
+of an array. This constant is defined in the include file
+ARY_PAR.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 14-JUN-1989 (RFWS):
+    Original version.
+1 ARY_UNMAP
+Unmap an array.
+
+CALL ARY_UNMAP( IARY, STATUS )
+
+Description:
+
+   The routine unmaps an array which has previously been mapped for
+   READ, UPDATE or WRITE access.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  This routine attempts to execute even if STATUS is set on
+entry, although no further error report will be made if it
+subsequently fails under these circumstances.
+
+-  An error will result if the array has not previously been
+mapped for access.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 28-JUL-1989 (RFWS):
+    Original version.
+
+ 9-OCT-1989 (RFWS):
+    Added STATUS check after call to ARY_$IMPID.
+1 ARY_VALID
+Determine whether an array identifier is valid.
+
+CALL ARY_VALID( IARY, VALID, STATUS )
+
+Description:
+
+   Determine whether an array identifier is valid (i.e. associated
+   with an array).
+2 Arguments
+IARY = INTEGER (Given)
+   Identifier to be tested.
+
+VALID = LOGICAL (Returned)
+   Whether the identifier is valid.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 31-JUL-1989 (RFWS):
+    Original version.
+1 ARY_VERFY
+Verify that an array's data structure is correctly constructed.
+
+CALL ARY_VERFY( IARY, STATUS )
+
+Description:
+
+   The routine checks that the data structure containing an array is
+   correctly constructed and that the array's pixel values are
+   defined. It also checks for the presence of any "rogue"
+   components in the data structure. If an anomaly is found, then an
+   error results. Otherwise, the routine returns without further
+   action.
+2 Arguments
+IARY = INTEGER (Given)
+   Array identifier.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK)
+2 History
+ 1-SEP-1989 (RFWS):
+    Original version.
+
+ 18-SEP-1989 (RFWS):
+    Made minor improvements to error message.

@@ -1,0 +1,94 @@
+!+
+!  Name:
+!     STARLSE_COMMENT
+!
+!  Purpose:
+!     Insert a comment describing the current line.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of module:
+!     PROCEDURE.
+!
+!  Description:
+!     This procedure causes a comment placeholder to be inserted so that a
+!     comment may be made about the current line.  The cursor is positioned
+!     on the placeholder so that the comment may be entered immediately.  The
+!     comment is inserted immediately before the line being commented on and
+!     a blank line is inserted in front of the comment if there is not one
+!     there already.  No action occurs if the current line is already a comment
+!     line.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     21-APR-1989 (RFWS):
+!        Original version.
+!     8-JUN-1992 (RFWS):
+
+
+!        Adapted for DECset (originally for VAXset).
+!     {enter_further_changes_here}
+!
+!  Bugs:
+!     {enter_any_bugs_here}
+!
+!-
+
+      LOCAL
+         FIRST_CHAR,             ! First character in current line
+         IS_COMMENT,             ! Whether current line is a comment
+         PREVIOUS_BLANK;         ! Whether previous line is blank
+
+!  See if beginning-of-line comments are defined for the current language.
+      IF ( STARLSE1_BEGIN_COMMENT_CHARS <> '' ) THEN
+
+!  See if the current line is a comment line.  The end-of-buffer is not a
+!  comment line for this purpose.
+         INITIAL_POSITION := MARK( NONE );
+         MOVE_HORIZONTAL( - CURRENT_OFFSET );
+         IS_COMMENT := ( MARK( NONE ) <> END_OF( CURRENT_BUFFER ) );
+         IF ( IS_COMMENT ) THEN
+            FIRST_CHAR := CURRENT_CHARACTER;
+            IS_COMMENT := ( FIRST_CHAR <> '' );
+            IF( IS_COMMENT ) THEN
+               IS_COMMENT := ( INDEX( STARLSE1_BEGIN_COMMENT_CHARS,
+                                      FIRST_CHAR ) <> 0 );
+            ENDIF;
+         ENDIF;
+
+!  If the current line is a comment line, take no action.
+         IF ( IS_COMMENT ) THEN
+            POSITION( INITIAL_POSITION );
+         ELSE
+
+!  See if the previous line is blank.  The beginning-of-buffer counts as a
+!  blank line for this purpose.
+            PREVIOUS_BLANK := ( MARK( NONE ) =
+                                BEGINNING_OF( CURRENT_BUFFER ) );
+            IF ( NOT PREVIOUS_BLANK ) THEN
+               MOVE_VERTICAL( -1 );
+               PREVIOUS_BLANK := ( CURRENT_LINE = '' );
+               MOVE_VERTICAL( 1 );
+            ENDIF;
+
+!  Insert the appropriate number of blank lines in front of the current line.
+            IF ( NOT PREVIOUS_BLANK ) THEN
+               SPLIT_LINE;
+            ENDIF;
+            SPLIT_LINE;
+
+!  Position at the start of the new comment line and insert the comment
+!  placeholder.
+            MOVE_VERTICAL( -1 );
+            COPY_TEXT( STARLSE1_BEGIN_COMMENT_TEMPLATE );
+
+!  Position on the comment placeholder.
+            LSE_PREVIOUS_PLACEHOLDER;
+         ENDIF;
+      ENDIF;
+
+      ENDPROCEDURE;

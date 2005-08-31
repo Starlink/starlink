@@ -1,0 +1,58 @@
+      PROCEDURE STARLSE1_UPDATE_DEFAULT
+!+
+!  Purpose:
+!     Set the default directory to match the parent process.
+
+!  Description:
+!     This TPU procedure is intended to be invoked when it is detected
+!     that the current default directory may be out of date (i.e. no
+!     longer match that of the parent process from which a subprocess
+!     was spawned). This may happen, for instance, if the terminal is
+!     temporarily detached from LSE. It obtains the name of the parent
+!     process' default directory and then sets this as the new LSE default.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     22-AUG-1991 (RFWS):
+!        Original version.
+!     {enter_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!  Local Variables:
+      LOCAL FNAME, DEFAULT_DIR;
+
+!.
+
+!  Initialise the default directory name.
+      DEFAULT_DIR := "";
+
+!  Translate the environment variable STARLSE_COMFILE to get the communication
+!  file name. Then check to see if the file exists.
+      FNAME := STARLSE1_GETENV( "STARLSE_COMFILE" );
+      IF ( FNAME <> "" ) THEN
+         FNAME := STARLSE1_DO_CLI( "if(-e " + FNAME + ")echo " + FNAME );
+         IF ( FNAME <> "" ) THEN
+
+!  If OK, read the file's contents to obtain the default directory name. Then
+!  remove the file.
+            DEFAULT_DIR := STARLSE1_DO_CLI( "cat " + FNAME );
+            STARLSE1_DO_CLI( "rm " + FNAME );
+         ENDIF;
+      ENDIF;
+
+!  If obtained OK, set this as the new default directory.
+      IF ( DEFAULT_DIR <> "" ) THEN
+         LSE_SET_DIRECTORY_DEFAULT( DEFAULT_DIR );
+      ENDIF;
+
+!  Note the default directory is now up to date.
+      STARLSE1_DEFAULT_DIR_VALID := 1;
+
+      ENDPROCEDURE;

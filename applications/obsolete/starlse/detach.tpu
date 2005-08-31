@@ -1,0 +1,41 @@
+      PROCEDURE STARLSE1_DETACH
+!+
+!  Purpose:
+!     Flush all buffers and detach the terminal from LSE.
+
+!  Description:
+!     This TPU procedure is intended to be invoked when the "detach key"
+!     is pressed from within STARLSE. It will cause the contents of all
+!     modified buffers to be written back to the associated files and will
+!     then attach the terminal to the parent process. LSE remains active
+!     and may be re-attached later.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     22-AUG-1991 (RFWS):
+!        Original version.
+!     8-JUN-1992 (RFWS):
+!        Adapted to compile with DECset (originally for VAXset). Doesn't
+!        actually do anything useful yet.
+!     {enter_further_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!.
+
+!  Flush modified buffers.
+      STARLSE_FB;
+
+!  Note that the default directory may be changed while LSE is detached.
+      STARLSE1_DEFAULT_DIR_VALID := 0;
+
+!  Attach to the parent process.
+      LSE_ATTACH;
+
+      ENDPROCEDURE;

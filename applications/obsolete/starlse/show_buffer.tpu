@@ -1,0 +1,64 @@
+      PROCEDURE STARLSE_SB
+!+
+!  Purpose:
+!     Show a list of the current buffers.
+
+!  Description:
+!     This TPU procedure issues the LSE "SHOW BUFFER *" command to display a
+!     list of the currently available buffers. It also moves the cursor to
+!     the current (now previous) buffer in the list.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     24-OCT-1991 (RFWS):
+!        Original version.
+!     6-DEC-11991 (RFWS):
+!        Use TPU to locate the previous buffer entry, rather than LSE, so as
+!        not to change the current LSE search string.
+!     8-JUN-1992 (RFWS):
+!        Modified for use with DECset (originally for VAXset).
+!     {enter_further_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+      LOCAL BUFNAM, RNG;
+
+!.
+
+!  Define an error handler for the SEARCH operation. If the name of the
+!  previous buffer can't be found, position the cursor at the end of the
+!  SHOW buffer.
+      ON_ERROR
+         POSITION( END_OF( CURRENT_BUFFER ) );
+         RETURN;
+      ENDON_ERROR;
+
+!  Obtain the name of the current buffer.
+      BUFNAM := GET_INFO( CURRENT_BUFFER, "NAME" );
+
+!  Do the "SHOW BUFFER *" command and move to the start of the SHOW buffer.
+      LSE_SHOW_BUFFER( "*" );
+      POSITION( BEGINNING_OF( CURRENT_BUFFER ) );
+
+!  Remove any previous highlighting range which is still active.
+      STARLSE$HIGHLIGHTED_BUFNAME := 0;
+
+!  If the current (now previous) buffer name is known, search for it, highlight
+!  it and position the cursor on it (note that the range to be highlighted has
+!  to be a global variable, or the highlighting disappears once this procedure
+!  exits).
+      IF ( BUFNAM <> 0 ) THEN
+         RNG := SEARCH( BUFNAM, FORWARD );
+         STARLSE$HIGHLIGHTED_BUFNAME :=
+            CREATE_RANGE( BEGINNING_OF( RNG ), END_OF( RNG ), BOLD );
+         RNG := 0;
+         POSITION( BEGINNING_OF( STARLSE$HIGHLIGHTED_BUFNAME ) );
+      ENDIF;
+
+      ENDPROCEDURE;

@@ -1,0 +1,4648 @@
+1 SLA_AFIN
+      CALL SLA_AFIN( STRING, NSTRT, RESLT, JF)
+
+  Decode a free-format sexagesimal character string (degrees,
+  arcminutes, arcseconds) into a single precision floating point
+  number.
+
+  Given:
+     STRING    C*(*)  string containing deg, arcmin, arcsec fields
+     NSTRT     I      pointer to start of decode (beginning of STRING
+                      = 1)         
+  Returned:
+     NSTRT     I      advanced past the decoded angle
+     RESLT     R      angle in radians
+     JF        I      status:
+                           0 = OK
+                          +1 = default, RESLT unchanged (note 2)
+                          -1 = bad degrees (note 3)
+                          -2 = bad arcminutes (note 3)
+                          -3 = bad arcseconds (note 3)
+2 Example
+  argument        before                            after
+
+  STRING          '-57 17 44.806  12 34 56.7'       unchanged
+  NSTRT           1                                 16 (pointing to 12...)
+  RESLT           -                                 -1.00000
+  JF              -                                 0
+
+  A further call to SLA_AFIN, without adjustment of NSTRT will decode the
+  second angle, i.e. '12 34 56.7'.
+2 Notes
+     1)  The first three "fields" in STRING are degrees, arcminutes
+         arcseconds, separated by spaces or commas. The degrees field
+         may be signed, but not the others. The decoding is carried
+         out by the SLA_DFLTIN routine and is free-format.
+
+     2)  Successive fields may be absent, defaulting to zero. For zero
+         status, the only combinations allowed are degrees alone,
+         degrees and arcminutes, and all three fields present. If all
+         three fields are omitted, a status of +1 is returned and RESLT
+         is unchanged.  In all other cases RESLT is changed.
+
+     3)  Range checking:
+
+            -  The degrees field is not range checked. However, it is
+               expected to be integral unless the other two fields are
+               absent.
+
+            -  The arcminutes field is expected to be 0-59 and integral
+               if the arcseconds field is present. If the arcseconds field
+               is absent, the arcminutes is expected to be 0-59.9999...
+
+            -  The arcseconds field is expected to be 0-59.9999...
+
+            -  Decoding continues even when a check has failed. Under
+               these circumstances the field takes the supplied value,
+               defaulting to zero, and the result RESLT is computed and
+               returned.
+
+            -  Further fields after the three expected ones are not
+               treated as an error. The pointer NSTRT is left in the
+               correct state for further decoding with the present
+               routine or with SLA_DFLTIN etc. See the Example section.
+
+     4)  If STRING contains hours, minutes, seconds instead of degrees,
+         etc., or if the required units are turns (or days) instead of
+         radians, the result RESLT should be multipled as follows:
+
+         for STRING        to obtain        multiply RESLY by
+
+         d m s             radians          1.0
+         d m s             turns            1/(2*PI)=0.1591549430918953358
+         h m s             radians          15.0
+         h m s             days             15/(2*PI)=2.3873241463784300365
+2 Authors
+  P.T.Wallace   Starlink   1990
+1 SLA_ADDET
+      CALL SLA_ADDET( RM, DM, EQ, RC, DC )
+
+  Add the E-terms (elliptic component of annual aberration)
+  to a pre IAU 1976 mean place to conform to the old
+  catalogue convention
+
+  (double precision)
+
+  Given:
+     RM,DM     dp     RA,Dec (radians) without E-terms
+     EQ        dp     Besselian epoch of mean equator and equinox
+
+  Returned:
+     RC,DC     dp     RA,Dec (radians) with E-terms included
+2 Routines_called
+ SLA_ETRMS, SLA_DCS2C, SLA_DCC2S, SLA_DRANRM, SLA_DRANGE
+2 Explanation
+     Most star positions from pre-1984 optical catalogues (or
+     derived from astrometry using such stars) embody the
+     E-terms.  If it is necessary to convert a formal mean
+     place (for example a pulsar timing position) to one
+     consistent with such a star catalogue, then the RA,Dec
+     should be adjusted using this routine.
+2 References
+     Explanatory Supplement to the Astronomical Ephemeris,
+     section 2D, page 48.
+2 Authors
+  P.T.Wallace   Starlink   July 1986
+1 SLA_AMP
+      CALL SLA_AMP( RA, DA, DATE, EQ, RM, DM )
+
+  The mean coordinate system is the post IAU 1976 system,
+  loosely called FK5.
+
+  Given:
+     RA       d      apparent RA (radians)
+     DA       d      apparent Dec (radians)
+     DATE     d      TDB for apparent place (JD-2400000.5)
+     EQ       d      equinox:  Julian epoch of mean place
+
+  Returned:
+     RM       d      mean RA (radians)
+     DM       d      mean Dec (radians)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Notes
+     1)  The distinction between the required TDB and TDT is
+         always negligible.  Moreover, for all but the most
+         critical applications UTC is adequate.
+
+     2)  The accuracy is limited by the routine SLA_EVP, called
+         by SLA_MAPPA, which computes the Earth positions and
+         velocities using the methods of Stumpff.  The maximum
+         error is about 0.3 milliarcsecond.
+
+     3)  Iterative techniques are used for the aberration and
+         light deflection corrections so that the routines
+         SLA_AMP (or SLA_AMPQK) and SLA_MAP (or SLA_MAPQK) are
+         accurate inverses;  even at the edge of the Sun's disc
+         the discrepancy is only about 1 nanoarcsecond.
+
+     4)  Where multiple apparent places are to be converted to
+         mean places, for a fixed date and equinox, it is more
+         efficient to use the SLA_MAPPA routine to compute the
+         required parameters once, followed by one call to
+         SLA_AMPQK per star.
+2 Routines_called
+ SLA_MAPPA, SLA_AMPQK
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_AMPQK
+      CALL SLA_AMPQK( RA, DA, AMPRMS, RM, DM )
+
+  The mean coordinate system is the post IAU 1976 system,
+  loosely called FK5.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions are all to be transformed for
+  one epoch and equinox.  The star-independent parameters can be
+  obtained by calling the SLA_MAPPA routine.
+
+  Given:
+     RA       d      apparent RA (radians)
+     DA       d      apparent Dec (radians)
+
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1)      time interval for proper motion (Julian years)
+       (2-4)    barycentric position of the Earth (AU)
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)2/(Sun-Earth distance)
+       (9-11)   ABV: barycentric Earth velocity in units of c
+       (12)     sqrt(1-v2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+
+  Returned:
+     RM       d      mean RA (radians)
+     DM       d      mean Dec (radians)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Notes
+     1)  The accuracy is limited by the routine SLA_EVP, called
+         by SLA_MAPPA, which computes the earth positions and
+         velocities using the methods of Stumpff.  The maximum
+         error is about 0.3 milliarcsecond.
+
+     2)  Iterative techniques are used for the aberration and
+         light deflection corrections so that the routines
+         SLA_AMP (or SLA_AMPQK) and SLA_MAP (or SLA_MAPQK) are
+         accurate inverses;  even at the edge of the Sun's disc
+         the discrepancy is only about 1 nanoarcsecond.
+2 Routines_called
+ SLA_DCS2C, SLA_DIMXV, SLA_DVDV, SLA_DVN, SLA_DCC2S, SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_AOP
+      CALL SLA_AOP( RAP, DAP, DATE, DUT, ELONGM, PHIM, HM,
+     :              XP, YP, TDK, PMB, RH, WL, TLR,
+     :              AOB, ZOB, HOB, DOB, ROB)
+
+  Apparent to observed place, for optical sources distant from
+  the solar system.
+
+  Given:
+     RAP    d      geocentric apparent right ascension
+     DAP    d      geocentric apparent declination
+     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
+     DUT    d      delta UT:  UT1-UTC (UTC seconds)
+     ELONGM d      mean longitude of the observer (radians, East +ve)
+     PHIM   d      mean geodetic latitude of the observer (radians)
+     HM     d      observer's height above sea level (metres)
+     XP     d      polar motion x-coordinate (radians)
+     YP     d      polar motion y-coordinate (radians)
+     TDK    d      local ambient temperature (DegK; std=273.155D0)
+     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+     RH     d      local relative humidity (in the range 0D0-1D0)
+     WL     d      effective wavelength (micron, e.g. 0.55D0)
+     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+
+  Returned:
+     AOB    d      observed azimuth (radians: N=0,E=90)
+     ZOB    d      observed zenith distance (radians)
+     HOB    d      observed Hour Angle (radians)
+     DOB    d      observed Declination (radians)
+     ROB    d      observed Right Ascension (radians)
+2 Notes
+   1)  This routine returns zenith distance rather than elevation
+       in order to reflect the fact that no allowance is made for
+       depression of the horizon.
+
+   2)  The accuracy of the result is limited by the corrections for
+       refraction.  Providing the meteorological parameters are
+       known accurately and there are no gross local effects, the
+       predicted azimuth and elevation should be within about
+       0.1 arcsec.  Even at a topocentric zenith distance of
+       90 degrees, the accuracy in elevation should be better than
+       1 arcmin;  useful results are available for a further
+       3 degrees, beyond which the SLA_REFRO routine returns a
+       fixed value of the refraction.  The complementary
+       routines SLA_AOP (or SLA_AOPQK) and SLA_OAP (or SLA_OAPQK)
+       are self-consistent to better than 1 microarcsecond all over
+       the celestial sphere.
+
+   3)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   4)  "Apparent" place means the geocentric apparent right ascension
+       and declination, which is obtained from a catalogue mean place
+       by allowing for space motion, parallax, precession, nutation,
+       annual aberration, and the Sun's gravitational lens effect.  For
+       star positions in the FK5 system (i.e. J2000), these effects can
+       be applied by means of the SLA_MAP etc routines.  Starting from
+       other mean place systems, additional transformations will be
+       needed;  for example, FK4 (i.e. B1950) mean places would first
+       have to be converted to FK5, which can be done with the
+       SLA_FK425 etc routines.
+
+   5)  "Observed" Az,El means the position that would be seen by a
+       perfect theodolite located at the observer.  This is obtained
+       from the geocentric apparent RA,Dec by allowing for Earth
+       orientation and diurnal aberration, rotating from equator
+       to horizon coordinates, and then adjusting for refraction.
+       The HA,Dec is obtained by rotating back into equatorial
+       coordinates, using the geodetic latitude corrected for polar
+       motion, and is the position that would be seen by a perfect
+       equatorial located at the observer and with its polar axis
+       aligned to the Earth's axis of rotation (n.b. not to the
+       refracted pole).  Finally, the RA is obtained by subtracting
+       the HA from the local apparent ST.
+
+   6)  To predict the required setting of a real telescope, the
+       observed place produced by this routine would have to be
+       adjusted for the tilt of the azimuth or polar axis of the
+       mounting (with appropriate corrections for mount flexures),
+       for non-perpendicularity between the mounting axes, for the
+       position of the rotator axis and the pointing axis relative
+       to it, for tube flexure, for gear and encoder errors, and
+       finally for encoder zero points.  Some telescopes would, of
+       course, exhibit other properties which would need to be
+       accounted for at the appropriate point in the sequence.
+
+   7)  This routine takes time to execute, due mainly to the
+       rigorous integration used to evaluate the refraction.
+       For processing multiple stars for one location and time,
+       call SLA_AOPPA once followed by one call per star to SLA_AOPQK.
+       Where a range of times within a limited period of a few hours
+       is involved, and the highest precision is not required, call
+       SLA_AOPPA once, followed by a call to SLA_AOPPAT each time the
+       time changes, followed by one call per star to SLA_AOPQK.
+
+   8)  The delta UT (UT1-UTC) is tabulated in RGO Time Service
+       Circulars and elsewhere.  It is kept within +/- 1 second
+       by introducing leap seconds in the UTC.
+
+   9)  The polar coordinates XP,YP also can be obtained from RGO
+       Time Service circulars and equivalent publications.  The
+       maximum amplitude is about 0.3 arcseconds.  If XP,YP values
+       are unavailable, use XP=YP=0D0.  See page B60 of the 1988
+       Astronomical Almanac for a definition of the two angles.
+
+   10) The height above sea level of the observing station, HM,
+       can be obtained from the Astronomical Almanac (Section J
+       in the 1988 edition), or via the routine SLA_OBS.  If P,
+       the pressure in millibars, is available, an adequate
+       estimate of HM can be obtained from the expression
+
+             HM ~ -8149.9415D0LOG(P/1013.25D0).
+
+       (See Astrophysical Quantities, C.W.Allen, 3rd edition,
+       section 52.)  Similarly, if the pressure P is not known,
+       it can be estimated from the height of the observing
+       station, HM as follows:
+
+             P ~ 1013.25D0EXP(-HM/8149.9415D0).
+
+       Note, however, that the refraction is proportional to the
+       pressure and that an accurate P value is important for
+       precise work.
+2 Routines_called
+ SLA_AOPPA, SLA_AOPQK
+2 Authors
+  P.T.Wallace   Starlink   May 1989
+1 SLA_AOPPA
+      CALL SLA_AOPPA( DATE, DUT, ELONGM, PHIM, HM,
+     :                XP, YP, TDK, PMB, RH, WL, TLR, AOPRMS)
+
+  Precompute apparent to observed place parameters required by
+  SLA_AOPQK and SLA_OAPQK.
+
+  Given:
+     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
+     DUT    d      delta UT:  UT1-UTC (UTC seconds)
+     ELONGM d      mean longitude of the observer (radians, East +ve)
+     PHIM   d      mean geodetic latitude of the observer (radians)
+     HM     d      observer's height above sea level (metres)
+     XP     d      polar motion x-coordinate (radians)
+     YP     d      polar motion y-coordinate (radians)
+     TDK    d      local ambient temperature (DegK; std=273.155D0)
+     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+     RH     d      local relative humidity (in the range 0D0-1D0)
+     WL     d      effective wavelength (micron, e.g. 0.55D0)
+     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+
+  Returned:
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1)      geodetic latitude (radians)
+       (2,3)    sine and cosine of geodetic latitude
+       (4)      magnitude of diurnal aberration vector
+       (5)      height (HM)
+       (6)      ambient temperature (TDK)
+       (7)      pressure (PMB)
+       (8)      relative humidity (RH)
+       (9)      wavelength (WL)
+       (10)     lapse rate (TLR)
+       (11,12)  refraction constants A and B (radians)
+       (13)     longitude + eqn of equinoxes + sidereal DUT (radians)
+       (14)     local apparent sidereal time (radians)
+2 Notes
+   1)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   2)  The delta UT (UT1-UTC) is tabulated in RGO Time Service
+       Circulars and elsewhere.  It is kept within +/- 1 second
+       by introducing leap seconds in the UTC.
+
+   3)  The polar coordinates XP,YP also can be obtained from RGO
+       Time Service circulars and equivalent publications.  The
+       maximum amplitude is about 0.3 arcseconds.  If XP,YP values
+       are unavailable, use XP=YP=0D0.  See page B60 of the 1988
+       Astronomical Almanac for a definition of the two angles.
+
+   4)  The height above sea level of the observing station, HM,
+       can be obtained from the Astronomical Almanac (Section J
+       in the 1988 edition), or via the routine SLA_OBS.  If P,
+       the pressure in millibars, is available, an adequate
+       estimate of HM can be obtained from the expression
+
+             HM ~ -8149.9415D0LOG(P/1013.25D0).
+
+       (See Astrophysical Quantities, C.W.Allen, 3rd edition,
+       section 52.)  Similarly, if the pressure P is not known,
+       it can be estimated from the height of the observing
+       station, HM as follows:
+
+             P ~ 1013.25D0EXP(-HM/8149.9415D0).
+
+       Note, however, that the refraction is proportional to the
+       pressure and that an accurate P value is important for
+       precise work.
+2 Routines_called
+ SLA_GEOC, SLA_REFCO, SLA_EQEQX, SLA_AOPPAT
+2 Authors
+  P.T.Wallace   Starlink   January 1989
+1 SLA_AOPPAT
+      CALL SLA_AOPPAT( DATE, AOPRMS )
+
+  Recompute the sidereal time in the apparent to observed place
+  star-independent parameter block.
+
+  Given:
+     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
+     AOPRMS d(14)  star-independent apparent-to-observed parameters
+
+       (1-12)   not required
+       (13)     longitude + eqn of equinoxes + sidereal DUT
+       (14)     not required
+
+  Returned:
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1-13)   not changed
+       (14)     local apparent sidereal time (radians)
+
+  For more information, see SLA_AOPPA.
+2 Routines_called
+ SLA_GMST
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_AOPQK
+      CALL SLA_AOPQK( RAP, DAP, AOPRMS,
+     :                AOB, ZOB, HOB, DOB, ROB)
+
+  Quick apparent to observed place
+
+  Given:
+     RAP    d      geocentric apparent right ascension
+     DAP    d      geocentric apparent declination
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1)      geodetic latitude (radians)
+       (2,3)    sine and cosine of geodetic latitude
+       (4)      magnitude of diurnal aberration vector
+       (5)      height (HM)
+       (6)      ambient temperature (T)
+       (7)      pressure (P)
+       (8)      relative humidity (RH)
+       (9)      wavelength (WL)
+       (10)     lapse rate (TLR)
+       (11,12)  refraction constants A and B (radians)
+       (13)     longitude + eqn of equinoxes + sidereal DUT (radians)
+       (14)     local apparent sidereal time (radians)
+
+  Returned:
+     AOB    d      observed azimuth (radians: N=0,E=90)
+     ZOB    d      observed zenith distance (radians)
+     HOB    d      observed Hour Angle (radians)
+     DOB    d      observed Declination (radians)
+     ROB    d      observed Right Ascension (radians)
+2 Notes
+   1)  This routine returns zenith distance rather than elevation
+       in order to reflect the fact that no allowance is made for
+       depression of the horizon.
+
+   2)  The accuracy of the result is limited by the corrections for
+       refraction.  Providing the meteorological parameters are
+       known accurately and there are no gross local effects, the
+       predicted azimuth and elevation should be within about
+       0.1 arcsec.  Even at a topocentric zenith distance of
+       90 degrees, the accuracy in elevation should be better than
+       1 arcmin;  useful results are available for a further
+       3 degrees, beyond which the SLA_REFRO routine returns a
+       fixed value of the refraction.  The complementary
+       routines SLA_AOP (or SLA_AOPQK) and SLA_OAP (or SLA_OAPQK)
+       are self-consistent to better than 1 microarcsecond all over
+       the celestial sphere.
+
+   3)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   4)  "Apparent" place means the geocentric apparent right ascension
+       and declination, which is obtained from a catalogue mean place
+       by allowing for space motion, parallax, precession, nutation,
+       annual aberration, and the Sun's gravitational lens effect.  For
+       star positions in the FK5 system (i.e. J2000), these effects can
+       be applied by means of the SLA_MAP etc routines.  Starting from
+       other mean place systems, additional transformations will be
+       needed;  for example, FK4 (i.e. B1950) mean places would first
+       have to be converted to FK5, which can be done with the
+       SLA_FK425 etc routines.
+
+   5)  "Observed" Az,El means the position that would be seen by a
+       perfect theodolite located at the observer.  This is obtained
+       from the geocentric apparent RA,Dec by allowing for Earth
+       orientation and diurnal aberration, rotating from equator
+       to horizon coordinates, and then adjusting for refraction.
+       The HA,Dec is obtained by rotating back into equatorial
+       coordinates, using the geodetic latitude corrected for polar
+       motion, and is the position that would be seen by a perfect
+       equatorial located at the observer and with its polar axis
+       aligned to the Earth's axis of rotation (n.b. not to the
+       refracted pole).  Finally, the RA is obtained by subtracting
+       the HA from the local apparent ST.
+
+   6)  To predict the required setting of a real telescope, the
+       observed place produced by this routine would have to be
+       adjusted for the tilt of the azimuth or polar axis of the
+       mounting (with appropriate corrections for mount flexures),
+       for non-perpendicularity between the mounting axes, for the
+       position of the rotator axis and the pointing axis relative
+       to it, for tube flexure, for gear and encoder errors, and
+       finally for encoder zero points.  Some telescopes would, of
+       course, exhibit other properties which would need to be
+       accounted for at the appropriate point in the sequence.
+
+   7)  The star-independent apparent-to-observed-place parameters
+       in AOPRMS may be computed by means of the SLA_AOPPA routine.
+       If nothing has changed significantly except the time, the
+       SLA_AOPPAT routine may be used to perform the requisite
+       partial recomputation of AOPRMS.
+2 Routines_called
+ SLA_DCS2C, SLA_REFZ, SLA_REFRO, SLA_DCC2S, SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   May 1989
+1 SLA_AV2M
+      CALL SLA_AV2M( AXVEC, RMAT )
+
+  Form the rotation matrix corresponding to a given axial vector.
+
+  (single precision)
+
+  A rotation matrix describes a rotation about some arbitrary axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector supplied to this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.
+
+  Given:
+    AXVEC  r(3)     axial vector (radians)
+
+  Returned:
+    RMAT   r(3,3)   rotation matrix
+
+  If AXVEC is null, the unit matrix is returned.
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_BEAR
+      REAL FUNCTION SLA_BEAR( A1, B1, A2, B2 )
+
+  Bearing between points on a sphere
+
+  (single precision)
+
+  Returns the bearing of one point on a sphere relative to another.
+
+  Given:
+     A1,B1       real      spherical coordinates of one point
+     A2,B2       real      spherical coordinates of the other point
+
+  Result:  Bearing from first point to second
+2 Notes
+     1)  The spherical coordinates are [RA,Dec] in radians.
+
+     2)  The result is the bearing, in radians, of point [A2,B2] as seen
+         from point [A1,B1]. It is in the range +/- Pi. Zero is returned if
+         the two points are coincident.
+2 Authors
+  P.T.Wallace   Starlink
+1 SLA_CAF2R
+      CALL SLA_CAF2R( IDEG, IAMIN, ASEC, RAD, J )
+
+  Convert degrees, arcminutes, arcseconds to radians
+
+  (single precision)
+
+  Given:
+     IDEG        int       degrees
+     IAMIN       int       arcminutes
+     ASEC        real      arcseconds
+
+  Returned:
+     RAD         real      angle in radians
+     J           int       status:  0 = OK
+                                    1 = IDEG outside range 0-359
+                                    2 = IAMIN outside range 0-59
+                                    3 = ASEC outside range 0-59.999...
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_CALDJ
+      CALL SLA_CALDJ( IY, IM, ID, DJM, J )
+
+  Gregorian Calendar to Modified Julian Date
+
+  (Includes century default feature:  use SLA_CLDJ for years
+   before 100AD.)
+
+  Given:
+     IY,IM,ID     int    year, month, day in Gregorian calendar
+
+  Returned:
+     DJM          dp     modified Julian Date (JD-2400000.5) for 0 hrs
+     J            int    status:
+                           0 = OK
+                           1 = bad year   (MJD not computed)
+                           2 = bad month  (MJD not computed)
+                           3 = bad day    (MJD computed)
+
+  Acceptable years are 00-49, interpreted as 2000-2049,
+                       50-99,     "       "  1950-1999,
+                       100 upwards, interpreted literally.
+2 Routines_called
+ SLA_CLDJ
+2 Authors
+  P.T.Wallace   Starlink   November 1985
+1 SLA_CALYD
+      CALL SLA_CALYD( IY, IM, ID, NY, ND, J )
+
+  Calendar to year and day in year
+
+  Given:
+     IY,IM,ID   int    year, month, day in Gregorian calendar
+                       (year may optionally omit the century)
+  Returned:
+     NY         int    year AD
+     ND         int    day in year (1 = January 1st)
+     J          int    status:
+                        -1 = OK, but outside range 1900/3/1-2100/2/28
+                         0 = OK, and within above range
+                         2 = bad month  (day not computed)
+                         3 = bad day    (year,day both computed)
+
+  J=0 means that the date is within the range where the Gregorian
+  rule concerning century leap years can be neglected.
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_CC2S
+      CALL SLA_CC2S( V, A, B )
+
+  Direction cosines to spherical coordinates (single precision)
+
+  Given:
+     V     r(3)   x,y,z vector
+
+  Returned:
+     A,B   r      spherical coordinates in radians
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+
+  If V is null, zero A and B are returned.
+  At either pole, zero A is returned.
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_CC62S
+      CALL SLA_CC62S( V, A, B, R, AD, BD, RD )
+
+  Conversion of position & velocity in Cartesian coordinates
+  to spherical coordinates
+
+  (single precision)
+
+  Given:
+     V     r(6)   Cartesian position & velocity vector
+
+  Returned:
+     A     r      longitude (radians)
+     B     r      latitude (radians)
+     R     r      radial coordinate
+     AD    r      longitude derivative (radians per unit time)
+     BD    r      latitude derivative (radians per unit time)
+     RD    r      radial derivative
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_CD2TF
+      CALL SLA_CD2TF( NDP, DAYS, SIGN, IHMSF )
+
+  Convert an interval in days into hours, minutes, seconds
+  (single precision)
+
+  Given:
+     NDP       int      number of decimal places of seconds
+     DAYS      real     interval in days
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IHMSF     int(4)   hours, minutes, seconds, fraction
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_CLDJ
+      CALL SLA_CLDJ( IY, IM, ID, DJM, J )
+
+  Gregorian Calendar to Modified Julian Date
+
+  Given:
+     IY,IM,ID     int    year, month, day in Gregorian calendar
+
+  Returned:
+     DJM          dp     modified Julian Date (JD-2400000.5) for 0 hrs
+     J            int    status:
+                           0 = OK
+                           1 = bad year   (MJD not computed)
+                           2 = bad month  (MJD not computed)
+                           3 = bad day    (MJD computed)
+
+  The year must be -4699 (i.e. 4700BC) or later.
+
+  The algorithm is derived from that of Hatcher 1984
+  (QJRAS 25, 53-55).
+2 Authors
+  P.T.Wallace   Starlink   December 1985
+1 SLA_CR2AF
+      CALL SLA_CR2AF( NDP, ANGLE, SIGN, IDMSF )
+
+  Convert an angle in radians into degrees, arcminutes, arcseconds
+  (single precision)
+
+  Given:
+     NDP       int      number of decimal places of arcseconds
+     ANGLE     real     angle in radians
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IDMSF     int(4)   degrees, arcminutes, arcseconds, fraction
+2 Routines_called
+ SLA_CD2TF
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_CR2TF
+      CALL SLA_CR2TF( NDP, ANGLE, SIGN, IHMSF )
+
+  Convert an angle in radians into hours, minutes, seconds
+
+  (single precision)
+
+  Given:
+     NDP       int      number of decimal places of seconds
+     ANGLE     real     angle in radians
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IHMSF     int(4)   hours, minutes, seconds, fraction
+2 Routines_called
+ SLA_CD2TF
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_CS2C
+      CALL SLA_CS2C( A, B, V )
+
+  Spherical coordinates to direction cosines (single precision)
+
+  Given:
+     A,B      real      spherical coordinates in radians
+                        (RA,Dec), (Long,Lat) etc
+
+  Returned:
+     V        real(3)   x,y,z unit vector
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+2 Authors
+  P.T.Wallace   Starlink   October 1984
+1 SLA_CS2C6
+      CALL SLA_CS2C6( A, B, R, AD, BD, RD, V )
+
+  Conversion of position & velocity in spherical coordinates
+  to Cartesian coordinates
+
+  (single precision)
+
+  Given:
+     A     r      longitude (radians)
+     B     r      latitude (radians)
+     R     r      radial coordinate
+     AD    r      longitude derivative (radians per unit time)
+     BD    r      latitude derivative (radians per unit time)
+     RD    r      radial derivative
+
+  Returned:
+     V     r(6)   Cartesian position & velocity vector
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_CTF2D
+      CALL SLA_CTF2D( IHOUR, IMIN, SEC, DAYS, J )
+
+  Convert hours, minutes, seconds to days
+
+  (single precision)
+
+  Given:
+     IHOUR       int       hours
+     IMIN        int       minutes
+     SEC         real      seconds
+
+  Returned:
+     DAYS        real      interval in days
+     J           int       status:  0 = OK
+                                    1 = IHOUR outside range 0-23
+                                    2 = IMIN outside range 0-59
+                                    3 = SEC outside range 0-59.999...
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_CTF2R
+      CALL SLA_CTF2R( IHOUR, IMIN, SEC, RAD, J )
+
+  Convert hours, minutes, seconds to radians
+
+  (single precision)
+
+  Given:
+     IHOUR       int       hours
+     IMIN        int       minutes
+     SEC         real      seconds
+
+  Returned:
+     RAD         real      angle in radians
+     J           int       status:  0 = OK
+                                    1 = IHOUR outside range 0-23
+                                    2 = IMIN outside range 0-59
+                                    3 = SEC outside range 0-59.999...
+2 Routines_called
+ SLA_CTF2D
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_DAF2R
+      CALL SLA_DAF2R( IDEG, IAMIN, ASEC, RAD, J )
+
+  Convert degrees, arcminutes, arcseconds to radians
+
+  (double precision)
+
+  Given:
+     IDEG        int       degrees
+     IAMIN       int       arcminutes
+     ASEC        dp        arcseconds
+
+  Returned:
+     RAD         dp        angle in radians
+     J           int       status:  0 = OK
+                                    1 = IDEG outside range 0-359
+                                    2 = IAMIN outside range 0-59
+                                    3 = ASEC outside range 0-59.999...
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   July 1984
+1 SLA_DAFIN
+      CALL SLA_DAFIN( STRING, NSTRT, DRESLT, JF)
+
+  Decode a free-format sexagesimal character string (degrees,
+  arcminutes, arcseconds) into a single precision floating point
+  number.
+
+  Given:
+     STRING    C*(*)  string containing deg, arcmin, arcsec fields
+     NSTRT     I      pointer to start of decode (beginning of STRING
+                      = 1)         
+  Returned:
+     NSTRT     I      advanced past the decoded angle
+     DRESLT    R      angle in radians
+     JF        I      status:
+                           0 = OK
+                          +1 = default, DRESLT unchanged (note 2)
+                          -1 = bad degrees (note 3)
+                          -2 = bad arcminutes (note 3)
+                          -3 = bad arcseconds (note 3)
+2 Example
+  argument        before                            after
+
+  STRING          '-57 17 44.806  12 34 56.7'       unchanged
+  NSTRT           1                                 16 (pointing to 12...)
+  DRESLT          -                                 -1.00000D0
+  JF              -                                 0
+
+  A further call to SLA_DAFIN, without adjustment of NSTRT will decode the
+  second angle, i.e. '12 34 56.7'.
+2 Notes
+     1)  The first three "fields" in STRING are degrees, arcminutes
+         arcseconds, separated by spaces or commas. The degrees field
+         may be signed, but not the others. The decoding is carried
+         out by the SLA_DFLTIN routine and is free-format.
+
+     2)  Successive fields may be absent, defaulting to zero. For zero
+         status, the only combinations allowed are degrees alone,
+         degrees and arcminutes, and all three fields present. If all
+         three fields are omitted, a status of +1 is returned and DRESLT
+         is unchanged.  In all other cases DRESLT is changed.
+
+     3)  Range checking:
+
+            -  The degrees field is not range checked. However, it is
+               expected to be integral unless the other two fields are
+               absent.
+
+            -  The arcminutes field is expected to be 0-59 and integral
+               if the arcseconds field is present. If the arcseconds field
+               is absent, the arcminutes is expected to be 0-59.9999...
+
+            -  The arcseconds field is expected to be 0-59.9999...
+
+            -  Decoding continues even when a check has failed. Under
+               these circumstances the field takes the supplied value,
+               defaulting to zero, and the result DRESLT is computed and
+               returned.
+
+            -  Further fields after the three expected ones are not
+               treated as an error. The pointer NSTRT is left in the
+               correct state for further decoding with the present
+               routine or with SLA_DFLTIN etc. See the Example section.
+
+     4)  If STRING contains hours, minutes, seconds instead of degrees,
+         etc., or if the required units are turns (or days) instead of
+         radians, the result DRESLT should be multipled as follows:
+
+         for STRING        to obtain        multiply RESLY by
+
+         d m s             radians          1.0
+         d m s             turns            1/(2*PI)=0.1591549430918953358D0
+         h m s             radians          15.0
+         h m s             days             15/(2*PI)=2.3873241463784300365D0
+2 Authors
+  P.T.Wallace   Starlink   1990
+1 SLA_DAT
+      DOUBLE PRECISION FUNCTION SLA_DAT (UTC)
+
+  Increment to be applied to Coordinated Universal Time UTC to give
+  International Atomic Time TAI
+
+  (double precision)
+
+  Given:
+     UTC      dp      UTC as a modified JD (JD-2400000.5)
+
+  Result:  TAI-UTC in seconds
+
+  Pre 1972 January 1 a fixed value of 10 sec is returned.
+
+     :-----------------------------------------:
+     :                                         :
+     :                IMPORTANT                :
+     :                                         :
+     :  This routine must be updated on each   :
+     :     occasion that a leap second is      :
+     :                announced                :
+     :                                         :
+     :  Latest leap second:  1988 January 1    :
+     :                                         :
+     :-----------------------------------------:
+2 Authors
+  P.T.Wallace   Starlink   21 November 1989
+1 SLA_DAV2M
+      CALL SLA_DAV2M( AXVEC, RMAT )
+
+  Form the rotation matrix corresponding to a given axial vector.
+
+  (double precision)
+
+  A rotation matrix describes a rotation about some arbitrary axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector supplied to this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.
+
+  Given:
+    AXVEC  d(3)     axial vector (radians)
+
+  Returned:
+    RMAT   d(3,3)   rotation matrix
+
+  If AXVEC is null, the unit matrix is returned.
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_DBEAR
+      DOUBLE PRECISION FUNCTION SLA_DBEAR( A1, B1, A2, B2 )
+
+  Bearing between points on a sphere
+
+  (double precision)
+
+  Returns the bearing of one point on a sphere relative to another.
+
+  Given:
+     A1,B1       dp        spherical coordinates of one point
+     A2,B2       dp        spherical coordinates of the other point
+
+  Result:  Bearing from first point to second
+2 Notes
+     1)  The spherical coordinates are [RA,Dec] in radians.
+
+     2)  The result is the bearing, in radians, of point [A2,B2] as seen
+         from point [A1,B1]. It is in the range +/- Pi. Zero is returned if
+         the two points are coincident.
+2 Authors
+  P.T.Wallace   Starlink
+1 SLA_DBJIN
+      CALL SLA_DBJIN( STRING, NSTRT, DRESLT, J1, J2 )
+
+  Convert free-format input into double precision floating point,
+  using DFLTIN but with special syntax extensions.
+
+  The purpose of the syntax extensions is to help cope with mixed
+  FK4 and FK5 data.  In addition to the syntax accepted by DFLTIN,
+  the following two extensions are recognised by DBJIN:
+
+     1)  A valid non-null field preceded by the character 'B'
+         (or 'b') is accepted.
+
+     2)  A valid non-null field preceded by the character 'J'
+         (or 'j') is accepted.
+
+  The calling program is notified of the incidence of either of these
+  extensions through an supplementary status argument.  The rest of
+  the arguments are as for DFLTIN.
+
+  Given:
+     STRING      char       string containing field to be decoded
+     NSTRT       int        pointer to 1st character of field in string
+
+  Returned:
+     NSTRT       int        incremented
+     DRESLT      double     result
+     J1          int        DFLTIN status: -1 = -OK
+                                            0 = +OK
+                                           +1 = null field
+                                           +2 = error
+     J2          int        syntax flag:  0 = normal DFLTIN syntax
+                                         +1 = 'B' or 'b'
+                                         +2 = 'J' or 'j'
+
+  For details of the basic syntax, see SLA_DFLTIN.
+2 Routines_called
+ SLA_DFLTIN
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_DC62S
+      CALL SLA_DC62S( V, A, B, R, AD, BD, RD )
+
+  Conversion of position & velocity in Cartesian coordinates
+  to spherical coordinates
+
+  (double precision)
+
+  Given:
+     V     dp(6)   Cartesian position & velocity vector
+
+  Returned:
+     A     dp      longitude (radians)
+     B     dp      latitude (radians)
+     R     dp      radial coordinate
+     AD    dp      longitude derivative (radians per unit time)
+     BD    dp      latitude derivative (radians per unit time)
+     RD    dp      radial derivative
+2 Authors
+  P.T.Wallace   Starlink   September 1984
+1 SLA_DCC2S
+      CALL SLA_DCC2S( V, A, B )
+
+  Direction cosines to spherical coordinates (double precision)
+
+  Given:
+     V     d(3)   x,y,z vector
+
+  Returned:
+     A,B   d      spherical coordinates in radians
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+
+  If V is null, zero A and B are returned.
+  At either pole, zero A is returned.
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_DCMPF
+      CALL SLA_DCMPF( COEFFS,XZ,YZ,XS,YS,PERP,ORIENT )
+
+  Decompose an [X,Y] linear fit into its constituent parameters:
+  zero points, scales, nonperpendicularity and orientation.
+
+  Given:
+     COEFFS  d(6)      transformation coefficients (see note)
+
+  Returned:
+     XZ       d        x zero point
+     YZ       d        y zero point
+     XS       d        x scale
+     YS       d        y scale
+     PERP     d        nonperpendicularity (radians)
+     ORIENT   d        orientation (radians)
+
+  The model relates two sets of [X,Y] coordinates as follows.
+  Naming the elements of COEFFS:
+
+     COEFFS(1) = A
+     COEFFS(2) = B
+     COEFFS(3) = C
+     COEFFS(4) = D
+     COEFFS(5) = E
+     COEFFS(6) = F
+
+  the model transforms coordinates [X1,Y1] into coordinates
+  [X2,Y2] as follows:
+
+     X2 = A + BX1 + CY1
+     Y2 = D + EX1 + FY1
+
+  The transformation can be decomposed into four steps:
+
+     1)  Zero points:
+
+             x' = XZ + X1
+             y' = YZ + Y1
+
+     2)  Scales:
+
+             x'' = XSx'
+             y'' = YSy'
+
+     3)  Nonperpendicularity:
+
+             x''' = cos(PERP)x'' + sin(PERP)y''
+             y''' = sin(PERP)x'' + cos(PERP)y''
+
+     4)  Orientation:
+
+             X2 = cos(ORIENT)x''' + sin(ORIENT)y'''
+             Y2 =-sin(ORIENT)y''' + cos(ORIENT)y'''
+
+  See also SLA_FITXY, SLA_PXY, SLA_INVF, SLA_XY2XY
+2 Authors
+  P.T.Wallace   Starlink   8 June 1989
+1 SLA_DCS2C
+      CALL SLA_DCS2C( A, B, V )
+
+  Spherical coordinates to direction cosines (double precision)
+
+  Given:
+     A,B       dp      spherical coordinates in radians
+                        (RA,Dec), (Long,Lat) etc
+
+  Returned:
+     V         dp(3)   x,y,z unit vector
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+2 Authors
+  P.T.Wallace   Starlink   October 1984
+1 SLA_DD2TF
+      CALL SLA_DD2TF( NDP, DAYS, SIGN, IHMSF )
+
+  Convert an interval in days into hours, minutes, seconds
+
+  (double precision)
+
+  Given:
+     NDP       int      number of decimal places of seconds
+     DAYS      dp       interval in days
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IHMSF     int(4)   hours, minutes, seconds, fraction
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_DEULER
+      CALL SLA_DEULER( ORDER, PHI, THETA, PSI, RMAT )
+
+  Form a rotation matrix from the Euler angles - three successive
+  rotations about specified Cartesian axes.
+
+  (double precision)
+
+  Given:
+    ORDER  c()    specifies about which axes the rotations occur
+    PHI    dp       1st rotation (radians)
+    THETA  dp       2nd rotation (   "   )
+    PSI    dp       3rd rotation (   "   )
+
+  Returned:
+    RMAT   dp(3,3)  rotation matrix
+
+  A rotation is positive when the reference frame rotates
+  anticlockwise as seen looking towards the origin from the
+  positive region of the specified axis.
+
+  The characters of ORDER define which axes the three successive
+  rotations are about.  A typical value is 'ZXZ', indicating that
+  RMAT is to become the direction cosine matrix corresponding to
+  rotations of the reference frame through PHI radians about the
+  old Z-axis, followed by THETA radians about the resulting X-axis,
+  then PSI radians about the resulting Z-axis.
+
+  The axis names can be any of the following, in any order or
+  combination:  X, Y, Z, uppercase or lowercase, 1, 2, 3.  Normal
+  axis labelling/numbering conventions apply;  the xyz (=123)
+  triad is right-handed.  Thus, the 'ZXZ' example given above
+  could be written 'zxz' or '313' (or even 'ZxZ' or '3xZ').  ORDER
+  is terminated by length or by the first unrecognised character.
+
+  Fewer than three rotations are acceptable, in which case the later
+  angle arguments are ignored.  Zero rotations produces a unit RMAT.
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_DFLTIN
+      CALL SLA_DFLTIN( STRING, NSTRT, DRESLT, JFLAG )
+
+  Convert free-format input into double precision floating point
+
+  Given:
+     STRING      char       string containing field to be decoded
+     NSTRT       int        pointer to 1st character of field in string
+
+  Returned:
+     NSTRT       int        advanced to next field
+     DRESLT      dp         result
+     JFLAG       int        -1 = -OK, 0 = +OK, 1 = null field, 2 = error
+2 Routines_called
+ SLA_$IDCHF
+2 Notes
+     1     A TAB character is interpreted as a space, and lower
+           case d,e are interpreted as upper case.
+
+     2     The basic format is #^.^@#^ where # means + or -,
+           ^ means a decimal subfield and @ means D or E.
+
+     3     Spaces:
+             Leading spaces are ignored.
+             Embedded spaces are allowed only after # and D or E,
+             and after . where the first ^ is absent.
+             Trailing spaces are ignored;  the first signifies
+             end of decoding and subsequent ones are skipped.
+
+     4     Field separators:
+             Any character other than +,-,0-9,.,D,E or space may be
+             used to end a field.  Comma is recognised by DFLTIN
+             as a special case; it is skipped, leaving the
+             pointer on the next character.  See 12, below.
+
+     5     Both signs are optional.  The default is +.
+
+     6     The mantissa defaults to 1.
+
+     7     The exponent defaults to D0.
+
+     8     The decimal subfields may be of any length.
+
+     9     The decimal point is optional for whole numbers.
+
+     10    A null field is one that does not begin with
+           +,-,0-9,.,D or E, or consists entirely of spaces.
+           If the field is null, JFLAG is set to 1 and DRESLT
+           is left untouched.
+
+     11    NSTRT = 1 for the first character in the string.
+
+     12    On return from DFLTIN, NSTRT is set ready for the next
+           decode - following trailing blanks and (if used) the
+           comma separator.  If a separator other than comma is
+           being used, NSTRT must be incremented before the next
+           call to DFLTIN.
+
+     13    Errors (JFLAG=2) occur when:
+             a)  A +, -, D or E is left unsatisfied.
+             b)  The decimal point is present without at least
+                 one decimal subfield.
+             c)  An exponent more than 100 has been presented.
+
+     14    When an error has been detected, NSTRT is left
+           pointing to the character following the last
+           one used before the error came to light.  This
+           may be after the point at which a more sophisticated
+           program could have detected the error.  For example,
+           DFLTIN does not detect that '1D999' is unacceptable
+           until the whole field has been read.
+
+     15    Certain highly unlikely combinations of mantissa &
+           exponent can cause arithmetic faults during the
+           decode, in some cases despite the fact that they
+           together could be construed as a valid number.
+
+     16    Decoding is left to right, one pass.
+
+     17    End of field may occur in either of two ways:
+             a)  As dictated by the string length.
+             b)  Detected during the decode.
+                 (b overrides a.)
+2 Authors
+  P.T.Wallace   Starlink   October 1987
+1 SLA_DIMXV
+      CALL SLA_DIMXV( DM, VA, VB )
+
+  Performs the 3-D backward unitary transformation:
+     vector VB = (inverse of matrix DM)  vector VA
+
+  (double precision)
+
+  (n.b.  the matrix must be unitary, as this routine assumes that
+   the inverse and transpose are identical)
+
+  Given:
+     DM       dp(3,3)    matrix
+     VA       dp(3)      vector
+
+  Returned:
+     VB       dp(3)      result vector
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_DJCAL
+      CALL SLA_DJCAL( NDP, DJM, IYMDF, J )
+
+  Modified Julian Date to Gregorian Calendar, expressed
+  in a form convenient for formatting messages (namely
+  rounded to a specified precision, and with the fields
+  stored in a single array)
+
+  Given:
+     NDP      i      number of decimal places of days in fraction
+     DJM      d      modified Julian Date (JD-2400000.5)
+
+  Returned:
+     IYMDF    i(4)   year, month, day, fraction in Gregorian
+                     calendar
+     J        i      status:  nonzero = out of range
+
+  Any date after 4701BC March 1 is accepted.
+2 References
+  The algorithm is derived from that of Hatcher 1984
+  (QJRAS 25, 53-55).
+2 Authors
+  P.T.Wallace   Starlink   January 1989
+1 SLA_DJCL
+      CALL SLA_DJCL( DJM, IY, IM, ID, FD, J )
+
+  Modified Julian Date to Gregorian year, month, day,
+  and fraction of a day.
+
+  Given:
+     DJM      dp     modified Julian Date (JD-2400000.5)
+
+  Returned:
+     IY       int    year AD
+     IM       int    month
+     ID       int    day
+     FD       dp     fraction of day
+     J        int    status:
+                      -1 = unacceptable date (before 4701BC March 1)
+2 References
+  The algorithm is derived from that of Hatcher 1984
+  (QJRAS 25, 53-55).
+2 Authors
+  P.T.Wallace   Starlink   February 1987
+1 SLA_DM2AV
+      CALL SLA_DM2AV( RMAT, AXVEC )
+
+  From a rotation matrix, determine the corresponding axial vector.
+
+  (double precision)
+
+  A rotation matrix describes a rotation about some arbitry axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector returned by this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.  (The
+  magnitude and direction can be separated by means of the routine
+  SLA_DVN.)
+
+  Given:
+    RMAT   d(3,3)   rotation matrix
+
+  Returned:
+    AXVEC  d(3)     axial vector (radians)
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+
+  If RMAT is null, so is the result.
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_DMAT
+      CALL SLA_DMAT( N, A, Y, D, JF, IW )
+
+  Matrix inversion & solution of simultaneous equations
+
+  (double precision)
+
+  For the set of n simultaneous equations in n unknowns:
+     A.Y = X
+
+  where:
+     A is a non-singular N x N matrix
+     Y is the vector of N unknowns
+     X is the known vector
+
+  DMAT computes:
+     the inverse of matrix A
+     the determinant of matrix A
+     the vector of N unknowns
+
+  Arguments:
+     symbol  type dimension           before              after
+
+       N      int                 no. of unknowns       unchanged
+       A      dp    (N,N)             matrix             inverse
+       Y      dp     (N)              vector            solution
+       D      dp                         -             determinant
+      JF     int                         -          singularity flag
+      IW     int    (N)                  -              workspace
+
+    JF is the singularity flag.  If the matrix is non-singular,
+    JF=0 is returned.  If the matrix is singular, JF=-1 & D=0.0 are
+    returned.  In the latter case, the contents of array A on return
+    are undefined.
+
+    This routine replaces the obsolete SLA_DMATRX.
+2 Algorithm
+     Gaussian elimination with partial pivoting.
+2 Speed
+     Very fast; some much slower algorithms can give better accuracy,
+     but only by a small factor.
+2 Accuracy
+     Fairly accurate - errors 1 to 4 times those of routines optimised
+     for accuracy.
+2 Authors
+  P.T.Wallace   Starlink   October 1985
+1 SLA_DMXM
+      CALL SLA_DMXM( A, B, C )
+
+  Product of two 3x3 matrices:
+      matrix C  =  matrix A  x  matrix B
+
+  (double precision)
+
+  Given:
+      A      dp(3,3)        matrix
+      B      dp(3,3)        matrix
+
+  Returned:
+      C      dp(3,3)        matrix result
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_DMXV
+      CALL SLA_DMXV( DM, VA, VB )
+
+  Performs the 3-D forward unitary transformation:
+     vector VB = matrix DM  vector VA
+
+  (double precision)
+
+  Given:
+     DM       dp(3,3)    matrix
+     VA       dp(3)      vector
+
+  Returned:
+     VB       dp(3)      result vector
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_DR2AF
+      CALL SLA_DR2AF( NDP, ANGLE, SIGN, IDMSF )
+
+  Convert an angle in radians to degrees, arcminutes, arcseconds
+
+  (double precision)
+
+  Given:
+     NDP       int      number of decimal places of arcseconds
+     ANGLE     dp       angle in radians
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IDMSF     int(4)   degrees, arcminutes, arcseconds, fraction
+2 Routines_called
+ SLA_DD2TF
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_DR2TF
+      CALL SLA_DR2TF( NDP, ANGLE, SIGN, IHMSF )
+
+  Convert an angle in radians to hours, minutes, seconds
+
+  (double precision)
+
+  Given:
+     NDP       int      number of decimal places of seconds
+     ANGLE     dp       angle in radians
+
+  Returned:
+     SIGN      char     '+' or '-'
+     IHMSF     int(4)   hours, minutes, seconds, fraction
+2 Routines_called
+ SLA_DD2TF
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_DRANGE
+      DOUBLE PRECISION FUNCTION SLA_DRANGE (ANGLE)
+
+  Normalise angle into range +/- pi  (double precision)
+
+  Given:
+     ANGLE     dp      the angle in radians
+
+  The result is ANGLE expressed in the +/- pi (double
+  precision).
+2 Authors
+  P.T.Wallace   Starlink   December 1984
+1 SLA_DRANRM
+      DOUBLE PRECISION FUNCTION SLA_DRANRM (ANGLE)
+
+  Normalise angle into range 0-2 pi  (double precision)
+
+  Given:
+     ANGLE     dp      the angle in radians
+
+  The result is ANGLE expressed in the range 0-2 pi (double
+  precision).
+2 Authors
+  P.T.Wallace   Starlink   December 1984
+1 SLA_DS2C6
+      CALL SLA_DS2C6( A, B, R, AD, BD, RD, V )
+
+  Conversion of position & velocity in spherical coordinates
+  to Cartesian coordinates
+
+  (double precision)
+
+  Given:
+     A     dp      longitude (radians)
+     B     dp      latitude (radians)
+     R     dp      radial coordinate
+     AD    dp      longitude derivative (radians per unit time)
+     BD    dp      latitude derivative (radians per unit time)
+     RD    dp      radial derivative
+
+  Returned:
+     V     dp(6)   Cartesian position & velocity vector
+2 Authors
+  P.T.Wallace   Starlink   September 1984
+1 SLA_DS2TP
+      CALL SLA_DS2TP( RA, DEC, RAZ, DECZ, XI, ETA, J )
+
+  Projection of spherical coordinates onto tangent plane
+  ('gnomonic' projection - 'standard coordinates')
+
+  (double precision)
+
+  Given:
+     RA,DEC      dp   spherical coordinates of point to be projected
+     RAZ,DECZ    dp   spherical coordinates of tangent point
+
+  Returned:
+     XI,ETA      dp   rectangular coordinates on tangent plane
+     J           int  status:   0 = OK, star on tangent plane
+                                1 = error, star too far from axis
+                                2 = error, antistar too far from axis
+                                3 = error, antistar on tangent plane
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_DSEP
+      DOUBLE PRECISION FUNCTION SLA_DSEP (A1, B1, A2, B2)
+
+  Angle between two points on a sphere
+
+  (double precision)
+
+  Given:
+     A1,B1    dp    spherical coordinates of one point
+     A2,B2    dp    spherical coordinates of the other point
+
+  (The spherical coordinates are RA,Dec, Long,Lat etc, in radians.)
+
+  The result is the angle, in radians, between the two points.  It
+  is always positive.
+2 Routines_called
+ SLA_DCS2C
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_DTA
+     OBSOLETE ROUTINE - USE SLA_DTT INSTEAD
+
+      DOUBLE PRECISION FUNCTION SLA_DTA (DJU)
+
+  Correction from UTC to TDT (formerly ET)
+
+  (double precision)
+
+  Given:
+     DJU      dp      UTC as a modified JD (JD-2400000.5)
+
+  Result:  TDT minus UTC in seconds
+
+  Pre 1972 January 1 a fixed value of 10 + ET-TAI is returned.
+
+     :-----------------------------------------:
+     :                                         :
+     :                IMPORTANT                :
+     :                                         :
+     :  This routine must be updated on each   :
+     :     occasion that a leap second is      :
+     :                announced                :
+     :                                         :
+     :  Latest leap second:  1988 January 1    :
+     :                                         :
+     :-----------------------------------------:
+2 Authors
+     P.T.Wallace   Starlink   21 September 1989
+1 SLA_DTF2D
+      CALL SLA_DTF2D( IHOUR, IMIN, SEC, DAYS, J )
+
+  Convert hours, minutes, seconds to days
+
+  (double precision)
+
+  Given:
+     IHOUR       int       hours
+     IMIN        int       minutes
+     SEC         dp        seconds
+
+  Returned:
+     DAYS        dp        interval in days
+     J           int       status:  0 = OK
+                                    1 = IHOUR outside range 0-23
+                                    2 = IMIN outside range 0-59
+                                    3 = SEC outside range 0-59.999...
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   July 1984
+1 SLA_DTF2R
+      CALL SLA_DTF2R( IHOUR, IMIN, SEC, RAD, J )
+
+  Convert hours, minutes, seconds to radians
+
+  (double precision)
+
+  Given:
+     IHOUR       int       hours
+     IMIN        int       minutes
+     SEC         dp        seconds
+
+  Returned:
+     RAD         dp        angle in radians
+     J           int       status:  0 = OK
+                                    1 = IHOUR outside range 0-23
+                                    2 = IMIN outside range 0-59
+                                    3 = SEC outside range 0-59.999...
+2 Routines_called
+ SLA_DTF2D
+2 Notes
+     1)  The result is computed even if any of the range checks
+         fail.
+
+     2)  The sign must be dealt with outside this routine.
+2 Authors
+  P.T.Wallace   Starlink   July 1984
+1 SLA_DTP2S
+      CALL SLA_DTP2S( XI, ETA, RAZ, DECZ, RA, DEC )
+
+  Transform tangent plane coordinates into spherical
+
+  (double precision)
+
+  Given:
+     XI,ETA      dp   tangent plane rectangular coordinates
+     RAZ,DECZ    dp   spherical coordinates of tangent point
+
+  Returned:
+     RA,DEC      dp   spherical coordinates (0-2pi,+/-pi/2)
+2 Routines_called
+ SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_DTT
+      DOUBLE PRECISION FUNCTION SLA_DTT (UTC)
+
+  Increment to be applied to Coordinated Universal Time UTC to give
+  Terrestrial Dynamical Time TDT (formerly Ephemeris Time ET)
+
+  (double precision)
+
+  Given:
+     UTC      dp      UTC as a modified JD (JD-2400000.5)
+
+  Result:  TDT-UTC in seconds
+
+  Pre 1972 January 1 a fixed value of 10 + ET-TAI is returned.
+2 Routines_called
+ SLA_DAT
+2 Authors
+  P.T.Wallace   Starlink   31st August 1989
+1 SLA_DVDV
+      DOUBLE PRECISION FUNCTION SLA_DVDV (VA, VB)
+
+  Scalar product of two 3-vectors  (double precision)
+
+  Given:
+      VA      dp(3)     first vector
+      VB      dp(3)     second vector
+
+  The result is the scalar product VA.VB (double precision)
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_DVN
+      CALL SLA_DVN( V, UV, VM )
+
+  Normalises a 3-vector also giving the modulus
+
+  (double precision)
+
+  Given:
+     V       dp(3)      vector
+
+  Returned:
+     UV      dp(3)      unit vector in direction of V
+     VM      dp         modulus of V
+
+  If the modulus of V is zero, UV is set to zero as well
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_DVXV
+      CALL SLA_DVXV( VA, VB, VC )
+
+  Vector product of two 3-vectors  (double precision)
+
+  Given:
+      VA      dp(3)     first vector
+      VB      dp(3)     second vector
+
+  Returned:
+      VC      dp(3)     vector result
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_EARTH
+      CALL SLA_EARTH( IY, ID, FD, POSVEL )
+
+  Approximate heliocentric position and velocity of the Earth
+
+  Given:
+     IY       I       year AD
+     ID       I       day in year (1 = Jan 1st)
+     FD       R       fraction of day
+
+  Returned:
+     POSVEL   R(6)    Earth position & velocity vector
+
+  The date and time is TDB (loosely ET) in the Gregorian
+  calendar, and is interpreted in a manner which is valid
+  between 1900 March 1 and 2100 February 28.
+
+  The Earth heliocentric 6-vector is mean equator and equinox
+  of date.  Position part, POSVEL(1-3), is in AU;  velocity part,
+  POSVEL(4-6), is in AU/sec.
+
+  Max/RMS errors 1950-2050:
+     13/5 E-5 AU = 19200/7600 km in position
+     47/26 E-10 AU/s = 0.0070/0.0039 km/s in speed
+
+  More precise results are obtainable with the routine SLA_EVP.
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_ECLEQ
+      CALL SLA_ECLEQ( DL, DB, DATE, DR, DD )
+
+  Transformation from ecliptic coordinates to
+  J2000.0 equatorial coordinates
+
+  (double precision)
+
+  Given:
+     DL,DB       dp      ecliptic longitude and latitude
+                           (mean of date, IAU 1980 theory, radians)
+     DATE        dp      TDB (loosely ET) as Modified Julian Date
+                                              (JD-2400000.5)
+  Returned:
+     DR,DD       dp      J2000.0 mean RA,Dec (radians)
+2 Routines_called
+ SLA_DCS2C, SLA_ECMAT, SLA_DIMXV, SLA_PREC, SLA_EPJ, SLA_DCC2S,
+ SLA_DRANRM, SLA_DRANGE
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_ECMAT
+      CALL SLA_ECMAT( DATE, RMAT )
+
+  Form the equatorial to ecliptic rotation matrix (IAU 1980 theory)
+
+  (double precision)
+
+  Given:
+     DATE     dp         TDB (loosely ET) as Modified Julian Date
+                                            (JD-2400000.5)
+  Returned:
+     RMAT     dp(3,3)    matrix
+2 References
+     Murray,C.A., Vectorial Astrometry, section 4.3.
+2 Notes
+    The matrix is in the sense   V(ecl)  =  RMAT  V(equ);  the
+    equator, equinox and ecliptic are mean of date.
+2 Routines_called
+ SLA_DEULER
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_ECOR
+      CALL SLA_ECOR( RM, DM, IY, ID, FD, RV, TL )
+
+  Component of Earth orbit velocity and heliocentric
+  light time in a given direction
+
+  (single precision)
+
+  Given:
+     RM,DM    real    mean RA, Dec of date (radians)
+     IY       int     year AD
+     ID       int     day in year (1 = Jan 1st)
+     FD       real    fraction of day
+
+  Returned:
+     RV       real    component of Earth orbital velocity (km/sec)
+     TL       real    component of heliocentric light time (sec)
+
+  The date and time is TDB (loosely ET) in the Gregorian
+  calendar, and is interpreted in a manner which is valid
+  between 1900 March 1 and 2100 February 28.
+2 Sign_convention
+    The velocity component is +ve when the Earth is receding from
+    the given point on the sky.  The light time component is +ve
+    when the Earth lies between the Sun and the given point on
+    the sky.
+2 Accuracy
+    The velocity component is usually within 0.004 km/s of the
+    correct value and is never in error by more than 0.007 km/s.
+    The error in light time correction is about 0.03s at worst,
+    but is usually better than 0.01s. For applications requiring
+    higher accuracy, see the SLA_EVP routine.
+2 Routines_called
+ SLA_EARTH, SLA_CS2C, SLA_VDV
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_EG50
+      CALL SLA_EG50( DR, DD, DL, DB )
+
+  Transformation from B1950.0 'FK4' equatorial coordinates to
+  IAU 1958 galactic coordinates
+
+  (double precision)
+
+  Given:
+     DR,DD       dp       B1950.0 'FK4' RA,Dec
+
+  Returned:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DMXV, SLA_DCC2S, SLA_SUBET, SLA_DRANRM, SLA_DRANGE
+2 Notes
+     The equatorial coordinates are B1950.0 'FK4'.  Use the
+     routine SLA_EQGAL if conversion from J2000.0 coordinates
+     is required.
+2 References
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_EPB
+      DOUBLE PRECISION FUNCTION SLA_EPB (DATE)
+
+  Conversion of Modified Julian Date to Besselian Epoch
+
+  (double precision)
+
+  Given:
+     DATE     dp       Modified Julian Date (JD - 2400000.5)
+
+  The result is the Besselian Epoch.
+2 References
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_EPB2D
+      DOUBLE PRECISION FUNCTION SLA_EPB2D (EPB)
+
+  Conversion of Besselian Epoch to Modified Julian Date
+
+  (double precision)
+
+  Given:
+     EPB      dp       Besselian Epoch
+
+  The result is the Modified Julian Date (JD - 2400000.5).
+2 References
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_EPCO
+      DOUBLE PRECISION FUNCTION SLA_EPCO (K0, K, E)
+
+  Convert an epoch into the appropriate form - 'B' or 'J'
+
+  Given:
+     K0    char    form of result:  'B'=Besselian, 'J'=Julian
+     K     char    form of given epoch:  'B' or 'J'
+     E     dp      epoch
+
+  The result is the given epoch converted as required;
+  the change, if any, will be small.
+2 Routines_called
+ SLA_EPB, SLA_EPJ2D, SLA_EPJ, SLA_EPB2D
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_EPJ
+      DOUBLE PRECISION FUNCTION SLA_EPJ (DATE)
+
+  Conversion of Modified Julian Date to Julian Epoch
+
+  (double precision)
+
+  Given:
+     DATE     dp       Modified Julian Date (JD - 2400000.5)
+
+  The result is the Julian Epoch.
+2 References
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_EPJ2D
+      DOUBLE PRECISION FUNCTION SLA_EPJ2D (EPJ)
+
+  Conversion of Julian Epoch to Modified Julian Date
+
+  (double precision)
+
+  Given:
+     EPJ      dp       Julian Epoch
+
+  The result is the Modified Julian Date (JD - 2400000.5).
+2 References
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_EQECL
+      CALL SLA_EQECL( DR, DD, DATE, DL, DB )
+
+  Transformation from J2000.0 equatorial coordinates to
+  ecliptic coordinates
+
+  (double precision)
+
+  Given:
+     DR,DD       dp      J2000.0 mean RA,Dec (radians)
+     DATE        dp      TDB (loosely ET) as Modified Julian Date
+                                              (JD-2400000.5)
+  Returned:
+     DL,DB       dp      ecliptic longitude and latitude
+                         (mean of date, IAU 1980 theory, radians)
+2 Routines_called
+ SLA_DCS2C, SLA_PREC, SLA_EPJ, SLA_DMXV, SLA_ECMAT, SLA_DCC2S,
+ SLA_DRANRM, SLA_DRANGE
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_EQEQX
+      DOUBLE PRECISION FUNCTION SLA_EQEQX (DATE)
+
+  Equation of the equinoxes  (double precision)
+
+  Given:
+     DATE    dp      TDB (loosely ET) as Modified Julian Date
+                                          (JD-2400000.5)
+
+  The result is the equation of the equinoxes (double precision)
+  in radians:
+
+     Greenwich apparent ST = GMST + SLA_EQEQX
+2 Routines_called
+ SLA_NUTC
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_EQGAL
+      CALL SLA_EQGAL( DR, DD, DL, DB )
+
+  Transformation from J2000.0 equatorial coordinates to
+  IAU 1958 galactic coordinates
+
+  (double precision)
+
+  Given:
+     DR,DD       dp       J2000.0 RA,Dec
+
+  Returned:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DMXV, SLA_DCC2S, SLA_DRANRM, SLA_DRANGE
+2 Notes
+     The equatorial coordinates are J2000.0.  Use the routine
+     SLA_EG50 if conversion from B1950.0 'FK4' coordinates is
+     required.
+2 References
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_ETRMS
+      CALL SLA_ETRMS( EP, EV )
+
+  Compute the E-terms (elliptic component of annual aberration)
+  vector
+
+  (double precision)
+
+  Given:
+     EP      dp      Besselian epoch
+
+  Returned:
+     EV      dp(3)   E-terms as (dx,dy,dz)
+2 References
+     1  Smith, C.A. et al, 1989.  "The transformation of astrometric
+        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+
+     2  Yallop, B.D. etal, 1989.  "Transformation of mean star places
+        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+        Astron.J. 97, 274.
+2 Notes
+  Note the use of the J2000 aberration constant (20.49552 arcsec).
+  This is a reflection of the fact that the E-terms embodied in
+  existing star catalogues were computed from a variety of
+  aberration constants.  Rather than adopting one of the old
+  constants the latest value is used here.
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_EULER
+      CALL SLA_EULER( ORDER, PHI, THETA, PSI, RMAT )
+
+  Form a rotation matrix from the Euler angles - three successive
+  rotations about specified Cartesian axes.
+
+  (single precision)
+
+  Given:
+    ORDER  c()    specifies about which axes the rotations occur
+    PHI    r        1st rotation (radians)
+    THETA  r        2nd rotation (   "   )
+    PSI    r        3rd rotation (   "   )
+
+  Returned:
+    RMAT   r(3,3)   rotation matrix
+
+  A rotation is positive when the reference frame rotates
+  anticlockwise as seen looking towards the origin from the
+  positive region of the specified axis.
+
+  The characters of ORDER define which axes the three successive
+  rotations are about.  A typical value is 'ZXZ', indicating that
+  RMAT is to become the direction cosine matrix corresponding to
+  rotations of the reference frame through PHI radians about the
+  old Z-axis, followed by THETA radians about the resulting X-axis,
+  then PSI radians about the resulting Z-axis.
+
+  The axis names can be any of the following, in any order or
+  combination:  X, Y, Z, uppercase or lowercase, 1, 2, 3.  Normal
+  axis labelling/numbering conventions apply;  the xyz (=123)
+  triad is right-handed.  Thus, the 'ZXZ' example given above
+  could be written 'zxz' or '313' (or even 'ZxZ' or '3xZ').  ORDER
+  is terminated by length or by the first unrecognised character.
+
+  Fewer than three rotations are acceptable, in which case the later
+  angle arguments are ignored.  Zero rotations produces a unit RMAT.
+2 Routines_called
+ SLA_DEULER
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_EVP
+      CALL SLA_EVP( DATE, DEQX, DVB, DPB, DVH, DPH )
+
+  Barycentric and heliocentric velocity and position of the Earth
+
+  All arguments are double precision
+
+  Given:
+     DATE          TDB (loosely ET) as a Modified Julian Date
+                                         (JD-2400000.5)
+     DEQX          Julian Epoch (e.g. 2000.0D0) of mean equator and
+                   equinox of the vectors returned.  If DEQX .LE. 0D0,
+                   all vectors are referred to the mean equator and
+                   equinox (FK5) of date DATE.
+
+  Returned (all 3D Cartesian vectors):
+     DVB,DPB       barycentric velocity, position
+     DVH,DPH       heliocentric velocity, position
+
+  (Units are au/s for velocity and au for position)
+
+  This routine is adapted from the BARVEL and BARCOR
+  subroutines of P. Stumpff, which are described in
+  Astron. Astrophys. Suppl. Ser. 41, 1-8 (1980).  Most of the
+  changes are merely cosmetic and do not affect the results at
+  all.  However, some adjustments have been made so as to give
+  results that refer to the new (IAU 1976 'FK5') equinox
+  and precession, although the differences these changes make
+  relative to the results from Stumpff's original 'FK4' version
+  are smaller than the inherent accuracy of the algorithm.  One
+  minor shortcoming in the original routines that has NOT been
+  corrected is that better numerical accuracy could be achieved
+  if the various polynomial evaluations were nested.  Note also
+  that one of Stumpff's precession constants differs by 0.001 arcsec
+  from the value given in the Explanatory Supplement to the A.E.
+2 Routines_called
+ SLA_EPJ, SLA_PREC
+2 Accuracy
+     The maximum deviations from the JPL DE96 ephemeris are as
+     follows:
+
+     barycentric velocity                  42  cm/s
+     barycentric position           0.000 046  au
+
+     heliocentric velocity                 42  cm/s
+     heliocentric position          0.000 011  au
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_FITXY
+      CALL SLA_FITXY( ITYPE,NP,XYE,XYM,COEFFS,J )
+
+  Fit a linear model to relate two sets of [X,Y] coordinates.
+
+  Given:
+     ITYPE    i        type of model: 4 or 6 (note 1)
+     NP       i        number of samples (note 2)
+     XYE     d(np)     expected [X,Y] for each sample
+     XYM     d(np)     measured [X,Y] for each sample
+
+  Returned:
+     COEFFS  d(6)      coefficients of model (note 3)
+     J        i        status:  0 = OK
+                               -1 = illegal ITYPE
+                               -2 = insufficient data
+                               -3 = singular solution
+2 Notes
+    1)  ITYPE, which must be either 4 or 6, selects the type of model
+        fitted.  Both allowed ITYPE values produce a model COEFFS which
+        consists of six coefficients, namely the zero points and, for
+        each of XE and YE, the coefficient of XM and YM.  For ITYPE=6,
+        all six coefficients are independent, modelling squash and shear
+        as well as origin, scale, and orientation.  However, ITYPE=4
+        selects the "solid body rotation" option;  the model COEFFS
+        still consists of the same six coefficients, but now two of
+        them are used twice (appropriately signed).  Origin, scale
+        and orientation are still modelled, but not squash or shear -
+        the units of X and Y have to be the same.
+
+    2)  For NC=4, NP must be at least 2.  For NC=6, NP must be at
+        least 3.
+
+    3)  The model is returned in the array COEFFS.  Naming the
+        elements of COEFFS as follows:
+
+                    COEFFS(1) = A
+                    COEFFS(2) = B
+                    COEFFS(3) = C
+                    COEFFS(4) = D
+                    COEFFS(5) = E
+                    COEFFS(6) = F
+
+        the model is:
+
+              XE = A + BXM + CYM
+              YE = D + EXM + FYM
+
+        For the "solid body rotation" option (ITYPE=4), the
+        magnitudes of B and F, and of C and E, are equal.  The
+        signs of these coefficients depend on whether there is a
+        sign reversal between XE,YE and XM,YM;  fits are performed
+        with and without a sign reversal and the best one chosen.
+
+    4)  Error status values J=-1 and -2 leave COEFFS unchanged;
+        if J=-3 COEFFS may have been changed.
+
+  See also SLA_PXY, SLA_INVF, SLA_XY2XY, SLA_DCMPF
+2 Routines_called
+ SLA_DMAT, SLA_DMXV
+2 Authors
+  P.T.Wallace   Starlink   25 August 1989
+1 SLA_FK425
+      CALL SLA_FK425( R1950,D1950,DR1950,DD1950,P1950,V1950,
+     :                R2000,D2000,DR2000,DD2000,P2000,V2000)
+
+  Convert B1950.0 FK4 star data to J2000.0 FK5
+
+  (double precision)
+
+  This routine converts stars from the old, Bessel-Newcomb, FK4
+  system to the new, IAU 1976, FK5, Fricke system, using Yallop's
+  implementation (see ref 2) of a matrix method due to Standish.
+  The numerical values of ref 2 are used canonically.
+
+  Given:  (all B1950.0,FK4)
+     R1950,D1950     dp    B1950.0 RA,Dec (rad)
+     DR1950,DD1950   dp    B1950.0 proper motions (rad/trop.yr)
+     P1950           dp    parallax (arcsec)
+     V1950           dp    radial velocity (km/s, +ve = moving away)
+
+  Returned:  (all J2000.0,FK5)
+     R2000,D2000     dp    J2000.0 RA,Dec (rad)
+     DR2000,DD2000   dp    J2000.0 proper motions (rad/Jul.yr)
+     P2000           dp    parallax (arcsec)
+     V2000           dp    radial velocity (km/s, +ve = moving away)
+2 Notes
+     1)  The proper motions in RA are dRA/dt rather than
+         cos(Dec)dRA/dt, and are per year rather than per century.
+
+     2)  Conversion from Besselian epoch 1950.0 to Julian epoch
+         2000.0 only is provided for.  Conversions involving other
+         epochs will require use of the appropriate precession,
+         proper motion, and E-terms routines before and/or
+         after FK425 is called.
+
+     3)  In the FK4 catalogue the proper motions of stars within
+         10 degrees of the poles do not embody the differential
+         E-term effect and should, strictly speaking, be handled
+         in a different manner from stars outside these regions.
+         However, given the general lack of homogeneity of the star
+         data available for routine astrometry, the difficulties of
+         handling positions that may have been determined from
+         astrometric fields spanning the polar and non-polar regions,
+         the likelihood that the differential E-terms effect was not
+         taken into account when allowing for proper motion in past
+         astrometry, and the undesirability of a discontinuity in
+         the algorithm, the decision has been made in this routine to
+         include the effect of differential E-terms on the proper
+         motions for all stars, whether polar or not.  At epoch 2000,
+         and measuring on the sky rather than in terms of dRA, the
+         errors resulting from this simplification are less than
+         1 milliarcsecond in position and 1 milliarcsecond per
+         century in proper motion.
+2 References
+     1  Smith, C.A. et al, 1989.  "The transformation of astrometric
+        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+
+     2  Yallop, B.D. etal, 1989.  "Transformation of mean star places
+        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+        Astron.J. 97, 274.
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_FK45Z
+      CALL SLA_FK45Z( R1950,D1950,BEPOCH,R2000,D2000 )
+
+  Convert B1950.0 FK4 star data to J2000.0 FK5 assuming zero
+  proper motion in an inertial frame.
+
+  (double precision)
+
+  This routine converts stars from the old, Bessel-Newcomb, FK4
+  system to the new, IAU 1976, FK5, Fricke system, in such a
+  way that the FK5 proper motion is zero.  Because such a star
+  has, in general, a non-zero proper motion in the FK4 system,
+  the routine requires the epoch at which the position in the
+  FK4 system was determined.
+
+  The method is from Appendix 2 of ref 1, but using the constants
+  of ref 2.
+
+  Given:
+     R1950,D1950     dp    B1950.0 FK4 RA,Dec at epoch (rad)
+     BEPOCH          dp    Besselian epoch (e.g. 1979.3D0)
+
+  Returned:
+     R2000,D2000     dp    J2000.0 FK5 RA,Dec (rad)
+2 Notes
+     1)  The epoch BEPOCH is strictly speaking Besselian, but
+         if a Julian epoch is supplied the result will be
+         affected only to a negligible extent.
+
+     2)  Conversion from Besselian epoch 1950.0 to Julian epoch
+         2000.0 only is provided for.  Conversions involving other
+         epochs will require use of the appropriate precession,
+         proper motion, and E-terms routines before and/or
+         after FK425 is called.
+
+     3)  In the FK4 catalogue the proper motions of stars within
+         10 degrees of the poles do not embody the differential
+         E-term effect and should, strictly speaking, be handled
+         in a different manner from stars outside these regions.
+         However, given the general lack of homogeneity of the star
+         data available for routine astrometry, the difficulties of
+         handling positions that may have been determined from
+         astrometric fields spanning the polar and non-polar regions,
+         the likelihood that the differential E-terms effect was not
+         taken into account when allowing for proper motion in past
+         astrometry, and the undesirability of a discontinuity in
+         the algorithm, the decision has been made in this routine to
+         include the effect of differential E-terms on the proper
+         motions for all stars, whether polar or not.  At epoch 2000,
+         and measuring on the sky rather than in terms of dRA, the
+         errors resulting from this simplification are less than
+         1 milliarcsecond in position and 1 milliarcsecond per
+         century in proper motion.
+2 References
+     1  Aoki,S., et al, 1983.  Astron.Astrophys., 128, 263.
+
+     2  Smith, C.A. et al, 1989.  "The transformation of astrometric
+        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+
+     3  Yallop, B.D. etal, 1989.  "Transformation of mean star places
+        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+        Astron.J. 97, 274.
+2 Routines_called
+ SLA_DCS2C, SLA_EPJ, SLA_EPB2D, SLA_DCC2S, SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_FK524
+      CALL SLA_FK524( R2000,D2000,DR2000,DD2000,P2000,V2000,
+     :                R1950,D1950,DR1950,DD1950,P1950,V1950)
+
+  Convert J2000.0 FK5 star data to B1950.0 FK4
+
+  (double precision)
+
+  This routine converts stars from the new, IAU 1976, FK5, Fricke
+  system, to the old, Bessel-Newcomb, FK4 system, using Yallop's
+  implementation (see ref 2) of a matrix method due to Standish.
+  The numerical values of ref 2 are used canonically.
+
+  Given:  (all J2000.0,FK5)
+     R2000,D2000     dp    J2000.0 RA,Dec (rad)
+     DR2000,DD2000   dp    J2000.0 proper motions (rad/Jul.yr)
+     P2000           dp    parallax (arcsec)
+     V2000           dp    radial velocity (km/s, +ve = moving away)
+
+  Returned:  (all B1950.0,FK4)
+     R1950,D1950     dp    B1950.0 RA,Dec (rad)
+     DR1950,DD1950   dp    B1950.0 proper motions (rad/trop.yr)
+     P1950           dp    parallax (arcsec)
+     V1950           dp    radial velocity (km/s, +ve = moving away)
+2 Notes
+     1)  The proper motions in RA are dRA/dt rather than
+         cos(Dec)dRA/dt, and are per year rather than per century.
+
+     2)  Note that conversion from Julian epoch 2000.0 to Besselian
+         epoch 1950.0 only is provided for.  Conversions involving
+         other epochs will require use of the appropriate precession,
+         proper motion, and E-terms routines before and/or after
+         FK524 is called.
+
+     3)  In the FK4 catalogue the proper motions of stars within
+         10 degrees of the poles do not embody the differential
+         E-term effect and should, strictly speaking, be handled
+         in a different manner from stars outside these regions.
+         However, given the general lack of homogeneity of the star
+         data available for routine astrometry, the difficulties of
+         handling positions that may have been determined from
+         astrometric fields spanning the polar and non-polar regions,
+         the likelihood that the differential E-terms effect was not
+         taken into account when allowing for proper motion in past
+         astrometry, and the undesirability of a discontinuity in
+         the algorithm, the decision has been made in this routine to
+         include the effect of differential E-terms on the proper
+         motions for all stars, whether polar or not.  At epoch 2000,
+         and measuring on the sky rather than in terms of dRA, the
+         errors resulting from this simplification are less than
+         1 milliarcsecond in position and 1 milliarcsecond per
+         century in proper motion.
+2 References
+     1  Smith, C.A. et al, 1989.  "The transformation of astrometric
+        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+
+     2  Yallop, B.D. etal, 1989.  "Transformation of mean star places
+        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+        Astron.J. 97, 274.
+2 Authors
+  P.T.Wallace   Starlink   July 1989
+1 SLA_FK54Z
+      CALL SLA_FK54Z( R2000,D2000,BEPOCH,
+     :                R1950,D1950,DR1950,DD1950)
+
+  Convert a J2000.0 FK5 star position to B1950.0 FK4 assuming
+  zero proper motion and parallax.
+
+  (double precision)
+
+  This routine converts star positions from the new, IAU 1976,
+  FK5, Fricke system to the old, Bessel-Newcomb, FK4 system.
+
+  Given:
+     R2000,D2000     dp    J2000.0 FK5 RA,Dec (rad)
+     BEPOCH          dp    Besselian epoch (e.g. 1950D0)
+
+  Returned:
+     R1950,D1950     dp    B1950.0 FK4 RA,Dec (rad) at epoch BEPOCH
+     DR1950,DD1950   dp    B1950.0 FK4 proper motions (rad/trop.yr)
+
+  n.b.  The proper motion in RA is dRA/dt rather than cos(Dec)dRA/dt.
+2 Notes
+     1) Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0
+        only is provided for.  Conversions involving other epochs will
+        require use of the appropriate precession routines before and
+        after this routine is called.
+
+     2) Unlike in the SLA_FK524 routine, the FK5 proper motions, the
+        parallax and the radial velocity are presumed zero.
+
+     3) It is the intention that FK5 should be a close approximation
+        to an inertial frame, so that distant objects have zero proper
+        motion;  such objects have (in general) non-zero proper motion
+        in FK4, and this routine returns those fictitious proper
+        motions.
+
+     4) The position returned by this routine is in the B1950
+        reference frame but at Besselian epoch BEPOCH.  For
+        comparison with catalogues the BEPOCH argument will
+        frequently be 1950D0.
+2 Routines_called
+ SLA_FK524, SLA_PM
+2 Authors
+  P.T.Wallace   Starlink   July 1987
+1 SLA_FLOTIN
+      CALL SLA_FLOTIN( STRING, NSTRT, RESLT, JFLAG )
+
+  Convert free-format input into single precision floating point
+
+  Given:
+     STRING      char       string containing field to be decoded
+     NSTRT       int        pointer to 1st character of field in string
+
+  Returned:
+     NSTRT       int        advanced to next field
+     RESLT       real       result
+     JFLAG       int        -1 = -OK, 0 = +OK, 1 = null field, 2 = error
+2 Routines_called
+ SLA_DFLTIN
+2 Notes
+     1     A TAB character is interpreted as a space, and lower
+           case d,e are interpreted as upper case.
+
+     2     The basic format is #^.^@#^ where # means + or -,
+           ^ means a decimal subfield and @ means D or E.
+
+     3     Spaces:
+             Leading spaces are ignored.
+             Embedded spaces are allowed only after # and D or E,
+             and after . where the first ^ is absent.
+             Trailing spaces are ignored;  the first signifies
+             end of decoding and subsequent ones are skipped.
+
+     4     Field separators:
+             Any character other than +,-,0-9,.,D,E or space may be
+             used to end a field.  Comma is recognised by FLOTIN
+             as a special case; it is skipped, leaving the
+             pointer on the next character.  See 12, below.
+
+     5     Both signs are optional.  The default is +.
+
+     6     The mantissa defaults to 1.
+
+     7     The exponent defaults to D0.
+
+     8     The decimal subfields may be of any length.
+
+     9     The decimal point is optional for whole numbers.
+
+     10    A null field is one that does not begin with
+           +,-,0-9,.,D or E, or consists entirely of spaces.
+           If the field is null, JFLAG is set to 1 and RESLT
+           is left untouched.
+
+     11    NSTRT = 1 for the first character in the string.
+
+     12    On return from FLOTIN, NSTRT is set ready for the next
+           decode - following trailing blanks and (if used) the
+           comma separator.  If a separator other than comma is
+           being used, NSTRT must be incremented before the next
+           call to FLOTIN.
+
+     13    Errors (JFLAG=2) occur when:
+             a)  A +, -, D or E is left unsatisfied.
+             b)  The decimal point is present without at least
+                 one decimal subfield.
+             c)  An exponent more than 100 has been presented.
+
+     14    When an error has been detected, NSTRT is left
+           pointing to the character following the last
+           one used before the error came to light.  This
+           may be after the point at which a more sophisticated
+           program could have detected the error.  For example,
+           FLOTIN does not detect that '1E999' is unacceptable
+           until the whole field has been read.
+
+     15    Certain highly unlikely combinations of mantissa &
+           exponent can cause arithmetic faults during the
+           decode, in some cases despite the fact that they
+           together could be construed as a valid number.
+
+     16    Decoding is left to right, one pass.
+
+     17    End of field may occur in either of two ways:
+             a)  As dictated by the string length.
+             b)  Detected during the decode.
+                 (b overrides a.)
+2 Authors
+  P.T.Wallace   Starlink   October 1987
+1 SLA_GALEQ
+      CALL SLA_GALEQ( DL, DB, DR, DD )
+
+  Transformation from IAU 1958 galactic coordinates to
+  J2000.0 equatorial coordinates
+
+  (double precision)
+
+  Given:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  Returned:
+     DR,DD       dp       J2000.0 RA,Dec
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DIMXV, SLA_DCC2S, SLA_DRANRM, SLA_DRANGE
+2 Notes
+     The equatorial coordinates are J2000.0.  Use the routine
+     SLA_GE50 if conversion to B1950.0 'FK4' coordinates is
+     required.
+2 References
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_GALSUP
+      CALL SLA_GALSUP( DL, DB, DSL, DSB )
+
+  Transformation from IAU 1958 galactic coordinates to
+  de Vaucouleurs supergalactic coordinates
+
+  (double precision)
+
+  Given:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  Returned:
+     DSL,DSB     dp       supergalactic longitude and latitude
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DIMXV, SLA_DCC2S, SLA_DRANRM, SLA_DRANGE
+2 References
+     de Vaucouleurs, de Vaucouleurs, & Corwin, Second Reference
+     Catalogue of Bright Galaxies, U. Texas, page 8.
+
+     Systems & Applied Sciences Corp., Documentation for the
+     machine-readable version of the above catalogue,
+     Contract NAS 5-26490.
+
+    (These two references give different values for the galactic
+     longitude of the supergalactic origin.  Both are wrong;  the
+     correct value is L2=137.37.)
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_GE50
+      CALL SLA_GE50( DL, DB, DR, DD )
+
+  Transformation from IAU 1958 galactic coordinates to
+  B1950.0 'FK4' equatorial coordinates
+
+  (double precision)
+
+  Given:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  Returned:
+     DR,DD       dp       B1950.0 'FK4' RA,Dec
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DIMXV, SLA_DCC2S, SLA_ADDET, SLA_DRANRM, SLA_DRANGE
+2 Notes
+     The equatorial coordinates are B1950.0 'FK4'.  Use the
+     routine SLA_GALEQ if conversion to J2000.0 coordinates
+     is required.
+2 References
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_GEOC
+      CALL SLA_GEOC( P, H, R, Z )
+
+  Convert geodetic position to geocentric
+
+  (double precision)
+
+  Given:
+     P     dp     latitude (geodetic, radians)
+     H     dp     height above reference spheroid (geodetic, metres)
+
+  Returned:
+     R     dp     distance from Earth axis (AU)
+     Z     dp     distance from plane of Earth equator (AU)
+2 Notes
+     1)  Geocentric latitude can be obtained by evaluating ATAN2(Z,R).
+
+     2)  IAU 1976 constants are used.
+2 References
+     Green,R.M., Spherical Astronomy, CUP 1985, p98.
+2 Authors
+  P.T.Wallace   Starlink   4th October 1989
+1 SLA_GMST
+      DOUBLE PRECISION FUNCTION SLA_GMST (UT1)
+
+  Conversion from universal time to sidereal time
+
+  (double precision)
+
+  Given:
+    UT1    dp     universal time (strictly UT1) expressed as
+                  modified Julian Date (JD-2400000.5)
+
+  The result is the Greenwich mean sidereal time (double
+  precision, radians).
+
+  The IAU 1982 expression (see page S15 of 1984 Astronomical
+  Almanac) is used, but rearranged to reduce rounding errors.
+  This expression is always described as giving the GMST at
+  0 hours UT.  In fact, it gives the difference between the
+  GMST and the UT, which happens to equal the GMST (modulo
+  24 hours) at 0 hours UT each day.  In this routine, the
+  fractional UT is used directly as the argument for the
+  standard formula, and the fractional part of the UT is
+  added separately;  note that the factor 1.0027379... does
+  not appear.
+2 Routines_called
+ SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_GRESID
+      REAL FUNCTION SLA_GRESID (S)
+
+  Generate pseudo-random normal deviate ( = 'Gaussian residual')
+
+  (single precision)
+
+  Given:
+     S      real     standard deviation
+
+  The results of many calls to this routine will be
+  normally distributed with mean zero and standard deviation S.
+
+  The Box-Muller algorithm is used.  This is described in
+  Numerical Recipes, section 7.2.
+2 Routines_called
+ SLA_RANDOM
+2 Authors
+  P.T.Wallace   Starlink   December 1988
+1 SLA_IMXV
+      CALL SLA_IMXV( RM, VA, VB )
+
+  Performs the 3-D backward unitary transformation:
+     vector VB = (inverse of matrix RM)  vector VA
+
+  (single precision)
+
+  (n.b.  the matrix must be unitary, as this routine assumes that
+   the inverse and transpose are identical)
+
+  Given:
+     RM       real(3,3)    matrix
+     VA       real(3)      vector
+
+  Returned:
+     VB       real(3)      result vector
+
+  The same vector can be specified for both VA and VB.
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_INTIN
+      CALL SLA_INTIN( STRING, NSTRT, IRESLT, JFLAG )
+
+  Convert free-format input into integer
+
+  Given:
+     STRING      char       string containing field to be decoded
+     NSTRT       int        pointer to 1st character of field in string
+
+  Returned:
+     NSTRT       int        advanced to next field
+     IRESLT      int        result
+     JFLAG       int        -1 = -OK, 0 = +OK, 1 = null field, 2 = error
+2 Routines_called
+ SLA_$IDCHI
+2 Notes
+     1     A TAB character is interpreted as a space.
+
+     2     The basic format is #^ where # means + or -, and ^
+           means a string of decimals.
+
+     3     Spaces:
+             Leading spaces are ignored.
+             Spaces between # and ^ are ignored.
+             Trailing spaces are ignored;  the first signifies
+             end of decoding and subsequent ones are skipped.
+
+     4     # is optional.  The default is +.
+           If # is present, ^ must be as well.
+
+     5     A null field is one that does not begin with
+           +,-, or 0-9, or consists entirely of spaces.
+           If the field is null, JFLAG is set to 1 and
+           IRESLT is left untouched.
+
+     6     NSTRT = 1 for the first character in the string.
+
+     7     On return from INTIN, NSTRT is set ready for the next
+           decode - following trailing blanks and (if used) the
+           comma separator.  If a separator other than comma is
+           being used, NSTRT must be incremented before the next
+           call to INTIN.
+
+     8     Errors (JFLAG=2) occur when:
+             a)  The field has # but no ^.
+             b)  ^ is greater than 231-1.
+
+     9     When an error has been detected, NSTRT is left
+           pointing to the character which caused the error.
+
+    10     End of field may occur in either of two ways:
+             a)  As dictated by the string length.
+             b)  Detected during the decode.
+                 (b overrides a.)
+2 Authors
+  P.T.Wallace   Starlink   October 1987
+1 SLA_INVF
+      CALL SLA_INVF( FWDS,BKWDS,J )
+
+  Invert a linear model of the type produced by the
+  SLA_FITXY routine.
+
+  Given:
+     FWDS    d(6)      model coefficients
+
+  Returned:
+     BKWDS   d(6)      inverse model
+     J        i        status:  0 = OK, -1 = no inverse
+
+  The models relate two sets of [X,Y] coordinates as follows.
+  Naming the elements of FWDS:
+
+     FWDS(1) = A
+     FWDS(2) = B
+     FWDS(3) = C
+     FWDS(4) = D
+     FWDS(5) = E
+     FWDS(6) = F
+
+  where two sets of coordinates [X1,Y1] and [X2,Y1] are related
+  thus:
+
+     X2 = A + BX1 + CY1
+     Y2 = D + EX1 + FY1
+
+  the present routine generates a new set of coefficients:
+
+     BKWDS(1) = P
+     BKWDS(2) = Q
+     BKWDS(3) = R
+     BKWDS(4) = S
+     BKWDS(5) = T
+     BKWDS(6) = U
+
+  such that:
+
+     X1 = P + QX2 + RY2
+     Y1 = S + TX2 + UY2
+
+  Two successive calls to SLA_INVF will thus deliver a set
+  of coefficients equal to the starting values.
+
+  See also SLA_FITXY, SLA_PXY, SLA_XY2XY, SLA_DCMPF
+2 Authors
+  P.T.Wallace   Starlink   27 April 1989
+1 SLA_KBJ
+      CALL SLA_KBJ( JB, E, K, J )
+
+  Select epoch prefix 'B' or 'J'
+
+  Given:
+     JB     int     SLA_DBJIN prefix status:  0=none, 1='B', 2='J'
+     E      dp      epoch - Besselian or Julian
+
+  Returned:
+     K      char    'B' or 'J'
+     J      int     status:  0=OK
+
+  If JB=0, B is assumed for E < 1984D0, otherwise J.
+2 Authors
+  P.T.Wallace   Starlink   31 July 1989
+1 SLA_M2AV
+      CALL SLA_M2AV( RMAT, AXVEC )
+
+  From a rotation matrix, determine the corresponding axial vector.
+
+  (single precision)
+
+  A rotation matrix describes a rotation about some arbitry axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector returned by this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.  (The
+  magnitude and direction can be separated by means of the routine
+  SLA_VN.)
+
+  Given:
+    RMAT   r(3,3)   rotation matrix
+
+  Returned:
+    AXVEC  r(3)     axial vector (radians)
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+
+  If RMAT is null, so is the result.
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_MAP
+      CALL SLA_MAP( RM, DM, PR, PD, PX, RV, EQ, DATE, RA, DA )
+
+  Transform star RA,Dec from mean place to geocentric apparent
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    dp     mean RA,Dec (rad)
+     PR,PD    dp     proper motions:  RA,Dec changes per Julian year
+     PX       dp     parallax (arcsec)
+     RV       dp     radial velocity (km/sec, +ve if receeding)
+     EQ       dp     epoch and equinox of star data (Julian)
+     DATE     dp     TDB for apparent place (JD-2400000.5)
+
+  Returned:
+     RA,DA    dp     apparent RA,Dec (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Routines_called
+ SLA_MAPPA       star-independent parameters
+ SLA_MAPQK       quick mean to apparent
+2 Notes
+     1)  EQ is the Julian epoch specifying both the reference
+         frame and the epoch of the position - usually 2000.
+         For positions where the epoch and equinox are
+         different, use the routine SLA_PM to apply proper
+         motion corrections before using this routine.
+
+     2)  The distinction between the required TDB and TDT is
+         always negligible.  Moreover, for all but the most
+         critical applications UTC is adequate.
+
+     3)  The proper motions in RA are dRA/dt rather than
+         cos(Dec)dRA/dt.
+
+     4)  This routine may be wasteful for some applications
+         because it recomputes the Earth position/velocity and
+         the precession/nutation matrix each time, and because
+         it allows for parallax and proper motion.  Where
+         multiple transformations are to be carried out for one
+         epoch, a faster method is to call the SLA_MAPPA routine
+         once and then either the SLA_MAPQK routine (which includes
+         parallax and proper motion) or SLA_MAPQKZ (which assumes
+         zero parallax and proper motion).
+2 Authors
+  P.T.Wallace   Starlink   May 1989
+1 SLA_MAPP
+     OBSOLETE ROUTINE - USE SLA_MAPPA INSTEAD
+
+      CALL SLA_MAPP( EQ, DATE,
+     :               PMT, EB, EHN, GR2E, ABV, AB1, AB2, PNM)
+
+  Compute star-independent parameters in preparation for
+  conversions between mean place and geocentric apparent place.
+
+  The parameters produced by this routine are required in the
+  parallax, light deflection, aberration, and precession/nutation
+  parts of the mean/apparent transformations.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     EQ       dp     epoch of mean equinox to be used (Julian)
+     DATE     dp     TDB (JD-2400000.5)
+
+  Returned:
+     PMT      dp     time interval for proper motion (Julian years)
+     EB      dp(3)   barycentric position of the Earth (AU)
+     EHN     dp(3)   heliocentric direction of the Earth (unit vector)
+     GR2E     dp     (grav rad Sun)2/(Sun-Earth distance)
+     ABV     dp(3)   barycentric Earth velocity in units of c
+     AB1      dp     sqrt(1-v2) where v=modulus(ABV)
+     AB2      dp     AB1+1
+     PNM    dp(3,3)  precession/nutation matrix
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Routines_called
+ SLA_EPJ         MDJ to Julian epoch
+ SLA_EVP         earth position & velocity
+ SLA_DVN         normalise vector
+ SLA_PRENUT      precession/nutation matrix
+2 Notes
+    1) The distinction between the required TDB and TDT is
+       always negligible.  Moreover, for all but the most
+       critical applications UTC is adequate.
+
+    2) The accuracy is limited by the routine SLA_EVP (qv),
+       which computes the earth positions and velocities using
+       the methods of Stumpff.  The maximum error in resulting
+       aberration corrections is about 0.3 milliarcsecond.
+
+    3) The vectors EB and EHN are referred to the mean equinox
+       and equator of epoch EQ.
+2 Authors
+  P.T.Wallace   Starlink   July 1986
+1 SLA_MAPPA
+      CALL SLA_MAPPA( EQ, DATE, AMPRMS )
+
+  Compute star-independent parameters in preparation for
+  conversions between mean place and geocentric apparent place.
+
+  The parameters produced by this routine are required in the
+  parallax, light deflection, aberration, and precession/nutation
+  parts of the mean/apparent transformations.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     EQ       d      epoch of mean equinox to be used (Julian)
+     DATE     d      TDB (JD-2400000.5)
+
+  Returned:
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1)      time interval for proper motion (Julian years)
+       (2-4)    barycentric position of the Earth (AU)
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)2/(Sun-Earth distance)
+       (9-11)   ABV: barycentric Earth velocity in units of c
+       (12)     sqrt(1-v2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Notes
+    1) For DATE, the distinction between the required TDB and TDT
+       is always negligible.  Moreover, for all but the most
+       critical applications UTC is adequate.
+
+    2) The accuracy of the routines using the parameters AMPRMS is
+       limited by the routine SLA_EVP, used here to compute the
+       Earth positions and velocities by the methods of Stumpff.
+       The maximum error in resulting aberration corrections is
+       about 0.3 milliarcsecond.
+
+    3) The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
+       the mean equinox and equator of epoch EQ.
+
+    4) The parameters AMPRMS produced by this routine are used by
+       SLA_MAPQK and SLA_MAPQKZ.
+
+    5) This routine replaces earlier routine SLA_MAPP, which is
+       to be withdrawn.
+2 Routines_called
+ SLA_EPJ         MDJ to Julian epoch
+ SLA_EVP         earth position & velocity
+ SLA_DVN         normalise vector
+ SLA_PRENUT      precession/nutation matrix
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_MAPQ
+     OBSOLETE ROUTINE - USE SLA_MAPQK INSTEAD
+
+      CALL SLA_MAPQ( RM, DM, PR, PD, PX, RV, PMT, EB, EHN,
+     :               GR2E, ABV, AB1, AB2, PNM, RA, DA)
+
+  Quick mean to apparent place:  transform a star RA,Dec from
+  mean place to geocentric apparent place, given the
+  star-independent parameters.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions, all referred to the same equator
+  and equinox, are to be transformed for one epoch.  The
+  star-independent parameters can be obtained by calling the
+  SLA_MAPP routine.
+
+  If the parallax and proper motions are zero the SLA_MAPQZ can
+  be used instead.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    dp     mean RA,Dec (rad)
+     PR,PD    dp     proper motions:  RA,Dec changes per Julian year
+     PX       dp     parallax (arcsec)
+     RV       dp     radial velocity (km/sec, +ve if receeding)
+     PMT      dp     time interval for proper motion (Julian years)
+     EB      dp(3)   barycentric position of the Earth (AU)
+     EHN     dp(3)   heliocentric direction of the Earth (unit vector)
+     GR2E     dp     (grav rad Sun)2/(Sun-Earth distance)
+     ABV     dp(3)   barycentric Earth velocity in units of c
+     AB1      dp     sqrt(1-v2) where v=modulus(ABV)
+     AB2      dp     AB1+1
+     PNM    dp(3,3)  precession/nutation matrix
+
+  Returned:
+     RA,DA    dp     apparent RA,Dec (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Routines_called
+ SLA_DCS2C       spherical to Cartesian
+ SLA_DVDV        dot product
+ SLA_DMXV        matrix x vector
+ SLA_DCC2S       Cartesian to spherical
+ SLA_DRANRM      normalise angle 0-2Pi
+2 Notes
+    1)  The vectors EB and EHN are referred to the mean equinox
+        and equator of epoch EQ.
+
+    2)  Within about 300 arcsec of the centre of the Sun the
+        gravitational deflection term is set to zero to avoid
+        overflow.  Otherwise no account is taken of the
+        impossibility of observing stars which lie behind
+        the Sun.
+2 Authors
+  P.T.Wallace   Starlink   May 1988
+1 SLA_MAPQK
+      CALL SLA_MAPQK( RM, DM, PR, PD, PX, RV, AMPRMS, RA, DA )
+
+  Quick mean to apparent place:  transform a star RA,Dec from
+  mean place to geocentric apparent place, given the
+  star-independent parameters.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions, all referred to the same equator
+  and equinox, are to be transformed for one epoch.  The
+  star-independent parameters can be obtained by calling the
+  SLA_MAPPA routine.
+
+  If the parallax and proper motions are zero the SLA_MAPQKZ
+  routine can be used instead.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    d      mean RA,Dec (rad)
+     PR,PD    d      proper motions:  RA,Dec changes per Julian year
+     PX       d      parallax (arcsec)
+     RV       d      radial velocity (km/sec, +ve if receeding)
+
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1)      time interval for proper motion (Julian years)
+       (2-4)    barycentric position of the Earth (AU)
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)2/(Sun-Earth distance)
+       (9-11)   barycentric Earth velocity in units of c
+       (12)     sqrt(1-v2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+
+  Returned:
+     RA,DA    d      apparent RA,Dec (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Notes
+    1)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
+        the mean equinox and equator of epoch EQ.
+
+    2)  Within about 300 arcsec of the centre of the Sun the
+        gravitational deflection term is set to zero to avoid
+        overflow.  Otherwise no account is taken of the
+        impossibility of observing stars which lie behind
+        the Sun.
+
+    3)  This routine replaces earlier routine SLA_MAPQ, which is
+        to be withdrawn.
+2 Routines_called
+ SLA_DCS2C       spherical to Cartesian
+ SLA_DVDV        dot product
+ SLA_DMXV        matrix x vector
+ SLA_DCC2S       Cartesian to spherical
+ SLA_DRANRM      normalise angle 0-2Pi
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_MAPQKZ
+      CALL SLA_MAPQKZ( RM, DM, AMPRMS, RA, DA )
+
+  Quick mean to apparent place:  transform a star RA,Dec from
+  mean place to geocentric apparent place, given the
+  star-independent parameters, and assuming zero parallax
+  and proper motion.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions, all with parallax and proper
+  motion either zero or already allowed for, and all referred to
+  the same equator and equinox, are to be transformed for one
+  epoch.  The star-independent parameters can be obtained by
+  calling the SLA_MAPPA routine.
+
+  The corresponding routine for the case of non-zero parallax
+  and proper motion is SLA_MAPQK.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    d      mean RA,Dec (rad)
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1-4)    not used
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)2/(Sun-Earth distance)
+       (9-11)   ABV: barycentric Earth velocity in units of c
+       (12)     sqrt(1-v2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+
+  Returned:
+     RA,DA    d      apparent RA,Dec (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Notes
+    1)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to the
+        mean equinox and equator of epoch EQ.
+
+    2)  Within about 300 arcsec of the centre of the Sun the
+        gravitational deflection term is set to zero to avoid
+        overflow.  Otherwise no account is taken of the
+        impossibility of observing stars which lie behind
+        the Sun.
+
+    3)  This routine replaces earlier routine SLA_MAPQZ, which is
+        to be withdrawn.
+2 Routines_called
+ SLA_DCS2C       spherical to Cartesian
+ SLA_DVDV        dot product
+ SLA_DMXV        matrix x vector
+ SLA_DCC2S       Cartesian to spherical
+ SLA_DRANRM      normalise angle 0-2Pi
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_MAPQZ
+     OBSOLETE ROUTINE - USE SLA_MAPQKZ INSTEAD
+
+      CALL SLA_MAPQZ( RM, DM, EHN, GR2E, ABV, AB1, AB2, PNM,
+     :                RA, DA)
+
+  Quick mean to apparent place:  transform a star RA,Dec from
+  mean place to geocentric apparent place, given the
+  star-independent parameters, and assuming zero parallax
+  and proper motion.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions, all with parallax and proper
+  motion either zero or already allowed for, and all referred to
+  the same equator and equinox, are to be transformed for one
+  epoch.  The star-independent parameters can be obtained by
+  calling the SLA_MAPP routine.
+
+  The corresponding routine for the case of non-zero parallax
+  and proper motion is SLA_MAPQ.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    dp     mean RA,Dec (rad)
+     EHN     dp(3)   heliocentric direction of the Earth (unit vector)
+     GR2E     dp     (grav rad Sun)2/(Sun-Earth distance)
+     ABV     dp(3)   barycentric Earth velocity in units of c
+     AB1      dp     sqrt(1-v2) where v=modulus(ABV)
+     AB2      dp     AB1+1
+     PNM    dp(3,3)  precession/nutation matrix
+
+  Returned:
+     RA,DA    dp     apparent RA,Dec (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Routines_called
+ SLA_DCS2C       spherical to Cartesian
+ SLA_DVDV        dot product
+ SLA_DMXV        matrix x vector
+ SLA_DCC2S       Cartesian to spherical
+ SLA_DRANRM      normalise angle 0-2Pi
+2 Notes:
+  The vectors EB and EHN are referred to the mean equinox and equator
+  of epoch EQ.
+2 Authors
+  P.T.Wallace   Starlink   July 1986
+1 SLA_MOON
+      CALL SLA_MOON( IY, ID, FD, POSVEL )
+
+  Approximate geocentric position and velocity of the moon
+
+  Given:
+     IY       i       year AD
+     ID       i       day in year (1 = Jan 1st)
+     FD       r       fraction of day
+
+  Returned:
+     POSVEL   r(6)    Moon position & velocity vector
+
+2 Routines_called
+ SLA_CS2C6, SLA_EULER, SLA_MXV
+
+  The date and time is TDB (loosely ET) in the Gregorian
+  calendar, and is interpreted in a manner which is valid
+  between 1900 March 1 and 2100 February 28.
+
+  The Moon 6-vector is Moon centre relative to Earth centre,
+  mean equator and equinox of date.  Position part, POSVEL(1-3),
+  is in AU;  velocity part, POSVEL(4-6), is in AU/sec.
+
+  The position is accurate to better than 0.5 arcminute
+  in direction and 1E-5 AU in distance.  The velocity
+  is accurate to better than 0.5"/hour in direction and
+  4 m/s in distance.  Note that the distance accuracy is
+  comparatively poor because this routine is merely
+  intended for use in computing topocentric direction.
+
+  This routine is only a partial implementation of the original
+  algorithm, which offers somewhat higher accuracy in direction
+  and much higher accuracy in distance (or rather in horizontal
+  parallax) when fully implemented.
+2 References
+     Meeus, l'Astronomie, June 1984, p348.
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_MXM
+      CALL SLA_MXM( A, B, C )
+
+  Product of two 3x3 matrices:
+      matrix C  =  matrix A  x  matrix B
+
+  (single precision)
+
+  Given:
+      A      real(3,3)        matrix
+      B      real(3,3)        matrix
+
+  Returned:
+      C      real(3,3)        matrix result
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_MXV
+      CALL SLA_MXV( RM, VA, VB )
+
+  Performs the 3-D forward unitary transformation:
+     vector VB = matrix RM  vector VA
+
+  (single precision)
+
+  Given:
+     RM       real(3,3)    matrix
+     VA       real(3)      vector
+
+  Returned:
+     VB       real(3)      result vector
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_NUT
+      CALL SLA_NUT( DATE, RMATN )
+
+  Form the matrix of nutation for a given date (IAU 1980 theory)
+
+  (double precision)
+
+  Given:
+     DATE   dp         TDB (loosely ET) as Modified Julian Date
+
+  Returned:
+     RMATN  dp(3,3)    nutation matrix
+
+  The matrix is in the sense   V(true)  =  RMATN  V(mean) .
+2 References
+     Final report of the IAU Working Group on Nutation,
+      chairman P.K.Seidelmann, 1980.
+     Kaplan,G.H., 1981, USNO circular no. 163, pA3-6.
+2 Routines_called
+ SLA_NUTC, SLA_NUTM
+2 Authors
+  P.T.Wallace   Starlink   July 1984
+1 SLA_NUTC
+      CALL SLA_NUTC( DATE, DPSI, DEPS, EPS0 )
+
+  Nutation:  longitude & obliquity components and
+             mean obliquity (IAU 1980 theory)
+
+  (double precision)
+
+  Given:
+     DATE        dp    TDB (loosely ET) as Modified Julian Date
+                                            (JD-2400000.5)
+
+  Returned:
+     DPSI,DEPS   dp    nutation in longitude,obliquity
+     EPS0        dp    mean obliquity
+2 References
+     Final report of the IAU Working Group on Nutation,
+      chairman P.K.Seidelmann, 1980.
+     Kaplan,G.H., 1981, USNO circular no. 163, pA3-6.
+2 Authors
+  P.T.Wallace   Starlink   September 1987
+1 SLA_NUTM
+     OBSOLETE ROUTINE - USE SLA_NUT INSTEAD
+
+      CALL SLA_NUTM( DPSI, DEPS, EPS0, RMATN )
+
+  Form the matrix of nutation
+
+  (double precision)
+
+  Given:
+     DPSI,DEPS    dp    nutation in longitude & obliquity
+     EPS0         dp    mean obliquity
+
+  Returned:
+     RMATN  dp(3,3)    nutation matrix
+
+  The matrix is in the sense   V(true)  =  RMATN  V(mean) .
+2 Routines_called
+ SLA_DEULER
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_OAP
+      CALL SLA_OAP( TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
+     :              HM, XP, YP, TDK, PMB, RH, WL, TLR,
+     :              RAP, DAP)
+
+  Observed to apparent place
+
+  Given:
+     TYPE   c()  type of coordinates - 'R', 'H' or 'A' (see below)
+     OB1    d      observed Az, HA or RA (radians; Az is N=0,E=90)
+     OB2    d      observed ZD or Dec (radians)
+     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
+     DUT    d      delta UT:  UT1-UTC (UTC seconds)
+     ELONGM d      mean longitude of the observer (radians, East +ve)
+     PHIM   d      mean geodetic latitude of the observer (radians)
+     HM     d      observer's height above sea level (metres)
+     XP     d      polar motion x-coordinate (radians)
+     YP     d      polar motion y-coordinate (radians)
+     TDK    d      local ambient temperature (DegK; std=273.155D0)
+     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+     RH     d      local relative humidity (in the range 0D0-1D0)
+     WL     d      effective wavelength (micron, e.g. 0.55D0)
+     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+
+  Returned:
+     RAP    d      geocentric apparent right ascension
+     DAP    d      geocentric apparent declination
+2 Notes
+   1)  Only the first character of the TYPE argument is significant.
+       'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
+       Ascension and Declination;  'H' or 'h' indicates that they are
+       Hour Angle (West +ve) and Declination;  anything else ('A' or
+       'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
+       (North zero, East is 90 deg) and zenith distance.  (Zenith
+       distance is used rather than elevation in order to reflect the
+       fact that no allowance is made for depression of the horizon.)
+
+   2)  The accuracy of the result is limited by the corrections for
+       refraction.  Providing the meteorological parameters are
+       known accurately and there are no gross local effects, the
+       predicted apparent RA,Dec should be within about 0.1 arcsec.
+       Even at a topocentric zenith distance of 90 degrees, the
+       zenith distance should be well within 1 arcmin;  useful
+       results are available for a further 3 degrees, beyond which
+       the SLA_REFRO routine returns a fixed value of the refraction.
+       The complementary routines SLA_AOP (or SLA_AOPQK) and SLA_OAP
+       (or SLA_OAPQK) are self-consistent to better than 1 micro-
+       arcsecond all over the celestial sphere.
+
+   3)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   4)  "Observed" Az,El means the position that would be seen by a
+       perfect theodolite located at the observer.  This is
+       related to the observed HA,Dec via the standard rotation, using
+       the geodetic latitude (corrected for polar motion), while the
+       observed HA and RA are related simply through the local
+       apparent ST.  "Observed" RA,Dec or HA,Dec thus means the
+       position that would be seen by a perfect equatorial located
+       at the observer and with its polar axis aligned to the
+       Earth's axis of rotation (n.b. not to the refracted pole).
+       By removing from the observed place the effects of
+       atmospheric refraction and diurnal aberration, the
+       geocentric apparent RA,Dec is obtained.
+
+   5)  Frequently, mean rather than apparent RA,Dec will be required,
+       in which case further transformations will be necessary.  The
+       SLA_AMP etc routines will convert the apparent RA,Dec produced
+       by the present routine into an "FK5" (J2000) mean place, by
+       allowing for the Sun's gravitational lens effect, annual
+       aberration, nutation and precession.  Should "FK4" (1950)
+       coordinates be needed, the routines SLA_FK524 etc will also
+       need to be applied.
+
+   6)  To convert to apparent RA,Dec the coordinates read from a
+       real telescope, corrections would have to be applied for
+       encoder zero points, gear and encoder errors, tube flexure,
+       the position of the rotator axis and the pointing axis
+       relative to it, non-perpendicularity between the mounting
+       axes, and finally for the tilt of the azimuth or polar axis
+       of the mounting (with appropriate corrections for mount
+       flexures).  Some telescopes would, of course, exhibit other
+       properties which would need to be accounted for at the
+       appropriate point in the sequence.
+
+   7)  The star-independent apparent-to-observed-place parameters
+       in AOPRMS may be computed by means of the SLA_AOPPA routine.
+       If nothing has changed significantly except the time, the
+       SLA_AOPPAT routine may be used to perform the requisite
+       partial recomputation of AOPRMS.
+
+   8)  The delta UT (UT1-UTC) is tabulated in RGO Time Service
+       Circulars and elsewhere.  It is kept within +/- 1 second
+       by introducing leap seconds in the UTC.
+
+   9)  The polar coordinates XP,YP also can be obtained from RGO
+       Time Service circulars and equivalent publications.  The
+       maximum amplitude is about 0.3 arcseconds.  If XP,YP values
+       are unavailable, use XP=YP=0D0.  See page B60 of the 1988
+       Astronomical Almanac for a definition of the two angles.
+
+   10) The height above sea level of the observing station, HM,
+       can be obtained from the Astronomical Almanac (Section J
+       in the 1988 edition), or via the routine SLA_OBS.  If P,
+       the pressure in millibars, is available, an adequate
+       estimate of HM can be obtained from the expression
+
+             HM ~ -8149.9415D0LOG(P/1013.25D0).
+
+       (See Astrophysical Quantities, C.W.Allen, 3rd edition,
+       section 52.)  Similarly, if the pressure P is not known,
+       it can be estimated from the height of the observing
+       station, HM as follows:
+
+             P ~ 1013.25D0EXP(-HM/8149.9415D0).
+
+       Note, however, that the refraction is proportional to the
+       pressure and that an accurate P value is important for
+       precise work.
+2 Routines_called
+ SLA_AOPPA, SLA_OAPQK
+2 Authors
+  P.T.Wallace   Starlink   January 1989
+1 SLA_OAPQK
+      CALL SLA_OAPQK( TYPE, OB1, OB2, AOPRMS, RAP, DAP )
+
+  Quick observed to apparent place
+
+  Given:
+     TYPE   c()  type of coordinates - 'R', 'H' or 'A' (see below)
+     OB1    d      observed Az, HA or RA (radians; Az is N=0,E=90)
+     OB2    d      observed ZD or Dec (radians)
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1)      geodetic latitude (radians)
+       (2,3)    sine and cosine of geodetic latitude
+       (4)      magnitude of diurnal aberration vector
+       (5)      height (HM)
+       (6)      ambient temperature (T)
+       (7)      pressure (P)
+       (8)      relative humidity (RH)
+       (9)      wavelength (WL)
+       (10)     lapse rate (TLR)
+       (11,12)  refraction constants A and B (radians)
+       (13)     longitude + eqn of equinoxes + sidereal DUT (radians)
+       (14)     local apparent sidereal time (radians)
+
+  Returned:
+     RAP    d      geocentric apparent right ascension
+     DAP    d      geocentric apparent declination
+2 Notes
+   1)  Only the first character of the TYPE argument is significant.
+       'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
+       Ascension and Declination;  'H' or 'h' indicates that they are
+       Hour Angle (West +ve) and Declination;  anything else ('A' or
+       'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
+       (North zero, East is 90 deg) and zenith distance.  (Zenith
+       distance is used rather than elevation in order to reflect the
+       fact that no allowance is made for depression of the horizon.)
+
+   2)  The accuracy of the result is limited by the corrections for
+       refraction.  Providing the meteorological parameters are
+       known accurately and there are no gross local effects, the
+       predicted apparent RA,Dec should be within about 0.1 arcsec.
+       Even at a topocentric zenith distance of 90 degrees, the
+       accuracy in elevation should be better than 1 arcmin;  useful
+       results are available for a further 3 degrees, beyond which
+       the SLA_REFRO routine returns a fixed value of the refraction.
+       The complementary routines SLA_AOP (or SLA_AOPQK) and SLA_OAP
+       (or SLA_OAPQK) are self-consistent to better than 1 micro-
+       arcsecond all over the celestial sphere.
+
+   3)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   5)  "Observed" Az,El means the position that would be seen by a
+       perfect theodolite located at the observer.  This is
+       related to the observed HA,Dec via the standard rotation, using
+       the geodetic latitude (corrected for polar motion), while the
+       observed HA and RA are related simply through the local
+       apparent ST.  "Observed" RA,Dec or HA,Dec thus means the
+       position that would be seen by a perfect equatorial located
+       at the observer and with its polar axis aligned to the
+       Earth's axis of rotation (n.b. not to the refracted pole).
+       By removing from the observed place the effects of
+       atmospheric refraction and diurnal aberration, the
+       geocentric apparent RA,Dec is obtained.
+
+   5)  Frequently, mean rather than apparent RA,Dec will be required,
+       in which case further transformations will be necessary.  The
+       SLA_AMP etc routines will convert the apparent RA,Dec produced
+       by the present routine into an "FK5" (J2000) mean place, by
+       allowing for the Sun's gravitational lens effect, annual
+       aberration, nutation and precession.  Should "FK4" (1950)
+       coordinates be needed, the routines SLA_FK524 etc will also
+       need to be applied.
+
+   6)  To convert to apparent RA,Dec the coordinates read from a
+       real telescope, corrections would have to be applied for
+       encoder zero points, gear and encoder errors, tube flexure,
+       the position of the rotator axis and the pointing axis
+       relative to it, non-perpendicularity between the mounting
+       axes, and finally for the tilt of the azimuth or polar axis
+       of the mounting (with appropriate corrections for mount
+       flexures).  Some telescopes would, of course, exhibit other
+       properties which would need to be accounted for at the
+       appropriate point in the sequence.
+
+   7)  The star-independent apparent-to-observed-place parameters
+       in AOPRMS may be computed by means of the SLA_AOPPA routine.
+       If nothing has changed significantly except the time, the
+       SLA_AOPPAT routine may be used to perform the requisite
+       partial recomputation of AOPRMS.
+2 Routines_called
+ SLA_DCS2C, SLA_DCC2S, SLA_REFRO, SLA_DRANRM
+2 Authors
+  P.T.Wallace   Starlink   May 1989
+1 SLA_OBS
+      CALL SLA_OBS( N, C, NAME, W, P, H )
+
+  Parameters of selected groundbased observing stations
+
+  Given:
+     N       int     number specifying observing station
+
+  Either given or returned
+     C       c()   identifier specifying observing station
+
+  Returned:
+     NAME    c()   name of specified observing station
+     W       dp      longitude (radians, West +ve)
+     P       dp      geodetic latitude (radians, North +ve)
+     H       dp      height above sea level (metres)
+2 Notes
+     Station identifiers C may be up to 10 characters long,
+     and station names NAME may be up to 40 characters long.
+
+     C and N are alternative ways of specifying the observing
+     station.  The C option, which is the most generally useful,
+     may be selected by specifying an N value of zero or less.
+     If N is 1 or more, the parameters of the Nth station
+     in the currently supported list are interrogated, and
+     the station identifier C is returned as well as NAME, W,
+     P and H.
+
+     If the station parameters are not available, either because
+     the station identifier C is not recognised, or because an
+     N value greater than the number of stations supported is
+     given, a name of '?' is returned and W, P and H are left in
+     their current states.
+
+     Programs can obtain a list of all currently supported
+     stations by calling the routine repeatedly, with N=1,2,3...
+     When NAME='?' is seen, the list of stations has been
+     exhausted.
+
+     Programs must not assume that the N value corresponding to
+     a given station will remain the same between successive
+     releases of this routine.  The station identifiers C will,
+     however, remain substantially unchanged from one release
+     to the next.
+
+     All station identifiers C are upper case only;  lower case
+     characters must be converted to upper case by the calling
+     program.  The station names returned may contain both upper
+     and lower case.  All characters up to the first space are
+     checked;  thus an abbreviated ID will return the parameters
+     for the first station in the list which matches the
+     abbreviation supplied, and no station in the list will ever
+     contain embedded spaces.  C must not have leading spaces.
+
+     Users are urged to inform the author of any improvements
+     they would like to see made.  For example:
+
+         typographical corrections
+         more accurate parameters
+         better station identifiers or names
+         additional stations
+2 Authors
+  P.T.Wallace   Starlink   15th September 1989
+1 SLA_PCD
+      CALL SLA_PCD( DISCO,X,Y )
+
+  Apply pincushion/barrel distortion to a tangent-plane [x,y].
+
+  Given:
+     DISCO    d      pincushion/barrel distortion coefficient
+     X,Y      d      tangent-plane coordinates
+
+  Returned:
+     X,Y      d      distorted coordinates
+2 Notes
+   1)  The distortion is of the form RP = R(1 + CR2), where R is
+       the radial distance from the tangent point, C is the DISCO
+       arguments, and RP is the radial distance in the presence of
+       the distortion.
+
+   2)  For pincushion distortion, C is +ve;  for barrel distortion,
+       C is -ve.
+
+   3)  For X,Y in units of one projection radius (in the case of
+       a photographic plate, the focal length), the following
+       DISCO values apply:
+
+           Geometry          DISCO
+
+           astrograph         0.0
+           Schmidt           -0.3333
+           AAT PF doublet  +147.069
+           AAT PF triplet  +178.585
+           AAT f/8          +21.20
+           JKT f/8          +13.32
+
+    4)  There is a companion routine, SLA_UNPCD, which performs
+        an approximately inverse operation.
+2 Authors
+  P.T.Wallace   Starlink   20 April 1989
+1 SLA_PM
+      CALL SLA_PM( R0, D0, PR, PD, PX, RV, EP0, EP1, R1, D1 )
+
+  Apply corrections for proper motion to a star RA,Dec
+
+  (double precision)
+
+  Given:
+     R0,D0    dp     RA,Dec at epoch EP0 (rad)
+     PR,PD    dp     proper motions:  RA,Dec changes per year of epoch
+     PX       dp     parallax (arcsec)
+     RV       dp     radial velocity (km/sec, +ve if receeding)
+     EP0      dp     start epoch in years (e.g Julian epoch)
+     EP1      dp     end epoch in years (same system as EP0)
+
+  Returned:
+     R1,D1    dp     RA,Dec at epoch EP1 (rad)
+2 References
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+2 Routines_called
+ SLA_DCS2C       spherical to Cartesian
+ SLA_DCC2S       Cartesian to spherical
+ SLA_DRANRM      normalise angle 0-2Pi
+2 Notes
+     1)  The proper motions in RA are dRA/dt rather than
+         cos(Dec)dRA/dt, and are in the same coordinate
+         system as R0,D0.
+2 Authors
+  P.T.Wallace   Starlink   June 1984
+1 SLA_PREBN
+      CALL SLA_PREBN( BEP0, BEP1, RMATP )
+
+  Generate the matrix of precession between two epochs,
+  using the old, pre-IAU1976, Bessel-Newcomb model, using
+  Andoyer's formulation.
+
+  (double precision)
+
+  Given:
+     BEP0    dp         beginning Besselian epoch
+     BEP1    dp         ending Besselian epoch
+
+  Returned:
+     RMATP  dp(3,3)    precession matrix
+
+  The matrix is in the sense   V(BEP1)  =  RMATP  V(BEP0) .
+2 References
+     Smith et al 1989, Astron. J., 97, 1 p269.
+2 Routines_called
+ SLA_DEULER
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_PREC
+      CALL SLA_PREC( EP0, EP1, RMATP )
+
+  Form the matrix of precession between two epochs (IAU1976/FK5)
+
+  (double precision)
+
+  Given:
+     EP0    dp         beginning epoch
+     EP1    dp         ending epoch
+
+  Returned:
+     RMATP  dp(3,3)    precession matrix
+2 Notes
+  1)  The epochs are TDB (loosely ET) Julian epochs.
+
+  2)  The matrix is in the sense   V(EP1)  =  RMATP  V(EP0) .
+2 References
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+      equations (6) & (7), p283.
+     Kaplan,G.H., 1981. USNO circular no. 163, pA2.
+2 Routines_called
+ SLA_DEULER
+2 Authors
+  P.T.Wallace   Starlink   November 1988
+1 SLA_PRECES
+      CALL SLA_PRECES( SYSTEM, EP0, EP1, RA, DC )
+
+  Precession - either FK4 (Bessel-Newcomb, pre-IAU1976) or
+  FK5 (Fricke, post-IAU1976) as required.
+
+  Given:
+     SYSTEM     char   precession to be applied: 'FK4' or 'FK5'
+     EP0,EP1    dp     starting and ending epoch
+     RA,DC      dp     RA,Dec, mean equator & equinox of epoch EP0
+
+  Returned:
+     RA,DC      dp     RA,Dec, mean equator & equinox of epoch EP1
+2 Routines_called
+ SLA_DRANRM, SLA_PREBN, SLA_PREC, SLA_DCS2C, SLA_DMXV, SLA_DCC2S
+2 Notes
+  1)  The epochs are Besselian if SYSTEM='FK4' and Julian if 'FK5'.
+      For example, to precess coordinates in the old system from
+      equinox 1900.0 to 1950.0 the call would be:
+          CALL SLA_PRECES ('FK4', 1900D0, 1950D0, RA, DC)
+
+  2)  This routine will NOT correctly convert between the old and
+      the new systems - for example conversion from B1950 to J2000.
+      For these purposes see SLA_FK425, SLA_FK524, SLA_FK45Z and
+      SLA_FK54Z.
+
+  3)  If an invalid SYSTEM is supplied, values of -99D0,-99D0 will
+      be returned for both RA and DC.
+2 Authors
+  P.T.Wallace   Starlink   March 1989
+1 SLA_PRENUT
+      CALL SLA_PRENUT( EPOCH, DATE, RMATPN )
+
+  Form the matrix of precession and nutation (IAU1976/FK5)
+
+  (double precision)
+
+  Given:
+
+     EPOCH   dp         Julian Epoch for mean coordinates
+     DATE    dp         Modified Julian Date (JD-2400000.5)
+                        for true coordinates
+
+  Returned:
+     RMATPN  dp(3,3)    combined precession/nutation matrix
+2 Routines_called
+ SLA_PREC, SLA_EPJ, SLA_NUT, SLA_DMXM
+2 Notes
+  1)  The epoch and date are TDB (loosely ET).
+
+  2)  The matrix is in the sense   V(true)  =  RMATPN  V(mean) .
+2 Authors
+  P.T.Wallace   Starlink   April 1987
+1 SLA_PVOBS
+      CALL SLA_PVOBS( P, H, STL, PV )
+
+  Position and velocity of an observing station
+
+  (double precision)
+
+  Given:
+     P     dp     latitude (geodetic, radians)
+     H     dp     height above reference spheroid (geodetic, metres)
+     STL   dp     local apparent sidereal time (radians)
+
+  Returned:
+     PV    dp(6)  position/velocity 6-vector (AU, AU/s, geocentric
+                                                            apparent)
+
+  IAU 1976 constants are used.
+2 Routines_called
+ SLA_GEOC
+2 Authors
+  P.T.Wallace   Starlink   October 1986
+1 SLA_PXY
+      CALL SLA_PXY( NP,XYE,XYM,COEFFS,XYP,XRMS,YRMS,RRMS )
+
+  Given arrays of "expected" and "measured" [X,Y] coordinates, and a
+  linear model relating them (as produced by SLA_FITXY), compute
+  the array of "predicted" coordinates and the RMS residuals.
+
+  Given:
+     NP       i        number of samples
+     XYE     d(np)     expected [X,Y] for each sample
+     XYM     d(np)     measured [X,Y] for each sample
+     COEFFS  d(6)      coefficients of model (see below)
+
+  Returned:
+     XYP     d(np)     predicted [X,Y] for each sample
+     XRMS     d        RMS in X
+     YRMS     d        RMS in Y
+     RRMS     d        total RMS (vector sum of XRMS and YRMS)
+
+  The model is supplied in the array COEFFS.  Naming the
+  elements of COEFF as follows:
+
+     COEFFS(1) = A
+     COEFFS(2) = B
+     COEFFS(3) = C
+     COEFFS(4) = D
+     COEFFS(5) = E
+     COEFFS(6) = F
+
+  the model is applied thus:
+
+     XP = A + BXM + CYM
+     YP = D + EXM + FYM
+
+  The residuals are (XP-XE) and (YP-YE).
+
+  If NP is less than or equal to zero, no coordinates are
+  transformed, and the RMS residuals are all zero.
+
+  See also SLA_FITXY, SLA_INVF, SLA_XY2XY, SLA_DCMPF
+2 Routines_called
+ SLA_XY2XY
+2 Authors
+  P.T.Wallace   Starlink   27 April 1989
+1 SLA_RANDOM
+      REAL FUNCTION SLA_RANDOM (SEED)
+
+  Generate pseudo-random real number in the range 0 <= X < 1.
+
+  (single precision)
+
+  This implementation is VAX dependent.
+
+  Given:
+     SEED     real     an arbitrary real number
+
+  Returned:
+     SEED     real     a new arbitrary value
+2 Authors
+  P.T.Wallace   Starlink   February 1984
+1 SLA_RANGE
+      REAL FUNCTION SLA_RANGE (ANGLE)
+
+  Normalise angle into range +/- pi  (single precision)
+
+  Given:
+     ANGLE     dp      the angle in radians
+
+  The result is ANGLE expressed in the +/- pi (single
+  precision).
+2 Authors
+  P.T.Wallace   Starlink   December 1984
+1 SLA_RANORM
+      REAL FUNCTION SLA_RANORM (ANGLE)
+
+  Normalise angle into range 0-2 pi  (single precision)
+
+  Given:
+     ANGLE     dp      the angle in radians
+
+  The result is ANGLE expressed in the range 0-2 pi (single
+  precision).
+2 Authors
+  P.T.Wallace   Starlink   December 1984
+1 SLA_RCC
+      DOUBLE PRECISION FUNCTION SLA_RCC (TDB, UT1, WL, U, V)
+
+  Relativistic clock correction:  the difference between proper time
+  on Earth and coordinate time in the solar system barycentric
+  space-time frame of reference.
+
+  The proper time is TDT;  the coordinate time is an
+  implementation of TDB.
+
+  Given:
+    TDB   dp   coordinate time - MJD
+    UT1   dp   universal time - fraction of one day
+    WL    dp   clock longitude - radians West
+    U     dp   clock distance from earth spin axis - km
+    V     dp   clock distance north of earth equatorial plane - km
+
+  Returned:
+    The clock correction:  TDB - TDT, where TDB may be considered to
+    be the coordinate time in the solar system barycentre frame of
+    reference, and TDT is the proper time given by clocks at mean sea
+    level on the Earth, in seconds.
+
+    The result has a main (annual) sinusoidal term of amplitude
+    approximately 0.00166 seconds, plus planetary terms up to 20
+    microseconds, and lunar and diurnal terms up to 2 microseconds.
+
+  The argument TDB is in the form of a modified Julian Date:
+  JD - 2400000.5.  Though coordinate time (TDB) is strictly required,
+  the terrestrial proper time (TDT) can in practice be used.
+
+  The geocentric model is that of Fairhead and Bretagnon (1990), in its
+  full form. It was supplied by Fairhead (private communication) as a
+  Fortran subroutine. A number of coding changes were made to this
+  subroutine in order to match the calling sequence of previous versions
+  of the present routine and to comply with Starlink programming
+  standards. Under VAX/VMS, the numerical results were essentially
+  unaffected by the changes. The topocentric model is from Moyer 1981
+  and Murray 1983. During the interval 1950-2050, the absolute accuracy
+  of the geocentric model is better than +/-3 nanoseconds relative to
+  direct numerical integrations using the JPL DE200/LE200 solar system
+  ephemeris.
+
+  The IAU definition of TDB is that it must differ from TDT only by
+  periodic terms. Though practical, this is an imprecise definition,
+  which ignores the existence of very long-period and secular effects
+  in the dynamics of the solar system. As a consequence, different
+  implementations of TDB will, in general, differ in zero-point and will
+  drift linearly relative to one another.
+2 References
+    Fairhead, L & Bretagnon, P., 1990. Astr. Astrophys., 229, 240-247.
+    Moyer T D, 1981, Cel. Mech., 23, 33.
+    Murray C A, 1983, Vectorial Astrometry, Adam Hilger.
+2 Authors
+  P.T.Wallace   Starlink   1990
+1 SLA_REFCO
+      CALL SLA_REFCO( HM, TDK, PMB, RH, WL, PHI, TLR, EPS,
+     :                REFA, REFB)
+
+  Determine constants A and B in atmospheric refraction
+  model dZ = A tan Z + B tan3 Z.
+
+  Z is the "observed" zenith distance (i.e. affected by
+  refraction) and dZ is what to add to Z to give the "topocentric"
+  (i.e. in vacuo) zenith distance.
+
+  The constants are such that the model agrees precisely with
+  the full integration performed by the SLA_REFRO routine at
+  zenith distances arctan(1) and arctan(4).
+
+  Given:
+    HM    dp    height of the observer above sea level (metre)
+    TDK   dp    ambient temperature at the observer (deg K)
+    PMB   dp    pressure at the observer (millibar)
+    RH    dp    relative humidity at the observer (range 0-1)
+    WL    dp    effective wavelength of the source (micrometre)
+    PHI   dp    latitude of the observer (radian, astronomical)
+    TLR   dp    temperature lapse rate in the troposphere (degK/metre)
+    EPS   dp    precision required to terminate iteration (radian)
+
+  Returned:
+    REFA  dp    tan Z coefficient (radian)
+    REFB  dp    tan3 coefficient (radian)
+
+  Typical values for the TLR and EPS arguments might be 0.0065D0 and
+  1D-10 respectively.
+
+  Relative to the comprehensive refraction model used by this
+  routine, the simple A tan Z + B tan3 Z formula achieves
+  0.5 arcsec accuracy for ZD < 80 deg, 0.01 arcsec accuracy for
+  ZD < 60 deg, and 0.001 arcsec accuracy for ZD < 45 deg.
+2 Routines_called
+ SLA_REFRO
+2 Authors
+  P.T.Wallace   Starlink   14 November 1989
+1 SLA_REFRO
+      CALL SLA_REFRO( ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
+     :                EPS, REF)
+
+  Atmospheric refraction for radio and optical wavelengths
+
+  Given:
+    ZOBS    d  observed zenith distance of the source (radian)
+    HM      d  height of the observer above sea level (metre)
+    TDK     d  ambient temperature at the observer (deg K)
+    PMB     d  pressure at the observer (millibar)
+    RH      d  relative humidity at the observer (range 0-1)
+    WL      d  effective wavelength of the source (micrometre)
+    PHI     d  latitude of the observer (radian, astronomical)
+    TLR     d  temperature lapse rate in the troposphere (degK/metre)
+    EPS     d  precision required to terminate iteration (radian)
+
+  Returned:
+    REF     d  refraction: in vacuo ZD minus observed ZD (radian)
+
+  Typical values for the TLR and EPS arguments are 0.0065D0
+  and 1D-9 respectively.
+
+  This routine computes the refraction for zenith distances up to
+  and a little beyond 90 deg using the method of Hohenkerk and
+  Sinclair (NAO Technical Notes 59 and 63).  The code is a
+  slightly modified form of the optical refraction subroutine AREF
+  of C.Hohenkerk (HMNAO, September 1984), with extensions to support
+  radio wavelengths.  Most of the modifications to the HMNAO optical
+  algorithm are cosmetic;  in addition the angle arguments have been
+  changed to radians, any value of ZOBS is allowed, and other values
+  have been limited to safe values.  The radio expressions were
+  devised by A.T.Sinclair (RGO - private communication), based on
+  the Essen & Froome refractivity formula adopted in Resolution 1
+  of the 13th International Geodesy Association General Assembly
+  (Bulletin Geodesique 1963 p390).
+
+  Before use, the value of ZOBS is expressed in the range +/- Pi.
+  If this ranged ZOBS is -ve, the result REF is computed from its
+  absolute value before being made -ve to match.  In addition, if
+  it has an absolute value greater than 93 deg, a fixed REF value
+  equal to the result for ZOBS = 93 deg is returned, appropriately
+  signed.
+
+  Fixed values of the water vapour exponent, height of tropopause, and
+  height at which refraction is negligible are used.
+2 Routines_called
+ SLA_DRANGE, SLA_$ATMT, SLA_$ATMS
+2 Authors
+  Original version by C.Hohenkerk, HMNAO, September 1986.
+  Starlink version by P.T.Wallace, 14 November 1989.
+1 SLA_REFV
+      CALL SLA_REFV( VU, REFA, REFB, VR )
+
+  Adjust an unrefracted Cartesian vector to include the effect of
+  atmospheric refraction, using the simple A tan Z + B tan3 Z
+  model.
+
+  Given:
+    VU    dp    unrefracted position of the source (Az/El 3-vector)
+    REFA  dp    tan Z coefficient (radian)
+    REFB  dp    tan3 Z coefficient (radian)
+
+  Returned:
+    VR    dp    refracted position of the source (Az/El 3-vector)
+
+  Note that this routine applies the adjustment for refraction in
+  the opposite sense to the usual one - it takes an unrefracted
+  (in vacuo) position and produces an observed (refracted)
+  position, whereas the basic A tan Z + B tan3 Z model strictly
+  applies to the case where a refracted position is available and
+  must be corrected for refraction.  This requires an inverted form of
+  the refraction expression;  the algorithm used here is based on
+  two iterations of the Newton-Raphson method.
+
+  See also the routine SLA_REFZ, which performs the adjustment to
+  the zenith distance rather than in Cartesian Az/El coordinates.
+  The results from SLA_REFZ are slightly more accurate (in a
+  numerical sense) to those produced by the present routine, due to
+  the various approximations used in the latter for simplicity and
+  speed.
+
+  To avoid arithmetic overflow at the horizon, the z-component is
+  artificially constrained to the positive non-zero range.  The
+  vector VU must be of unit length;  no check is made.
+2 Authors
+  P.T.Wallace   Starlink   December 1988
+1 SLA_REFZ
+      CALL SLA_REFZ( ZU, REFA, REFB, ZR )
+
+  Adjust an unrefracted zenith distance to include the effect of
+  atmospheric refraction, using the simple A tan Z + B tan3 Z
+  model.
+
+  Given:
+    ZU    dp    unrefracted zenith distance of the source (radian)
+    REFA  dp    tan Z coefficient (radian)
+    REFB  dp    tan3 Z coefficient (radian)
+
+  Returned:
+    ZR    dp    refracted zenith distance (radian)
+
+  Note that this routine applies the adjustment for refraction in
+  the opposite sense to the usual one - it takes an unrefracted
+  (in vacuo) position and produces an observed (refracted)
+  position, whereas the basic A tan Z + B tan3 Z model strictly
+  applies to the case where a refracted position is available and
+  must be corrected for refraction.  This requires an inverted form of
+  the refraction expression; the formula used here is based on the
+  Newton/Raphson method.  For numerical consistency with the
+  refracted to unrefracted model, two iterations are used;  the error
+  is less than 1D-11 arcseconds at 80 degrees ZD, and is still under
+  1 milliarcsecond at 88 degrees.
+
+  For the results to be useful, ZU should be in the range zero to
+  89 degrees (expressed in radians).  For ZU bigger than 89 degrees,
+  the value for ZU = 89 degrees is returned.  No check is made for
+  ZU very large or negative.
+
+  See also the routine SLA_REFV, which performs the adjustment in
+  Cartesian Az/El coordinates.
+2 Authors
+  P.T.Wallace   Starlink   December 1988
+1 SLA_RVEROT
+      REAL FUNCTION SLA_RVEROT (PHI, RA, DA, ST)
+
+  Velocity component in a given direction due to Earth rotation
+
+  (single precision)
+
+  Given:
+     PHI     real    latitude of observing station (geodetic)
+     RA,DA   real    apparent RA,DEC
+     ST      real    local apparent sidereal time
+
+  PHI, RA, DEC and ST are all in radians.
+
+  Result:
+     Component of Earth rotation in direction RA,DA (km/s)
+2 Sign_convention
+     The result is +ve when the observatory is receding from the
+     given point on the sky.
+2 Accuracy
+     The simple algorithm used assumes a spherical Earth and
+     an observing station at sea level.  For actual observing
+     sites, the error is unlikely to be greater than 0.0005 km/s.
+     For applications requiring greater precision, see the
+     routine SLA_PVOBS.
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_RVGALC
+      REAL FUNCTION SLA_RVGALC (R2000, D2000)
+
+  Velocity component in a given direction due to the rotation
+  of the Galaxy
+
+  (single precision)
+
+  Given:
+     R2000,D2000   real    J2000.0 mean RA,Dec (radians)
+
+  Result:
+     Component of LSR motion in direction R2000,D2000 (km/s)
+2 Sign_convention
+     The result is +ve when the LSR is receding from the
+     given point on the sky.
+2 Routines_called
+ SLA_CS2C, SLA_VDV
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_RVLG
+      REAL FUNCTION SLA_RVLG (R2000, D2000)
+
+  Velocity component in a given direction due to the combination
+  of the rotation of the Galaxy and the motion of the Galaxy
+  relative to the mean motion of the local group.
+
+  (single precision)
+
+  Given:
+     R2000,D2000   real    J2000.0 mean RA,Dec (radians)
+
+  Result:
+     Component of SOLAR motion in direction R2000,D2000 (km/s)
+2 Sign_convention
+     The result is +ve when the Sun is receding from the
+     given point on the sky.
+2 References
+     IAU Trans 1976, 168, p201.
+2 Routines_called
+ SLA_CS2C, SLA_VDV
+2 Authors
+  P.T.Wallace   Starlink   June 1985
+1 SLA_RVLSR
+      REAL FUNCTION SLA_RVLSR (R2000, D2000)
+
+  Velocity component in a given direction due to the Sun's
+  motion with respect to the Local Standard of Rest
+
+  (single precision)
+
+  Given:
+     R2000,D2000   real    J2000.0 mean RA,Dec (radians)
+
+  Result:
+     Component of solar motion in direction R2000,D2000 (km/s)
+2 Sign_convention
+     The result is +ve when the Sun is receding from the
+     given point on the sky.
+2 Routines_called
+ SLA_CS2C, SLA_VDV
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_S2TP
+      CALL SLA_S2TP( RA, DEC, RAZ, DECZ, XI, ETA, J )
+
+  Projection of spherical coordinates onto tangent plane
+  ('gnomonic' projection - 'standard coordinates')
+
+  (single precision)
+
+  Given:
+     RA,DEC      real  spherical coordinates of point to be projected
+     RAZ,DECZ    real  spherical coordinates of tangent point
+
+  Returned:
+     XI,ETA      real  rectangular coordinates on tangent plane
+     J           int   status:   0 = OK, star on tangent plane
+                                 1 = error, star too far from axis
+                                 2 = error, antistar too far from axis
+                                 3 = error, antistar on tangent plane
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_SEP
+      REAL FUNCTION SLA_SEP (A1, B1, A2, B2)
+
+  Angle between two points on a sphere
+
+  (single precision)
+
+  Given:
+     A1,B1    real    spherical coordinates of one point
+     A2,B2    real    spherical coordinates of the other point
+
+  (The spherical coordinates are RA,Dec, Long,Lat etc, in radians.)
+
+  The result is the angle, in radians, between the two points.  It
+  is always positive.
+2 Routines_called
+ SLA_CS2C
+2 Authors
+  P.T.Wallace   Starlink   April 1985
+1 SLA_SMAT
+      CALL SLA_SMAT( N, A, Y, D, JF, IW )
+
+  Matrix inversion & solution of simultaneous equations
+
+  (single precision)
+
+  For the set of n simultaneous equations in n unknowns:
+     A.Y = X
+
+  where:
+     A is a non-singular N x N matrix
+     Y is the vector of N unknowns
+     X is the known vector
+
+  SMAT computes:
+     the inverse of matrix A
+     the determinant of matrix A
+     the vector of N unknowns
+
+  Arguments:
+     symbol  type dimension           before              after
+
+       N      int                 no. of unknowns       unchanged
+       A      real  (N,N)             matrix             inverse
+       Y      real   (N)              vector            solution
+       D      real                       -             determinant
+      JF      int                        -           singularity flag
+      IW      int    (N)                 -              workspace
+
+    JF is the singularity flag.  If the matrix is non-singular,
+    JF=0 is returned.  If the matrix is singular, JF=-1 & D=0.0 are
+    returned.  In the latter case, the contents of array A on return
+    are undefined.
+
+    This routine replaces the obsolete SLA_SMATRX.
+2 Algorithm
+     Gaussian elimination with partial pivoting.
+2 Speed
+     Very fast; some much slower algorithms can give better accuracy,
+     but only by a small factor.
+2 Accuracy
+     Fairly accurate - errors 1 to 4 times those of routines optimised
+     for accuracy.
+2 Authors
+  P.T.Wallace   Starlink   October 1985
+1 SLA_SUBET
+      CALL SLA_SUBET( RC, DC, EQ, RM, DM )
+
+  Remove the E-terms (elliptic component of annual aberration)
+  from a pre IAU 1976 catalogue RA,Dec to give a mean place
+
+  (double precision)
+
+  Given:
+     RC,DC     dp     RA,Dec (radians) with E-terms included
+     EQ        dp     Besselian epoch of mean equator and equinox
+
+  Returned:
+     RM,DM     dp     RA,Dec (radians) without E-terms
+2 Routines_called
+ SLA_ETRMS, SLA_DCS2C, SLA_,DVDV, SLA_DCC2S, SLA_DRANRM
+2 Explanation
+     Most star positions from pre-1984 optical catalogues (or
+     derived from astrometry using such stars) embody the
+     E-terms.  This routine converts such a position to a
+     formal mean place (allowing, for example, comparison with a
+     pulsar timing position).
+2 References
+     Explanatory Supplement to the Astronomical Ephemeris,
+     section 2D, page 48.
+2 Authors
+  P.T.Wallace   Starlink   July 1986
+1 SLA_SUPGAL
+      CALL SLA_SUPGAL( DSL, DSB, DL, DB )
+
+  Transformation from de Vaucouleurs supergalactic coordinates
+  to IAU 1958 galactic coordinates
+
+  (double precision)
+
+  Given:
+     DSL,DSB     dp       supergalactic longitude and latitude
+
+  Returned:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  (all arguments are radians)
+2 Routines_called
+ SLA_DCS2C, SLA_DIMXV, SLA_DCC2S, SLA_DRANRM, SLA_DRANGE
+2 References
+     de Vaucouleurs, de Vaucouleurs, & Corwin, Second Reference
+     Catalogue of Bright Galaxies, U. Texas, page 8.
+
+     Systems & Applied Sciences Corp., Documentation for the
+     machine-readable version of the above catalogue,
+     Contract NAS 5-26490.
+
+    (These two references give different values for the galactic
+     longitude of the supergalactic origin.  Both are wrong;  the
+     correct value is L2=137.37.)
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_SVD
+      CALL SLA_SVD( M, N, MP, NP, A, W, V, WORK, JSTAT )
+
+  Singular value decomposition  (double precision)
+
+  This routine expresses a given matrix A as the product of
+  three matrices U, W, V:
+
+     A = U x W x VT
+
+  Where:
+
+     A   is any M (rows) x N (columns) matrix, where M.GE.N
+     U   is an M x N column-orthogonal matrix
+     W   is an N x N diagonal matrix with W(I,I).GE.0
+     VT  is the transpose of an NxN orthogonal matrix
+
+     Note that M and N, above, are the LOGICAL dimensions of the
+     matrices and vectors concerned, which can be located in
+     arrays of larger PHYSICAL dimensions, given by MP and NP.
+
+  Given:
+     M,N    i         numbers of rows and columns in matrix A
+     MP,NP  i         physical dimensions of array containing matrix A
+     A      d(MP,NP)  array containing MxN matrix A
+
+  Returned:
+     A      d(MP,NP)  array containing MxN column-orthogonal matrix U
+     W      d(N)      NxN diagonal matrix W (diagonal elements only)
+     V      d(NP,NP)  array containing NxN orthogonal matrix V
+     WORK   d(N)      workspace
+     JSTAT  i         0 = OK, -1 = A wrong shape, >0 = index of W
+                      for which convergence failed.
+
+     (n.b. V contains matrix V, not the transpose of matrix V)
+2 References
+     The algorithm is an adaptation of the routine SVD in the EISPACK
+     library (Garbow et al 1977, EISPACK Guide Extension, Springer
+     Verlag), which is a FORTRAN 66 implementation of the Algol
+     routine SVD of Wilkinson & Reinsch 1971 (Handbook for Automatic
+     Computation, vol 2, ed Bauer et al, Springer Verlag).  For the
+     non-specialist, probably the clearest general account of the use
+     of SVD in least squares problems is given in Numerical Recipes
+     (Press et al 1986, Cambridge University Press).
+2 Authors
+  P.T.Wallace   Starlink   4th August 1989
+1 SLA_SVDCOV
+      CALL SLA_SVDCOV( N, NP, NC, W, V, WORK, CVM )
+
+  From the W and V matrices from the SVD factorisation of a matrix
+  (as obtained from the SLA_SVD routine), obtain the covariance matrix.
+
+  (double precision)
+
+  Given:
+     N      i         number of rows and columns in matrices W and V
+     NP     i         first dimension of array containing matrix V
+     NC     i         first dimension of array to receive CVM
+     W      d(N)      NxN diagonal matrix W (diagonal elements only)
+     V      d(NP,NP)  array containing NxN orthogonal matrix V
+
+  Returned:
+     WORK   d(N)      workspace
+     CVM    d(NC,NC)  array to receive covariance matrix
+2 References
+     Numerical Recipes, section 14.3.
+2 Authors
+  P.T.Wallace   Starlink   December 1988
+1 SLA_SVDSOL
+      CALL SLA_SVDSOL( M, N, MP, NP, B, U, W, V, WORK, X )
+
+  From a given vector and the SVD of a matrix (as obtained from
+  the SVD routine), obtain the solution vector.
+
+  (double precision)
+
+  This routine solves the equation:
+
+     A . x = b
+
+  where:
+
+     A   is a given M (rows) x N (columns) matrix, where M.GE.N
+     x   is the N-vector we wish to find
+     b   is a given N-vector
+
+  by means of the Singular Value Decomposition method (SVD).  In
+  this method, the matrix A is first factorised (for example by
+  the routine SLA_SVD) into the following components:
+
+     A = U x W x VT
+
+  where:
+
+     A   is the M (rows) x N (columns) matrix
+     U   is an M x N column-orthogonal matrix
+     W   is an N x N diagonal matrix with W(I,I).GE.0
+     VT  is the transpose of an NxN orthogonal matrix
+
+     Note that M and N, above, are the LOGICAL dimensions of the
+     matrices and vectors concerned, which can be located in
+     arrays of larger PHYSICAL dimensions MP and NP.
+
+  The solution is found from the expression:
+
+     x = V . [diag(1/Wj)] . (transpose(U) . b)
+
+  Given:
+     M,N    i         numbers of rows and columns in matrix A
+     MP,NP  i         physical dimensions of array containing matrix A
+     B      d(M)      known vector b
+     U      d(MP,NP)  array containing MxN matrix U
+     W      d(N)      NxN diagonal matrix W (diagonal elements only)
+     V      d(NP,NP)  array containing NxN orthogonal matrix V
+
+  Returned:
+     WORK   d(N)      workspace
+     X      d(N)      unknown vector x
+2 Notes
+  1)  If matrix A is square, and if the diagonal matrix W is not
+      adjusted, the method is equivalent to conventional solution
+      of simultaneous equations.
+
+  2)  If M>N, the result is a least-squares fit.
+
+  3)  If the solution is poorly determined, this shows up in the
+      SVD factorisation as very small or zero Wj values.  Where
+      a Wj value is small but non-zero it can be set to zero to
+      avoid ill effects.  The present routine detects such zero
+      Wj values and produces a sensible solution, with highly
+      correlated terms kept under control rather than being allowed
+      to elope to infinity, and with meaningful values for the
+      other terms.
+2 References
+     Numerical Recipes, section 2.9.
+2 Authors
+  P.T.Wallace   Starlink   December 1988
+1 SLA_TP2S
+      CALL SLA_TP2S( XI, ETA, RAZ, DECZ, RA, DEC )
+
+  Transform tangent plane coordinates into spherical
+
+  (single precision)
+
+  Given:
+     XI,ETA      real  tangent plane rectangular coordinates
+     RAZ,DECZ    real  spherical coordinates of tangent point
+
+  Returned:
+     RA,DEC      real  spherical coordinates (0-2pi,+/-pi/2)
+2 Routines_called
+ SLA_RANORM
+2 Authors
+  P.T.Wallace   Starlink   June 1989
+1 SLA_UNPCD
+      CALL SLA_UNPCD( DISCO,X,Y )
+
+  Remove pincushion/barrel distortion from a distorted [x,y]
+  to give tangent-plane [x,y].
+
+  Given:
+     DISCO    d      pincushion/barrel distortion coefficient
+     X,Y      d      distorted coordinates
+
+  Returned:
+     X,Y      d      tangent-plane coordinates
+2 Notes
+   1)  The distortion is of the form RP = R(1 + CR2), where R is
+       the radial distance from the tangent point, C is the DISCO
+       arguments, and RP is the radial distance in the presence of
+       the distortion.
+
+   2)  For pincushion distortion, C is +ve;  for barrel distortion,
+       C is -ve.
+
+   3)  For X,Y in "radians" - units of one projection radius,
+       which in the case of a photograph is the focal length of
+       the camera - the following DISCO values apply:
+
+           Geometry          DISCO
+
+           astrograph         0.0
+           Schmidt           -0.3333
+           AAT PF doublet  +147.069
+           AAT PF triplet  +178.585
+           AAT f/8          +21.20
+           JKT f/8          +13.32
+
+    4)  The present routine is an approximate inverse to the
+        companion routine SLA_PCD, obtained from two iterations
+        of Newton's method.  The mismatch between the SLA_PCD
+        and SLA_UNPCD is negligible for astrometric applications;
+        to reach 1 milliarcsec at the edge of the AAT triplet or
+        Schmidt field would require field diameters of 2.4 degrees
+        and 42 degrees respectively.
+2 Authors
+  P.T.Wallace   Starlink   20 April 1989
+1 SLA_VDV
+      REAL FUNCTION SLA_VDV (VA, VB)
+
+  Scalar product of two 3-vectors  (single precision)
+
+  Given:
+      VA      real(3)     first vector
+      VB      real(3)     second vector
+
+  The result is the scalar product VA.VB (single precision)
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_VN
+      CALL SLA_VN( V, UV, VM )
+
+  Normalises a 3-vector also giving the modulus
+
+  (single precision)
+
+  Given:
+     V       real(3)      vector
+
+  Returned:
+     UV      real(3)      unit vector in direction of V
+     VM      real         modulus of V
+
+  If the modulus of V is zero, UV is set to zero as well
+2 Authors
+  P.T.Wallace   Starlink   November 1984
+1 SLA_VXV
+      CALL SLA_VXV( VA, VB, VC )
+
+  Vector product of two 3-vectors  (single precision)
+
+  Given:
+      VA      real(3)     first vector
+      VB      real(3)     second vector
+
+  Returned:
+      VC      real(3)     vector result
+2 Authors
+  P.T.Wallace   Starlink   March 1986
+1 SLA_WAIT
+      CALL SLA_WAIT( DELAY )
+
+  Interval wait
+
+  VAX SPECIFIC
+
+  Given:
+     DELAY     real      delay in seconds
+
+  A delay 100ns < DELAY < 200s is requested.
+2 Authors
+  P.T.Wallace   Starlink   February 1987
+1 SLA_XY2XY
+      CALL SLA_XY2XY( X1, Y1, COEFFS, X2, Y2 )
+
+  Transform one [X,Y] into another using a linear model of the type
+  produced by the SLA_FITXY routine.
+
+  Given:
+     X1       d        x-coordinate
+     Y1       d        y-coordinate
+
+  Returned:
+     COEFFS  d(6)      transformation coefficients (see note)
+     X2       d        x-coordinate
+     Y2       d        y-coordinate
+
+  The model relates two sets of [X,Y] coordinates as follows.
+  Naming the elements of COEFFS:
+
+     COEFFS(1) = A
+     COEFFS(2) = B
+     COEFFS(3) = C
+     COEFFS(4) = D
+     COEFFS(5) = E
+     COEFFS(6) = F
+
+  the present routine performs the transformation:
+
+     X2 = A + BX1 + CY1
+     Y2 = D + EX1 + FY1
+
+  See also SLA_FITXY, SLA_PXY, SLA_INVF, SLA_DCMPF
+2 Authors
+  P.T.Wallace   Starlink   27 April 1989

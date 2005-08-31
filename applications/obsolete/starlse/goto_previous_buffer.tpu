@@ -1,0 +1,68 @@
+      PROCEDURE STARLSE_PB
+!+
+!  Purpose:
+!     Return to the previous editing buffer (and language).
+
+!  Description:
+!     This TPU procedure sets the current editing buffer and language
+!     to the values stored in STARLSE1_PREVIOUS_BUFFER and
+!     STARLSE1_PREVIOUS_LANGUAGE, which represent the previously used buffer
+!     and the language in use when it was left.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     23-AUG-1991 (RFWS):
+!        Original version.
+!     24-OCT-1991 (RFWS):
+!        Check whether previous buffer name is available before trying to
+!        select it by name.
+!     {enter_further_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+      LOCAL BUFNAM, MSG, PREV_EXISTS;
+
+!.
+
+!  If the previous buffer is defined, then go to it.
+      PREV_EXISTS := 0;
+      IF ( STARLSE1_PREVIOUS_BUFFER <> 0 ) THEN
+         BUFNAM := GET_INFO( STARLSE1_PREVIOUS_BUFFER, "NAME" );
+         IF ( BUFNAM <> 0 ) THEN
+            PREV_EXISTS := 1;
+            LSE_GOTO_BUFFER( BUFNAM );
+            MSG := 'Buffer ' + BUFNAM + ' selected, ';
+
+!  If the previous language is also defined, then set it.
+            IF ( ( STARLSE1_PREVIOUS_LANGUAGE <> 0 ) AND
+                 ( STARLSE1_PREVIOUS_LANGUAGE <> '' ) ) THEN
+               LSE_SET_BUFFER_LANGUAGE( STARLSE1_PREVIOUS_LANGUAGE );
+               MSG := MSG + 'language = ' + STARLSE1_PREVIOUS_LANGUAGE;
+
+!  If there was no language associated with the previous buffer, then set no
+!  language.
+            ELSE
+               LSE_SET_BUFFER_LANGUAGE( '' );
+               MSG := MSG + 'no language.';
+            ENDIF;
+
+!  Show which buffer and language have been selected.
+            MESSAGE( MSG );
+
+!  Re-initialise STARLSE for the new buffer.
+            STARLSE1_INIT_BUFFER;
+         ENDIF;
+      ENDIF;
+
+!  If there is no previous buffer, then say so.
+      IF ( NOT PREV_EXISTS ) THEN
+         MESSAGE( 'There is no previous buffer to select.' );
+      ENDIF;
+
+      ENDPROCEDURE;

@@ -1,0 +1,177 @@
+!+
+!  Name:
+!     BUILD.LSE
+!
+!  Purpose:
+!     Build the STARLSE environment and section files from the source files.
+!
+!  Type of Module:
+!     LSE initialisation file.
+!
+!  Language:
+!     VAX LSE commands.
+!
+!  Description:
+!     When supplied as an initialisation file to LSE using the /INITIALIZATION=
+!     option, this file causes LSE to be configured to behave like STARLSE by
+!     reading and compiling the necessary source files. The resulting LSE
+!     context is saved in environment and section files and LSE then exits.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     1-JUN-1990 (RFWS):
+!        First official version.
+!     1-JUN-1990 (RFWS):
+!        Added SLALIB package definition.
+!     7-JUN-1990 (RFWS):
+!        Installed "adjustments" file for the STARLINK_FORTRAN language.
+!     2-OCT-1990 (RFWS):
+!        Added TPU procedure to implement the PRINT command.
+!     22-AUG-1991 (RFWS):
+!       Added TPU procedure to implement the "detach key" facility.
+!     23-AUG-1991 (RFWS):
+!       Added TPU procedure to implement the PB command.
+!     12-SEP-1991 (RFWS):
+!        Added POST_KEY procedure.
+!     24-OCT-1991 (RFWS):
+!        Added SHOW_BUFFER procedure.
+!     6-DEC-1991 (RFWS):
+!        Added GWM and PSX package definitions.
+!     10-DEC-1991 (RFWS):
+!        Added FLUSH_BUFFERS procedure.
+!     {enter_further_changes_here}
+!
+!  Bugs:
+!     {note_any_bugs_here}
+!
+!-
+!
+!  Enable STARLSE_ commands
+!      ENABLE GRAMMAR PREFIX STARLSE_
+!
+!  Compile TPU procedures which provide additional functions via new LSE
+!  commands.
+!      OPEN FILE align_comment.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE comment.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE fix_continuation.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE flush_buffers.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE generic.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE goto_previous_buffer.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE help.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE print.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE show_buffer.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE sort.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE where.tpu
+!      EXECUTE BUFFER TPU
+!
+!  Compile TPU procedures which provide functions for re-defining standard LSE
+!  command.
+!      OPEN FILE key_procedures.tpu
+!      EXECUTE BUFFER TPU
+!
+!  Define other new TPU procedures for internal use.
+!      OPEN FILE detach.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE do_cli.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE getenv.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE pre_key.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE post_key.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE starlse_initialisation.tpu
+!      EXECUTE BUFFER TPU
+!      OPEN FILE update_default.tpu
+!      EXECUTE BUFFER TPU
+!
+!  Make new key definitions to execute TPU procedures.
+!      OPEN FILE key_definitions.lse
+!      EXECUTE BUFFER LSE
+!
+!  Compile the STARLINK_FORTRAN language definition files.
+!      OPEN FILE starlink_fortran_a.lse
+!      EXECUTE BUFFER LSE
+!      OPEN FILE starlink_fortran_b.lse
+!      EXECUTE BUFFER LSE
+!      OPEN FILE starlink_fortran_adjust.lse
+!      EXECUTE BUFFER LSE
+!      OPEN FILE starlink_fortran_alias.lse
+!      EXECUTE BUFFER LSE
+!      OPEN FILE adam_constructs.lse
+!      EXECUTE BUFFER LSE
+!
+!  Compile TPU procedures to handle the expansion of routine argument lists
+!  for package definitions within the STARLINK_FORTRAN language.
+!      OPEN FILE starlink_fortran_package.tpu
+!      EXECUTE BUFFER TPU
+!
+!  Compile the IFL language definition.
+!      OPEN FILE ifl.lse
+!      EXECUTE BUFFER LSE
+!
+!  Compile the subroutine package definitions used by the STARLINK_FORTRAN
+!  language.
+      OPEN FILE agi.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE ary.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE chr.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE ems.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE err.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE fio.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE gks.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE grp.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE gwm.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE hds.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE idi.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE mag.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE msg.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE ndf.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE par.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE pgplot.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE primdat.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE psx.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE slalib.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE sgs.lse
+      EXECUTE BUFFER LSE
+      OPEN FILE trn.lse
+      EXECUTE BUFFER LSE
+!
+!  Save the current LSE context in environment and section files in the
+!  default directory.
+      SAVE ENVIRONMENT starlse_2.env
+      SAVE SECTION starlse_2.tpu_section
+!
+!  Exit from LSE without creating any more files.
+!      QUIT

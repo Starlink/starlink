@@ -1,0 +1,12 @@
+
+   file="$1"
+   if test -f "$file"; then
+      echo "$file"
+   else
+      for dir in `echo $SDT_SOURCE_PATH | tr ":" " "`; do
+         if test -f "$dir/$file"; then
+            echo "$dir/$file"
+            exit 0
+         fi
+      done
+   fi

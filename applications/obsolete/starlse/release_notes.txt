@@ -1,0 +1,30 @@
+Martin,
+    A new version of STARLSE is now ready for release. Details are as follows:
+
+Version:
+=======
+   STARLSE V1.8-1 (December 1991)
+   This is a minor upgrade. It introduces support for two new subroutine
+   libraries (PSX and GWM), updates to other libraries, several new
+   commands, and fixes for a few minor problems. Changes are summarised in the
+   NEWS item which accompanies the release and in Appendix B of the new
+   documentation (SUN/105.5).
+
+Installation:
+============
+   1) Delete all files in the current Starlink directory which holds STARLSE.
+
+   2) Copy the files DISK$USER1:[RFWS.IN-HOUSE.STARLSE]*.* into the Starlink
+   directory to replace them.
+
+Documentation:
+=============
+   New documentation (SUN/105.5) is provided in the file SUN105.TEX which
+   should be moved to DOCSDIR.
+
+News:
+====
+   There is a news item to accompany this release in STARLSE.NEWS. This file
+   may be removed from the STARLSE directory.
+
+Rod.

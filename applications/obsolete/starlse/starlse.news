@@ -1,0 +1,54 @@
+1 STARLSE
+                                              Expires: 31st January 1992
+
+A new release of the extended Language Sensitive Editor STARLSE (V1.8)
+is now available.
+
+The main new features in this release are subroutine definitions for the
+PSX and GWM libraries (POSIX Interface Routines and the X Graphics
+Window Manager). A number of minor problems introduced with the previous
+version of STARLSE have also been fixed.
+
+For a summary of changes, please see the "Changes" topic below, or refer
+to Appendix B of the new documentation (SUN/105.5).
+2 Changes
+The following describes the main changes which have taken place since
+the previous version of STARLSE (V1.7):
+
+ 1) A new FB (Flush Buffers) command has been added to force all modified
+ editing buffers to be updated on disk.
+
+ 2) A new command SB (Show Buffer) has been added to simplify navigation
+ between different editing buffers. The SB command is bound to the F14
+ key by default.
+
+ 3) New subroutine package definitions have been added for the PSX
+ library (POSIX Interface Routines -- SUN/121) and the GWM library (X
+ Graphics Window Manager -- SUN/130).
+
+ 4) The definitions for the EMS, ERR, MSG & NDF subroutine libraries have
+ been updated to match recent new releases of these systems.
+
+ 5) The behaviour of the PB command has been improved in cases where the
+ ``previous buffer'' does not exist. This command is now bound to the
+ GOLD-P key.
+
+ 6) The handling of the `:' continuation character in the
+ STARLINK_FORTRAN language has been improved. In particular, a problem
+ introduced in the previous version of STARLSE which made it impossible
+ to delete backwards over a continuation character has been fixed. A
+ work-around has also been installed for an apparent problem with LSE
+ which could cause the continuation character to arbitrarily revert to
+ `1'.
+
+ 7) The behaviour of the ``auto-initialisation'' feature introduced in
+ the previous version of STARLSE has been modified slightly. The screen
+ width will not now be altered if you move to an editing buffer where you
+ do not have write access (the screen width continues to adjust
+ automatically to the current language if you have write access and other
+ buffer-dependent features continue to auto-initialise as before). This
+ change has been made to reduce the number of screen refreshes which
+ occur when using navigation buffers (such as when reviewing a failed
+ compilation). These were found to be annoying on slow terminals.
+
+ 8) The documentation has been revised to reflect the above changes.

@@ -1,0 +1,1590 @@
+1 PGADVANCE -- advance to new page
+        SUBROUTINE PGADVANCE
+   
+  PGADVANCE is a non-standard synonym for PGPAGE. The name PGPAGE is
+  preferred because it conforms to the Fortran-77 restriction that
+  Fortran subroutine names should not be longer than 6 characters.
+   
+  Arguments: none
+1 PGASK -- control new page prompting
+        SUBROUTINE PGASK (FLAG)
+        LOGICAL FLAG
+   
+  Change the "prompt state" of PGPLOT. If the prompt state is
+  ON, PGADVANCE will type "Type <RETURN> for next page:" and will wait
+  for the user to type <CR> before starting a new page.  The initial
+  prompt state (after a call to PGBEGIN) is ON for interactive devices.
+  Prompt state is always OFF for non-interactive devices.
+   
+  Arguments:
+   FLAG   (input)  : if .TRUE., and if the device is an interactive
+                     device, the prompt state will be set to ON. If
+                     .FALSE., the prompt state will be set to OFF.
+1 PGBBUF -- begin batch of output (buffer)
+        SUBROUTINE PGBBUF
+   
+  Begin saving graphical output commands in an internal buffer; the
+  commands are held until a matching PGEBUF call (or until the buffer
+  is emptied by PGUPDT). This can greatly improve the efficiency of
+  PGPLOT.  PGBBUF increments an internal counter, while PGEBUF
+  decrements this counter and flushes the buffer to the output
+  device when the counter drops to zero.  PGBBUF and PGEBUF calls
+  should always be paired.
+   
+  Arguments: none
+1 PGBEGIN -- begin PGPLOT, open output device
+        INTEGER FUNCTION PGBEGIN (UNIT, FILE, NXSUB, NYSUB)
+        INTEGER       UNIT
+        CHARACTER*(*) FILE
+        INTEGER       NXSUB, NYSUB
+   
+  Begin PGPLOT, open the plot file.  A call to PGBEGIN is
+  required before any other calls to PGPLOT subroutines.  If a plot
+  file is already open for PGPLOT output, it is closed before the new
+  file is opened.
+   
+  Returns:
+   PGBEGIN         : a status return value. A value of 1 indicates
+                     successful completion, any other value indicates
+                     an error. In the event of error a message is
+                     written on the standard error unit.  
+                     To test the return value, call
+                     PGBEGIN as a function, eg IER=PGBEGIN(...); note
+                     that PGBEGIN must be declared INTEGER in the
+                     calling program.
+  Arguments:
+   UNIT  (input)   : this argument is ignored by PGBEGIN (use zero).
+   FILE  (input)   : the "device specification" for the plot device.
+                     Device specifications are installation dependent,
+                     but usually have the form "device/type" or
+                     "file/type". If this argument is a
+                     question mark ('?'), PGBEGIN will prompt the user
+                     to supply a string.
+   NXSUB  (input)  : the number of subdivisions of the view surface in
+                     X.
+   NYSUB  (input)  : the number of subdivisions of the view surface in
+                     Y. PGPLOT puts NXSUB x NYSUB graphs on each plot
+                     page or screen; when the view surface is sub-
+                     divided in this way, PGADVANCE moves to the next
+                     sub-page, not the  next physical page.
+1 PGBIN -- histogram of binned data
+        SUBROUTINE PGBIN (NBIN, X, DATA, CENTER)
+        INTEGER NBIN
+        REAL X(*), DATA(*)
+        LOGICAL CENTER
+   
+  Plot a histogram of NBIN values with X(1..NBIN) values along
+  the ordinate, and DATA(1...NBIN) along the abscissa. Bin width is
+  spacing between X values.
+   
+  Arguments:
+   NBIN   (input)  : number of values.
+   X      (input)  : abscissae of bins.
+   DATA   (input)  : data values of bins.
+   CENTER (input)  : if .TRUE., the X values denote the center of the
+                     bin; if .FALSE., the X values denote the lower
+                     edge (in X) of the bin.
+1 PGBOX -- draw labeled frame around viewport
+        SUBROUTINE PGBOX (XOPT, XTICK, NXSUB, YOPT, YTICK, NYSUB)
+        CHARACTER*(*) XOPT, YOPT
+        REAL XTICK, YTICK
+        INTEGER NXSUB, NYSUB
+   
+  Annotate the viewport with frame, axes, numeric labels, etc.
+  PGBOX is called by on the user's behalf by PGENV, but may also be
+  called explicitly.
+   
+  Arguments:
+   XOPT   (input)  : string of options for X (horizontal) axis of
+                     plot. Options are single letters, and may be in
+                     any order (see below).
+   XTICK  (input)  : world coordinate interval between major tick marks
+                     on X axis. If XTICK=0.0, the interval is chosen by
+                     PGBOX, so that there will be at least 3 major tick
+                     marks along the axis.
+   NXSUB  (input)  : the number of subintervals to divide the major
+                     coordinate interval into. If XTICK=0.0 or NXSUB=0,
+                     the number is chosen by PGBOX.
+   YOPT   (input)  : string of options for Y (vertical) axis of plot.
+                     Coding is the same as for XOPT.
+   YTICK  (input)  : like XTICK for the Y axis.
+   NYSUB  (input)  : like NXSUB for the Y axis.
+   
+  Options (for parameters XOPT and YOPT):
+   A : draw Axis (X axis is horizontal line Y=0, Y axis is vertical
+       line X=0).
+   B : draw bottom (X) or left (Y) edge of frame.
+   C : draw top (X) or right (Y) edge of frame.
+   G : draw Grid of vertical (X) or horizontal (Y) lines.
+   I : Invert the tick marks; ie draw them outside the viewport
+       instead of inside.
+   L : label axis Logarithmically (see below).
+   N : write Numeric labels in the conventional location below the
+       viewport (X) or to the left of the viewport (Y).
+   P : extend ("Project") major tick marks outside the box (ignored if
+       option I is specified).
+   M : write numeric labels in the unconventional location above the
+       viewport (X) or to the right of the viewport (Y).
+   T : draw major Tick marks at the major coordinate interval.
+   S : draw minor tick marks (Subticks).
+   V : orient numeric labels Vertically. This is only applicable to Y.
+       The default is to write Y-labels parallel to the axis
+   
+  To get a complete frame, specify BC in both XOPT and YOPT.
+  Tick marks, if requested, are drawn on the axes or frame
+  or both, depending which are requested. If none of ABC is specified,
+  tick marks will not be drawn. When PGENV calls PGBOX, it sets both
+  XOPT and YOPT according to the value of its parameter AXIS:
+  -1: 'BC', 0: 'BCNST', 1: 'ABCNST', 2: 'ABCGNST'.
+   
+  For a logarithmic axis, the major tick interval is always 1.0. The
+  numeric label is 10**(x) where x is the world coordinate at the
+  tick mark. If subticks are requested, 8 subticks are drawn between
+  each major tick at equal logarithmic intervals.
+1 PGCONB -- contour map of a 2D data array, with blanking
+      SUBROUTINE PGCONB (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR, BLANK)
+      INTEGER IDIM, JDIM, I1, I2, J1, J2, NC
+      REAL    A(IDIM,JDIM), C(*), TR(6), BLANK
+ 
+  Draw a contour map of an array. This routine is the same as PGCONS,
+  except that array elements that have the "magic value" defined by
+  argument BLANK are ignored, making gaps in the contour map. The
+  routine may be useful for data measured on most but not all of the
+  points of a grid.
+ 
+  Arguments:
+   A      (input)  : data array.
+   IDIM   (input)  : first dimension of A.
+   JDIM   (input)  : second dimension of A.
+   I1,I2  (input)  : range of first index to be contoured (inclusive).
+   J1,J2  (input)  : range of second index to be contoured (inclusive).
+   C      (input)  : array of contour levels (in the same units as the
+                     data in array A); dimension at least NC.
+   NC     (input)  : number of contour levels (less than or equal to
+                     dimension of C). The absolute value of this
+                     argument is used (for compatibility with PGCONT,
+                     where the sign of NC is significant).
+   TR     (input)  : array defining a transformation between the I,J
+                     grid of the array and the world coordinates. The
+                     world coordinates of the array point A(I,J) are
+                     given by:
+                       X = TR(1) + TR(2)*I + TR(3)*J
+                       Y = TR(4) + TR(5)*I + TR(6)*J
+                     Usually TR(3) and TR(5) are zero - unless the
+                     coordinate transformation involves a rotation
+                     or shear.
+   BLANK   (input) : elements of array A that are exactly equal to
+                     this value are ignored (blanked).
+1 PGCONS -- contour map of a 2D data array (fast algorithm)
+        SUBROUTINE PGCONS (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR)
+        INTEGER IDIM, JDIM, I1, I2, J1, J2, NC
+        REAL    A(IDIM,JDIM), C(*), TR(6)
+   
+  Draw a contour map of an array. The map is truncated if
+  necessary at the boundaries of the viewport.  Each contour line is
+  drawn with the current line attributes (color index, style, and
+  width).  This routine, unlike PGCONT, does not draw each contour as a
+  continuous line, but draws the straight line segments composing each
+  contour in a random order.  It is thus not suitable for use on pen
+  plotters, and it usually gives unsatisfactory results with dashed or
+  dotted lines.  It is, however, faster than PGCONT, especially if
+  several contour levels are drawn with one call of PGCONS.
+   
+  Arguments:
+   A      (input)  : data array.
+   IDIM   (input)  : first dimension of A.
+   JDIM   (input)  : second dimension of A.
+   I1,I2  (input)  : range of first index to be contoured (inclusive).
+   J1,J2  (input)  : range of second index to be contoured (inclusive).
+   C      (input)  : array of contour levels (in the same units as the
+                     data in array A); dimension at least NC.
+   NC     (input)  : number of contour levels (less than or equal to
+                     dimension of C). The absolute value of this
+                     argument is used (for compatibility with PGCONT,
+                     where the sign of NC is significant).
+   TR     (input)  : array defining a transformation between the I,J
+                     grid of the array and the world coordinates. The
+                     world coordinates of the array point A(I,J) are
+                     given by:
+                       X = TR(1) + TR(2)*I + TR(3)*J
+                       Y = TR(4) + TR(5)*I + TR(6)*J
+                     Usually TR(3) and TR(5) are zero - unless the
+                     coordinate transformation involves a rotation
+                     or shear.
+1 PGCONT -- contour map of a 2D data array (contour-following)
+        SUBROUTINE PGCONT (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR)
+        INTEGER IDIM, JDIM, I1, J1, I2, J2, NC
+        REAL A(IDIM,JDIM), C(*), TR(6)
+   
+  Draw a contour map of an array.  The map is truncated if
+  necessary at the boundaries of the viewport.  Each contour line
+  is drawn with the current line attributes (color index, style, and
+  width); except that if argument NC is positive (see below), the line
+  style is set by PGCONT to 1 (solid) for positive contours or 2
+  (dashed) for negative contours.
+   
+  Arguments:
+   A      (input) : data array.
+   IDIM   (input) : first dimension of A.
+   JDIM   (input) : second dimension of A.
+   I1, I2 (input) : range of first index to be contoured (inclusive).
+   J1, J2 (input) : range of second index to be contoured (inclusive).
+   C      (input) : array of NC contour levels; dimension at least NC.
+   NC     (input) : +/- number of contour levels (less than or equal
+                    to dimension of C). If NC is positive, it is the
+                    number of contour levels, and the line-style is
+                    chosen automatically as described above. If NC is
+                    negative, it is minus the number of contour
+                    levels, and the current setting of line-style is
+                    used for all the contours.
+   TR     (input) : array defining a transformation between the I,J
+                    grid of the array and the world coordinates.
+                    The world coordinates of the array point A(I,J)
+                    are given by:
+                      X = TR(1) + TR(2)*I + TR(3)*J
+                      Y = TR(4) + TR(5)*I + TR(6)*J
+                    Usually TR(3) and TR(5) are zero - unless the
+                    coordinate transformation involves a rotation or
+                    shear.
+1 PGCONX -- contour map of a 2D data array (non-rectangular)
+        SUBROUTINE PGCONX (A, IDIM, JDIM, I1, I2, J1, J2, C, NC, PLOT)
+        INTEGER  IDIM, JDIM, I1, J1, I2, J2, NC
+        REAL     A(IDIM,JDIM), C(*)
+        EXTERNAL PLOT
+   
+  Draw a contour map of an array using a user-supplied plotting
+  routine.  This routine should be used instead of PGCONT when the
+  data are defined on a non-rectangular grid.  PGCONT permits only
+  a linear transformation between the (I,J) grid of the array
+  and the world coordinate system (x,y), but PGCONX permits any
+  transformation to be used, the transformation being defined by a
+  user-supplied subroutine. The nature of the contouring algorithm,
+  however, dictates that the transformation should maintain the
+  rectangular topology of the grid, although grid-points may be
+  allowed to coalesce.  As an example of a deformed rectangular
+  grid, consider data given on the polar grid theta=0.1n(pi/2),
+  for n=0,1,...,10, and r=0.25m, for m=0,1,..,4. This grid
+  contains 55 points, of which 11 are coincident at the origin.
+  The input array for PGCONX should be dimensioned (11,5), and
+  data values should be provided for all 55 elements.  PGCONX can
+  also be used for special applications in which the height of the
+  contour affects its appearance, e.g., stereoscopic views.
+   
+  The map is truncated if necessary at the boundaries of the viewport.
+  Each contour line is drawn with the current line attributes (color
+  index, style, and width); except that if argument NC is positive
+  (see below), the line style is set by PGCONX to 1 (solid) for
+  positive contours or 2 (dashed) for negative contours. Attributes
+  for the contour lines can also be set in the user-supplied
+  subroutine, if desired.
+   
+  Arguments:
+   A      (input) : data array.
+   IDIM   (input) : first dimension of A.
+   JDIM   (input) : second dimension of A.
+   I1, I2 (input) : range of first index to be contoured (inclusive).
+   J1, J2 (input) : range of second index to be contoured (inclusive).
+   C      (input) : array of NC contour levels; dimension at least NC.
+   NC     (input) : +/- number of contour levels (less than or equal
+                    to dimension of C). If NC is positive, it is the
+                    number of contour levels, and the line-style is
+                    chosen automatically as described above. If NC is
+                    negative, it is minus the number of contour
+                    levels, and the current setting of line-style is
+                    used for all the contours.
+   PLOT   (input) : the address (name) of a subroutine supplied by
+                    the user, which will be called by PGCONX to do
+                    the actual plotting. This must be declared
+                    EXTERNAL in the program unit calling PGCONX.
+   
+  The subroutine PLOT will be called with four arguments:
+       CALL PLOT(VISBLE,X,Y,Z)
+  where X,Y (input) are real variables corresponding to
+  I,J indices of the array A. If  VISBLE (input, integer) is 1,
+  PLOT should draw a visible line from the current pen
+  position to the world coordinate point corresponding to (X,Y);
+  if it is 0, it should move the pen to (X,Y). Z is the value
+  of the current contour level, and may be used by PLOT if desired.
+  Example:
+        SUBROUTINE PLOT (VISBLE,X,Y,Z)
+        REAL X, Y, Z, XWORLD, YWORLD
+        INTEGER VISBLE
+        XWORLD = X*COS(Y) ! this is the user-defined
+        YWORLD = X*SIN(Y) ! transformation
+        IF (VISBLE.EQ.0) THEN
+            CALL PGDRAW (XWORLD, YWORLD)
+        ELSE
+            CALL PGMOVE (XWORLD, YWORLD)
+        END IF
+        END
+1 PGCURSE -- read cursor position
+        INTEGER FUNCTION PGCURSE (X, Y, CH)
+        REAL X, Y
+        CHARACTER*1 CH
+   
+  Read the cursor position and a character typed by the user.
+  The position is returned in world coordinates.  PGCURSE positions
+  the cursor at the position specified, allows the user to move the
+  cursor using the joystick or arrow keys or whatever is available on
+  the device. When he has positioned the cursor, the user types a
+  single character on the keyboard; PGCURSE then returns this
+  character and the new cursor position (in world coordinates).
+   
+  Returns:
+   PGCURSE         : 1 if the call was successful; 0 if the device
+                     has no cursor or some other error occurs.
+  Arguments:
+   X      (in/out) : the world x-coordinate of the cursor.
+   Y      (in/out) : the world y-coordinate of the cursor.
+   CH     (output) : the character typed by the user; if the device has
+                     no cursor or if some other error occurs, the value
+                     CHAR(0) [ASCII NUL character] is returned.
+   
+  Note: The cursor coordinates (X,Y) may be changed by PGCURSE even if
+  the device has no cursor or if the user does not move the cursor.
+  Under these circumstances, the position returned in (X,Y) is that of
+  the pixel nearest to the requested position.
+1 PGDRAW -- draw a line from the current pen position to a point
+        SUBROUTINE PGDRAW (X, Y)
+        REAL X, Y
+   
+  Draw a line from the current pen position to the point
+  with world-coordinates (X,Y). The line is clipped at the edge of the
+  current window. The new pen position is (X,Y) in world coordinates.
+   
+  Arguments:
+   X      (input)  : world x-coordinate of the end point of the line.
+   Y      (input)  : world y-coordinate of the end point of the line.
+1 PGEBUF -- end batch of output (buffer)
+        SUBROUTINE PGEBUF
+   
+  A call to PGEBUF marks the end of a batch of graphical output begun
+  with the last call of PGBBUF.  PGBBUF and PGEBUF calls should always
+  be paired. Each call to PGBBUF increments a counter, while each call
+  to PGEBUF decrements the counter. When the counter reaches 0, the
+  batch of output is written on the output device.
+   
+  Arguments: none
+1 PGEND -- terminate PGPLOT
+        SUBROUTINE PGEND
+   
+  Terminate PGPLOT, close the plot file, release the graphics
+  device.  If the call to PGEND is omitted, some or all of the plot
+  may be lost. If the environment parameter PGPLOT_IDENT is defined 
+  (with any value), and the device is a hardcopy device, an
+  identifying label is written on the plot (by calling PGIDEN: q.v.).
+   
+  Arguments: none
+1 PGENV -- set window and viewport and draw labeled frame
+        SUBROUTINE PGENV (XMIN, XMAX, YMIN, YMAX, JUST, AXIS)
+        REAL XMIN, XMAX, YMIN, YMAX
+        INTEGER JUST, AXIS
+   
+  Set PGPLOT "Plotter Environment".  PGENV establishes the scaling
+  for subsequent calls to PGPOINT, PGLINE, etc.  The plotter is
+  advanced to a new (sub-)page, clearing the screen if necessary.
+  If the "prompt state" is ON (see PGASK), confirmation
+  is requested from the user before clearing the screen.
+  If requested, a box, axes, labels, etc. are drawn according to
+  the setting of argument AXIS.
+   
+  Arguments:
+   XMIN   (input)  : the world x-coordinate at the bottom left corner
+                     of the viewport.
+   XMAX   (input)  : the world x-coordinate at the top right corner
+                     of the viewport (note XMAX may be less than XMIN).
+   YMIN   (input)  : the world y-coordinate at the bottom left corner
+                     of the viewport.
+   YMAX   (input)  : the world y-coordinate at the top right corner
+                     of the viewport (note YMAX may be less than YMIN).
+   JUST   (input)  : if JUST=1, the scales of the x and y axes (in
+                     world coordinates per inch) will be equal,
+                     otherwise they will be scaled independently.
+   AXIS   (input)  : controls the plotting of axes, tick marks, etc:
+       AXIS = -2 : draw no box, axes or labels;
+       AXIS = -1 : draw box only;
+       AXIS =  0 : draw box and label it with coordinates;
+       AXIS =  1 : same as AXIS=0, but also draw the
+                   coordinate axes (X=0, Y=0);
+       AXIS =  2 : same as AXIS=1, but also draw grid lines
+                   at major increments of the coordinates;
+       AXIS = 10 : draw box and label X-axis logarithmically;
+       AXIS = 20 : draw box and label Y-axis logarithmically;
+       AXIS = 30 : draw box and label both axes logarithmically.
+   
+  For other axis options, use routine PGBOX. PGENV can be pursuaded to
+  call PGBOX with additional axis options by defining an environment
+  parameter PGPLOT_ENVOPT containing the required option codes. 
+  Examples:
+    PGPLOT_ENVOPT=P      ! draw Projecting tick marks
+    PGPLOT_ENVOPT=I      ! Invert the tick marks
+    PGPLOT_ENVOPT=IV     ! Invert tick marks and label y Vertically
+1 PGERRX -- horizontal error bar
+        SUBROUTINE PGERRX (N, X1, X2, Y, T)
+        INTEGER N
+        REAL X1(*), X2(*), Y(*)
+        REAL T
+   
+  Plot horizontal error bars.
+  This routine draws an error bar only; to mark the data point in
+  the middle of the error bar, an additional call to PGPOINT or
+  PGERRY is required.
+   
+  Arguments:
+   N      (input)  : number of error bars to plot.
+   X1     (input)  : world x-coordinates of lower end of the
+                     error bars.
+   X2     (input)  : world x-coordinates of upper end of the
+                     error bars.
+   Y      (input)  : world y-coordinates of the data.
+   T      (input)  : length of terminals to be drawn at the ends
+                     of the error bar, as a multiple of the default
+                     length; if T = 0.0, no terminals will be drawn.
+   
+  Note: the dimension of arrays X1, X2, and Y must be greater
+  than or equal to N. If N is 1, X1, X2, and Y may be scalar
+  variables, or expressions, eg:
+        CALL PGERRX(1,X-SIGMA,X+SIGMA,Y)
+1 PGERRY -- vertical error bar
+        SUBROUTINE PGERRY (N, X, Y1, Y2, T)
+   
+  Plot vertical error bars.
+  This routine draws an error bar only; to mark the data point in
+  the middle of the error bar, an additional call to PGPOINT or
+  PGERRX is required.
+   
+  Arguments:
+   N      (input)  : number of error bars to plot.
+   X      (input)  : world x-coordinates of the data.
+   Y1     (input)  : world y-coordinates of top end of the
+                     error bars.
+   Y2     (input)  : world y-coordinates of bottom end of the
+                     error bars.
+   T      (input)  : length of terminals to be drawn at the ends
+                     of the error bar, as a multiple of the default
+                     length; if T = 0.0, no terminals will be drawn.
+   
+  Note: the dimension of arrays X, Y1, and Y2 must be greater
+  than or equal to N. If N is 1, X, Y1, and Y2 may be scalar
+  variables or expressions, eg:
+        CALL PGERRY(1,X,Y+SIGMA,Y-SIGMA)
+1 PGETXT -- erase text from graphics display
+        SUBROUTINE PGETXT
+   
+  Some graphics terminals display text (the normal interactive dialog)
+  on the same screen as graphics. This routine erases the text from the
+  view surface without affecting the graphics. It does nothing on
+  devices which do not display text on the graphics screen, and on
+  devices which do not have this capability.
+   
+  Arguments:
+   None
+1 PGFUNT -- function defined by X = F(T), Y = G(T)
+        SUBROUTINE PGFUNT (FX, FY, N, TMIN, TMAX, PGFLAG)
+        REAL FX, FY
+        INTEGER N
+        REAL TMIN, TMAX
+        INTEGER PGFLAG
+   
+  Draw a curve defined by parametric equations X = FX(T), Y = FY(T).
+   
+  Arguments:
+   FX     (external real function): supplied by the user, evaluates
+                     X-coordinate.
+   FY     (external real function): supplied by the user, evaluates
+                     Y-coordinate.
+   N      (input)  : the number of points required to define the
+                     curve. The functions FX and FY will each be
+                     called N+1 times.
+   TMIN   (input)  : the minimum value for the parameter T.
+   TMAX   (input)  : the maximum value for the parameter T.
+   PGFLAG (input)  : if PGFLAG = 1, the curve is plotted in the
+                     current window and viewport; if PGFLAG = 0,
+                     PGENV is called automatically by PGHIST to
+                     start a new plot with automatic scaling.
+   
+  Note: The functions FX and FY must be declared EXTERNAL in the
+  Fortran program unit that calls PGFUNT.
+1 PGFUNX -- function defined by Y = F(X)
+        SUBROUTINE PGFUNX (FY, N, XMIN, XMAX, PGFLAG)
+        REAL FY
+        INTEGER N
+        REAL XMIN, XMAX
+        INTEGER PGFLAG
+   
+  Draw a curve defined by the equation Y = FY(X), where FY is a
+  user-supplied subroutine.
+   
+  Arguments:
+   FY     (external real function): supplied by the user, evaluates
+                     Y value at a given X-coordinate.
+   N      (input)  : the number of points required to define the
+                     curve. The function FY will be called N+1 times.
+                     If PGFLAG=0 and N is greater than 1000, 1000
+                     will be used instead.  If N is less than 1,
+                     nothing will be drawn.
+   XMIN   (input)  : the minimum value of X.
+   XMAX   (input)  : the maximum value of X.
+   PGFLAG (input)  : if PGFLAG = 1, the curve is plotted in the
+                     current window and viewport; if PGFLAG = 0,
+                     PGENV is called automatically by PGHIST to
+                     start a new plot with X limits (XMIN, XMAX)
+                     and automatic scaling in Y.
+   
+  Note: The function FY must be declared EXTERNAL in the Fortran
+  program unit that calls PGFUNT.  It has one argument, the
+  x-coordinate at which the y value is required, e.g.
+    REAL FUNCTION FY(X)
+    REAL X
+    FY = .....
+    END
+1 PGFUNY -- function defined by X = F(Y)
+        SUBROUTINE PGFUNY (FX, N, YMIN, YMAX, PGFLAG)
+        REAL    FX
+        INTEGER N
+        REAL    YMIN, YMAX
+        INTEGER PGFLAG
+   
+  Draw a curve defined by the equation X = FX(Y), where FY is a
+  user-supplied subroutine.
+   
+  Arguments:
+   FX     (external real function): supplied by the user, evaluates
+                     X value at a given Y-coordinate.
+   N      (input)  : the number of points required to define the
+                     curve. The function FX will be called N+1 times.
+                     If PGFLAG=0 and N is greater than 1000, 1000
+                     will be used instead.  If N is less than 1,
+                     nothing will be drawn.
+   YMIN   (input)  : the minimum value of Y.
+   YMAX   (input)  : the maximum value of Y.
+   PGFLAG (input)  : if PGFLAG = 1, the curve is plotted in the
+                     current window and viewport; if PGFLAG = 0,
+                     PGENV is called automatically by PGHIST to
+                     start a new plot with Y limits (YMIN, YMAX)
+                     and automatic scaling in X.
+   
+  Note: The function FX must be declared EXTERNAL in the Fortran
+  program unit that calls PGFUNT.  It has one argument, the
+  y-coordinate at which the x value is required, e.g.
+    REAL FUNCTION FX(Y)
+    REAL Y
+    FX = .....
+    END
+1 PGGRAY -- gray-scale map of a 2D data array
+        SUBROUTINE PGGRAY (A, IDIM, JDIM, I1, I2, J1, J2,
+       1                   FG, BG, TR)
+        INTEGER IDIM, JDIM, I1, I2, J1, J2
+        REAL    A(IDIM,JDIM)
+        REAL    FG, BG
+        REAL TR(6)
+   
+  Draw gray-scale map of an array in current window. The subsection
+  of the array A defined by indices (I1:I2, J1:J2) is mapped onto
+  the view surface world-coordinate system by the transformation
+  matrix TR. The resulting quadrilateral region is clipped at the edge
+  of the window and shaded with the shade at each point determined
+  by the corresponding array value.  The shade is a number in the
+  range 0 to 1 obtained by linear interpolation between the background
+  level (BG) and the foreground level (FG), i.e.,
+   
+    shade = [A(i,j) - BG] / [FG - BG]
+   
+  The background level BG can be either less than or greater than the
+  foreground level FG.  Points in the array that are outside the range
+  BG to FG are assigned shade 0 or 1 as appropriate.
+   
+  The algorithm used by PGGRAY is device-dependent.  On devices
+  that have only two color indices (0 and 1), the background color
+  is the color assigned to color index 0, the foreground color
+  is the color assigned to color index 1, and PGGRAY uses a
+  "dithering" algorithm to fill in pixels in the two colors, with
+  the shade (computed as above) determining the faction of pixels
+  that are assigned color index 1.
+   
+  On devices that have more than 16 color indices, PGGRAY may use
+  color indices outside the range 0-15 to provide more than two
+  gray shades.  Note that PGGRAY may change the color representation
+  of these color indices, but it will not change the representation
+  of indices 0-15.
+   
+  On most devices, the shaded region is "opaque", i.e., it obscures
+  all graphical elements previously drawn in the region. But on
+  devices that do not have erase capability, the background shade
+  is "transparent" and allows previously-drawn graphics to show
+  through.
+   
+  The transformation matrix TR is used to calculate the world
+  coordinates of the center of the "cell" that represents each
+  array element. The world coordinates of the center of the cell
+  corresponding to array element A(I,J) are given by:
+   
+           X = TR(1) + TR(2)*I + TR(3)*J
+           Y = TR(4) + TR(5)*I + TR(6)*J
+   
+  Usually TR(3) and TR(5) are zero -- unless the coordinate
+  transformation involves a rotation or shear.  The corners of the
+  quadrilateral region that is shaded by PGGRAY are given by
+  applying this transformation to (I1-0.5,J1-0.5), (I2+0.5, J2+0.5).
+   
+  Arguments:
+   A      (input)  : the array to be plotted.
+   IDIM   (input)  : the first dimension of array A.
+   JDIM   (input)  : the second dimension of array A.
+   I1, I2 (input)  : the inclusive range of the first index
+                     (I) to be plotted.
+   J1, J2 (input)  : the inclusive range of the second
+                     index (J) to be plotted.
+   FG     (input)  : the array value which is to appear with shade
+                     1 ("foreground").
+   BG     (input)  : the array value which is to appear with shade
+                     0 ("background").
+   TR     (input)  : transformation matrix between array grid and
+                     world coordinates.
+1 PGHI2D -- cross-sections through a 2D data array
+        SUBROUTINE PGHI2D (DATA, NXV, NYV, IX1, IX2, IY1, IY2, X, IOFF,
+       1                   BIAS, CENTER, YLIMS)
+        INTEGER NXV, NYV, IX1, IX2, IY1, IY2
+        REAL    DATA(NXV,NYV)
+        REAL    X(IX2-IX1+1), YLIMS(IX2-IX1+1)
+        INTEGER IOFF
+        REAL    BIAS
+        LOGICAL CENTER
+   
+  Plot a series of cross-sections through a 2D data array.
+  Each cross-section is plotted as a hidden line histogram.  The plot
+  can be slanted to give a pseudo-3D effect - if this is done, the
+  call to PGENV may have to be changed to allow for the increased X
+  range that will be needed.
+   
+  Arguments:
+   DATA   (input)  : the data array to be plotted.
+   NXV    (input)  : the first dimension of DATA.
+   NYV    (input)  : the second dimension of DATA.
+   IX1    (input)
+   IX2    (input)
+   IY1    (input)
+   IY2    (input)  : PGHI2D plots a subset of the input array DATA.
+                     This subset is delimited in the first (x)
+                     dimension by IX1 and IX2 and the 2nd (y) by IY1
+                     and IY2, inclusively. Note: IY2 < IY1 is
+                     permitted, resulting in a plot with the
+                     cross-sections plotted in reverse Y order.
+                     However, IX2 must be => IX1.
+   X      (input)  : the abscissae of the bins to be plotted. That is,
+                     X(1) should be the X value for DATA(IX1,IY1), and
+                     X should have (IX2-IX1+1) elements.  The program
+                     has to assume that the X value for DATA(x,y) is
+                     the same for all y.
+   IOFF   (input)  : an offset in array elements applied to successive
+                     cross-sections to produce a slanted effect.  A
+                     plot with IOFF > 0 slants to the right, one with
+                     IOFF < 0 slants left.
+   BIAS   (input)  : a bias value applied to each successive cross-
+                     section in order to raise it above the previous
+                     cross-section.  This is in the same units as the
+                     data.
+   CENTER (input)  : if .true., the X values denote the center of the
+                     bins; if .false. the X values denote the lower
+                     edges (in X) of the bins.
+   YLIMS  (input)  : workspace.  Should be an array of at least
+                     (IX2-IX1+1) elements.
+1 PGHIST -- histogram of unbinned data
+        SUBROUTINE PGHIST (N, DATA, DATMIN, DATMAX, NBIN, PGFLAG)
+        INTEGER N
+        REAL    DATA(*)
+        REAL    DATMIN, DATMAX
+        INTEGER NBIN, PGFLAG
+   
+  Draw a histogram of N values of a variable in array
+  DATA(1...N) in the range DATMIN to DATMAX using NBIN bins.  Note
+  that array elements which fall exactly on the boundary between
+  two bins will be counted in the higher bin rather than the
+  lower one; and array elements whose value is less than DATMIN or
+  greater than or equal to DATMAX will not be counted at all.
+   
+  Arguments:
+   N      (input)  : the number of data values.
+   DATA   (input)  : the data values. Note: the dimension of array
+                     DATA must be greater than or equal to N. The
+                     first N elements of the array are used.
+   DATMIN (input)  : the minimum data value for the histogram.
+   DATMAX (input)  : the maximum data value for the histogram.
+   NBIN   (input)  : the number of bins to use: the range DATMIN to
+                     DATMAX is divided into NBIN equal bins and
+                     the number of DATA values in each bin is
+                     determined by PGHIST.  NBIN may not exceed 200.
+   PGFLAG (input)  : if PGFLAG = 1, the histogram is plotted in the
+                     current window and viewport; if PGFLAG = 0,
+                     PGENV is called automatically by PGHIST to start
+                     a new plot (the x-limits of the window will be
+                     DATMIN and DATMAX; the y-limits will be chosen
+                     automatically.
+1 PGIDEN -- write username, date, and time at bottom of plot
+        SUBROUTINE PGIDEN
+   
+  Write username, date, and time at bottom of plot.
+   
+  Arguments: none.
+1 PGLABEL -- write labels for x-axis, y-axis, and top of plot
+        SUBROUTINE PGLABEL (XLBL, YLBL, TOPLBL)
+        CHARACTER*(*) XLBL, YLBL, TOPLBL
+   
+  Write labels outside the viewport. This routine is a simple
+  interface to PGMTEXT, which should be used if PGLABEL is inadequate.
+   
+  Arguments:
+   XLBL   (input) : a label for the x-axis (centered below the
+                    viewport).
+   YLBL   (input) : a label for the y-axis (centered to the left
+                    of the viewport, drawn vertically).
+   TOPLBL (input) : a label for the entire plot (centered above the
+                    viewport).
+1 PGLCUR -- draw a line using the cursor
+        SUBROUTINE PGLCUR (MAXPT, NPT, X, Y)
+        INTEGER MAXPT, NPT
+        REAL    X(*), Y(*)
+   
+  Interactive routine for user to enter a polyline by use of
+  the cursor.  Routine allows user to Add and Delete vertices;
+  vertices are joined by straight-line segments.
+   
+  Arguments:
+   MAXPT  (input)  : maximum number of points that may be accepted.
+   NPT    (in/out) : number of points entered; should be zero on
+                     first call.
+   X      (in/out) : array of x-coordinates (dimension at least MAXPT).
+   Y      (in/out) : array of y-coordinates (dimension at least MAXPT).
+   
+  Notes:
+   
+  (1) On return from the program, cursor points are returned in
+  the order they were entered. Routine may be (re-)called with points
+  already defined in X,Y (# in NPT), and they will be plotted
+  first, before editing.
+   
+  (2) User commands: the user types single-character commands
+  after positioning the cursor: the following are accepted:
+    A (Add)    - add point at current cursor location.
+    D (Delete) - delete last-entered point.
+    X (eXit)   - leave subroutine.
+1 PGLDEV -- list available device types
+        SUBROUTINE PGLDEV
+   
+  Writes a list to the terminal of all device types known to the
+  current version of PGPLOT.
+   
+  Arguments: none.
+1 PGLEN -- Find length of a string in a variety of units
+      SUBROUTINE PGLEN (UNITS, STRING, XL, YL)
+      INTEGER UNITS
+      CHARACTER*(*) STRING
+      REAL XL, YL
+ 
+  Work out length of a string in x and y directions 
+ 
+  Input
+   UNITS    :  0 => answer in normalized device coordinates
+               1 => answer in inches
+               2 => answer in mm
+               3 => answer in absolute device coordinates (dots)
+               4 => answer in world coordinates
+               5 => answer as a fraction of the current viewport size
+   STRING   :  String of interest
+  Output
+   XL       :  Length of string in x direction
+   YL       :  Length of string in y direction
+1 PGLINE -- draw a polyline (curve defined by line-segments)
+        SUBROUTINE PGLINE (N, XPTS, YPTS)
+        INTEGER  N
+        REAL     XPTS(*), YPTS(*)
+   
+  Primitive routine to draw a Polyline. A polyline is one or more
+  connected straight-line segments.  The polyline is drawn using
+  the current setting of attributes color-index, line-style, and
+  line-width. The polyline is clipped at the edge of the window.
+   
+  Arguments:
+   N      (input)  : number of points defining the line; the line
+                     consists of (N-1) straight-line segments.
+                     N should be greater than 1 (if it is 1 or less,
+                     nothing will be drawn).
+   XPTS   (input)  : world x-coordinates of the points.
+   YPTS   (input)  : world y-coordinates of the points.
+   
+  The dimension of arrays X and Y must be greater than or equal to N.
+  The "pen position" is changed to (X(N),Y(N)) in world coordinates
+  (if N > 1).
+1 PGMOVE -- move pen (change current pen position)
+        SUBROUTINE PGMOVE (X, Y)
+        REAL X, Y
+   
+  Primitive routine to move the "pen" to the point with world
+  coordinates (X,Y). No line is drawn.
+   
+  Arguments:
+   X      (input)  : world x-coordinate of the new pen position.
+   Y      (input)  : world y-coordinate of the new pen position.
+1 PGMTEXT -- write text at position relative to viewport
+        SUBROUTINE PGMTEXT (SIDE, DISP, COORD, FJUST, TEXT)
+        CHARACTER*(*) SIDE, TEXT
+        REAL DISP, COORD, FJUST
+   
+  Write text at a position specified relative to the viewport (outside
+  or inside).  This routine is useful for annotating graphs. It is used
+  by routine PGLABEL.  The text is written using the current values of
+  attributes color-index, line-width, character-height, and
+  character-font.
+   
+  Arguments:
+   SIDE   (input)  : must include one of the characters 'B', 'L', 'T',
+                     or 'R' signifying the Bottom, Left, Top, or Right
+                     margin of the viewport. If it includes 'LV' or
+                     'RV', the string is written perpendicular to the
+                     frame rather than parallel to it.
+   DISP   (input)  : the displacement of the character string from the
+                     specified edge of the viewport, measured outwards
+                     from the viewport in units of the character
+                     height. Use a negative value to write inside the
+                     viewport, a positive value to write outside.
+   COORD  (input)  : the location of the character string along the
+                     specified edge of the viewport, as a fraction of
+                     the length of the edge.
+   FJUST  (input)  : controls justification of the string parallel to
+                     the specified edge of the viewport. If
+                     FJUST = 0.0, the left-hand end of the string will
+                     be placed at COORD; if JUST = 0.5, the center of
+                     the string will be placed at COORD; if JUST = 1.0,
+                     the right-hand end of the string will be placed at
+                     at COORD. Other values between 0 and 1 give inter-
+                     mediate placing, but they are not very useful.
+   TEXT   (input) :  the text string to be plotted. Trailing spaces are
+                     ignored when justifying the string, but leading
+                     spaces are significant.
+   
+1 PGNCURSE -- mark a set of points using the cursor
+        SUBROUTINE PGNCURSE (MAXPT, NPT, X, Y, SYMBOL)
+        INTEGER MAXPT, NPT
+        REAL    X(*), Y(*)
+        INTEGER SYMBOL
+   
+  Interactive routine for user to enter data points by use of
+  the cursor.  Routine allows user to Add and Delete points.  The
+  points are returned in order of increasing x-ccordinate, not in the
+  order they were entered.
+   
+  Arguments:
+   MAXPT  (input)  : maximum number of points that may be accepted.
+   NPT    (in/out) : number of points entered; should be zero on
+                     first call.
+   X      (in/out) : array of x-coordinates.
+   Y      (in/out) : array of y-coordinates.
+   SYMBOL (input)  : code number of symbol to use for marking
+                     entered points (see PGPOINT).
+   
+  Note (1): The dimension of arrays X and Y must be greater than or
+  equal to MAXPT.
+   
+  Note (2): On return from the program, cursor points are returned in
+  increasing order of X. Routine may be (re-)called with points
+  already defined in X,Y (number in NPT), and they will be plotted
+  first, before editing.
+   
+  Note (3): User commands: the user types single-character commands
+  after positioning the cursor: the following are accepted:
+  A (Add)    - add point at current cursor location.
+  D (Delete) - delete nearest point to cursor.
+  X (eXit)   - leave subroutine.
+1 PGNUMB -- convert a number into a plottable character string
+        SUBROUTINE PGNUMB (MM, PP, FORM, STRING, NC)
+        INTEGER MM, PP, FORM
+        CHARACTER*(*) STRING
+        INTEGER NC
+   
+  This routine converts a number into a decimal character
+  representation. To avoid problems of floating-point roundoff, the
+  number must be provided as an integer (MM) multiplied by a power of 10
+  (10**PP).  The output string retains only significant digits of MM,
+  and will be in either integer format (123), decimal format (0.0123),
+  or exponential format (1.23x10**5). Standard escape sequences \u, \d 
+  raise the exponent and \\ is used for the multiplication sign.
+  This routine is used by PGBOX to create numeric labels for a plot.
+   
+  Formatting rules:
+    (a) Decimal notation (FORM=1):
+        - Trailing zeros to the right of the decimal sign are
+          omitted
+        - The decimal sign is omitted if there are no digits
+          to the right of it
+        - When the decimal sign is placed before the first digit
+          of the number, a zero is placed before the decimal sign
+        - The decimal sign is a period (.)
+        - No spaces are placed between digits (ie digits are not
+          grouped in threes as they should be)
+        - A leading minus (-) is added if the number is negative
+    (b) Exponential notation (FORM=2):
+        - The exponent is adjusted to put just one (non-zero)
+          digit before the decimal sign
+        - The mantissa is formatted as in (a), unless its value is
+          1 in which case it and the multiplication sign are omitted
+        - If the power of 10 is not zero and the mantissa is not
+          zero, an exponent of the form \\10\u[-]nnn is appended,
+          where \\ is a multiplication sign (cross), \u is an escape
+          sequence to raise the exponent, and as many digits nnn
+          are used as needed
+    (c) Automatic choice (FORM=0):
+          Decimal notation is used if the absolute value of the
+          number is less than 10000 or greater than or equal to
+          0.01. Otherwise exponential notation is used.
+   
+  Arguments:
+   MM     (input)
+   PP     (input)  : the value to be formatted is MM*10**PP.
+   FORM   (input)  : controls how the number is formatted:
+                     FORM = 0 -- use either decimal or exponential
+                     FORM = 1 -- use decimal notation
+                     FORM = 2 -- use exponential notation
+   STRING (output) : the formatted character string, left justified.
+                     If the length of STRING is insufficient, a single
+                     asterisk is returned, and NC=1.
+   NC     (output) : the number of characters used in STRING:
+                     the string to be printed is STRING(1:NC).
+1 PGOLIN -- mark a set of points using the cursor
+        SUBROUTINE PGOLIN (MAXPT, NPT, X, Y, SYMBOL)
+        INTEGER MAXPT, NPT
+        REAL    X(*), Y(*)
+        INTEGER SYMBOL
+   
+  Interactive routine for user to enter data points by use of
+  the cursor.  Routine allows user to Add and Delete points.  The
+  points are returned in the order that they were entered (unlike
+  PGNCURSE).
+   
+  Arguments:
+   MAXPT  (input)  : maximum number of points that may be accepted.
+   NPT    (in/out) : number of points entered; should be zero on
+                     first call.
+   X      (in/out) : array of x-coordinates.
+   Y      (in/out) : array of y-coordinates.
+   SYMBOL (input)  : code number of symbol to use for marking
+                     entered points (see PGPOINT).
+   
+  Note (1): The dimension of arrays X and Y must be greater than or
+  equal to MAXPT.
+   
+  Note (2): On return from the program, cursor points are returned in
+  the order they were entered. Routine may be (re-)called with points
+  already defined in X,Y (number in NPT), and they will be plotted
+  first, before editing.
+   
+  Note (3): User commands: the user types single-character commands
+  after positioning the cursor: the following are accepted:
+  A (Add)    - add point at current cursor location.
+  D (Delete) - delete the last point entered.
+  X (eXit)   - leave subroutine.
+1 PGPAGE -- advance to new page
+        SUBROUTINE PGPAGE
+   
+  Advance plotter to a new (sub-)page, clearing the screen if
+  necessary. If the "prompt state" is ON (see PGASK), confirmation is
+  requested from the user before clearing the screen.  For an
+  explanation of sub-pages, see PGBEGIN.  PGPAGE does not change the
+  window or the position of the viewport relative to the (sub-)page.
+   
+  Arguments: none
+1 PGPAPER -- change the size of the view surface
+        SUBROUTINE PGPAPER (WIDTH, ASPECT)
+        REAL WIDTH, ASPECT
+   
+  This routine changes the size of the view surface to a specified
+  width and aspect ratio (height/width), in so far as this is possible
+  on the specific device. If this routine is used, it must be called
+  immediately after PGBEGIN.
+   
+  Arguments:
+   WIDTH  (input)  : the requested width of the view surface in inches;
+                     if WIDTH=0.0, or if the device is an interactive
+                     device, PGPAPER will obtain the largest view
+                     surface available consistent with argument ASPECT.
+   ASPECT (input)  : the aspect ratio (height/width) of the view
+                     surface; e.g., ASPECT=1.0 gives a square view
+                     surface, ASPECT=0.618 gives a horizontal
+                     rectangle, ASPECT=1.618 gives a vertical rectangle.
+1 PGPOINT -- draw one or more graph markers
+        SUBROUTINE PGPOINT (N, XPTS, YPTS, SYMBOL)
+        INTEGER N
+        REAL XPTS(*), YPTS(*)
+        INTEGER SYMBOL
+   
+  Primitive routine to draw Graph Markers (polymarker). The markers
+  are drawn using the current values of attributes color-index,
+  line-width, and character-height (character-font applies if the symbol
+  number is >31).  If the point to be marked lies outside the window,
+  no marker is drawn.  The "pen position" is changed to
+  (XPTS(N),YPTS(N)) in world coordinates (if N > 0).
+   
+  Arguments:
+   N      (input)  : number of points to mark.
+   XPTS   (input)  : world x-coordinates of the points.
+   YPTS   (input)  : world y-coordinates of the points.
+   SYMBOL (input)  : code number of the symbol to be plotted at each
+                     point; if it is negative, a single dot is plotted.
+                     Standard marker symbol numbers are 0 to 31; higher
+                     numbers (32 to 127) represent ASCII characters;
+                     e.g. to use letter F as a marker, let
+                     SYMBOL = ICHAR('F'). If the number is greater
+                     than 127, it is assumed to be a Hershey symbol
+                     number.
+   
+  Note: the dimension of arrays X and Y must be greater than or equal
+  to N. If N is 1, X and Y may be scalars (constants or variables). If
+  N is less than 1, nothing is drawn.
+1 PGPOLY -- fill a polygonal area with shading
+        SUBROUTINE PGPOLY (N, XPTS, YPTS)
+        INTEGER N
+        REAL XPTS(*), YPTS(*)
+   
+  Fill-area primitive routine: shade the interior of a closed
+  polygon in the current window.  The action of this routine depends
+  on the setting of the Fill-Area Style attribute. If Fill-Area Style
+  is SOLID (the default), the interior of the polygon is solid-filled
+  using the current Color Index. If Fill-Area Style is HOLLOW, the
+  outline of the polygon is drwan using the current line attributes
+  (color index, line-style, and line-width). Other values of the Fill-
+  Area attribute may be allowed in future, e.g., for shading with
+  patterns or hatching. The polygon is clipped at the edge of the
+  window. The pen position is changed to (XPTS(1),YPTS(1)) in world
+  coordinates (if N > 1).  If the polygon is not convex, a point is
+  assumed to lie inside the polygon if a straight line drawn to
+  infinity intersects and odd number of the polygon's edges.
+   
+  Arguments:
+   N      (input)  : number of points defining the polygon; the
+                     line consists of N straight-line segments,
+                     joining points 1 to 2, 2 to 3,... N-1 to N, N to 1.
+                     N should be greater than 2 (if it is 2 or less,
+                     nothing will be drawn).
+   XPTS   (input)  : world x-coordinates of the vertices.
+   YPTS   (input)  : world y-coordinates of the vertices.
+                     Note: the dimension of arrays XPTS and YPTS must be
+                     greater than or equal to N.
+1 PGPTEXT -- write text at arbitrary position and angle
+        SUBROUTINE PGPTEXT (X, Y, ANGLE, FJUST, TEXT)
+        REAL X, Y, ANGLE, FJUST
+        CHARACTER*(*) TEXT
+   
+  Primitive routine for drawing text. The text may be drawn at any
+  angle with the horizontal, and may be centered or left- or right-
+  justified at a specified position.  Routine PGTEXT provides a
+  simple interface to PGPTEXT for horizontal strings. Text is drawn
+  using the current values of attributes color-index, line-width,
+  character-height, and character-font.  Text is NOT subject to
+  clipping at the edge of the window.
+   
+  Arguments:
+   X      (input)  : world x-coordinate.
+   Y      (input)  : world y-coordinate. The string is drawn with the
+                     baseline of all the characters passing through
+                     point (X,Y); the positioning of the string along
+                     this line is controlled by argument FJUST.
+   ANGLE  (input)  : angle, in degrees, that the baseline is to make
+                     with the horizontal, increasing counter-clockwise
+                     (0.0 is horizontal).
+   FJUST  (input)  : controls horizontal justification of the string.
+                     If FJUST = 0.0, the string will be left-justified
+                     at the point (X,Y); if FJUST = 0.5, it will be
+                     centered, and if FJUST = 1.0, it will be right
+                     justified. [Other values of FJUST give other
+                     justifications.]
+   TEXT   (input)  : the character string to be plotted.
+1 PGQCF -- inquire character font
+        SUBROUTINE PGQCF (IF)
+        INTEGER  IF
+   
+  Query the current Character Font (set by routine PGSCF).
+   
+  Argument:
+   IF     (output)   : the current font number (in range 1-4).
+1 PGQCH -- inquire character height
+        SUBROUTINE PGQCH (SIZE)
+        REAL SIZE
+   
+  Query the Character Size attribute (set by routine PGSCH).
+   
+  Argument:
+   SIZE   (output) : current character size (dimensionless multiple of
+                     the default size).
+1 PGQCI -- inquire color index
+        SUBROUTINE PGQCI (CI)
+        INTEGER  CI
+   
+  Query the Color Index attribute (set by routine PGSCI).
+   
+  Argument:
+   CI     (output) : the current color index (in range 0-max). This is
+                     the color index actually in use, and may differ
+                     from the color index last requested by PGSCI if
+                     that index is not available on the output device.
+1 PGQCOL -- inquire color capability
+        SUBROUTINE PGQCOL (CI1, CI2)
+        INTEGER  CI1, CI2
+   
+  Query the range of color indices available on the current device.
+   
+  Argument:
+   CI1    (output) : the minimum available color index. This will be
+                     either 0 if the device can write in the
+                     background color, or 1 if not.
+   CI2    (output) : the maximum available color index. This will be
+                     1 if the device has no color capability, or a
+                     larger number (e.g., 3, 7, 15, 255).
+1 PGQCR -- inquire color representation
+  PGQCR: not yet available.
+1 PGQFS -- inquire fill-area style
+        SUBROUTINE PGQFS (FS)
+        INTEGER  FS
+   
+  Query the current Fill-Area Style attribute (set by routine
+  PGSFS).
+   
+  Argument:
+   FS     (output) : the current fill-area style:
+                       FS = 1 => solid (default)
+                       FS = 2 => hollow
+1 PGQINF -- inquire PGPLOT general information
+        SUBROUTINE PGQINF (ITEM, VALUE, LENGTH)
+        CHARACTER*(*) ITEM, VALUE
+        INTEGER LENGTH
+   
+  This routine can be used to obtain miscellaneous information about
+  the PGPLOT environment. Input is a character string defining the
+  information required, and output is a character string containing the
+  requested information.
+   
+  The following item codes are accepted (note that the strings must
+  match exactly, except for case, but only the first 8 characters are
+  significant). For items marked *, PGPLOT must be in the OPEN state
+  for the inquiry to succeed. If the inquiry is unsuccessful, either
+  because the item code is not recognized or because the information
+  is not available, a question mark ('?') is returned.
+   
+    'VERSION'     - version of PGPLOT software in use.
+    'STATE'       - status of PGPLOT ('OPEN' if a graphics device
+                    is open for output, 'CLOSED' otherwise).
+    'USER'        - the username associated with the calling program.
+    'NOW'         - current date and time (e.g., '17-FEB-1986 10:04').
+    'DEVICE'    * - current PGPLOT device or file.
+    'FILE'      * - current PGPLOT device or file.
+    'TYPE'      * - device-type of the current PGPLOT device.
+    'DEV/TYPE'  * - current PGPLOT device and type, in a form which
+                    is acceptable as an argument for PGBEGIN.
+    'HARDCOPY'  * - is the current device a hardcopy device? ('YES' or
+                    'NO').
+    'TERMINAL'  * - is the current device the user's interactive
+                    terminal? ('YES' or 'NO').
+    'CURSOR'    * - does the current device have a graphics cursor?
+                    ('YES' or 'NO').
+   
+  Arguments:
+   ITEM  (input)  : character string defining the information to
+                    be returned; see above for a list of possible
+                    values.
+   VALUE (output) : returns a character-string containing the
+                    requested information.
+   LENGTH (output): the number of characters returned in VALUE
+                    (VALUE is padded with spaces to the length
+                    supplied).
+1 PGQLS -- inquire line style
+        SUBROUTINE PGQLS (LS)
+        INTEGER  LS
+   
+  Query the current Line Style attribute (set by routine PGSLS).
+   
+  Argument:
+   LS     (output) : the current line-style attribute (in range 1-5).
+1 PGQLW -- inquire line width
+        SUBROUTINE PGQLW (LW)
+        INTEGER  LW
+   
+  Query the current Line-Width attribute (set by routine PGSLW).
+   
+  Argument:
+   LW     (output)  : the line-width (in range 1-21).
+1 PGQVP -- inquire viewport size and position
+        SUBROUTINE PGQVP (UNITS, X1, X2, Y1, Y2)
+        INTEGER UNITS
+        REAL    X1, X2, Y1, Y2
+   
+  Inquiry routine to determine the current viewport setting.
+  The values returned may be normalized device coordinates, inches, mm,
+  or pixels, depending on the value of the input parameter CFLAG.
+   
+  Arguments:
+   UNITS  (input)  : used to specify the units of the output parameters:
+                     UNITS = 0 : normalized device coordinates
+                     UNITS = 1 : inches
+                     UNITS = 2 : millimeters
+                     UNITS = 3 : pixels
+                     Other values give an error message, and are
+                     treated as 0.
+   X1     (output) : the x-coordinate of the bottom left corner of the
+                     viewport.
+   X2     (output) : the x-coordinate of the top right corner of the
+                     viewport.
+   Y1     (output) : the y-coordinate of the bottom left corner of the
+                     viewport.
+   Y2     (output) : the y-coordinate of the top right corner of the
+                     viewport.
+1 PGQWIN -- inquire window boundary coordinates
+        SUBROUTINE PGQWIN (X1, X2, Y1, Y2)
+        REAL X1, X2, Y1, Y2
+   
+  Inquiry routine to determine the current window setting.
+  The values returned are world coordinates.
+   
+  Arguments:
+   X1     (output) : the x-coordinate of the bottom left corner
+                     of the window.
+   X2     (output) : the x-coordinate of the top right corner
+                     of the window.
+   Y1     (output) : the y-coordinate of the bottom left corner
+                     of the window.
+   Y2     (output) : the y-coordinate of the top right corner
+                     of the window.
+1 PGRECT -- draw a rectangle, using fill-area attributes
+        SUBROUTINE PGRECT (X1, X2, Y1, Y2)
+        REAL X1, X2, Y1, Y2
+   
+  This routine can be used instead of PGPOLY for the special case of
+  drawing a rectangle aligned with the coordinate axes; only two
+  vertices need be specified instead of four.  On most devices, it is
+  faster to use PGRECT than PGPOLY for drawing rectangles.  The
+  rectangle has vertices at (X1,Y1), (X1,Y2), (X2,Y2), and (X1,Y2).
+   
+  Arguments:
+   X1, X2 (input) : the horizontal range of the rectangle.
+   Y1, Y2 (input) : the vertical range of the rectangle.
+1 PGRND -- find the smallest "round" number greater than x
+        REAL FUNCTION PGRND (X, NSUB)
+        REAL X
+        INTEGER NSUB
+   
+  Rooutine to find the smallest "round" number larger than x, a
+  "round" number being 1, 2 or 5 times a power of 10. If X is negative,
+  PGRND(X) = -PGRND(ABS(X)). eg PGRND(8.7) = 10.0,
+  PGRND(-0.4) = -0.5.  If X is zero, the value returned is zero.
+  CThis routine is used by PGBOX for choosing  tick intervals.
+   
+  Returns:
+   PGRND         : the "round" number.
+  Arguments:
+   X      (input)  : the number to be rounded.
+   NSUB   (output) : a suitable number of subdivisions for
+                     subdividing the "nice" number: 2 or 5.
+1 PGRNGE -- choose axis limits
+        SUBROUTINE PGRNGE (X1, X2, XLO, XHI)
+        REAL X1, X2, XLO, XHI
+   
+  Choose plotting limits XLO and XHI which encompass the data
+  range X1 to X2.
+   
+  Arguments:
+   X1, X2 (input)  : the data range (X1<X2), ie, the min and max values
+                     to be plotted.
+   XLO
+   XHI    (output) : suitable values to use as the extremes of a graph
+                     axis (XLO <= X1, XHI >= X2).
+1 PGSCF -- set character font
+        SUBROUTINE PGSCF (IF)
+        INTEGER  IF
+   
+  Set the Character Font for subsequent text plotting. Four different
+  fonts are available:
+    1: (default) a simple single-stroke font ("normal" font)
+    2: roman font
+    3: italic font
+    4: script font
+  This call determines which font is in effect at the beginning of
+  each text string. The font can be changed (temporarily) within a text
+  string by using the escape sequences \fn, \fr, \fi, and \fs for fonts
+  1, 2, 3, and 4, respectively.
+   
+  Argument:
+   IF     (input)  : the font number to be used for subsequent text
+                     plotting (in range 1-4).
+1 PGSCH -- set character height
+        SUBROUTINE PGSCH (SIZE)
+        REAL SIZE
+   
+  Set the character size attribute. The size affects all text and graph
+  markers drawn later in the program. The default character size is
+  1.0, corresponding to a character height about 1/40 the height of
+  the view surface.  Changing the character size also scales the length
+  of tick marks drawn by PGBOX and terminals drawn by PGERRX and PGERRY.
+   
+  Argument:
+   SIZE   (input)  : new character size (dimensionless multiple of
+                     the default size).
+1 PGSCI -- set color index
+        SUBROUTINE PGSCI (CI)
+        INTEGER  CI
+   
+  Set the Color Index for subsequent plotting, if the output device
+  permits this. The default color index is 1, usually white on a black
+  background for video displays or black on a white background for
+  printer plots. The color index is an integer in the range 0 to a
+  device-dependent maximum. Color index 0 corresponds to the background
+  color; lines may be "erased" by overwriting them with color index 0
+  (if the device permits this).
+   
+  If the requested color index is not available on the selected device,
+  color index 1 will be substituted.
+   
+  The assignment of colors to color indices can be changed with
+  subroutine PGSCR (set color representation).  Color indices 0-15
+  have predefined color representations (see the PGPLOT manual), but
+  these may be changed with PGSCR.  Color indices above 15  have no
+  predefined representations: if these indices are used, PGSCR must
+  be called to define the representation.
+   
+  Argument:
+   CI     (input)  : the color index to be used for subsequent plotting
+                     on the current device (in range 0-max). If the
+                     index exceeds the device-dependent maximum, the
+                     default color index (1) is used.
+1 PGSCR -- set color representation
+        SUBROUTINE PGSCR (CI, CR, CG, CB)
+        INTEGER CI
+        REAL    CR, CG, CB
+   
+  Set color representation: i.e., define the color to be
+  associated with a color index.  Ignored for devices which do not
+  support variable color or intensity.  Color indices 0-15
+  have predefined color representations (see the PGPLOT manual), but
+  these may be changed with PGSCR.  Color indices 16-maximum have no
+  predefined representations: if these indices are used, PGSCR must
+  be called to define the representation. On monochrome output
+  devices (e.g. VT125 terminals with monochrome monitors), the
+  monochrome intensity is computed from the specified Red, Green, Blue
+  intensities as 0.30*R + 0.59*G + 0.11*B, as in US color television
+  systems, NTSC encoding.  Note that most devices do not have an
+  infinite range of colors or monochrome intensities available;
+  the nearest available color is used.  Examples: for black,
+  set CR=CG=CB=0.0; for white, set CR=CG=CB=1.0; for medium gray,
+  set CR=CG=CB=0.5; for medium yellow, set CR=CG=0.5, CB=0.0.
+   
+  Argument:
+   CI     (input)  : the color index to be defined, in the range 0-max.
+                     If the color index greater than the device
+                     maximum is specified, the call is ignored. Color
+                     index 0 applies to the background color.
+   CR     (input)  : red, green, and blue intensities,
+   CG     (input)    in range 0.0 to 1.0.
+   CB     (input)
+1 PGSFS -- set fill-area style
+        SUBROUTINE PGSFS (FS)
+        INTEGER  FS
+   
+  Set the Fill-Area Style attribute for subsequent area-fill by
+  PGPOLY.  At present only two styles are available: solid (fill
+  polygon with solid color of the current color-index), and hollow
+  (draw outline of polygon only, using current line attributes).
+   
+  Argument:
+   FS     (input)  : the fill-area style to be used for subsequent
+                     plotting:
+                       FS = 1 => solid (default)
+                       FS = 2 => hollow
+                     Other values give an error message and are
+                     treated as 2.
+1 PGSHLS -- set color representation using HLS system
+        SUBROUTINE PGSHLS (CI, CH, CL, CS)
+        INTEGER CI
+        REAL    CH, CL, CS
+   
+  Set color representation: i.e., define the color to be
+  associated with a color index.  This routine is equivalent to
+  PGSCR, but the color is defined in the Hue-Lightness-Saturation
+  model instead of the Red-Green-Blue model.
+   
+  Reference: SIGGRAPH Status Report of the Graphic Standards Planning
+  Committee, Computer Graphics, Vol.13, No.3, Association for
+  Computing Machinery, New York, NY, 1979.
+   
+  Argument:
+   CI     (input)  : the color index to be defined, in the range 0-max.
+                     If the color index greater than the device
+                     maximum is specified, the call is ignored. Color
+                     index 0 applies to the background color.
+   CH     (input)  : hue, in range 0.0 to 360.0.
+   CL     (input)  : lightness, in range 0.0 to 1.0.
+   CS     (input)  : saturation, in range 0.0 to 1.0.
+1 PGSLS -- set line style
+        SUBROUTINE PGSLS (LS)
+        INTEGER  LS
+   
+  Set the line style attribute for subsequent plotting. This
+  attribute affects line primitives only; it does not affect graph
+  markers, text, or area fill.
+  Five different line styles are available, with the following codes:
+  1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted),
+  5 (dash-dot-dot-dot). The default is 1 (normal full line).
+   
+  Argument:
+   LS     (input)  : the line-style code for subsequent plotting
+                     (in range 1-5).
+1 PGSLW -- set line width
+        SUBROUTINE PGSLW (LW)
+        INTEGER  LW
+   
+  Set the line-width attribute. This attribute affects lines, graph
+  markers, and text. Thick lines are generated by tracing each line
+  with multiple strokes offset in the direction perpendicular to the
+  line. The line width is specified by the number of strokes to be
+  used, which must be in the range 1-21. The actual line width
+  obtained depends on the device resolution.
+   
+  Argument:
+   LW     (input)  : the number of strokes to be used
+                     (in range 1-21).
+1 PGTBOX -- Draw a box and optionally write HH MM SS style numeric labelling
+
+      SUBROUTINE PGTBOX (XOPT, XTICKD, NXSUBD, YOPT, YTICKD, NYSUBD)
+      REAL XTICKD, YTICKD
+      INTEGER NXSUBD, NYSUBD
+      CHARACTER XOPT*(*), YOPT*(*)
+ 
+ Draw a box and optionally label one or both axes with HH MM SS style 
+ numeric labels (useful for time or RA - DEC plots). Should deal with 
+ axes that increase or decrease, and are positive or negative, or both.
+ If the HH MM SS labelling is desired, then PGWINDOW should have been
+ previously called with the extrema in SECONDS.
+ 
+ Inputs:
+  XOPT   :  X-options for PGBOX.  Same as for PGBOX plus 'Z' for time 
+            labelling, and 'F' means write only the last part of the
+            label for the first time tick on the axis.  E.g., if
+            the full first label is 17 42 34.4 then write only 34.4
+  YOPT   :  Y-options for PGBOX.  Same as for PGBOX plus 'Z' and 'F'
+  XTICKD :  X-axis major tick increment.  Use 0.0 to get default. 
+  YTICKD :  Y-axis major tick increment.  Use 0.0 to get default. 
+  NXSUB  :  Number of intervals for minor ticks on X-axis. Use 0 for default
+  NYSUB  :  Number of intervals for minor ticks on Y-axis. Use 0 for default
+1 PGTEXT -- write text (horizontal, left-justified)
+        SUBROUTINE PGTEXT (X, Y, TEXT)
+        REAL X, Y
+        CHARACTER*(*) TEXT
+   
+  Write text. The bottom left corner of the first character is placed
+  at the specified position, and the text is written horizontally.
+  This is a simplified interface to the primitive routine PGPTEXT.
+  For non-horizontal text, use PGPTEXT.
+   
+  Arguments:
+   X      (input)  : world x-coordinate of start of string.
+   Y      (input)  : world y-coordinate of start of string.
+   TEXT   (input)  : the character string to be plotted.
+1 PGUPDT -- update display
+        SUBROUTINE PGUPDT
+   
+  Update the graphics display: flush any pending commands to the
+  output device. This routine empties the buffer created by PGBBUF,
+  but it does not alter the PGBBUF/PGEBUF counter. The routine should
+  be called when it is essential that the display be completely up to
+  date (before interaction with the user, for example) but it is not
+  known if output is being buffered.
+   
+  Arguments: none
+1 PGVPORT -- set viewport (normalized device coordinates)
+        SUBROUTINE PGVPORT (XLEFT, XRIGHT, YBOT, YTOP)
+        REAL XLEFT, XRIGHT, YBOT, YTOP
+   
+  Change the size and position of the viewport, specifying
+  the viewport in normalized device coordinates.  Normalized
+  device coordinates run from 0 to 1 in each dimension. The
+  viewport is the rectangle on the view surface "through"
+  which one views the graph.  All the PG routines which plot lines
+  etc. plot them within the viewport, and lines are truncated at
+  the edge of the viewport (except for axes, labels etc drawn with
+  PGBOX or PGLABEL).  The region of world space (the coordinate
+  space of the graph) which is visible through the viewport is
+  specified by a call to PGWINDOW.  It is legal to request a
+  viewport larger than the view surface; only the part which
+  appears on the view surface will be plotted.
+   
+  Arguments:
+   XLEFT  (input)  : x-coordinate of left hand edge of viewport, in NDC.
+   XRIGHT (input)  : x-coordinate of right hand edge of viewport,
+                     in NDC.
+   YBOT   (input)  : y-coordinate of bottom edge of viewport, in NDC.
+   YTOP   (input)  : y-coordinate of top  edge of viewport, in NDC.
+1 PGVSIZE -- set viewport (inches)
+        SUBROUTINE PGVSIZE (XLEFT, XRIGHT, YBOT, YTOP)
+        REAL XLEFT, XRIGHT, YBOT, YTOP
+   
+  Change the size and position of the viewport, specifying
+  the viewport in physical device coordinates (inches).  The
+  viewport is the rectangle on the view surface "through"
+  which one views the graph.  All the PG routines which plot lines
+  etc. plot them within the viewport, and lines are truncated at
+  the edge of the viewport (except for axes, labels etc drawn with
+  PGBOX or PGLABEL).  The region of world space (the coordinate
+  space of the graph) which is visible through the viewport is
+  specified by a call to PGWINDOW.  It is legal to request a
+  viewport larger than the view surface; only the part which
+  appears on the view surface will be plotted.
+   
+  Arguments:
+   XLEFT  (input)  : x-coordinate of left hand edge of viewport, in
+                     inches from left edge of view surface.
+   XRIGHT (input)  : x-coordinate of right hand edge of viewport, in
+                     inches from left edge of view surface.
+   YBOT   (input)  : y-coordinate of bottom edge of viewport, in
+                     inches from bottom of view surface.
+   YTOP   (input)  : y-coordinate of top  edge of viewport, in inches
+                     from bottom of view surface.
+1 PGVSTAND -- set standard (default) viewport
+        SUBROUTINE PGVSTAND
+   
+  Define the viewport to be the standard viewport.  The standard
+  viewport is the full area of the view surface (or subpage),
+  less a margin of 4 character heights all round for labelling.
+  It thus depends on the current character size, set by PGSCH.
+   
+  Arguments: none.
+1 PGWINDOW -- set window
+        SUBROUTINE PGWINDOW (X1, X2, Y1, Y2)
+        REAL X1, X2, Y1, Y2
+   
+  Change the window in world coordinate space that is to be mapped on
+  to the viewport.  Usually PGWINDOW is called automatically by PGENV,
+  but it may be called directly by the user.
+   
+  Arguments:
+   X1     (input)  : the x-coordinate of the bottom left corner
+                     of the viewport.
+   X2     (input)  : the x-coordinate of the top right corner
+                     of the viewport (note X2 may be less than X1).
+   Y1     (input)  : the y-coordinate of the bottom left corner
+                     of the viewport.
+   Y2     (input)  : the y-coordinate of the top right corner
+                     of the viewport (note Y2 may be less than Y1).
+1 PGWNAD -- set window and adjust viewport to same aspect ratio
+        SUBROUTINE PGWNAD (X1, X2, Y1, Y2)
+        REAL X1, X2, Y1, Y2
+   
+  Change the window in world coordinate space that is to be mapped on
+  to the viewport, and simultaneously adjust the viewport so that the
+  world-coordinate scales are equal in x and y. The new viewport is
+  the largest one that can fit within the previously set viewport
+  while retaining the required aspect ratio.
+   
+  Arguments:
+   X1     (input)  : the x-coordinate of the bottom left corner
+                     of the viewport.
+   X2     (input)  : the x-coordinate of the top right corner
+                     of the viewport (note X2 may be less than X1).
+   Y1     (input)  : the y-coordinate of the bottom left corner
+                     of the viewport.
+   Y2     (input)  : the y-coordinate of the top right corner of the
+                     viewport (note Y2 may be less than Y1).

@@ -1,0 +1,50 @@
+!+
+!  Name:
+!     KEY_DEFINITIONS.LSE
+
+!  Purpose:
+!     Define keys for STARLSE.
+
+!  Description:
+!     This LSE procedure makes key definitions for STARLSE. Some of these are
+!     simply convenience keys for common functions. Others are defined to
+!     execute new functions written especially for STARLSE. A third set is to
+!     re-define keys to provide enhancements or fixups for the key's normal LSE
+!     definition.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     24-OCT-1991 (RFWS):
+!        Prologue added.
+!     {enter_further_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!.
+
+!  New facilities available via key definitions.
+      NEW KEY CTRL_A "ALIGN COMMENT"
+      NEW KEY CTRL_W "WHERE"
+      NEW KEY F14 "SB"
+      NEW KEY RS_KEY "COMMENT"
+      NEW KEY GOLD/C "FIX CONTINUATION"
+      NEW KEY GOLD/P "PB"
+
+!   Re-definitions of the "placeholder navigation" keys to perform automatic
+!   trailing comment alignment.
+      NEW KEY CTRL_N "NEXT PLACEHOLDER"
+      NEW KEY CTRL_P "PREVIOUS PLACEHOLDER"
+      NEW KEY CTRL_K "ERASE NEXT PLACEHOLDER"
+      NEW KEY GOLD/CTRL_K "RESTORE PLACEHOLDER"
+      NEW KEY CTRL_E "TPU STARLSE1_KEY_EXPAND"
+      NEW KEY GOLD/CTRL_E "DELETE EXPAND"
+
+!   Re-definition of the HELP/INDICATED key, so that the full screen width
+!   may be used for help text.
+!      NEW KEY GOLD/PF2 "HELP_INDICATED"

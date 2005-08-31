@@ -1,0 +1,3368 @@
+1 GACTM
+
+ CALL GACTM(trmin, xo, yo, dx, dy, phi, fx, fy, jcotyp , trmout)
+ 
+ Level  1a     Accumulate Transform Matrix
+ 
+Returns the segment transformation matrix trmout, which is an accumulation
+of the input transformation matrix trmin and the matrix represented
+by the fixed point (xo, yo), the shift vector (dx, dy), the rotation
+angle in radians phi and the scale factors fx and fy. The coordinate
+type to be used is specified by jcotyp.
+2 Parameters
+ 
+Input    trmin       REAL (3,2)  Input transformation matrix
+Input    xo          REAL        Fixed point coordinate (X)
+Input    yo          REAL        Fixed point coordinate (Y)
+Input    dx          REAL        Shift vector (X)
+Input    dy          REAL        Shift vector (Y)
+Input    phi         REAL        Rotation angle (in radians)
+Input    fx          REAL        Scale factor (X)
+Input    fy          REAL        Scale factor (Y)
+Input    jcotyp      ENUMERATED  Coordinate type switch:
+
+                     0   GWC     "World Coordinates (WC)"
+                     1   GNDC    "Normalized Device Coordinates (NDC)"
+Output   trmout      REAL (3,2)  Output transformation matrix
+1 GACWK
+
+ CALL GACWK(kwkid)
+ 
+ Level  0a     Activate Workstat
+ 
+Adds kwkid to list of active workstations and so causes subsequent
+GKS functions to be routed to it.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+1 GASGWK
+
+ CALL GASGWK(kwkid, ksegnm)
+ 
+ Level  2a     Associate Segment with Workstat
+ 
+Copies WISS segment ksegnm to workstation kwkid as if the workstation
+was active when the segment was created.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ksegnm      INTEGER     Segment name
+1 GCA
+
+ CALL GCA(px, py, qx, qy, lx, ly, mx, kcola)
+ 
+ Level  0a     Cell Array
+ 
+Draws the cell array kcola in the rectangle defined by (px,py) and
+(qx,qy); kcola has first dimension mx; the cell array has lx cells in
+X and ly cells in Y.
+2 Parameters
+ 
+Input    px          REAL        One corner of rectangle (X)
+Input    py          REAL        One corner of rectangle (Y)
+Input    qx          REAL        Other corner of rectangle (X)
+Input    qy          REAL        Other corner of rectangle (Y)
+Input    lx          INTEGER     Cell array dimension (X)
+Input    ly          INTEGER     Cell array dimension (Y)
+Input    mx          INTEGER     Actual first dimension of 2D array
+Input    kcola       INTEGER (*,*Colour index matrix
+1 GCLKS
+
+ CALL GCLKS()
+ 
+ Level  0a     Close GKS
+ 
+Ends a session using GKS.
+1 GCLRWK
+
+ CALL GCLRWK(kwkid, jclear)
+ 
+ Level  0a     Clear Workstat
+ 
+Performs all deferred actions on workstation kwkid and clear its display
+surface according to jclear.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    jclear      ENUMERATED  Flag controlling clearing of view surface:
+
+                     0   GCONDI  "view surface is cleared if necessary"
+                     1   GALWAY  "view surface is always cleared"
+1 GCLSG
+
+ CALL GCLSG()
+ 
+ Level  1a     Close Segment
+ 
+Closes the open segment; subsequent output is not stored in it.
+1 GCLWK
+
+ CALL GCLWK(kwkid)
+ 
+ Level  0a     Close Workstat
+ 
+Closes workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+1 GCRSG
+
+ CALL GCRSG(ksegnm)
+ 
+ Level  1a     Create Segment
+ 
+Starts a new segment called ksegnm; subsequent GKS output functions
+are added to it.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+1 GCSGWK
+
+ CALL GCSGWK(kwkid, ksegnm)
+ 
+ Level  2a     Copy Segment to Workstat
+ 
+Copies the primitives in WISS segment ksegnm to workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ksegnm      INTEGER     Segment name
+1 GDAWK
+
+ CALL GDAWK(kwkid)
+ 
+ Level  0a     Deactivate Workstat
+ 
+Removes kwkid from list of active workstation and so causes subsequent
+GKS functions to be ignored by it.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+1 GDSG
+
+ CALL GDSG(ksegnm)
+ 
+ Level  1a     Delete Segment
+ 
+Deletes segment ksegnm from all workstations that contain it.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+1 GDSGWK
+
+ CALL GDSGWK(kwkid, ksegnm)
+ 
+ Level  1a     Delete Segment from Workstat
+ 
+Deletes segment ksegnm from workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ksegnm      INTEGER     Segment name
+1 GECLKS
+
+ CALL GECLKS()
+ 
+ Level  0a     Emergency Close GKS
+ 
+Performs an emergency close of GKS. Any open segment is closed, all
+open workstations are updated, all active workstations are deactivated,
+all workstations are closed and GKS is closed.
+1 GERHND
+
+ CALL GERHND(kerrno, kfctid, kerrfl)
+ 
+ Level  0a     Error Handling
+ 
+This is the standard error handler routine which calls GERLOG. It can
+be replaced by a user-supplied routine with the same name and parameters
+error number kerrno, GKS function identification kfctid and error
+file kerrfl.
+2 Parameters
+ 
+Input    kerrno      INTEGER     Error number
+Input    kfctid      INTEGER     GKS function identifier
+Input    kerrfl      INTEGER     Error message file stream number
+1 GERLOG
+
+ CALL GERLOG(kerrno, kfctid, kerrfl)
+ 
+ Level  0a     Error Logging
+ 
+Logs the error kerrno, encountered in the GKS function with identification
+kfctid, in the specified error file kerrfl.
+2 Parameters
+ 
+Input    kerrno      INTEGER     Error number
+Input    kfctid      INTEGER     GKS function identifier
+Input    kerrfl      INTEGER     Error message file stream number
+1 GESC
+
+ CALL GESC(kescid, lescdr, escdr)
+ 
+ Level  0a     Escape
+ 
+Invokes non-standard action kescid on all appropriate workstations;
+escdr is a data record that further describes the action to be taken; at
+present no ESCAPE functions are implemented in gks.
+2 Parameters
+ 
+Input    kescid      INTEGER     Escape function identifier
+Input    lescdr      INTEGER     Length of ESCAPE data record
+Input    escdr       CHAR*80 (*) ESCAPE data record
+1 GEVTM
+
+ CALL GEVTM(xo, yo, dx, dy, phi, fx, fy, jcotyp , trmout)
+ 
+ Level  1a     Evaluate Transform Matrix
+ 
+Returns the transformation matrix trmout for the requested fixed point
+(xo, yo), shift vector (dx, dy), rotation angle in radians phi and
+the scale factors fx and fy. The coordinate type used is specified
+by jcotyp which can have the value GWC or GNDC.
+2 Parameters
+ 
+Input    xo          REAL        Fixed point coordinate (X)
+Input    yo          REAL        Fixed point coordinate (Y)
+Input    dx          REAL        Shift vector (X)
+Input    dy          REAL        Shift vector (Y)
+Input    phi         REAL        Rotation angle (in radians)
+Input    fx          REAL        Scale factor (X)
+Input    fy          REAL        Scale factor (Y)
+Input    jcotyp      ENUMERATED  Coordinate type switch:
+
+                     0   GWC     "World Coordinates (WC)"
+                     1   GNDC    "Normalized Device Coordinates (NDC)"
+Output   trmout      REAL (3,2)  Output transformation matrix
+1 GFA
+
+ CALL GFA(npoint, xa, ya)
+ 
+ Level  0a     Fill Area
+ 
+Draws the area defined by the npoint points (xa,ya) in a way determined
+by the current FILL AREA attributes.
+2 Parameters
+ 
+Input    npoint      INTEGER     Number of points
+Input    xa          REAL (*)    An X-coordinate array
+Input    ya          REAL (*)    A Y-coordinate array
+1 GGDP
+
+ CALL GGDP(npoint, xa, ya, kgdpid, lgdpdr, gdpdr)
+ 
+ Level  0a     General Drawing Primitive (GDP)
+ 
+Invokes the non-standard output function kgdpid with the npoint coordinate
+list (xasubi,yasubi) and data record gdpdr.
+2 Parameters
+ 
+Input    npoint      INTEGER     Number of points
+Input    xa          REAL (*)    An X-coordinate array
+Input    ya          REAL (*)    A Y-coordinate array
+Input    kgdpid      INTEGER     GDP identifier
+Input    lgdpdr      INTEGER     Length of GDP data record
+Input    gdpdr       CHAR*80 (*) GDP data record
+1 GGTITM
+
+ CALL GGTITM(kwkid , mftype, lmfdr)
+ 
+ Level  0a     Get Item type from GKSM
+ 
+Reads the metafile to discover the type of record (mftype) and the
+space required to read it in (lmfdr)
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Output   mftype      INTEGER     Metafile data record type
+Output   lmfdr       INTEGER     Length of metafile data record
+1 GIITM
+
+ CALL GIITM(mftype, lmfdr, mfdr)
+ 
+ Level  0a     Interpret Item
+ 
+Interprets metafile item in record mfdr, of length lmfdr, which has
+item type mftype.
+2 Parameters
+ 
+Input    mftype      INTEGER     Metafile data record type
+Input    lmfdr       INTEGER     Length of metafile data record
+Input    mfdr        CHAR*80 (*) Metafile data record
+1 GINCH
+
+ CALL GINCH(kwkid, kchdnr, ichnr, kpet, xmin, xmax, ymin, ymax, linpdr, inpdr)
+ 
+ Level  9z     Initialize Choice
+ 
+Initializes CHOICE device kchdnr on workstation kwkid; the initial
+choice value is given by ichnr; the PROMPT/ECHO type is kpet; the
+echo area has corners (xmin,ymin) and (xmax,ymax); further attributes
+are controlled by data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kchdnr      INTEGER     Choice device number
+Input    ichnr       INTEGER     Initial choice
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINLC
+
+ CALL GINLC(kwkid, klcdnr, ktnr, xinloc, yinloc, kpet, xmin, xmax, ymin, ymax, linpdr, inpdr)
+ 
+ Level  9z     Initialize Locator
+ 
+Initializes LOCATOR device klcdnr on workstation kwkid; the initial
+position is (xinloc,yinloc); the initial normalization transformation
+number ktnr; the PROMPT/ECHO type is kpet; the echo area has corners
+(xmin,ymin) and (xmax,ymax); further attributes are controlled by
+data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    klcdnr      INTEGER     Locator device number
+Input    ktnr        INTEGER     Transformation number
+Input    xinloc      REAL        Initial LOCATOR coordinate (X)
+Input    yinloc      REAL        Initial LOCATOR coordinate (Y)
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINPK
+
+ CALL GINPK(kwkid, kpkdnr, jistat, ksegnm, kpkid, kpet, xmin, xmax, ymin, ymax, linpdr, inpdr)
+ 
+ Level  9z     Initialize Pick
+ 
+Initializes PICK device kpkdnr on workstation kwkid; the initial status
+is jistat; the initial segment is isegnm; the initial pick identifier
+is ipkid; the PROMPT/ECHO type is kpet; the echo area has corners
+(xmin,ymin) and (xmax,ymax); further attributes are controlled by
+data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpkdnr      INTEGER     Pick device number
+Input    jistat      ENUMERATED  Initial PICK status:
+
+                     0   GNONE   "None"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Input    ksegnm      INTEGER     Segment name
+Input    kpkid       INTEGER     Pick Identifier
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINSG
+
+ CALL GINSG(ksegnm, segtrn)
+ 
+ Level  2a     Insert Segment
+ 
+Copies the primitives in segment ksegnm to all active workstations,
+transforming coordinates according to transformation matrix segtrn.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    segtrn      REAL (3,2)  Transformation matrix
+1 GINSK
+
+ CALL GINSK(kwkid, kskdnr, ktnr, npoint, xinstr, yinstr, kpet, xmin, xmax, ymin, ymax, mp, linpdr, inpdr)
+ 
+ Level  9z     Initialize Stroke
+ 
+Initializes STROKE device kskdnr on workstation kwkid; the initial
+stroke is given by the npoint points (xinstrsubi,yinstrsubi); the initial
+normalization transformation number ktnr; the PROMPT/ECHO type is
+kpet; the echo area has corners (xmin,ymin) and (xmax,ymax); the maximum
+number of points is mp; further attributes are controlled by data
+record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kskdnr      INTEGER     Stroke device number
+Input    ktnr        INTEGER     Transformation number
+Input    npoint      INTEGER     Number of points
+Input    xinstr      REAL (*)    Initial STROKE array (X)
+Input    yinstr      REAL (*)    Initial STROKE array (Y)
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    mp          INTEGER     Maximum number of points
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINST
+
+ CALL GINST(kwkid, kstdnr, istr, kpet, xmin, xmax, ymin, ymax, mc, inipos, linpdr, inpdr)
+ 
+ Level  9z     Initialize String
+ 
+Initializes STRING device kstdnr on workstation kwkid; the initial
+string is istr; the PROMPT/ECHO type is kpet; the echo area has corners
+(xmin,ymin) and (xmax,ymax); the maximum number of characters is mc; further
+attributes are controlled by data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    istr        CHAR*(*)    Initial STRING
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    mc          INTEGER     Maximum number of characters
+Input    inipos      INTEGER     Initial position within string
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINSTS
+
+ CALL GINSTS(kwkid, kstdnr, listr, istr, kpet, xmin, xmax, ymin, ymax, mc, inipos, linpdr, inpdr)
+ 
+ Level  0a     Initialize String (Subset.)
+ 
+See GINST. The parameter listr is the length of the initial string istr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    listr       INTEGER     Length of initial string
+Input    istr        CHAR*(*)    Initial STRING
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    mc          INTEGER     Maximum number of characters
+Input    inipos      INTEGER     Initial position within string
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GINVL
+
+ CALL GINVL(kwkid, kvldnr, val, kpet, xmin, xmax, ymin, ymax, valmin, valmax, linpdr, inpdr)
+ 
+ Level  9z     Initialize Valuator
+ 
+Initializes VALUATOR device kvldnr on workstation kwkid; the initial
+value is given by val; the PROMPT/ECHO type is kpet; the echo area
+has corners (xmin,ymin) and (xmax,ymax); the value is limited to the
+range valmin:valmax; further attributes are controlled by data record
+inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kvldnr      INTEGER     Valuator device number
+Input    val         REAL        Value
+Input    kpet        INTEGER     Prompt/echo type
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+Input    valmin      REAL        Minimum value of VALUATOR
+Input    valmax      REAL        Maximum value of VALUATOR
+Input    linpdr      INTEGER     Length of input data record
+Input    inpdr       CHAR*80 (*) Input data record
+1 GMSG
+
+ CALL GMSG(kwkid, mess)
+ 
+ Level  1a     Message
+ 
+Sends message mess to workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    mess        CHAR*(*)    Message text
+1 GMSGS
+
+ CALL GMSGS(kwkid, ltext, text)
+ 
+ Level  0a     Message (Subset.)
+ 
+See GMSG. The parameter ltext is the length of the text string text.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ltext       INTEGER     Length of string (Fortran 77 subset)
+Input    text        CHAR*(*)    Character string
+1 GOPKS
+
+ CALL GOPKS(kerrfl)
+ 
+ Level  0a     Open GKS
+ 
+Begins a session with GKS, error messages being routed to Fortran
+stream kerrfl.
+2 Parameters
+ 
+Input    kerrfl      INTEGER     Error message file stream number
+1 GOPWK
+
+ CALL GOPWK(kwkid, kconid, kwtype)
+ 
+ Level  0a     Open Workstat
+ 
+Opens a workstation of type kwtype on stream kconid and assigns identifier
+kwkid to it.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kconid      INTEGER     Connection identifier
+Input    kwtype      INTEGER     Workstation type
+1 GPL
+
+ CALL GPL(npoint, xa, ya)
+ 
+ Level  0a     Polyline
+ 
+Draws npoint-1 lines between points (xasubi,yasubi) according to the
+current POLYLINE attributes.
+2 Parameters
+ 
+Input    npoint      INTEGER     Number of points
+Input    xa          REAL (*)    An X-coordinate array
+Input    ya          REAL (*)    A Y-coordinate array
+1 GPM
+
+ CALL GPM(npoint, xa, ya)
+ 
+ Level  0a     Polymarker
+ 
+Draws npoint markers at the points (xasubi,yasubi) according to the
+current POLYMARKER attributes.
+2 Parameters
+ 
+Input    npoint      INTEGER     Number of points
+Input    xa          REAL (*)    An X-coordinate array
+Input    ya          REAL (*)    A Y-coordinate array
+1 GQACWK
+
+ CALL GQACWK(n , kerror, nacwk, kwkid)
+ 
+ Level    1a   Inquire set member of Active Workstats
+ 
+Returns the number of active workstation nacwk and the identifier kwkid of
+number n.
+2 Parameters
+ 
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nacwk       INTEGER     Number of active workstations
+Output   kwkid       INTEGER     Workstation identifier
+1 GQASF
+
+ CALL GQASF(kerror, jasf)
+ 
+ Level  0a     Inquire Aspect Source Flags
+ 
+Please see the description of routine GSASF
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   jasf        ENUMERATED (Aspect Source Flags: each may be:
+
+                     0   GBUNDL  "bundled"
+                     1   GINDIV  "individual"
+                     "The array element indices are:"
+                     1   GALN    "linetype ASF"
+                     2   GALWSC  "linewidth scale factor ASF"
+                     3   GAPLCI  "polyline colour index ASF"
+                     4   GAMK    "marker type ASF"
+                     5   GAMKSC  "marker size scale factor ASF"
+                     6   GAPMCI  "polymarker colour index ASF"
+                     7   GATXFP  "text font and precision ASF"
+                     8   GACHXP  "character expansion factor ASF"
+                     9   GACHSP  "character spacing ASF"
+                     10  GATXCI  "text colour index ASF"
+                     11  GAFAIS  "fill area interior style ASF"
+                     12  GAFASI  "fill area style index ASF"
+                     13  GAFACI  "fill area colour index ASF"
+1 GQASWK
+
+ CALL GQASWK(ksegnm, n , kerror, naswk, kwkid)
+ 
+ Level    1a   Inquire set member of Associated Workstats
+ 
+Returns the number of associated workstations naswk and the n'th member
+kwkid of the set of associated workstations, for the segment with
+name ksegnm,
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   naswk       INTEGER     Number of associated workstations
+Output   kwkid       INTEGER     Workstation identifier
+1 GQCF
+
+ CALL GQCF(kwtype , kerror, ncol, jcolav, npcoli)
+ 
+ Level    0a   Inquire Colour Facilities
+ 
+Returns the type of colour available jcolav, the number of colours available
+ncol and the number of predefined colour indices npcoli.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   ncol        INTEGER     Number of colour table entries
+Output   jcolav      ENUMERATED  Colour available:
+
+                     0   GMONOC  "monochrome"
+                     1   GCOLOR  "colour"
+Output   npcoli      INTEGER     Number of pre-defined colour indices
+1 GQCHH
+
+ CALL GQCHH(kerror, chh)
+ 
+ Level  0a     Inquire Character Height
+ 
+Please see the description of routine GSCHH
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   chh         REAL        Character height
+1 GQCHS
+
+ CALL GQCHS(kwkid, kchdnr, minpdr , kerror, jmode, jesw, ichnr, kpet, earea, linpdr, inpdr)
+ 
+ Level    0b   Inquire Choice device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw,
+the prompt/echo type kpet, the echo area in device coordinates earea,
+the initial choice number ichnr and the length linpdr of the data
+record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kchdnr      INTEGER     Choice device number
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   ichnr       INTEGER     Initial choice
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQCHSP
+
+ CALL GQCHSP(kerror, chsp)
+ 
+ Level  0a     Inquire Character Spacing
+ 
+Please see the description of routine GSCHSP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   chsp        REAL        Character spacing
+1 GQCHUP
+
+ CALL GQCHUP(kerror, chux, chuy)
+ 
+ Level  0a     Inquire Character Up vector
+ 
+Please see the description of routine GSCHUP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   chux        REAL        Character up coordinate (X)
+Output   chuy        REAL        Character up coordinate (Y)
+1 GQCHXP
+
+ CALL GQCHXP(kerror, chxp)
+ 
+ Level  0a     Inquire Character Expansion factor
+ 
+Please see the description of routine GSCHXP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   chxp        REAL        Character expansion factor
+1 GQCLIP
+
+ CALL GQCLIP(kerror, jclip)
+ 
+ Level  0a     Inquire Clipping indicator
+ 
+Please see the description of routine GSCLIP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   jclip       ENUMERATED  Clipping indicator:
+
+                     0   GNCLIP  "no clipping"
+                     1   GCLIP   "clipping"
+1 GQCNTN
+
+ CALL GQCNTN(kerror, ktnr)
+ 
+ Level  0a     Inquire Current Normaliz Transform number
+ 
+Returns the number of the current normalization transformation ktnr.
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   ktnr        INTEGER     Transformation number
+1 GQCR
+
+ CALL GQCR(kwkid, kcol, jtype , kerror, red, green, blue)
+ 
+ Level    0a   Inquire Colour Represent
+ 
+Please see the description of routine GSCR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kcol        INTEGER     Colour index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Output   kerror      INTEGER     Error indicator
+Output   red         REAL        Red component of colour
+Output   green       REAL        Green component of colour
+Output   blue        REAL        Blue component of colour
+1 GQDCH
+
+ CALL GQDCH(kwtype, kchdnr, n, minpdr , kerror, malt, npet, kpet, earea, linpdr, inpdr)
+ 
+ Level    0b   Inquire Default Choice device data
+ 
+Returns the maximum number of choice alternatives malt, the number of
+available prompt/echo types npet, the n'th prompt/echo type kpet, the
+default echo area in device coordinates earea and the length linpdr
+of the data record inpdr, for the logical input device with the number
+kchdnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kchdnr      INTEGER     Choice device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   malt        INTEGER     Maximum number of CHOICE alternatives
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDDS
+
+ CALL GQDDS(kwtype , kerror, jdefmo, jregmo)
+ 
+ Level    1a   Inquire Default Deferral State values
+ 
+Returns the default value for deferral mode jdefmo and the default value
+for implicit regeneration mode jregmo.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jdefmo      ENUMERATED  Deferral mode flag:
+
+                     0   GASAP   "As soon as possible"
+                     1   GBNIL   "Before next interaction locally"
+                     2   GBNIG   "Before next interaction globally"
+                     3   GASTI   "At some time"
+Output   jregmo      ENUMERATED  Implicit regeneration mode flag:
+
+                     0   GSUPPD  "Regeneration suppressed"
+                     1   GALLOW  "Regeneration allowed"
+1 GQDLC
+
+ CALL GQDLC(kwtype, klcdnr, n, minpdr , kerror, xinloc, yinloc, npet, kpet, earea, linpdr, inpdr)
+ 
+ Level    0b   Inquire Default Locator device data
+ 
+Returns the default initial locator coordinate position (xinloc, yinloc), the
+number of available prompt/echo types npet, the n'th prompt/echo type
+kpet, the default echo area in device coordinates earea and the length
+linpdr of the data record inpdr, for the logical input device with
+the number klcdnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    klcdnr      INTEGER     Locator device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   xinloc      REAL        Initial LOCATOR coordinate (X)
+Output   yinloc      REAL        Initial LOCATOR coordinate (Y)
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDPK
+
+ CALL GQDPK(kwtype, kpkdnr, n, minpdr , kerror, npet, kpet, earea, linpdr, inpdr)
+ 
+ Level    9z   Inquire Default Pick device data
+ 
+Returns the number of available prompt/echo types npet, the n'th prompt/echo
+type kpet, the default echo area in device coordinates earea the length
+linpdr of the data record inpdr, for the logical input device with
+the number kpkdnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kpkdnr      INTEGER     Pick device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDSGA
+
+ CALL GQDSGA(kwtype , kerror, jsgtr, jvonof, jvofon, jhigh, jsgpr, jadd, jsgdel)
+ 
+ Level    1a   Inquire Dynamic modification of Segment Attributes
+ 
+Returns GIRG or GIMM for the attributes segment transformation changeable jsgtr,
+visibility changeable from on to off jvonof, highlighting changeable
+jhigh, segment priority changeable jsgpr, adding primitives to open
+segment jadd and segment deletion immediately visible jsgdel.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jsgtr       ENUMERATED  Segment transformation changeable:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jvonof      ENUMERATED  Visibility changeable from on to off:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jvofon      ENUMERATED  Visibility changeable from off to on:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jhigh       ENUMERATED  Highlighting changeable:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jsgpr       ENUMERATED  Segment priority changeable:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jadd        ENUMERATED  Addition of primitives to segment:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jsgdel      ENUMERATED  Segment deletion immediately visible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+1 GQDSK
+
+ CALL GQDSK(kwtype, kskdnr, n, minpdr , kerror, mbufsk, npet, kpet, earea, mp, linpdr, inpdr)
+ 
+ Level    0b   Inquire Default Stroke device data
+ 
+Returns the maximum input buffer size mbufsk, the number of available prompt/echo
+types npet, the n'th prompt/echo type kpet, the default area in device
+coordinates earea, the buffer length for stroke mp and the length
+linpdr of the data record inpdr, for the logical input device with
+the number kskdnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kskdnr      INTEGER     Stroke device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   mbufsk      INTEGER     Maximum size of STROKE buffer (points)
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   mp          INTEGER     Maximum number of points
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDST
+
+ CALL GQDST(kwtype, kstdnr, n, minpdr , kerror, mbufst, npet, kpet, earea, mc, linpdr, inpdr)
+ 
+ Level    0b   Inquire Default String device data
+ 
+Returns the maximum string buffer size mbufst, the number of available prompt/echo
+types npet, the n'th prompt/echo type kpet, the default echo area
+in device coordinates earea, the buffer length of string mc and the
+length linpdr of the data record inpdr, for the logical input device
+with the number kstdnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kstdnr      INTEGER     String device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   mbufst      INTEGER     Maximum size of STRING buffer (characters)
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   mc          INTEGER     Maximum number of characters
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDVL
+
+ CALL GQDVL(kwtype, kvldnr, n, minpdr , kerror, val, npet, kpet, earea, valmin, valmax, linpdr, inpdr)
+ 
+ Level    0b   Inquire Default Valuator device data
+ 
+Returns the default initial value val, the number of available prompt/echo
+types npet, the n'th prompt/echo type kpet, the default echo area
+in device coordinates earea, the minimal and maximal values valmin
+and valmax respectively and the length linpdr of the data record inpdr, for
+the logical input device with the number kvldnr.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kvldnr      INTEGER     Valuator device number
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   val         REAL        Value
+Output   npet        INTEGER     Number of PROMPT/ECHO types
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   valmin      REAL        Minimum value of VALUATOR
+Output   valmax      REAL        Maximum value of VALUATOR
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQDWKA
+
+ CALL GQDWKA(kwtype , kerror, jplbun, jpmbun, jtxbun, jfabun, jparep, jcolrp, jwktr)
+ 
+ Level    1a   Inquire Dynamic modification of Workstat Attributes
+ 
+Returns the workstation attributes polyline representation changeable
+jplbun, polymarker representation changeable jpmbun, text representation
+changeable jtxbun, fill area representation changeable jfabun, pattern representation
+changeable jparep, colour representation changeable jcolrp and workstation
+representation changeable jwktr. For all attributes the values returned
+are GIRG or GIMM.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jplbun      ENUMERATED  Dynamic polyline modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jpmbun      ENUMERATED  Dynamic polymarker modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jtxbun      ENUMERATED  Dynamic text modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jfabun      ENUMERATED  Dynamic fill area modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jparep      ENUMERATED  Dynamic pattern modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jcolrp      ENUMERATED  Dynamic colour modification possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+Output   jwktr       ENUMERATED  Dynamic workstation transformation possible:
+
+                     0   GIRG    "leads to implicit regeneration"
+                     1   GIMM    "may be done immediately"
+1 GQECI
+
+ CALL GQECI(kwkid, n , kerror, ncol, kcol)
+ 
+ Level    0a   Inquire list Element of Colour Indices
+ 
+Returns the number of colour indices ncol and the index of the n'th
+element kcol.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   ncol        INTEGER     Number of colour table entries
+Output   kcol        INTEGER     Colour index
+1 GQEFAI
+
+ CALL GQEFAI(kwkid, n , kerror, nfai, kfai)
+ 
+ Level    1a   Inquire list Element of Fill Area Indices
+ 
+Returns the number of fill area indices nfai and the index of the n'th
+element kfai.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nfai        INTEGER     Number of fill area indices
+Output   kfai        INTEGER     Fill area index
+1 GQEGDP
+
+ CALL GQEGDP(kwtype, n , kerror, ngdp, kgdpid)
+ 
+ Level    0a   Inquire list Element of available General Drawing Primitives
+ 
+Returns the number of available generalized drawing primitives ngdp and
+the n'th GDP identifier kgdpid.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   ngdp        INTEGER     Number of GENERALIZED DRAWING PRIMITIVES
+Output   kgdpid      INTEGER     GDP identifier
+1 GQENTN
+
+ CALL GQENTN(n , kerror, ntnr, ktnr)
+ 
+ Level  0a     Inquire list Element of Normaliz Transform Numbers
+ 
+Returns the number of normalization transformation numbers ntnr and
+the transformation number ktnr of the n'th in viewport input priority.
+2 Parameters
+ 
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   ntnr        INTEGER     Number of transformation numbers
+Output   ktnr        INTEGER     Transformation number
+1 GQEPAI
+
+ CALL GQEPAI(kwkid, n , kerror, npai, kpai)
+ 
+ Level    1a   Inquire list Element of Pattern Indices
+ 
+Returns the number of pattern indices npai and the index of the n'th
+element kpai.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   npai        INTEGER     Number of pattern indices
+Output   kpai        INTEGER     Pattern index
+1 GQEPLI
+
+ CALL GQEPLI(kwkid, n , kerror, npli, kpli)
+ 
+ Level    1a   Inquire list Element of Polyline Indices
+ 
+Returns the number of polyline indices npli and the index of the n'th
+element kpli.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   npli        INTEGER     Number of polyline indices
+Output   kpli        INTEGER     Polyline index
+1 GQEPMI
+
+ CALL GQEPMI(kwkid, n , kerror, npmi, kpmi)
+ 
+ Level    1a   Inquire list Element of Polymarker Indices
+ 
+Returns the number of polymarker indices npmi and the index of the
+n'th element kpmi.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   npmi        INTEGER     Number of polymarker indices
+Output   kpmi        INTEGER     Polymarker index
+1 GQETXI
+
+ CALL GQETXI(kwkid, n , kerror, ntxi, ktxi)
+ 
+ Level    1a   Inquire list of Text Indices
+ 
+Returns the number of text indices ntxi and the index of the n'th element
+ktxi.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   ntxi        INTEGER     Number of text indices
+Output   ktxi        INTEGER     Text index
+1 GQEWK
+
+ CALL GQEWK(n , kerror, navwk, kwtype)
+ 
+ Level  0a     Inquire list Element of available Workstat types
+ 
+Returns the number of workstation types navwk and the type kwtype of
+number n.
+2 Parameters
+ 
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   navwk       INTEGER     Number of available workstations
+Output   kwtype      INTEGER     Workstation type
+1 GQFACI
+
+ CALL GQFACI(kerror, kfacol)
+ 
+ Level  0a     Inquire Fill Area Colour Index
+ 
+Please see the description of routine GSFACI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kfacol      INTEGER     Fill Area Colour index
+1 GQFAF
+
+ CALL GQFAF(kwtype, nis, nsi , kerror, nistyl, jstyle, nstyle, kstyli, npfai)
+ 
+ Level    0a   Inquire Fill Area Facilities
+ 
+Returns the number of available fill area interior styles nistyl,
+the n'th fill area interior style jstyle, the number of available
+fill area hatch styles nstyle, the n'th hatch style kstyli   and the
+number of predefined fill area indices npfai.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    nis         INTEGER     Number of available FILL AREA styles
+Input    nsi         No information given.
+Output   kerror      INTEGER     Error indicator
+Output   nistyl      INTEGER     Number of available FILL AREA styles
+Output   jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+Output   nstyle      INTEGER     Number of available FILL AREA styles
+Output   kstyli      INTEGER     Style index
+Output   npfai       INTEGER     Number of pre-defined FILL AREA indices
+1 GQFAI
+
+ CALL GQFAI(kerror, kfai)
+ 
+ Level  0a     Inquire Fill Area Index
+ 
+Please see the description of routine GSFAI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kfai        INTEGER     Fill area index
+1 GQFAIS
+
+ CALL GQFAIS(kerror, jstyle)
+ 
+ Level  0a     Inquire Fill Area Interior Style
+ 
+Please see the description of routine GSFAIS
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+1 GQFAR
+
+ CALL GQFAR(kwkid, kfai, jtype , kerror, jstyle, kstyli, kfacol)
+ 
+ Level    1a   Inquire Fill Area Represent
+ 
+Please see the description of routine GSFAR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kfai        INTEGER     Fill area index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Output   kerror      INTEGER     Error indicator
+Output   jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+Output   kstyli      INTEGER     Style index
+Output   kfacol      INTEGER     Fill Area Colour index
+1 GQFASI
+
+ CALL GQFASI(kerror, kstyli)
+ 
+ Level  0a     Inquire Fill Area Style Index
+ 
+Please see the description of routine GSFASI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kstyli      INTEGER     Style index
+1 GQGDP
+
+ CALL GQGDP(kwtype, kgdpid , kerror, nbundl, jbunda)
+ 
+ Level    0a   Inquire General Drawing Primitive
+ 
+Returns the number of sets of attributes used nbundl and the list of
+sets of attributes used jbunda by the requested generalized drawing
+primitive kgdpid.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kgdpid      INTEGER     GDP identifier
+Output   kerror      INTEGER     Error indicator
+Output   nbundl      INTEGER     Number of bundle tables
+Output   jbunda      ENUMERATED (Attribute set index:
+
+                     0   GPLBND  "POLYLINE attributes"
+                     1   GPMBND  "POLYMARKER attributes"
+                     2   GTXBND  "TEXT attributes"
+                     3   GFABND  "FILL AREA attributes"
+1 GQLCS
+
+ CALL GQLCS(kwkid, klcdnr, jtype, minpdr , kerror, jmode, jesw, ktnr, xinloc, yinloc, kpet, earea, linpdr, inpdr)
+ 
+ Level    0b   Inquire Locator device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw,
+the prompt/echo type kpet, the echo area in device coordinates earea,
+the initial normalization transformation number ktnr, the initial
+locator position (x, y) in world coordinates (xinloc, yinloc) and
+the length linpdr of the data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    klcdnr      INTEGER     Locator device number
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   ktnr        INTEGER     Transformation number
+Output   xinloc      REAL        Initial LOCATOR coordinate (X)
+Output   yinloc      REAL        Initial LOCATOR coordinate (Y)
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQLI
+
+ CALL GQLI(kwtype , kerror, nlcd, nskd, nvld, nchd, npkd, nstd)
+ 
+ Level    0b   Inquire number of available Logical Input devices
+ 
+Returns the number of locator, stroke, valuator, choice, pick and string
+devices nlcd, nskd, nvld, nchd, npkd and nstd respectively for the
+workstation type kwtype.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   nlcd        INTEGER     Number of LOCATOR devices
+Output   nskd        INTEGER     Number of STROKE devices
+Output   nvld        INTEGER     Number of VALUATOR devices
+Output   nchd        INTEGER     Number of CHOICE devices
+Output   npkd        INTEGER     Number of PICK devices
+Output   nstd        INTEGER     Number of STRING devices
+1 GQLN
+
+ CALL GQLN(kerror, lntype)
+ 
+ Level  0a     Inquire Linetype
+ 
+Please see the description of routine GSLN
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   lntype      INTEGER     Linetype
+1 GQLVKS
+
+ CALL GQLVKS(kerror, jlevel)
+ 
+ Level  0a     Inquire Level of GKS
+ 
+Returns the level jlevel of GKS supported by the implementation.
+2 Parameters
+ 
+Input    kerror      INTEGER     Error indicator
+Input    jlevel      ENUMERATED  Level of GKS:
+
+                     0   GL0A    "Level 0a"
+                     1   GL0B    "Level 0b"
+                     2   GL0C    "Level 0c"
+                     3   GL1A    "Level 1a"
+                     4   GL1B    "Level 1b"
+                     5   GL1C    "Level 1c"
+                     6   GL2A    "Level 2a"
+                     7   GL2B    "Level 2b"
+                     8   GL2C    "Level 2c"
+1 GQLWK
+
+ CALL GQLWK(kwtype , kerror, mplbte, mpmbte, mtxbte, mfabte, mpate, mcolte)
+ 
+ Level    1a   Inquire maximum Length of Workstat state tables
+ 
+Returns the maximum number of bundle table entries mplbte, mpmbte, mtxbte
+and mfabte for polyline, polymarker, text and fill area respectively,
+the maximum number of pattern indices mpate and the maximum number
+of colour indices mcolte.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   mplbte      INTEGER     Maximum number of POLYLINE bundle table entries
+Output   mpmbte      INTEGER     Maximum number of POLYMARKER bundle table entries
+Output   mtxbte      INTEGER     Maximum number of TEXT bundle table entries
+Output   mfabte      INTEGER     Maximum number of FILL AREA bundle table entries
+Output   mpate       INTEGER     Maximum number of pattern table entries
+Output   mcolte      INTEGER     Maximum number of colour table entries
+1 GQLWSC
+
+ CALL GQLWSC(kerror, width)
+ 
+ Level  0a     Inquire Linewidth Scale factor
+ 
+Please see the description of routine GSLWSC
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   width       REAL        Linewidth scale factor
+1 GQMDS
+
+ CALL GQMDS(kwtype , kerror, jdunit, sizex, sizey, ksizex, ksizey)
+ 
+ Level    0a   Inquire Maximum Display Surface size
+ 
+Returns the device coordinate units jdunit, the maximum display surface
+size in device coordinates sizex and sizey and the maximum display
+surface size in raster untits ksizex and ksizey.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jdunit      ENUMERATED  Type of device units:
+
+                     0   GMETRE  "Metres"
+                     1   GOTHU   "Others"
+Output   sizex       REAL        Maximum display surface size (X, in DC)
+Output   sizey       REAL        Maximum display surface size (Y, in DC)
+Output   ksizex      INTEGER     Maximum display surface size (X, in rasters)
+Output   ksizey      INTEGER     Maximum display surface size (Y, in rasters)
+1 GQMK
+
+ CALL GQMK(kerror, mktype)
+ 
+ Level  0a     Inquire Marker type
+ 
+Please see the description of routine GSMK
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   mktype      INTEGER     Marker type
+1 GQMKSC
+
+ CALL GQMKSC(kerror, sizemk)
+ 
+ Level  0a     Inquire Marker size Scale factor
+ 
+Please see the description of routine GSMKSC
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   sizemk      REAL        Marker size scale factor
+1 GQMNTN
+
+ CALL GQMNTN(kerror, maxtnr)
+ 
+ Level    0a   Inquire Maximum Normaliz Transform Number
+ 
+Returns the maximum normalization transformation number supported
+maxtnr.
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   maxtnr      INTEGER     Highest normalization transformation number
+1 GQNT
+
+ CALL GQNT(ktnr , kerror, window, viewpt)
+ 
+ Level  0a     Inquire Normaliz Transform
+ 
+Returns the window window and viewport viewpt for normalization transformation
+ktnr.
+2 Parameters
+ 
+Input    ktnr        INTEGER     Transformation number
+Output   kerror      INTEGER     Error indicator
+Output   window      REAL (4)    Window coordinates
+Output   viewpt      REAL (4)    Viewport coordinates (NDC)
+1 GQOPS
+
+ CALL GQOPS(jopsta)
+ 
+ Level  0a     Inquire Operating State value
+ 
+Returns the current operating state of GKS jopsta.
+2 Parameters
+ 
+Input    jopsta      ENUMERATED  GKS operating state:
+
+                     0   GGKCL   "GKS closed"
+                     1   GGKOP   "GKS open"
+                     2   GWSOP   "At least one workstation open"
+                     3   GWSAC   "At least one workstation active"
+                     4   GSGOP   "Segment open"
+1 GQOPSG
+
+ CALL GQOPSG(kerror, ksegnm)
+ 
+ Level  1a     Inquire name of Open Segment
+ 
+Returns the name of the open segment ksegnm.
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   ksegnm      INTEGER     Segment name
+1 GQOPWK
+
+ CALL GQOPWK(n , kerror, nopwk, kwkid)
+ 
+ Level    0a   Inquire set member of Open Workstats
+ 
+Returns the number of open workstation nopwk and the identifier kwkid of
+number n.
+2 Parameters
+ 
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nopwk       INTEGER     Number of open workstations
+Output   kwkid       INTEGER     Workstation identifier
+1 GQPA
+
+ CALL GQPA(kerror, szx, szy)
+ 
+ Level  0a     Inquire Pattern size
+ 
+Please see the description of routine GSPA
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   szx         REAL        Pattern size component (X)
+Output   szy         REAL        Pattern size component (Y)
+1 GQPAF
+
+ CALL GQPAF(kwtype , kerror, nppai)
+ 
+ Level    0a   Inquire Pattern Facilities
+ 
+Returns the number of predefined pattern indices nppai for the workstation
+type kwtype.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   nppai       INTEGER     Number of pre-defined PATTERN indices
+1 GQPAR
+
+ CALL GQPAR(kwkid, kpai, jtype, kx, ky , kerror, nx, ny, kcola)
+ 
+ Level    1a   Inquire Pattern Represent
+ 
+Please see the description of routine GSPAR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpai        INTEGER     Pattern index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Input    kx          No information given.
+Input    ky          No information given.
+Output   kerror      INTEGER     Error indicator
+Output   nx          INTEGER     Number of elements in X-direction
+Output   ny          INTEGER     Number of elements in Y-direction
+Output   kcola       INTEGER (*,*Colour index matrix
+1 GQPARF
+
+ CALL GQPARF(kerror, rfx, rfy)
+ 
+ Level  0a     Inquire Pattern Reference point
+ 
+Please see the description of routine GSPARF
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   rfx         REAL        Pattern reference point coordinate (X)
+Output   rfy         REAL        Pattern reference point coordinate (Y)
+1 GQPCR
+
+ CALL GQPCR(kwtype, kcol , kerror, red, green, blue)
+ 
+ Level    0a   Inquire Predefined Colour Represent
+ 
+Returns the red, green and blue intensities for the requested predefined
+colour kcol.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kcol        INTEGER     Colour index
+Output   kerror      INTEGER     Error indicator
+Output   red         REAL        Red component of colour
+Output   green       REAL        Green component of colour
+Output   blue        REAL        Blue component of colour
+1 GQPFAR
+
+ CALL GQPFAR(kwtype, kpfai , kerror, jstyle, kstyli, kfacol)
+ 
+ Level    0a   Inquire Predefined Fill Area Represent
+ 
+Returns the fill area interior style jstyle, the fill area style index kstyli
+and the fill area colour index kfacol for the predefined fill area
+index kpfai.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kpfai       No information given.
+Output   kerror      INTEGER     Error indicator
+Output   jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+Output   kstyli      INTEGER     Style index
+Output   kfacol      INTEGER     Fill Area Colour index
+1 GQPKID
+
+ CALL GQPKID(kerror, kpkid)
+ 
+ Level  9z     Inquire Pick Identifier
+ 
+Please see the description of routine GSPKID
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kpkid       INTEGER     Pick Identifier
+1 GQPKS
+
+ CALL GQPKS(kwkid, kpkdnr, jtype, minpdr , kerror, jmode, jesw, jistat, ksegnm, kpkid, kpet, earea, linpdr, inpdr)
+ 
+ Level    9z   Inquire Pick device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw, the
+prompt/echo type kpet, the echo area in device coordinates earea, the
+initial status jistat, the initial segment number ksegnm, the initial
+pick identifier kpkid and the length linpdr of the data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpkdnr      INTEGER     Pick device number
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   jistat      ENUMERATED  Initial PICK status:
+
+                     0   GNONE   "None"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   ksegnm      INTEGER     Segment name
+Output   kpkid       INTEGER     Pick Identifier
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQPLCI
+
+ CALL GQPLCI(kerror, kplcol)
+ 
+ Level  0a     Inquire Polyline Colour Index
+ 
+Please see the description of routine GSPLCI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kplcol      INTEGER     Polyline colour index
+1 GQPLF
+
+ CALL GQPLF(kwtype, n , kerror, nlt, lntype, nlw, widnom, widmin, widmax, nppli)
+ 
+ Level    0a   Inquire Polyline Facilities
+ 
+Returns the number of available linetypes nlt, the n'th linetype lntype,
+the number of available linewidths nlw, the nominal, minimal and maximal
+linewidths widnom, widmin and widmax respectively and the number of
+predefined polyline indices nppli.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nlt         INTEGER     Number of linetypes
+Output   lntype      INTEGER     Linetype
+Output   nlw         INTEGER     Number of linewidths
+Output   widnom      REAL        Nominal linewidth
+Output   widmin      REAL        Minimum linewidth
+Output   widmax      REAL        Maximum linewidth
+Output   nppli       INTEGER     Number of pre-defined POLYLINE indices
+1 GQPLI
+
+ CALL GQPLI(kerror, kpli)
+ 
+ Level  0a     Inquire Polyline Index
+ 
+Please see the description of routine GSPLI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kpli        INTEGER     Polyline index
+1 GQPLR
+
+ CALL GQPLR(kwkid, kpli, jtype , kerror, lntype, width, kplcol)
+ 
+ Level    1a   Inquire Polyline Represent
+ 
+Please see the description of routine GSPLR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpli        INTEGER     Polyline index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Output   kerror      INTEGER     Error indicator
+Output   lntype      INTEGER     Linetype
+Output   width       REAL        Linewidth scale factor
+Output   kplcol      INTEGER     Polyline colour index
+1 GQPMCI
+
+ CALL GQPMCI(kerror, kpmcol)
+ 
+ Level  0a     Inquire Polymarker Colour Index
+ 
+Please see the description of routine GSPMCI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kpmcol      INTEGER     Polymarker colour index
+1 GQPMF
+
+ CALL GQPMF(kwtype, n , kerror, nmt, mktype, nms, siznom, sizmin, sizmax, nppmi)
+ 
+ Level    0a   Inquire Polymarker Facilities
+ 
+Returns the number of available marker types nmt, the n'th marker
+type mktype, the number of available marker sizes nms, the nominal,
+minimal and maximal marker sizes siznom, sizmin and sizmax respectively
+and the number of predefined polymarker indices nppmi.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nmt         INTEGER     Number of marker types
+Output   mktype      INTEGER     Marker type
+Output   nms         INTEGER     Number of marker sizes
+Output   siznom      REAL        Nominal marker size
+Output   sizmin      REAL        Minimum marker size
+Output   sizmax      REAL        Maximum marker size
+Output   nppmi       INTEGER     Number of pre-defined POLYMARKER indices
+1 GQPMI
+
+ CALL GQPMI(kerror, kpmi)
+ 
+ Level  0a     Inquire Polymarker Index
+ 
+Please see the description of routine GSPMI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kpmi        INTEGER     Polymarker index
+1 GQPMR
+
+ CALL GQPMR(kwkid, kpmi, jtype , kerror, mktype, sizemk, kpmcol)
+ 
+ Level    1a   Inquire Polymarker Represent
+ 
+Please see the description of routine GSPMR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpmi        INTEGER     Polymarker index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Output   kerror      INTEGER     Error indicator
+Output   mktype      INTEGER     Marker type
+Output   sizemk      REAL        Marker size scale factor
+Output   kpmcol      INTEGER     Polymarker colour index
+1 GQPPAR
+
+ CALL GQPPAR(kwtype, kpai, kx, ky , kerror, nx, ny, kcola)
+ 
+ Level    0a   Inquire Predefined Pattern Represent
+ 
+Returns the pattern array dimensions nx by ny and the pattern array itself
+kcola for the requested predefined pattern kpai.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kpai        INTEGER     Pattern index
+Input    kx          No information given.
+Input    ky          No information given.
+Output   kerror      INTEGER     Error indicator
+Output   nx          INTEGER     Number of elements in X-direction
+Output   ny          INTEGER     Number of elements in Y-direction
+Output   kcola       INTEGER (*,*Colour index matrix
+1 GQPPLR
+
+ CALL GQPPLR(kwtype, kpli , kerror, lntype, width, kplcol)
+ 
+ Level    0a   Inquire Predefined Polyline Represent
+ 
+Returns the linetype lntype, the linewidth scale factor width and
+the polyline colour index kplcol for the predefined polyline index kpli.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kpli        INTEGER     Polyline index
+Output   kerror      INTEGER     Error indicator
+Output   lntype      INTEGER     Linetype
+Output   width       REAL        Linewidth scale factor
+Output   kplcol      INTEGER     Polyline colour index
+1 GQPPMR
+
+ CALL GQPPMR(kwtype, kpmi , kerror, mktype, sizemk, kpmcol)
+ 
+ Level    0a   Inquire Predefined Polymarker Represent
+ 
+Returns the marker type mktype, the marker size scale factor sizemk and
+the polymarker colour index kpmcol for the predefined polymarker index kpmi.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    kpmi        INTEGER     Polymarker index
+Output   kerror      INTEGER     Error indicator
+Output   mktype      INTEGER     Marker type
+Output   sizemk      REAL        Marker size scale factor
+Output   kpmcol      INTEGER     Polymarker colour index
+1 GQPTXR
+
+ CALL GQPTXR(kwtype, ktxi , kerror, kfont, jprec, chxp, chsp, ktxcol)
+ 
+ Level    0a   Inquire Predefined Text Represent
+ 
+Returns the text font kfont, the text precision jprec, the character expansion
+factor chxp, the character spacing chsp and the text colour index
+ktxcol for the predefined text index ktxi.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    ktxi        INTEGER     Text index
+Output   kerror      INTEGER     Error indicator
+Output   kfont       INTEGER     Text font number
+Output   jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+Output   chxp        REAL        Character expansion factor
+Output   chsp        REAL        Character spacing
+Output   ktxcol      INTEGER     Text colour index
+1 GQPX
+
+ CALL GQPX(kwkid, px, py , kerror, kcol)
+ 
+ Level    0a   Inquire Pixel
+ 
+Returns the colour index kcol of the requested pixel at point
+             (px, py).
+
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    px          REAL        One corner of rectangle (X)
+Input    py          REAL        One corner of rectangle (Y)
+Output   kerror      INTEGER     Error indicator
+Output   kcol        INTEGER     Colour index
+1 GQPXA
+
+ CALL GQPXA(kwkid, px, py, lx, ly, mx , kerror, jinvva, kcola)
+ 
+ Level    0a   Inquire Pixel Array
+ 
+Returns the presence of invalid values jinvva and the array of colour
+indices kcola representing the pixel array which is defined by the
+upper left corner (px, py) and the requested size lx by ly of the
+pixel array.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    px          REAL        One corner of rectangle (X)
+Input    py          REAL        One corner of rectangle (Y)
+Input    lx          INTEGER     Cell array dimension (X)
+Input    ly          INTEGER     Cell array dimension (Y)
+Input    mx          INTEGER     Actual first dimension of 2D array
+Output   kerror      INTEGER     Error indicator
+Output   jinvva      ENUMERATED  Presence of invalid values:
+
+                     0   GABSNT  "absent"
+                     1   GPRSNT  "present"
+Output   kcola       INTEGER (*,*Colour index matrix
+1 GQPXAD
+
+ CALL GQPXAD(kwkid, px, py, qx, qy , kerror, lx, ly)
+ 
+ Level    0a   Inquire Pixel Array Dimensions
+ 
+Returns the dimensions lx and ly of the pixel array defined by points
+(px, py) and (qx, qy), for workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    px          REAL        One corner of rectangle (X)
+Input    py          REAL        One corner of rectangle (Y)
+Input    qx          REAL        Other corner of rectangle (X)
+Input    qy          REAL        Other corner of rectangle (Y)
+Output   kerror      INTEGER     Error indicator
+Output   lx          INTEGER     Cell array dimension (X)
+Output   ly          INTEGER     Cell array dimension (Y)
+1 GQSGA
+
+ CALL GQSGA(ksegnm , kerror, segtrn, jvis, jhil, prior, jdet)
+ 
+ Level    1a   Inquire Segment Attributes
+ 
+Returns the segment transformation matrix segtrn, the visibility jvis, the
+highlighting jhil, the segment priority prior and the detectability
+jdet, for the requested segment ksegnm.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Output   kerror      INTEGER     Error indicator
+Output   segtrn      REAL (3,2)  Transformation matrix
+Output   jvis        ENUMERATED  Segment visibility:
+
+                     0   GINVIS  "invisible"
+                     1   GVISI   "visible"
+Output   jhil        ENUMERATED  Segment highlighting:
+
+                     0   GNORML  "normal"
+                     1   GHILIT  "highlighted"
+Output   prior       REAL        Segment priority (range 0.0:1.0
+Output   jdet        ENUMERATED  Segment detectability:
+
+                     0   GUNDET  "undetectable"
+                     1   GDETEC  "detectable"
+1 GQSGP
+
+ CALL GQSGP(kwtype , kerror, nsegpr)
+ 
+ Level    1a   Inquire number of Segment Priorities supported
+ 
+Returns the number of segment priorities supported nsegpr by the workstation
+type kwtype.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   nsegpr      INTEGER     Number of segment priorities
+1 GQSGUS
+
+ CALL GQSGUS(n , kerror, nsegnm, ksegnm)
+ 
+ Level  1a     Inquire set of Segment names in Use
+ 
+Returns the number of segment names in use nsegnm and the name of the
+n'th segment ksegnm.
+2 Parameters
+ 
+Input    n           INTEGER     Number of STROKE devices
+Output   kerror      INTEGER     Error indicator
+Output   nsegnm      INTEGER     Number of segment names
+Output   ksegnm      INTEGER     Segment name
+1 GQSGWK
+
+ CALL GQSGWK(kwkid, n , kerror, nsegnm, ksegnm)
+ 
+ Level    1a   Inquire set member of Segment names on Workstat
+ 
+Returns the number of segment names nsegnm on workstation kwkid and
+the name ksegnm of the n'th segment.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nsegnm      INTEGER     Number of segment names
+Output   ksegnm      INTEGER     Segment name
+1 GQSKS
+
+ CALL GQSKS(kwkid, kskdnr, jtype, n, minpdr , kerror, jmode, jesw, ktnr, npoint, xinstr, yinstr, kpet, earea, mp, linpdr, inpdr)
+ 
+ Level    0b   Inquire Stroke device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw,
+the prompt/echo type kpet, the echo area in device coordinates earea,
+the initial normalization transformation number ktnr, the number of
+points npoint, the initial points in stroke in world coordinates xinstr
+and yinstr, the buffer length for stroke mp and the length linpdr
+of the data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kskdnr      INTEGER     Stroke device number
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Input    n           INTEGER     Element number for inquiry about a set or list
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   ktnr        INTEGER     Transformation number
+Output   npoint      INTEGER     Number of points
+Output   xinstr      REAL (*)    Initial STROKE array (X)
+Output   yinstr      REAL (*)    Initial STROKE array (Y)
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   mp          INTEGER     Maximum number of points
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQSTS
+
+ CALL GQSTS(kwkid, kstdnr, minpdr , kerror, jmode, jesw, listr, istr, kpet, earea, mc, inipos, linpdr, inpdr)
+ 
+ Level    0b   Inquire String device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw, the
+prompt/echo type kpet, the echo area in device coordinates earea,
+the number of characters returned listr, the initial character string
+istr, the buffer length of the string mc, the initial cursor position
+inipos and the length linpdr of the data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   listr       INTEGER     Length of initial string
+Output   istr        CHAR*(*)    Initial STRING
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   mc          INTEGER     Maximum number of characters
+Output   inipos      INTEGER     Initial position within string
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQSTSS
+
+ CALL GQSTSS(kwkid, kstdnr, mstr, minpdr , kerror, jmode, jesw, listr, istr, kpet, earea, mc, inipos, linpdr, inpdr)
+ 
+ Level  0a     Inquire String device State (Subset.)
+ 
+See GQSTS. The parameter mstr is the maximum length of the string.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    mstr        INTEGER     Maximum length of string
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   listr       INTEGER     Length of initial string
+Output   istr        CHAR*(*)    Initial STRING
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   mc          INTEGER     Maximum number of characters
+Output   inipos      INTEGER     Initial position within string
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQTXAL
+
+ CALL GQTXAL(kerror, jtxalh, jtxalv)
+ 
+ Level  0a     Inquire Text Alignment
+ 
+Please see the description of routine GSTXAL
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   jtxalh      ENUMERATED  Text alignment: horizontal component:
+
+                     0   GAHNOR  "normal"
+                     1   GALEFT  "left aligned"
+                     2   GACENT  "centre aligned"
+                     3   GARITE  "right aligned"
+Output   jtxalv      ENUMERATED  Text alignment: vertical component:
+
+                     0   GAVNOR  "normal"
+                     1   GATOP   "top"
+                     2   GACAP   "cap line"
+                     3   GAHALF  "half height line"
+                     4   GABASE  "base line"
+                     5   GABOTT  "bottom line"
+1 GQTXCI
+
+ CALL GQTXCI(kerror, ktxcol)
+ 
+ Level  0a     Inquire Text Colour Index
+ 
+Please see the description of routine GSTXCI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   ktxcol      INTEGER     Text colour index
+1 GQTXF
+
+ CALL GQTXF(kwtype, n , kerror, nfpp, kfont, jprec, nchh, chhmin, chhmax, nchxp, chxpmn, chxpmx, nptxi)
+ 
+ Level    0a   Inquire Text Facilities
+ 
+Returns the number of text font and precision pairs nfpp, the n'th font
+kfont, the n'th text precision jprec, the number of available character
+heights nchh, the minimum and maximum character heights chhmin and chhmax
+respectively, the number of available character expansion factors nchxp,
+the minimum and maximum expansion factors chxpmn and chxpmx respectively
+and the number of predefined text indices nptxi.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Input    n           INTEGER     Element number for inquiry about a set or list
+Output   kerror      INTEGER     Error indicator
+Output   nfpp        INTEGER     Number of text font/precision pairs
+Output   kfont       INTEGER     Text font number
+Output   jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+Output   nchh        INTEGER     Number of character heights
+Output   chhmin      REAL        Minimum character height
+Output   chhmax      REAL        Maximum character height
+Output   nchxp       INTEGER     Number of character expansion factors
+Output   chxpmn      REAL        Minimum character expansion factor
+Output   chxpmx      REAL        Maximum character expansion factor
+Output   nptxi       INTEGER     Number of pre-defined TEXT indices
+1 GQTXFP
+
+ CALL GQTXFP(kerror, kfont, jprec)
+ 
+ Level  0a     Inquire Text Font and Precision
+ 
+Please see the description of routine GSTXFP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   kfont       INTEGER     Text font number
+Output   jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+1 GQTXI
+
+ CALL GQTXI(kerror, ktxi)
+ 
+ Level  0a     Inquire Text Index
+ 
+Please see the description of routine GSTXI
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   ktxi        INTEGER     Text index
+1 GQTXP
+
+ CALL GQTXP(kerror, jtxp)
+ 
+ Level  0a     Inquire Text Path
+ 
+Please see the description of routine GSTXP
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   jtxp        ENUMERATED  Text path:
+
+                     0   GRIGHT  "right"
+                     1   GLEFT   "left"
+                     2   GUP     "up"
+                     3   GDOWN   "down"
+1 GQTXR
+
+ CALL GQTXR(kwkid, ktxi, jtype , kerror, kfont, jprec, chxp, chsp, ktxcol)
+ 
+ Level    1a   Inquire Text Represent
+ 
+Please see the description of routine GSTXR
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ktxi        INTEGER     Text index
+Input    jtype       ENUMERATED  Type of returned values:
+
+                     0   GSET    "Value as set"
+                     1   GREALI  "Value as realized"
+Output   kerror      INTEGER     Error indicator
+Output   kfont       INTEGER     Text font number
+Output   jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+Output   chxp        REAL        Character expansion factor
+Output   chsp        REAL        Character spacing
+Output   ktxcol      INTEGER     Text colour index
+1 GQTXX
+
+ CALL GQTXX(kwkid, x, y, text , kerror, cpx, cpy, txexpx, txexpy)
+ 
+ Level    0a   Inquire Text Extent
+ 
+Returns the extent of string text if drawn at (x,y) with current text
+attributes; the area is defined by the rectangle with sides txexpx and
+txexpy; the concatenation point returned is (cpx,cpy).
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    x           REAL        An X-coordinate
+Input    y           REAL        A Y-coordinate
+Input    text        CHAR*(*)    Character string
+Output   kerror      INTEGER     Error indicator
+Output   cpx         REAL        Concatenation point for text extent (X-coordinate)
+Output   cpy         REAL        Concatenation point for text extent (Y-coordinate)
+Output   txexpx      REAL        Text extent position (X-coordinate)
+Output   txexpy      REAL        Text extent position (Y-coordinate)
+1 GQTXXS
+
+ CALL GQTXXS(kkwid, x, y, ltext, text , kerror, cpx, cpy, txexpx, txexpy)
+ 
+ Level  0a     Inquire Text Extent (Subset.)
+ 
+See GQTXX. The parameter ltext is the length of the text string text.
+2 Parameters
+ 
+Input    kkwid       No information given.
+Input    x           REAL        An X-coordinate
+Input    y           REAL        A Y-coordinate
+Input    ltext       INTEGER     Length of string (Fortran 77 subset)
+Input    text        CHAR*(*)    Character string
+Output   kerror      INTEGER     Error indicator
+Output   cpx         REAL        Concatenation point for text extent (X-coordinate)
+Output   cpy         REAL        Concatenation point for text extent (Y-coordinate)
+Output   txexpx      REAL        Text extent position (X-coordinate)
+Output   txexpy      REAL        Text extent position (Y-coordinate)
+1 GQVLS
+
+ CALL GQVLS(kwkid, kvldnr, minpdr , kerror, jmode, jesw, val, kpet, earea, valmin, valmax, linpdr, inpdr)
+ 
+ Level    0b   Inquire Valuator device State
+ 
+Returns the operating mode jmode, the state of the echo switch jesw,
+the prompt/echo type kpet, the initial, minimal and maximal values
+val, valmin and valmax respectively, the echo area in device coordinates
+earea and the length linpdr of the data record inpdr.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kvldnr      INTEGER     Valuator device number
+Input    minpdr      INTEGER     Maximum length of input data record
+Output   kerror      INTEGER     Error indicator
+Output   jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Output   jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+Output   val         REAL        Value
+Output   kpet        INTEGER     Prompt/echo type
+Output   earea       REAL (4)    Echo area (xmin, xmax, ymin, ymax)
+Output   valmin      REAL        Minimum value of VALUATOR
+Output   valmax      REAL        Maximum value of VALUATOR
+Output   linpdr      INTEGER     Length of input data record
+Output   inpdr       CHAR*80 (*) Input data record
+1 GQWKC
+
+ CALL GQWKC(kwkid , kerror, kconid, kwtype)
+ 
+ Level    0a   Inquire Workstat Connection and type
+ 
+Returns the connection identifier kconid and the workstation type kwtype for
+workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Output   kerror      INTEGER     Error indicator
+Output   kconid      INTEGER     Connection identifier
+Output   kwtype      INTEGER     Workstation type
+1 GQWKCA
+
+ CALL GQWKCA(kwtype , kerror, jwkcat)
+ 
+ Level    0a   Inquire Workstat Category
+ 
+Returns the workstation category jwkcat for the workstation type kwtype.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jwkcat      ENUMERATED  Workstation category:
+
+                     0   GOUTPT  "Output only Workstation"
+                     1   GINPUT  "Input only Workstation"
+                     2   GOUTIN  "Output/input Workstation"
+                     3   GWISS   "WISS pseudo-Workstation"
+                     4   GMO     "Metafile Output Workstation"
+                     5   GMI     "Metafile Input Workstation"
+1 GQWKCL
+
+ CALL GQWKCL(kwtype , kerror, jwkcla)
+ 
+ Level    0a   Inquire Workstat Classif
+ 
+Returns the workstation classification jwkcla for the workstation type
+kwtype.
+2 Parameters
+ 
+Input    kwtype      INTEGER     Workstation type
+Output   kerror      INTEGER     Error indicator
+Output   jwkcla      ENUMERATED  Workstation classification:
+
+                     0   GVECTR  "Vector technology"
+                     1   GRASTR  "Raster Technology"
+                     2   GOTHWK  "Other technology"
+1 GQWKDU
+
+ CALL GQWKDU(kwkid , kerror, jdefmo, jregmo, jempty, jframe)
+ 
+ Level    0a   Inquire Workstat Deferral and Update states
+ 
+Returns the deferral mode flag jdefmo, the implicit regeneration mode
+flag jregmo, the current state of the device jempty and the new frame
+action flag jframe for workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Output   kerror      INTEGER     Error indicator
+Output   jdefmo      ENUMERATED  Deferral mode flag:
+
+                     0   GASAP   "As soon as possible"
+                     1   GBNIL   "Before next interaction locally"
+                     2   GBNIG   "Before next interaction globally"
+                     3   GASTI   "At some time"
+Output   jregmo      ENUMERATED  Implicit regeneration mode flag:
+
+                     0   GSUPPD  "Regeneration suppressed"
+                     1   GALLOW  "Regeneration allowed"
+Output   jempty      ENUMERATED  Display Surface Status:
+
+                     0   GNEMPT  "Display surface not empty"
+                     1   GEMPTY  "Display Surface Empty"
+Output   jframe      ENUMERATED  New frame action needed at update:
+
+                     0   GNO     "no"
+                     1   GYES    "yes"
+1 GQWKM
+
+ CALL GQWKM(kerror, mxopwk, mxacwk, mxaswk)
+ 
+ Level    1a   Inquire Workstat Maximum numbers
+ 
+Returns the maximum numbers of open (mxopwk), active (mxacwk) and
+associated (mxaswk) workstations supported.
+2 Parameters
+ 
+Output   kerror      INTEGER     Error indicator
+Output   mxopwk      INTEGER     Maximum number of open workstations
+Output   mxacwk      INTEGER     Maximum number of active workstations
+Output   mxaswk      INTEGER     Maximum number of workstations associated with segment
+1 GQWKS
+
+ CALL GQWKS(kwkid , kerror, jstate)
+ 
+ Level    0a   Inquire Workstat State
+ 
+Returns the current state jstate of workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Output   kerror      INTEGER     Error indicator
+Output   jstate      ENUMERATED  Workstation State:
+
+                     0   GINACT  "Workstation Inactive"
+                     1   GACTIV  "Workstation Active"
+1 GQWKT
+
+ CALL GQWKT(kwkid , kerror, jtus, rwindo, cwindo, rviewp, cviewp)
+ 
+ Level    0a   Inquire Workstat Transform
+ 
+Returns the workstation transformation update state jtus, the requested
+and current workstation window in normalized device coordinates rwindo
+and cwindo respectively and the requested and current workstation
+viewport in NDC, rviewp and cviewp respectively.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Output   kerror      INTEGER     Error indicator
+Output   jtus        ENUMERATED  Workstation Transformation Update State:
+
+                     0   GNPEND  "No update pending"
+                     1   GPEND   "Update pending"
+Output   rwindo      REAL (4)    Requested workstation window
+Output   cwindo      REAL (4)    Current workstation window
+Output   rviewp      REAL (4)    Requested workstation viewport
+Output   cviewp      REAL (4)    Current workstation viewport
+1 GRDITM
+
+ CALL GRDITM(kwkid, ml , lmfdr, mfdr)
+ 
+ Level  0a     Read Item from GKSM
+ 
+Reads the next metafile item into mfdr; length of record is lmfdr and
+is limited to ml.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ml          INTEGER     Maximum length of metafile input record
+Output   lmfdr       INTEGER     Length of metafile data record
+Output   mfdr        CHAR*80 (*) Metafile data record
+1 GRENSG
+
+ CALL GRENSG(namold, namnew)
+ 
+ Level  1a     Rename Segment
+ 
+Renames segment namold as namnew; namold may be reused.
+2 Parameters
+ 
+Input    namold      INTEGER     Old segment name
+Input    namnew      INTEGER     New segment name
+1 GRQCH
+
+ CALL GRQCH(kwkid, kchdnr , jstat, kchnr)
+ 
+ Level  0b     Request Choice
+ 
+Returns to the application program the CHOICE value kchnr from input
+device kchdnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kchdnr      INTEGER     Choice device number
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   kchnr       INTEGER     Choice number
+1 GRQLC
+
+ CALL GRQLC(kwkid, klcdnr , jstat, ktnr, xloc, yloc)
+ 
+ Level  0b     Request Locator
+ 
+Returns to the application program the LOCATOR position (xloc,yloc) after
+interpretation with respect to transformation number ktnr from input
+device klcdnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    klcdnr      INTEGER     Locator device number
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   ktnr        INTEGER     Transformation number
+Output   xloc        REAL        LOCATOR value (X)
+Output   yloc        REAL        LOCATOR value (Y)
+1 GRQPK
+
+ CALL GRQPK(kwkid, kpkdnr , jstat, ksegnm, kpkid)
+ 
+ Level  9z     Request Pick
+ 
+Returns to the application program the PICK value kpkid and segment
+name ksegnm from input device kpkdnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpkdnr      INTEGER     Pick device number
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   ksegnm      INTEGER     Segment name
+Output   kpkid       INTEGER     Pick Identifier
+1 GRQSK
+
+ CALL GRQSK(kwkid, kskdnr, mp , jstat, ktnr, npoint, xsk, ysk)
+ 
+ Level  0b     Request Stroke
+ 
+Returns to the application program the npoint STROKE coordinates (xsksubi,ysksubi) after
+interpretation with respect to transformation number ktnr from input
+device kskdnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kskdnr      INTEGER     Stroke device number
+Input    mp          INTEGER     Maximum number of points
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   ktnr        INTEGER     Transformation number
+Output   npoint      INTEGER     Number of points
+Output   xsk         REAL (*)    STROKE x-coordinate array
+Output   ysk         REAL (*)    STROKE y-coordinate array
+1 GRQST
+
+ CALL GRQST(kwkid, kstdnr , jstat, lstr, str)
+ 
+ Level  0b     Request String
+ 
+Returns to the application program the STRING value str (of length
+lstr) from input device kstdnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   lstr        INTEGER     Length of string
+Output   str         CHAR*(*)    Character string
+1 GRQSTS
+
+ CALL GRQSTS(kwkid, kstdnr, mstr , jistat, lstr, str)
+ 
+ Level  0a     Request String (Subset.)
+ 
+See GRQST. The parameter mstr is the maximum length of the string.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    mstr        INTEGER     Maximum length of string
+Output   jistat      ENUMERATED  Initial PICK status:
+
+                     0   GNONE   "None"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   lstr        INTEGER     Length of string
+Output   str         CHAR*(*)    Character string
+1 GRQVL
+
+ CALL GRQVL(kwkid, kvldnr , jstat, val)
+ 
+ Level  0b     Request Valuator
+ 
+Returns to the application program the VALUATOR value val from input
+device kvldnr on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kvldnr      INTEGER     Valuator device number
+Output   jstat       ENUMERATED  Input status returned:
+
+                     0   GNONE   "none"
+                     1   GOK     "OK"
+                     2   GNPICK  "No pick"
+Output   val         REAL        Value
+1 GRSGWK
+
+ CALL GRSGWK(kwkid)
+ 
+ Level  1a     Redraw all Segments on Workstat
+ 
+Redraws all visible segments stored on workstation kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+1 GSASF
+
+ CALL GSASF(jasf)
+ 
+ Level  0a     Set Aspect Source Flags
+ 
+Sets the aspect source flags according to the flag array jasf.
+2 Parameters
+ 
+Input    jasf        ENUMERATED (Aspect Source Flags: each may be:
+
+                     0   GBUNDL  "bundled"
+                     1   GINDIV  "individual"
+                     "The array element indices are:"
+                     1   GALN    "linetype ASF"
+                     2   GALWSC  "linewidth scale factor ASF"
+                     3   GAPLCI  "polyline colour index ASF"
+                     4   GAMK    "marker type ASF"
+                     5   GAMKSC  "marker size scale factor ASF"
+                     6   GAPMCI  "polymarker colour index ASF"
+                     7   GATXFP  "text font and precision ASF"
+                     8   GACHXP  "character expansion factor ASF"
+                     9   GACHSP  "character spacing ASF"
+                     10  GATXCI  "text colour index ASF"
+                     11  GAFAIS  "fill area interior style ASF"
+                     12  GAFASI  "fill area style index ASF"
+                     13  GAFACI  "fill area colour index ASF"
+1 GSCHH
+
+ CALL GSCHH(chh)
+ 
+ Level  0a     Set Character Height
+ 
+Sets the character height for subsequent text to chh.
+2 Parameters
+ 
+Input    chh         REAL        Character height
+1 GSCHM
+
+ CALL GSCHM(kwkid, kchdnr, jmode, jesw)
+ 
+ Level  0b     Set Choice Mode
+ 
+Sets the mode of CHOICE device kchdnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kchdnr      INTEGER     Choice device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSCHSP
+
+ CALL GSCHSP(chsp)
+ 
+ Level  0a     Set Character Spacing
+ 
+Sets the individual character spacing to chsp. Subsequent TEXT output
+is modified if ASF(GACHSP) is set to GINDIV.
+2 Parameters
+ 
+Input    chsp        REAL        Character spacing
+1 GSCHUP
+
+ CALL GSCHUP(chux, chuy)
+ 
+ Level  0a     Set Character Up vector
+ 
+Sets the character up vector for subsequent text to (chux,chuy).
+2 Parameters
+ 
+Input    chux        REAL        Character up coordinate (X)
+Input    chuy        REAL        Character up coordinate (Y)
+1 GSCHXP
+
+ CALL GSCHXP(chxp)
+ 
+ Level  0a     Set Character Expansion factor
+ 
+Sets the individual character expansion factor to chxp. Subsequent TEXT output
+is modified if ASF(GACHXP) is set to GINDIV.
+2 Parameters
+ 
+Input    chxp        REAL        Character expansion factor
+1 GSCLIP
+
+ CALL GSCLIP(jclip)
+ 
+ Level  0a     Set Clipping indicator
+ 
+Switches clipping on or off.
+2 Parameters
+ 
+Input    jclip       ENUMERATED  Clipping indicator:
+
+                     0   GNCLIP  "no clipping"
+                     1   GCLIP   "clipping"
+1 GSCR
+
+ CALL GSCR(kwkid, kcol, red, green, blue)
+ 
+ Level  0a     Set Colour Represent
+ 
+Defines (or redefines) the representation for colour kcol on workstation
+kwkid having red, green and blue components red, green and blue.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kcol        INTEGER     Colour index
+Input    red         REAL        Red component of colour
+Input    green       REAL        Green component of colour
+Input    blue        REAL        Blue component of colour
+1 GSDS
+
+ CALL GSDS(kwkid, jdefmo, jregmo)
+ 
+ Level  1a     Set Deferral State
+ 
+Sets the deferral mode jdefmo and the regeneration mode jregmo on workstation
+kwkid.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    jdefmo      ENUMERATED  Deferral mode flag:
+
+                     0   GASAP   "As soon as possible"
+                     1   GBNIL   "Before next interaction locally"
+                     2   GBNIG   "Before next interaction globally"
+                     3   GASTI   "At some time"
+Input    jregmo      ENUMERATED  Implicit regeneration mode flag:
+
+                     0   GSUPPD  "Regeneration suppressed"
+                     1   GALLOW  "Regeneration allowed"
+1 GSDTEC
+
+ CALL GSDTEC(ksegnm, jdet)
+ 
+ Level  1b     Set Detect
+ 
+Sets segment ksegnm detectable or not according to jdet.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    jdet        ENUMERATED  Segment detectability:
+
+                     0   GUNDET  "undetectable"
+                     1   GDETEC  "detectable"
+1 GSELNT
+
+ CALL GSELNT(ktnr)
+ 
+ Level  0a     Select Normaliz Transform
+ 
+Selects normalization transformation number ktnr for subsequent output.
+2 Parameters
+ 
+Input    ktnr        INTEGER     Transformation number
+1 GSFACI
+
+ CALL GSFACI(kfacol)
+ 
+ Level  0a     Set Fill Area Colour Index
+ 
+Sets the individual fill area colour index to kfacol. Subsequent FILL
+AREA output is modified if ASF(GAFACI) is set to GINDIV.
+2 Parameters
+ 
+Input    kfacol      INTEGER     Fill Area Colour index
+1 GSFAI
+
+ CALL GSFAI(kfai)
+ 
+ Level  0a     Set Fill Area Index
+ 
+Selects fill area bundle index kfai. Subsequent FILL AREA output is
+modified if any FILL AREA ASFs are set to GBUNDL.
+2 Parameters
+ 
+Input    kfai        INTEGER     Fill area index
+1 GSFAIS
+
+ CALL GSFAIS(jstyle)
+ 
+ Level  0a     Set Fill Area Interior Style
+ 
+Sets the individual fill area interior style index to jstyle. Subsequent FILL
+AREA output is modified if ASF(GAFAIS) is set to GINDIV.
+2 Parameters
+ 
+Input    jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+1 GSFAR
+
+ CALL GSFAR(kwkid, kfai, jstyle, kstyli, kfacol)
+ 
+ Level  1a     Set Fill Area Represent
+ 
+Defines (or redefines) the representation for FILL AREA bundle kfai on
+workstation kwkid as interior style jstyle, style index kstyli and
+colour ktxcol.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kfai        INTEGER     Fill area index
+Input    jstyle      ENUMERATED  Interior style:
+
+                     0   GHOLLO  "hollow"
+                     1   GSOLID  "solid"
+                     2   GPATTR  "pattern"
+                     3   GHATCH  "hatch"
+Input    kstyli      INTEGER     Style index
+Input    kfacol      INTEGER     Fill Area Colour index
+1 GSFASI
+
+ CALL GSFASI(kstyli)
+ 
+ Level  0a     Set Fill Area Style Index
+ 
+Sets the individual fill area style index to kstyli. Subsequent FILL
+AREA output is modified if ASF(GAFASI) is set to GINDIV and FILL AREA
+INTERIOR STYLE is GPATTR or GHATCH.
+2 Parameters
+ 
+Input    kstyli      INTEGER     Style index
+1 GSHLIT
+
+ CALL GSHLIT(ksegnm, jhil)
+ 
+ Level  1a     Set Highlight
+ 
+Sets highlighting for segment ksegnm to jhil.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    jhil        ENUMERATED  Segment highlighting:
+
+                     0   GNORML  "normal"
+                     1   GHILIT  "highlighted"
+1 GSLCM
+
+ CALL GSLCM(kwkid, klcdnr, jmode, jesw)
+ 
+ Level  0b     Set Locator Mode
+ 
+Sets the mode of LOCATOR device klcdnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    klcdnr      INTEGER     Locator device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSLN
+
+ CALL GSLN(lntype)
+ 
+ Level  0a     Set Linetype
+ 
+Sets the individual linetype to lntype. Subsequent POLYLINE output
+is modified if ASF(GALN) is set to GINDIV.
+2 Parameters
+ 
+Input    lntype      INTEGER     Linetype
+1 GSLWSC
+
+ CALL GSLWSC(width)
+ 
+ Level  0a     Set Linewidth Scale factor
+ 
+Sets the individual linewidth scale factor to width. Subsequent POLYLINE output
+is modified if ASF(GALWSC) is set to GINDIV.
+2 Parameters
+ 
+Input    width       REAL        Linewidth scale factor
+1 GSMK
+
+ CALL GSMK(mktype)
+ 
+ Level  0a     Set Markertype
+ 
+Sets the individual marker type to mktype. Subsequent POLYMARKER output
+is modified if ASF(GAMK) is set to GINDIV.
+2 Parameters
+ 
+Input    mktype      INTEGER     Marker type
+1 GSMKSC
+
+ CALL GSMKSC(sizemk)
+ 
+ Level  0a     Set Marker size Scale factor
+ 
+Sets the individual marker size scale factor to sizemk. Subsequent POLYMARKER output
+is modified if ASF(GAMKSC) is set to GINDIV.
+2 Parameters
+ 
+Input    sizemk      REAL        Marker size scale factor
+1 GSPA
+
+ CALL GSPA(szx, szy)
+ 
+ Level  0a     Set Pattern size
+ 
+Sets the pattern size to be used for subsequent FILL AREA patterned output
+to szx in X and szy in Y; in gks, patterns are not transformed and pattern
+size is ignored.
+2 Parameters
+ 
+Input    szx         REAL        Pattern size component (X)
+Input    szy         REAL        Pattern size component (Y)
+1 GSPAR
+
+ CALL GSPAR(kwkid, kpai, nx, ny, mx, kcola)
+ 
+ Level  1a     Set Pattern Represent
+ 
+Defines (or redefines) the representation for PATTERN kpai as that
+in array kcola.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpai        INTEGER     Pattern index
+Input    nx          INTEGER     Number of elements in X-direction
+Input    ny          INTEGER     Number of elements in Y-direction
+Input    mx          INTEGER     Actual first dimension of 2D array
+Input    kcola       INTEGER (*,*Colour index matrix
+1 GSPARF
+
+ CALL GSPARF(rfx, rfy)
+ 
+ Level  0a     Set Pattern Reference point
+ 
+Sets the reference point for subsequent FILL AREA patterned output to
+(rfx,rfy).
+2 Parameters
+ 
+Input    rfx         REAL        Pattern reference point coordinate (X)
+Input    rfy         REAL        Pattern reference point coordinate (Y)
+1 GSPKID
+
+ CALL GSPKID(kpkid)
+ 
+ Level  9z     Set Pick Identifier
+ 
+Sets the pick identifier for the current segment to kpkid.
+2 Parameters
+ 
+Input    kpkid       INTEGER     Pick Identifier
+1 GSPKM
+
+ CALL GSPKM(kwkid, kpkdnr, jmode, jesw)
+ 
+ Level  9z     Set Pick Mode
+ 
+Sets the mode of PICK device kpkdnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpkdnr      INTEGER     Pick device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSPLCI
+
+ CALL GSPLCI(kplcol)
+ 
+ Level  0a     Set Polyline Colour Index
+ 
+Sets the individual polyline colour index to kplcol. Subsequent POLYLINE output
+is modified if ASF(GAPLCI) is set to GINDIV.
+2 Parameters
+ 
+Input    kplcol      INTEGER     Polyline colour index
+1 GSPLI
+
+ CALL GSPLI(kpli)
+ 
+ Level  0a     Set Polyline Index
+ 
+Selects polyline bundle index kpli. Subsequent POLYLINE output is
+modified if any POLYLINE ASFs are set to GBUNDL.
+2 Parameters
+ 
+Input    kpli        INTEGER     Polyline index
+1 GSPLR
+
+ CALL GSPLR(kwkid, kpli, lntype, width, kplcol)
+ 
+ Level  1a     Set Polyline Represent
+ 
+Defines (or redefines) the representation for POLYLINE bundle kpli on
+workstation kwkid as linetype lntype, linewidth scale factor width and
+colour kplcol.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpli        INTEGER     Polyline index
+Input    lntype      INTEGER     Linetype
+Input    width       REAL        Linewidth scale factor
+Input    kplcol      INTEGER     Polyline colour index
+1 GSPMCI
+
+ CALL GSPMCI(kpmcol)
+ 
+ Level  0a     Set Polymarker Colour Index
+ 
+Sets the individual polymarker colour index to kpmcol. Subsequent POLYMARKER output
+is modified if ASF(GAPMCI) is set to GINDIV.
+2 Parameters
+ 
+Input    kpmcol      INTEGER     Polymarker colour index
+1 GSPMI
+
+ CALL GSPMI(kpmi)
+ 
+ Level  0a     Set Polymarker Index
+ 
+Selects polymarker bundle index kpmi. Subsequent POLYMARKER output
+is modified if any POLYMARKER ASFs are set to GBUNDL.
+2 Parameters
+ 
+Input    kpmi        INTEGER     Polymarker index
+1 GSPMR
+
+ CALL GSPMR(kwkid, kpmi, mktype, sizemk, kpmcol)
+ 
+ Level  1a     Set Polymarker Represent
+ 
+Defines (or redefines) the representation for POLYMARKER bundle kpmi on
+workstation kwkid as marker type mktype, marker size scale factor sizemk and
+colour kpmcol.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kpmi        INTEGER     Polymarker index
+Input    mktype      INTEGER     Marker type
+Input    sizemk      REAL        Marker size scale factor
+Input    kpmcol      INTEGER     Polymarker colour index
+1 GSSGP
+
+ CALL GSSGP(ksegnm, prior)
+ 
+ Level  1a     Set Segment Priority
+ 
+Sets the segment priority for segment ksegnm to prior.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    prior       REAL        Segment priority (range 0.0:1.0
+1 GSSGT
+
+ CALL GSSGT(ksegnm, segtrn)
+ 
+ Level  1a     Set Segment Transform
+ 
+Sets the segment transformation for segment ksegnm to segtrn.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    segtrn      REAL (3,2)  Transformation matrix
+1 GSSKM
+
+ CALL GSSKM(kwkid, kskdnr, jmode, jesw)
+ 
+ Level  0b     Set Stroke Mode
+ 
+Sets the mode of STROKE device kskdnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kskdnr      INTEGER     Stroke device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSSTM
+
+ CALL GSSTM(kwkid, kstdnr, jmode, jesw)
+ 
+ Level  0b     Set String Mode
+ 
+Sets the mode of STRING device kstdnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kstdnr      INTEGER     String device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSTXAL
+
+ CALL GSTXAL(jtxalh, jtxalv)
+ 
+ Level  0a     Set Text Alignment
+ 
+Sets the text alignment for subsequent text output to jtxalh horizontally
+and jtxalv vertically.
+2 Parameters
+ 
+Input    jtxalh      ENUMERATED  Text alignment: horizontal component:
+
+                     0   GAHNOR  "normal"
+                     1   GALEFT  "left aligned"
+                     2   GACENT  "centre aligned"
+                     3   GARITE  "right aligned"
+Input    jtxalv      ENUMERATED  Text alignment: vertical component:
+
+                     0   GAVNOR  "normal"
+                     1   GATOP   "top"
+                     2   GACAP   "cap line"
+                     3   GAHALF  "half height line"
+                     4   GABASE  "base line"
+                     5   GABOTT  "bottom line"
+1 GSTXCI
+
+ CALL GSTXCI(ktxcol)
+ 
+ Level  0a     Set Text Colour Index
+ 
+Sets the individual text colour index to ktxcol. Subsequent TEXT output
+is modified if ASF(GATXCI) is set to GINDIV.
+2 Parameters
+ 
+Input    ktxcol      INTEGER     Text colour index
+1 GSTXFP
+
+ CALL GSTXFP(kfont, jprec)
+ 
+ Level  0a     Set Text Font and Precision
+ 
+Sets the individual text font to kfont and text precision to jprec. Subsequent TEXT output
+is modified if ASF(GATXFP) is set to GINDIV.
+2 Parameters
+ 
+Input    kfont       INTEGER     Text font number
+Input    jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+1 GSTXI
+
+ CALL GSTXI(ktxi)
+ 
+ Level  0a     Set Text Index
+ 
+Selects text bundle index ktxi. Subsequent TEXT output is modified
+if any TEXT ASFs are set to GBUNDL.
+2 Parameters
+ 
+Input    ktxi        INTEGER     Text index
+1 GSTXP
+
+ CALL GSTXP(jtxp)
+ 
+ Level  0a     Set Text Path
+ 
+Sets the text path for subsequent output to jtxp.
+2 Parameters
+ 
+Input    jtxp        ENUMERATED  Text path:
+
+                     0   GRIGHT  "right"
+                     1   GLEFT   "left"
+                     2   GUP     "up"
+                     3   GDOWN   "down"
+1 GSTXR
+
+ CALL GSTXR(kwkid, ktxi, kfont, jprec, chxp, chsp, ktxcol)
+ 
+ Level  1a     Set Text Represent
+ 
+Defines (or redefines) the representation for TEXT bundle ktxi on
+workstation kwkid as font kfont, precision jprec, character expansion
+factor chxp, character spacing chsp and colour ktxcol.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    ktxi        INTEGER     Text index
+Input    kfont       INTEGER     Text font number
+Input    jprec       ENUMERATED  Text precision:
+
+                     0   GSTRP   "string precision"
+                     1   GCHARP  "character precision"
+                     2   GSTRKP  "stroke precision"
+Input    chxp        REAL        Character expansion factor
+Input    chsp        REAL        Character spacing
+Input    ktxcol      INTEGER     Text colour index
+1 GSVIS
+
+ CALL GSVIS(ksegnm, jvis)
+ 
+ Level  1a     Set Visibility
+ 
+Sets the visibility of segment ksegnm to jvis.
+2 Parameters
+ 
+Input    ksegnm      INTEGER     Segment name
+Input    jvis        ENUMERATED  Segment visibility:
+
+                     0   GINVIS  "invisible"
+                     1   GVISI   "visible"
+1 GSVLM
+
+ CALL GSVLM(kwkid, kvldnr, jmode, jesw)
+ 
+ Level  0b     Set Valuator Mode
+ 
+Sets the mode of VALUATOR device kvldnr on workstation kwkid to jmode and
+the echo switch to jesw.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    kvldnr      INTEGER     Valuator device number
+Input    jmode       ENUMERATED  Input operating mode:
+
+                     0   GREQU   "Request mode"
+                     1   GSAMPL  "Sample mode"
+                     2   GEVENT  "Event mode"
+Input    jesw        ENUMERATED  Echo switch:
+
+                     0   GNECHO  "no echo"
+                     1   GECHO   "echo"
+1 GSVP
+
+ CALL GSVP(ktnr, xmin, xmax, ymin, ymax)
+ 
+ Level  0a     Set Viewport
+ 
+Defines the viewport component of normalization transformation ktnr as
+xmin:xmax in X and ymin:ymax in Y; all coordinates are NDC.
+2 Parameters
+ 
+Input    ktnr        INTEGER     Transformation number
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+1 GSVPIP
+
+ CALL GSVPIP(ktnr, krtnr, jrelpr)
+ 
+ Level  0b     Set Viewport Input Priority
+ 
+Sets the input priority of normalization transformation ktnr higher
+or lower than that of krtnr according to jrelpr.
+2 Parameters
+ 
+Input    ktnr        INTEGER     Transformation number
+Input    krtnr       INTEGER     Reference transformation number
+Input    jrelpr      ENUMERATED  Relative priority:
+
+                     0   GHIGHR  "higher priority"
+                     1   GLOWER  "lower priority"
+1 GSWKVP
+
+ CALL GSWKVP(kwkid, xmin, xmax, ymin, ymax)
+ 
+ Level  0a     Set Workstat Viewport
+ 
+Defines the workstation viewport for workstation kwkid as xmin:xmax in
+X and ymin:ymax in Y; all coordinates are in DC.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+1 GSWKWN
+
+ CALL GSWKWN(kwkid, xmin, xmax, ymin, ymax)
+ 
+ Level  0a     Set Workstat Window
+ 
+Defines the workstation window for workstation kwkid as xmin:xmax in
+X and ymin:ymax in Y; all coordinates are in NDC.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+1 GSWN
+
+ CALL GSWN(ktnr, xmin, xmax, ymin, ymax)
+ 
+ Level  0a     Set Window
+ 
+Defines the window component of normalization transformation ktnr as
+xmin:xmax in X and ymin:ymax in Y; all coordinates are WC.
+2 Parameters
+ 
+Input    ktnr        INTEGER     Transformation number
+Input    xmin        REAL        Minimum window (WC)/viewport (NDC) coordinate (X)
+Input    xmax        REAL        Maximum window (WC)/viewport (NDC) coordinate (X)
+Input    ymin        REAL        Minimum window (WC)/viewport (NDC) coordinate (Y)
+Input    ymax        REAL        Maximum window (WC)/viewport (NDC) coordinate (Y)
+1 GTX
+
+ CALL GTX(x, y, text)
+ 
+ Level  0a     Text
+ 
+Generates text string text at position (x,y).
+2 Parameters
+ 
+Input    x           REAL        An X-coordinate
+Input    y           REAL        A Y-coordinate
+Input    text        CHAR*(*)    Character string
+1 GTXS
+
+ CALL GTXS(x, y, ltext, text)
+ 
+ Level  0a     Text (Subset.)
+ 
+See GTX. The parameter ltext is the length of the text string text.
+2 Parameters
+ 
+Input    x           REAL        An X-coordinate
+Input    y           REAL        A Y-coordinate
+Input    ltext       INTEGER     Length of string (Fortran 77 subset)
+Input    text        CHAR*(*)    Character string
+1 GUWK
+
+ CALL GUWK(kwkid, jregfl)
+ 
+ Level  0a     Update Workstat
+ 
+Performs all deferred actions on workstation kwkid according to the
+regeneration flag jregfl and redraws all visible segments stored on
+it.
+2 Parameters
+ 
+Input    kwkid       INTEGER     Workstation identifier
+Input    jregfl      ENUMERATED  Regeneration flag:
+
+                     0   GSUPP   "suppress"
+                     1   GPERFO  "perform"
+1 GWITM
+
+ CALL GWITM(kwkid, mftype, lmfdr, mfdr)
+ 
+ Level  0a     Write Item to GKSM
+ 
+Writes a user item mfdr to metafile output workstation kwkid; the item
+has type mftype.
+
+1 HELP
+ This help library describes all the routines of the RAL GKS 
+ implementation. It may prove useful for any version of GKS.
+
+ All subroutine parameters are described using the PARAMETERS 
+ sub-topic in help.
+
+ All information contained in this help library has been obtained
+ from the source documentation for RAL GKS. This is still under 
+ development and some inconsistencies may be present. Please report
+ any errors found to SYSTEM.

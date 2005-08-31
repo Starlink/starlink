@@ -1,0 +1,682 @@
+#+
+#  Name:
+#     makefile
+
+#  Purpose:
+#     Build and install the STARLSE package.
+
+#  Type of Module:
+#     Description file for the make utility.
+
+#  Description:
+#     This description file is used by the make utility to build the
+#     STARLSE package from the distributed source files, to install the
+#     resulting system for use, and to perform other housekeeping
+#     tasks.
+
+#  Invocation:
+#     This makefile is not intended to be used by make when invoked
+#     directly (although this is possible), but instead to be used via
+#     the accompanying mk script. This script sets up a number of
+#     environment variables which are used as macros within the
+#     makefile and which accommodate differences between machines and
+#     operating systems (it invokes make with the -e option). Please
+#     consult the mk script prologue for full details.
+
+#  Targets:
+#     The following make targets are defined in this makefile for
+#     external use:
+#     
+#        [help]
+#	    This is the default target. It outputs a message describing
+#	    the mk script and lists the targets provided.
+#        check
+#	    Performs a simple check that all necessary source files are
+#	    present, and displays the version number and current state
+#	    of the package (built/installed/tested, etc.).
+#        build
+#           Compiles the source files and creates all files needed
+#           prior to installing the package for use.
+#        install
+#	    Installs the package for use by putting the necessary files
+#	    into sub-directories of the $INSTALL directory (the $HOME
+#	    directory is used if the environment variable INSTALL is
+#	    not defined). Links to the installed files are left in the
+#	    source directory.
+#        deinstall
+#           Reverses the action of the install target, removing files
+#           from sub-directories of the $INSTALL directory and
+#           restoring them to the source directory (the $HOME directory
+#           is used by default if the environment variable INSTALL is
+#           not defined).
+#        test
+#           Builds and runs a simple test program to check for correct
+#           installation of the package.
+#        export
+#           Produces an export copy of the built package suitable for
+#           passing to another user. A compressed tar file is created
+#           in the $EXPORT directory containing copies of the source
+#           files and built files for the package (the current
+#           directory is used by default if the environment variable
+#           EXPORT is not defined). The package should normally be
+#           built, installed and tested (see above) before using this
+#           target. After unpacking the exported file on a similar
+#           machine, the recipient may simply install it for use.
+#        export_source
+#	    Produces an export copy of the source for the package
+#	    suitable for passing to another user to build (possibly on
+#	    a different type of machine). A compressed tar file is
+#	    created in the $EXPORT directory containing copies of just
+#	    the source files for the package (the current directory is
+#	    used by default if the environment variable EXPORT is not
+#	    defined). After unpacking the exported file, the recipient
+#	    must build the package before installing it for use.
+#        clean
+#           Cleans up after building the package, removing all
+#           intermediate files created during the building process, but
+#           leaving the built files themselves.
+#        unbuild
+#           Reverses the building process, removing all intermediate
+#           files along with all the built files.
+
+#  External Dependencies:
+#     The STARLSE package depends on DECset, which must previously have
+#     been installed on the machine on which STARLSE is to be built or
+#     installed.
+
+#  Notes:
+#     This makefile uses the presence/absence of the hidden files
+#     .BUILT, .INSTALLED and .TESTED to record the current state of the
+#     system during housekeeping operations.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-FEB-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-------------------------------------------------------------------------------
+
+#  Help target.
+#  ===========
+#
+#  This is the default target, so appears first.
+
+#  Display information about the mk script and the make targets.
+
+help:
+	@ echo \
+    "   The makefile provided is intended to be used by the make utility when";\
+        echo \
+    "   invoked via the associated mk script. This script defines environment";\
+        echo \
+    "   variables which are used by make to accommodate differing machine and";\
+        echo \
+    "   operating system characteristics. Please see the mk script prologue";\
+        echo \
+    "   for full details.";\
+        echo;\
+        echo \
+    "   The following targets are provided:";\
+        echo;\
+        echo \
+    "      help          - Print out this message";\
+        echo \
+    "      check         - Check source file presence and show current state";\
+        echo \
+    "      build         - Build the package from source";\
+        echo \
+    "      install       - Install the built package for use";\
+        echo \
+    "      deinstall     - Deinstall the package";\
+        echo \
+    "      test          - Perform a quick test of the installation";\
+        echo \
+    "      export        - Make a tar file for exporting the built package";\
+        echo \
+    "      export_source - Make a tar file for exporting the package source";\
+        echo \
+    "      clean         - Tidy up after building the package";\
+        echo \
+    "      unbuild       - Remove all the built files";\
+        echo;\
+        echo \
+    "   To build and install the $(PKG_NAME) package on a supported system, do:";\
+        echo;\
+        echo \
+    "      mk build; mk install; mk test; mk clean";\
+        echo
+
+#-------------------------------------------------------------------------------
+
+#  Defaults.
+#  ========
+#
+#  This section defines default macros and should rarely need changing.
+#  The values given here should be overridden externally to adapt to
+#  the local system setup (either use the mk script or use environment
+#  variables and invoke "make" with the "-e" option).
+
+#  Name of computer system.
+
+SYSTEM = unknown
+
+#  Pathname of the root directory beneath which other Starlink software
+#  is currently installed.
+
+STARLINK = /star
+
+#  Pathnames of Starlink sub-directories that may be referenced when
+#  building this package.
+
+STAR_BIN = $(STARLINK)/bin
+STAR_DATES = $(STARLINK)/dates
+STAR_ETC = $(STARLINK)/etc
+STAR_HELP = $(STARLINK)/help
+STAR_INC = $(STARLINK)/include
+STAR_LIB = $(STARLINK)/lib
+
+#  Pathname of the root directory beneath which the built files for
+#  this package should be installed for use. This defaults to the
+#  user's home directory.
+
+INSTALL = $(HOME)
+
+#  Pathname of the directory into which exported tar files will be
+#  placed. This defaults to the current working directory.
+
+EXPORT = .
+
+#  Command for forming a link to a file.
+
+LINK = ln
+
+#  Commands for adding to and extracting from an archive file (.tar).
+
+TAR_IN = pax -w -v -x ustar -f
+TAR_OUT = pax -r -f
+
+#-------------------------------------------------------------------------------
+
+#  Define package source files.
+#  ===========================
+#
+#  This section defines the set of source files for the package.
+
+#  Name of the package and the package version number.
+#
+#  The major component of the version number (before the dot) should
+#  normally only be incremented following major changes to the package.
+#  The minor version number (after the dot) is the number normally
+#  incremented following development which introduces new documented
+#  functionslity. The revision number (after the dash) should be
+#  incremented for other minor changes (bug fixes, etc.) which no not
+#  merit documentation changes.
+
+PKG_NAME = starlse
+PKG_VERS = 2.1-1
+
+#  List of files comprising the distributed source-only system. This
+#  defines the minimum set of files required to completely rebuild the
+#  package from source (including this makefile, the associated mk
+#  script and any documentation files).
+
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+
+#  List of public script files. These are scripts which form part of
+#  the package and will be required by users of it. They will be
+#  installed in the $(INSTALL_DIR) directory with execute permission
+#  set.
+
+PUBLIC_SCRIPTS = $(PKG_NAME)setup.csh $(PKG_NAME)start.csh \
+$(PKG_NAME)begin.csh $(PKG_NAME)_end.csh
+
+#  List of TPU source files to be compiled.
+
+TPU_SOURCE = align_comment.tpu comment.tpu detach.tpu do_cli.tpu \
+fix_continuation.tpu flush_buffers.tpu generic.tpu getenv.tpu \
+goto_previous_buffer.tpu help.tpu key_procedures.tpu post_key.tpu \
+pre_key.tpu print.tpu show_buffer.tpu sort.tpu \
+starlink_fortran_package.tpu starlse_initialisation.tpu \
+update_default.tpu where.tpu
+
+#  List of LSE source files to be compiled.
+
+LSE_SOURCE = adam_constructs.lse agi.lse ary.lse build.lse \
+chr.lse ems.lse err.lse fio.lse gks.lse grp.lse gwm.lse hds.lse \
+idi.lse ifl.lse key_definitions.lse mag.lse msg.lse ndf.lse par.lse \
+pgplot.lse primdat.lse psx.lse sgs.lse slalib.lse \
+starlink_fortran_a.lse starlink_fortran_adjust.lse \
+starlink_fortran_alias.lse starlink_fortran_b.lse trn.lse
+
+#  List of executable files which must be built for use by LSE.
+
+LSE_EXECUTABLES = $(PKG_NAME).env $(PKG_NAME).tpu_section
+
+#  List of documentation files.
+
+DOCUMENTATION = sun105.tex $(PKG_NAME).news
+
+#-------------------------------------------------------------------------------
+
+#  Define files required for building the package.
+#  ==============================================
+#
+#  This section defines the set of files produced from the source files
+#  when the package is built and installed.
+
+#  Use no pre-defined suffix rules.
+
+.SUFFIXES:
+
+#  List of files which must be built from the source files before the
+#  package can be installed for use. This should comprise all the files
+#  that are required to use the package (but excluding the date stamp
+#  file).
+
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(LSE_EXECUTABLES)
+#build:
+#	lse -i build.lse -n d
+
+#  Rules for extracting source files from the source archive.
+
+$(PUBLIC_SCRIPTS) $(TPU_SOURCE) $(LSE_SOURCE):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+
+#  Name of the date stamp file. This is used to record the time of the
+#  most recent build for use in subsequent operations that require it.
+#  There must be no rule for generating this file; it is only updated
+#  as a side effect of building the package.
+
+DATE_STAMP = $(PKG_NAME)_datestamp
+
+#  Pathnames of directories into which files may be placed when the
+#  package is installed.
+
+INSTALL_BIN_TOP = $(INSTALL)/bin
+INSTALL_BIN = $(INSTALL_BIN_TOP)/$(PKG_NAME)
+INSTALL_DATES = $(INSTALL)/dates
+INSTALL_ETC = $(INSTALL)/etc
+INSTALL_HELP = $(INSTALL)/help
+INSTALL_INC = $(INSTALL)/include
+INSTALL_LIB = $(INSTALL)/lib
+
+#  List of directories actually used for installation (selected from
+#  those above) and rules to create them.
+
+INSTALL_DIRS = $(INSTALL_BIN_TOP) $(INSTALL_BIN) $(INSTALL_DATES)
+
+$(INSTALL_DIRS): 
+	mkdir $@
+
+#-------------------------------------------------------------------------------
+
+#  Primary targets.
+#  ===============
+#
+#  These are the targets intended for normal external use (apart from
+#  help, which appears at the start of the file).
+
+#  check: Check source file presence and show current state.
+#  --------------------------------------------------------
+
+#  The check target simply depends on all the source files being
+#  present.
+
+check: $(SOURCE_FILES)
+	@ echo
+	@ echo \
+   "*** This is $(PKG_NAME) version V$(PKG_VERS) on system $(SYSTEM)"
+	@ echo
+	@ echo "    All essential source files are present"
+	@ echo
+#
+#  Display the current state.
+	@ if test -f .BUILT;\
+          then echo "    The package is currently:  built";\
+          else echo "    The package is currently:  not built";fi
+	@ if test -f .INSTALLED;\
+          then echo "                               installed";\
+          else echo "                               not installed";fi
+	@ if test -f .TESTED;\
+          then echo "                               tested";\
+          else echo "                               not tested";fi
+	@ echo
+
+#  build: Build the system.
+#  -----------------------
+#
+#  Compile the source and build the required files in the source
+#  directory.
+
+#  The build target first checks that the package is not installed. If
+#  not, it then causes the .BUILT target to be made which ensures that
+#  the package has been built.
+
+build:
+	@ if test -f .INSTALLED; then \
+           echo;\
+           echo \
+   "*** The $(PKG_NAME) package is currently installed -- please use the";\
+           echo "    \"deinstall\" target before re-building it";\
+           echo;\
+        elif $(MAKE) .BUILT; then \
+           echo;\
+           echo "*** The $(PKG_NAME) package has been built";\
+           echo;\
+        fi
+
+#  The .BUILT target records the time of the most recent build which
+#  modified any of the built files. It depends on all the built files
+#  being up to date (which causes them to be built).
+
+.BUILT: $(BUILT_FILES)
+#
+#  Note the package will need to be tested again.
+	@- if test -f .TESTED; then rm .TESTED; else :; fi
+#
+#  Enter information about the current machine and build environment
+#  into the date stamp file.
+	@ echo "Package : $(PKG_NAME)"         >$(DATE_STAMP)
+	@ echo "Version : V$(PKG_VERS)"       >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "Built by: $(USER) on node `uname -n`" \
+                                              >>$(DATE_STAMP)
+	@ echo "On      : `date`"             >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo \
+  "Machine : `uname -m` running `uname -s` `uname -v` (release `uname -r`)" \
+                                              >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "make macros:"                 >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   SYSTEM  : $(SYSTEM)"       >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   EXPORT  : $(EXPORT)"       >>$(DATE_STAMP)
+	@ echo "   INSTALL : $(INSTALL)"      >>$(DATE_STAMP)
+	@ echo "   STARLINK: $(STARLINK)"     >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   TAR_IN  : $(TAR_IN)"       >>$(DATE_STAMP)
+	@ echo "   TAR_OUT : $(TAR_OUT)"      >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+#
+#  Record completion of the build.
+	@ touch .BUILT
+
+#  install: Install the package for use.
+#  ------------------------------------
+#
+#  Copy the built files to their installation directories, from where
+#  they may be accessed.
+
+#  The install target first checks that no part of the package is
+#  already installed. If not, it causes the .INSTALLED target to be
+#  made which performs the installation.
+
+install:
+	@ if test -f .INSTALLED; then \
+           echo;\
+           echo \
+   "*** The $(PKG_NAME) package has already been installed -- please use the";\
+           echo \
+   "    \"deinstall\" target first if you wish to reinstall it";\
+           echo;\
+        elif $(MAKE) .INSTALLED; then \
+           echo;\
+           echo \
+   "*** The $(PKG_NAME) package has been installed in directory $(INSTALL)";\
+           echo;\
+        fi
+
+#  The .INSTALLED target copies each file from the source directory
+#  using "cp -p" to preserve its date, and replaces each original file
+#  by a link to the installed copy.
+
+.INSTALLED: $(INSTALL_DIRS)
+#
+#  Touch .INSTALLED to record that the package is installed (at least
+#  in part), and note that it may need re-testing.
+	@ touch .INSTALLED
+	@- if test -f .TESTED; then rm .TESTED; else :; fi
+#
+#  Install the public scripts, giving them world execute permission.
+	for f in $(PUBLIC_SCRIPTS); do \
+           cp -p $$f $(INSTALL_BIN);\
+           chmod 755 $(INSTALL_BIN)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_BIN)/$$f $$f;\
+        done
+#
+#  Install the executables, giving them world read permission.
+	for f in $(LSE_EXECUTABLES); do \
+           cp -p $$f $(INSTALL_BIN);\
+           chmod 644 $(INSTALL_BIN)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_BIN)/$$f $$f;\
+        done
+#
+#  Install the date stamp file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(DATE_STAMP) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
+	chmod 644 $(DATE_STAMP)
+	rm $(DATE_STAMP)
+	$(LINK) $(INSTALL_DATES)/$(DATE_STAMP) $(DATE_STAMP)
+
+#  deinstall: Deinstall the package.
+#  --------------------------------
+#
+#  Reverse the action of the install target, removing the installed
+#  files and returning them to the source directory.
+
+#  The deinstall target checks that the package is installed. If so, it
+#  causes the do_deinstall target to be made which performs the
+#  deinstallation.
+
+deinstall:
+	@ if test ! -f .INSTALLED; then \
+           echo;\
+           echo "*** The $(PKG_NAME) package is not currently installed";\
+           echo;\
+        else \
+           $(MAKE) do_deinstall;\
+           echo;\
+           echo \
+"*** The $(PKG_NAME) package has been deinstalled from directory $(INSTALL)";\
+           echo;\
+        fi
+
+#  The do_deinstall target (which should never exist) checks that an
+#  installed version of each file exists (in case an install failed
+#  part of the way through) and returns it to the source directory,
+#  using "cp -p" to preserve file dates. Links are removed from the
+#  source directory before copying.
+
+do_deinstall:
+#
+#  Deinstall the public script files, if installed versions exist.
+	- for f in $(PUBLIC_SCRIPTS); do \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_BIN)/$$f ./;\
+              rm $(INSTALL_BIN)/$$f;\
+           else :; fi \
+        done
+#
+#  Deinstall the executables, if installed versions exist.
+	- for f in $(LSE_EXECUTABLES); do \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_BIN)/$$f ./;\
+              rm $(INSTALL_BIN)/$$f;\
+           else :; fi \
+        done
+#
+#  Deinstall the date stamp file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
+           chmod 644 $(DATE_STAMP); rm $(DATE_STAMP);\
+           chmod 644 $(INSTALL_DATES)/$(DATE_STAMP);\
+           cp -p $(INSTALL_DATES)/$(DATE_STAMP) ./;\
+           rm $(INSTALL_DATES)/$(DATE_STAMP);\
+        else :; fi
+#
+#  Note the system is no longer installed. Touch .BUILT, since we have
+#  returned the built files to the source directory.
+	@- rm .INSTALLED 1>/dev/null 2>/dev/null
+	@ touch .BUILT
+
+#  test: Perform an installation test.
+#  ----------------------------------
+#
+#  Check that installed files are in their correct places and that a
+#  simple test program will run correctly.
+
+#  The test target checks that the package is currently installed. If
+#  so, it causes the do_test target to be made, which performs the
+#  installation test.
+
+test:
+	@ if test ! -f .INSTALLED; then \
+           echo;\
+           echo "*** The $(PKG_NAME) package is not currently installed";\
+           echo;\
+        elif $(MAKE) do_test; then\
+           echo;\
+           echo \
+           "*** Installation test for the $(PKG_NAME) package has been run";\
+           echo;\
+        fi
+
+#  The do_test target (which should never exist) performs the
+#  installation test.
+
+do_test:
+#
+#  Note the test has not yet succeeded.
+	@- if test -f .TESTED; then rm .TESTED; else :; fi
+#
+#  Extract the test program from the archive and set up new links for
+#  the include files which point at the installed versions. Remove any
+#  pre-existing links first if necessary.
+#	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.f
+#	-rm NDF_ERR NDF_FUNC NDF_PAR
+#	ln -s $(INSTALL_INC)/ndf_err NDF_ERR
+#	ln -s $(INSTALL_INC)/ndf_func NDF_FUNC
+#	ln -s $(INSTALL_INC)/ndf_par NDF_PAR
+#
+#  Build the test program, ensuring that the installed version of the library
+#  and link files are used.
+#	$(FC) $(FFLAGS) $(PKG_NAME)_test.f -L$(INSTALL_LIB) -L$(STAR_LIB) \
+#              `$(INSTALL_BIN)/$(PKG_NAME)_link` `$(STAR_BIN)/hds_link` \
+#              `$(STAR_BIN)/err_link` -o $(PKG_NAME)_test
+#
+#  Execute the test program and remove the binary file when done. Note
+#  that any external mechanism for locating shareable libraries (e.g. a
+#  search path) must previously have been set up.
+#	./$(PKG_NAME)_test
+#	rm $(PKG_NAME)_test
+#
+#  Note the test has been run.
+	@ touch .TESTED
+
+#  export: Export the installed system.
+#  -----------------------------------
+#
+#  Export the source plus all the built files to a new user.
+
+#  The export target depends on the resulting compressed tar file being
+#  up to date.
+
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	@ echo
+	@ echo \
+"*** Export copy of the built $(PKG_NAME) package is in the compressed"
+	@ echo \
+"    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z"
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files and the date stamp file (which
+#  records the time of the last build which modified any files).
+
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+#
+#  Issue a warning if the package has not been tested.
+	@ if test ! -f .TESTED; then \
+           echo;\
+           echo "*** Warning: the $(PKG_NAME) package has not been tested";\
+           echo;\
+        else :; fi
+#
+#  Remove any pre-existing tar files before creating new ones.
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; then \
+           rm $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
+           rm $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	$(TAR_IN) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar $(SOURCE_FILES) \
+            $(BUILT_FILES) $(DATE_STAMP) .BUILT
+	compress -v $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar
+
+#  export_source: Export the source.
+#  --------------------------------
+#
+#  Export the source files only to a new user.
+
+#  This target depends on the resulting compressed tar file being up to
+#  date.
+
+export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+	@ echo
+	@ echo \
+"*** Export copy of the $(PKG_NAME) package source is in the compressed"
+	@ echo \
+"    tar file $(EXPORT)/$(PKG_NAME).tar.Z"
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files.
+
+$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+#
+#  Remove any pre-existing tar files before creating new ones.
+	if test -f $(EXPORT)/$(PKG_NAME).tar; then \
+           rm $(EXPORT)/$(PKG_NAME).tar; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
+           rm $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	$(TAR_IN) $(EXPORT)/$(PKG_NAME).tar $(SOURCE_FILES)
+	compress -v $(EXPORT)/$(PKG_NAME).tar
+
+#  clean: Clean up the source directory.
+#  ------------------------------------
+#
+#  Remove all intermediate files. Do not remove built files.
+
+clean:
+	@- rm $(TPU_SOURCE) $(LSE_SOURCE) 1>/dev/null 2>/dev/null
+	@ echo
+	@ echo "*** Intermediate files removed"
+	@ echo
+
+#  unbuild: Reverse the build process.
+#  ----------------------------------
+
+#  Remove all intermediate files and all built files, and note that the
+#  package is no longer built or tested.
+
+unbuild: clean
+	@- rm $(BUILT_FILES) $(DATE_STAMP) 1>/dev/null 2>/dev/null
+	@- rm .BUILT .TESTED 1>/dev/null 2>/dev/null
+	@ echo "*** Built files removed"
+	@ echo
+
+#  End of makefile.

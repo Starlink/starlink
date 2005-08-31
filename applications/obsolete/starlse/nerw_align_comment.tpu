@@ -1,0 +1,323 @@
+      PROCEDURE STARLSE1_ALIGN_TRAILING
+!+
+!  Name:
+!     STARLSE1_ALIGN_TRAILING
+!
+!  Purpose:
+!     Align a trailing comment on the current line.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of Module:
+!     PROCEDURE
+!
+!  Description:
+!     Any trailing comment in the current line is aligned to the standard
+!     column. The procedure copes with embedded tab characters and quoted
+!     strings. 
+!
+!  Implementation deficiencies:
+!     Quoted strings are not handled if they are part of a Fortran statement
+!     which is continued and spans a line boundary.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!
+!  History:
+!     7-APR-1989: (RFWS)
+!        Original version.
+!     17-APR-1989 (RFWS):
+!        Adapted to use global variables to specify comment characters and
+!        the alignment column.
+!-
+
+!  Local variables:
+      LOCAL CHAR,                ! Single character from line
+            COMCOL,              ! Screen column containing comment delimiter 
+            FIRST_CHAR,          ! First character in line
+            I,                   ! Character counter
+            ICOMM,               ! Position of comment delimiter
+            INQUOTES,            ! Whether the current character is inside
+                                 ! quotes 
+            LAST,                ! Position of last non-blank before comment
+            LASTCOL,             ! Screen column containing 'LAST' character
+            LINE,                ! Current line, as a string
+            N_CHAR,              ! Number of characters in line
+            OLDPOS               ! Initial position marker
+            ;
+
+!.
+      
+!  Remember the initial position, then check that trailing comment alignment
+!  is enabled (column not zero) and that the current position is not at the
+!  end of the buffer. 
+      OLDPOS := MARK( NONE );
+      IF ( ( STARLSE1_TRAIL_COMMENT_COLUMN > 0 ) AND
+           ( OLDPOS <> END_OF( CURRENT_BUFFER ) ) ) THEN
+
+!  Extract the first character of the current line.
+         MOVE_HORIZONTAL( - CURRENT_OFFSET );
+         FIRST_CHAR := CURRENT_CHARACTER;
+         POSITION( OLDPOS );
+
+!  Check that the first character is not a comment character, and the line
+!  is not blank, otherwise there is nothing to do.
+         IF ( ( INDEX( STARLSE1_BEGIN_COMMENT_CHARS, FIRST_CHAR ) = 0 ) AND
+              ( FIRST_CHAR <> '' ) ) THEN 
+
+!  Otherwise, extract the current line as a string, and check that there
+!  is a trailing comment delimiter within it. There is no work to do if
+!  there is not. 
+            LINE := CURRENT_LINE;
+            IF ( INDEX( LINE, STARLSE1_TRAIL_COMMENT_CHARS ) <> 0 ) THEN
+
+!  Find the length of the line and initialise for finding the first
+!  non-quoted comment delimiter. 
+               N_CHAR := LENGTH( LINE );
+               I := 1;
+               LAST := 1;
+               ICOMM := 0;
+               INQUOTES := 0;
+
+!  Loop to find the trailing comment delimiter.
+               LOOP
+                  I := I + 1;
+                  EXITIF I > N_CHAR;
+
+!  Test each character which is not in quotes.  Exit this loop when
+!  a trailing comment delimiter is found.
+                  CHAR := SUBSTR( LINE, I, 1 );
+                  IF ( NOT INQUOTES ) AND
+                     ( INDEX( STARLSE1_TRAIL_COMMENT_CHARS, CHAR ) <> 0 ) THEN
+                     ICOMM := I;
+                     EXITIF 1;
+                  ELSE
+
+!  Note the last character which was not a space or a tab.
+                     IF ( CHAR <> ' ' ) AND ( CHAR <> ASCII( 9 ) ) THEN
+                        LAST := I;
+
+!  Keep track of quotes.
+                        IF ( CHAR = '''' ) THEN
+                           INQUOTES := ( NOT INQUOTES );
+                        ENDIF;
+                     ENDIF;
+                  ENDIF;
+               ENDLOOP;
+
+!  If a trailing comment delimiter was found, mark the current
+!  position and move to the last non-blank (or tab) character before
+!  the comment. 
+               IF ICOMM <> 0 THEN
+                  OLDPOS := MARK( NONE );
+                  MOVE_HORIZONTAL( LAST - CURRENT_OFFSET - 1 );
+
+!  Find which screen column this character appears in, then move to
+!  the comment delimiter.
+                  LASTCOL := GET_INFO( CURRENT_BUFFER, 'OFFSET_COLUMN' );
+                  MOVE_HORIZONTAL( ICOMM - CURRENT_OFFSET - 1 );
+
+!  Loop to remove characters in front of the comment delimiter
+!  until it appears in the required column or the last non-blank
+!  character imposes a limit on the alignment. (The position may
+!  overshoot, because of the removal of tab characters.)
+                  LOOP
+                     COMCOL := GET_INFO( CURRENT_BUFFER, 'OFFSET_COLUMN' );
+                     EXITIF ( COMCOL <= STARLSE1_TRAIL_COMMENT_COLUMN ) OR
+                            ( COMCOL <= ( LASTCOL + 2 ) );
+                     ERASE_CHARACTER( -1 );
+                     ICOMM := ICOMM - 1;
+                  ENDLOOP;
+
+!  If the comment is in too low a column number, loop to insert
+!  blanks in front of it until the required position is reached.
+!  The previous non-blank character may force the comment to move
+!  to a higher column. 
+                  LOOP
+                     COMCOL := GET_INFO( CURRENT_BUFFER, 'OFFSET_COLUMN' );
+                     EXITIF ( COMCOL >= STARLSE1_TRAIL_COMMENT_COLUMN ) AND
+                            ( COMCOL >= ( LASTCOL + 2 ) );
+                     COPY_TEXT( ' ' );
+                  ENDLOOP;
+
+!  Move mack to the initial position in the line and clean up.
+                  POSITION( OLDPOS );
+                  DELETE( OLDPOS );
+               ENDIF;
+            ENDIF;
+         ENDIF;
+      ENDIF;
+
+      ENDPROCEDURE;
+
+!-------------------------------------------------------------------------------
+      PROCEDURE STARLSE1_ALIGN_COMMENT_LINE
+!+
+!  Name:
+!     STARLSE1_ALIGN_COMMENT
+!
+!  Purpose:
+!     Align the current line to start in a standard column, if it is a
+!     comment line.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of module:
+!     PROCEDURE.
+!
+!  Description:
+!     If the current line starts with a comment character in the first column,
+!     the procedure aligns the text of the comment so that it starts in the
+!     standard column. If several possible comment characters exist, the
+!     standard one is substituted. If the line contains an end-of-line comment,
+!     then that is aligned to its respective column instead. If a blank
+!     beginning-of-line comment is encountered, then it is replaced with a
+!     completely blank line.
+!     
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     1-JUN-1989 (RFWS):
+!        Original version.
+!     24-JUL-1989 (RFWS):
+!        Added handling of blank comment lines; they are now erased.
+!     {enter_further_changes_here}
+!
+!  Bugs:
+!     {enter_any_bugs_here}
+!
+!-
+
+      LOCAL INITIAL_POSN,  ! Initial cursor position
+            START_OF_SEARCH, ! Point at which search is started
+            TARGET,        ! Search pattern (a non-blank character)
+            LINE_START,    ! Start of initial line
+            OFS;           ! Offset from start of line
+
+!  Define an error handler; if the SEARCH operation for a non-blank character
+!  in a comment line fails, then erase the blank comment line and create an
+!  empty one in its place. Position the cursor on this line and return.
+      ON_ERROR
+         ERASE_LINE;
+         SPLIT_LINE;
+         MOVE_VERTICAL( -1 );
+         RETURN;
+      ENDON_ERROR;
+
+!  Mark the initial position and check it is not the end of buffer, then move to
+!  the start of the current line and mark that also.
+      INITIAL_POSN := MARK( NONE );
+      IF( INITIAL_POSN <> END_OF( CURRENT_BUFFER ) ) THEN
+         MOVE_HORIZONTAL( - CURRENT_OFFSET );
+         LINE_START := MARK( NONE );
+
+!  Check the line is not blank.  Look for a trailing comment if beginning
+!  of line commenting is not enabled.
+         IF( CURRENT_CHARACTER <> '' ) THEN
+            IF( STARLSE1_BEGIN_COMMENT_CHARS = '' ) THEN
+               STARLSE1_ALIGN_TRAILING;
+
+!  If there is no comment character in column 1, look for a trailing comment.
+            ELSE
+               IF( INDEX( STARLSE1_BEGIN_COMMENT_CHARS, CURRENT_CHARACTER )
+                   = 0 ) THEN
+                  STARLSE1_ALIGN_TRAILING;
+
+!  If there is a comment character, then look for the following non-blank
+!  character.
+               ELSE
+                  MOVE_HORIZONTAL( 1 );
+                  START_OF_SEARCH := MARK( NONE );
+                  TARGET := NOTANY( ' ' );
+                  POSITION( BEGINNING_OF( SEARCH( TARGET, FORWARD ) ) );
+                  OFS := CURRENT_OFFSET;
+
+!  Check this lies on the current line.  If so, erase the text in front of
+!  it and substitute the standard comment character and alignment.
+                  MOVE_HORIZONTAL( - OFS );
+                  IF ( MARK( NONE ) = LINE_START ) THEN
+                     ERASE_CHARACTER( OFS );
+                     COPY_TEXT( SUBSTR( STARLSE1_BEGIN_COMMENT_CHARS, 1, 1 ) );
+                     COPY_TEXT( '  ' );
+
+!  If there are no non-blank characters on the current line (but the line
+!  does have a beginning of line comment character) then the search will
+!  terminate on a different line (or will fail, in which case the error
+!  handler takes over). Erase the blank comment line and position the cursor
+!  on it, re-defining the "initial position" so it stays there.
+                  ELSE
+                     POSITION( START_OF_SEARCH );
+                     ERASE_LINE;
+                     SPLIT_LINE;
+                     MOVE_VERTICAL( -1 );
+                     INITIAL_POSN := MARK( NONE );
+                  ENDIF;
+               ENDIF;
+            ENDIF;
+         ENDIF;
+
+!  Reposition the cursor.
+         POSITION( INITIAL_POSN );
+      ENDIF;
+
+      ENDPROCEDURE;
+
+!-------------------------------------------------------------------------------
+      PROCEDURE STARLSE_ALIGN_COMMENT
+!+
+!  Name:
+!     STARLSE_ALIGN_COMMENT
+!
+!  Purpose:
+!     Align comments in the current select range.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of Module:
+!     PROCEDURE
+!
+!  Description:
+!     All comment lines (leading and trailing) within the current select
+!     range are aligned to their respective standard columns and standard
+!     comment characters are substituted. If no select range is active, then
+!     only the current line is processed.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!
+!  History:
+!     1-JUN-1989 (RFWS):
+!        Initial version.
+!-
+
+      LOCAL INITIAL_POSN;
+
+!  If a select is not in progress, just process the current line.
+      IF( NOT LSE$SELECT_IN_PROGRESS ) THEN
+         STARLSE1_ALIGN_COMMENT_LINE;
+
+!  Loop through the select range, aligning each line.
+      ELSE
+         LSE$CREATE_SELECT_RANGE;
+         INITIAL_POSN := MARK( NONE );
+         POSITION( BEGINNING_OF( LSE$SELECT_RANGE ) );
+         MOVE_HORIZONTAL( - CURRENT_OFFSET );
+         LOOP
+            EXITIF( ( MARK( NONE ) > END_OF( LSE$SELECT_RANGE ) ) OR
+                    ( MARK( NONE ) = END_OF( CURRENT_BUFFER ) ) );
+            STARLSE1_ALIGN_COMMENT_LINE;
+            MOVE_VERTICAL( 1 );
+         ENDLOOP;
+
+!  Reposition the cursor and delete the select range.
+         POSITION( INITIAL_POSN );
+         DELETE( LSE$SELECT_RANGE );
+      ENDIF;
+
+      ENDPROCEDURE;

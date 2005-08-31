@@ -1,0 +1,38 @@
+      PROCEDURE STARLSE1_DO_CLI( CMD );
+
+      LOCAL INFO;
+
+!  Create a CLI buffer ffor STARLSE if it doesn't already exist. Supress
+!  informational messages during this process.
+      IF ( STARLSE1_CLI_BUF = TPU$K_UNSPECIFIED ) THEN
+         INFO := GET_INFO( SYSTEM, "informational" );
+         SET( INFORMATIONAL, OFF );
+         STARLSE1_CLI_BUF := CREATE_BUFFER( "$STARLSE1_CLI_BUF" );
+         IF ( INFO ) THEN
+            SET( INFORMATIONAL, ON );
+         ENDIF;
+
+!  Make this a system buffer which is not written out when LSE exits.
+         SET( SYSTEM, STARLSE1_CLI_BUF );
+         SET( NO_WRITE, STARLSE1_CLI_BUF );
+      ENDIF;
+
+!  Similarly create a CLI process to write to this buffer.
+      IF ( STARLSE1_CLI_PROC = TPU$K_UNSPECIFIED ) THEN
+         INFO := GET_INFO( SYSTEM, "informational" );
+         SET( INFORMATIONAL, OFF );
+         STARLSE1_CLI_PROC := CREATE_PROCESS( STARLSE1_CLI_BUF, " " );
+         IF ( INFO ) THEN
+            SET( INFORMATIONAL, ON );
+         ENDIF;
+      ENDIF;
+
+!  Empty the buffer and send the command to the CLI process.
+      ERASE( STARLSE1_CLI_BUF );
+      SEND( CMD, STARLSE1_CLI_PROC );
+
+!  Return the buffer contents, formatted as a string, and empty the buffer.
+      STARLSE1_DO_CLI := STR( STARLSE1_CLI_BUF );
+      ERASE( STARLSE1_CLI_BUF );
+
+      ENDPROCEDURE;

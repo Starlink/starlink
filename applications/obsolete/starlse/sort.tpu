@@ -1,0 +1,41 @@
+      PROCEDURE STARLSE_SORT( QUAL )
+!+
+!  Purpose:
+!     Sort all lines in the current select range using the CLI SORT utility.
+!     The usual qualifiers may be specified.
+!
+!  Notes:
+!     - This procedure is taken from the example in the VAX LSE manual.
+!-
+
+      LOCAL SORT_PROCESS, CMD, SAVE_POSITION, CURRENT_MESSAGE;
+
+      IF NOT LSE$SELECT_IN_PROGRESS THEN
+         MESSAGE( 'No select active' );
+         RETURN;
+      ENDIF;
+
+      LSE$CREATE_SELECT_RANGE;
+      WRITE_FILE( LSE$SELECT_RANGE, 'STARLSE_SORT_IN.TMP' );
+      
+      SORT_PROCESS := CREATE_PROCESS( MESSAGE_BUFFER, " " );
+      CMD := "sort " + SUBSTR( QUAL, 2, LENGTH( QUAL) - 1 ) +
+             " STARLSE_SORT_IN.TMP >STARLSE_SORT_OUT.TMP";
+      MESSAGE( CMD );
+      SEND( CMD, SORT_PROCESS );
+
+      SAVE_POSITION := MARK( NONE );
+      POSITION( MESSAGE_BUFFER );
+      CURRENT_MESSAGE := CURRENT_LINE;
+      POSITION( SAVE_POSITION );
+
+      IF CURRENT_MESSAGE = CMD THEN
+         ERASE( LSE$SELECT_RANGE );
+         READ_FILE( 'STARLSE_SORT_OUT.TMP' );
+      ENDIF;
+
+      DELETE( LSE$SELECT_RANGE );
+      SEND( "rm STARLSE_SORT_IN.TMP STARLSE_SORT_OUT.TMP", SORT_PROCESS );
+      DELETE( SORT_PROCESS );
+
+     ENDPROCEDURE;

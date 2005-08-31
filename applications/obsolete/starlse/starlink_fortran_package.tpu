@@ -1,0 +1,75 @@
+!  Purpose:
+!     This file contains procedures which handle the expansion of routine
+!     names and argument lists for package definitions accessed from the
+!     STARLINK_FORTRAN language.
+
+PROCEDURE LSE$PKG_EXPAND_PARM_STARLINK_FORTRAN;
+
+LSE$PKG_DEFINE_PARAMETER;
+
+ENDPROCEDURE;
+
+!*******************************************************************************
+PROCEDURE LSE$PKG_EXPAND_ROUT_STARLINK_FORTRAN
+!++
+!   This routine generates a FORTRAN token definition from a routine definition.
+!   It differs from the version supplied with LSE in that all the parameters are
+!   placed on the same line and the subroutine name is in upper case.
+!
+!   See the LSE manual Appendix D
+!--
+    LOCAL
+	proc_name,
+	command_string,
+	cur_param,
+	cur_option;
+
+    !	Start DEFINE TOKEN command
+!    lse$pkg_define_token;
+
+    !	Remove quotes from routine name and make upper case
+    proc_name := SUBSTR(LSE$PKG_ROUT_NAME, 2, LENGTH(LSE$PKG_ROUT_NAME)-2);
+    CHANGE_CASE(proc_name,UPPER);
+
+    IF LSE$PKG_ROUT_PARM = '' THEN
+	!   No parameters so the call is just the routine name
+	command_string := proc_name;
+    ELSE
+	!   The routine has parameters so add an opening parenthesis
+	command_string := proc_name + '( ';
+                                                                     
+	!   For each parameter  
+	LOOP
+	    EXITIF lse$pkg_get_param (cur_param,
+					cur_option,
+					LSE$PKG_ROUT_PARM,
+					LSE$PKG_ROUT_OPT) = 0;
+	    !	Fold to lower case
+	    CHANGE_CASE(cur_param,LOWER);
+
+	    IF cur_option = 'O' THEN
+		!   Optional parameter
+		command_string := command_string + '[' + cur_param + '], ';
+	    ELSE
+		!   Mandatory parameter
+		command_string := command_string + '{' + cur_param + '}, ';
+	    ENDIF;
+	ENDLOOP;
+	!   Remove the trailing comma from last parameter and add the
+	!   closing parenthesis.
+	command_string := SUBSTR(command_string, 1, 
+					    LENGTH(command_string)-2) + ' )';
+    ENDIF;
+
+!  Issue NEW TOKEN command.
+    LSE_NEW_TOKEN( proc_name, "TERMINAL", "STARLINK_FORTRAN" );
+    LSE_SET_TOKEN_BODY_LINE( command_string, "EXPAND", 0, "SPACE", "SAME",
+                             "ADD", proc_name, "STARLINK_FORTRAN" );
+    IF ( LSE$PKG_ROUT_DESC <> "" ) THEN
+       LSE_SET_TOKEN_DESCRIPTION( LSE$PKG_ROUT_DESC, proc_name, "STARLINK_FORTRAN" );
+    ENDIF;
+    IF ( LSE$PKG_ROUT_TOP <> "" ) THEN
+       LSE_SET_TOKEN_HELP_TOPIC( LSE$PKG_ROUT_TOP, proc_name, "STARLINK_FORTRAN" );
+    ENDIF;
+
+ENDPROCEDURE;

@@ -1,0 +1,80 @@
+      PROCEDURE STARLSE_PRINT( QUAL )
+!+
+!  Purpose:
+!     Print the current buffer or the current select range.
+
+!  Description:
+!     This TPU procedure is intended to be invoked from LSE. It will then
+!     cause the contents of the current buffer to be printed using the DCL
+!     command PRINT, to which the usual qualifiers may be appended. If a
+!     select range is active, then only the contents of the select range
+!     will be printed.
+
+!  Arguments:
+!     QUAL = STRING (Given)
+!        The qualifiers to be appended to the DCL PRINT command.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     2-OCT-1990 (RFWS):
+!        Original version.
+!     8-OCT-1990 (RFWS):
+!        Fixed bug whereby a modified file was being written back to a file
+!        with the same version number as the original, hence causing a file
+!        name conflict error.
+!     {enter_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!  Local Variables:
+         LOCAL PRINT_PROCESS, CMD, FILENAME;
+
+!.
+
+!  If no select range is active then the entire buffer is to be printed.
+!  Obtain the name of the associated file.
+         IF NOT LSE$SELECT_IN_PROGRESS THEN
+            FILENAME := GET_INFO( CURRENT_BUFFER, 'FILE_NAME' );
+
+!  If the associated file name is defined, then see if the buffer has been
+!  modified. If so, then update the file by writing the current buffer
+!  contents to it.
+            IF FILENAME <> '' THEN
+               IF GET_INFO( CURRENT_BUFFER, 'MODIFIED' ) THEN
+                  FILENAME := WRITE_FILE( CURRENT_BUFFER );
+               ENDIF;
+
+!  If there is no associated file name, then use a temporary file name and
+!  note this fact. Write the buffer to the file.
+            ELSE
+               FILENAME := WRITE_FILE( CURRENT_BUFFER, 'starlse_print.tmp' );
+            ENDIF;
+
+!  If a select range is active, then a temporary file must be used. Note
+!  this fact and write the select range to the file.
+         ELSE
+            LSE$CREATE_SELECT_RANGE;
+            FILENAME := WRITE_FILE( LSE$SELECT_RANGE, 'starlse_print.tmp' );
+
+!  Delete the select range.
+            DELETE( LSE$SELECT_RANGE );
+         ENDIF;
+
+!  Construct the command.
+         CMD := 'lpr ' + SUBSTR( QUAL, 2, LENGTH( QUAL ) - 1 ) + ' ' + FILENAME;
+
+!  Show the command being used.
+         MESSAGE( CMD );
+
+!  Send the command to the process. Then delete the process.
+!  Create a process to execute the PRINT command.
+         PRINT_PROCESS := CREATE_PROCESS( MESSAGE_BUFFER, CMD );
+         DELETE( PRINT_PROCESS );
+
+      ENDPROCEDURE;

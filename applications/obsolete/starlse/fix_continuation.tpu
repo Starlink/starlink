@@ -1,0 +1,144 @@
+      PROCEDURE STARLSE1_FIX_CONTINUATION_LINE
+!+
+!  Name:
+!     STARLSE1_FIX_CONTINUATION_LINE
+!
+!  Purpose:
+!     Change the continuation character in the current line to be ':'
+!     (only works for the STARLINK_FORTRAN language).
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of module:
+!     PROCEDURE.
+!
+!  Description:
+!     This procedure searches for a Fortran continuation character in the
+!     current line. If found, it is converted to a colon ':'. No action is
+!     taken if STARLINK_FORTRAN is not the current STARLSE language.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     23-MAY-1989 (RFWS):
+!        Original version.
+!     {enter_further_changes_here}
+!
+!  Bugs:
+!     {enter_any_bugs_here}
+!
+!-
+
+      LOCAL INITIAL_POSN,  ! Initial cursor position
+            TARGET,        ! Search pattern (a non-blank character)
+            LINE_START,    ! Start of initial line
+            CONT_COLUMN,   ! Column containing continuation (?) character
+            OFS;           ! Offset from start of line
+
+!  Define an error handler; if the SEARCH operation for a non-blank character
+!  fails, then reposition the cursor to its initial position and return.
+      ON_ERROR
+         POSITION( INITIAL_POSN );
+         RETURN;
+      ENDON_ERROR;
+
+!  Check that STARLINK_FORTRAN is the current language.
+      IF ( STARLSE1_CURRENT_LANGUAGE = STARLSE1_STARLINK_FORTRAN_LANGUAGE ) THEN
+
+!  Mark the initial position, then move to the start of the current line
+!  and mark that also.
+         INITIAL_POSN := MARK( NONE );
+         MOVE_HORIZONTAL( - CURRENT_OFFSET );
+         LINE_START := MARK( NONE );
+
+!  Search for the next non-blank character and move to it.
+         TARGET := NOTANY( ' ' );
+         POSITION( BEGINNING_OF( SEARCH( TARGET, FORWARD ) ) );
+
+!  Find which column it lies in.
+         CONT_COLUMN := GET_INFO( CURRENT_BUFFER, 'OFFSET_COLUMN' );
+
+!  If in column 6, then move to the start of the line and check the
+!  cursor is still in the same line as it started in.
+         IF ( CONT_COLUMN = 6 ) THEN
+            OFS := CURRENT_OFFSET;
+            MOVE_HORIZONTAL( - OFS );
+            IF ( MARK( NONE ) = LINE_START ) THEN
+
+!  If OK, then return to the continuation character and replace it with
+!  a colon.
+               MOVE_HORIZONTAL( OFS );
+               ERASE_CHARACTER( 1 );
+               COPY_TEXT( ':' );
+            ENDIF;
+         ENDIF;
+
+!  Reposition the cursor at its initial position.
+         POSITION( INITIAL_POSN );
+      ENDIF;
+
+      ENDPROCEDURE;
+
+      PROCEDURE STARLSE_FIX_CONTINUATION
+!+
+!  Name:
+!     STARLSE_FIX_CONTINUATION
+!
+!  Purpose:
+!     Fix Fortran continuation characters in the current select range.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of Module:
+!     PROCEDURE
+!
+!  Description:
+!     All Fortran continuation lines in the current select range are changed
+!     to colon ':' (only works from the STARLINK_FORTRAN language).
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!
+!  History:
+!     25-JUL-1989 (RFWS):
+!        Initial version.
+!     {enter_changes_here}
+!-
+
+      LOCAL INITIAL_POSN;
+
+!  Give an error message if STARLINK_FORTRAN is not the current STARLSE
+!  language.
+      IF ( STARLSE1_CURRENT_LANGUAGE <> STARLSE1_STARLINK_FORTRAN_LANGUAGE ) THEN
+         MESSAGE( 'FIX_CONTINUATION only works from the ' +
+                  'STARLINK_FORTRAN language' );
+
+!  If a select is not in progress, just process the current line.
+      ELSE
+         IF( NOT LSE$SELECT_IN_PROGRESS ) THEN
+            STARLSE1_FIX_CONTINUATION_LINE;
+
+!  Loop through the select range, processing each line.
+         ELSE
+            LSE$CREATE_SELECT_RANGE;
+            INITIAL_POSN := MARK( NONE );
+            POSITION( BEGINNING_OF( LSE$SELECT_RANGE ) );
+            MOVE_HORIZONTAL( - CURRENT_OFFSET );
+            LOOP
+               EXITIF( ( MARK( NONE ) > END_OF( LSE$SELECT_RANGE ) ) OR
+                       ( MARK( NONE ) = END_OF( CURRENT_BUFFER ) ) );
+               STARLSE1_FIX_CONTINUATION_LINE;
+               MOVE_VERTICAL( 1 );
+            ENDLOOP;
+
+!  Reposition the cursor and delete the select range.
+            POSITION( INITIAL_POSN );
+            DELETE( LSE$SELECT_RANGE );
+        ENDIF;
+      ENDIF;
+
+      ENDPROCEDURE;

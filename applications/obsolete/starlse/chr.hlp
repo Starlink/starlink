@@ -1,0 +1,938 @@
+1 CHR_APPND
+Copy one string into another (ignoring trailing blanks).
+
+CALL CHR_APPND( STR1, STR2, LEN2 )
+
+Description:
+
+   The string STR1 (or as much of it as there is room for) is copied
+   into the part of STR2 beginning at position LEN2 + 1.  LEN2 is
+   updated to indicate the final length of STR1 after this operation.
+   Trailing blanks are ignored. 
+2 Arguments
+STR1 = CHARACTER ( * ) (Given)
+   Input string to be copied into the string that is to be modified.
+
+STR2 = CHARACTER * ( * ) (Given and Returned)
+   String to be updated by adding the contents of STR1.
+
+LEN2 = INTEGER (Given and Returned)
+   The current position of the last non-blank character in STR2.
+1 CHR_CLEAN
+Remove all non-printable ASCII characters from a string.
+
+CALL CHR_CLEAN( STRING )
+
+Description:
+
+   Replace all non-printable characters in a string with blanks.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String to be "cleaned".
+1 CHR_COPY
+Copy one string to another, checking for truncation.
+
+CALL CHR_COPY( INSTR, FLAG, OUTSTR, LSTAT )
+
+Description:
+
+   This routine copies one character string to another, checking for
+   truncation caused by the output being too short to accommodate all
+   the input string. Trailing blanks in the input string are ignored.
+   If truncation is found it is indicated by a local status being set.
+   As much as possible of the truncated string is copied and
+   optionally the last character of the output string may be set to
+   '#' if truncation has occurred. 
+2 Arguments
+INSTR = CHARACTER * ( * ) (Given)
+   Input string.
+
+FLAG = LOGICAL (Given)
+   A logical flag indicating the action to be taken in the event of
+   truncation being detected. If FLAG is .TRUE., then a '#' will be
+   written to the last element of the output string on detecting
+   truncation. If FLAG is .FALSE., then no '#' is written to the
+   output string.
+
+OUTSTR = CHARACTER * ( * ) (Returned)
+   Output string. This will contain the input string, possibly
+   truncated. 
+
+LSTAT = INTEGER (Returned)
+   Local status; 0 ==> success, 1 ==> truncation was detected.
+2 Notes
+-  This routine may be rather slow and probably should not be used
+where it is going to be called many times inside a loop. It is really
+intended for cases where it will not be called very often but it is
+imperative to check that truncation is not occurring. 
+1 CHR_CTOC
+Write a character value into a string.
+
+CALL CHR_CTOC( CVALUE, STRING, NCHAR )
+
+Description:
+
+   Write a character value into a string using as concise a format as
+   possible.
+2 Arguments
+CVALUE = CHARACTER * ( * ) (Given)
+   Value to be written
+
+CVALUE = CHARACTER * ( * ) (Returned)
+   String into which the value is to be written.
+
+NCHAR = INTEGER (Returned)
+   Field width.
+1 CHR_CTOD
+Read a double precision number from a character string.
+
+CALL CHR_CTOD( CVALUE, DVALUE, STATUS )
+
+Description:
+
+   Read a double precision number from a character string.
+2 Arguments
+CVALUE = CHARACTER * ( * ) (Given)
+   String from which an attempt will be made to read a double
+   precision number.
+
+DVALUE = DOUBLE PRECISION (Returned)
+   Value read from the input string.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this value is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_CTOI
+Read an integer number from a character string.
+
+CALL CHR_CTOI( CVALUE, IVALUE, STATUS )
+
+Description:
+
+   Read an integer number from a character string.
+2 Arguments
+CVALUE = CHARACTER * ( * ) (Given)
+   String from which an attempt will be made to read an integer
+   number.
+
+IVALUE = INTEGER (Returned)
+   Value read from the input string.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this value is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_CTOL
+Read a logical value from a character string.
+
+CALL CHR_CTOL( CVALUE, LVALUE, STATUS )
+
+Description:
+
+   The string supplied is decoded as a logical constant. 'TRUE', 'T',
+   'YES', 'Y' and 'FALSE', 'F', 'NO', 'N' are recognised, regardless
+   of case. Other strings will result in STATUS being set to
+   SAI__ERROR. 
+2 Arguments
+CVALUE = CHARACTER * ( * ) (Given)
+   String to be decoded.
+
+LVALUE = LOGICAL (Returned)
+   Decoded value.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this variable is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_CTOR
+Read a real number from a character string.
+
+CALL CHR_CTOR( CVALUE, RVALUE, STATUS )
+
+Description:
+
+   Read a real number from a character string.
+2 Arguments
+CVALUE = CHARACTER * ( * ) (Given)
+   String from which an attempt will be made to read a real number.
+
+RVALUE = REAL (Returned)
+   Value read from the input string.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this variable is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_DCWRD
+Return all the words in a character string.
+
+CALL CHR_DCWRD( STRING, MXWD, NWRD, START, STOP, WORDS, LSTAT )
+
+Description:
+
+   All the words in a character variable are detected and returned as
+   individual elements of a character array. In this context a word is
+   defined as a contiguous string of non-blank characters. Hence,
+   words must be separated from each other by one or more blanks. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   Character string to be decomposed into its constituent words.
+
+MXWD = INTEGER (Given)
+   The maximum number of words to be extracted from the input string. 
+
+NWRD = INTEGER (Returned)
+   The actual number of words located in the input string. If there
+   are more than MXWD words in the input string, then only the first
+   MXWD will be found.
+
+START( MXWD ) = INTEGER (Returned)
+   The I'th element returns the position of the first character of
+   the I'th word in the input string.
+
+STOP( MXWD ) = INTEGER (Returned)
+   The I'th element returns the position of the last character of the
+   I'th word in the input string.
+
+WORDS( MXWD ) = CHARACTER * ( * ) (Returned)
+   The I'th element contains the I'th word in the input string.
+ 
+LSTAT = INTEGER (Returned)
+   Local status. This is a return status only; 0 ==> success, 1 ==>
+   number of words exceeds MXWD.
+1 CHR_DELIM
+Locate indices to substring with given delimiter character.
+
+CALL CHR_DELIM( STRING, DELIM, INDEX1, INDEX2 )
+
+Description:
+
+   The input string, STRING, is examined to see if it contains a
+   substring delimited by the character DELIM. The character positions
+   of the substring delimiters are returned as INDEX1 and INDEX2. 
+
+   See "notes" for details of how the routine behaves if the input
+   string does not contain just two instances of the delimiting
+   character DELIM.
+   
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   String to be searched.
+
+DELIM = CHARACTER * ( 1 ) (Given)
+   The substring delimiting character.
+
+INDEX1 = INTEGER (Returned)
+   Index to the first occurrence of the delimiter or to the first
+   character in the string (see "notes").
+
+INDEX2 = INTEGER (Returned)
+   Index to the last occurrence of the delimiter or to the last
+   character in the string (see "notes").
+2 Notes
+-  If no occurrence of DELIM is found, or if the only occurrence of
+DELIM is the last character of the string, then the indices are
+returned pointing to the whole of the input string.
+
+-  If only one occurrence of DELIM is found and it is not the last
+character in the string, then INDEX1 will point to this position and
+INDEX2 will point to the last character in the string. 
+
+-  If there are more than two occurrences of DELIM, then INDEX1 will
+point to the first occurrence and INDEX2 to the last occurrence. 
+1 CHR_DTOC
+Encode a double precision number as a character string.
+
+CALL CHR_DTOC( DVALUE, CVALUE, NCHAR )
+
+Description:
+
+   Encode a double precision value as a character string, using as
+   concise a format as possible, and return the number of characters
+   used. In the event of an error, '*'s will be written to the string.
+2 Arguments
+DVALUE = DOUBLE PRECISION (Given)
+   Value to be encoded.
+
+CVALUE = CHARACTER ( * ) (Given)
+   String into which the value is to be encoded.
+
+NCHAR = INTEGER (Returned)
+   Field width used in encoding the value.
+1 CHR_EQUAL
+Determine whether two strings are equal.
+
+(LOGICAL) RESULT = CHR_EQUAL( STR1, STR2 )
+
+Description:
+
+   Determine whether the two strings given are the same (with case
+   distinction). Their lengths must be identical after removing
+   trailing blanks
+
+   This routine exists for historical reasons only; its function is
+   better performed by a Fortran relational expression.
+2 Arguments
+STR1 = CHARACTER * ( * ) (Given)
+   First string.
+
+STR2 = CHARACTER * ( * ) (Given)
+   Second string.
+
+2 Result
+CHR_EQUAL = LOGICAL (Returned)
+   Returns .TRUE. if the two strings given are the same, otherwise
+   returns .FALSE..
+1 CHR_FANDL
+Find the positions of the first and last non-blank characters.
+
+CALL CHR_FANDL( STRING, INDEX1, INDEX2 )
+
+Description:
+
+   Find the positions of the first and last non-blank characters in
+   the given string. If the string is all spaces, then the first index
+   points to the end of the string and the second index points to the
+   beginning of the string; i.e. INDEX1 > INDEX2.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   Input string.
+
+INDEX1 = INTEGER (Returned)
+   Position of the first non-blank character.
+
+INDEX2 = INTEGER (Returned)
+   Position of the last non-blank character.
+1 CHR_FILL
+Fill a string with a given character.
+
+CALL CHR_FILL( CHAR, STRING )
+
+Description:
+
+   The string supplied, STRING, is filled with the character CHAR.
+2 Arguments
+CHAR = CHARACTER * ( 1 ) (Given)
+   The character with which the string is to be filled.
+
+STRING = CHARACTER * ( * ) (Returned)
+   The string to be filled.
+1 CHR_FIWE
+Find next end of word.
+
+CALL CHR_FIWE( STRING, INDEX, STATUS )
+
+Description:
+
+   The routine finds the next end of word in the character string
+   STRING and increments the INDEX argument to point at it. An end of
+   word is indicated by the following character being a word delimiter
+   (i.e. a tab, space or comma). If INDEX already points to an end of
+   word, then it is returned unchanged. This routine is intended to be
+   used in conjunction with the routine CHR_FIWS.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   The character string to be searched.
+
+INDEX = INTEGER (Given and Returned)
+   On entry, this argument specifies the character position in STRING
+   at which the search is to start. If its value is less than 1, then
+   searching begins at the first character. On exit, INDEX is set to
+   the character position preceding the next word delimiter. If INDEX
+   already points at an end of word, then it will be returned
+   unchanged. If no delimiter is found, then INDEX will be set to
+   point at the last character in STRING, and the STATUS argument will
+   be set.
+
+STATUS = INTEGER (Given and Returned)
+   If this argument is not set to SAI__OK on entry, then the routine
+   will return without action. If no word delimiter is found in
+   STRING, then STATUS will be returned set to the value
+   CHR__ENDOFSENT.
+1 CHR_FIWS
+Find start of next word.
+
+CALL CHR_FIWS( STRING, INDEX, STATUS )
+
+Description:
+
+   The routine finds the start of the next word in the character
+   string STRING and increments the INDEX argument to point at it. A
+   word is considered to start at a character which is not a tab,
+   space or comma. If INDEX already points at a character within a
+   word, then it will be returned unchanged. This routine is intended
+   to be used in conjunction with the routine CHR_FIWE.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   The character string to be searched.
+
+INDEX = INTEGER (Given and Returned)
+   On entry, this argument specifies the character position in STRING
+   at which the search is to start. If its value is less than 1, then
+   searching begins at the first character. On exit, INDEX is set to
+   the character position at which the next word starts. If INDEX
+   already points at a character which is not a word delimiter, then
+   it will be returned unchanged. If no word is found, then INDEX will
+   be set to point at the last character in STRING, and the STATUS
+   argument will be set.
+
+STATUS = INTEGER (Given and Returned)
+   If this argument is not set to SAI__OK on entry, then the routine
+   will return without action. If no word is found in STRING, then
+   STATUS will be returned set to the value CHR__WRDNOTFND.
+1 CHR_HTOI
+Read an integer number from a hexadecimal string.
+
+CALL CHR_HTOI( STRING, IVALUE, STATUS )
+
+Description:
+
+   Read an integer number from a hexadecimal string.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   String to be decoded.
+
+IVALUE = INTEGER (Returned)
+   Value decoded from the given string.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this variable is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_INDEX
+Find the index of a substring in a string.
+
+(INTEGER) RESULT = CHR_INDEX( STRING, SUBSTR )
+
+Description:
+
+   Find the position of a given substring within another string.
+
+   This routine exists only for historical reasons and should not be
+   used in new software; its function is better performed by the
+   Fortran intrinsic function INDEX, called directly. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   String to be searched.
+
+SUBSTR = CHARACTER * ( * ) (Given)
+   Substring to be found.
+
+2 Returned_Result
+CHR_INDEX = INTEGER (Returned)
+   The position of SUBSTR within STRING.
+1 CHR_INSET
+Determine whether a string is a member of a set.
+
+(LOGICAL) RESULT = CHR_INSET( SET, STRING )
+
+Description:
+
+   Checks a character string, STRING, for being equal to any of a
+   number of possible values given in SET, which is also a character
+   variable. The possible values can be of any length and should be
+   separated by commas. Upper and lower case are treated as equivalent
+   and commas are ignored. 
+2 Arguments
+SET = CHARACTER * ( * ) (Given)
+   The set of possible values. It takes the form 'string1,...,stringN'
+   where each of the substrings 'string1' up to 'stringN' may be of
+   different lengths. 
+
+STRING = CHARACTER * ( * ) (Given)
+   The string to be checked for membership of the set.
+2 Returned_Result
+CHR_INSET = LOGICAL (Returned)
+   Whether the string is a member of the set; .TRUE. ==> member,
+   .FALSE. ==> not a member.
+1 CHR_ISALF
+Determine whether a character is alphabetic.
+
+(LOGICAL) RESULT = CHR_ISALF( CHAR )
+
+Description:
+
+   The given character CHAR is tested for being alphabetic, i.e. for
+   being in one of the two sets ('A' to 'Z') or ('a' to 'z').
+2 Arguments
+CHAR = CHARACTER * ( 1 ) (Given)
+   The character to be tested.
+2 Returned_Result
+CHR_ISALF = LOGICAL (Returned)
+   Whether the character is alphabetic; .TRUE. ==> alphabetic, .FALSE
+   ==> not alphabetic.
+1 CHR_ISALM
+Determine whether a character is alphanumeric.
+
+(LOGICAL) RESULT = CHR_ISALM( CHAR )
+
+Description:
+
+   Determine whether a given character is alphanumeric, i.e. in one of
+   the sets ('A' to 'Z'), ('a' to 'z'), ('0' to '9') or ('_'). Note
+   that this routine treats underscore '_' as an alphanumeric
+   character. 
+2 Arguments
+CHAR = CHARACTER * ( 1 ) (Given)
+   The character to be tested.
+2 Returned_Result
+CHR_ISALM = LOGICAL (Returned)
+   Whether the character is alphanumeric; .TRUE. ==> alphanumeric,
+   .FALSE. ==> not alphanumeric.
+1 CHR_ISDIG
+Determine whether a character is a digit.
+
+(LOGICAL) RESULT = CHR_ISDIG( CHAR )
+
+Description:
+
+   Determine whether the given character is a digit, i.e. is in the
+   set ('0' to '9').
+2 Arguments
+CHAR = CHARACTER ( 1 ) (Given)
+   The character to be tested.
+2 Returned_Result
+CHR_ISDIG = LOGICAL (Returned)
+   Whether the character is a digit; .TRUE. ==> digit, .FALSE. ==> not
+   a digit.
+1 CHR_ISNAM
+Determine whether a string is a valid name.
+
+(LOGICAL) RESULT = CHR_ISNAM( STRING )
+
+Description:
+
+   Determine whether the string given is a valid name. That is,
+   whether it starts with an alphabetic character and continues with
+   alphanumeric or underscore characters. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   The string to be tested.
+2 Returned_Result
+CHR_ISNAM = LOGICAL (Returned)
+   Whether the string is a valid name; .TRUE. ==> valid name, .FALSE.
+   ==> not a valid name.
+1 CHR_ITOC
+Encode an integer value as a string.
+
+CALL CHR_ITOC( IVALUE, CVALUE, STATUS )
+
+Description:
+
+   Encode an integer value as a character string, using as concise a
+   format as possible, and return the number of characters used. In
+   the event of an error, '*'s will be written to the string. 
+2 Arguments
+IVALUE = INTEGER (Given)
+   Value to be encoded.
+
+CVALUE = CHARACTER * ( * ) (Returned)
+   String into which the integer value is to be encoded.
+
+NCHAR = INTEGER (Returned)
+   Field width used in encoding the value.
+1 CHR_LCASE
+Convert a string to lower case.
+
+CALL CHR_LCASE( STRING )
+
+Description:
+
+   The characters in the string are all converted to lower case, in
+   situ. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given and Returned)
+   The string to be converted to lower case.
+1 CHR_LDBLK
+Remove leading blanks from a string.
+
+CALL CHR_LDBLK( STRING )
+
+Description:
+
+   The routine removes leading blanks from a string. The space at the
+   end of the string created by shunting up the non-blank characters
+   is padded out with blanks. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String from which the leading blanks are to be removed.
+1 CHR_LEN
+Find the used length of a string.
+
+(INTEGER) RESULT = CHR_LEN( STRING )
+
+Description:
+
+   Find the length of a string, ignoring trailing blanks.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   String whose length is to be determined.
+2 Returned_Result
+CHR_LEN = INTEGER (Returned)
+   Length of the string (i.e. the position of the last non-blank
+   character). A value of zero is returned if the string is entirely
+   blank. 
+1 CHR_LOWER
+Give lower case equivalent of a character.
+
+(CHARACTER * 1) RESULT = CHR_LOWER( CHAR )
+
+Description:
+
+   If the given character is an upper case character, this function
+   returns the lower case equivalent. Otherwise, the character will be
+   returned unchanged as the function result. 
+2 Arguments
+CHAR = CHARACTER * ( 1 ) (Given)
+   The character for which the lower case equivalent is required.
+2 Returned_Result
+CHR_LOWER = CHARACTER * ( 1 ) (Returned)
+   Lower case equivalent of the character supplied.
+1 CHR_LTOC
+Encode a logical value as a string.
+
+CALL CHR_LTOC( LVALUE, CVALUE, NCHAR )
+
+Description:
+
+   Encode a logical value as one of the character strings 'TRUE' or
+   'FALSE'.
+2 Arguments
+LVALUE = LOGICAL (Given)
+   Value to be encoded as a character string.
+
+CVALUE = CHARACTER * ( * ) (Returned)
+   String into which the value is to be encoded.
+
+NCHAR = INTEGER (Returned)
+   Field width used in encoding the value.
+1 CHR_MOVE
+Move one string into another (ignoring trailing blanks).
+
+CALL CHR_MOVE( STR1, STR2 )
+
+Description:
+
+   The string STR1 (or as much of it as there is room for) is copied
+   into STR2 beginning at position 1. Trailing blanks in STR1 are
+   ignored.
+2 Arguments
+STR1 = CHARACTER * ( * ) (Given)
+   Input string.
+
+STR2 = CHARACTER * ( * ) (Given and Returned)
+   String to receive the transferred characters.
+1 CHR_OTOI
+Read an integer number from an octal string.
+
+CALL CHR_OTOI( STRING, IVALUE, STATUS )
+
+Description:
+
+   Read an integer number from an octal string.
+2 Arguments
+STRING = CHARACTER * ( *) (Given)
+   String to be decoded.
+
+IVALUE = INTEGER (Returned)
+   Value decoded from the string supplied.
+ 
+STATUS = INTEGER (Given and Returned)
+   Inherited global status. If this variable is not SAI__OK on input,
+   then the routine will return without action. If the routine fails
+   to complete, this variable will be set to SAI__ERROR.
+1 CHR_PUTC
+Copy one string into another.
+
+CALL CHR_PUTC( STR1, STR2, LEN2 )
+
+Description:
+
+   The string STR1 (or as much of it as there is room for) is copied
+   into the part of STR2 beginning at position LEN2 + 1. LEN2 is
+   updated to indicate the end position of the copy. If no copying is
+   done (because STR2 is full), then LEN2 remains unchanged.
+
+   The lengths of STR1 and STR2 used by this routine are the declared
+   Fortran 77 sizes as returned by the intrinsic LEN function (i.e.
+   trailing blanks are significant). 
+2 Arguments
+STR1 = CHARACTER * ( * ) (Given)
+   Input string to be copied.
+
+STR2 = CHARACTER * ( * ) (Given and Returned)
+   String to receive the copied characters.
+
+LEN2 = INTEGER (Given and Returned)
+   Position of last copied character within STR2.
+1 CHR_PUTD
+Put a double precision number into a string at a given position.
+
+CALL CHR_PUTD( DVALUE, STRING, LENGTH )
+
+Description:
+
+   The double precision number supplied is encoded into a concise
+   string which is copied into that part of the STRING argument
+   beginning at position LENGTH + 1. LENGTH is updated to indicate the
+   position of the final character of the encoded value within STRING.
+2 Arguments
+DVALUE = DOUBLE PRECISION (Given)
+   Value to be encoded into the string.
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String into which the double precision value is to be inserted.
+
+LENGTH = INTEGER (Given and Returned)
+   Position of the last character inserted into STRING.
+1 CHR_PUTI
+Put an integer number into a string at a given position.
+
+CALL CHR_PUTI( IVALUE, STRING, LENGTH )
+
+Description:
+
+   The integer number supplied is encoded into a concise string which
+   is copied into that part of the STRING argument beginning at
+   position LENGTH + 1. LENGTH is updated to indicate the position of
+   the final character of the encoded value within STRING. 
+2 Arguments
+IVALUE = INTEGER (Given)
+   Value to be encoded into the string.
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String into which the integer value is to be inserted.
+
+LENGTH = INTEGER (Given and Returned)
+   Position of the last character inserted into STRING.
+1 CHR_PUTL
+Put a logical value into a string at a given position.
+
+CALL CHR_PUTL( LVALUE, STRING, LENGTH )
+
+Description:
+
+   The logical value supplied is encoded as 'T' or 'F' and copied into
+   that part of the STRING argument beginning at position LENGTH + 1.
+   LENGTH is updated to indicate the position of the final character
+   of the encoded value within STRING. 
+2 Arguments
+LVALUE = LOGICAL (Given)
+   Value to be encoded into the string.
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String into which the logical value is to be inserted.
+
+LENGTH = INTEGER (Given and Returned)
+   Position of the last character inserted into STRING.
+1 CHR_PUTR
+Put a real number into a string at a given position.
+
+CALL CHR_PUTR( RVALUE, STRING, LENGTH )
+
+Description:
+
+   The real number supplied is encoded into a concise string which is
+   copied into that part of the STRING argument beginning at position
+   LENGTH + 1. LENGTH is updated to indicate the position of the final
+   character of the encoded value within STRING. 
+2 Arguments
+DVALUE = REAL (Given)
+   Value to be encoded into the string.
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String into which the real value is to be inserted.
+
+LENGTH = INTEGER (Given and Returned)
+   Position of the last character inserted into STRING.
+1 CHR_RMBLK
+Remove all blanks from a string in situ.
+
+CALL CHR_RMBLK( STRING )
+
+Description:
+
+   The routine removes all of the leading and embedded blanks from a
+   string and places them at the end.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given and Returned)
+   The string from which all leading and embedded blanks are to be
+   removed.
+1 CHR_RTOAN
+Write a real number into a string as hr/deg:min:sec.
+
+CALL CHR_RTOAN( RVALUE, UNITS, STRING, LENGTH )
+
+Description:
+
+   The routine writes a real value into a character string, formatting
+   it as hour/degrees:minutes:seconds. This routine is intended for
+   writing angular measures into a character string in a format
+   suitable for presentation to an astronomer. 
+
+   The value is written into that part of the string beginning at
+   LENGTH + 1, and LENGTH is then updated to reflect the new length of
+   the string (excluding trailing blanks) after adding the value. 
+   
+2 Arguments
+RVALUE = REAL (Given)
+   Value to be encoded into the string. The value probably represents
+   an angular measure.
+
+UNITS = CHARACTER * ( * ) (Given)
+   This argument controls the maximum value which will be formatted as
+   hr/deg:min:sec (see "notes"). If UNITS = 'HOURS' the maximum
+   permitted value is 24.0, if UNITS = 'DEGREES' the maximum permitted
+   is 360.0 and in all other cases, the maximum is 1000.0. 
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String into which the value is to be encoded.
+
+LENGTH = INTEGER (Given and Returned)
+   Current length of STRING, excluding trailing blanks.
+2 Notes
+-  If the absolute value of the number to be written exceeds a
+predefined maximum, then a conversion is not attempted, but the number
+is written as a real value in Fortran "exponential" format and a
+couple of question marks are appended to it. This prevents silly
+results when very large numbers are input. The UNITS argument controls
+the maximum permitted value for the conversion. 
+1 CHR_RTOC
+Encode a real number as a character string.
+
+CALL CHR_RTOC( RVALUE, CVALUE, NCHAR )
+
+Description:
+
+   Encode a real number as a character string, using as concise a
+   format as possible, and return the number of characters used. In
+   the event of an error, '*'s are written to the string.
+2 Arguments
+RVALUE = REAL (Given)
+   Value to be encoded.
+
+CVALUE = CHARACTER * ( * ) (Returned)
+   String into which the value is to be encoded.
+
+NCHAR = INTEGER (Returned)
+   Field width used in encoding the value.
+1 CHR_SIMLR
+Determine whether two strings are equal apart from case.
+
+(LOGICAL) RESULT = CHR_SIMLR( STR1, STR2 )
+
+Description:
+
+   The routine determines whether two strings are equal, ignoring
+   distinctions between upper and lower case letters. Their lengths
+   must also be equal after removing trailing blanks.
+2 Arguments
+STR1 = CHARACTER * ( * ) (Given)
+   The first string.
+
+STR2 = CHARACTER * ( * ) (Given)
+   The second string.
+2 Returned_Result
+CHR_SIMLR = LOGICAL (Returned)
+   Whether the two strings are equal (ignoring case); .TRUE. ==>
+   equal, .FALSE ==> not equal.
+1 CHR_SIZE
+Find the declared size of a string.
+
+(INTEGER) RESULT = CHR_SIZE( STRING )
+
+Description:
+
+   Give the declared size of a Fortran 77 character string (including
+   trailing blanks).
+
+   This routine exists for historical reasons only and should not be
+   used in new software. Its function is better performed by the
+   Fortran intrinsic function LEN, called directly.
+2 Arguments
+STRING = CHARACTER * ( * ) (Given)
+   The string whose length is to be determined.
+2 Returned_Result
+CHR_SIZE = INTEGER (Returned)
+   The declared Fortran 77 length of the string.
+1 CHR_SWAP
+Swap two single-character variables.
+
+CALL CHR_SWAP( V1, V2 )
+
+Description:
+
+   Exchange the values held by two single-character variables.
+2 Arguments
+V1 = CHARACTER * ( 1 ) (Given and Returned)
+   First character.
+
+V2 = character * ( 1 ) (Given and Returned)
+   Second character.
+1 CHR_TERM
+Terminate string by padding out with blanks.
+
+CALL CHR_TERM( LENGTH, STRING )
+
+Description:
+
+   The string given, STRING, is terminated to a length of LENGTH
+   characters by filling the remainder of its declared length with
+   blanks (i.e. so that the first LENGTH characters retain their
+   previous values). 
+2 Arguments
+LENGTH = INTEGER (Given)
+   Required length of the string once trailing blanks are ignored.
+   This must be positive and not greater than the declared length of
+   the string.
+
+STRING = CHARACTER * ( * ) (Given and Returned)
+   String to be terminated.
+1 CHR_TRUNC
+Truncate string rightwards from a given delimiter.
+
+CALL CHR_TRUNC( DELIM, STRING )
+
+Description:
+
+   The routine is given a single character delimiter DELIM. The
+   string, STRING, is examined for the first occurrence of this
+   delimiter and, when one is found, that character and all subsequent
+   characters in the string are replaced by blanks. 
+2 Arguments
+DELIM = CHARACTER * ( 1 ) (Given)
+   Single delimiter character.
+
+STRING = character * ( * ) (Given and Returned)
+   String to be truncated; all characters from (and including) the
+   first occurrence of DELIM will be replaced with blanks.
+1 CHR_UCASE
+Convert a string to upper case.
+
+CALL CHR_UCASE( STRING )
+
+Description:
+
+   The characters in the string are all converted to upper case, in
+   situ. 
+2 Arguments
+STRING = CHARACTER * ( * ) (Given and Returned)
+   The string to be converted to upper case.
+1 CHR_UPPER
+Give upper case equivalent of a character.
+
+(CHARACTER * 1) RESULT = CHR_UPPER( CHAR )
+
+Description:
+
+   If the character given is a lower case letter, then this function
+   returns the upper case equivalent. Otherwise, the character is
+   returned unchanged as the function result. 
+2 Arguments
+CHAR = CHARACTER * ( 1 ) (Given)
+   Character for which the upper case equivalent is required.
+2 Returned_Result
+CHR_UPPER = CHARACTER * ( 1 ) (Returned)
+   Upper case equivalent of the input character if this was a lower
+   case letter, otherwise set to the input character.

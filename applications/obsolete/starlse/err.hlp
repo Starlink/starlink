@@ -1,0 +1,280 @@
+1 ERR_ANNUL
+Annul the contents of the current error context.
+
+CALL ERR_ANNUL( STATUS )
+
+Description:
+
+   Any pending error messages for the current error context are annulled,
+   i.e. deleted. The values of any existing message tokens become
+   undefined, and the value of the status argument is reset to SAI__OK.
+2 Arguments
+STATUS = INTEGER (Returned)
+   The global status value: it is set to SAI__OK on return.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 17-Apr-1983 (SLW):
+    Added MARK and RELEASE mods.
+
+ 20-JUN-1989 (RFWS):
+    Updated prologue, comments and layout.
+
+ 11-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 15-DEC-1989 (PCTR):
+    Converted to call EMS_ANNUL.
+1 ERR_FIOER
+Assign a Fortran I/O error message to a token.
+
+CALL ERR_FIOER( TOKEN, IOSTAT )
+
+Description:
+
+   The text of the error message associated with the Fortran I/O status
+   value, IOSTAT, is assigned to the message token, TOKEN. This token may
+   then be included in an error message.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+IOSTAT = INTEGER (Given)
+   The Fortran I/O status value.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 4-OCT-1989 (PCTR):
+    Original version, based upon code for PONGO.
+
+ 15-DEC-1989 (PCTR):
+    Converted to call EMS_FIOER.
+1 ERR_FLUSH
+Flush the current error context.
+
+CALL ERR_FLUSH( STATUS )
+
+Description:
+
+   This ensures that all pending error messages in the current error
+   context have been output to the user. On successful completion, the
+   error context is annulled and the status argument is reset to SAI__OK;
+   if an error is encountered during output of the error messages, the
+   error context is not anulled and the status argument is set to
+   ERR__OPTER.
+2 Arguments
+STATUS = INTEGER (Returned)
+   The global status value: it is set to SAI__OK on return if the
+   error message output is successful; if not, it is set to ERR_OPTER.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+SLW: Sid Wright (UCL)
+
+BDK: Dennis Kelly (ROE)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 17-ARP-1983 (SLW):
+    Added MARK and RELEASE mods.
+
+ 14-NOV-1984 (BDK):
+    Change name of ERR_PRINT.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 11-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 1-MAR-1990 (PCTR):
+    Converted to use EMS_ calls where possible, and changed the
+    behaviour of STATUS.
+
+ 9-APR-1990 (PCTR):
+    Removed unreferenced declarations and replaced DO WHILE construct
+    with ANSI Fortran 77 equivalent.
+1 ERR_LOAD
+Return error messages from the current error context.
+
+ERR_LOAD( OPSTR, OPLEN, STATUS )
+
+Description:
+
+   Each pending error message for the current error context is copied into
+   a character variable from the error table. The subroutine is invoked
+   repeatedly until all the error messages in the current context have
+   been copied, indicated by STATUS being reset to SAI__OK. At this point
+   the current error context is annulled.
+2 Arguments
+OPSTR = CHARACTER * ( * ) (Returned)
+   The error message.
+
+OPLEN = INTEGER (Returned)
+   The length of the error message.
+
+STATUS = INTEGER (Given and Returned)
+   The global status value.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 28-NOV-1989 (PCTR):
+    Original version adapted from ERR_FLUSH and MSG_MLOAD.
+
+ 15-DEC-1989 (PCTR):
+    Changed name to ERR_LOAD, and converted to call EMS_ELOAD.
+1 ERR_MARK
+Start a new error context.
+
+CALL ERR_MARK
+
+Description:
+
+   This subroutine begins a new error context, so that delivery of
+   subsequently reported error messages is deferred and the messages
+   held in the error table. Calls to ERR_ANNUL, ERR_FLUSH and ERR_LOAD
+   will only flush or annul the contents of the error table within this
+   context.
+2 Authors
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 17-APR-1983 (SLW):
+    Original version.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 12-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 15-DEC-1989 (PCTR):
+    Converted to use EMS_ calls.
+1 ERR_REP
+Report an error message.
+
+CALL ERR_REP( PARAM, MSG, STATUS )
+
+Description:
+
+   This subroutine reports an error message. According to the error context,
+   the error message is either sent to the user or retained in the error 
+   table. The latter case allows the application to take further action before 
+   deciding if the user should receive the message. The values associated 
+   with any existing message tokens are left undefined. On successful 
+   completion, the global status is returned unchanged; if an output error 
+   is encountered, the status argument is returned set to ERR__OPTER. 
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   The error message name.
+
+MSG = CHARACTER * ( * ) (Given)
+   The error message text.
+
+STATUS = INTEGER (Given and Returned)
+   The global status. This variable is left unchanged on successful
+   completion, and is set to ERR__OPTER if an output error is
+   encountered.
+2 Authors
+JRG: Jack Giddings (UCL)
+
+SLW: Sid Wright (UCL)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 3-JAN-1983 (JRG):
+    Original version.
+
+ 17-APR-1983 (SLW):
+    Added MARK and RELEASE mods.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 12-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 13-DEC-1989 (PCTR):
+    Converted to use EMS_ calls.
+
+ 19-MAR-1990 (PCTR):
+    Changed handling of status returned from ERR_FLUSH.
+1 ERR_RLSE
+Release (end) an error context.
+
+CALL ERR_RLSE
+
+Description:
+
+   This subroutine releases a "mark" in the error message table, returning
+   the Error Reporting System to the previous error context. Note that
+   any pending error messages will be passed to this context, not annulled.
+2 Authors
+SLW: Sid Wright (UCL)
+
+AJC: Alan Chipperfield (STARLINK)
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 17-APR-1983 (SLW):
+    Original version.
+
+ 2-DEC-1988 (AJC):
+    Retain unflushed messages from above the mark.
+
+ 7-AUG-1989 (RFWS):
+    Converted to new prologue layout and added comments.
+
+ 2-SEP-1989 (PCTR):
+    Completed code tidy-up.
+
+ 15-DEC-1989 (PCTR):
+    Converted to call EMS_RLSE.
+
+ 16-MAR-1990 (PCTR):
+    Added trap to stop ADAM version returning to the lowest context.
+1 ERR_SYSER
+Assign a System error message to a token.
+
+CALL ERR_SYSER( TOKEN, SYSTAT )
+
+Description:
+
+   The text of the error message associated with the Operating System
+   status value, SYSTAT, is assigned to the message token, TOKEN. This
+   token may then be included in an error message.
+2 Arguments
+TOKEN = CHARACTER * ( * ) (Given)
+   The message token name.
+
+SYSTAT = INTEGER (Given)
+   The Operating System status value.
+2 Authors
+PCTR: P.C.T. Rees (STARLINK)
+2 History
+ 4-OCT-1989 (PCTR):
+    Original version.
+
+ 15-DEC-1989 (PCTR):
+    Converted to call EMS_SYSER.

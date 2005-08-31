@@ -1,0 +1,50 @@
+      PROCEDURE STARLSE_FB
+!+
+!  Purpose:
+!     Flush all modified buffers.
+
+!  Description:
+!     This TPU procedure will cause the contents of all modified
+!     buffers to be written back to the associated files.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     10-DEC-1991 (RFWS):
+!        Original version.
+!     8-JUN-1992 (RFWS):
+!        Modified for use with DECset (originally for VAXset).
+!     {enter_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!  Local Variables:
+         LOCAL BUFF;
+
+!.
+
+!  Identify the first buffer. Then loop through all the active buffers.
+      BUFF := GET_INFO( BUFFER, "FIRST" );
+      LOOP
+         EXITIF ( BUFF = 0 );
+
+!  Only process buffers which are associated with a file.
+         IF GET_INFO( BUFF, "FILE_NAME" ) <> "" THEN
+
+!  Check if the buffer has been modified. If so, then write it back to the
+!  associated file.
+            IF GET_INFO( BUFF, "MODIFIED" ) THEN
+               WRITE_FILE( BUFF );
+            ENDIF;
+         ENDIF;
+
+!  Obtain the next buffer and return to process it.
+         BUFF := GET_INFO( BUFFER, "NEXT" );
+      ENDLOOP;
+
+      ENDPROCEDURE;

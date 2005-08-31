@@ -1,0 +1,41 @@
+      PROCEDURE STARLSE1_POST_KEY
+!+
+!  Purpose:
+!     Perform post-key processing for STARLSE.
+
+!  Description:
+!     This TPU procedure is called whenever a key press occurs in
+!     STARLSE. It executes after the key's actual definition and
+!     performs checks on the validity of the STARLSE environment,
+!     performing any necessary updates.
+
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+
+!  History:
+!     11-SEP-1991 (RFWS):
+!        Original version, derived from the PRE_KEY procedure.
+!     24-OCT-1991 (RFWS):
+!        Make Fortran continuation character fixup dependent on being in
+!        the statement field.
+!     {enter_further_changes_here}
+
+!  Bugs:
+!     {note_any_bugs_here}
+
+!-
+
+!.
+
+!  If STARLINK_FORTRAN is the current language, convert any new continuation
+!  characters on the current line to be ':'. Don't to this unless we are
+!  in the statement part of the field, otherwise you can't delete backwards
+!  over a continuation character.
+      IF ( STARLSE1_CURRENT_LANGUAGE = STARLSE1_STARLINK_FORTRAN_LANGUAGE ) THEN
+	 IF ( CURRENT_OFFSET > 6 ) THEN
+            STARLSE1_FIX_CONTINUATION_LINE;
+         ENDIF;
+      ENDIF;
+
+      ENDPROCEDURE;

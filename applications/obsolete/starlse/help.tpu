@@ -1,0 +1,45 @@
+      PROCEDURE STARLSE_HELP_INDICATED
+!+
+!  Name:
+!     STARLSE_HELP_INDICATED
+!
+!  Purpose:
+!     Get help information on the indicated subject.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of Module:
+!     PROCEDURE
+!
+!  Description:
+!     This procedure obtains HELP information (if available) on the subject
+!     indicated by the current cursor position. It replaces the LSE built-in
+!     command HELP/INDICATED and manages the screen width, so that complete
+!     lines of help text are visible, even if STARLSE uses a reduced screen
+!     width for editing the current buffer.
+!
+!  Authors:
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     28-JUN-1988 (RFWS):
+!        Original version.
+!     {enter_changes_here}
+!
+!  Bugs:
+!     {enter_any_bugs_here}
+!
+!-
+
+!  Set screen width so that all the help text can be seen.
+      LSE_SET_WIDTH( 80 );
+
+!  Obtain HELP.
+      LSE_HELP_INDICATED;
+
+!  Restore the screen width.
+      LSE_SET_WIDTH( STARLSE1_SCREEN_WIDTH );
+
+      ENDPROCEDURE;

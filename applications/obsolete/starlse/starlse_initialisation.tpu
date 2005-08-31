@@ -1,0 +1,316 @@
+!  Purpose:
+!  This file contains VAXTPU procedures to perform STARLSE initialisation.
+
+!*******************************************************************************
+      PROCEDURE STARLSE1_SET_SCREEN( SCR_WIDTH )
+
+!  Set line wrapping and the screen width to make lines which exceed
+!  the permitted line length stand out. Only change the width if necessary
+!  and the current buffer is modifiable, or the resulting screen refeshes can
+!  become annoying.
+      LSE_SET_BUFFER_WRAP( "on" );
+      IF ( ( GET_INFO( SCREEN, 'WIDTH' ) <> SCR_WIDTH ) AND
+           ( GET_INFO( CURRENT_BUFFER, 'MODIFIABLE' ) ) ) THEN
+         LSE_SET_WIDTH( SCR_WIDTH );
+
+!  Remember the new screen width.
+         STARLSE1_SCREEN_WIDTH := SCR_WIDTH;
+      ENDIF;
+
+      ENDPROCEDURE;
+!*******************************************************************************
+      PROCEDURE STARLSE1_INIT_STARLINK_FORTRAN
+
+!+
+!  Purpose:
+!     Perform STARLINK_FORTRAN language initialisation.
+!-
+
+      LOCAL AFFILIATION, USER_ID, USER_NAME, DATE, YEAR, FILE, FNAME;
+
+!  Obtain the user's institutional affiliation. If this is defined (i.e. not
+!  blank), then define an AFFILIATION placeholder from it. 
+      AFFILIATION := STARLSE1_GETENV( "STARLSE_PERSONAL_AFFILIATION" );
+      IF ( AFFILIATION <> "" ) THEN
+         LSE_DELETE_PLACEHOLDER( "AFFILIATION", "STARLINK_FORTRAN" );
+         LSE_NEW_PLACEHOLDER( "AFFILIATION", "NONTERMINAL",
+                              "STARLINK_FORTRAN" );
+         LSE_SET_PLACEHOLDER_BODY_LINE( AFFILIATION, "EXPAND", 0, "SPACE",
+                                        "SAME", "ADD", "AFFILIATION",
+                                        "STARLINK_FORTRAN" );
+      ENDIF;
+
+!  See if a personal user ID has been supplied, otherwise get the process user
+!  ID. Define an AUTHOR_IDENTIFIER placeholder from it. 
+      USER_ID := STARLSE1_GETENV( "STARLSE_PERSONAL_USERID" );
+      IF ( USER_ID = "" ) THEN
+         USER_ID := STARLSE1_GETENV( "USER" );
+      ENDIF;
+      CHANGE_CASE( USER_ID, UPPER );
+      LSE_DELETE_PLACEHOLDER( "AUTHOR_IDENTIFIER", "STARLINK_FORTRAN" );
+      LSE_NEW_PLACEHOLDER( "AUTHOR_IDENTIFIER", "NONTERMINAL",
+                           "STARLINK_FORTRAN" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( USER_ID, "EXPAND", 0, "SPACE",
+                                     "SAME", "ADD", "AUTHOR_IDENTIFIER",
+                                     "STARLINK_FORTRAN" );
+
+!  Obtain the user's personal name. If this is defined (i.e. not blank), then
+!  define an AUTHORS_NAME placeholder from it. 
+      USER_NAME := STARLSE1_GETENV( "STARLSE_PERSONAL_NAME" );
+      IF ( USER_NAME <> "" ) THEN
+         LSE_DELETE_PLACEHOLDER( "AUTHORS_NAME", "STARLINK_FORTRAN" );
+         LSE_NEW_PLACEHOLDER( "AUTHORS_NAME", "NONTERMINAL",
+                              "STARLINK_FORTRAN" );
+         LSE_SET_PLACEHOLDER_BODY_LINE( USER_NAME, "EXPAND", 0, "SPACE",
+                                        "SAME", "ADD", "AUTHORS_NAME",
+                                        "STARLINK_FORTRAN" );
+      ENDIF;
+
+!  Define a DATE placeholder which expands to today's date.
+      DATE := SUBSTR( FAO( "!%D", 0 ), 1, 11 );
+      IF ( SUBSTR( DATE, 1, 1 ) = ' ' ) THEN
+         DATE := SUBSTR( DATE, 2, 10 );
+      ENDIF;
+      LSE_DELETE_PLACEHOLDER( "DATE", "STARLINK_FORTRAN" );
+      LSE_NEW_PLACEHOLDER( "DATE", "NONTERMINAL", "STARLINK_FORTRAN" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( DATE, "EXPAND", 0, "SPACE", "SAME",
+                                     "ADD", "DATE", "STARLINK_FORTRAN" );
+
+!  Define a YEAR placeholder which expands into the current year.
+      YEAR := SUBSTR( FAO( "!%D", 0 ), 8, 4 );
+      LSE_DELETE_PLACEHOLDER( "YEAR", "STARLINK_FORTRAN" );
+      LSE_NEW_PLACEHOLDER( "YEAR", "NONTERMINAL", "STARLINK_FORTRAN" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( YEAR, "EXPAND", 0, "SPACE", "SAME",
+                                     "ADD", "YEAR", "STARLINK_FORTRAN" );
+
+!  Extract the file name associated with the current buffer and use it to
+!  define a ROUTINE_NAME placeholser.
+      FILE := GET_INFO( CURRENT_BUFFER, 'FILE_NAME' );
+      FNAME := FILE_PARSE( FILE, '', '', NAME );
+      CHANGE_CASE( FNAME , UPPER );
+      LSE_DELETE_PLACEHOLDER( "ROUTINE_NAME", "STARLINK_FORTRAN" );
+      LSE_NEW_PLACEHOLDER( "ROUTINE_NAME", "NONTERMINAL", "STARLINK_FORTRAN" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( FNAME, "EXPAND", 0, "SPACE", "SAME",
+                                     "ADD", "ROUTINE_NAME",
+                                     "STARLINK_FORTRAN" );
+      LSE_SET_PLACEHOLDER_AUTO_SUBSTITUTE( "YES", "ROUTINE_NAME",
+                                           "STARLINK_FORTRAN" );
+
+!  Set the screen width to 72 to make lines which exceed the permitted line
+!  length stand out.
+      STARLSE1_SET_SCREEN( 72 );
+
+!  Define values to control comment alignment.
+      STARLSE1_BEGIN_COMMENT_CHARS := '*Cc';
+      STARLSE1_BEGIN_COMMENT_TEMPLATE := '*  [comment]';
+      STARLSE1_TRAIL_COMMENT_CHARS := '!';
+      STARLSE1_TRAIL_COMMENT_COLUMN := 34;
+
+!  Set the current STARLSE language flag.
+      STARLSE1_CURRENT_LANGUAGE := STARLSE1_STARLINK_FORTRAN_LANGUAGE;
+      MESSAGE("STARLINK_FORTRAN language initialised");
+
+      ENDPROCEDURE;
+
+!*******************************************************************************
+      PROCEDURE STARLSE1_INIT_IFL
+
+!+
+!  Purpose:
+!     Initialise for the IFL language.
+!-
+
+      LOCAL AFFILIATION, USER_ID, USER_NAME, DATE, FILE, FNAME;
+
+!  Obtain the user's institutional affiliation. If this is defined (i.e. not
+!  blank), then define an AFFILIATION placeholder from it. 
+      AFFILIATION := STARLSE1_GETENV( "STARLSE_PERSONAL_AFFILIATION" );
+      IF ( AFFILIATION <> "" ) THEN
+         LSE_DELETE_PLACEHOLDER( "AFFILIATION", "IFL" );
+         LSE_NEW_PLACEHOLDER( "AFFILIATION", "NONTERMINAL", "IFL" );
+         LSE_SET_PLACEHOLDER_BODY_LINE( AFFILIATION, "EXPAND", 0, "SPACE",
+                                        "SAME", "ADD", "AFFILIATION", "IFL" );
+      ENDIF;
+
+!  See if a personal user ID has been supplied, otherwise get the process user
+!  ID. Define an AUTHOR_IDENTIFIER placeholder from it. 
+      USER_ID := STARLSE1_GETENV( "STARLSE_PERSONAL_USERID" );
+      IF ( USER_ID = "" ) THEN
+         USER_ID := STARLSE1_GETENV( "USER" );
+      ENDIF;
+      CHANGE_CASE( USER_ID, UPPER );
+      LSE_DELETE_PLACEHOLDER( "AUTHOR_IDENTIFIER", "IFL" );
+      LSE_NEW_PLACEHOLDER( "AUTHOR_IDENTIFIER", "NONTERMINAL", "IFL" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( USER_ID, "EXPAND", 0, "SPACE",
+                                     "SAME", "ADD", "AUTHOR_IDENTIFIER",
+                                     "IFL" );
+
+!  Obtain the user's personal naame. If this is defined (i.e. not blank), then
+!  define an AUTHORS_NAME placeholder from it. 
+      USER_NAME := STARLSE1_GETENV( "STARLSE_PERSONAL_NAME" );
+      IF ( USER_NAME <> "" ) THEN
+         LSE_DELETE_PLACEHOLDER( "AUTHORS_NAME", "IFL" );
+         LSE_NEW_PLACEHOLDER( "AUTHORS_NAME", "NONTERMINAL", "IFL" );
+         LSE_SET_PLACEHOLDER_BODY_LINE( USER_NAME, "EXPAND", 0, "SPACE",
+                                        "SAME", "ADD", "AUTHORS_NAME", "IFL" );
+      ENDIF;
+
+!  Define a DATE placeholder which expands to today's date.
+      DATE := SUBSTR( FAO( "!%D", 0 ), 1, 11 );
+      IF ( SUBSTR( DATE, 1, 1 ) = ' ' ) THEN
+         DATE := SUBSTR( DATE, 2, 10 );
+      ENDIF;
+      LSE_DELETE_PLACEHOLDER( "DATE", "IFL" );
+      LSE_NEW_PLACEHOLDER( "DATE", "NONTERMINAL", "IFL" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( DATE, "EXPAND", 0, "SPACE", "SAME",
+                                     "ADD", "DATE", "IFL" );
+
+!  Extract the file name associated with the current buffer and use it to
+!  define a MODULE_NAME placeholser.
+      FILE := GET_INFO( CURRENT_BUFFER, 'FILE_NAME' );
+      FNAME := FILE_PARSE( FILE, '', '', NAME );
+      CHANGE_CASE( FNAME , UPPER );
+      LSE_DELETE_PLACEHOLDER( "MODULE_NAME", "IFL" );
+      LSE_NEW_PLACEHOLDER( "MODULE_NAME", "NONTERMINAL", "IFL" );
+      LSE_SET_PLACEHOLDER_BODY_LINE( FNAME, "EXPAND", 0, "SPACE", "SAME",
+                                     "ADD", "MODULE_NAME", "IFL" );
+      LSE_SET_PLACEHOLDER_AUTO_SUBSTITUTE( "YES", "MODULE_NAME", "IFL" );
+
+!  Set the screen width to 80.
+      STARLSE1_SET_SCREEN( 80 );
+
+!  Define values to control comment alignment.
+      STARLSE1_BEGIN_COMMENT_CHARS := '#';
+      STARLSE1_BEGIN_COMMENT_TEMPLATE := '#  [comment]';
+      STARLSE1_TRAIL_COMMENT_CHARS := '#';
+      STARLSE1_TRAIL_COMMENT_COLUMN := 34;
+
+!  Set the current STARLSE language flag.
+      STARLSE1_CURRENT_LANGUAGE := STARLSE1_IFL_LANGUAGE;
+      MESSAGE("IFL language initialised");
+
+      ENDPROCEDURE;
+
+!*******************************************************************************
+      PROCEDURE STARLSE1_INIT_NONE
+
+!+
+!  Purpose:
+!     Initialise when there is no recognised language.
+!-
+
+!  Set the screen width to 80.
+      STARLSE1_SET_SCREEN( 80 );
+
+!  Define values to turn trailing comment alignment off.
+      STARLSE1_BEGIN_COMMENT_CHARS := '';
+      STARLSE1_BEGIN_COMMENT_TEMPLATE := '';
+      STARLSE1_TRAIL_COMMENT_CHARS := '';
+      STARLSE1_TRAIL_COMMENT_COLUMN := 0;
+
+!  Reset the current STARLSE language flag.
+      STARLSE1_CURRENT_LANGUAGE := STARLSE1_NO_LANGUAGE;
+
+      ENDPROCEDURE;
+
+!*******************************************************************************
+      PROCEDURE STARLSE1_INIT_BUFFER
+
+!+
+!  Purpose:
+!     To perform initialisation for STARLSE. Note this procedure may be
+!     called repeatedly to re-initialise buffer-dependent features of
+!     STARLSE.
+!-
+
+      LOCAL LANGUAGE;
+
+!  Determine the language associated with the current buffer.
+      LANGUAGE := GET_INFO( CURRENT_BUFFER, 'LANGUAGE' );
+
+!   Initialise for the STARLINK_FORTRAN language.
+      IF( LANGUAGE = 'STARLINK_FORTRAN' ) THEN
+         STARLSE1_INIT_STARLINK_FORTRAN;
+      ELSE
+
+!   Initialise for the IFL language.
+         IF( LANGUAGE = 'IFL' ) THEN
+            STARLSE1_INIT_IFL;
+         ELSE
+
+!   Initialise in the case of no current language.
+            STARLSE1_INIT_NONE;
+         ENDIF;
+      ENDIF;
+
+!  Define the procedures to be executed when each key is pressed.
+      SET ( PRE_KEY_PROCEDURE, 'TPU$KEY_MAP_LIST', 'STARLSE1_PRE_KEY' );
+
+!  If the buffer has changed since the last initialisation occurred (but not
+!  if only the language has changed), then save the previous values of the
+!  buffer and language so that we can return to them using
+!  STARLSE1_PREVIOUS_BUFFER.
+      IF ( CURRENT_BUFFER <> STARLSE1_LAST_BUFFER ) THEN
+         STARLSE1_PREVIOUS_BUFFER := STARLSE1_LAST_BUFFER;
+         STARLSE1_PREVIOUS_LANGUAGE := STARLSE1_LAST_LANGUAGE;
+      ENDIF;
+
+!  Update the last buffer and language values.
+      STARLSE1_LAST_BUFFER := CURRENT_BUFFER;
+      STARLSE1_LAST_LANGUAGE := LANGUAGE;
+
+      ENDPROCEDURE;
+
+!*******************************************************************************
+      PROCEDURE STARLSE$LOCAL_INIT
+
+!+
+!  Purpose:
+!     Dummy procedure to be optionally replaced, thereby allowing a
+!     user-defined initialisation procedure to be incorporated.  This executes
+!     following any STARLSE initialisation.
+!-
+
+      ENDPROCEDURE;
+
+!*******************************************************************************
+      PROCEDURE TPU$LOCAL_INIT
+
+!+
+!  Purpose:
+!     Replace the dummy LSE procedure of the same name, thereby allowing
+!     STARLSE-specific initialisation. Note this procedure is called
+!     only once, when LSE first starts.
+!-
+      LOCAL DETACH_KEY;
+
+!  Set up values which are used as global constants.
+      STARLSE1_NO_LANGUAGE := 0;
+      STARLSE1_STARLINK_FORTRAN_LANGUAGE := 1;
+      STARLSE1_IFL_LANGUAGE := 2;
+
+!  Note that the default directory not up to date.
+      STARLSE1_DEFAULT_DIR_VALID := 0;
+
+!  Initialise the values of the last buffer and the last language.
+      STARLSE1_LAST_BUFFER := 0;
+      STARLSE1_LAST_LANGUAGE := '';
+
+!  Initialise values of the buffer and language used previously.
+      STARLSE1_PREVIOUS_BUFFER := 0;
+      STARLSE1_PREVIOUS_LANGUAGE := '';
+
+!  Obtain the name of the "detach key" to be used to detach the
+!  terminal from LSE and define the appropriate key to execute the
+!  detach procedure.
+      DETACH_KEY := STARLSE1_GETENV( "STARLSE_ATTACH_KEY" );
+      IF ( DETACH_KEY <> "" ) THEN
+         LSE_NEW_KEY( DETACH_KEY, "", "", "Detach terminal from STARLSE",
+                      "Detach", "STARLSE1_DETACH" );
+      ENDIF;
+
+!  Perform STARLSE initialisation.
+      STARLSE1_INIT_BUFFER;
+      STARLSE$LOCAL_INIT;
+
+      ENDPROCEDURE;

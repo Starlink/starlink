@@ -1,0 +1,89 @@
+      PROCEDURE STARLSE_WHERE
+!+
+!  Name:
+!     STARLSE$WHERE
+!
+!  Purpose:
+!     Show which column and line is being edited.
+!
+!  Language:
+!     VAXTPU
+!
+!  Type of module:
+!     PROCEDURE.
+!
+!  Description:
+!     This procedure produces a message showing the number of the current
+!     editing column and line, the total number of lines in the current buffer
+!     at what percentage of the way through the buffer the current line is
+!     situated (in terms of numbers of lines, not in terms of characters). 
+!
+!  Authors:
+!     DJC: Dave Carnochan (STARLINK)
+!     RFWS: R.F. Warren-Smith (STARLINK)
+!     {enter_new_authors_here}
+!
+!  History:
+!     19-AUG-1988 (DJC):
+!        Original version.
+!     18-APR-1989 (RFWS):
+!        Adapted for inclusion in STARLSE and added current column to message.
+!     {enter_further_changes_here}
+!
+!  Bugs:
+!     {enter_any_bugs_here}
+!
+!-
+
+      LOCAL
+            COLUMN,              ! integer - current column number
+            HIGH_LINE,		 ! integer - high line limit for binary search
+            LOW_LINE,		 ! integer - low line limit for binary search
+            PERCENT,		 ! integer - percent of way through buffer
+            START_OF_BUFFER,	 ! marker - beginning of current buffer
+            THIS_LINE,		 ! integer - line number of current guess
+            THIS_LINE_POSITION,	 ! marker - position at start of this_line
+            THIS_POSITION,	 ! marker - current position
+            TOTAL_LINES;	 ! integer - total lines in buffer
+
+!    Initialise.
+      THIS_POSITION := MARK (NONE);
+      START_OF_BUFFER := BEGINNING_OF (CURRENT_BUFFER);
+      TOTAL_LINES := GET_INFO (CURRENT_BUFFER, "RECORD_COUNT") + 1;
+      HIGH_LINE := TOTAL_LINES;
+      IF THIS_POSITION = END_OF (CURRENT_BUFFER) THEN
+         LOW_LINE := TOTAL_LINES;
+      ELSE
+         LOW_LINE := 1;
+      ENDIF;
+
+!    Perform a binary search to find the current line number.
+      LOOP
+         EXITIF HIGH_LINE - LOW_LINE <= 1;
+         THIS_LINE := LOW_LINE + ((HIGH_LINE - LOW_LINE) / 2);
+         POSITION (START_OF_BUFFER);
+         MOVE_VERTICAL (THIS_LINE - 1);
+         IF MARK (NONE) > THIS_POSITION THEN
+            HIGH_LINE := THIS_LINE;
+         ELSE
+            LOW_LINE := THIS_LINE;
+            IF MARK (NONE) = THIS_POSITION THEN
+               HIGH_LINE := THIS_LINE;
+            ENDIF;
+         ENDIF;
+      ENDLOOP;
+
+!    TPU truncates numbers on division; make it round instead
+      PERCENT := (((LOW_LINE * 1000) / TOTAL_LINES)+5)/10;
+
+!    Return to original position and obtain the column number.
+      POSITION (THIS_POSITION);
+      COLUMN := GET_INFO( CURRENT_BUFFER, "OFFSET_COLUMN" );
+
+!    Display message.
+      SET (BELL,BROADCAST,ON);
+      MESSAGE (FAO ("You are in column !SL of line !SL out of !SL (!SL%)",
+                    COLUMN, LOW_LINE, TOTAL_LINES, PERCENT));
+      SET (BELL,BROADCAST,ON);
+
+      ENDPROCEDURE;
