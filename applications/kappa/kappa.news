@@ -1,14 +1,17 @@
-1 KAPPA_Version_1.4-3
+1 KAPPA_Version_1.5
 
-   A new release of KAPPA (v1.4-3) has been made. The main changes are:
+   A new release of KAPPA (v1.5) has been made. The main changes are:
+
+   o  A new application INTERLEAVE to form a higher-resolution NDF by
+   interleaving a set of NDFs of the same dimensionality.
 
    o  FITSEXIST is now a self-contained application.  It needs only read 
    access to an NDF, unlike the former version that was an alias to
-   FITSMOD. It should be faster too.
+   FITSMOD.  It should be faster too.
 
    o  The WCSALIGN and REGRID applications now have options for using a
    rebinning algorithm rather than a resampling algorithm. Rebinning
-   produces accuracte flux conservation. See the new REBIN parameter.
+   produces accurate flux conservation.  See the new REBIN parameter.
 
    o  The WCSALIGN and REGRID applications now have an option to produce
    approximate flux conservation when using the traditional resampling
@@ -25,13 +28,13 @@
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 
-   each WCS Frame if FULLFRAME is set to YES. Also, the bounds of the NDF 
+   each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the NDF 
    within the current WCS Frame are written to the new output parameters 
    FLBND and FUBND.
 
    o The BLOCK application can now smooth 3-d NDFs, in the sense that it 
    will smooth all the 2-d planes within a 3-d NDF independently, using 
-   the same 2-dimensional box. The smoothing plane can be parallel to any 
+   the same 2-dimensional box.  The smoothing plane can be parallel to any 
    face of the cube.
 
 Changes introduced in version 1.4-1
@@ -39,7 +42,7 @@ Changes introduced in version 1.4-1
    o  The PIXDUPE application now has a facility for applying a mask to 
    each block of output pixels.
 
-   o  The WCSALIGN application now has a facility for aligning the input NDFs 
+   o  The WCSALIGN application now has a facility for aligning the input NDFs
    in-situ if possible (that is, if the alignment Mapping is a simple shift 
    of origin). The new parameters are INSITU and ABORT.
 
