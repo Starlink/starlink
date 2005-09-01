@@ -503,6 +503,8 @@
      :       MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0,
      :       MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0 /
 
+      DATA RMIN, RMAX / 4*0, 4*0 /
+
       DO I = 1, 9*MAXGAU*MAXGAU
          COVAR(I) = 0.0D0
       END DO
