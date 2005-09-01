@@ -16,7 +16,6 @@ pisa_mon_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 pisa_mon_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
-pisa_mon_LDFLAGS = -static
 
 pisa_mon_TASKS = addnoise pisa2ard pisacut pisafind pisafit pisagen \
  pisagrey pisaknn pisamatch pisapeak pisaplot pisa2cat
