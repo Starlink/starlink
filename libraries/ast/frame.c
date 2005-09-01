@@ -9903,6 +9903,10 @@ MAKE_TEST(Direction)
 *     The Epoch attribute is stored as a Modified Julian Date, but
 *     when setting its value it may be given in a variety of
 *     formats. See the "Input Formats" section (below) for details.
+*     Strictly, the Epoch value should be supplied in the TDB timescale,
+*     but for some purposes (for instance, for converting sky positions 
+*     between different types of equatorial system) the timescale is not
+*     significant, and UTC may be used.   
 
 *  Input Formats:
 *     The formats accepted when setting an Epoch value are listed
@@ -11009,7 +11013,17 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        +PI/2. When converting to and from other celestial coordinate 
 *        systems, no corrections are applied for atmospheric refraction,
 *        diurnal aberattion or polar motion. Note, unlike most other
-*        celestial coordinate systems, this system is right handed.
+*        celestial coordinate systems, this system is right handed. Also,
+*        unlike other SkyFrame systems, the AzEl system is sensitive to
+*        the timescale in which the Epoch value is supplied. This is
+*        because of the gross diurnal rotation which this system undergoes,
+*        causing a small change in time to translate to a large rotation.
+*        When converting to or from an AzEl system, the Epoch value for
+*        both source and destination SkyFrames should be supplied in the 
+*        TDB timescale. The difference between TDB and TT is between 1
+*        and 2 milliseconds, and so a TT value can usually be supplied in
+*        place of a TDB value. The TT timescale is related to TAI via
+*        TT = TAI + 32.184 seconds.
 *
 *        - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
 *        ecliptic and mean equinox specified by the qualifying Equinox

@@ -19,6 +19,7 @@
 *     AST_ISAMAPPING
 *     AST_LINEARMAPPING
 *     AST_REBIN<X>
+*     AST_REBINSEQ<X>
 *     AST_MAPBOX
 *     AST_MAPSPLIT
 *     AST_RATE
@@ -57,6 +58,8 @@
 *        Added AST_RATE.
 *     30-JUN-2005 (DSB):
 *        Added AST_REBIN<X>.
+*     1-SEP-2005 (DSB):
+*        Added AST_REBINSEQ<X>.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -447,6 +450,81 @@ MAKE_AST_REBIN(d,D,DOUBLE,D,double)
 MAKE_AST_REBIN(r,R,REAL,F,float)
 MAKE_AST_REBIN(i,I,INTEGER,I,int)
 #undef MAKE_AST_REBIN
+
+/* AST_REBINSEQ<X> requires a function for each possible data type, so
+   define it via a macro. */
+#define MAKE_AST_REBINSEQ(f,F,Ftype,X,Xtype) \
+F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
+                              INTEGER(NDIM_IN), \
+                              INTEGER_ARRAY(LBND_IN), \
+                              INTEGER_ARRAY(UBND_IN), \
+                              Ftype##_ARRAY(IN), \
+                              Ftype##_ARRAY(IN_VAR), \
+                              INTEGER(INTERP), \
+                              DOUBLE_ARRAY(PARAMS), \
+                              INTEGER(FLAGS), \
+                              DOUBLE(TOL), \
+                              INTEGER(MAXPIX), \
+                              Ftype(BADVAL), \
+                              INTEGER(NDIM_OUT), \
+                              INTEGER_ARRAY(LBND_OUT), \
+                              INTEGER_ARRAY(UBND_OUT), \
+                              INTEGER_ARRAY(LBND), \
+                              INTEGER_ARRAY(UBND), \
+                              Ftype##_ARRAY(OUT), \
+                              Ftype##_ARRAY(OUT_VAR), \
+                              DOUBLE_ARRAY(WEIGHTS), \
+                              INTEGER(STATUS) ) { \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_INTEGER(NDIM_IN) \
+   GENPTR_INTEGER_ARRAY(LBND_IN) \
+   GENPTR_INTEGER_ARRAY(UBND_IN) \
+   GENPTR_##Ftype##_ARRAY(IN) \
+   GENPTR_##Ftype##_ARRAY(IN_VAR) \
+   GENPTR_INTEGER(INTERP) \
+   GENPTR_DOUBLE_ARRAY(PARAMS) \
+   GENPTR_INTEGER(FLAGS) \
+   GENPTR_DOUBLE(TOL) \
+   GENPTR_INTEGER(MAXPIX) \
+   GENPTR_##Ftype(BADVAL) \
+   GENPTR_INTEGER(NDIM_OUT) \
+   GENPTR_INTEGER_ARRAY(LBND_OUT) \
+   GENPTR_INTEGER_ARRAY(UBND_OUT) \
+   GENPTR_INTEGER_ARRAY(LBND) \
+   GENPTR_INTEGER_ARRAY(UBND) \
+   GENPTR_##Ftype##_ARRAY(OUT) \
+   GENPTR_##Ftype##_ARRAY(OUT_VAR) \
+   GENPTR_DOUBLE_ARRAY(WEIGHTS) \
+   GENPTR_INTEGER(STATUS) \
+\
+   Xtype *out_var; \
+   const Xtype *in_var; \
+\
+   astAt( "AST_REBINSEQ"#F, NULL, 0 ); \
+   astWatchSTATUS( \
+\
+/* If the AST__USEVAR flag is set, use the input and output variance \
+   arrays, otherwise pass NULL pointers. */ \
+      in_var = out_var = NULL; \
+      if ( AST__USEVAR & *FLAGS ) { \
+         in_var = (const Xtype *) IN_VAR; \
+         out_var = (Xtype *) OUT_VAR; \
+      } \
+      astRebinSeq##X( astI2P( *THIS ), *NDIM_IN, \
+                   LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
+                   *INTERP, PARAMS, *FLAGS, \
+                   *TOL, *MAXPIX, *BADVAL, \
+                   *NDIM_OUT, LBND_OUT, UBND_OUT, \
+                   LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS ); \
+   ) \
+}
+
+/* Invoke the above macro to define a function for each data
+   type. Include synonyms for some functions. */
+MAKE_AST_REBINSEQ(d,D,DOUBLE,D,double)
+MAKE_AST_REBINSEQ(r,R,REAL,F,float)
+MAKE_AST_REBINSEQ(i,I,INTEGER,I,int)
+#undef MAKE_AST_REBINSEQ
 
 F77_INTEGER_FUNCTION(ast_simplify)( INTEGER(THIS),
                                     INTEGER(STATUS) ) {

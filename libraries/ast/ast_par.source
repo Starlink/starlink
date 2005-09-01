@@ -55,6 +55,8 @@
 *        Added KeyMap.
 *     16-JUN-2005 (DSB):
 *        Added TimeMap and TimeFrame.
+*     1-SEP-2005 (DSB):
+*        Added AST__REBININIT and AST__REBINNORM.
 *-
 
 *  Length of character string returned by a character function.
@@ -111,6 +113,10 @@
       PARAMETER ( AST__USEBAD = 32 )
       INTEGER AST__CONSERVEFLUX
       PARAMETER ( AST__CONSERVEFLUX = 64 )
+      INTEGER AST__REBININIT
+      PARAMETER ( AST__REBININIT = 128 )
+      INTEGER AST__REBINNORM
+      PARAMETER ( AST__REBINNORM = 256 )
 
       INTEGER AST__UKERN1
       PARAMETER ( AST__UKERN1 = 1 )

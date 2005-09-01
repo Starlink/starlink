@@ -48,6 +48,7 @@ c     - astMapBox: Find a bounding box for a Mapping
 c     - astMapSplit: Split a Mapping up into parallel component Mappings
 c     - astRate: Calculate the rate of change of a Mapping output
 c     - astRebin<X>: Rebin a region of a data grid
+f     - astRebinSeq<X>: Rebin a region of a sequence of data grids
 c     - astResample<X>: Resample a region of a data grid
 c     - astSimplify: Simplify a Mapping
 c     - astTran1: Transform 1-dimensional coordinates
@@ -61,6 +62,7 @@ f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
 f     - AST_REBIN<X>: Rebin a region of a data grid
+f     - AST_REBINSEQ<X>: Rebin a region of a sequence of data grids
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
 f     - AST_SIMPLIFY: Simplify a Mapping
 f     - AST_TRAN1: Transform 1-dimensional coordinates
@@ -153,6 +155,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added the AST__CONSERVEFLUX flag (used by astResampleX).
 *     17-AUG-2005 (DSB):
 *        Added the AST__SOMBCOS kernel.
+*     31-AUG-2005 (DSB):
+*        Added astRebinSeq.
 *class--
 */
 
@@ -276,6 +280,7 @@ static void SpreadLinearLD( int, const int *, const int *, const long double *, 
 static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, double *);
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [] );
 static void ConserveFluxLD( double, int, const int *, long double, long double *, long double * );
 #endif
 
@@ -392,6 +397,9 @@ static void RebinAdaptively( AstMapping *, int, const int *, const int *, const 
 static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
 static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
 static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
+static void RebinSeqD( AstMapping *, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [] );
+static void RebinSeqF( AstMapping *, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [] );
+static void RebinSeqI( AstMapping *, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [] );
 static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double * );
 static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, double *  );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
@@ -2405,6 +2413,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
    vtab->ResampleLD = ResampleLD;
    vtab->RebinLD = RebinLD;
+   vtab->RebinSeqLD = RebinSeqLD;
 #endif
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
@@ -2426,6 +2435,9 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->RebinD = RebinD;
    vtab->RebinF = RebinF;
    vtab->RebinI = RebinI;
+   vtab->RebinSeqD = RebinSeqD;
+   vtab->RebinSeqF = RebinSeqF;
+   vtab->RebinSeqI = RebinSeqI;
    vtab->ResampleB = ResampleB;
    vtab->ResampleD = ResampleD;
    vtab->ResampleF = ResampleF;
@@ -8092,6 +8104,12 @@ f                        LBND, UBND, OUT, OUT_VAR, STATUS )
 *     rebined output data. Propagation of missing data (bad pixels)
 *     is supported.
 *
+*     Note, if you will be rebining a sequence of input arrays and then 
+*     co-adding them into a single array, the alternative 
+c     astRebinSeq<X> functions
+f     AST_REBINSEQ<X> routines
+*     will in general be more efficient.
+*
 *     You should use a rebinning function which matches the numerical
 *     type of the data you are processing by replacing <X> in
 c     the generic function name astRebin<X> by an appropriate 1- or
@@ -8255,10 +8273,7 @@ f        An optional array which should contain
 *        any additional parameter values required by the pixel
 *        spreading scheme. If such parameters are required, this
 *        will be noted in the "Pixel Spreading Schemes"
-c        section below (you may also use this array to pass values
-c        to your own spread function).
-f        section below (you may also use this array to pass values
-f        to your own spread routine).
+*        section below.
 *
 c        If no additional parameters are required, this array is not
 c        used and a NULL pointer may be given.
@@ -8338,10 +8353,7 @@ c        elements in the "out" (and "out_var") array(s) for which
 f        elements in the OUT (and OUT_VAR) array(s) for which
 *        rebined values could not be obtained (see the "Propagation
 *        of Missing Data" section below for details of the
-c        circumstances under which this may occur). The astRebin<X>
-f        circumstances under which this may occur). The AST_REBIN<X>
-*        function return value indicates whether any such values have
-*        been produced.
+*        circumstances under which this may occur). 
 c     ndim_out
 f     NDIM_OUT = INTEGER (Given)
 *        The number of dimensions in the output grid. This should be
@@ -8448,15 +8460,11 @@ f     - R: REAL
 f     - I: INTEGER
 *
 c     For example, astRebinD would be used to process "double"
-c     data, while astRebinS would be used to process "short int"
+c     data, while astRebinI would be used to process "int"
 c     data, etc.
 f     For example, AST_REBIND would be used to process DOUBLE
-f     PRECISION data, while AST_REBINS would be used to process
-f     short integer data (stored in an INTEGER*2 array), etc.
-f
-f     For compatibility with other Starlink facilities, the code W
-f     is provided as a synonym for S (but only in the Fortran interface 
-f     to AST).
+f     PRECISION data, while AST_REBINI would be used to process
+f     integer data (stored in an INTEGER array), etc.
 *
 *     Note that, unlike 
 c     astResample<X>, the astRebin<X>
@@ -8782,7 +8790,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    } \
 \
 /* Perform the rebinning. Note that we pass all gridded data, the \
-   sprad function and the bad pixel value by means of pointer \
+   spread function and the bad pixel value by means of pointer \
    types that obscure the underlying data type. This is to avoid \
    having to replicate functions unnecessarily for each data \
    type. However, we also pass an argument that identifies the data \
@@ -10127,6 +10135,982 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    stride = astFree( stride );
 }
 
+
+
+static void RebinSeqD( AstMapping *this, int ndim_in,
+                     const int lbnd_in[], const int ubnd_in[],
+                     const double in[], const double in_var[],
+                     int spread, const double params[], int flags,
+                     double tol, int maxpix, double badval,
+                     int ndim_out, const int lbnd_out[],
+                     const int ubnd_out[], const int lbnd[],
+                     const int ubnd[], double out[], double out_var[],
+                     double weights[] ) {
+
+/* Local Variables: */
+   AstMapping *simple;           /* Pointer to simplified Mapping */
+   double *d;                     /* Pointer to next output data value */
+   double *v;                     /* Pointer to next output variance value */
+   double *w;                    /* Pointer to next weight value */
+   double f;                     /* Scaling factor */
+   double lim;                   /* Smallest usable weight */
+   double meanw;                 /* Mean weight value */
+   int i;                        /* Loop counter for output pixels */
+   int idim;                     /* Loop counter for coordinate dimensions */
+   int ipix_out;                 /* Index into output array */
+   int nin;                      /* Number of Mapping input coordinates */
+   int nnz;                      /* Number of non-zero weights */
+   int nout;                     /* Number of Mapping output coordinates */
+   int npix;                     /* Number of pixels in input region */
+   int npix_out;                 /* Number of pixels in output array */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain values for the Nin and Nout attributes of the Mapping. */
+   nin = astGetNin( this );
+   nout = astGetNin( this );
+
+/* If OK, check that the number of input grid dimensions matches the
+   number required by the Mapping and is at least 1. Report an error
+   if necessary. */
+   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) {
+      astError( AST__NGDIN, "astRebinSeqD(%s): Bad number of input grid "
+                "dimensions (%d).", astGetClass( this ), ndim_in );
+      if ( ndim_in != nin ) {
+         astError( AST__NGDIN, "The %s given requires %d coordinate value%s "
+                   "to specify an input position.",
+                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" );
+      }
+   }
+
+/* If OK, also check that the number of output grid dimensions matches
+   the number required by the Mapping and is at least 1. Report an
+   error if necessary. */
+   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) {
+      astError( AST__NGDIN, "astRebinSeqD(%s): Bad number of output grid "
+                "dimensions (%d).", astGetClass( this ), ndim_out );
+      if ( ndim_out != nout ) {
+         astError( AST__NGDIN, "The %s given generates %s%d coordinate "
+                   "value%s for each output position.", astGetClass( this ),
+                   ( nout < ndim_out ) ? "only " : "", nout,
+                   ( nout == 1 ) ? "" : "s" );
+      }
+   }
+
+/* Check that the lower and upper bounds of the input grid are
+   consistent. Report an error if any pair is not. */
+   if ( astOK ) {
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) {
+            astError( AST__GBDIN, "astRebinSeqD(%s): Lower bound of "
+                      "input grid (%d) exceeds corresponding upper bound "
+                      "(%d).", astGetClass( this ),
+                      lbnd_in[ idim ], ubnd_in[ idim ] );
+            astError( AST__GBDIN, "Error in input dimension %d.",
+                      idim + 1 );
+            break;
+         }
+      }
+   }
+
+/* Check that the positional accuracy tolerance supplied is valid and
+   report an error if necessary. */
+   if ( astOK && ( tol < 0.0 ) ) {
+      astError( AST__PATIN, "astRebinSeqD(%s): Invalid positional "
+                "accuracy tolerance (%.*g pixel).",
+                astGetClass( this ), DBL_DIG, tol );
+      astError( AST__PATIN, "This value should not be less than zero." );
+   }
+
+/* Check that the initial scale size in pixels supplied is valid and
+   report an error if necessary. */
+   if ( astOK && ( maxpix < 0 ) ) {
+      astError( AST__SSPIN, "astRebinSeqD(%s): Invalid initial scale "
+                "size in pixels (%d).", astGetClass( this ), maxpix );
+      astError( AST__SSPIN, "This value should not be less than zero." );
+   }
+
+/* Check that the lower and upper bounds of the output grid are
+   consistent. Report an error if any pair is not. */
+   if ( astOK ) {
+      for ( idim = 0; idim < ndim_out; idim++ ) {
+         if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) {
+            astError( AST__GBDIN, "astRebinSeqD(%s): Lower bound of "
+                      "output grid (%d) exceeds corresponding upper bound "
+                      "(%d).", astGetClass( this ),
+                      lbnd_out[ idim ], ubnd_out[ idim ] );
+            astError( AST__GBDIN, "Error in output dimension %d.",
+                      idim + 1 );
+            break;
+         }
+      }
+   }
+
+/* Similarly check the bounds of the input region. */
+   if ( astOK ) {
+      for ( idim = 0; idim < ndim_out; idim++ ) {
+         if ( lbnd[ idim ] > ubnd[ idim ] ) {
+            astError( AST__GBDIN, "astRebinSeqD(%s): Lower bound of "
+                      "input region (%d) exceeds corresponding upper "
+                      "bound (%d).", astGetClass( this ),
+                      lbnd[ idim ], ubnd[ idim ] );
+
+/* Also check that the input region lies wholly within the input
+   grid. */
+         } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) {
+            astError( AST__GBDIN, "astRebinSeqD(%s): Lower bound of "
+                      "input region (%d) is less than corresponding "
+                      "bound of input grid (%d).", astGetClass( this ),
+                      lbnd[ idim ], lbnd_in[ idim ] );
+         } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) {
+            astError( AST__GBDIN, "astRebinSeqD(%s): Upper bound of "
+                      "input region (%d) exceeds corresponding "
+                      "bound of input grid (%d).", astGetClass( this ),
+                      ubnd[ idim ], ubnd_in[ idim ] );
+         }
+
+/* Say which dimension produced the error. */
+         if ( !astOK ) {
+            astError( AST__GBDIN, "Error in output dimension %d.",
+                      idim + 1 );
+            break;
+         }
+      }
+   }
+
+/* If OK, loop to determine how many input pixels are to be binned. */
+   simple = NULL;
+   npix = 1;
+   npix_out = 1;
+   unsimplified_mapping = this;
+   if ( astOK ) {
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         npix *= ubnd[ idim ] - lbnd[ idim ] + 1;
+      }
+
+/* Loop to determine how many pixels the output array contains. */
+      for ( idim = 0; idim < ndim_out; idim++ ) {
+         npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1;
+      }
+
+/* If there are sufficient pixels to make it worthwhile, simplify the
+   Mapping supplied to improve performance. Otherwise, just clone the
+   Mapping pointer. Note we have already saved a pointer to the original
+   Mapping so that lower-level functions can use it if they need to report
+   an error. */
+      if ( npix > 1024 ) {
+         simple = astSimplify( this );
+      } else {
+         simple = astClone( this );
+      }
+   }
+
+/* Report an error if the forward transformation of this simplified
+   Mapping is not defined. */
+   if ( !astGetTranForward( simple ) && astOK ) {
+      astError( AST__TRNND, "astRebinSeqD(%s): An forward coordinate "
+                "transformation is not defined by the %s supplied.",
+                astGetClass( unsimplified_mapping ),
+                astGetClass( unsimplified_mapping ) );
+   }
+
+/* If required, initialise the output arrays to hold zeros. */
+   if( flags & AST__REBININIT ) {
+      w = weights;
+      d = out;
+      if( out_var ) {
+         v = out_var;
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++, w++ ) {
+            *d = 0;
+            *v = 0;
+            *w = 0;
+         }
+      } else {
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) {
+            *d = 0;
+            *w = 0;
+         }
+      }
+   }
+
+/* Perform the rebinning. Note that we pass all gridded data, the
+   spread function and the bad pixel value by means of pointer
+   types that obscure the underlying data type. This is to avoid
+   having to replicate functions unnecessarily for each data
+   type. However, we also pass an argument that identifies the data
+   type we have obscured. */
+   RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in,
+                    (const void *) in, (const void *) in_var,
+                    TYPE_D, spread,
+                    params, flags, tol, maxpix,
+                    (const void *) &badval,
+                    ndim_out, lbnd_out, ubnd_out,
+                    lbnd, ubnd,
+                    (void *) out, (void *) out_var, weights );
+
+/* If required normalise the returned data and variance arrays. We scale
+   the weights array to ensure it has a mean value of 1.0. */
+   if( flags & AST__REBINNORM ) {
+      meanw = 0.0;
+      nnz = 0;
+      for( i = 0; i < npix_out; i++ ) {
+         if(  weights[ i ] > 1.0E-10 ) {
+            meanw += weights[ i ];
+            nnz++;
+         }
+      }
+
+      if( nnz != 0 && meanw != 0.0 ) {
+         meanw /= nnz;
+         lim = 1.0E-10*meanw;
+         for( i = 0; i < npix_out; i++ ) {
+            if( weights[ i ] > lim && out[ i ] != badval ) {
+               f = meanw/weights[ i ];
+               out[ i ] *= f;
+            } else {
+               out[ i ] = badval;
+            }
+         }
+         if( out_var ) {
+            for( i = 0; i < npix_out; i++ ) {
+               if( weights[ i ] > lim && out_var[ i ] != badval ) {
+                  f = meanw/weights[ i ];
+                  out_var[ i ] *= f*f;
+               } else {
+                  out_var[ i ] = badval;
+               }
+            }
+         }
+      }
+   }
+
+/* Annul the pointer to the simplified/cloned Mapping. */
+   simple = astAnnul( simple );
+
+}
+
+
+
+
+
+
+
+/*
+*++
+*  Name:
+c     astRebinSeq<X>
+f     AST_REBINSEQ<X>
+
+*  Purpose:
+*     Rebin a region of a sequence of data grids.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astRebinSeq<X>( AstMapping *this, int ndim_in,
+c                          const int lbnd_in[], const int ubnd_in[],
+c                          const <Xtype> in[], const <Xtype> in_var[],
+c                          int spread, const double params[], int flags,
+c                          double tol, int maxpix, <Xtype> badval, 
+c                          int ndim_out, const int lbnd_out[], 
+c                          const int ubnd_out[], const int lbnd[], 
+c                          const int ubnd[], <Xtype> out[], <Xtype> out_var[], 
+c                          double weights[] );
+f     CALL AST_REBINSEQ<X>( THIS, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
+f                           SPREAD, PARAMS, FLAGS, TOL, MAXPIX, BADVAL,
+f                           NDIM_OUT, LBND_OUT, UBND_OUT, LBND, UBND, OUT, 
+f                           OUT_VAR, WEIGHTS, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This set of 
+c     functions is identical to astRebin<X>
+f     routines is identical to AST_REBIN<X>
+*     except that the rebinned input data is added into the supplied
+*     output arrays, rather than simply over-writing the contents of the 
+*     output arrays. Thus, by calling this 
+c     function
+f     routine
+*     repeatedly, a sequence of input arrays can be rebinned and accumulated 
+*     into a single output array, effectively forming a mosaic of the
+*     input data arrays.
+*
+*     In addition, the weights associated with each output pixel are
+*     returned. The weight of an output pixel indicates the number of input 
+*     pixels which have been accumulated in that output pixel. If the entire
+*     value of an input pixel is assigned to a single output pixel, then the 
+*     weight of that output pixel is incremented by one. If some fraction of 
+*     the value of an input pixel is assigned to an output pixel, then the 
+*     weight of that output pixel is incremented by the fraction used.
+*
+*     The start of a new sequence is indicated by specifying the 
+*     AST__REBININIT flag via the
+c     "flags" parameter.
+f     FLAGS argument.
+*     This causes the supplied arrays to be filled with zeros before the 
+*     rebinned input data is added into them. Subsequenct invocations
+*     within the same sequence should omit the AST__REBININIT flag.
+*
+*     If the AST__REBINNORM flag is supplied, the output data and
+*     variance arrays are normalised before being returned. This
+*     normalisation consists of dividing the data array by the weights 
+*     array, and then multiplying the data array by the average of the
+*     non-zero values in the weights array. Any output variances are also 
+*     appropriately normalised. This flag should usually only be supplied 
+*     on the last call in a sequence. Normalisation can eliminate artifacts 
+*     which may be introduced into the rebinned data as a consequence of 
+*     aliasing between the input and output grids. However, it can also result 
+*     in small changes to the total pixel value in any given area of the 
+*     output array.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to a Mapping, whose forward transformation will be
+*        used to transform the coordinates of pixels in the input
+*        grid into the coordinate system of the output grid. 
+*
+*        The number of input coordinates used by this Mapping (as
+*        given by its Nin attribute) should match the number of input
+c        grid dimensions given by the value of "ndim_in"
+f        grid dimensions given by the value of NDIM_IN
+*        below. Similarly, the number of output coordinates (Nout
+*        attribute) should match the number of output grid dimensions
+c        given by "ndim_out".
+f        given by NDIM_OUT.
+c     ndim_in
+f     NDIM_IN = INTEGER (Given)
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+c     lbnd_in
+f     LBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd_in
+f     UBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd_in" and "ubnd_in" together define the shape
+f        Note that LBND_IN and UBND_IN together define the shape
+*        and size of the input grid, its extent along a particular
+c        (j'th) dimension being ubnd_in[j]-lbnd_in[j]+1 (assuming the
+c        index "j" to be zero-based). They also define
+f        (J'th) dimension being UBND_IN(J)-LBND_IN(J)+1. They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre.
+c     in
+f     IN( * ) = <Xtype> (Given)
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
+*        input grid, containing the input data to be rebined.  The
+*        numerical type of this array should match the 1- or
+*        2-character type code appended to the function name (e.g. if
+c        you are using astRebinSeqF, the type of each array element
+c        should be "float").
+f        you are using AST_REBINSEQR, the type of each array element
+f        should be REAL).
+*
+*        The storage order of data within this array should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the final dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     in_var
+f     IN_VAR( * ) = <Xtype> (Given)
+c        An optional pointer to a second array with the same size and
+c        type as the "in" array. If given, this should contain a set
+c        of non-negative values which represent estimates of the
+c        statistical variance associated with each element of the "in"
+c        array. If this array is supplied (together with the
+c        corresponding "out_var" array), then estimates of the
+c        variance of the rebined output data will be calculated.
+c
+c        If no input variance estimates are being provided, a NULL
+c        pointer should be given.
+f        An optional second array with the same size and type as the
+f        IN array. If the AST__USEVAR flag is set via the FLAGS
+f        argument (below), this array should contain a set of
+f        non-negative values which represent estimates of the
+f        statistical variance associated with each element of the IN
+f        array. Estimates of the variance of the rebined output data
+f        will then be calculated.
+f
+f        If the AST__USEVAR flag is not set, no input variance
+f        estimates are required and this array will not be used. A
+f        dummy (e.g. one-element) array may then be supplied.
+c     spread
+f     SPREAD = INTEGER (Given)
+c        This parameter specifies the scheme to be used for dividing
+f        This argument specifies the scheme to be used for dividing
+*        each input data value up amongst the corresponding output pixels.
+*        It may be used to select
+*        from a set of pre-defined schemes by supplying one of the
+*        values described in the "Pixel Spreading Schemes"
+*        section in the descrioption of the 
+c        astRebin<X> functions.
+f        AST_REBIN<X> routines.
+*        If a value of zero is supplied, then the default linear spreading 
+*        scheme is used (equivalent to supplying the value AST__LINEAR).
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
+c        An optional pointer to an array of double which should contain
+f        An optional array which should contain
+*        any additional parameter values required by the pixel
+*        spreading scheme. If such parameters are required, this
+*        will be noted in the "Pixel Spreading Schemes" section in the 
+*        descrioption of the 
+c        astRebin<X> functions.
+f        AST_REBIN<X> routines.
+*
+c        If no additional parameters are required, this array is not
+c        used and a NULL pointer may be given.
+f        If no additional parameters are required, this array is not
+f        used. A dummy (e.g. one-element) array may then be supplied.
+c     flags
+f     FLAGS = INTEGER (Given)
+c        The bitwise OR of a set of flag values which may be used to
+f        The sum of a set of flag values which may be used to
+*        provide additional control over the rebinning operation. See
+*        the "Control Flags" section below for a description of the
+*        options available.  If no flag values are to be set, a value
+*        of zero should be given.
+c     tol
+f     TOL = DOUBLE PRECISION (Given)
+*        The maximum tolerable geometrical distortion which may be
+*        introduced as a result of approximating non-linear Mappings
+*        by a set of piece-wise linear transformations. This should be
+*        expressed as a displacement in pixels in the output grid's
+*        coordinate system.
+*
+*        If piece-wise linear approximation is not required, a value
+*        of zero may be given. This will ensure that the Mapping is
+*        used without any approximation, but may increase execution
+*        time.
+*        
+*        If the value is too high, discontinuities between the linear
+*        approximations used in adjacent panel will be higher, and may
+*        cause the edges of the panel to be visible when viewing the output 
+*        image at high contrast. If this is a problem, reduce the
+*        tolerance value used.
+c     maxpix
+f     MAXPIX = INTEGER (Given)
+*        A value which specifies an initial scale size (in pixels) for
+*        the adaptive algorithm which approximates non-linear Mappings
+*        with piece-wise linear transformations. Normally, this should
+*        be a large value (larger than any dimension of the region of
+*        the input grid being used). In this case, a first attempt to
+*        approximate the Mapping by a linear transformation will be
+*        made over the entire input region.
+*
+*        If a smaller value is used, the input region will first be
+c        divided into sub-regions whose size does not exceed "maxpix"
+f        divided into sub-regions whose size does not exceed MAXPIX
+*        pixels in any dimension. Only at this point will attempts at
+*        approximation commence.
+*
+*        This value may occasionally be useful in preventing false
+*        convergence of the adaptive algorithm in cases where the
+*        Mapping appears approximately linear on large scales, but has
+*        irregularities (e.g. holes) on smaller scales. A value of,
+*        say, 50 to 100 pixels can also be employed as a safeguard in
+*        general-purpose software, since the effect on performance is
+*        minimal.
+*
+*        If too small a value is given, it will have the effect of
+*        inhibiting linear approximation altogether (equivalent to
+c        setting "tol" to zero). Although this may degrade
+f        setting TOL to zero). Although this may degrade
+*        performance, accurate results will still be obtained.
+c     badval
+f     BADVAL = <Xtype> (Given)
+*        This argument should have the same type as the elements of
+c        the "in" array. It specifies the value used to flag missing
+f        the IN array. It specifies the value used to flag missing
+*        data (bad pixels) in the input and output arrays.
+*
+c        If the AST__USEBAD flag is set via the "flags" parameter,
+f        If the AST__USEBAD flag is set via the FLAGS argument,
+c        then this value is used to test for bad pixels in the "in"
+c        (and "in_var") array(s).
+f        then this value is used to test for bad pixels in the IN
+f        (and IN_VAR) array(s).
+*
+*        In all cases, this value is also used to flag any output
+c        elements in the "out" (and "out_var") array(s) for which
+f        elements in the OUT (and OUT_VAR) array(s) for which
+*        rebined values could not be obtained (see the "Propagation
+*        of Missing Data" section below for details of the
+*        circumstances under which this may occur). 
+c     ndim_out
+f     NDIM_OUT = INTEGER (Given)
+*        The number of dimensions in the output grid. This should be
+*        at least one. It need not necessarily be equal to the number
+*        of dimensions in the input grid.
+c     lbnd_out
+f     LBND_OUT( NDIM_OUT ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_out" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the output grid along each dimension.
+c     ubnd_out
+f     UBND_OUT( NDIM_OUT ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_out" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the output grid along each dimension.
+*
+c        Note that "lbnd_out" and "ubnd_out" together define the
+f        Note that LBND_OUT and UBND_OUT together define the
+*        shape, size and coordinate system of the output grid in the
+c        same way as "lbnd_in" and "ubnd_in" define the shape, size
+f        same way as LBND_IN and UBND_IN define the shape, size
+*        and coordinate system of the input grid.
+c     lbnd
+f     LBND( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the first pixel in the region
+*        of the input grid which is to be included in the rebined output
+*        array.
+c     ubnd
+f     UBND( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the last pixel in the region of
+*        the input grid which is to be included in the rebined output
+*        array.
+*
+c        Note that "lbnd" and "ubnd" together define the shape and
+f        Note that LBND and UBND together define the shape and
+*        position of a (hyper-)rectangular region of the input grid
+*        which is to be included in the rebined output array. This region
+*        should lie wholly within the extent of the input grid (as
+c        defined by the "lbnd_in" and "ubnd_in" arrays). Regions of
+f        defined by the LBND_IN and UBND_IN arrays). Regions of
+*        the input grid lying outside this region will not be used.
+c     out
+f     OUT( * ) = <Xtype> (Given and Returned)
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
+*        output grid. The rebined data values will be added into the
+*        original contents of this array. The numerical type of this array 
+*        should match that of the
+c        "in" array, and the data storage order should be such
+f        IN array, and the data storage order should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the final dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     out_var
+f     OUT_VAR( * ) = <Xtype> (Given and Returned)
+*        An optional 
+c        pointer to an 
+*        array with the same type and size as the 
+c        "out" 
+f        OUT
+*        array. If given, variance estimates for the rebined data values will 
+*        be added into this array.
+f        This array will only be used if the 
+f        AST__USEVAR flag is set via the FLAGS argument.
+*
+*        The output variance values will be calculated on the
+*        assumption that errors on the input data values are
+*        statistically independent and that their variance estimates
+*        may simply be summed (with appropriate weighting factors)
+*        when several input pixels contribute to an output data
+*        value. If this assumption is not valid, then the output error
+*        estimates may be biased. In addition, note that the
+*        statistical errors on neighbouring output data values (as
+*        well as the estimates of those errors) may often be
+*        correlated, even if the above assumption about the input data
+*        is correct, because of the pixel spreading schemes
+*        employed.
+*
+c        If no output variance estimates are required, a NULL pointer
+c        should be given.
+f        If the AST__USEVAR flag is not set, no output variance
+f        estimates will be calculated and this array will not be
+f        used. A dummy (e.g. one-element) array may then be supplied.
+c     weights
+f     WEIGHTS( * ) = DOUBLE PRECISION (Given and Returned)
+c        Pointer to an array of double, 
+f        An array 
+*        with one element for each pixel in the output grid. The weight
+*        associated with each output pixel will be added into this array. The 
+*        data storage order should be such that the index of the first grid 
+*        dimension varies most rapidly and that of the final dimension least 
+*        rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Data Type Codes:
+*     To select the appropriate rebinning function, you should
+c     replace <X> in the generic function name astRebinSeq<X> with a
+f     replace <X> in the generic function name AST_REBINSEQ<X> with a
+*     1- or 2-character data type code, so as to match the numerical
+*     type <Xtype> of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - I: int
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+*
+c     For example, astRebinSeqD would be used to process "double"
+c     data, while astRebinSeqI would be used to process "int"
+c     data, etc.
+f     For example, AST_REBIND would be used to process DOUBLE
+f     PRECISION data, while AST_REBINI would be used to process
+f     integer data (stored in an INTEGER array), etc.
+*
+*     Note that, unlike 
+c     astResample<X>, the astRebinSeq<X>
+f     AST_RESAMPLE<X>, the AST_REBINSEQ<X>
+*     set of functions does not yet support unsigned integer data types
+*     or integers of different sizes.
+
+*  Control Flags:
+c     The following flags are defined in the "ast.h" header file and
+f     The following flags are defined in the AST_PAR include file and
+*     may be used to provide additional control over the rebinning
+*     process. Having selected a set of flags, you should supply the
+c     bitwise OR of their values via the "flags" parameter:
+f     sum of their values via the FLAGS argument:
+*
+*     - AST__REBININIT: Indicates that the supplied 
+c     "out", "out_var" and "weights" 
+f     OUT, OUT_VAR and WEIGHTS
+*     arrays should be filled with zeros (thus over-writing any supplied
+*     values) before adding the rebinned input data into them. This flag
+*     should be used when rebinning the first input array in a sequence.
+*     - AST__REBINNORM: Indicates that the each value in the 
+c     "out" and "out_var" 
+f     OUT and OUT_VAR 
+*     arrays should be divided by a normalisation factor before being 
+*     returned. The normalisation factor for each output data value is the 
+*     corresponding value from the weights array divided by the mean value 
+*     of the non-zero values in the weights array. The normalisation factor 
+*     for each output variance
+*     value (if used) is the square of the data value normalisation factor.
+*     This flag would normally onlybe used when rebinning the last input
+*     array within a sequence, but even there its use is optional. 
+*     - AST__USEBAD: Indicates that there may be bad pixels in the
+*     input array(s) which must be recognised by comparing with the
+c     value given for "badval" and propagated to the output array(s).
+f     value given for BADVAL and propagated to the output array(s).
+*     If this flag is not set, all input values are treated literally
+c     and the "badval" value is only used for flagging output array
+f     and the BADVAL value is only used for flagging output array
+*     values.
+f     - AST__USEVAR: Indicates that variance information should be
+f     processed in order to provide estimates of the statistical error
+f     associated with the rebined values. If this flag is not set,
+f     no variance processing will occur and the IN_VAR and OUT_VAR
+f     arrays will not be used. (Note that this flag is only available
+f     in the Fortran interface to AST.)
+
+*  Propagation of Missing Data:
+*     Instances of missing data (bad pixels) in the output grid are
+c     identified by occurrences of the "badval" value in the "out"
+f     identified by occurrences of the BADVAL value in the OUT
+*     array. These are only produced if the AST__REBINNORM flag is
+*     specified and a pixel has zero weight.
+*
+*     An input pixel is considered bad (and is consequently ignored) if 
+*     its
+c     data value is equal to "badval" and the AST__USEBAD flag is
+c     set via the "flags" parameter.
+f     data value is equal to BADVAL and the AST__USEBAD flag is
+f     set via the FLAGS argument.
+*
+*     In addition, associated output variance estimates (if
+c     calculated) may be declared bad and flagged with the "badval"
+c     value in the "out_var" array for similar reasons.
+f     calculated) may be declared bad and flagged with the BADVAL
+f     value in the OUT_VAR array for similar reasons.
+*--
+*/
+/* Define a macro to implement the function for a specific data
+   type. */
+#define MAKE_REBINSEQ(X,Xtype,IntType) \
+static void RebinSeq##X( AstMapping *this, int ndim_in, \
+                     const int lbnd_in[], const int ubnd_in[], \
+                     const Xtype in[], const Xtype in_var[], \
+                     int spread, const double params[], int flags, \
+                     double tol, int maxpix, Xtype badval, \
+                     int ndim_out, const int lbnd_out[], \
+                     const int ubnd_out[], const int lbnd[], \
+                     const int ubnd[], Xtype out[], Xtype out_var[], \
+                     double weights[] ) { \
+\
+/* Local Variables: */ \
+   AstMapping *simple;           /* Pointer to simplified Mapping */ \
+   Xtype *d;                     /* Pointer to next output data value */ \
+   Xtype *v;                     /* Pointer to next output variance value */ \
+   double *w;                    /* Pointer to next weight value */ \
+   double f;                     /* Scaling factor */ \
+   double lim;                   /* Smallest usable weight */ \
+   double meanw;                 /* Mean weight value */ \
+   int i;                        /* Loop counter for output pixels */ \
+   int idim;                     /* Loop counter for coordinate dimensions */ \
+   int ipix_out;                 /* Index into output array */ \
+   int nin;                      /* Number of Mapping input coordinates */ \
+   int nnz;                      /* Number of non-zero weights */ \
+   int nout;                     /* Number of Mapping output coordinates */ \
+   int npix;                     /* Number of pixels in input region */ \
+   int npix_out;                 /* Number of pixels in output array */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Obtain values for the Nin and Nout attributes of the Mapping. */ \
+   nin = astGetNin( this ); \
+   nout = astGetNin( this ); \
+\
+/* If OK, check that the number of input grid dimensions matches the \
+   number required by the Mapping and is at least 1. Report an error \
+   if necessary. */ \
+   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_in ); \
+      if ( ndim_in != nin ) { \
+         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                   "to specify an input position.", \
+                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* If OK, also check that the number of output grid dimensions matches \
+   the number required by the Mapping and is at least 1. Report an \
+   error if necessary. */ \
+   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_out ); \
+      if ( ndim_out != nout ) { \
+         astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
+                   "value%s for each output position.", astGetClass( this ), \
+                   ( nout < ndim_out ) ? "only " : "", nout, \
+                   ( nout == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* Check that the lower and upper bounds of the input grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                      "input grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), \
+                      lbnd_in[ idim ], ubnd_in[ idim ] ); \
+            astError( AST__GBDIN, "Error in input dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Check that the positional accuracy tolerance supplied is valid and \
+   report an error if necessary. */ \
+   if ( astOK && ( tol < 0.0 ) ) { \
+      astError( AST__PATIN, "astRebinSeq"#X"(%s): Invalid positional " \
+                "accuracy tolerance (%.*g pixel).", \
+                astGetClass( this ), DBL_DIG, tol ); \
+      astError( AST__PATIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the initial scale size in pixels supplied is valid and \
+   report an error if necessary. */ \
+   if ( astOK && ( maxpix < 0 ) ) { \
+      astError( AST__SSPIN, "astRebinSeq"#X"(%s): Invalid initial scale " \
+                "size in pixels (%d).", astGetClass( this ), maxpix ); \
+      astError( AST__SSPIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the lower and upper bounds of the output grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                      "output grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), \
+                      lbnd_out[ idim ], ubnd_out[ idim ] ); \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Similarly check the bounds of the input region. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd[ idim ] > ubnd[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                      "input region (%d) exceeds corresponding upper " \
+                      "bound (%d).", astGetClass( this ), \
+                      lbnd[ idim ], ubnd[ idim ] ); \
+\
+/* Also check that the input region lies wholly within the input \
+   grid. */ \
+         } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                      "input region (%d) is less than corresponding " \
+                      "bound of input grid (%d).", astGetClass( this ), \
+                      lbnd[ idim ], lbnd_in[ idim ] ); \
+         } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Upper bound of " \
+                      "input region (%d) exceeds corresponding " \
+                      "bound of input grid (%d).", astGetClass( this ), \
+                      ubnd[ idim ], ubnd_in[ idim ] ); \
+         } \
+\
+/* Say which dimension produced the error. */ \
+         if ( !astOK ) { \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* If OK, loop to determine how many input pixels are to be binned. */ \
+   simple = NULL; \
+   npix = 1; \
+   npix_out = 1; \
+   unsimplified_mapping = this; \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         npix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
+      } \
+\
+/* Loop to determine how many pixels the output array contains. */ \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+      } \
+\
+/* If there are sufficient pixels to make it worthwhile, simplify the \
+   Mapping supplied to improve performance. Otherwise, just clone the \
+   Mapping pointer. Note we have already saved a pointer to the original \
+   Mapping so that lower-level functions can use it if they need to report \
+   an error. */ \
+      if ( npix > 1024 ) { \
+         simple = astSimplify( this ); \
+      } else { \
+         simple = astClone( this ); \
+      } \
+   } \
+\
+/* Report an error if the forward transformation of this simplified \
+   Mapping is not defined. */ \
+   if ( !astGetTranForward( simple ) && astOK ) { \
+      astError( AST__TRNND, "astRebinSeq"#X"(%s): An forward coordinate " \
+                "transformation is not defined by the %s supplied.", \
+                astGetClass( unsimplified_mapping ), \
+                astGetClass( unsimplified_mapping ) ); \
+   } \
+\
+/* If required, initialise the output arrays to hold zeros. */ \
+   if( flags & AST__REBININIT ) { \
+      w = weights; \
+      d = out; \
+      if( out_var ) { \
+         v = out_var; \
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++, w++ ) { \
+            *d = 0; \
+            *v = 0; \
+            *w = 0; \
+         } \
+      } else { \
+         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
+            *d = 0; \
+            *w = 0; \
+         } \
+      } \
+   } \
+\
+/* Perform the rebinning. Note that we pass all gridded data, the \
+   spread function and the bad pixel value by means of pointer \
+   types that obscure the underlying data type. This is to avoid \
+   having to replicate functions unnecessarily for each data \
+   type. However, we also pass an argument that identifies the data \
+   type we have obscured. */ \
+   RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
+                    (const void *) in, (const void *) in_var, \
+                    TYPE_##X, spread, \
+                    params, flags, tol, maxpix, \
+                    (const void *) &badval, \
+                    ndim_out, lbnd_out, ubnd_out, \
+                    lbnd, ubnd, \
+                    (void *) out, (void *) out_var, weights ); \
+\
+/* If required normalise the returned data and variance arrays. We scale \
+   the weights array to ensure it has a mean value of 1.0. */ \
+   if( flags & AST__REBINNORM ) { \
+      meanw = 0.0; \
+      nnz = 0; \
+      for( i = 0; i < npix_out; i++ ) { \
+         if(  weights[ i ] > 1.0E-10 ) { \
+            meanw += weights[ i ]; \
+            nnz++; \
+         } \
+      } \
+\
+      if( nnz != 0 && meanw != 0.0 ) { \
+         meanw /= nnz; \
+         lim = 1.0E-10*meanw; \
+         for( i = 0; i < npix_out; i++ ) { \
+            if( weights[ i ] > lim && out[ i ] != badval ) { \
+               f = meanw/weights[ i ]; \
+               out[ i ] *= f; \
+            } else { \
+               out[ i ] = badval; \
+            } \
+         } \
+         if( out_var ) { \
+            for( i = 0; i < npix_out; i++ ) { \
+               if( weights[ i ] > lim && out_var[ i ] != badval ) { \
+                  f = meanw/weights[ i ]; \
+                  out_var[ i ] *= f*f; \
+               } else { \
+                  out_var[ i ] = badval; \
+               } \
+            } \
+         } \
+      } \
+   } \
+\
+/* Annul the pointer to the simplified/cloned Mapping. */ \
+   simple = astAnnul( simple ); \
+\
+}
+
+/* Expand the above macro to generate a function for each required
+   data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_REBINSEQ(LD,long double,0)
+#endif
+/* MAKE_REBINSEQ(D,double,0) */
+MAKE_REBINSEQ(F,float,0) 
+MAKE_REBINSEQ(I,int,1)
+
+/* Undefine the macro. */
+#undef MAKE_REBIN
+
 static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                               int ndim_in,
                               const int *lbnd_in, const int *ubnd_in,
@@ -10649,8 +11633,8 @@ f     with type REAL, you should use the function AST_RESAMPLER (see
 *     scaling the output values using the ratio of the output pixel size
 *     to the input pixel size. However, if accurate flux conservation is
 *     important to you, consder using the
-c     astRebin<X> family of functions
-f     AST_REBIN<X> family of routines
+c     astRebin<X> or astRebinSeq<X> family of functions
+f     AST_REBIN<X> or AST_REBINSEQ<X> family of routines
 *     instead.
 *
 *     Output pixel coordinates are transformed into the coordinate
@@ -11361,8 +12345,8 @@ f     TOL argument
 *
 *     Flux conservation can only be approximate when using a resampling
 *     algorithm. For accurate flux conservation use the 
-c     astRebin function
-f     AST_REBIN routine
+c     astRebin<X> or astRebinSeq<X> function
+f     AST_REBIN<X> or AST_REBINSEQ<X> routine
 *     instead.
 
 *  Propagation of Missing Data:
@@ -18934,6 +19918,34 @@ MAKE_REBIN_(D,double)
 MAKE_REBIN_(F,float)
 MAKE_REBIN_(I,int)
 #undef MAKE_REBIN_
+
+#define MAKE_REBINSEQ_(X,Xtype) \
+void astRebinSeq##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
+                        const int *ubnd_in, const Xtype *in, \
+                        const Xtype *in_var, int interp, \
+                        const double *params, \
+                        int flags, double tol, int maxpix, Xtype badval, \
+                        int ndim_out, \
+                        const int *lbnd_out, const int *ubnd_out, \
+                        const int *lbnd, const int *ubnd, Xtype *out, \
+                        Xtype *out_var, double *weights ) { \
+   if ( !astOK ) return; \
+   (**astMEMBER(this,Mapping,RebinSeq##X))( this, ndim_in, lbnd_in, \
+                                         ubnd_in, in, in_var, \
+                                         interp, params, \
+                                         flags, tol, maxpix, \
+                                         badval, ndim_out, \
+                                         lbnd_out, ubnd_out, \
+                                         lbnd, ubnd, \
+                                         out, out_var, weights ); \
+}
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_REBINSEQ_(LD,long double)
+#endif
+MAKE_REBINSEQ_(D,double)
+MAKE_REBINSEQ_(F,float)
+MAKE_REBINSEQ_(I,int)
+#undef MAKE_REBINSEQ_
 
 double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
    if ( !astOK ) return AST__BAD;
