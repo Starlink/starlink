@@ -20,174 +20,181 @@
 *        The global status.
 
 *  Description:
-*     This application draws a pair of arrows on top of a previously displayed 
-*     DATA picture which indicate the directions of the labelled axes in the
-*     underlying picture, at the position specified by parameter ORIGIN. For 
-*     instance, if the underlying picture has axes labelled with celestial 
-*     co-ordinates, then the arrows will by default indicate the directions 
-*     of north and east. The appearance of the arrows, including the labels 
-*     attached to each arrow, may be controlled using the STYLE parameter. 
-*     The picture area behind the arrows may optionally be cleared before 
-*     drawing the arrows (see parameter BLANK).
+*     This application draws a pair of arrows on top of a previously
+*     displayed DATA picture which indicate the directions of the
+*     labelled axes in the underlying picture, at the position specified 
+*     by parameter ORIGIN. For instance, if the underlying picture has
+*     axes labelled with celestial co-ordinates, then the arrows will
+*     by default indicate the directions of north and east. The
+*     appearance of the arrows, including the labels attached to each
+*     arrow, may be controlled using the STYLE parameter.  The picture
+*     area behind the arrows may optionally be cleared before drawing
+*     the arrows (see parameter BLANK).
 
 *  Usage:
 *     drawnorth [device] [length] [origin] 
 
 *  ADAM Parameters:
 *     ARROW = _REAL (Read)
-*        The size of the arrow heads are specified by this parameter. Simple 
-*        lines can be drawn by setting the arrow head size to zero. The value 
-*        should be expressed as a fraction of the largest dimension of the 
-*        underlying DATA picture. [current value]
+*        The size of the arrow heads are specified by this parameter.
+*        Simple lines can be drawn by setting the arrow head size to
+*        zero. The value should be expressed as a fraction of the
+*        largest dimension of the underlying DATA picture.
+*        [current value]
 *     BLANK = _LOGICAL (Read)
 *        If TRUE, then the area behind the arrows is blanked before the
-*        arrows are drawn. This is done by drawing a rectangle filled with 
-*        the current background colour of the selected graphics device. 
-*        The size of the blanked area can be controlled using parameter 
-*        BLANKSIZE. [FALSE]
+*        arrows are drawn. This is done by drawing a rectangle filled
+*        with the current background colour of the selected graphics
+*        device.  The size of the blanked area can be controlled using
+*        parameter BLANKSIZE. [FALSE]
 *     BLANKSIZE = _REAL (Read)
 *        Specifies the size of the blanked area (see parameter BLANK). A
-*        value of 1.0 results in the blanked area being just large enough
-*        to contain the drawn arrows and labels. Values larger than 1.0
-*        introduce a blank margin around the drawn arrows and labels. This 
-*        parameter also specifies the size of the picture stored in the
-*        graphics database. [1.05]
+*        value of 1.0 results in the blanked area being just large
+*        enough to contain the drawn arrows and labels. Values larger
+*        than 1.0 introduce a blank margin around the drawn arrows and
+*        labels. This parameter also specifies the size of the picture
+*        stored in the graphics database. [1.05]
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
 *     FRAME = LITERAL (Read)
-*        Specifies the co-ordinate Frame to which the drawn arrows refer.
-*        If a null (!) value is supplied, the arrows are drawn parallel to
-*        the two axes which were used to annotate the previously displayed 
-*        picture. If the arrows are required to be parallel to the axes of 
-*        some other  Frame, the required Frame should be specified using this
-*        parameter. The string supplied for FRAME can be one of the following:
+*        Specifies the co-ordinate Frame to which the drawn arrows
+*        refer. If a null (!) value is supplied, the arrows are drawn
+*        parallel to the two axes which were used to annotate the
+*        previously displayed picture. If the arrows are required to be
+*        parallel to the axes of some other Frame, the required Frame
+*        should be specified using this parameter. The string supplied
+*        for FRAME can be one of the following:
 *
 *        - A domain name such as SKY, AXIS, PIXEL, etc.
 *
 *        - An integer value giving the index of the required Frame.
 *
-*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see 
-*        section "Sky Co-ordinate Systems" in SUN/95).
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
+*        (see section "Sky Co-ordinate Systems" in SUN/95).
 *
 *        An error will be reported if a co-ordinate Frame is requested
 *        which is not available in the previously displayed picture. If
 *        the selected Frame has more than 2 axes, the parameter USEAXIS 
 *        will determine the 2 axes which are to be used. [!]
 *     LENGTH( 2 ) = _REAL (Read)
-*        The lengths of the arrows, expressed as fractions of the largest 
-*        dimension of the underlying DATA picture. If only one value is 
-*        supplied, both arrows will be drawn with the given length. One of 
-*        the supplied values can be set to zero if only a single arrow is 
-*        required. [current value]
+*        The lengths of the arrows, expressed as fractions of the
+*        largest dimension of the underlying DATA picture. If only one
+*        value is supplied, both arrows will be drawn with the given
+*        length. One of the supplied values can be set to zero if only
+*        a single arrow is required. [current value]
 *     OFRAME = LITERAL (Read)
-*        Specifies the co-ordinate Frame in which the position of the arrows 
-*        will be supplied (see parameter ORIGIN). The following Frames will 
-*        always be available:
+*        Specifies the co-ordinate Frame in which the position of the
+*        arrows will be supplied (see parameter ORIGIN). The following
+*        Frames will always be available:
 *
-*        - GRAPHICS -- gives positions in millimetres from the bottom left 
-*        corner of the plotting surface.
+*        - GRAPHICS -- gives positions in millimetres from the 
+*        bottom-left corner of the plotting surface.
 *
-*        - BASEPIC -- gives positions in a normalised system in which the 
-*        bottom left corner of the plotting surface is (0,0) and the 
+*        - BASEPIC -- gives positions in a normalised system in which
+*        the bottom-left corner of the plotting surface is (0,0) and the
 *        shortest dimension of the plotting surface has length 1.0. The
 *        scales on the two axes are equal.
 *
-*        - CURPIC -- gives positions in a normalised system in which the 
-*        bottom left corner of the underlying DATA picture is (0,0) and
-*        the shortest dimension of the picture has length 1.0. The scales 
-*        on the two axes are equal.
+*        - CURPIC -- gives positions in a normalised system in which the
+*        bottom-left corner of the underlying DATA picture is (0,0) and
+*        the shortest dimension of the picture has length 1.0. The
+*        scales on the two axes are equal.
 *
 *        - NDC -- gives positions in a normalised system in which the 
-*        bottom left corner of the plotting surface is (0,0) and the 
-*        top right corner is (1,1).
+*        bottom-left corner of the plotting surface is (0,0) and the 
+*        top-right corner is (1,1).
 *
-*        - CURNDC -- gives positions in a normalised system in which the 
-*        bottom left corner of the underlying DATA picture is (0,0) and the 
-*        top right corner is (1,1).
+*        - CURNDC -- gives positions in a normalised system in which
+*        the bottom-left corner of the underlying DATA picture is (0,0)
+*        and the top-right corner is (1,1).
 *
-*        Additional Frames will be available, describing the co-ordinates
-*        systems known to the data displayed within the underlying picture.
-*        These could include PIXEL, AXIS, SKY, for instance, but the
-*        exact list will depend on the displayed data. If a null value is 
-*        supplied, the ORIGIN position should be supplied in the Frame
-*        used to annotate the underlying picture (supplying a colon ":" 
-*        will display details of this co-ordinate Frame). [CURNDC]
+*        Additional Frames will be available, describing the
+*        co-ordinates systems known to the data displayed within the
+*        underlying picture.  These could include PIXEL, AXIS, SKY, for
+*        instance, but the exact list will depend on the displayed data.
+*        If a null value is supplied, the ORIGIN position should be
+*        supplied in the Frame used to annotate the underlying picture
+*        (supplying a colon ":" will display details of this
+*        co-ordinate Frame). [CURNDC]
 *     ORIGIN = LITERAL (Read)
-*        The co-ordinates at which to place the origin of the arrows, in the 
-*        Frame specified by parameter OFRAME. If a null (!) value is
-*        supplied, OFRAME is ignored and the arrows are positions at a
-*        default position near one of the corners, or at the centre. The
-*        supplied position can be anywhere within the current picture. An 
-*        error is reported if the arrows and labels cannot be drawn at any 
-*        of these positions. [!]
+*        The co-ordinates at which to place the origin of the arrows,
+*        in the Frame specified by parameter OFRAME. If a null (!) value
+*        is supplied, OFRAME is ignored and the arrows are positions at
+*        a default position near one of the corners, or at the centre.
+*        The supplied position can be anywhere within the current
+*        picture. An error is reported if the arrows and labels cannot
+*        be drawn at any of these positions. [!]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        for the vectors and annotated axes. 
+*        A group of attribute settings describing the plotting style to
+*        use for the vectors and annotated axes. 
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^". Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner. Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings over-riding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *        
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        defaulted if a null value (!) is supplied. See section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes. Any unrecognised attributes are ignored
+*        (no error is reported). 
 *
 *        The appearance of the arrows is controlled by the attributes
 *        Colour(Axes), Width(Axes), etc (the synonym Arrows may be
 *        used in place of Axes). 
 *
-*        The text of the label to draw against each arrow is specified by 
-*        the Symbol(1) and Symbol(2) attributes. These default to the
+*        The text of the label to draw against each arrow is specified
+*        by the Symbol(1) and Symbol(2) attributes. These default to the
 *        corresponding attributes of the underlying picture. The
-*        appearance of these labels can be controlled using the attributes
-*        Font(TextLab), Size(TextLab), etc. The gap between the end of the 
-*        arrow and the corresponding label can be controlled using attribute 
-*        TextLabGap. The drawing of labels can be suppressed using
-*        attribute TextLab. [current value]
+*        appearance of these labels can be controlled using the
+*        attributes Font(TextLab), Size(TextLab), etc. The gap between
+*        the end of the arrow and the corresponding label can be
+*        controlled using attribute TextLabGap. The drawing of labels
+*        can be suppressed using attribute TextLab. [current value]
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the co-ordinate Frame selected using
-*        parameter FRAME has more than 2 axes. A group of two strings should
-*        be supplied specifying the 2 axes to which the 2 drawn arrows should
-*        refer. Each axis can be specified either by its integer index within 
-*        the Frame (in the range 1 to the number of axes in the current Frame),
-*        or by its symbol string. A list of acceptable values is displayed if 
-*        an illegal value is supplied. If a null (!) value is supplied, the 
+*        USEAXIS is only accessed if the co-ordinate Frame selected
+*        using parameter FRAME has more than two axes. A group of two
+*        strings should be supplied specifying the two axes to which
+*        the two drawn arrows should refer. Each axis can be specified
+*        either by its integer index within the Frame (in the range 1 to
+*        the number of axes in the current Frame), or by its symbol
+*        string. A list of acceptable values is displayed if an illegal
+*        value is supplied. If a null (!) value is supplied, the 
 *        first two axes of the Frame are used. [!]
 
 *  Examples:
 *     drawnorth 
 *        Draws a pair of arrows indicating the directions of the axes of
-*        the previously displayed image, contour map, etc. The arrows are
-*        drawn at the top left of the picture. The current values for all
-*        other parameters are used.
+*        the previously displayed image, contour map, etc. The arrows
+*        are drawn at the top left of the picture. The current values
+*        for all other parameters are used.
 *     drawnorth blank origin="0.5,0.5" style='TextBackColour=clear'
-*        As above, but blanks out the picture area behind the arrows, and 
-*        positions them in the middle of the underlying DATA picture. In
-*        addition, the text labels are drawn with a clear background so
-*        that the underlying image can seen around the text. 
+*        As above, but blanks out the picture area behind the arrows,
+*        and positions them in the middle of the underlying DATA
+*        picture. In addition, the text labels are drawn with a clear
+*        background so that the underlying image can seen around the
+*        text. 
 *     drawnorth blank blanksize=1.2 oframe=pixel origin="150,250" 
 *        As above, but positions the arrows at pixel co-ordinates
 *        (150,250), and blanks out a larger area around the arrows.
-*     drawnorth blank oframe=\! origin="10:12:34,-12:23:37"
+*     drawnorth blank oframe=! origin="10:12:34,-12:23:37"
 *        As above, but positions the arrows at RA=10:12:34 and
-*        DEC=-12:23:37 (this assumes the underlying picture was annotated
-*        with RA and DEC axes).
-*     drawnorth length=\[0.1,0\] style='colour(arrows)=red'
-*        Draws the axis 1 arrow with length equal to 0.1 of the longest
-*        dimension of the underlying picture, but does not draw the axis 2 
-*        arrow. Both arrows are drawn red.
+*        DEC=-12:23:37 (this assumes the underlying picture was
+*        annotated with RA and DEC axes).
+*     drawnorth length=[0.1,0] style='colour(arrows)=red'
+*        Draws the axis-1 arrow with length equal to 0.1 of the longest
+*        dimension of the underlying picture, but does not draw the
+*        axis-2 arrow. Both arrows are drawn red.
 *     drawnorth style='textlab=0'
 *        Draws both arrows but does not draw any text labels.
 *     drawnorth style="'Size(TextLab1)=2,Symbol(1)=A,Symbol(2)=B'"
@@ -195,11 +202,12 @@
 *        the default size for the label for the first axis.
 
 *  Notes:
-*     -  An error is reported if there is no existing DATA picture within
-*     the current picture on the selected graphics device.
-*     -  The application stores a picture in the graphics database with name 
-*     KEY which contains the two arrows. On exit the current database picture 
-*     for the chosen device reverts to the input picture.
+*     -  An error is reported if there is no existing DATA picture
+*     within the current picture on the selected graphics device.
+*     -  The application stores a picture in the graphics database with
+*     name KEY which contains the two arrows. On exit the current
+*     database picture for the chosen device reverts to the input
+*     picture.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -212,7 +220,7 @@
 *        Modified to allow arrows to be palced anywhere within the
 *        current picture.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-
