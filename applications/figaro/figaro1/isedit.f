@@ -48,6 +48,7 @@ C                    GKD_WRITE_LINE. Disuse PAR_Q*. Add parameter
 C                    YVALUE.
 C     2005 June 8    MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+C     2005 Sep 1     TIMJ / JACH     Fix CNF pointer variable confusion
 C+
       IMPLICIT NONE
 
@@ -74,7 +75,6 @@ C
       LOGICAL   FINISHED         ! TRUE if finished
       REAL      HIGH             ! Highest data value
       INTEGER   IGNORE           ! Ignoreable status
-      LOGICAL   ISNEW            ! Is CNF pointer to data new?
       LOGICAL   ISNEWE           ! Is CNF pointer to errors new?
       LOGICAL   ISNEWO           ! Is CNF pointer to outout data new?
       LOGICAL   ISNEWQ           ! Is CNF pointer to quality new?
@@ -218,18 +218,18 @@ C
 C     Set pointers to appropriate scan
 C
          CALL DYN_INCAD(OPTR1,'FLOAT',(SCAN-1)*NX,TPTR,ISNEWO,STATUS)
-         IF (PISNO) CALL CNF_UNREGP(OPTR1)
-         OPTR1 = TPTR
+         IF (PISNO) CALL CNF_UNREGP(OPTR)
+         OPTR = TPTR
          PISNO = ISNEWO
          
          CALL DYN_INCAD(EPTR1,'FLOAT',(SCAN-1)*NX,TPTR,ISNEWE,STATUS)
-         IF (PISNE) CALL CNF_UNREGP(EPTR1)
-         EPTR1 = TPTR
-         PISNE = ISNEW
+         IF (PISNE) CALL CNF_UNREGP(EPTR)
+         EPTR = TPTR
+         PISNE = ISNEWE
           
          CALL DYN_INCAD(QPTR1,'BYTE',(SCAN-1)*NX,TPTR,ISNEWQ,STATUS)
-         IF (PISNQ) CALL CNF_UNREGP(QPTR1)
-         QPTR1 = TPTR
+         IF (PISNQ) CALL CNF_UNREGP(QPTR)
+         QPTR = TPTR
          PISNQ = ISNEWQ
 C
 C     Get Range
