@@ -4,7 +4,7 @@
 *     GAUSMOOTH
 
 *  Purpose:
-*     Smooths a 1- or 2-dimensional image using a Gaussian filter.
+*     Smooths a one- or two-dimensional image using a Gaussian filter.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,8 +20,8 @@
 *        The global status.
 
 *  Description:
-*     This application applies a symmetrical filter to a 1- or
-*     2-dimensional image so as to convolve it with a Gaussian point
+*     This application applies a symmetrical filter to a one- or
+*     two-dimensional image so as to convolve it with a Gaussian point
 *     spread function (PSF) of specified width, or widths and
 *     orientation.  The image is held in an NDF data structure.
 
@@ -35,7 +35,7 @@
 *        smoothing PSF will be set to zero outside this rectangle,
 *        which should therefore be sufficiently large not to truncate
 *        the PSF too early.  A square region is defined should only one
-*        size be given.  For a 1-dimensional or circular Gaussian a
+*        size be given.  For a one-dimensional or circular Gaussian a
 *        second size is ignored.  Two values are expected when an
 *        elliptical PSF is requested (see the description of parameter
 *        FWHM).
@@ -50,10 +50,10 @@
 *        elliptical Gaussian. [!]
 *     FWHM() = _REAL (Read)
 *        This specifies whether a circular or elliptical Gaussian
-*        point-spread function is used in smoothing a 2-dimensional
+*        point-spread function is used in smoothing a two-dimensional
 *        image.  If one value is given it is the full-width at
-*        half-maximum of a 1-dimensional or circular Gaussian PSF.
-*        (Indeed only one value is permitted for a 1-dimensional
+*        half-maximum of a one-dimensional or circular Gaussian PSF.
+*        (Indeed only one value is permitted for a one-dimensional
 *        array.)  If two values are supplied, this parameter becomes the
 *        full-width at half-maximum of the major and minor axes of an
 *        elliptical Gaussian PSF.  Values between 0.1 and 100.0 pixels
@@ -62,14 +62,14 @@
 *        smoothing will increase in approximate proportion to the
 *        value(s) of FWHM.  The suggested default is the current value.
 *     IN = NDF (Read)
-*        The input NDF containing the 1- or 2-dimensional image to which
-*        Gaussian smoothing is to be applied.
+*        The input NDF containing the one- or two-dimensional image to
+*        which Gaussian smoothing is to be applied.
 *     ORIENT = _REAL (Read)
 *        The orientation of the major axis of the elliptical Gaussian
 *        PSF, measured in degrees in an anti-clockwise direction from
 *        the x axis of the NDF.  ORIENT is not obtained if FWHM has one
 *        value, i.e. a circular Gaussian PSF will be used to smooth the
-*        image, or the input NDF is 1-dimensional.  The suggested
+*        image, or the input NDF is one-dimensional.  The suggested
 *        default is the current value.
 *     OUT = NDF (Write)
 *        The output NDF which is to contain the smoothed image.
@@ -102,25 +102,25 @@
 
 *  Examples:
 *     gausmooth image1 image2 5.0
-*        Smooths the 2-dimensional image held in the NDF structure
+*        Smooths the two-dimensional image held in the NDF structure
 *        image1 using a symmetrical Gaussian PSF with a full-width at
 *        half-maximum of 5 pixels.  The smoothed image is written to
 *        image2.  If any pixels in the input image are bad, then the
 *        corresponding pixels in the output image will also be bad.
 *     gausmooth spectrum1 spectrum2 5.0 box=9
-*        Smooths the 1-dimensional image held in the NDF structure
+*        Smooths the one-dimensional image held in the NDF structure
 *        spectrum1 using a symmetrical Gaussian PSF with a full-width
 *        at half-maximum of 5, and is evaluated over a length of 9
 *        pixels.  The smoothed image is written to spectrum2.  If any
 *        pixels in the input image are bad, then the corresponding
 *        pixels in the output image will also be bad.
 *     gausmooth in=a out=b fwhm=3.5 box=31
-*        Smooths the 2-dimensional image held in the NDF structure a,
+*        Smooths the two-dimensional image held in the NDF structure a,
 *        writing the result into the structure b. The Gaussian
 *        smoothing PSF has a full-width at half-maximum of 3.5 pixels
 *        and is evaluated over a large square of size 31x31 pixels.
 *     gausmooth in=a out=b fwhm=[4,3] orient=52.7 box=[29,33]
-*        Smooths the 2-dimensional image held in the NDF structure a,
+*        Smooths the two-dimensional image held in the NDF structure a,
 *        writing the result into the structure b.  The elliptical
 *        Gaussian smoothing PSF has full-width at half-maximum of 4
 *        pixels along its major axis and three pixels along its minor
@@ -190,7 +190,7 @@
 *        Added support for elliptical Gaussian PSFs.
 *     1995 April 5 (MJC):
 *        Renamed from GAUSS to avoid clash with Figaro.  Made to work on
-*        1-dimensional arrays.  Used lowercase examples and usage.
+*        one-dimensional arrays.  Used lowercase examples and usage.
 *        Added Related Applications and additional commentary.  Changed
 *        default of TITLE to null.  Used PSX to obtain workspace.
 *     5-JUN-1998 (DSB):
@@ -615,8 +615,8 @@
 *  If an error occurred, then report contextual information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GAUSMOOTH_ERR',
-     :     'GAUSMOOTH: Error smoothing a 2-dimensional image using a '/
-     :     /'Gaussian filter.', STATUS )
+     :     'GAUSMOOTH: Error smoothing a two-dimensional image using '/
+     :     /'a Gaussian filter.', STATUS )
       END IF
 
       END

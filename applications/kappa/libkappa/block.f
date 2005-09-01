@@ -4,8 +4,8 @@
 *     BLOCK
 
 *  Purpose:
-*     Smooths an NDF using a 1- or 2-dimensional square or rectangular
-*     box filter.
+*     Smooths an NDF using a one- or two-dimensional square or 
+*     rectangular box filter.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,18 +21,19 @@
 *        The global status.
 
 *  Description:
-*     This application smooths an NDF using a 1- or 2-dimensional square or 
-*     rectangular box filter. Each output pixel is either the mean or the 
-*     median of the input pixels within the filter box. The mean estimator 
-*     provides one of the fastest methods of smoothing an image and is often 
-*     useful as a general-purpose smoothing algorithm when the exact form of 
-*     the smoothing point-spread function is not important.  
+*     This application smooths an NDF using a one- or two-dimensional
+*     square or rectangular box filter. Each output pixel is either the
+*     mean or the median of the input pixels within the filter box. The
+*     mean estimator provides one of the fastest methods of smoothing
+*     an image and is often useful as a general-purpose smoothing
+*     algorithm when the exact form of the smoothing point-spread
+*     function is not important.  
 *
-*     The NDF may have up to 3 dimensions. If it has 3 dimensions, then
-*     the filter is applied in turn to each plane in the cube and the
-*     result written to the corresponding plane in the output cube. The
-*     orientation of the smoothing plane can be specified using the
-*     AXES parameter.
+*     The NDF may have up to three dimensions. If it has three
+*     dimensions, then the filter is applied in turn to each plane in
+*     the cube and the result written to the corresponding plane in the 
+*     output cube. The orientation of the smoothing plane can be
+*     specified using the AXES parameter.
 
 *  Usage:
 *     block in out box [estimator]
@@ -40,24 +41,25 @@
 *  ADAM Parameters:
 *     AXES(2) = _INTEGER (Read)
 *        This parameter is only accessed if the NDF has exactly three 
-*        significant pixel axes. It should be set to the indices of the NDF 
-*        pixel axes which span the plane in which smoothing is to be
-*        applied. All pixel planes parallel to the specified plane will
+*        significant pixel axes. It should be set to the indices of the
+*        NDF  pixel axes which span the plane in which smoothing is to
+*        be applied. All pixel planes parallel to the specified plane will
 *        be smoothed independently of each other. The dynamic default
 *        is the indices of the first two significant axes in the NDF. []
 *     BOX(2) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular box to be
 *        applied to smooth the image.  If only a single value is given,
 *        then it will be duplicated so that a square filter is used,
-*        except where the image is 1-dimensional, for which the box size
-*        along the insignificant dimension is set to 1.  The values
-*        given will be rounded up to positive odd integers, if necessary.
+*        except where the image is one-dimensional, for which the box 
+*        size along the insignificant dimension is set to 1.  The values
+*        given will be rounded up to positive odd integers, if
+*        necessary.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
 *        can be either "Mean" or "Median". ["Mean"]
 *     IN = NDF (Read)
-*        The input NDF containing the 1-, 2- or 3-dimensional image to which
-*        box smoothing is to be applied.
+*        The input NDF containing the one-, two- or three-dimensional 
+*        image to which box smoothing is to be applied.
 *     OUT = NDF (Write)
 *        The output NDF which is to contain the smoothed image.
 *     TITLE = LITERAL (Read)
@@ -90,14 +92,14 @@
 
 *  Examples:
 *     block aa bb 9
-*        Smooths the 2-dimensional image held in the NDF structure aa,
+*        Smooths the two-dimensional image held in the NDF structure aa,
 *        writing the result into the structure bb.  The smoothing box is
 *        9 pixels square.  If any pixels in the input image are bad,
 *        then the corresponding pixels in the output image will also be
 *        bad.  Each output pixel is the mean of the corresponding input
 *        pixels.
 *     block spectrum spectrums 5 median title="Smoothed spectrum"
-*        Smooths the 1-dimensional data in the NDF called spectrum
+*        Smooths the one-dimensional data in the NDF called spectrum
 *        using a box size of 5 pixels, and stores the result in the NDF
 *        structure spectrums.  Each output pixel is the median of the
 *        corresponding input pixels.  If any pixels in the input image
@@ -105,13 +107,13 @@
 *        will also be bad.  The output NDF has the title "Smoothed
 *        spectrum".
 *     block ccdin(123,) ccdcol [1,9] 
-*        Smooths the 123rd column in the 2-dimensional NDF called ccdin
-*        using a box size of 9 pixels, and stores the result in the NDF
-*        structure ccdcol.  The first value of the smoothing box is
-*        ignored as the first dimension has only one element.  Each
+*        Smooths the 123rd column in the two-dimensional NDF called
+*        ccdin using a box size of 9 pixels, and stores the result in
+*        the NDF structure ccdcol.  The first value of the smoothing box
+*        is ignored as the first dimension has only one element.  Each
 *        output pixel is the mean of the corresponding input pixels.
 *     block in=image1 out=image2 box=[5,7] estimator=median
-*        Smooths the 2-dimensional image held in the NDF structure
+*        Smooths the two-dimensional image held in the NDF structure
 *        image1 using a rectangular box of size 5x7 pixels.  The
 *        smoothed image is written to the structure image2.  Each
 *        output pixel is the median of the corresponding input pixels.
@@ -130,8 +132,8 @@
 *     approximately doubled if a variance array is present in the input
 *     NDF.
 *
-*     The median estimator is much slower than the mean estimator, and is 
-*     heavily dependent on the smoothing box size.
+*     The median estimator is much slower than the mean estimator, and
+*     is heavily dependent on the smoothing box size.
 
 *  Related Applications:
 *     KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN; Figaro: ICONV3,
@@ -139,9 +141,9 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
-*     propagates all extensions.  In addition, if the mean estimator is
-*     used, the VARIANCE component is also processed.  If the median
+*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
+*     and propagates all extensions.  In addition, if the mean estimator
+*     is used, the VARIANCE component is also processed.  If the median
 *     estimator is used, then the output NDF will have no VARIANCE
 *     component, even if there is a VARIANCE component in the input
 *     NDF.
@@ -176,7 +178,7 @@
 *        Introduced ESTIMATOR parameter.  Replaced AIF VM calls with PSX
 *        calls.
 *     1995 March 16 (MJC):
-*        Made to operate on 1-dimensional arrays.  Enabled the writing
+*        Made to operate on one-dimensional arrays.  Enabled the writing
 *        of the bad-pixel flags.  Usage and examples to lowercase.
 *        Added a "Related Applications" section.  Fixed bug that
 *        attempted to create an output variance array when the median
@@ -186,7 +188,8 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     23-MAR-2005 (DSB):
-*        Added support for smoothing all 2D planes in a 3D cube.
+*        Added support for smoothing all two-dimensional planes in a
+*        three-dimensional cube.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -511,8 +514,8 @@
 *  If an error occurred, then report contextual information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'BLOCK_ERR',
-     :     'BLOCK: Error smoothing an NDF using a 1- or 2-dimensional '/
-     :     /'rectangular box filter.', STATUS )
+     :     'BLOCK: Error smoothing an NDF using a one- or '/
+     :     /'two-dimensional rectangular box filter.', STATUS )
       END IF
 
       END
