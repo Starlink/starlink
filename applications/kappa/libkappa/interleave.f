@@ -61,14 +61,14 @@
 *        - the name of a text file, preceded by an up-arrow character
 *        "^".  Each line in the text file should contain a
 *        comma-separated list of elements, each of which can in turn
-*        be an NDF name (with optional wild-cards, etc), or another
+*        be an NDF name (with optional wild-cards, etc.), or another
 *        file specification (preceded by a caret).  Comments can be
 *        included in the file by commencing lines with a hash
 *        character "#".
 *
-*        If the value supplied for this parameter ends with a minus
-*        sign "-", then you are re-prompted for further input until
-*        a value is given which does not end with a minus sign.  All
+*        If the value supplied for this parameter ends with a hyphen
+*        "-", then you are re-prompted for further input until
+*        a value is given which does not end with a hyphen.  All
 *        the datasets given in this way are concatenated into a single
 *        group.
 *     OUT = NDF (Write)
@@ -88,11 +88,11 @@
 
 *  Examples:
 *     interleave "vector1,vector2" weave 2
-*        This interleaves the 1-dimensional NDFs called vector1 and
+*        This interleaves the 1one-dimensional NDFs called vector1 and
 *        vector2 and stores the result in NDF weave.  Only the
 *        intersection of the the two input NDFs is used.
 *     interleave 'image*' weave [3,2] title="Interlaced image"
-*        This interleaves the 2-dimensional NDFs with names beginning
+*        This interleaves the two-dimensional NDFs with names beginning
 *        with "image" into an NDF called weave.  The interleaving has
 *        three datasets along the first dimension and two along the
 *        second.  Therefore there should be six input NDFs.  The output
@@ -110,9 +110,10 @@
 *     KAPPA: PIXDUPE; CCDPACK: DRIZZLE.
 
 *  Implementation Status:
-*     -  This routine processes the WCS, AXIS, DATA, QUALITY, VARIANCE,
-*     LABEL, TITLE, UNITS, and HISTORY, components of an NDF data
-*     structure and propagates all extensions. 
+*     -  This routine processes the AXIS, DATA, QUALITY, and VARIANCE
+*     from the all input NDF data structures.  It also processes the 
+*     WCS, LABEL, TITLE, UNITS, and HISTORY components of the primary
+*     NDF data structure, and propagates all of its extensions. 
 *     -  The AXIS centre values along each axis are formed by
 *     interleaving the corresponding centres from the first NDF, and
 *     linearly interpolating between those to complete the array.  
