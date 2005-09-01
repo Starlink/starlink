@@ -269,6 +269,7 @@
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     acd: Clive Davenhall (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -358,6 +359,9 @@
 *        FWHM) as ADAM parameters as well as to the screen and log file.
 *     2005 June 1 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     2005 Sep 1 (TIMJ):
+*        Fix slight problem with CNF_PVAL and pointer arithmetic.
+*        Initialise FIT arrays
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -490,8 +494,18 @@
       DATA NDF, PNTR /6*0, 10*0/
 
 *  Initialise fitting flag values
-      DATA CFLAGS, PFLAGS, SFLAGS /6*0, 6*0, 6*0/
+      DATA CFLAGS, PFLAGS, SFLAGS /MAXGAU*0, MAXGAU*0, MAXGAU*0/
 
+*  And all MAXGAU arrays
+      DATA FWHM, FFWHM, FLUX, CVAR, PVAR, SVAR, WVAR,
+     :     CENTRE, PEAK, SIGMA, COMP
+     :     / MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0,
+     :       MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0.0,
+     :       MAXGAU*0.0, MAXGAU*0.0, MAXGAU*0 /
+
+      DO I = 1, 9*MAXGAU*MAXGAU
+         COVAR(I) = 0.0D0
+      END DO
 *.
 
 *  Check inherited global status.
@@ -626,7 +640,7 @@
 *     Get residuals as difference of masked data minus guess data. Also
 *     need the range of residuals for plotting purposes.
          CALL VEC_SUBR( .FALSE., MSKELM, 
-     :                  %VAL( CNF_PVAL(PNTR(4)+REALSZ*MSKELM) ),
+     :                  %VAL( CNF_PVAL(PNTR(4))+REALSZ*MSKELM ),
      :                  %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
          CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
@@ -634,7 +648,7 @@
 
 *     Get masked 1/error as square root of weights. Can skip guess data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :                   %VAL( CNF_PVAL(PNTR(4)+2*REALSZ*MSKELM) ), 
+     :                   %VAL( CNF_PVAL(PNTR(4))+2*REALSZ*MSKELM ), 
      :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.
@@ -723,7 +737,7 @@
 *     Get residuals as difference of masked data minus fit data. Also
 *     need the range of residuals for plotting purposes.
          CALL VEC_SUBR( .FALSE., MSKELM,
-     :                  %VAL( CNF_PVAL(PNTR(4)+REALSZ*MSKELM) ),
+     :                  %VAL( CNF_PVAL(PNTR(4))+REALSZ*MSKELM ),
      :                  %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
          CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
@@ -731,7 +745,7 @@
 
 *     Get masked 1/error as square root of weights. Can skip fit data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :                   %VAL( CNF_PVAL(PNTR(4)+2*REALSZ*MSKELM) ),
+     :                   %VAL( CNF_PVAL(PNTR(4))+2*REALSZ*MSKELM ),
      :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.
