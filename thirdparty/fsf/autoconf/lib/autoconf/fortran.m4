@@ -1076,6 +1076,9 @@ AC_CACHE_CHECK([for alternate main to link with Fortran libraries],
  rm -f conftest*
  LIBS=$ac_[]_AC_LANG_ABBREV[]_m_save_LIBS
 ])
+if test "$ac_cv_[]_AC_LANG_ABBREV[]_main" != "main"; then
+   AC_DEFINE(HAVE_[]_AC_FC[]_MAIN, 1, [True when Fortran main isn't C main])
+fi
 AC_DEFINE_UNQUOTED([]_AC_FC[]_MAIN, $ac_cv_[]_AC_LANG_ABBREV[]_main,
                    [Define to alternate name for `main' routine that is
                     called from a `main' in the Fortran libraries.])
