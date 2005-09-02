@@ -1383,6 +1383,9 @@ astTest( this, attrib )
 # Use annul as automatic destructor
 # For automatic destructor we do not want to throw an exception
 # on error. So do not use ASTCALL. Do a manual printf to stderr and continue.
+# Does nothing if a key _annul is present in the object and is true.
+# This condition is usually met if the user has manually called the Annull
+# method on the object.
 
 void
 astDESTROY( obj )
