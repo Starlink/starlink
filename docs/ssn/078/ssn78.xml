@@ -6644,6 +6644,45 @@ int main(int argc, char** argv)
         </subsect>
 
         <subsect id='macro-latex-documentation' export='export'
+          indexkey="starconf!macros!STAR_LARGEFILE_SUPPORT">
+          <subhead>
+            <title>STAR_LARGEFILE_SUPPORT</title>
+          </subhead>
+
+          <p><strong><code>STAR_LARGEFILE_SUPPORT</code></strong></p>
+
+          <p>Set macros for compiling C routines that want to make use of
+          large file support. This is a joining of
+          <code>AC_SYS_LARGEFILE</code> and <code>AC_FUNC_FSEEKO</code> so
+          defines the macros <code>_FILE_OFFSET_BITS</code>,
+          <code>_LARGEFILE_SOURCE</code> and <code>_LARGE_FILES</code> as
+          needed , along with <code>HAVE_FSEEKO</code> when
+          <code>fseeko</code> and <code>ftello</code> are available. 
+          </p>
+
+          <p>To use large file support you need to use fseeko and ftello,
+          instead of fseek and ftell, when <code>HAVE_FSEEKO</code> is defined
+          (and use type <code>off_t</code> for offsets) and compile all C code
+          with the other defines (many of the usual system calls are replaced
+          with large file supporting ones, when this is done).
+          </p>
+
+          <p>Currently the <code>AC_FUNC_FSEEKO</code> macro does not define
+          <code>_LARGEFILE_SOURCE</code> under Solaris, so this function makes
+          sure that this is done. It also gathers the values of
+          <code>_FILE_OFFSET_BITS</code>, <code>_LARGEFILE_SOURCE</code> and
+          <code>_LARGE_FILES</code> and sets the
+          <code>STAR_LARGEFILE_CFLAGS</code> variable so that it can be used
+          as part of CFLAGS when compiling. This in useful for passing to
+          packages which are not directly part of the starconf system. Note
+          that normally the necessary defines are written to
+          <code>config.h</code> or are already made part of the local
+          <code>CFLAGS</code>, so this variable is not needed.
+          </p>
+
+        </subsect>
+
+        <subsect id='macro-latex-documentation' export='export'
           indexkey="starconf!macros!STAR_LATEX_DOCUMENTATION">
           <subhead>
             <title>STAR_LATEX_DOCUMENTATION</title>
