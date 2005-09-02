@@ -23,7 +23,7 @@ include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = nbs_err.h NBS_ERR
 
 PUBLIC_INCLUDES = NBS_PAR nbs_par.h
-PRIVATE_INCLUDES = nbs_mac.h  nbs_module.h  nbs_typ.h
+PRIVATE_INCLUDES = nbs_mac.h  nbs_module.h  nbs_typ.h nbs1.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
