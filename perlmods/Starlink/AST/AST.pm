@@ -313,6 +313,38 @@ sub _rebless {
   return bless $self, $perl_class;
 }
 
+# Hooks for Storable, to allow deep cloning of Starlink::AST objects
+# via dclone().
+sub STORABLE_freeze {
+  my $self = shift;
+
+  my $string = "";
+  my $ch = new Starlink::AST::Channel( sink => sub { $string .= "$_[0]\n" } );
+  $ch->Write( $self );
+  return $string;
+}
+
+sub STORABLE_thaw {
+  my ( $self, $cloning, $serialized ) = @_;
+
+  my @cards = split "\n", $serialized;
+  my $ch = new Starlink::AST::Channel( source => sub{ return shift( @cards ) } );
+
+  # Create a new Starlink::AST object...
+  my $new = $ch->Read();
+
+  # Copy the internal hash representation to the object created by
+  # STORABLE.
+  %$self = %$new;
+
+  # And delete the pointer in the new Starlink::AST object so that
+  # when the destructor runs, it doesn't try to free the memory
+  # pointed to by this object. If that happened, then we'd lose the
+  # pointer in the Starlink::AST object created by STORABLE, which
+  # isn't what we want to have happen.
+  delete $new->{'_pointer'};
+}
+
 package Starlink::AST::Axis;
 use base qw/ Starlink::AST /;
 
