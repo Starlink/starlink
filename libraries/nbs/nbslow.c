@@ -147,9 +147,6 @@
 #define NBS_MLIST_UNMAP         nbc_mlist_unmap
 #define NBS_SLEEPMS             nbc_sleepms
 
-char *NBS_STRIMP ();
-void  NBS_STREXP ();
-
 #else
 
 #ifdef vms
@@ -243,12 +240,39 @@ void   F77_EXTERNAL_NAME(nbs_strexp) ();
 
 /* Internal protoypes */
 
-char *NBS_RELOCATE_ADDRESS( char *, int, int );
-char *NBS_MLIST_FIND( int, int*);
-void NBS_MLIST_ADD( int, int, char*, int*);
-void NBS_RELOCATE_ITEM( item_id, int, int, int, int );
+key_t NBS_MAKE_KEY( char * );
+char * NBS_INIT_ALLOC( int, char *);
+char * NBS_ALLOC( int );
+char * NBS_DATA_ALLOC( int );
+char * NBS_DEINIT_ALLOC ();
+void NBS_WRITE_FILE( RW_CHARACTER(), RW_BYTE_ARRAY(), int, int, int,
+		     W_INTEGER() TRAIL() );
+void NBS_OPEN_FILE( RW_CHARACTER(), FILE**, W_INTEGER(), W_INTEGER(),
+		    W_INTEGER(), W_INTEGER() TRAIL() );
+void NBS_READ_FILE ( FILE *, int, RW_BYTE_ARRAY(), W_INTEGER());
+void NBS_CLOSE_FILE( RW_POINTER() );
+void NBS_OPEN_WRITE( char*, FILE**, int*);
+void NBS_UPDATE_FILE(FILE*, char*, int, int*);
+char *NBS_CREATE_SECTION ( RW_CHARACTER(), int,
+                           W_INTEGER() TRAIL() );
+char *NBS_MAP_SECTION( RW_CHARACTER(), W_INTEGER() TRAIL() );
+void NBS_UNMAP_SECTION ( RW_POINTER(), int, W_INTEGER() );
 void NBS_RELOCATE_POINTERS( item_id, int, int, int, int);
+void NBS_RELOCATE_ITEM( item_id, int, int, int, int );
+char *NBS_RELOCATE_ADDRESS( char *, int, int );
+#ifdef c_string
+char *NBS_STRIMP ( char *, RW_CHARACTER(), int TRAIL() );
+void NBS_STREXP( RW_CHARACTER(), char *, int TRAIL() );
+#else
+/* These are macros to account for the TRAIL without having to include it */
+char * NBS_STRIMP( a, b, c );
+void NBS_STREXP( a, b, c );
+#endif
+void NBS_MLIST_EXITHANDLER();
+void NBS_MLIST_ADD( int, int, char*, int*);
+char *NBS_MLIST_FIND( int, int*);
 void NBS_MLIST_UNMAP (char *,int *);
+void NBS_SLEEPMS( int );
 
 /* Local static data */
 
