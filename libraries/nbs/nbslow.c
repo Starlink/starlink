@@ -2239,7 +2239,7 @@ else if ( first )
 #  if HAVE_ON_EXIT
   on_exit( NBS_MLIST_EXITHANDLER, NULL );
 #  else
-#    error "no way to register exit handler"
+    error "no way to register exit handler"
 #  endif
 #endif
   first = NO;
