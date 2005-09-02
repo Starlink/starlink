@@ -479,6 +479,10 @@ extern void F77_EXTERNAL_NAME(nbs_strexp) ();
 
 #include "nbs_mac.h"
 
+/* Low level prototypes */
+
+#include "nbs1.h"
+
 /* Error processing */
 #include "sae_par.h"
 #include "ems.h"
