@@ -94,6 +94,8 @@
 *        Changed ifdef logic for Mac OSX support.
 *     12-Sep-04 (TIMJ):
 *        Minimize compiler warnings. Use config.h
+*     2-Sep-05 (TIMJ):
+*        Move protoypes out of functions (gcc 4 objects)
 *     {enter_changes_here}
 */
 
@@ -197,8 +199,6 @@ void   F77_EXTERNAL_NAME(nbs_strexp) ();
 
 #endif
 
-extern void   NBS_MLIST_UNMAP (char *,int *);
-
 /* Include files	*/
 
 #include <ctype.h>		    /* Character classification macros	*/
@@ -240,6 +240,15 @@ extern void   NBS_MLIST_UNMAP (char *,int *);
 
 #include "sae_par.h"
 #include "ems.h"
+
+/* Internal protoypes */
+
+char *NBS_RELOCATE_ADDRESS( char *, int, int );
+char *NBS_MLIST_FIND( int, int*);
+void NBS_MLIST_ADD( int, int, char*, int*);
+void NBS_RELOCATE_ITEM( item_id, int, int, int, int );
+void NBS_RELOCATE_POINTERS( item_id, int, int, int, int);
+void NBS_MLIST_UNMAP (char *,int *);
 
 /* Local static data */
 
@@ -1346,10 +1355,6 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 
 /* UNIX-specific section	*/
 
-/* External function declarations	*/
-
-   extern void    NBS_MLIST_ADD ();
-
 /* Local variable declarations	*/
    key_t	key;		/* Key to shared memory segment */
    int		memid;		/* Shared memory segment id */
@@ -1463,10 +1468,6 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
   GENPTR_CHARACTER(name)
   GENPTR_INTEGER(status)
 
-/* Common external function declarations	*/
-
-/*   extern int	strlen(); */
-
 /* Common local variable declarations	*/
 
    char		*retadr[2];	/* Returned as start / end virtual addresses */
@@ -1534,11 +1535,6 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 
 
 /* UNIX-specific section	*/
-
-/* External function declarations	*/
-
-   extern char *NBS_MLIST_FIND ();
-   extern void NBS_MLIST_ADD ();
 
 /* Local variable declarations	*/
 
@@ -1795,11 +1791,6 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
                        int d_offset,int add)
 {
 
-/* External function declarations   */
-
-   extern void	NBS_RELOCATE_ITEM();
-   extern void	NBS_RELOCATE_POINTERS();
-
 /* Start of code */
 
 /* If given a NIL identifier, do nothing at all.    */
@@ -1878,10 +1869,6 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
 void
 NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
 {
-
-/* External function declarations   */
-
-   extern char	*NBS_RELOCATE_ADDRESS();
 
 /* Start of code */
 
