@@ -337,12 +337,14 @@ sub STORABLE_thaw {
   # STORABLE.
   %$self = %$new;
 
-  # And delete the pointer in the new Starlink::AST object so that
-  # when the destructor runs, it doesn't try to free the memory
-  # pointed to by this object. If that happened, then we'd lose the
+  # And lie to AST to indicate that we have annulled this object
+  # already. This will prevent the object destructor from freeing the
+  # memory. If that happened, then we'd lose the
   # pointer in the Starlink::AST object created by STORABLE, which
   # isn't what we want to have happen.
-  delete $new->{'_pointer'};
+  # We have to go through this hoop because STORABLE pre-creates an
+  # object for us
+  $new->{'_annul'} = 1;
 }
 
 package Starlink::AST::Axis;
