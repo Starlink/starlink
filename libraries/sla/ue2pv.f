@@ -113,7 +113,7 @@
 *  Test value for solution and maximum number of iterations
       DOUBLE PRECISION TEST
       INTEGER NITMAX
-      PARAMETER (TEST=1D-13,NITMAX=20)
+      PARAMETER (TEST=1D-13,NITMAX=25)
 
       INTEGER I,NIT,N
 
