@@ -12,7 +12,7 @@ void FC_MAIN () {}
 
 #include <stdlib.h>
 #include "shl.h"
-#include "cnf.h"
+#include "f77.h"
 
 int main( int argc, char **argv )
 {
