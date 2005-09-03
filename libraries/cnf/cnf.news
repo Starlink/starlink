@@ -12,6 +12,10 @@
  C pointer masking is now only performed on systems where the
  pointer size is not equal to a Fortran integer.
 
+ New routines are available to activate the Fortran Run Time
+ Library. See cnfInitRTL(). This is required when C programs
+ call Fortran libraries. See also the cnfrtl_link script.
+
  CNF Version 4.0-2 is released.
 
  The names of the C interface functions have been changed from the form
