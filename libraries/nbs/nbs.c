@@ -1678,14 +1678,6 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
   GENPTR_CHARACTER(option)
   GENPTR_INTEGER(status)
 
-/* External function declarations */
-
-      /*extern char	*NBS_CREATE_SECTION();
-        extern char	*NBS_DEINIT_ALLOC();
-        extern char	*NBS_RELOCATE_ADDRESS();
-        extern void	NBS_RELOCATE_POINTERS();
-        extern int	*NBS_WRITE_FILE();*/
-
 /* Local variable declarations */
 
    board_id	bid;
@@ -1872,15 +1864,6 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
   GENPTR_CHARACTER(save_name)
   GENPTR_INTEGER(status)
 
-/* External function declarations */
-
-      /*extern int	NBS_CLOSE_FILE();
-        extern char	*NBS_CREATE_SECTION();
-        extern int	NBS_OPEN_FILE();
-        extern int	NBS_READ_FILE();
-        extern char	*NBS_RELOCATE_ADDRESS();
-        extern int	NBS_UNMAP_SECTION();*/
-
 /* Local variable declarations */
 
    board_id	bid;
@@ -2038,15 +2021,6 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
   GENPTR_CHARACTER(save_name)
   GENPTR_INTEGER(status)
 
-/* External function declarations */
-
-      /*extern int	NBS_CLOSE_FILE();
-        extern char	*NBS_CREATE_SECTION();
-        extern int	NBS_OPEN_FILE();
-        extern int	NBS_READ_FILE();
-        extern char	*NBS_RELOCATE_ADDRESS();
-        extern int	NBS_UNMAP_SECTION();*/
-
 /* Local variable declarations */
 
    board_id	bid;
@@ -2182,11 +2156,6 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 {
   GENPTR_INTEGER(id)
   GENPTR_INTEGER(status)
-
-/* External function declarations */
-
-      /*extern int	NBS_OPEN_WRITE();
-        extern int	NBS_UPDATE_FILE();*/
 
 /* Local variable declarations */
 
@@ -2348,12 +2317,6 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 {
   GENPTR_CHARACTER(name)
   GENPTR_INTEGER(status)
-
-/* External function declarations */
-
-      /*extern char	*NBS_MAP_SECTION();
-        extern void	NBS_RELOCATE_ITEM();
-        extern int	NBS_UNMAP_SECTION();*/
 
 /* Local variable declarations */
 
@@ -2858,12 +2821,6 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
   GENPTR_INTEGER(id)
   GENPTR_CHARACTER(option)
   GENPTR_INTEGER(status)
-
-/* External function declarations */
-
-      /*extern int	NBS_UNMAP_SECTION();*/
-
-/*   extern int	free(); */
 
 /* Local variable declarations */
 
