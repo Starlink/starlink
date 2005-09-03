@@ -52,12 +52,19 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
 *     2005 August 23 (MJC):
 *        Original version.
+*     2005 September 2 (TIMJ):
+*        Array indices must be integers
 *     {enter_changes_here}
+
+*  Copyright:
+*     Copyright (C) Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
  
 *  Bugs:
 *     {note_any_bugs_here}
@@ -143,7 +150,7 @@
      :            NUM_<T>TOD( INARR( I ) ) ) / DEXP
          LAST = FIRST - 1 + ( I - 1 ) * EXPAND
          DO J = 1, EXPAND
-            BASE( LAST + J ) = INARR( I ) +
+            BASE( NUM_DTOI(LAST) + J ) = INARR( I ) +
      :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
          END DO
       END DO
@@ -155,7 +162,7 @@
      :            NUM_<T>TOD( INARR( ELI - 1 ) ) ) / DEXP
          LAST = FIRST - 1 + ( ELI - 1 ) * EXPAND
          DO J = 1, EXPAND - FIRST + 1
-            BASE( LAST + J ) = INARR( ELI ) +
+            BASE( NUM_DTOI(LAST) + J ) = INARR( ELI ) +
      :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
          END DO
       END IF
