@@ -306,12 +306,6 @@
 
 #ifdef c_string
 
-#ifdef vms
-#define MODULE nbc
-#include "nbs_module.h"
-#endif
-
-
 /* C strings are used for character string arguments and input scalars are
    passed by value. Module name is "nbc" and routine names are all prefixed
    "nbc_". */
@@ -356,32 +350,8 @@
 #define NBS_INTIMP(_out,_in)	*(_out) = (_in)
 #define NBS_PTRIMP(_type,_out,_in) {(_out)=NIL; *((_type *) &_out) = (_in);}
 
-#define NBS_INIT_ALLOC		nbc_init_alloc
-#define NBS_ALLOC		nbc_alloc
-#define NBS_DATA_ALLOC		nbc_data_alloc
-#define NBS_DEINIT_ALLOC	nbc_deinit_alloc
-#define NBS_WRITE_FILE		nbc_write_file
-#define NBS_OPEN_FILE		nbc_open_file
-#define NBS_READ_FILE		nbc_read_file
-#define NBS_CLOSE_FILE		nbc_close_file
-#define NBS_OPEN_WRITE	        nbc_open_write
-#define NBS_UPDATE_FILE		nbc_update_file
-#define NBS_CREATE_SECTION	nbc_create_section
-#define NBS_MAP_SECTION		nbc_map_section
-#define NBS_UNMAP_SECTION	nbc_unmap_section
-#define NBS_RELOCATE_POINTERS	nbc_relocate_pointers
-#define NBS_RELOCATE_ITEM	nbc_relocate_item
-#define NBS_RELOCATE_ADDRESS	nbc_relocate_address
-#define NBS_STRIMP		nbc_strimp
-#define NBS_STREXP		nbc_strexp
-#define NBS_SLEEPMS             nbc_sleepms
 
 #else
-
-#ifdef vms
-#define MODULE nbs
-#include "nbs_module.h"
-#endif
 
 /* String descriptors used for character string arguments and input scalars
    are passed by reference. Module name is "nbs" and routine names are all
@@ -430,32 +400,6 @@
 
 #define NBS_INTIMP(_out,_in)	*(_out) = *(_in)
 #define NBS_PTRIMP(_type,_out,_in) {(_out)=NIL; *((_type *) &_out) = *(_in);}
-
-#define NBS_INIT_ALLOC		F77_EXTERNAL_NAME(nbs_init_alloc)
-#define NBS_ALLOC		F77_EXTERNAL_NAME(nbs_alloc)
-#define NBS_DATA_ALLOC		F77_EXTERNAL_NAME(nbs_data_alloc)
-#define NBS_DEINIT_ALLOC	F77_EXTERNAL_NAME(nbs_deinit_alloc)
-#define NBS_WRITE_FILE		F77_EXTERNAL_NAME(nbs_write_file)
-#define NBS_OPEN_FILE		F77_EXTERNAL_NAME(nbs_open_file)
-#define NBS_READ_FILE		F77_EXTERNAL_NAME(nbs_read_file)
-#define NBS_CLOSE_FILE		F77_EXTERNAL_NAME(nbs_close_file)
-#define NBS_OPEN_WRITE		F77_EXTERNAL_NAME(nbs_open_write)
-#define NBS_UPDATE_FILE		F77_EXTERNAL_NAME(nbs_update_file)
-#define NBS_CREATE_SECTION	F77_EXTERNAL_NAME(nbs_create_section)
-#define NBS_MAP_SECTION		F77_EXTERNAL_NAME(nbs_map_section)
-#define NBS_UNMAP_SECTION	F77_EXTERNAL_NAME(nbs_unmap_section)
-#define NBS_RELOCATE_POINTERS	F77_EXTERNAL_NAME(nbs_relocate_pointers)
-#define NBS_RELOCATE_ITEM	F77_EXTERNAL_NAME(nbs_relocate_item)
-#define NBS_RELOCATE_ADDRESS	F77_EXTERNAL_NAME(nbs_relocate_address)
-#define NBS_SLEEPMS             F77_EXTERNAL_NAME(nbs_sleepms)
-
-#define NBS_STRIMP(loc,arg,loc_l) \
-F77_EXTERNAL_NAME(nbs_strimp) (loc,CHARACTER_ARG(arg),loc_l TRAIL_ARG(arg))
-#define NBS_STREXP(arg,loc,loc_l) \
-F77_EXTERNAL_NAME(nbs_strexp) (CHARACTER_ARG(arg),loc,loc_l TRAIL_ARG(arg))
-
-extern char *F77_EXTERNAL_NAME(nbs_strimp) ();
-extern void F77_EXTERNAL_NAME(nbs_strexp) ();
 
 #endif
 
