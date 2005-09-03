@@ -45,6 +45,9 @@
  *       Don't use SIGSYS and SIGEMT if not defined (on Linux)
  *    22 Aug 2005 (timj):
  *       Reintegrate the DIPSO changes
+ *    02 Sep 2005 (timj):
+ *       Now use C main and inti runtime library. Do not try to
+ *       stay running if SIGBUS or SIGSEGV occurs.
  *    {enter_changes_here}
 
  * Bugs:
@@ -75,15 +78,16 @@ extern F77_SUBROUTINE(scl_main)( INTEGER(n) );
 extern F77_SUBROUTINE(ndf_end)( INTEGER(status) );
 extern F77_SUBROUTINE(hds_stop)( INTEGER(status) );
 
-#ifdef FC_MAIN
-/* void FC_MAIN () {} */
+#if HAVE_FC_MAIN
+void FC_MAIN () {}
 #endif
 
 /*  Global Variables: */
 jmp_buf here;      
 
-/*  Entry Point: Go straight into fortran main */
-int FC_MAIN () {
+/* Play it safe and use a C main rather than a fortran entry point */
+
+int main () {
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
@@ -97,6 +101,9 @@ int FC_MAIN () {
       nonstandard_arithmetic();
  
 #endif
+
+      /* Initialise fortran runtime */
+      cnfInitRTL( 0, NULL );
 
 /*  Use the setjmp function to define here to be the place to which the
  *  signal handling function will jump when a signal is detected. Zero is
@@ -124,6 +131,7 @@ int FC_MAIN () {
  *  SIGBUS   bus error
  *  SIGSEGV  segmentation violation
  *  SIGSYS   bad argument to system call
+
  *  Other signals that by default terminate the process are:
  *  SIGEMT    EMT trap - EMT instruction
  *  SIGKILL   kill
@@ -144,12 +152,8 @@ int FC_MAIN () {
       sigaction( SIGHUP,   &act, &oact );
       sigaction( SIGINT,   &act, &oact );
       sigaction( SIGQUIT,  &act, &oact );
-      sigaction( SIGILL,   &act, &oact );
-      sigaction( SIGTRAP,  &act, &oact );
-      sigaction( SIGABRT,  &act, &oact );
       sigaction( SIGFPE,   &act, &oact );
-      sigaction( SIGBUS,   &act, &oact );
-      sigaction( SIGSEGV,  &act, &oact );
+
 #ifdef SIGSYS
       sigaction( SIGSYS,   &act, &oact );
 #endif
@@ -157,6 +161,11 @@ int FC_MAIN () {
 #ifdef SIGEMT
       sigaction( SIGEMT,   &act, &oact );
 #endif
+      sigaction( SIGILL,   &act, &oact );
+      sigaction( SIGTRAP,  &act, &oact );
+      sigaction( SIGABRT,  &act, &oact );
+      sigaction( SIGBUS,   &act, &oact );
+      sigaction( SIGSEGV,  &act, &oact );
       sigaction( SIGKILL,  &act, &oact );
       sigaction( SIGPIPE,  &act, &oact );
       sigaction( SIGALRM,  &act, &oact );

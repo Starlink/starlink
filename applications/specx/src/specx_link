@@ -5,7 +5,7 @@
 #     19-Sep-2000 (AJC):
 #        Add GSD
 #-
-   echo `gsd_link` `pgplot_link -star` \
+   echo `gsd_link` `pgplot_link -star` `cnfrtl_link` \
       `fio_link` `psx_link` `chr_link` \
       `shl_link` `ndf_link` `gsd_link` `sla_link` \
       | awk 'BEGIN{RS=" ";FS="\n"}
