@@ -7,7 +7,7 @@ include_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = libshl.la `err_link` `one_link` `hlp_link` `fio_link`\
-	@FCLIBS@
+	`cnfrtl_link` @FCLIBS@
 browsehlp_DEPENDENCIES = shl.h
 
 lib_LTLIBRARIES = libshl.la libshl_adam.la
@@ -54,7 +54,7 @@ testhelp_DEPENDENCIES = demo.shl
 ctesthelp_SOURCES = ctesthelp.c
 ctesthelp_DEPENDENCIES = demo.shl
 ctesthelp_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link` \
-	@FCLIBS@
+	`cnfrtl_link` @FCLIBS@
 
 test_pager_SOURCES = test_pager.f
 test_pager_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link`
