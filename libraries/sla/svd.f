@@ -97,7 +97,8 @@
       LOGICAL CANCEL
       DOUBLE PRECISION G,SCALE,AN,S,X,F,H,C,Y,Z
 
-
+*  Keep the compiler happy
+      DATA L, L1 / 2*0 /
 
 *  Check that the matrix is the right shape
       IF (M.LT.N) THEN

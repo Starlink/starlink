@@ -195,6 +195,8 @@
 
       DOUBLE PRECISION sla_DRANRM
 
+*  Keep the compiler happy
+      DATA DN, Q, TP / 3*0.0D0 /
 
 *  Validate arguments PMASS and JFORMR.
       IF (PMASS.LT.0D0) THEN

@@ -121,6 +121,8 @@
      :                 TOL,PSJ,PSJ2,BETA,S0,S1,S2,S3,
      :                 FF,R,FLAST,PLAST,F,G,FD,GD
 
+*  Keep the compiler happy
+      DATA S0, S1, S2, S3, R, FLAST, PLAST / 7*0.0D0 /
 
 
 *  Unpack the parameters.

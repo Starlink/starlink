@@ -99,6 +99,8 @@
      :                 SGN,SXXYY,SXYYX,SX2Y2,A,B,C,D,
      :                 SDR2,XR,YR,AOLD,BOLD,COLD,DOLD,SOLD
 
+*  Keep the compiler happy
+      DATA A, B, C, D, AOLD, BOLD, COLD, DOLD, SOLD / 9*0.0D0 /
 
 
 *  Preset the status

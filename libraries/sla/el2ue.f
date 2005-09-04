@@ -166,6 +166,8 @@
      :                 X,Y,Z,PX,PY,PZ,VX,VY,VZ,DT,FC,FP,PSI,
      :                 UL(13),PV(6)
 
+*  Keep the compiler happy
+      DATA PHT, ARGPH, Q, CM / 4*0.0D0 /
 
 
 *  Validate arguments.

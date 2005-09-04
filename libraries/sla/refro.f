@@ -182,7 +182,8 @@
       DOUBLE PRECISION REFI
       REFI(DN,RDNDR) = RDNDR/(DN+RDNDR)
 
-
+*  Keep the compiler happy
+      DATA REFT / 0.0D0 /
 
 *  Transform ZOBS into the normal range.
       ZOBS1 = sla_DRANGE(ZOBS)
