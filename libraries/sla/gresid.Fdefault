@@ -62,7 +62,8 @@
       SAVE GNEXT,FTF,FIRST
       DATA FTF,FIRST / .TRUE.,.TRUE. /
 
-
+      X = 0.0
+      Y = 0.0
 
 *  First time through, initialise the random-number generator
 #if HAVE_RAND
