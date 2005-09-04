@@ -75,9 +75,9 @@
 *
 *  Reference:  Everhart, E. & Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
 *
-*  P.T.Wallace   Starlink   19 March 1999
+*  P.T.Wallace   Starlink   3 September 2005
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -91,8 +91,8 @@
 *    GNU General Public License for more details.
 *
 *    You should have received a copy of the GNU General Public License
-*    along with this program (see SLA_CONDITIONS); if not, write to the 
-*    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 *    Boston, MA  02111-1307  USA
 *
 *-
@@ -118,7 +118,8 @@
       INTEGER I,NIT,N
 
       DOUBLE PRECISION CM,ALPHA,T0,P0(3),V0(3),R0,SIGMA0,T,PSI,DT,W,
-     :                 TOL,PSJ,PSJ2,BETA,S0,S1,S2,S3,FF,R,F,G,FD,GD
+     :                 TOL,PSJ,PSJ2,BETA,S0,S1,S2,S3,
+     :                 FF,R,FLAST,PLAST,F,G,FD,GD
 
 
 
@@ -142,7 +143,7 @@
 *  day is 58.1324409... days, defined as 1/GCON).
       DT = (DATE-T0)*GCON
 
-*  Refine the universal eccentric anomaly.
+*  Solve for the universal eccentric anomaly, psi.
       NIT = 1
       W = 1D0
       TOL = 0D0
@@ -188,15 +189,34 @@
             N = N-1
          END DO
 
-*     Improve the approximation to PSI.
+*     Value of function F corresponding to the current value of psi.
          FF = R0*S1+SIGMA0*S2+CM*S3-DT
-         R = R0*S0+SIGMA0*S1+CM*S2
-         IF (R.EQ.0D0) GO TO 9010
-         W = FF/R
+
+*     If first iteration, create dummy "last F".
+         IF ( NIT.EQ.1) FLAST = FF
+
+*     Check for sign change.
+         IF ( FF*FLAST.LT.0D0 ) THEN
+
+*        Sign change:  get psi adjustment using secant method.
+            W = FF*(PLAST-PSI)/(FLAST-FF)
+         ELSE
+
+*        No sign change:  use Newton-Raphson method instead.
+            R = R0*S0+SIGMA0*S1+CM*S2
+            IF (R.EQ.0D0) GO TO 9010
+            W = FF/R
+         END IF
+
+*     Save the last psi and F values.
+         PLAST = PSI
+         FLAST = FF
+
+*     Apply the Newton-Raphson or secant adjustment to psi.
          PSI = PSI-W
 
 *     Next iteration, unless too many already.
-         IF (NIT.GE.NITMAX) GO TO 9020
+         IF (NIT.GT.NITMAX) GO TO 9020
          NIT = NIT+1
       END DO
 
