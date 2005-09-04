@@ -1,7 +1,9 @@
-#     14-JUN-2005 (PTW):
-#        Bug fix in sla_DSEPV.
-#        Package version number changed to 2.5-2.
 
+SLALIB_Version_2.5.3                                  Expiry 31 March 2006
+
+* sla_UE2PV was sometimes behaving erratically with minor changes
+  to the elements. The iterative algorithm has been modified to make it
+  more stable.
 
 SLALIB_Version_2.5.2                                  Expiry 31 March 2006
 
@@ -21,6 +23,13 @@ SLALIB_Version_2.4-14                              Expiry 31 December 2005
 * Cosmetic changes to about 20% of the routines.
 
 * Updated optical refraction model in REFCOQ and REFRO.
+
+SLALIB_Version_2.4-12
+
+* SLALIB has been autoconfed and integrated into the new Starlink build
+  system.
+
+* It has been released under the Gnu General Public License
 
 SLALIB_Version_2.4-11                                 Expiry 31 March 2004
 
