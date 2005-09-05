@@ -59,8 +59,11 @@
 *     2005 August 23 (MJC):
 *        Original version.
 *     2005 September 2 (TIMJ):
-*        Array indices must be integers
-*     {enter_changes_here}
+*        Array indices must be integers.
+*     2005 September 5 (MJC):
+*        LAST was integer in all but its declaration.  Now corrected
+*        to what had been intended without the cut/paste error.
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) Particle Physics and Astronomy Research Council.
@@ -95,12 +98,12 @@
       DOUBLE PRECISION DEXP      ! Expansion factor
       INTEGER I                  ! Loop counter
       INTEGER J                  ! Loop counter
-      DOUBLE PRECISION LAST      ! Index of last value filled
+      INTEGER LAST               ! Index of last value filled
       DOUBLE PRECISION STEP      ! Interpolation step
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
 
 *.
  
@@ -150,7 +153,7 @@
      :            NUM_<T>TOD( INARR( I ) ) ) / DEXP
          LAST = FIRST - 1 + ( I - 1 ) * EXPAND
          DO J = 1, EXPAND
-            BASE( NUM_DTOI(LAST) + J ) = INARR( I ) +
+            BASE( LAST + J ) = INARR( I ) +
      :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
          END DO
       END DO
@@ -162,7 +165,7 @@
      :            NUM_<T>TOD( INARR( ELI - 1 ) ) ) / DEXP
          LAST = FIRST - 1 + ( ELI - 1 ) * EXPAND
          DO J = 1, EXPAND - FIRST + 1
-            BASE( NUM_DTOI(LAST) + J ) = INARR( ELI ) +
+            BASE( LAST + J ) = INARR( ELI ) +
      :                         NUM_DTO<T>( STEP * DBLE( J - 1 ) )
          END DO
       END IF
