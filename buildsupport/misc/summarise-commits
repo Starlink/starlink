@@ -35,7 +35,10 @@ my $module = undef;
 my $verbose = 0;
 
 # See Getopt::Std for the reason for this voodoo
-$Getopt::Std::STANDARD_HELP_VERSION = 1;
+$Getopt::Std::STANDARD_HELP_VERSION = 1
+    # redundant reference to this variable (it's not in old versions of
+    # Getopt (?), so we get a spurious `possible typo' warning then).
+    unless $Getopt::Std::STANDARD_HELP_VERSION;
 
 # Prototypes
 sub sendmail(%);
