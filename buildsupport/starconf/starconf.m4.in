@@ -1509,26 +1509,14 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
 # ftello when HAVE_FSEEKO is defined (and use off_t for offsets) and compile
 # all C code with the other defines. 
 #
-# Currently the AC_FUNC_FSEEKO macro does not define _LARGEFILE_SOURCE 
-# under Solaris, so this function makes sure that this is done. It also
-# gathers the values of _FILE_OFFSET_BITS, _LARGEFILE_SOURCE and _LARGE_FILES
-# and set the STAR_LARGEFILE_CFLAGS variable (this in useful for passing to
-# packages which are not directly part of the starconf system).
+# This function also gathers the values of _FILE_OFFSET_BITS, _LARGEFILE_SOURCE
+# and _LARGE_FILES and sets the STAR_LARGEFILE_CFLAGS variable (this in useful
+# for passing to packages which are not directly part of the starconf system).
 #
 AC_DEFUN([STAR_LARGEFILE_SUPPORT],
 [dnl Enable autoconf largefile support.
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
-
-dnl On Solaris AC_FUNC_FSEEKO fails to set _LARGEFILE_SOURCE. Add a check
-dnl for that condition and fudge it. XXX does this make any difference
-dnl when using 64 bit compiler flags?
-case "$host_os" in
-   *solaris*)
-      AC_DEFINE(_LARGEFILE_SOURCE, 1, [Enable large file support for Solaris])
-      ac_cv_sys_largefile_source=1
-   ;;
-esac
 
 # Gather state into a single variable for passing to other packages.
 STAR_LARGEFILE_CFLAGS=
