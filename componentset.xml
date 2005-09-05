@@ -1922,7 +1922,7 @@ No longer under active control.
 </component>
 
 <component id="cnf" support="S">
-  <version>4.1-1</version>
+  <version>4.1-2</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -2464,7 +2464,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="nbs" support="S">
-  <version>2.5-9</version>
+  <version>2.5-10</version>
   <path>libraries/nbs</path>
   <description>NBS Noticeboard System</description>
   <abstract><p> The noticeboard system routines provide a fast means
@@ -3067,7 +3067,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="sla" support="S">
-  <version>2.5-2</version>
+  <version>2.5-3</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
   <abstract><p>SLALIB is a library used by writers of
