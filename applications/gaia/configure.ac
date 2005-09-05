@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gaia, 2.9-0, gaia@star.rl.ac.uk)
+AC_INIT(gaia, 2.9-2, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -30,6 +30,14 @@ dnl    We have a C++ main function, but we call Fortran.  This defines
 dnl    the cpp macro of the same name, which will do any 
 dnl    initialisation which is necessary with this platform/compiler.
 STAR_INITIALISE_FORTRAN
+
+dnl    Define support for large files. We need to get at the 
+dnl    CFLAGS and pass these to the subsystems.
+STAR_LARGEFILE_SUPPORT
+if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
+   CFLAGS="$STAR_LARGEFILE_CFLAGS $CFLAGS"
+   export CFLAGS
+fi
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 

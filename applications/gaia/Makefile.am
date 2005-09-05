@@ -80,6 +80,7 @@ $(TCL_FILES) $(TCL_TEST_FILES):
 	export INSTALL; unset INSTALL;\
 	export TCL_LIBRARY; unset TCL_LIBRARY;\
 	export TK_LIBRARY; unset TK_LIBRARY;\
+	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	./configure --prefix=$${pwd}/built;\
 	make -e World)
 	for f in $(SCRIPT_PLACES); do \
@@ -94,6 +95,7 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL; \
 	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
 	cp -p ./built/bin/rtdClient$(EXEEXT) .
@@ -112,6 +114,7 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
 	STARLINK="$(STARLINK)"; export STARLINK;\
+	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	FCFLAGS="$(FCFLAGS) $(STAR_FCFLAGS)"; export FCFLAGS;\
 	FC="$(FC)"; export FC;\
 	./configure --prefix=$${pwd}/built;\
