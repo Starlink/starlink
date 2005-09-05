@@ -18,7 +18,8 @@ ET2CFLAGS =
 #
 # Flags for the C compiler
 #
-CFLAGS = @TCLTK_INC@ @XINCLUDES@ @CFLAGS@
+CFLAGS = @CFLAGS@
+INCLUDES = @TCLTK_INC@ @XINCLUDES@
 
 CC = @CC@
 LIBS = @LD_SEARCH_FLAGS@ @LIBS@ @XLIBSW@ @MATH_LIBS@ -lc
@@ -35,36 +36,36 @@ examples:	bell browser color dclock etwish fontchooser hello \
 
 et.o:	${ET_SRC} et2c
 	./et2c ${ET2CFLAGS} @TCLTK_INC@ ${ET_SRC} >et.c
-	${CC} ${CFLAGS} -c et.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c et.c -o $@
 
 et2c:	et2c.c
-	${CC} ${CFLAGS} -o $@ et2c.c
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ et2c.c
 
 bell:	bell.o et.o
-	${CC} ${CFLAGS} -o $@ bell.o et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ bell.o et.o ${LIBS}
 
 bell.o:	bell.c et2c
 	./et2c ${ET2CFLAGS} bell.c >temp.c
-	${CC} ${CFLAGS} -c temp.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c temp.c -o $@
 	rm -f temp.c
 
 browser:	browser.o et.o
-	${CC} ${CFLAGS} -o $@ browser.o et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ browser.o et.o ${LIBS}
 
 browser.o:	browser.c et2c browser.tcl
 	./et2c ${ET2CFLAGS} browser.c >temp.c
-	${CC} ${CFLAGS} -c temp.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c temp.c -o $@
 	rm -f temp.c
 
 help2tk:	help2tk.c
-	${CC} ${CFLAGS} -o $@ help2tk.c
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ help2tk.c
 
 color:	color.o et.o
-	${CC} ${CFLAGS} -o $@ color.o et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ color.o et.o ${LIBS}
 
 color.o:	color.c color.tcl colorhelp.tcl et2c
 	./et2c ${ET2CFLAGS} color.c >temp.c
-	${CC} ${CFLAGS} -c temp.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c temp.c -o $@
 	rm -f temp.c
 
 colorhelp.tcl:	color.help help2tk
@@ -72,59 +73,59 @@ colorhelp.tcl:	color.help help2tk
 
 dclock:	dclock.c et2c et.o
 	./et2c ${ET2CFLAGS} dclock.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 etwish:	etwish.c et2c et.o
 	./et2c ${ET2CFLAGS} etwish.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 fontchooser:	fontchooser.c fontchooser.tcl et2c et.o
 	./et2c ${ET2CFLAGS} fontchooser.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 hello:	hello.c et2c et.o
 	./et2c ${ET2CFLAGS} hello.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 httpd:	httpd.c httpd.tcl et2c et.o
 	./et2c ${ET2CFLAGS} httpd.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 linuxstat:	linuxstat.c linuxstat.tcl et2c et.o
 	./et2c ${ET2CFLAGS} linuxstat.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 runscript:	runscript.c et2c et.o
 	./et2c ${ET2CFLAGS} runscript.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 tkdiff:	tkdiff.c tkdiff.tcl et2c et.o
 	./et2c ${ET2CFLAGS} tkdiff.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 tkedit:	tkedit.c tkedit.tcl et2c et.o
 	./et2c ${ET2CFLAGS} tkedit.c >temp.c
-	${CC} ${CFLAGS} -o $@ temp.c et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ temp.c et.o ${LIBS}
 	rm -f temp.c
 
 tkterm:	tkterm.o getpty.o et.o
-	${CC} ${CFLAGS} -o $@ tkterm.o getpty.o et.o ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDES} -o $@ tkterm.o getpty.o et.o ${LIBS}
 
 tkterm.o:	tkterm.c tkterm.tcl et2c
 	./et2c ${ET2CFLAGS} tkterm.c >temp.c
-	${CC} ${CFLAGS} -c temp.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c temp.c -o $@
 	rm -f temp.c
 
 getpty.o:	getpty.c
-	${CC} ${CFLAGS} -c getpty.c -o $@
+	${CC} ${CFLAGS} ${INCLUDES} -c getpty.c -o $@
 
 Makefile:	Makefile.in
 	$(SHELL) config.status
