@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(hds, 4.3-5, ussc@star.rl.ac.uk)
+AC_INIT(hds, 5.0-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -11,10 +11,19 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([hds_state.c])
+AC_CONFIG_SRCDIR([hdsState.c])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
+
+dnl    Define _POSIX_C_SOURCE to be used in all routines. This was
+dnl    declared in the old header file "hds1_feature.h", but we need
+dnl    to make sure all feature-level defines are included in the autoconf
+dnl    tests (this is important for large file support under Solaris, which
+dnl    does not define _LARGEFILE_SOURCE without _POSIX_C_SOURCE).
+AC_DEFINE([_POSIX_C_SOURCE], [199506L], [Specify the version of the POSIX
+standard we want to work with (should provide POSIX.1, POSIX.2 and POSIX.4, 
+if available)]) 
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
@@ -53,6 +62,25 @@ AC_CHECK_FUNCS(fcntl)
 
 dnl    Or fsync
 AC_CHECK_FUNCS(fsync)
+
+dnl    RTL "fixups"
+AC_CHECK_FUNCS(atexit)
+AC_CHECK_FUNCS(on_exit)
+AC_CHECK_FUNCS(memmove)
+AC_CHECK_FUNCS(strerror)
+
+AC_CHECK_HEADERS(stddefs.h)
+
+dnl Check for largefile support (various macros and fseeko).
+STAR_LARGEFILE_SUPPORT
+
+dnl Calculate sizes and types
+AC_CHECK_TYPE(long long int)
+
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF(off_t)
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae chr cnf ems])

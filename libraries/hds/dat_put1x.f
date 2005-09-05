@@ -51,10 +51,7 @@
 *    Status return :
       integer status			! Status Return
 *    Local variables :
-      integer ndim
       integer dims(1)
-*    Local data :
-      data ndim/1/
 *-
 
       if (status .eq. SAI__OK) then
@@ -120,10 +117,7 @@
 *    Status return :
       integer status			! Status Return
 *    Local variables :
-      integer ndim
       integer dims(1)
-*    Local data :
-      data ndim/1/
 *-
 
       if (status .eq. SAI__OK) then
@@ -189,10 +183,7 @@
 *    Status return :
       integer status			! Status Return
 *    Local variables :
-      integer ndim
       integer dims(1)
-*    Local data :
-      data ndim/1/
 *-
 
       if (status .eq. SAI__OK) then
@@ -258,10 +249,7 @@
 *    Status return :
       integer status			! Status Return
 *    Local variables :
-      integer ndim
       integer dims(1)
-*    Local data :
-      data ndim/1/
 *-
 
       if (status .eq. SAI__OK) then
@@ -327,10 +315,7 @@
 *    Status return :
       integer status			! Status Return
 *    Local variables :
-      integer ndim
       integer dims(1)
-*    Local data :
-      data ndim/1/
 *-
 
       if (status .eq. SAI__OK) then

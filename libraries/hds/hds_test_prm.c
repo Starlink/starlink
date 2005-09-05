@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 /*
  * This test checks that the values which HDS determines for the
  * platform-specific bad, maximum, minimum (etc) numbers do match

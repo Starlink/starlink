@@ -1,4 +1,7 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <stdio.h>
 #include "hds1.h"		 /* Global definitions for HDS		    */
 #include "rec.h"		 /* Public rec_ definitions		    */
@@ -30,6 +33,7 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -37,6 +41,8 @@
 /*       Added prologue and error handling and tidied.			    */
 /*    26-APR-1991 (RFWS):						    */
 /*       Changed to cater for a null-terminate file name.		    */
+/*    12-MAY-2004: (BKM)                                                    */
+/*       Add 64-bit item to report                                          */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -47,6 +53,7 @@
 /* Local Variables:							    */
       const char *disp;		 /* Pointer to file disposition string	    */
       const char *mode;		 /* Pointer to access mode string	    */
+      const char *bit64;         /* Pointer to 64-bit type string           */
       int slot;			 /* Loop counter for File Control Vector    */
 
 /*.									    */
@@ -62,11 +69,13 @@
 
 /* For each open slot, display the fully expanded file name, the	    */
 /* disposition and access mode, and the reference count.		    */
-            disp = ( rec_ga_fcv[ slot ].dele ) ? "[D]" : "[K]";
-            mode = ( rec_ga_fcv[ slot ].write) ? "[U]" : "[R]";
-            printf( "%s, disp=%s, mode=%s, refcnt=%-d\n",
+            disp  = ( rec_ga_fcv[ slot ].dele ) ? "[D]" : "[K]";
+            mode  = ( rec_ga_fcv[ slot ].write) ? "[U]" : "[R]";
+            bit64 = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 ) ? 
+                    "[Y]" : "[N]";
+            printf( "%s, disp=%s, mode=%s, refcnt=%-d, 64-bit=%s\n",
                     rec_ga_fcv[ slot ].name, disp, mode,
-		    rec_ga_fcv[ slot ].count );
+		    rec_ga_fcv[ slot ].count, bit64 );
          }
       }
 

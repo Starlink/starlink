@@ -1,14 +1,20 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
-#include "f77.h"		 /* F77 <-> C interface macros		    */
-#include "ems.h"		 /* EMS error reporting routines	    */
-#include "hds1.h"		 /* Global definitions for HDS		    */
-#include "rec.h"		 /* Public rec_ definitions		    */
-#include "dat1.h"		 /* Internal dat_ definitions		    */
-#include "dat_err.h"		 /* DAT__ error code definitions	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
-   F77_INTEGER_FUNCTION(hds_start)
-                       ( int *status )
-   {
+#include "f77.h"                 /* F77 <-> C interface macros              */
+#include "ems.h"                 /* EMS error reporting routines            */
+#include "hds1.h"                /* Global definitions for HDS              */
+#include "str.h"                 /* Character string import/export macros   */
+#include "dat_err.h"             /* DAT__ error code definitions            */
+
+int dat1_init( void );           /* Function prototype                      */
+
+/* Note that this routine is obselete and does NOT have a counterpart in    */
+/* C interface to HDS                                                       */
+
+F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) )
+{
 /*
 *+
 *  Name:
@@ -38,6 +44,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     BKM:  B.K. McIlwrath    (STARLINK, RAL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +52,8 @@
 *        Added prologue and made portable.
 *     24-FEB-1992 (RFWS):
 *        Modified to call HDS1_INIT internally.
+*     19-MAR-2001 (BKM):
+*        Convert to use consistent F77 macros and remove tabs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -53,25 +62,21 @@
 *-
 */
 
-/*.									    */
-
-/* Check the inherited global status.					    */
-      if ( !_ok( *status ) ) return *status;
+/* Check the inherited global status */
+      if ( !_ok( *status ) ) return;
       hds_gl_status = DAT__OK;
 
-/* Initialise HDS.							    */
-      dat1_init( );
+/* Initialise HDS  */
+      dat1_init();
 
-/* If an error occurred, then report contextual information.		    */
+/* If an error occurred, then report contextual information */
       if ( !_ok( hds_gl_status ) )
       {
          ems_rep_c( "HDS_START_ERR",
-		    "HDS_START: Error activating the Hierarchical Data System \
-(HDS).",
-		    &hds_gl_status );
+                    "HDS_START: Error activating the Hierarchical Data System \
+                     (HDS).",&hds_gl_status );
       }
-	           
-/* Exit the routine, returning the current global status value.		    */
+           
+/* Exit the routine */
       *status = hds_gl_status;
-      return *status;
-   }
+}

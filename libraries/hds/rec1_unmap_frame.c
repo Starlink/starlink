@@ -1,8 +1,6 @@
 #if HAVE_CONFIG_H
-#include <config.h>
+#   include <config.h>
 #endif
-
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 /* VMS version include files:						    */
 /* =========================						    */
@@ -13,7 +11,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
 #include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>		 /* Definitions for memory management	    */
 
@@ -41,7 +39,8 @@
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
 #include "f77.h"                 /* Fortran <--> C interface facilities     */
 
-   int rec1_unmap_frame( int slot, int bloc, int length, int offset, char mode,
+   int rec1_unmap_frame( int slot, INT_BIG bloc, INT_BIG length,
+                         INT_BIG offset, char mode,
 			 unsigned char **pntr )
    {
 /*+									    */
@@ -155,7 +154,7 @@
       unsigned int systat;	 /* System status code			    */
 #else
 
-#if defined( _mmap) || defined( HAVE_MMAP )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
                          	 /* Local variables for version using mmap: */
       size_t len;		 /* Length of data to unmap		    */
       unsigned long int ipntr;	 /* Pointer value cast to an integer	    */
@@ -164,7 +163,7 @@
 #endif
 				 /* Portable version local variables:	    */
       FILE *iochan;		 /* File I/O stream			    */
-      int offs;			 /* File offset to start of data	    */
+      INT_BIG offs;		 /* File offset to start of data	    */
       int writeok;		 /* Write operation completed successfully? */
 #endif
 
@@ -307,7 +306,7 @@
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
 	 if ( hds_gl_map )
 	 {
 
@@ -330,7 +329,7 @@
 /* file is closed.                                                           */
             if ( ( msync( addr, len, MS_ASYNC ) != 0 ) ||
                  ( munmap( addr, len ) != 0 ) )
-            {
+	    {
 	       hds_gl_status = DAT__FILMP;
 	       ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
 	       rec1_fmsg( "FILE", slot );
@@ -359,7 +358,11 @@
 /* Seek to the required file offset and write the mapped values back to the */
 /* file.								    */
                iochan = rec_ga_fcv[ slot ].write;
-	       if ( writeok = !fseek( iochan, offs, SEEK_SET ) )
+#if HAVE_FSEEKO
+	       if ( (writeok = !fseeko( iochan, offs, SEEK_SET )) )
+#else
+	       if ( (writeok = !fseek( iochan, offs, SEEK_SET )) )
+#endif
 	       {
 	          fwrite( *pntr, 1, length, iochan );
 

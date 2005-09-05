@@ -1,17 +1,19 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #if defined( vms ) || defined __MINGW32__
-void rec1_shell( void ){};	 /* This routine not used on VMS and
-                                  * Windows systems    */
+void rec1_shell( void ){};       /* This routine not used on VMS and        */
+                                 /* Windows systems                         */ 
 #else
 
-/* C include files:							    */
-/* ===============							    */
+/* C include files:                                                         */
+/* ===============                                                          */
 #include <errno.h>
 #include <string.h>
 
-/* Posix include files:							    */
-/* ===================							    */
+/* Posix include files:                                                     */
+/* ===================                                                      */
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
@@ -23,91 +25,91 @@ void rec1_shell( void ){};	 /* This routine not used on VMS and
 #include <stdlib.h>
 #endif
 
-/* Other include files:							    */
-/* ===================							    */
-#include "ems.h"		 /* EMS error reporting routines	    */
-#include "ems_par.h"		 /* EMS__ public constants		    */
-#include "hds1.h"		 /* Global definitions for HDS		    */
-#include "rec.h"		 /* Public rec_ definitions		    */
-#include "rec1.h"		 /* Private rec_ definitions		    */
-#include "dat_err.h"		 /* DAT__ error code definitions	    */
+/* Other include files:                                                     */
+/* ===================                                                      */
+#include "ems.h"                 /* EMS error reporting routines            */
+#include "ems_par.h"             /* EMS__ public constants                  */
+#include "hds1.h"                /* Global definitions for HDS              */
+#include "rec.h"                 /* Public rec_ definitions                 */
+#include "rec1.h"                /* Private rec_ definitions                */
+#include "dat_err.h"             /* DAT__ error code definitions            */
 
 /* External Variables: */
 /* =================== */
-#if defined( _POSIX2_VERSION )	 /* External variables for POSIX.2 systems: */
+#if defined( _POSIX2_VERSION )   /* External variables for POSIX.2 systems: */
 extern char **environ;           /* Pointer to environment array            */
 #endif
 
    void rec1_shell( pid_t *pid, FILE *stream[ 2 ] )
    {
-/*+									    */
-/* Name:								    */
-/*    rec1_shell							    */
+/*+                                                                         */
+/* Name:                                                                    */
+/*    rec1_shell                                                            */
 
-/* Purpose:								    */
-/*    Create a shell process and communication channels (UNIX & POSIX	    */
-/*    only).								    */
+/* Purpose:                                                                 */
+/*    Create a shell process and communication channels (UNIX & POSIX       */
+/*    only).                                                                */
 
-/* Invocation:								    */
-/*    rec1_shell( pid, stream )						    */
+/* Invocation:                                                              */
+/*    rec1_shell( pid, stream )                                             */
 
-/* Description:								    */
-/*    This routine forks a process to execute a shell and returns file	    */
+/* Description:                                                             */
+/*    This routine forks a process to execute a shell and returns file      */
 /*    streams that may be used to send commands to it and to read results   */
-/*    from it. The shell used is determined by the HDS_SHELL tuning	    */
+/*    from it. The shell used is determined by the HDS_SHELL tuning         */
 /*    parameter. If the "sh" shell is specified, and POSIX.2 is available,  */
-/*    then an attempt will be made to use the standard POSIX.2 shell.	    */
-/*    Otherwise, the shell is located following the PATH of the current	    */
-/*    process.								    */
+/*    then an attempt will be made to use the standard POSIX.2 shell.       */
+/*    Otherwise, the shell is located following the PATH of the current     */
+/*    process.                                                              */
 
-/* Parameters:								    */
-/*    pid_t *pid							    */
-/*	 Pointer to an integer of type pid_t into which the routine will    */
-/*	 write the process ID of the child process which is created to run  */
-/*	 the shell.  It is the caller's responsibility to ensure that the   */
-/*	 created process terminates correctly and to wait for it (e.g. with */
-/*	 the waitpid function).						    */
-/*    FILE *stream[ 2 ]							    */
-/*	 Array in which two file streams will be returned; stream[ 0 ] will */
-/*	 be open for reading and may be used to read output from the shell, */
-/*	 while stream[ 1 ] will be open for writing and may be used to send */
-/*	 input (i.e. commands) to the shell. These streams are associated   */
-/*	 with pipes which are attached to the standard output and standard  */
-/*	 input of the shell process, respectively. It is the caller's	    */
-/*	 responsibility to close these streams when they are no longer	    */
-/*	 required.							    */
+/* Parameters:                                                              */
+/*    pid_t *pid                                                            */
+/*       Pointer to an integer of type pid_t into which the routine will    */
+/*       write the process ID of the child process which is created to run  */
+/*       the shell.  It is the caller's responsibility to ensure that the   */
+/*       created process terminates correctly and to wait for it (e.g. with */
+/*       the waitpid function).                                             */
+/*    FILE *stream[ 2 ]                                                     */
+/*       Array in which two file streams will be returned; stream[ 0 ] will */
+/*       be open for reading and may be used to read output from the shell, */
+/*       while stream[ 1 ] will be open for writing and may be used to send */
+/*       input (i.e. commands) to the shell. These streams are associated   */
+/*       with pipes which are attached to the standard output and standard  */
+/*       input of the shell process, respectively. It is the caller's       */
+/*       responsibility to close these streams when they are no longer      */
+/*       required.                                                          */
 
-/* Returned Value:							    */
-/*    void								    */
+/* Returned Value:                                                          */
+/*    void                                                                  */
 
-/* Notes:								    */
-/*    -  A *pid value of (pid_t) -1 and stream values of NULL will be	    */
+/* Notes:                                                                   */
+/*    -  A *pid value of (pid_t) -1 and stream values of NULL will be       */
 /*    returned if this routine is called with the global status set, or if  */
-/*    it should fail for any reason.					    */
+/*    it should fail for any reason.                                        */
 /*    -  The standard error stream of the shell process is routed to the    */
 /*    null device (i.e. error messages from this process are suppressed).   */
 /*    -  When sending commands to the shell process, care should be taken   */
 /*    that it does not produce large amounts of output before all the input */
 /*    commands have been sent. If this occurs, the shell may block, causing */
-/*    the process sending input to block as well, thus resulting in	    */
+/*    the process sending input to block as well, thus resulting in         */
 /*    deadlock.  The safest approach is to ensure that the shell will not   */
-/*    produce output until each batch of input commands is complete.	    */
-/*    -  This routine is only implemented on UNIX & POSIX systems.	    */
+/*    produce output until each batch of input commands is complete.        */
+/*    -  This routine is only implemented on UNIX & POSIX systems.          */
 
-/* Copyright:								    */
-/*    Copyright (C) 1992 Science & Engineering Research Council		    */
+/* Copyright:                                                               */
+/*    Copyright (C) 1992 Science & Engineering Research Council             */
 
-/* Authors:								    */
-/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)				    */
-/*    {@enter_new_authors_here@}					    */
+/* Authors:                                                                 */
+/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
+/*    {@enter_new_authors_here@}                                            */
 
-/* History:								    */
-/*    25-NOV-1992 (RFWS):						    */
-/*       Original version.						    */
-/*    27-NOV-1992 (RFWS):						    */
-/*       Converted to return streams instead of file descriptors.	    */
-/*    18-DEC-1992 (RFWS):						    */
-/*       Use the _fork macro.						    */
+/* History:                                                                 */
+/*    25-NOV-1992 (RFWS):                                                   */
+/*       Original version.                                                  */
+/*    27-NOV-1992 (RFWS):                                                   */
+/*       Converted to return streams instead of file descriptors.           */
+/*    18-DEC-1992 (RFWS):                                                   */
+/*       Use the _fork macro.                                               */
 /*    1-JUN-1995 (RFWS):                                                    */
 /*       Add function prototype for confstr (missing on sun4_Solaris        */
 /*       systems).                                                          */
@@ -117,34 +119,33 @@ extern char **environ;           /* Pointer to environment array            */
 /*    9-MAY-1997 (RFWS):                                                    */
 /*       Define a new PATH environment variable before running the POSIX.2  */
 /*       shell.                                                             */
-/*    {@enter_further_changes_here@}					    */
+/*    {@enter_further_changes_here@}                                        */
 
-/* Bugs:								    */
-/*    {@note_any_bugs_here@}						    */
+/* Bugs:                                                                    */
+/*    {@note_any_bugs_here@}                                                */
 
-/*-									    */
+/*-                                                                         */
 
-/* Local Variables:							    */
-      int done;			 /* sh shell invoked yet?		    */
-      int nullfd;		 /* File descriptor for the null device	    */
-      int pipein[ 2 ];		 /* File descriptors for input pipe	    */
-      int pipeout[ 2 ];		 /* File descriptors for output pipe	    */
-      int stat_val;		 /* Shell process status information	    */
+/* Local Variables:                                                         */
+      int done;                  /* sh shell invoked yet?                   */
+      int nullfd;                /* File descriptor for the null device     */
+      int pipein[ 2 ];           /* File descriptors for input pipe         */
+      int pipeout[ 2 ];          /* File descriptors for output pipe        */
+      int stat_val;              /* Shell process status information        */
 
-#if defined( _POSIX2_VERSION )	 /* Local variables for POSIX.2 systems:    */
+#if defined( _POSIX2_VERSION )   /* Local variables for POSIX.2 systems:    */
       char **new_environ;        /* Pointer to new environment array        */
       char **old_environ;        /* Poiner to original environment array    */
-      char* new_path;		 /* PATH string for finding POSIX.2 shell   */
+      char* new_path;            /* PATH string for finding POSIX.2 shell   */
       int ipath;                 /* Index of PATH environment variable      */
       int n;                     /* No. of environment variables set        */
       size_t lpath_new;          /* Length required for new PATH assignment */
       size_t lpath_old;          /* Length of original PATH assignment      */
-      size_t lpath_std;		 /* Length required for standard PATH	    */
+      size_t lpath_std;          /* Length required for standard PATH       */
 #endif
-int i;
 
-/* External References:							    */
-      pid_t _fork( void );	 /* Function to fork a new process	    */
+/* External References:                                                     */
+      pid_t _fork( void );       /* Function to fork a new process          */
 
 #if defined( _POSIX2_VERSION ) && defined( _sun4_Solaris )
       size_t confstr( int name,  /* Prototype missing on sun4_Solaris       */
@@ -152,43 +153,43 @@ int i;
                       size_t len );
 #endif
 
-/*.									    */
+/*.                                                                         */
 
-/* Set initial null values for the returned results.			    */
+/* Set initial null values for the returned results.                        */
       *pid = (pid_t) -1;
       stream[ 0 ] = NULL;
       stream[ 1 ] = NULL;
 
-/* Check the inherited global status.					    */
+/* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return;
 
-/* Initialise to "safe" values.						    */
+/* Initialise to "safe" values.                                             */
       pipein[ 0 ] = pipein[ 1 ] = -1;
       pipeout[ 0 ] = pipeout[ 1 ] = -1;
 
 /* Create a pipe for sending commands to the shell process. If this fails,  */
-/* set safe values for the file descriptors and report an error.	    */
+/* set safe values for the file descriptors and report an error.            */
       if ( pipe( pipein ) == -1 )
       {
          pipein[ 0 ] = pipein[ 1 ] = -1;
          hds_gl_status = DAT__FATAL;
          ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
          ems_rep_c( "REC1_SHELL_1",
-	            "Error creating a pipe for sending commands to a shell "
+                    "Error creating a pipe for sending commands to a shell "
                     "process - ^MESSAGE", &hds_gl_status );
       }
 
-/* Create a pipe for receiving output from the shell process. If this	    */
-/* fails, set safe values for the file descriptors and report an error.	    */
+/* Create a pipe for receiving output from the shell process. If this       */
+/* fails, set safe values for the file descriptors and report an error.     */
       if ( _ok( hds_gl_status ) )
       {
          if ( pipe( pipeout ) == -1 )
          {
-	    pipeout[ 0 ] = pipeout[ 1 ] = -1;
+            pipeout[ 0 ] = pipeout[ 1 ] = -1;
             hds_gl_status = DAT__FATAL;
             ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
             ems_rep_c( "REC1_SHELL_2",
-	               "Error creating a pipe for receiving output from a "
+                       "Error creating a pipe for receiving output from a "
                        "shell process - ^MESSAGE", &hds_gl_status );
          }
       }
@@ -206,68 +207,68 @@ int i;
 #endif
 
 /* Fork a new process, checking for errors. Note that we use a macro for    */
-/* the forking function to allow vfork to be used for efficiency if	    */
-/* available.								    */
+/* the forking function to allow vfork to be used for efficiency if         */
+/* available.                                                               */
          *pid = _fork( );
          if ( *pid == (pid_t) -1 )
-	 {
+         {
             hds_gl_status = DAT__FATAL;
             ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
-	    ems_rep_c( "REC1_SHELL_3",
-		       "Error creating a child process to execute a shell - "
+            ems_rep_c( "REC1_SHELL_3",
+                       "Error creating a child process to execute a shell - "
                        "^MESSAGE", &hds_gl_status );
-	 }
+         }
 
 /* If this is the child process, then close the writing end of the input    */
-/* pipe and the reading end of the output pipe. These are not required.	    */
-	 else if ( *pid == (pid_t) 0 )
-	 {
+/* pipe and the reading end of the output pipe. These are not required.     */
+         else if ( *pid == (pid_t) 0 )
+         {
             (void) close( pipein[ 1 ] );
             (void) close( pipeout[ 0 ] );
 
-/* Redirect standard input to the reading end of the input pipe.	    */
+/* Redirect standard input to the reading end of the input pipe.            */
             (void) dup2( pipein[ 0 ], STDIN_FILENO );
             (void) close( pipein[ 0 ] );
 
-/* Redirect standard output to the writing end of the output pipe.	    */
+/* Redirect standard output to the writing end of the output pipe.          */
             (void) dup2( pipeout[ 1 ], STDOUT_FILENO );
             (void) close( pipeout[ 1 ] );
 
 /* We want to ignore error messages produced by the shell process, so open  */
 /* a file descriptor on the null device and redirect standard error to this */
-/* device.								    */
+/* device.                                                                  */
             nullfd = open( "/dev/null", O_WRONLY, 0 );
             (void) dup2( nullfd, STDERR_FILENO );
             (void) close( nullfd );
 
 /* Invoke the appropriate shell, specifying that commands are to be read    */
-/* from standard input. Note that the commands to invoke the shells	    */
+/* from standard input. Note that the commands to invoke the shells         */
 /* themselves (apart from the standard POSIX.2 shell) are macros, so their  */
-/* defaults may be over-ridden by external definitions appropriate to a	    */
-/* particular system.							    */
+/* defaults may be over-ridden by external definitions appropriate to a     */
+/* particular system.                                                       */
 
-/* tcsh shell:								    */
-/* ==========								    */
+/* tcsh shell:                                                              */
+/* ==========                                                               */
             if ( hds_gl_shell == HDS__TCSHSHELL )
-	    {
+            {
                (void) execlp( _tcsh, _tcsh, "-f", "-s", (char *) NULL );
-	    }
+            }
 
-/* csh shell:								    */
-/* =========								    */
-	    else if ( hds_gl_shell == HDS__CSHSHELL )
-	    {
+/* csh shell:                                                               */
+/* =========                                                                */
+            else if ( hds_gl_shell == HDS__CSHSHELL )
+            {
                (void) execlp( _csh, _csh, "-f", "-s", (char *) NULL );
-	    }
+            }
 
-/* sh shell:								    */
-/* ========								    */
-/* Include the "no shell" case, as the "sh" shell is still used in this	    */
-/* instance to perform wild-card file searching.			    */
-	    else if ( ( hds_gl_shell == HDS__SHSHELL ) ||
-		      ( hds_gl_shell == HDS__NOSHELL ) )
-	    {
-	       done = 0;
+/* sh shell:                                                                */
+/* ========                                                                 */
+/* Include the "no shell" case, as the "sh" shell is still used in this     */
+/* instance to perform wild-card file searching.                            */
+            else if ( ( hds_gl_shell == HDS__SHSHELL ) ||
+                      ( hds_gl_shell == HDS__NOSHELL ) )
+            {
+               done = 0;
 
 /* If POSIX.2 is available, then we will attempt to locate and use the      */
 /* standard POSIX.2 shell.                                                  */
@@ -276,10 +277,10 @@ int i;
 /* Determine if the PATH string which locates the standard shell is         */
 /* available (note the length returned includes a final null, so correct    */
 /* for this).                                                               */
-	       lpath_std = confstr( _CS_PATH, (char *) NULL, (size_t) 0 ) -
+               lpath_std = confstr( _CS_PATH, (char *) NULL, (size_t) 0 ) -
                            (size_t) 1;
-	       if ( lpath_std != (size_t) -1 )
-	       {
+               if ( lpath_std != (size_t) -1 )
+               {
 
 /* Count the number of environment variables set in the "environ" array and */
 /* note which element (if any) contains the assignment to the PATH          */
@@ -310,20 +311,20 @@ int i;
                   {
                      lpath_new += lpath_old - (size_t) 4;
                   }
-	          new_path = (char *) malloc( lpath_new + (size_t) 1 );
+                  new_path = (char *) malloc( lpath_new + (size_t) 1 );
 
 /* Check for success.                                                       */
-		  if ( ( new_environ != NULL ) && ( new_path != NULL ) )
-		  {
+                  if ( ( new_environ != NULL ) && ( new_path != NULL ) )
+                  {
 
 /* Obtain the standard PATH string, using it to construct an environment    */
 /* variable assignment. Check for success.                                  */
                      (void) strcpy( new_path, "PATH=" );
-	             lpath_std = confstr( _CS_PATH, new_path + 5,
+                     lpath_std = confstr( _CS_PATH, new_path + 5,
                                           lpath_std + (size_t) 1 ) -
                                  (size_t) 1;
-		     if ( lpath_std != (size_t) -1 )
-		     {
+                     if ( lpath_std != (size_t) -1 )
+                     {
 
 /* If a non-empty PATH assignment originally existed, append its value to   */
 /* the standard PATH, with a ":" separator.                                 */
@@ -357,28 +358,28 @@ int i;
 /* standard POSIX.2 shell and that this shell finds other standard POSIX.2  */
 /* utilities. The remainder of the PATH allows any other user-defined       */
 /* utilities to be located.                                                 */
-		        (void) execlp( "sh", "sh", "-s", (char *) NULL );
+                        (void) execlp( "sh", "sh", "-s", (char *) NULL );
 
 /* The "execlp" should not return, but if it does, note we do not want to   */
 /* try looking for another shell. The child process will then just exit     */
 /* (below).                                                                 */
-		        done = 1;
-		     }
-		  }
-	       }
+                        done = 1;
+                     }
+                  }
+               }
 #endif
 
-/* If POSIX.2 is not available, or if the required path could not be	    */
+/* If POSIX.2 is not available, or if the required path could not be        */
 /* obtained, then invoke the sh shell using the current process PATH value. */
-	       if ( !done )
-	       {
+               if ( !done )
+               {
                   (void) execlp( _sh, _sh, "-s", (char *) NULL );
-	       }
-	    }
+               }
+            }
 
-/* Terminate the child process in case the exec above failed.		    */
+/* Terminate the child process in case the exec above failed.               */
             _exit( 127 );
-	 }
+         }
 
 /* We are now back (or still) in the parent process. On POSIX.2 systems,   */
 /* the process environment which was changed in the child process (above)  */
@@ -401,82 +402,82 @@ int i;
       {
          hds_gl_status = DAT__FATAL;
          ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
-	 ems_rep_c( "REC1_SHELL_4",
-	            "Error closing (unused) reading end of input pipe "
+         ems_rep_c( "REC1_SHELL_4",
+                    "Error closing (unused) reading end of input pipe "
                     "after creating a shell process - ^MESSAGE",
-		    &hds_gl_status );
+                    &hds_gl_status );
       }
       ems_end_c( &hds_gl_status );
 
-/* Similarly close the writing end of the output pipe.			    */
+/* Similarly close the writing end of the output pipe.                      */
       ems_begin_c( &hds_gl_status );
       if ( close( pipeout[ 1 ] ) != 0 )
       {
          hds_gl_status = DAT__FATAL;
          ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
-	 ems_rep_c( "REC1_SHELL_5",
-	            "Error closing (unused) writing end of output pipe "
+         ems_rep_c( "REC1_SHELL_5",
+                    "Error closing (unused) writing end of output pipe "
                     "after creating a shell process - ^MESSAGE",
-		    &hds_gl_status );
+                    &hds_gl_status );
       }
       ems_end_c( &hds_gl_status );
 
-/* Open a file stream on the input pipe.				    */
+/* Open a file stream on the input pipe.                                    */
       if ( _ok( hds_gl_status ) )
       {
          stream[ 1 ] = fdopen( pipein[ 1 ], "w" );
-	 if ( stream[ 1 ] == NULL )
-	 {
-	    hds_gl_status = DAT__FATAL;
+         if ( stream[ 1 ] == NULL )
+         {
+            hds_gl_status = DAT__FATAL;
             ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
-	    ems_seti_c( "FD", (INT) pipein[ 1 ] );
-	    ems_rep_c( "REC1_SHELL_6",
-	               "Error associating a stream with file descriptor ^FD "
+            ems_seti_c( "FD", (INT) pipein[ 1 ] );
+            ems_rep_c( "REC1_SHELL_6",
+                       "Error associating a stream with file descriptor ^FD "
                        "for writing to a shell prrocess - ^MESSAGE",
                        &hds_gl_status );
-	 }
+         }
       }
 
-/* Open a file stream on the output pipe.				    */
+/* Open a file stream on the output pipe.                                   */
       if ( _ok( hds_gl_status ) )
       {
          stream[ 0 ] = fdopen( pipeout[ 0 ], "r" );
-	 if ( stream[ 0 ] == NULL )
-	 {
-	    hds_gl_status = DAT__FATAL;
+         if ( stream[ 0 ] == NULL )
+         {
+            hds_gl_status = DAT__FATAL;
             ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
-	    ems_seti_c( "FD", (INT) pipeout[ 0 ] );
-	    ems_rep_c( "REC1_SHELL_7",
-	               "Error associating a stream with file descriptor ^FD "
+            ems_seti_c( "FD", (INT) pipeout[ 0 ] );
+            ems_rep_c( "REC1_SHELL_7",
+                       "Error associating a stream with file descriptor ^FD "
                        "for reading from a shell prrocess - ^MESSAGE",
                        &hds_gl_status );
-	 }
+         }
       }
 
 /* If an error occurred, then close all streams and file descriptors which  */
-/* may still be open.							    */
+/* may still be open.                                                       */
       if ( !_ok( hds_gl_status ) )
       {
-	 (void) fclose( stream[ 0 ] );
-	 (void) fclose( stream[ 1 ] );
-	 (void) close( pipeout[ 0 ] );
-	 (void) close( pipein[ 1 ] );
+         (void) fclose( stream[ 0 ] );
+         (void) fclose( stream[ 1 ] );
+         (void) close( pipeout[ 0 ] );
+         (void) close( pipein[ 1 ] );
 
 /* If a child process was created before the error, then kill it and wait   */
-/* for it to terminate.							    */
-	 if ( *pid != (pid_t) -1 )
-	 {
-	    (void) kill( *pid, SIGKILL );
-	    (void) waitpid( *pid, &stat_val, 0 );
-	 }
+/* for it to terminate.                                                     */
+         if ( *pid != (pid_t) -1 )
+         {
+            (void) kill( *pid, SIGKILL );
+            (void) waitpid( *pid, &stat_val, 0 );
+         }
 
-/* Return null values.							    */
-	 *pid = (pid_t) -1;
+/* Return null values.                                                      */
+         *pid = (pid_t) -1;
          stream[ 0 ] = NULL;
-	 stream[ 1 ] = NULL;
+         stream[ 1 ] = NULL;
       }
 
-/* Exit the routine.							    */
+/* Exit the routine.                                                        */
       return;
    }
 #endif

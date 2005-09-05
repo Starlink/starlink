@@ -1,8 +1,6 @@
 #if HAVE_CONFIG_H
-#include <config.h>
+#   include <config.h>
 #endif
-
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 /* C include files:							    */
 /* ===============							    */
@@ -40,8 +38,8 @@
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
 #include "f77.h"                 /* Fortran <--> C interface facilities     */
 
-   int rec1_map_frame( int slot, int bloc, int length, int offset, char mode,
-                       unsigned char **pntr )
+   int rec1_map_frame( int slot, INT_BIG bloc, INT_BIG length,
+                       INT_BIG offset, char mode, unsigned char **pntr )
    {
 /*+									    */
 /* Name:								    */
@@ -126,7 +124,7 @@
       int bloc2;		 /* Last complete block			    */
       int brf;			 /* First block broken?			    */
       int brl;			 /* Last block broken?			    */
-      int nbloc;		 /* Number of file blocks to map	    */
+      INT_BIG nbloc;		 /* Number of file blocks to map	    */
       int tail;			 /* Data required after last complete block */
       static unsigned char *guard = NULL; /* Pointer to guard page	    */
       unsigned char *end;	 /* End of free address range		    */
@@ -156,7 +154,7 @@
 #endif
 				 /* Portable version local variables	    */
       FILE *iochan;		 /* File I/O stream			    */
-      int offs;			 /* File offset to start of data	    */
+      INT_BIG offs;		 /* File offset to start of data	    */
       int readok;		 /* Read operation completed successfully?  */
 #endif
 
@@ -678,7 +676,11 @@ file ^FILE - ^MESSAGE",
 	       offs = ( bloc - 1 ) * REC__SZBLK + offset;
 
 /* Seek to this file offset and read the values into the allocated memory.  */
-	       if ( readok = !fseek( iochan, offs, SEEK_SET ) );
+#if HAVE_FSEEKO
+	       if ( (readok = !fseeko( iochan, offs, SEEK_SET )) );
+#else
+	       if ( (readok = !fseek( iochan, offs, SEEK_SET )) );
+#endif
                {
                   fread( (void *) *pntr, 1, length, iochan );
 

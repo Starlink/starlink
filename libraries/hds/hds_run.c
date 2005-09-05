@@ -1,19 +1,24 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
-#include "f77.h"		 /* F77 <-> C interface macros		    */
-#include "ems.h"		 /* EMS error reporting routines	    */
-#include "hds1.h"		 /* Global definitions for HDS		    */
-#include "str.h"		 /* Character string import/export macros   */
-#include "dat_err.h"		 /* DAT__ error code definitions	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#include "ems.h"                 /* EMS error reporting routines            */
+#include "hds1.h"                /* Global definitions for HDS              */
+#include "str.h"                 /* Character string import/export macros   */
+#include "dat_err.h"             /* DAT__ error code definitions            */
+
+/* Note that this routine is obselete and does NOT have a counterpart in    */
+/* C interface to HDS                                                       */
 
 /* Function prototypes (these are part of the external interface for HDS).  */
-   F77_INTEGER_FUNCTION(hds_start)( int *status );
-   F77_INTEGER_FUNCTION(hds_stop)( int *status );
+   F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) );
+   F77_SUBROUTINE(hds_stop)( F77_INTEGER_TYPE(*status) );
 
 
-   F77_INTEGER_FUNCTION(hds_run)
-		       ( void (*subroutine)( int * ),
-			 int *status )
-   {
+
+F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
+                         F77_INTEGER_TYPE(*status ) )
+{
 /*
 *+
 *  Name:
@@ -45,11 +50,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     BKM:  B.K. McIlwrath    (STARLINK, RAL)
 *     {enter_new_authors_here}
 
 *  History:
-*     4-APR-1991 (RFWS):
+*     04-APR-1991 (RFWS):
 *        Added prologue and error reporting and made portable.
+*     19-MAR-2001 (BKM):
+*        Convert to use consistent F77 macros and mark as obselete.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -58,24 +66,21 @@
 *-
 */
 
-/*.									    */
+/* Check the inherited global status. */
+      if ( !_ok( *status ) ) return;
 
-/* Check the inherited global status.					    */
-      if ( !_ok( *status ) ) return *status;
-
-/* Start up HDS, call the application and close HDS down.		    */
+/* Start up HDS, call the application and close HDS down  */
       F77_CALL(hds_start)( status );
       (*subroutine)( status );
       F77_CALL(hds_stop)( status );
 
-/* If an error occurred, then report contextual information.		    */
+/* If an error occurred, then report contextual information.  */
       if ( !_ok( *status ) )
       {
          ems_rep_c( "HDS_RUN_ERR",
-	            "HDS_RUN: Error running an HDS application subroutine.",
-		    status );
+                   "HDS_RUN: Error running an HDS application subroutine.",
+                    status );
       }
 
-/* Exit the routine.							    */
-      return *status;
-   }
+/* Exit the routine */
+}

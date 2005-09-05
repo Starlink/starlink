@@ -91,6 +91,7 @@
 #define HDS__SHELL HDS__SHSHELL	 /* UNIX "sh" shell used for file expansion */
 #define HDS__SYSLCK 0		 /* System wide lock flag		    */
 #define HDS__WAIT 0		 /* Wait for locked files?		    */
+#define HDS__64BIT 0		 /* Create new files in 64-bit HDS format?  */
 
 /* Arithmetic data types:						    */
 /* =====================						    */
@@ -101,6 +102,33 @@
 #define INT int
 #else
 #define INT long int
+#endif
+
+/* Definitions for 64-bits integers                                        */ 
+#if !defined(__alpha)
+#define INT_BIG long long int
+#define INT_BIG_S "lld"
+#define INT_BIG_U "llu"
+#else
+#define INT_BIG long int
+#define INT_BIG_S "ld"
+#define INT_BIG_U "lu"
+#endif
+
+/* The Fortran interface can be compiled as either 32 or 64 bits depending */
+/* on a switch definition                                                  */
+#if !defined(HDS_F_64)
+#define FORTRAN_INDEX_TYPE F77_INTEGER_TYPE
+#else
+#define FORTRAN_INDEX_TYPE INT_BIG
+#endif
+
+/* The internal size of array dimensions within HDS can be either 32 or 64  */
+/* bits. Note that 64 bits is untested and WILL change the file format!!!   */
+#if !defined(HDS_64)
+#define HDS_PTYPE int
+#else
+#define HDS_PTYPE INT_BIG
 #endif
 
 /* Global Structure Definitions:					    */
@@ -210,6 +238,7 @@
       extern int hds_gl_ntemp;	 /* Counter for temporary names		    */
       extern int hds_gl_status;	 /* Global status			    */
       extern unsigned int hds_gl_locseq; /* Locator sequence number	    */
+      extern int hds_gl_64bit;   /* V4 (64-bit) type records                */
 
 /* Global Tuning Variables:						    */
 /* =======================						    */
@@ -223,6 +252,8 @@
       extern int hds_gl_shell;	 /* UNIX shell used for file name expansion */
       extern int hds_gl_syslck;	 /* System-wide lock flag		    */
       extern int hds_gl_wait;	 /* Wait for locked files?		    */
+      extern int hds_gl_c64bit;  /* Create 64-bit (HDS V4) new files?       */
+      extern int hds_gl_longints;/* Default all INTEGERs to 64-bits?        */
 
 /* Fixups for various machine deficiencies:				    */
 /* =======================================				    */

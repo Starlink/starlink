@@ -1,4 +1,7 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <string.h>
 #include "ems.h"		 /* EMS error reporting routines	    */
 #include "ems_par.h"		 /* EMS__ public constants		    */
@@ -71,6 +74,7 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -104,6 +108,10 @@
 /*	 since marking a file for deletion is a useful method of creating a */
 /*	 scratch file and re-opening such a file may sometimes be	    */
 /*	 necessary.							    */
+/*    19-APR-2004 (BKM):                                                    */
+/*       Revised for 64-bit HDS files.                                      */
+/*    06-MAY-2004 (BKM):                                                    */
+/*       Cope with both 32-bit and 64-bit files                             */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -133,6 +141,7 @@
       {
          inalq = hds_gl_inalq;
 	 hds_gl_inalq = hds_gl_inalq0;
+         rcl->extended = hds_gl_64bit = hds_gl_c64bit;
 	 rec1_create_file( expand, file, file_len, inalq, &slot, &inalq );
 
 /* Locate the Header Control Block information.				    */
@@ -147,7 +156,10 @@
 /* Initialise the Header Control Block stamp, version and end-of-file	    */
 /* fields.								    */
 	    hcb->stamp = REC__STAMP;
-            hcb->version = REC__VERSION;
+            if( hds_gl_64bit ) 
+               hcb->version = REC__VERSION4;
+            else
+               hcb->version = REC__VERSION3;
             hcb->eof = inalq;
 
 /* Fill the free space stack with null entries (-1) and insert the current  */
@@ -202,33 +214,26 @@ file.",
 /* Check the version number of the software that created or last modified   */
 /* the file. Report an error if there is a version mis-match. Close the	    */
 /* file again if necessary.						    */
-	       else if ( hcb->version > REC__VERSION )
+	       else if ( hcb->version > REC__VERSION4 )
 	       {
 	          hds_gl_status = DAT__VERMM;
 		  rec1_fmsg( "FILE", slot );
 	          ems_seti_c( "VFILE", hcb->version );
-	          ems_seti_c( "VSOFT", REC__VERSION );
+	          ems_seti_c( "VSOFT", REC__VERSION4 );
 	          ems_rep_c( "REC_ATTACH_FILE_2",
 	                     "HDS file format version mismatch in file ^FILE \
 - file version=^VFILE, software version=^VSOFT (possible re-link needed).",
                              &hds_gl_status );
 	          rec_close_file( han );
 	       }
-
-/* If the file is being opened for write or update access and its version   */
-/* number is less than that of the software which is modifying it, then	    */
-/* obtain update access to the HCB information and update the file version  */
-/* number.								    */
-	       else if ( ( mode != 'R' ) && ( hcb->version < REC__VERSION ) )
-	       {
-	          rec1_locate_hcb( slot, 'U', &hcb );
-	          if ( _ok( hds_gl_status ) )
-	          {
-		     hcb->version = REC__VERSION;
-	          }
-	       }
+               else
+               {
+                  rec_ga_fcv[ slot ].hds_version = hcb->version;
+                  hds_gl_64bit = ( hcb->version > REC__VERSION3 );
+               }
             }
-         }
+         } else        /* !newslot */
+            hds_gl_64bit = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 );
 
 /* Read the Record Control Label for the top-level record.		    */
 	 rec_get_rcl( han, rcl );

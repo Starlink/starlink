@@ -12,9 +12,9 @@
 /* The following are "public" values. Copies are made available externally  */
 /* in the dat_par.h and dat_par(.f) files.				    */
 #define DAT__MXDIM 7		 /* Maximum number of object dimensions	    */
-#define DAT__NOLOC "<NOT A LOCATOR>" /*	Null (invalid) locator value	    */
+#define DAT__NOLOC "<NOT A LOCATOR> "/*	Null (invalid) locator value	    */
 #define DAT__NOWLD 0		 /* Null wild-card search context	    */
-#define DAT__ROOT "<ROOT LOCATOR>" /* Root locator value		    */
+#define DAT__ROOT "<ROOT LOCATOR>   "/* Root locator value		    */
 #define DAT__SZGRP 15		 /* Size of group name			    */
 #define DAT__SZLOC ( ( 15 > (int) sizeof( struct LOC ) ) ? \
 		     15 : (int) sizeof( struct LOC ) )
@@ -31,11 +31,13 @@
 
 #define DAT__LOCCHECK 0x7f7f7f7f /* Locator check value			    */
 #define DAT__MXSLICE 3		 /* Maximum no. of slice dimensions	    */
-#define DAT__SZCRV 20            /* Size of Component Record Vector element */
+#define DAT__SZCRV 24            /* Size of Component Record Vector element */
+#define DAT__SZOCRV 20           /* Size of HDS V3 CRV element              */
 #define DAT__SZDIM 4		 /* Size of a packed ODL dimension size	    */
 #define DAT__SZNCOMP 4		 /* Size of a packed component count	    */
 #define DAT__SZNDIM 1		 /* Size of a packed ODL dimension count    */
-#define DAT__SZSRV 4		 /* Size of Structure Record Vector element */
+#define DAT__SZSRV 8		 /* Size of Structure Record Vector element */
+#define DAT__SZOSRV 4		 /* Size of HDS V3 SRV element              */
 
 #define LOWER 0			 /* Lower-bound vector element		    */
 #define UPPER 1			 /* Upper-bound vector element		    */
@@ -52,7 +54,7 @@
 #define DAT__R 5		 /* _REAL				    */
 #define DAT__UB 6		 /* _UBYTE				    */
 #define DAT__UW 7		 /* _UWORD				    */
-#define DAT__W 8		 /* _WORD				    */
+#define DAT__W 8		 /* _WORD                                   */
 
 #define DAT__MXPRM 9		 /* Number of primitive data types	    */
                         
@@ -129,6 +131,11 @@
 				 /* boundary				    */
 #endif
 
+/* Determine the size of sructures depending the 64-bit mode type  */
+#define SZSRV (hds_gl_64bit ? DAT__SZSRV : DAT__SZOSRV)
+#define SZCRV (hds_gl_64bit ? DAT__SZCRV : DAT__SZOCRV)
+#define SET_64BIT_MODE(han) (hds_gl_64bit =\
+    (rec_ga_fcv[han->slot].hds_version > REC__VERSION3))
 #define _call(event)\
 {\
 *status = (event);\
@@ -184,9 +191,9 @@ if (!_ok(*status))\
 /* ODL - Object Descriptor Label.					    */
       struct ODL
       {
-         char type[ DAT__SZTYP ]; /* Object type specification		    */
-         int naxes;		 /* Number of axes			    */
-         int axis[ DAT__MXDIM ]; /* Vector of axis sizes		    */
+         char type[ DAT__SZTYP ];    /* Object type specification	    */
+         int naxes;		     /* Number of axes			    */
+         HDS_PTYPE axis[ DAT__MXDIM ]; /* Vector of axis sizes		    */
       };
 
 /* LCP - Locator Control Packet.					    */
@@ -211,11 +218,11 @@ if (!_ok(*status))\
          struct LCP_STATE state; /* LCP dynamic state flags		    */
          struct PDD app;	 /* Application primitive data descriptor   */
          struct PDD obj;	 /* Object primitive data descriptor	    */
-         int bounds[ 3 ][ 2 ];	 /* Dimension bounds			    */
+         HDS_PTYPE bounds[ 3 ][ 2 ];/* Dimension bounds			    */
          int level;		 /* Component level			    */
          int naxes;		 /* Number of axes			    */
-         unsigned int offset;	 /* Slice or cell offset		    */
-         unsigned int size;	 /* Size of object			    */
+         unsigned INT_BIG offset; /* Slice or cell offset		    */
+         unsigned INT_BIG size;	 /* Size of object			    */
          char group[ DAT__SZGRP + 1 ]; /* Group specification		    */
          char name[ DAT__SZNAM + 1 ]; /* Name  specification		    */
          char type[ DAT__SZTYP + 1 ]; /* Type specification		    */
@@ -255,9 +262,9 @@ if (!_ok(*status))\
 
 /* Function Prototypes:							    */
 /* ===================							    */
-      void dat1_alloc_lcp( int loc_len, char *loc, struct LCP **lcp );
+      void dat1_alloc_lcp( INT loc_len, char *loc, struct LCP **lcp );
       void dat1_annul_lcp( struct LCP **lcp );
-      void dat1_check_mode( const char *mode, int mode_len, char *modechar,
+      void dat1_check_mode( const char *mode, INT mode_len, char *modechar,
 			    INT *status );
       int dat1_check_type( const struct DSC *type, char ptype[ DAT__SZTYP ] );
       int dat1_cvt( int bad, int nval, struct PDD *imp, struct PDD *exp,
@@ -271,11 +278,11 @@ if (!_ok(*status))\
       void dat1_cvt_order( int nval, const struct PDD *imp, struct PDD *exp,
                            int *status );
       void dat1_decoy( long int arg1, void *arg2 );
-      int dat1_erase_object( int ncomp, struct HAN *kin, unsigned char *crv );
       void dat1_getenv( const char *varname, int def, int *val );
       int dat1_get_ncomp( const struct HAN *han, int *ncomp );
       int dat1_get_odl( const struct HAN *han, struct ODL *odl );
-      int dat1_get_off( int ndim, int *dims, int *subs, unsigned int *offset );
+      int dat1_get_off( int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs,
+                     unsigned INT_BIG *offset );
       void dat1_import_loc( const char *loc, const int loc_length,
                             struct LCP **lcp );
       int dat1_init( void );
@@ -287,24 +294,24 @@ if (!_ok(*status))\
                             struct HAN *des, unsigned char *des_crv );
       int dat1_pack_crv( const struct RID *rid, int i, unsigned char *pcrv );
       int dat1_pack_odl( const struct ODL *odl, unsigned char *podl );
-      int dat1_pack_srv( const struct RID *rid, unsigned char psrv[ 4 ] );
+      int dat1_pack_srv( const struct RID *rid, unsigned char psrv[ ] );
       int dat1_put_ncomp( const struct HAN *han, int ncomp );
       int dat1_put_odl( const struct HAN *han, struct ODL *odl );
       void dat1_show_ndr( int *status );
       int dat1_unpack_crv( const unsigned char *pcrv, int i, struct RID *rid );
       int dat1_unpack_odl( const unsigned char *podl, struct ODL *odl );
-      int dat1_unpack_srv( const unsigned char psrv[ 4 ], struct RID *rid );
+      int dat1_unpack_srv( const unsigned char psrv[ ], struct RID *rid );
       int dat1_unpack_type( const char ptype[ DAT__SZTYP ], struct PDD *pdd );
 
       int dau_check_name( struct DSC *name, char *buf );
-      int dau_check_shape( int ndim, int *dims, struct ODL *odl );
+      int dau_check_shape( int ndim, HDS_PTYPE *dims, struct ODL *odl );
       int dau_copy_object( int ncomp, struct HAN *src, unsigned char *src_crv,
                            struct HAN *des, unsigned char *des_crv );
       int dau_defuse_lcp( struct LCP **pntr );
       int dau_export_loc( struct DSC *locator, struct LCP **pntr );
       int dau_flush_data( struct LCP_DATA *data );
       int dau_gather_data( int bad, struct LCP_DATA *data, int *nbad );
-      int dau_get_shape( struct LCP_DATA *data, int *naxes, int *axis );
+      int dau_get_shape( struct LCP_DATA *data, int *naxes, HDS_PTYPE *axis );
       int dau_import_loc( struct DSC *locator, struct LCP **pntr );
       int dau_match_types( struct PDD *obj, struct PDD *app );
       int dau_move_data( int nval, struct PDD *imp, struct PDD *exp );
@@ -312,9 +319,10 @@ if (!_ok(*status))\
       int dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad );
 
       int hds1_check_group( struct DSC *group, char *buf );
-      int hds1_encode_subs( int nlim, int nsub, int *subs, char *buf,
+      int hds1_encode_subs( int nlim, int nsub, HDS_PTYPE *subs, char *buf,
 			    int *nchar );
       void hds1_exit( void );
-      int hds1_get_subs( int ndim, int *dims, int offset, int *subs );
+      int hds1_get_subs( int ndim, HDS_PTYPE *dims, INT_BIG offset,
+                         HDS_PTYPE  *subs );
 
 #endif

@@ -1,4 +1,6 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #if defined( vms )
 void rec1_find_file( void ){};	 /* This routine not used on VMS systems */

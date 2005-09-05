@@ -12,7 +12,7 @@ check_PROGRAMS = hds_test hds_test_prm
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
-        $(PRIVATE_INCLUDES) \
+	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES) \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES)
@@ -46,7 +46,7 @@ PUBLIC_INCLUDES = DAT_PAR dat_par.h
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
 	dat1.h hds1.h \
-	hds1_feature.h rec.h rec1.h str.h \
+	rec.h rec1.h str.h \
         win_fixups.h \
 	$(noinst_MESSAGES)
 
@@ -55,11 +55,11 @@ F_ROUTINES = \
 	cmp_getnx.f cmp_getvx.f cmp_len.f cmp_mapn.f cmp_mapv.f \
 	cmp_mod.f cmp_modc.f cmp_prim.f cmp_put0x.f cmp_put1x.f \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
-	cmp_type.f cmp_unmap.f dat_ccopy.f dat_cctyp.f dat_erdsc.f \
+	cmp_type.f cmp_unmap.f dat_cctyp.f dat_erdsc.f \
 	dat_erdsn.f dat_ertxt.f dat_get0x.f dat_get1x.f dat_getnx.f \
 	dat_getvx.f dat_mapn.f dat_mapv.f dat_msg.f dat_new0.f \
 	dat_new0c.f dat_new0x.f dat_new1.f dat_new1c.f dat_new1x.f \
-	dat_newc.f dat_prec.f dat_put0x.f dat_put1x.f dat_putnx.f \
+	dat_prec.f dat_put0x.f dat_put1x.f dat_putnx.f \
 	dat_putvx.f dat_rcera.f dat_rcopy.f dat_ref.f dat_tune.f
 
 #  List of Fortran BLOCK DATA routines.
@@ -73,16 +73,16 @@ C_ROUTINES = \
 	dat1_locate_name.c dat1_pack_crv.c dat1_pack_odl.c \
 	dat1_pack_srv.c dat1_put_ncomp.c dat1_put_odl.c \
 	dat1_show_ndr.c dat1_unpack_crv.c dat1_unpack_odl.c \
-	dat1_unpack_srv.c dat1_unpack_type.c dat_clen.c dat_copy.c \
-	dat_drep.c dat_ermsg.c dat_paren.c dat_prmry.c dat_refct.c \
-	dat_where.c datalter.c datannul.c daterase.c datfinind.c \
+	dat1_unpack_srv.c dat1_unpack_type.c datClen.c datCopy.c \
+	datDrep.c datErmsg.c datParen.c datPrmry.c datRefct.c \
+	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
 	datput.c dattemp.c daucheck.c daucnv.c daucopy.c dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
 	\
-	hds1_exit.c hds_copy.c hds_ewild.c hds_globals.c hds_gtune.c \
-	hds_run.c hds_start.c hds_state.c hds_stop.c hds_tune.c \
-	hds_wild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
+	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
+	hds_run.c hds_start.c hdsState.c hdsStop.c hdsTune.c \
+	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
 	hdsopclos.c hdstools.c  \
 	\
 	rec1_alloc_frame.c rec1_clear_cbm.c rec1_close_file.c \
@@ -108,9 +108,7 @@ C_ROUTINES = \
 	rec_release_block.c rec_release_data.c rec_reset_record.c \
 	rec_same_file.c rec_shrink_record.c rec_start.c rec_stop.c \
 	rec_unlock.c rec_where.c rec_wild_file.c \
-	\
-	rtl_fixups.c \
-        \
+	rtl_fixups.c fortran_interface.c \
         win_fixups.c
 
 dat_par.h: dat_par_h$(EXEEXT)

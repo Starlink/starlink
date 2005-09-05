@@ -1,37 +1,31 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 /*+DATLOCOPS.C-*/
 
 /* Include files */
 
-#include "f77.h"		 /* F77 <-> C interface macros		    */
-#include "ems.h"		 /* EMS error reporting routines	    */
+#include "ems.h"                 /* EMS error reporting routines            */
 
-#include "hds1.h"		 /* Global definitions for HDS		    */
-#include "rec.h"		 /* Public rec_ definitions		    */
-#include "str.h"		 /* Character string import/export macros   */
-#include "dat1.h"		 /* Internal dat_ definitions		    */
-#include "dat_err.h"		 /* DAT__ error code definitions	    */
+#include "hds1.h"                /* Global definitions for HDS              */
+#include "rec.h"                 /* Public rec_ definitions                 */
+#include "str.h"                 /* Character string import/export macros   */
+#include "dat1.h"                /* Internal dat_ definitions               */
+#include "dat_err.h"             /* DAT__ error code definitions            */
 
 /* Control Blocks */
-
-
-   F77_INTEGER_FUNCTION(dat_slice)
-                       (locator1_str,nsub,lower,upper,locator2_str,status,
-	   locator1_lenarg,locator2_lenarg)
 
 /*==========================*/
 /* DAT_SLICE - Locate slice */
 /*==========================*/
-
-struct STR	 	 *locator1_str;
-int			 *nsub;
-int			 *lower;
-int			 *upper;
-struct STR	 	 *locator2_str;
-int			 *status;
-int			  locator1_lenarg;
-int			  locator2_lenarg;
-
+int
+datSlice(char     locator1_str[DAT__SZLOC],
+         int      ndim,
+         HDS_PTYPE  lower[],
+         HDS_PTYPE  upper[],
+         char     locator2_str[DAT__SZLOC],
+         int      *status )
 {
 #undef context_name
 #undef context_message
@@ -39,120 +33,124 @@ int			  locator2_lenarg;
 #define context_message\
         "DAT_SLICE: Error obtaining a locator to a slice of an HDS array."
 
-struct DSC		  locator1;
-struct DSC		  locator2;
-int			  locator1_len = locator1_lenarg;
-int			  locator2_len = locator2_lenarg;
+   struct DSC locator1;
+   struct DSC locator2;
 
-struct LCP		 *lcp1;
-struct LCP_DATA		 *data1;
-struct LCP		 *lcp2;
-struct LCP_DATA	   	 *data2;
-struct LCP_STATE	 *state2;
-int			(*dbt1)[2];
-int			(*dbt2)[2];
-int			  axis[DAT__MXDIM];
-int			  off[2];
-int			  naxes;
-int			  stride;
-int			  i;
+   struct LCP       *lcp1;
+   struct LCP_DATA  *data1;
+   struct LCP       *lcp2;
+   struct LCP_DATA  *data2;
+   struct LCP_STATE *state2;
+   HDS_PTYPE        (*dbt1)[2];
+   HDS_PTYPE        (*dbt2)[2];
+   HDS_PTYPE        axis[DAT__MXDIM];
+   HDS_PTYPE        off[2];
+   int              naxes;
+   HDS_PTYPE        stride;
+   int              i;
 
-/* Enter routine.	*/
+/* Enter routine.       */
 
-if (!_ok(*status))
-	return *status;
-hds_gl_status	= DAT__OK;
+   if (!_ok(*status))
+      return *status;
+   hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
+/* Import the source locator string and export the destination */
+/* locator string.*/
 
-_strimp(&locator1,locator1_str,&locator1_len);
-_strexp(&locator2,locator2_str,&locator2_len);
+   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
+   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
 
-/* Import the source locator.	*/
+/* Import the source locator.   */
 
-_call(dau_import_loc(&locator1, &lcp1))
-data1		= &lcp1->data;
+   _call(dau_import_loc( &locator1, &lcp1 ))
+   data1 = &lcp1->data;
 
 /* Get the current object shape and check that the # of dimensions matches
-   the # of subscript bounds specified.	*/
+   the # of subscript bounds specified. */
 
-_call(dau_get_shape(data1, &naxes, axis))
-if (naxes != *nsub || naxes > DAT__MXSLICE)
-	_call(DAT__DIMIN)
+   _call(dau_get_shape( data1, &naxes, axis ))
+   if (naxes != ndim || naxes > DAT__MXSLICE)
+     _call(DAT__DIMIN)
 
-/* Export the destination locator and copy all the LCP data fields.	*/
+/* Export the destination locator and copy all the LCP data fields.     */
 
-_call(dau_export_loc(&locator2, &lcp2))
-data2	   	= &lcp2->data;
-state2		= &data2->state;
-*data2 = *data1;
+   _call(dau_export_loc( &locator2, &lcp2 ))
+   data2 = &lcp2->data;
+   state2 = &data2->state;
+   *data2 = *data1;
 
 /* Mark the locator as invalid until the subscript bounds have been checked
-   and clear the LCP state flags.	*/
+   and clear the LCP state flags.       */
 
-data2->valid	= 0;
-state2->mapped	= 0;
-state2->vmcopy	= 0;
-state2->unlike	= 0;
-state2->slice	= 0;
-state2->cell	= 0;
-state2->vector	= 0;
-state2->broken	= 0;
+   data2->valid   = 0;
+   state2->mapped = 0;
+   state2->vmcopy = 0;
+   state2->unlike = 0;
+   state2->slice  = 0;
+   state2->cell   = 0;
+   state2->vector = 0;
+   state2->broken = 0;
 
-/* Associate both Dimension Bounds Tables.	*/
+/* Associate both Dimension Bounds Tables.      */
 
-dbt1		= data1->bounds;
-dbt2		= data2->bounds;
+   dbt1 = data1->bounds;
+   dbt2 = data2->bounds;
 
 /* Fill in the Dimension Bounds Table for the sliced object, calculate the
-   # of values in the slice and the lower and upper offsets.	*/
+   # of values in the slice and the lower and upper offsets.    */
 
-stride		= 1;
-data2->size	= 1;
-off[UPPER]	= 0;
-off[LOWER]	= 0;
-for (i=0; i<naxes; i++)
-	{
-	dbt2[i][LOWER]	 = dbt1[i][LOWER] + lower[i] - 1;
-	dbt2[i][UPPER]	 = (upper[i] <= 0) ?
-			dbt1[i][UPPER] : dbt1[i][LOWER] + upper[i] - 1;
-	if (dbt2[i][LOWER] < dbt1[i][LOWER] ||
-	    dbt2[i][UPPER] > dbt1[i][UPPER] ||
-	    dbt2[i][LOWER] > dbt2[i][UPPER])
-		_call(DAT__SUBIN)
-	data2->size	*= dbt2[i][UPPER] - dbt2[i][LOWER] + 1;
-	off[LOWER]	+= (stride * (dbt2[i][LOWER] - 1));
-	off[UPPER]	+= (stride * (dbt2[i][UPPER] - 1));
-	stride		*= axis[i];
-	}
+   stride = 1;
+   data2->size = 1;
+   off[UPPER] = 0;
+   off[LOWER] = 0;
+   for (i=0; i<naxes; i++)
+   {
+      dbt2[i][LOWER] = dbt1[i][LOWER] + lower[i] - 1;
+      dbt2[i][UPPER] = (upper[i] <= 0) ?
+                        dbt1[i][UPPER] : dbt1[i][LOWER] + upper[i] - 1;
+      if (dbt2[i][LOWER] < dbt1[i][LOWER] ||
+          dbt2[i][UPPER] > dbt1[i][UPPER] ||
+          dbt2[i][LOWER] > dbt2[i][UPPER])
+             _call(DAT__SUBIN)
+      data2->size *= dbt2[i][UPPER] - dbt2[i][LOWER] + 1;
+      off[LOWER] += (stride * (dbt2[i][LOWER] - 1));
+      off[UPPER] += (stride * (dbt2[i][UPPER] - 1));
+      stride *= axis[i];
+   }
 
 /* If the opposite corners of the slice are not 'size' units apart, then
-   the slice is broken (discontiguous).	*/
+   the slice is broken (discontiguous). */
 
-state2->broken	= ((off[LOWER] + data2->size) != (off[UPPER] + 1));
-data2->offset	= off[LOWER];
-state2->cell	= (data2->naxes == 0);
-state2->slice	= !state2->cell;
-data2->valid	= 1;
-return hds_gl_status;
+   state2->broken = ((off[LOWER] + data2->size) != (off[UPPER] + 1));
+   data2->offset  = off[LOWER];
+   state2->cell   = (data2->naxes == 0);
+   state2->slice  = !state2->cell;
+   data2->valid   = 1;
+   return hds_gl_status;
 }
-
-   F77_INTEGER_FUNCTION(dat_cell)
-                       (locator1_str,nsub,subs,locator2_str,status,
-	  locator1_lenarg,locator2_lenarg)
+
+
+/* F77_INTEGER_FUNCTION(dat_cell)(struct STR *locator1_str,
+ *                              F77_INTEGER_TYPE *nsub,
+ *                              F77_INTEGER_TYPE *subs,
+ *                              struct STR *locator2_str,
+ *                              F77_INTEGER_TYPE *status
+ *                             TRAIL(locator1_str)
+ *                              TRAIL(locator2_str) )
+ */
+
 
 /*========================*/
 /* DAT_CELL - Locate cell */
 /*========================*/
 
-struct STR	 	 *locator1_str;
-int			 *nsub;
-int			 *subs;
-struct STR	 	 *locator2_str;
-int			 *status;
-int			  locator1_lenarg;
-int			  locator2_lenarg;
-
+int
+datCell( char     loc1_str[DAT__SZLOC],
+         int      ndim,
+         HDS_PTYPE subs[],
+         char     loc2_str[DAT__SZLOC],
+         int      *status)
 {
 #undef context_name
 #undef context_message
@@ -160,97 +158,98 @@ int			  locator2_lenarg;
 #define context_message\
         "DAT_CELL: Error obtaining a locator to a cell of an HDS array."
 
-struct DSC		  locator1;
-struct DSC		  locator2;
-int			  locator1_len = locator1_lenarg;
-int			  locator2_len = locator2_lenarg;
+   struct DSC locator1;
+   struct DSC locator2;
 
-struct LCP		 *lcp1;
-struct LCP_DATA		 *data1;
-struct LCP_STATE	 *state1;
-struct LCP		 *lcp2;
-struct LCP_DATA		 *data2;
-struct LCP_STATE	 *state2;
-int			  axis[DAT__MXDIM];
-int			  naxes;
+   struct LCP       *lcp1;
+   struct LCP_DATA  *data1;
+   struct LCP_STATE *state1;
+   struct LCP       *lcp2;
+   struct LCP_DATA  *data2;
+   struct LCP_STATE *state2;
+   HDS_PTYPE        axis[DAT__MXDIM];
+   int              naxes;
 
-/* Enter routine.	*/
+/* Enter routine.       */
 
-if (!_ok(*status))
-	return *status;
-hds_gl_status	= DAT__OK;
+   if (!_ok(*status))
+      return *status;
+   hds_gl_status = DAT__OK;
 
 /* Import the source locator string and export the destination locator string.*/
 
-_strimp(&locator1,locator1_str,&locator1_len);
-_strexp(&locator2,locator2_str,&locator2_len);
+   _strflcsimp( &locator1, loc1_str, DAT__SZLOC );
+   _strflcsexp( &locator2, loc2_str, DAT__SZLOC );
 
-/* Import the source locator.	*/
+/* Import the source locator.   */
 
-_call(dau_import_loc(&locator1, &lcp1))
-data1		= &lcp1->data;
-state1		= &data1->state;
+   _call(dau_import_loc( &locator1, &lcp1 ))
+   data1  = &lcp1->data;
+   state1 = &data1->state;
 
-/* Return if the object is discontiguous.	*/
+/* Return if the object is discontiguous.       */
 
-if (state1->broken)
-	_call(DAT__OBJIN)
+   if (state1->broken)
+      _call(DAT__OBJIN)
 
 /* Get the current object shape and check that the # of dimensions matches
-   the # of subscripts specified.	*/
+   the # of subscripts specified.       */
 
-_call(dau_get_shape(data1, &naxes, axis))
-if (naxes != *nsub)
-	_call(DAT__DIMIN)
+   _call(dau_get_shape(data1, &naxes, axis))
+   if (naxes != ndim)
+      _call(DAT__DIMIN)
 
-/* Export the destination locator and copy all the LCP data fields.	*/
+/* Export the destination locator and copy all the LCP data fields.     */
 
-_call(dau_export_loc(&locator2, &lcp2))
-data2		= &lcp2->data;
-state2		= &data2->state;
-*data2 = *data1;
+   _call(dau_export_loc( &locator2, &lcp2 ))
+   data2  = &lcp2->data;
+   state2 = &data2->state;
+   *data2 = *data1;
 
 /* Mark the locator as invalid until the subscript bounds have been checked
-   and clear the LCP state flags.	*/
+   and clear the LCP state flags.       */
 
-data2->valid	= 0;
-state2->mapped	= 0;
-state2->vmcopy	= 0;
-state2->unlike	= 0;
-state2->slice	= 0;
-state2->cell	= 0;
-state2->vector	= 0;
-state2->broken	= 0;
+   data2->valid   = 0;
+   state2->mapped = 0;
+   state2->vmcopy = 0;
+   state2->unlike = 0;
+   state2->slice  = 0;
+   state2->cell   = 0;
+   state2->vector = 0;
+   state2->broken = 0;
 
 /* Convert the subscript information to a zero-based offset and ensure
-   that the required cell is within the bounds of the object.	*/
+   that the required cell is within the bounds of the object.   */
 
-_call(dat1_get_off(naxes, axis, subs, &data2->offset))
-if (data2->offset >= data1->size)
-	_call(DAT__SUBIN)
+   _call(dat1_get_off( naxes, axis, subs, &data2->offset) )
+   if (data2->offset >= data1->size)
+      _call(DAT__SUBIN)
 
-/* Adjust the cell offset and mark the object as scalar.	*/
+/* Adjust the cell offset and mark the object as scalar.        */
 
-data2->offset	+= data1->offset;
-data2->naxes	= 0;
-data2->size 	= 1;
-state2->cell	= 1;
-data2->valid	= 1;
-return hds_gl_status;
-}
-   F77_INTEGER_FUNCTION(dat_vec)
-                       (locator1_str,locator2_str,status,locator1_lenarg,locator2_lenarg)
+   data2->offset += data1->offset;
+   data2->naxes = 0;
+   data2->size  = 1;
+   state2->cell = 1;
+   data2->valid = 1;
+   
+   return hds_gl_status;
+}
+
+/*F77_INTEGER_FUNCTION(dat_vec)(struct STR *locator1_str,
+ *                             struct STR *locator2_str,
+ *                             F77_INTEGER_TYPE *status
+ *                             TRAIL(locator1_str)
+ *                             TRAIL(locator2_str) )
+ */
 
 /*============================*/
 /* DAT_VEC - Vectorise object */
 /*============================*/
-
-struct STR	 	 *locator1_str;
-struct STR	 	 *locator2_str;
-int	 		 *status;
-int			  locator1_lenarg;
-int			  locator2_lenarg;
-
+int
+datVec(char locator1_str[DAT__SZLOC],
+       char locator2_str[DAT__SZLOC],
+       int  *status )
 {
 #undef context_name
 #undef context_message
@@ -258,83 +257,84 @@ int			  locator2_lenarg;
 #define context_message\
         "DAT_VEC: Error vectorising an HDS object."
 
-struct DSC		  locator1;
-struct DSC		  locator2;
-int			  locator1_len = locator1_lenarg;
-int			  locator2_len = locator2_lenarg;
+   struct DSC locator1;
+   struct DSC locator2;
 
-struct LCP		 *lcp1;
-struct LCP_DATA		 *data1;
-struct LCP_STATE	 *state1;
-struct LCP		 *lcp2;
-struct LCP_DATA		 *data2;
-struct LCP_STATE	 *state2;
-int			(*dbt)[2];
+   struct LCP       *lcp1;
+   struct LCP_DATA  *data1;
+   struct LCP_STATE *state1;
+   struct LCP       *lcp2;
+   struct LCP_DATA  *data2;
+   struct LCP_STATE *state2;
+   HDS_PTYPE        (*dbt)[2];
 
-/* Enter routine.	*/
+/* Enter routine.       */
 
-if (!_ok(*status))
-	return *status;
-hds_gl_status		= DAT__OK;
+   if (!_ok(*status))
+      return *status;
+   hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
+/* Import the source locator string and export the destination */
+/* locator string.*/
 
-_strimp(&locator1,locator1_str,&locator1_len);
-_strexp(&locator2,locator2_str,&locator2_len);
+     _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
+     _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
 
-/* Import the source locator.	*/
+/* Import the source locator.   */
 
-_call(dau_import_loc(&locator1, &lcp1))
-data1			= &lcp1->data;
-state1			= &data1->state;
+   _call(dau_import_loc( &locator1, &lcp1 ))
+   data1  = &lcp1->data;
+   state1 = &data1->state;
 
-/* Return if the object is discontiguous.	*/
+/* Return if the object is discontiguous.       */
 
-if (state1->broken)
-	_call(DAT__OBJIN)
+   if (state1->broken)
+      _call(DAT__OBJIN)
 
-/* Export the destination locator and copy all the LCP data fields.	*/
+/* Export the destination locator and copy all the LCP data fields.     */
 
-_call(dau_export_loc(&locator2, &lcp2))
-data2			= &lcp2->data;
-state2			= &data2->state;
-*data2 = *data1;
+   _call(dau_export_loc( &locator2, &lcp2 ))
+   data2  = &lcp2->data;
+   state2 = &data2->state;
+   *data2 = *data1;
 
-/* Clear the LCP state flags.	*/
+/* Clear the LCP state flags.   */
 
-state2->mapped		= 0;
-state2->vmcopy		= 0;
-state2->unlike		= 0;
-state2->slice		= 0;
-state2->cell		= 0;
-state2->vector		= 0;
-state2->broken		= 0;
+   state2->mapped = 0;
+   state2->vmcopy = 0;
+   state2->unlike = 0;
+   state2->slice  = 0;
+   state2->cell   = 0;
+   state2->vector = 0;
+   state2->broken = 0;
 
-/* Mark the object as a vector.	*/
+/* Mark the object as a vector. */
 
-data2->naxes		= 1;
-state2->vector		= 1;
-dbt			= data2->bounds;
-dbt[0][LOWER]		= 1;
-dbt[0][UPPER]		= data2->size;
-return hds_gl_status;
+   data2->naxes   = 1;
+   state2->vector = 1;
+   dbt            = data2->bounds;
+   dbt[0][LOWER]  = 1;
+   dbt[0][UPPER]  = data2->size;
+     
+   return hds_gl_status;
 }
-
-   F77_INTEGER_FUNCTION(dat_coerc)
-                       (locator1_str,ndim,locator2_str,status,
-	   locator1_lenarg,locator2_lenarg)
+
+/* F77_INTEGER_FUNCTION(dat_coerc)(struct STR *locator1_str,
+ *                                F77_INTEGER_TYPE *ndim,
+ *                                struct STR *locator2_str,
+ *                                F77_INTEGER_TYPE *status
+ *                               TRAIL(locator1_str)
+ *                               TRAIL(locator2_str) )
+ */
 
 /*=================================*/
 /* DAT_COERC - Coerce object shape */
 /*=================================*/
-
-struct STR	 	 *locator1_str;
-int			 *ndim;
-struct STR	 	 *locator2_str;
-int			 *status;
-int			  locator1_lenarg;
-int			  locator2_lenarg;
-
+int
+datCoerc(char locator1_str[DAT__SZLOC],
+         int ndim,
+         char locator2_str[DAT__SZLOC],
+         int *status)
 {
 #undef context_name
 #undef context_message
@@ -342,93 +342,92 @@ int			  locator2_lenarg;
 #define context_message\
         "DAT_COERC: Error coercing an HDS object to change its shape."
 
-struct DSC		  locator1;
-struct DSC		  locator2;
-int			  locator1_len = locator1_lenarg;
-int			  locator2_len = locator2_lenarg;
+   struct DSC locator1;
+   struct DSC locator2;
 
-struct LCP		 *lcp1;
-struct LCP_DATA		 *data1;
-struct LCP		 *lcp2;
-struct LCP_DATA		 *data2;
-struct LCP_STATE	 *state2;
-int			  axis[DAT__MXDIM];
-int			(*dbt)[2];
-int			  naxes;
-int			  i;
+   struct LCP       *lcp1;
+   struct LCP_DATA  *data1;
+   struct LCP       *lcp2;
+   struct LCP_DATA  *data2;
+   struct LCP_STATE *state2;
+   HDS_PTYPE        axis[DAT__MXDIM];
+   HDS_PTYPE        (*dbt)[2];
+   int              naxes;
+   int              i;
 
-/* Enter routine.	*/
+/* Enter routine.       */
 
-if (!_ok(*status))
-	return *status;
-hds_gl_status	= DAT__OK;
+   if (!_ok(*status))
+      return *status;
+   hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
+/* Import the source locator string and export the destination locator       */
+/* string.                                                                   */
 
-_strimp(&locator1,locator1_str,&locator1_len);
-_strexp(&locator2,locator2_str,&locator2_len);
+   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
+   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
 
-/* Import the source locator.	*/
+/* Import the source locator.   */
 
-_call(dau_import_loc(&locator1, &lcp1))
-data1		= &lcp1->data;
+   _call(dau_import_loc( &locator1, &lcp1 ))
+   data1 = &lcp1->data;
 
-/* Ensure that the requested # dimensions is valid.	*/
+/* Ensure that the requested # dimensions is valid.     */
 
-if (*ndim < 1 || *ndim > DAT__MXSLICE)
-	_call(DAT__DIMIN)
+   if (ndim < 1 || ndim > DAT__MXSLICE)
+      _call(DAT__DIMIN)
 
 /* Get the current object shape and return if any discarded dimension
-   sizes are not 1.	*/
+   sizes are not 1.     */
 
-_call(dau_get_shape(data1, &naxes, axis))
-for (i=(*ndim); i<naxes; i++)
-	if (axis[i] != 1)
-		_call(DAT__DIMIN)
+   _call(dau_get_shape( data1, &naxes, axis ))
+   for (i=ndim; i<naxes; i++)
+      if (axis[i] != 1)
+         _call(DAT__DIMIN)
 
-/* Export the destination locator and copy all the LCP data fields.	*/
+/* Export the destination locator and copy all the LCP data fields.     */
 
-_call(dau_export_loc(&locator2, &lcp2))
-data2		= &lcp2->data;
-state2		= &data2->state;
-*data2 = *data1;
+   _call(dau_export_loc( &locator2, &lcp2 ))
+   data2  = &lcp2->data;
+   state2 = &data2->state;
+   *data2 = *data1;
 
-/* Clear the LCP state flags.	*/
+/* Clear the LCP state flags.   */
 
-state2->mapped	= 0;
-state2->vmcopy	= 0;
-state2->unlike	= 0;
-state2->slice	= 0;
-state2->cell	= 0;
-state2->vector	= 0;
-state2->broken	= 0;
+   state2->mapped = 0;
+   state2->vmcopy = 0;
+   state2->unlike = 0;
+   state2->slice  = 0;
+   state2->cell   = 0;
+   state2->vector = 0;
+   state2->broken = 0;
 
-/* Coerce the shape.	*/
+/* Coerce the shape.    */
 
-data2->naxes	= *ndim;
-dbt		= data2->bounds;
-for (i=naxes; i<(*ndim); i++)
-	{
-	dbt[i][LOWER] = 1;
-	dbt[i][UPPER] = 1;
-	}
-return hds_gl_status;
+   data2->naxes = ndim;
+   dbt = data2->bounds;
+   for (i=naxes; i<ndim; i++)
+   {
+      dbt[i][LOWER] = 1;
+      dbt[i][UPPER] = 1;
+   }
+   return hds_gl_status;
 }
-
-   F77_INTEGER_FUNCTION(dat_clone)
-                       (locator1_str,locator2_str,status,
-	   locator1_lenarg,locator2_lenarg)
+
+/*F77_INTEGER_FUNCTION(dat_clone)(struct STR *locator1_str,
+ *                               struct STR *locator2_str,
+ *                               F77_INTEGER_TYPE *status
+ *                               TRAIL(locator1_str)
+ *                               TRAIL(locator2_str) )
+ */
 
 /*===========================*/
 /* DAT_CLONE - Clone locator */
 /*===========================*/
-
-struct STR	 	 *locator1_str;
-struct STR	 	 *locator2_str;
-int			 *status;
-int			  locator1_lenarg;
-int			  locator2_lenarg;
-
+int
+datClone(char locator1_str[DAT__SZLOC],
+         char locator2_str[DAT__SZLOC],
+         int *status)
 {
 #undef context_name
 #undef context_message
@@ -436,49 +435,51 @@ int			  locator2_lenarg;
 #define context_message\
         "DAT_CLONE: Error cloning (duplicating) an HDS locator."
 
-struct DSC		  locator1;
-struct DSC		  locator2;
-int			  locator1_len = locator1_lenarg;
-int			  locator2_len = locator2_lenarg;
+   struct DSC locator1;
+   struct DSC locator2;
 
-struct LCP		 *lcp1;
-struct LCP_DATA		 *data1;
-struct LCP		 *lcp2;
-struct LCP_DATA		 *data2;
-struct LCP_STATE	 *state2;
+   struct LCP       *lcp1;
+   struct LCP_DATA  *data1;
+   struct LCP       *lcp2;
+   struct LCP_DATA  *data2;
+   struct LCP_STATE *state2;
 
-/* Enter routine.	*/
+/* Enter routine.       */
 
-if (!_ok(*status))
-	return *status;
-hds_gl_status	= DAT__OK;
+   if (!_ok(*status))
+      return *status;
+   hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
+/* Import the source locator string and export the destination               */
+/* locator string.                                                           */
 
-_strimp(&locator1,locator1_str,&locator1_len);
-_strexp(&locator2,locator2_str,&locator2_len);
+   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
+   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
 
-/* Import the source locator.	*/
+/* Import the source locator.   */
 
-_call(dau_import_loc(&locator1, &lcp1))
-data1		= &lcp1->data;
+   _call(dau_import_loc( &locator1, &lcp1 ))
+   data1 = &lcp1->data;
 
-/* Export the destination locator and copy all the LCP data fields.	*/
+/* Export the destination locator and copy all the LCP data fields.     */
 
-_call(dau_export_loc(&locator2, &lcp2))
-data2		= &lcp2->data;
-state2		= &data2->state;
-*data2 = *data1;
+   _call(dau_export_loc( &locator2, &lcp2 ))
+   data2  = &lcp2->data;
+   state2 = &data2->state;
+   *data2 = *data1;
 
-/* Ensure that the mapped data flags are cleared.	*/
+/* Ensure that the mapped data flags are cleared.       */
 
-state2->mapped	= 0;
-state2->vmcopy	= 0;
-state2->unlike	= 0;
-return hds_gl_status;
+   state2->mapped = 0;
+   state2->vmcopy = 0;
+   state2->unlike = 0;
+
+   return hds_gl_status;
 }
-
-dat1_get_off(ndim,dims,subs,offset)
+
+int
+dat1_get_off(int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs, 
+             unsigned INT_BIG *offset)
 
 /*+
  * GET_OFF - Get offset (from subscripts)
@@ -488,39 +489,33 @@ dat1_get_off(ndim,dims,subs,offset)
  *
  * Calling sequence:
  *
- * 	  GET_OFF(NDIM,DIMS,SUBS,OFFSET)
+ *        GET_OFF(NDIM,DIMS,SUBS,OFFSET)
  *
- * NDIM	  is the number of dimensions.
+ * NDIM   is the number of dimensions.
  * DIMS   is the address of a longword vector whose elements contain the
- *	  size of each dimension.
+ *        size of each dimension.
  * SUBS   is the address of a longword vector whose elements contain the
- *	  subscript for each dimension.
+ *        subscript for each dimension.
  * OFFSET is the address of a longword which is to receive the zero-based
- *	  offset.
+ *        offset.
  *
  * Routine value:
  *
- * 	  DAT__OK    if successful.
- * 	  DAT__SUBIN if any of the subscripts are outside the corresponding
- *	    	     dimension bound.
+ *        DAT__OK    if successful.
+ *        DAT__SUBIN if any of the subscripts are outside the corresponding
+ *                   dimension bound.
  */
-
-int	  		  ndim;
-int			 *dims;
-int			 *subs;
-unsigned int		 *offset;
-
 {
-int stride;
-int i;
+   INT_BIG stride;
+   int i;
 
-stride  = 1;
-*offset = 0;
-for (i=0; i<ndim; i++)
-	{
-	if (subs[i]>dims[i] || subs[i]<1) return hds_gl_status = DAT__SUBIN;
-	*offset += (subs[i]-1) * stride;
-	stride  *= dims[i];
-	}
-return hds_gl_status;
+   stride  = 1;
+   *offset = 0;
+   for (i=0; i<ndim; i++)
+   {
+      if (subs[i]>dims[i] || subs[i]<1) return hds_gl_status = DAT__SUBIN;
+      *offset += (subs[i]-1) * stride;
+      stride  *= dims[i];
+   }
+   return hds_gl_status;
 }

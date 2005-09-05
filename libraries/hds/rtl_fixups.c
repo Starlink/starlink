@@ -1,12 +1,17 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 /* Routines which fix up deficiencies in the run-time-libraries of various  */
-/* machines. At present, routines are only needed for SUN4 systems.	    */
+/* machines. */
 
-#if defined( sun4 )
+#if HAVE_STDDEF_H
+#  include <stddef.h>
+#endif
 
-#include <stddef.h>
 #include <stdio.h>
 
+#if !HAVE_ATEXIT
    int atexit( void ( *func ) ( void ) )
    {
 /*+									    */
@@ -47,8 +52,12 @@
 /*-									    */
 
 /* External References:							    */
+#if HAVE_ON_EXIT
       int on_exit( void ( *func ) ( ), int arg ); /* Name termination	    */
 						  /* handler		    */
+#else
+   Error neither on_exit nor atexit are available
+#endif
 
 /*.									    */
 
@@ -57,6 +66,12 @@
       return on_exit( func, 0 );
    }
 
+#else
+/* Dummy function so the compiler has something to do */
+void hds_rtl_fixup_on_exit_dummy () {}
+#endif
+
+#if !HAVE_MEMMOVE
    void *memmove( void *s, const void *ct, size_t n )
    {
 /*+									    */
@@ -130,7 +145,12 @@
 /* Exit the routine.							    */
       return s;
    }
+#else
+/* Dummy function so the compiler has something to do */
+void hds_rtl_fixup_memmove_dummy () {}
+#endif
 
+#if !HAVE_STRERROR
    char *strerror( int errnum )
    {
 /*+									    */
@@ -202,12 +222,7 @@
          return nomsg;
       }
    }
-
-/* End of SUN4-specific routines.					    */
 #else
-
-/* For all other machines, just define a null function to stop the compiler */
-/* complaining about finding nothing in the file.			    */
-      void hds1_void( void ){}
-
+/* Dummy function so the compiler has something to do */
+void hds_rtl_fixup_strerror_dummy () {}
 #endif

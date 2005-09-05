@@ -1,4 +1,6 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 /* C include files:							    */
 /* ===============							    */
@@ -29,7 +31,7 @@
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "rec1.h"		 /* Internal rec_ definitions		    */
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
-#include "win_fixups.h"          /* Windows special functions */
+#include "win_fixups.h"          /* Windows special functions               */
 
    void rec1_create_file( int expand, const char *file, INT file_len,
 			  INT size, INT *slot, INT *alq )
@@ -88,6 +90,7 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -120,6 +123,8 @@
 /*	 Improved error reporting in portable implementation by		    */
 /*	 categorising possible error conditions. Also added initial file    */
 /*	 extension to portable version. Added expand parameter.		    */
+/*    6-MAY-2004 (BKM):                                                     */
+/*       Set appropriate FCV bit for 64-bit files                           */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -139,7 +144,7 @@
       struct RAB rab;		 /* RMS RAB block			    */
 
 #else				 /* Portable version local variables:	    */
-      FILE *iochan;		 /* File I/O stream			    */
+      FILE *iochan=NULL;	 /* File I/O stream			    */
       struct stat statbuf;	 /* Buffer for file status information	    */
 #endif
 
@@ -149,7 +154,7 @@
       char *fns;		 /* Pointer to file name string		    */
       struct FCV *fcv;		 /* Pointer to File Control Vector element  */
       struct FID *fid;		 /* Pointer to File ID			    */
-
+      INT_BIG alql;              /* Temporary variable to return file size  */
 /*.									    */
 
 /* Check the inherited global status.					    */
@@ -475,6 +480,7 @@ name cannot be used to create a new container file.",
 	 fcv->locked = 0;
 	 fcv->hcb = NULL;
 	 fcv->hcbmodify = 0;
+         fcv->hds_version = ( hds_gl_64bit ? REC__VERSION4 : REC__VERSION3 );
 
 /* Extend the file to the required size.				    */
 
@@ -488,7 +494,8 @@ name cannot be used to create a new container file.",
 /* Portable version:							    */
 /* ================							    */
 #else
-         rec1_extend_file( *slot, size, alq );
+         rec1_extend_file( *slot, (INT_BIG) size, &alql);
+         *alq = alql;
 #endif
       }
 

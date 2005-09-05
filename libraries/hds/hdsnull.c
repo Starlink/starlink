@@ -1,4 +1,7 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 /*======================================*/
 /* HDS_NULL - Replace obsolete routines */
 /*======================================*/

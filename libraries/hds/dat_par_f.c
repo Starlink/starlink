@@ -1,59 +1,61 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "hds1.h"		 /* Global definitions for HDS		    */
-#include "rec.h"		 /* Public rec_ definitions		    */
-#include "dat1.h"		 /* Internal dat_ definitions		    */
+#include "hds1.h"                /* Global definitions for HDS              */
+#include "rec.h"                 /* Public rec_ definitions                 */
+#include "dat1.h"                /* Internal dat_ definitions               */
 
    int main( int argc, char *argv[] )
    {
-/* Name:								    */
-/*    dat_par_f								    */
+/* Name:                                                                    */
+/*    dat_par_f                                                             */
 
-/* Purpose:								    */
-/*    Generate the Fortran dat_par(.f) public include file for HDS.	    */
+/* Purpose:                                                                 */
+/*    Generate the Fortran dat_par(.f) public include file for HDS.         */
 
-/* Type of Module:							    */
-/*    Main Program.							    */
+/* Type of Module:                                                          */
+/*    Main Program.                                                         */
 
-/* Invocation:								    */
-/*    dat_par_f								    */
+/* Invocation:                                                              */
+/*    dat_par_f                                                             */
 
-/* Parameters:								    */
-/*    None.								    */
+/* Parameters:                                                              */
+/*    None.                                                                 */
 
-/* Description:								    */
-/*    This program is used to generate the Fortran public include file	    */
+/* Description:                                                             */
+/*    This program is used to generate the Fortran public include file      */
 /*    dat_par(.f) for use by software which calls HDS routines. This method */
-/*    is used so that this file may contain constants whose value is	    */
-/*    determined by the C compiler at compile time, depending on such	    */
+/*    is used so that this file may contain constants whose value is        */
+/*    determined by the C compiler at compile time, depending on such       */
 /*    things as the size of internal HDS structures which are not public.   */
-/*    The dat_par(.f) file contents are written to the standard output.	    */
+/*    The dat_par(.f) file contents are written to the standard output.     */
 
-/* Copyright:								    */
+/* Copyright:                                                               */
 /*    Copyright (C) 1998 Central Laboratory of the Research Councils        */
 
-/* Authors:								    */
-/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)				    */
-/*    {enter_new_authors_here}						    */
+/* Authors:                                                                 */
+/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
+/*    {enter_new_authors_here}                                              */
 
-/* History:								    */
-/*    7-JUL-1993 (RFWS):						    */
-/*       Original version.						    */
-/*    {enter_changes_here}						    */
+/* History:                                                                 */
+/*    7-JUL-1993 (RFWS):                                                    */
+/*       Original version.                                                  */
+/*    {enter_changes_here}                                                  */
 
-/* Bugs:								    */
-/*    {note_any_bugs_here}						    */
+/* Bugs:                                                                    */
+/*    {note_any_bugs_here}                                                  */
 
-/*-									    */
+/*-                                                                         */
 
-/*.									    */
+/*.                                                                         */
 
-/* Write out the contents of the dat_par(.f) file, leaving the constant	    */
-/* values to be filled in.						    */
+/* Write out the contents of the dat_par(.f) file, leaving the constant     */
+/* values to be filled in.                                                  */
       (void) printf( "\
 *+\n\
 *  Name:\n\
@@ -125,11 +127,11 @@
 \n\
 *.\n",
 
-/* Specify the constant values.						    */
+/* Specify the constant values.                                             */
       DAT__MXDIM, DAT__SZLOC, DAT__NOLOC, DAT__NOWLD, DAT__ROOT, DAT__SZGRP,
       DAT__SZMOD, DAT__SZNAM, DAT__SZTYP );
 
-/* End of program.							    */
+/* End of program.                                                          */
       exit( 0 );
       return 0;
    }

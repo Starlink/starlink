@@ -62,4 +62,18 @@ struct STR
 	_dscinit(d,*(l),(c)->body)
 
 #endif
+
+/* Macros to handle null terminated strings - as in the C interface in HDS 4 */
+
+#define _strcsimp(d,c)\
+        _dscinit(d,strlen(c),c)
+
+#define _strcsexp(d,c)\
+        _dscinit(d,strlen(c),c)
+
+#define _strflcsimp(d,c,l)\
+        _dscinit(d,l,c)
+
+#define _strflcsexp(d,c,l)\
+        _dscinit(d,l,c)
 #endif

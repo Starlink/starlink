@@ -1,4 +1,7 @@
-#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "hds1.h"		 /* Global definitions for HDS		    */
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "rec1.h"		 /* Internal rec_ definitions		    */
@@ -39,11 +42,14 @@
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
+/*    BKM:  B.K, McIlwrath    (STARLINK)                                    */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
 /*    14-APR-1991 (RFWS):						    */
 /*       Added prologue and error handling and tidied.			    */
+/*    19-APR-2004 (BKM):                                                    */
+/*       Revise for 64-bit HDS files.                                       */
 /*    {@enter_changes_here@}						    */
 
 /* Bugs:								    */
@@ -52,7 +58,7 @@
 /*-									    */
 
 /* Local Variables:							    */
-
+      struct RCL rcl;
 /*.									    */
 
 /* Check the inherited global status.					    */
@@ -63,6 +69,7 @@
       han->slot = kin->slot;
       han->read = kin->read;
       han->rid = *rid;
+      rec_get_rcl(han, &rcl);
 
 /* Return the current global status value.				    */
       return hds_gl_status;
