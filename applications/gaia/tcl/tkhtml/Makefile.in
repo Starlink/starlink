@@ -1,5 +1,7 @@
 CC = @CC@
-CFLAGS = -I@TCL_EXEC_PREFIX@/include @CFLAGS@
+CFLAGS = @CFLAGS@
+INCLUDES = -I. -I@TCL_EXEC_PREFIX@/include
+CC_SWITCHES = $(CFLAGS) $(INCLUDES)
 RANLIB = @RANLIB@
 INSTALL = @INSTALL@
 PREFIX = @prefix@
@@ -8,43 +10,43 @@ LIBDIR = @LIBDIR@
 all:	libtkhtml.a
 
 htmlcmd.o:	htmlcmd.c htmlcmd.h
-	$(CC) $(CFLAGS) -I. -o htmlcmd.o -c htmlcmd.c
+	$(CC) $(CC_SWITCHES)  -o htmlcmd.o -c htmlcmd.c
 
 htmldraw.o:	htmldraw.c htmldraw.h
-	$(CC) $(CFLAGS) -I. -o htmldraw.o -c htmldraw.c
+	$(CC) $(CC_SWITCHES)  -o htmldraw.o -c htmldraw.c
 
 htmlform.o:	htmlform.c htmlform.h
-	$(CC) $(CFLAGS) -I. -o htmlform.o -c htmlform.c
+	$(CC) $(CC_SWITCHES)  -o htmlform.o -c htmlform.c
 
 htmlimage.o:	htmlimage.c htmlimage.h
-	$(CC) $(CFLAGS) -I. -o htmlimage.o -c htmlimage.c
+	$(CC) $(CC_SWITCHES)  -o htmlimage.o -c htmlimage.c
 
 htmlindex.o:	htmlindex.c htmlindex.h
-	$(CC) $(CFLAGS) -I. -o htmlindex.o -c htmlindex.c
+	$(CC) $(CC_SWITCHES)  -o htmlindex.o -c htmlindex.c
 
 htmllayout.o:	htmllayout.c htmllayout.h
-	$(CC) $(CFLAGS) -I. -o htmllayout.o -c htmllayout.c
+	$(CC) $(CC_SWITCHES)  -o htmllayout.o -c htmllayout.c
 
 htmlparse.o:	htmlparse.c htmlparse.h
-	$(CC) $(CFLAGS) -I. -o htmlparse.o -c htmlparse.c
+	$(CC) $(CC_SWITCHES)  -o htmlparse.o -c htmlparse.c
 
 htmlsizer.o:	htmlsizer.c htmlsizer.h
-	$(CC) $(CFLAGS) -I. -o htmlsizer.o -c htmlsizer.c
+	$(CC) $(CC_SWITCHES)  -o htmlsizer.o -c htmlsizer.c
 
 htmltable.o:	htmltable.c htmltable.h
-	$(CC) $(CFLAGS) -I. -o htmltable.o -c htmltable.c
+	$(CC) $(CC_SWITCHES)  -o htmltable.o -c htmltable.c
 
 htmltest.o:	htmltest.c htmltest.h
-	$(CC) $(CFLAGS) -I. -o htmltest.o -c htmltest.c
+	$(CC) $(CC_SWITCHES)  -o htmltest.o -c htmltest.c
 
 htmlurl.o:	htmlurl.c htmlurl.h
-	$(CC) $(CFLAGS) -I. -o htmlurl.o -c htmlurl.c
+	$(CC) $(CC_SWITCHES)  -o htmlurl.o -c htmlurl.c
 
 htmlwidget.o:	htmlwidget.c htmlwidget.h
-	$(CC) $(CFLAGS) -I. -o htmlwidget.o -c htmlwidget.c
+	$(CC) $(CC_SWITCHES)  -o htmlwidget.o -c htmlwidget.c
 
 htmltokens.o:	htmltokens.c htmltokens.h
-	$(CC) $(CFLAGS) -I. -o htmltokens.o -c htmltokens.c
+	$(CC) $(CC_SWITCHES)  -o htmltokens.o -c htmltokens.c
 
 libtkhtml.a:	htmlcmd.o htmldraw.o htmlform.o htmlimage.o htmlindex.o htmllayout.o htmlparse.o htmlsizer.o htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o
 	ar cr libtkhtml.a htmlcmd.o htmldraw.o htmlform.o htmlimage.o htmlindex.o htmllayout.o htmlparse.o htmlsizer.o htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o
