@@ -473,7 +473,7 @@ void func_two_() { return; }
         # used do only the single-underscore mangling.
         for opt in "" "-fno-second-underscore"
         do
-            if $FC $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
+            if $FC $FCFLAGS $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
             then
                 star_cv_cnf_compatible_symbols=$opt
                 break
