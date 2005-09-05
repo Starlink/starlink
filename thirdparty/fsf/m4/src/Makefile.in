@@ -38,7 +38,7 @@ transform = @program_transform_name@
 bindir = $(exec_prefix)/bin
 
 COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
-LINK = $(CC) $(LDFLAGS) -o $@
+LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
 .SUFFIXES:
 .SUFFIXES: .c .o
