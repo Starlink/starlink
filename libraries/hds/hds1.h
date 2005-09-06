@@ -5,7 +5,7 @@
 /* ===============							    */
 #include <limits.h>
 #include <string.h>
-#if defined( HAVE_CONFIG_H )    /* configure definitions                    */
+#if HAVE_CONFIG_H               /* configure definitions                    */
 #include <config.h>
 #endif
 
@@ -32,7 +32,7 @@
 #define HDS__MAPSPARSE 1	 /* Mapping best for sparse access?	    */
 #define HDS__MAPMEM 1		 /* Mapping best to reduce memory usage?    */
 
-#elif defined( _mmap) || defined( HAVE_MMAP ) 
+#elif defined( _mmap) || HAVE_MMAP
                                  /* UNIX implementation using mmap:	    */
 #define HDS__CANMAP 1		 /* File mapping supported?		    */
 #define HDS__MAPSEQ 1		 /* Mapping best for sequential access?	    */
@@ -75,7 +75,7 @@
 /* ================							    */
 /* Use vfork for more efficient child process creation if supported,	    */
 /* otherwise use the POSIX.1 fork function.				    */
-#if defined( _vfork ) || defined( HAVE_WORKING_VFORK )
+#if defined( _vfork ) || HAVE_WORKING_VFORK
 #define _fork vfork
 #else
 #define _fork fork
