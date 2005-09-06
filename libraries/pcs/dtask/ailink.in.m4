@@ -461,12 +461,12 @@ fi
 ## in ways which are not appropriate for these compile/link commands,
 ## since they are working in a different directory, building some completely
 ## different application or library.
-cmpdtask="$LIBTOOL --mode=compile @FC@ $extra_mode_args @STAR_FCFLAGS@ \
+cmpdtask="$LIBTOOL --mode=compile @FC@ @FCFLAGS@ $extra_mode_args @STAR_FCFLAGS@ \
         -c dtask_applic.f"
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
-linkcmd="$LIBTOOL --mode=link @FC@ $extra_mode_args @STAR_LDFLAGS@ \
+linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $extra_mode_args @STAR_LDFLAGS@ \
         -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
