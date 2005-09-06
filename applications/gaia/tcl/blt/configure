@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP GCCFLAGS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LN_S SHLIB_CFLAGS SHLIB_TARGET SHLIB_LD SHLIB_LD_FLAGS SHLIB_LD_LIBS SHLIB_LIBS SHLIB_SUFFIX EXTRA_LDFLAGS INCLUDES BLT_MAJOR_VERSION BLT_MINOR_VERSION BLT_VERSION AUX_LIBS BLT_LIBRARY LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os EGREP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP GCCFLAGS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LN_S SHLIB_CFLAGS SHLIB_TARGET SHLIB_LD SHLIB_LD_FLAGS SHLIB_LD_LIBS SHLIB_LIBS SHLIB_SUFFIX EXTRA_LDFLAGS INCLUDES BLT_MAJOR_VERSION BLT_MINOR_VERSION BLT_VERSION AUX_LIBS BLT_LIBRARY LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1460,6 +1460,21 @@ test -n "$target_alias" &&
   test "$program_prefix$program_suffix$program_transform_name" = \
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
+echo "$as_me:$LINENO: checking for egrep" >&5
+echo $ECHO_N "checking for egrep... $ECHO_C" >&6
+if test "${ac_cv_prog_egrep+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
+    then ac_cv_prog_egrep='grep -E'
+    else ac_cv_prog_egrep='egrep'
+    fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
+echo "${ECHO_T}$ac_cv_prog_egrep" >&6
+ EGREP=$ac_cv_prog_egrep
+
+
 
 # -----------------------------------------------------------------------
 #
@@ -2685,21 +2700,6 @@ if test "x${GCC}" != "x" ; then
 else
   echo "$as_me:$LINENO: checking if C compiler is really gcc" >&5
 echo $ECHO_N "checking if C compiler is really gcc... $ECHO_C" >&6
-
-
-echo "$as_me:$LINENO: checking for egrep" >&5
-echo $ECHO_N "checking for egrep... $ECHO_C" >&6
-if test "${ac_cv_prog_egrep+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
-    then ac_cv_prog_egrep='grep -E'
-    else ac_cv_prog_egrep='egrep'
-    fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
-echo "${ECHO_T}$ac_cv_prog_egrep" >&6
- EGREP=$ac_cv_prog_egrep
 
 
 cat >conftest.$ac_ext <<_ACEOF
@@ -4905,16 +4905,16 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-#ifdef HAVE_FLOAT_H
+#if HAVE_FLOAT_H
 #include <float.h>
 #endif
 #ifdef DBL_EPSILON
- yes
+present_and_correct
 #endif
 
 _ACEOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "yes" >/dev/null 2>&1; then
+  $EGREP "present_and_correct" >/dev/null 2>&1; then
   blt_cv_found_dbl_epsilon=yes
 else
   blt_cv_found_dbl_epsilon=no
@@ -6603,7 +6603,7 @@ fi
     SHLIB_CFLAGS="-KPIC"
     SHLIB_LD="/usr/ccs/bin/ld"
     SHLIB_LD_FLAGS="-G -z text"
-    SHLIB_LD_LIBS="${bltLibraries}"
+    SHLIB_LD_LIBS="$(bltLibraries)"
 
     bltLibraries="${bltLibraries} -ldl"
     LDFLAGS="-R ${bltRunPath}"
@@ -7341,6 +7341,7 @@ s,@target@,$target,;t t
 s,@target_cpu@,$target_cpu,;t t
 s,@target_vendor@,$target_vendor,;t t
 s,@target_os@,$target_os,;t t
+s,@EGREP@,$EGREP,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
@@ -7349,7 +7350,6 @@ s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
-s,@EGREP@,$EGREP,;t t
 s,@GCCFLAGS@,$GCCFLAGS,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t

@@ -43,6 +43,7 @@ AC_ARG_WITH(cflags, [  --with-cflags=FLAGS  	  set compiler flags to FLAGS],
   blt_ckcmd_cflags="$with_cflags")
 
 AC_CANONICAL_SYSTEM
+AC_PROG_EGREP
 
 # -----------------------------------------------------------------------
 #
@@ -264,13 +265,12 @@ AC_MSG_RESULT([$blt_cv_struct_wait_works])
 
 AC_MSG_CHECKING([whether DBL_EPSILON is defined in float.h])
 AC_CACHE_VAL(blt_cv_found_dbl_epsilon,
-    AC_EGREP_CPP(yes,	
-   [
-#ifdef HAVE_FLOAT_H
+    AC_EGREP_CPP([present_and_correct],	[
+#if HAVE_FLOAT_H
 #include <float.h>
 #endif
 #ifdef DBL_EPSILON
- yes
+present_and_correct
 #endif
 ], blt_cv_found_dbl_epsilon=yes, blt_cv_found_dbl_epsilon=no) 
 )
