@@ -128,27 +128,27 @@ char * NBS_ALLOC( int );
 char * NBS_DATA_ALLOC( int );
 char * NBS_DEINIT_ALLOC ();
 void NBS_WRITE_FILE( RW_CHARACTER(), RW_BYTE_ARRAY(), int, int, int,
-		     W_INTEGER() TRAIL() );
+		     W_INTEGER() TRAIL(arg) );
 void NBS_OPEN_FILE( RW_CHARACTER(), FILE**, W_INTEGER(), W_INTEGER(),
-		    W_INTEGER(), W_INTEGER() TRAIL() );
+		    W_INTEGER(), W_INTEGER() TRAIL(arg) );
 void NBS_READ_FILE ( FILE *, int, RW_BYTE_ARRAY(), W_INTEGER());
 void NBS_CLOSE_FILE( RW_POINTER() );
 void NBS_OPEN_WRITE( char*, FILE**, int*);
 void NBS_UPDATE_FILE(FILE*, char*, int, int*);
 char *NBS_CREATE_SECTION ( RW_CHARACTER(), int,
-                           W_INTEGER() TRAIL() );
-char *NBS_MAP_SECTION( RW_CHARACTER(), W_INTEGER() TRAIL() );
+                           W_INTEGER() TRAIL(arg) );
+char *NBS_MAP_SECTION( RW_CHARACTER(), W_INTEGER() TRAIL(arg) );
 void NBS_UNMAP_SECTION ( RW_POINTER(), int, W_INTEGER() );
 void NBS_RELOCATE_POINTERS( item_id, int, int, int, int);
 void NBS_RELOCATE_ITEM( item_id, int, int, int, int );
 char *NBS_RELOCATE_ADDRESS( char *, int, int );
 #ifdef c_string
-char *NBS_STRIMP ( char *, RW_CHARACTER(), int TRAIL() );
-void NBS_STREXP( RW_CHARACTER(), char *, int TRAIL() );
+char *NBS_STRIMP ( char *, RW_CHARACTER(), int TRAIL(arg) );
+void NBS_STREXP( RW_CHARACTER(), char *, int TRAIL(arg) );
 #else
 /* These are macros to account for the TRAIL without having to include it */
-char * F77_EXTERNAL_NAME(nbs_strimp) ( char *, RW_CHARACTER(), int TRAIL() );
-void   F77_EXTERNAL_NAME(nbs_strexp) (RW_CHARACTER(), char *, int TRAIL() );;
+char * F77_EXTERNAL_NAME(nbs_strimp) ( char *, RW_CHARACTER(), int TRAIL(arg) );
+void   F77_EXTERNAL_NAME(nbs_strexp) (RW_CHARACTER(), char *, int TRAIL(arg) );;
 #endif
 
 /* Only used for C interface */
