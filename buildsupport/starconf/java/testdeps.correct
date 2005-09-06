@@ -69,13 +69,39 @@ zb:
   path=zb \
   --
 
+# List of all supported components
+SUPPORTED_COMPONENTS = \
+	$(MANIFESTS)/a \
+	$(MANIFESTS)/b \
+	$(MANIFESTS)/c \
+	$(MANIFESTS)/d \
+	$(MANIFESTS)/e \
+	$(MANIFESTS)/f \
+	$(MANIFESTS)/g \
+	$(MANIFESTS)/h \
+	$(MANIFESTS)/i \
+	$(MANIFESTS)/t \
+	$(MANIFESTS)/u \
+	$(MANIFESTS)/v \
+	$(MANIFESTS)/w \
+	$(MANIFESTS)/x \
+	$(MANIFESTS)/y \
+	$(MANIFESTS)/z \
+	$(MANIFESTS)/za \
+	$(MANIFESTS)/zb
 
 # Buildsupport tools -- building and cleaning
 BUILDSUPPORT_MANIFESTS =
   za
+# Buildsupport tools which are conditionally built
 EXTRA_BUILDSUPPORT_MANIFESTS =
 
+# Make all the buildsupport tools which are
+# unconditionally build
 buildsupport: $(BUILDSUPPORT_MANIFESTS)
+
+# Clean out the buildsupport tools,
+# including any conditionally built ones
 clean-buildsupport:
 	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
 
