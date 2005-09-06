@@ -4,8 +4,11 @@
 \RCS$Revision$
 \RCS$Date$
 
-\usepackage{url}
+\usepackage{url,prettyref}
 \usepackage[bookmarksopen,urlcolor=red]{hyperref}
+
+\newrefformat{s}{Sect.~\ref{#1}}
+\newrefformat{it}{item~\ref{#1}}
 
 \begin{document}
 
@@ -41,6 +44,8 @@ feature-discovery via GNU Autoconf.
 We describe here the practical lessons we learned from this
 experience, including the sometimes unexpected benefits and costs.
 
+XXX Expand
+
 % XXX Comment out before submission
 [Version \RCSRevision]
 \end{abstract}
@@ -59,12 +64,14 @@ reasons we made the decision to overhaul this build system, resulting
 in an CVS-plus-autoconf setup which is much more efficient for the
 developers, as well as more familiar to the users and and the
 community which will soon have to take a larger role in its maintainance.
-In Section~\ref{s:background} we elaborate the 
+In \prettyref{s:background} we elaborate the 
 motivations for this and the problems we faced; in
-Section~\ref{s:result} we briefly describe the resulting system; and
-in Section~\ref{s:lessons} we list some of the lessons we learned, in
+\prettyref{s:result} we briefly describe the resulting system; and
+in \prettyref{s:lessons} we list some of the lessons we learned, in
 the hope that these will be of use to other projects considering the
-same important move.
+same important move.  We discuss our typology of dependencies and its
+relations with other dependency systems, the management of the
+repository, and the overall architecture of the build system.
 
 We intend this article as practical advice from the front line, and
 hope it will be of use to others in the same position of trying to
@@ -75,7 +82,8 @@ interfaces to documentation style conventions.  At the same time, it
 was far from the worst, since the ad hoc features were confined within
 disciplined structures; and once-irksome coding standards documents and
 previous migrations meant that the code was maintainable and
-portable.  This was specifically a build-system migration, not a
+portable.  All our eccentricities were in our makefiles; our Fortran
+was a joy to behold.  This was specifically a build-system migration, not a
 porting project, and we expected to keep code changes to a bare minimum.
 
 
@@ -154,6 +162,54 @@ target platforms to those explicitly supported by the project.
 
 % Do we need to mention the age of the software -- crustiness?
 
+We also need our software to be portable in time.  Astronomical data
+has quite a long lifetime, and data is quite often useful a couple of
+decades after it is taken, and this gives us an archival
+responsibility for the software.  We can reasonably expect that people
+will want to build our software in a number of years' time, even in
+the absence of ongoing maintainance or traceable experts.  This
+requires a system with few surprises, good documentation, and a design
+sane enough to be usefully documented.
+
+Our overall goals, therefore, were various.
+\begin{enumerate}
+\item \label{it:portable}The resulting source code had to be portable,
+  covering as many Unix-like platforms as possible, and certainly our
+  original core set of RedHat, Solaris and DUX.  This comfortably
+  included MacOS\,X (though its ultra-fussy linker provided
+  entertaining challenges), and with rather more effort included
+  Cygwin.  As well, we aimed to avoid commitments to specific
+  distribution technologies such as RPM or Debian packages.
+\item The resulting system had to use only open-source tools, on the
+  multiple grounds that
+  (i) these are the tools our constituency would expect to use;
+  (ii) our archival responsibilities mean that the build software has
+  to be available, and if possible be well-known, a couple of decades
+  into the future.  This pushes us firmly toward non-commercial
+  software that can be embedded in the source code repository.
+\item \label{it:normal}
+  The system had to look as `normal' as possible, to stand any
+  chance of it being maintained on an ad-hoc basis.  Documentation
+  helps, of course, but the greater the proportion of the build system
+  that doesn't have to be documented, or the documentation left
+  unread, the greater the chance of fixes being made carefully, rather
+  than as hacks.  The archival concerns mean that the software has to
+  continue to look normal in the medium term: tools such as
+  \texttt{make} or CVS have sufficiently large commitments to them
+  (even though the latter is now dominated by Subversion for new
+  projects) that they will continue to be reasonably familiar to
+  developers for perhaps another couple of decades; we cannot say the
+  same for any specific packaging tool, for example.  The customised
+  autotools do not look normal in this sense, but their use is
+  unavoidable.
+%\item Related to the previous point, the system had to support
+%  developers interested in only a subset of the codebase
+\item The change to the build system had to involve as few as possible
+  changes to the bulk of our code-base.  Our code has some test
+  support, but it is not pervasive, and we could not practically
+  handle a large number of bugs being introduced simply by the changed
+  build system.
+\end{enumerate}
 
 
 \section{The Outcome}
@@ -190,6 +246,212 @@ buildsystem's maintainance.  It should
 be portable to other Unix-like systems, and in particular
 \textsc{posix} systems which include an X~server.
 
+\subsection{Overall architecture}
+\label{s:arch}
+
+Building from a freshly checked-out repository, or section of the
+repository, proceeds in four stages.
+\begin{enumerate}
+\item Bootstrap: We first build and install our patched versions of
+  the autotools, and then use them to build the makefiles and
+  configure scripts for the entire code-base.  This is a
+  time-consuming step, but the only way of avoiding it is to include
+  these generated files in the repository, which we discounted for the
+  reasons rehearsed in \prettyref{s:generated}.
+
+\item \label{it:configuredeps} Build configure dependencies: see
+  \prettyref{s:deps}.
+
+\item Configure: The entire tree is configured, using the
+  autoconf-generated scripts.  The autotools are built in the
+  bootstrap phase with a project-specific default installation
+  location, different from the autotools' default \texttt{/usr/local},
+  but that information is overridable here.  As part of this
+  configuration step, each component generates an XML file summarising
+  the component's metadata, such as name, version, maintainer,
+  dependencies and the like; this file is the component's principal
+  interface with the rest of the system.
+
+\item Finally, the software is built and installed.
+\end{enumerate}
+
+During the final build stage, each component is in turn built and
+immediately installed, in an order which respects the dependencies
+described in \prettyref{s:deps}.  The order is deduced by
+\texttt{make}, working on a set of dependencies between components
+expressed as dependencies between component `manifest files'; these
+contain component metadata, and are generated and installed as the
+final step of per-component installation, by makefile code which is
+generated by our modified \texttt{automake}.  This makes it possible
+to build either the entire software set, or only a specific package
+and its dependencies.
+
+An alternative strategy here would have been to use a packaging tool
+such as \texttt{dpkg}.  This would have advantage of a pre-existing
+dependencies model, at the cost of somewhat abusing that tool's aims
+(it is, after all, intended for managing ports rather than builds),
+including another layer of indirection along with its associated
+documentation costs, requiring to be included in our set of tracked
+sources (see \prettyref{s:tracking}), and marginally violating our
+`normality' constraint~\ref{it:normal} in \prettyref{s:background}.
+
+Another potential advantage of \texttt{dpkg} would be ready-made
+distributions, but since we aimed to be as promiscuous as possible in
+our support for packaging technology (\prettyref{it:portable} in
+\prettyref{s:background}), since we had component metadata in an
+easily reprocessed form (the component XML files mentioned above), and
+since our packaging requirements were not particularly intricate, we
+settled in the end on using the EPM package manager~\cite{epm} to
+generate Debian \texttt{.deb} files, OS\,X \texttt{.mpkg} files, RPMs
+and others.  This packaging aspect is not one of our core committments
+for the future, so we are not worried that we are using a
+still-developing and untracked tool.
+
+\subsection{Do not include generated code in the repository}
+\label{s:generated}
+
+In general, we feel that the disadvantages of including generated code
+in the repository (which includes makefiles and configure scripts)
+outweigh the advantages in all but a few cases where it is not
+practically avoidable.  The FAQ in the \texttt{automake} manual
+rehearses some of the arguments both for and against this practice,
+but the central problem is that checking files into and out of a
+repository can set file timestamps in such a way as to cause spurious
+regeneration of files in contexts where the generating tools are
+unavailable, or the wrong versions, or otherwise inappropriate (our
+actual experience was with CVS, but we doubt there is any reasonable
+model for a repository system which reliably avoids this problem).  Even
+with a full understanding of the software involved, it is hard to
+explain just why this happens \emph{so} often, why it causes \emph{so}
+much trouble when it happens, or why working around the trouble is
+quite \emph{so} very errorprone.  All we can say is that handling
+those few checked-in generated files that we could not avoid caused
+much more trouble and anguish than we were ever able to satisfactorily
+account for.
+
+Because we had our own versions of the autotools checked in to the
+repository, and built as part of the build system, we were not subject
+to the most prominent disadvantages of keeping generated files out of
+the repository, and were thus able to enjoy the advantages of
+robustness and predictability which flow from treating products as
+products.  The only disadvantages are that our `build support' tools
+(primarily the autotools) are an implicit additional dependency of all
+the components in the collection, and that the bootstrapping phase
+mentioned in \prettyref{s:arch} -- the phase during which these
+generated files are in fact produced -- is much more protracted than
+it would otherwise be.  Both of these turn out to be rather minor
+disadvantages in fact.
+
+The generated files that have nonetheless ended up checked-in are
+firstly those files used in the bootstrapping itself -- which means
+the makefiles and configure scripts of the build support tools, and
+the component metadata files -- and secondly the generated files in
+the tracked third party sources, because they are generated by tools,
+or versions of tools, which we do not have to hand.
+
+\subsection{Dependencies}
+\label{s:deps}
+
+Dependencies are a problem for any large project which is at all
+componentized.  We had evaded this problem before by having a magic
+shell script which built everything in a working order; apart from
+being ugly, this was no longer reasonable if we were to accomodate
+developers interested in only a subset of the codebase.  There are
+several systems in existence for expressing and managing dependencies
+between discrete software components, of which the best known are
+possibly the Debian and RPM package frameworks
+(see~\cite[ch~7]{debian05} and \url{http://www.rpm.org}).  Much of the
+literature on `dependency analysis' is concerned to discover
+fine-grained dependencies between modules or variables, as part of
+reverse-engineering or redocumenting software.  The broader question of
+inter-package dependencies is usually discussed in the context of
+specific software tools to discover the dependencies, for example in
+an early paper by Wilde and Huitt~\cite{wilde91} and in the context of
+large scientific codes by Tuura and Taylor~\cite{tuura01}.
+
+We identified no fewer than five distinct dependency types, which are
+broadly consistent with the typology discussed in these sources.
+
+First, \emph{sourceset dependencies} are the components which must be
+installed in order to build the complete set of sources, either for
+building or for distribution.  This means those tools which are used
+to build documentation or build generated and distributed sources.
+That is, these are dependencies which are necessary to bootstrap a
+freshly checked-out repository, but which are not dependencies for a
+distributed package.
+
+Next, a component's \emph{build dependencies} are the dependencies
+which are required in order to build it.  This most often implies
+files included during compilation, but also refers to project-specific
+tools -- for example to compile message files -- which must be run on
+the build host rather than the host which builds the distribution.
+The network of build dependencies must be non-cyclic.  These are most
+closely analogous to \texttt{dpkg}'s \texttt{Build-depend} dependencies.
+
+Thirdly, \emph{link dependencies} are the dependencies required to
+link against the libraries in a component. That means all the
+libraries that this component's libraries use. These are not
+necessarily build dependencies, since if you are building a
+library~$X$, which uses functions in library~$Y$, the library~$Y$ does
+not have to be present in order to build library~$X$, only when you
+subsequently want to actually link against it.  Thus there is no
+problem in having cyclic link dependencies.  For an application, on
+the other hand, all its link dependencies will actually be build
+dependencies and should be declared as such as well.
+
+This category is actually somewhat smaller than it might appear.  A
+C~library will typically (and ideally) have a set of header files
+containing C~prototypes which effectively describe the library's
+interface; since these header files will be included during the
+build of any software which uses the library, they must be
+installed at build time, and thus the library becomes a full build
+dependency.  The category was required because a large proportion of
+our libraries are Fortran libraries, for which there are
+(unfortunately!) no include files, so that mutually dependent
+libraries can in practice be built without difficulties; the fact that
+we discovered we did in fact have several such sets of cyclic
+dependencies meant that we had to rely on this unfortunate property in
+several places.
+
+There is a further justification for these link dependencies, which is
+that if we distribute binary packages using shared libraries, the
+dependencies between them will be this set of link dependencies (thus
+it is analogous to \texttt{dpkg}'s \texttt{Depend} dependencies,
+without the issue of pre- and post-configuration).  This is not fully
+worked out, however, since apart from a few tests, the project has not
+routinely distributed binary packages.
+
+There are some components which must be installed before the configure
+step, since they must be present in order for other packages to
+configure against them.  These \emph{configure dependencies} are built
+prior to tree-wide configuration, in step~\ref{it:configuredeps} of
+\prettyref{s:arch}.  Because this heavily subverted the build order,
+we kept this set as small as possible, and it turned out to include
+only a couple of third party libraries, which other components
+searched for during configuration.
+
+The final dependency category is that of \emph{use dependencies}.
+These are the components which a given component requires in order to
+function, but which are not link dependencies -- this rather small set
+includes, for us, only a small number of cases where a library uses a
+separate application to do some of its work.  These are irrelevant for
+the build (this is the difference from link dependencies), but would
+be essential for packaging and distribution.
+
+%% All these relationships are transitive: if A has a build dependency on
+%% B, and B has one on C, then A has a build dependency on C. You can
+%% augment this by using the final `option' argument: if, in component
+%% A's configure.ac, you say \verb|STAR_DECLARE_DEPENDENCIES(build, B, link)|,
+%% then you declare that A has a build-time dependency on B, but that
+%% (presumably because B is a component consisting entirely or mostly of
+%% libraries) you need to link against B, so component A has a dependency
+%% on all of B's link dependencies, not just its build dependencies. An
+%% application component should generally declare such a dependency for
+%% each of the libraries it depends on. This is (I believe) the only case
+%% where this `option' attribute is useful, though it is legal for each
+%% of the dependency types.
+
+Debugging dependencies?  Peter's multi-build.  Hard to be sure.
 
 
 \section{Lessons and Warnings}
@@ -251,20 +513,34 @@ automake is fairly amenable to cautious hacking, spotting likely
 features in existing \texttt{Makefile.in} files, and tracing them back
 to the code or template which generates them.
 
-Even if we had not patched it, it
-would probably be wise, in a project of this size, to keep a
-repository copy of the automake and autoconf distributions and mandate
-their use when bootstrapping the source tree; apart from the increase
-in long-term security, there are a number of potentially nasty
-version-skew problems that this practice evades.  This admittedly adds
-an extra step for a developer interested in working on CVS sources,
-and an extra stage to be documented and supported,
-but since the bootstrapping of the CVS sources is necessarily
-elaborate anyway, and since it is only the more sophisticated
-developers who would work on CVS rather than distributed sources, this
-is probably not too much of a disadvantage in practice.
+Even if we had not patched it, it is wise, in a project of this size,
+to keep a repository copy of the automake and autoconf distributions
+and mandate their use when bootstrapping the source tree; apart from
+the increase in long-term security, there are a number of potentially
+nasty version-skew problems that this practice evades.  This
+admittedly adds an extra step for a developer interested in working on
+CVS sources, and an extra stage to be documented and supported, but
+since the bootstrapping of the CVS sources is necessarily elaborate
+anyway, and since it is only the more sophisticated developers who
+would work on CVS rather than distributed sources, this is probably
+not too much of a disadvantage in practice.
 
-As a general point, we can recommend the use of automake.  Though
+Tracking \label{s:tracking} a third party distribution like this has
+important benefits, but also important costs: you must either actively
+track updates in the third party software, fixing breakage that new
+versions cause, or else by removing the pressure to track the
+software, lose compatibility with more stable or featureful updated
+versions.  As well as the autotools, we are currently tracking Caltech
+PGPlot, ESO catlib, CFITSIO, the IJG JPEG libraries, the NCAR graphics
+library, Perl and Tcl/Tk.  This is a worryingly long list, and the
+latter two in particular take up a large fraction of the repository.
+However these distributions are generally rather quiescent (the
+exception is Perl, and the project happens to have on hand personnel
+with considerable Perl expertise), so that we have not in practice had
+to suffer many of the disadvantages of this policy.
+
+As a general point, we feel the case for automake (or a tool very like
+it) is overwhelming.  Though
 there is a rather steep learning curve, and one does naturally suspect
 it of being dangerously clever, this turns out not to be a problem
 \emph{as long as} you are willing to build your project the way
@@ -281,7 +557,33 @@ Fortran in the standard autoconf distribution, and added tests for
 intrinsics, open specifiers, support for \texttt{\%val} 
 and the like.  These modifications affected only one component of the
 autoconf system, and will be offered back to the autoconf mainline.
-If they are accepted, we will be running an unpatched autoconf once more.
+If they are accepted, we will be running an unpatched autoconf once
+more.
+
+We ended up using Fortran preprocessing quite extensively, even though
+this is regarded as rather exotic in the Fortran world.  This allows
+us to use useful but non-standard Fortran extensions, without closing
+the door on the eccentric or conservative compilers which users might
+have good reason to prefer.  Preprocessing code is non-trivial in
+Fortran, as there is no standard for it; however Sun have produced an
+effective standard in their full-featured \texttt{fpp} tool, available
+at Netlib, \url{http://www.netlib.org/fortran/}, and as part of Sun's
+compiler collection.  Several Fortran compilers can already recognise
+C-style preprocesor directives, though the options for switching on
+this behaviour unhelpfully vary from compiler to compiler.  In
+principle, \texttt{cpp} cannot be used on Fortran, since the languages
+are syntactically so different, but in practice it generally does work
+in fact, as long as you avoid using \texttt{\#define} (or else risk
+accidentally breaching Fortran's 72-character line limit) and ensure
+the preprocessor not recognise \texttt{//} as a (C++) comment string
+(it has a rather different interpretation in Fortran).  In fact we
+never had to use any preprocessing constructs other than
+\texttt{\#define} and \texttt{\#if}, so we didn't run into any
+portability problems at all.  Standard autoconf does not include any
+tests for Fortran preprocessing capability or flags, so we
+incorporated Martin Wilck's autoconf extensions to provide this, and
+these are part of the autoconf patches we intend to submit to the
+autoconf mainline.
 
 The port to OS\,X was easier, in some ways, than we expected, partly
 because the OS\,X system compiler is a modified GCC.  However Apple's
@@ -315,15 +617,6 @@ package by package without much thought, and that creating the
 \texttt{Makefile.am} file in this way was a useful first step in
 acquianting oneself with the quirks of a package last touched last century.
 
-Starlink is a well-run project with disciplined developers, but we
-were surprised by the number of individually minor hurdles we had
-accumulated over a decade, despite our best efforts at vigilance, enough that working with
-the code would have been daunting for a non-insider.  Our complete
-build system overhaul was quite expensive, but I speculate that almost
-any similar project-wide development would produce some of the same
-benefits, as a by-product of scanning a large fraction of the
-project's code from a new perspective.
-
 One of our own and others' criticisms of our code base was that, over
 twenty years, it had had plenty time to fall victim to `big sticky
 lump' syndrome, and one of our hopes at the beginning of this effort
@@ -335,19 +628,11 @@ on a larger scale would have required a more formal analysis we did
 not have the resources to perform, identifying refactoring targets we
 had not the resources to attack.
 
+Although we did not set out to resolve our more tangled dependencies
 We found dependencies more complicated than we expected, and found at
 least four types in our code base, which had their effects at
 different phases, and had to be handled in different ways.  We discuss
-these in Sect.~\ref{s:deps}.
-
-As a result of teasing out and articulating the sub-projects'
-interdependencies, it became feasible to generate distributable
-components in a much more flexible way than had been possible before.
-We were able to generate and centralise package metadata, and use
-this, in conjunction with the EPM package manager~\cite{epm} to
-generate Debian \texttt{.deb} files, OS\,X \texttt{.mpkg} files, RPMs
-and others.  If further changes are required, changes to the automake
-templates will make it easy to apply them project-wide.
+these in \prettyref{s:deps}.
 
 In parallel with this porting project, we worked through the internal
 bureaucracy involved in applying a GPL licence to the code where
@@ -363,111 +648,22 @@ all of the build system); all of the rest is at least licensed for
 academic use; users concerned about the remainder should get in touch
 with us and we'll try to work it out.
 
+Starlink is a well-run project with disciplined developers, but we
+were surprised by the number of individually minor hurdles we had
+accumulated over a decade, despite our best efforts at vigilance,
+enough that working with
+the code would have been daunting for a non-insider.  Our complete
+build system overhaul was quite expensive, but I speculate that almost
+any similar project-wide development would produce some of the same
+benefits, as a by-product of scanning a large fraction of the
+project's code from a new perspective.
+
 The project took a \emph{lot} longer than we expected (surprise!).  It
 took around six person-months to get the initial system up and
 running, and then another six to adapt the bulk of our code to the new
 system, followed by another six months of low-level tinkering to
 remove the wrinkles and have the nightly builds produce relocatable
 and useful distribution tarballs.
-
-\subsection{Dependencies}
-\label{s:deps}
-
-We identified no fewer than five distinct dependency types.
-
-First, \emph{sourceset dependencies} are the components which must be
-installed in order to build the complete set of sources, either for
-building or for distribution.  This means those tools which are used
-to build documentation or generated sources which are included in distributions.
-
-Next, a component's \emph{build dependencies} are the dependencies
-which are required in order to build it.  This most often implies
-files included during compilation, but also refers to project-specific
-tools -- for example to compile message files -- which must be run on
-the build host rather than the host which builds the distribution.
-You may not have two components which have a build dependency on each
-other, since that would mean that each would have to be built before
-the other, which is impossible.
-
-Thirdly, \emph{link dependencies} are the dependencies required to
-link against the libraries in a component. That means all the
-libraries that this component's libraries use. These are not
-necessarily build dependencies, since if you are building a library~$X$,
-which uses functions in library~$Y$, the library~$Y$ does not have to be
-present in order to build library~$X$, only when you subsequently want
-to actually link against it.  Thus you can have two components which
-have mutual link dependencies.  If you are building an application,
-however, all its link dependencies will actually be build dependencies
-and should be declared as such. In other words, the distinction
-between build and link dependencies is important only for library
-components.
-
-\emph{Configure dependencies}
-There are some components which must be installed before the configure
-step, since they must be present in order for other packages to
-configure against them. Components which are listed as a configure
-dependency of some other component are made during the make
-configure-deps stage of the bootstrapping build process.
-
-You should try hard to avoid declaring dependencies of this type,
-since they necessarily subvert the normal build order. Note that
-transitivity implies that any dependencies of a configure dependency
-are also configure dependencies, so that declaring a configure
-dependency on sst for example (an obvious but bad plan), results in
-half the software set being built before configuration. Which is
-crazy. 
-
-You can see the set of configure dependencies by looking at the configure-deps target in Makefile.dependencies.
-
-Use dependencies
-These are the dependencies required in order for the component to be
-used by something else, after it has been built and installed. For
-example a library which called another application as part of its
-functionality would have only a use dependency on the component which
-contained that application. If no use dependencies are declared, we
-take the use dependencies to be the same as the link dependencies. We
-expect that such use dependencies will become more important when we
-start using this dependency information to build distribution
-packages, or to assemble .rpm or .deb packages. You should add any use
-dependencies you are aware of, even though we cannot really debug them
-until a distribution system is in place. 
-
-Test dependencies
-These are required in order to run any regression tests which come
-with the component. It's generally a good idea to avoid making this a
-larger set than the use dependencies, but sometimes this is
-unavoidable. If no test dependencies are declared, we take the test
-dependencies to be the same as the use dependencies. Note that the
-system does not currently make any use of this information.
-
-The point of all this is that different dependencies are required at
-different times. The set of dependencies in the master makefile is
-composed of all the `sourceset' and `build' dependencies, but not
-`link' or `use' dependencies, and since the core Starlink libraries
-are closely interdependent, the set of `build' dependencies needs to
-be kept as small as possible in order to avoid circularities (that is,
-A depending on B, which depends, possibly indirectly, on A).
-
-
-It is because of this intricacy that the dependencies scheme is so
-complicated. In general, it is safe to declare most things to have
-build dependencies, and only refine these into link or use
-dependencies when things won't work otherwise.
-
-
-All these relationships are transitive: if A has a build dependency on
-B, and B has one on C, then A has a build dependency on C. You can
-augment this by using the final `option' argument: if, in component
-A's configure.ac, you say \verb|STAR_DECLARE_DEPENDENCIES(build, B, link)|,
-then you declare that A has a build-time dependency on B, but that
-(presumably because B is a component consisting entirely or mostly of
-libraries) you need to link against B, so component A has a dependency
-on all of B's link dependencies, not just its build dependencies. An
-application component should generally declare such a dependency for
-each of the libraries it depends on. This is (I believe) the only case
-where this `option' attribute is useful, though it is legal for each
-of the dependency types.
-
 
 \section{Conclusions}
 
