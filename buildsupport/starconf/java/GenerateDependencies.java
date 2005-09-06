@@ -255,6 +255,18 @@ public class GenerateDependencies {
                 "# If the environment variable BUILDSUPPORT_PREFIX is defined",
                 "# then the buildsupport tools will be REconfigured when they",
                 "# are built; if not, they must be configured already.",
+                "#",
+                "# As well as defining each of the manifest targets, this",
+                "# file also defines the following targets:",
+                "#   buildsupport       - build each of the buildsupport tools",
+                "#   clean-buildsupport - clean the buildsupport tools",
+                "#   configure-deps     - build the set of components which ",
+                "#                        must be built before ./configure",
+                "# It additionally defines the variable SUPPORTED_COMPONENTS,",
+                "# containing the list of manifest files corresponding to",
+                "# components marked `supported' in their component.xml file.",
+                "# No other targets or variables defined here should be ",
+                "# regarded as persistent or otherwise relied upon.",
                 "",
                 "",
             };
@@ -414,10 +426,16 @@ public class GenerateDependencies {
         makefile.println("# Buildsupport tools -- building and cleaning");
         makefile.println("BUILDSUPPORT_MANIFESTS ="
                            + autoBuildsupport.toString());
+        makefile.println("# Buildsupport tools which are conditionally built");
         makefile.println("EXTRA_BUILDSUPPORT_MANIFESTS ="
                            + nonautoBuildsupport.toString());
         makefile.println();
+        makefile.println("# Make all the buildsupport tools which are");
+        makefile.println("# unconditionally build");
         makefile.println("buildsupport: $(BUILDSUPPORT_MANIFESTS)");
+        makefile.println();
+        makefile.println("# Clean out the buildsupport tools,");
+        makefile.println("# including any conditionally built ones");
         makefile.println("clean-buildsupport:");
         makefile.println("\trm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)");
 
