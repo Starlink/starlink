@@ -61,7 +61,7 @@ all: $(bltlib)
 
 $(bltlib):  $(OBJS)
 	$(RM) $@
-	$(SHLIB_LD) ${CFLAGS} $(SHLIB_LD_FLAGS) -o $@ $(OBJS) $(SHLIB_LD_LIBS)
+	$(SHLIB_LD) $(SHLIB_LD_FLAGS) -o $@ $(OBJS) $(SHLIB_LD_LIBS)
 
 install: mkdirs
 	if test -f $(bltlib) ; then \
