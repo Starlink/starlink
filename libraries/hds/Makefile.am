@@ -42,7 +42,7 @@ noinst_MESSAGES = dat_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-PUBLIC_INCLUDES = DAT_PAR dat_par.h
+PUBLIC_INCLUDES = DAT_PAR dat_par.h hds.h
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
 	dat1.h hds1.h \
