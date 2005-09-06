@@ -147,7 +147,7 @@ extern char **environ;           /* Pointer to environment array            */
 /* External References:                                                     */
       pid_t _fork( void );       /* Function to fork a new process          */
 
-#if defined( _POSIX2_VERSION ) && defined( _sun4_Solaris )
+#if defined( _POSIX2_VERSION ) && !HAVE_DECL_CONFSTR
       size_t confstr( int name,  /* Prototype missing on sun4_Solaris       */
                       char *buf,
                       size_t len );

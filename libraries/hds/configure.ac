@@ -69,7 +69,14 @@ AC_CHECK_FUNCS(on_exit)
 AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(strerror)
 
+dnl    Look for standard headers rather than assuming availability
+dnl    by operating system
+AC_HEADER_STDC
 AC_CHECK_HEADERS(stddefs.h)
+AC_CHECK_HEADERS(unistd.h)
+
+dnl    Look for missing declarations
+AC_CHECK_DECLS(confstr)
 
 dnl Check for largefile support (various macros and fseeko).
 STAR_LARGEFILE_SUPPORT
