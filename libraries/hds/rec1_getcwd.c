@@ -2,23 +2,41 @@
 #  include <config.h>
 #endif
 
-#if defined( vms )
+#if !HAVE_GETWD && !HAVE_GETCWD
+/* use a void function on the rare (VMS) chance that neither getwd not
+   getcwd are available */
 void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 #else
 
-/* SUN4 version include files:                                              */
-/* ==========================                                               */
-#if defined( sun4 )
-#include <string.h>
-#include <sys/param.h>
+/* This routine includes code for both getwd and getcwd. The trick
+   is to decide which one to prefer. In the past, solaris always
+   used getwd (for "speed") and everything else used getcwd.
+   We prefer to use getcwd if it is available since in most cases
+   getwd is a wrapper around getcwd
+ */
 
-/* Portable version include files:                                          */
-/* ==============================                                           */
+#if HAVE_GETCWD
+# define USE_GETCWD 1
+#elif HAVE_GETWD
+# define USE_GETWD 1
 #else
-#include <errno.h>
+   error unable to find either getwd or getcwd
+#endif
+
+
+/* System include files */
+
 #include <string.h>
-#include <limits.h>
-#include <unistd.h>
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
+#if USE_GETCWD
+#  include <errno.h>
+#  include <limits.h>
+#else
+/* GETWD requires sys/param.h for constants */
+#  include <sys/param.h>
 #endif
 
 /* Other include files:                                                     */
@@ -72,11 +90,14 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
 /*    23-NOV-1992 (RFWS):                                                   */
 /*       Original version.                                                  */
+/*    06-SEP-2005 (TIMJ):                                                   */
+/*       Use autoconf to determine getwd availability                       */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -85,27 +106,25 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 /*-                                                                         */
 
 /* Local Constants:                                                         */
-#if defined( sun4 )              /* No local constants for SUN4 version     */
-
-#else                            /* Portable version local constants:       */
-#if defined( PATH_MAX )
+#if USE_GETCWD
+#  if defined( PATH_MAX )
       const INT mxwd0 = PATH_MAX + 1; /* Initial amount of space for path   */
-#else
+#  else
       const INT mxwd0 = _POSIX_PATH_MAX + 1;
-#endif
+#  endif
 #endif
 
 /* Local Variables:                                                         */
-#if defined( sun4 )              /* SUN4 version local variables:           */
+#if USE_GETWD
       static char wd[ MAXPATHLEN ]; /* Static buffer for path name          */
 
-#else                            /* Portable version local variables:       */
+#else                            /* getcwd local variables:                 */
       static INT mxwd;           /* Amount of space allocated               */
       static char *wd = NULL;    /* Pointer to working directory string.    */
 #endif
 
 /* External references:                                                     */
-#if defined( sun4 )              /* SUN4 version system routines:           */
+#if USE_GETWD && !HAVE_DECL_GETWD
       char *getwd( char pathname[ MAXPATHLEN ] ); /* Get working directory  */
 #endif
 
@@ -118,10 +137,10 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 /* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return;
 
-/* SUN4 version:                                                            */
+/* getwd version:                                                           */
 /* ============                                                             */
 /* Implemented separately for better performance.                           */
-#if defined( sun4 )
+#if USE_GETWD
 
 /* Copy the working directory name into a static buffer and check for       */
 /* errors.                                                                  */
@@ -135,7 +154,7 @@ working directory - ^MESSAGE",
                     &hds_gl_status );
       }
 
-/* Portable version:                                                        */
+/* getcwd version:                                                          */
 /* ================                                                         */
 #else
 /* If no space has yet been allocated for the working directory path, then  */
