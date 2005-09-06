@@ -258,11 +258,14 @@
 /* Fixups for various machine deficiencies:				    */
 /* =======================================				    */
 
-#if defined( sun4 )		 /* Functions missing from Gnu C on SUNs.   */
+#if !HAVE_STRERROR
       char *strerror( int );
+#endif
+#if !HAVE_ATEXIT
       int atexit( void (*fcn)( void ) );
+#endif
+#if HAVE_MEMMOVE
       void *memmove( void *, const void *, size_t );
-
 #endif
 
 /*.									    */
