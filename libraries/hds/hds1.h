@@ -126,9 +126,9 @@
 /* The internal size of array dimensions within HDS can be either 32 or 64  */
 /* bits. Note that 64 bits is untested and WILL change the file format!!!   */
 #if !defined(HDS_64)
-#define HDS_PTYPE int
+#define HDS_PTYPE unsigned int
 #else
-#define HDS_PTYPE INT_BIG
+#define HDS_PTYPE unsigned INT_BIG
 #endif
 
 /* Global Structure Definitions:					    */
@@ -264,7 +264,7 @@
 #if !HAVE_ATEXIT
       int atexit( void (*fcn)( void ) );
 #endif
-#if HAVE_MEMMOVE
+#if !HAVE_MEMMOVE
       void *memmove( void *, const void *, size_t );
 #endif
 
