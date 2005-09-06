@@ -294,7 +294,7 @@ main () {
     e = u * 2.0;
     printf("%.17e\n", e);
     exit(0);
-}])
+}],)
     CFLAGS="$oldFlags"
     AC_DEFINE_UNQUOTED(BLT_DBL_EPSILON, ${blt_cv_dbl_epsilon})
     AC_MSG_RESULT([${blt_cv_dbl_epsilon}])
@@ -940,7 +940,7 @@ AC_SUBST(EXTRA_LDFLAGS)
 
 INCLUDES=${bltIncludes}
 AC_SUBST(INCLUDES)
-LIBS=${bltLibraries}
+LIBS="${bltLibraries}"
 AC_SUBST(LIBS)
 BLT_MAJOR_VERSION=${bltMajor}
 AC_SUBST(BLT_MAJOR_VERSION)

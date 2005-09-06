@@ -789,14 +789,8 @@ AC_CHECK_FUNC(catgets,
 #------------------------------------------------------------------------------
 # Check for missing functions that we need.  Must be done after library checks.
 #------------------------------------------------------------------------------
-
-AC_CHECK_FUNC(random, ,[LIBOBJS="$LIBOBJS random.o"]
-              AC_DEFINE(NO_RANDOM))
-AC_CHECK_FUNC(rename, ,[LIBOBJS="$LIBOBJS rename.o"])
-AC_SUBST(LIBOBJS)
-
-LIBSOBJS=`echo $LIBOBJS |sed -e s/\\\\.o/$SHOBJ_SUFFIX/g`
-AC_SUBST(LIBSOBJS)
+AC_CHECK_FUNC(random, ,[AC_LIBOBJ([random])])
+AC_CHECK_FUNC(rename, ,[AC_LIBOBJ([rename])])
 
 #------------------------------------------------------------------------------
 # Determine if random is declared in stdlib.h or math.h.  If it is, we don't
