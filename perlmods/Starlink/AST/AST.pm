@@ -457,6 +457,21 @@ use base qw/ Starlink::AST::Mapping /;
 package Starlink::AST::Frame;
 use base qw/ Starlink::AST::Mapping /;
 
+# Wrapper for PickAxes
+# Uses context to decide whether to return the frame mapping or not
+
+sub PickAxes {
+  my $self = shift;
+  my ($frame, $mapping) = $self->_PickAxes( @_ );
+  $frame = $frame->_rebless();
+  $mapping = $mapping->_rebless();
+  if (wantarray) {
+    return ($frame, $mapping);
+  } else {
+    return $frame;
+  }
+}
+
 package Starlink::AST::Region;
 use base qw/ Starlink::AST::Frame /;
 

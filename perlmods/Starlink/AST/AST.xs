@@ -442,6 +442,41 @@ AST__BAD()
  OUTPUT:
   RETVAL
 
+int
+AST__CURRENT()
+ CODE:
+#ifdef AST__CURRENT
+    RETVAL = AST__CURRENT;
+#else
+    Perl_croak(aTHX_ "Constant AST__CURRENT not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+AST__NOFRAME()
+ CODE:
+#ifdef AST__NOFRAME
+    RETVAL = AST__NOFRAME;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOFRAME not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+AST__BASE()
+ CODE:
+#ifdef AST__BASE
+    RETVAL = AST__BASE;
+#else
+    Perl_croak(aTHX_ "Constant AST__BASE not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+
+
 MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
 
@@ -2288,31 +2323,38 @@ astPermAxes( this, perm )
   )
 
 # Returns a new frame and an optional mapping
-# Use a boolean to control whether a mapping is returned
-# Ignore for now
+# Also note that we count axes ourselves
 
-# Also note that we count axes ourselfs
+# We always ask for the return mapping and we always
+# return both the new frame and the mapping from the old
+# The perl side decides whether the user wants to keep the
+# mapping or not depending on context (Which is unavailable
+# to XS)
 
-AstFrame *
-astPickAxes( this, axes )
+void
+ast_PickAxes( this, axes )
   AstFrame * this;
   AV* axes
  PREINIT:
   int maxaxes;
   int naxes;
   int * aa;
- CODE:
+  AstMapping * map;
+  AstFrame * newframe;
+ PPCODE:
   maxaxes = astGetI(this, "Naxes");
   naxes = av_len(axes) + 1;
   if ( naxes > maxaxes )
     Perl_croak(aTHX_ "Number of axes selected must be less than number of axes in frame");
   aa = pack1D( newRV_noinc((SV*)axes), 'i');
   ASTCALL(
-   RETVAL = astPickAxes( this, naxes, aa, NULL);
+   newframe = astPickAxes( this, naxes, aa, &map);
   )
-  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
- OUTPUT:
-  RETVAL
+  if ( newframe == AST__NULL ) XSRETURN_UNDEF;
+  /* Create perl objects from the two return arguments */
+  XPUSHs(sv_2mortal( createPerlObject( "AstFramePtr", (AstObject*)newframe )));
+  XPUSHs(sv_2mortal( createPerlObject( "AstMappingPtr", (AstObject*)map )));
+
 
 # Returns reference to array [point4], plus two distances
 
@@ -2656,7 +2698,100 @@ astTran2( this, xin, yin, forward )
 
 # astTranN  XXXX
 
-# astTranP  XXXX
+# astTranP
+
+# Note that to allow a better perl interface, we put all the array
+# arguments at the end and allow an arbitrary number of coordinates
+# to be provided without having to use an array of arrays
+
+# To match the interface to astTranP there must be an input array
+# per input axis, and each array must contain the same number of elements
+# referring to the coordinate for a specific dimension. ie for a 2D coordinate
+# you will need just two arrays: the first array has all the X coordinates
+# and the second has all the Y coordinates.
+
+#  @transformed = $wcs->TranP( 1, [ 1,0 ], [1,-1] ... );
+
+void
+astTranP( this, forward, ... )
+  AstMapping * this
+  int forward
+ PREINIT:
+  int i;
+  int n;
+  int argoff = 2; /* number of fixed arguments */
+  int ndims;
+  int npoint;
+  int naxin;
+  int naxout;
+  int ncoord_in;
+  int ncoord_out;
+  double **ptr_in;
+  double **ptr_out;
+ PPCODE:
+  /* Make sure we have some coordinates to transform */
+  ndims = items - argoff;
+  if (ndims > 0) {
+    /* Number of in and output coordinates required for this mapping */
+    naxin = astGetI( this, "Nin" );
+    naxout = astGetI( this, "Nout" );
+
+    /* The required dimensionality depends on direction */
+    if (forward) {
+      ncoord_in = naxin;
+      ncoord_out = naxout;
+    } else {
+      ncoord_in = naxout;
+      ncoord_out = naxin;
+    }
+
+    /* Make sure that the number of supplied arguments matches the
+       number of required input dimensions */
+    if ( ndims != ncoord_in )
+      Perl_croak(aTHX_ "Number of input arrays must be identical to the number of coordinates in the input frame (%d != %d )", ndims, ncoord_in);
+
+    /* Get some memory for the input and output pointer arrays */
+    ptr_in = get_mortalspace( ncoord_in, 'v' );
+    ptr_out = get_mortalspace( ncoord_out, 'v' );
+
+    /* Need to get the number of input elements in the first array */
+    npoint = (int)nelem1D( ST(argoff) );
+
+    /* Loop over all the remaining arrays and store them in an array */
+    for (i = argoff; i<items; i++) {
+       int count = i - argoff;
+       /* input coordinates */
+       printf("I: %d  Count: %d  Argoff: %d Items: %d\n",i,count,argoff,items);
+       ptr_in[count] = pack1D( ST(i), 'd' );
+
+       /* Check size */
+       n = nelem1D( ST(i) );
+       if (n != npoint)
+          Perl_croak(aTHX_ "Input array %d has differing number of elements to first array (%d != %d)",
+                     count, n, npoint);
+
+       /* output coordinates */
+       ptr_out[count] = get_mortalspace( npoint, 'd' );
+    }
+
+    printf(" %d - %d - %d\n",npoint,ncoord_in, ncoord_out);
+
+    /* Call AST */
+    ASTCALL (
+      astTranP( this, npoint, ncoord_in, (const double**)ptr_in, forward, ncoord_out, ptr_out);
+    )
+
+    /* Copy the output to perl */
+    for (i = 0; i < ncoord_out; i++) {
+       AV* outarr = newAV();
+       unpack1D( newRV_noinc((SV*)outarr), ptr_out[i], 'd', npoint);
+       XPUSHs( newRV_noinc((SV*)outarr) );
+    }
+
+  } else {
+    /* no input, no output */
+    XSRETURN_EMPTY;
+  }
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::RateMap
 
