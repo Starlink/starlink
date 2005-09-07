@@ -58,7 +58,7 @@ int RetrieveUrl (int status,  const char *hostNumber,  int queryPort,
 /* In general most modern systems will have these functions */
 #if !HAVE_INET_NTOP
 const char *inet_ntop(int af, const void *src,
-                             char *dst, socklen_t cnt);
+                             char *dst, size_t cnt);
 #endif
 #if !HAVE_INET_PTON
 int inet_pton(int af, const char *src, void *dst);
