@@ -3511,11 +3511,22 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
             tmap3 = (AstMapping *) astCmpMap( map2b, tmap2, 1, "" );
             tmap2 = astAnnul( tmap2 );
 
+/* If there are more WCS axes than IWC axes, create aUnitMapfor the extra
+   WCS axes and add it in parallel with tmap3. */
+            nwcsmap = astGetNin( map3 );
+            if( nwcsmap < nwcs ) {
+               tmap2 = (AstMapping *) astUnitMap( nwcs - nwcsmap, "" );
+               tmap4 = (AstMapping *) astCmpMap( tmap3, tmap2, 0, "" );
+               tmap3 = astAnnul( tmap3 );
+               tmap2 = astAnnul( tmap2 );
+               tmap3 = tmap4;
+               nwcsmap = nwcs;
+            } 
+
 /* The pixel->wcs mapping may include a PermMap which selects some sub-set 
    or super-set of the orignal WCS axes. In this case the number of inputs 
    and outputs for "tmap3" created above may not equal "nwcs". To avoid this, 
    we embed "tmap3" between 2 PermMaps which select the required axes. */
-            nwcsmap = astGetNin( map2b );
             if( nwcsmap != nwcs || ilon != axlon || ilat != axlat ) {
                inperm = astMalloc( sizeof( int )*(size_t) nwcs );
                outperm = astMalloc( sizeof( int )*(size_t) nwcsmap );
@@ -8228,7 +8239,7 @@ static int FitOK( int n, double *act, double *est ) {
    estimates values is sufficiently high. */
       } else if( denom > 0.0 ) {
          r = ( s3 - s1*s2 )/sqrt( denom );
-         ret = ( r > 0.999999 );
+         ret = ( fabs( r ) > 0.999999 );
       }
    } 
 
