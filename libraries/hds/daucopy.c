@@ -15,7 +15,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-int
+int
 dau_copy_object(int ncomp,
                 struct HAN *src,
                 unsigned char *src_crv,
@@ -180,7 +180,7 @@ dau_copy_object(int ncomp,
                {
                   int szcrv2 = SZCRV;
                   int szcrv1 = dlen2/nelem1;
-                  char *p1, *p2;
+                  unsigned char *p1, *p2;
                   int i;
                   
                   memset( (void *) des_crv2, 0, rcl2.dlen);
