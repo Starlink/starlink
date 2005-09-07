@@ -16,6 +16,8 @@ AV*   coerce1D ( SV* arg, int n );     /* Coerce/create array to specified size 
  
 void* get_mortalspace( int n, char packtype ); /* Utility to just get workspace */
 
+IV nelem1D( SV* arg );
+
 /* Prevent the prototypes being defined twice */
 
 #define _INC_ARRAYS_

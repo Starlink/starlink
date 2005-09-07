@@ -41,6 +41,41 @@ int is_scalar_ref (SV* arg) { /* Utility to determine if ref to scalar */
        return 0;
 }
 
+/* #################################
+
+  nelem1D - returns number of elements in supplied SV*
+          Can handle references to Arrays, single scalars and globs
+          and packed strings
+
+    IV n = nelem1D( SV * arg );
+
+          Pre-packed binary perl scalars are not supported.
+
+*/
+
+IV
+nelem1D( SV* arg ) {
+  IV retval = 0;
+  AV* array;
+
+   /* Is arg a scalar? Return scalar*/
+   
+   if (!SvROK(arg) && SvTYPE(arg)!=SVt_PVGV) {
+     retval = 1;
+   } else if (SvTYPE(arg)==SVt_PVGV || (SvROK(arg) && SvTYPE(SvRV(arg))==SVt_PVAV)) {
+     /* glob or ref to array */
+     if (SvTYPE(arg)==SVt_PVGV) {
+       array = (AV *) GvAVn((GV*) arg);   /* glob */
+     } else {
+       array = (AV *) SvRV(arg);   /* reference */
+     }
+   
+     retval = av_len(array) + 1;
+   }
+
+   return retval;
+}
+
 
 /* ####################################################################################
 
