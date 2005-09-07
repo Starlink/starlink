@@ -16,7 +16,7 @@
 
 /* Control Blocks */
 
-
+int
 dau_flush_data(struct LCP_DATA *data)
 
 /*+
