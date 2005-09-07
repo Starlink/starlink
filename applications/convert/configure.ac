@@ -77,8 +77,28 @@ for f in $IRAFSUPPORT; do
 done
 )
 
-dnl    Define -DHAVE_IRAF_LIBIMFORT_A=1, if libimfort.a exists.
-AC_CHECK_FILES([iraf/libimfort.a])
+dnl    Define -DHAVE_IRAF_LIBIMFORT_A=1, if libimfort.a exists and we can link
+dnl    against it. We need to work harder as the presence of platform
+dnl    libraries doesn't mean we can link against them (difference compilers
+dnl    g77-v-g95 or 64-v-32 bit flags for instance).
+
+AC_MSG_CHECKING([if iraf libraries can create programs])
+irafgood=no
+if test -f "iraf/libimfort.a"; then
+   iraf_save_LIBS=$LIBS
+   LIBS="iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a"
+   AC_LANG_PUSH([Fortran])
+   AC_LINK_IFELSE([AC_LANG_CALL([],[imopen])],[irafgood=yes],[irafgood=no])
+   AC_LANG_POP([Fortran])
+   if test "$irafgood" = yes; then
+      AC_DEFINE(HAVE_IRAF_LIBIMFORT_A,1,[Have iraf support])
+   fi
+   LIBS=$iraf_save_LIBS
+fi
+AC_MSG_RESULT([$irafgood])
+
+dnl    Old test.
+dnl AC_CHECK_FILES([iraf/libimfort.a])
 
 dnl    Configure .in files.
 AC_CONFIG_FILES([Makefile component.xml iraf/Makefile libaif/Makefile
