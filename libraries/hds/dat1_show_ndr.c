@@ -179,17 +179,17 @@
             _hexfmt( dat_gl_ndr[ i ].min.t, dat_gl_ndr[ i ].order )\
             (void) printf( "      Minimum value:  %*"INT_BIG_U" (hex %s)\n",\
                            (int) dat_gl_ndr[ i ].txtsize,\
-                           (unsigned INT_BIG) dat_gl_ndr[ i ].min.t,\
+                           (UINT_BIG) dat_gl_ndr[ i ].min.t,\
                             hexbuf );\
             _hexfmt( dat_gl_ndr[ i ].max.t, dat_gl_ndr[ i ].order )\
             (void) printf( "      Maximum value:  %*"INT_BIG_U" (hex %s)\n",\
                            (int) dat_gl_ndr[ i ].txtsize,\
-                           (unsigned INT_BIG) dat_gl_ndr[ i ].max.t,\
+                           (UINT_BIG) dat_gl_ndr[ i ].max.t,\
                             hexbuf );\
             _hexfmt( dat_gl_ndr[ i ].bad.t, dat_gl_ndr[ i ].order )\
             (void) printf( "      Bad data value: %*"INT_BIG_U" (hex %s)\n",\
                            (int) dat_gl_ndr[ i ].txtsize,\
-                           (unsigned INT_BIG) dat_gl_ndr[ i ].bad.t,\
+                           (UINT_BIG) dat_gl_ndr[ i ].bad.t,\
                             hexbuf );\
          }\
       }

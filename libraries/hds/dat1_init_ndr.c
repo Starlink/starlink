@@ -795,9 +795,9 @@ may require modification for use on this machine.",\
 /* If the values are unsigned, cast to unsigned long int                    */\
          else\
          {\
-            (void) sprintf( buf, "%-"INT_BIG_U"%n", (unsigned INT_BIG) (min), \
+            (void) sprintf( buf, "%-"INT_BIG_U"%n", (UINT_BIG) (min), \
                            &len1 );\
-            (void) sprintf( buf, "%-"INT_BIG_U"%n", (unsigned INT_BIG) (max), \
+            (void) sprintf( buf, "%-"INT_BIG_U"%n", (UINT_BIG) (max), \
                            &len2 );\
          }\
 \

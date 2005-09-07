@@ -106,11 +106,13 @@
 
 /* Definitions for 64-bits integers                                        */ 
 #if !defined(__alpha)
-#define INT_BIG long long int
+typedef long long int INT_BIG;
+typedef unsigned long long int UINT_BIG;
 #define INT_BIG_S "lld"
 #define INT_BIG_U "llu"
 #else
-#define INT_BIG long int
+typedef long int INT_BIG;
+typedef unsigned long int UINT_BIG;
 #define INT_BIG_S "ld"
 #define INT_BIG_U "lu"
 #endif
@@ -126,9 +128,9 @@
 /* The internal size of array dimensions within HDS can be either 32 or 64  */
 /* bits. Note that 64 bits is untested and WILL change the file format!!!   */
 #if !defined(HDS_64)
-#define HDS_PTYPE unsigned int
+typedef unsigned int HDS_PTYPE;
 #else
-#define HDS_PTYPE unsigned INT_BIG
+typedef UINT_BIG HDS_PTYPE;
 #endif
 
 /* Global Structure Definitions:					    */

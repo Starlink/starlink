@@ -479,7 +479,7 @@ datClone(char locator1_str[DAT__SZLOC],
 
 int
 dat1_get_off(int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs, 
-             unsigned INT_BIG *offset)
+             UINT_BIG *offset)
 
 /*+
  * GET_OFF - Get offset (from subscripts)

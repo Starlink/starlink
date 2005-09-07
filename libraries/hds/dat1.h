@@ -221,8 +221,8 @@ if (!_ok(*status))\
          HDS_PTYPE bounds[ 3 ][ 2 ];/* Dimension bounds			    */
          int level;		 /* Component level			    */
          int naxes;		 /* Number of axes			    */
-         unsigned INT_BIG offset; /* Slice or cell offset		    */
-         unsigned INT_BIG size;	 /* Size of object			    */
+         UINT_BIG offset;        /* Slice or cell offset		    */
+         UINT_BIG size;	         /* Size of object			    */
          char group[ DAT__SZGRP + 1 ]; /* Group specification		    */
          char name[ DAT__SZNAM + 1 ]; /* Name  specification		    */
          char type[ DAT__SZTYP + 1 ]; /* Type specification		    */
@@ -282,7 +282,7 @@ if (!_ok(*status))\
       int dat1_get_ncomp( const struct HAN *han, int *ncomp );
       int dat1_get_odl( const struct HAN *han, struct ODL *odl );
       int dat1_get_off( int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs,
-                     unsigned INT_BIG *offset );
+                     UINT_BIG *offset );
       void dat1_import_loc( const char *loc, const int loc_length,
                             struct LCP **lcp );
       int dat1_init( void );

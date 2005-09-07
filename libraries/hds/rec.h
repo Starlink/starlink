@@ -22,7 +22,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
          int class;		 /* Record class			    */
          int size;		 /* Record size (chips)			    */
          int slen;		 /* Static domain length (chars)	    */
-         unsigned INT_BIG dlen; /* Dynamic domain length (chars)	    */
+         UINT_BIG dlen;          /* Dynamic domain length (chars)	    */
          int active;		 /* Dynamic domain active?		    */
          int chain;		 /* Dynamic domain chained?		    */
          int modify;		 /* Dynamic domain modified?		    */
