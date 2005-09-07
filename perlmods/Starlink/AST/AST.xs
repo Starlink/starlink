@@ -2761,7 +2761,6 @@ astTranP( this, forward, ... )
     for (i = argoff; i<items; i++) {
        int count = i - argoff;
        /* input coordinates */
-       printf("I: %d  Count: %d  Argoff: %d Items: %d\n",i,count,argoff,items);
        ptr_in[count] = pack1D( ST(i), 'd' );
 
        /* Check size */
@@ -2773,8 +2772,6 @@ astTranP( this, forward, ... )
        /* output coordinates */
        ptr_out[count] = get_mortalspace( npoint, 'd' );
     }
-
-    printf(" %d - %d - %d\n",npoint,ncoord_in, ncoord_out);
 
     /* Call AST */
     ASTCALL (
