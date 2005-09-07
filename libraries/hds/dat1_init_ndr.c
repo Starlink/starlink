@@ -132,6 +132,15 @@
 /* Check the inherited global status.                                       */
       if ( !_ok( *status ) ) return;
 
+/* Initialisations to stop optimized compiler warnings                      */
+      format_REAL = 0;
+      format_DOUBLE = 0;
+      dig_REAL = 0;
+      dig_DOUBLE = 0;
+      eps_REAL = 0.0;
+      eps_DOUBLE = 0.0;
+      
+
 /* Set up the name of each primitive data type.                             */
 /* ===========================================                              */
       dat_gl_ndr[ DAT__C ].name =  "_CHAR";
