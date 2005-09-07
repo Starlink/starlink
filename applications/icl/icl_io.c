@@ -1455,7 +1455,7 @@ keyboard_input(void)
                        else {
                           putp( cursor_up );
                           if ( parm_right_cursor != CHARNIL )
-                             putp(tparm(parm_right_cursor, (long int)COLS-1));
+                             putp(tparm(parm_right_cursor, (long int)COLS-1,0,0,0,0,0,0,0,0));
                           else if ( cursor_right != CHARNIL )
                              for (i=COLS-1;i--;putp(cursor_right));
                           else printf("%s%.*s", prompt, inpl_cpos, inputline);
@@ -1735,7 +1735,7 @@ keyboard_input(void)
                        else {
                           putp( cursor_up );
                           if ( parm_right_cursor != CHARNIL )
-                             putp(tparm(parm_right_cursor, 79L));
+                             putp(tparm(parm_right_cursor, 79L,0,0,0,0,0,0,0,0));
                           else
                              for (i=79;i--;putp(cursor_right));
                        }
