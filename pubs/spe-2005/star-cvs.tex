@@ -8,7 +8,6 @@
 \usepackage[bookmarksopen,urlcolor=red]{hyperref}
 
 \newrefformat{s}{Sect.~\ref{#1}}
-\newrefformat{it}{item~\ref{#1}}
 
 \begin{document}
 
@@ -29,7 +28,7 @@
 \norevised{}
 \noaccepted{}
 
-\keywords{Starlink; CVS; autoconf}
+\keywords{Starlink; CVS; autoconf, automake}
 
 % ... to here
 
@@ -39,12 +38,11 @@ Unix and POSIX platforms and contains around 100 separate software items,
 totalling 2.5~million lines of code, in a mixture of languages.  We
 recently changed the build system from a hand-maintained collection of
 makefiles with hard-wired OS variants to a scheme involving
-feature-discovery via GNU Autoconf.
+feature-discovery via GNU Autoconf and a patched and extended Automake.
 
 We describe here the practical lessons we learned from this
-experience, including the sometimes unexpected benefits and costs.
-
-XXX Expand
+experience, covering dependency analysis and repository management,
+and including the sometimes unexpected benefits and costs.
 
 % XXX Comment out before submission
 [Version \RCSRevision]
@@ -53,10 +51,9 @@ XXX Expand
 
 
 The Starlink Software Collection \cite{draper05} is a large set of
-astronomical data-reduction 
-applications, written over about two decades in a variety of
-languages, primarily~C, C++ and Fortran.  Until recently the source
-code was managed, and the
+astronomical data-reduction applications, written over about two
+decades in a variety of languages, primarily Fortran, C, C++.  Until
+recently the source code was managed, and the
 products distributed, using a system that worked, but which was
 rather ad hoc and opaque, and which was correspondingly rather
 expensive to maintain.  For a variety of technical, political, and financial
@@ -72,19 +69,21 @@ the hope that these will be of use to other projects considering the
 same important move.  We discuss our typology of dependencies and its
 relations with other dependency systems, the management of the
 repository, and the overall architecture of the build system.
-
 We intend this article as practical advice from the front line, and
 hope it will be of use to others in the same position of trying to
-rationalise a large existing system.  Our system was not an ideal
-starting point, as it was large, infuriatingly ad hoc in places, and
-had a mass of interface commitments, at levels ranging from library
-interfaces to documentation style conventions.  At the same time, it
-was far from the worst, since the ad hoc features were confined within
-disciplined structures; and once-irksome coding standards documents and
-previous migrations meant that the code was maintainable and
-portable.  All our eccentricities were in our makefiles; our Fortran
-was a joy to behold.  This was specifically a build-system migration, not a
-porting project, and we expected to keep code changes to a bare minimum.
+rationalise a large existing system.
+
+Our system was not an ideal starting point, as it was large,
+infuriatingly ad hoc in places, and had a mass of interface
+commitments, at levels ranging from library interfaces to
+documentation style conventions.  At the same time, it was far from
+the worst, since the ad hoc features were confined within disciplined
+structures; and once-irksome coding standards, along with previous
+migrations, meant that the code at the module level was maintainable
+and portable.  All our eccentricities were in our build system; our
+Fortran was a joy to behold.  Thus this was specifically a
+restructuring, not a porting project, and we expected to keep code
+changes to a bare minimum.
 
 
 \section{Background}
@@ -116,20 +115,20 @@ role in its curation, we needed to make the classic software as
 accessible as possible.
 
 The biggest problem with the software was that there was an awful lot
-of it!  Even with ongoing pruning, we have ended up with about 100
+of it.  Even with ongoing pruning, we have ended up with about 100
 components, totalling around 1800\,kSLOC written by the project or
 curated by it, in various languages
 including Fortran, C, C++, Perl and Tcl/Tk.  We add to this another
 700\,kSLOC of thirdparty code, some tweaked, and all built at the same
 time.  Not included in this total is about 300\,kSLOC of Java,
 built separately.  Just to put this in context, David A
-Wheeler's \texttt{SLOCCount} would have us believe that that's worth
+Wheeler's \texttt{SLOCCount} would have us believe that this is worth
 over \$100M and, according to his analysis of the RH7.1 distribution
-\cite{wheeler02}, it appears that 1.8\,MSLOC is larger than anything in
+\cite{wheeler02}, is larger than anything in
 that distribution except the kernel, Mozilla and XFree86.  We've been busy.
 
 The build system we had was idiosyncratic, with code scattered amongst
-the distributed developers, and a set of source and compiled build
+the distributed developers, and a set of source and binary build
 products maintained by cut-and-paste of template makefiles.  This
 system did work, and was a reasonable design for the early nineties,
 but it required discipline and effort to maintain, and worked largely
@@ -164,51 +163,49 @@ target platforms to those explicitly supported by the project.
 
 We also need our software to be portable in time.  Astronomical data
 has quite a long lifetime, and data is quite often useful a couple of
-decades after it is taken, and this gives us an archival
+decades after it is taken, which gives us an archival
 responsibility for the software.  We can reasonably expect that people
 will want to build our software in a number of years' time, even in
 the absence of ongoing maintainance or traceable experts.  This
 requires a system with few surprises, good documentation, and a design
-sane enough to be usefully documented.
+intelligible enough to be usefully documented.
 
 Our overall goals, therefore, were various.
 \begin{enumerate}
 \item \label{it:portable}The resulting source code had to be portable,
-  covering as many Unix-like platforms as possible, and certainly our
+  covering as many Unix-like platforms as possible, beyond our
   original core set of RedHat, Solaris and DUX.  This comfortably
   included MacOS\,X (though its ultra-fussy linker provided
   entertaining challenges), and with rather more effort included
   Cygwin.  As well, we aimed to avoid commitments to specific
   distribution technologies such as RPM or Debian packages.
 \item The resulting system had to use only open-source tools, on the
-  multiple grounds that
+  dual grounds that
   (i) these are the tools our constituency would expect to use;
   (ii) our archival responsibilities mean that the build software has
-  to be available, and if possible be well-known, a couple of decades
-  into the future.  This pushes us firmly toward non-commercial
+  to be available, and if possible be reasonably familiar, a couple of decades
+  hence.  This pushes us firmly toward non-commercial
   software that can be embedded in the source code repository.
-\item \label{it:normal}
-  The system had to look as `normal' as possible, to stand any
-  chance of it being maintained on an ad-hoc basis.  Documentation
-  helps, of course, but the greater the proportion of the build system
-  that doesn't have to be documented, or the documentation left
-  unread, the greater the chance of fixes being made carefully, rather
-  than as hacks.  The archival concerns mean that the software has to
-  continue to look normal in the medium term: tools such as
-  \texttt{make} or CVS have sufficiently large commitments to them
-  (even though the latter is now dominated by Subversion for new
-  projects) that they will continue to be reasonably familiar to
-  developers for perhaps another couple of decades; we cannot say the
-  same for any specific packaging tool, for example.  The customised
-  autotools do not look normal in this sense, but their use is
-  unavoidable.
+\item \label{it:normal} The system had to look as `normal' as
+  possible, to stand any chance of it being maintained on an ad-hoc
+  basis.  Documentation helps, of course, but the more documentation
+  the user can skip as familiar, the greater the chance of fixes being
+  made carefully, rather than as hacks.  The archival concerns mean
+  that the software must also continue to look normal in the medium
+  term: tools such as \texttt{make} or CVS have sufficiently large
+  commitments to them (even though the latter is now dominated by
+  Subversion for new projects) that they will continue to be broadly
+  familiar to developers for perhaps another couple of decades; we
+  cannot say the same for any specific packaging tool, for example.
+  Although our autotool modifications were quite substantial, we took
+  care to make our extensions as consistent as possible.
 %\item Related to the previous point, the system had to support
 %  developers interested in only a subset of the codebase
 \item The change to the build system had to involve as few as possible
   changes to the bulk of our code-base.  Our code has some test
   support, but it is not pervasive, and we could not practically
-  handle a large number of bugs being introduced simply by the changed
-  build system.
+  handle a large number of bugs being introduced simply by the
+  infrastructural changes.
 \end{enumerate}
 
 
@@ -218,7 +215,7 @@ Our overall goals, therefore, were various.
 With this project now largely complete, we have made a number of
 significant improvements to the collection.
 
-All the source code is now conveniently available in a single CVS
+All the source code is now centrally available in a single CVS
 repository, with anonymous access
 (\texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} with password `starlink').
 
@@ -228,7 +225,7 @@ result that the collection now builds and installs the shared
 libraries that were too much trouble before.  Automake generates the
 makefiles, respecting all of our installation conventions and
 generating support for our internal build tools.  And autoconf
-generates the \texttt{./configure} scripts which test the capabilities
+generates the \texttt{configure} scripts which test the capabilities
 of the build system and adapt the makefiles and other files
 appropriately.  It turned out to be impractical to use standard
 autoconf and automake, and so the former was extended with new macros,
@@ -297,15 +294,15 @@ sources (see \prettyref{s:tracking}), and marginally violating our
 
 Another potential advantage of \texttt{dpkg} would be ready-made
 distributions, but since we aimed to be as promiscuous as possible in
-our support for packaging technology (\prettyref{it:portable} in
+our support for packaging technology (constraint~\ref{it:portable} in
 \prettyref{s:background}), since we had component metadata in an
 easily reprocessed form (the component XML files mentioned above), and
 since our packaging requirements were not particularly intricate, we
 settled in the end on using the EPM package manager~\cite{epm} to
 generate Debian \texttt{.deb} files, OS\,X \texttt{.mpkg} files, RPMs
-and others.  This packaging aspect is not one of our core committments
-for the future, so we are not worried that we are using a
-still-developing and untracked tool.
+and others, as a separate, auxiliary, task.  This packaging aspect is
+not one of our core committments for the future, so we are not worried
+that we are using a still-developing and untracked tool.
 
 \subsection{Do not include generated code in the repository}
 \label{s:generated}
@@ -320,17 +317,17 @@ repository can set file timestamps in such a way as to cause spurious
 regeneration of files in contexts where the generating tools are
 unavailable, or the wrong versions, or otherwise inappropriate (our
 actual experience was with CVS, but we doubt there is any reasonable
-model for a repository system which reliably avoids this problem).  Even
+logic for a repository system which fully reliably avoids this problem).  Even
 with a full understanding of the software involved, it is hard to
 explain just why this happens \emph{so} often, why it causes \emph{so}
 much trouble when it happens, or why working around the trouble is
-quite \emph{so} very errorprone.  All we can say is that handling
+quite \emph{so} very errorprone and fragile.  All we can say is that handling
 those few checked-in generated files that we could not avoid caused
 much more trouble and anguish than we were ever able to satisfactorily
 account for.
 
 Because we had our own versions of the autotools checked in to the
-repository, and built as part of the build system, we were not subject
+repository, and built as part of the bootstrap, we were not subject
 to the most prominent disadvantages of keeping generated files out of
 the repository, and were thus able to enjoy the advantages of
 robustness and predictability which flow from treating products as
@@ -340,11 +337,15 @@ the components in the collection, and that the bootstrapping phase
 mentioned in \prettyref{s:arch} -- the phase during which these
 generated files are in fact produced -- is much more protracted than
 it would otherwise be.  Both of these turn out to be rather minor
-disadvantages in fact.
+disadvantages in fact, since the represent a small addition to an
+already large network of dependencies, and the bootstrap phase either
+happens at night, when no-one cares how long it takes, or on those
+sporadic occasions when a developer feels a completely fresh checkout
+would be useful.
 
 The generated files that have nonetheless ended up checked-in are
 firstly those files used in the bootstrapping itself -- which means
-the makefiles and configure scripts of the build support tools, and
+the makefiles and configure scripts of the build support tools, plus
 the component metadata files -- and secondly the generated files in
 the tracked third party sources, because they are generated by tools,
 or versions of tools, which we do not have to hand.
@@ -364,13 +365,14 @@ possibly the Debian and RPM package frameworks
 literature on `dependency analysis' is concerned to discover
 fine-grained dependencies between modules or variables, as part of
 reverse-engineering or redocumenting software.  The broader question of
-inter-package dependencies is usually discussed in the context of
+inter-package dependencies is usually discussed as part of the decription of
 specific software tools to discover the dependencies, for example in
 an early paper by Wilde and Huitt~\cite{wilde91} and in the context of
 large scientific codes by Tuura and Taylor~\cite{tuura01}.
 
-We identified no fewer than five distinct dependency types, which are
-broadly consistent with the typology discussed in these sources.
+We identified five usefully distinct dependency types, which are
+broadly consistent with the typology discussed in these sources,
+though not matching any one in particular.
 
 First, \emph{sourceset dependencies} are the components which must be
 installed in order to build the complete set of sources, either for
@@ -378,9 +380,10 @@ building or for distribution.  This means those tools which are used
 to build documentation or build generated and distributed sources.
 That is, these are dependencies which are necessary to bootstrap a
 freshly checked-out repository, but which are not dependencies for a
-distributed package.
+distributed source package.
 
-Next, a component's \emph{build dependencies} are the dependencies
+Next, a component's \emph{build dependencies} are the inter-component
+dependencies 
 which are required in order to build it.  This most often implies
 files included during compilation, but also refers to project-specific
 tools -- for example to compile message files -- which must be run on
@@ -397,10 +400,10 @@ not have to be present in order to build library~$X$, only when you
 subsequently want to actually link against it.  Thus there is no
 problem in having cyclic link dependencies.  For an application, on
 the other hand, all its link dependencies will actually be build
-dependencies and should be declared as such as well.
+dependencies.
 
 This category is actually somewhat smaller than it might appear.  A
-C~library will typically (and ideally) have a set of header files
+C~library will essentially always have a set of header files
 containing C~prototypes which effectively describe the library's
 interface; since these header files will be included during the
 build of any software which uses the library, they must be
@@ -411,17 +414,20 @@ our libraries are Fortran libraries, for which there are
 libraries can in practice be built without difficulties; the fact that
 we discovered we did in fact have several such sets of cyclic
 dependencies meant that we had to rely on this unfortunate property in
-several places.
+several places.  References \cite{tuura01,wilde91} identify a category
+of implicit dependencies which appears to be the same as this one --
+functional dependencies which are not marked by actual inclusions of
+files; it is thankfully a rather small category.
 
 There is a further justification for these link dependencies, which is
 that if we distribute binary packages using shared libraries, the
 dependencies between them will be this set of link dependencies (thus
 it is analogous to \texttt{dpkg}'s \texttt{Depend} dependencies,
-without the issue of pre- and post-configuration).  This is not fully
-worked out, however, since apart from a few tests, the project has not
-routinely distributed binary packages.
+without the issue of pre- and post-configuration).  The network of
+such dependencies is not fully worked out, however, since apart from a
+few tests, the project has not routinely distributed binary packages.
 
-There are some components which must be installed before the configure
+There are a few components which must be installed before the configure
 step, since they must be present in order for other packages to
 configure against them.  These \emph{configure dependencies} are built
 prior to tree-wide configuration, in step~\ref{it:configuredeps} of
@@ -435,7 +441,7 @@ These are the components which a given component requires in order to
 function, but which are not link dependencies -- this rather small set
 includes, for us, only a small number of cases where a library uses a
 separate application to do some of its work.  These are irrelevant for
-the build (this is the difference from link dependencies), but would
+the build (this is the difference from build and link dependencies), but would
 be essential for packaging and distribution.
 
 %% All these relationships are transitive: if A has a build dependency on
@@ -451,11 +457,24 @@ be essential for packaging and distribution.
 %% where this `option' attribute is useful, though it is legal for each
 %% of the dependency types.
 
-Debugging dependencies?  Peter's multi-build.  Hard to be sure.
+%% Debugging dependencies?  Peter's multi-build.  Hard to be sure.
+
+One of our own and others' criticisms of our code base was that, over
+twenty years, it had had plenty time to fall victim to `big sticky
+lump' syndrome, and one of our hopes at the beginning of this effort
+was that reorganising the build system would resolve this problem.
+This was over-optimistic.  Although we did become aware of a few
+easily removed dependencies, in part because this was the first time
+that the network of dependencies was expressed explicitly, doing this
+on a larger scale would have required a more formal analysis we did
+not have the resources to perform, identifying refactoring targets we
+had not the resources to attack.
 
 
 \section{Lessons and Warnings}
 \label{s:lessons}
+
+\subsection{More tweaks than planned}
 
 The original plan was to autoconf everything with only necessary code
 changes -- in principle, we wanted to touch only makefiles.  However
@@ -486,6 +505,8 @@ but no less real benefits that the current developers have a stake in
 the design of the system, along with a more communitarian attitude to
 the code.
 
+\subsection{Patching the autotools}
+
 We should have bowed to the inevitable, and started patching the
 autotools earlier, since delaying this meant some functionality had to
 be implemented twice.  Our initial expectation was that we could
@@ -507,11 +528,26 @@ the program logic is in a monolithic kernel; however that kernel is
 relatively simple in overall design (suck in the input file to create
 a complicated internal state, modify that state, then spit out
 the result), the makefile fragments which it manages are organised in
-as modular a way as seems possible, and the code is well written, so
+as modular a way as seems possible, and the code is probably as well
+written as Perl can be, so
 that the tool as a whole is reasonably easy to patch.  In particular,
 automake is fairly amenable to cautious hacking, spotting likely
 features in existing \texttt{Makefile.in} files, and tracing them back
 to the code or template which generates them.
+
+As a general point, we feel the case for automake (or a tool very like
+it) is overwhelming.  Though
+there is a rather steep learning curve, and one does naturally suspect
+it of being dangerously clever, this turns out not to be a problem
+\emph{as long as} you are willing to build your project the way
+automake thinks it ought to be built.  Since the (GNU) coding
+standards it implements are both conventional and reasonably sensible,
+this is not the imposition it appears.  However it follows that
+adapting a pre-existing makefile to automake can be frustrating and
+hard, and we found it much less frustrating to start again, and produce the
+much shorter \texttt{Makefile.am} automake source file from scratch.
+
+\subsection{Tracking third party code}
 
 Even if we had not patched it, it is wise, in a project of this size,
 to keep a repository copy of the automake and autoconf distributions
@@ -539,17 +575,7 @@ exception is Perl, and the project happens to have on hand personnel
 with considerable Perl expertise), so that we have not in practice had
 to suffer many of the disadvantages of this policy.
 
-As a general point, we feel the case for automake (or a tool very like
-it) is overwhelming.  Though
-there is a rather steep learning curve, and one does naturally suspect
-it of being dangerously clever, this turns out not to be a problem
-\emph{as long as} you are willing to build your project the way
-automake thinks it ought to be built.  Since the (GNU) coding
-standards it implements are both conventional and reasonably sensible,
-this is not the imposition it appears.  However it follows that
-adapting a pre-existing makefile to automake can be frustrating and
-hard, and we found it much less frustrating to start again, and produce the
-much shorter \texttt{Makefile.am} automake source file from scratch.
+\subsection{Autoconf's Fortran support, and preprocessing Fortran}
 
 The Fortran support in autoconf is rather slim.  A large proportion of the
 autoconf extensions addressed the rather inadequate support for
@@ -585,6 +611,8 @@ incorporated Martin Wilck's autoconf extensions to provide this, and
 these are part of the autoconf patches we intend to submit to the
 autoconf mainline.
 
+\subsection{Odds and ends}
+
 The port to OS\,X was easier, in some ways, than we expected, partly
 because the OS\,X system compiler is a modified GCC.  However Apple's
 GCC installation does not include \texttt{g77}, so we needed to
@@ -602,8 +630,8 @@ the linking stage consumed a disproportionate amount of effort.
 We couldn't automatically convert our old build system to the new one,
 because, though tidily implemented, it was based on hand-adapted
 template makefiles, with an idiosyncratic collection of build targets
-(I never could remember the difference between \texttt{make export}
-and \texttt{make export-source}), providing much scope for ad hoc
+(I never could quite remember the difference between our three
+different export targets), providing much scope for ad hoc
 cleverness, making the conversion impossible to automate.  To the
 surprise of the present author -- much given to 
 delivering phillipics on the eccentricity, future expensiveness, and
@@ -613,20 +641,9 @@ old-style makefiles had to be changed by hand into new-style
 eccentric targets proved less important than the presence of the
 organising patterns.  Here, some structure was enough structure, and
 we discovered that the conversion could be done
-package by package without much thought, and that creating the
+package by package without much deep thought, and that creating the
 \texttt{Makefile.am} file in this way was a useful first step in
 acquianting oneself with the quirks of a package last touched last century.
-
-One of our own and others' criticisms of our code base was that, over
-twenty years, it had had plenty time to fall victim to `big sticky
-lump' syndrome, and one of our hopes at the beginning of this effort
-was that reorganising the build system would resolve this problem.
-This was over-optimistic.  Although we did become aware of a few
-easily removed dependencies, in part because this was the first time
-that the network of dependencies was expressed explicitly, doing this
-on a larger scale would have required a more formal analysis we did
-not have the resources to perform, identifying refactoring targets we
-had not the resources to attack.
 
 Although we did not set out to resolve our more tangled dependencies
 We found dependencies more complicated than we expected, and found at
@@ -648,6 +665,8 @@ all of the build system); all of the rest is at least licensed for
 academic use; users concerned about the remainder should get in touch
 with us and we'll try to work it out.
 
+\section{Conclusions}
+
 Starlink is a well-run project with disciplined developers, but we
 were surprised by the number of individually minor hurdles we had
 accumulated over a decade, despite our best efforts at vigilance,
@@ -664,8 +683,6 @@ running, and then another six to adapt the bulk of our code to the new
 system, followed by another six months of low-level tinkering to
 remove the wrinkles and have the nightly builds produce relocatable
 and useful distribution tarballs.
-
-\section{Conclusions}
 
 Though this autoconfing project consumed more resources than we
 expected, it has produced worthwhile results.  The code is now in a
