@@ -109,6 +109,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *        defined forward transformation.
 *     1-SEP-2004 (DSB):
 *        Ensure do1 and do2 are initialised before use in MapMerge.
+*     7-SEP-2005 (DSB):
+*        Take account of the Invert flag when using the zoom factor from
+*        a ZoomMap.
 *class--
 */
 
@@ -2792,8 +2795,10 @@ static AstMatrixMap *MatZoom( AstMatrixMap *mm, AstZoomMap *zm, int minv,
    axes). */
    nrow = astGetNout( mm );
    
-/* Get the zoom factor implemented by the ZoomMap. */
+/* Get the zoom factor implemented by the ZoomMap. Invert it if necessary
+   since astGetZoom does not take account of the Invert setting.  */
    zfac = astGetZoom( zm );
+   if( zinv ) zfac = 1.0 / zfac;
 
 /* Create a diagonal matrix map in which each diagonal element is equal
    to the zoom factor. */

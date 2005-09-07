@@ -7533,7 +7533,7 @@ static int MakeBasisVectors( AstMapping *map, int nin, int nout,
 *        "root" position.
 *     psetg
 *        A pointer to a PointSet which can be used to hold the required
-*        grid position. This should have room for nin+1 positions. On
+*        grid positions. This should have room for nin+1 positions. On
 *        return, the first position holds "g0", and the subsequent "nin" 
 *        positions hold are offset from "g0" by unit vectors along the
 *        corresponding grid axis. 
@@ -9707,8 +9707,7 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
 *        Mapping should match the number of inputs to "map2".
 *     map2
 *        The Mapping which converts native spherical coordinates into WCS
-*        coordinates. This Mapping should have the same number of inputs
-*        as outputs.
+*        coordinates. 
 *     colon
 *        The index of the celestial longitude output from "map2".
 *     colat
@@ -9734,7 +9733,8 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
    int axlat;                /* Index of latitude axis */
    int axlon;                /* Index of longitude axis */
    int iax;                  /* Axis index */
-   int nax;                  /* Number of axes */
+   int naxin;                /* Number of IWC axes */
+   int naxout;               /* Number of WCS axes */
    int ret;                  /* The returned FrameSet */
 
 /* Initialise */
@@ -9744,10 +9744,11 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
    if( !astOK ) return ret;
 
 /* Allocate resources. */
-   nax = astGetNin( map2 );
-   pset1 = astPointSet( 1, nax, "" );
+   naxin = astGetNin( map2 );
+   naxout = astGetNout( map2 );
+   pset1 = astPointSet( 1, naxin, "" );
    ptr1 = astGetPoints( pset1 );
-   pset2 = astPointSet( 1, nax, "" );
+   pset2 = astPointSet( 1, naxout, "" );
    ptr2 = astGetPoints( pset2 );
    if( astOK ) {
 
@@ -9758,8 +9759,7 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
       axlat = astGetWcsAxis( wcsmap, 1 );
 
 /* Use zero on all non-celestial axes. */
-      nax = astGetNout( wcsmap );
-      for( iax = 0; iax < nax; iax++ ) ptr1[ iax ][ 0 ] = 0.0;
+      for( iax = 0; iax < naxin; iax++ ) ptr1[ iax ][ 0 ] = 0.0;
 
 /* Get the native spherical coords at the fiducial point. */
       GetFiducialNSC( wcsmap, ptr1[ axlon ], ptr1[ axlat ] );

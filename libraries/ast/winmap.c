@@ -78,6 +78,9 @@ f     The WinMap class does not define any new routines beyond those
 *        Changes to simplification algorithm.
 *     1-SEP-2004 (DSB):
 *        Ensure do1 and do2 are initialised before use in MapMerge.
+*     7-SEP-2005 (DSB):
+*        Take account of the Invert flag when using the soom factor from
+*        a ZoomMap.
 *class--
 */
 
@@ -2988,6 +2991,14 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
    wm1 = (AstWinMap *) map1;
    wm2 = (AstWinMap *) map2;
 
+   printf("%s %s\n", astGetIdent( wm1 ), astGetIdent( wm2 ) );
+
+   if( !strcmp( astGetIdent( wm1 ), "DDD" ) ||
+       !strcmp( astGetIdent( wm2 ), "DDD" ) ) {
+      printf("Got WinMap DDD\n");
+   }
+
+
 /* Temporarily set their Invert attributes to the supplied values. */
    invert[ 0 ] = astGetInvert( wm1 );
    astSetInvert( wm1, inv1 );
@@ -3196,8 +3207,10 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
    old_zinv = astGetInvert( zm );
    astSetInvert( zm, zinv );
    
-/* Get the zoom factor implemented by the ZoomMap. */
+/* Get the zoom factor implemented by the ZoomMap. Invert it if necessary
+   since astGetZoom does not take account of the Invert setting.  */
    zfac = astGetZoom( zm );
+   if( zinv ) zfac = 1.0 / zfac;
 
 /* Create copies of the scale and shift terms from the WinMap, and store the 
    number of axes in it. */

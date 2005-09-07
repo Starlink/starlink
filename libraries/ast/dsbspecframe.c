@@ -62,7 +62,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     7-OCT-2004 (DSB):
 *        Fixed SetAttrib code which assigns values to SideBand. Previously 
 *        all supplied values were ignored, leaving SideBand unchanged.
-
+*     2-SEP-2005 (DSB):
+*        Allow conversion in any DOmain within TopoMap (sometimes
+*        SpecFrames have a new Domain set which is not equal to SPECTRUM").
 *class--
 
 *  Implementation Deficiencies:
@@ -1598,9 +1600,7 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
    topocentric frequency in Hz. */
-   fs = astConvert( tf1, tf2, "SPECTRUM" );
-   tf1 = astAnnul( tf1 );
-   tf2 = astAnnul( tf2 );
+   fs = astConvert( tf1, tf2, "" );
    if ( astOK ) {
       if( !fs ) {
          astError( AST__INTER, "%s(%s): Cannot convert DSBCentre "
@@ -1613,6 +1613,10 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
       }
       fs = astAnnul( fs );
    }
+
+/* Free resources */
+   tf1 = astAnnul( tf1 );
+   tf2 = astAnnul( tf2 );
 
 /* Annul the result if an error has occurred. */
    if( !astOK ) result = astAnnul( result );
