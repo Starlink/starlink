@@ -69,7 +69,7 @@ C
 C     Output -- All TYPE REAL variables are DOUBLE PRECISION
 C         NDEG -   degree of the highest degree fit computed.
 C         EPS -    RMS error of the polynomial of degree  NDEG .
-C         R -      vector of dimension at least NDEG containing values
+C         R -      vector of dimension at least N containing values
 C                  of the fit of degree  NDEG  at each of the  X(I) .
 C                  Except when the statistical test is used, these
 C                  values are more accurate than results from subroutine
@@ -129,7 +129,9 @@ C   920527  Corrected erroneous statements in DESCRIPTION.  (WRB)
 C   950404  Implement status.  (HME)
 C   950517  Return immediately if PDA_DP1VLU returns a status.  (HME)
 C***END PROLOGUE  PDA_DPOLFT
+      IMPLICIT NONE
       INTEGER STATUS
+      INTEGER N
       INTEGER I,IDEGF,IERR,J,JP1,JPAS,K1,K1PJ,K2,K2PJ,K3,K3PI,K4,
      * K4PI,K5,K5PI,KSIG,M,MAXDEG,MOP1,NDEG,NDER,NFAIL
       DOUBLE PRECISION TEMD1,TEMD2
