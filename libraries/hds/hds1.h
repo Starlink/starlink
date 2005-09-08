@@ -128,9 +128,9 @@ typedef unsigned long int UINT_BIG;
 /* The internal size of array dimensions within HDS can be either 32 or 64  */
 /* bits. Note that 64 bits is untested and WILL change the file format!!!   */
 #if !defined(HDS_64)
-typedef unsigned int HDS_PTYPE;
+typedef int HDS_PTYPE;
 #else
-typedef UINT_BIG HDS_PTYPE;
+typedef INT_BIG HDS_PTYPE;
 #endif
 
 /* Global Structure Definitions:					    */
