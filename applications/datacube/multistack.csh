@@ -4,30 +4,32 @@
 #     multistack.csh
 #
 #  Purpose:
-#     Averages groups of spectra extracted from a 3D IFU NDF and then
-#     plots these averaged spectra in a stack.
+#     Averages groups of spectra extracted from a three-dimensional IFU NDF and 
+#     then plots these averaged spectra in a stack.
 #
 #  Type of Module:
-#     C shell script.
+#     C-shell script.
 #
 #  Usage:
 #     multistack [-i filename] [-g number] [-n number] [-o number] [-z/+z] 
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-#     and presents the user with a white light image of the cube. The user
-#     can then select a number of x,y position using the cursor. The script
-#     will then group these spectra creating an average spectra and display
-#     the average spedtra in a "stack" with each spectra plotted offset
-#     vertically from the prevous one in the stack.
+#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
+#     and presents you with a white-light image of the cube.   You can
+#     then select a number of X-Y positions using the cursor.  The script
+#     will then group these spectra creating an average spectrum for each
+#     group.  It then displays the average spectra in a "stack", where each
+#     group spectrum plotted offset vertically from the prevous one in the
+#     stack.
 #
 #  Parameters:
-#     -i filename
-#       The script will use this as its input file, the specified file should
-#       be a 3D NDF, by default the script will prompt for the input file.
 #     -g number
 #       The number of spectra in a group.
+#     -i filename
+#       The script will use this as its input file, the specified file should
+#       be a three-dimensional NDF.  By default the script will prompt for the
+#       input file.
 #     -n number
 #       The number of groups to extract.
 #     -o number
@@ -42,6 +44,7 @@
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -51,50 +54,53 @@
 #       Fixed some bugs
 #     18-OCT-2001 (AALLAN):
 #       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#     2005 September 6 (MJC):
+#       Some tidying of grammar, punctuation, and spelling.  Added section
+#       headings in the code.  Attempt removal of files silently.
+#       Clarify the description.  Ordered the parameters alphabetically.
+#       Avoid :r.
+#     {enter_further changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #-
 
-# on interrupt
+# Preliminaries
+# =============
+
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# clean up from previous runs
-
+# Clean up from previous runs.
 rm -f ${tmpdir}/${user}/mstk* >& /dev/null
 
-# do variable initialisation
-
+# Do variable initialisation.
 mkdir ${tmpdir}/${user}
 set curfile = "${tmpdir}/${user}/mstk_cursor.tmp"
-set colfile = "${tmpdir}/${user}/mstk_col.sdf"
+set colfile = "${tmpdir}/${user}/mstk_col"
 touch ${curfile}
 
-set args = ($argv[1-])
-set plotdev = "xwin"
 set gotinfile = "FALSE"
 set gotgrp = "FALSE"
 set gotnum = "FALSE"
 set gotoff = "FALSE"
 set gotzoom = "ASK"
 
-# do package setup
-
-alias echo 'echo > /dev/null'
-source ${DATACUBE_DIR}/datacube.csh
-unalias echo
-
-# handle any command line arguements
-
+# Handle any command-line arguements.
+set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
-   case -i:    # input 3D IFU NDF
+   case -g:    # number of groups
+      shift args
+      set gotgrp = "TRUE"
+      set numgrp = $args[1]
+      shift args
+      breaksw      
+   case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
       set infile = $args[1]
@@ -106,34 +112,36 @@ while ( $#args > 0 )
       set numspec = $args[1]
       shift args
       breaksw    
-   case -g:    # number of groups
-      shift args
-      set gotgrp = "TRUE"
-      set numgrp = $args[1]
-      shift args
-      breaksw      
    case -o:    # offset for each spectra
       shift args
       set gotoff = "TRUE"
       set offset = $args[1]
       shift args
       breaksw      
-   case -z:    # zoom
+   case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
       breaksw 
-   case +z:    # not zoom
+   case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
       breaksw                            
    endsw  
 end
 
-# get input filename
+# Do the package setup.
+alias echo 'echo > /dev/null'
+source ${DATACUBE_DIR}/datacube.csh
+unalias echo
 
+# Obtain details of the input cube.
+# =================================
+
+# Get the input filename.
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
+   set infile = ${infile:r}
 endif
 
 echo " "
@@ -149,8 +157,7 @@ if ( ! -e ${infile}.sdf ) then
    exit  
 endif
 
-# find out the cube dimensions
-
+# Check that it exists.
 ndftrace ${infile} >& /dev/null
 set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
@@ -172,21 +179,27 @@ echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
 
-# collapse white light image
+# Show the white-light image.
+# ===========================
 
+# Collapse white-light image.
 echo "      Collapsing:"
-echo "        White light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile:r} axis=3" >& /dev/null 
+echo "        White-light image: ${dims[1]} x ${dims[2]}"
+collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
 
-# display collapsed image
+# Setup the plot device.
+set plotdev = "xwin"
 
+# Display the collapsed image.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
 
-# ask for number of spectra to grab
+# Form spectral stack of averaged spectra.
+# ========================================
 
+# Ask for number of spectra to grab.
 if ( ${gotgrp} == "FALSE" ) then
    echo " "
    echo -n "Number of groups: "
@@ -201,72 +214,72 @@ endif
 
 echo " "
 
-# loop round the groups
+# Form spectral groups.
+# ---------------------
+
+# Loop through the groups.
 set grpcount = 1
 while ( $grpcount <= $numgrp )
 
-   # setup mean spectra file
-   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}.sdf"
-      
-   # loop round the spectra
+# Setup the mean spectrum file.
+   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}"
 
+# Loop through the spectra.
    set counter = 1
    while ( $counter <= $numspec )
 
-      # setup extraction file
+# Setup the extraction file.
+      set specfile = "${tmpdir}/${user}/mstk_g${grpcount}_s${counter}"
 
-      set specfile = "${tmpdir}/${user}/mstk_g${grpcount}_s${counter}.sdf"
-
-      # grab x,y position
-
+# Grab an X-Y position.
       echo " "
-      echo "  Left click on pixel to be extracted"
+      echo "  Left click on pixel to be extracted."
    
       cursor showpixel=true style="Colour(marker)=2" plot=mark \
              maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
 
-      # wait for cursor output 
-
+# Wait for CURSOR output.
       while ( ! -e ${curfile} ) 
          sleep 1
       end
 
-      # grab position 
-
+# Grab the position.
       set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-      # get pixel co-ordinates
-
+# Get the pixel co-ordinates and convert to grid indices.
       set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
       set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
       @ xpix = $xpix + 1
       @ ypix = $ypix + 1
 
-      # clean up the cursor temporary file
-
-      rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+      rm -f ${curfile} >& /dev/null
       touch ${curfile}
 
-      # extract the spectra
-
+# Extract the spectrum.
+# ---------------------
       echo " "
-      echo "      Extracing:"
+      echo "      Extracting:"
       echo "        (X,Y) pixel: ${xpix},${ypix}"
 
-      # extract spectra from cube
-
+# Extract the spectrum from cube.
       ndfcopy in="${infile}($xpix,$ypix,)" out=${specfile} trim=true \
-      trimwcs=true
- 
-      # if this is the 1st spectra extracted create the ave file
+              trimwcs=true
+
+# Add the current spectrum to the group spectrum.
+# -----------------------------------------------
+
+# If this is the first spectrum extracted, create the file to store
+# the average spectrum for the group.
       if ( ${counter} == 1 ) then
-         cp -f ${specfile} ${grpfile}
+         ndfcopy "in=${specfile} out=${grpfile}"
          echo "        Creating: Group ${grpcount}"
+
       else
          echo "        Adding: Group ${grpcount}"
-         mv ${grpfile} ${grpfile:r}_tmp.sdf
-         add in1="${grpfile:r}_tmp" in2=${specfile:r} out=${grpfile:r} 
-         rm -f ${grpfile:r}_tmp.sdf 
+         ndfcopy "in=${grpfile} out=${grpfile}_tmp"
+         add in1="${grpfile}_tmp" in2=${specfile} out=${grpfile} 
+         rm -f ${grpfile}_tmp.sdf >& /dev/null
       endif
       
       # increment counter
@@ -274,17 +287,22 @@ while ( $grpcount <= $numgrp )
 
    end
    
-   # take the mean
-   mv ${grpfile} ${grpfile:r}_tmp.sdf
-   cdiv in="${grpfile:r}_tmp" out=${grpfile:r} scalar=${numgrp}
-   rm -f ${grpfile:r}_tmp.sdf
+# Take the mean of the current group spectrum.
+   ndfcopy "in=${grpfile} out=${grpfile}_tmp"
+   cdiv in="${grpfile}_tmp" out=${grpfile} scalar=${numgrp}
+   rm -f ${grpfile}_tmp.sdf >& /dev/null
 
-   # increment group counter
+# Increment the group counter.
    @ grpcount = $grpcount + 1
 
 end
 
-# get the offset between each spectrum
+# At this point we have average spectra for each group.
+
+# Apply offsets to group spectra.
+# ===============================
+
+# Get the offset between each spectrum.
 
 if ( ${gotoff} == "FALSE" ) then
    echo " "
@@ -295,50 +313,48 @@ endif
 echo " "
 echo "      Adding:"
 
-# add offsets to each spectrum
-
+# Add offsets to each spectrum.
 set grpcount = 1
 while ( $grpcount <= $numgrp )
 
-   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}.sdf" 
-   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off.sdf" 
-   
-# do the addition
-   set specoff = \
-                `calc exp="'${offset}*(${grpcount}-1)'" prec=_double`
+   set grpfile = "${tmpdir}/${user}/mstk_g${grpcount}" 
+   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
+
+# Do the addition.
+   set specoff = `calc exp="'${offset}*(${grpcount}-1)'" prec=_double`
 
    echo "        Adding ${specoff} to spectrum ${grpcount}"
 
-   cadd in=${grpfile:r} out=${outfile:r} scalar=${specoff}
+   cadd in=${grpfile} out=${outfile} scalar=${specoff}
 
-# increment counter
-
+# Increment the group counter.
    @ grpcount = $grpcount + 1
 end
 
-# do the plot
+# Create the multi-spectrum plot.
+# ===============================
 
 gdclear device=${plotdev}
 
 echo " "
 echo "      Plotting:"
 
+# Plot each group spectrum in turn in the same graphic.
 set grpcount = $numgrp
 while ( $grpcount > 0 )
    
-   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off.sdf" 
+   set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
 
    echo "        Group: ${grpcount} "
 
-   linplot ${outfile:r} device=${plotdev} style="Colour(curves)=1"\
+   linplot ${outfile} device=${plotdev} style="Colour(curves)=1"\
            clear=no ybot=0 >& /dev/null
 
    @ grpcount = $grpcount - 1
 
 end
 
-# zoom if required
-
+# Zoom if required.
 if ( ${gotzoom} == "ASK") then
    echo " "
    echo -n "Zoom in (yes/no): "
@@ -351,29 +367,31 @@ endif
 
 if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
-# get the lower limit
-
+# Get the lower limit.
+# --------------------
    echo " "
-   echo "  Left click on lower zoom boundary"
-   
+   echo "  Left click on lower zoom boundary."
+
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
+
    while ( ! -e ${curfile} ) 
       sleep 1
    end
    set pos = `parget lastpos cursor`
    set low_z = $pos[1]
 
-# clean up the cursor temporary file
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
    
-# get the upper limit
-
-   echo "  Left click on upper zoom boundary"
+# Get the upper limit.
+# --------------------
+   echo "  Left click on upper zoom boundary."
    
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
+
    while ( ! -e ${curfile} ) 
       sleep 1
    end
@@ -385,12 +403,12 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
 
-# clean up the cursor temporary file
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
 
-# do the plot
-
+# Create the zoomed plot.
+# -----------------------
    gdclear device=${plotdev}
 
    echo " "
@@ -399,12 +417,12 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    set grpcount = $numgrp
    while ( $grpcount > 0 )
    
-      set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off.sdf" 
-   
+      set outfile = "${tmpdir}/${user}/mstk_g${grpcount}_off" 
+
       echo "        Group: ${grpcount} "
 
-      linplot ${outfile:r} xleft=${low_z} xright=${upp_z}\
-              device=${plotdev} style="Colour(curves)=1"\
+      linplot ${outfile} xleft=${low_z} xright=${upp_z} \
+              device=${plotdev} style="Colour(curves)=1" \
               clear=no ybot=0 >& /dev/null
 
       @ grpcount = $grpcount - 1
@@ -412,8 +430,9 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    end
 endif
 
-# clean up
+# Clean up.
+# =========
 cleanup:
 
 rm -f ${tmpdir}/${user}/mstk* >& /dev/null     
-rmdir ${tmpdir}/${user}
+rmdir ${tmpdir}/${user} >& /dev/null
