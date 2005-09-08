@@ -107,7 +107,7 @@ if ( *status != SAI__OK ) return;
       bpix = 1;
       break;
    case IDL_TYP_STRING:
-      datType( cloc, type, status);
+      idlDatType( cloc, type, status);
       bpix = 1;
       break;
    default:
@@ -121,9 +121,9 @@ if ( *status != SAI__OK ) return;
 
    if ( (*status == SAI__OK ) && bpix ) {
 /* Map the data as if a vector - provided it is defined */
-      datState( cloc, &defined, status );
+      idlDatState( cloc, &defined, status );
       if ( defined ) {
-         datMapv( cloc, type, "READ", &cpntr, &nels, status );
+         idlDatMapv( cloc, type, "READ", &cpntr, &nels, status );
          if ( *status != SAI__OK ) {
             emsRep(" ", "Failed to map HDS component", status );
          } else {
@@ -171,7 +171,7 @@ if ( *status != SAI__OK ) return;
                   } /* end of case */
                } /* end of if array */
             } /* end if string */
-            datUnmap( cloc, status );
+            idlDatUnmap( cloc, status );
          } /* end of mapped data */
       } /* end of if defined */
    } /* end of bpix non-zero */

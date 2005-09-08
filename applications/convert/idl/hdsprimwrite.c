@@ -99,7 +99,7 @@ int i;
 
    if ( strncmp( hdstype, "_CHAR", 5 ) ) {
       if ( *hdstype == '_' ) {
-         datPut( toploc, hdstype, ndims, dims, data, status );
+         idlDatPut( toploc, hdstype, ndims, dims, data, status );
       } else {
          *status = SAI__ERROR;
          emsSetc( "TYPE", hdstype, EMS__SZTOK );
@@ -109,7 +109,7 @@ int i;
    } else {
       clen = atoi( hdstype+6 )+1;
       carray = getstringarray( ndims, dims, data );
-      datPutc( toploc, ndims, dims, carray, clen, status );
+      idlDatPutc( toploc, ndims, dims, carray, clen, status );
       retstringarray(carray);
    }
 return;

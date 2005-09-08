@@ -111,24 +111,24 @@ int valid;
             if (checkarr( comp, name, &slice, &ndims, starts, ends, status )) {
 /* only part of array component required */
                if( file_opened ) {
-                  datFind( loc, name, tmploc, status );
+                  idlDatFind( loc, name, tmploc, status );
                } else {
                   idlHdsOpen( name, acmode, tmploc, status );
                }
 
                if ( slice ) {
-                  datSlice( tmploc, ndims, starts, ends, botloc, status );
+                  idlDatSlice( tmploc, ndims, starts, ends, botloc, status );
                } else {
-                  datCell( tmploc, ndims, starts, botloc, status );
+                 idlDatCell( tmploc, ndims, starts, botloc, status );
                }
-               datPrmry( TRUE , botloc, &true, status );
-               datAnnul( tmploc, status );
+               idlDatPrmry( TRUE , botloc, &true, status );
+               idlDatAnnul( tmploc, status );
 
             } else {
 /* Whole component required */
                if( file_opened ) {
-                  datFind( loc, name, botloc, status );
-                  datPrmry( TRUE , botloc, &true, status );
+                  idlDatFind( loc, name, botloc, status );
+                  idlDatPrmry( TRUE , botloc, &true, status );
                } else {
                   idlHdsOpen( name, acmode, botloc, status );
                }
@@ -140,11 +140,11 @@ int valid;
             if ( !file_opened ) {
                file_opened = TRUE;                 
             } else {
-               datAnnul( loc, status );
+               idlDatAnnul( loc, status );
             }
-            datClone( botloc, loc, status );
-            datPrmry( TRUE, loc, &true, status );
-            datAnnul( botloc, status );
+            idlDatClone( botloc, loc, status );
+            idlDatPrmry( TRUE, loc, &true, status );
+            idlDatAnnul( botloc, status );
          }
       }
       free( tempstr );

@@ -113,13 +113,13 @@ IDL_ARRAY arr;            /* subdirectory array structure */
    sref2.arr = &arr;
 
 /* Get the HDS structure shape */
-   datShape( sloc, MAXDIMS, dims, &ndims, status );
+   idlDatShape( sloc, MAXDIMS, dims, &ndims, status );
 /* Treat it as a vector of structures */
-   datVec( sloc, vloc, status );
+   idlDatVec( sloc, vloc, status );
 /* Get its size */
-   datSize( vloc, &nsels, status );
+   idlDatSize( vloc, &nsels, status );
 /* Set the HDS structure type */
-   datType(  sloc, type, status );
+   idlDatType(  sloc, type, status );
 
 /* Get the IDL structure tag info */
    if ((toffset=IDL_StructTagInfoByIndex( sdef, 0, IDL_MSG_RET, &datav ))
@@ -166,12 +166,12 @@ IDL_ARRAY arr;            /* subdirectory array structure */
          nscomp = IDL_StructNumTags( sdefc );
 
 /* Get locator to the corresponding HDS structure array cell */
-         datCell( vloc, 1, &k, aloc, status );
+         idlDatCell( vloc, 1, &k, aloc, status );
          if ( *status != SAI__OK ) {
             emsRep( " ", 
             "Failed to get locator to structure array element", status );
          } else {
-            datNcomp( aloc, &ncomp, status );
+            idlDatNcomp( aloc, &ncomp, status );
             if ( ncomp + 1 != nscomp ) {
                if ( *status == SAI__OK )
                   *status = SAI__ERROR;
@@ -204,8 +204,8 @@ IDL_ARRAY arr;            /* subdirectory array structure */
                      idltype = datav->type;
 
 /* Get locator to i'th component of the HDS structure */
-                     datIndex( aloc, i, cloc, status );
-                     if ( *status != SAI__OK ) {         
+                     idlDatIndex( aloc, i, cloc, status );
+                     if( *status != SAI__OK ) {         
                         emsRep(" ", "Failed locator to next index", status );
                      } else {
 /* check type compatibility */
@@ -223,16 +223,16 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 /* It's primitive data */
                            idlprimfill( cloc, datav, tdata, status );                           
                         }
-                        datAnnul( cloc, status );
+                        idlDatAnnul( cloc, status );
                      } /* end index  got OK */
                   } /* end offset got OK */
                } /* end for each component */
             } /* end of component number agreement OK */
-         datAnnul( aloc, status );
+         idlDatAnnul( aloc, status );
          } /* end of structure cell got OK */
 /* increment pointer to structure start */
       } /* end of for each structure vector element */
-   datAnnul( vloc, status );
+   idlDatAnnul( vloc, status );
    } /* end of got tag0 info */
    return;
 

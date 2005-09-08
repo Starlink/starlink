@@ -153,7 +153,7 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
       getcomp( IDL_STRING_STR(objname), "READ", objloc, &status );
 
    /* Check for structure or primitive */
-      datStruc( objloc, &isstruct, &status );
+      idlDatStruc( objloc, &isstruct, &status );
       if (status == SAI__OK) {
          if ( isstruct ) {
          /* Create a structure */
@@ -167,9 +167,9 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
 
          } else {
          /* Object is primitive */
-            datType( objloc, type, &status );
+            idlDatType( objloc, type, &status );
             idltype = getidltype( type );
-            datShape( objloc, DAT__MXDIM, dims, &ndims, &status );
+            idlDatShape( objloc, DAT__MXDIM, dims, &ndims, &status );
             if ( status == SAI__OK ) {
                if (ndims) {
                /* Get dimensions IDL style */
@@ -192,7 +192,7 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
          }
 
       /* Annul the object (and close the file) */
-         datAnnul( objloc, &status );
+         idlDatAnnul( objloc, &status );
       }
    }
 

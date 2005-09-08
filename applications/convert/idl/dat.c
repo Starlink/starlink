@@ -6,7 +6,7 @@ F77_SUBROUTINE(dat_annul)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datAnnul( char *loc,
+void idlDatAnnul( char *loc,
                int *status ) {
 
 DECLARE_CHARACTER(floc,DAT__SZLOC);
@@ -32,7 +32,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(loc1),
                           TRAIL(loc1)
                           TRAIL(loc2) );
 
-void datCell( const char *loc1,
+void idlDatCell( const char *loc1,
               int ndim,
               const int *sub,
               char *loc2,
@@ -71,7 +71,7 @@ F77_SUBROUTINE(dat_clen)( CHARACTER(loc),
                           INTEGER(status)
                           TRAIL(loc) );
 
-void datClen( const char *loc,
+void idlDatClen( const char *loc,
               int *clen,
               int *status ) {
 
@@ -98,7 +98,7 @@ F77_SUBROUTINE(dat_clone)( CHARACTER(loc1),
                            TRAIL(loc1)
                            TRAIL(loc2) );
 
-void datClone( const char *loc1,
+void idlDatClone( const char *loc1,
                char *loc2,
                int *status ) {
 
@@ -128,7 +128,7 @@ F77_SUBROUTINE(dat_find)( CHARACTER(loc1),
                           TRAIL(name)
                           TRAIL(loc2) );
 
-void datFind( const char *loc1,
+void idlDatFind( const char *loc1,
               const char *name,
               char *loc2,
               int *status ) {
@@ -162,7 +162,7 @@ F77_SUBROUTINE(dat_index)( CHARACTER(loc1),
                            TRAIL(loc1)
                            TRAIL(loc2) );
 
-void datIndex( const char *loc1,
+void idlDatIndex( const char *loc1,
                int index,
                char *loc2,
                int *status ) {
@@ -198,7 +198,7 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(loc),
                           TRAIL(type)
                           TRAIL(mode) );
 
-void datMapv( const char *loc,
+void idlDatMapv( const char *loc,
               const char *type,
               const char *mode,
               void * *ptr,
@@ -239,7 +239,7 @@ F77_SUBROUTINE(dat_name)( CHARACTER(loc),
                           TRAIL(loc)
                           TRAIL(name) );
 
-void datName( const char *loc,
+void idlDatName( const char *loc,
               char *name,
               int *status ) {
 
@@ -266,7 +266,7 @@ F77_SUBROUTINE(dat_ncomp)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datNcomp( const char *loc,
+void idlDatNcomp( const char *loc,
                int *ncomp,
                int *status ) {
 
@@ -297,7 +297,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(loc),
                          TRAIL(name)
                          TRAIL(type) );
 
-void datNew( const char *loc,
+void idlDatNew( const char *loc,
              const char *name,
              const char *type,
              int ndim,
@@ -342,7 +342,7 @@ F77_SUBROUTINE(dat_prim)( CHARACTER(loc),
                           INTEGER(status)
                           TRAIL(loc) );
 
-void datPrim( const char *loc,
+void idlDatPrim( const char *loc,
               int *reply,
               int *status ) {
 
@@ -369,7 +369,7 @@ F77_SUBROUTINE(dat_prmry)( LOGICAL(set),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datPrmry( int set,
+void idlDatPrmry( int set,
                char *loc,
                int *prmry,
                int *status ) {
@@ -405,7 +405,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(loc),
                          TRAIL(loc)
                          TRAIL(type) );
 
-void datPut( const char *loc,
+void idlDatPut( const char *loc,
              const char *type,
              int ndim,
              const int *dim,
@@ -476,7 +476,7 @@ int value_length;
       if ( strlen(type) > 5 ) {
          value_length = atoi( type+6 );
       } else {
-         datClen( loc, &value_length, status );
+         idlDatClen( loc, &value_length, status );
       }
       F77_CREATE_CHARACTER_ARRAY(cvalue,value_length,nvalues);
       F77_EXPORT_CHARACTER_ARRAY_P(value,cvalue,value_length,nvalues);
@@ -525,7 +525,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(loc),
                           TRAIL(loc)
                           TRAIL(value) );
 
-void datPutc( const char *loc,
+void idlDatPutc( const char *loc,
               int ndim,
               const int *dim,
               char *const *value,
@@ -570,7 +570,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datShape( const char *loc,
+void idlDatShape( const char *loc,
                int ndimx,
                int *dim,
                int *ndim,
@@ -607,7 +607,7 @@ F77_SUBROUTINE(dat_size)( CHARACTER(loc),
                           INTEGER(status)
                           TRAIL(loc) );
 
-void datSize( const char *loc,
+void idlDatSize( const char *loc,
               int *size,
               int *status ) {
 
@@ -637,7 +637,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(loc1),
                            TRAIL(loc1)
                            TRAIL(loc2) );
 
-void datSlice( const char *loc1,
+void idlDatSlice( const char *loc1,
                int ndim,
                const int *diml,
                const int *dimu,
@@ -684,7 +684,7 @@ F77_SUBROUTINE(dat_state)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datState( const char *loc,
+void idlDatState( const char *loc,
                int *reply,
                int *status ) {
 
@@ -710,7 +710,7 @@ F77_SUBROUTINE(dat_struc)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datStruc( const char *loc,
+void idlDatStruc( const char *loc,
                int *reply,
                int *status ) {
 
@@ -737,7 +737,7 @@ F77_SUBROUTINE(dat_type)( CHARACTER(loc),
                           TRAIL(loc)
                           TRAIL(type) );
 
-void datType( const char *loc,
+void idlDatType( const char *loc,
               char *type,
               int *status ) {
 
@@ -763,7 +763,7 @@ F77_SUBROUTINE(dat_unmap)( CHARACTER(loc),
                            INTEGER(status)
                            TRAIL(loc) );
 
-void datUnmap( const char *loc,
+void idlDatUnmap( const char *loc,
                int *status ) {
 
 DECLARE_CHARACTER(floc,DAT__SZLOC);
@@ -786,7 +786,7 @@ F77_SUBROUTINE(dat_vec)( CHARACTER(loc1),
                          TRAIL(loc1)
                          TRAIL(loc2) );
 
-void datVec( const char *loc1,
+void idlDatVec( const char *loc1,
              char *loc2,
              int *status ) {
 

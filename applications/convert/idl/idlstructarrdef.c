@@ -89,7 +89,7 @@ char type[DAT__SZTYP];
    if ( !(*status == SAI__OK) ) return;
 
 /* Get memory for tags */
-   datSize ( sloc, &nels, status );
+   idlDatSize ( sloc, &nels, status );
    tags = (IDL_STRUCT_TAG_DEF *)IDL_GetScratch( &tagvar, (IDL_LONG)nels+2,
             (IDL_LONG)sizeof(IDL_STRUCT_TAG_DEF) );
    
@@ -106,12 +106,12 @@ char type[DAT__SZTYP];
    tagname = tagnames;
 
 /* Get the array as a vector */
-   datVec( sloc, vloc, status );
+   idlDatVec( sloc, vloc, status );
 
 /* Now go through the structure setting up the tags array */
 /* for each element. Each will be a scalar structure      */
    for ( i=1; (*status==SAI__OK) && (i<=nels); i++ ) {
-      datCell( vloc, 1, &i, cloc, status );
+      idlDatCell( vloc, 1, &i, cloc, status );
 
       if ( *status == SAI__OK ) {
 
@@ -144,11 +144,11 @@ char type[DAT__SZTYP];
          }
       } /* end cell got OK */
 
-      datAnnul( cloc, status );
+      idlDatAnnul( cloc, status );
 
    } /* end for each element */
 
-   datAnnul( vloc, status );
+   idlDatAnnul( vloc, status );
 
    if ( *status == SAI__OK ) {
 /* Terminate the tags */

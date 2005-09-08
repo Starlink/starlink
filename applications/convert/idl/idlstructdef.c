@@ -113,14 +113,14 @@ UCHAR idltype; /* IDL type of component */
 
 if ( !(*status == SAI__OK) ) return;
 
-datShape( sloc, maxdims, dims, &ndims, status );
+idlDatShape( sloc, maxdims, dims, &ndims, status );
 if ( !ndims ) {
-   datNcomp ( sloc, &ncomp, status );
+   idlDatNcomp ( sloc, &ncomp, status );
    tags = (IDL_STRUCT_TAG_DEF *)IDL_GetScratch( &tagvar, (IDL_LONG)ncomp+2,
             (IDL_LONG)sizeof(IDL_STRUCT_TAG_DEF) );
 
 /* Set tag for the HDS type */
-   datType( sloc, type, status );
+   idlDatType( sloc, type, status );
    tags[0].name = hdsstructype;
    tags[0].dims = 0;
    tags[0].type = (void *)IDL_TYP_STRING;
@@ -140,9 +140,9 @@ if ( !ndims ) {
 
 /* Now go through the structure setting up the tags array */
    for ( i=1; (*status==SAI__OK) && (i<=ncomp); i++ ) {
-      datIndex( sloc, i, cloc, status );
-      datName( cloc, name, status );
-      datPrim( cloc, &prim, status );
+      idlDatIndex( sloc, i, cloc, status );
+      idlDatName( cloc, name, status );
+      idlDatPrim( cloc, &prim, status );
       if ( !prim ) {
 /* It's another structure                                                    */
 /* For IDL arrays of structures each element must have the same structure    */
@@ -156,8 +156,8 @@ if ( !ndims ) {
          tags[i].type = (void*)idlstructdef(cloc, status);
 
       } else {
-         datShape( cloc, maxdims, dims, &ndims, status );
-         datType( cloc, type, status );
+         idlDatShape( cloc, maxdims, dims, &ndims, status );
+         idlDatType( cloc, type, status );
 
          if ( *status == SAI__OK ) {
 
@@ -203,10 +203,10 @@ if ( !ndims ) {
                emsRep( " ", "Illegal type ^TYPE", status );
             }
 
-            datAnnul( cloc, status );
+            idlDatAnnul( cloc, status );
          } /* endif cloc OK */
 
-      } /* end if structure
+      } /* end if structure */
 
 /* Set the flags */
       tags[i].flags = (UCHAR)0;
@@ -229,7 +229,7 @@ if ( !ndims ) {
 
 } else {
 /* It's an array of structures */
-   datName( sloc, name, status );
+   idlDatName( sloc, name, status );
    s = idlstructarrdef( sloc, name, ndims, dims, status);
 
 }
