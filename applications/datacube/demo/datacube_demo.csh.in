@@ -2,59 +2,61 @@
 #+
 
 #  Name:
-#     daatcube_demo.csh
+#     datacube_demo.csh
 
 #  Purpose:
-#     Demo script for the datacube package
+#     Demonstrates the DATACUBE package.
 
 #  Type of Module:
-#     C shell script.
+#     C-shell script.
 
 #  Usage:
 #     datacube_demo
 
 #  Description:
-#     This shell script is a simple demo script to check that everything
-#     has installed correctly.
+#     This shell script is a simple demonstration script to check that
+#     everything has installed correctly.
 
-#
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 
 #  History:
 #     29-DEC-2000 (AALLAN):
-#       Original version.
+#        Original version.
 #     18-OCT-2001 (AALLAN):
-#       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#        Modified temporary files to use ${tmpdir}/${user}.
+#     2005 September 6 (MJC):
+#        Some tidying: punctuation and spelling corrections.  Added section
+#        headings in the code.  Avoid :r.
+#     {enter_further_changes_here}
 
 #  Copyright:
-#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 
 #-
 
+# Preliminaries
+# =============
 
-# on interrupt
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# do variable initialisation
-
+# Do variable initialisation.
 mkdir "${tmpdir}/${user}"
-set colfile = "${tmpdir}/${user}/test_col.sdf"
-set ripfile = "${tmpdir}/${user}/test_rip.sdf"
-set cubfile = "@datadir@/datacube/smirfsdc.sdf"
-set wlifile = "@datadir@/datacube/smirfswl.sdf"
-set rspfile = "@datadir@/datacube/smirfsrs.sdf"
+set colfile = "${tmpdir}/${user}/test_col"
+set ripfile = "${tmpdir}/${user}/test_rip"
+set cubfile = "@datadir@/datacube/smirfsdc"
+set wlifile = "@datadir@/datacube/smirfswl"
+set rspfile = "@datadir@/datacube/smirfsrs"
 set plotdev = "xwin"
 
-# do package setup
-
+# Do the package setup.
 alias echo 'echo > /dev/null'
 setenv DATACUBE_DIR @bindir@
 setenv KAPPA_DIR @bindir@/../kappa
@@ -64,45 +66,43 @@ setenv FIG_DIR @bindir@/../figaro
 source ${DATACUBE_DIR}/datacube.csh
 unalias echo
 
-
 echo "DATACUBE TEST SCRIPT"
 echo " "
 echo "  Datacube file:"
-echo "    ${cubfile}"
+echo "    ${cubfile}.sdf"
 echo "  White light image:"
-echo "    ${wlifile}"
+echo "    ${wlifile},sdf"
 echo " "
 
-# setup the graphics window
+# Graphics
+# ========
 
+# Setup the graphics window.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
 
-# setup frames
-
+# Setup graphics-database frames.
 picdef "mode=cl fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="left_plot"
 
 picdef "mode=cr fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="right_plot"
 
-# display white light image
-
-echo "  Plotting white light image (LEFT)"
+# Display white-light image.
+echo "  Plotting white-light image (LEFT)."
 
 picsel label="left_plot" device=${plotdev}
-display ${wlifile:r} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
+display ${wlifile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
 
-echo "  Collapsing datacube in spectral direction"
-collapse in=${cubfile:r} out=${colfile:r} axis=3 >& /dev/null
+echo "  Collapsing datacube in spectral direction."
+collapse in=${cubfile} out=${colfile} axis=3 >& /dev/null
 
-# display collapsed image
-
-echo "  Plotting collapsed cube (RIGHT)"
+# Display the collapsed image.
+echo "  Plotting collapsed cube (RIGHT)."
 
 picsel label="right_plot" device=${plotdev}
-display ${colfile:r} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
+display ${colfile} device=${plotdev} mode=SIGMA sigmas="[-3,2]" >& /dev/null 
         
 echo " "
 echo "  LEFT and RIGHT images should be identical"
@@ -110,36 +110,32 @@ echo "  LEFT and RIGHT images should be identical"
 sleep 5
 echo " "
 
-# setup the graphics window
-
+# Setup the graphics window.
 gdclear device=${plotdev}
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
 
-# setup frames
-
+# Setup graphics-database frames.
 picdef "mode=cl fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="left_plot"
 
 picdef "mode=cr fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="right_plot"
 
-# plot spectra 
-
-echo "  Plotting spectra from pixel (9,19)"
+# Plot spectrum.
+echo "  Plotting spectrum from pixel (9,19)."
 picsel label="left_plot" device=${plotdev}
-linplot "${rspfile:r} device=xwin" 
+linplot "${rspfile} device=xwin" 
 
-# rip single spectra from pixel (9,19)
+# Rip single spectrum from pixel (9,19).
+echo "  Extracting spectra from datacube."
+ndfcopy "in=${cubfile}(9,19,) out=${ripfile} trim=true trimwcs=true"
+settitle "ndf=${ripfile} title='Pixel (9,19) EXTRACTED'"
 
-echo "  Extracting spectra from datacube"
-ndfcopy "in=${cubfile:r}(9,19,) out=${ripfile:r} trim=true trimwcs=true"
-settitle "ndf=${ripfile:r} title='Pixel (9,19) EXTRACTED'"
-
-# display extracted spectra
+# Display the extracted spectrum.
 picsel label="right_plot" device=${plotdev}
-linplot "${ripfile:r} device=xwin"
+linplot "${ripfile} device=xwin"
         
 echo " "
 echo "  LEFT and RIGHT spectra should be identical" 
@@ -147,8 +143,9 @@ echo "  LEFT and RIGHT spectra should be identical"
 echo " " 
 echo "END"
 
-# clean up
+# Clean up.
+# =========
 cleanup:
-rm -f ${colfile}
-rm -f ${ripfile} 
-rmdir "${tmpdir}/${user}"
+rm -f ${colfile}.sdf >& /dev/null
+rm -f ${ripfile}.sdf >& /dev/null
+rmdir ${tmpdir}/${user} >& /dev/null
