@@ -1,37 +1,39 @@
-#!/bin/csh
+#!/bin/csh -v
 #+
 #  Name:
 #     ripper.csh
 #
 #  Purpose:
-#     Extract a 1D spectra from a 3D IFU NDF datacube
+#     Extracts a one-dimensional spectrum from a three-dimensional IFU NDF.
 #
 #  Type of Module:
-#     C shell script.
+#     C-shell script.
 #
 #  Usage:
 #     ripper [-i filename] [-o filename] [-p]
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     package. It reads a 3D IFU NDF datacube as input, presents the user
-#     with a white light image of the cube and allows the user to select an
-#     x,y position using the cursor. It then extracts (and optionally displays)
-#     the spectra for that X,Y position.
+#     package.  It reads a three-dimensional IFU NDF datacube as input, 
+#     presents you with a white-light image of the cube and allows you to
+#     select an X-Y position using the cursor.  It then extracts (and
+#     optionally displays) the spectrum for that X-Y position.
 #
 #  Parameters:
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a 3D NDF, by default the script will prompt for the input file.
+#       be a three-dimensional NDF.  By default the script will prompt for the
+#       input file.
 #     -o filename
-#       The filename for the output spectra, by default the script will 
+#       The filename for the output spectrum.  By default the script will 
 #       prompt for the name of the output file.
 #     -p
-#       The script will plot the extracted spectra to the current display 
+#       The script will plot the extracted spectrum to the current display 
 #       as well as saving it to an NDF file.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -47,85 +49,88 @@
 #       Added error trap to image click.
 #     18-OCT-2001 (AALLAN):
 #       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#     2005 September  2 (MJC):
+#       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
+#       remove tabs, spelling corrections.  Added section headings in the code.
+#       Avoid :r.
+#     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #-
 
-# on interrupt
+# Preliminaries
+# =============
+
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# clean up from previous runs
-
+# Clean up from previous runs.
 rm -f ${tmpdir}/${user}/rip* >& /dev/null
 
-# do variable initialisation
-
+# Do variable initialisation.
 mkdir "${tmpdir}/${user}" >& /dev/null
 set tmpfile = "${tmpdir}/${user}/rip_cursor.tmp"
-set colfile = "${tmpdir}/${user}/rip_col.sdf"
+set colfile = "${tmpdir}/${user}/rip_col"
 touch $tmpfile
 
 set plotspec = "false"
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
+
+# Handle any command-line arguements.
 set args = ($argv[1-])
-
-# do package setup
-
-alias echo 'echo > /dev/null'
-source ${DATACUBE_DIR}/datacube.csh
-unalias echo
-
-# handle any command line arguements
-
 while ( $#args > 0 )
    switch ($args[1])
-   case -i:    # input 3D IFU NDF
+   case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
       set infile = $args[1]
       shift args
       breaksw
-   case -o:    # output ripped spectra
+   case -o:    # output ripped spectrum
       shift args
       set gotoutfile = "TRUE"
       set outfile = $args[1]
       shift args
       breaksw
-   case -p:    # plot output spectra
+   case -p:    # plot output spectrum
       set plotspec = "true"
       shift args
       breaksw
    endsw   
 end
 
-# get input filename
+# Do the package setup.
+alias echo 'echo > /dev/null'
+source ${DATACUBE_DIR}/datacube.csh
+unalias echo
 
+# Obtain details of the input cube.
+# =================================
+
+# Get the input filename.
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
+   set infile = $(infile:r}
 endif
 
 echo "      Input NDF:"
 echo "        File: ${infile}.sdf"
 
-# check that it exists
-
+# Check that it exists.
 if ( ! -e ${infile}.sdf ) then
    echo "RIPPER_ERR: ${infile}.sdf does not exist."
    rm -f ${tmpfile} >& /dev/null
    exit  
 endif
 
-# find out the cube dimensions
-
+# Find out the cube dimensions.
 ndftrace ${infile} >& /dev/null
 set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
@@ -147,58 +152,58 @@ echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
 
-# collapse white light image
+# Show the white-light image.
+# ===========================
 
+# Collapse white-light image.
 echo "      Collapsing:"
-echo "        White light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile:r} axis=3" >& /dev/null
+echo "        White-light image: ${dims[1]} x ${dims[2]}"
+collapse "in=${infile} out=${colfile} axis=3" >& /dev/null
 
-# display collapsed image
+# Setup the plot device.
+set plotdev = "xwin"
 
-gdclear device=xwin
-paldef device=xwin
-lutgrey device=xwin
-display "${colfile:r} device=xwin mode=SIGMA sigmas=[-3,2]" >& /dev/null
+# Display the collapsed image.
+gdclear device=${plotdev}
+paldef device=${plotdev}
+lutgrey device=${plotdev}
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
 
-# setup exit condition
+exit
+
+# Obtain the spatial position of the spectrum graphically.
+# ========================================================
+
+# Setup exit condition.
 set prev_xpix = 1
 set prev_ypix = 1
 
-# loop marker for spectral extraction
+# Loop marker for spectral extraction.
 extract:
 
-# grab x,y position
-
+# Grab X-Y position.
 echo " "
-echo "  Left click to extract spectra"
-  
+echo "  Left click to extract spectrum."
+
 cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=xwin frame="PIXEL" >> ${tmpfile}
+       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${tmpfile}
 
-# wait for cursor output then get x,y co-ordinates from 
-# the temporary file created by KAPPA cursor.
-
+# Wait for CURSOR output then get X-Y co-ordinates from 
+# the temporary file created by KAPPA:CURSOR.
 while ( ! -e ${tmpfile} ) 
    sleep 1
 end
 
-# grab position
-
-# set string = `grep "(*)" ${tmpfile}`
-# set string = `echo ${string} | sed 's/(/ /'`
-# set string = `echo ${string} | sed 's/)/ /'`
-# set pos=`echo $string | awk '{split($0,a," ");print a[1], a[2]}'`
+# Grab the position.
 set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# get pixel co-ordinates
-
+# Get the pixel co-ordinates and convert to grid indices.
 set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
 set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
 @ xpix = $xpix + 1
 @ ypix = $ypix + 1
 
-# check for exit condtions
-
+# Check for the exit conditions.
 if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
    goto cleanup
 else if ( $xpix == 1 && $ypix == 1 ) then
@@ -210,41 +215,44 @@ else
    set prev_ypix = $ypix
 endif
 
+# Extract and plot the selected spectrum.
+# =======================================
+
 echo " "	 
-echo "      Extracing:"
+echo "      Extracting:"
 echo "        (X,Y) pixel: ${xpix},${ypix}"
 
-# get output filename
-
+# Get the output filename.
 if ( ${gotoutfile} == "FALSE" ) then
    echo -n "NDF output file: "
    set outfile = $<
+   set outfile = ${outfile:r}
 endif
 
-# extract spectra from cube
-
+# Extract the spectrum from the cube.
 echo "      Output NDF:"
 echo "        File: ${outfile}.sdf"
-ndfcopy "in=${infile}($xpix,$ypix,) out=${outfile} trim=true trimwcs=true"
+ndfcopy "in=${infile}($xpix,$ypix,) out=${outfile} trim trimwcs=true"
 settitle "ndf=${outfile} title='Pixel ($xpix,$ypix)'"
 
-# check to see if the output file has AXIS extensions
+# Check to see if the output file has an AXIS structure.
 set axis = `parget axis ndftrace`
 
+# If not, create an array of axis centres derived from the current WCS Frame.
 if ( ${axis} == "FALSE" ) then
-   putaxis "${outfile} spectral=1" >& /dev/null
-   echo "        Axes: Adding AXIS extensions"
+   setaxis "ndf=${outfile} dim=1 mode=wcs comp=Centre" >& /dev/null
+   echo "        Axes: Adding AXIS centres."
 endif
 
-# check to see if we need to plot the output spectra
-
+# Check to see if we need to plot the output spectrum.
 if ( ${plotspec} == "true" ) then
-   linplot ${outfile} device=xwin style="Colour(curves)=1" >& /dev/null
+   linplot ${outfile} device=${plotdev} style="Colour(curves)=1" >& /dev/null
 endif
 
-# clean up
+# Clean up.
+# =========
 cleanup:
 
-rm -f ${tmpfile}
-rm -f ${colfile}
-rmdir $tmpdir/${user}
+rm -f ${tmpfile} >& /dev/null
+rm -f ${colfile}.sdf >& /dev/null
+rmdir ${tmpdir}/${user} >& /dev/null
