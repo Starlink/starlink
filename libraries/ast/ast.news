@@ -33,6 +33,9 @@ attribute names can be used as synonyms for ObsLat and ObsLon. Also,
 dumps created using the old scheme can be read succesfully by AST V4.1
 and converted to the new form.
 
+- A new function astMapSplit has been added to the Mapping class. This
+splits a Mapping into two component Mappings which, when combined in
+parallel, are equivalent to the original Mapping.
 
 Main Changes in Version 4.0
 ---------------------------
