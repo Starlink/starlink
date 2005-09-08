@@ -113,7 +113,7 @@ int valid;
                if( file_opened ) {
                   datFind( loc, name, tmploc, status );
                } else {
-                  hdsOpen( name, acmode, tmploc, status );
+                  idlHdsOpen( name, acmode, tmploc, status );
                }
 
                if ( slice ) {
@@ -130,7 +130,7 @@ int valid;
                   datFind( loc, name, botloc, status );
                   datPrmry( TRUE , botloc, &true, status );
                } else {
-                  hdsOpen( name, acmode, botloc, status );
+                  idlHdsOpen( name, acmode, botloc, status );
                }
             }
 

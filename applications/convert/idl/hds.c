@@ -14,7 +14,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
                          TRAIL(type)
                          TRAIL(loc) );
 
-void hdsNew( const char *file,
+void idlHdsNew( const char *file,
              const char *name,
              const char *type,
              int ndim,
@@ -69,7 +69,7 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
                           TRAIL(mode)
                           TRAIL(loc) );
 
-void hdsOpen( const char *file,
+void idlHdsOpen( const char *file,
               const char *mode,
               char *loc,
               int *status ) {
@@ -102,7 +102,7 @@ F77_SUBROUTINE(hds_show)( CHARACTER(topic),
                           INTEGER(status)
                           TRAIL(topic) );
 
-void hdsShow( const char *topic,
+void idlHdsShow( const char *topic,
               int *status ) {
 
 DECLARE_CHARACTER_DYN(ftopic);

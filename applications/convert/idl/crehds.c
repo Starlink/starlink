@@ -159,7 +159,7 @@ char defname[12]="IDL2HDS_OUT";
 
       getobjectdetails( var, data, taglist,
          hdstype, &numtags, &ndims, dims, &elt_len, &status );
-      hdsNew( hdsname, strucname, hdstype, ndims, dims, toploc, &status );
+      idlHdsNew( hdsname, strucname, hdstype, ndims, dims, toploc, &status );
       if ( numtags ) {
 /* is a structure - invoke the structure handler */
          hdsstructwrite( 
@@ -169,7 +169,7 @@ char defname[12]="IDL2HDS_OUT";
          hdsprimwrite( toploc, hdstype, ndims, dims, data, &status );
       }
 
-      datAnnul( toploc, &status );
+      idlDatAnnul( toploc, &status );
 
    } else {
       status = SAI__ERROR;

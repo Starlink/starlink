@@ -118,7 +118,7 @@ int cmpelt_len;
       sdef = var->value.s.sdef;
 
 /* If it's a structure array, vectorise it */
-      if ( ndims ) datVec( toploc, vecloc, status );
+      if ( ndims ) idlDatVec( toploc, vecloc, status );
 
 /* If OK do for each tag */
       if ( *status == SAI__OK ) {
@@ -157,12 +157,12 @@ int cmpelt_len;
 /* If we have a structure array, don't create a new HDS component but */
 /* locate the next cell */
             if ( ndims ) {
-               datCell( vecloc, 1, &cellno, cmploc, status );
+               idlDatCell( vecloc, 1, &cellno, cmploc, status );
                cellno++;
             } else {
-               datNew( 
+               idlDatNew( 
                   toploc, tagname, cmphdstype, cmpndims, cmpdims, status );
-               datFind( toploc, tagname, cmploc, status );
+               idlDatFind( toploc, tagname, cmploc, status );
             }
 
 /* Now fill the new object */
@@ -180,12 +180,12 @@ int cmpelt_len;
 
 /*    Clean up for this component */
             free( cmptaglist );
-            datAnnul( cmploc, status );
+            idlDatAnnul( cmploc, status );
 
          } /* end for each tag */
 
 /* Annul vecloc if it was obtained */
-         if ( ndims ) datAnnul( vecloc, status );
+         if ( ndims ) idlDatAnnul( vecloc, status );
 
       } /* end top locator got OK */
 
