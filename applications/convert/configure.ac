@@ -59,7 +59,6 @@ dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro
 dnl    definition. We cd into iraf, rather than perform this test in the
 dnl    configure script in iraf, as this configure script is ran first, so
 dnl    cannot depend on the results of a later configure.
-
 (
 cd iraf
 IRAFSUPPORT="libcompat.a libimfort.a libos.a libsys.a libvops.a"
@@ -86,7 +85,7 @@ AC_MSG_CHECKING([if iraf libraries can create programs])
 irafgood=no
 if test -f "iraf/libimfort.a"; then
    iraf_save_LIBS=$LIBS
-   LIBS="iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a"
+   LIBS="`./iraf_link`"
    AC_LANG_PUSH([Fortran])
    AC_LINK_IFELSE([AC_LANG_CALL([],[imopen])],[irafgood=yes],[irafgood=no])
    AC_LANG_POP([Fortran])
