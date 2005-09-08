@@ -2,7 +2,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(src/bltInit.c)
 AC_CONFIG_HEADER(src/bltConfig.h)
-dnl AC_CONFIG_AUX_DIR(cf)
+AC_CONFIG_AUX_DIR(cf)
 AC_PREREQ(2.0)	
 
 # -----------------------------------------------------------------------
