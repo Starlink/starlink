@@ -378,7 +378,7 @@ static double Q50[5][15]={{-2.279594e-5,-3.494537e-5,
 1.5542754389685e+4}};static double Q54[4][3]={{1.097594e-1,-
 2.223581e-2,1.148966e-2},{2.896773e-7,5.083103e-8,
 5.658888e-8},{5.450474e-2,1.002548e-2,8.249439e-3},{
-1.438491e-7,-2.291823e-8,4.063015e-8}};Q3=(FOo<=0.0)?0:1;Q21
+1.438491e-7,-2.291823e-8,4.063015e-8}};DISK=0.0;Q3=(FOo<=0.0)?0:1;Q21
 =(q0-15019.5)/36525.0;for(FOOBAR=0;FOOBAR<8;FOOBAR++){q22=
 dmod(Q46[0][FOOBAR]+Q21*(Q46[1][FOOBAR]+Q21*Q46[2][FOOBAR]),
 D2PI);if(FOOBAR==0){DISK=q22;}else{BAR_FRED[FOOBAR-1]=q22;}}
@@ -929,6 +929,7 @@ bar_fOBAR,Q35,Q36,BAR_FOOBAR,Q37,q38,bAr_FOBaZ,q39,Q40,q41,
 baR_fOoBaz,q42,BaR_qUux,Q43,BAR_FRED,BaR_DoG,Q44,BAr_CAt,
 bar_fish,Q45,q46,Q47,Q48;
 #define q49(Q50,q51) ((q51)/(Q50+q51));
+Q48=0.0;
 q23=slaDrange(q1);q24=fabs(q23);q24=gmin(q24,fobaz);q25=gmax
 (BAR,-1000.0);q25=gmin(q25,FREd);Q12=gmax(Q2,100.0);Q12=gmin
 (Q12,500.0);DISK=gmax(Q3,0.0);DISK=gmin(DISK,10000.0);EMPty=
