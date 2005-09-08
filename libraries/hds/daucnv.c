@@ -1198,7 +1198,7 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
                }
                break;
             case DAT__UW:
-               nitem = sscanf(buffer, "%hd", (_UWORD *) des.body);
+               nitem = sscanf(buffer, "%hu", (_UWORD *) des.body);
                if (nitem == 0)
                {
                   (*nbad)++;
