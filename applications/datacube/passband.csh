@@ -4,41 +4,41 @@
 #     passband.csh
 #
 #  Purpose:
-#     Display of multiple passband image from a 3D IFU NDF
+#     Displays multiple passband images from a three-dimensional IFU NDF.
 #
 #  Type of Module:
-#     C shell script.
+#     C-shell script.
 #
 #  Usage:
 #     passband [-i filename] [-o filename] [-z/+z]
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-#     and presents the user with a white light image of the cube. The user
-#     can then select and x,y position using the cursor. The script will
-#     extract and display this spectra next to the white light image. The 
-#     user can then select a wavelength range using the cursor and the 
-#     script will display a passband image of the cube in that wavelength
-#     range.
+#     This shell script sits onto of a collection of A-tasks from the KAPPA,
+#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
+#     and presents you with a white-light image of the cube.  You can then
+#     select and X-Y position using the cursor.  The script will extract
+#     and display this spectrum next to the white-light image.  You can
+#     then select a spectral range using the cursor and the script will
+#     display a passband image of the cube in that spectral range.
 #
 #  Parameters:
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a 3D NDF, by default the script will prompt for the input file.
+#       be a three-dimensional NDF.  By default the script will prompt for the
+#       input file.
 #     -o filename
-#       The script will generate output 2D NDF of passband image, by default
-#       the output will be displayed only.
+#       An output two-dimensional NDF of the passband image.  By default the
+#       output will be displayed only.
 #     -z 
-#       The script will automatically prompt the user to select a region to
+#       The script will automatically prompt to select a region to
 #       zoom before prompting for the region of interest.
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.
-
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -52,53 +52,53 @@
 #       Added on interrupt handler.
 #       Added +-z command line options.
 #     31-DEC-2000 (AALLAN):
-#       Allowed 1 character responses to yes/no prompts
+#       Allowed one-character responses to yes/no prompts.
 #     18-OCT-2001 (AALLAN):
-#       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#       Modified temporary files to use ${tmpdir}/${user}.
+#     2005 September  2 (MJC):
+#       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
+#       remove tabs, spelling corrections.  Added section headings in the
+#       code.  Avoid :r.
+#     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #-
 
-# on interrupt
+# Preliminaries
+# =============
+
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# clean up from previous runs
-
+# Clean up from previous runs.
 rm -f ${tmpdir}/${user}/pass* >& /dev/null
 
-# do variable initialisation
-
+# Do variable initialisation.
 mkdir ${tmpdir}/${user}
 set curfile = "${tmpdir}/${user}/pass_cursor.tmp"
-set colfile = "${tmpdir}/${user}/pass_col.sdf"
-set pasfile = "${tmpdir}/${user}/pass_pas.sdf"
-set spectral = "${tmpdir}/${user}/pass_rip.sdf"
+set colfile = "${tmpdir}/${user}/pass_col"
+set pasfile = "${tmpdir}/${user}/pass_pas"
+set spectral = "${tmpdir}/${user}/pass_rip"
 set statsfile = "${tmpdir}/${user}/pass_stats.txt"
 touch ${curfile}
 
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
 set gotzoom = "ASK"
+
+# Setup the plot device.
+set plotdev = "xwin"
+
+# Handle any command-line arguments.
 set args = ($argv[1-])
-
-# do package setup
-
-alias echo 'echo > /dev/null'
-source ${DATACUBE_DIR}/datacube.csh
-unalias echo
-
-# handle any command line arguements
-
 while ( $#args > 0 )
    switch ($args[1])
-   case -i:    # input 3D IFU NDF
+   case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
       set infile = $args[1]
@@ -121,33 +121,33 @@ while ( $#args > 0 )
    endsw  
 end
 
-# setup plot device
+# Do the package setup.
+alias echo 'echo > /dev/null'
+source ${DATACUBE_DIR}/datacube.csh
+unalias echo
 
-set plotdev = "xwin"
-gdclear device=${plotdev}
-gdclear device=${plotdev}
+# Obtain details of the input cube.
+# =================================
 
-# get input filename
-
+# Get the input filename.
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
+   set infile = ${infile:r}
    echo " "
 endif
 
 echo "      Input NDF:"
 echo "        File: ${infile}.sdf"
 
-# check that it exists
-
+# Check that it exists.
 if ( ! -e ${infile}.sdf ) then
    echo "PASSBAND_ERR: ${infile}.sdf does not exist."
    rm -f ${curfile} >& /dev/null
    exit  
 endif
 
-# find out the cube dimensions
-
+# Find out the cube dimensions.
 ndftrace ${infile} >& /dev/null
 set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
@@ -169,59 +169,57 @@ echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
 
-# collapse white light image
+# Show the white-light image.
+# ===========================
 
+# Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile:r} axis=3" >& /dev/null 
-settitle "ndf=${colfile:r} title='White Light Image'"
+collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
+settitle "ndf=${colfile} title='White-light Image'"
 
-# setup the graphics window
-
+# Setup the graphics window.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
 
-# display collapsed image
-
+# Display the collapsed image.
 picbase device=${plotdev}
-display "${colfile:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
 
-# setup exit condition
+# Obtain the spatial position of the spectrum graphically.
+# ========================================================
+
+# Setup the exit condition.
 set prev_xpix = 1
 set prev_ypix = 1
 
-# loop marker for spectral extraction
+# Loop marker for spectral extraction.
 extract:
 
-# grab x,y position
-
+# Grab the X-Y position.
 echo " "
 echo "  Left click to extract spectra"
   
 cursor showpixel=true style="Colour(marker)=2" plot=mark \
        maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
 
-# wait for cursor output then get x,y co-ordinates from 
-# the temporary file created by KAPPA cursor.
-
+# Wait for CURSOR output then get X-Y co-ordinates from 
+# the temporary file created by KAPPA:CURSOR.
 while ( ! -e ${curfile} ) 
    sleep 1
 end
 
-# grab position 
-
+# Grab the position.
 set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# get pixel co-ordinates
-
+# Get the pixel co-ordinates and convert to grid indices.
 set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
 set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
 @ xpix = $xpix + 1
 @ ypix = $ypix + 1
 
-# check for exit condtions
-
+# Check for exit condtions.
 if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
    goto cleanup
 else if ( $xpix == 1 && $ypix == 1 ) then
@@ -233,32 +231,32 @@ else
    set prev_ypix = $ypix
 endif
 
-# clean up the cursor temporary file
-
+# Clean up the CURSOR temporary file.
 rm -f ${curfile}
 touch ${curfile}
 
-# extract the spectra
-
+# Extract the spectrum.
+# =====================
 echo " "
-echo "      Extracing:"
+echo "      Extracting:"
 echo "        (X,Y) pixel             : ${xpix},${ypix}"
 
-# extract spectra from cube
-
+# Extract the spectrum from the cube and give it an identifiable TITLE.
 ndfcopy "in=${infile}($xpix,$ypix,) out=${spectral} trim=true trimwcs=true"
 settitle "ndf=${spectral} title='Pixel (${xpix},${ypix})'"
 
-# plot the ripped spectra
+# Obtain the zoom range interactively.
+# ====================================
 
+# Plot the ripped spectrum.
 linplot ${spectral} device=${plotdev} style="Colour(curves)=1" >& /dev/null
 stats ndf=${spectral} > ${statsfile}
 
+# Report the results.
 cat ${statsfile} | tail -14
 rm -f ${statsfile}
 
-# zoom if required
-
+# Zoom if required.
 if ( ${gotzoom} == "ASK") then
    echo " "
    echo -n "Zoom in (yes/no): "
@@ -271,10 +269,10 @@ endif
 
 if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
-# get the lower limit
-
+# Get the lower limit.
+# --------------------
    echo " "
-   echo "  Left click on lower zoom boundary"
+   echo "  Left click on lower zoom boundary."
    
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
@@ -284,13 +282,13 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    set pos = `parget lastpos cursor`
    set low_z = $pos[1]
 
-# clean up the cursor temporary file
+# Clean up the CURSOR temporary file.
    rm -f ${curfile}
    touch ${curfile}
    
-# get the upper limit
-
-   echo "  Left click on upper zoom boundary"
+# Get the upper limit.
+# --------------------
+   echo "  Left click on upper zoom boundary."
    
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
@@ -305,20 +303,23 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
 
-# clean up the cursor temporary file
+# Clean up the CURSOR temporary file.
    rm -f ${curfile}
    touch ${curfile}
  
-#  replot the spectra
+# Replot the spectrum.
    linplot ${spectral} xleft=${low_z} xright=${upp_z} \
            device=${plotdev} style="Colour(curves)=1" >& /dev/null
 
 endif
 
-# get the lower limit
+# Obtain the spectral range interactively.
+# ========================================
 
+# Get the lower limit.
+# --------------------
 echo " "
-echo "  Left click on lower boundary"
+echo "  Left click on lower boundary."
    
 cursor showpixel=true style="Colour(curves)=2" plot=vline \
        maxpos=1 device=${plotdev} >> ${curfile}
@@ -328,13 +329,14 @@ end
 set pos = `parget lastpos cursor`
 set low = $pos[1]
 
-# clean up the cursor temporary file
+# Clean up the CURSOR temporary file.
 rm -f ${curfile}
 touch ${curfile}
    
-# get the upper limit
+# Get the upper limit.
+# --------------------
 
-echo "  Left click on upper boundary"
+echo "  Left click on upper boundary."
    
 cursor showpixel=true style="Colour(curves)=2" plot=vline \
        maxpos=1 device=${plotdev} >> ${curfile}
@@ -349,66 +351,83 @@ echo "      Passband:"
 echo "        Lower Boundary: ${low}"
 echo "        Upper Boundary: ${upp}"
 
-# clean up the cursor temporary file
+# Clean up the CURSOR temporary file.
 rm -f ${curfile}
 touch ${curfile}
 
-# create the passband image
+# Create the passband image.
+# ==========================
 
+# Get the spectral label and units.
+set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
+set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+
+# Inform the user.
 echo "      Collapsing:"
-echo "        White light image: ${dims[1]} x ${dims[2]}"
-echo "        Wavelength range: ${low} - ${upp}"
+echo "        White-light image: ${dims[1]} x ${dims[2]}"
+printf "%15s%s\n" "${slabel}" ": ${low}--${upp} $sunits"
 
-# collapse white light image
-
-collapse "in=${infile} out=${pasfile:r} " \
+# Collapse the white-light image.
+collapse "in=${infile} out=${pasfile} " \
          "axis=3 low=${low} high=${upp}" >& /dev/null 
-settitle "ndf=${pasfile:r} title='$low - $upp'"
+settitle "ndf=${pasfile} title='$low--$upp'"
 
-# clean up the graphics device
+# Display the passband image.
+# ===========================
 
+# Clean up the graphics device.
 gdclear device=${plotdev}
 
-# setup frames
+# Setup two plotting frames.
 echo "      Plotting:"
-   
+
 picdef "mode=tl fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="left"
 
 picdef "mode=cr fraction=[0.5,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="right" 
 
-# display the white light image on the left and the passband image on the right
-echo "        Left: White light image." 
+# Display the white-light image on the left and the passband image on
+# the right.
+echo "        Left: White-light image." 
 picsel label="left" device=${plotdev}
-display ${colfile:r} device=${plotdev} mode=SCALE \
+display ${colfile} device=${plotdev} mode=SCALE \
         low='!' high='!' >&/dev/null 
 
 echo "        Right: Passband image (${low} - ${upp})" 
 picsel label="right" device=${plotdev}
-display ${pasfile:r} device=${plotdev} mode=SCALE \
+display ${pasfile} device=${plotdev} mode=SCALE \
         low='!' high='!' >&/dev/null 
 
-if ( ${gotoutfile} == "TRUE" ) then
-   echo "      Output NDF:"
-   echo "        Creating: ${outfile:r}.sdf" 
-   cp -f ${pasfile} ./${outfile:r}.sdf
+# Save passband image as an NDF.
+# ==============================
 
-   # check to see if the NDF has an AXIS extensions
+if ( ${gotoutfile} == "TRUE" ) then
+
+# Allow the user to enter the NDF name or filename.
+   set outfile = ${outfile:r}
+   echo "      Output NDF:"
+   echo "        Creating: ${outfile}.sdf" 
+   ndfcopy "in=${pasfile} out=${outfile}"
+
+# Check to see if the NDF has an AXIS structure.  If one does not exist,
+# create an array of axis centres, derived from the current WCS Frame, along
+# each axis.
    set axis = `parget axis ndftrace`
    if ( ${axis} == "FALSE" ) then
-      echo "        Axes: Creating AXIS extensions"
-      putaxis "${outfile:r} spectral=3" >& /dev/null
+      echo "        Axes: Creating AXIS centres."
+      setaxis "ndf=${outfile} dim=1 mode=wcs comp=Centre" >& /dev/null
+      setaxis "ndf=${outfile} dim=2 mode=wcs comp=Centre" >& /dev/null
    endif
 endif
 
-# cleanup
+# Cleanup.
+# ========
 
 cleanup:
 rm -f ${curfile} >&/dev/null 
-rm -f ${colfile} >&/dev/null 
-rm -f ${pasfile} >&/dev/null 
-rm -f ${spectral} >&/dev/null 
-rm -f ${statsfile} >&/dev/null 
+rm -f ${colfile}.sdf >&/dev/null
+rm -f ${pasfile}.sdf >&/dev/null
+rm -f ${spectral}.sdf >&/dev/null
+rm -f ${statsfile} >&/dev/null
 rmdir ${tmpdir}/${user} >& /dev/null
-
