@@ -1645,12 +1645,13 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
 #if defined(HDS_64)
-/* Ensure that array subscripts are 64-bits         */
-   for( i = 0; i<DAT__MXDIM; i++ )
-      dims64[i] = dims[i];
-
 /* Call pure C routine                                       */
    datShape( locator_c, *ndimx, dims64, ndim, status );
+
+   /* Copy the array back to fortran from HDS_PTYPE */
+   for( i = 0; i<_min(*ndimx,*ndim); i++)
+      dims[i] = dims64[i];
+
 #else
    datShape( locator_c, *ndimx, dims, ndim, status );
 #endif
