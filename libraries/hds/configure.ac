@@ -82,6 +82,9 @@ dnl    Look for missing declarations
 AC_CHECK_DECLS(confstr)
 AC_CHECK_DECLS(getwd)
 
+dnl    fsync is only declared if _POSIX_C_SOURCE isn't!!
+AC_CHECK_DECLS(fsync)
+
 dnl Check for largefile support (various macros and fseeko).
 STAR_LARGEFILE_SUPPORT
 

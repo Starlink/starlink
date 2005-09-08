@@ -1,7 +1,15 @@
 #if HAVE_CONFIG_H
 #   include <config.h>
 #endif
-#include <unistd.h>
+
+#if HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
+/* fsync is not always defined when _POSIX_C_SOURCE is defined */
+#if HAVE_FSYNC && !HAVE_DECL_FSYNC
+int fsync ( int );
+#endif
 
 /* VMS version include files:                                               */
 /* =========================                                                */
@@ -138,7 +146,7 @@
 /* ================                                                         */
 #else
 
-#if defined( HAVE_FSYNC ) && ( defined( _mmap ) || defined( HAVE_MMAP ) )
+#if HAVE_FSYNC && ( defined( _mmap ) || HAVE_MMAP )
 /* To make sure that a mapped file is correctly written to disk we need to  */
 /* perform an fsync, this should have also been preceded by calls to        */
 /* msync(MS_ASYNC) when the data was unmapped. Ignore any errors.           */
