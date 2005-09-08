@@ -129,8 +129,10 @@ typedef unsigned long int UINT_BIG;
 /* bits. Note that 64 bits is untested and WILL change the file format!!!   */
 #if !defined(HDS_64)
 typedef int HDS_PTYPE;
+#define HDS_PTYPE_FORMAT "d"
 #else
 typedef INT_BIG HDS_PTYPE;
+#define HDS_PTYPE_FORMAT INT_BIG_S
 #endif
 
 /* Global Structure Definitions:					    */

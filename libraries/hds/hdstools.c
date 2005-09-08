@@ -379,11 +379,8 @@ hds1_encode_subs(int nlim, int nsub, HDS_PTYPE *subs, char *buf, int *nchar)
       for (m=0; m<nlim; m++)
       {
          ++i;
-#if !defined(HDS_64)
-         (void) sprintf( buf + i, "%d%n", subs[ n * nlim + m ], &nc );
-#else
-         (void) sprintf( buf + i, "INT_BIG_S%n", subs[ n * nlim + m ], &nc );
-#endif
+         (void) sprintf( buf + i, "%"HDS_PTYPE_FORMAT"%n", 
+			 subs[ n * nlim + m ], &nc );
          i += nc;
          buf[i]   = ':';
       }
