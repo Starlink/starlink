@@ -622,6 +622,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        In WcsMapFrm, check reffrm is used before annulling it.
 *     8-SEP-2005 (DSB):
 *        Change "if( a < b < c )" constructs to "if( a < b && b < c )"
+*        DSBSetup: correct test on FrameSet pointer state
 *class--
 */
 
@@ -6238,7 +6239,7 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 
 /* Now get the Mapping between these. */
    fs = astConvert( dsb, dsb2, "" );
-   if( fs == NULL ) {
+   if( fs != NULL ) {
 
 /* Use this Mapping to transform the rest frequency and the image
    frequency from the standard of rest of the source to that of the
