@@ -4,26 +4,27 @@
 #     stacker.csh
 #
 #  Purpose:
-#     Plots a stack of spectra extracted from a 3D IFU NDF
+#     Plots a stack of spectra extracted from a three-dimensional IFU NDF.
 #
 #  Type of Module:
-#     C shell script.
+#     C-shell script.
 #
 #  Usage:
 #     stacker [-i filename] [-n number] [-o number] [-z/+z] 
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-#     and presents the user with a white light image of the cube. The user
-#     can then select a number of x,y position using the cursor. The script 
+#     This shell script sits onto of a collection of A-tasks from the KAPPA,
+#     and FIGARO packages.  It reads a three-dimensional IFU NDF datacube
+#     as input and presents you with a white-light image of the cube.  You
+#     can then select a number of X-Y position using the cursor.  The script 
 #     will then extract and display these spectra in a "stack" with each
-#     spectra plotted offset vertically from the previous one in the stack.
+#     spectrum plotted offset vertically from the previous one in the stack.
 #
 #  Parameters:
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a 3D NDF, by default the script will prompt for the input file.
+#       be a three-dimensional NDF.   By default the script will prompt for
+#       the input file.
 #     -n number
 #       Number of spectra to extract.
 #     -o number
@@ -38,6 +39,7 @@
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -47,49 +49,45 @@
 #       Allowed 1 character responses to yes/no prompts
 #     18-OCT-2001 (AALLAN):
 #       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#     2005 September 6 (MJC):
+#       Some tidying of grammar, punctuation, and spelling.  Added section
+#       headings in the code.  Attempt removal of files silently.
+#       Avoid :r.
+#     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #-
 
-# on interrupt
+# Preliminaries
+# =============
+
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# clean up from previous runs
-
+# Clean up from previous runs.
 rm -f ${tmpdir}/${user}/stak* >& /dev/null
 
-# do variable initialisation
-
+# Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
 set curfile = "${tmpdir}/${user}/stak_cursor.tmp"
-set colfile = "${tmpdir}/${user}/stak_col.sdf"
+set colfile = "${tmpdir}/${user}/stak_col"
 touch ${curfile}
 
-set args = ($argv[1-])
-set plotdev = "xwin"
 set gotinfile = "FALSE"
 set gotnum = "FALSE"
 set gotoff = "FALSE"
 set gotzoom = "ASK"
 
-# do package setup
-
-alias echo 'echo > /dev/null'
-source ${DATACUBE_DIR}/datacube.csh
-unalias echo
-
-# handle any command line arguements
-
+# Handle any command-line arguements.
+set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
-   case -i:    # input 3D IFU NDF
+   case -i:    # input three-dimensional IFU NDF
       shift args
       set gotinfile = "TRUE"
       set infile = $args[1]
@@ -111,39 +109,44 @@ while ( $#args > 0 )
       set gotpost = "TRUE"
       shift args
       breaksw             
-   case -z:    # zoom
+   case -z:    # zoom?
       set gotzoom = "TRUE"
       shift args
       breaksw 
-   case +z:    # not zoom
+   case +z:    # not zoom?
       set gotzoom = "FALSE"
       shift args
       breaksw                            
    endsw  
 end
 
-# get input filename
+# Do the package setup.
+alias echo 'echo > /dev/null'
+source ${DATACUBE_DIR}/datacube.csh
+unalias echo
 
+# Obtain details of the input cube.
+# =================================
+
+# Get the input filename.
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
+   set infile = ${infile:r}
 endif
 
 echo " "
-
 echo "      Input NDF:"
 echo "        File: ${infile}.sdf"
 
-# check that it exists
-
+# Check that it exists.
 if ( ! -e ${infile}.sdf ) then
    echo "STACKER_ERR: ${infile}.sdf does not exist."
    rm -f ${curfile} >& /dev/null
    exit  
 endif
 
-# find out the cube dimensions
-
+# Find out the cube dimensions.
 ndftrace ${infile} >& /dev/null
 set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
@@ -165,21 +168,27 @@ echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
 
-# collapse white light image
+# Show the white-light image.
+# ===========================
 
+# Collapse white-light image.
 echo "      Collapsing:"
-echo "        White light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile:r} axis=3" >& /dev/null 
+echo "        White-light image: ${dims[1]} x ${dims[2]}"
+collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
 
-# display collapsed image
+# Setup the plot device.
+set plotdev = "xwin"
 
+# Display the collapsed image.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
 
-# ask for number of spectra to grab
+# Form spectral stack.
+# ====================
 
+# Ask for number of spectra to grab.
 if ( ${gotnum} == "FALSE" ) then
    echo " "
    echo -n "Number of spectra: "
@@ -188,64 +197,58 @@ endif
 
 echo " "
 
-# loop round the spectra
-
+# Loop through the spectra.
 set counter = 1
 while ( $counter <= $numspec )
 
-# setup extraction file
-
+# Setup the extraction file.
    set specfile = "${tmpdir}/${user}/stak_${counter}.sdf"
 
-# grab x,y position
-
+# Grab an X-Y position.
    echo " "
-   echo "  Left click on pixel to be extracted"
+   echo "  Left click on pixel to be extracted."
    
    cursor showpixel=true style="Colour(marker)=2" plot=mark \
           maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
 
-# wait for cursor output then get x,y co-ordinates from 
-# the temporary file created by KAPPA cursor.
-
+# Wait for CURSOR output then get X-Y co-ordinates from 
+# the temporary file created by KAPPA:CURSOR.
    while ( ! -e ${curfile} ) 
       sleep 1
    end
 
-# grab position 
-
+# Grab the position 
    set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# get pixel co-ordinates
-
+# Get the pixel co-ordinates and convert to grid indices.
    set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
    set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
    @ xpix = $xpix + 1
    @ ypix = $ypix + 1
 
-# clean up the cursor temporary file
-
+# Clean up the CURSOR temporary file.
    rm -f ${curfile}
    touch ${curfile}
 
-# extract the spectra
-
+# Extract the spectrum.
    echo " "
-   echo "      Extracing:"
+   echo "      Extracting:"
    echo "        (X,Y) pixel: ${xpix},${ypix}"
 
-# extract spectra from cube
-
+# Extract the spectrum from the cube.
    ndfcopy "in=${infile}($xpix,$ypix,) out=${specfile} trim=true trimwcs=true"
 
-# increment counter
+# Increment spectrum counter
    @ counter = $counter + 1
 
 end
 
-# get the offset between each spectrum
+# Apply offsets to spectra.
+# =========================
 
+# Why not use MLINPLOT? - MJC
 
+# Get the offset between each spectrum.
 if ( ${gotoff} == "FALSE" ) then
    echo " "
    echo -n "Offset: "
@@ -255,34 +258,33 @@ endif
 echo " "
 echo "      Adding:"
 
-# add offsets to each spectrum
-
+# Add the offset to each spectrum.
 set counter = 1
 while ( $counter <= $numspec )
 
    set specfile = "${tmpdir}/${user}/stak_${counter}.sdf" 
    set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf" 
    
-# do the addition
-   set specoff = \
-                `calc exp="'${offset}*(${counter}-1)'" prec=_double`
+# Do the addition.
+   set specoff = `calc exp="'${offset}*(${counter}-1)'" prec=_double`
 
    echo "        Adding ${specoff} to spectrum ${counter}"
 
    cadd in=${specfile} out=${outfile} scalar=${specoff}
 
-# increment counter
-
+# Increment the spectrum counter.
    @ counter = $counter + 1
 end
 
-# do the plot
+# Create the multi-spectrum plot.
+# ===============================
 
 gdclear device=${plotdev}
 
 echo " "
 echo "      Plotting:"
 
+# Plot each spectrum in turn in the same graphic.
 set counter = $numspec
 while ( $counter > 0 )
    
@@ -297,8 +299,7 @@ while ( $counter > 0 )
 
 end
 
-# zoom if required
-
+# Zoom if required.
 if ( ${gotzoom} == "ASK") then
    echo " "
    echo -n "Zoom in (yes/no): "
@@ -311,29 +312,31 @@ endif
 
 if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
-# get the lower limit
-
+# Get the lower limit.
+# --------------------
    echo " "
-   echo "  Left click on lower zoom boundary"
+   echo "  Left click on lower zoom boundary."
    
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
+
    while ( ! -e ${curfile} ) 
       sleep 1
    end
    set pos = `parget lastpos cursor`
    set low_z = $pos[1]
 
-# clean up the cursor temporary file
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
    
-# get the upper limit
+# Get the upper limit.
+# --------------------
+   echo "  Left click on upper zoom boundary."
 
-   echo "  Left click on upper zoom boundary"
-   
    cursor showpixel=true style="Colour(curves)=3" plot=vline \
           maxpos=1 device=${plotdev} >> ${curfile}
+
    while ( ! -e ${curfile} ) 
       sleep 1
    end
@@ -345,12 +348,12 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
 
-# clean up the cursor temporary file
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
 
-# do the plot
-
+# Create the zoomed plot.
+# -----------------------
    gdclear device=${plotdev}
 
    echo " "
@@ -359,7 +362,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    set counter = $numspec
    while ( $counter > 0 )
    
-      set outfile = "${tmpdir}/${user}/stak_${counter}_off.sdf" 
+      set outfile = "${tmpdir}/${user}/stak_${counter}_off" 
 
       echo "        Spectrum: ${counter} "
 
@@ -372,11 +375,12 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    end
 endif
 
-# clean up
+# Clean up.
+# =========
 cleanup:
 
 rm -f ${tmpdir}/${user}/stak_?.sdf >& /dev/null     
 rm -f ${tmpdir}/${user}/stak_?_off.sdf >& /dev/null   
 rm -f ${tmpdir}/${user}/stak_col.sdf >& /dev/null    
 rm -f ${tmpdir}/${user}/stak_cursor.tmp >& /dev/null 
-rmdir ${tmpdir}/${user} 
+rmdir ${tmpdir}/${user}  >& /dev/null
