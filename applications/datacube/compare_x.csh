@@ -5,21 +5,21 @@
 #     compare_x.csh
 
 #  Purpose:
-#     Comparison of multiple extracted spectra from a IFU datacube
+#     Compares multiple extracted spectra from a IFU datacube
 
 #  Type of Module:
-#     C shell script
+#     C-shell script
 
 #  Usage:
 #     xcompare [-gtk path] [-xdialog path]
 
 #  Description:
-#     This shell script reads a 3D IFU NDF datacube as input and presents
-#     the user with a white light image of the cube. The user can then 
-#     select and x,y position using the cursor. The script will extract 
-#     and display this spectra next to the white light image. The user can 
-#     then select another x,y position using the cursor and the script 
-#     will display this spectra as well, allowing comparison of the two.
+#     This shell script reads a three-dimensional IFU NDF as input and
+#     presents you with a white-light image of the cube.   You can then 
+#     select and X-Y position using the cursor.  The script will extract 
+#     and display this spectrum next to the white-light image.   You can 
+#     then select another X-Y position using the cursor and the script 
+#     will display this spectrum as well, allowing comparison of the two.
 
 #  Parameters
 #    -gtk path
@@ -29,6 +29,7 @@
 
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, University of Exeter)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -44,7 +45,10 @@
 #       Converted to GUI using XDialog ontop of GTK+
 #     18-OCT-2001 (AALLAN):
 #       Modified temporary files to use ${tmpdir}/${user}
-#     {enter_changes_here}
+#     2005 September  6 (MJC):
+#       Some tidying of grammar, punctutation, and spelling.  Added section
+#       headings in the code.  Attempt removal of files silently.
+#     {enter_further_changes_here}
 
 #  Required:
 #     GTK+ >v1.2.0 (v1.2.8 recommended)
@@ -57,7 +61,7 @@
 #     http://xdialog.free.fr/
 
 #  License:
-#     Copyright (C) 2000-2001 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #
 #     This program is free software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -75,37 +79,34 @@
 
 #-
 
-# on interrupt
+# Preliminaries
+# =============
+
+# On interrupt tidy up.
 onintr cleanup
 
-# get the user name
-
+# Get the user name.
 set user = `whoami`
 set tmpdir = "/tmp"
 
-# clean up from previous runs
-
+# Clean up from previous runs.
 rm -f ${tmpdir}/${user}/comp* >& /dev/null
 
-# do variable initialisation
-
-set args = ($argv[1-])
-
+# Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
 set curfile = "${tmpdir}/${user}/comp_cursor.tmp"
-set colfile = "${tmpdir}/${user}/comp_col.sdf"
-set specone = "${tmpdir}/${user}/comp_s1.sdf"
-set spectwo = "${tmpdir}/${user}/comp_s2.sdf"
+set colfile = "${tmpdir}/${user}/comp_col"
+set specone = "${tmpdir}/${user}/comp_s1"
+set spectwo = "${tmpdir}/${user}/comp_s2"
 set statsfile = "${tmpdir}/${user}/comp_stats.txt"
 touch ${curfile}
 
-# set default values for the location of libgtk.a and XDialog
-
+# Set default values for the location of libgtk.a and XDialog.
 set libgtk = /usr/lib
 set xdialog = /usr/bin
 
-# handle any command line arguements
-
+# Handle any command-line arguments.
+set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
    case -gtk:
@@ -122,37 +123,38 @@ while ( $#args > 0 )
 end
 
 # Check that GTK+ and XDialog are installed
-
 if ( ! -f ${libgtk}/libgtk.a ) then
   echo "ERROR - Cannot find libgtk"
   echo " "
-  echo "Current search path is ${libgtk}, if this is incorrect"
-  echo "for you system you can manually specify the correct path to libgtk"
-  echo "with the -gtk <path> command line option."
+  echo "Current search path is ${libgtk}.  If this is incorrect for"
+  echo "your system you can manually specify the correct path to libgtk"
+  echo "with the -gtk <path> command-line option."
   exit
+
 else if ( ! -f ${xdialog}/Xdialog ) then
   echo "ERROR - Cannot find Xdialog"
   echo " "
-  echo "Current search path is ${xdialog}, if this is incorrect"
-  echo "for you system you can manually specify the correct path to the"
-  echo "Xdialog executable with the -xdialog <path> command line option."
+  echo "Current search path is ${xdialog}.  If this is incorrect for"
+  echo "your system you can manually specify the correct path to the"
+  echo "Xdialog executable with the -xdialog <path> command-line option."
   exit
 endif
 
-# do package setup
-
+# Do the package setup.
 alias echo 'echo > /dev/null'
 source ${DATACUBE_DIR}/datacube.csh
 unalias echo
 
-# setup plot device
+# Setup the plot device.
 
 set plotdev = "xwin"
 gdclear device=${plotdev}
 gdclear device=${plotdev}
 
-# get input filename
+# Obtain details of the input cube.
+# =================================
 
+# Get the input filename.
 set infile =\
  `Xdialog --stdout --title "Please choose a file" --fselect /home/${user} 40 60`
 
@@ -168,8 +170,7 @@ switch ($?)
       breaksw
 endsw
 
-# check that it exists
-
+# Check that the file exists
 if ( ! -e ${infile}.sdf ) then
     
    Xdialog --no-cancel \
@@ -185,7 +186,7 @@ if ( ! -e ${infile}.sdf ) then
    endsw
 endif
 
-# find out the cube dimensions
+# Find out the cube dimensions.
 
 ndftrace ${infile} >& /dev/null
 set ndim = `parget ndim ndftrace`
@@ -215,20 +216,20 @@ Xdialog --left --buttons-style text \
 	--fixed-font \
 	--no-buttons \
 	--infobox \
-	   "      Shape:\n        No. of dimensions: ${ndim}\n        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}\n        Pixel bounds       : ${bnd}\n        Total pixels         : $pixnum\n\n  Left click to extract spectra.\n  Right click to exit program." 0 0 7000 >& /dev/null &
+	   "      Shape:\n        No. of dimensions: ${ndim}\n        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}\n        Pixel bounds       : ${bnd}\n        Total pixels         : $pixnum\n\n  Left click to extract spectrum.\n  Right click to exit program." 0 0 7000 >& /dev/null &
 
-# collapse white light image
+# Show the white-light image.
+# ===========================
 
-collapse "in=${infile} out=${colfile:r} axis=3" >& /dev/null 
+# Collapse the white-light image.
+collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
 
-# setup the graphics window
-
+# Setup the graphics window.
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
 
-# setup frames
-
+# Create graphics-database frames for the graphical elements.
 picdef "mode=cl fraction=[0.4,1.0] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="whitelight"
 
@@ -238,181 +239,174 @@ piclabel device=${plotdev} label="specone"
 picdef "mode=br fraction=[0.6,0.5] device=${plotdev} nooutline"
 piclabel device=${plotdev} label="spectwo" 
 
-# display collapsed image
-
+# Display the collapsed image.
 picsel label="whitelight" device=${plotdev}
-display "${colfile:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
 
-# setup exit condition
+# Obtain the spatial position of the spectrum graphically.
+# ========================================================
+
+# Setup the exit condition.
 set prev_xpix = 1
 set prev_ypix = 1
 
-# loop marker for spectral extraction
+# Loop marker for spectral extraction
 upp_cont:
 
-# grab x,y position
+# Grab an X-Y position.
+   cursor showpixel=true style="Colour(marker)=2" plot=mark \
+          maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
 
-cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
+# Wait for CURSOR output then get X-Y co-ordinates from 
+# the temporary file created by KAPPA:CURSOR.
+   while ( ! -e ${curfile} ) 
+      sleep 1
+   end
 
-# wait for cursor output then get x,y co-ordinates from 
-# the temporary file created by KAPPA cursor.
+# Grab the position.
+   set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
+# Get the pixel co-ordinates and convert to grid indices.
+   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
+   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
+   @ xpix = $xpix + 1
+   @ ypix = $ypix + 1
 
-# grab position 
+# Check for the exit conditions.
+   if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+      goto cleanup
+   else if ( $xpix == 1 && $ypix == 1 ) then
+      rm -f ${curfile} >& /dev/null
+      touch ${curfile}
+      goto upp_cont
+   else
+      set prev_xpix = $xpix
+      set prev_ypix = $ypix
+   endif
 
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# get pixel co-ordinates
-
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-@ xpix = $xpix + 1
-@ ypix = $ypix + 1
-
-# check for exit condtions
-
-if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
-   goto cleanup
-else if ( $xpix == 1 && $ypix == 1 ) then
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
-   goto upp_cont
-else
-   set prev_xpix = $xpix
-   set prev_ypix = $ypix
-endif
 
-# clean up the cursor temporary file
+# Extract and plot the selected spectrum.
+# =======================================
 
-rm -f ${curfile}
-touch ${curfile}
+   ndfcopy "in=${infile}($xpix,$ypix,) out=${specone} trim=true trimwcs=true"
+   settitle "ndf=${specone} title='Pixel (${xpix},${ypix})'"
 
-# extract spectra from cube
+# Change graphics-database frame.
+   picsel label="specone" device=${plotdev}
 
-ndfcopy "in=${infile}($xpix,$ypix,) out=${specone} trim=true trimwcs=true"
-settitle "ndf=${specone} title='Pixel (${xpix},${ypix})'"
+# Plot the ripped spectrum.
+   linplot ${specone} device=${plotdev} style="Colour(curves)=2" >& /dev/null
 
-# change frames
+# Show statistics of the spectrum.
+   stats ndf=${specone} > ${statsfile}
+   rm -f ${specone}.sdf >& /dev/null
 
-picsel label="specone" device=${plotdev}
+# This is not robust if the output of STATS changes!  It would be better to
+# report from the line starting with "Title" until the end. --MJC
+   cat ${statsfile} | tail -14 > ${statsfile}_tail
 
-# plot the ripper spectra
+   echo "      Extracting:" > ${statsfile}_final
+   echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
 
-linplot ${specone} device=${plotdev} style="Colour(curves)=2" >& /dev/null
+   cat ${statsfile}_tail >> ${statsfile}_final
+   rm -f ${statsfile} ${statsfile}_tail >& /dev/null
 
-# show spectra statistics
-
-stats ndf=${specone} > ${statsfile}
-rm -f ${specone}
-cat ${statsfile} | tail -14 > ${statsfile}_tail
-echo "      Extracing:" > ${statsfile}_final
-echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
-cat ${statsfile}_tail >> ${statsfile}_final
-rm -f ${statsfile} ${statsfile}_tail
-
-cat ${statsfile}_final | Xdialog --no-cancel --buttons-style text \
-                                 --title "Spectral Statistics" \
+   cat ${statsfile}_final | Xdialog --no-cancel --buttons-style text \
+                                    --title "Spectral Statistics" \
                                  --fixed-font --textbox "-" 40 80
-rm -f ${statsfile}_final
+   rm -f ${statsfile}_final >& /dev/null
 
-switch ($?)
-   case 0:
-      breaksw
-endsw
+   switch ($?)
+      case 0:
+         breaksw
+   endsw
 
-# go back to the white light image
+# Extract and plot the second selected spectrum.
+# ===============================================
 
-picsel label="whitelight" device=${plotdev}
+# Go back to the white-light image.
+   picsel label="whitelight" device=${plotdev}
 
-# loop marker for spectral extraction
+# Loop marker for spectral extraction
 low_cont:
 
-#  grab x,y position
+# Grab an X-Y position.
+   cursor showpixel=true style="Colour(marker)=3" plot=mark \
+          maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
 
-cursor showpixel=true style="Colour(marker)=3" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
+# Wait for CURSOR output then get X-Y co-ordinates from 
+# the temporary file created by KAPPA:CURSOR.
+   while ( ! -e ${curfile} ) 
+      sleep 1
+   end
 
-# wait for cursor output then get x,y co-ordinates from 
-# the temporary file created by KAPPA cursor.
+# Grab the position.
+   set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
+# Get the pixel co-ordinates and convert to grid indices.
+   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
+   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
+   @ xpix = $xpix + 1
+   @ ypix = $ypix + 1
 
-# grab position 
+# Check for exit conditions.
+   if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+      goto cleanup
+   else if ( $xpix == 1 && $ypix == 1 ) then
+      rm -f ${curfile} >& /dev/null
+      touch ${curfile}
+      goto low_cont
+   else
+      set prev_xpix = $xpix
+      set prev_ypix = $ypix
+   endif
 
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# get pixel co-ordinates
-
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-@ xpix = $xpix + 1
-@ ypix = $ypix + 1
-
-# check for exit condtions
-
-if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
-   goto cleanup
-else if ( $xpix == 1 && $ypix == 1 ) then
-   rm -f ${curfile}
+# Clean up the CURSOR temporary file.
+   rm -f ${curfile} >& /dev/null
    touch ${curfile}
-   goto low_cont
-else
-   set prev_xpix = $xpix
-   set prev_ypix = $ypix
-endif
 
-# clean up the cursor temporary file
+# Extract spectrum from the cube.
+   ndfcopy "in=${infile}($xpix,$ypix,) out=${spectwo} trim=true trimwcs=true"
+   settitle "ndf=${spectwo} title='Pixel ($xpix,$ypix)'"
 
-rm -f ${curfile}
-touch ${curfile}
+# Change graphics-database frame.
+   picsel label="spectwo" device=${plotdev}
 
-# extract spectra from cube
+# Plot the ripped spectra
+   linplot ${spectwo} device=${plotdev} style="Colour(curves)=3" >& /dev/null
 
-ndfcopy "in=${infile}($xpix,$ypix,) out=${spectwo} trim=true trimwcs=true"
-settitle "ndf=${spectwo} title='Pixel ($xpix,$ypix)'"
+# Extract the statistics.
+   stats ndf=${spectwo} > ${statsfile}
+   rm -f ${spectwo}.sdf >& /dev/null
+   cat ${statsfile} | tail -14 > ${statsfile}_tail
 
-# change frames
+   echo "      Extracting:" > ${statsfile}_final
+   echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
+   cat ${statsfile}_tail >> ${statsfile}_final
+   rm -f ${statsfile} ${statsfile}_tail >& /dev/null
 
-picsel label="spectwo" device=${plotdev}
+   cat ${statsfile}_final | Xdialog --no-cancel --buttons-style text \
+                                    --title "Spectral Statistics" \
+                                    --fixed-font --textbox "-" 40 80
+   rm -f ${statsfile}_final >& /dev/null
 
-# plot the ripped spectra
-
-linplot ${spectwo} device=${plotdev} style="Colour(curves)=3" >& /dev/null
-
-# show spectra statistics
-
-stats ndf=${spectwo} > ${statsfile}
-rm -f ${spectwo}
-cat ${statsfile} | tail -14 > ${statsfile}_tail
-echo "      Extracing:" > ${statsfile}_final
-echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
-cat ${statsfile}_tail >> ${statsfile}_final
-rm -f ${statsfile} ${statsfile}_tail
-
-cat ${statsfile}_final | Xdialog --no-cancel --buttons-style text \
-                                 --title "Spectral Statistics" \
-                                 --fixed-font --textbox "-" 40 80
-rm -f ${statsfile}_final
-
-switch ($?)
-   case 0:
-      breaksw
-endsw
+   switch ($?)
+      case 0:
+         breaksw
+   endsw
 
 goto upp_cont
 
-# clean up
+# Clean up.
+# =========
 cleanup:
 
-rm -f ${curfile} 
-rm -f ${colfile} 
-rm -f ${specone} 
-rm -f ${spectwo} 
-rm -f ${statsfile}
-rmdir ${tmpdir}/${user}
+rm -f ${curfile} >& /dev/null
+rm -f ${colfile}.sdf >& /dev/null
+rm -f ${specone}.sdf >& /dev/null
+rm -f ${spectwo}.sdf >& /dev/null
+rm -f ${statsfile} >& /dev/null
+rmdir ${tmpdir}/${user} >& /dev/null
