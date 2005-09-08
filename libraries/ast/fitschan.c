@@ -621,8 +621,10 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     9-AUG-2005 (DSB):
 *        In WcsMapFrm, check reffrm is used before annulling it.
 *     8-SEP-2005 (DSB):
-*        Change "if( a < b < c )" constructs to "if( a < b && b < c )"
-*        DSBSetup: correct test on FrameSet pointer state
+*        - Change "if( a < b < c )" constructs to "if( a < b && b < c )"
+*        - DSBSetup: correct test on FrameSet pointer state
+*        - Ensure CLASS keywords written to a FitsChan do not come before
+*        the final fixed position keyword.
 *class--
 */
 
@@ -1177,6 +1179,8 @@ static void WriteIsA( AstChannel *, const char *, const char * );
 static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char * );
 static void WriteString( AstChannel *, const char *, int, int, const char *, const char * );
 static void WriteToSink( AstFitsChan * );
+
+
 
 /* Member functions. */
 /* ================= */
@@ -4226,12 +4230,12 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       }
    }
 
-/* Save the number of axes */
+/* Save the number of WCS axes */
    naxis = GetMaxJM( &(store->crpix), ' ' ) + 1;
 
-/* If this is different to the value of NAXIS abort since this encoding
-   does not support WCSAXES keyword. */
-   if( naxis != store->naxis ) ok = 0;
+/* If this is larger than the number of pixel axes, ignore the surplus
+   WCS axes. */
+   if( naxis > store->naxis ) naxis = store->naxis;
 
 /* Allocate memory to store the CDELT values */
    if( ok ) {
@@ -4324,9 +4328,13 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
           != AST__BAD ) ok = 0;
    }
 
+
 /* Only create the keywords if the FitsStore conforms to the requirements
    of the FITS-CLASS encoding. */
    if( ok ) {
+
+/* Find the last WCS related card. */
+      FindWcs( this, 1, method, class );
 
 /* Get and save CRPIX for all pixel axes. These are required, so break
    if they are not available. */
@@ -33237,9 +33245,9 @@ int astGetCDMatrix_( AstFitsChan *this ){
  * standard output. 
  */
 
+
 /*
 static void ListFC( AstFitsChan *, const char * );
-
 
 static void ListFC( AstFitsChan *this, const char *ttl ) {
    FitsCard *cardo;
@@ -33257,8 +33265,8 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
       MoveCard( this, 1, "List", "FitsChan" );
    }
    this->card = cardo;
-} */
-
+} 
+*/
 
 
 
