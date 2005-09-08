@@ -649,7 +649,8 @@ AC_HEADER_CHECK(sys/select.h, , AC_DEFINE(NO_SYS_SELECT_H))
 # Check for missing typedefs.
 #------------------------------------------------------------------------------
 
-AC_CHECK_TYPE(clock_t, long)
+dnl Fails because of bad includes for standard tests.
+dnl AC_CHECK_TYPE(clock_t, long)
 AC_CHECK_TYPE(time_t, long)
 AC_CHECK_TYPE(off_t, long)
 
