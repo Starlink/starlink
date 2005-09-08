@@ -620,6 +620,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        character indicating an alternate axis set.
 *     9-AUG-2005 (DSB):
 *        In WcsMapFrm, check reffrm is used before annulling it.
+*     8-SEP-2005 (DSB):
+*        Change "if( a < b < c )" constructs to "if( a < b && b < c )"
 *class--
 */
 
@@ -22820,7 +22822,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                use_projp = 0;
 
 /* Are there any PV values for the longitude axis? */
-               if( tlbnd[ 0 ] <= axlon + 1 <= tubnd[ 0 ] ) {
+               if( tlbnd[ 0 ] <= axlon + 1 && axlon + 1 <= tubnd[ 0 ] ) {
 
 /* Are either PVi_1 or PVi_2 available? */
                   if( SearchCard( this, FormatKey( "PV", axlon + 1, 1, ' ' ),
