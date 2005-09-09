@@ -157,6 +157,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added the AST__SOMBCOS kernel.
 *     31-AUG-2005 (DSB):
 *        Added astRebinSeq.
+*     9-SEP-2005 (DSB):
+*        Corrected axis indices returned by public interface for astMapSplit.
 *class--
 */
 
@@ -20585,7 +20587,7 @@ f     MAP.
 /* If succesful, copy the output axes to the supplied array. */
       if( result ) {
          nout = astGetNout( *map );
-         for( i = 0; i < nout; i++ ) out[ i ] = result[ i ];
+         for( i = 0; i < nout; i++ ) out[ i ] = result[ i ] + 1;
 
 /* Free resurces. */
          result = astFree( result );
