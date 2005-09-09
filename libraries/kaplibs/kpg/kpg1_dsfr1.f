@@ -40,6 +40,8 @@
 *        Original version.
 *     11-AUG-2004 (DSB):
 *        Report details of DSBSpecFrame class.
+*     9-SEP-2005 (DSB):
+*        Change GeoLon/Lat to ObsLon/Lat and move out of SpecFrame section.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -340,28 +342,6 @@
      :                    IND( : NIND )//'Reference (RA,Dec)  : ^REF', 
      :                    STATUS )
 
-* Observers position...
-            IF( AST_TEST( FRM, 'GeoLon', STATUS ) ) THEN
-               POSBUF = ' '
-               IAT = 0
-               CALL CHR_APPND( AST_GETC( FRM, 'GeoLon', STATUS ),
-     :                          POSBUF, IAT )
-               CALL CHR_APPND( ',', POSBUF, IAT )
-               IAT = IAT + 1
-               CALL CHR_APPND( AST_GETC( FRM, 'GeoLat',
-     :                                  STATUS ), POSBUF, IAT )
-               IAT = IAT + 1
-               CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
-	    
-            ELSE
-               CALL MSG_SETC( 'OBS', '<not defined>' )
-            END IF
-	    
-            CALL MSG_OUT( 'WCS_REF', 
-     :                    IND( : NIND )//'Observer (Lon,Lat)  : ^OBS', 
-     :                    STATUS )
-
-
 *  Now display stuff specific to the DSBSpecFrame sub-class of SpecFrame.
             IF( AST_ISADSBSPECFRAME( FRM, STATUS ) ) THEN
 
@@ -437,6 +417,27 @@
      :                 IND( : NIND )//'Epoch of observation: '//
      :                 '^EPOCH (^DATE ^TIME)', STATUS )
          END IF
+
+* Observers position...
+         IF( AST_TEST( FRM, 'ObsLon', STATUS ) ) THEN
+            POSBUF = ' '
+            IAT = 0
+            CALL CHR_APPND( AST_GETC( FRM, 'ObsLon', STATUS ),
+     :                       POSBUF, IAT )
+            CALL CHR_APPND( ',', POSBUF, IAT )
+            IAT = IAT + 1
+            CALL CHR_APPND( AST_GETC( FRM, 'ObsLat',
+     :                               STATUS ), POSBUF, IAT )
+            IAT = IAT + 1
+            CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
+	 
+         ELSE
+            CALL MSG_SETC( 'OBS', '<not defined>' )
+         END IF
+	 
+         CALL MSG_OUT( 'WCS_REF', 
+     :                 IND( : NIND )//'Observer (Lon,Lat)  : ^OBS', 
+     :                 STATUS )
 
       END IF
 
