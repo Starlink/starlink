@@ -250,7 +250,7 @@ on-line catalogues via the Internet.
 </component>
 
 <component id="datacube" support="S">
-  <version>1.0-4</version>
+  <version>1.1</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>
   <abstract><p>DATACUBE is a package which includes the IFU Data Product Co

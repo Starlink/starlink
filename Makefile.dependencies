@@ -7,6 +7,18 @@
 # If the environment variable BUILDSUPPORT_PREFIX is defined
 # then the buildsupport tools will be REconfigured when they
 # are built; if not, they must be configured already.
+#
+# As well as defining each of the manifest targets, this
+# file also defines the following targets:
+#   buildsupport       - build each of the buildsupport tools
+#   clean-buildsupport - clean the buildsupport tools
+#   configure-deps     - build the set of components which 
+#                        must be built before ./configure
+# It additionally defines the variable SUPPORTED_COMPONENTS,
+# containing the list of manifest files corresponding to
+# components marked `supported' in their component.xml file.
+# No other targets or variables defined here should be 
+# regarded as persistent or otherwise relied upon.
 
 
 CONFIG_CPT=test -f config.status \
@@ -1848,10 +1860,16 @@ BUILDSUPPORT_MANIFESTS = \
 		$(MANIFESTS)/automake \
 		$(MANIFESTS)/libtool \
 		$(MANIFESTS)/starconf
+# Buildsupport tools which are conditionally built
 EXTRA_BUILDSUPPORT_MANIFESTS = \
 		$(MANIFESTS)/m4
 
+# Make all the buildsupport tools which are
+# unconditionally build
 buildsupport: $(BUILDSUPPORT_MANIFESTS)
+
+# Clean out the buildsupport tools,
+# including any conditionally built ones
 clean-buildsupport:
 	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
 
