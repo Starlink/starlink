@@ -186,57 +186,63 @@
       else
       {
          rec1_open_file( expand, file, file_len, mode, &slot, &newslot );
-         han->slot = slot;
-         han->read = ( mode == 'R' );
-         han->rid = ridprimary;
+         if ( _ok( hds_gl_status ) ) 
+         {
+             han->slot = slot;
+             han->read = ( mode == 'R' );
+             han->rid = ridprimary;
 
 /* If the file is being opened for the first time, then locate its Header   */
 /* Control Block information.						    */
-         if ( newslot )
-	 {
-	    rec1_locate_hcb( slot, 'R', &hcb );
-	    if ( _ok( hds_gl_status ) )
-	    {
+             if ( newslot )
+             {
+                 rec1_locate_hcb( slot, 'R', &hcb );
+                 if ( _ok( hds_gl_status ) )
+                 {
 
 /* Check the container file stamp and report an error if this is not an HDS */
 /* file. Close the file again if necessary.				    */
-	       if ( hcb->stamp != REC__STAMP )
-	       {
-	          hds_gl_status = DAT__FILIN;
-		  rec1_fmsg( "FILE", slot );
-	          ems_rep_c( "REC_ATTACH_FILE_1",
-	                     "The file ^FILE is not a valid HDS container \
+                     if ( hcb->stamp != REC__STAMP )
+                     {
+                         hds_gl_status = DAT__FILIN;
+                         rec1_fmsg( "FILE", slot );
+                         ems_rep_c( "REC_ATTACH_FILE_1",
+                                    "The file ^FILE is not a valid HDS container \
 file.",
-			     &hds_gl_status );
-                  rec_close_file( han );
-	       }
+                                    &hds_gl_status );
+                         rec_close_file( han );
+                     }
 
 /* Check the version number of the software that created or last modified   */
 /* the file. Report an error if there is a version mis-match. Close the	    */
 /* file again if necessary.						    */
-	       else if ( hcb->version > REC__VERSION4 )
-	       {
-	          hds_gl_status = DAT__VERMM;
-		  rec1_fmsg( "FILE", slot );
-	          ems_seti_c( "VFILE", hcb->version );
-	          ems_seti_c( "VSOFT", REC__VERSION4 );
-	          ems_rep_c( "REC_ATTACH_FILE_2",
-	                     "HDS file format version mismatch in file ^FILE \
+                     else if ( hcb->version > REC__VERSION4 )
+                     {
+                         hds_gl_status = DAT__VERMM;
+                         rec1_fmsg( "FILE", slot );
+                         ems_seti_c( "VFILE", hcb->version );
+                         ems_seti_c( "VSOFT", REC__VERSION4 );
+                         ems_rep_c( "REC_ATTACH_FILE_2",
+                                    "HDS file format version mismatch in file ^FILE \
 - file version=^VFILE, software version=^VSOFT (possible re-link needed).",
-                             &hds_gl_status );
-	          rec_close_file( han );
-	       }
-               else
-               {
-                  rec_ga_fcv[ slot ].hds_version = hcb->version;
-                  hds_gl_64bit = ( hcb->version > REC__VERSION3 );
-               }
-            }
-         } else        /* !newslot */
-            hds_gl_64bit = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 );
+                                    &hds_gl_status );
+                         rec_close_file( han );
+                     }
+                     else
+                     {
+                         rec_ga_fcv[ slot ].hds_version = hcb->version;
+                         hds_gl_64bit = ( hcb->version > REC__VERSION3 );
+                     }
+                 }
+             } 
+             else        /* !newslot */
+             {
+                 hds_gl_64bit = ( rec_ga_fcv[ slot ].hds_version > REC__VERSION3 );
+             }
 
 /* Read the Record Control Label for the top-level record.		    */
-	 rec_get_rcl( han, rcl );
+             rec_get_rcl( han, rcl );
+         }
       }
 
 /* Exit the routine.							    */
