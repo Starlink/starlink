@@ -157,6 +157,8 @@
 *        we only want this to happen if TRIMWCS is true.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     9-SEP-2005 (DSB):
+*        Modified to use AST_MAPSPLIT if possible when trimming WCS axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -197,6 +199,7 @@
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop index
       INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
+      INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IERR               ! Index of first numerical error
       INTEGER IP1                ! Pointer to mapped input array
@@ -206,7 +209,9 @@
       INTEGER IWCS2              ! WCS FrameSet from input
       INTEGER LBND( NDF__MXDIM ) ! Template NDF lower bounds
       INTEGER LTTL               ! Length of title
-      INTEGER MAP                ! Axis permutation Mapping
+      INTEGER MAP                ! Original base->current Mapping
+      INTEGER MAP2               ! Non-degenerate axes component of MAP
+      INTEGER MAP3               ! Axis permutation Mapping
       INTEGER NCOMP              ! No. of components in AXIS structure
       INTEGER NDF1               ! Input NDF identifier
       INTEGER NDF2               ! Template NDF identifier
@@ -228,6 +233,7 @@
       LOGICAL THERE              ! Does object exists?
       LOGICAL TRIM               ! Remove insignificant pixel axes?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
+      LOGICAL USEPRM             ! Use a PermMap to select current Frame axes?
 
       DATA COMP /'DATA', 'VARIANCE', 'QUALITY' /
 *.
@@ -309,6 +315,9 @@
 *  Get the WCS FrameSet from the input NDF. 
          CALL KPG1_GTWCS( NDF1, IWCS, STATUS )
 
+*  Get the Mapping from base (GRID) Frame to current Frame. 
+         MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
+
 *  Create a PermMap which goes from the NDIM-dimensional GRID Frame to
 *  a SIGDIM_dimensional copy of the GRID Frame, supplying a value of 1.0
 *  for the insignificant axes.
@@ -320,53 +329,71 @@
 *  supplies AST__BAD for the insignificant axes and so we use the better
 *  PermMap created above.
          CALL AST_INVERT( IWCS, STATUS )
-         NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP, STATUS ) 
+         NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP2, STATUS ) 
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
          CALL AST_ADDFRAME( IWCS, AST__CURRENT, PM, NEWFRM, STATUS ) 
          CALL AST_REMOVEFRAME( IWCS, ICURR, STATUS )
          CALL AST_INVERT( IWCS, STATUS )
 
+*  Get the number of axes in the original Current Frame.
+         NFC = AST_GETI( IWCS, 'NAXES', STATUS )
+
 *  See if the current WCS co-ordinate Frame is to be modified so that it
 *  has the same number of axes as the pixel Frame.
          CALL PAR_GET0L( 'TRIMWCS', TRMWCS, STATUS )
 
-*  Get the number of axes in the original Current Frame.
-         NFC = AST_GETI( IWCS, 'NAXES', STATUS )
-
-*  If there are no exces WCS axes, there is nothing to trim.
+*  If there are no excess WCS axes, there is nothing to trim.
          IF( NFC .LE. SIGDIM ) TRMWCS = .FALSE.
 
-*  If requested, delete excess WCS axes.
+*  If required, remove WCS axes.   
          IF( TRMWCS ) THEN 
 
-*  If the Current Frame has too many axes, a PermMap is used to select
-*  SIGDIM axes from those available in the Current Frame. A value of AST__BAD 
-*  is assigned to the other axes by this PermMap. If the selected axes are 
-*  not independant of the other axes, then these AST__BAD values will result 
-*  in bad values on all axes when points are transformed from the trimmed 
-*  Current Frame to the GRID (or any other) Frame. Ideally, the value 
-*  assigned to the "non-slected" axes by the PermMap would vary in order to 
-*  ensure that points transformed into the GRID Frame reside in the slice 
-*  selected above. This may be possible with a future release of AST, which may
-*  include a "SubMap" class for doing this. Until then, the best that we
-*  can do is to assign AST__BAD values to the non-selected axes. At least
-*  this will work in the common cases.
+*  See if the non-degenerate GRID axes correspond to a distinct and indepenent
+*  group of current Frame axes. If so, MAP2 is returned holding the Mapping 
+*  from the non-degenerate GRID axes to the corresponding WCS axes, and
+*  CAXES is returned holding the indices of these WCS axes.
+      call ast_show( map, status )
+            CALL AST_MAPSPLIT( MAP, SIGDIM, OPERM, CAXES, MAP2, STATUS )
 
-*  Get the required number of axis selections. A resonable guess should
-*  be to assume a one-to-one correspondance between Current and Base axes.
-*  Therefore, use the significant axes selected above as the defaults to be
-*  used if a null (!) parameter value is supplied.
+*  Now see which WCS axes are to be retained. If the base->current Mapping 
+*  can be split into two parallel components, we use a default USEAXIS
+*  value which includes the WCS axes corresponding to the non-degenerate
+*  pixel axes. If the base->current Mapping cannot be split, we use a
+*  default USEAXIS which assumes that the non-degenerate WCS axes simply
+*  have the same index as the non-degenerate pixel axes.
             DO I = 1, SIGDIM
                IAXIS( I ) = OPERM( I )
             END DO
+   
+            USEPRM = .TRUE.
+            IF( MAP2 .NE. AST__NULL ) THEN
+               IF( AST_GETI( MAP2, 'NOUT', STATUS ) .EQ. SIGDIM ) THEN
+                  USEPRM = .FALSE.
+                  DO I = 1, SIGDIM
+                     IAXIS( I ) = CAXES( I )
+                  END DO
+               END IF
+            END IF
 
+*  Get a value for USEAXIS from the user using the above default.
             CALL KPG1_GTAXI( 'USEAXIS', IWCS, SIGDIM, IAXIS, STATUS )
+
+*  If the base->current Mapping can be split, check that the user has not
+*  chosen to retain any degenerate WCS axes. If so, we will have to use a
+*  PermMap to selected the required WCS axes (rather than replacing the
+*  base->current Mapping by the component Mappaing found above).
+            IF( .NOT. USEPRM ) THEN 
+               DO I = 1, SIGDIM
+                  IF( IAXIS( I ) .NE. CAXES( I ) ) USEPRM = .TRUE.
+               END DO
+            END IF
 
 *  Create a new Frame by picking the selected axes from the original
 *  Current Frame. This also returns a PermMap which goes from the 
 *  original Frame to the new one, using AST__BAD values for the
-*  un-selected axes.
-            NEWFRM = AST_PICKAXES( IWCS, SIGDIM, IAXIS, MAP, STATUS )
+*  un-selected axes. We will only use this Mapping if the base->current
+*  Mapping was not succesfully split by AST_MAPSPLIT.
+            NEWFRM = AST_PICKAXES( IWCS, SIGDIM, IAXIS, MAP3, STATUS )
 
 *  If the original Current Frame is a CmpFrame, the Frame created from
 *  the above call to AST_PICKAXES may not have inherited its Title. If
@@ -379,14 +406,32 @@
                CALL AST_SETC( NEWFRM, 'TITLE', TTL( : LTTL ), STATUS )
             END IF
 
-*  Add this new Frame into the FrameSet. It becomes the Current Frame.
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP, NEWFRM, STATUS )
+*  If the base->current Mapping cannot be split into two parallel component 
+*  Mappings, or if the user wants to select WCS axes which depend on the 
+*  degenerate pixel axes, then we use the PermMap created by AST_PICKAXES
+*  above to select the required WCS axes. Add this new Frame into the 
+*  FrameSet. It becomes the Current Frame.
+            IF( USEPRM ) THEN                     
+               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP3, NEWFRM, 
+     :                            STATUS )
 
-         END IF
+*  If the degenerate pixel axes correspond to a distinct subset of the
+*  current Frame axes, then we can use the simpler base->current Mapping
+*  returned by AST_MAPSPLIT above.
+            ELSE
+               CALL AST_ADDFRAME( IWCS, AST__BASE, MAP2, NEWFRM, 
+     :                            STATUS )
+
+            END IF
+
+         END IF                
 
 *  Modify the bounds of the output NDF so that the significant axes
 *  span axes 1 to SIGDIM.
          CALL NDF_SBND( SIGDIM, SLBND, SUBND, NDF3, STATUS ) 
+
+*  Store the new WCS FrameSet in the output NDF.
+         CALL NDF_PTWCS( IWCS, NDF3, STATUS )
 
 *  We now need to copy any AXIS structures into the output NDF so that 
 *  they refer to the re-ordered axes. 
@@ -428,12 +473,14 @@
 *  Copy all components of the old axis structure into the new axis
 *  structure.
                CALL DAT_NCOMP( LOC4C, NCOMP, STATUS ) 
-               DO I = 1, NCOMP
-                  CALL DAT_INDEX( LOC4C, I, LOC5, STATUS ) 
-                  CALL DAT_NAME( LOC5, NAME, STATUS ) 
-                  CALL DAT_COPY( LOC5, LOC2C, NAME, STATUS ) 
-                  CALL DAT_ANNUL( LOC5, STATUS ) 
-               END DO
+               IF( STATUS .EQ. SAI__OK ) THEN 
+                  DO I = 1, NCOMP
+                     CALL DAT_INDEX( LOC4C, I, LOC5, STATUS ) 
+                     CALL DAT_NAME( LOC5, NAME, STATUS ) 
+                     CALL DAT_COPY( LOC5, LOC2C, NAME, STATUS ) 
+                     CALL DAT_ANNUL( LOC5, STATUS ) 
+                  END DO
+               END IF
 
 *  Annul the locators to the cells.
                CALL DAT_ANNUL( LOC4C, STATUS )
@@ -451,9 +498,6 @@
             CALL DAT_ANNUL( LOC1, STATUS )
 
          END IF
-
-*  Store the new WCS FrameSet in the output NDF.
-         CALL NDF_PTWCS( IWCS, NDF3, STATUS )
 
 *  Now copy the array components from input to output.
          DO I = 1, 3
