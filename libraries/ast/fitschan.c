@@ -625,6 +625,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - DSBSetup: correct test on FrameSet pointer state
 *        - Ensure CLASS keywords written to a FitsChan do not come before
 *        the final fixed position keyword.
+*     9-SEP-2005 (DSB):
+*        - Added "AZ--" and "EL--" as allowed axis types in FITS-WCS
+*        ctype values.
 *class--
 */
 
@@ -725,6 +728,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #define GALAC              3
 #define SUPER              4
 #define HECLIP             5
+#define AZEL               6
 #define LONAX             -1
 #define NONAX              0
 #define LATAX              1
@@ -893,7 +897,7 @@ typedef struct FitsStore {
 static AstFitsChanVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
-/* Strings to decribe each data type. These should be in the order implied
+/* Strings to describe each data type. These should be in the order implied
    by the corresponding macros (eg AST__FLOAT, etc). */
 static const char *type_names[] = {"comment", "integer", "floating point",
                                    "string", "complex floating point",
@@ -7893,12 +7897,14 @@ static int FindLonLatSpecAxes( FitsStore *store, char s, int *axlon, int *axlat,
 /* See if this is a longitude axis (e.g. if the first 4 characters of CTYPE 
    are "RA--" or "xLON" or "yzLN" ). */
             if( !strncmp( ctype, "RA--", 4 ) ||
+                !strncmp( ctype, "AZ--", 4 ) ||
                 !strncmp( ctype + 1, "LON", 3 ) ||
                 !strncmp( ctype + 2, "LN", 2 ) ){
                *axlon = i;
 
 /* Otherwise see if it is a latitude axis. */
             } else if( !strncmp( ctype, "DEC-", 4 ) ||
+                       !strncmp( ctype, "EL--", 4 ) ||
                        !strncmp( ctype + 1, "LAT", 3 ) ||
                        !strncmp( ctype + 2, "LT", 2 ) ){
                *axlat = i;
@@ -21306,8 +21312,8 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 *  Description:
 *     This function sets values for the following FITS-WCS keywords
 *     within the supplied FitsStore structure: CTYPE, CNAME, RADECSYS, EQUINOX,
-*     MJDOBS, CUNIT. The values are derived from the supplied SkyFrame
-*     and WcsMap.
+*     MJDOBS, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied 
+*     SkyFrame and WcsMap.
 
 *  Parameters:
 *     skyfrm
@@ -21338,22 +21344,26 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 */
 
 /* Local Variables: */
+   char *label;             /* Pointer to axis label string */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE value */
    char lontype[MXCTYPELEN];/* Longitude axis CTYPE value */
-   char *label;             /* Pointer to axis label string */
-   const char *prj_name;    /* Pointer to projection name string */
-   const char *sys;         /* Celestal coordinate system */
    const char *latsym;      /* SkyFrame latitude axis symbol */
    const char *lonsym;      /* SkyFrame longitude axis symbol */
+   const char *prj_name;    /* Pointer to projection name string */
+   const char *sys;         /* Celestal coordinate system */
    double ep;               /* Epoch of observation (MJD) */
    double eq;               /* Epoch of reference equinox (MJD) */
+   double geolat;           /* Geodetic latitude of observer (radians) */
+   double geolon;           /* Geodetic longitude of observer (radians) */
+   double r;                /* Distance (in AU) from earth axis */
+   double z;                /* Distance (in AU) above earth equator */
    int defdate;             /* Can the date keywords be defaulted? */
    int i;                   /* Character count */
    int isys;                /* Celestial coordinate system */
-   int radesys;             /* RA/DEC reference frame */
-   int ret;                 /* Returned flag */
    int latax;               /* Index of latitude axis in SkyFrame */
    int lonax;               /* Index of longitude axis in SkyFrame */
+   int radesys;             /* RA/DEC reference frame */
+   int ret;                 /* Returned flag */
 
 /* Check the status. */
    if( !astOK ) return 0;
@@ -21427,6 +21437,11 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       radesys = NORADEC;
       isys = SUPER;
 
+   } else if( !Ustrcmp( sys, "AzEl" ) ){
+      eq = AST__BAD;
+      radesys = NORADEC;
+      isys = AZEL;
+
    } else {
       eq = AST__BAD;
       radesys = NORADEC;
@@ -21467,6 +21482,10 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       } else if( isys == SUPER ){
          strcpy( lontype, "SLON" );
          strcpy( lattype, "SLAT" );
+
+      } else if( isys == AZEL ){
+         strcpy( lontype, "AZ--" );
+         strcpy( lattype, "EL--" );
 
 /* For unknown systems, use the axis symbols within CTYPE */
       } else {
@@ -21521,6 +21540,20 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 /* Store the Domain name as the WCSNAME keyword (if set). */
    if( astTestDomain( skyfrm ) ) { 
       SetItemC( &(store->wcsname), 0, s, (char *) astGetDomain( skyfrm ) );
+   }
+
+/* Store the observers position if set (needed for definition of AzEl
+   systems). */
+   if( astTestObsLon( skyfrm ) && astTestObsLat( skyfrm ) && s == ' ' ) {
+      geolon = astGetObsLon( skyfrm );
+      geolat = astGetObsLat( skyfrm );
+      if( geolat != AST__BAD && geolon != AST__BAD ) {
+         slaGeoc( geolat, 0.0, &r, &z );
+         r *= AST__AU;
+         SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ) );
+         SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
+         SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU );
+      }
    }
 
    if( !astOK ) ret = 0;
@@ -22509,6 +22542,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                        AST__STRING, (void *) &cval, 0, method, 
                        class ) ){
             if( !strncmp( cval, "RA--", 4 ) ||
+                !strncmp( cval, "AZ--", 4 ) ||
                 !strncmp( cval + 1, "LON", 3 ) ||
                 !strncmp( cval + 2, "LN", 2 ) ) {
                axlon = j;
@@ -22517,6 +22551,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                prj[ 4 ] = 0;
    
             } else if( !strncmp( cval, "DEC-", 4 ) ||
+                !strncmp( cval, "EL--", 4 ) ||
                 !strncmp( cval + 1, "LAT", 3 ) ||
                 !strncmp( cval + 2, "LT", 2 ) ) {
                axlat = j;
@@ -25610,6 +25645,10 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
             strcpy( type, "EQU" );
             gotax = 1;
 
+         } else if( !strncmp( ctype, "AZ--", 4 ) ){
+            strcpy( type, "AZL" );
+            gotax = 1;
+
          } else if( !strncmp( ctype + 1, "LON", 3 ) ){
             type[ 0 ] = ctype[ 0 ];
             type[ 1 ] = 0;
@@ -25657,6 +25696,10 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          gotax = 0;
          if( !strncmp( ctype, "DEC-", 4 ) ){
             strcpy( type, "EQU" );
+            gotax = 1;
+
+         } else if( !strncmp( ctype, "EL--", 4 ) ){
+            strcpy( type, "AZL" );
             gotax = 1;
 
          } else if( !strncmp( ctype + 1, "LAT", 3 ) ){
@@ -28548,7 +28591,11 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    char sym[10];                  /* Axis symbol */
    double eqmjd;                  /* MJD equivalent of equinox */
    double equinox;                /* EQUINOX value */
+   double geolat;                 /* Observers geodetic latitude */
+   double geolon;                 /* Observers geodetic longitude */
+   double h;                      /* Observers geodetic height */
    double mjdobs;                 /* MJD-OBS value */
+   double obsgeo[ 3 ];            /* Observers Cartesian position */
    int radesys;                   /* RADESYS value */
 
 /* Initialise. */
@@ -28707,6 +28754,9 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    } else if( !(strcmp( sys, "S" ) ) ){
       ret = astSkyFrame( "System=Supergalactic" );
 
+   } else if( !(strcmp( sys, "AZL" ) ) ){
+      ret = astSkyFrame( "System=AzEl" );
+
    } else if( !(strcmp( sys, "EQU" ) ) ){
 
 /* For equatorial systems, the specific system is given by the RADESYS
@@ -28781,6 +28831,20 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
       ckeyval = GetItemC( &(store->cname), axlat, s, NULL, method, class );
       if( ckeyval ) astSetLabel( ret, 1, ckeyval );
 
+/* Observer's position (from primary axis descriptions). Get the OBSGEO-X/Y/Z 
+   keywords, convert to geodetic longitude and latitude and store as the 
+   SpecFrame's ObsLat and ObsLon attributes (we ignore the height of the 
+   observer above sea level ). */
+      obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, ' ', NULL, method, class );
+      obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, ' ', NULL, method, class );
+      obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, ' ', NULL, method, class );
+      if( obsgeo[ 0 ] != AST__BAD && 
+          obsgeo[ 1 ] != AST__BAD && 
+          obsgeo[ 2 ] != AST__BAD ) {
+         Geod( obsgeo, &geolat, &h, &geolon );
+         astSetObsLat( ret, geolat );
+         astSetObsLon( ret, geolon );
+      }         
    }   
 
 /* If an error has occurred, annul the Frame. */
@@ -30943,6 +31007,15 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     without any corrections. This should be seen as an interim solution
 *     until such time as an agreed method for describing projection
 *     distortions within FITS-WCS has been published.
+*
+*     AST extends the range of celestial coordinate sytstems which may be
+*     described using this encoding by inclusion of the allowing the use of
+*     "AZ--" and "EL--" as the coordinate specification within CTYPE
+*     values. These form a longitude/latitude pair of axes which describe
+*     azimuth and elevation. The geographic position of the observer
+*     should be supplied using the OBSGEO-X/Y/Z keywords described in FITS-WCS
+*     paper III. Currently, a simple model is used which ignores atmospheric 
+*     refraction, polar motion, etc. These may be added in a leter release.
 *
 c     When reading a FITS-WCS encoded Object (using astRead), the FitsChan
 f     When reading a FITS-WCS encoded Object (using AST_READ), the FitsChan

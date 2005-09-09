@@ -22,6 +22,9 @@ functions which produces approximate flux conservation.
 - The SkyFrame class now supports a System value of "AZEL" corresponding
 to horizon (azimuth/elevation) coordinates.
 
+- The FitsChan class allows the non-standard strings "AZ--" and "EL--" to 
+be used as axis types in FITS-WCS CTYPE keyword values.
+
 - The Frame class now has attributes ObsLon and ObsLat to specify
 the geodetic longitude and latitude of the observer.
 

@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {15th August 2005}
+\newcommand{\stardocdate}      {9th September 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21046,6 +21046,9 @@ first order Bessel function of the first kind).
 
 \item The SkyFrame class now supports a System value of AZEL corresponding
 to horizon (azimuth/elevation) coordinates.
+
+\item The FitsChan class allows the non-standard strings ``AZ--'' and
+``EL--'' to be used as axis types in FITS-WCS CTYPE keyword values.
 
 \item The Frame class now has attributes ObsLon and ObsLat to specify
 the geodetic longitude and latitude of the observer.
