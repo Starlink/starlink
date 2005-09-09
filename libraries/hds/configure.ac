@@ -86,6 +86,9 @@ dnl    fsync is only declared if _POSIX_C_SOURCE isn't!!
 AC_CHECK_DECLS(fsync)
 
 dnl Check for largefile support (various macros and fseeko).
+dnl Make sure we don't use the cached version for this (can
+dnl be incorrect due to _POSIX_C_SOURCE on Solaris).
+$as_unset ac_cv_sys_largefile_source
 STAR_LARGEFILE_SUPPORT
 
 dnl Calculate sizes and types
