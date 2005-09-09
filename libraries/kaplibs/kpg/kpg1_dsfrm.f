@@ -109,7 +109,7 @@
      :                 '(programming error).', STATUS )
       END IF      
 
-*  Display the global properties fo the Frame.
+*  Display the global properties of the Frame.
       CALL KPG1_DSFR1( CFRM, TEXT, 8, FULL, STATUS )
 
 *  Get the Frame dimensionality.

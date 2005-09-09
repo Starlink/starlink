@@ -56,7 +56,7 @@
      : IRA__MAXP   = 8,
      : IRA__MXBRK  = 10,
      : IRA__NOID   = 0,
-     : IRA__SZCLS  = 30,
+     : IRA__SZCLS  = 35,
      : IRA__SZCTX  = 10,
      : IRA__SZFSC  = 28,
      : IRA__SZPLS  = 75,

@@ -60,6 +60,11 @@
 *            If no equinox specifier is added, the coordinates are
 *            referred to the mean equinox of Besselian epoch 1950.0.
 *
+*     AZEL
+*
+*            The longitude axis is horizon azimuth and the latitude axis is
+*            horizon elevation.
+*            
 *     All sky coordinate values supplied to, or returned from any IRA
 *     routine, are given in units of radians.
 
@@ -82,6 +87,8 @@
 *        Original version.
 *     27-APR-1991 (DSB):
 *        Modified fro IRA version 2.
+*     9-SEP-2005 (DSB):
+*        Added AZEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,7 +120,7 @@
 *  by the other IRA routines. The length of this string is stored in
 *  parameter IRA__SZCLS which should be updated when new sky coordinate
 *  systems are added to the list.
-      LIST = 'EQUATORIAL,GALACTIC,ECLIPTIC'
+      LIST = 'EQUATORIAL,GALACTIC,ECLIPTIC,AZEL'
 
 *  If the list was truncated, give a warning message.
       IF( LEN( LIST ) .LT. IRA__SZCLS ) THEN
