@@ -99,9 +99,9 @@
 /* Define a "normal integer". Typically use the "int" type, but ensure it   */
 /* has at least 4 bytes of precision.					    */
 #if ( ( INT_MIN <= -2147483647L ) && ( INT_MAX >= 2147483647L ) )
-#define INT int
+typedef int INT;
 #else
-#define INT long int
+typedef long int INT;
 #endif
 
 /* Definitions for 64-bits integers                                        */ 
