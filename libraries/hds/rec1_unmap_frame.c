@@ -11,7 +11,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
 #include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>		 /* Definitions for memory management	    */
 
@@ -154,7 +154,7 @@
       unsigned int systat;	 /* System status code			    */
 #else
 
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
                          	 /* Local variables for version using mmap: */
       size_t len;		 /* Length of data to unmap		    */
       unsigned long int ipntr;	 /* Pointer value cast to an integer	    */
@@ -175,7 +175,7 @@
 	   int acmode );	 /* Not used				    */
 
                                  /* System calls for version using mmap:    */
-#elif ( defined( _mmap) || defined( HAVE_MMAP ) ) && \
+#elif ( defined( _mmap) || HAVE_MMAP ) && \
       !defined( _POSIX_MAPPED_FILES ) /* Use POSIX.4 mapped files           */
       int munmap		 /* Unmap pages of memory		    */
          ( void *addr,
@@ -306,7 +306,7 @@
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
 	 if ( hds_gl_map )
 	 {
 

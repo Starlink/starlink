@@ -15,7 +15,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
 #include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>            /* Memory management definitions	    */
 #endif
@@ -140,7 +140,7 @@
       unsigned short int iochan; /* File I/O channel			    */
 #else
 
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
                                  /* Local variables for version using mmap: */
       int fd;			 /* File descriptor			    */
       int flags;		 /* Mapping flags			    */
@@ -194,7 +194,7 @@
 	   unsigned int region );
 
                                  /* System calls for version using mmap:    */
-#elif ( defined( _mmap) || defined( HAVE_MMAP ) ) && \
+#elif ( defined( _mmap) || HAVE_MMAP ) && \
       !defined( _POSIX_MAPPED_FILES ) /* Use POSIX.4 mapped files           */
       void *mmap		 /* Map file contents to pages of memory    */
          ( void *addr,
@@ -529,7 +529,7 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap) || defined( HAVE_MMAP ) 
+#if defined( _mmap) || HAVE_MMAP
       if ( hds_gl_map )
       {
 
