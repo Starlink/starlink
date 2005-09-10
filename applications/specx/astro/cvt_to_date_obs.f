@@ -18,8 +18,8 @@
 *     MJD = DOUBLE PRECISION (Given)
 *        Modified Julian date (Defined as JD - 2400000.5)
 *     DATE_OBS = CHARACTER * (*) (Returned)
-*        FITS DATE-OBS string. Should have at least 24
-*        characters for YYYY-MM-DDThh:mm:ss.sssZ format
+*        FITS DATE-OBS string. Should have at least 23
+*        characters for YYYY-MM-DDThh:mm:ss.sss format
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -30,11 +30,14 @@
 *        First version
 *     20-Sep-2000 (AJC):
 *        Don't split strings across lines
+*     09-Sep-2005 (TIMJ):
+*        Trailing Z is not part of the FITS standard since FITS enforces
+*        the use of UTC.
 
 *  Notes:
 *     The format used for the DATE-OBS keyword depends on the value of the
 *     keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-*     Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format.
+*     Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format.
 
 *.
 
@@ -94,7 +97,7 @@
 
 *     Insert the values into the string
          WRITE (DATE_OBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'','//
-     :        'I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3,''Z'')')
+     :        'I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3)')
      :        YY, MM, DD, IHMSF(1), IHMSF(2), IHMSF(3), IHMSF(4)
 
 
