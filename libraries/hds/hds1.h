@@ -105,16 +105,19 @@
 #endif
 
 /* Definitions for 64-bits integers                                        */ 
-#if !defined(__alpha)
+/* Use 'long' if it is 8 bytes, else use 'long long'                       */
+#if SIZEOF_LONG == 8
+typedef long int INT_BIG;
+typedef unsigned long int UINT_BIG;
+#define INT_BIG_S "ld"
+#define INT_BIG_U "lu"
+#elif SIZEOF_LONG_LONG == 8
 typedef long long int INT_BIG;
 typedef unsigned long long int UINT_BIG;
 #define INT_BIG_S "lld"
 #define INT_BIG_U "llu"
 #else
-typedef long int INT_BIG;
-typedef unsigned long int UINT_BIG;
-#define INT_BIG_S "ld"
-#define INT_BIG_U "lu"
+error unable to find an 8 byte integer type
 #endif
 
 /* The Fortran interface can be compiled as either 32 or 64 bits depending */
