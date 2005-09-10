@@ -116,7 +116,7 @@
 *
 *  Called:  sla_DRANGE, sla__ATMT, sla__ATMS
 *
-*  Last revision:   26 December 2004
+*  Last revision:   8 September 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *
@@ -182,8 +182,7 @@
       DOUBLE PRECISION REFI
       REFI(DN,RDNDR) = RDNDR/(DN+RDNDR)
 
-*  Keep the compiler happy
-      DATA REFT / 0.0D0 /
+
 
 *  Transform ZOBS into the normal range.
       ZOBS1 = sla_DRANGE(ZOBS)
@@ -269,10 +268,12 @@
       ZS = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
       FS = REFI(DNS,RDNDRS)
 
-*
+*  Variable initialization to avoid compiler warning.
+      REFT = 0D0
+
 *  Integrate the refraction integral in two parts;  first in the
 *  troposphere (K=1), then in the stratosphere (K=2).
-*
+
       DO K = 1,2
 
 *     Initialize previous refraction to ensure at least two iterations.

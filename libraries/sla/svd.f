@@ -61,9 +61,9 @@
 *     Numerical Recipes (Press et al 1986, Cambridge University Press),
 *     which includes another variant of the EISPACK code.
 *
-*  P.T.Wallace   Starlink   22 December 1993
+*  P.T.Wallace   Starlink   8 September 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -93,12 +93,15 @@
       INTEGER ITMAX
       PARAMETER (ITMAX=30)
 
-      INTEGER I,K,L,J,K1,ITS,L1,I1
+      INTEGER L,L1,I,K,J,K1,ITS,I1
       LOGICAL CANCEL
       DOUBLE PRECISION G,SCALE,AN,S,X,F,H,C,Y,Z
 
-*  Keep the compiler happy
-      DATA L, L1 / 2*0 /
+
+
+*  Variable initializations to avoid compiler warnings.
+      L = 0
+      L1 = 0
 
 *  Check that the matrix is the right shape
       IF (M.LT.N) THEN

@@ -136,9 +136,9 @@
 *
 *  Called:  sla_DRANRM
 *
-*  P.T.Wallace   Starlink   31 December 2002
+*  P.T.Wallace   Starlink   7 September 2005
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -195,8 +195,6 @@
 
       DOUBLE PRECISION sla_DRANRM
 
-*  Keep the compiler happy
-      DATA DN, Q, TP / 3*0.0D0 /
 
 *  Validate arguments PMASS and JFORMR.
       IF (PMASS.LT.0D0) THEN
@@ -294,6 +292,14 @@
       HAT = AT/2D0
       SHAT = SIN(HAT)
       CHAT = COS(HAT)
+
+*  Variable initializations to avoid compiler warnings.
+      AM = 0D0
+      DN = 0D0
+      PL = 0D0
+      EL = 0D0
+      Q = 0D0
+      TP = 0D0
 
 *  Ellipse?
       IF (ECC.LT.1D0 ) THEN

@@ -122,9 +122,9 @@
 *
 *  Reference:  Everhart & Pitkin, Am.J.Phys. 51, 712 (1983).
 *
-*  P.T.Wallace   Starlink   31 December 2002
+*  P.T.Wallace   Starlink   7 September 2005
 *
-*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -166,8 +166,6 @@
      :                 X,Y,Z,PX,PY,PZ,VX,VY,VZ,DT,FC,FP,PSI,
      :                 UL(13),PV(6)
 
-*  Keep the compiler happy
-      DATA PHT, ARGPH, Q, CM / 4*0.0D0 /
 
 
 *  Validate arguments.
@@ -197,21 +195,30 @@
 *  CM    = combined mass, M+m (mu)
 
       IF (JFORM.EQ.1) THEN
+
+*     Major planet.
          PHT = EPOCH-(AORL-PERIH)/DM
          ARGPH = PERIH-ANODE
          Q = AORQ*(1D0-E)
          W = DM/GCON
          CM = W*W*AORQ*AORQ*AORQ
+
       ELSE IF (JFORM.EQ.2) THEN
+
+*     Minor planet.
          PHT = EPOCH-AORL*SQRT(AORQ*AORQ*AORQ)/GCON
          ARGPH = PERIH
          Q = AORQ*(1D0-E)
          CM = 1D0
-      ELSE IF (JFORM.EQ.3) THEN
+
+      ELSE
+
+*     Comet.
          PHT = EPOCH
          ARGPH = PERIH
          Q = AORQ
          CM = 1D0
+
       END IF
 
 *  The universal variable alpha.  This is proportional to the total
@@ -278,7 +285,7 @@
 
       DT = (DATE-PHT)*GCON
 
-*  First Approximation to the Universal Eccentric Anomaly, PSI,
+*  First approximation to the Universal Eccentric Anomaly, PSI,
 *  based on the circle (FC) and parabola (FP) values.
 
       FC = DT/Q

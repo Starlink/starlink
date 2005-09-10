@@ -64,9 +64,9 @@
 *
 *  Called:  sla_DMAT, sla_DMXV
 *
-*  P.T.Wallace   Starlink   30 November 2001
+*  P.T.Wallace   Starlink   7 September 2005
 *
-*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -93,18 +93,27 @@
       INTEGER J
 
       INTEGER I,JSTAT,IW(4),NSOL
-      DOUBLE PRECISION P,SXE,SXEXM,SXEYM,SYE,SYEYM,SYEXM,SXM,
+      DOUBLE PRECISION A,B,C,D,AOLD,BOLD,COLD,DOLD,SOLD,
+     :                 P,SXE,SXEXM,SXEYM,SYE,SYEYM,SYEXM,SXM,
      :                 SYM,SXMXM,SXMYM,SYMYM,XE,YE,
      :                 XM,YM,V(4),DM3(3,3),DM4(4,4),DET,
-     :                 SGN,SXXYY,SXYYX,SX2Y2,A,B,C,D,
-     :                 SDR2,XR,YR,AOLD,BOLD,COLD,DOLD,SOLD
+     :                 SGN,SXXYY,SXYYX,SX2Y2,SDR2,XR,YR
 
-*  Keep the compiler happy
-      DATA A, B, C, D, AOLD, BOLD, COLD, DOLD, SOLD / 9*0.0D0 /
 
 
 *  Preset the status
       J=0
+
+*  Variable initializations to avoid compiler warnings
+      A = 0D0
+      B = 0D0
+      C = 0D0
+      D = 0D0
+      AOLD = 0D0
+      BOLD = 0D0
+      COLD = 0D0
+      DOLD = 0D0
+      SOLD = 0D0
 
 *  Float the number of samples
       P=DBLE(NP)
