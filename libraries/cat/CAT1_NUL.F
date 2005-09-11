@@ -1,4 +1,6 @@
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
 *+
 *  Name:
 *     CAT1_NUL
@@ -62,10 +64,12 @@ C      INCLUDE 'PRM_PAR'
 *    all its bits set to zero) as null.  This value is adopted as the
 *    default for data type CHARACTER.
       LOGICAL CAT1__DNULL
-#if FC_HAVE_HEX_NUMBERS
+#if HAVE_TYPELESS_BOZ
+      PARAMETER (CAT1__DNULL = X'A55A5AA5')
+#elif HAVE_OLD_TYPELESS_BOZ
       PARAMETER (CAT1__DNULL = 'A55A5AA5'X )
 #else
-      PARAMETER (CAT1__DNULL = X'A55A5AA5')
+      Error Do not have typeless BOZ
 #endif
 
       CHARACTER CAT1__DNULC*1

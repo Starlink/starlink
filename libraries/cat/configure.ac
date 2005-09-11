@@ -22,7 +22,6 @@ AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
-dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
@@ -38,23 +37,12 @@ dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
 dnl    which correspond to it.
 STAR_MESSGEN(cat_err.msg)
 
-
-dnl    Lifted from PRM to determine if the 'xxx'X notation is supported.
+dnl    Determine if the 'xxx'X notation is supported.
 dnl    If not use X'xxx' and keep fingers crossed, one has to work
 dnl    for CAT1_NUL.
-AC_LANG_PUSH([Fortran])
-AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
-   [ac_cv_fc_have_hex_numbers],
-   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
-      INTEGER I
-      PARAMETER ( I = 'FF'X )
-])],
-        ac_cv_fc_have_hex_numbers=yes,
-        ac_cv_fc_have_hex_numbers=no)])
-if test $ac_cv_fc_have_hex_numbers = yes; then
-    AC_DEFINE([FC_HAVE_HEX_NUMBERS], 1,
-              [Define as 1 if the Fortran compiler supports 'xxx'X numbers])
-fi
+AC_FC_HAVE_BOZ
+AC_FC_HAVE_TYPELESS_BOZ
+AC_FC_HAVE_OLD_TYPELESS_BOZ
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
