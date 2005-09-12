@@ -115,7 +115,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AGI_PAR'          ! AGI constants
 
 *  Arguments Given:
       REAL MARGIN( 4 )
