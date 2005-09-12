@@ -1,3 +1,7 @@
+2005-03-08  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * Extractor.pm: Change licence to GPL.
+
 2005-02-10  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * Extractor.pm: Add error handling.
