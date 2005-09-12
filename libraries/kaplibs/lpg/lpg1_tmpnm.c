@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "f77.h"
 #include "cnf.h"
 #include "sae_par.h"
@@ -23,11 +25,14 @@ F77_SUBROUTINE(lpg1_tmpnm)( CHARACTER(TMPNAM), INTEGER(STATUS) TRAIL(TMPNAM) ){
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     15-MAR-2004 (DSB):
 *        Original version.
+*     12-SEP-2005 (TIMJ):
+*        Fix compiler warnings
 *     {enter_changes_here}
 
 *  Bugs:
