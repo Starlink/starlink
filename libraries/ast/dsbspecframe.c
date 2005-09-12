@@ -63,8 +63,12 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Fixed SetAttrib code which assigns values to SideBand. Previously 
 *        all supplied values were ignored, leaving SideBand unchanged.
 *     2-SEP-2005 (DSB):
-*        Allow conversion in any DOmain within TopoMap (sometimes
+*        Allow conversion in any Domain within TopoMap (sometimes
 *        SpecFrames have a new Domain set which is not equal to SPECTRUM").
+*     12-SEP-2005 (DSB):
+*        Set all attributes required to described the RestFreq value
+*        before determining Mapping from RestFreq to ImagFreq in
+*        GetImageFreq.
 *class--
 
 *  Implementation Deficiencies:
@@ -438,60 +442,39 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
 */
 
 /* Local Variables: */
+   AstDSBSpecFrame *rf_frame;/* DSBSpecFrame describing the rest frequency */
    AstMapping *map;         /* Pointer to "Observed to Image" mapping */
    double result;           /* The returned frequency */
    double rf;               /* Rest frequency in observed sideband */
-   int oldsb;               /* Original value of the SideBand Attribute */
-   int oldsor;              /* Original value of the StdOfRest Attribute */
-   int sbset;               /* Was the SideBand attribute set?*/
-   int sorset;              /* Was the StdOfRest attribute set?*/
 
 /* Check the global error status. */
    if ( !astOK ) return AST__BAD;
 
-/* Initialise */
-   oldsb = 0;
-   oldsor = 0;
-
-/* Save the original value of the StdOfRest attribute and set it
-   temporarily to SOURCE. */
-   sorset = astTestStdOfRest( this );
-   if( sorset ) oldsor = astGetStdOfRest( this );
-   astSetStdOfRest( this, AST__SCSOR );
-
-/* Save the original value of the SideBand attribute and temporarily 
-   set it to "observed". */
-   sbset = astTestSideBand( this );
-   if( sbset ) oldsb = astGetSideBand( this );
-   astSetC( this, "SideBand", "observed" );
+/* The RestFreq attribute is an observed sideband frequency in the
+   source's standard of rest, measured in Hz. Temporaily set attributes
+   to these values. Create a copy of the supplied DSBSpecFrame and set
+   its attributes to these values.  */
+   rf_frame = astCopy( this );
+   astSetStdOfRest( rf_frame, AST__SCSOR );
+   astSetSystem( rf_frame, AST__FREQ );
+   astSetUnit( rf_frame, 0, "Hz" );
+   astSetC( rf_frame, "SideBand", "observed" );
 
 /* Create a Mapping which transforms positions from the observed to the
    image sideband. */
-   if( astGetSideBand( this ) == USB ) {
-      map = ToLSBMapping( this, "astGetImagFreq" );
+   if( astGetSideBand( rf_frame ) == USB ) {
+      map = ToLSBMapping( rf_frame, "astGetImagFreq" );
    } else {
-      map = ToUSBMapping( this, "astGetImagFreq" );
-   }
-
-/* Re-instate the original attribute values. */
-   if( sorset ) {
-      astSetStdOfRest( this, oldsor );
-   } else {
-      astClearStdOfRest( this );
-   }
-
-   if( sbset ) {
-      astSetSideBand( this, oldsb );
-   } else {
-      astClearSideBand( this );
+      map = ToUSBMapping( rf_frame, "astGetImagFreq" );
    }
 
 /* Get the rest frequency in Hz, and transform it using the above Mapping. */
-   rf = astGetRestFreq( this );
+   rf = astGetRestFreq( rf_frame );
    astTran1( map, 1, &rf, 1, &result );
 
-/* Annul the Mapping */
+/* Free resources */
    map = astAnnul( map );
+   rf_frame = astAnnul( rf_frame );
 
 /* If an error has occurrred, return AST__BAD. */
    if( !astOK ) result = AST__BAD;
