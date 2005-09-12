@@ -79,7 +79,7 @@ set tmpdir = "/tmp"
 rm -f ${tmpdir}/${user}/pass* >& /dev/null
 
 # Do variable initialisation.
-mkdir ${tmpdir}/${user}
+mkdir ${tmpdir}/${user} >& /dev/null
 set curfile = "${tmpdir}/${user}/pass_cursor.tmp"
 set colfile = "${tmpdir}/${user}/pass_col"
 set pasfile = "${tmpdir}/${user}/pass_pas"
@@ -199,7 +199,7 @@ extract:
 
 # Grab the X-Y position.
 echo " "
-echo "  Left click to extract spectra"
+echo "  Left click to extract spectrum."
   
 cursor showpixel=true style="Colour(marker)=2" plot=mark \
        maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
@@ -242,7 +242,7 @@ echo "      Extracting:"
 echo "        (X,Y) pixel             : ${xpix},${ypix}"
 
 # Extract the spectrum from the cube and give it an identifiable TITLE.
-ndfcopy "in=${infile}($xpix,$ypix,) out=${spectral} trim=true trimwcs=true"
+ndfcopy "in=${infile}($xpix,$ypix,) out=${spectral} trim=true trimwcs=true" >& /dev/null
 settitle "ndf=${spectral} title='Pixel (${xpix},${ypix})'"
 
 # Obtain the zoom range interactively.
@@ -365,7 +365,7 @@ set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 # Inform the user.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-printf "%15s%s\n" "${slabel}" ": ${low}--${upp} $sunits"
+printf "%25s%s\n" "${slabel}" ": ${low}--${upp} $sunits"
 
 # Collapse the white-light image.
 collapse "in=${infile} out=${pasfile} " \
