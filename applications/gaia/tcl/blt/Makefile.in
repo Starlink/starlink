@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------
 
 DEFINES      =
-CFLAGS       = @CFLAGS@
+CFLAGS       = @CFLAGS@ @DEFS@
 EXTRA_CFLAGS = @GCCFLAGS@
 CC 	     = @CC@
 

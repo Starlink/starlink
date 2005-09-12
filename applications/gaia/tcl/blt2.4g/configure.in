@@ -73,6 +73,7 @@ blt_ckenv_cc=$CC
 #
 
 AC_MSG_CHECKING([which C compiler])
+AC_PROG_CC
 if test "x${blt_ckcmd_cc}" != "x" ; then 
   CC=${blt_ckcmd_cc}
   unset ac_cv_prog_CPP
