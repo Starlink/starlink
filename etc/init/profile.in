@@ -78,6 +78,13 @@ if test -f @bindir@/hdstools/hdstools.sh; then
    export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
 fi
 
+#  HDSTRACE
+
+if test -f @bindir@/hdstrace; then
+   export HDSTRACE_DIR=@bindir@/
+   export HDSTRACE_HELP=@starhelpdir@/hdstrace
+fi
+
 #
 #  ICL
 #
@@ -147,7 +154,7 @@ fi
 
 # ATOOLS
 
-if test -f @bindir@/ccdpack/ccdpack.sh; then
+if test -f @bindir@/atools/atools.sh; then
   atools () { . $ATOOLS_DIR/atools.sh; }
   atools () { . $ATOOLS_DIR/atools.sh; }
 else
