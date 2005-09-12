@@ -628,6 +628,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     9-SEP-2005 (DSB):
 *        - Added "AZ--" and "EL--" as allowed axis types in FITS-WCS
 *        ctype values.
+*     12-SEP-2005 (DSB):
+*        - Cast difference between two pointers to (int)
 *class--
 */
 
@@ -16734,7 +16736,7 @@ static int Match( const char *test, const char *temp, int maxfld, int *fields,
    the field and store it in the supplied array (if there is room). */
    if( match && type == 'd' && a > test ){
       if( *nfld < maxfld ){
-         sprintf( fmt, "%%%dd", a - test );
+         sprintf( fmt, "%%%dd", (int) ( a - test ) );
          astSscanf( test, fmt, fields + *nfld );
       }
       (*nfld)++;
