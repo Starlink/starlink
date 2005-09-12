@@ -95,7 +95,7 @@ BUILT_SOURCES = $(include_MESSAGES) $(PRIVATE_INCLUDES)
 ## by hand to avoid expanding that.
 CAT1_NUL: CAT1_NUL.F
 	rm -f $@
-	$(FPP) $(FPPFLAGS) $(DEFAULT_INCLUDES) $(CPPFLAGS) CAT1_NUL.F $(FPP_OUTPUT)
+	$(FPP) $(FPPFLAGS) $(FPP_MAKE_FLAGS) CAT1_NUL.F $(FPP_OUTPUT)
 	test -f $@ || mv CAT1_NUL.f $@
 	rm -f CAT1_NUL.tmp
 	echo "* Generated from CAT1_NUL.F using preprocessor $(FPP)" > CAT1_NUL.tmp
