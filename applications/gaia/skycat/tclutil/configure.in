@@ -98,7 +98,7 @@ fi
 
 # Special gcc flags if needed. After GCC4 the -fwritable-strings flag
 # if not allowed, so has been removed.
-#compiler=`basename $CC`
+compiler=`basename $CC`
 #if test "$compiler" = "gcc" ; then
 #    CC="$CC"
 #fi
@@ -110,8 +110,8 @@ if test "$CXX" = "c++" ; then
 fi
 
 #  Tried of all those warnings...
-compiler=`basename $CXX`
-if test "$CXX" = "g++" ; then
+cxxcompiler=`basename $CXX`
+if test "$cxxcompiler" = "g++" ; then
     CXX="g++ -Wno-deprecated"
 fi
 
