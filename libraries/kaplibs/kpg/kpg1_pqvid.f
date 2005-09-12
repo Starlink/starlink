@@ -73,7 +73,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colour-table-management definitions
-      INCLUDE 'GNS_PAR'          ! GNS constants 
+c      INCLUDE 'GNS_PAR'          ! GNS constants 
 
 *  Arguments Given:
       CHARACTER PNDEV*(*)
@@ -96,7 +96,7 @@
       PARAMETER( MAXOPT = 40 )
 
 *  Local Variables:
-      CHARACTER ACLASS( MAXOPT )*( GNS__SZKEY) ! The array of class options
+c      CHARACTER ACLASS( MAXOPT )*( GNS__SZKEY) ! The array of class options
       CHARACTER VAL*1            ! PGPLOT information string
       INTEGER CI1                ! Minimum colour index 
       INTEGER I                  ! Loop counter
