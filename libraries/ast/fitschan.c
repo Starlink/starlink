@@ -630,6 +630,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        ctype values.
 *     12-SEP-2005 (DSB):
 *        - Cast difference between two pointers to (int)
+*        - CLASSFromStore:Check source velocity is defined before
+*          storing it in the output header.
 *class--
 */
 
@@ -4056,7 +4058,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Initialise */ 
    specfactor = 1.0;
-   srcsys = "";
+   srcsys = NULL;
 
 /* First check that the values in the FitsStore conform to the
    requirements of the CLASS encoding. Assume they do not to begin with. */
@@ -4449,7 +4451,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       SetValue( this, "RESTFREQ", &rf, AST__FLOAT, "[Hz] Rest frequency" );
 
 /* Source velocity */
-      SetValue( this, srcsys, &srcvel, AST__FLOAT, "[m/s] Source velocity" );
+      if( srcsys ) SetValue( this, srcsys, &srcvel, AST__FLOAT, "[m/s] Source velocity" );
 
 /* The image frequency corresponding to the rest frequency (only used for
    double sideband data). */
