@@ -57,6 +57,9 @@
        IsA Frame 	# Coordinate system description
           Proj = "gnomonic" 	# Description of sky projection
           Eqnox = 2000 	# Julian epoch of mean equinox
+          SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
+          SRef1 = 2.82723746556841 	# Ref. pos. RA 10:47:57.3
+          SRef2 = -1.05181225405027 	# Ref. pos. Dec -60:15:52
        End SkyFrame
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping

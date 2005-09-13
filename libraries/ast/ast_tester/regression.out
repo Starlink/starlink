@@ -100,6 +100,9 @@ AST_SHOW:
              End SkyAxis
        IsA Frame 	# Coordinate system description
           Proj = "zenithal equal area" 	# Description of sky projection
+          SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
+          SRef1 = -2.61046557479594 	# Ref. pos. l -149.5687
+          SRef2 = -0.344845661720836 	# Ref. pos. b -19.7582
        End SkyFrame
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
@@ -285,6 +288,9 @@ BEGAST_G= 'SkyAxis '           / Celestial coordinate axis
 ENDAST_E= 'SkyAxis '           / End of object definition                       
 ISA_B   = 'Frame   '           / Coordinate system description                  
 PROJ_A  = 'zenithal equal area'/ Description of sky projection                  
+SREFIS_A= 'Ignored '           / Not rotated (ref. pos. is ignored)             
+SREF1_A =    -2.61046557479594 / Ref. pos. l -149.5687                          
+SREF2_A =   -0.344845661720836 / Ref. pos. b -19.7582                           
 ENDAST_F= 'SkyFrame'           / End of object definition                       
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
@@ -6259,6 +6265,9 @@ AST_SHOW:
        IsA Frame 	# Coordinate system description
           Proj = "gnomonic" 	# Description of sky projection
           Eqnox = 2000 	# Julian epoch of mean equinox
+          SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
+          SRef1 = 0 	# Ref. pos. RA 0:00:00.0
+          SRef2 = -1.57079633000002 	# Ref. pos. Dec -90:00:00
        End SkyFrame
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
@@ -6578,6 +6587,9 @@ ENDAST_E= 'SkyAxis '           / End of object definition
 ISA_B   = 'Frame   '           / Coordinate system description                  
 PROJ_A  = 'gnomonic'           / Description of sky projection                  
 EQNOX_A =               2000.0 / Julian epoch of mean equinox                   
+SREFIS_A= 'Ignored '           / Not rotated (ref. pos. is ignored)             
+SREF1_A =                  0.0 / Ref. pos. RA 0:00:00.0                         
+SREF2_A =          -1.57079633 / Ref. pos. Dec -90:00:00                        
 ENDAST_F= 'SkyFrame'           / End of object definition                       
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
