@@ -61,6 +61,9 @@
 #     4-OCT-2004 (DSB):
 #        Added Tk/Tcl libraries (now needed since kpg1_tkast has been
 #        moved to kps1_tkast).
+#     12-SEP-2005 (TIMJ):
+#        Add -nogrf option
+#        Add -withtk option
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -70,6 +73,8 @@
 
 #  Initialise linking options.
       kaplibs_opts=''
+      tk_libs=''
+      kapgrf_libs='kapsub/libkapsub_grf.la'
 
 #  Interpret command line switches.
 #  --------------------------------
@@ -79,6 +84,17 @@
 #  -nogks - Requests linking with native pgplot and without GKS or IDI
          -nogks)
             kaplibs_opts=' -nogks'
+            shift;;
+
+#  -nogrf - Requests linking without any graphics libraries
+         -nogrf)
+            kaplibs_opts=' -nogrf'
+            kapgrf_libs=''
+            shift;;
+
+#  -withtk  - Requests linking with Tcl/Tk libraries
+         -withtk)
+            tk_libs=' kapsub/libkapsub_tk.la @TCL_LIBS@ @TK_LIBS@ '
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -92,10 +108,16 @@
       done
 
 #  Echo the link list.
-      echo @TCL_LIBS@ @TK_LIBS@ `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
-           `shl_link_adam` `one_link_adam` \
+#  Sometimes the TCL_LIBS and TK_LIBS will include repeated information
+#  that must remain so we do not include them in the library reduction
+      all="`ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
+           `shl_link_adam` `one_link_adam` `ref_link_adam`"
+
+      uniq=`echo $all \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
-                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'`
+
+      echo $tk_libs $kapgrf_libs $uniq
 
 #  End of script.
