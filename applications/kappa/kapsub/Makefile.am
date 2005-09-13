@@ -1,9 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LTLIBRARIES = libkapsub.la
+noinst_LTLIBRARIES = libkapsub.la libkapsub_tk.la
 
 libkapsub_la_SOURCES = $(F_ROUTINES)  $(C_ROUTINES) $(GEN_F_ROUTINES)
 
+libkapsub_tk_la_SOURCES = $(TK_C_ROUTINES)
 
 F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f getv2.f hstdsp.f   \
 hstlo.f hstrep.f imlst.f inhi.f inpol.f inre.f inva.f lsfun1.f	   \
@@ -66,7 +67,9 @@ medwts.f medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f	   \
 kps1_dnrth.f kps1_inmat.f kps1_pxdpm.f
 
 
-C_ROUTINES = kps1_luted.c kps1_tkast.c
+C_ROUTINES = kps1_luted.c
+
+TK_C_ROUTINES = kps1_tkast.c
 
 MEM_ROUTINES = kps1_mem20.f kps1_memco.f kps1_memcp.f kps1_memcs.f \
 kps1_memfp.f kps1_memfx.f kps1_memga.f kps1_memin.f kps1_memnm.f   \
