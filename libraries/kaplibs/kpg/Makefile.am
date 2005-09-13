@@ -40,7 +40,7 @@ GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f)
 
-GRAPHIC_GEN_F_ROUTINES = $(KPG_GRAPHIC_DR_GEN:.gdr:.f)
+GRAPHIC_GEN_F_ROUTINES = $(KPG_GRAPHIC_DR_GEN:.gdr=.f)
 
 ADAM_GEN_F_ROUTINES = $(KPG_ADAM_DR_GEN:.gdr=.f) \
 	$(KPG_ADAM_N_GEN:.gn=.f)
@@ -405,10 +405,8 @@ kpg1_lgtrn.f \
 kpg1_ltget.f \
 kpg1_ltlod.f \
 kpg1_ltsav.f \
-kpg1_lutk3.f \
 kpg1_lutk4.f \
 kpg1_mkpos.f \
-kpg1_pacol.f \
 kpg1_pgclr.f \
 kpg1_pgcur.f \
 kpg1_pgcut.f \
@@ -427,14 +425,15 @@ kpg1_plput.f \
 kpg1_plsav.f \
 kpg1_pqvid.f
 
-
 KPG_GRAPHIC_ADAM_NONGEN = \
 kpg1_asset.f \
 kpg1_gdbnd.f \
 kpg1_gdnew.f \
 kpg1_graph.f \
 kpg1_grphw.f \
+kpg1_lutk3.f \
 kpg1_lutky.f \
+kpg1_pacol.f \
 kpg1_pgcls.f \
 kpg1_pgopn.f \
 kpg1_plot.f \
@@ -443,6 +442,7 @@ kpg1_plotn.f \
 kpg1_plotp.f \
 kpg1_plots.f \
 kpg1_pltln.f
+
 
 
 .gn.f:
