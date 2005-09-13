@@ -126,7 +126,14 @@ if test -f @bindir@/pongo/pongo.icl; then
    export PONGO_EXAMPLES=@datadir@/pongo
 fi
 
+#
+#  SPECX
+#
 
+if test -f @datadir@/specx/specxstart.sh; then
+   export SYS_SPECX=@datadir@/specx
+   export SPECX_HELP=@starhelpdir@/specx
+fi
 
 #  SST
 
@@ -276,6 +283,20 @@ if test -f @bindir@/pongo/pongo.icl; then
    pongo () { icl $PONGO_BIN/pongo; }
 else
    pongo () { @staretcdir@/notinst pongo; }
+fi
+
+#
+# SPECX
+#
+
+if test -f @datadir@/specx/specxstart.sh; then
+  specx () { . $SYS_SPECX/specxstart.sh; command specx; }
+  specxsetup () { . $SYS_SPECX/specxstart.sh; }
+  specxstart () { . $SYS_SPECX/specxstart.sh; }
+else
+  specx () { @staretcdir@/notinst specx; }
+  specxsetup () { @staretcdir@/notinst specxsetup; }
+  specxstart () { @staretcdir@/notinst specxstart; }
 fi
 
 # SST
