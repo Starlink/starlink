@@ -1,6 +1,7 @@
 
 #  Initialise linking options.
       nogks=''
+      nogrf=''
 
 #  Interpret command line switches.
 #  --------------------------------
@@ -10,6 +11,11 @@
 #  -nogks - Requests linking with native pgplot and without GKS or IDI
          -nogks)
             nogks='y'
+            shift;;
+
+#  -nogrf - Requests linking without any graphics libraries
+         -nogrf)
+            nogrf='y'
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -22,9 +28,21 @@
          esac
       done
 
+      if test "${nogrf}" = 'y'; then 
+#   No graphics
+         echo -lkpg -lira -lirq -lfts -laif \
+           `cat_link` `ndg_link` \
+           `ndf_link` `ast_link -ems` \
+           `fio_link` \
+           `grp_link` `trn_link` \
+           `prm_link` `mag_link` \
+           `psx_link` `pda_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+      elif test "${nogks}" = 'y'; then 
 #  Form list of graphics libraries.
-      if test "${nogks}" = 'y'; then 
-         echo -lkpg -lira -lirq -lfts -laif -lkapgrf \
+         echo -lkpg -lkpg_grf -lira -lirq -lfts -laif -lkapgrf \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems -grf` \
            `agp_link` `fio_link` \
@@ -36,7 +54,7 @@
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
-         echo -lkgs -lkpg -lira -lirq -lfts -laif -lkapgrf \
+         echo -lkgs -lkpg -lkpg_grf -lira -lirq -lfts -laif -lkapgrf \
            `cat_link` `snx_link` \
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \
