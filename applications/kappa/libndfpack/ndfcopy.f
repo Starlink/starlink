@@ -53,48 +53,53 @@
 *        cause the title of the NDF supplied for parameter IN to be
 *        used instead. [!]
 *     TRIM = _LOGICAL (Read)
-*        If TRUE, then the number of pixel axes in the output NDF will be
-*        reduced if necessary to remove any pixel axes which span only a
-*        single pixel. For instance if "stokes" is a 3D data cube with 
-*        pixel bounds (1:100,-50:40,1:3), and the parameter IN is given the 
-*        value "stokes(,,2)", then the dimensionality of the output depends 
-*        on the setting of TRIM: if TRIM=NO the output is 3D with pixel 
-*        bounds (1:100,-50:40,2:2) and if TRIM=YES the output is 2D with 
-*        pixel bounds (1:100,-50:40). In this example, the third pixel 
-*        axis spans only a single pixel and is consequently removed if 
-*        TRIM=YES.  [FALSE]
+*        If TRUE, then the number of pixel axes in the output NDF will
+*        be reduced if necessary to remove any pixel axes which span
+*        only a single pixel.  For instance if "stokes" is a 
+*        three-dimensional data cube with pixel bounds
+*        (1:100,-50:40,1:3), and the parameter IN is given the value
+*        "stokes(,,2)", then the dimensionality of the output depends 
+*        on the setting of TRIM: if TRIM=FALSE, the output is
+*        three-dimensional with pixel bounds (1:100,-50:40,2:2), and if
+*        TRIM=TRUE the output is two-dimensional with pixel bounds
+*        (1:100,-50:40).  In this example, the third pixel axis spans
+*        only a single pixel and is consequently removed if TRIM=TRUE. 
+*        [FALSE]
 *     TRIMWCS = _LOGICAL (Read)
-*        This parameter is only accessed if parameter TRIM is TRUE. It
-*        controls the number of axes in the current WCS co-ordinate Frame
-*        of the output NDF. If TRIMWCS=YES, then the current Frame in the 
-*        output NDF will have the same number of axes as there are pixel
-*        axes in the output NDF. If this involves removing axes, then the
-*        axes to retain are specified by parameter USEAXIS. If TRIMWCS=NO
-*        then all axes are retained in the current WCS Frame of the
-*        output NDF. Using the example in the description of the TRIM
-*        parameter, if the input NDF "stokes" has a 3D current WCS Frame 
-*        with axes (Ra,Dec,Stokes) and TRIMWSC=YES, then an axis will be
-*        removed from the current Frame to make it 2 dimensional (that
+*        This parameter is only accessed if parameter TRIM is TRUE.  It
+*        controls the number of axes in the current WCS co-ordinate
+*        Frame of the output NDF.  If TRIMWCS=TRUE, then the current
+*        Frame in the output NDF will have the same number of axes as
+*        there are pixel axes in the output NDF.  If this involves
+*        removing axes, then the axes to retain are specified by
+*        parameter USEAXIS.  If TRIMWCS=FALSE, then all axes are
+*        retained in the current WCS Frame of the output NDF.  Using the 
+*        example in the description of the TRIM parameter, if the input 
+*        NDF "stokes" has a three-dimensional current WCS Frame with 
+*        axes (Ra,Dec,Stokes) and TRIMWSC=TRUE, then an axis will be
+*        removed from the current Frame to make it two-dimensional (that
 *        is, to match the number of pixel axes remaining after the
-*        removal of insignificant pixel axes). The choice of which two
-*        axes to retain is controlled by parameter USEAXIS. If, on the
+*        removal of insignificant pixel axes).  The choice of which two
+*        axes to retain is controlled by parameter USEAXIS.  If, on the
 *        other hand, TRIMWCS was set to FALSE, then the output NDF would
-*        still have two pixel axes, but the current WCS Frame would retain 
-*        all three axes from the input NDF. If one or more current Frame 
-*        axes are removed, the transformation from the current Frame to 
-*        pixel Frame may become undefined resulting in some WCS operations 
-*        being unusable. The inverse of this transformation (from pixel 
-*        Frame to current Frame) is unchanged however. [TRUE]
+*        still have two pixel axes, but the current WCS Frame would
+*        retain all three axes from the input NDF.  If one or more
+*        current Frame axes are removed, the transformation from the
+*        current Frame to pixel Frame may become undefined resulting in
+*        some WCS operations being unusable.  The inverse of this
+*        transformation (from pixel Frame to current Frame) is
+*        unchanged however. [TRUE]
 *     USEAXIS = LITERAL (Read)
-*        This parameter is only accessed if TRIM and TRIMWCS are both TRUE
-*        and some axes need to be removed from the current WCS Frame of
-*        the output NDF. It gives the axes which are to be retained in
-*        the current WCS Frame of the output NDF. Each axis can be 
-*        specified either by giving its index within the Current Frame 
-*        of the input NDF in the range 1 to the number of axes in the Frame, 
-*        or by giving its symbol. The dynamic default selects the axes with 
-*        the same indices as the pixel axes being copied. The value should 
-*        be given as a comma separated list. []
+*        This parameter is only accessed if TRIM and TRIMWCS are both
+*        TRUE, and some axes need to be removed from the current WCS
+*        Frame of the output NDF.  It gives the axes which are to be
+*        retained in the current WCS Frame of the output NDF.  Each axis
+*        can be specified either by giving its index within the Current
+*        Frame of the input NDF in the range 1 to the number of axes in
+*        the Frame, or by giving its symbol.  The dynamic default
+*        selects the axes with the same indices as the pixel axes being 
+*        copied.  The value should be given as a comma-separated list. 
+*        []
 
 *  Examples:
 *     ndfcopy infile outfile
@@ -122,8 +127,8 @@
 *        value.
 
 *  Implementation Status:
-*     If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-*     QUALITY, AXIS WCS and HISTORY components are copied by this routine,
+*     If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY,
+*     AXIS WCS and HISTORY components are copied by this routine,
 *     together with all extensions.  The output NDF's title may be
 *     modified, if required, by specifying a new value via the TITLE
 *     parameter.
@@ -158,7 +163,11 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     9-SEP-2005 (DSB):
-*        Modified to use AST_MAPSPLIT if possible when trimming WCS axes.
+*        Modified to use AST_MAPSPLIT if possible when trimming WCS
+*        axes.
+*     2005 September 12 (MJC):
+*        Removed diagnostic ast_show and used 72-character wrap for
+*        comments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,13 +193,15 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      CHARACTER COMP(3)*(DAT__SZNAM)! NDF array component names
-      CHARACTER LOC1*(DAT__SZLOC)! Locator to the output NDF
-      CHARACTER LOC2*(DAT__SZLOC)! Locator to output AXIS array
-      CHARACTER LOC2C*(DAT__SZLOC)! Locator to a single output AXIS structure
-      CHARACTER LOC3*(DAT__SZLOC)! Locator to the input NDF
-      CHARACTER LOC4*(DAT__SZLOC)! Locator to input AXIS array
-      CHARACTER LOC4C*(DAT__SZLOC)! Locator to a single input AXIS structure
+      CHARACTER COMP(3)*(DAT__SZNAM) ! NDF array component names
+      CHARACTER LOC1*(DAT__SZLOC) ! Locator to the output NDF
+      CHARACTER LOC2*(DAT__SZLOC) ! Locator to output AXIS array
+      CHARACTER LOC2C*(DAT__SZLOC) ! Locator to a single output AXIS
+                                 ! structure
+      CHARACTER LOC3*(DAT__SZLOC) ! Locator to the input NDF
+      CHARACTER LOC4*(DAT__SZLOC) ! Locator to input AXIS array
+      CHARACTER LOC4C*(DAT__SZLOC) ! Locator to a single input AXIS
+                                 ! structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
       CHARACTER TTL*80           ! Frame title
@@ -229,11 +240,13 @@
       INTEGER SLBND( NDF__MXDIM )! Significant axis lower bounds
       INTEGER SUBND( NDF__MXDIM )! Significant axis upper bounds
       INTEGER UBND( NDF__MXDIM ) ! Template NDF upper bounds
-      LOGICAL BAD                ! Any bad values in the array component?
+      LOGICAL BAD                ! Any bad values in the array
+                                 ! component?
       LOGICAL THERE              ! Does object exists?
       LOGICAL TRIM               ! Remove insignificant pixel axes?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
-      LOGICAL USEPRM             ! Use a PermMap to select current Frame axes?
+      LOGICAL USEPRM             ! Use a PermMap to select current
+                                 ! Frame axes?
 
       DATA COMP /'DATA', 'VARIANCE', 'QUALITY' /
 *.
@@ -299,15 +312,15 @@
 *  If there are no insignificant axes, there is nothing to trim.
       IF( SIGDIM .EQ. NDIM ) TRIM = .FALSE.
 
-*  If not, copy all components from the input NDF (or section) to create 
-*  the output NDF.
+*  If not, copy all components from the input NDF (or section) to
+*  create  the output NDF.
       IF( .NOT. TRIM ) THEN
          CALL LPG_PROP( NDF1,
      :               'Title,Label,Units,Data,Variance,Quality,Axis,' //
      :               'History,WCS', 'OUT', NDF3, STATUS )
 
-*  Otherwise, we do not need to copy the array comnponents, or the WCS or
-*  AXIS components since we will be copying these explicitly.
+*  Otherwise, we do not need to copy the array comnponents, or the WCS
+*  or AXIS components since we will be copying these explicitly.
       ELSE
          CALL LPG_PROP( NDF1, 'Title,Label,Units,History', 'OUT', NDF3, 
      :                  STATUS )
@@ -324,10 +337,10 @@
          PM = AST_PERMMAP( NDIM, IPERM, SIGDIM, OPERM, 1.0D0, ' ',
      :                     STATUS ) 
 
-*  Create a SIGDIM-dimensional GRID Frame, then add it into the WCS FrameSet, 
-*  deleting the original. Note, the Mapping returned by AST_PICKAXES
-*  supplies AST__BAD for the insignificant axes and so we use the better
-*  PermMap created above.
+*  Create a SIGDIM-dimensional GRID Frame, then add it into the WCS
+*  FrameSet, deleting the original.  Note, the Mapping returned by
+*  AST_PICKAXES supplies AST__BAD for the insignificant axes and so we
+*  use the better PermMap created above.
          CALL AST_INVERT( IWCS, STATUS )
          NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP2, STATUS ) 
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
@@ -348,19 +361,19 @@
 *  If required, remove WCS axes.   
          IF( TRMWCS ) THEN 
 
-*  See if the non-degenerate GRID axes correspond to a distinct and indepenent
-*  group of current Frame axes. If so, MAP2 is returned holding the Mapping 
-*  from the non-degenerate GRID axes to the corresponding WCS axes, and
-*  CAXES is returned holding the indices of these WCS axes.
-      call ast_show( map, status )
+*  See if the non-degenerate GRID axes correspond to a distinct and
+*  independent group of current Frame axes. If so, MAP2 is returned
+*  holding the Mapping from the non-degenerate GRID axes to the
+*  corresponding WCS axes, and CAXES is returned holding the indices of
+*  these WCS axes.
             CALL AST_MAPSPLIT( MAP, SIGDIM, OPERM, CAXES, MAP2, STATUS )
 
-*  Now see which WCS axes are to be retained. If the base->current Mapping 
-*  can be split into two parallel components, we use a default USEAXIS
-*  value which includes the WCS axes corresponding to the non-degenerate
-*  pixel axes. If the base->current Mapping cannot be split, we use a
-*  default USEAXIS which assumes that the non-degenerate WCS axes simply
-*  have the same index as the non-degenerate pixel axes.
+*  Now see which WCS axes are to be retained.  If the base->current
+*  Mapping can be split into two parallel components, we use a default
+*  USEAXIS value which includes the WCS axes corresponding to the
+*  non-degenerate pixel axes.  If the base->current Mapping cannot be
+*  split, we use a default USEAXIS which assumes that the non-degenerate
+*  WCS axes simply have the same index as the non-degenerate pixel axes.
             DO I = 1, SIGDIM
                IAXIS( I ) = OPERM( I )
             END DO
@@ -378,10 +391,11 @@
 *  Get a value for USEAXIS from the user using the above default.
             CALL KPG1_GTAXI( 'USEAXIS', IWCS, SIGDIM, IAXIS, STATUS )
 
-*  If the base->current Mapping can be split, check that the user has not
-*  chosen to retain any degenerate WCS axes. If so, we will have to use a
-*  PermMap to selected the required WCS axes (rather than replacing the
-*  base->current Mapping by the component Mappaing found above).
+*  If the base->current Mapping can be split, check that the user has
+*  not chosen to retain any degenerate WCS axes.  If so, we will have to
+*  use a PermMap to selected the required WCS axes (rather than
+*  replacing the base->current Mapping by the component Mapping found
+*  above).
             IF( .NOT. USEPRM ) THEN 
                DO I = 1, SIGDIM
                   IF( IAXIS( I ) .NE. CAXES( I ) ) USEPRM = .TRUE.
@@ -389,16 +403,16 @@
             END IF
 
 *  Create a new Frame by picking the selected axes from the original
-*  Current Frame. This also returns a PermMap which goes from the 
+*  Current Frame.  This also returns a PermMap which goes from the 
 *  original Frame to the new one, using AST__BAD values for the
-*  un-selected axes. We will only use this Mapping if the base->current
+*  un-selected axes.  We will only use this Mapping if the base->current
 *  Mapping was not succesfully split by AST_MAPSPLIT.
             NEWFRM = AST_PICKAXES( IWCS, SIGDIM, IAXIS, MAP3, STATUS )
 
 *  If the original Current Frame is a CmpFrame, the Frame created from
-*  the above call to AST_PICKAXES may not have inherited its Title. If
-*  the Frame created above has no Title, but the original Frame had, then
-*  copy the original Frame's Title to the new Frame.
+*  the above call to AST_PICKAXES may not have inherited its Title.  If
+*  the Frame created above has no Title, but the original Frame had,
+*  then copy the original Frame's Title to the new Frame.
             IF( AST_TEST( IWCS, 'TITLE', STATUS ) .AND.
      :          .NOT. AST_TEST( NEWFRM, 'TITLE', STATUS ) ) THEN
                TTL = AST_GETC( IWCS, 'TITLE', STATUS )
@@ -406,11 +420,11 @@
                CALL AST_SETC( NEWFRM, 'TITLE', TTL( : LTTL ), STATUS )
             END IF
 
-*  If the base->current Mapping cannot be split into two parallel component 
-*  Mappings, or if the user wants to select WCS axes which depend on the 
-*  degenerate pixel axes, then we use the PermMap created by AST_PICKAXES
-*  above to select the required WCS axes. Add this new Frame into the 
-*  FrameSet. It becomes the Current Frame.
+*  If the base->current Mapping cannot be split into two parallel
+*  component Mappings, or if the user wants to select WCS axes which
+*  depend on the degenerate pixel axes, then we use the PermMap created
+*  by AST_PICKAXES above to select the required WCS axes.  Add this new
+*  Frame into the FrameSet. It becomes the Current Frame.
             IF( USEPRM ) THEN                     
                CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP3, NEWFRM, 
      :                            STATUS )
@@ -441,10 +455,10 @@
 *  Since we will be using HDS to modify the output NDF, we need to take
 *  care that the internal representation of the NDF stored within the
 *  common blocks of the NDF library does not get out of step with the 
-*  actual HDS structure of the NDF. For this reason, we get an HDS
+*  actual HDS structure of the NDF.  For this reason, we get an HDS
 *  locator to the NDF and then annul the NDF identifier. We will
 *  re-import the modified NDF back into the NDF library once all the
-*  changes have been made. Before annulling the NDF, we need to map the
+*  changes have been made.  Before annulling the NDF, we need to map the
 *  DATA array to put it into a defined state since we are not allowed to
 *  release an NDF with an undefined DATA array.
             CALL NDF_MAP( NDF3, 'DATA', '_BYTE', 'WRITE', IP2, EL, 
@@ -453,8 +467,8 @@
             CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS ) 
             CALL NDF_ANNUL( NDF3, STATUS )
 
-*  Create a new array of axis structures within the output NDF, and get a 
-*  locator to it.
+*  Create a new array of axis structures within the output NDF, and get
+*  a locator to it.
             CALL DAT_NEW( LOC1, 'AXIS', 'AXIS', 1, SIGDIM, STATUS ) 
             CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
 
