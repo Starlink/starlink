@@ -143,7 +143,7 @@ static char* getFromStdin(char* filename)
 	return NULL;
     }
     char buf[1024];
-    int n;
+    size_t n;
     while((n = fread(buf, 1, sizeof(buf), stdin)) > 0) {
 	if (fwrite(buf, 1, n, f) != n) {
 	    sys_error("error writing temp file: ", filename);
@@ -264,7 +264,7 @@ FitsIO* FitsIO::read(const char* filename, int mem_options)
     }
     
     // check the file extension for recognized compression types
-    filename = check_compress(filename, tmpfile, sizeof(tmpfile), istemp, 1, 0);
+    filename = check_compress(filename, tmpfile, (int)sizeof(tmpfile), istemp, 1, 0);
     if (filename == NULL) {
  	if (istemp)
 	    unlink(tmpfile);
@@ -775,7 +775,7 @@ int FitsIO::write(const char *filename)
     
     // check the file extension for recognized compression types
     
-    const char *tmpfile = check_compress(filename, tmpfilename, sizeof(tmpfilename), 
+    const char *tmpfile = check_compress(filename, tmpfilename, (int)sizeof(tmpfilename), 
 					 istemp, 0, bitpix_);
     if (tmpfile == NULL) 
 	return ERROR;

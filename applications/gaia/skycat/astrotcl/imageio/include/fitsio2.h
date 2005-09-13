@@ -1,8 +1,8 @@
 #ifndef _FITSIO2_H
 #define _FITSIO2_H
- 
+
 #include "fitsio.h"
- 
+
 #define DBUFFSIZE 28800 /* size of data buffer in bytes */
 
 #define NIOBUF 25        /* number of IO buffers to create */
@@ -35,40 +35,47 @@
 #endif
 
 #if defined(vax) && defined(VMS)
- 
+
 #define MACHINE VAXVMS
 #define BYTESWAPPED TRUE
- 
+
 #elif defined(__alpha) && defined(__VMS) &&  (__D_FLOAT == TRUE)
 
 /* this float option is the same as for VAX/VMS machines. */
 #define MACHINE VAXVMS
 #define BYTESWAPPED TRUE
- 
+
 #elif defined(__alpha) && defined(__VMS) &&  (__G_FLOAT == TRUE)
- 
+
 /*  G_FLOAT is the default for ALPHA VMS systems */
 #define MACHINE ALPHAVMS
 #define BYTESWAPPED TRUE
 #define FLOATTYPE GFLOAT
- 
+
 #elif defined(__alpha) && defined(__VMS) &&  (__IEEE_FLOAT == TRUE)
- 
+
 #define MACHINE ALPHAVMS
 #define BYTESWAPPED TRUE
 #define FLOATTYPE IEEEFLOAT
 
 #elif defined(__alpha) && defined(__unix__)
- 
+
 #define MACHINE ALPHA_OSF
 #define BYTESWAPPED TRUE
 #define LONGSIZE 64
 
 #elif defined(ultrix) && defined(unix)
- 
+
 #define MACHINE ULTRIX
 #define BYTESWAPPED TRUE
- 
+
+#elif defined(__sparcv9)
+
+/*  SUN Solaris7 in 64-bit mode */
+#define BYTESWAPPED FALSE
+#define MACHINE NATIVE
+#define LONGSIZE 64
+
 #elif defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
 
 /*  IBM PC */
@@ -87,13 +94,13 @@
 #elif defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 
 /*  IBM PC running DOS or Windows */
-#define MACHINE IBMPC       
+#define MACHINE IBMPC
 #define BYTESWAPPED TRUE
 
 #elif defined(_NI_mswin_)
 
 /*  LabWindows/CVI with Windows 3.x, 95, or NT  */
-#define MACHINE IBMPC       
+#define MACHINE IBMPC
 #define BYTESWAPPED TRUE
 
 #elif  defined(__EMX__)
@@ -107,44 +114,44 @@
 /*  assume machine uses the same IEEE formats as used in FITS files */
 #define MACHINE NATIVE
 #define BYTESWAPPED FALSE
- 
+
 #endif
 
 /*  assume longs are 4 bytes long, unless previously set otherwise */
 #ifndef LONGSIZE
 #define LONGSIZE 32
 #endif
-  
+
 #define IGNORE_EOF 1
 #define REPORT_EOF 0
 #define DATA_UNDEFINED -1
 #define NULL_UNDEFINED 1234554321
 #define ASCII_NULL_UNDEFINED 1   /* indicate no defined null value */
- 
+
 #define maxvalue(A,B) ((A) > (B) ? (A) : (B))
 #define minvalue(A,B) ((A) < (B) ? (A) : (B))
- 
+
 #define FSTRCMP(a,b)     ((a)[0]<(b)[0]? -1:(a)[0]>(b)[0]?1:strcmp((a),(b)))
 #define FSTRNCMP(a,b,n)  ((a)[0]<(b)[0]?-1:(a)[0]>(b)[0]?1:strncmp((a),(b),(n)))
 
 #if MACHINE == ALPHAVMS
- 
+
 #define FNANMASK   0x7F00 /* mask bits 1 - 7; all set on NaNs */
                                      /* all 0 on underflow  or 0. */
- 
+
 #define DNANMASK   0x7FE0 /* mask bits 1 - 10; all set on NaNs */
                                      /* all 0 on underflow  or 0. */
- 
+
 #else
- 
+
 #define FNANMASK   0x7F80 /* mask bits 1 - 8; all set on NaNs */
                                      /* all 0 on underflow  or 0. */
- 
+
 #define DNANMASK   0x7FF0 /* mask bits 1 - 11; all set on NaNs */
                                      /* all 0 on underflow  or 0. */
- 
+
 #endif
- 
+
 #if MACHINE == CRAY
     /*
       Cray machines:   the large negative integer corresponds
@@ -153,23 +160,23 @@
       a reserved value (i.e., a NaN)
     */
 #define fnan(L) ( (L) >= 0xE000000000000000 ? 1 : 0) )
- 
+
 #else
     /* these functions work for both big and little endian machines */
     /* that use the IEEE floating point format for internal numbers */
- 
+
    /* These functions tests whether the float value is a reserved IEEE     */
    /* value such as a Not-a-Number (NaN), or underflow, overflow, or       */
    /* infinity.   The functions returns 1 if the value is a NaN, overflow  */
    /* or infinity; it returns 2 if the value is an denormalized underflow  */
    /* value; otherwise it returns 0. fnan tests floats, dnan tests doubles */
- 
+
 #define fnan(L) \
       ( (L & FNANMASK) == FNANMASK ?  1 : (L & FNANMASK) == 0 ? 2 : 0)
- 
+
 #define dnan(L) \
       ( (L & DNANMASK) == DNANMASK ?  1 : (L & DNANMASK) == 0 ? 2 : 0)
- 
+
 #endif
 
 #define DUCHAR_MAX  255.49 /* max double value that fits in an unsigned char */
@@ -230,14 +237,14 @@ int ffgphd(fitsfile *fptr, int maxdim, int *simple, int *bitpix, int *naxis,
           double *bzero, long *blank, int *nspace, int *status);
 int ffgttb(fitsfile *fptr, long *rowlen, long *nrows, long *pcount,
           long *tfield, int *status);
- 
+
 int ffmkey(fitsfile *fptr, char *card, int *status);
 int ffikey(fitsfile *fptr, char *card, int *status);
- 
+
 int ffmbyt(fitsfile *fptr, long bytpos, int ignore_err, int *status);
 int ffgbyt(fitsfile *fptr, long nbytes, void *buffer, int *status);
 int ffpbyt(fitsfile *fptr, long nbytes, void *buffer, int *status);
-int ffgbytoff(fitsfile *fptr, long gsize, long ngroups, long offset, 
+int ffgbytoff(fitsfile *fptr, long gsize, long ngroups, long offset,
            void *buffer, int *status);
 int ffpbytoff(fitsfile *fptr, long gsize, long ngroups, long offset,
            void *buffer, int *status);
@@ -251,7 +258,7 @@ int fits_get_num_files(void);
 
 int ffoptplt(fitsfile *fptr, const char *tempname, int *status);
 int fits_is_this_a_copy(char *urltype);
-int fits_already_open(fitsfile **fptr, char *url, 
+int fits_already_open(fitsfile **fptr, char *url,
     char *urltype, char *infile, char *extspec, char *rowfilter,
     char *binspec, char *colspec, int  mode,int  *isopen, int  *status);
 int ffedit_columns(fitsfile **fptr, char *outfile, char *expr, int *status);
@@ -259,10 +266,10 @@ int ffhist(fitsfile **fptr, char *outfile, int imagetype, int naxis,
            char colname[4][FLEN_VALUE],
            double *minin, double *maxin, double *binsizein,
            char minname[4][FLEN_VALUE], char maxname[4][FLEN_VALUE],
-           char binname[4][FLEN_VALUE], 
+           char binname[4][FLEN_VALUE],
            double weightin, char wtcol[FLEN_VALUE],
            int recip, int *status);
-int fits_get_col_minmax(fitsfile *fptr, int colnum, float *datamin, 
+int fits_get_col_minmax(fitsfile *fptr, int colnum, float *datamin,
                      float *datamax, int *status);
 int ffwritehisto(long totaln, long offset, long firstn, long nvalues,
              int narrays, iteratorCol *imagepars, void *userPointer);
@@ -287,13 +294,13 @@ int ffgtbp(fitsfile *fptr, char *name, char *value, int *status);
 int ffiblk(fitsfile *fptr, long nblock, int headdata, int *status);
 int ffshft(fitsfile *fptr, long firstbyte, long nbytes, long nshift,
     int *status);
- 
+
 int ffgcpr(fitsfile *fptr, int colnum, long firstrow, long firstelem,
            long nelem, int writemode, double *scale, double *zero, char *tform,
            long *twidth, int *tcode, int *maxelem, long *startpos,
            long *elemnum, long *incre, long *repeat,long *rowlen,
            int *hdutype, long *tnull, char *snull, int *status);
- 
+
 int ffflushx(FITSfile *fptr);
 int ffseek(FITSfile *fptr, long position);
 int ffread(FITSfile *fptr, long nbytes, void *buffer,
@@ -335,7 +342,7 @@ int ffgcle(fitsfile *fptr, int colnum, long firstrow, long firstelem,
 int ffgcld(fitsfile *fptr, int colnum, long firstrow, long firstelem,
            long nelem, long elemincre, int nultyp, double nulval,
            double *array, char *nularray, int *anynul, int  *status);
- 
+
 int ffpi1b(fitsfile *fptr, long nelem, long incre, unsigned char *buffer,
            int *status);
 int ffpi2b(fitsfile *fptr, long nelem, long incre, short *buffer, int *status);
@@ -343,7 +350,7 @@ int ffpi4b(fitsfile *fptr, long nelem, long incre, INT32BIT *buffer,
            int *status);
 int ffpr4b(fitsfile *fptr, long nelem, long incre, float *buffer, int *status);
 int ffpr8b(fitsfile *fptr, long nelem, long incre, double *buffer, int *status);
- 
+
 int ffgi1b(fitsfile *fptr, long pos, long nelem, long incre,
           unsigned char *buffer, int *status);
 int ffgi2b(fitsfile *fptr, long pos, long nelem, long incre, short *buffer,
@@ -354,13 +361,13 @@ int ffgr4b(fitsfile *fptr, long pos, long nelem, long incre, float *buffer,
           int *status);
 int ffgr8b(fitsfile *fptr, long pos, long nelem, long incre, double *buffer,
           int *status);
- 
+
 int ffcins(fitsfile *fptr, long naxis1, long naxis2, long nbytes,
            long bytepos, int *status);
 int ffcdel(fitsfile *fptr, long naxis1, long naxis2, long nbytes,
            long bytepos, int *status);
 int ffkshf(fitsfile *fptr, int firstcol, int tfields, int nshift, int *status);
- 
+
 int fffi1i1(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, unsigned char nullval, char
              *nullarray, int *anynull, unsigned char *output, int *status);
@@ -380,9 +387,9 @@ int fffstri1(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             unsigned char nullval, char *nullarray, int *anynull,
             unsigned char *output, int *status);
- 
+
 int fffi1u2(unsigned char *input, long ntodo, double scale, double zero,
-            int nullcheck, unsigned char tnull, unsigned short nullval, 
+            int nullcheck, unsigned char tnull, unsigned short nullval,
             char *nullarray,
             int *anynull, unsigned short *output, int *status);
 int fffi2u2(short *input, long ntodo, double scale, double zero,
@@ -399,7 +406,7 @@ int fffr8u2(double *input, long ntodo, double scale, double zero,
             int *anynull, unsigned short *output, int *status);
 int fffstru2(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
-            unsigned short nullval, char *nullarray, int  *anynull, 
+            unsigned short nullval, char *nullarray, int  *anynull,
             unsigned short *output, int *status);
 
 int fffi1i2(unsigned char *input, long ntodo, double scale, double zero,
@@ -442,7 +449,7 @@ int fffstru4(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             unsigned long nullval, char *nullarray, int *anynull,
             unsigned long *output, int *status);
- 
+
 int fffi1i4(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, long nullval, char *nullarray,
             int *anynull, long *output, int *status);
@@ -462,7 +469,7 @@ int fffstri4(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             long nullval, char *nullarray, int *anynull, long *output,
             int *status);
- 
+
 int fffi1int(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, int nullval, char *nullarray,
             int *anynull, int *output, int *status);
@@ -482,7 +489,7 @@ int fffstrint(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             int nullval, char *nullarray, int *anynull, int *output,
             int *status);
- 
+
 int fffi1uint(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, unsigned int nullval,
             char *nullarray, int *anynull, unsigned int *output, int *status);
@@ -502,7 +509,7 @@ int fffstruint(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             unsigned int nullval, char *nullarray, int *anynull,
             unsigned int *output, int *status);
- 
+
 int fffi1r4(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, float nullval, char *nullarray,
             int *anynull, float *output, int *status);
@@ -522,7 +529,7 @@ int fffstrr4(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             float nullval, char *nullarray, int *anynull, float *output,
             int *status);
- 
+
 int fffi1r8(unsigned char *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char tnull, double nullval, char *nullarray,
             int *anynull, double *output, int *status);
@@ -542,7 +549,7 @@ int fffstrr8(char *input, long ntodo, double scale, double zero,
             long twidth, double power, int nullcheck, char *snull,
             double nullval, char *nullarray, int *anynull, double *output,
             int *status);
- 
+
 int ffi1fi1(unsigned char *array, long ntodo, double scale, double zero,
             unsigned char *buffer, int *status);
 int ffu2fi1(unsigned short *array, long ntodo, double scale, double zero,
@@ -561,7 +568,7 @@ int ffr4fi1(float *array, long ntodo, double scale, double zero,
             unsigned char *buffer, int *status);
 int ffr8fi1(double *array, long ntodo, double scale, double zero,
             unsigned char *buffer, int *status);
- 
+
 int ffi1fi2(unsigned char *array, long ntodo, double scale, double zero,
             short *buffer, int *status);
 int ffu2fi2(unsigned short *array, long ntodo, double scale, double zero,
@@ -580,7 +587,7 @@ int ffr4fi2(float *array, long ntodo, double scale, double zero,
             short *buffer, int *status);
 int ffr8fi2(double *array, long ntodo, double scale, double zero,
             short *buffer, int *status);
- 
+
 int ffi1fi4(unsigned char *array, long ntodo, double scale, double zero,
             INT32BIT *buffer, int *status);
 int ffu2fi4(unsigned short *array, long ntodo, double scale, double zero,
@@ -599,7 +606,7 @@ int ffr4fi4(float *array, long ntodo, double scale, double zero,
             INT32BIT *buffer, int *status);
 int ffr8fi4(double *array, long ntodo, double scale, double zero,
             INT32BIT *buffer, int *status);
- 
+
 int ffi1fr4(unsigned char *array, long ntodo, double scale, double zero,
             float *buffer, int *status);
 int ffu2fr4(unsigned short *array, long ntodo, double scale, double zero,
@@ -618,7 +625,7 @@ int ffr4fr4(float *array, long ntodo, double scale, double zero,
             float *buffer, int *status);
 int ffr8fr4(double *array, long ntodo, double scale, double zero,
             float *buffer, int *status);
- 
+
 int ffi1fr8(unsigned char *array, long ntodo, double scale, double zero,
             double *buffer, int *status);
 int ffu2fr8(unsigned short *array, long ntodo, double scale, double zero,
@@ -673,7 +680,7 @@ int  ffcvtn( int inputType, void *input, char *undef, long ntodo,
 int  parse_data( long totalrows, long offset, long firstrow,
                  long nrows, int nCols, iteratorCol *colData,
                  void *userPtr );
-int  uncompress_hkdata( fitsfile *fptr, long ntimes, 
+int  uncompress_hkdata( fitsfile *fptr, long ntimes,
                         double *times, int *status );
 int  ffffrw_work( long totalrows, long offset, long firstrow,
                   long nrows, int nCols, iteratorCol *colData,
@@ -751,7 +758,7 @@ int mem_read(int hdl, void *buffer, long nbytes);
 int mem_write(int hdl, void *buffer, long nbytes);
 int mem_uncompress2mem(char *filename, FILE *diskfile, int hdl);
 
-int iraf2mem(char *filename, char **buffptr, size_t *buffsize, 
+int iraf2mem(char *filename, char **buffptr, size_t *buffsize,
       size_t *filesize, int *status);
 
 /* root driver I/O routines */
@@ -790,9 +797,9 @@ int uncompress2mem(char *filename, FILE *diskfile,
              void *(*mem_realloc)(void *p, size_t newsize),
              size_t *filesize, int *status);
 
-int uncompress2file(char *filename, 
-             FILE *indiskfile, 
-             FILE *outdiskfile, 
+int uncompress2file(char *filename,
+             FILE *indiskfile,
+             FILE *outdiskfile,
              int *status);
 
 /* ==================== SHARED MEMORY DRIVER SECTION ======================= */
