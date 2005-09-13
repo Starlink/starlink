@@ -34,11 +34,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-FEB-1998 (DSB):
 *        Original version.
+*     12-SEP-2005 (TIMJ):
+*        Use KPG1_ASRGN rather than KPG1_ASREG
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,8 +97,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
       
-*  Ensure all KAPPA AST IntraMaps are registered.
-      CALL KPG1_ASREG( STATUS )
+*  Ensure all KAPPA non-graphical AST IntraMaps are registered.
+      CALL KPG1_ASRGN( STATUS )
 
 *  See if the named component is present in the supplied structure.
       IF( NAME .NE. ' ' ) THEN

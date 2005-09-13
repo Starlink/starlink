@@ -51,6 +51,9 @@
 *        astrometry structure, or a FITS extension.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     2005 September 12 (TIMJ):
+*        Now use KPG1_ASRGN rather than KPG1_ASREG to avoid
+*        dependency on graphics system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,8 +121,8 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Ensure all KAPPA AST IntraMaps are registered.
-      CALL KPG1_ASREG( STATUS )
+*  Ensure all KAPPA non-graphical AST IntraMaps are registered.
+      CALL KPG1_ASRGN( STATUS )
 
 *  See if the WCS component in the NDF is in a defined state.
       CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )
