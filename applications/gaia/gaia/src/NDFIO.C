@@ -139,7 +139,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component )
     double bzero = 0.0;
     int bitpix = 0;
     int header_records = 0;
-    int hsize = 0;
+    size_t hsize = 0;
     int height = 0;
     int ndfid = 0;
     int width = 0;
@@ -172,7 +172,8 @@ NDFIO *NDFIO::read( const char *filename, const char *component )
             }
 
             //  Create a Mem object to hold the displayable data.
-            int tsize = width * height * ( abs( bitpix ) / 8 );
+            size_t tsize = (size_t) width * (size_t) height * 
+	                   (size_t) ( abs( bitpix ) / 8 );
 
             // Now map the data and initialise with this pointer.
             if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
@@ -182,7 +183,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component )
 
                 // Copy the header. Use CNF memory so it can be passed to
                 // Fortran.
-                hsize = header_length * header_records + 1;
+                hsize = (size_t)header_length * (size_t)header_records + 1;
                 hdata = cnfMalloc( hsize );
                 memcpy( hdata, inheader, hsize );
                 header = Mem( hdata, hsize, 0 );
@@ -432,7 +433,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
       int bitpix = 0;
       int header_records = 0;
       int height = 0;
-      int hsize = 0;
+      size_t hsize = 0;
       int ndfid = 0;
       int width = 0;
       int hasv;
@@ -451,7 +452,8 @@ int NDFIO::makeDisplayable( int index, const char *component )
       }
 
       //  Create a Mem object to hold the displayable data.
-      int tsize = width * height * ( abs( bitpix ) / 8 );
+      size_t tsize = (size_t)width * (size_t)height * 
+                     (size_t)( abs( bitpix ) / 8 );
 
       //  Release existing displayable.
       if ( curd_ != 0 ) {
@@ -474,7 +476,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
          data = Mem( indata, tsize, 0 );
 
          // Copy the header.
-         hsize = header_length * header_records + 1;
+         hsize = (size_t)header_length * (size_t)header_records + 1;
          hdata = cnfMalloc( hsize );
          memcpy( hdata, inheader, hsize );
          header = Mem( hdata, hsize, 0 );
