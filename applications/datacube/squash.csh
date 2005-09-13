@@ -141,7 +141,7 @@ unalias echo
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
-   set infile = $(infile:r}
+   set infile = ${infile:r}
 endif
 
 # Check that it exists.
@@ -196,7 +196,7 @@ endif
 
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-printf "%24s%s\n" "${slabel} range" ": ${lower}--${upper} ${sunits}"
+printf "%25s%s\n" "${slabel} range" ": ${lower}--${upper} ${sunits}"
 
 # Form and display the collapsed image.
 # =====================================
