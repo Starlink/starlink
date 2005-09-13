@@ -636,6 +636,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Corrected B1940 to B1950 in AddEncodingFrame. This bug
 *        prevented some FrameSets being written out using FITS-CLASS.
 *        - Rationalise the use of the "mapping" pointer in AddVersion.
+*        - WcsCelestial: Modified so that the FITS reference point is
+*        stored as the SkyFrame SkyRef attribute value.
 *class--
 */
 
@@ -25981,9 +25983,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          sfrm = WcsSkyFrame( this, store, s, prj, type, axlon, axlat, 
                              method, class  );
 
-/* Return a clone of this SkyFrame as the reference Frame. */
-         *reffrm = astClone( sfrm );
-
 /* The values currently stored in *reflat and *reflon are the CRVAL
    values. In some circumstances, these may not be the original values in
    the supplied header but may have been translated within the SpecTrans
@@ -26002,6 +26001,18 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
             *reflon = lonval*AST__DD2R;
             *reflat = latval*AST__DD2R;
          }         
+
+/* Store the reflon and reflat values as the SkyRef position in the
+   SkyFrame, and set SkyRefIs to "ignore" so that the SkyFrame continues
+   to represent absolute celestial coords. */
+         if( *reflon != AST__BAD && *reflat != AST__BAD ) {
+            astSetSkyRef( sfrm, 0, *reflon );
+            astSetSkyRef( sfrm, 1, *reflat );
+            astSet( sfrm, "SkyRefIs=Ignored" );
+         }
+
+/* Return a clone of this SkyFrame as the reference Frame. */
+         *reffrm = astClone( sfrm );
 
 /* Create a Frame by picking all the other (non-celestial) axes from the 
    supplied Frame. */
