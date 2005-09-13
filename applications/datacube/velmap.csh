@@ -590,7 +590,7 @@ echo " "
 
 # Get the spectral label and units.  Obtain the one value in case
 # the strings include blanks.
-set sunits = `parget funits\(3\) ndftrace`
+set sunits = `parget funit\(3\) ndftrace`
 set slabel = `parget flabel\(3\) ndftrace`
 
 if ( ${gotrest} == "FALSE" ) then
@@ -600,7 +600,7 @@ endif
 
 echo " "
 printf "%15s%s\n" "Rest ${slabel}" ":"
-printf "%24s%s\n" "${slabel}" " : ${line_centre} $units"
+printf "%24s%s\n" "${slabel}" " : ${line_centre} ${sunits}"
 
 # Fit the line.
 # =============
