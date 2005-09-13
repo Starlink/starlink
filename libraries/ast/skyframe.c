@@ -133,6 +133,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Override astNormBox method.
 *     15-AUG-2005 (DSB):
 *        Added AZEL system.
+*     13-SEP-2005 (DSB):
+*        Override astClearSystem so that SkyRef/SkyRefPcan be converted
+*        from the original System to the default System.
 *class--
 */
 
@@ -580,6 +583,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are used or extended by this
    class. */
 static AstSystemType (* parent_getsystem)( AstFrame * );
+static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_setsystem)( AstFrame *, AstSystemType );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static const char *(* parent_format)( AstFrame *, int, double );
@@ -620,6 +624,7 @@ static AstMapping *OffsetMap( AstSkyFrame * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
+static void ClearSystem( AstFrame * );
 static void SetSystem( AstFrame *, AstSystemType );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
@@ -1072,6 +1077,107 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    for further interpretation. */
    } else {
       (*parent_clearattrib)( this_object, attrib );
+   }
+}
+
+static void ClearSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearSystem
+
+*  Purpose:
+*     Clear the System attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void ClearSystem( AstFrame *this_frame )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astClearSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function clears the System attribute for a SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*/
+
+/* Local Variables: */
+   AstFrameSet *fs;              /* FrameSet to be used as the Mapping */
+   AstSkyFrame *sfrm;            /* Copy of original SkyFrame */
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   double xin[ 2 ];              /* Axis 0 values */
+   double yin[ 2 ];              /* Axis 1 values */
+   double xout[ 2 ];             /* Axis 0 values */
+   double yout[ 2 ];             /* Axis 1 values */
+   int skyref_set;               /* Is either SkyRef attribute set? */
+   int skyrefp_set;              /* Is either SkyRefP attribute set? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* See if either the SkyRef or SkyRefP attribute is set. */
+   skyref_set = astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 );
+   skyrefp_set = astTestSkyRefP( this, 0 ) || astTestSkyRefP( this, 1 );
+
+/* If so, we will need to transform their values into the new coordinate 
+   system. Save a copy of the SkyFrame with its original System value. */
+   sfrm = ( skyref_set || skyrefp_set )?astCopy( this ):NULL;
+
+/* Use the parent method to clear the System value. */
+   (*parent_clearsystem)( this_frame );
+
+/* Now modify the SkyRef and SkyRefP attributes if necessary. */
+   if( sfrm ) {
+
+/* Save the SkyRef and SkyRefP values. */
+      xin[ 0 ] = astGetSkyRef( sfrm, 0 );
+      xin[ 1 ] = astGetSkyRefP( sfrm, 0 );
+      yin[ 0 ] = astGetSkyRef( sfrm, 1 );
+      yin[ 1 ] = astGetSkyRefP( sfrm, 1 );
+
+/* Clear the SkyRef values to avoid infinite recursion in the following
+   call to astConvert. */
+      if( skyref_set ) {
+         astClearSkyRef( sfrm, 0 );
+         astClearSkyRef( sfrm, 1 );
+         astClearSkyRef( this, 0 );
+         astClearSkyRef( this, 1 );
+      }
+
+/* Get the Mapping from the original System to the default System. Invoking 
+   astConvert will recursively invoke ClearSystem again. This is why we need
+   to be careful to ensure that SkyRef is cleared above - doing so ensure 
+   we do not end up with infinite recursion. */
+      fs = astConvert( sfrm, this, "" );
+
+/* Use the Mapping to find the SkyRef and SkyRefP positions in the default
+   coordinate system. */
+      astTran2( fs, 2, xin, yin, 1, xout, yout );
+
+/* Store the values as required. */
+      if( skyref_set ) {
+         astSetSkyRef( this, 0, xout[ 0 ] );
+         astSetSkyRef( this, 1, yout[ 0 ] );
+      }
+
+      if( skyrefp_set ) {
+         astSetSkyRefP( this, 0, xout[ 1 ] );
+         astSetSkyRefP( this, 1, yout[ 1 ] );
+      }
+
+/* Free resources. */
+      fs = astAnnul( fs );
+      sfrm = astAnnul( sfrm );
    }
 }
 
@@ -3321,6 +3427,8 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->GetSystem = GetSystem;
    parent_setsystem = frame->SetSystem;
    frame->SetSystem = SetSystem;
+   parent_clearsystem = frame->ClearSystem;
+   frame->ClearSystem = ClearSystem;
    parent_getalignsystem = frame->GetAlignSystem;
    frame->GetAlignSystem = GetAlignSystem;
    parent_getformat = frame->GetFormat;
