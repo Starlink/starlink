@@ -16,8 +16,8 @@
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
 #     package.  It reads a three-dimensional IFU NDF as input and allows you
-*     to step through the datacube in the spectral direction in slices.
-*     The output goes to files and (optionally) to the screen.
+#     to step through the datacube in the spectral direction in slices.
+#     The output goes to files and (optionally) to the screen.
 #
 #  Parameters:
 #     -i filename
@@ -210,7 +210,7 @@ endif
 
 echo "      Stepping:"
 echo "        Range: ${lower}--${upper} ${sunits}"
-echo "        Step: ${chunk}"
+echo "        Step : ${chunk}"
 
 # Setup the current chunk.
 set curr_low = $lower
@@ -224,7 +224,7 @@ set counter = 1
 while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
    echo "      Collapsing:"
    echo "        White-light image: ${dims[1]} x ${dims[2]}"
-   printf "%24s%s\n" "${slabel} bounds" ": ${curr_low}--${curr_upp} ${sunits}"
+   printf "%25s%s\n" "${slabel} bounds" ": ${curr_low}--${curr_upp} ${sunits}"
 
 # Collapse the white-light image.
    collapse "in=${infile} out=${colfile} " \
@@ -232,6 +232,7 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
 
 # Check to see whether or not to output the chunk.
    set outfile = "chunk_${counter}"
+   echo " "
    echo "      Output NDF:"
    echo "        File: ${outfile}.sdf"
 
