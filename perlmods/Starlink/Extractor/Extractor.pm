@@ -429,6 +429,8 @@ sub _write_param_temp_file {
   print $fh "Y_IMAGE\n";
   print $fh "ALPHA_J2000\n";
   print $fh "DELTA_J2000\n";
+  print $fh "FLUX_ISOCOR\n";
+  print $fh "FLUXERR_ISOCOR\n";
   print $fh "MAG_ISOCOR\n";
   print $fh "MAGERR_ISOCOR\n";
   print $fh "X2_IMAGE\n";
