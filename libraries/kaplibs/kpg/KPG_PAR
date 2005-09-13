@@ -21,16 +21,26 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-FEB-1998 (DSB):
 *        Original version.
+*     12-SEP-2005 (TIMJ):
+*        Add contact details
 *     {enter_further_changes_here}
 
 *-
 
 *  Global Constants:
+
+*  Contact details
+	CHARACTER KPG_AUTHOR*32
+	PARAMETER ( KPG_AUTHOR = 'D.S. Berry' )
+
+	CHARACTER KPG_CONTACT*32
+	PARAMETER ( KPG_CONTACT = 'ussc@star.rl.ac.uk' )
 
 *  World Coordinate Systems.
 *  ========================

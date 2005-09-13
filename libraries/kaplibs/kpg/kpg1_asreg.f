@@ -42,6 +42,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'KPG_PAR'          ! KPG constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -51,21 +52,17 @@
       EXTERNAL KPG1_ASLOG
 
 *  Local Variables:
-      CHARACTER AUTHOR*10, CONTACT*18, PURPOSE*80
+      CHARACTER PURPOSE*80
 *.
 
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Store the same Author and Contact for each IntraMap.
-      AUTHOR  = 'D.S. Berry'
-      CONTACT = 'ussc@star.rl.ac.uk'
-
 *  "Log10" - Log base 10
       PURPOSE = 'Take log. (base 10) of each coordinate value'
       CALL AST_INTRAREG( 'Log10', AST__ANY, AST__ANY, KPG1_ASLOG, 
      :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 44 ), 
-     :                   AUTHOR, CONTACT, STATUS )
+     :                   KPG_AUTHOR, KPG_CONTACT, STATUS )
 
 *  "ASAGD" - Encapsulates a TRANSFORM structure stored with an AGI database
 *  picture. The transformation routine uses the TRANSFORM structure
@@ -73,6 +70,6 @@
       PURPOSE = 'Converts AGI World co-ords to AGI DATA co-ords'
       CALL AST_INTRAREG( 'ASAGD', 2, 2, KPG1_ASAGD, 
      :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 46 ), 
-     :                   AUTHOR, CONTACT, STATUS )
+     :                   KPG_AUTHOR, KPG_CONTACT, STATUS )
 
       END
