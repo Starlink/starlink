@@ -129,6 +129,8 @@ kpg1_asprp.f \
 kpg1_aspsy.f \
 kpg1_asptp.f \
 kpg1_asreg.f \
+kpg1_asrgg.f \
+kpg1_asrgn.f \
 kpg1_asshr.f \
 kpg1_assig.f \
 kpg1_assim.f \
