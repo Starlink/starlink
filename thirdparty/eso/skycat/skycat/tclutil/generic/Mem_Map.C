@@ -82,7 +82,7 @@ Mem_Map::~Mem_Map (void)
 // to map the file into memory.
 int 
 Mem_Map::map_it(int handle, 
-		int len_request, 
+		size_t len_request, 
 		int prot, 
 		int share, 
 		void *addr, 
@@ -185,7 +185,7 @@ Mem_Map::open(const char file_name[],
 //----------------------------------------------------------------------------
 int
 Mem_Map::map(const char file_name[], 
-	     int len, 
+	     size_t len, 
 	     int flags, 
 	     int mode, 
 	     int prot, 
@@ -215,7 +215,7 @@ Mem_Map::Mem_Map(void)
 //----------------------------------------------------------------------------
 // Map a file specified by FILE_NAME. 
 Mem_Map::Mem_Map (const char file_name[], 
-			  int len, 
+			  size_t len, 
 			  int flags, 
 			  int mode, 
 			  int prot, 
@@ -236,7 +236,7 @@ Mem_Map::Mem_Map (const char file_name[],
 // Map a file from an open file descriptor HANDLE.  This function will
 // lookup the length of the file if it is not given.
 Mem_Map::Mem_Map (int handle, 
-		  int len, 
+		  size_t len, 
 		  int prot, 
 		  int share, 
 		  void *addr, 

@@ -28,7 +28,7 @@ const char* fileSuffix(const char* p);
 const char* fileBasename(const char* p);
 
 // get the real name of a file, which may be a link
-const char* fileRealname(const char* filename, char* buf, int buflen);
+const char* fileRealname(const char* filename, char* buf, size_t buflen);
 
 // return the size of the file in bytes or -1 on error
 int fileSize(const char* filename);

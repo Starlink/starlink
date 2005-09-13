@@ -29,7 +29,7 @@ class Mem_Map;
 
 // internal struct used for reference counting
 struct MemRep {
-    int size;			// size in bytes
+    size_t size;			// size in bytes
     int owner;			// true if we should delete the shm when no longer needed
     int refcnt;			// count of the number of reference to this memory area
     void* ptr;			// pointer to memory area
@@ -49,17 +49,17 @@ struct MemRep {
     MemRep();
 
     // attach to sysV shared memory
-    MemRep(int size, int owner, int shmId, int verbose);
+    MemRep(size_t size, int owner, int shmId, int verbose);
 
     // create memory (sysV shared, if useShm is 1) with given size
-    MemRep(int size, int useShm, int verbose);
+    MemRep(size_t size, int useShm, int verbose);
 
     // mmap the given file, create/extend if nbytes > 0
     MemRep(const char *filename, int flags, int prot, int share,
-           int nbytes, int owner, int verbose, void *addr = NULL);
+           size_t nbytes, int owner, int verbose, void *addr = NULL);
 
     // accept pointer to malloc'd memory.
-    MemRep(void *inptr, int size, int owner);
+    MemRep(void *inptr, size_t size, int owner);
 
     // destructor
     ~MemRep();
@@ -72,7 +72,7 @@ struct MemRep {
 
     // remap the shared memory after a call to unmap(), optionally specifying
     // new mapping options and a new file size.
-    int remap(int options = 0, int newsize = -1);
+    int remap(int options = 0, size_t newsize = -1);
 
 };
 
@@ -97,10 +97,10 @@ public:
     }
 
     // constructor: attach (if needed) to existing shared memory area
-    Mem(int size, int shmId, int owner, int verbose);
+    Mem(size_t size, int shmId, int owner, int verbose);
 
     // constructor: create new memory area, shared if useShm is true
-    Mem(int size, int useShm, int verbose = 0)
+    Mem(size_t size, int useShm, int verbose = 0)
 	: offset_(0), length_(0), rep_(new MemRep(size, useShm, verbose)) {
     }
 
@@ -122,13 +122,13 @@ public:
 
     // Constructor: creates a file of the given size and uses mmap
     // to map the file read/write.
-    Mem(int size, const char *filename, int owner, int verbose = 0 );
+    Mem(size_t size, const char *filename, int owner, int verbose = 0 );
 
     // Constructor to use when multi-buffering shared memory.
-    Mem(int size, int shmId, int owner, int verbose, int shmNum, int semId);
+    Mem(size_t size, int shmId, int owner, int verbose, int shmNum, int semId);
 
     // Accept pointer to malloc'd memory
-    Mem(void *ptr, int size, int owner);
+    Mem(void *ptr, size_t size, int owner);
 
     // copy constructor, just copy ptr and increment ref count
     Mem(const Mem& m)
@@ -160,7 +160,7 @@ public:
 
     // remap the shared memory after a call to unmap(), optionally specifying
     // new mapping options and a new file size
-    int remap(int options = 0, int newsize = -1) {
+    int remap(int options = 0, size_t newsize = -1) {
 	return rep_->remap(options, newsize);
     }
 
@@ -174,7 +174,7 @@ public:
     void length(long newLength) {length_ = newLength;}
 
     // member access
-    int size() const {return rep_->size;}
+    size_t size() const {return rep_->size;}
     void* ptr() const {return rep_->ptr ? ((void *)((char *)rep_->ptr + offset_)) : NULL;}
     int shmId() const {return rep_->shmId;}
     int shmNum() const {return rep_->shmNum;}

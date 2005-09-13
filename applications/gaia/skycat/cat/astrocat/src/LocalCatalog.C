@@ -134,7 +134,7 @@ int LocalCatalog::getInfo()
 	return 1;
     
     // make a null terminated copy, which will be managed by info_
-    int size = m.size() + 1;
+    size_t size = m.size() + 1;
     char* data = (char*)malloc(size);
     if (!data)
 	return fmt_error("can't allocate %d bytes for %s", size, filename_);

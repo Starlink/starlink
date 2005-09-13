@@ -98,7 +98,7 @@ MemRep::MemRep()
 /*
  * constructor - attach to existing sysV shared memory with given id
  */
-MemRep::MemRep(int sz, int own, int id, int verb)
+MemRep::MemRep(size_t sz, int own, int id, int verb)
     : size(sz),
       owner(own),
       refcnt(1),
@@ -151,7 +151,7 @@ MemRep::MemRep(int sz, int own, int id, int verb)
  * "useShm" is non-zero, shared memory is allocated, otherwise "operator
  * new" is used.
  */
-MemRep::MemRep(int sz, int useShm, int verb)
+MemRep::MemRep(size_t sz, int useShm, int verb)
     : size(sz),
       owner(1),
       refcnt(1),
@@ -204,7 +204,7 @@ MemRep::MemRep(int sz, int useShm, int verb)
  * If owner is non-zero the memory is freed when this object is
  * deleted.
  */
-MemRep::MemRep(void *inptr, int sz, int own)
+MemRep::MemRep(void *inptr, size_t sz, int own)
     : size(sz),
       owner(own),
       refcnt(1),
@@ -227,7 +227,7 @@ MemRep::MemRep(void *inptr, int sz, int own)
  * If owner is non-zero, the file is deleted when this object is deleted.
  */
 MemRep::MemRep(const char *filename, int flags, int prot, int share,
-               int nbytes, int own, int verb, void *addr)
+               size_t nbytes, int own, int verb, void *addr)
     : size(0),
       owner(own),
       refcnt(1),
@@ -420,7 +420,7 @@ void MemRep::unmap()
  * If the optional newsize arg is given and is not -1, it indicates a new
  * file size. This can be used to extend the file size.
  */
-int MemRep::remap(int opts, int newsize)
+int MemRep::remap(int opts, size_t newsize)
 {
     if (!m_map || !m_map->filename())
 	return error("can't remap memory, not mapped");
@@ -516,7 +516,7 @@ static MemRep* findMemRep(const char* filename)
 /*
  * constructor - attach (if needed) to existing shm area
  */
-Mem::Mem(int size, int shmId, int owner, int verbose)
+Mem::Mem(size_t size, int shmId, int owner, int verbose)
     : offset_(0), length_(0)
 {
     // see if we have this Id already
@@ -536,7 +536,7 @@ Mem::Mem(int size, int shmId, int owner, int verbose)
  * The final argument is the ID of the semaphore used to lock this
  * particular area of shared memory.
  */
-Mem::Mem(int size, int shmId, int owner, int verbose, int shmNum, int semId)
+Mem::Mem(size_t size, int shmId, int owner, int verbose, int shmNum, int semId)
 : offset_(0), length_(0)
 {
     // see if we have this Id already
@@ -612,7 +612,7 @@ Mem::Mem(const char *filename, int options, int verbose, void *addr)
  * If owner if non-zero, the file is deleted when there are no more
  * references.
  */
-Mem::Mem(int size, const char *filename, int owner, int verbose)
+Mem::Mem(size_t size, const char *filename, int owner, int verbose)
     : offset_(0), length_(0)
 {
     // see if we have mapped this file already
@@ -631,7 +631,7 @@ Mem::Mem(int size, const char *filename, int owner, int verbose)
  * Constructor: accept a pointer to memory, do not modify this
  * reference (assume user looks after it).
  */
-Mem::Mem(void *ptr, int size, int owner)
+Mem::Mem(void *ptr, size_t size, int owner)
    : offset_(0), length_(0)
 {
    rep_ = new MemRep(ptr, size, owner);
