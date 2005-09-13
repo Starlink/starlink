@@ -13,19 +13,24 @@ dist_bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
 include_MESSAGES = kap_err.h KAP_ERR
 BUILT_SOURCES = $(include_MESSAGES)
 
-LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la `$(srcdir)/kappa_nogks_link_adam`
+# Local Libraries that we always include in link
+LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la 
 
 bin_MONOLITHS = kappa_mon kapview_mon ndfpack_mon
 kappa_mon_SOURCES = kappa_mon.f
-kappa_mon_LDADD = libkappa/libkappa.la $(LOCAL_LINK)
+kappa_mon_LDADD = libkappa/libkappa.la $(LOCAL_LINK) \
+	`$(srcdir)/kappa_nogks_link_adam`
+
 kappa_mon_TASKS = $(KAPPA_TASKS)
 
 kapview_mon_SOURCES = kapview_mon.f
-kapview_mon_LDADD = libkapview/libkapview.la $(LOCAL_LINK)
+kapview_mon_LDADD = libkapview/libkapview.la $(LOCAL_LINK) \
+	`$(srcdir)/kappa_nogks_link_adam`
 kapview_mon_TASKS = $(KAPVIEW_TASKS)
 
 ndfpack_mon_SOURCES = ndfpack_mon.f
-ndfpack_mon_LDADD = libndfpack/libndfpack.la $(LOCAL_LINK)
+ndfpack_mon_LDADD = libndfpack/libndfpack.la $(LOCAL_LINK) \
+	`$(srcdir)/kappa_wtk_nogks_link_adam`
 ndfpack_mon_TASKS = $(NDFPACK_TASKS)
 
 
