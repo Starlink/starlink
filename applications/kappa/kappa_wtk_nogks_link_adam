@@ -1,0 +1,5 @@
+
+#  N.B. the previous line should be blank.
+
+# Convenience wrapper for build system
+echo `./kappa_link_adam -nogks -withtk`
