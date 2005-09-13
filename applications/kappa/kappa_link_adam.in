@@ -74,7 +74,11 @@
 #  Initialise linking options.
       kaplibs_opts=''
       tk_libs=''
+
+#  Leave this blank until we actually support graphic-less
+#  kappa builds
       kapgrf_libs='kapsub/libkapsub_grf.la'
+      kapgrf_libs=''
 
 #  Interpret command line switches.
 #  --------------------------------
@@ -87,6 +91,7 @@
             shift;;
 
 #  -nogrf - Requests linking without any graphics libraries
+#         - Experimental option
          -nogrf)
             kaplibs_opts=' -nogrf'
             kapgrf_libs=''
