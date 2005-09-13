@@ -292,7 +292,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
  */
 int gaiaWriteNDF( const char *filename, int type, int width, int height,
                   void *data , int ndfid, const char *component,
-                  const char *header, int lheader, char **error_mess )
+                  const char *header, size_t lheader, char **error_mess )
 {
    DECLARE_CHARACTER(ndfname,MAXNDFNAME);   /* Local copy of filename (F77) */
    DECLARE_CHARACTER(tmpname,MAXNDFNAME);   /* Local copy of filename (F77) */
@@ -318,7 +318,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    if ( lheader > 0) {
 
       /*  Convert the C string into a Fortran array. */
-      dims[0] = lheader / 80;
+      dims[0] = (int) lheader / 80;
       F77_CREATE_CHARACTER_ARRAY( fhead, 80, dims[0] );
       cnfExprta( (char *) header, 80, fhead, 80, 1, dims );
    }

@@ -113,7 +113,7 @@ protected:
 public:
 
   //  Constructor (derived classes call this)
-  StarWCS( const char* header, const int lheader );
+  StarWCS( const char* header, const size_t lheader );
 
   //  Destructor
   virtual ~StarWCS();

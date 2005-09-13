@@ -129,7 +129,7 @@ static void dcard(char *card, const char *keyword, double value)
 //
 //  Constructor
 //
-StarWCS::StarWCS( const char *header, const int lheader )
+StarWCS::StarWCS( const char *header, const size_t lheader )
   : wcs_(NULL),
     equinox_(0.0),
     raIndex_(1),
@@ -154,7 +154,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
             AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
             char card[81];
             char *ptr = (char *) header;
-            int ncard = lheader / 80;
+            int ncard = (int) lheader / 80;
             for ( int i = 0 ; i < ncard; i++, ptr += 80 ) {
                 memcpy( card, (void *)ptr, (size_t) 80 );
                 card[80] = '\0';
@@ -1540,7 +1540,7 @@ char *StarWCS::getDomains()
     for ( int i = 1; i <= nframe; i++ ) {
         astSetI( wcs_, "Current", i );
         char *domain = (char *) astGetC( wcs_, "Domain" );
-        int newlength = strlen( domain );
+        int newlength = (int) strlen( domain );
         if ( newlength == 0 ) { // No domain name, so make one up.
             domain = (char *) malloc( (size_t) chunk );
             sprintf( domain, "Domain%d", i );

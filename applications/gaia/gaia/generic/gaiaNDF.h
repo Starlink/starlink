@@ -19,7 +19,8 @@ extern "C" {
    /*  Write an NDF */
    int gaiaWriteNDF( const char *filename, int type, int width, int height,
                      void *data, int ndfid, const char *component,
-                     const char *header, int lheader, char **error_message );
+                     const char *header, size_t lheader, 
+		     char **error_message );
    /*  Free an NDF */
    int gaiaFreeNDF( int ndfid );
 

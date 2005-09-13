@@ -605,7 +605,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     WCSRep* rep = imio.wcs().rep();
     if ( ! rep || strcmp( rep->classname(), "StarWCS" ) != 0 ) {
         char* header = "";
-        int lheader = 0;
+        size_t lheader = 0;
         if ( ! imio.isclear() )  {
             // if image is not cleared, set WCS header
             header = (char *) imio.header().ptr();
@@ -799,9 +799,9 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  Now add all the current FITS headers to this channel.
             Mem oldhead = image_->header();
             char *oldptr = (char *) oldhead.ptr();
-            int oldsize = oldhead.size();
+            size_t oldsize = oldhead.size();
             char card[FITSCARD+1];
-            int ncard = oldsize / FITSCARD;
+            int ncard = (int) oldsize / FITSCARD;
 
             for ( int i = 0 ; i < ncard; i++, oldptr += FITSCARD ) {
                 memcpy( card, (void *)oldptr, (size_t)FITSCARD );
