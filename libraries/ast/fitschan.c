@@ -632,6 +632,10 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Cast difference between two pointers to (int)
 *        - CLASSFromStore:Check source velocity is defined before
 *          storing it in the output header.
+*     13-SEP-2005 (DSB):
+*        - Corrected B1940 to B1950 in AddEncodingFrame. This bug
+*        prevented some FrameSets being written out using FITS-CLASS.
+*        - Rationalise the use of the "mapping" pointer in AddVersion.
 *class--
 */
 
@@ -1324,7 +1328,7 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
          if( sys == AST__FK5 ) {
             astSetC( skyfrm, "Equinox", "J2000.0" );
          } else if( sys == AST__FK4 ) {
-            astSetC( skyfrm, "Equinox", "B1940.0" );
+            astSetC( skyfrm, "Equinox", "B1950.0" );
          }
 
 /* Combine the spectraland celestial Frames into a single CmpFrame with
@@ -1601,11 +1605,9 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    each WCS axis, we use the index of the pixel axis which is most closely 
    aligned with it. Allocate memory to store these indices, and then fill
    the memory. */
-   mapping = astGetMapping( fset, AST__BASE, AST__CURRENT );
    nwcs= astGetNout( mapping );
    wperm = astMalloc( sizeof(int)*(size_t) nwcs );
    WorldAxes( mapping, dim, wperm );
-   mapping = (AstMapping *) astAnnul( mapping );
 
 /* Allocate an array of flags, one for each axis, which indicate if a
    description of the corresponding axis has yet been stored in the
@@ -1651,7 +1653,6 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 /* The "iwcmap" Mapping found above converts from the WCS Frame to the IWC 
    Frame. Combine the pixel->WCS Mapping with this WCS->IWC Mapping to
    get the pixel->IWC Mapping. */
-   mapping = astGetMapping( fset, AST__BASE, AST__CURRENT );
    pixiwcmap = (AstMapping *) astCmpMap( mapping, iwcmap, 1, "" );
    mapping = astAnnul( mapping );
    iwcmap = astAnnul( iwcmap );
@@ -1702,8 +1703,6 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
          }
       }
    }
-
-
 
 /* Free remaining resources. */
    if( crvals ) crvals = astFree( crvals );
