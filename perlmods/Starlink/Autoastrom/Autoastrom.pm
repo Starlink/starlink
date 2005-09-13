@@ -89,7 +89,7 @@ sub new {
   $auto->obsdata( 'source=USER:AST:FITS,angle=0,scale=1,invert=0' ) if ( ! defined( $auto->obsdata ) );
   $auto->temp( tempdir( CLEANUP => ( ! $auto->keeptemps ) ) ) if ( ! defined( $auto->temp ) );
   $auto->timeout( 180 ) if ( ! defined( $auto->timeout ) );
-  $auto->verbose( 0 ) if ( ! defined( $auto->verbose ) );
+  $auto->verbose( 1 ) if ( ! defined( $auto->verbose ) );
 
 # Return.
   return $auto;
@@ -650,6 +650,25 @@ sub obsdata {
   return $self->{OBSDATA};
 }
 
+=item B<result_catalogue>
+
+Retrieve the catalogue of detected objects with the updated WCS.
+
+  $result = $auto->result_catalogue;
+
+This method returns an C<Astro::Catalog> object.
+
+=cut
+
+sub result_catalogue {
+  my $self = shift;
+  if( @_ ) {
+    my $result = shift;
+    $self->{RESULT_CATALOGUE} = $result;
+  }
+  return $self->{RESULT_CATALOGUE};
+}
+
 =item B<skycatconfig>
 
 Retrieve or set the location of the SkyCat configuration file.
@@ -810,7 +829,6 @@ sub solve {
 # We need some kind of coordinates to use. Go through the list
 # of sources given in obsdata->{SOURCE} and find the first one
 # that returns.
-  my $merged;
   my $cencoords;
   my $radius;
   my $epoch;
@@ -934,7 +952,10 @@ sub solve {
                                   File => $self->ccdcatalogue );
   } else {
     print "Extracting objects in " . $self->ndf . " at 5.0 sigma or higher..." if $self->verbose;
-    my $filter = new Astro::WaveBand( Filter => 'unknown' );
+    my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
+    tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
+    my %generic_headers = translate_from_FITS(\%header_keywords);
+    my $filter = new Astro::WaveBand( Filter => $generic_headers{'FILTER'} );
     my $ext = new Starlink::Extractor;
     $ext->detect_thresh( 5.0 );
 
@@ -1025,8 +1046,8 @@ sub solve {
   }
   my @filteredstars;
   my $filter;
-  my $allstars = $querycat->allstars;
-  foreach my $star ( @$allstars ) {
+  my $querystars = $querycat->stars;
+  foreach my $star ( @$querystars ) {
 
     # Check to see if we have a filter defined yet. If not, set
     # it from the first filter for the current object.
@@ -1038,10 +1059,11 @@ sub solve {
     # Hack to get around not being able to write 'undef' values
     # in Cluster format catalogues. We're making an assumption
     # here that a star can't be located at (0.000,0.000).
-    if( $star->x eq "0.000" ) {
+    if( defined( $star->x ) && $star->x eq "0.000" ) {
       $star->x( undef );
     }
-    if( $star->y eq "0.000" ) {
+
+    if( defined( $star->y ) && $star->y eq "0.000" ) {
       $star->y( undef );
     }
 
@@ -1071,6 +1093,13 @@ sub solve {
                                  );
 
   ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
+
+  # Reset the star IDs in the NDF catalog.
+#  foreach my $newndfstar ( $ndfcat->stars ) {
+#    if( $newndfstar->comment =~ /Old ID: (\d+)/ ) {
+#      $newndfstar->id( $1 );
+#    }
+#  }
 
 # And yes, croak if the correlation resulted in fewer than 4 matches.
   if( $corrndfcat->sizeof < 4 ) {
@@ -1144,34 +1173,40 @@ sub solve {
     print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
   }
 
-# Write the detected object catalogue, if requested.
-  if( defined( $self->detected_catalogue ) ) {
-
-# Get the FK5 frameset for the WCS.
-    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
-    my $frameset = $newwcs->FindFrame( $template, "" );
-    if( ! defined( $frameset ) ) {
-      croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
-    }
+# Update the NDF catalogue with the new WCS. First get the FK5
+# frameset for the WCS.
+  my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+  $frameset = $newwcs->FindFrame( $template, "" );
+  if( ! defined( $frameset ) ) {
+    croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
+  }
 
 # Modify the RA/Dec for each item.
-    my $items = $ndfcat->stars();
-    my $printed = 0;
-    foreach my $item ( @{$items} ) {
-      my( $ra, $dec ) = $frameset->Tran2( [$item->x],
-                                          [$item->y],
-                                          1 );
-      my $coords = new Astro::Coords( ra    => $ra->[0],
-                                      dec   => $dec->[0],
-                                      type  => 'J2000',
-                                      units => 'radians',
-                                    );
-      $item->coords( $coords );
-    }
+  my $items = $ndfcat->stars();
+  my $printed = 0;
+  foreach my $item ( @{$items} ) {
+    my( $ra, $dec ) = $frameset->Tran2( [$item->x],
+                                        [$item->y],
+                                        1 );
+    my $coords = new Astro::Coords( ra    => $ra->[0],
+                                    dec   => $dec->[0],
+                                    type  => 'J2000',
+                                    units => 'radians',
+                                  );
+    $item->coords( $coords );
+    $item->wcs( $newwcs );
+  }
 
-# Now dump the catalogue to disk.
+# Write the detected object catalogue, if requested.
+  if( defined( $self->detected_catalogue ) ) {
     $ndfcat->write_catalog( Format => 'Cluster', File => $self->detected_catalogue );
   }
+
+# Set the new catalogue to be the 'fitted' catalogue.
+  $self->result_catalogue( $ndfcat );
+
+# And return the new catalogue.
+  return $self->result_catalogue;
 
 }
 
