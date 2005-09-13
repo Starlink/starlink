@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSMP( STATUS )
+*     CALL KPG1_ASREG( STATUS )
 
 *  Description:
 *     This routine registers all AST IntraMaps known to KAPPA. It should 
@@ -29,6 +29,8 @@
 *  History:
 *     21-SEP-1998 (DSB):
 *        Original version.
+*     12-SEP-2005 (TIMJ):
+*        CONTACT and AUTHOR now in KPG_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
