@@ -121,7 +121,7 @@ typedef struct {
 typedef struct {
   XVisualInfo *vi;   /* The visual info descriptor for the colormap */
   Colormap cmap;     /* Colormap ID */
-  int ncol;          /* The number of colors available. ci = [0...ncol-1] */
+  unsigned long ncol;/* The number of colors available. ci = [0...ncol-1] */
   int monochrome;    /* True we have to use a monochrome screen */
   unsigned long *pixel; /* 'ncol' colormap pixel indexes. */
   XColor *xcolor;    /* 'ncol' colormap color representations */
@@ -1449,8 +1449,7 @@ static GWMdev *new_GWMdev(char *gwm_name, int mode)
 /*
  * Get the window colour information and visual details
  */
-   GWM_GetColTable( display, window, &gwm->color.pixel,
-                    (long *) &gwm->color.ncol);
+   GWM_GetColTable( display, window, &gwm->color.pixel, &gwm->color.ncol);
    gwm->color.xcolor = (XColor *) malloc(sizeof(XColor) * gwm->color.ncol);
    gwm->color.vi = gwm_visual_info(gwm->display, gwm->screen, attr.visual);
    gwm->color.cmap = attr.colormap;
