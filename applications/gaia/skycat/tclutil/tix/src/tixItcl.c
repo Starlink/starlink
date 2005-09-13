@@ -66,7 +66,7 @@ TixItclRestoreGlobalNameSp(nameSpPtr, interp)
 
 #else
 
-#include <tcl.h>
+#include <tclInt.h>
 #include <tix.h>
 #include <tixItcl.h>
 
