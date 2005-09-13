@@ -73,7 +73,8 @@ set tmpdir = "/tmp"
 rm -f ${tmpdir}/${user}/rip* >& /dev/null
 
 # Do variable initialisation.
-mkdir "${tmpdir}/${user}" >& /dev/null
+set tmpuser = "${tmpdir}/${user}"
+if ( ! -e $tmpuser ) mkdir $tmpuser >& /dev/null
 set tmpfile = "${tmpdir}/${user}/rip_cursor.tmp"
 set colfile = "${tmpdir}/${user}/rip_col"
 touch $tmpfile
@@ -117,7 +118,7 @@ unalias echo
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
-   set infile = $(infile:r}
+   set infile = ${infile:r}
 endif
 
 echo "      Input NDF:"
