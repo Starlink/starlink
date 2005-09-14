@@ -113,10 +113,12 @@ C  Put a label to the screen in the best place
         CALL LABEL_MAP_SOURCE (MAP_RA, MAP_DEC)
         CALL LABEL_MAP_Z      (ARRMAX, ARRMIN, PBEG(IZ), PEND(IZ))
 
-        IF (ICAUTO .OR. .NOT. CLEVELS_SET) THEN
-          CALL LABEL_MAP_CONT (ZC, DZ, NZ)
-        ELSE
-          CALL LABEL_MAP_MCONT(ZC, NZ)
+        IF (CONTOURS) THEN
+           IF (ICAUTO .OR. .NOT. CLEVELS_SET) THEN
+              CALL LABEL_MAP_CONT (ZC, DZ, NZ)
+           ELSE
+              CALL LABEL_MAP_MCONT(ZC, NZ)
+           END IF
         END IF
 
       END IF
