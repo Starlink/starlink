@@ -41,11 +41,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-JUL-1998 (DSB):
 *        Original version.
+*     14-SEP-2005 (TIMJ):
+*        Use common block accessor functions
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,18 +76,18 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common blocks.
-*        ASTING = INTEGER (Read)
-*           GRP identifier for group holding synonyms.
-*        ASTNPS = INTEGER (Read)
-*           Number of defined synonyms.
-*        ASTOUG = INTEGER (Read)
-*           GRP identifier for group holding corresponding AST attribute names.
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
       LOGICAL KPG1_SHORT         ! Is string an allowed abbreviation?
       LOGICAL CHR_SIMLR          ! Are strings equal apart from case?
+
+      INTEGER KPG1_GETASTING     ! GRP identifier for group holding synonyms.
+      INTEGER KPG1_GETASTNPS     ! Number of defined synonyms
+      INTEGER KPG1_GETASTOUG     ! GRP id for group holding AST attr names
+      EXTERNAL KPG1_GETASTING
+      EXTERNAL KPG1_GETASTOUG
+      EXTERNAL KPG1_GETASTNPS
 
 *  Local Variables:
       CHARACTER ANAME*(GRP__SZNAM)! Attribute name to return
@@ -155,16 +158,16 @@
 
 *  See if any synonymns are available. This is the case if both group 
 *  identifiers supplied in common (KPG_AST) are valid.
-      CALL GRP_VALID( ASTING, VALID1, STATUS )
-      CALL GRP_VALID( ASTOUG, VALID2, STATUS )
+      CALL GRP_VALID( KPG1_GETASTING(), VALID1, STATUS )
+      CALL GRP_VALID( KPG1_GETASTOUG(), VALID2, STATUS )
       IF( VALID1 .AND. VALID2 ) THEN
 
 *  Check for each synonym in turn. 
-         DO J = 1, ASTNPS
+         DO J = 1, KPG1_GETASTNPS()
 
 *  Get the synonym and its corresponding attribute name.
-            CALL GRP_GET( ASTING, J, 1, SY, STATUS )
-            CALL GRP_GET( ASTOUG, J, 1, TRAN, STATUS )
+            CALL GRP_GET( KPG1_GETASTING(), J, 1, SY, STATUS )
+            CALL GRP_GET( KPG1_GETASTOUG(), J, 1, TRAN, STATUS )
 
 *  See if the synonym contains a qualifier (i.e. a string in parenthesise).
             CALL KPG1_PRNTH( SY, OP, CL, STATUS )
