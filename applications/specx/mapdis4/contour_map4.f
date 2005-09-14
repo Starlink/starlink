@@ -5,6 +5,9 @@
 *     20 July 2000 (ajc):
 *        Change TYPE * to PRINT *
 *        Unused FILESIZE, SAVMAP, IEXIST, IGETVM
+*     13 Sep 2005 (timj):
+*        Initialise variable NCONT to stop random addressing in array
+*        lookup when contours are disabled.
 C-----------------------------------------------------------------------
 
       SUBROUTINE CONTOUR_MAP4 (IFAIL)
@@ -27,6 +30,10 @@ C-----------------------------------------------------------------------
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
       INCLUDE 'PLOT2D'
+
+*     Local constants
+      INTEGER   MAX_CONTOURS
+      PARAMETER ( MAX_CONTOURS = 32 )
 
 *     Local variables:
 
@@ -51,7 +58,7 @@ C-----------------------------------------------------------------------
       REAL      DZ
       REAL      XAXLEN
       REAL      YAXLEN
-      REAL      ZC(32)
+      REAL      ZC(MAX_CONTOURS)
       REAL      ZMAX, ZMIN
       REAL      GRLIMITS(2)
       CHARACTER OPTIONS*64
@@ -68,6 +75,12 @@ C-----------------------------------------------------------------------
 *  Ok, go...
 
       IFAIL = 0
+
+*  Default to no contours
+      DATA ZC / MAX_CONTOURS * 0.0 /
+      NZ = 0
+      DZ = 0.0
+      NCONT1 = 1
 
       IX   = LINK(1)
       IY   = LINK(2)
@@ -158,7 +171,7 @@ C  Work out contour levels
             CALL SXGTTGRAPH
           END IF
         ELSE
-          NZ = 1
+          NZ = 0
         END IF
 
         IF (PLOTGREY .AND. FIRST) THEN
