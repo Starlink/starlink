@@ -48,6 +48,7 @@
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -55,6 +56,9 @@
 /*       Original version.                                                  */
 /*    10-SEP-1992 (RFWS):                                                   */
 /*       Added writing of format string for use by sscanf.                  */
+/*    14-SEP-2005 (TIMJ):                                                   */
+/*       Initialise ptype on entry to stop it accessing uninitialised       */
+/*       memory.                                                            */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -77,6 +81,9 @@
 
 /* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
+
+/* Initialise typbuf to prevent valgrind warnings */
+      memset( ptype, 0, DAT__SZTYP);
 
 /* Obtain a char pointer to the input string and scan through it checking   */
 /* the syntax and converting lower case characters to upper case.           */
