@@ -8550,10 +8550,14 @@ astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 c     are normalized for display by astNorm.
 f     are normalized for display by AST_NORM.
 *
-*     If the NegLon attribute is zero (the default), then normalized 
+*     If the NegLon attribute is zero, then normalized 
 *     longitude values will be in the range zero to 2.pi. If NegLon is
 *     non-zero, then normalized longitude values will be in the range -pi 
 *     to pi. 
+*
+*     The default value depends on the current value of the SkyRefIs
+*     attribute, If SkyRefIs has a value of "Origin", then the default for
+*     NegLon is one, otherwise the default is zero.
 
 *  Applicability:
 *     SkyFrame
@@ -8563,9 +8567,10 @@ f     are normalized for display by AST_NORM.
 /* Clear the NegLon value by setting it to -INT_MAX. */
 astMAKE_CLEAR(SkyFrame,NegLon,neglon,-INT_MAX)
 
-/* Supply a default of 0 if no NegLon value has been set. */
+/* Supply a default of 0 for absolute coords and 1 for offset coords if 
+   no NegLon value has been set. */
 astMAKE_GET(SkyFrame,NegLon,int,0,( ( this->neglon != -INT_MAX ) ?
-                                   this->neglon : 0 ))
+this->neglon : (( astGetSkyRefIs( this ) == ORIGIN_REF )? 1 : 0)))
 
 /* Set a NegLon value of 1 if any non-zero value is supplied. */
 astMAKE_SET(SkyFrame,NegLon,int,neglon,( value != 0 ))
