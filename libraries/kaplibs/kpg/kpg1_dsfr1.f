@@ -43,7 +43,8 @@
 *     9-SEP-2005 (DSB):
 *        Change GeoLon/Lat to ObsLon/Lat and move out of SpecFrame section.
 *     14-SEP-2005 (DSB):
-*        Modify logic for choosing whether to display the observers position.
+*        - Modify logic for choosing whether to display the observers position.
+*        - Include the SkyFrame reference position in the report, if used.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,6 +84,7 @@
       CHARACTER PRJ*50           ! Sky projection
       CHARACTER SIGN*1           ! Sign of day value
       CHARACTER SOR*30           ! Spectral standard of rest 
+      CHARACTER SREFIS*10        ! Value of SkyFrame SkyRefIs attribute
       CHARACTER SYS*30           ! Sky coordinate system
       DOUBLE PRECISION EP        ! Epoch of observation
       DOUBLE PRECISION EQ        ! Epoch of reference equinox
@@ -149,10 +151,11 @@
 *  Indicate that the EPOCH should be displayed.
             SHOWEP = .TRUE.
 
-*  First get the equinox, system and projection.
+*  First get the equinox, system, projection, etc.
             EQ = AST_GETD( FRM, 'EQUINOX', STATUS )
             SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
             PRJ = AST_GETC( FRM, 'PROJECTION', STATUS )
+            SREFIS = AST_GETC( FRM, 'SKYREFIS', STATUS ) 
 
 *  Construct a message token holding suitable description for each type of 
 *  system...
@@ -214,9 +217,36 @@
                CALL MSG_SETC( 'SYS', SYS )
             END IF                        
 
+*  Indicate if the system represents offsets or absolute coords
+            IF( SREFIS .EQ. 'Pole' ) THEN
+               CALL MSG_SETC( 'OFF', 'polar offsets' )
+            ELSE IF( SREFIS .EQ. 'Origin' ) THEN
+               CALL MSG_SETC( 'OFF', 'offsets' )
+            ELSE
+               CALL MSG_SETC( 'OFF', ' ' )
+            END IF
+
 *  Display the system.
             CALL MSG_OUT( 'WCS_SYS', 
-     :          IND( : NIND )//'System              : ^SYS', STATUS )
+     :                 IND( : NIND )//'System              : ^SYS ^OFF', 
+     :                 STATUS )
+
+*  Display the reference position, if it is being used.
+            IF( SREFIS .NE. 'Ignored' ) THEN
+               POSBUF = ' '
+               IAT = 0
+               CALL CHR_APPND( SREFIS, POSBUF, IAT )
+               IAT = IAT + 1
+               CALL CHR_APPND( 'position', POSBUF, IAT )
+               IAT = 20
+               CALL CHR_APPND( ':', POSBUF, IAT )
+
+               CALL MSG_SETC( 'LAB', POSBUF( :IAT ) )
+               CALL MSG_SETC( 'REF', AST_GETC( FRM, 'SkyRef', STATUS ) )
+               
+               CALL MSG_OUT( 'WCS_REF', IND( : NIND )//'^LAB ^REF', 
+     :                       STATUS )
+            END IF
 
 *  Display the projection.
             IF( PRJ .NE. ' ' ) THEN
