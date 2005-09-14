@@ -42,6 +42,8 @@
 *        Report details of DSBSpecFrame class.
 *     9-SEP-2005 (DSB):
 *        Change GeoLon/Lat to ObsLon/Lat and move out of SpecFrame section.
+*     14-SEP-2005 (DSB):
+*        Modify logic for choosing whether to display the observers position.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,6 +96,7 @@
       INTEGER IY                 ! Year
       INTEGER J                  ! SLALIB status
       LOGICAL SHOWEP             ! Display the Epoch value?
+      LOGICAL SHOWOB             ! Display the Observers position?
 
       DATA MONTH/ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 
      :            'AUG', 'SEP', 'OCT', 'NOV', 'DEC' /,
@@ -135,6 +138,10 @@
 *  Initialise a flag to indicate that we do not have a SkyFrame or a
 *  SpecFrame, and should therefore not display the EPOCH.
          SHOWEP = .FALSE.
+         
+*  Initialise a flag to indicate that we do not have a AzEl SkyFrame or a 
+*  SpecFrame, and should therefore not display the ObsLon/Lat.
+         SHOWOB = .FALSE.
 
 *  If the Frame is a SkyFrame, display the equinox, system and projection.
          IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
@@ -197,6 +204,11 @@
             ELSE IF( SYS .EQ. 'SUPERGALACTIC' ) THEN
                CALL MSG_SETC( 'SYS', 'Supergalactic' )
 
+*  AzEl...
+            ELSE IF( SYS .EQ. 'AZEL' ) THEN
+               CALL MSG_SETC( 'SYS', 'Horizon' )
+               SHOWOB = .TRUE.
+
 *  Anything else..
             ELSE
                CALL MSG_SETC( 'SYS', SYS )
@@ -216,8 +228,9 @@
 *  If the Frame is a SpecFrame, display SpecFrame specific information...
          ELSE IF( AST_ISASPECFRAME( FRM, STATUS ) ) THEN
 
-*  Indicate that the EPOCH should be displayed.
+*  Indicate that the EPOCH and ObsLon/Lat should be displayed.
             SHOWEP = .TRUE.
+            SHOWOB = .TRUE.
 
 *  System...
             SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
@@ -419,26 +432,30 @@
          END IF
 
 * Observers position...
-         IF( AST_TEST( FRM, 'ObsLon', STATUS ) ) THEN
-            POSBUF = ' '
-            IAT = 0
-            CALL CHR_APPND( AST_GETC( FRM, 'ObsLon', STATUS ),
-     :                       POSBUF, IAT )
-            CALL CHR_APPND( ',', POSBUF, IAT )
-            IAT = IAT + 1
-            CALL CHR_APPND( AST_GETC( FRM, 'ObsLat',
-     :                               STATUS ), POSBUF, IAT )
-            IAT = IAT + 1
-            CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
-	 
-         ELSE
-            CALL MSG_SETC( 'OBS', '<not defined>' )
-         END IF
-	 
-         CALL MSG_OUT( 'WCS_REF', 
-     :                 IND( : NIND )//'Observer (Lon,Lat)  : ^OBS', 
-     :                 STATUS )
+         IF( .NOT. SHOWOB ) SHOWOB = AST_TEST( FRM, 'OBSLON', STATUS )
+         IF( SHOWOB ) THEN
 
+            IF( AST_TEST( FRM, 'OBSLON', STATUS ) ) THEN
+               POSBUF = ' '
+               IAT = 0
+               CALL CHR_APPND( AST_GETC( FRM, 'ObsLon', STATUS ),
+     :                          POSBUF, IAT )
+               CALL CHR_APPND( ',', POSBUF, IAT )
+               IAT = IAT + 1
+               CALL CHR_APPND( AST_GETC( FRM, 'ObsLat',
+     :                                  STATUS ), POSBUF, IAT )
+               IAT = IAT + 1
+               CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
+         	 
+            ELSE
+               CALL MSG_SETC( 'OBS', '<not defined>' )
+            END IF
+
+            CALL MSG_OUT( 'WCS_REF', 
+     :                    IND( : NIND )//'Observer (Lon,Lat)  : ^OBS', 
+     :                    STATUS )
+
+         END IF
       END IF
 
 *  End the AST context.
