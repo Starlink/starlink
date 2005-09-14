@@ -128,6 +128,8 @@ C  Write out information about map
       ENTRY LABEL_MAP_CONT (ZC, DZ, NZ)
 *     ---------------------------------
 
+      IF (NZ .EQ. 0) RETURN
+
       WRITE  (CONTINT, '(F6.2)', IOSTAT=IERR) DZ
       WRITE  (CONBASE, '(F8.2)', IOSTAT=IERR) ZC(1)
 
@@ -158,6 +160,8 @@ C  Write out information about map
 
       ENTRY LABEL_MAP_MCONT (ZLEV, NC)
 *     ---------------------------------
+
+      IF (NC .EQ. 0) RETURN
 
       WRITE (CONTNO, '(I2)', IOSTAT=IERR) NC
 
