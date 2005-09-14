@@ -84,6 +84,7 @@
       INTEGER MPLACE             ! Placeholder of map
       INTEGER NPOINTS            ! Number of points in POSN
       REAL MAPVERSION            ! Map version number
+      INTEGER IMAPV              ! INT form of version number (*10)
       CHARACTER * ( DAT__SZLOC ) TLOC ! Temporary locator
       INTEGER SPDIM( NUM_POSN_DIMS ) ! Dimensions of POSN
       INTEGER NSPDIMS            ! Actual number of dimensions
@@ -92,6 +93,7 @@
       INTEGER ISTAT              ! Genlib thing
 
 *.
+      MAPVERSION = 0.0
 
 *  Check inherited global status.
       IF ( IFAIL .NE. 0 ) RETURN
@@ -108,8 +110,13 @@
       CALL NDF_XGT0R( IDXNDF, 'SPECX_MAP', 'VERSION', MAPVERSION,
      :                STATUS )
 
-*  Convert to version 4.2
-      IF (MAPVERSION .EQ. 4.1) THEN
+*  Force 1 decimal place for version number check
+*  but round up second decimal place
+      IMAPV = INT( (MAPVERSION + 0.01 ) * 10.0 )
+
+*  Convert v4.1 to version 4.2
+*  Use INTEGER comparison
+      IF (IMAPV .EQ. 41) THEN
          PRINT *,'Map version 4.1 is no longer supported'
          PRINT *,'This map must be converted in order to continue'
 
