@@ -56,6 +56,8 @@
       integer dims(DAT__MXDIM)		! Dimensions
 *-
 
+      data dims / DAT__MXDIM * 0 /
+
       if (status .eq. SAI__OK) then
          call dat_size(loc, actval, status)
          call dat_shape(loc, DAT__MXDIM, dims, ndim, status)
