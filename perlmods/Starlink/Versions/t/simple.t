@@ -11,7 +11,7 @@ BEGIN { plan tests => 17 }
 use Starlink::Versions qw/ :Funcs /;
 
 # Need to know where I am
-use Cwd; 
+use Cwd;
 
 # loaded ok
 ok(1);
@@ -19,15 +19,13 @@ ok(1);
 # The first thing to do is write out some version information
 # as a version.dat file
 END { unlink "version.dat" if -e "version.dat" }
-open ( VERSION, "> version.dat") or die "Could not open version.dat: $!";
+
 
 my $major = 1;
 my $minor = 4;
 my $patch = 17;
-my $ver1 = "V$major.$minor-$patch";
-print VERSION $ver1, "\n";
-close VERSION or die "Could not close version.dat file";
 
+my $ver1 = write_version_file( $major, $minor, $patch);
 ok(2); # Version file written
 
 # Set PROG_DIR to the current directory
@@ -54,4 +52,19 @@ ok( starversion_ge('this_prog', '1.3-17') );
 
 # This will return undef
 ok( !defined starversion_major('your_prog') );
+
+exit;
+
+sub write_version_file {
+  my ($maj, $min, $pt, $no_v) = @_;
+
+  open ( my $VERSION, "> version.dat") or die "Could not open version.dat: $!";
+
+  my $v= ( $no_v ? '' : 'V');
+
+  my $verstr = "$v$maj.$min-$pt";
+  print $VERSION $verstr, "\n";
+  close $VERSION or die "Could not close version.dat file";
+  return $verstr;
+}
 
