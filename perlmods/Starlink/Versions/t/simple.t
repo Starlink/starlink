@@ -73,7 +73,8 @@ exit;
 sub write_version_file {
   my ($maj, $min, $pt, $no_v, $usedot) = @_;
 
-  open ( my $VERSION, "> version.dat") or die "Could not open version.dat: $!";
+  # Use global filehandles for backwards compatibility with perl5.005
+  open ( VERSION, "> version.dat") or die "Could not open version.dat: $!";
 
   my $v= ( $no_v ? '' : 'V');
   my $d= ( $usedot ? '.' : '-' );
@@ -86,8 +87,8 @@ sub write_version_file {
 
   # form the string and write it
   my $verstr = "$v$maj.$min$d$pt";
-  print $VERSION $verstr, "\n";
-  close $VERSION or die "Could not close version.dat file";
+  print VERSION $verstr, "\n";
+  close(VERSION) or die "Could not close version.dat file";
   return $verstr;
 }
 
