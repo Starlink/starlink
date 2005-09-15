@@ -9619,7 +9619,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    "accum" array.) */
                      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
                         i1 = coord_out * ndim_in;
-                        for ( idim = coord_out; idim >= 1; idim-- ) {
+                        for ( idim = coord_in; idim >= 1; idim-- ) {
                            i2 = i1 + idim;
                            accum[ i2 - 1 ] = accum[ i2 ] +
                                              dim[ idim ] * grad[ i2 ];
