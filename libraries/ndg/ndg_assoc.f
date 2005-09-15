@@ -127,6 +127,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -139,6 +140,8 @@
 *        Improved the prologue.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     15-SEP-2005 (TIMJ):
+*        Check that return variables from CHR_FANDL are non-zero
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -190,6 +193,11 @@
 *  already occured.
       FLAG = .FALSE.
 
+*  Ensure that variables are initialised even if bad status
+*  is set inside the routien
+      GRPEXP = ' '
+      LIST = .FALSE.
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -217,22 +225,34 @@
       CALL SUBPAR_GETNAME( IPAR, GRPEXP, STATUS )
 
 *  If the first and last characters are single quotes, remove them.
-      CALL CHR_FANDL( GRPEXP, FIRST, LAST )
-      IF( GRPEXP( FIRST : FIRST ) .EQ. '''' .AND.
-     :    GRPEXP( LAST : LAST ) .EQ. '''' ) THEN
-         GRPEXP( FIRST : FIRST ) = ' '
-         GRPEXP( LAST : LAST ) = ' '
+*  Check for status and make sure that FIRST and LAST do not addres
+*  element 0 in the string
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL CHR_FANDL( GRPEXP, FIRST, LAST )
+         IF (FIRST .NE. 0 .AND. LAST .NE. 0) THEN
+            IF( GRPEXP( FIRST : FIRST ) .EQ. '''' .AND.
+     :           GRPEXP( LAST : LAST ) .EQ. '''' ) THEN
+               GRPEXP( FIRST : FIRST ) = ' '
+               GRPEXP( LAST : LAST ) = ' '
+            END IF
+         END IF
       END IF
 
 *  If the last character is a colon remove it and set a flag 
 *  indicating that the names are to be listed but not included in the 
 *  returned group.
-      CALL CHR_FANDL( GRPEXP, FIRST, LAST )
-      IF( GRPEXP( LAST : LAST ) .EQ. ':' ) THEN
-         LIST = .TRUE.      
-         GRPEXP( LAST : LAST ) = ' '
-      ELSE
-         LIST = .FALSE.
+*  Check for status and make sure that FIRST and LAST do not addres
+*  element 0 in the string
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL CHR_FANDL( GRPEXP, FIRST, LAST )
+         IF (FIRST .NE. 0 .AND. LAST .NE. 0) THEN
+            IF( GRPEXP( LAST : LAST ) .EQ. ':' ) THEN
+               LIST = .TRUE.      
+               GRPEXP( LAST : LAST ) = ' '
+            ELSE
+               LIST = .FALSE.
+            END IF
+         END IF
       END IF
 
 *  Expand the group expression into a list of NDF names and append
