@@ -6,15 +6,15 @@
 # an app is installed or what version it may have.
 
 use strict;
-use Test;
-BEGIN { plan tests => 17 }
-use Starlink::Versions qw/ :Funcs /;
+use Test::More tests => 17;
 
 # Need to know where I am
-use Cwd;
+use File::Spec;
 
-# loaded ok
-ok(1);
+BEGIN {
+  use_ok( "Starlink::Versions" );
+  Starlink::Versions->import( ":Funcs" );
+}
 
 # The first thing to do is write out some version information
 # as a version.dat file
@@ -25,22 +25,22 @@ my $major = 1;
 my $minor = 4;
 my $patch = 17;
 
-my $ver1 = write_version_file( $major, $minor, $patch);
-ok(2); # Version file written
+my $verstr = write_version_file( $major, $minor, $patch);
+ok(defined $verstr, "Got version string from write function"); 
 
 # Set PROG_DIR to the current directory
-$ENV{THIS_PROG_DIR} = cwd;
+$ENV{THIS_PROG_DIR} = File::Spec->curdir;
 
 # Now get the version
-ok( starversion_major('this_prog'), $major);
-ok( starversion_minor('this_prog'), $minor);
-ok( starversion_patchlevel('this_prog'), $patch);
-ok( starversion_string('this_prog'), $ver1);
+is( starversion_major('this_prog'), $major, "cf major");
+is( starversion_minor('this_prog'), $minor, "cf minor");
+is( starversion_patchlevel('this_prog'), $patch, "cf patch");
+is( starversion_string('this_prog'), $verstr, "cf string");
 
 # Do some comparisons
-ok( starversion_cmp('this_prog', $ver1), 0);
-ok( starversion_cmp('this_prog', 'V5.6.7'), -1);
-ok( starversion_cmp('this_prog', 'V1.2-3'), 1);
+is( starversion_cmp('this_prog', $verstr), 0);
+is( starversion_cmp('this_prog', 'V5.6.7'), -1);
+is( starversion_cmp('this_prog', 'V1.2-3'), 1);
 
 ok( starversion_lt('this_prog', '1.4-18') );
 ok( starversion_eq('this_prog', '1.4-17') );
@@ -51,7 +51,7 @@ ok( starversion_ge('this_prog', '1.4-17') );
 ok( starversion_ge('this_prog', '1.3-17') );
 
 # This will return undef
-ok( !defined starversion_major('your_prog') );
+ok( !defined starversion_major('your_prog'), "Test unknown program" );
 
 exit;
 
