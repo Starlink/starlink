@@ -42,7 +42,7 @@
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       elif test "${nogks}" = 'y'; then 
 #  Form list of graphics libraries.
-         echo -lkpg -lkpg_grf -lira -lirq -lfts -laif -lkapgrf \
+         echo -lkpg_grf -lkpg -lira -lirq -lfts -laif -lkapgrf \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems -grf` \
            `agp_link` `fio_link` \
@@ -54,7 +54,7 @@
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
-         echo -lkgs -lkpg -lkpg_grf -lira -lirq -lfts -laif -lkapgrf \
+         echo -lkgs -lkpg_grf -lkpg -lira -lirq -lfts -laif -lkapgrf \
            `cat_link` `snx_link` \
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \
