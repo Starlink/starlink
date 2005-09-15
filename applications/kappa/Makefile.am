@@ -3,9 +3,11 @@
 SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
 
-dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) kappa_nogks_link_adam
+dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
 
 nodist_bin_SCRIPTS = $(NODIST_PUBLICSCRIPTS)
+
+dist_noinst_SCRIPTS = kappa_nogks_link_adam kappa_wtk_nogks_link_adam
 
 bindatadir = $(bindir)
 dist_bindata_DATA = $(STYLE_FILES) $(DATA_FILES) $(MISC_FILES)
