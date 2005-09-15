@@ -241,6 +241,9 @@ F77_POINTER_TYPE cnfFptr( void *cpointer ) {
    int i;                        /* Loop counter for searching pointer list */
    F77_POINTER_TYPE result = (F77_POINTER_TYPE) 0; /* Result to return */
 
+/* Do not bother translating if we have a null pointer */
+   if ( cpointer == NULL ) return result;
+
 /* Search the pointer list for an entry whose C pointer matches the
    one supplied. */
    for ( i = 0; i < pointer_count; i++ ) {
