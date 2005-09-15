@@ -655,8 +655,10 @@ sub _parse_version_string ($) {
     return ($1, $2, $3);
   } elsif ($_[0] =~ /[Vv](\d+)\.(\d+)/) {
     return ($1, $2, 0);
-  } elsif ($_[0] =~ /(\d+)\.(\d+)-(\d+)/ ) {
+  } elsif ($_[0] =~ /(\d+)\.(\d+)[-\.](\d+)/ ) {
     return ($1, $2, $3);
+  } elsif ($_[0] =~ /(\d+)\.(\d+)/ ) {
+    return ($1, $2, 0);
   } else {
     return (undef, undef, undef);
   }
@@ -680,6 +682,7 @@ Returns C<undef> on error.
 sub _read_datestamp_file ($) {
   my $file = shift;
   print "Opening datestamp file $file\n" if $DEBUG;
+  # use gensym for perl5.005 compatibility
   my $sym = gensym;
   open( $sym, "< $file" ) || return (undef, undef, undef);
 
@@ -919,7 +922,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2000-2004 Particle Physics and Astronomy Research Council.
+Copyright (C) 2000-2005 Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
