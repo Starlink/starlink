@@ -93,7 +93,7 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
 
 /* Local variables.     */
    char mode_c[DAT__SZMOD+1];
-   unsigned char *cpntr;
+   unsigned char *cpntr = NULL; /* initialise in case of bad return status */
    char locator_c[DAT__SZLOC];
    
 /* Enter routine.	*/
@@ -719,7 +719,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char type_c[DAT__SZTYP+1];
    char mode_c[DAT__SZMOD+1];
-   unsigned char *cpntr;
+   unsigned char *cpntr = NULL; /* initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -766,7 +766,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
-   unsigned char *cpntr;
+   unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -812,7 +812,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
-   double *cpntr;
+   double *cpntr = NULL; /* initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -858,7 +858,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
-   int *cpntr;
+   int *cpntr = NULL; /* initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -904,7 +904,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
-   int *cpntr;
+   int *cpntr = NULL; /* initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -950,7 +950,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
-   float *cpntr;
+   float *cpntr = NULL; /* initialise in case of bad return status */
 #if defined(HDS_64)
    INT_BIG dims64[DAT__MXDIM];
    int i;
