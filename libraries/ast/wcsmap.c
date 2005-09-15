@@ -2881,7 +2881,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 /* If only one of the latitude and longitude axes was selected we remove
    it from the returned Mapping (a PermMap) and list of outputs */
-         } else {
+         } else if( nin > 1 ) {
             
             for( i = ilatlon; i < nin - 1; i++ ) {
                result[ i ] = result[ i + 1 ];
@@ -2907,6 +2907,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
             inperm = astFree( inperm );
             outperm = astFree( outperm );
 
+         } else {
+            result = astFree( result );   
          }
       }
    }
