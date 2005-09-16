@@ -54,14 +54,17 @@ STAR_BUILT_DRIVERS="$common_built_drivers star_xwdriv.lo gwmdriv.lo"
 AC_SUBST(BUILT_DRIVERS)
 AC_SUBST(STAR_BUILT_DRIVERS)
 
+# See if we have X
+AC_PATH_XTRA
+
 dnl    Stuff required for xathena
 AC_ARG_WITH([athena], 
              AC_HELP_STRING([--with-athena[=path]],
              [use Xaw (or Xaw3d) (default location /usr/X11R6/)]),
   [if test "$withval" = "yes"; then
     # Default place
-    LIBS="$LIBS -L/usr/X11R6/lib"
-    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include/X11"
+    LIBS="$LIBS $X_LIBS"
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   elif test "$withval" = "no"; then
     : # We do nothing
   else
@@ -74,8 +77,8 @@ AC_ARG_WITH([athena],
 dnl    Hack and slash for the Mac. This should only add goodness to 
 dnl    non-Mac builds in the case where whoever did their filesystem 
 dnl    have done something as wierd as Apple.
-LIBS="$LIBS -L/usr/X11R6/lib"
-CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+LIBS="$LIBS $X_LIBS"
+CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 
 AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
 AC_CHECK_HEADER([X11/Xaw/Simple.h], have_xaheader=yes ) 
@@ -116,8 +119,8 @@ AC_ARG_WITH([motif],
              [use XMotif (default location /usr/X11R6)]),
   [if test "$withval" = "yes"; then
     # Default place
-    LIBS="$LIBS -L/usr/X11R6/lib"
-    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+    LIBS="$LIBS $X_LIBS"
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   elif test "$withval" = "no"; then
     : # We do nothing
   else
