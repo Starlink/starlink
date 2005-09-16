@@ -37,6 +37,8 @@
 #        Original version.
 #     28-JUL-2004 (TIMJ):
 #        Add SHL
+#     12-SEP-2005 (TIMJ):
+#        Use graphicless kaplibs
 #     {enter_further_changes_here}
 
 #  Bugs:
