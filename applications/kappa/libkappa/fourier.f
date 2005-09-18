@@ -305,6 +305,8 @@
 *        corrected so that they call KPS1_FOPRx.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2005 September 17 (TIMJ):
+*        Prefer VEC_xTOx over COPAx
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -362,6 +364,7 @@
       INTEGER FTWKSZ             ! Size of work array needed for FFTs
       LOGICAL HERMI              ! Hermitian NDF given?
       LOGICAL HERMO              ! Hermitian NDF created?
+      INTEGER IERR               ! Error position from VEC_xTOx
       INTEGER IDIM( NDIM )       ! Dimensions of input imaginary data
                                  ! arrays
       LOGICAL IMAGI              ! Imaginary NDF given?
@@ -402,6 +405,7 @@
       INTEGER MDIM               ! Dimensionality of input NDF
 *
                                  ! NDF identifiers to:
+      INTEGER NERR               ! Error count from VEC_xTOx
       INTEGER NDFHI              ! Hermitian input
       INTEGER NDFHO              ! Hermitian output
       INTEGER NDFI               ! Generic imaginary array for reverse
@@ -826,12 +830,16 @@
 *  1st: Hermitian output
                   IF ( HERMO ) THEN
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL COPAR( NPNTS, %VAL( CNF_PVAL( IP ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IP ) ),
      :                              %VAL( CNF_PVAL( IPHO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      ELSE
-                        CALL COPAD( NPNTS, %VAL( CNF_PVAL( IP ) ), 
+                        CALL VEC_DTOD( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IP ) ),
      :                              %VAL( CNF_PVAL( IPHO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      END IF
 
@@ -847,12 +855,16 @@
 *  2nd: real part of complex output.
                   IF ( REALO ) THEN
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPW2 ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW2 ) ),
      :                              %VAL( CNF_PVAL( IPRO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      ELSE
-                        CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPW2 ) ), 
+                        CALL VEC_DTOD( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW2 ) ), 
      :                              %VAL( CNF_PVAL( IPRO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      END IF
 
@@ -868,12 +880,16 @@
 *  3rd: imaginary part of complex output.
                   IF ( IMAGO ) THEN
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPW1 ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS, 
+     :                              %VAL( CNF_PVAL( IPW1 ) ), 
      :                              %VAL( CNF_PVAL( IPIO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      ELSE
-                        CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPW1 ) ), 
+                        CALL VEC_DTOD( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW1 ) ), 
      :                              %VAL( CNF_PVAL( IPIO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      END IF
 
@@ -904,12 +920,16 @@
 *  Create the power data array.
                      IF ( POWERO ) THEN
                         IF ( ITYPE .EQ. '_REAL' ) THEN
-                           CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPW2 ) ),
+                           CALL VEC_RTOR( .FALSE., NPNTS,
+     :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 %VAL( CNF_PVAL( IPPO ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
                         ELSE
-                           CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPW2 ) ),
+                           CALL VEC_DTOD( .FALSE., NPNTS,
+     :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 %VAL( CNF_PVAL( IPPO ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
                         END IF
 
@@ -924,12 +944,16 @@
 *  Create the phase data array.
                      IF ( PHASEO ) THEN
                         IF ( ITYPE .EQ. '_REAL' ) THEN
-                           CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPW1 ) ),
+                           CALL VEC_RTOR( .FALSE., NPNTS,
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 %VAL( CNF_PVAL( IPZO ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
                         ELSE
-                           CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPW1 ) ),
+                           CALL VEC_DTOD( .FALSE., NPNTS,
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 %VAL( CNF_PVAL( IPZO ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
                         END IF
 
@@ -1699,14 +1723,18 @@
      :                                   STATUS )
 
 *  Copy the reconfigured array to the output data array.
-                        CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPH ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPH ) ), 
      :                              %VAL( CNF_PVAL( IPO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      ELSE
 
 *  Copy the work array to the output data array.
-                        CALL COPAR( NPNTS, %VAL( CNF_PVAL( IPW1 ) ), 
+                        CALL VEC_RTOR( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW1 ) ), 
      :                              %VAL( CNF_PVAL( IPO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      END IF
 
@@ -1724,14 +1752,18 @@
      :                                   STATUS )
 
 *  Copy the reconfigured array to the output data array.
-                        CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPH ) ), 
+                        CALL VEC_DTOD( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPH ) ), 
      :                              %VAL( CNF_PVAL( IPO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      ELSE
 
 *  Copy the work array to the output data array.
-                        CALL COPAD( NPNTS, %VAL( CNF_PVAL( IPW1 ) ), 
+                        CALL VEC_DTOD( .FALSE., NPNTS,
+     :                              %VAL( CNF_PVAL( IPW1 ) ), 
      :                              %VAL( CNF_PVAL( IPO ) ),
+     :                              IERR, NERR,
      :                              STATUS )
                      END IF
                   END IF
