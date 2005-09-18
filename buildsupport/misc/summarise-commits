@@ -444,6 +444,7 @@ a[href]:hover { background: #FF9; }     /* CSS2 */
 h1 {
   margin-left: -10%;
   margin-right: -10%;
+  padding: 0.5em;
   background: navy;
   color: white;
 }
@@ -473,7 +474,8 @@ tr.entry {
 </head>
 <body>
 EOD
-printf HTML "<h1>Commits between %s and %s</h1>\n",
+printf HTML "<h1>Commits %sbetween %s and %s</h1>\n",
+	    ($module ? "to module $module " : ""),
             $startdate->humandate, $enddate->humandate;
 
 
