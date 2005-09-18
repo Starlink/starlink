@@ -180,6 +180,7 @@
       CHARACTER * ( 4 ) ESTIM    ! Uppercase version of the estimator
       LOGICAL HITHRS             ! Upper threshold to apply?
       INTEGER I                  ! Loop counter
+      INTEGER IERR               ! Error posn for VEC_
       INTEGER IX, IY             ! Counters used to sum the x-y pixel
                                  ! positions within the bin
       INTEGER J                  ! Loop counter
@@ -198,6 +199,7 @@
       INTEGER MINPCL             ! Index of minimum value after clipping
       INTEGER MINPOS             ! Index of minimum value
       REAL MODE                  ! Mode value of the bin
+      INTEGER NERR               ! Number of errors from VEC_
       INTEGER NGMIN              ! Minimum number of good pixels
                                  ! permitted
       INTEGER NINVAL             ! Number of bad pixels in the bin
@@ -312,8 +314,9 @@
  
 *  Put the result of the thresholding back into the original bin array,
 *  for later processing.
-               CALL COPAR( BINTOT, TBIN, BIN, STATUS )
-            END IF
+               CALL VEC_RTOR( .FALSE., BINTOT, TBIN, BIN, IERR, NERR,
+     :              STATUS )
+             END IF
  
 *  There is a choice of estimators for the value of the bin.  These
 *  fall into broad groups: ordered statistics --- the median and mode,
