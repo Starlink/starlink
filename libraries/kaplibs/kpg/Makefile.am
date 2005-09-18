@@ -83,7 +83,7 @@ kpg1_unz2.gdr kpg1_mono.gdr kpg1_hmlt.gdr kpg1_rfco.gdr kpg1_axvl.gdr \
 kpg1_ffr.gdr kpg1_axex.gdr kpg1_d2w2.gdr kpg1_aind.gdr kpg1_hsfl.gdr \
 kpg1_psfs.gdr kpg1_aker.gdr kpg1_chep.gdr kpg1_qntl.gdr \
 kpg1_hcon.gdr kpg1_prow.gdr kpg1_gaus.gdr kpg1_chev.gdr kpg1_mthe.gdr \
-kpg1_dwso.gdr
+kpg1_dwso.gdr kpg1_fftf.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir kpg1_sqsu.gdir kpg1_prsa.gdir \
 kpg1_chel.gdir
@@ -201,8 +201,6 @@ kpg1_expouw.f \
 kpg1_expow.f \
 kpg1_fftbd.f \
 kpg1_fftbr.f \
-kpg1_fftfd.f \
-kpg1_fftfr.f \
 kpg1_fhdat.f \
 kpg1_fit1d.f \
 kpg1_floor.f \

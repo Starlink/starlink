@@ -1,7 +1,7 @@
-      SUBROUTINE KPG1_FFTFD( M, N, IN, WORK, OUT, STATUS )
+      SUBROUTINE KPG1_FFTF<T>( M, N, IN, WORK, OUT, STATUS )
 *+
 *  Name:
-*     KPG1_FFTFD
+*     KPG1_FFTF<T>
 
 *  Purpose:
 *     Takes the forward FFT of a real image.
@@ -10,29 +10,29 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_FFTFD( M, N, IN, WORK, OUT, STATUS )
+*     CALL KPG1_FFTF<T>( M, N, IN, WORK, OUT, STATUS )
 
 *  Description:
 *     The Fourier transform of the input (purely real) image is taken 
 *     and returned in OUT.  The returned FT is stored in Hermitian format,
 *     in which the real and imaginary parts of the FT are combined into
-*     a single array. The FT can be inverted using KPG1_FFTBD, and two
-*     Hermitian FTs can be multipled together using routine KPG1_HMLTD.
+*     a single array. The FT can be inverted using KPG1_FFTB<T>, and two
+*     Hermitian FTs can be multipled together using routine KPG1_HMLT<T>.
 
 *  Arguments:
 *     M = INTEGER (Given)
 *        Number of columns in the input image.
 *     N = INTEGER (Given)
 *        Number of rows in the input image.
-*     IN( M, N ) = DOUBLE PRECISION (Given)
+*     IN( M, N ) = <COMM> (Given)
 *        The input image.
-*     WORK( * ) = DOUBLE PRECISION (Given)
-*         Work space.  This must be at least ( 3*MAX( M, N ) + 15 )
-*         elements long.
-*    OUT( M, N ) = DOUBLE PRECISION (Returned)
-*       The FFT in Hermitian form.  Note, the same array can be used
-*       for both input and output, in which case the supplied values
-*       will be over-written.
+*     WORK( * ) = <COMM> (Given)
+*        Work space.  This must be at least ( 3*MAX( M, N ) + 15 )
+*        elements long.
+*     OUT( M, N ) = <COMM> (Returned)
+*        The FFT in Hermitian form.  Note, the same array can be used
+*        for both input and output, in which case the supplied values
+*        will be over-written.
 *    STATUS = INTEGER (Given and Returned)
 *       The global status.
 
@@ -52,11 +52,21 @@
 *     1995 September 7 (MJC):
 *        Used PDA_ prefix for FFTPACK routines.
 *     13-DEC-2003 (DSB):
-*        Use KPG1_D2NAG in stead of PDA_D2NAG. KPG1_D2NAG uses workspace
+*        Use KPG1_<T>2NAG in stead of PDA_<T>2NAG. KPG1_<T>2NAG uses workspace
 *        to achieve greater speed.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     2005 September 17 (TIMJ):
+*        Generic-ify.
 *     {enter_further_changes_here}
+
+*  Implementation Status:
+*     Some of the generated code looks a bit odd because the names of
+*     the PDA subroutines do not match the standard type naming conventions
+*     required by GENERIC. Explicit IF statements are included but since
+*     these compare constants (after generic is run) the compiler will
+*     optimize the checks out of the final runtime. The real fix is to
+*     fix the names of the PDA routines (and associated KPG routine).
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -73,11 +83,11 @@
 *  Arguments Given:
       INTEGER M
       INTEGER N
-      DOUBLE PRECISION IN( M, N )
-      DOUBLE PRECISION WORK( * )
+      <TYPE> IN( M, N )
+      <TYPE> WORK( * )
 
 *  Arguments Returned:
-      DOUBLE PRECISION OUT( M, N )
+      <TYPE> OUT( M, N )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -93,8 +103,16 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      IF ( '<HTYPE>' .NE. '_REAL' .AND. '<HTYPE>' .NE. '_DOUBLE') THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_FFTF<T>',
+     :        'Routine only supports _REAL or _DOUBLE not <HTYPE>',
+     :        STATUS )
+         RETURN
+      END IF
+
 *  Allocate work space for use in KPG1_R2NAG. Abort if failure.
-      CALL PSX_CALLOC( MAX( M, N ), '_DOUBLE', IPW, STATUS )
+      CALL PSX_CALLOC( MAX( M, N ), '<HTYPE>', IPW, STATUS )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Copy the input array to the output array.
@@ -106,18 +124,33 @@
 
 *  Initialise an array holding trig. functions used to form the FFT
 *  of the input image rows.
-      CALL PDA_DRFFTI( M, WORK )
+      IF ( '<TYPE>' .EQ. 'REAL' ) THEN
+         CALL PDA_RFFTI( M, WORK )
+      ELSE
+         CALL PDA_DRFFTI( M, WORK )
+      END IF
 
 *  Transform each row of the output array, and convert each array into
 *  the equivalent NAG format.
-      DO J = 1, N
-         CALL PDA_DRFFTF( M, OUT( 1, J ), WORK )
-         CALL KPG1_DR2NAG( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
-      END DO
+      IF ( '<TYPE>' .EQ. 'REAL' ) THEN
+         DO J = 1, N
+            CALL PDA_RFFTF( M, OUT( 1, J ), WORK )
+            CALL KPG1_R2NAG( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
+         END DO
+      ELSE
+         DO J = 1, N
+            CALL PDA_DRFFTF( M, OUT( 1, J ), WORK )
+            CALL KPG1_DR2NAG( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
+         END DO
+      END IF
 
 *  Re-initialise the work array to hold trig. functions used to form
 *  the FFT of the image columns.
-      CALL PDA_DRFFTI( N, WORK )
+      IF ( '<TYPE>' .EQ. 'REAL' ) THEN
+         CALL PDA_RFFTI( N, WORK )
+      ELSE
+         CALL PDA_DRFFTI( N, WORK )
+      END IF
 
 *  Store the index of the last-used element in the work array.
       IW = 2 * N + 15
@@ -132,8 +165,17 @@
          END DO
 
 *  Transform the copy of this column.
-         CALL PDA_DRFFTF( N, WORK( IW + 1 ), WORK )
-         CALL KPG1_DR2NAG( N, WORK( IW + 1 ), %VAL( CNF_PVAL( IPW ) ) )
+*  The compiler should be able to optimize out the IF that is
+*  always true
+         IF ( '<TYPE>' .EQ. 'REAL' ) THEN
+            CALL PDA_RFFTF( N, WORK( IW + 1 ), WORK )
+            CALL KPG1_R2NAG( N, WORK( IW + 1 ),
+     :           %VAL( CNF_PVAL( IPW ) ) )
+         ELSE
+            CALL PDA_DRFFTF( N, WORK( IW + 1 ), WORK )
+            CALL KPG1_DR2NAG( N, WORK( IW + 1 ),
+     :           %VAL( CNF_PVAL( IPW ) ) )
+         END IF
 
 *  Copy the transformed column back to the output array.
          DO  J = 1, N
