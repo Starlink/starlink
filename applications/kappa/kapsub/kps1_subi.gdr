@@ -86,14 +86,14 @@
 *        there is no thresholding to be done, this can be a
 *        single-element array, otherwise it should have %BINX * %BINY
 *        elements.
-*     X( MAXBIN ) = <TYPE> (Returned)
+*     X( MAXBIN ) = <COMM> (Returned)
 *        The mean x positions for each bin.
-*     Y( MAXBIN ) = <TYPE> (Returned)
+*     Y( MAXBIN ) = <COMM> (Returned)
 *        The mean y positions for each bin.
-*     Z( MAXBIN ) = <TYPE> (Returned)
+*     Z( MAXBIN ) = <COMM> (Returned)
 *        The global value as measured by the requested estimator for
 *        each bin.
-*     W( MAXBIN ) = <TYPE> (Returned)
+*     W( MAXBIN ) = <COMM> (Returned)
 *        The weight for each bin.
 *     NBIN = INTEGER (Returned)
 *        Number of bins with defined statistics.
@@ -133,7 +133,8 @@
 *     1996 October 15 (MJC):
 *        Renamed from BINST, made generic, and reordered ARRAY argument.
 *     2005 September 17 (TIMJ):
-*        Remake generic routine
+*        - Remake generic routine
+*        - Replace calls to COPAR with calls to VEC_xTOx
 *     {enter_further_changes_here}
  
 *  Bugs:
