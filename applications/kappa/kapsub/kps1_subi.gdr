@@ -316,7 +316,7 @@
 *  for later processing.
                CALL VEC_RTOR( .FALSE., BINTOT, TBIN, BIN, IERR, NERR,
      :              STATUS )
-             END IF
+            END IF
  
 *  There is a choice of estimators for the value of the bin.  These
 *  fall into broad groups: ordered statistics --- the median and mode,
