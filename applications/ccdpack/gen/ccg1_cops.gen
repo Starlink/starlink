@@ -34,11 +34,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-JUL-2000 (MBT):
 *        Original version.
+*     17-SEP-2005 (TIMJ):
+*        Use VEC_xTOx
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,18 +68,18 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER I                  ! Loop variable
-
+      INTEGER IERR               ! Dummy variable for VEC_
+      INTEGER NERR               ! Dummy variable for VEC_
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop over the whole of the input array copying the values to the
-*  output array.
-      DO 1 I = 0, N - 1
-         DEST( DFIRST + I ) = SRC( SFIRST + I )
- 1    CONTINUE
+*  output array. Use VEC routine since that may be optimized better
+*  than a hand written loop.
+      CALL VEC_<T>TO<T>( .FALSE., N, SRC( SFIRST ),
+     :     DEST( DFIRST ), IERR, NERR, STATUS )
 
       END
 * $Id$
