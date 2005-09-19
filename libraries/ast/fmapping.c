@@ -455,6 +455,7 @@ MAKE_AST_REBIN(i,I,INTEGER,I,int)
    define it via a macro. */
 #define MAKE_AST_REBINSEQ(f,F,Ftype,X,Xtype) \
 F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
+                              DOUBLE(WLIM), \
                               INTEGER(NDIM_IN), \
                               INTEGER_ARRAY(LBND_IN), \
                               INTEGER_ARRAY(UBND_IN), \
@@ -476,6 +477,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
                               DOUBLE_ARRAY(WEIGHTS), \
                               INTEGER(STATUS) ) { \
    GENPTR_INTEGER(THIS) \
+   GENPTR_DOUBLE(WLIM) \
    GENPTR_INTEGER(NDIM_IN) \
    GENPTR_INTEGER_ARRAY(LBND_IN) \
    GENPTR_INTEGER_ARRAY(UBND_IN) \
@@ -510,7 +512,15 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
          in_var = (const Xtype *) IN_VAR; \
          out_var = (Xtype *) OUT_VAR; \
       } \
-      astRebinSeq##X( astI2P( *THIS ), *NDIM_IN, \
+\
+/* If the AST__GENVAR flag is set, use the output variance \
+   arrays, otherwise pass NULL pointers. */ \
+      if ( AST__GENVAR & *FLAGS ) { \
+         in_var = NULL; \
+         out_var = (Xtype *) OUT_VAR; \
+      } \
+\
+      astRebinSeq##X( astI2P( *THIS ), *WLIM, *NDIM_IN, \
                    LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
                    *INTERP, PARAMS, *FLAGS, \
                    *TOL, *MAXPIX, *BADVAL, \

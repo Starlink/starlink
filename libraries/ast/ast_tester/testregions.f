@@ -1488,6 +1488,7 @@ C
 
       frm2 = ast_copy( frm1, status )
       call ast_setd( frm2, 'skyref(1)', 0.0005D0, status )
+      call ast_setc( frm2, 'skyrefis', 'origin', status )
 
       fs = ast_convert( frm1, frm2, ' ', status )
 

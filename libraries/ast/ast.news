@@ -40,6 +40,13 @@ and converted to the new form.
 splits a Mapping into two component Mappings which, when combined in
 parallel, are equivalent to the original Mapping.
 
+- The default value for the SkyRefIs attribute has been changed from
+"Origin" to "Ignored". This means that if you want to use a SkyFrame
+to represent offsets from some origin position, you must now set the
+SkyRefIs attribute explicitly to either "Pole" or "Origin", in addition 
+to assigning the required origin position to the SkyRef attribute.
+
+
 Main Changes in Version 4.0
 ---------------------------
 
