@@ -136,6 +136,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *     13-SEP-2005 (DSB):
 *        Override astClearSystem so that SkyRef/SkyRefPcan be converted
 *        from the original System to the default System.
+*     19-SEP-2005 (DSB):
+*        Changed default for SkyRefIs from ORIGIN to IGNORED.
 *class--
 */
 
@@ -8652,7 +8654,7 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 *     rather than absolute axis values. SkyRefIs can take one of the 
 *     case-insensitive values "Origin", "Pole" or "Ignored". 
 *
-*     If SkyRefIs is set to "Origin" (the default), then the coordinate system
+*     If SkyRefIs is set to "Origin", then the coordinate system
 *     represented by the SkyFrame is modified to put the origin of longitude
 *     and latitude at the position specified by the SkyRef attribute.
 *
@@ -8660,8 +8662,8 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 *     by the SkyFrame is modified to put the north pole at the position 
 *     specified by the SkyRef attribute. 
 *
-*     If SkyRefIs is set to "Ignored", then any value set for the SkyRef
-*     attribute is ignored, and the SkyFrame represents the coordinate
+*     If SkyRefIs is set to "Ignored" (the default), then any value set for the 
+*     SkyRef attribute is ignored, and the SkyFrame represents the coordinate
 *     system specified by the System attribute directly without any rotation.
 
 *  Applicability:
@@ -8673,7 +8675,7 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 astMAKE_CLEAR(SkyFrame,SkyRefIs,skyrefis,BAD_REF)
 astMAKE_SET(SkyFrame,SkyRefIs,int,skyrefis,value)
 astMAKE_TEST(SkyFrame,SkyRefIs,( this->skyrefis != BAD_REF ))
-astMAKE_GET(SkyFrame,SkyRefIs,int,ORIGIN_REF,(this->skyrefis == BAD_REF ? ORIGIN_REF : this->skyrefis))
+astMAKE_GET(SkyFrame,SkyRefIs,int,IGNORED_REF,(this->skyrefis == BAD_REF ? IGNORED_REF : this->skyrefis))
 
 /*
 *att++
@@ -8715,9 +8717,7 @@ astMAKE_GET(SkyFrame,SkyRefIs,int,ORIGIN_REF,(this->skyrefis == BAD_REF ? ORIGIN
 *     comma, followed by an axis 2 value). The same form
 *     will be used when getting the value of the attribute. 
 *
-*     The default values for SkyRef are zero longitude and zero latitude,
-*     but no rotation of the SkyFrame coordinate system will occur
-*     until a value is set explicitly for at least one axis.
+*     The default values for SkyRef are zero longitude and zero latitude.
 
 *  Aligning SkyFrames with Offset Coordinate Systems:
 *     The offset coordinate system within a SkyFrame should normally be 
