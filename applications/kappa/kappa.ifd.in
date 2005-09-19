@@ -15640,6 +15640,116 @@ iraf! {
 
       }
 
+      action wcsmosaic {
+
+         helplib {$KAPPA_HELP}
+
+         parameter acc {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.05
+            prompt {Positional accuracy in pixels}
+            helpkey *
+          }
+
+         parameter genvar {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Generate output variances from input spread?}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input images}
+            helpkey *
+          }
+
+         parameter lbnd {
+            size *
+            position 3
+            type _INTEGER
+            access READ
+            ppath DYNAMIC
+            prompt {Lower pixel index bounds for output image}
+            helpkey *
+          }
+
+         parameter maxpix {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 1000
+            prompt {Scale size for mappings (in pixels)}
+            helpkey *
+          }
+
+         parameter method {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default SincSinc
+            prompt {Interpolation method}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output image}
+            helpkey *
+          }
+
+         parameter params {
+            type _DOUBLE
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Interpolation parameters}
+            helpkey *
+          }
+
+         parameter ref {
+            position 5
+            type NDF
+            access READ
+            ppath DEFAULT
+            default !
+            prompt {The reference image}
+            helpkey *
+          }
+
+         parameter ubnd {
+            size *
+            position 4
+            type _INTEGER
+            access READ
+            ppath DYNAMIC
+            prompt {Upper pixel index bounds for output image}
+            helpkey *
+          }
+
+         parameter wlim {
+            type _REAL
+            prompt {Minimum weight for valid output pixels}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0E-10
+            helpkey *
+          }
+      }
+
       action wcsalign {
 
          helplib {$KAPPA_HELP}

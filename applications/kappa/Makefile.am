@@ -112,7 +112,7 @@ histogram interleave laplace kstest logar look lucy manic makesurface \
 maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
-zaplin listmake listshow profile wcsalign wcstran kapversion \
+zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
 kaphelp
 
 KAPVIEW_TASKS = ardplot colcomp contour cursor drawsig drawnorth       \
@@ -246,7 +246,7 @@ listshow.ifc profile.ifc rotate.ifc segment.ifc \
 setmagic.ifc shadow.ifc slide.ifc sqorst.ifc \
 stats.ifc sub.ifc substitute.ifc surfit.ifc \
 thresh.ifc trandat.ifc trig.ifc wcsalign.ifc \
-wcstran.ifc wiener.ifc zaplin.ifc errclip.ifc \
+wcsmosaic.ifc wcstran.ifc wiener.ifc zaplin.ifc errclip.ifc \
 expon.ifc ffclean.ifc fillbad.ifc fitsurface.ifc \
 flip.ifc fourier.ifc gausmooth.ifc glitch.ifc \
 globals.ifc histat.ifc histeq.ifc histogram.ifc \
@@ -279,7 +279,7 @@ pixdupe.ifl pow.ifl profile.ifl psf.ifl regrid.ifl \
 rift.ifl rotate.ifl segment.ifl setmagic.ifl \
 shadow.ifl slide.ifl sqorst.ifl stats.ifl sub.ifl \
 substitute.ifl surfit.ifl thresh.ifl trandat.ifl \
-trig.ifl wcsalign.ifl wcstran.ifl wiener.ifl \
+trig.ifl wcsalign.ifl wcsmosaic.ifl wcstran.ifl wiener.ifl \
 zaplin.ifl add.ifl aperadd.ifl ardgen.ifl ardmask.ifl \
 ardplot.ifl axlabel.ifl axunits.ifl block.ifl cadd.ifl \
 calc.ifl calpol.ifl cdiv.ifl centroid.ifl chain.ifl \

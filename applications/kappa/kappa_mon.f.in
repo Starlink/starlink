@@ -461,6 +461,10 @@
          ELSE IF ( NAME .EQ. 'WCSALIGN' ) THEN
             CALL WCSALIGN ( STATUS )
 
+*  Mosaic a group of NDFs using the WCS components.
+         ELSE IF ( NAME .EQ. 'WCSMOSAIC' ) THEN
+            CALL WCSMOSAIC ( STATUS )
+
 *  Transforms positions between NDF WCS Frames.
          ELSE IF ( NAME .EQ. 'WCSTRAN' ) THEN
             CALL WCSTRAN ( STATUS )

@@ -675,9 +675,9 @@
 
          ELSE
             NPAR = 1
-            METHOD_CODE = AST__SINC
+            METHOD_CODE = AST__SOMB
             CALL MSG_OUT( 'WCSALIGN_MSG8', 
-     :                    '  Using sinc ^W kernel.', STATUS ) 
+     :                    '  Using somb ^W kernel.', STATUS ) 
 
          END IF
 
