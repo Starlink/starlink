@@ -39,6 +39,10 @@ extern int Gaia_Init(Tcl_Interp *interp);
 #endif
 }
 
+/* Fortran initialisation. */
+extern "C" {
+void initFortran( int argc, char *argv[] );
+}
 
 /*
  * The following variable is a special hack that is needed in order for
@@ -49,7 +53,7 @@ extern int Gaia_Init(Tcl_Interp *interp);
 extern "C" int matherr();
 int *tclDummyMathPtr = (int *) matherr;
 #endif
-
+
 /*
  *----------------------------------------------------------------------
  *
@@ -66,30 +70,16 @@ int *tclDummyMathPtr = (int *) matherr;
  *
  *----------------------------------------------------------------------
  */
-
-extern "C" {
-#include "ndf.h"                 /* Define NDF interface */
-#include "sae_par.h"             /* Define SAI__OK */
-
-void initFortran(int,char**);    /* Initialise the Fortran runtime */
-}
-
-
 int
-main(int argc, char** argv)
+main( int argc, char *argv[] )
 {
     /*  Initialise the Fortran runtime, if necessary */
     initFortran(argc, argv);
 
-    /*  Initialise the NDF library, needed to make sure history works,
-     *	must do this here to access argc and argv */
-    int status = SAI__OK;
-    ndfInit( argc, argv, &status );
-
-    Tk_Main(argc, argv, Tcl_AppInit);
-    return 0;			/* Needed only to prevent compiler warning. */
+    Tk_Main( argc, argv, Tcl_AppInit );
+    return 0;  /* Needed only to prevent compiler warning. */
 }
-
+
 /*
  *----------------------------------------------------------------------
  *

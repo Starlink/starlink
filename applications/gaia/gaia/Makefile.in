@@ -172,9 +172,9 @@ $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
-$(DEMO_TCL): normallib tclAppInit.o FORCE
+$(DEMO_TCL): normallib tclAppInit.o initFortran.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
-	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o -o $(DEMO_TCL) \
+	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o initFortran.o -o $(DEMO_TCL) \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)

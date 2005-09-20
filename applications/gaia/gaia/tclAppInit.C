@@ -28,6 +28,11 @@ extern int Tclx_Init(Tcl_Interp *interp);
 extern int Tcladam_Init(Tcl_Interp *interp);
 }
 
+/* Fortran initialisation. */
+extern "C" {
+void initFortran( int argc, char *argv[] );
+}
+
 /*
  * The following variable is a special hack that is needed in order for
  * Sun shared libraries to be used for Tcl.
@@ -37,7 +42,7 @@ extern int Tcladam_Init(Tcl_Interp *interp);
 extern "C" int matherr();
 int *tclDummyMathPtr = (int *) matherr;
 #endif
-
+
 /*
  *----------------------------------------------------------------------
  *
@@ -54,14 +59,16 @@ int *tclDummyMathPtr = (int *) matherr;
  *
  *----------------------------------------------------------------------
  */
-
 int
-main(int argc, char** argv)
+main( int argc, char *argv[] )
 {
+    /*  Initialise the Fortran runtime, if necessary */
+    initFortran(argc, argv);
+
     Tcl_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }
-
+
 /*
  *----------------------------------------------------------------------
  *

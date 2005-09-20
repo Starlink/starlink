@@ -152,9 +152,10 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
-$(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
+$(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
-	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
+	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o ../initFortran.o \
+	       -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) \
 	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)

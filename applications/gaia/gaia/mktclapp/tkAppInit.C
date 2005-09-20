@@ -39,7 +39,11 @@ extern int Skycat_Init(Tcl_Interp *interp);
 extern int Gaia_Init(Tcl_Interp *interp);
 }
 
-
+/* Fortran initialisation. */
+extern "C" {
+void initFortran( int argc, char *argv[] );
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -92,20 +96,15 @@ int Et_AppInit( Tcl_Interp *interp )
   return TCL_OK;
 }
 
-extern "C" void initFortran(int,char**);
-
 /*
- * Main function. 
- * 
- * Patterned after the unskipped parts of the main function generated
- * in gaia_swish.c (q.v.), but with the addition of the initFortran()
- * call, to initialise the Fortran runtime.
+ * Main function. Provide our own so we can do the necessary Fortran
+ * initialisations.
  */
 int
-main(int argc, char** argv)
+main( int argc, char *argv[] )
 {
     /* Do any work to initialise the Fortran runtime */
-    initFortran(argc, argv);
+    initFortran( argc, argv );
 
-    return Et_Init(argc,argv)!=TCL_OK;
+    return ( Et_Init( argc, argv ) != TCL_OK );
 }
