@@ -164,6 +164,24 @@ itcl::class gaia::GaiaAstSystem {
       }
       set system_(equinox) default
 
+      #  Sky reference type for offset coordinate systems.
+      itk_component add SkyRefIs {
+         LabelMenu $w_.skyrefis \
+	       -text "Ref point:" \
+	       -relief raised \
+	       -labelwidth 8 \
+               -valuewidth 18
+      }
+      add_short_help $itk_component(SkyRefIs) \
+         {Select the type of offset coordinate system}
+      foreach sys $skyrefismap_ {
+         $itk_component(SkyRefIs) add \
+	       -command [code $this set_skyrefis_ $sys] \
+	       -label $sys \
+	       -value $sys
+      }
+      set skyrefis_ [lindex $skyrefismap_ 0]
+
       #  Set the defaults for all the known systems (these are used to
       #  set the labels for the default identifiers).
       foreach {system epoch equinox} $systemmap_ {
@@ -220,6 +238,7 @@ itcl::class gaia::GaiaAstSystem {
       pack $itk_component(System) -side top -ipadx 1m -ipady 1m -anchor w
       pack $itk_component(Epoch) -side top -ipadx 1m -ipady 1m -anchor w
       pack $itk_component(Equinox) -side top -ipadx 1m -ipady 1m -anchor w
+      pack $itk_component(SkyRefIs) -side top -ipadx 1m -ipady 1m -anchor w
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 3 -padx 3
       pack $itk_component(accept) -side right -expand 1 -pady 1 -padx 1
@@ -291,6 +310,8 @@ itcl::class gaia::GaiaAstSystem {
 	 if { $system_(equinox) != "default" } {
 	    append options "equinox=$system_(equinox)"
 	 }
+         append options "skyrefis=$skyrefis_"
+
 	 if { $options != {} } {
 	    $itk_option(-rtdimage) astsystem image $options
 	    $itk_option(-rtdimage) astreplace
@@ -323,6 +344,11 @@ itcl::class gaia::GaiaAstSystem {
 
       #  Make sure that the default labels are correct.
       set_system_defaults_ 0
+   }
+
+   #  Set the SkyRefIs value.
+   protected method set_skyrefis_ {value} {
+      set skyrefis_ $value
    }
 
    #  Reset the image and the system controls to their defaults.
@@ -432,6 +458,12 @@ itcl::class gaia::GaiaAstSystem {
 
    #  Whether testing new system.
    protected variable testing_ 0
+
+   #  The SkyRefIs setting.
+   protected variable skyrefis_
+
+   #  The values of SkyRefIs. First is default.
+   protected variable skyrefismap_ "ignored origin pole"
 
    #  Common variables: (shared by all instances)
    #  -----------------
