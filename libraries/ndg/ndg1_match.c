@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <fnmatch.h>
 #include "f77.h"
 #include "cnf.h"
@@ -37,10 +38,13 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     28-FEB-2001 (DSB):
 *        - First version.
+*     20-SEP-2005 (TIMJ):
+*        Update cnf usage. Use free not cnfFree to free temp storage.
 */
    GENPTR_CHARACTER(template) 
    GENPTR_CHARACTER(test) 
@@ -59,10 +63,10 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
    if( *status != SAI__OK ) return match;
 
 /* Import the template string */
-   tmplt = cnf_creim( template, template_length );
+   tmplt = cnfCreim( template, template_length );
 
 /* Import the test string */
-   tst = cnf_creim( test, test_length );
+   tst = cnfCreim( test, test_length );
 
 /* Use the fnmatch posix routine to do the matching. */
    if( fnmatch( tmplt, tst, FNM_PERIOD ) ){
@@ -72,8 +76,8 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
    }
 
 /* Free the memory used to hold local copies of the supplied strings */
-   cnf_free( tmplt );
-   cnf_free( tst );
+   free( tmplt );
+   free( tst );
 
 /* Return the answer */
    return match;
