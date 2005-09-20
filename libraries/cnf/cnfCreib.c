@@ -34,6 +34,7 @@ char *cnfCreib( const char *source_f, int source_len )
 *  Returned Value:
 *     char *cnfCreib
 *        A pointer to the temporary storage location
+*        It should be freed after use using "free" (not cnfFree).
 
 *  Notes:
 *     -  If the routine could not create the space, then it returns a
