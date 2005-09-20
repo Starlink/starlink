@@ -167,6 +167,9 @@
 *         Made the Command string dynamic (was 256, which is too
 *         small for the current NDF_FORMATS_IN). Increased length
 *         of returned line to 512, in line with NDG practice.
+*      19-SEP-2005 (TJ):
+*         Removed unused defines for isspace and memcpy.
+*         Use cnfExprt rather than hand-rolled padding of strings
 *.
 *-
  */
@@ -234,16 +237,9 @@ typedef struct ContextStruct {
 #define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
 #endif
 
-/* memcpy is declared in string.h -- read this if we have it, or
-   declare memcpy in terms of (BSD) bcopy if not */
 #if STDC_HEADERS
 #  include <string.h>
 #  include <ctype.h>
-#else
-#  if !HAVE_MEMCPY
-#    define memcpy(d, s, n) bcopy((s), (d), (n))
-#  endif
-#  define isspace(x) ((x) == ' ')
 #endif
 
 #include <errno.h>
@@ -276,7 +272,6 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    char *Command;        /* 'ls' command executed */
    int *Fdptr;           /* Pointer to array of two integer file descriptors */
    int GotFileName;      /* Used to control loop reading lines from 'ls' */
-   int I;                /* Loop index used to copy strings */
    int Ichar;            /* Index into FileName for next character */
    char LastChar;        /* Last non-blank char read in line */
    char Line[LINE_LEN];  /* String into which line is read */
@@ -522,11 +517,10 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                FileName[NameLength - 1] = '\0';
 
                /*  And, remembering that this is a Fortran character string,
-                *  blank pad it properly.
+                *  blank pad it properly. Overwriting the last NULL.
                 */
 
-               for (I = strlen(FileName); I < NameLength; FileName[I++] = ' ')
-                   ;
+	       cnfExprt( FileName, FileName, NameLength );
             }
          }
       }
