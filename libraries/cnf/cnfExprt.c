@@ -1,3 +1,4 @@
+#include <string.h>
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 void cnfExprt( const char *source_c, char *dest_f, int dest_len )
@@ -30,12 +31,20 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 *     int dest_len (Given)
 *        The length of the output FORTRAN string
 
+*  Notes:
+*     The input C string and output Fortran string can point
+*     to the same string if the intention is to modify the
+*     C string in situ.
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 1998 CCLRC
+*     Copyright (C) 2005 Particle Physics and Engineering Research Council
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +52,8 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 *        Original version.
 *     24-SEP-1998 (AJC):
 *        Specify const char * for input strings
+*     19-SEP-2005 (TIMJ):
+*        Use strncpy and memset
 *     {enter_changes_here}
 
 *  Bugs:
@@ -55,17 +66,20 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 {
 /* Local Variables:							    */
 
-   int i;			 /* Loop counter			    */
-
+   size_t clen;                  /* Input String length                     */
+   size_t ncpy;                  /* Number of bytes to copy                 */
 
 /* Copy the characters of the input C string to the output FORTRAN string,  */
 /* taking care not to go beyond the end of the FORTRAN string.		    */
 
-   for( i = 0 ; (i < dest_len ) && ( source_c[i] != '\0' ) ; i++ )
-      dest_f[i] = source_c[i];
+   clen = strlen( source_c );
+   if (dest_f != source_c)
+     strncpy( dest_f, source_c, dest_len );
 
 /* Fill the rest of the output FORTRAN string with blanks.		    */
 
-   for(  ; i < dest_len ; i++ )
-      dest_f[i] = ' ';
+   if (clen < dest_len) {
+     ncpy = dest_len - clen + 1;
+     memset( &dest_f[clen], ' ', ncpy );
+   }
 }
