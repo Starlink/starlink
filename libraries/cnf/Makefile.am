@@ -69,7 +69,7 @@ f_calls_c_SOURCES = f_calls_c_main.f f_calls_c_sub.c
 f_calls_c_LDADD = libcnf.la
 
 c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f
-c_calls_f_LDADD = libcnf.la @FCLIBS@
+c_calls_f_LDADD = libcnf.la libcnfrtl.la @FCLIBS@
 
 c_calls_f_args_SOURCES = c_calls_f_args.c f_receive_args.f
 c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@
