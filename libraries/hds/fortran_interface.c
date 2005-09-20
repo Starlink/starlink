@@ -2020,7 +2020,7 @@ F77_SUBROUTINE(hds_copy)( CHARACTER(locator),
    hdsCopy( locator_c, file_c, name_c, status );
 
 /* Free allocated string memory.                             */
-   cnfFree( file_c );
+   free( file_c );
 }
 
 F77_SUBROUTINE(hds_erase)( CHARACTER(locator),
@@ -2148,7 +2148,7 @@ F77_SUBROUTINE(hds_gtune) ( CHARACTER(param_str),
    hdsGtune( param_str_c, value, status );
 
 /* Free allocated string memory.                             */
-   cnfFree( param_str_c );
+   free( param_str_c );
 }
 
 F77_SUBROUTINE(hds_link)( CHARACTER(locator),
@@ -2250,7 +2250,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    cnfExpch( locator_c, locator, DAT__SZLOC );
    
 /* Free allocated string memory.                             */
-   cnfFree( file_c );
+   free( file_c );
 }
 
 F77_SUBROUTINE(hds_open)( CHARACTER(file),
@@ -2286,7 +2286,7 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
    cnfExpch( locator_c, locator, DAT__SZLOC );
    
 /* Free allocated string memory.                             */
-   cnfFree( file_c );
+   free( file_c );
 }
 
 F77_SUBROUTINE(hds_show)( CHARACTER(topic),
@@ -2310,7 +2310,7 @@ F77_SUBROUTINE(hds_show)( CHARACTER(topic),
    hdsShow( topic_c, status);
 
 /* Free allocated string memory.                             */
-   cnfFree( topic_c );
+   free( topic_c );
 }
 
 F77_SUBROUTINE(hds_state) (int *state,
@@ -2389,7 +2389,7 @@ F77_SUBROUTINE(hds_tune) ( CHARACTER(param_str),
    hdsTune( param_str_c, value, status );
    
 /* Free allocated string memory.                             */
-   cnfFree( param_str_c );
+   free( param_str_c );
 }
 
 F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
@@ -2425,8 +2425,8 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
    cnfExpch( locator_c, locator, DAT__SZLOC );
       
 /* Free allocated string memory.                             */
-   cnfFree( fspec_c );
-   cnfFree( mode_c );
+   free( fspec_c );
+   free( mode_c );
 }
 
 /*=================================================================*/

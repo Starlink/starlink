@@ -4,6 +4,7 @@
  *
  *  Fortran callable routine
 */
+#include <stdlib.h>
 #include "ems.h"                       /* ems_ function prototypes */
 #include "ems_par.h"                   /* EMS constatnts           */
 #include "f77.h"                       /* CNF macros and prototypes */
@@ -25,6 +26,6 @@ F77_SUBROUTINE(ems_rep) ( CHARACTER(err), CHARACTER(text), INTEGER(status)
 
    emsRep( cerr, ctext, status);
 
-   cnfFree( ctext );
+   free( ctext );
    return;
 }
