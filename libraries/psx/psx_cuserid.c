@@ -86,6 +86,10 @@
 *        Add check for GetUserName function. This is the equivalent
 *        for Windows and MinGW. Should only try to use this when all others
 *        have failed.
+*     19-SEP-2005 (TIMJ):
+*        Cache result after first call. This helps NDF history writing
+*        which makes extensive use of PSX_CUSERID. Assumes that the
+*        user ID does not change.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +105,7 @@
 #include <config.h>
 #include <stdlib.h>
 #include <stdio.h>		 /* Standard I/O routines		    */
+#include <string.h>
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 
@@ -136,6 +141,14 @@ extern char *cuserid( const char *);
 #  endif
 #endif
 
+/* Cache storage to minimize system calls. This routine is used
+   a lot by NDF when history writing is enabled and we can assume
+   that the information is invariant between calls within a single
+   process.
+*/
+static char user_cache[L_cuserid];
+static char *user_cache_ptr = NULL;
+
 F77_SUBROUTINE(psx_cuserid)( CHARACTER(user), INTEGER(status) TRAIL(user) )
 {
 
@@ -168,59 +181,68 @@ F77_SUBROUTINE(psx_cuserid)( CHARACTER(user), INTEGER(status) TRAIL(user) )
 
 /* Get the username.							    */
 
+/* Only try a system call if user_cache is not defined                      */
+   if ( user_cache_ptr == NULL ) {
+
 /* Use getpwuid(geteuid) if we have it, else use getlogin, else use cuserid.
    Try using LOGNAME environment variable as last resort.
  */
 
 #ifdef USE_GETPWUID
-   pw = getpwuid( geteuid() );
-   p_tempuser = pw->pw_name;
+     pw = getpwuid( geteuid() );
+     p_tempuser = pw->pw_name;
 #endif
 
 #ifdef USE_GETLOGIN
-   p_tempuser = getlogin();
+     p_tempuser = getlogin();
 #endif
 
 #ifdef USE_CUSERID
 /* Try twice with cuserid since on some linux system uses NIS+ there
    can be a delay which will cause an initial failure */
-   p_tempuser = cuserid( tempuser );
-   if ( p_tempuser == NULL ) {
-      p_tempuser = cuserid( tempuser );
-   }
+     p_tempuser = cuserid( tempuser );
+     if ( p_tempuser == NULL ) {
+       p_tempuser = cuserid( tempuser );
+     }
 #endif
 
 #ifdef USE_GETUSERNAME
    /* Use Windows function when operating under MinGW */
-   p_tempuser = tempuser;
-   if ( ! GetUserName( tempuser, &len ) ) {
+     p_tempuser = tempuser;
+     if ( ! GetUserName( tempuser, &len ) ) {
        p_tempuser = NULL;
-   }
+     }
 #endif
 
 #if HAVE_GETENV
    /* Use LOGNAME then USER env var if we do not have a string */
-   if (p_tempuser == NULL) {
+     if (p_tempuser == NULL) {
      /* do not use PSX_GETENV since we only want to use a simple
 	command without lots of temp char arrays */
-     p_tempuser = getenv( "LOGNAME");
-     if (p_tempuser == NULL) {
-       p_tempuser = getenv( "USER" );
+       p_tempuser = getenv( "LOGNAME");
+       if (p_tempuser == NULL) {
+	 p_tempuser = getenv( "USER" );
+       }
      }
-   }
 #endif
 
    /* Last gasp protection from NULL pointer */
    /* If we got a NULL value, just copy in empty string */
-   if (p_tempuser == NULL ) {
-     tempuser[0] = '\0';
-     p_tempuser = tempuser;
-   }
+     if (p_tempuser == NULL ) {
+       tempuser[0] = '\0';
+       p_tempuser = tempuser;
+     }
+
+     /* Store p_tempuser in the cache and set static pointer */
+     strncpy( user_cache, p_tempuser, L_cuserid );
+     user_cache_ptr = user_cache;
+
+   } /* Cache check */
 
 /* Export the username to the Fortran string user.
    if we have a value.
 */
 
-   cnfExprt( p_tempuser, user, user_length );
+   cnfExprt( user_cache, user, user_length );
 
 }
