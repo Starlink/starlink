@@ -79,7 +79,7 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 /* Fill the rest of the output FORTRAN string with blanks.		    */
 
    if (clen < dest_len) {
-     ncpy = dest_len - clen + 1;
+     ncpy = dest_len - clen;
      memset( &dest_f[clen], ' ', ncpy );
    }
 }
