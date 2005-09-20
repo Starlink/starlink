@@ -65,43 +65,43 @@ check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
 	test_remove test_access
 
 psx_test_SOURCES = psx_test.f
-psx_test_LDADD = `$(srcdir)/psx_link`
+psx_test_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_alloc_SOURCES = test_alloc.f
-test_alloc_LDADD = `$(srcdir)/psx_link`
+test_alloc_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_cuserid_SOURCES = test_cuserid.f
-test_cuserid_LDADD = `$(srcdir)/psx_link`
+test_cuserid_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_getenv_SOURCES = test_getenv.f
-test_getenv_LDADD = `$(srcdir)/psx_link`
+test_getenv_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_getpid_SOURCES = test_getpid.f
-test_getpid_LDADD = `$(srcdir)/psx_link`
+test_getpid_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_getuid_SOURCES = test_getuid.f
-test_getuid_LDADD = `$(srcdir)/psx_link`
+test_getuid_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_putenv_SOURCES = test_putenv.f
-test_putenv_LDADD = `$(srcdir)/psx_link`
+test_putenv_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_rand_SOURCES = test_rand.f
-test_rand_LDADD = `$(srcdir)/psx_link`
+test_rand_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_remove_SOURCES = test_remove.f
-test_remove_LDADD = `$(srcdir)/psx_link`
+test_remove_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_term_SOURCES = test_term.f
-test_term_LDADD = `$(srcdir)/psx_link`
+test_term_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_time_SOURCES = test_time.f
-test_time_LDADD = `$(srcdir)/psx_link`
+test_time_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_uname_SOURCES = test_uname.f
-test_uname_LDADD = `$(srcdir)/psx_link`
+test_uname_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_access_SOURCES = test_access.f
-test_access_LDADD = `$(srcdir)/psx_link`
+test_access_LDADD = libpsx.la `ems_link` `cnf_link`
 
 dist_starnews_DATA = psx.news
 
