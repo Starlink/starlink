@@ -44,6 +44,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     DLT: David Terrett (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,9 @@
 *     23-JUN-2000 (AJC):
 *        Tidy refs to CNF routines
 *        Remove refs to VMS in prologue
+*     19-SEP-2005 (TIMJ):
+*        Should use 'free' not 'cnfFree' when freeing string returned
+*        by cnfCreim.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,7 +100,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
    
 /* Local Variables:							    */
 
-   char *temp_name;		 /* Pointer to local copy of name 	    */
+   char *temp_name;     	 /* Pointer to local copy of name 	    */
    char *ptr;			 /* Pointer to environment variable	    */
    char *errmsg_p;		 /* Pointer to complete error message	    */
 #if defined(vms)
@@ -135,7 +139,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 
 /* Free the temporary space.						    */
 
-      cnfFree( temp_name );
+      free( temp_name );
 
    }
 
@@ -159,7 +163,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
       strcat( errmsg_p, "\"" );
       psx1_rep_c( "PSX_GETENV_NOENV", errmsg_p, status );
       free( errmsg_p );
-      cnfFree( temp_name );
+      free( temp_name );
    }
 
 

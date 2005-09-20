@@ -47,6 +47,9 @@
 *    10-APR-2003 (AJC):
 *      Cosmetic changes
 *      Improved error reporting - PSX status etc
+*    20-SEP-2005 (TIMJ):
+*      Use free rather than cnfFree when using cnfCreim.
+*      Fix potential memory leak.
 
 *  Notes:
 *    Uses the setenv() function where available. If setenv()
@@ -141,15 +144,17 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
          *status = PSX__NOMEM;
       }
 
-  /* Free temp storage */
-      cnfFree( temp_name );
-      cnfFree( temp_value );
-  
    } else {
   /* No memory for input arguments */
       *status = PSX__NOMEM;
    }
-   
+
+  /* Free temp storage */
+   if (temp_name != NULL)
+     free( temp_name );
+   if (temp_value != NULL)
+     free( temp_value );
+
    if( *status != SAI__OK ) {
       strcpy( errmsg, "Error setting environment variable " );
       strcat( errmsg, name );
