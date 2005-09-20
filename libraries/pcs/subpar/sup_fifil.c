@@ -47,6 +47,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Correct checking of access mode
 *     10-SEP-2002 (AJC):
 *        Free C-from-Fortran strings
+*     20-SEP-2005 (TIMJ):
+*        Update CNF usage. Fix cnfFree vs free usage
 *     {enter_changes_here}
 
 *  Bugs:
@@ -123,11 +126,11 @@ struct stat statb;
 
 /* Convert given strings to C strings 
 */
-   path_c = cnf_creim( path, path_length );
-   name_c = cnf_creim( name, name_length );
-   ext_c = cnf_creim( ext, ext_length );
+   path_c = cnfCreim( path, path_length );
+   name_c = cnfCreim( name, name_length );
+   ext_c = cnfCreim( ext, ext_length );
    tmpext = malloc( strlen(ext_c) + 1 );
-   acc_c = cnf_creim( acc, acc_length );
+   acc_c = cnfCreim( acc, acc_length );
    
    if ( ( path_c != NULL )
      && ( name_c != NULL )
@@ -243,7 +246,7 @@ struct stat statb;
                               if( statb.st_mode & S_IFDIR )
                                  notfound = 1;
                               else
-                                 cnf_exprt( tmpname, file, file_length);
+                                 cnfExprt( tmpname, file, file_length);
                               }
                            }
                         free( tmpname );
@@ -305,11 +308,11 @@ struct stat statb;
       
 /* Free the imported C strings etc. - works OK even if they weren't allocated
 */
-   cnfFree( path_c );  
-   cnfFree( name_c );   
-   cnfFree( ext_c ); 
+   free( path_c );  
+   free( name_c );   
+   free( ext_c ); 
    free( tmpext ); 
-   cnfFree( acc_c );
+   free( acc_c );
  
    return;
    }

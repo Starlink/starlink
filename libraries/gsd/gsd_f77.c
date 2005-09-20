@@ -24,16 +24,19 @@
 *       Original version.
 *    16 Dec 1999 (timj):
 *       Fix prototype warning in gsdGet1b
+*    20 Sep 2005 (timj):
+*       Update CNF usage and fix cnfFree vs free usage.
 
 * Copyright:
-*    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+*    Copyright (C) 1994-2005 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
 *-
  */
 
-#include <f77.h>
-#include <cnf.h>
+#include <stdlib.h>
+#include "f77.h"
+#include "cnf.h"
 #include "gsd.h"
 
 F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
@@ -194,7 +197,7 @@ F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
 
 /* Convert given file name to C string. Open the file. Flag slot as used.
  */
-   cfile = cnf_creim( file, file_length );
+   cfile = cnfCreim( file, file_length );
    cstatus = gsdOpenRead( cfile, &cversion, clabel, &cnitem,
       &gsd_fptr[cfd], &gsd_fdsc[cfd], &gsd_idsc[cfd], &gsd_dptr[cfd] );
    if ( cstatus ) { *status = SAI__ERROR; goto abort; }
@@ -205,12 +208,12 @@ F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
    *fd = cfd + 1;
    *version = cversion;
    *no_items = cnitem;
-   (void) cnf_exprt( clabel, label, label_length );
+   cnfExprt( clabel, label, label_length );
 
 /* Return.
  */
    abort:
-   if ( cfile ) (void) cnf_free( cfile );
+   if ( cfile ) free( cfile );
    return;
 }
 
@@ -355,7 +358,7 @@ F77_SUBROUTINE(gsd_find)( INTEGER(fd), CHARACTER(name), INTEGER(number),
    extern int   gsd_used[];
 
    char  carray;     /* Arrayness       */
-   char *cname;      /* Item name       */
+   char *cname = NULL; /* Item name       */
    char  ctype;      /* Data type       */
    char  ctype2[2];  /* dto.            */
    char  cunit[11];  /* Item unit       */
@@ -378,7 +381,7 @@ F77_SUBROUTINE(gsd_find)( INTEGER(fd), CHARACTER(name), INTEGER(number),
 
 /* Convert given item name to C string. Find the item.
  */
-   cname = cnf_creim( name, name_length );
+   cname = cnfCreim( name, name_length );
    cstatus = gsdFind( gsd_fdsc[cfd], gsd_idsc[cfd], cname, &cnumber,
       cunit, &ctype, &carray );
    if ( cstatus ) { *status = SAI__ERROR; goto abort; }
@@ -389,13 +392,13 @@ F77_SUBROUTINE(gsd_find)( INTEGER(fd), CHARACTER(name), INTEGER(number),
    if ( carray ) *array = F77_TRUE; else *array = F77_FALSE;
    index[0] = *fd; index[1] = cnumber;
    ctype2[0] = ctype; ctype2[1] = '\0';
-   (void) cnf_exprt( ctype2, type, type_length );
-   (void) cnf_exprt( cunit,  unit, unit_length );
+   cnfExprt( ctype2, type, type_length );
+   cnfExprt( cunit,  unit, unit_length );
 
 /* Return.
  */
    abort:
-   if ( cname ) (void) cnf_free( cname );
+   if ( cname ) free( cname );
    return;
 }
 
@@ -499,9 +502,9 @@ F77_SUBROUTINE(gsd_item)( INTEGER(fd), INTEGER(number), CHARACTER(name),
    if ( carray ) *array = F77_TRUE; else *array = F77_FALSE;
    index[0] = *fd; index[1] = cnumber;
    ctype2[0] = ctype; ctype2[1] = '\0';
-   (void) cnf_exprt( ctype2, type, type_length );
-   (void) cnf_exprt( cunit,  unit, unit_length );
-   (void) cnf_exprt( cname,  name, name_length );
+   cnfExprt( ctype2, type, type_length );
+   cnfExprt( cunit,  unit, unit_length );
+   cnfExprt( cname,  name, name_length );
 
 /* Return.
  */
@@ -627,9 +630,9 @@ F77_SUBROUTINE(gsd_inq_size)( INTEGER(fd), INTEGER(number), INTEGER(maxdims),
 /* Convert to Fortran the names, units, values, actdims, and size.
  */
    for ( i = 0; i < cactdims; i++ )
-   {  (void) cnf_exprt( cdimnames[i],
+   {  cnfExprt( cdimnames[i],
          dimnames + i * dimnames_length, dimnames_length );
-      (void) cnf_exprt( cdimunits[i],
+      cnfExprt( cdimunits[i],
          dimunits + i * dimunits_length, dimunits_length );
       dimvals[i] = cdimvals[i];
    }
@@ -1014,7 +1017,7 @@ F77_SUBROUTINE(gsd_get0c)( INTEGER_ARRAY(index), CHARACTER(cvalue),
 
 /* Convert value.
  */
-   (void) cnf_exprt( ccvalue, cvalue, cvalue_length );
+   cnfExprt( ccvalue, cvalue, cvalue_length );
 
 /* Return.
  */
