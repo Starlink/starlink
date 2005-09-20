@@ -39,6 +39,8 @@ void cnfExpch( const char *source_c, char *dest_f, int nchars )
 
 *  Authors:
 *     AJC: A.J. Chipperfield (Starlink, RAL)
+*     PWD: Peter Draper (Starlink, University of Durham)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +54,8 @@ void cnfExpch( const char *source_c, char *dest_f, int nchars )
 *        Changed to use memmove when bcopy isn't available. Also to 
 *        just do the straight copy when neither is available (very unlikely). 
 *        Note that bcopy is deprecated in POSIX.
+*     19-SEP-2005 (TIMJ):
+*        Prefer MEMMOVE over BCOPY
 *     {enter_changes_here}
 
 *  Bugs:
@@ -64,15 +68,16 @@ void cnfExpch( const char *source_c, char *dest_f, int nchars )
 {
 /* Local Variables:							    */
 
+#if !HAVE_MEMMOVE && !HAVE_BCOPY
    int i;			 /* Loop counter			    */
-
+#endif
 
 /* Copy the characters of the input C array to the output FORTRAN string.  */
 
-#if HAVE_BCOPY
-   bcopy( (const void *)source_c, (void *)dest_f, (size_t)nchars );
-#elif HAVE_MEMMOVE
+#if HAVE_MEMMOVE
    memmove( (void *)dest_f, (const void *)source_c, (size_t)nchars );
+#elif HAVE_BCOPY
+   bcopy( (const void *)source_c, (void *)dest_f, (size_t)nchars );
 #else
 /* Do this by hand, note no overlaps allowed */
    for ( i = 0; i < nchars; i++ ) {
