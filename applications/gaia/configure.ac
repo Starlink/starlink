@@ -31,6 +31,9 @@ dnl    the cpp macro of the same name, which will do any
 dnl    initialisation which is necessary with this platform/compiler.
 STAR_INITIALISE_FORTRAN
 
+dnl    Sometimes also need to know the name of the Fortran MAIN.
+AC_FC_MAIN
+
 dnl    Define support for large files. We need to get at the 
 dnl    CFLAGS and pass these to the subsystems.
 STAR_LARGEFILE_SUPPORT
