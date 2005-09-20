@@ -19,5 +19,7 @@
 
       CALL PSX_CUSERID( NAME, STATUS )
       PRINT *,'Username is ',NAME
+      CALL PSX_CUSERID( NAME, STATUS )
+      PRINT *,'Username is still ',NAME
 
       END
