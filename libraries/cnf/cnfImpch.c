@@ -46,6 +46,8 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 
 *  Authors:
 *     AJC: A.J. Chipperfield (Starlink, RAL)
+*     PWD: Peter Draper (Starlink, University of Durham)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +61,9 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 *        Changed to use memmove when bcopy isn't available. Also to 
 *        just do the straight copy when neither is available (very unlikely). 
 *        Note that bcopy is deprecated in POSIX.
+*     19-SEP-2005 (TIMJ):
+*        Prefer memmove over bcopy.
+*        Remove double copy (bcopy was always called at least once).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,17 +76,16 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 {
 /* Local Variables:							    */
 
+#if !HAVE_MEMMOVE && !HAVE_BCOPY
    int i;			 /* Loop counter			    */
-
+#endif
 
 /* Copy the characters of the input C array to the output FORTRAN string.  */
 
-   bcopy( (const void *)source_f, (void *)dest_c, (size_t)nchars );
-
-#if HAVE_BCOPY
-   bcopy( (const void *)source_f, (void *)dest_c, (size_t)nchars );
-#elif HAVE_MEMMOVE
+#if HAVE_MEMMOVE
    memmove( (void *)dest_c, (const void *)source_f, (size_t)nchars );
+#elif HAVE_BCOPY
+   bcopy( (const void *)source_f, (void *)dest_c, (size_t)nchars );
 #else
 /* Do this by hand, note no overlaps allowed */
    for ( i = 0; i < nchars; i++ ) {
