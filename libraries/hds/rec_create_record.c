@@ -101,6 +101,12 @@ int rec_create_record( const struct HAN *par, struct RCL *rcl,
 /* Locate the free space stack.                                             */
       stk = hcb->stk;
 
+/* Set the entended format flag                                             */
+      if( hds_gl_64bit )
+            rcl->extended = 1;
+      else
+            rcl->extended = 0;
+
 /* Calculate the number of chips required for the new record and determine  */
 /* if its dynamic domain needs chaining. (If it does, then it becomes a     */
 /* pointer to a frame of Pure Data Blocks).                                 */
@@ -117,12 +123,6 @@ int rec_create_record( const struct HAN *par, struct RCL *rcl,
       rcl->parent = par->rid;
       rcl->active = 0;
       rcl->modify = 0;
-
-/* Set the entended format flag                                             */
-      if( hds_gl_64bit )
-            rcl->extended = 1;
-      else
-            rcl->extended = 0;
 
 /* Locate the parent Logical Record Block, if it exists.                    */
       chip = 0;
