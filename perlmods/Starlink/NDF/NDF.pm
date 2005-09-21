@@ -8,7 +8,6 @@ use vars qw($VERSION @ISA $AUTOLOAD %EXPORT_TAGS);
 
 #grep "dat_.*(" NDF.xs | grep -v ';' | awk -F'(' '{print $1}' | grep -v '_r$' | sort | fmt -50
 
-use Starlink::AST;
 require Exporter;
 require DynaLoader;
 require AutoLoader;
@@ -252,6 +251,7 @@ sub mem2array ($$$) {
 # AST wrappers
 #  $frameset = ndfGtwcs( $indf, $status );
 sub ndfGtwcs {
+  require Starlink::AST;
   my $buffer = ndfGtwcs_( $_[0], $_[1]);
   my @strings = split(/\n/, $buffer);
   my $chan = new Starlink::AST::Channel( 
@@ -264,6 +264,7 @@ sub ndfGtwcs {
 
 # ndfPtwcs( $wcs, $indf, $status )
 sub ndfPtwcs {
+  require Starlink::AST;
   my $wcs = shift;
   my @buffer;
   my $chan = new Starlink::AST::Channel( sink => sub { push(@buffer,$_[0]."\n")});
