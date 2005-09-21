@@ -109,6 +109,19 @@
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
 
+#elif defined(__ppc__)
+
+/*  PPC/Mac OS X running in 32 bit mode */
+#define MACHINE NATIVE
+#define BYTESWAPPED FALSE
+
+#elif defined(__ppc64__)
+
+/*  PPC/Mac OS X running in 64 bit mode */
+#define MACHINE NATIVE
+#define BYTESWAPPED FALSE
+#define LONGSIZE 64
+
 #else
 
 /*  assume machine uses the same IEEE formats as used in FITS files */
