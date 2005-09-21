@@ -7,7 +7,7 @@ $osname = $Config{osname};
 # For location of Starlink libraries and incs
 eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
-  print "Could not find Starlink::Config - using /stardev\n";
+  print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
                  Star_Inc => '/star/include',
                  Star_Lib => '/star/lib',
