@@ -56,13 +56,18 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     - The actual arguments supplied for "argv" and "argc" should
 *     normally be the standard arguments supplied to the C "main"
 *     function by the operating system.
+*     - If "argv" is created dynamically by the caller (for example
+*     building up the arguments from a dynamic language such as perl)
+*     the memory associated with "argv" should not be freed until NDF
+*     has been shut down. NDF does not copy the arguments. If you do free
+*     the arguments, expect a core dump when history writing is enabled.
 *     - If these arguments are not available, then an "argc" value of
 *     zero should be given (whereupon the "argv" value will be
 *     ignored).
 *     - Additional initialisations of the Fortran Runtime may be 
 *     required for this to work correctly. The STAR_INITIALISE_FORTRAN
-*     macro of the Starlink Build System will do this work, otherwise
-*     you need to arrange this for yourself.
+*     macro of the Starlink Build System or the cnfInitRTL function
+*     will do this work, otherwise you need to arrange this for yourself.
 *-
 */
    
