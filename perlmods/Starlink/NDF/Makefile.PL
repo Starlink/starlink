@@ -7,7 +7,7 @@ $osname = $Config{osname};
 # For location of Starlink libraries and incs
 eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
-  print "Could not find Starlink::Config - using /star\n";
+  print "Could not find Starlink::Config - using /stardev\n";
   %StarConfig = (
                  Star_Inc => '/star/include',
                  Star_Lib => '/star/lib',
@@ -27,6 +27,7 @@ $install = $StarConfig{Star_Bin};
 # This is the list of libraries required to use NDFs
 # $ndflibs = -lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a 
 $ndflibs = qx/ndf_link/;
+$cnfrtllibs = qx/cnfrtl_link/;
 
 die "No NDF libraries were found.\n This may imply that the ndf_link command is not in your path." if $ndflibs !~ /./;
 
@@ -87,7 +88,10 @@ $starlibs = "-L$StarConfig{Star_Lib}";
 # Uncomment this if you are explicitly linking with libarrays
 # $arrays = "-Larrays -larrays";
 
-$libs = "$starlibs $ndflibs $arrays $fortranlibs";
+$libs = "$starlibs $ndflibs $cnfrtllibs $arrays $fortranlibs";
+
+# If cnfrtllibs is undefined, assume we have an old CNF
+$defines = "-DHAVE_OLD_CNF" if !$cnfrtllibs;
 
 WriteMakefile(
     'INSTALLBIN'=> $install,

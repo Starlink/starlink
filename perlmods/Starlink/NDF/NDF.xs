@@ -24,6 +24,7 @@ extern "C" {
 
 /* C interface to NDF */
 #include "ndf.h"
+#include "f77.h"
 
 /* For AST object creation */
 #include "ast.h"
@@ -89,23 +90,22 @@ extern "C" {
 
 #define NDF__SZHIS   72
 
+/* Dummy mains required for some fortran compilers */
 
-/* This is here for linux when building the sharable library */
-/* libf2c seems to want it */
-
+void MAIN_ () {
+   /* Cheat to define MAIN__ symbol */
+   croak("This should never happen");
+}
 void MAIN__ () {
    /* Cheat to define MAIN__ symbol */
    croak("This should never happen");
 }
 
-/* This is to prevent a call to getarg_ on the alpha */
-/* It seems that the alpha routine has a segmentation violation when */
-/* called from a C main() */
+/* Copy perl's ARGV variable into argc/argv as used by NDF and CNF
+   to initialise the Fortran runtime. */
 
-/* Comment this out if it clashes with your fortran version */
-/* This code is called whenever the HISTORY component is updated */
+#include "getarg.c"
 
-#include "getarg.c" 
 
 
 /* Setup typedefs for the C to Fortran conversion */
@@ -141,7 +141,11 @@ typedef char locator;
 static STRLEN  datszloc = DAT__SZLOC;
 static locator datroot[DAT__SZLOC]  = DAT__ROOT;
 
-
+/* Variables used in the BOOT section */
+/* pargv can not be free since ndfInit does not copy the argument */
+static char **pargv = NULL;
+static int  pargc = 0;
+int  arg_status = SAI__OK;
 
 /* max size of our strings */
 #define FCHAR 512       /* Size of Fortran character string */
@@ -435,6 +439,17 @@ static void astsink(  void (*sink)(const char *), const char *line ) {
  
  
 MODULE = NDF    PACKAGE = NDF
+
+BOOT:
+   /* We need to initialise the fortran run time and NDF
+       First though we need to get the perl arguments, which
+       can not be freed until ndf has shut down.
+   */
+   perl2argv( &pargc, &pargv );
+#ifndef HAVE_OLD_CNF
+   cnfInitRTL(pargc, pargv);
+#endif
+   ndfInit( pargc, pargv, &arg_status );
 
 # Locator constants
 
