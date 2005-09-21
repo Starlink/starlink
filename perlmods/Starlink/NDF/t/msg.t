@@ -87,7 +87,7 @@ foreach my $tok (keys %tokens) {
   eval "msg_fmt$tok('$tok', '$tokfmt{$tok}','$tokens{$tok}');";
   die "Error processing msg_fmt$tok : $@" if $@;
   msg_load($tok, "^$tok", my $opstr, my $oplen, $status);
-  is($opstr, $tokans{$tok},"compare tokens");
+  is($opstr, $tokans{$tok},"compare tokens [$tok: format $tokens{$tok} as $tokfmt{$tok}]");
 }
 
 # Tuning
