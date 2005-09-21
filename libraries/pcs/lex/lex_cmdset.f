@@ -154,8 +154,8 @@
       CALL LEX_SET(25,TABLE,BRACKET,C0,C127,BRACKET,0,F,T,F,F,' ',
      : S)
       CALL LEX_SET(25,TABLE,BRACKET,')',')',NAME,0,F,T,F,F,' ',S)
-      CALL LEX_SET(25,TABLE,BRACKET,' ',' ',PAR,LEX__NAME,F,F,F,F,' ',S)  
-      CALL LEX_SET(25,TABLE,BRACKET,C9,C9,PAR,LEX__NAME,F,F,F,F,' ',S)  
+      CALL LEX_SET(25,TABLE,BRACKET,' ',' ',PAR,LEX__NAME,F,F,F,F,' ',S)
+      CALL LEX_SET(25,TABLE,BRACKET,C9,C9,PAR,LEX__NAME,F,F,F,F,' ',S)
 
 *  LIT state  -  processing a literal string, a ' character
 *                causes transition to QUOTE state
@@ -274,7 +274,7 @@
       CALL LEX_SET(25,TABLE,ABRACKET,C0,C127,ABRACKET,0,F,T,F,F,' ',
      : S)
       CALL LEX_SET(25,TABLE,ABRACKET,')',')',AMBIG,0,F,T,F,F,' ',S)
-      CALL LEX_SET(25,TABLE,ABRACKET,' ',' ',0,LEX__AMBIG,F,F,F,F,' ',S)  
+      CALL LEX_SET(25,TABLE,ABRACKET,' ',' ',0,LEX__AMBIG,F,F,F,F,' ',S)
       CALL LEX_SET(25,TABLE,ABRACKET,C9,C9,0,LEX__AMBIG,F,F,F,F,' ',S)  
 
 *  ARRAY state - first array component expected
