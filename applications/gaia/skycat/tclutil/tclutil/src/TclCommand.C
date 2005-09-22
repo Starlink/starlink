@@ -84,7 +84,7 @@ TclCommand::TclCommand(Tcl_Interp* interp, const char* cmdname, const char* inst
 TclCommand::~TclCommand() 
 {
     free((char*)cmdname_);
-    delete instname_; 
+    delete[] instname_; 
     instname_ = NULL;
 }
 

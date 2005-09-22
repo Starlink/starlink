@@ -107,7 +107,7 @@ LookupTableRep::LookupTableRep(int size)
  */
 LookupTableRep::~LookupTableRep() 
 {
-    delete lookup_;
+    delete[] lookup_;
 }
 
 

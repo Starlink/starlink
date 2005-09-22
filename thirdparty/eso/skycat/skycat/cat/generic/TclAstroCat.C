@@ -1852,17 +1852,17 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
     for (int row = 0; row < nrows; row++) {
 	if (tab.get(row, 0, xyvalues[n=row*2]) != 0 
 	    || tab.get(row, 1, xyvalues[++n]) != 0) {
-	    delete xyvalues;
+	    delete[] xyvalues;
 	    return TCL_ERROR;
 	}
     }
 
     if (Blt_GraphElement(interp_, graph, elem, nvalues, xyvalues, 
 			 argv[3], argv[4]) != TCL_OK) {
-	delete xyvalues;
+	delete[] xyvalues;
 	return TCL_ERROR;
     }
-    delete xyvalues;
+    delete[] xyvalues;
 
     return set_result(nrows);
 }
@@ -1978,7 +1978,7 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 
     if (rows)
 	free(rows);		// free split list of rows
-    delete os.str();		// free generated tab table buffer
+    delete[] os.str();		// free generated tab table buffer
 
     return status;
 }

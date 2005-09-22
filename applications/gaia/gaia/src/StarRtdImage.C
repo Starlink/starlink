@@ -664,10 +664,10 @@ int StarRtdImage::loadFile()
     char *slice;
     char *path;
     if ( parseName( file(), &name, &fitsext, &slice, &path ) != TCL_OK ) {
-        if ( name ) delete name;
-        if ( fitsext ) delete fitsext;
-        if ( slice ) delete slice;
-        if ( path ) delete path;
+        if ( name ) delete[] name;
+        if ( fitsext ) delete[] fitsext;
+        if ( slice ) delete[] slice;
+        if ( path ) delete[] path;
         return error( file(), " is not an image" );
     }
 
@@ -676,10 +676,10 @@ int StarRtdImage::loadFile()
 
     //  Release resources and return an error if image couldn't be
     //  created for some reason.
-    delete name;
-    if ( fitsext ) delete fitsext;
-    if ( slice ) delete slice;
-    if ( path ) delete path;
+    delete[] name;
+    if ( fitsext ) delete[] fitsext;
+    if ( slice ) delete[] slice;
+    if ( path ) delete[] path;
     if (! image ) {
         return TCL_ERROR;
     }
@@ -2456,10 +2456,10 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
     char *slice;
     char *path;
     if ( parseName( argv[0], &name, &fitsext, &slice, &path ) != TCL_OK ) {
-        if ( name ) delete name;
-        if ( fitsext ) delete fitsext;
-        if ( slice ) delete slice;
-        if ( path ) delete path;
+        if ( name ) delete[] name;
+        if ( fitsext ) delete[] fitsext;
+        if ( slice ) delete[] slice;
+        if ( path ) delete[] path;
         return error( argv[0], " is not an image" );
     }
 
@@ -2467,10 +2467,10 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
     // XXX this is a very inefficient way to get at WCS information, but
     // at least it's general.
     ImageData* newimage = getStarImage( name, fitsext, slice, path );
-    delete name;
-    if ( fitsext ) delete fitsext;
-    if ( slice ) delete slice;
-    if ( path ) delete path;
+    delete[] name;
+    if ( fitsext ) delete[] fitsext;
+    if ( slice ) delete[] slice;
+    if ( path ) delete[] path;
     if ( ! newimage ) {
         return TCL_ERROR;
     }
@@ -3642,18 +3642,18 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
     //  Convert the index/value and x/y pairs into Blt vectors.
     if ( Blt_GraphElement( interp_, argv[0], argv[1], numValues*2,
                            ivvalues, argv[7], argv[8]) != TCL_OK ) {
-        delete xyvalues;
-        delete ivvalues;
+        delete[] xyvalues;
+        delete[] ivvalues;
         return TCL_ERROR;
     }
     if ( Blt_GraphElement( interp_, argv[0], argv[1], numValues*2,
                            xyvalues, argv[9], argv[10] ) != TCL_OK ) {
-        delete xyvalues;
-        delete ivvalues;
+        delete[] xyvalues;
+        delete[] ivvalues;
         return TCL_ERROR;
     }
-    delete xyvalues;
-    delete ivvalues;
+    delete[] xyvalues;
+    delete[] ivvalues;
 
     return set_result(numValues);
 }
@@ -5056,23 +5056,23 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         //  Check that name is a file, if so nothing to do except to check
         //  that it is a regular file.
         if ( ! fileExists( *fullname ) ) {
-            delete *fullname;
+            delete[] *fullname;
             *fullname = NULL;
-            delete *slice;
+            delete[] *slice;
             *slice = NULL;
-            delete *path;
+            delete[] *path;
             *path = NULL;
             return error( imagename, " cannot be accessed" );
         } else {
             if ( ! haveslice ) {
-                delete *slice;
+                delete[] *slice;
                 *slice = NULL;
             }
             if ( ! havefitsext ) {
-                delete *fitsext;
+                delete[] *fitsext;
                 *fitsext = NULL;
             }
-            delete *path;
+            delete[] *path;
             *path = (char *) NULL;
             return TCL_OK;
         }
@@ -5087,14 +5087,14 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
             //  but ultimately means this will be accessed as an NDF.
             if ( fileExists( *fullname ) ) {
                 if ( ! haveslice ) {
-                    delete *slice;
+                    delete[] *slice;
                     *slice = NULL;
                 }
                 if ( ! havefitsext ) {
-                    delete *fitsext;
+                    delete[] *fitsext;
                     *fitsext = NULL;
                 }
-                delete *path;
+                delete[] *path;
                 *path = NULL;
                 return TCL_OK;
             }
@@ -5118,21 +5118,21 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         }
     }
     if ( found ) {
-        delete *fitsext;
+        delete[] *fitsext;
         *fitsext = NULL;
         if ( ! haveslice ) {
-            delete *slice;
+            delete[] *slice;
             *slice = NULL;
         }
         return TCL_OK;
     } else {
-        delete *fullname;
+        delete[] *fullname;
         *fullname = NULL;
-        delete *fitsext;
+        delete[] *fitsext;
         *fitsext = NULL;
-        delete *slice;
+        delete[] *slice;
         *slice = NULL;
-        delete *path;
+        delete[] *path;
         *path = NULL;
         return error( imagename, " cannot be accessed" );
     }

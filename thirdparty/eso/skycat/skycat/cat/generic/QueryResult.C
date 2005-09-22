@@ -167,7 +167,7 @@ int QueryResult::circularSearch(
 
     os << ends;
     int status = init(numCols_, colNames_, os.str(), maxRows);
-    delete os.str();
+    delete[] os.str();
     return status;
     
     return 0;

@@ -114,8 +114,10 @@ HTTP::~HTTP()
 {
     if (fd_ >= 0) 
 	close(fd_);
-    if (resultGC_) 
-	delete resultGC_;
+    if (resultGC_) {
+	delete[] resultGC_;
+        resultGC_ = NULL;
+    }
     reset();
 }
 
@@ -768,7 +770,7 @@ int HTTP::get(const char* url)
 char* HTTP::get(const char* url, int& nlines, int freeFlag)
 {
     if (resultGC_) {
-	delete resultGC_;
+	delete[] resultGC_;
 	resultGC_ = resultBuf_ = resultPtr_ = NULL;
     }
 

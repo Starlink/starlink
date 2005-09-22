@@ -777,7 +777,7 @@ RtdImage::~RtdImage()
     }
 
     if (pixTab_) {
-	delete pixTab_;
+	delete[] pixTab_;
 	pixTab_ = NULL;
     }
 
@@ -3369,7 +3369,7 @@ int RtdImage::cmapCmd(int argc, char* argv[])
 	 ColorMapInfo::list(os);
 	 os << ends;
 	 set_result(os.str());
-	 delete os.str();
+	 delete[] os.str();
 	 return TCL_OK;
      }
      if (strcmp(argv[0], "private") == 0) {
@@ -3434,7 +3434,7 @@ int RtdImage::ittCmd(int argc, char* argv[])
 	 ITTInfo::list(os);
 	 os << ends;
 	 set_result(os.str());
-	 delete os.str();
+	 delete[] os.str();
 	 return TCL_OK;
     }
 
@@ -3817,7 +3817,7 @@ int RtdImage::graphdistCmd(int argc, char* argv[])
     else
 	status = error("all image pixels have the same value");
 #ifndef __GNUC__
-    delete xyvalues;
+    delete[] xyvalues;
 #endif
     return status;
 }
@@ -4141,10 +4141,10 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
     int numValues = image_->getSpectrum(xyvalues, x0, y0, x1, y1);
     assert(numValues <= dist);
     if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2, xyvalues, argv[7], argv[8]) != TCL_OK) {
-	delete xyvalues;
+	delete[] xyvalues;
 	return TCL_ERROR;
     }
-    delete xyvalues;
+    delete[] xyvalues;
     return set_result(numValues);
 }
 
@@ -4241,7 +4241,7 @@ int RtdImage::fitsCmd(int argc, char* argv[])
             STRSTD::ostrstream os;
 	    image_->getFitsHeader(os);
 	    set_result(os.str());
-	    delete os.str();
+	    delete[] os.str();
 	    return TCL_OK;
 	}
 
@@ -4907,7 +4907,7 @@ int RtdImage::colorrampCmd(int argc, char* argv[])
 	p[i] = (int)(i * scale);
     }
     for (int j = 0; j < h; j++) {
-	memcpy(p+(j*w), p, w);
+	memmove(p+(j*w), p, w);
     }
     if (image_)
 	delete image_;
@@ -5261,7 +5261,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
 	pixTabCols_ = ncols;
 
 	if (pixTab_)
-	    delete pixTab_;
+	    delete[] pixTab_;
 
 	// generate an array of pixel values with left and right headings
 	// for the x/y coordinates
@@ -5271,7 +5271,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
     }
     else if (strcmp(argv[0], "stop") == 0) {
 	if (pixTab_)
-	    delete pixTab_;
+	    delete[] pixTab_;
 	pixTab_ = NULL;
     }
     else {

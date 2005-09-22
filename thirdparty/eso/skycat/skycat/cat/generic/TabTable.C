@@ -182,15 +182,15 @@ int TabTable::init(int numCols, char** colNames, const char* buf,
 int TabTable::clear()
 {
     if (table_) {
-	delete table_;
+	delete[] table_;
 	table_ = NULL;
     }
     if (index_) {
-	delete index_;
+	delete[] index_;
 	index_ = NULL;
     }
     if (colNames_) {
-	delete colNames_;
+	delete[] colNames_;
 	colNames_ = NULL;
     }
     numCols_ = 0;
@@ -549,7 +549,7 @@ int TabTable::insert(const char* filename, int col)
     for (row = 0; row < numRows_; row++)
 	if (!insertedRow[row])
 	    printRow(os, row);
-    delete insertedRow;
+    delete[] insertedRow;
         
     // make a backup file and rename the tmpfile to the original
     char bakfile[1024];
@@ -832,7 +832,7 @@ int TabTable::search(istream& is, int numSearchCols, char** searchCols,
 
     os << ends;
     int status = init(numCols_, colNames_, os.str(), maxRows);
-    delete os.str();
+    delete[] os.str();
     return status;
 }
 
@@ -872,7 +872,7 @@ int TabTable::search(const TabTable& table, int numSearchCols, char** searchCols
 
     os << ends;
     int status = init(numCols_, colNames_, os.str(), maxRows);
-    delete os.str();
+    delete[] os.str();
     return status;
 }
 
@@ -1139,7 +1139,7 @@ int TabTable::head(istream& is, TabTable& t)
     }
     os << ends;
     int status = t.init(os.str());
-    delete os.str();
+    delete[] os.str();
     return status;
 }
 

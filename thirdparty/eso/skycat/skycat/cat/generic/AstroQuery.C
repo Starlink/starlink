@@ -79,15 +79,15 @@ AstroQuery::~AstroQuery()
     if (id_)
 	free(id_);
     if (colNames_)
-	delete(colNames_);
+	delete[] colNames_;
     if (sortCols_)
-	delete sortCols_;
+	delete[] sortCols_;
     if (searchCols_)
-	delete searchCols_ ;
+	delete[] searchCols_ ;
     if (minValues_)
-	delete minValues_;
+	delete[] minValues_;
     if (maxValues_)
-	delete maxValues_;
+	delete[] maxValues_;
 
 }
 

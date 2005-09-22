@@ -1442,7 +1442,7 @@ int Skycat::hduCmdList(int argc, char** argv, FitsIO* fits)
 	    os << ends;
 	    set_result(os.str());
 	}
-	delete os.str();
+	delete[] os.str();
 	fits->setHDU(curHDU);
     }
     return status;

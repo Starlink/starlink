@@ -356,7 +356,7 @@ MemRep::~MemRep()
     else if (m_map != 0) {	// mmap file
 	if (owner && m_map->filename())
 	    unlink(m_map->filename()); // if we are the owner, rm the file now
-	delete m_map;
+	if(m_map) delete m_map;
     }
     else if (ptr) {		// must be using plain memory
        if (newmem && owner) {
