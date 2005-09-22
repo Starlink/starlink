@@ -119,7 +119,10 @@ typedef void AstEllipse;
 #define RATE_HAS_SECOND_DERIVATIVE 1
 #endif
 
-
+#if ( (AST_MAJOR_VERS == 4 && AST_MINOR_VERS >= 1) || AST_MAJOR_VERS >= 5 )
+#define HASMAPSPLIT
+#else
+#endif
 
 
 
