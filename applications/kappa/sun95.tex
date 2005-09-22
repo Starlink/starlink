@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.31}
 \newcommand{\stardocnumber}    {95.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2005 August 26}
+\newcommand{\stardocdate}      {2005 September 22}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -9875,25 +9875,25 @@ applications, however, have NDF parameters which are explicitly described
 in the reference section of this document as being associated with a
 \emph{group} of NDFs.  An example is WCSALIGN which has a parameter IN
 to read a \emph{group} of NDFs that are to be aligned with each
-other. Such applications process all the specified NDFs in a single
-invocation. For the purposes of the multiple invocation scheme described
+other.  Such applications process all the specified NDFs in a single
+invocation.  For the purposes of the multiple invocation scheme described
 above, such parameters are not considered to be `NDF' parameters, and
 will not cause the application to be re-run.
 
 \subsection{What about the other Parameters?}
 When an application is re-run to process multiple data files, all the
 parameters not associated with NDFs or positions lists retain their
-values from one invocation to the next. So, for instance, the assignment
+values from one invocation to the next.  So, for instance, the assignment
 for the MODE Parameter in the earlier \htmlref{DISPLAY}{DISPLAY} example is
 retained and used for all subsequent invocations of the application, you
 are not prompted for a new value each time the application runs.
 
 This is usually what you want, but beware that there \emph{are} times
-when this behaviour may trip you up. Sometimes an application may prompt
+when this behaviour may trip you up.  Sometimes an application may prompt
 for a new parameter value while in the middle of processing a group of
 NDFs.  This can occur for instance, if the initial value you supplied on
 the first invocation is inappropriate for the NDF currently being
-processed. For instance, supposing you use \htmlref{WCSFRAME}{WCSFRAME}
+processed.  For instance, supposing you use \htmlref{WCSFRAME}{WCSFRAME}
 to set the current co-ordinate Frame to SKY for a group of NDFs.  To do
 this, you would set the FRAME Parameter to SKY either on the command line
 or when prompted during the first invocation.  This value would be
@@ -9901,7 +9901,7 @@ retained for subsequent invocations, but what happens if one of the NDFs
 does not have a SKY Frame defined in its \htmlref{WCS component}{apndf:wcs}? 
 Not surprisingly,
 you get an error message identifying the NDF, and you are asked to supply a
-new value for FRAME. You could, for instance supply {\tt PIXEL} as the new
+new value for FRAME.  You could, for instance supply {\tt PIXEL} as the new
 value.  This changes the current value of the FRAME parameter to PIXEL,
 and this value will consequently be used for any remaining NDFs.
 
@@ -9910,11 +9910,11 @@ the first invocation will be re-used for all subsequent invocations. Note
 that the default value for some parameters (for instance the CENTRE
 parameter of the DISPLAY command) is the null value {\tt{!}}.  This is
 usually interpreted as a request for the application to find an
-appropriate value itself for the parameter. In these cases, the parameter
+appropriate value itself for the parameter.  In these cases, the parameter
 \emph{value} is {\tt{!}} and is re-used on all invocations, resulting in the
 application finding and using a potentially different value on each
 invocation. So, for instance, the above DISPLAY example will find and use
-an appropriate CENTRE value for each displayed image. If you want to use
+an appropriate CENTRE value for each displayed image.  If you want to use
 the same CENTRE value for all images you should specify it explicitly on
 the command line, for instance:
 
@@ -9929,7 +9929,7 @@ If you tried out the examples at the start of this section, you may be
 wondering what happened about the output parameters for STATS.  The
 \htmlref{STATS}{STATS} application writes the various statistics it
 calculates to lots of output parameters which can be used by subsequent
-applications. If an application is re-run several times to process
+applications.  If an application is re-run several times to process
 different data files then the values left in the application's output
 parameters will be the values created on the \emph{last} invocation of the
 application.
@@ -9949,15 +9949,15 @@ the user. Examples are the INIT parameter of \htmlref{CENTROID}{CENTROID}
 and the OPTION parameter of \htmlref{SETEXT}{SETEXT}. Remembering that
 parameters which are not associated with either an NDF or a positions
 list retain their values between invocations, it is not surprising that
-care is needed when using such application to process groups of NDFs. For
-instance, when using CENTROID you supply a null parameter value
-(\emph{i.e.} a single exclamation mark {\tt{!}}) as the final value for the
-INIT parameter to indicate that you do not wish to find any more
+care is needed when using such application to process groups of NDFs. 
+For instance, when using CENTROID you supply a null parameter value
+(\emph{i.e.} a single exclamation mark {\tt{!}}) as the final value for
+the INIT parameter to indicate that you do not wish to find any more
 centroids. Since parameter values are retained between invocations when
 processing groups of NDFs, this null value becomes the first value to be
 used by any subsequent invocation.  The next invocation of CENTROID finds
 INIT set to a null value, assumes that no more centroids are to be found,
-and exits immediately! The same goes for all subsequent invocations until
+and exits immediately!  The same goes for all subsequent invocations until
 the group of NDFs has been exhausted.
 
 The only way (currently) to avoid this behaviour is to specify the INIT
@@ -9972,8 +9972,8 @@ parameter.}
 
 Most applications which re-use one or more parameters during a single
 invocation have some similar means of indicating that you do not want to
-be prompted for a new value. For some (like CENTROID), putting the
-parameter value on the command line accomplishes this. Some others (such
+be prompted for a new value.  For some (like CENTROID), putting the
+parameter value on the command line accomplishes this.  Some others (such
 as SETEXT) have a LOOP parameter which can be set FALSE to indicate that
 parameters should not be accessed more than once.  The reference
 documentation for each command should be consulted for details.
@@ -9982,7 +9982,7 @@ documentation for each command should be consulted for details.
 Sometimes you may want to slow down the speed at which data files are
 processed. For instance, if you display several small images using a
 single DISPLAY command, you may want time to examine each image before
-moving on to the next. You can introduce a delay between invocations
+moving on to the next.  You can introduce a delay between invocations
 by setting the shell environment variable {\tt KAPPA\_LOOP\_DELAY} to the
 required delay time (in units of seconds). For instance, in the
 C-shell:
@@ -9994,8 +9994,8 @@ C-shell:
 \normalsize
 
 causes a delay of 2.5 seconds between invocations of any \KAPPA\ 
-command.  To remove the delay, you should undefined {\tt KAPPA\_LOOP\_DELAY}. In 
-C-shell:
+command.  To remove the delay, you should undefined {\tt KAPPA\_LOOP\_DELAY}. 
+In C-shell:
 
 \small
 \begin{verbatim}
@@ -10012,7 +10012,7 @@ you do not. It just depends on the application.
 
 However, it is often very useful to see the names of the files as they are 
 processed. For instance, if an error occurs processing one of the files,
-it is useful to know which file failed. If the application doesn't display
+it is useful to know which file failed.  If the application doesn't display
 this information, then you can force it to by setting the shell
 environment variable {\tt KAPPA\_REPORT\_NAMES} to an arbitrary
 value.\footnote{The actual value does not matter.} For instance, in the
@@ -12123,6 +12123,8 @@ Manages attribute values associated with the WCS component of an NDF.}
 Copies WCS information from one NDF to another.}
 \menuitem{WCSFRAME}{
 Changes the current co-ordinate Frame in the WCS component of an NDF.}
+\menuitem{WCSMOSAIC}{
+Tiles a group of NDFs using World Co-ordinate System information.}
 \menuitem{WCSREMOVE}{
 Removes co-ordinate Frames from the WCS component of an NDF.}
 \menuitem{WCSSHOW}{
@@ -12420,6 +12422,8 @@ functions as follows.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -12614,6 +12618,8 @@ WCS component of an NDF.
  Copies WCS information from one NDF to another.
 \classitem{WCSFRAME}
  Changes the current co-ordinate Frame in the WCS component of an NDF.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
 \classitem{WCSSHOW}
@@ -12683,6 +12689,8 @@ WCS component of an NDF.
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -42552,8 +42560,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A group of input NDFs (of any dimensionality).  This should be given
-         as  a comma-separated list, in which each list element can be:
+         A group of input NDFs (of any dimensionality).  This should be
+         given as a comma-separated list, in which each list element
+         can be:
 
          \ssthitemlist{
 
@@ -43511,6 +43520,319 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 \htmlref{WCSREMOVE}{WCSREMOVE}.
    }
 }
+\sstroutine{
+   WCSMOSAIC
+}{
+   Tiles a group of NDFs using World Co-ordinate System information
+}{
+   \sstdescription{
+      This application aligns and rebins a group of input NDFs into a
+      single output NDF.
+
+      The algorithm proceeds as follows.  First, the output NDF is
+      filled with zeros.  An associated array of weights (one weight for
+      each output pixel) is created and is also filled with zeros.  Each
+      input NDF is then processed in turn.  For each pixel in the
+      current input NDF, the corresponding transformed position in the
+      output NDF is found (based on the \htmlref{WCS}{apndf:wcs}
+      information in both NDFs).
+      The input pixel value is then divided up between a small group of
+      output pixels centred on this central output position.  The method
+      used for choosing the fraction of the input pixel value assigned
+      to each output pixel is determined by the METHOD and PARAMS
+      parameters.  Each of the affected output pixel values is then
+      incremented by its allocated fraction of the input pixel value.
+      The corresponding weight values are incremented by the fractions
+      used (that is, if 0.25 of an input pixel is assigned to an output
+      pixel, the weight for the output pixel is incremented by 0.25).
+      Once all pixels in the current input NDF have been rebinned into
+      the output NDF in this way, the algorithm proceeds to rebin the
+      next input NDF in the same way.  Once all input NDFs have been
+      processed, output pixels which have a weight less than the value
+      given by parameter WLIM are set bad.  The mean value in the
+      weights array (excluding those values less than WLIM) is then
+      found.  The output NDF is then normalised by dividing it by the
+      weights array.  This normalisation of the output NDF takes account
+      of any difference in the number of pixels contributing to each
+      output pixel, and also removes artifacts which may be produced by
+      aliasing between the input and output pixel grids.
+
+      If the input NDFs contain variances, then these are propagated to
+      the output.  Alternatively, output variances can be generated from
+      the spread of input values contributing to each output pixel (see
+      parameter GENVAR).
+
+      The transformations needed to produce alignment are derived from
+      the co-ordinate system information stored in the WCS components of
+      the supplied NDFs.  For each input NDF, alignment is first
+      attempted in the current \htmlref{co-ordinate Frame}{se:domains}~ 
+      of the reference NDF. If this fails, alignment is attempted in the 
+      current co-ordinate Frame of the input NDF.  If this fails, alignment
+      occurs in the pixel co-ordinate Frame.  A message indicating which Frame
+      alignment was achieved in is displayed.
+   }
+   \sstusage{
+      wcsmosaic in out lbnd ubnd ref
+   }
+   \sstparameters{
+      \sstsubsection{
+         ACC = \_REAL (Read)
+      }{
+         The positional accuracy required, as a number of pixels.  For
+         highly non-linear projections, a recursive algorithm is used in
+         which successively smaller regions of the projection are
+         fitted with a least-squares linear transformation.  If such a
+         transformation results in a maximum positional error greater
+         than the value supplied for ACC (in pixels), then a smaller
+         region is used.  High accuracy is paid for by longer run times.
+         {\tt [0.05]}
+      }
+      \sstsubsection{
+         GENVAR = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, any input variances are ignored and output variances
+         are generated based on the spread of input pixel values
+         contributing to each output pixel.  If {\tt FALSE}, the output
+         variances are based on the variances in the input NDFs, and the
+         output NDF will contain variances only if all input NDFs
+         contain variances. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         A group of input NDFs (of any dimensionality).  This should be
+         given as a comma-separated list, in which each list element
+         can be:
+
+         \ssthitemlist{
+
+            \sstitem
+            an NDF name, optionally containing wild-cards and/or regular
+            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
+
+            \sstitem
+            the name of a text file, preceded by an up-arrow character
+            {\tt "$\wedge$"}.  Each line in the text file should
+            contain a comma-separated list of elements, each of which
+            can in turn be an NDF name (with optional wild-cards,
+            \emph{etc.}), or another file specification (preceded by an
+            up-arrow).  Comments can be included in the file by
+            commencing lines with a hash character {\tt "\#"}.
+
+         }
+         If the value supplied for this parameter ends with a hyphen,
+         then you are re-prompted for further input until a value is
+         given which does not end with a hyphen.  All the NDFs given in
+         this way are concatenated into a single group.
+      }
+      \sstsubsection{
+         LBND() = \_INTEGER (Read)
+      }{
+         An array of values giving the lower pixel-index bound on each
+         axis for the output NDF.  The suggested default values just
+         encompass all the input data.  A null value ({\tt{!}}) also
+         results in these same defaults being used. {\tt [!]}
+      }
+      \sstsubsection{
+         MAXPIX = \_INTEGER (Read)
+      }{
+         A value which specifies an initial scale size in pixels for the
+         adaptive algorithm which approximates non-linear 
+         \htmlref{Mappings}{se:curframe} with piece-wise linear
+         transformations.  If MAXPIX is larger than sny
+         dimension of the region of the output grid being used, a
+         first attempt will be made to approximate the Mapping by a
+         linear transformation over the entire output region.  If a
+         smaller value is used, the output region will first be divided
+         into subregions whose size does not exceed MAXPIX pixels in any
+         dimension, and then attempts will be made at approximation.
+         {\tt [1000]}
+      }
+      \label{method:wcsmosaic}
+      \sstsubsection{
+         METHOD = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The method to use when dividing an input pixel value between a
+         group of neighbouring output pixels.  For details on these
+         schemes, see the description of \xref{AST\_REBINx}{sun210}{AST_REBINX} 
+         in \xref{SUN/210}{sun210}{}.  METHOD can take the following
+         values.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Bilinear"} -- The input pixel value is divided bi-linearly
+            between  the four nearest output pixels.  This produces smoother
+            output NDFs than the nearest-neighbour scheme, but is
+            marginally slower.
+
+            \sstitem
+            {\tt "Nearest"} -- The input pixel value is assigned completely to
+            the single nearest output pixel.
+
+            \sstitem
+            {\tt "Sinc"} -- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is
+            the pixel offset from the transformed input pixel centre, and
+            ${\rm sinc}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
+
+            \sstitem
+            {\tt "SincSinc"} -- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$
+            kernel.  This is a valuable general-purpose scheme, intermediate in
+            its visual effect on NDFs between the bilinear and nearest-neighbour 
+            schemes.
+
+            \sstitem
+            {\tt "SincCos"} -- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  
+            It gives similar results to the {\tt "Sincsinc"} scheme.
+
+            \sstitem
+            {\tt "SincGauss"} -- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel. 
+            Good results can be obtained by matching the FWHM of the
+            envelope function to the point-spread function of the
+            input data (see parameter PARAMS).
+
+            \sstitem
+            {\tt "Somb"} -- Uses the  ${\rm somb}({\pi}x)$ kernel, where
+            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel function
+            of the first kind).  This scheme is similar to the {\tt "Sinc"} scheme.
+
+            \sstitem
+            {\tt "SombCos"} -- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel. 
+            This scheme is similar to the {\tt "SincCos"} scheme.
+
+            \sstitem
+            {\tt "Gauss"} -- Uses the $e^{-kx^2}$ kernel.  The FWHM of the
+            Gaussian is given by parameter PARAMS(2), and the point at
+            which to truncate the Gaussian to zero is given by parameter
+            PARAMS(1).
+
+         }
+         All methods propagate variances from input to output, but the
+         variance estimates produced by schemes other than
+         nearest neighbour need to be treated with care since the
+         spatial smoothing produced by these methods introduces
+         correlations in the variance estimates.  Also, the degree of
+         smoothing produced varies across the NDF.  This is because a
+         sample taken at a pixel centre will have no contributions from
+         the neighbouring pixels, whereas a sample taken at the corner
+         of a pixel will have equal contributions from all four
+         neighbouring pixels, resulting in greater smoothing and lower
+         noise.  This effect can produce complex Moir\'{e} patterns in the
+         output variance estimates, resulting from the interference of
+         the spatial frequencies in the sample positions and in the
+         pixel-centre positions.  For these reasons, if you want to use
+         the output variances, you are generally safer using
+         nearest-neighbour interpolation. {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         PARAMS( 2 ) = \_DOUBLE (Read)
+      }{
+         An optional array which consists of additional parameters
+         required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+         SombCos and Gauss methods.
+
+         PARAMS( 1 ) is required by all the above schemes.  It is used
+         to specify how many output pixels on either side of the central
+         output pixel are to receive contribution from the corresponding
+         input pixel.  Typically, a value of {\tt 2} is appropriate and the
+         minimum allowed value is {\tt 1} (\emph{i.e.} one pixel on each side).  A
+         value of zero or fewer indicates that a suitable number of
+         pixels should be calculated automatically. {\tt [0]}
+
+         PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
+         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+         SincCos schemes, it specifies the number of output pixels at
+         which the envelope of the function goes to zero.  The minimum
+         value is 1.0, and the run-time default value is 2.0.  For the
+         Gauss and SincGauss scheme, it specifies the full-width at
+         half-maximum (FWHM) of the Gaussian envelope.  The minimum
+         value is 0.1, and the run-time default is 1.0. {\tt []}
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         The NDF to which all the input NDFs are to be aligned.  If a
+         null value is supplied for this parameter, the first NDF
+         supplied for parameter IN is used.
+      }
+      \sstsubsection{
+         UBND() = \_INTEGER (Read)
+      }{
+         An array of values giving the upper pixel-index bound on each
+         axis for the output NDF.  The suggested default values just
+         encompass all the input data.  A null value ({\tt{!}}) also results in
+         these same defaults being used. {\tt [!]}
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         This parameter specifies the minimum number of good pixels
+         that must contribute to an output pixel for the output pixel
+         to be valid.  Note, fractional values are allowed.  If a value
+         less than 1.0E-10 is supplied, a value of {\tt 1.0E-10} is used.
+         {\tt [1.0E-10]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsmosaic m51$*$ mosaic lbnd=! accept
+      }{
+         This example rebins all the NDFs with names starting with
+         the string {\tt "m51"} in the current directory so that they are
+         aligned with the first input NDF, and combines them all into a
+         single output NDF called mosaic.  The output NDF is just big
+         enough to contain all the pixels in all the input NDFs.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{WCS}{apndf:wcs} information (including the current 
+         co-ordinate Frame) is propagated from the reference NDF to the
+         output NDF.
+
+         \sstitem
+         \htmlref{QUALITY}{apndf:quality} is not propagated from input to output.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
+      \htmlref{WCSALIGN}{WCSALIGN},
+      \htmlref{REGRID}{REGRID};
+      \xref{CCDPACK}{sun139}{}: 
+      \xref{TRANNDF}{sun139}{TRANNDF}.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, \htmlref{VARIANCE}{apndf:variance}, 
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, 
+         \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and
+         \htmlref{HISTORY}{apndf:history} components of the input NDFs (see the
+         \htmlref{METHOD}{method:wcsmosaic} parameter for notes on the interpretation of output variances).
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic
+         \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled,
+         but the data type will be converted to one of \_INTEGER,
+         \_DOUBLE or \_REAL for processing.
+
+      }
+   }
+}
+
 \sstroutine{
    WCSREMOVE
 }{
@@ -48841,6 +49163,10 @@ The following new applications have been added:
    \item [\htmlref{INTERLEAVE}{INTERLEAVE}] \mbox{}
        Forms a higher-resolution NDF by interleaving a set of NDFs of
        the same dimensionality.
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
+       Tiles a group of NDFs using World Co-ordinate System information.
+       It is like \htmlref{WCSALIGN}{WCSALIGN} but operates on more
+       than one input frame.
 \end{description}
 
 \goodbreak
@@ -49162,6 +49488,8 @@ functions as follows.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -49354,6 +49682,8 @@ functions as follows.
  Copies WCS information from one NDF to another.
 \classitem{WCSFRAME}
  Changes the current co-ordinate Frame in the WCS component of an NDF.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
 \classitem{WCSSHOW}
@@ -49421,6 +49751,8 @@ functions as follows.
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of NDFs using WCS information.
+\classitem{WCSMOSAIC}
+ Tiles a group of NDFs using World Co-ordinate System information.
 \end{description}
 \vspace*{0.7ex}
 %
