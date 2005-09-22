@@ -41,6 +41,9 @@
 
 <authorlist>
 <author id="nxg">Norman Gray</author>
+<author id="pwd">Peter W Draper</author>
+<author id="mbt">Mark B Taylor</author>
+<author id="ser">Steven E Rankin</author>
 </authorlist>
 
 <docnumber>78</docnumber>
@@ -74,10 +77,21 @@ Research Councils</p>
 <docbody>
 
 <abstract>
-<px>An introduction to the Starlink build system.  At present, this
-document covers only the configuration and build aspects of
-the system, but it should expand to cover tagging, branching,
-and other source maintenance patterns as well.</px>
+<px>This document provides an introduction to the Starlink build
+system.  It describes how to use the Starlink versions of the GNU
+autotools (autoconf, automake and libtool), how to build the software
+set from a checkout, how to add and configure new components, and acts
+as a reference manual for the Starlink-specific autoconf macros and
+Starlink automake features.</px>
+
+<px>It does not describe the management of the CVS repository in
+detail, nor any other source maintainance patterns.</px>
+
+<px>It should be read in conjunction with the detailed build
+instructions in the <code>README</code> file at the top of the source
+tree (which takes precedence over any instructions in this document,
+though there should be no major disagreements), and with <docxref
+doc="SUN/248"/>, which additionally includes platform-specific notes.</px>
 
 <!-- XXX remove or comment this out when preparing a release version -->
 <px>This is an inter-release snapshot:
@@ -6643,7 +6657,7 @@ int main(int argc, char** argv)
 
         </subsect>
 
-        <subsect id='macro-latex-documentation' export='export'
+        <subsect id='macro-largefile-support' export='export'
           indexkey="starconf!macros!STAR_LARGEFILE_SUPPORT">
           <subhead>
             <title>STAR_LARGEFILE_SUPPORT</title>
