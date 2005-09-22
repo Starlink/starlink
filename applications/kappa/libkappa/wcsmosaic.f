@@ -105,7 +105,8 @@
 *     LBND() = _INTEGER (Read)
 *        An array of values giving the lower pixel index bound on each
 *        axis for the output NDF. The suggested default values just encompass 
-*        all the input data. []
+*        all the input data. A null value (!) also results in these same
+*        defaults being used. [!]
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -204,7 +205,8 @@
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel index bound on each
 *        axis for the output NDF. The suggested default values just encompass 
-*        all the input data. []
+*        all the input data. A null value (!) also results in these same
+*        defaults being used. [!]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels which 
 *        must contribute to an output pixel for the output pixel to be valid. 
@@ -272,6 +274,8 @@
       CHARACTER METHOD*13        ! Interpolation method to use.
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
+      INTEGER DLBND( NDF__MXDIM )! Defaults for LBND
+      INTEGER DUBND( NDF__MXDIM )! Defaults for UBND
       INTEGER EL                 ! Number of array elements mapped
       INTEGER FLAGS              ! Flags for AST_REBINSEQ
       INTEGER I                  ! Index into input and output groups
@@ -339,16 +343,27 @@
 *  This includes the default values for LBND and UBND, and the Mappings
 *  from the input PIXEL Frames to the output PIXEL Frame
       CALL PSX_CALLOC( SIZE, '_INTEGER', IPMAP, STATUS )
-      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, LBND, UBND, USEVAR,
+      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, DLBND, DUBND, USEVAR,
      :                 %VAL( CNF_PVAL( IPMAP ) ), STATUS )
 
 *  Set the default bounds for the output NDF.
-      CALL PAR_DEF1I( 'LBND', NDIM, LBND, STATUS )
-      CALL PAR_DEF1I( 'UBND', NDIM, UBND, STATUS )
+      CALL PAR_DEF1I( 'LBND', NDIM, DLBND, STATUS )
+      CALL PAR_DEF1I( 'UBND', NDIM, DUBND, STATUS )
 
-*  Get the bounds required for the output NDF.
+*  Get the bounds required for the output NDF. Use the above defaults if
+*  a null value is supplied.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       CALL PAR_EXACI( 'LBND', NDIM, LBND, STATUS )
       CALL PAR_EXACI( 'UBND', NDIM, UBND, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         DO I = 1, NDIM
+            LBND( I ) = DLBND( I )     
+            UBND( I ) = DUBND( I )     
+         END DO
+      END IF
 
 *  Get the pixel spreading method to be used.
       CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
