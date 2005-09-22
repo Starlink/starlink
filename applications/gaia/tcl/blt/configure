@@ -7079,7 +7079,7 @@ fi
     SHLIB_CFLAGS="-fPIC"
     SHLIB_LD="${CC}"
     SHLIB_SUFFIX=".so.${bltMajor}.${bltMinor}"
-    SHLIB_LD_FLAGS="-shared -Wl,-E -Wl,-soname,libBLT.so.${bltMajor}"
+    SHLIB_LD_FLAGS="${CFLAGS} -shared -Wl,-E -Wl,-soname,libBLT.so.${bltMajor}"
 
     bltLibraries="${bltLibraries} -ldl"
     LDFLAGS="-Wl,-rpath,${bltRunPath}"
