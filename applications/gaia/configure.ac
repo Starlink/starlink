@@ -42,6 +42,15 @@ if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
    export CFLAGS
 fi
 
+dnl    Check for X libraries. These should be passed on to subdirs.
+AC_PATH_X
+if test "X$x_includes" != "X"; then
+   AC_SUBST([X11_INCLUDES], [--x-includes=$x_includes])
+fi
+if test "X$x_libraries" != "X"; then
+   AC_SUBST([X11_LIBRARIES], [--x-libraries=$x_libraries])
+fi
+
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
      [ard ast cat cfitsio generic fio img pcs pda sae sla], link)
