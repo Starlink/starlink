@@ -45,10 +45,11 @@
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
+*     Tim Jenness (JAC, Hawaii)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 1995,1996,1997,1998,1999,2005 Particle Physics
+*     and Astronomy Research Council. All Rights Reserved.
 
 *  Method:
 
@@ -61,6 +62,9 @@
 *     $Id$
 *     2-AUG-1995: original version.
 *     $Log$
+*     Revision 1.7  2005/09/22 01:54:43  timj
+*     pull constants out of loops and make sure that we minimize type conversion by making SCULIB_AIRMASS use double precision
+*
 *     Revision 1.6  1999/08/19 03:37:06  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -108,13 +112,17 @@
 *  Local Constants:
       DOUBLE PRECISION PI                    !
       PARAMETER (PI = 3.14159265359D0)
+      DOUBLE PRECISION PIBY2
+      PARAMETER ( PIBY2 = PI / 2.0D0 )
 
 *  Local variables:
-      REAL             AIRMASS               !
+      DOUBLE PRECISION AIRMASS               !
       INTEGER          BOL                   ! bolometer index in DO loop
       REAL             CORRECTION            ! correction for sky opacity
+      DOUBLE PRECISION COS_LAT_OBS           ! cos(lat_obs)
       DOUBLE PRECISION HOUR_ANGLE            ! hour angle (radians)
       DOUBLE PRECISION SIN_E                 ! sin(elevation)
+      DOUBLE PRECISION SIN_LAT_OBS           ! sin(lat_obs)
       DOUBLE PRECISION Z                     ! zenith disatance (radians)
 
 *  Internal References:
@@ -127,20 +135,23 @@
 
       IF (N_BOL .GT. 0) THEN
 
+         COS_LAT_OBS = COS( LAT_OBS )
+         SIN_LAT_OBS = SIN( LAT_OBS )
+
          DO BOL = 1, N_BOL
 
 *  calculate the zenith distance and airmass of the bolometer
 
             HOUR_ANGLE = LST - BOL_RA (BOL)
-            SIN_E = SIN (LAT_OBS) * SIN (BOL_DEC(BOL)) +
-     :           COS(LAT_OBS) * COS(BOL_DEC(BOL)) * COS(HOUR_ANGLE)
-            Z = PI/2.0D0 - ASIN(SIN_E)
+            SIN_E = SIN_LAT_OBS * SIN (BOL_DEC(BOL)) +
+     :           COS_LAT_OBS * COS(BOL_DEC(BOL)) * COS(HOUR_ANGLE)
+            Z = PIBY2 - ASIN(SIN_E)
 
-            CALL SCULIB_AIRMASS (REAL(Z), AIRMASS, STATUS)
+            CALL SCULIB_AIRMASS (Z, AIRMASS, STATUS)
 
 *  and the correction for the extinction
             
-            CORRECTION = EXP (AIRMASS*TAUZ)
+            CORRECTION = EXP (REAL(AIRMASS)*TAUZ)
 
 *  correct the data
 
