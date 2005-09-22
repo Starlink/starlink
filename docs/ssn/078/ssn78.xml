@@ -900,7 +900,8 @@ AC_SUBST(wibble)
               Thus to add comments to a <code>configure.ac</code> file
               which won't make it into the <code>./configure</code>
               file, you should prefix them with the m4 <em>macro</em>
-              <code>dnl</code>, as in
+              <code>dnl</code> (which means `delete to next newline'),
+              as in
 <verbatim>
 dnl   This is a comment
 AC_INIT(...)
@@ -1143,11 +1144,11 @@ bin_SCRIPTS = start
 
 bin_MONOLITHS = sst_mon
 sst_mon_SOURCES = \
-	sst_mon.f \
-	$(sst_mon_TASKS:=.f) \
-	$(SUBSRC) \
-	$(SUBCSRC) \
-	$(PRIVATE_INCLUDES)
+    sst_mon.f \
+    $(sst_mon_TASKS:=.f) \
+    $(SUBSRC) \
+    $(SUBCSRC) \
+    $(PRIVATE_INCLUDES)
 sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
 sst_mon_LDADD = $(LDADD) `fio_link`
 
@@ -1166,14 +1167,14 @@ sstsupport_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
 # The `start' script needs to have installation locations edited into it
 edit = sed \
-	-e 's,@bindir\@,$(bindir),g' \
-	-e 's,@VERSION\@,$(VERSION),g'
+    -e 's,@bindir\@,$(bindir),g' \
+    -e 's,@VERSION\@,$(VERSION),g'
 start: start.in
-	rm -f start.tmp start
-	$(edit) \
-	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
-	    $(srcdir)/start.in >start.tmp
-	mv start.tmp start
+    rm -f start.tmp start
+    $(edit) \
+        -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
+        $(srcdir)/start.in >start.tmp
+    mv start.tmp start
 
 EXTRA_DIST = start.in $(sstsupport_DATA)
 </verbatim></p>
@@ -1191,7 +1192,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             install time, but instead at make time, so that the user
             is free to specify one installation prefix at configure time
             (through <kbd>./configure --prefix=www</kbd>), override
-            this with another prefix at make time (through
+            this with another prefix at build time (through
             <kbd>make prefix=xxx</kbd>) and specify a
             <em>different</em> one -- presumably a staging location or
             something similar -- at installation time (through
@@ -2479,7 +2480,7 @@ doubt, copy the <code>.F.f:</code> rule in one of the generated
         </subhead>
 
         <p>There is a compact CVS Primer on the web at
-          <url>http://www.astro.gla.ac.uk/users/norman/note/2003/cvsprimer/</url>,
+          <url>http://purl.org/nxg/note/cvsprimer</url>,
           and that includes pointers to fuller documentation.  This
           section includes a few tips on using CVS which go beyond
           that document, or which are more specific to the Starlink
