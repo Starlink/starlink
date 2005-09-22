@@ -265,7 +265,8 @@ StarWCS::~StarWCS()
         wcs_ = (AstFrameSet *) astAnnul( wcs_ );
     }
     if ( warnings_ ) {
-        delete warnings_;
+        delete[] warnings_;
+        warnings_ = NULL;
     }
 }
 
@@ -1162,8 +1163,8 @@ int StarWCS::make2D()
         return 1;
     }
     if ( nsky < 2 ) {
-        // Current frame has too few axes. Add in a dummy one
-        // to make it 2D.
+
+        // Current frame has too few axes. Add in a dummy one to make it 2D.
         outperm[0] = 1;
         outperm[1] = 0;
         AstFrame* newFrame =
@@ -1195,13 +1196,14 @@ int StarWCS::make2D()
         return 0;
     }
 
-    // Add the necessary frames to make the base frame 2D. For these
-    // we need to pick out the significant dimensions. Only two are
-    // allowed.
+    // Add the necessary frames to make the base frame 2D. For these we need
+    // to pick out the significant dimensions. Only two are allowed.
     int sigaxes = 0;
+    for ( int i = 0; i < MAXDIM; i++ ) {
+        outperm[i] = 0;                  /* nbase can be greater than ndims_ */
+        inperm[i] = -1;                  /* need initialisation for all axis */
+    }
     for ( int i = 0; i < ndims_; i++ ) {
-        outperm[i] = 0;
-        inperm[i] = -1;
         if ( dims_[i] > 1 && sigaxes < 2 ) {
             inperm[i] = sigaxes + 1;
             outperm[sigaxes] = i + 1;
