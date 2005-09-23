@@ -31,7 +31,7 @@ The AST library provides:
 REQUIREMENTS
 ------------
 
-Has been tested with AST v1.8 onwards (AST is currently at v3.5)
+Has been tested with AST v1.8 onwards (AST is currently at v4.1)
 and with perl 5.005 through perl 5.8.3. Also known to work on Linux,
 Mac OS X, Solaris and Digital Unix.
 
@@ -54,7 +54,7 @@ location:
 NOTES
 -----
 
-The Tk canvas interface is not yet complete.
+The Tk canvas interface does work with limitations.
 This is an early proof of concept release (although 95% of AST
 is supported and the PGPLOT and PLplot interfaces do work).
 
@@ -83,12 +83,15 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 HISTORY
 -------
 
-v0.01 - First release. Most methods implemented. PGPLOT and PLplot
-        interfaces okay. Tk plotting interface requires work.
-        **** INTERFACES MAY CHANGE AS API IS TIDIED ****
-
-v0.02 - Same as 0.01 except that now include the PLplot interface
-        which was mistakenly missing from the MANIFEST
+v0.04 - + Much improved Tk canvas support
+        + Channel and XmlChan source functions now work properly
+        + Fix return value when AST routines fail
+        + AST objects can now be cloned with Storable
+        + PickAxes() method now returns the frame and mapping in a list
+          context
+        + New constants: AST__CURRENT, AST__BASE, AST__NOFRAME
+        + Add TranP() method
+        + Fix compilation problem with AST v3.4.
 
 v0.03 - Now supports AST functionality added between v3.2 and v3.5 of AST
         (if you don't have this version it will still compile with older
@@ -100,4 +103,12 @@ v0.03 - Now supports AST functionality added between v3.2 and v3.5 of AST
         + Support for DSBSpecFrame
         + astRate now returns the second derivative only if the version
            supports it
-        + Add astLinearApprox (Mapping), astEscapes (Plotting), astPutCards (FitsChan)
+        + Add astLinearApprox (Mapping), astEscapes (Plotting),
+          astPutCards (FitsChan)
+
+v0.02 - Same as 0.01 except that now include the PLplot interface
+        which was mistakenly missing from the MANIFEST
+
+v0.01 - First release. Most methods implemented. PGPLOT and PLplot
+        interfaces okay. Tk plotting interface requires work.
+        **** INTERFACES MAY CHANGE AS API IS TIDIED ****

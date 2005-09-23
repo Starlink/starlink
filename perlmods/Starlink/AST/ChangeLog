@@ -1,5 +1,7 @@
 2005-09-22  Tim Jenness  <tjenness@cpan.org>
 
+	* README: Update for v0.04
+
 	* AST.xs: Fixed introduction of astLinearApprox. It actually
 	turned up in v3.5 not v3.4 (well, the public interface did not get
 	it until then).
