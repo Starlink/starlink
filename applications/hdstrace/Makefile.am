@@ -26,3 +26,6 @@ dist_check_SCRIPTS = hdtest
 dist_starnews_DATA = hdstrace.news
 
 EXTRA_DIST = hdstrace_test.sdf $(HELP_SOURCES)
+
+CLEANFILES = hdstrace.ifc
+
