@@ -1,3 +1,13 @@
+2005-09-22  Tim Jenness  <tjenness@cpan.org>
+
+	* AST.xs: Fixed introduction of astLinearApprox. It actually
+	turned up in v3.5 not v3.4 (well, the public interface did not get
+	it until then).
+
+	* AST.xs: For older AST (pre v4.0) a fortran compiler is required
+	for linking against fortran SLA. Some compilers require a dummy
+	MAIN_ definition (g95 on OS X).
+	
 2005-09-07  Tim Jenness  <tjenness@cpan.org>
 
 	* AST.xs: Add astTranP support. 

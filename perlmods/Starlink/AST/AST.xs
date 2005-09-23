@@ -47,6 +47,14 @@ typedef int WcsMapType;
 #include "ast.h"
 #include "grf.h"
 
+/* Older versions of AST can require Fortran, so we add dummy main
+   needed by, eg, g95 */
+#if ( AST_MAJOR_VERS < 4 )
+void MAIN_ () {}
+void MAIN__ () {}
+#endif
+
+
 /* The following definitions are required for backwards compatible
    Since AST version 2 does not have these.
 */
@@ -91,12 +99,12 @@ typedef void AstTranMap;
 
 #if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 4) || AST_MAJOR_VERS >= 4 )
 #define HASDSBSPECFRAME
-#define HASLINEARAPPROX
 #else
 typedef void AstDSBSpecFrame;
 #endif
 
 #if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 5) || AST_MAJOR_VERS >= 4 )
+#define HASLINEARAPPROX
 #define HASSETFITS
 #define HASRATEMAP
 #define HASKEYMAP
@@ -2549,7 +2557,7 @@ astLinearApprox( this, lbnd, ubnd, tol )
   int status;
  PPCODE:
 #ifndef HASLINEARAPPROX
-   Perl_croak(aTHX_ "astRate: Please upgrade to AST V3.x or greater");
+   Perl_croak(aTHX_ "astLinearApprox: Please upgrade to AST V3.4 or greater");
 #else
   /* get the input values and verify them */
   nin = astGetI( this, "Nin" );
