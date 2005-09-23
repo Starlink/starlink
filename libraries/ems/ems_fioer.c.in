@@ -224,6 +224,7 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
  *    currently (February 2004, autoconf-2.59) in the autoconf `known'
  *    list is as follows:
  *      f77/f90/f95: generic compiler names
+ *      g95: Unofficial Gnu Fortran 95 compiler
  *      g77: GNU Fortran 77 compiler
  *      gfortran: putative GNU Fortran 95+ compiler (in progress)
  *      fort77: native F77 compiler under HP-UX (and some older Crays)
@@ -257,12 +258,15 @@ static const MessageInfo* getMessageInfo(void)
    
 
    if ( STRING_EQ( AC_is_gnu, "yes" ) ) {
+     static int nmsg;
 
+     if (STRING_EQ( AC_FC, "g77" ) ) {
       /* These messages are from
        * http://gcc.gnu.org/cgi-bin/cvsweb.cgi/gcc/libf2c/libI77/err.c 
        * as of 2004 February 25
        */
-      static const char *msgs[] = {
+       info.first_iostat = 100;
+       static const char *msgs[] = {
          "error in format",                       /* 100 */
          "illegal unit number",                   /* 101 */
          "formatted io not allowed",              /* 102 */
@@ -296,14 +300,46 @@ static const MessageInfo* getMessageInfo(void)
          "non-positive record number",            /* 130 */
          "I/O started while already doing I/O",   /* 131 */
          "Temporary file name (TMPDIR?) too long",/* 132 */
-      };
-      static int nmsg = sizeof(msgs)/sizeof(msgs[0]);
+       };
+       nmsg = sizeof(msgs)/sizeof(msgs[0]);
+       info.msgs = &msgs[0];
+     } else if ( STRING_EQ( AC_FC, "g95" ) ) {
+       info.first_iostat = 200;
+       static const char *msgs[] = {
+	 "conflicting statement options",         /* 200 */
+	 "bad statement option",                  /* 201 */
+	 "missing statement option",              /* 202 */
+	 "File already opened in another unit",   /* 203 */
+	 "Unattached unit",                       /* 204 */
+	 "FORMAT error",                          /* 205 */
+	 "Incorrect ACTION specified",            /* 206 */
+	 "Read past ENDFILE record",              /* 207 */
+	 "Bad value during read",                 /* 208 */
+	 "Numeric overflow on read",              /* 209 */
+	 "Out of memory",                         /* 210 */
+	 "Array already allocated",               /* 211 */
+	 "Deallocated a bad pointer",             /* 212 */
+	 "Bad record number in direct-access file", /* 213 */
+	 "Corrupt record in unformatted sequential access file", /* 214 */
+	 "Reading more data than the record size (RECL)", /* 215 */
+	 "Writing more data than the record size (RECL)", /* 216 */
+       };
+       nmsg = sizeof(msgs)/sizeof(msgs[0]);
+       info.msgs = &msgs[0];
+     } else {
+       /* do not know the gfortran codes */
+       info.first_iostat = 1;
+       static const char *msgs[] = {
+	 "gnu compiler with unknown code",
+       };
+       nmsg = sizeof(msgs)/sizeof(msgs[0]);
+       info.msgs = &msgs[0];
+     }
 
-      info.msgs = &msgs[0];
-      info.name = "g77";
-      info.first_iostat = 100;
-      info.last_iostat = info.first_iostat + nmsg - 1;
-      info.lookup = 0;
+     /* shared information */
+     info.name = AC_FC;
+     info.last_iostat = info.first_iostat + nmsg - 1;
+     info.lookup = 0;
 
    } else if ( STRING_EQ( AC_FC, "f77" )
                && STRING_EQ( AC_vendor, "sun" ) ) {
