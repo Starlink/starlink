@@ -265,7 +265,6 @@ static const MessageInfo* getMessageInfo(void)
        * http://gcc.gnu.org/cgi-bin/cvsweb.cgi/gcc/libf2c/libI77/err.c 
        * as of 2004 February 25
        */
-       info.first_iostat = 100;
        static const char *msgs[] = {
          "error in format",                       /* 100 */
          "illegal unit number",                   /* 101 */
@@ -301,10 +300,10 @@ static const MessageInfo* getMessageInfo(void)
          "I/O started while already doing I/O",   /* 131 */
          "Temporary file name (TMPDIR?) too long",/* 132 */
        };
+       info.first_iostat = 100;
        nmsg = sizeof(msgs)/sizeof(msgs[0]);
        info.msgs = &msgs[0];
      } else if ( STRING_EQ( AC_FC, "g95" ) ) {
-       info.first_iostat = 200;
        static const char *msgs[] = {
 	 "conflicting statement options",         /* 200 */
 	 "bad statement option",                  /* 201 */
@@ -324,14 +323,15 @@ static const MessageInfo* getMessageInfo(void)
 	 "Reading more data than the record size (RECL)", /* 215 */
 	 "Writing more data than the record size (RECL)", /* 216 */
        };
+       info.first_iostat = 200;
        nmsg = sizeof(msgs)/sizeof(msgs[0]);
        info.msgs = &msgs[0];
      } else {
        /* do not know the gfortran codes */
-       info.first_iostat = 1;
        static const char *msgs[] = {
 	 "gnu compiler with unknown code",
        };
+       info.first_iostat = 1;
        nmsg = sizeof(msgs)/sizeof(msgs[0]);
        info.msgs = &msgs[0];
      }
