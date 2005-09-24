@@ -76,6 +76,9 @@
  *     05-JAN-2005 (PWD):
  *        Increase identifier buffer to allow 15 characters (match
  *        capabilities of ems/ems1Fcerr.c).
+ *     23-SEP-2005 (TIMJ):
+ *        C header files now write enum constants rather than
+ *        CPP defines.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -346,7 +349,7 @@ process_file(char *filename)
 	    if (fp_c) {
                 fprintf(fp_c,
                         "/* %s */\n"
-                        "#define %s%-16s	%d	/* messid=%d */\n\n", 
+                        "enum { %s%-16s	= %d };	/* messid=%d */\n\n", 
 			message_text, fac_prefix, message_ident, errcode,
 			message_number);
 	    }
