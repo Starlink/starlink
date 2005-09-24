@@ -16,20 +16,23 @@
 
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
 
  *  History:
  *     12-JUN-1990 (PCTR):
  *        Original version.
+ *     23-SEP-2005 (TIMJ):
+ *        Use proper constants rather than the C preprocessor
 
  *  Bugs:
 
  *- */
 
 /* OK Status. */
-# define   SAI__OK      0
+enum     { SAI__OK = 0 }; 
 
 /* Warning. */
-# define   SAI__WARN    148013859
+enum     { SAI__WARN  = 148013859 };
  
 /* Error. */
-# define   SAI__ERROR   148013867
+enum     { SAI__ERROR = 148013867 };
