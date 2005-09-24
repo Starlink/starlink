@@ -107,4 +107,4 @@ dist_starnews_DATA = psx.news
 
 EXTRA_DIST = psx_err.msg
 
-CLEANFILES = PSX_ERR
+CLEANFILES = PSX_ERR psx_err.h
