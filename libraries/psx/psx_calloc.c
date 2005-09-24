@@ -114,6 +114,8 @@
 *        Add type _BYTE, _UBYTE, _WORD and _UWORD
 *      3-SEP-2004 (TIMJ):
 *        Fix -Wall compiler warnings
+*      23-SEP-2005 (TIMJ):
+*        Fix compiler warning when sizeof(size_t) != sizeof(int)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -157,6 +159,7 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
 /* Local Variables:							    */
 
    int i;			 /* Loop counter			    */
+   long total;                   /* Total number of bytes for error msg     */
    size_t size;			 /* The size in bytes of the data type	    */
    void *temp;			 /* Temporary return value from malloc	    */
    char type_c[maxlen+1];	 /* A C string copy of the argument TYPE    */
@@ -235,9 +238,10 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
       {
          *pntr = (F77_POINTER_TYPE)0;
          *status = PSX__NOALL;
+	 total = (long)(*nmemb * size);
          sprintf( errbuf, 
-            "Failed to allocate space with calloc. %d bytes requested",
-            *nmemb * size );
+            "Failed to allocate space with calloc. %ld bytes requested",
+            total );
          psx1_rep_c( "PSX_CALLOC_NOALL", errbuf, status );
       }
    }
