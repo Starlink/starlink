@@ -74,5 +74,5 @@ dist_starnews_DATA = idi.news
 
 EXTRA_DIST = xworks.dct
 
-CLEANFILES = xworks.dat idi_test.ifc 
+CLEANFILES = xworks.dat idi_test.ifc idi_err.h IDI_ERR
 
