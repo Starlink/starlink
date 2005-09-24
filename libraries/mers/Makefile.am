@@ -85,6 +85,7 @@ TEST_SOURCE = err_test.f err_test.c err_test.ifl
 
 BUILT_SOURCES = $(include_MESSAGES)
 
+CLEANFILES = err_err.h msg_err.h ERR_ERR MSG_ERR
 
 # Testing
 TESTS = err_ftest
