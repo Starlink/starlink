@@ -78,5 +78,5 @@ ems_test_LDADD = libemsf.la libems.la `cnf_link`
 
 EXTRA_DIST = ems_err.msg
 
-CLEANFILES = EMS_ERR
+CLEANFILES = EMS_ERR ems_err.h
 
