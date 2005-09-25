@@ -23,10 +23,16 @@
  *        Original version.
  *     23-SEP-2005 (TIMJ):
  *        Use proper constants rather than the C preprocessor
+ *     25-SEP-2005 (TIMJ):
+ *        Prevent the constants being defined multiple times if
+ *        the file is included multiple times.
 
  *  Bugs:
 
  *- */
+
+#ifndef SAE_PAR_DEFINED
+#define SAE_PAR_DEFINED
 
 /* OK Status. */
 enum     { SAI__OK = 0 }; 
@@ -36,3 +42,5 @@ enum     { SAI__WARN  = 148013859 };
  
 /* Error. */
 enum     { SAI__ERROR = 148013867 };
+
+#endif  /* SAE_PAR_DEFINED */
