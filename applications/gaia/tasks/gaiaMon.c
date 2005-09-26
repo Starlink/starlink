@@ -40,6 +40,7 @@
  */
 
 /*  Include files */
+#include <strings.h>
 #include "sae_par.h"
 #include "par_par.h"
 #include "f77.h"
@@ -80,7 +81,6 @@ extern void F77_EXTERNAL_NAME( task_get_name )(
 static void taskGetName( char *name, int name_length, int *status )
 {
    DECLARE_CHARACTER_DYN(fname);
-   DECLARE_INTEGER(flevel);
    DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fname, name_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
