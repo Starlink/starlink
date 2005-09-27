@@ -1,0 +1,7 @@
+.deps
+.libs
+Makefile
+Makefile.in
+libsmurf.la
+smurf_extinction.lo
+
