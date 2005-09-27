@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/surf2</path>
+  <description>SURF2 - SCUBA-2 User Reduction Facility</description>
+  <abstract><p>
+SURF2 is a set of ADAM tasks necessary for reducing raw
+Submillimetre Common-User Bolometer Array 2 (SCUBA-2) data obtained from
+the James Clerk Maxwell Telescope. The tasks allows one to completely
+reduce your SCUBA-2 data.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

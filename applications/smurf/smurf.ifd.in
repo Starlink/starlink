@@ -1,0 +1,28 @@
+package @PACKAGE@ {
+   version @PACKAGE_VERSION@
+   prefix @PACKAGE@
+
+   executable @PACKAGE@_mon {
+
+     action extinction {
+
+     }
+
+   }
+
+   icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
+
+   display {
+
+     @PACKAGE_UPCASE@ commands are now available -- (Version @PACKAGE_VERSION@)
+
+     Type smurfhelp for help on @PACKAGE_UPCASE@ commands.
+     Type "showme sunXXX" to browse the hypertext documentation.
+
+     NOTE, several applications have had major changes made to their
+     parameter lists. See the "Release Notes" section of SUN/XXX for
+     details.
+
+   }
+
+}

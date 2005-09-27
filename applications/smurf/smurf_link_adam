@@ -1,0 +1,89 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#      surf_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against SURF.
+
+#  Type of Module:
+#     Bourne-shell script.
+
+#  Description:
+#     This script lists the linking qualifiers for the non-SURF
+#     libraries used by SURF.  It should be invoked by those building
+#     SURF or other applications which use SURF libraries in order to
+#     generate the correct arguments for the compiler (or ld) command.
+#     The arguments generated are written to the standard output.
+
+#     The script contains an awk script to remove duplicate references
+#     that result from other linker `options' files.  The file is
+#     needed because there would be too many references before the awk
+#     script could reduce them.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Starlink standard makefiles, thus:
+#
+#         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) `surf_libs` \
+#             -L$(STAR_LIB) `./surf_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     TJ:   Tim Jenness (JACH)
+#     MJC:  Malcolm J. Currie (STARLINK)
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  Copyright:
+#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
+#  History:
+#     1992 June 3 (MJC):
+#        Original version.
+#     1995 August 19 (MJC)
+#        Merged with the RFWS-BLY template app_link_adam.  Incorporated
+#        the libraries listed in kappa_graphics and kappa_rest scripts.
+#     1995 October 26 (MJC)
+#        Added PDA and ARD.
+#     1997 June 12 (TJ)
+#        Convert from KAPPA to SURF
+#     1997 October (TJ)
+#        Add the PGPLOT librarry.
+#     1998 April 20 (TJ)
+#	 Add GRP
+#     1999 July 2 (TJ)
+#        Remove IRAS90 dependency
+#     2000 June 2 (TJ)
+#	 Remove SGS dependency.
+#     2000 August 21 (TJ)
+#        Add NDG
+#     2000 October 27 (TJ)
+#        Remove /star/lib since that makes it impossible to build
+#        on stardev system.
+#     2004 July 14 (TJ)
+#        Stop using SGS/GKS
+#     2004 July 27 (TJ)
+#        Use SHL
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+# Now find the necessary libraries
+      echo `ndf_link_adam` `fio_link_adam` \
+           `sla_link_adam` `shl_link_adam` `pda_link_adam` \
+           `prm_link_adam` \
+           `grp_link_adam` `ndg_link_adam` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
