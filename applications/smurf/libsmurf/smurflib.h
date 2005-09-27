@@ -52,5 +52,9 @@
 *     {note_any_bugs_here}
 *-
 */
+#ifndef SMURF_LIB_DEFINED
+#define SMURF_LIB_DEFINED
 
 void smurf_extinction( int * );
+
+#endif /* SMURF_LIB_DEFINED */

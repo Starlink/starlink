@@ -53,6 +53,9 @@
 *-
 */
 
+#ifndef SMURF_PAR_DEFINED
+#define SMURF_PAR_DEFINED
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -74,3 +77,4 @@ error can not determine PI
 #  endif
 #endif
 
+#endif /* SMURF_PAR_DEFINED */
