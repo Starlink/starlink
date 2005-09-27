@@ -360,7 +360,7 @@ MemRep::~MemRep()
     }
     else if (ptr) {		// must be using plain memory
        if (newmem && owner) {
-          delete (char *)ptr;
+          delete[] (char *)ptr;
        } else if (owner) {
           free( ptr );
        }
