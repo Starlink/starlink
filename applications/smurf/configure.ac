@@ -30,6 +30,9 @@ LIBS="$LIBS -L/usr/lib64"
 AC_CHECK_LIB( gslcblas, cblas_dsdot )
 AC_CHECK_LIB( gsl, gsl_acosh )
 
+AC_CHECK_HEADERS(math.h)
+AC_CHECK_HEADERS(gsl/gsl_math.h)
+
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
@@ -44,6 +47,6 @@ dnl Ask for a config.h so that we can retain control of when to define
 dnl parameters. And also to simplify the build line
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile smurf.ifd component.xml)
+AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile)
 
 AC_OUTPUT

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-## SUBDIRS = sculib surflib src docs
+SUBDIRS = libsmurf
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc
@@ -14,7 +14,7 @@ smurf_mon_SOURCES = smurf_mon.c
 smurf_mon_TASKS = extinction
 
 # Linking
-smurf_mon_LDADD = `$(srcdir)/smurf_link_adam`
+smurf_mon_LDADD = libsmurf/libsmurf.la `$(srcdir)/smurf_link_adam`
 
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
