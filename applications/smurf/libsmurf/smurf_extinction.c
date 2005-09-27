@@ -27,11 +27,15 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-09-27 (TIMJ):
 *        Initial test version
+*     2005-09-27 (AGG):
+*        Now uses smurf_par.h
+*        Factored out extinction correction
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -64,43 +68,26 @@
 #include <config.h>
 #endif
 
-#if HAVE_MATH_H
-#  include <math.h>
-#endif
-#if HAVE_GSL_GSL_MATH_H
-#  include <gsl/gsl_math.h>
-#endif
+#include <string.h>
 
-#ifndef M_PI_2
-#  ifdef M_PI
-#    define M_PI_2  (M_PI/2)
-#  else
-error can not determine PI
-#  endif
-#endif
-
+#include "smurf_par.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
-#include "smurflib.h"
 
-/* Fortran prototypes */
-#include "f77.h"
-F77_DOUBLE_FUNCTION(sla_airmas)( double * );
+#include "libsmf/smf.h"
+#include "smurflib.h"
 
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
-  double airmass;     /* Local airmass */
-  int i;              /* loop counter */
   void * indataArr[1];  /* Pointer to input data */
   float * indata;
-  int index;          /* index into vectorized data array */
   int indf;           /* Input NDF identifier */
-  int indims[NDF__MXDIM]; /* Dimensions of input NDF */
-  int j;              /* Loop counter */
+  dim_t indims[2];    /* Copy of the NDF dimensions */
+  int ndfdims[NDF__MXDIM]; /* Dimensions of input NDF */
   int ndims;          /* Number of active dimensions in input */
   int nin;            /* Number of input data points */
   int nout;           /* Number of output data points */
@@ -108,12 +95,7 @@ void smurf_extinction( int * status ) {
   float * outdata;
   int outndf;         /* Output NDF identifier */
   float tau;          /* tau at this wavelength */
-  double xin;         /* X coordinate of input mapping */
-  double xout;        /* X coordinate of output */
-  double yin;         /* Y coordinate of input */
-  double yout;        /* Y coordinate of output */
   AstFrameSet * wcs;  /* Pointer to frame set */
-  double zd;          /* Zenith distance */
 
   tau = 0.5;
 
@@ -153,7 +135,10 @@ void smurf_extinction( int * status ) {
   }
 
   /* Need the dimensions of the data array */
-  ndfDim( indf, NDF__MXDIM, indims, &ndims, status );
+  ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
+
+  indims[0] = (dim_t)ndfdims[0];
+  indims[1] = (dim_t)ndfdims[1];
 
   /* Get the world coordinate information */
   ndfGtwcs( indf, &wcs, status );
@@ -168,32 +153,8 @@ void smurf_extinction( int * status ) {
     }
   }
 
-  /* Assume 2 dimensions. Start counting at 1 since this is the GRID
-     coordinate frame */
-  if (*status == SAI__OK) {
-    for (j = 1; j <= indims[1]; j++) {
-      for (i = 1; i <= indims[0]; i++) {
-
-	index = (j-1)*indims[0] + (i-1);
-	if (indata[index] != VAL__BADR) {
-
-	  xin = (double)i;
-	  yin = (double)j;
-	  astTran2( wcs, 1, &xin, &yin, 1, &xout, &yout );
-
-	  zd = M_PI_2 - yout;
-	  airmass = F77_CALL(sla_airmas)( &zd );
-	  printf( "Airmass: %f\n",airmass);
-
-	  printf("Index: %d  Data: %f  Correction: %f\n",
-		 index, indata[index], (expf((float)airmass*tau)));
-	  outdata[index] = indata[index] * expf((float)airmass*tau);
-	} else {
-	  outdata[index] = indata[index];
-	}
-      }
-    }
-  }
+  memmove( outdata, indata, (size_t)(nin*sizeof(indata[0])) );
+  smf_correct_extinction( wcs, indims, tau, outdata, status);
 
   ndfEnd( status );
 
