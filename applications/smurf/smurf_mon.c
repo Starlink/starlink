@@ -78,6 +78,8 @@
 #include "f77.h"
 #include "ndf.h"
 
+#include "libsmurf/smurflib.h"
+
 F77_SUBROUTINE(task_get_name)(char *, int*, int);
 enum { SZAPP = 512 };
 
@@ -104,8 +106,7 @@ void smurf_mon( int * status ) {
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
-    printf("%s\n",appname);
-    /*    smurf_extinction( status ); */
+    smurf_extinction( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
