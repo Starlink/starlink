@@ -126,6 +126,13 @@ if test -f @bindir@/pongo/pongo.icl; then
    export PONGO_EXAMPLES=@datadir@/pongo
 fi
 
+#  SMURF
+
+if test -f @bindir@/smurf/smurf.sh; then
+   export SMURF_DIR=@bindir@/smurf
+   export SMURF_HELP=@starhelpdir@/smurf/smurf
+fi
+
 #
 #  SPECX
 #
@@ -283,6 +290,16 @@ if test -f @bindir@/pongo/pongo.icl; then
    pongo () { icl $PONGO_BIN/pongo; }
 else
    pongo () { @staretcdir@/notinst pongo; }
+fi
+
+# SMURF - SCUBA-2 SURF
+
+if test -f @bindir@/smurf/smurf.sh; then
+  smurf () { . $SMURF_DIR/smurf.sh; }
+  smurfsetup () { . $SMURF_DIR/smurf.sh; }
+else
+  smurf () { @staretcdir@/notinst smurf; }
+  smurfsetup () { @staretcdir@/notinst smurf; }
 fi
 
 #

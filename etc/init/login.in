@@ -535,6 +535,12 @@ endif
     setenv SOAPSERVER_DIR @starjavadir@/bin/soapserver
  endif
 
+#
+#  SMURF
+if ( -e @bindir@/smurf/smurf.csh ) then
+   setenv SMURF_DIR @bindir@/smurf
+   setenv SMURF_HELP @starhelpdir@/smurf/smurf
+endif
 
 #
 #  SURF

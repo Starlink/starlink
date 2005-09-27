@@ -596,6 +596,20 @@ endif
  endif
 
 #
+#   Surf
+#
+
+if ( -e @bindir@/smurf/smurf.csh ) then
+   alias smurf source @bindir@/smurf/smurf.csh
+   alias smurfsetup source @bindir@/smurf/smurf.csh
+   alias smurfstart source @bindir@/smurf/smurf.csh
+else
+   alias smurf '@staretcdir@/notinst smurf'
+   alias smurfsetup '@staretcdir@/notinst smurfsetup'
+   alias smurfstart '@staretcdir@/notinst smurfstart'
+endif
+
+#
 #   Sog, moved to StarJava - Spring 2003
 
  if ( -e @starjavadir@/bin/sog ) then

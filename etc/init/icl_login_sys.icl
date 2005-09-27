@@ -337,6 +337,16 @@ endif
 defhelp scar $ADAM_PACKAGES SCAR
 defstring SCAR noport SCAR
 
+{  SMURF
+defhelp smurf $ADAM_PACKAGES SMURF
+if file_exists("$SMURF_DIR/smurf.icl")
+   defstring smurf load $SMURF_DIR/smurf.icl
+elseif file_exists("$SMURF_DIR/smurf.csh")
+   defstring smurf notavailable SMURF
+else
+   defstring smurf notinstalled SMURF
+endif
+
 {  SPECDRE
 {  Withdrawn Spring-1998, merged with FIGARO
 defhelp specdre $ADAM_PACKAGES SPECDRE
