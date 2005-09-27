@@ -22,7 +22,7 @@ static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.6 1998/09/08 19:42:
 // include the C++ and C interfaces
 #include "AstroCatalog.h"
 extern "C" {
-#include "astroCatalog.h"
+#include "astroCatalog.hxx"
 }
 
 
