@@ -417,7 +417,7 @@ void MemRep::unmap()
 /*
  * remap the shared memory after a call to unmap()
  * (may be used to unmap and remap with different options, see MemFileOptions)
- * If the optional newsize arg is given and is not -1, it indicates a new
+ * If the optional newsize arg is given and is not 0, it indicates a new
  * file size. This can be used to extend the file size.
  */
 int MemRep::remap(int opts, size_t newsize)
@@ -568,7 +568,7 @@ Mem::Mem(const char *filename, int verbose)
     rep_ = new MemRep(filename,
 		    MEM_MMAP_DEFAULT_FLAGS,
 		    MEM_MMAP_DEFAULT_PROT,
-		    MEM_MMAP_DEFAULT_SHARING, -1, 0, verbose);
+		    MEM_MMAP_DEFAULT_SHARING, 0, 0, verbose);
 }
 
 
@@ -600,7 +600,7 @@ Mem::Mem(const char *filename, int options, int verbose, void *addr)
 	return;
     }
 
-    rep_ = new MemRep(filename, flags, prot, sharing, -1, 0, verbose, addr);
+    rep_ = new MemRep(filename, flags, prot, sharing, 0, 0, verbose, addr);
     rep_->options = options;
 }
 

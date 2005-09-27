@@ -17,6 +17,9 @@
  *                 03 Dec 96  Added filename() method to return filename mapped.
  *                            Reformatted .h file and put comments above declarations
  *                            for readability.
+ * Peter W. Draper 27 Sep 05  All lengths are now size_t, which usually means
+ *                            an unsigned long, consequently all use of 
+ *                            -1 as a special length has been changed to 0.
  */
 
 
@@ -68,7 +71,7 @@ public:
     // Map a file from an open file descriptor <handle>.  This function
     // will lookup the length of the file if it is not given.
     Mem_Map (int handle, 
-	     size_t length = -1, 
+	     size_t length = 0, 
 	     int prot = PROT_READ, 
 	     int share = MAP_SHARED, 
 	     void *addr = 0, 
@@ -76,7 +79,7 @@ public:
 
     // Map a file specified by <file_name>.
     Mem_Map (const char file_name[], 
-	     size_t len = -1, 
+	     size_t len = 0, 
 	     int flags = O_RDWR,
 	     int mode = MMAP_DEFAULT_PERMS, 
 	     int prot = PROT_READ, 
@@ -87,14 +90,14 @@ public:
     // Map a file from an open file descriptor <handle>.  This function
     // will lookup the length of the file if it is not given.
     int map (int handle, 
-	     size_t length = -1, 
+	     size_t length = 0, 
 	     int prot = PROT_READ, 
 	     int share = MAP_SHARED, 
 	     void *addr = 0,
 	     off_t pos = 0);
 
     // Remap the file associated with <handle_>.
-    int map (size_t length = -1, 
+    int map (size_t length = 0, 
 	     int prot = PROT_READ, 
 	     int share = MAP_SHARED, 
 	     void *addr = 0, 
@@ -102,7 +105,7 @@ public:
 
     // Map a file specified by <file_name>.
     int map (const char file_name[], 
-	     size_t len = -1, 
+	     size_t len = 0, 
 	     int flags = O_RDWR,
 	     int mode = MMAP_DEFAULT_PERMS, 
 	     int prot = PROT_READ, 
@@ -135,24 +138,24 @@ public:
     size_t size (void) const;
 
     // Unmap the region starting at <base_addr_>.
-    int unmap (size_t len = -1);
+    int unmap (size_t len = 0);
 
     // Unmap the region starting at <addr_>.
     int unmap (void *addr, size_t len);
 
     // Sync <len> bytes of the memory region to the backing store
-    // starting at <base_addr_>.  If <len> == -1 then sync the whole
+    // starting at <base_addr_>.  If <len> == 0 then sync the whole
     // region.
-    int sync (size_t len = -1, int flags = MS_SYNC);
+    int sync (size_t len = 0, int flags = MS_SYNC);
 
     // Sync <len> bytes of the memory region to the backing store
     // starting at <addr_>.
     int sync (void *addr, size_t len, int flags = MS_SYNC);
 
     // Change the protection of the pages of the mapped region to <prot>
-    // starting at <base_addr_> up to <len> bytes.  If <len> == -1 then
+    // starting at <base_addr_> up to <len> bytes.  If <len> == 0 then
     // change protection of all pages in the mapped region.
-    int protect (size_t len = -1, int prot = PROT_READ);
+    int protect (size_t len = 0, int prot = PROT_READ);
 
     // Change the protection of the pages of the mapped region to <prot>
     // starting at <addr> up to <len> bytes.
@@ -163,7 +166,7 @@ public:
 
 #if 0
     // Hook into the underlying VM system.
-    int advise (int behavior, size_t len = -1);
+    int advise (int behavior, size_t len = 0);
 #endif
 
     // Return the underlying <handle_>.
@@ -198,7 +201,7 @@ private:
     // This method does the dirty work of actually calling ::mmap to map
     // the file into memory.
     int map_it (int handle, 
-		size_t len = -1, 
+		size_t len = 0, 
 		int prot = PROT_READ, 
 		int share = MAP_SHARED, 
 		void *addr = 0, 
@@ -284,7 +287,7 @@ Mem_Map::size (void) const
 inline int
 Mem_Map::unmap (size_t len)
 {
-    return ::munmap ((caddr_t)this->base_addr_, len < 0 ? this->length_ : len);
+    return ::munmap ((caddr_t)this->base_addr_, len == 0 ? this->length_ : len);
 }
 
 //----------------------------------------------------------------------------
@@ -293,19 +296,19 @@ Mem_Map::unmap (size_t len)
 inline int
 Mem_Map::unmap (void *addr, size_t len)
 {
-    return ::munmap ((caddr_t)addr, len < 0 ? this->length_ : len);
+    return ::munmap ((caddr_t)addr, len == 0 ? this->length_ : len);
 }
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 // Sync <len> bytes of the memory region to the backing store starting
-// at <this->base_addr_>.  If <len> == -1 then sync the whole mapped
+// at <this->base_addr_>.  If <len> == 0 then sync the whole mapped
 // region.
 inline int
 Mem_Map::sync (size_t len, int flags)
 {
     return ::msync ((caddr_t)this->base_addr_, 
-		    len < 0 ? this->length_ : len, flags);
+		    len == 0 ? this->length_ : len, flags);
 }
 
 //----------------------------------------------------------------------------
@@ -322,12 +325,12 @@ Mem_Map::sync (void *addr, size_t len, int flags)
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 // Change the protection of the pages of the mapped region to <prot>
-// starting at <this->base_addr_> up to <len> bytes.  If <len> == -1
+// starting at <this->base_addr_> up to <len> bytes.  If <len> == 0
 // then change protection of all pages in the mapped region.
 inline int 
 Mem_Map::protect (size_t len, int prot)
 {
-    if (len < 0) {
+    if (len == 0) {
 	len = this->length_;
     }
     return ::mprotect((caddr_t)this->base_addr_, len, prot);
@@ -350,7 +353,7 @@ Mem_Map::protect(void *addr, size_t len, int prot)
 inline int
 Mem_Map::advise (int behavior, size_t len)
 {
-    if (len < 0) {
+    if (len == 0) {
 	len = this->length_;
     }
     return ::madvise ((caddr_t)this->base_addr_, len, behavior);

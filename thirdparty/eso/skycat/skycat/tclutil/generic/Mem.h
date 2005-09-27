@@ -72,7 +72,7 @@ struct MemRep {
 
     // remap the shared memory after a call to unmap(), optionally specifying
     // new mapping options and a new file size.
-    int remap(int options = 0, size_t newsize = -1);
+    int remap(int options = 0, size_t newsize = 0);
 
 };
 
@@ -160,7 +160,7 @@ public:
 
     // remap the shared memory after a call to unmap(), optionally specifying
     // new mapping options and a new file size
-    int remap(int options = 0, size_t newsize = -1) {
+    int remap(int options = 0, size_t newsize = 0) {
 	return rep_->remap(options, newsize);
     }
 

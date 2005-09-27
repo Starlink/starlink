@@ -91,24 +91,24 @@ Mem_Map::map_it(int handle,
   this->base_addr_ = addr;
   this->handle_	= handle;
 
+  //  Inquire file to access and get length in bytes.
   struct stat sb;
-  long file_len = ::fstat(this->handle_, &sb) < 0 ? -1 : sb.st_size;
+  int status = ::fstat(this->handle_, &sb);
 
-  if (file_len == -1) {
+  if (status == -1) {
     sys_error("get file status (fstat) failed for: ", filename_);	// allan: added error report
     return -1;
   }
 
-  // At this point we know <file_len> is not negative...
-  this->length_ = size_t(file_len); 
+  // Set initial length to all of file.
+  off_t file_len = sb.st_size;
+  this->length_ = file_len; 
 
-  if (len_request == -1) {
-    len_request = 0;
-  }
-
+  // If file is zero sized or too small.
   if ((this->length_ == 0 && len_request > 0)
-      || this->length_ < size_t(len_request)) {
+      || (this->length_ < len_request)) {
 
+    // Length is that requested.
     this->length_ = len_request;
 
 #ifdef HAVE_SYS_STATVFS_H
