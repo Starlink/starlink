@@ -107,6 +107,9 @@ void smurf_mon( int * status ) {
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
+  }
+  else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
+    smurf_makemap( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
