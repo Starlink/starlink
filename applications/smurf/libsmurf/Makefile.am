@@ -1,5 +1,5 @@
 
-lib_LTLIBRARIES = libsmurf.la
+noinst_LTLIBRARIES = libsmurf.la
 
 libsmurf_la_SOURCES = $(C_ROUTINES)
 

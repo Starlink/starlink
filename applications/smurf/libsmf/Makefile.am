@@ -1,5 +1,5 @@
 
-lib_LTLIBRARIES = libsmf.la
+noinst_LTLIBRARIES = libsmf.la
 
 libsmf_la_SOURCES = $(C_ROUTINES)
 
