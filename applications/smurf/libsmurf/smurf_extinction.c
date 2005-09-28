@@ -28,6 +28,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -36,6 +37,8 @@
 *     2005-09-27 (AGG):
 *        Now uses smurf_par.h
 *        Factored out extinction correction
+*     2005-09-27 (EC)
+*        Trap memmove when status is bad
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,18 +87,18 @@ void smurf_extinction( int * status ) {
 
   /* Local Variables */
   void * indataArr[1];  /* Pointer to input data */
-  float * indata;
-  int indf;           /* Input NDF identifier */
+  float * indata = NULL;
+  int indf = 0;       /* Input NDF identifier */
   dim_t indims[2];    /* Copy of the NDF dimensions */
   int ndfdims[NDF__MXDIM]; /* Dimensions of input NDF */
   int ndims;          /* Number of active dimensions in input */
   int nin;            /* Number of input data points */
   int nout;           /* Number of output data points */
   void * outdataArr[1];    /* Pointer to output data */
-  float * outdata;
-  int outndf;         /* Output NDF identifier */
+  float * outdata = NULL;
+  int outndf = 0;         /* Output NDF identifier */
   float tau;          /* tau at this wavelength */
-  AstFrameSet * wcs;  /* Pointer to frame set */
+  AstFrameSet * wcs = NULL;  /* Pointer to frame set */
 
   tau = 0.5;
 
@@ -115,17 +118,8 @@ void smurf_extinction( int * status ) {
   ndfMap( indf, "DATA", "_REAL", "READ", &indataArr, &nin, status);
   ndfMap( outndf, "DATA", "_REAL", "WRITE", &outdataArr, &nout, status );
 
-  /* Check for existence of VARIANCE array */
 
-
-  /* Check for covariance */
-  /* smf_find_extension( indf, "COVAR", &cndf, status ); */
-
-
-  indata = indataArr[0];
-  outdata = outdataArr[0];
-
-  if (*status != SAI__OK) {
+  if ( *status != SAI__OK ) {
     if ( nin != nout) {
       *status = SAI__ERROR;
       msgSeti( "NIN", nin);
@@ -134,17 +128,30 @@ void smurf_extinction( int * status ) {
     }
   }
 
+  /* Check for existence of VARIANCE array */
+
+  /* Check for covariance */
+  /* smf_find_extension( indf, "COVAR", &cndf, status ); */
+
+  if ( *status == SAI__OK ) {
+    indata = indataArr[0];
+    outdata = outdataArr[0];
+  }
+
   /* Need the dimensions of the data array */
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
-  indims[0] = (dim_t)ndfdims[0];
-  indims[1] = (dim_t)ndfdims[1];
-
+  if ( *status == SAI__OK ) {
+    indims[0] = (dim_t)ndfdims[0];
+    indims[1] = (dim_t)ndfdims[1];
+  }
+  
   /* Get the world coordinate information */
   ndfGtwcs( indf, &wcs, status );
 
   /* Select the AZEL system */
-  astSetC( wcs, "SYSTEM", "AZEL" );
+  if ( (wcs != NULL) || (*status == SAI__OK) ) 
+    astSetC( wcs, "SYSTEM", "AZEL" );
 
   if (!astOK) {
     if (*status == SAI__OK) {
@@ -153,7 +160,9 @@ void smurf_extinction( int * status ) {
     }
   }
 
-  memmove( outdata, indata, (size_t)(nin*sizeof(indata[0])) );
+  if (*status == SAI__OK) 
+    memmove( outdata, indata, (size_t)(nin*sizeof(indata[0])) );
+
   smf_correct_extinction( wcs, indims, tau, outdata, status);
 
   ndfEnd( status );
