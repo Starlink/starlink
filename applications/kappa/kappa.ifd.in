@@ -8926,14 +8926,14 @@ package kappa {
       }
 
       action fitlines {
-         alias {fit(lines)}
+         alias {fitl(ines)}
 
          helplib {$KAPPA_HELP}
 
          parameter axis {
             position 2
-            type _INTEGER
-            vpath DEFAULT
+            type LITERAL
+            vpath PROMPT
             ppath CURRENT DEFAULT
             default 3
             prompt {Axis of lines}
@@ -8970,6 +8970,7 @@ package kappa {
           }
 
          parameter out {
+            position 5
             type NDF
             access WRITE
             vpath PROMPT
@@ -8984,17 +8985,17 @@ package kappa {
             vpath PROMPT
             ppath CURRENT DEFAULT
             default !
-            prompt {Line ranges used in fit}
+            prompt {Coordinate ranges (pairs)}
             helpkey *
             size *
           }
 
          parameter subtract {
             type _LOGICAL
-            vpath PROMPT
+            vpath DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
-            prompt {Subtract fits from NDF}
+            prompt {Subtract fits}
             helpkey *
           }
 
