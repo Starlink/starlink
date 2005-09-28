@@ -78,16 +78,18 @@ AstroQuery::~AstroQuery()
 {
     if (id_)
 	free(id_);
-    if (colNames_)
-	delete[] colNames_;
-    if (sortCols_)
-	delete[] sortCols_;
-    if (searchCols_)
-	delete[] searchCols_ ;
-    if (minValues_)
-	delete[] minValues_;
-    if (maxValues_)
-	delete[] maxValues_;
+// PWD: let these leak. In fact these can be new or malloc memory
+//      depending on various freeflag values... Need to track which.
+//     if (colNames_)
+// 	delete[] colNames_;
+//     if (sortCols_)
+// 	delete[] sortCols_;
+//     if (searchCols_)
+// 	delete[] searchCols_ ;
+//     if (minValues_)
+// 	delete[] minValues_;
+//     if (maxValues_)
+// 	delete[] maxValues_;
 
 }
 
