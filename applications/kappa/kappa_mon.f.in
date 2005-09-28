@@ -34,6 +34,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,8 +57,10 @@
 *        Added multiple invocation of applications using LPG looping.
 *     16-MAR-2004 (DSB):
 *        Added call to LPG_REPLA.
-*     2005 August 12
+*     2005 August 12 (MJC):
 *        Added INTERLEAVE.
+*     20-SEP-2005 (PWD):
+*        Added FITLINES.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,6 +235,10 @@
 *  Removes regions of bad values from a 2-dimensional NDF.
          ELSE IF ( NAME .EQ. 'FILLBAD' ) THEN
             CALL FILLBAD ( STATUS )
+
+*  Fit polynomials to lines parallel to an axis.
+         ELSE IF ( NAME .EQ. 'FITLINES' ) THEN
+            CALL FITLINES ( STATUS )
 
 *  Reverses an NDF's pixels along a specified dimension.
          ELSE IF ( NAME .EQ. 'FITSURFACE' ) THEN
