@@ -232,13 +232,19 @@ istream& CatalogInfo::getline(istream& f, char* buf, int size)
 {
     if (f.getline(buf, size)) {
 	char* p = buf;
-	int i = strlen(p) - 1;
-	while(f && p[i] == '\\') {
-	    size -= i;
-	    p = p + i;
-	    if (f.getline(p, size))
-		i = strlen(p) - 1;
-	}
+	int i = strlen(p);
+        if ( i > 0 ) {
+            i -= 1;
+            while(f && p[i] == '\\') {
+                size -= i;
+                p = p + i;
+                if (f.getline(p, size)) {
+                    i = strlen(p);
+                    if ( i == 0 ) break;
+                    i -= 1;
+                }
+            }
+        }
     }
     return f;
 }
