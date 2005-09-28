@@ -64,7 +64,8 @@ kps1_wiefl.f kps1_wiefp.f kps1_wieou.f kps1_wiepw.f kps1_zpdec.f   \
 kps1_zprep.f kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f   \
 kps1_zprgub.f kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f med3d.f \
 medwts.f medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f	   \
-kps1_dnrth.f kps1_inmat.f kps1_pxdpm.f kps1_wmos0.f
+kps1_dnrth.f kps1_inmat.f kps1_pxdpm.f kps1_wmos0.f kps1_lftps.f   \
+kps1_lftsv.f kps1_polyv.f
 
 
 C_ROUTINES = kps1_luted.c
@@ -89,7 +90,8 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
-KPG_GN_GEN = kps1_inle.gn kps1_inli.gn kps1_inls.gn
+KPG_GN_GEN = kps1_inle.gn kps1_inli.gn kps1_inls.gn kps1_lft.gn \
+             kps1_lftq.gn kps1_lfts.gn
 
 KPG_R_GEN = kps1_pgft.gr
 

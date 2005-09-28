@@ -1,0 +1,217 @@
+      SUBROUTINE KPS1_LFTS<T>( ORDER, AXIS, SUBTRA, DATS, DIMS, BS, 
+     :                         STATUS )
+*+
+*  Name:
+*     KPG1_LFTSx
+
+*  Purpose:
+*     Evaluate and optionally subtract polynomial line fits.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_LFTS<T>( ORDER, AXIS, SUBTRA, DATS, DIMS, BS, STATUS )
+
+*  Description
+*     This routine evaluates and optionally subtracts the fits produced
+*     by the KPS1_LFTx and KPS1_LFTQx routines.
+
+*  Arguments:
+*     ORDER = INTEGER (Given)
+*        The order of polynomial to fit used to create the coefficients.
+*     AXIS = INTEGER (Given)
+*        The axis defining the lines that have been fitted.
+*     SUBTRA = LOGICAL (Given) 
+*        Whether to subtract the line fits. Otherwise the evaluations
+*        are returned.
+*     DATS( * ) = ? (Given and Returned)
+*        The data. The fit will be written to, or subtracted from this.
+*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*        The dimensions of the input data. Extra dimension should have
+*        size 1 up to NDF__MXDIM.
+*     BS( ORDER + 1, * ) = DOUBLE PRECISION (Returned)
+*        The polynomial coeffients. This array should be produced by the
+*        KPS1_LFTx routine for polynomials of order ORDER and for data with
+*        the given dimensions along the given AXIS.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine works in n-D, where n is 1 to 7.
+*
+*     - There is a routine for each numeric data type: replace "x" in
+*       the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*       base and arrays supplied to the routine must have the data type
+*       specified.
+
+*  Authors:
+*     PWD: Peter W. Draper (JAC, Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-SEP-2005 (PWD):
+*        Original version based upon KPS1_LFTx.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+
+*  Arguments Given:
+      INTEGER ORDER
+      INTEGER AXIS
+      LOGICAL SUBTRA
+      INTEGER DIMS( NDF__MXDIM )
+      DOUBLE PRECISION BS( ORDER + 1, * )
+
+*  Arguments Given and Returned:
+      <TYPE> DATS( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
+      EXTERNAL NUM_TRAP
+      INTEGER NUM_TRAP           ! Numerical error handler
+
+      EXTERNAL KPS1_POLYV
+      DOUBLE PRECISION KPS1_POLYV ! Value of polynomial
+
+*  Local Variables:
+      <TYPE> TVAL               ! The current data value.
+      DOUBLE PRECISION DVAL     ! The current data value.
+      INTEGER B                 ! Pixel index of work arrays
+      INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
+      INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER J                 ! Loop counter
+      INTEGER K                 ! Loop counter
+      INTEGER P                 ! Pixel index of the interleaved array
+      INTEGER STRID( NDF__MXDIM ) ! Dimension strides
+      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding the axis
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'     ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'     ! Declare NUM_ arithmetic functions      
+      INCLUDE 'NUM_DEF_CVT'     ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'     ! Define NUM_ arithmetic functions
+
+*  Equivalences so we can index loop variables by AXIS.
+      EQUIVALENCE( I1, I( 1 ) )
+      EQUIVALENCE( I2, I( 2 ) )
+      EQUIVALENCE( I3, I( 3 ) )
+      EQUIVALENCE( I4, I( 4 ) )
+      EQUIVALENCE( I5, I( 5 ) )
+      EQUIVALENCE( I6, I( 6 ) )
+      EQUIVALENCE( I7, I( 7 ) )
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Calculate the strides for each dimension.
+      STRID( 1 ) = 1
+      DO  J = 2, NDF__MXDIM
+         STRID( J ) = STRID( J - 1 ) * DIMS( J - 1 )
+      END DO
+
+*  Calculate the strides for each dimension, this time excluding AXIS
+*  so we can step around the workspace final dimension.
+      STRIDA( 1 ) = 1
+      K = 2
+      DO J = 2, NDF__MXDIM
+         IF ( J .NE. AXIS ) THEN
+            STRIDA( K ) = STRIDA( K - 1 ) * DIMS( K - 1 )
+            K = K + 1
+         END IF
+      END DO
+
+*  Reorder so workspace has same dimensions as data. Do this by giving
+*  the AXIS dimension size 0.
+      K = NDF__MXDIM - 1
+      DO J = NDF__MXDIM, 1, -1
+         IF ( J .EQ. AXIS ) THEN
+            STRIDA( J ) = 0
+         ELSE
+            STRIDA( J ) = STRIDA( K )
+            K = K - 1
+         END IF
+      END DO
+
+*  Need to be careful with numeric errors. So establish handlers. Use
+*  NUM not VAL for efficiency.
+      CALL NUM_HANDL( NUM_TRAP )
+      CALL NUM_CLEARERR()
+
+*  Loop over the whole data array.
+      P = 1
+      B = 1
+      DO I7 = 1, DIMS( 7 )
+         DO I6 = 1, DIMS( 6 )
+            DO I5 = 1, DIMS( 5 )
+               DO I4 = 1, DIMS( 4 )
+                  DO I3 = 1, DIMS( 3 )
+                     DO I2 = 1, DIMS( 2 )
+                        DO I1 = 1, DIMS( 1 )
+
+*  Check for BADness and evaluate the polynomial.
+                           TVAL = NUM_<T>TOD( DATS( P ) )
+                           IF ( TVAL .NE. VAL__BAD<T> ) THEN
+                              DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
+     :                                           DBLE( I( AXIS ) ) )
+
+*  Subtract, or not, from data value.
+                              IF ( SUBTRA ) THEN 
+                                 DATS( P ) =  NUM_SUB<T>( TVAL,
+     :                                                    NUM_DTO<T>(DVAL))
+                              ELSE 
+                                 DATS( P ) = NUM_DTO<T>( DVAL )
+                              END IF
+
+*  Failed conversion from double precision, or subtraction so output is
+*  now BAD.
+                              IF ( .NOT. NUM_WASOK() ) THEN
+                                 DATS( P ) = VAL__BAD<T>
+                                 CALL NUM_CLEARERR()
+                              END IF
+                           END IF
+
+*  Move to the next output pixel and next coefficients.
+                           P = P + STRID( 1 )
+                           B = B + STRIDA( 1 )
+                        END DO
+                        P = P + STRID( 2 ) - STRID( 1 ) * DIMS( 1 )
+                        B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
+                     END DO
+                     P = P + STRID( 3 ) - STRID( 2 ) * DIMS( 2 )
+                     B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
+                  END DO
+                  P = P + STRID( 4 ) - STRID( 3 ) * DIMS( 3 )
+                  B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
+               END DO
+               P = P + STRID( 5 ) - STRID( 4 ) * DIMS( 4 )
+               B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
+            END DO
+            P = P + STRID( 6 ) - STRID( 5 ) * DIMS( 5 )
+            B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
+         END DO
+         P = P + STRID( 7 ) - STRID( 6 ) * DIMS( 6 )
+         B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
+      END DO
+      
+* Remove error handler.
+      CALL NUM_REVRT
+
+      END
