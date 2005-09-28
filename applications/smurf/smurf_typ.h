@@ -20,11 +20,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-09-27 (AGG):
 *        Initial test version
+*     2005-09-27 (EC):
+*        Fixed format string macro
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -55,7 +58,7 @@
 #ifndef SMURF_TYP_DEFINED
 #define SMURF_TYP_DEFINED
 
-#define DIM_T_FMT "lud"
+#define DIM_T_FMT "lu"
 typedef unsigned long dim_t;
 
 #endif /* SMURF_TYP_DEFINED */
