@@ -58,6 +58,8 @@
 *        for the "Implementation Status" section.
 *     13-SEP-1990 (RFWS):
 *        Added support for A-task "Usage:" sections.
+*     28-SEP-2005 (DSB):
+*        Ignore "Synopsis" sections.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +85,7 @@
 
 *  Local Constants:
       INTEGER MXKEY              ! Max. no of search keys
-      PARAMETER ( MXKEY = 18 )
+      PARAMETER ( MXKEY = 19 )
 
       INTEGER SZKEY              ! Size of search keys
       PARAMETER ( SZKEY = 30 )
@@ -337,10 +339,11 @@
       NAME( 16 ) = 'Algorithm'
       NAME( 17 ) = 'Implementation Deficiencies'
       NAME( 18 ) = 'Language'
+      NAME( 19 ) = 'Synopsis'
       
 *  Loop to find all remaining sections.
 1     CONTINUE                ! Start of 'DO WHILE' loop
-      CALL SST_NSECT( .FALSE., 18, NAME, HEADER, FIRST, LAST, STATUS )
+      CALL SST_NSECT( .FALSE., 19, NAME, HEADER, FIRST, LAST, STATUS )
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
 
 *  Remove any trailing colon from the section heading.

@@ -29,6 +29,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     DSB: David S. Berry 
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +51,8 @@
 *        Added double \ for UNIX port.
 *     14-APR-2005 (PDRAPER):
 *        Made double \ sensitive to the compiler capabilities.
+*     28-SEP-2005 (DSB):
+*        Ignored "Synopsis" sections.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,7 +78,7 @@
 
 *  Local Constants:
       INTEGER MXKEY              ! Max. no of search keys
-      PARAMETER ( MXKEY = 19 )
+      PARAMETER ( MXKEY = 20 )
 
       INTEGER SZKEY              ! Size of search keys
       PARAMETER ( SZKEY = 30 )
@@ -330,10 +333,11 @@
       NAME( 17 ) = 'Algorithm'
       NAME( 18 ) = 'Implementation Deficiencies'
       NAME( 19 ) = 'Language'
+      NAME( 20 ) = 'Synopsis'
       
 *  Loop to find all remaining sections.
 1     CONTINUE                   ! Start of 'DO WHILE' loop
-      CALL SST_NSECT( .FALSE., 19, NAME, HEADER, FIRST, LAST, STATUS )
+      CALL SST_NSECT( .FALSE., 20, NAME, HEADER, FIRST, LAST, STATUS )
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
 
 *  Remove any trailing colon from the section heading.
