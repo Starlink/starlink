@@ -57,11 +57,11 @@ install-exec-local: dtask_main.o
 # Files alink.in and ilink.in depend on the values of the $(prefix)
 # variable, and so must be substituted at `make' time, rather than
 # `configure' time (see section `Installation Directory Variables' in
-# the autoconf manual).  Script dtask_link_adam calls (uninstalled)
+# the autoconf manual).  The other substitutions could be done at configure
+# time, but it would be pointlessly confusing to do the substititions in
+# two phases.  Script dtask_link_adam calls (uninstalled)
 # ../subpar/subpar_link adam internally, so we have to add that to
 # the PATH.
-#
-## Substitute ORIG_AM_FCFLAGS: see notes in ailink.in.m4
 edit = sed \
     -e 's,@staretcdir\@,$(staretcdir),g' \
     -e 's,@bindir\@,$(bindir),g' \
@@ -69,7 +69,9 @@ edit = sed \
     -e 's,@CC\@,$(CC),g' \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
     -e 's,@FC\@,$(FC),g' \
+    -e 's,@FCFLAGS\@,@FCFLAGS@,g' \
     -e 's,@STAR_FCFLAGS\@,@STAR_FCFLAGS@,g' \
+    -e 's,@STAR_CPPFLAGS\@,@STAR_CPPFLAGS@,g' \
     -e 's,@STAR_LDFLAGS\@,@STAR_LDFLAGS@,g' \
     -e 's,@FCLIBS\@,$(FCLIBS),g' \
     -e 's,@C_FC_FCLINK_MAGIC\@,$(C_FC_FCLINK_MAGIC),g' \
@@ -95,13 +97,17 @@ ilink: Makefile $(srcdir)/ilink.in
 	mv ilink.tmp ilink
 
 $(srcdir)/alink.in: $(srcdir)/ailink.in.m4
-	rm -f $@ alink.in.tmp
-	$(M4) -DSCRIPTNAME=alink $(srcdir)/ailink.in.m4 >alink.in.tmp \
-	    && mv alink.in.tmp $@
+	rm -f alink.in alink.in.tmp
+	$(M4) -D__SCRIPTNAME=alink \
+	    -D__GENMSG="alink.in: Generated from ailink.in.m4 by Makefile.am" \
+	    $(srcdir)/ailink.in.m4 >alink.in.tmp \
+	  && mv alink.in.tmp alink.in
 $(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
-	rm -f $@ ilink.in.tmp
-	$(M4) -DSCRIPTNAME=ilink $(srcdir)/ailink.in.m4 >ilink.in.tmp \
-	    && mv ilink.in.tmp $@
+	rm -f ilink.in ilink.in.tmp
+	$(M4) -D__SCRIPTNAME=ilink \
+	    -D__GENMSG="ilink.in: Generated from ailink.in.m4 by Makefile.am" \
+	    $(srcdir)/ailink.in.m4 >ilink.in.tmp \
+	  && mv ilink.in.tmp ilink.in
 # The installed dtask_libtool is just the libtool we configured for our.
 # own use -- it's specific to this configuration, not this directory.
 # Note that libtool is located in $(top_builddir) (not part of the
