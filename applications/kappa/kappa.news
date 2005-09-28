@@ -2,12 +2,16 @@
 
    A new release of KAPPA (v1.5) has been made. The main changes are:
 
-   o  A new application called WCSMOSAIC hass been added. This command
+   o  A new application called WCSMOSAIC has been added. This command
    mosaics a group of input NDFs using the associated WCS information to
    align them.
 
    o  A new application INTERLEAVE to form a higher-resolution NDF by
    interleaving a set of NDFs of the same dimensionality.
+
+   o  A new application FITLINES for fitting polynomials to lines
+   of multi-dimensional NDFs has been added. Lines are defined as 
+   running parallel to an axis and can be fitted to selected ranges.
 
    o  FITSEXIST is now a self-contained application.  It needs only read 
    access to an NDF, unlike the former version that was an alias to
