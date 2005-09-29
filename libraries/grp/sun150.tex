@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {sun150.6}
 \newcommand{\stardocnumber}    {150.6}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {8th January 2003}
+\newcommand{\stardocdate}      {29th September 2005}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
@@ -2808,6 +2808,8 @@ environment}
       This routine returns an item of integer information about a
       single name from a group. The item can be any one of those
       described under argument ITEM.
+
+      It can also return the current number of active GRP identifiers.
    }
    \sstinvocation{
       CALL GRP\_INFOI( IGRP, INDEX, ITEM, VALUE, STATUS )
@@ -2853,6 +2855,10 @@ environment}
          element have DEPTH 1. Names given explicitly within a DEPTH 1
          indirection element, have DEPTH 2, etc. If INDEX is out of
          bounds, then zero is returned.
+
+         NGRP - The number of GRP group identifiers currently in use.
+         The values of the IGRP and INDEX arguments are ignored. 
+
       }
       \sstsubsection{
          VALUE = INTEGER (Returned)
@@ -3572,6 +3578,8 @@ improvements to the GRP\_ package.
 The following changes have occurred in the GRP\_ system since version 3.1:
 
 \begin{enumerate}
+\item The GRP\_INFOI routine can now return the total number of active
+GRP identifiers.
 \item Shell meta-characters (references to environment variables, for
 instance) may now be included within file names which specify
 indirection elements.

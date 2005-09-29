@@ -16,6 +16,8 @@
 *     This routine returns an item of integer information about a
 *     single name from a group. The item can be any one of those
 *     described under argument ITEM.
+*
+*     It can also return the current number of active GRP identifiers.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -51,6 +53,9 @@
 *        indirection element, have DEPTH 2, etc. If INDEX is out of
 *        bounds, then zero is returned.
 *
+*        NGRP - The number of GRP group identifiers currently in use.
+*        The values of the IGRP and INDEX arguments are ignored. 
+*
 *     VALUE = INTEGER (Returned)
 *        The requested item of information.
 *     STATUS = INTEGER (Given and Returned)
@@ -63,6 +68,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     29-SEP-2005 (DSB):
+*        Added NGRP item.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,6 +134,24 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get an upper case version of the item label.
+      LITEM = ITEM
+      CALL CHR_UCASE( LITEM )
+
+*  The NGRP item is special in that it does not use the supplied GRP
+*  identifier or name index.
+      IF( LITEM( : 4 ) .EQ. 'NGRP' ) THEN
+
+*  Count the number of used slots in the common arrays.
+         VALUE = 0
+         DO SLOT = 1, GRP__MAXG
+            IF( CMN_USED( SLOT ) ) VALUE = VALUE + 1         
+         END DO
+
+*  All done, so jump to the end.
+         GO TO 999
+      END IF         
+
 *  Check that the supplied GRP identifier is valid, and find the index
 *  within the common arrays at which information describing the group is
 *  stored.
@@ -153,9 +178,6 @@
 
 *  If all has gone OK, store the relevant item.
       IF( STATUS .EQ. SAI__OK ) THEN
-
-         LITEM = ITEM
-         CALL CHR_UCASE( LITEM )
 
          IF( LITEM( : 6 ) .EQ. 'MODGRP' ) THEN
             VALUE = MODGRP
