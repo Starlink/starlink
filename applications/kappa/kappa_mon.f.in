@@ -60,7 +60,7 @@
 *     2005 August 12 (MJC):
 *        Added INTERLEAVE.
 *     20-SEP-2005 (PWD):
-*        Added FITLINES.
+*        Added MFITTRENDS.
 *     29-SEP-2005 (DSB):
 *        Added warnings about unannulled GRP identifiers.
 *     {enter_further_changes_here}
@@ -244,10 +244,6 @@
          ELSE IF ( NAME .EQ. 'FILLBAD' ) THEN
             CALL FILLBAD ( STATUS )
 
-*  Fit polynomials to lines parallel to an axis.
-         ELSE IF ( NAME .EQ. 'FITLINES' ) THEN
-            CALL FITLINES ( STATUS )
-
 *  Reverses an NDF's pixels along a specified dimension.
          ELSE IF ( NAME .EQ. 'FITSURFACE' ) THEN
             CALL FITSURFACE ( STATUS )
@@ -345,6 +341,10 @@
 *  Smooths a 2-dimensional data array using a weighted median filter.
          ELSE IF ( NAME .EQ. 'MEDIAN' ) THEN
             CALL MEDIAN ( STATUS )
+
+*  Determine trends using polynomial fits.
+         ELSE IF ( NAME .EQ. 'MFITTREND' ) THEN
+            CALL MFITTREND ( STATUS )
 
 *  Does cumulative statistics on a 2-d sub-array over a sequence of
 *  2-d data arrays.

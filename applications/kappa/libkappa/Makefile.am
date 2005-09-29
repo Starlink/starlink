@@ -16,7 +16,7 @@ paste.f permaxes.f pixdupe.f psf.f rift.f regrid.f rotate.f segment.f  \
 setmagic.f shadow.f slide.f sqorst.f stats.f sub.f substitute.f	       \
 surfit.f thresh.f trandat.f trig.f wiener.f zaplin.f listmake.f	       \
 listshow.f profile.f wcsalign.f wcsmosaic.f wcstran.f kapversion.f     \
-fitlines.f
+mfittrend.f
 
 F2_ROUTINES = kap_div.f kap_pow.f
 

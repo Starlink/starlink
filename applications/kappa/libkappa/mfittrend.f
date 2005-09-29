@@ -297,8 +297,8 @@
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
-         CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from the '//
-     :                 'current co-ordinate Frame of ''^NDF'' '//
+         CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from the'//
+     :                 ' current co-ordinate Frame of ''^NDF'' '//
      :                 '(^T) to pixel co-ordinates is not defined.',
      :                 STATUS )
 
@@ -768,7 +768,7 @@
 
 *  If an error occurred, then report context information.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'FITLINE_ERR', 
+         CALL ERR_REP( 'MFITTREND_ERR', 
      :                 'MFITTREND: Error determining trends',
      :                 STATUS )
       END IF

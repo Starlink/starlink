@@ -8925,99 +8925,6 @@ package kappa {
 
       }
 
-      action fitlines {
-         alias {fitl(ines)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter axis {
-            position 2
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            default 3
-            prompt {Axis of lines}
-            helpkey *
-          }
-
-          parameter in {
-            position 1
-            type NDF
-            access READ
-            vpath PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.DATA_ARRAY
-            prompt {Input NDF}
-            helpkey *
-          }
-
-         parameter modifyin {
-            type _LOGICAL
-            prompt {Modify the input NDF}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter order {
-            position 4
-            type _INTEGER
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default 3
-            prompt {Order of polynomials}
-            helpkey *
-          }
-
-         parameter out {
-            position 5
-            type NDF
-            access WRITE
-            vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
-            prompt {Output NDF}
-            helpkey *
-          }
-
-         parameter ranges {
-            position 3
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            default !
-            prompt {Coordinate ranges (pairs)}
-            helpkey *
-            size *
-          }
-
-         parameter subtract {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Subtract fits}
-            helpkey *
-          }
-
-         parameter title {
-            type LITERAL
-            vpath DEFAULT
-            prompt {Title for output NDF}
-            default !
-            helpkey *
-          }
-
-         parameter variance {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            default TRUE
-            prompt {Use variances as weights}
-            helpkey *
-          }
-
-      }
-
       action fillbad {
          alias {fill(bad)}
 
@@ -11958,6 +11865,99 @@ iraf! {
             vpath DEFAULT
             default !
             prompt {Output title}
+            helpkey *
+          }
+
+      }
+
+      action mfittrend {
+         alias {mfitt(rend)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter axis {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Axis of trends}
+            helpkey *
+          }
+
+          parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter modifyin {
+            type _LOGICAL
+            prompt {Modify the input NDF}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter order {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Order of polynomials}
+            helpkey *
+          }
+
+         parameter out {
+            position 5
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+          }
+
+         parameter ranges {
+            position 3
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Coordinate ranges (pairs)}
+            helpkey *
+            size *
+          }
+
+         parameter subtract {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Subtract trends}
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            default !
+            helpkey *
+          }
+
+         parameter variance {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Use variances as weights}
             helpkey *
           }
 

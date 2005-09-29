@@ -9,9 +9,11 @@
    o  A new application INTERLEAVE to form a higher-resolution NDF by
    interleaving a set of NDFs of the same dimensionality.
 
-   o  A new application FITLINES for fitting polynomials to lines
-   of multi-dimensional NDFs has been added. Lines are defined as 
-   running parallel to an axis and can be fitted to selected ranges.
+   o  A new application MFITTREND for multiple fitting of trends to individual 
+   data lines of multi-dimensional NDFs has been added. The trends are
+   actually polynomials, which can be restricted to selected coordinate 
+   ranges, making this a useful tool for fitting the continua of independent 
+   spectra stored in data cubes.
 
    o  FITSEXIST is now a self-contained application.  It needs only read 
    access to an NDF, unlike the former version that was an alias to
