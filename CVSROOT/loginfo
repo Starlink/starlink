@@ -28,19 +28,19 @@
 #
 # These regexps match the directory being committed
 #
-# Toby White is working on autoconf, too
-^thirdparty/fsf/autoconf	mail -s "CVS commit: autoconf" norman@astro.gla.ac.uk, tow21@cam.ac.uk
 #
 ^\.$			mail -s "CVS commit: %p" norman@astro.gla.ac.uk
-^buildsupport		mail -s "CVS commit: %p" norman@astro.gla.ac.uk
-^thirdparty/fsf		mail -s "CVS commit: %p" norman@astro.gla.ac.uk
-#
-^java/source/hdx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
-^java/source/ndx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/hds	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/util	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java/source/ast	mail -s "CVS commit: %p" M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java			mail -s "CVS commit: %p" ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
 ^applications/autoastrom	mail -s "CVS commit: %p" norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
 ^applications/sgmlkit	mail -s "CVS commit: %p" norman@astro.gla.ac.uk
+^buildsupport		mail -s "CVS commit: %p" norman@astro.gla.ac.uk
+^java			mail -s "CVS commit: %p" ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
+^java/source/ast	mail -s "CVS commit: %p" M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
+^java/source/hds	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/hdx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
+^java/source/ndx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/util	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
 ^libraries/ast		mail -s "CVS commit: %p" dsb@ast.man.ac.uk norman@astro.gla.ac.uk
+^pubs/spe-2005		mail -s "CVS commit: %p" timj@jach.hawaii.edu norman@astro.gla.ac.uk
+^thirdparty/fsf		mail -s "CVS commit: %p" norman@astro.gla.ac.uk
+# Toby White is working on autoconf, too
+^thirdparty/fsf/autoconf	mail -s "CVS commit: autoconf" norman@astro.gla.ac.uk tow21@cam.ac.uk
