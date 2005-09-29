@@ -166,6 +166,7 @@ kpg1_cmvvd.f \
 kpg1_cmvvr.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
+kpg1_copy.f \
 kpg1_cpbdd.f \
 kpg1_cpbdr.f \
 kpg1_cpndb.f \
