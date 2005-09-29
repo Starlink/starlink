@@ -36,10 +36,10 @@
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions
 \LoadClass{article}
-\RequirePackage[dvips]{graphicx}
+\RequirePackage{graphicx}
 \RequirePackage{pifont,latexsym,ifthen,theorem,rotating,alltt,calc}
 \RequirePackage{amsfonts,amssymb,amsbsy,amsmath}
-%\RequirePackage{times}
+\RequirePackage{times}
 %\RequirePackage[mtbold]{mathtime}
 \RequirePackage[errorshow]{tracefnt}
 
