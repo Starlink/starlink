@@ -20,12 +20,12 @@ libkpg_grf_la_SOURCES = \
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-PUBLIC_INCLUDES = CTM_PAR
+PUBLIC_INCLUDES = CTM_PAR kaplibs.h
 PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM
 BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
-kpg1_ieeer.c  kpg1_isfinr.c
+kpg1_ieeer.c  kpg1_isfinr.c kaplibs.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
