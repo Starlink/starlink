@@ -1,10 +1,10 @@
-      SUBROUTINE FITLINES( STATUS )
+      SUBROUTINE MFITTREND( STATUS )
 *+
 *  Name:
-*     FITLINES
+*     MFITTREND
 
 *  Purpose:
-*     Fits polynomials to data lines that are parallel to a WCS axis.
+*     Fits independent trends to data lines that are parallel to an axis.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,66 +13,70 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL FITLINES( STATUS )
+*     CALL MFITTREND( STATUS )
 
 *  Description:
-*     This routine performs the fitting of polynomials of any order up
-*     to 15 to individual lines of data that lie parallel to a chosen axis.
+*     This routine fits trends to all lines of data in an NDF that lie
+*     parallel to a chosen axis. The trends are characterised by
+*     polynomials of order up to 15 and can be restricted to use data
+*     that only lies within a series of coordinate ranges along the
+*     selected axis.
 *
-*     For instance when dealing with a cube whose third axis represents
-*     the spectral dispersion, the lines that will be fitted (when the
-*     third axis is chosen) are each of the spectra, one for each
-*     position on the sky.
+*     Once the trends have been determined they can either be stored
+*     directly or subtracted from the input data.  If stored directly
+*     they can be subtracted later. The advantage of that approach is
+*     the subtraction can be undone, but at some cost in efficiency.
 *
-*     The polynomial fits can either be evaluated and written to a new
-*     NDF or they can be subtracted from the input NDF. If evaluated and
-*     subtracted later, then the subtraction can be undone, at some
-*     speed cost.
-*
-*     The data used in each fit can be restricted by supplying a series
-*     of coordinate ranges along the axis.
+*     Fitting independent trends can be useful when you need to remove
+*     the continuum from a spectral cube, where each spectrum is
+*     independent of the others (that is you need an independent
+*     continuum determination for each position on the sky). It can also
+*     be used to de-trend individual spectra and perform functions like
+*     debiassing a CCD which has bias strips.
 
 *  Usage:
-*     fitlines in axis ranges order out
+*     mfittrend in axis ranges order out
 
 *  ADAM Parameters:
 *     AXIS = LITERAL (Read)
 *        The axis of the current coordinate system that defines the
-*        direction that polynomials should be fitted.  This is specified
-*        by its integer index within the current Frame of the input NDF
-*        (in the range 1 to the number of axes in the current Frame), or
-*        by its symbol string. A list of acceptable values is displayed
-*        if an illegal value is supplied. If the axes of the current
-*        Frame are not parallel to the NDF pixel axes, then the pixel
-*        axis which is most nearly parallel to the specified current
-*        Frame axis will be used. Defaults to the last axis. [!]
+*        direction of the trends. This is specified by its integer index
+*        within the current Frame of the input NDF (in the range 1 to
+*        the number of axes in the current Frame), or by its symbol
+*        string. A list of acceptable values is displayed if an illegal
+*        value is supplied. If the axes of the current Frame are not
+*        parallel to the NDF pixel axes, then the pixel axis which is
+*        most nearly parallel to the specified current Frame axis will
+*        be used. Defaults to the last axis. [!]
 *     IN = NDF (Read)
 *        The input NDF. On successful completion this may have the
-*        fit subtracted, if SUBTRACT and MODIFYIN are both set true.
+*        trends subtracted, but only, if SUBTRACT and MODIFYIN are both set
+*        true.
 *     MODIFYIN = _LOGICAL (Read)
-*        Whether to subtract the fit from the input NDF. Only used when
+*        Whether to subtract the trends from the input NDF. Only used when
 *        SUBTRACT is true. If this value is false then a NDF name must
 *        be supplied by the OUT parameter. [false]
 *     ORDER = _INTEGER (Read)
-*        The order of the polynomials to be fitted to each line of
-*        data. A polynomial of order 0 is a constant and 1 a line the
-*        maximum value is 15.
+*        The order of the polynomials to be used when trend fitting.
+*        A polynomial of order 0 is a constant and 1 a line, 2 a
+*        quadratic etc. The maximum value is 15.
 *        [3]
 *     OUT = NDF (Read)
 *        The output NDF containing either the difference between the
-*        input NDF and the various line fits, or the values of the line
-*        fits themselves. Will not be used if SUBTRACT and MODIFYIN
+*        input NDF and the various trends, or the values of the trends
+*        themselves. Will not be used if SUBTRACT and MODIFYIN
 *        are true (in that case the input NDF will be modified).
 *     RANGES() = LITERAL (Read)
-*        Pairs of coordinates that define ranges along the fit axis. When
-*        given these ranges are used to select the values that are used
-*        in the fit. If not given then all the data along each line is
-*        used. The units of these ranges is determined by the current
-*        axis of the world coordinate system that corresponds to the
-*        selected axis. Up to 10 pairs of values are allowed. [!]
+*        Pairs of coordinates that define ranges along the trend
+*        axis. When given these ranges are used to select the values
+*        that are used in the fits. If not given then all the values
+*        along each data line is used. The units of these ranges is
+*        determined by the current axis of the world coordinate system
+*        that corresponds to the trend axis. Up to 10 pairs of values
+*        are allowed. [!]
 *     SUBTRACT = _LOGICAL (Read)
-*        Whether to subtract the fit from the input NDF or not. If not
-*        then the line fits will be evaluated and written to a new NDF.
+*        Whether to subtract the trends from the input NDF or not. If not
+*        then the trends will be evaluated and written to a new NDF.
 *        [false]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
@@ -83,27 +87,29 @@
 *        polynomial fits will be weighted by the variances.
 
 *  Examples:
-*     fitlines in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=fit
+*     mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=fit
 *        This example fits cubic polynomials to the spectral axis of
 *        a data cube. The fits only use the data lying within the
-*        ranges 1000 to 2000 and 3000 to 4000 angstroms (assuming
-*        the spectral axis is calibrated in angstroms and that is the
+*        ranges 1000 to 2000 and 3000 to 4000 Angstroms (assuming
+*        the spectral axis is calibrated in Angstroms and that is the
 *        current coordinate system). The fit is evaluated and
 *        written to the data cube "fit".
 
 *  Notes:
-*     This application attempts to solve the problem of evaluating
-*     numerous line fits that do not following the natural ordering of the
-*     NDF data in the most efficient way possible. To do this requires
-*     the use of additional memory (of order one less than the
-*     dimensionality of the NDF itself, times the polynomial order squared).
-*     To minimise the use of memory and get the fastest possible
-*     determinations you should not use weighting and assert that the
-*     input data do not have any BAD values (use the application SETBAD
-*     to set the appropriate flag).
+*     This application attempts to solve the problem of fitting numerous
+*     polynomials in a least squares sense and that do not follow the
+*     natural ordering of the NDF data, in the most CPU time efficient
+*     way possible.
+*
+*     To do this requires the use of additional memory (of order one
+*     less than the dimensionality of the NDF itself, times the
+*     polynomial order squared).  To minimise the use of memory and get
+*     the fastest possible determinations you should not use weighting
+*     and assert that the input data do not have any BAD values (use the
+*     application SETBAD to set the appropriate flag).
 
 *  Related Applications:
-*     KAPPA: SETBAD
+*     KAPPA: SETBAD, CCDPACK: DEBIAS, FIGARO: FITCONT, FITPOLY
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
@@ -209,7 +215,7 @@
 *.
 
 *  Future development notes: Should look at storing the coefficients and
-*  write a model evaluating application MAKELINES? This would follow
+*  write a model evaluating application MAKETREND? This would follow
 *  the KAPPA model more closely and allow the fit to be undone, even
 *  when subtracting directly. Maybe a need for a statistics generating
 *  version too, but the quality of the fits is a potentially large
@@ -239,7 +245,7 @@
       END IF
 
 *  Obtain identifier for the input NDF.
-      IF ( MODIN ) THEN 
+      IF ( MODIN ) THEN
          CALL LPG_ASSOC( 'IN', 'UPDATE', INNDF, STATUS )
       ELSE
          CALL LPG_ASSOC( 'IN', 'READ', INNDF, STATUS )
@@ -271,7 +277,7 @@
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
       TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
 
-*  Get axis to fit the lines to. Default is last axis in the WCS.
+*  Get axis to fit the polynomials to. Default is last axis in the WCS.
       IF ( NDIM .NE. 1 ) THEN
          IAXIS = NAXC
          CALL KPG1_GTAXI( 'AXIS', CFRM, 1, IAXIS, STATUS )
@@ -291,7 +297,7 @@
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
-         CALL ERR_REP( 'FITLINES_ERR2', 'The transformation from the '//
+         CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from the '//
      :                 'current co-ordinate Frame of ''^NDF'' '//
      :                 '(^T) to pixel co-ordinates is not defined.',
      :                 STATUS )
@@ -301,7 +307,7 @@
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
-         CALL ERR_REP( 'FITLINES_ERR3', 'The transformation from '//
+         CALL ERR_REP( 'MFITTREND_ERR3', 'The transformation from '//
      :                 'pixel co-ordinates to the current co-ordinate'//
      :                 ' Frame of ''^NDF'' (^T) is not defined.',
      :                 STATUS )
@@ -325,7 +331,7 @@
 *  Ranges must come in pairs.
          IF ( 2 * ( NRANGE / 2 ) .NE. NRANGE ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'FITLINES_ERR4',
+            CALL ERR_REP( 'MFITTREND_ERR4',
      :                    'Range values must be supplied in pairs',
      :                    STATUS )
             GO TO 999
@@ -389,7 +395,7 @@
 
          ELSE IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'FITLINES_ERR5', 'The WCS information is '//
+            CALL ERR_REP( 'MFITTREND_ERR5', 'The WCS information is '//
      :                    'too complex (cannot find two valid pixel '//
      :                    'positions). Change current frame to PIXEL '//
      :                    'and try again', STATUS )
@@ -427,7 +433,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'LO', JLO )
                CALL MSG_SETI( 'HI', JHI )
-               CALL ERR_REP( 'FITLINES_ERR6', 'An axis range '//
+               CALL ERR_REP( 'MFITTREND_ERR6', 'An axis range '//
      :                       'covers zero pixels (are the '//
      :                       'RANGE values equal or outside the '//
      :                       'bounds of the NDF?)(^LO:^HI)',
@@ -472,8 +478,8 @@
       ELSE
 
 *  Will write evals to a new NDF. Don't propagate quality as this is
-*  model data now. Note we will also not propagate the variance. 
-         CALL LPG_PROP( INNDF, 'Units,Label,Axis,WCS', 'OUT', OUTNDF, 
+*  model data now. Note we will also not propagate the variance.
+         CALL LPG_PROP( INNDF, 'Units,Label,Axis,WCS', 'OUT', OUTNDF,
      :                  STATUS )
       END IF
 
@@ -509,11 +515,11 @@
 
 *  Same for variances.
             IF ( USEVAR ) THEN
-               CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPTMP, 
+               CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPTMP,
      :                       EL, STATUS )
                CALL NDF_MAP( OUTNDF, 'VARIANCE', ITYPE, 'WRITE', IPVAR,
      :                       EL, STATUS )
-               CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPVAR( 1 ), 
+               CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPVAR( 1 ),
      :                         STATUS )
                CALL NDF_UNMAP( INNDF, 'VARIANCE', STATUS )
             END IF
@@ -534,7 +540,7 @@
          CALL NDF_MAP( INNDF, 'DATA', ITYPE, 'READ', IPDAT, EL,
      :                 STATUS )
          IF ( USEVAR ) THEN
-            CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPVAR, EL, 
+            CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPVAR, EL,
      :                    STATUS )
          END IF
       END IF
@@ -762,8 +768,8 @@
 
 *  If an error occurred, then report context information.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'FITLINE_ERR',
-     :        'FITLINES: Error fitting polynomials to NDF lines',
+         CALL ERR_REP( 'FITLINE_ERR', 
+     :                 'MFITTREND: Error determining trends',
      :                 STATUS )
       END IF
 
