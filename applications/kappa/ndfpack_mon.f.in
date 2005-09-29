@@ -53,6 +53,8 @@
 *        Added call to LPG_REPLA.
 *     2005 April 15 (MJC):
 *        Added FITSEXIST, now a spearate A-task.
+*     29-SEP-2005 (DSB):
+*        Added warnings about unannulled GRP identifiers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,6 +67,7 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
+      INCLUDE  'GRP_PAR'          ! GRP definitions
 
 *  Status:
       INTEGER  STATUS
@@ -76,6 +79,8 @@
 
 *  Local Variables:
       CHARACTER NAME * ( 15 )     ! Task name from the command
+      INTEGER NGRP0               ! Number of active GRP groups on entry
+      INTEGER NGRP1               ! Number of active GRP groups on exit
       LOGICAL REPL                ! Replace input NDFs?
       LOGICAL DISAB               ! Disable looping?
       LOGICAL VERB                ! Run in verbose mode?
@@ -85,6 +90,9 @@
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Note the current number of active GRP identifiers.
+      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP0, STATUS )
 
 *  Obtain the command from the environment.  This returns uppercase
 *  names.
@@ -315,5 +323,28 @@
 
       END DO
 
+*  Note the current number of active GRP identifiers. Do this in a new
+*  error reporting context so that we get the correct value even if an
+*  error has occurred.
+      CALL ERR_BEGIN( STATUS )
+      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP1, STATUS )
+
+*  If there are more active groups now than there were on entry, there
+*  must be a problem (GRP identifiers are not being freed somewhere). So
+*  report it.
+      IF( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL MSG_SETI( 'NGRP0', NGRP0 )
+         CALL MSG_SETI( 'NGRP1', NGRP1 )
+         CALL MSG_OUT( 'KAPPA_NGRP', 'WARNING: The number of active '//
+     :             'GRP identifiers increased from ^NGRP0 to ^NGRP1 '//
+     :             'during execution of ^NAME (KAPPA programming '//
+     :             ' error).', STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
+      CALL ERR_END( STATUS )
+
 *  End and return.
+
       END
