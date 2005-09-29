@@ -181,6 +181,7 @@
       INTEGER IPIN( 1 )         ! Pointer to mapped data
       INTEGER IPIX              ! Index of PIXEL Frame within WCS FrameSet
       INTEGER IPOUT( 1 )        ! Pointer to mapped data
+      INTEGER IPTMP( 1 )        ! Pointer to temporary NDF component
       INTEGER IPVAR( 1 )        ! Pointer to NDF variance component
       INTEGER IPWRK1            ! Pointer to workspace
       INTEGER IPWRK2            ! Pointer to workspace
@@ -190,7 +191,6 @@
       INTEGER JLO               ! Low pixel index for axis
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER MAP               ! PIXEL Frame to Current Frame Mapping pointer
-      INTEGER MODNDF            ! NDF identifier for fit modified NDF
       INTEGER NAXC              ! Number of axes in current frame
       INTEGER NDIM              ! Number of NDF dimensions.
       INTEGER NRANGE            ! Number of range values (not pairs)
@@ -211,7 +211,9 @@
 *  Future development notes: Should look at storing the coefficients and
 *  write a model evaluating application MAKELINES? This would follow
 *  the KAPPA model more closely and allow the fit to be undone, even
-*  when subtracting directly.
+*  when subtracting directly. Maybe a need for a statistics generating
+*  version too, but the quality of the fits is a potentially large
+*  amount of information.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -222,9 +224,26 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain identifier for the input NDF. Note we use UPDATE access as the
-*  results of the fits are written to the NDF extension.
-      CALL LPG_ASSOC( 'IN', 'UPDATE', INNDF, STATUS )
+*  Get the order of the polynomial.
+      CALL PAR_GDR0I( 'ORDER', 3, 0, 15, .FALSE., ORDER, STATUS )
+
+*  See if we should subtract fit from data. Need to do this early as we
+*  may be modifying the input NDF.
+      CALL PAR_GET0L( 'SUBTRACT', SUBTRA, STATUS )
+
+*  See if the input NDF should have the fits subtracted, only matters if
+*  we're subtracting the fit.
+      MODIN = .FALSE.
+      IF ( SUBTRA ) THEN
+         CALL PAR_GET0L( 'MODIFYIN', MODIN, STATUS )
+      END IF
+
+*  Obtain identifier for the input NDF.
+      IF ( MODIN ) THEN 
+         CALL LPG_ASSOC( 'IN', 'UPDATE', INNDF, STATUS )
+      ELSE
+         CALL LPG_ASSOC( 'IN', 'READ', INNDF, STATUS )
+      END IF
 
 *  Get the bounds and dimensionality.
       CALL NDF_BOUND( INNDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -442,44 +461,20 @@
 *  End of get fit ranges
 *  =====================
 
-*  Get the order of the polynomial.
-      CALL PAR_GDR0I( 'ORDER', 3, 0, 15, .FALSE., ORDER, STATUS )
-
-*  See if we should subtract fit from data.
-      CALL PAR_GET0L( 'SUBTRACT', SUBTRA, STATUS )
-
-*  See if the input NDF should have the fits subtracted, only matters if
-*  we're subtracting the fit.
-      IF ( SUBTRA ) THEN
-         CALL PAR_GET0L( 'MODIFYIN', MODIN, STATUS )
-      END IF
-
 *  If needed create a new output NDF based on the input NDF.
       IF ( SUBTRA ) THEN
          IF ( .NOT. MODIN ) THEN
 
-*  Propagate all components as we will use this as the basis for further
-*  calculations and just map in the data from this NDF to save VM.
-            CALL LPG_PROP( INNDF,
-     :                     'Data,Variance,Quality,Units,Label,Axis,WCS',
+*  Propagate all components except data and variance to the new NDF.
+            CALL LPG_PROP( INNDF, 'Quality,Units,Label,Axis,WCS',
      :                     'OUT', OUTNDF, STATUS )
-
-*  Set the NDF that will have it's data mapped for fitting and
-*  eventually have the fit subtracted.
-            MODNDF = OUTNDF
-         ELSE
-            MODNDF = INNDF
          END IF
       ELSE
 
-*  Will write evals to a new NDF. Don't propagate variance or quality
-*  as this is model data now.
+*  Will write evals to a new NDF. Don't propagate quality as this is
+*  model data now. Note we will also not propagate the variance. 
          CALL LPG_PROP( INNDF, 'Units,Label,Axis,WCS', 'OUT', OUTNDF, 
      :                  STATUS )
-
-*  Just arrange to fit the input NDF data. The output NDF will be used
-*  later when evaluating the fits.
-         MODNDF = INNDF
       END IF
 
 *  Do we have any variances to use for weights and should they be used?
@@ -498,13 +493,50 @@
 *  Get the data type.
       CALL NDF_TYPE( INNDF, 'DATA', ITYPE, STATUS )
 
-*  Map in the data, use UPDATE mode if subtracting values.
+*  Map in the data. Note we transfer the data component from the input
+*  NDF to the output NDF, as this saves on an unmap by HDS followed by a
+*  map by us (if we allowed this to propagate).
       IF ( SUBTRA ) THEN
-         CALL NDF_MAP( MODNDF, 'DATA', ITYPE, 'UPDATE', IPDAT, EL,
-     :                 STATUS )
+         IF ( .NOT. MODIN ) THEN
+            CALL NDF_MAP( INNDF, 'DATA', ITYPE, 'READ', IPTMP, EL,
+     :                    STATUS )
+            CALL NDF_MAP( OUTNDF, 'DATA', ITYPE, 'WRITE', IPDAT, EL,
+     :                    STATUS )
+
+*  Copy data to the output NDF.
+            CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPDAT( 1 ), STATUS )
+            CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
+
+*  Same for variances.
+            IF ( USEVAR ) THEN
+               CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPTMP, 
+     :                       EL, STATUS )
+               CALL NDF_MAP( OUTNDF, 'VARIANCE', ITYPE, 'WRITE', IPVAR,
+     :                       EL, STATUS )
+               CALL KPG1_COPY( ITYPE, EL, IPTMP( 1 ), IPVAR( 1 ), 
+     :                         STATUS )
+               CALL NDF_UNMAP( INNDF, 'VARIANCE', STATUS )
+            END IF
+         ELSE
+
+*  Subtracting from the input DATA, just map that in update mode.
+            CALL NDF_MAP( INNDF, 'DATA', ITYPE, 'UPDATE', IPDAT, EL,
+     :                    STATUS )
+            IF ( USEVAR ) THEN
+               CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'UPDATE', IPVAR,
+     :                       EL, STATUS )
+            END IF
+         END IF
       ELSE
-         CALL NDF_MAP( MODNDF, 'DATA', ITYPE, 'READ', IPDAT, EL,
+
+*  No need to copy input data, will just populate output NDF data
+*  component with model values.
+         CALL NDF_MAP( INNDF, 'DATA', ITYPE, 'READ', IPDAT, EL,
      :                 STATUS )
+         IF ( USEVAR ) THEN
+            CALL NDF_MAP( INNDF, 'VARIANCE', ITYPE, 'READ', IPVAR, EL, 
+     :                    STATUS )
+         END IF
       END IF
 
 *  Allocate various workspaces. The requirements for these depends on
@@ -533,16 +565,11 @@
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
 
-*  If weighting fits access variance.
-      IF ( USEVAR ) THEN
-         CALL NDF_MAP( MODNDF, 'VARIANCE', '_DOUBLE', 'READ', IPVAR, EL,
-     :                 STATUS )
-      END IF
 
 *  Do the fits and optional subtraction. NB could reduce memory use by
 *  NDF blocking though planes for higher dimensional data, or just
 *  mapping the intersection of ranges, or individual ranges, but that
-*  would only be good if for the last axis.
+*  would only be good if working with the last axis (need contiguity).
       IF ( USEVAR .OR. HASBAD ) THEN
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
@@ -718,7 +745,11 @@
       CALL PSX_FREE( IPWRK2, STATUS )
 
 *  Obtain the output title and insert it into the result NDF.
-      CALL NDF_CINP( 'TITLE', MODNDF, 'TITLE', STATUS )
+      IF ( MODIN ) THEN
+         CALL NDF_CINP( 'TITLE', INNDF, 'TITLE', STATUS )
+      ELSE
+         CALL NDF_CINP( 'TITLE', OUTNDF, 'TITLE', STATUS )
+      END IF
 
 *  Exit in error label, tidyup after this point.
  999  CONTINUE
