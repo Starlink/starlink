@@ -4,9 +4,10 @@
 \RCS$Revision$
 \RCS$Date$
 
-\usepackage{url,prettyref}
+% XXX might have to remove or resolve these before submission
+\usepackage{url}
 \usepackage[bookmarksopen,urlcolor=red]{hyperref}
-
+\usepackage{prettyref}
 \newrefformat{s}{Sect.~\ref{#1}}
 
 \begin{document}
@@ -14,15 +15,16 @@
 % SPE-specific stuff ...
 \SPE{1}{1}{00}{00}{2004}
 
-\runningheads{N Gray}{Dragged from the stone-age [v\RCSRevision]}
+\runningheads{N Gray and T Jenness}{Dragged from the stone-age [v\RCSRevision]}
 
 \title{Dragged from the stone-age: autoconfing a big old project}
 
-\author{Norman Gray\footnotemark}
-\longaddress{Department of Physics and Astronomy,
+\author{Norman Gray\affil1\comma\corrauth\ and Tim Jenness\affil2}
+\longaddress{\affilnum1 Department of Physics and Astronomy,
   University of Glasgow, Glasgow G12 8QQ, UK; and\\
-  Starlink Project, Rutherford Appleton Laboratory, UK}
-\footnotetext{E-mail: norman@astro.gla.ac.uk}
+  Starlink Project, Rutherford Appleton Laboratory, UK\\
+\affil2 Joint Astronomy Centre, University Park, Hilo, Hawai'i 96720, USA}
+\corraddr{\texttt{norman@astro.gla.ac.uk}}
 
 \noreceived{}
 \norevised{}
