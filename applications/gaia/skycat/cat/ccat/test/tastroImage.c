@@ -10,7 +10,7 @@
  */
 
 #include <stdio.h>
-#include "astroCatalog.h"
+#include "astroCatalog.hxx"
 #include "worldCoords.h"
 
 /* 
