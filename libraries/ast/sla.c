@@ -39,6 +39,8 @@
 *        Added SLA_GEOC, SLA_HFK5Z and SLA_FK5HZ.
 *     2-DEC-2004 (DSB):
 *        Added SLA_DEULER.
+*     29-SEP-2005 (DSB):
+*        Added SLA_DE2H and SLA_DH2E
 */
 
 /* Macros */
@@ -1265,6 +1267,54 @@ void slaDeuler ( char *order, double phi, double theta, double psi,
 
 }
 
+
+F77_SUBROUTINE(sla_de2h)( DOUBLE(HA),
+                          DOUBLE(DEC),
+                          DOUBLE(PHI),
+                          DOUBLE(AZ),
+                          DOUBLE(EL) );
+
+void slaDe2h ( double ha, double dec, double phi, double *az, double *el ) {
+   DECLARE_DOUBLE(HA);
+   DECLARE_DOUBLE(DEC);
+   DECLARE_DOUBLE(PHI);
+   DECLARE_DOUBLE(AZ);
+   DECLARE_DOUBLE(EL);
+   HA = ha;
+   DEC = dec;
+   PHI = phi;
+   F77_CALL(sla_de2h)( DOUBLE_ARG(&HA),
+                       DOUBLE_ARG(&DEC),
+                       DOUBLE_ARG(&PHI),
+                       DOUBLE_ARG(&AZ),
+                       DOUBLE_ARG(&EL) );
+   *az = AZ;
+   *el = EL;
+}
+
+F77_SUBROUTINE(sla_dh2e)( DOUBLE(AZ),
+                          DOUBLE(EL),
+                          DOUBLE(PHI),
+                          DOUBLE(HA),
+                          DOUBLE(DEC) );
+
+void slaDh2e ( double az, double el, double phi, double *ha, double *dec ) {
+   DECLARE_DOUBLE(AZ);
+   DECLARE_DOUBLE(EL);
+   DECLARE_DOUBLE(PHI);
+   DECLARE_DOUBLE(HA);
+   DECLARE_DOUBLE(DEC);
+   AZ = az;
+   EL = el;
+   PHI = phi;
+   F77_CALL(sla_dh2e)( DOUBLE_ARG(&AZ),
+                       DOUBLE_ARG(&EL),
+                       DOUBLE_ARG(&PHI),
+                       DOUBLE_ARG(&HA),
+                       DOUBLE_ARG(&DEC) );
+   *ha = HA;
+   *dec = DEC;
+}
 
 
 
