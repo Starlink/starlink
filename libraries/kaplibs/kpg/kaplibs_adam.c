@@ -102,3 +102,31 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
 }
 
 
+
+F77_SUBROUTINE(kpg1_gtgrp)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(SIZE),
+                            INTEGER(STATUS) TRAIL(PARAM) );
+
+void kpg1Gtgrp( const char *param, int igrp, int *size, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_CHARACTER(PARAM,strlen( param ));
+   F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
+   F77_EXPORT_INTEGER(igrp,IGRP);
+   F77_EXPORT_INTEGER(*status,STATUS);
+
+   F77_CALL(kpg1_gtgrp)( CHARACTER_ARG(PARAM),
+                         INTEGER_ARG(&IGRP),
+                         INTEGER_ARG(&SIZE),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM) );
+
+   F77_FREE_CHARACTER(PARAM);
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
