@@ -31,5 +31,6 @@
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, 
                 AstFrameSet **, int * );
+void kpg1Gtgrp( const char *, int *, int*, int *);
 
 #endif
