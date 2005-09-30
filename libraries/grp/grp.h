@@ -29,6 +29,12 @@
 
 /* Public Constants */
 /* ---------------- */
+
+/* An illegal GRP_ identifier value. This value can sometimes be
+   specified by an application in place of a GRP_ identifier in order
+   to supress some operation. */
+#define GRP__NOID 0 
+
 /* Maximum length of a group expression. */
 #define GRP__SZGEX 255 
 
