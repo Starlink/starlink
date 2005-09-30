@@ -114,8 +114,8 @@ void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
 /* Loop round all the strings in the group. */
    for( i = 0; i < size; i++ ) {
 
-/* Get the i'th string from the group. */
-      grpGet( igrp, i, 1, &pname, GRP__SZNAM + 1, status );
+/* Get the i'th string from the group. Note, grp uses 1-based indices. */
+      grpGet( igrp, i + 1, 1, &pname, GRP__SZNAM + 1, status );
 
 /* Get the used length of this string. */
       thislen = astChrLen( name );
