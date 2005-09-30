@@ -74,6 +74,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Remove "void *" arithmetic.
 *     25-JAN-2005 (DSB):
 *        Added more DEBUG blocks
+*     30-SEP-2005 (DSB):
+*        Allow an integer to be read from a formatted floating point value.
 *class--
 */
 
@@ -429,7 +431,13 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
          if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
             if( out ) *( (int *) out ) = ival;
          } else {
-            result = 0;
+            nc = 0;
+            nval = astSscanf( cval, " %lf %n", &dval, &nc );
+            if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
+               if( out ) *( (int *) out ) = (int) ( dval + 0.5 );
+            } else {
+               result = 0;
+            }
          }
 
 /* Consider conversion to "double". */
