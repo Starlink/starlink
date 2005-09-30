@@ -4,7 +4,8 @@
 *     MFITTREND
 
 *  Purpose:
-*     Fits independent trends to data lines that are parallel to an axis.
+*     Fits independent trends to data lines that are parallel to an
+*     axis.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,88 +18,88 @@
 
 *  Description:
 *     This routine fits trends to all lines of data in an NDF that lie
-*     parallel to a chosen axis. The trends are characterised by
+*     parallel to a chosen axis.  The trends are characterised by
 *     polynomials of order up to 15 and can be restricted to use data
-*     that only lies within a series of coordinate ranges along the
+*     that only lies within a series of co-ordinate ranges along the
 *     selected axis.
 *
 *     Once the trends have been determined they can either be stored
 *     directly or subtracted from the input data.  If stored directly
-*     they can be subtracted later. The advantage of that approach is
+*     they can be subtracted later.  The advantage of that approach is
 *     the subtraction can be undone, but at some cost in efficiency.
 *
 *     Fitting independent trends can be useful when you need to remove
 *     the continuum from a spectral cube, where each spectrum is
 *     independent of the others (that is you need an independent
-*     continuum determination for each position on the sky). It can also
-*     be used to de-trend individual spectra and perform functions like
-*     debiassing a CCD which has bias strips.
+*     continuum determination for each position on the sky).  It can 
+*     also be used to de-trend individual spectra and perform functions
+*     like debiassing a CCD which has bias strips.
 
 *  Usage:
 *     mfittrend in axis ranges order out
 
 *  ADAM Parameters:
 *     AXIS = LITERAL (Read)
-*        The axis of the current coordinate system that defines the
-*        direction of the trends. This is specified by its integer index
-*        within the current Frame of the input NDF (in the range 1 to
-*        the number of axes in the current Frame), or by its symbol
-*        string. A list of acceptable values is displayed if an illegal
-*        value is supplied. If the axes of the current Frame are not
+*        The axis of the current co-ordinate system that defines the
+*        direction of the trends.  This is specified by its integer 
+*        index within the current Frame of the input NDF (in the range
+*        1 to the number of axes in the current Frame), or by its symbol
+*        string.  A list of acceptable values is displayed if an illegal
+*        value is supplied.  If the axes of the current Frame are not
 *        parallel to the NDF pixel axes, then the pixel axis which is
 *        most nearly parallel to the specified current Frame axis will
-*        be used. Defaults to the last axis. [!]
-*     IN = NDF (Read)
-*        The input NDF. On successful completion this may have the
-*        trends subtracted, but only, if SUBTRACT and MODIFYIN are both set
-*        true.
+*        be used.  AXIS defaults to the last axis. [!]
+*     IN = NDF (Read & Write)
+*        The input NDF.  On successful completion this may have the
+*        trends subtracted, but only if SUBTRACT and MODIFYIN are both
+*        set TRUE.
 *     MODIFYIN = _LOGICAL (Read)
-*        Whether to subtract the trends from the input NDF. Only used when
-*        SUBTRACT is true. If this value is false then a NDF name must
-*        be supplied by the OUT parameter. [false]
+*        Whether or not to subtract the trends from the input NDF.  Only
+*        used when SUBTRACT is TRUE.  If this value is FALSE, then an
+*        NDF name must be supplied by the OUT parameter.  [FALSE]
 *     ORDER = _INTEGER (Read)
 *        The order of the polynomials to be used when trend fitting.
 *        A polynomial of order 0 is a constant and 1 a line, 2 a
-*        quadratic etc. The maximum value is 15.
-*        [3]
+*        quadratic etc.  The maximum value is 15.  [3]
 *     OUT = NDF (Read)
 *        The output NDF containing either the difference between the
 *        input NDF and the various trends, or the values of the trends
-*        themselves. Will not be used if SUBTRACT and MODIFYIN
-*        are true (in that case the input NDF will be modified).
+*        themselves.  This will not be used if SUBTRACT and MODIFYIN
+*        are TRUE (in that case the input NDF will be modified).
 *     RANGES() = LITERAL (Read)
-*        Pairs of coordinates that define ranges along the trend
-*        axis. When given these ranges are used to select the values
-*        that are used in the fits. If not given then all the values
-*        along each data line is used. The units of these ranges is
-*        determined by the current axis of the world coordinate system
-*        that corresponds to the trend axis. Up to 10 pairs of values
-*        are allowed. [!]
+*        Pairs of co-ordinates that define ranges along the trend
+*        axis.  When given these ranges are used to select the values
+*        that are used in the fits.  The null value (!) causes all the
+*        values along each data line to be used.  The units of these
+*        ranges is determined by the current axis of the world
+*        co-ordinate system that corresponds to the trend axis.  Up to
+*        ten pairs of values are allowed. [!]
 *     SUBTRACT = _LOGICAL (Read)
-*        Whether to subtract the trends from the input NDF or not. If not
-*        then the trends will be evaluated and written to a new NDF.
-*        [false]
+*        Whether not to subtract the trends from the input NDF or not. 
+*        If not, then the trends will be evaluated and written to a new 
+*        NDF.  [FALSE]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN to be used
 *        instead.  [!]
 *     VARIANCE = _LOGICAL (Read)
-*        If true and the input NDF contains variances then the
+*        If TRUE and the input NDF contains variances, then the
 *        polynomial fits will be weighted by the variances.
 
 *  Examples:
-*     mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=fit
+*     mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 
+*               out=detrend
 *        This example fits cubic polynomials to the spectral axis of
 *        a data cube. The fits only use the data lying within the
 *        ranges 1000 to 2000 and 3000 to 4000 Angstroms (assuming
 *        the spectral axis is calibrated in Angstroms and that is the
-*        current coordinate system). The fit is evaluated and
-*        written to the data cube "fit".
+*        current co-ordinate system).  The fit is evaluated and
+*        written to the data cube called detrend.
 
 *  Notes:
 *     This application attempts to solve the problem of fitting numerous
-*     polynomials in a least squares sense and that do not follow the
-*     natural ordering of the NDF data, in the most CPU time efficient
+*     polynomials in a least-squares sense and that do not follow the
+*     natural ordering of the NDF data, in the most CPU-time-efficient
 *     way possible.
 *
 *     To do this requires the use of additional memory (of order one
@@ -109,12 +110,12 @@
 *     application SETBAD to set the appropriate flag).
 
 *  Related Applications:
-*     KAPPA: SETBAD, CCDPACK: DEBIAS, FIGARO: FITCONT, FITPOLY
+*     FIGARO: FITCONT, FITPOLY; CCDPACK: DEBIAS; KAPPA: SETBAD.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, UNITS, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
-*     structure and propagates all extensions.
+*     LABEL, UNITS, TITLE, HISTORY, WCS and VARIANCE components of an
+*     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -156,27 +157,36 @@
       INTEGER STATUS            ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR       ! Most positive integer .LE. a given real
-      INTEGER KPG1_CEIL        ! Most negative integer .GE. a given real
+      INTEGER KPG1_FLOOR        ! Most positive integer .LE. a given 
+                                ! real
+      INTEGER KPG1_CEIL         ! Most negative integer .GE. a given
+                                ! real
 
 *  Local Variables:
       CHARACTER * ( 255 ) TTLC  ! Title of original current Frame
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       DOUBLE PRECISION AXHIGH   ! High bound of axis in current Frame
-      DOUBLE PRECISION AXLOW    ! L ow bound of axis in current Frame
-      DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame positions
-      DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame position
-      DOUBLE PRECISION DLBND( NDF__MXDIM ) ! Lower bounds in pixel co-ords
-      DOUBLE PRECISION DRANGE( 20 ) ! The fit ranges world coordinates
-      DOUBLE PRECISION DUBND( NDF__MXDIM ) ! Upper bounds in pixel co-ords
-      DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame position
+      DOUBLE PRECISION AXLOW    ! Low bound of axis in current Frame
+      DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
+                                ! positions
+      DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
+                                ! position
+      DOUBLE PRECISION DLBND( NDF__MXDIM ) ! Lower bounds in pixel
+                                ! co-ords
+      DOUBLE PRECISION DRANGE( 20 ) ! The fit ranges world co-ordinates
+      DOUBLE PRECISION DUBND( NDF__MXDIM ) ! Upper bounds in pixel 
+                                ! co-ords
+      DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame
+                                ! position
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
-      DOUBLE PRECISION PRJ      ! Vector length projected onto a pixel axis
-      DOUBLE PRECISION PRJMAX   ! Maximum vector length projected onto an axis
-      INTEGER AREA              ! Area of axes orthogonal to fit axis.
+      DOUBLE PRECISION PRJ      ! Vector length projected onto a pixel
+                                ! axis
+      DOUBLE PRECISION PRJMAX   ! Maximum vector length projected onto 
+                                ! an axis
+      INTEGER AREA              ! Area of axes orthogonal to fit axis
       INTEGER AXES( NDF__MXDIM )! A list of axis indices
       INTEGER CFRM              ! Current frame
-      INTEGER DIMS( NDF__MXDIM )    ! Dimensions of NDF
+      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
       INTEGER EL                ! Number of mapped elements
       INTEGER I                 ! Loop variable
       INTEGER IAXIS             ! Index of axis within current Frame
@@ -185,7 +195,8 @@
       INTEGER IPBS              ! Pointer to coefficients
       INTEGER IPDAT( 1 )        ! Pointer to NDF data component
       INTEGER IPIN( 1 )         ! Pointer to mapped data
-      INTEGER IPIX              ! Index of PIXEL Frame within WCS FrameSet
+      INTEGER IPIX              ! Index of PIXEL Frame within WCS 
+                                ! FrameSet
       INTEGER IPOUT( 1 )        ! Pointer to mapped data
       INTEGER IPTMP( 1 )        ! Pointer to temporary NDF component
       INTEGER IPVAR( 1 )        ! Pointer to NDF variance component
@@ -196,9 +207,10 @@
       INTEGER JHI               ! High pixel index for axis
       INTEGER JLO               ! Low pixel index for axis
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
-      INTEGER MAP               ! PIXEL Frame to Current Frame Mapping pointer
+      INTEGER MAP               ! PIXEL Frame to Current Frame Mapping
+                                ! pointer
       INTEGER NAXC              ! Number of axes in current frame
-      INTEGER NDIM              ! Number of NDF dimensions.
+      INTEGER NDIM              ! Number of NDF dimensions
       INTEGER NRANGE            ! Number of range values (not pairs)
       INTEGER ORDER             ! The order of the polynomial to fit
       INTEGER OUTNDF            ! NDF identifier of output NDF
@@ -207,7 +219,7 @@
       LOGICAL BAD               ! Need to check for bad pixels?
       LOGICAL HASBAD            ! Input NDF may have BAD pixels
       LOGICAL HAVVAR            ! Have a variance component
-      LOGICAL MODIN             ! Modify input NDF by subtracting fits.
+      LOGICAL MODIN             ! Modify input NDF by subtracting fits
       LOGICAL SUBTRA            ! Whether to subtract fit from data
       LOGICAL USEALL            ! Use the entire axis?
       LOGICAL USEVAR            ! Use variance as weights in fits.
@@ -215,9 +227,9 @@
 *.
 
 *  Future development notes: Should look at storing the coefficients and
-*  write a model evaluating application MAKETREND? This would follow
+*  write a model evaluating application MAKETREND?  This would follow
 *  the KAPPA model more closely and allow the fit to be undone, even
-*  when subtracting directly. Maybe a need for a statistics generating
+*  when subtracting directly.  Maybe a need for a statistics-generating
 *  version too, but the quality of the fits is a potentially large
 *  amount of information.
 
@@ -315,7 +327,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the ranges to use. These values are transformed from current
-*  coordinates along the fit axis to pixel coordinates on some
+*  co-ordinates along the fit axis to pixel co-ordinates on some
 *  NDF axis (we've yet to determine).
       DRANGE( 1 ) = AST__BAD
       CALL KPG1_GTAXV( 'RANGES', 20, .FALSE., CFRM, IAXIS, DRANGE,
@@ -381,7 +393,7 @@
 
 *  Find the pixel axis with the largest projection of the vector joining
 *  these two pixel positions. The ranges apply to this axis. Report an
-*  error if the positions do not have valid pixel coordinates.
+*  error if the positions do not have valid pixel co-ordinates.
       PRJMAX = -1.0
       DO I = 1, NDIM
          IF ( PPOS( 1, I ) .NE. AST__BAD .AND.
@@ -410,7 +422,7 @@
          NRANGE = 2
       ELSE
 
-*  Project the given ranges into pixel coordinates.
+*  Project the given ranges into pixel co-ordinates.
          DO I = 1, NRANGE, 2
             CPOS( 1, IAXIS ) = DRANGE( I + 1 )
             CPOS( 2, IAXIS ) = DRANGE( I )
@@ -441,7 +453,7 @@
                GO TO 999
             END IF
 
-*  Store pixel coordinates.
+*  Store pixel co-ordinates.
             RANGES( I ) = JLO
             RANGES( I + 1 ) = JHI
          END DO
