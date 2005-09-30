@@ -46,6 +46,7 @@
 /* -------------------------- */
 void grpGrpsz( int, int *, int * );
 void grpGet( int, int, int, char *const *, int, int * );
+void grpDelet( int, int * );
 
 
 #endif

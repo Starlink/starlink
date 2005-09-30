@@ -58,6 +58,24 @@ void grpGrpsz( int igrp, int *size, int *status ){
 }
 
 
+F77_SUBROUTINE(grp_delet)( INTEGER(IGRP), INTEGER(STATUS) );
+
+void grpDelet( int igrp, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( igrp, IGRP );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
 
 F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE), 
                          CHARACTER_ARRAY(NAMES), INTEGER(STATUS)
