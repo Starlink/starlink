@@ -726,6 +726,9 @@
 *  Come here if something has gone wrong.
   999 CONTINUE
 
+*  Release GRP resources.
+      CALL GRP_DELET( IGRP, STATUS )
+
 *  Tidy the NDF system.
       CALL NDF_END( STATUS )
 
