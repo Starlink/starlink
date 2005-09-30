@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.31}
 \newcommand{\stardocnumber}    {95.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2005 September 22}
+\newcommand{\stardocdate}      {2005 September 29}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -11963,6 +11963,8 @@ picture.}
  Smooths a two-dimensional data array using a weighted median filter.}
 \menuitem{MEM2D}{
  Performs a Maximum-Entropy deconvolution of a two-dimensional NDF.}
+\menuitem{MFITTREND}{
+ Fits independent trends to data lines that are parallel to an axis.}
 \menuitem{MLINPLOT}{
  Draws a multi-line plot of the data values in a two-dimensional NDF.}
 \menuitem{MSTATS}{
@@ -12650,6 +12652,8 @@ WCS component of an NDF.
  Removes regions of bad values from a two-dimensional NDF.
 \classitem{GLITCH}
  Replaces bad pixels in a two-dimensional image with the local median.
+\classitem{MFITTREND}
+ Fits independent trends to data lines that are parallel to an axis.
 \classitem{NOMAGIC}
  Replaces all occurrences of \htmlref{magic-value}{se:masking}~ pixels in an NDF array with
  a new value.
@@ -12695,12 +12699,14 @@ WCS component of an NDF.
 \vspace*{0.7ex}
 %
 \label{cl:surfit}
-\item {\large\bf Surface fitting}
+\item {\large\bf Surface and vector fitting}
 \begin{description}
 \classitem{FITSURFACE}
  Fits a polynomial surface to two-dimensional data array.
 \classitem{MAKESURFACE}
  Creates a two-dimensional NDF from the coefficients of a polynomial surface.
+\classitem{MFITTREND}
+ Fits independent trends to data lines that are parallel to an axis.
 \classitem{SURFIT}
  Fits a polynomial or spline surface to a two-dimensional data array using blocking.
 \end{description}
@@ -30632,6 +30638,171 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
    }
 }
  
+\sstroutine{
+   MFITTREND
+}{
+   Fits independent trends to data lines that are parallel to an
+   axis
+}{
+   \sstdescription{
+      This routine fits trends to all lines of data in an NDF that lie
+      parallel to a chosen axis.  The trends are characterised by
+      polynomials of order up to 15 and can be restricted to use data
+      that only lies within a series of co-ordinate ranges along the
+      selected axis.
+
+      Once the trends have been determined they can either be stored
+      directly or subtracted from the input data.  If stored directly
+      they can be subtracted later.  The advantage of that approach is
+      the subtraction can be undone, but at some cost in efficiency.
+
+      Fitting independent trends can be useful when you need to remove
+      the continuum from a spectral cube, where each spectrum is
+      independent of the others (that is you need an independent
+      continuum determination for each position on the sky).  It can
+      also be used to de-trend individual spectra and perform functions
+      like debiassing a CCD which has bias strips.
+   }
+   \sstusage{
+      mfittrend in axis ranges order out
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXIS =  \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The axis of the current co-ordinate system that defines the
+         direction of the trends.  This is specified by its integer
+         index within the current Frame of the input NDF (in the range
+         1 to the number of axes in the current Frame), or by its symbol
+         string.  A list of acceptable values is displayed if an illegal
+         value is supplied.  If the axes of the current Frame are not
+         parallel to the NDF pixel axes, then the pixel axis which is
+         most nearly parallel to the specified current Frame axis will
+         be used.  AXIS defaults to the last axis. {\tt [!]}
+      }
+      \sstsubsection{
+         IN = NDF (Read \& Write)
+      }{
+         The input NDF.  On successful completion this may have the
+         trends subtracted, but only if SUBTRACT and MODIFYIN are both
+         set {\tt TRUE}.
+      }
+      \sstsubsection{
+         MODIFYIN = \_LOGICAL (Read)
+      }{
+         Whether or not to subtract the trends from the input NDF.  Only
+         used when SUBTRACT is {\tt TRUE}.  If this value is {\tt FALSE}, then an
+         NDF name must be supplied by the OUT parameter.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         ORDER = \_INTEGER (Read)
+      }{
+         The order of the polynomials to be used when trend fitting.
+         A polynomial of order {\tt 0} is a constant and {\tt 1} a line,
+         {\tt 2} a quadratic \emph{etc.}  The maximum value is {\tt 15}.
+         {\tt [3]}
+      }
+      \sstsubsection{
+         OUT = NDF (Read)
+      }{
+         The output NDF containing either the difference between the
+         input NDF and the various trends, or the values of the trends
+         themselves.  This will not be used if SUBTRACT and MODIFYIN
+         are {\tt TRUE} (in that case the input NDF will be modified).
+      }
+      \sstsubsection{
+         RANGES() = LITERAL (Read)
+      }{
+         Pairs of co-ordinates that define ranges along the trend
+         axis.  When given these ranges are used to select the values
+         that are used in the fits.  The null value ({\tt{!}}), 
+         causes all the values along each data line to be used.  
+         The units of these ranges is determined by the current axis of
+         the world co-ordinate system that corresponds to the trend
+         axis.  Up to ten pairs of values are allowed. {\tt [!]}
+      }
+      \sstsubsection{
+         SUBTRACT = \_LOGICAL (Read)
+      }{
+         Whether not to subtract the trends from the input NDF or not.
+         If not, then the trends will be evaluated and written to a new
+         NDF.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead.  {\tt [!]}
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} and the input NDF contains variances, then the
+         polynomial fits will be weighted by the variances.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=detrend
+      }{
+         This example fits cubic polynomials to the spectral axis of
+         a data cube. The fits only use the data lying within the
+         ranges 1000 to 2000 and 3000 to 4000 Angstroms (assuming
+         the spectral axis is calibrated in Angstroms and that is the
+         current co-ordinate system).  The fit is evaluated and
+         written to the data cube called detrend.
+      }
+   }
+   \sstnotes{
+      This application attempts to solve the problem of fitting numerous
+      polynomials in a least-squares sense and that do not follow the
+      natural ordering of the NDF data, in the most CPU-time-efficient
+      way possible.
+
+      To do this requires the use of additional memory (of order one
+      less than the dimensionality of the NDF itself, times the
+      polynomial order squared).  To minimise the use of memory and get
+      the fastest possible determinations you should not use weighting
+      and assert that the input data do not have any BAD values (use the
+      application SETBAD to set the appropriate flag).
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+\xref{FIGARO}{sun86}{}: \xref{FITCONT}{sun86}{FITCONT},
+\xref{FITPOLY}{sun86}{FITPOLY};
+\xref{CCDPACK}{sun139}{}: \xref{DEBIAS}{sun139}{DEBIAS};
+KAPPA: \htmlref{SETBAD}{SETBAD}.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the
+	 \htmlref{AXIS}{apndf:axis}, DATA,
+	 \htmlref{QUALITY}{apndf:quality},
+	 \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title},
+	 \htmlref{UNITS}{apndf:units},
+	 \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs},
+	 and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+	 data structure and propagates all
+	 \htmlref{extensions}{apndf:extensions}.
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic
+	 \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can
+         be handled.
+
+         \sstitem
+         Handles data of up to 7 dimensions.
+      }
+   }
+}
+
 \sstroutine{
    MLINPLOT
 }{
@@ -49163,10 +49334,15 @@ The following new applications have been added:
    \item [\htmlref{INTERLEAVE}{INTERLEAVE}] \mbox{}
        Forms a higher-resolution NDF by interleaving a set of NDFs of
        the same dimensionality.
+   \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
+       Fits independent trends to data lines that are parallel to an
+       axis using polynomials up to order 15.  Regions containing
+       features such as spectral lines or stars may be masked.  It has
+       an option to subtract the trend fits from the supplied NDF.
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
        Tiles a group of NDFs using World Co-ordinate System information.
        It is like \htmlref{WCSALIGN}{WCSALIGN} but operates on more
-       than one input frame.
+       than one input frame, improving efficiency for that case.
 \end{description}
 
 \goodbreak
@@ -49193,7 +49369,7 @@ The following applications have been modified:
          parameter CONSERVE.
 
          \item Now have options to use resampling or rebinning kernels
-         based on a sombrero function $2*J1(x)/x$, where $J1(x)$ is the
+         based on a sombrero function $2*J_{1}(x)/x$, where $J_{1}(x)$ is the
          first-order Bessel function of the first kind.
 
          \item The default values for the TOL parameter for REGRID, and the
@@ -49713,6 +49889,8 @@ functions as follows.
  Removes regions of bad values from a two-dimensional NDF.
 \classitem{GLITCH}
  Replaces bad pixels in a two-dimensional image with the local median.
+\classitem{MFITTREND}
+ Fits independent trends to data lines that are parallel to an axis.
 \classitem{NOMAGIC}
  Replaces all occurrences of magic value pixels in an NDF array with
  a new value.
@@ -49756,12 +49934,14 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
-\item {\large\bf Surface fitting}
+\item {\large\bf Surface and vector fitting}
 \begin{description}
 \classitem{FITSURFACE}
  Fits a polynomial surface to two-dimensional data array.
 \classitem{MAKESURFACE}
  Creates a two-dimensional NDF from the coefficients of a polynomial surface.
+\classitem{MFITTREND}
+ Fits independent trends to data lines that are parallel to an axis.
 \classitem{SURFIT}
  Fits a polynomial or spline surface to a two-dimensional data array using blocking.
 \end{description}
