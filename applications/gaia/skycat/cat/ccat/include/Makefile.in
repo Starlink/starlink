@@ -13,7 +13,7 @@
 TOPDIR      	= @DESTDIR@
 INCDIR      	= @INCDIR@
 
-SRCS 		=  astroCatalog.h astroImage.h
+SRCS 		=  astroCatalog.hxx astroImage.hxx
 
 INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@
