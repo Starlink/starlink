@@ -27,6 +27,25 @@
 *        Original version.
 */
 
+/* Public Constants */
+/* ---------------- */
+/* Maximum length of a group expression. */
+#define GRP__SZGEX 255 
+
+/* Length of a name within a group. */
+#define GRP__SZNAM 255
+
+/* Max. length of a group type */
+#define GRP__SZTYP 80 
+
+/* Max. length of a file name. */
+#define GRP__SZFNM 256 
+
+
+/* Public function prototypes */
+/* -------------------------- */
 void grpGrpsz( int, int *, int * );
+void grpGet( int, int, int, char *const *, int, int * );
+
 
 #endif

@@ -51,7 +51,46 @@ void grpGrpsz( int igrp, int *size, int *status ){
                         INTEGER_ARG(&SIZE),
                         INTEGER_ARG(&STATUS) );
 
-   F77_IMPORT_INTEGER( SIZE, size );
+   F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
+
+F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE), 
+                         CHARACTER_ARRAY(NAMES), INTEGER(STATUS)
+                         TRAIL(NAMES) );
+
+/* Note the addition of a "len" parameter following the "names" array.
+   This should be supplied equal to the allocated length of the shortest 
+   string for which a pointer has been supplied in "names". This length
+   should include room for the trailing null. */
+
+void grpGet( int igrp, int index, int size, char *const *names, int len, 
+             int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(INDEX);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_CHARACTER_ARRAY_DYN(NAMES);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( igrp, IGRP );
+   F77_EXPORT_INTEGER( index, INDEX );
+   F77_EXPORT_INTEGER( size, SIZE );
+   F77_CREATE_CHARACTER_ARRAY(NAMES,len-1,size);
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_get)( INTEGER_ARG(&IGRP),
+                      INTEGER_ARG(&INDEX),
+                      INTEGER_ARG(&SIZE),
+                      CHARACTER_ARRAY_ARG(NAMES),
+                      INTEGER_ARG(&STATUS) 
+                      TRAIL_ARG(NAMES) );
+
+   F77_IMPORT_CHARACTER_ARRAY_P(NAMES,NAMES_length,names,len,size);
+   F77_FREE_CHARACTER(NAMES);
    F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
