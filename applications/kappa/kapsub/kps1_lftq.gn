@@ -138,13 +138,6 @@
       INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding the axis
       INTEGER WEL               ! Workspace elements
 
-*  Internal References:
-      INCLUDE 'NUM_DEC_CVT'     ! Declare NUM_ conversion functions
-      INCLUDE 'NUM_DEC_<T>'     ! Declare NUM_ arithmetic functions
-      INCLUDE 'NUM_DEF_CVT'     ! Define NUM_ conversion functions
-      INCLUDE 'NUM_DEF_<T>'     ! Define NUM_ arithmetic functions
-
-
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
       EQUIVALENCE( I2, I( 2 ) )
@@ -153,6 +146,12 @@
       EQUIVALENCE( I5, I( 5 ) )
       EQUIVALENCE( I6, I( 6 ) )
       EQUIVALENCE( I7, I( 7 ) )
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'     ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'     ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_CVT'     ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'     ! Define NUM_ arithmetic functions
 *.
 
 *  Check the inherited global status.
