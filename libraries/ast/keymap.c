@@ -1965,6 +1965,7 @@ f     AST_MAPGET0<X>
 c     #include "ast.h"
 c     int astMapGet0<X>( AstKeyMap *this, const char *key, <X>type *value );
 f     RESULT = AST_MAPGET0<X>( THIS, KEY, VALUE, STATUS )
+
 f     RESULT = AST_MAPGET0C( THIS, KEY, VALUE, L, STATUS )
 
 *  Class Membership:
