@@ -38,11 +38,6 @@
 /* Wrapper function implementations. */
 /* ================================= */
 
-void kpg1Kymap( int igrp, AstKeyMap **keymap, int *status ){
-   kpg1Kymp1( igrp, keymap, status );
-}
-
-
 F77_SUBROUTINE(kpg1_asget)( INTEGER(INDF), INTEGER(NDIM), LOGICAL(EXACT), 
                             LOGICAL(TRIM), LOGICAL(REQINV), INTEGER_ARRAY(SDIM),
                             INTEGER_ARRAY(SLBND), INTEGER_ARRAY(SUBND),

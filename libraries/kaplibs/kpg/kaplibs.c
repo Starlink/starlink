@@ -32,10 +32,16 @@
 /* ============= */
 #include "f77.h"                 
 #include "kaplibs.h"
+#include "kaplibs_private.h"
 
 
 /* Wrapper function implementations. */
 /* ================================= */
+
+void kpg1Kymap( int igrp, AstKeyMap **keymap, int *status ){
+   kpg1Kymp1( igrp, keymap, status );
+}
+
 
 
 
