@@ -27,7 +27,7 @@ BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c kpg1_kymp1.c kpg1_kymp2.c \
-kpg1_kymap.c
+kpg1_kymap.c kaplibs.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
@@ -35,7 +35,7 @@ GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_NONGEN) $(GRAPHIC_GEN_F_ROUTINES)
 
 ADAM_F_ROUTINES = $(KPG_ADAM_NONGEN) $(ADAM_GEN_F_ROUTINES)
 
-ADAM_C_ROUTINES = kaplibs.c
+ADAM_C_ROUTINES = kaplibs_adam.c
 
 ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 
