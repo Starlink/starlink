@@ -29,7 +29,6 @@
 
 /* Header files. */
 /* ============= */
-#include "ast.h"                 
 #include "f77.h"                 
 #include "grp.h"
 
