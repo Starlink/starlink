@@ -168,6 +168,6 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    }
 
 /* Finish */
-L999:
+L999:;
 
 }
