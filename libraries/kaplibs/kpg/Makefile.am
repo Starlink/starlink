@@ -7,7 +7,7 @@ libkpg_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) \
-	$(C_ROUTINES) 
+	$(C_ROUTINES)
 
 libkpg_adam_la_SOURCES = \
 	$(ADAM_F_ROUTINES) \
@@ -22,7 +22,7 @@ libkpg_grf_la_SOURCES = \
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 PUBLIC_INCLUDES = CTM_PAR kaplibs.h
-PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM
+PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM kaplibs_private.h
 BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
@@ -485,4 +485,4 @@ kpg1_pltln.f
 .gbdirw.f:
 	$(FGENERIC) $(<)
 
-AM_FCFLAGS = -I../ira 
+AM_FCFLAGS = -I../ira
