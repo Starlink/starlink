@@ -997,7 +997,7 @@ sub solve {
       $self->filter( $filter );
     }
     my $ext = new Starlink::Extractor;
-    $ext->detect_thresh( 5.0 );
+    $ext->detect_thresh( 2.5 );
     $ext->analysis_thresh( 1.5 );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
