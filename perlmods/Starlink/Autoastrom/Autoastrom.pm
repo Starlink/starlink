@@ -85,6 +85,7 @@ sub new {
   $auto->match( 'FINDOFF' ) if ( ! defined( $auto->match ) );
   $auto->maxfit( 6 ) if ( ! defined( $auto->maxfit ) );
   $auto->maxobj( 500 ) if ( ! defined( $auto->maxobj ) );
+  $auto->max_image_obj( 500 ) if ( ! defined( $auto->max_image_obj ) );
   $auto->messages( 1 ) if ( ! defined( $auto->messages ) );
   $auto->obsdata( 'source=USER:AST:FITS,angle=0,scale=1,invert=0' ) if ( ! defined( $auto->obsdata ) );
   $auto->temp( tempdir( CLEANUP => ( ! $auto->keeptemps ) ) ) if ( ! defined( $auto->temp ) );
@@ -271,6 +272,19 @@ sub detected_catalogue {
   return $self->{DETECTED_CATALOGUE};
 }
 
+=item B<filter>
+
+=cut
+
+sub filter {
+  my $self = shift;
+  if( @_ ) {
+    my $filter = shift;
+    $self->{FILTER} = $filter;
+  }
+  return $self->{FILTER};
+}
+
 =item B<insert>
 
 Whether or not to insert the final astrometric fit into the input NDF
@@ -428,6 +442,27 @@ sub maxobj {
     $self->{MAXOBJ} = $maxobj;
   }
   return $self->{MAXOBJ};
+}
+
+=item B<max_image_obj>
+
+Retrieve or set the maximum number of objects to use from the image.
+
+  my $max_image_obj = $self->max_image_obj;
+  $self->max_image_obj( 1000 );
+
+Defaults to 500. Useful for speeding up processing time in
+densely-populated fields.
+
+=cut
+
+sub max_image_obj {
+  my $self = shift;
+  if( @_ ) {
+    my $max_image_obj = shift;
+    $self->{MAX_IMAGE_OBJ} = $max_image_obj;
+  }
+  return $self->{MAX_IMAGE_OBJ};
 }
 
 =item B<messages>
@@ -946,29 +981,49 @@ sub solve {
 # Starlink::Extractor to extract objects from the NDF.
 
   my $ndfcat;
+  my $filter;
   if( defined( $self->ccdcatalogue ) ) {
     print "Using " . $self->ccdcatalogue . " as input catalogue for sources in frame.\n" if $self->verbose;
     $ndfcat = new Astro::Catalog( Format => 'SExtractor',
                                   File => $self->ccdcatalogue );
+    $filter = $self->filter;
   } else {
     print "Extracting objects in " . $self->ndf . " at 5.0 sigma or higher..." if $self->verbose;
-    my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
-    tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
-    my %generic_headers = translate_from_FITS(\%header_keywords);
-    my $filter = new Astro::WaveBand( Filter => $generic_headers{'FILTER'} );
+    if( ! defined( $self->filter ) ) {
+      my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
+      tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
+      my %generic_headers = translate_from_FITS(\%header_keywords);
+      $filter = new Astro::WaveBand( Filter => $generic_headers{'FILTER'} );
+      $self->filter( $filter );
+    }
     my $ext = new Starlink::Extractor;
     $ext->detect_thresh( 5.0 );
+    $ext->analysis_thresh( 1.5 );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
-    print "done.\n" if $self->verbose;
+
+    my @ndfstars = $ndfcat->stars;
     print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
+    print "done.\n" if $self->verbose;
   }
 
 # We cannot do automated astrometry corrections if we have fewer
 # than 4 objects, so croak if we do.
   if( $ndfcat->sizeof < 4 ) {
     croak "Only detected " . $ndfcat->sizeof . " objects in " . $self->ndf . ". Cannot perform automated astrometry corrections with so few objects";
+  }
+
+# Limit the number of objects in the detected catalogue, if necessary.
+  if( $self->max_image_obj && $ndfcat->sizeof > $self->max_image_obj ) {
+    my @ndfstars = $ndfcat->stars;
+    my @sortedstars = map { $_->[0] }
+                      sort { $a->[1] <=> $b->[1] }
+                      map { [ $_, $_->get_magnitude( $filter ) ] } @ndfstars;
+    @sortedstars = @sortedstars[0..( $self->max_image_obj - 1 )];
+    my $newndfcat = new Astro::Catalog;
+    $newndfcat->pushstar( @sortedstars );
+    $ndfcat = $newndfcat;
   }
 
 # Check to see if we have a catalogue to read in instead of querying
@@ -1044,17 +1099,19 @@ sub solve {
   if( $self->maxobj && $querycat->sizeof > $self->maxobj ) {
     $take_brightest = 1;
   }
+
+# Grab the first filter from the first item in the retrieved
+# catalogue. We don't really care all too much about matching filters
+# between the image and the retrieved catalogue so long as objects
+# don't move around. This will allow us to match objects when the
+# filter that the image is in isn't present in the retrieved catalogue
+# (like using 2MASS to calibrate an optical image).
+  my $firstitem = ${$querycat->stars}[0];
+  my @ret_filters = $firstitem->what_filters;
+  my $ret_filter = $ret_filters[0]; #${${$querycat->stars}->[0]->get_filters}->[0];
   my @filteredstars;
-  my $filter;
   my $querystars = $querycat->stars;
   foreach my $star ( @$querystars ) {
-
-    # Check to see if we have a filter defined yet. If not, set
-    # it from the first filter for the current object.
-    if( ! defined( $filter ) ) {
-      my @filters = $star->what_filters;
-      $filter = $filters[0];
-    }
 
     # Hack to get around not being able to write 'undef' values
     # in Cluster format catalogues. We're making an assumption
@@ -1070,13 +1127,14 @@ sub solve {
     # And update the object's WCS.
     $star->wcs( $frameset );
 
-    if( $take_brightest && $star->get_magnitude( $filter ) =~ /^[\d\.]+/ ) {
+    if( $take_brightest && $star->get_magnitude( $ret_filter ) =~ /^[\d\.]+/ ) {
       push @filteredstars, $star;
     }
   }
-
   if( $take_brightest ) {
-    @filteredstars = sort { $a->get_magnitude( $filter ) <=> $b->get_magnitude( $filter ) } @filteredstars;
+    @filteredstars = map { $_->[0] }
+                     sort { $a->[1] <=> $b->[1] }
+                     map { [ $_, $_->get_magnitude( $ret_filter ) ] } @filteredstars;
     my @newstars = @filteredstars[0..( $self->maxobj - 1 )];
     my $newquerycat = new Astro::Catalog;
     $newquerycat->pushstar( @newstars );
@@ -1093,13 +1151,6 @@ sub solve {
                                  );
 
   ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
-
-  # Reset the star IDs in the NDF catalog.
-#  foreach my $newndfstar ( $ndfcat->stars ) {
-#    if( $newndfstar->comment =~ /Old ID: (\d+)/ ) {
-#      $newndfstar->id( $1 );
-#    }
-#  }
 
 # And yes, croak if the correlation resulted in fewer than 4 matches.
   if( $corrndfcat->sizeof < 4 ) {
@@ -1199,7 +1250,8 @@ sub solve {
 
 # Write the detected object catalogue, if requested.
   if( defined( $self->detected_catalogue ) ) {
-    $ndfcat->write_catalog( Format => 'Cluster', File => $self->detected_catalogue );
+    $ndfcat->write_catalog( Format => 'Cluster',
+                            File => $self->detected_catalogue );
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
