@@ -1,0 +1,60 @@
+#if !defined( CUPID_INCLUDED )   /* Include this file only once */
+#define CUPID_INCLUDED
+
+#include "ast.h"
+
+/* Constants */
+/* --------- */
+#define CUPID__DOUBLE 1
+#define CUPID__FLOAT  2
+
+
+/* Function macros */
+/* --------------- */
+
+/* A macro to return the size of a cupid data type. */
+#define cupidSize( type, fun ) \
+   ( ( type == CUPID__DOUBLE ) ? \
+      sizeof( double ) \
+\
+   : ( ( type == CUPID__FLOAT ) ? \
+       sizeof( float ) \
+\
+   : ( ( *status == SAI__OK ) ? \
+       *status = SAI__ERROR, \
+       msgSeti( "TYPE", type ), \
+       errRep( "GAUSSCLUMPS_ERR1", fun ": Invalid \"type\" " \
+               "value (^TYPE) supplied (CUPID programming error).", \
+               status ), 0 : 0 ) ) )
+
+
+
+/* A set of macros which invoke the corresponding AST memory management
+   functions, but which specify the size of a data element using a cupid
+   data type rather than a C data type. The "fun" macro parameter should
+   be a quoted string holding the name of the function to be included in 
+   any error messages. */
+
+#define cupidStore( mem, ptr, nel, type, fun ) \
+   astStore( mem, ptr, nel*cupidSize( type, fun ) );
+
+
+/* The global CUPID status value. */
+/* ------------------------------- */
+/* Is has a complicated name so that it will not clash with other external 
+   symbols, but we provide a conveniently short macro to refer to it. The
+   storage for this variable is allocated in cupid_mon.c. */
+extern int *cupid_global_status;
+#define status cupid_global_status
+
+/* Function prototypes */
+/* ------------------  */
+void clumps();
+void cupidhelp();
+void cupidClumpFind( int, int, int *, int *, void *, unsigned char *, AstKeyMap * );
+void cupidGaussClumps( int, int, int *, int *, void *, unsigned char *, AstKeyMap * );
+double cupidConfigD( AstKeyMap *, const char *, double );
+int cupidConfigI( AstKeyMap *, const char *, int );
+
+
+

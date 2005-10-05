@@ -1,0 +1,29 @@
+#!@PERL@
+
+   open( SM, "<sun_master.tex" );
+   open( TS, "<tasks.tex" );
+   open( LS, "<list.tex" );
+   open( OUT, ">sun999.tex" );
+
+   $state = 0;
+   while( $line = <SM> ){
+      chomp( $line );
+      if( $line =~ /include\{list\.tex\}/ ) {
+         while( $t = <LS> ){
+            print OUT $t;
+         }
+
+      } elsif( $line =~ /include\{tasks\.tex\}/ ) {
+         while( $t = <TS> ){
+            print OUT $t;
+         }
+
+      } else {
+         print OUT "$line\n";
+      }
+   }
+   close( SM );
+   close( TS );
+   close( LS );
+   close( OUT );
+

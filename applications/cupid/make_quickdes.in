@@ -1,0 +1,37 @@
+#!@PERL@
+
+   $state = 0;
+   open( INFILE, "<$ARGV[0]" );
+   while( $line = <INFILE> ){
+      chomp( $line );
+      if( $line =~ /^\* +Name: *$/ ) {
+         $state = 1;
+
+      } elsif( $state == 1 ) {
+         if( $line =~ /^\* +(\w+)/ ) {
+            $name = $1;
+            $state = 2;
+         } else {
+            last;
+         }
+
+      } elsif( $line =~ /^\* +Purpose: *$/ ) {
+         $state = 3;
+
+      } elsif( $state == 3 ) {
+         if( $line =~ /^\* +(\w.+) *$/ ) {
+            $purpose = $1;
+            $state = 4;
+         }
+         last;
+      } 
+   }
+   close( INFILE );
+
+   if( $state != 4 ) {
+      print "\n\nmake_quickdes: Ill-formed prologue in $ARGV[0]\n\n";
+   } else {
+      open( OUTFILE, ">$ARGV[0].quickdes" );
+      print OUTFILE "\\quickdes\{$name\}\{$purpose\}\{ $name \}\n";
+      close( OUTFILE );
+   }

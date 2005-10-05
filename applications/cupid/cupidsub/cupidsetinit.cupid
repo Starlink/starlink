@@ -1,0 +1,48 @@
+#include "sae_par.h"
+#include "cupid.h"
+
+void cupidSetInit:X:( ){
+/*
+*  Name:
+*     cupidSetInit:X:
+
+*  Purpose:
+*     Make an initial guess at the Gaussian clump parameters.
+
+*  Synopsis:
+*     void cupidSetInit:X:( );
+
+*  Description:
+*     This functions makes an initial guess at the Gaussian clump
+*     parameters.
+
+*  Parameters:
+
+*  Notes:
+*     - This function can be invoked using the generic cupidSetInit macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidSetInit:X: except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidSetInit... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+}
+

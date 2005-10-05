@@ -1,0 +1,217 @@
+#include "sae_par.h"
+#include "ast.h"
+#include "cupid.h"
+#include "prm_par.h"
+
+
+double cupidRms:X:( :Xtype: *array, int ndim, int *dims, AstKeyMap *config ){
+/*
+*  Name:
+*     cupidRms:X:
+
+*  Purpose:
+*     Find the RMS noise in the supplied data array.
+
+*  Synopsis:
+*     double cupidRms:X:( :Xtype: *array, int ndim, int *dims, 
+*                         AstKeyMap *config );
+
+*  Description:
+*     This functions finds an estimate of the RMS noise in the supplied
+*     data array. The algorithm smoothes each row using a 1D box filter,
+*     and finds the residuals between the smoothed and input data. These
+*     residuals will consist mainly of the noise, but will also contain 
+*     some left overs from the lower frequencies of the data. To get rid
+*     of these, the residuals are themselves smoothed, and the residuals
+*     of the residuals are found. This process is repeated "niter" times.
+*     The returned RMS noise estimate is the mean of the final squared
+*     residuals.
+
+*  Parameters:
+*     array
+*        Pointer to the data array. The elements should be stored in
+*        Fortran order. 
+*     ndim
+*        The number of pixel axes spanned by the array.
+*     dims
+*        Pointer to an array holding the size of each pixel dimension
+*        spanned by the array.
+*     config
+*        An AST KeyMap holding tuning parameters for the algorithm.
+
+*  Returned Value:
+*     The RMS noise estimate
+
+*  Notes:
+*     - This function can be invoked using the generic cupidRms macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidRms:X: except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidRms... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   :Xtype: *in;         /* Pointer to data to be smoothed */
+   :Xtype: *out;        /* Pointer to data to recieve residuals */
+   :Xtype: *pr;         /* Pointer to start of next row of input data */
+   :Xtype: *wa;         /* Pointer to first row buffer */
+   :Xtype: *wb;         /* Pointer to second row buffer */
+   double boxsum;       /* Sum of all good input values in smoothing box */
+   double res;          /* The residual between smoothed and input values */
+   double ret;          /* Returned value */
+   double sqres;        /* Sum of squared residuals for one row */
+   double tsqres;       /* Total of squared residuals over all rows */
+   int hpsf;            /* Half width of PSF in pixels */
+   int i;               /* Loop count */
+   int il;              /* Index of left hand pixel in current smoothing box */
+   int ir;              /* Index of right hand pixel in current smoothing box */
+   int irow;            /* Row counter */
+   int iter;            /* Smoothing iteration count */
+   int nbox;            /* Number of values summed in boxsum */
+   int niter;           /* No. of smoothing iterations to perform */
+   int nrow;            /* Number of rows in supplied array */
+   int nsqres;          /* Number of values summed in sqres */
+   int ntsqres;         /* Number of values summed in tsqres */
+   int rowlen;          /* Length of each row in pixels */
+
+/* Initialise. */
+   ret = VAL__BADD;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return ret;
+
+/* Get the half PSF size in pixels. */
+   hpsf = cupidConfigD( config, "PSFPIX", 3.0 )/2;
+
+/* Get the number of smoothing iterations to perform. */
+   niter = cupidConfigI( config, "NITER", 3 );
+
+/* How many pixels per row? */
+   rowlen = dims[ 0 ];
+
+/* How many rows in the entire data array? */
+   nrow = 1;
+   for( i = 1; i < ndim; i++ ) nrow *= dims[ i ];
+
+/* Allocate memory for two rows of data */
+   wa = astMalloc( sizeof( :Xtype: )*rowlen );
+   wb = astMalloc( sizeof( :Xtype: )*rowlen );
+   if( wb ) {
+
+/* Initialise the total sum of the squared residuals taken over all rows, and 
+   the number of good residuals. */
+      tsqres = 0.0;
+      ntsqres = 0;
+
+/* Loop round all rows in the supplied array. "pr" points to the start of
+   the row. */
+      pr = array;
+      for( irow = 0; irow < nrow; irow++, pr += rowlen ){
+
+printf("Row %d...\n", irow );
+
+/* Smooth this row using a box filter of width "psfpix" pixels, and put
+   the residuals between the smoothed and unsmoothed data in "wb". */
+         in = pr;
+         out = wa;
+         for( iter = 0; iter < niter; iter++ ) {
+
+/* Initialise the sum of the squared residuals, and the number of good
+   residuals. */
+            sqres = 0.0;
+            nsqres = 0;
+
+/* The box filter starts out centred on pixel "hpsf" and covering the input 
+   filter from pixel 0 to "2*hpsf". Find the total good data value in this
+   range. */
+            il = 0;
+            ir = 2*hpsf;
+            boxsum = 0.0;
+            nbox = 0;
+            for( i = il; i <= ir; i++ ) {
+               if( in[ i ] != :Badval: ) {
+                  boxsum += in[ i ];
+                  nbox++;
+               }
+            }
+
+/* Now run the box along the current input row until the right hand end
+   of the box hits the end of the array. */
+            for( i = hpsf; i < rowlen - hpsf; i++ ) {
+
+/* If the box currently contains 1 or more good values, calculate and
+   store the difference between the mean value in the box and the
+   corresponding central value in the input array. Also update the sum of
+   the squared residuals. */
+               if( nbox > 0 ) {
+                  res = boxsum/nbox - in[ i ];
+                  out[ i ] = res;
+                  sqres += res*res;
+                  nsqres++;
+               } else {
+                  out[ i ] = :Badval:;
+               }
+
+/* If good, remove the left hand input pixel from the box. */
+               if( in[ il ] != :Badval: ) {
+                  boxsum -= in[ il ];
+                  nbox--;
+               }
+
+/* Increment the indices of the left hand and right hand pixels in the
+   box. */
+               il++;
+               ir++;
+
+/* If good, add the new right hand input pixel into the box. */
+               if( in[ ir ] != :Badval: ) {
+                  boxsum += in[ ir ];
+                  nbox++;
+               }
+            }
+
+/* Next time round we will smooth the residuals rather than the original
+   data. */
+            if( out == wa ) {
+               in = wa;
+               out = wb;
+            } else {
+               in = wb;
+               out = wa;
+            }    
+
+printf("   Iter %d rms = %g\n", iter, sqrtf( sqres/nsqres ) );
+
+         }
+
+/* Increment the total of the sum of the squared residuals for all rows. */
+         tsqres += sqres;
+         ntsqres += nsqres;
+      }
+
+/* Find the over-all RMS error.*/
+      if( ntsqres > 0 ) ret = sqrt( tsqres/ntsqres );
+       
+   }
+
+/* Free resources. */
+   wa = astFree( wa );
+   wb = astFree( wb );
+
+/* Return the result. */
+   return ret;  
+}
+

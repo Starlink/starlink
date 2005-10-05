@@ -1,0 +1,87 @@
+#!@PERL@
+#
+#  Creates a new version of the file history.help containing an entry for 
+#  the CUPID on-line help file describing changes in each new version of 
+#  CUPID. The information read from the cupid.news file is merged with 
+#  the existing history.help file to create the new version.
+
+# Read the cupid.news file to get a hash in which the key is the cupid 
+# version number and the value is the description of the associated changes. 
+   open( INFILE, "<cupid.news" );
+   while( $line = <INFILE> ){
+      if( $line =~ /^ +Changes in +(.*): *$/ ) {
+         if( $newkey ne "" && $text ne ""  ) {
+            $news_changes{$newkey} = $text;
+         }
+         $newkey = $1;
+         $text = "";
+      } elsif ( $newkey ne "" ) {
+         $text  .= $line;
+      }
+   }
+   if( $newkey ne "" && $text ne ""  ) {
+      $news_changes{$newkey} = $text;
+      $newkey = "";
+      $text = "";
+   }
+   close( INFILE );
+
+# Likewise read the history.help file to get a hash in which the key is the 
+# cupid version number and the value is the description of the associated 
+# changes already contained in history.help.
+   $prev_blank = 0;
+   open( INFILE, "<history.help" );
+   while( $line = <INFILE> ){
+      if( $line =~ /^2 +(.*) *$/ && $prev_blank ) {
+         if( $newkey ne "" && $text ne ""  ) {
+            $help_changes{$newkey} = $text;
+         }
+         $newkey = $1;
+         $text = "";
+      } elsif ( $newkey ne "" ) {
+         if( $line =~ /^1 +/ && $prev_blank ) {
+            break;
+         }
+         $text  .= $line;
+      }
+
+      if( $line =~ /^\w*$/ ) {
+         $prev_blank = 1;
+
+      } else {
+         $prev_blank = 0;
+      }
+   }
+   if( $newkey ne "" && $text ne ""  ) {
+      $help_changes{$newkey} = $text;
+      $newkey = "";
+      $text = "";
+   }
+   close( INFILE );
+
+
+# If there are any versions in the existing history.help file which are
+# not descirbed in the cupid.news file, add them to the news_changes hash.
+   foreach $key (keys %help_changes) {
+      if( !defined( $news_changes{$key} ) ) {
+         $news_changes{$key} = $help_changes{$key};
+      }
+   }
+
+#  Write out the header to the new history.help file
+   open( OUTFILE, ">history.temp" );
+   print OUTFILE "\n1 Version_History\n";
+   print OUTFILE "\n";
+   print OUTFILE "  This topic contains details of the changes introduced into the\n";
+   print OUTFILE "  CUPID package at each release.\n";
+   print OUTFILE "\n";
+
+#  Write ourt each entry in the %news_changes hash
+   foreach $key (sort {$b cmp $a} (keys %news_changes)) {
+      print OUTFILE "\n2 $key\n";
+      print OUTFILE "$news_changes{$key}";
+
+   }
+   
+   close( OUTFILE );
+   system "mv history.temp history.help";

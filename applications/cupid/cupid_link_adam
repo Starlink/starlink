@@ -1,0 +1,45 @@
+
+#  N.B. the previous line should be blank.
+
+#+
+#  Name:
+#     cupid_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam cupid.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use cupid in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Starlink standard makefiles, thus:
+#
+#         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
+#             -L$(STAR_LIB) `./cupid_link_adam`
+
+#  Authors:
+#     DSB: David S. Berry
+#     {enter_new_authors_here}
+
+#  History:
+#     28-SEP-2005 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+      echo `kaplibs_link_adam -nogrf` `ast_link_adam` `shl_link_adam` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

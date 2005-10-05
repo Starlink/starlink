@@ -1,0 +1,120 @@
+#include "sae_par.h"
+#include "ast.h"
+#include "cupid.h"
+#include <limits.h>
+
+void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
+                      double rms, AstKeyMap *config, int *iter ){
+/*
+*  Name:
+*     cupidIterate:X:
+
+*  Purpose:
+*     Determine if a gaussian clump should be fitted to the peak around the
+*     pixel with the highest value in the residuals.
+
+*  Synopsis:
+*     void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
+*                           double rms, AstKeyMap *config, int *iter );
+
+*  Description:
+*     This functions determines if a gaussian clump should be fitted to the 
+*     peak around the pixel with the highest value in the residuals.
+
+*  Parameters:
+*     array
+*        Pointer to the start of the 1D array containing the current
+*        residuals. If "iclump" is zero, this array should hold the
+*        original data values before any gaussians have been removed.
+*     imax
+*        The index within the supplied array of the element with the largest 
+*        value. A value of -1 should be supplied if there are no good values 
+*        in the supplied array.
+*     sum
+*        The sum of all the (good) data values in the supplied array.
+*     iclump
+*        The number of clumps found so far.
+*     rms
+*        The RMS noise in the original data array.
+*     config
+*        An AST KeyMap holding tuning parameters for the algorithm.
+*     iter
+*        Address of an int in which to return a flag indicating if
+*        a Gaussian should be fitted to the supplied peak.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidIterate macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidIterate:X: except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidIterate... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int i;               /* Loop count */
+
+   static :Xtype: val_thresh;  /* Smallest value to be fitted */
+   static double sum_thresh;   /* Target value for the sum of the residuals */
+   static int maxclumps;       /* Maximum number of clumps to be fitted */
+
+/* Initialise. */
+   *iter = 0;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* If no gaussians have yet been removed from the original data, record
+   the target value for the sum of the residuals at which iteration will
+   stop. This target value is a user-specified fraction of the total data
+   sum in the original data. */
+   if( iclump == 0 ) {
+      sum_thresh = cupidConfigD( config, "MININTEGRAL", 0.01 )*sum;
+
+/* Also store the smallest peak value to which a gaussian should be
+   fitted. This value is a user-specified multiple of the RMS noise. */
+      val_thresh = cupidConfigD( config, "THRESHOLD", 2.0 )*rms;
+
+/* Also store the maximum allowed number of clumps to be fitted. */
+      maxclumps = cupidConfigI( config, "MAXCLUMPS", INT_MAX );
+
+   }
+
+/* Cannot iterate if all the residuals are bad. */
+   if( imax != -1 ) {
+
+/* We finish iterating when the sum of the residuals in the supplied array 
+   is less than the target value recorded on the first entry to this
+   function. */
+      if( sum > sum_thresh ) {
+
+/* We also finish iterating if the peak value is too small. The limit is
+   a user-specified multiple of the noise. */
+         if( array[ imax ] > val_thresh ) {
+
+/* We also finish iterating if we have already fitted the maximum allowed 
+   number of clumps. */
+            if( iclump < maxclumps ) {
+
+/* If all the abovetests were passed, indicate that we should continue to
+   fit a Gausian to the supplied peak. */
+               iter = 1;
+
+            }
+         }
+      }
+   }
+}
+

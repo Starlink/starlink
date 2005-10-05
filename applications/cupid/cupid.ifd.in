@@ -1,0 +1,126 @@
+package cupid {
+   version @PACKAGE_VERSION@
+   prefix scp
+
+   executable cupid_mon {
+
+      action clumps {
+
+         helplib {$CUPID_HELP}
+
+         parameter config {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Algorithm tuning parameters}
+            helpkey *
+            default !
+         }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter outcat {
+            position 2
+            type LITERAL
+            access WRITE
+            prompt {Output catalogue}
+            association ->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter method {
+            position 3
+            type LITERAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Clump identification algorithm}
+            default GaussClumps
+            helpkey *
+          }
+
+         parameter mask {
+            position 4
+            type _LOGICAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Create a mask in the input NDF?}
+            default TRUE
+            helpkey *
+          }
+
+      }
+
+      icl {defstring cupidh(elp) !$CUPID_DIR/cupidhelp}
+      icl {defstring kap_cupidh(elp) !$CUPID_DIR/cupidhelp}
+      action cupidhelp {
+         alias {cupidh(elp)}
+
+         helplib {$CUPID_HELP}
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+
+      }
+
+   }
+
+   icl {defhelp cupid $CUPID_HELP 0}
+
+   display {
+
+     CUPID commands are now available -- (Version @PACKAGE_VERSION@)
+
+     Type cupidhelp for help on CUPID commands.
+     Type "showme sun??" to browse the hypertext documentation.
+
+   }
+
+}

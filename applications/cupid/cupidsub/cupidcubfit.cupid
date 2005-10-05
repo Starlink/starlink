@@ -1,0 +1,59 @@
+#include "sae_par.h"
+#include "cupid.h"
+
+int cupidCubFit:X:( ){
+/*
+*  Name:
+*     cupidCubFit:X:
+
+*  Purpose:
+*     Find the best fitting parameters, starting from a given initial
+*     guess.
+
+*  Synopsis:
+*     int cupidCubFit:X:( );
+
+*  Description:
+*     This function finds the best fitting parameters, starting from a 
+*     given initial guess.
+
+*  Parameters:
+
+*  Returned Value:
+*     Non-zero if the fit was succesfully completed.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidCubFit macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidCubFit:X: except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidCubFit... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int ret;          /* Returned value */
+
+/* Initialise. */
+   ret = 0;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return ret;
+
+
+/* Return the result. */
+   return ret;  
+}
+

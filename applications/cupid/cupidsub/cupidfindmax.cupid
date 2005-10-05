@@ -1,0 +1,89 @@
+#include "sae_par.h"
+#include "mers.h"
+#include "ast.h"
+#include "cupid.h"
+#include "prm_par.h"
+
+
+void cupidFindMax:X:( :Xtype: *array, int nel, int *imax, double *sum ){
+/*
+*  Name:
+*     cupidFindMax:X:
+
+*  Purpose:
+*     Find the element with the largest value, and the total data sum,
+*     in the supplied array. 
+
+*  Synopsis:
+*     void cupidFindMax:X:( :Xtype: *array, int nel, int *imax, double *sum );
+
+*  Description:
+*     This functions finds the element with the largest value in the supplied 
+*     1D array. It also finds the total data sum in the array.
+
+*  Parameters:
+*     array
+*        Pointer to the start of the 1D array to be searched.
+*     nel
+*        The number of elements in the supplied array. 
+*     imax
+*        Pointer the location at which to return the index within the
+*        supplied array of the element with the largest value. A value of
+*        -1 is returned if there are no good values in the supplied array.
+*     sum
+*        Pointer to a double in which to return the sum of all the (good) 
+*        data values in the supplied array. A value of zero is returned if 
+*        there are no good values in the supplied array.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidFindMax macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidFindMax:X: except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidFindMax... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     29-SEP-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int i;               /* Loop count */
+   :Xtype: maxval;      /* Largest value found so far */
+
+/* Initialise. */
+   *sum = 0.0;
+   *imax = -1;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Loop round all elements of the array. */
+   for( i = 0; i < nel; i++ ) {
+
+/* Skip bad values. */
+      if( array[ i ] != :Badval: ) {
+
+/* If this is the first good value,  or if this value is larger than the 
+   previous found maximum, record its position. */
+         if( *imax == -1 || array[ i ] > maxval ) {
+            maxval = array[ i ];
+            *imax = i;
+         }
+
+/* Increment the total data sum in the array. */
+         *sum += (double) array[ i ];
+
+      }
+   }
+}
+
