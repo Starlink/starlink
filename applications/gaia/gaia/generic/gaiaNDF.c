@@ -1767,7 +1767,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     astSetI( frameSet, "Current", current );
     if ( pixel == 0 ) {
         frameSet = (AstFrameSet *) astAnnul( frameSet );
-        *error_mess = "Cannot locate the PIXEL domain";
+        *error_mess = strdup( "Cannot locate the PIXEL domain" );
         *coord = NULL;
         emsRlse();
         return 1;
@@ -1800,7 +1800,8 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     if ( ! astOK ) {
         astClearStatus;
         *coord = NULL;
-        *error_mess = "Failed to convert pixel index to world coordinate";
+        *error_mess = 
+            strdup( "Failed to convert pixel index to world coordinate" );
         astSetI( frameSet, "Base", base );
         frameSet = (AstFrameSet *) astAnnul( frameSet );
         errRlse();
