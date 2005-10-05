@@ -138,6 +138,8 @@
 *        them, to avoid the data points being obscured by the error bars.
 *     18-SEP-2001 (DSB):
 *        Make bad error bars extend to the corresponding edge of the plot.
+*     5-OCT-2005 (DSB):
+*        Free resources used to hold attribute synonyms before returning.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -723,6 +725,9 @@
 *  ========
 
  999  CONTINUE
+
+*  Ensure that any previous synonyms for AST attributes are cleared.
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
 *  Re-instate the original plotting attributes for the AST graphical elements 
 *  which may have been changed by this routine.
