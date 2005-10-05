@@ -37,6 +37,8 @@
 *  History:
 *     2005-09-26 (TIMJ):
 *        Initial test version
+*     2005-10-05 (TIMJ):
+*        Register inherited status pointer with AST
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +93,9 @@ void smurf_mon( int * status ) {
 
 
   if ( *status != SAI__OK ) return; 
+
+  /* Register our status variable with AST */
+  astWatch( status );
 
   /* Find out the task name we were invoked with */
   memset( taskname, ' ', PAR__SZNAM );
