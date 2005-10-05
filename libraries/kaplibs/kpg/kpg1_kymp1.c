@@ -88,6 +88,7 @@ void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
    char name[ GRP__SZNAM + 1 ]; /* A single string from the group */
    int acclen;                  /* Length of accumulation exc. trailing null */
    int i;                       /* Index into supplied group */
+   int *old_status;             /* Pointer to original status variable */
    int size;                    /* No. of strings in supplied group */
    int thislen;                 /* Length of current string */
 
@@ -97,9 +98,11 @@ void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
+/* Make AST use the Fortran status variable. */
+   old_status = astWatch( status );
+
 /* Create a new empty KeyMap. */
    *keymap = astKeyMap( "" );
-   if( !astOK ) *status = astStatus;
 
 /* Get the number of strings in the group. */
    grpGrpsz( igrp, &size, status );
@@ -160,5 +163,8 @@ void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
 
 /* If an error occurred, annul the returned KeyMap. */
    if( *status != SAI__OK ) *keymap = astAnnul( *keymap );
+
+/* Make AST use its original status variable. */
+   astWatch( old_status );
 
 }

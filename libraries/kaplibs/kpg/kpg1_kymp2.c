@@ -142,7 +142,6 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    add the value to the supplied keymap. */
    if( cend == equals ) {
       astMapPut0C( keymap, comp, equals + 1, NULL );
-      if( !astOK ) *status = astStatus;
 
 /* Otherwise, get another KeyMap in which to store the components
    following this first component. If the supplied KeyMap already
@@ -156,14 +155,12 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
          compmap = astKeyMap( "" );
          astMapPut0A( keymap, comp, compmap, NULL );
       } 
-      if( !astOK ) *status = astStatus;
 
 /* Call this function recursively to store the component value. */
       kpg1Kymp2( dot + 1, compmap, status );
 
 /* Free the component KeyMap pointer. */
       compmap = astAnnul( compmap );
-      if( !astOK ) *status = astStatus;
 
    }
 
