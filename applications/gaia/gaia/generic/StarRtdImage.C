@@ -282,7 +282,7 @@ public:
     { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
     { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
     { "ndf",           &StarRtdImage::ndfCmd,           1, 6 },
-    { "origin",        &StarRtdImage::originCmd,        2, 2 },
+    { "origin",        &StarRtdImage::originCmd,        2, 3 },
     { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
     { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
     { "readonly",      &StarRtdImage::readonlyCmd,      0, 1 },
@@ -1179,10 +1179,12 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
 //      Returns the NDF origin information.
 //
 //   Arguments:
-//       int argc         - Number of arguments passed to command (2).
+//       int argc         - Number of arguments passed to command.
 //       char *argv[]     - The arguments, names of the variables
-//                          to hold origin information. If not given
-//                          then return is a list.
+//                          to hold origin information. Note there
+//                          can be more than two of these. If more are
+//                          supplied than necessary then the 
+//                          extra ones will be set to 1.
 //    Return:
 //       TCL status.
 //
@@ -1196,17 +1198,18 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     if (!image_) {
         return error("no image loaded");
     }
-    char* outx_name = argv[0];
-    char* outy_name = argv[1];
-
-    // Set the origin information if available.
-    char *x = image_->image().get("LBOUND1");
-    if ( ! x ) x = "1";
-    Tcl_SetVar(interp_, outx_name, x, 0);
-
-    char *y = image_->image().get("LBOUND2");
-    if ( ! y ) y = "1";
-    Tcl_SetVar(interp_, outy_name, y, 0);
+    char *out_name;
+    char *value;
+    char name[10];
+    for ( int i = 0; i < argc; i++ ) {
+        out_name = argv[i];
+        sprintf( name, "LBOUND%d", i );
+        value = image_->image().get( name );
+        if ( ! value ) {
+            value = "1";
+        }
+        Tcl_SetVar(interp_, out_name, value, 0);
+    }
     return TCL_OK;
 }
 

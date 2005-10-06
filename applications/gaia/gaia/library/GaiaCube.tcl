@@ -377,6 +377,9 @@ itcl::class gaia::GaiaNDFCube {
 
       #  Reveal first page of controls.
       $itk_component(tabnotebook) select 0
+
+      #  Display spectra on mouse click.
+      add_bindings_
    }
 
    #  Destructor:
@@ -623,6 +626,62 @@ itcl::class gaia::GaiaNDFCube {
       blt::busy release $w_
    }
 
+   #  Configure canvas so we get any clicks on the image and can display 
+   protected method add_bindings_ {} {
+      global env
+      if {! [info exists env(SPLAT_DIR)]} {
+         error_dialog "No SPLAT_DIR variable available. Cannot display spectra"
+         return
+      }
+      set splat_dir_ $env(SPLAT_DIR)
+
+      #  Button-1 does a lot already so use double click. May clash with
+      #  image regions toolbox....
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <Double-Button-1> \
+         [code $this display_spectrum_ %x %y]
+   }
+
+   protected method display_spectrum_ {cx cy} {
+
+      #  Convert click coordinates from canvas coords to grid coords.
+      set cx [$itk_option(-canvas) canvasx $cx]
+      set cy [$itk_option(-canvas) canvasy $cy]
+      $itk_option(-rtdimage) convert coords $cx $cy canvas ix iy image
+
+      #  Use origins to get pixel indices.
+      if { $axis_ == 1 } {
+         set xo [lindex $bounds_ 2]
+         set yo [lindex $bounds_ 4]
+      } elseif { $axis_ == 2 } {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 4]
+      } else {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 2]
+      }
+      set ix [expr round($ix-1+$xo)]
+      set iy [expr round($iy-1+$yo)]
+
+      #  Create the right section. Use collapse coords as bounds on the
+      #  spectral axis.
+      set range "$lower_collapse_bound_:$upper_collapse_bound_"
+      if { $axis_ == 1 } {
+         set section "($range,$ix,$iy)"
+      } elseif { $axis_ == 2 } {
+         set section "($ix,$range,$iy)"
+      } else {
+         set section "($ix,$iy,$range)"
+      }
+
+      #  Send the section to SPLAT.
+      if { $splat_disp_ == {} } {
+         set splat_disp_ [GaiaForeignExec \#auto \
+                             -application $splat_dir_/splatdisp \
+                             -show_output 0]
+      }
+      $splat_disp_ runwith "${ndfname_}${section}" 0
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -633,6 +692,12 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Name of the Gaia instance we're controlling.
    itk_option define -gaia gaia Gaia {}
+
+   #  The canvas. Used for displaying spectra.
+   itk_option define -canvas canvas Canvas {}
+
+   #  The rtdimage instance. Used for coordinate conversions.
+   itk_option define -rtdimage rtdimage RtdImage {}
 
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {}
@@ -684,6 +749,12 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Name of the temporary image just created.
    protected variable tmpimage_
+
+   #  The SPLAT home directory.
+   protected variable splat_dir_ {}
+
+   #  Task controller for splatdisp command.
+   protected variable splat_disp_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

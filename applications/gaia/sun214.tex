@@ -16,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.16}
+\newcommand{\stardocnumber}    {214.17}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {8th June 2005}
+\newcommand{\stardocdate}      {6th October 2005}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {2.9.0}
+\newcommand{\stardocversion}   {2.9.3}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -430,7 +430,8 @@ GAIA provides the following normal ``image display tool'' features:
   You can also combine a range of image planes or do the stepping
   using a timed animation. The displayed images created by this tool can be 
   analysed just like any other image, but the data format should be 
-  NDF for efficiency.
+  NDF for efficiency. Finally a spectrum from the hidden dimension of
+  the cube can be displayed in the Starlink SPLAT program.
 \end{itemize}
 
 \subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
@@ -884,11 +885,15 @@ The minor changes are:
       These are converted into temporary files on the fly and can be used with
       all other tasks within GAIA.
 
+\item When you display slices from cubes, it is now possible to get a spectral
+      display by double-clicking on a display pixel. This sends the spectrum 
+      to the Starlink SPLAT program.
+
 \item The ESP toolbox now reports the mean count along the isophote and plots
       intensity profiles.
 
-\item A rarely seen problem with foreign-file conversion deleting the input files
-      has been fixed.
+\item A rarely seen problem with foreign-file conversion deleting the input
+      files has been fixed.
 
 \end{itemize}
 

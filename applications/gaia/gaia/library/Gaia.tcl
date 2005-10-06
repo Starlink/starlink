@@ -1125,6 +1125,8 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaNDFCube $w_.\#auto \
             -gaia $w_ \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -filter_types $itk_option(-file_types) \

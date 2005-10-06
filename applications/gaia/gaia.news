@@ -1,7 +1,7 @@
 1 Starlink GAIA update
 
-  Release 2.9-0: 06 June 2005
-  ===========================
+  Release 2.9-3: 06 October 2005
+  ==============================
 
   There have been several minor changes in this release of GAIA.
 
@@ -11,6 +11,10 @@
       These are converted into temporary files on the fly and can be
       used with all other tasks within GAIA.
 
+    - When you display slices from cubes, it is now possible to get a spectral
+      display by double-clicking on a display pixel. This sends the spectrum 
+      to the Starlink SPLAT program.
+
     - The ESP toolbox now reports the mean count along the isophote and plots
       intensity profiles.
 
@@ -19,7 +23,8 @@
 
   Internally GAIA has undergone major changes in the way that it is built and
   distributed. One immediate consequence of this is that GAIA no longer
-  distributes any files for IRAF support. AUTOASTROM does not exist.
+  distributes any files for IRAF support. AUTOASTROM does not exist at present
+  so may not be available.
 
   Release 2.8-0: 04 November 2004
   ===============================
