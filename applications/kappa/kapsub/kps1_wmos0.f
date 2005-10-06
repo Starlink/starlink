@@ -48,6 +48,11 @@
 *  History:
 *     14-SEP-2005 (DSB):
 *        Original version.
+*     6-OCT-2005 (DSB):
+*        Added ShiftMaps to returned Mappings because AST_REBINSEQ
+*        requires "pixel" coords to have integer values at the centre
+*        of pixels, but Starlink pixel coords have integer value at 
+*        pixel corners.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,6 +95,7 @@
       DOUBLE PRECISION DUBND1( NDF__MXDIM )! Upper bounds of input NDF
       DOUBLE PRECISION XL( NDF__MXDIM )! Input position at lower bound
       DOUBLE PRECISION XU( NDF__MXDIM )! Input position at upper bound
+      DOUBLE PRECISION SHIFT( NDF__MXDIM )! 0.5 pixel shifts
       INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in string
       INTEGER IL                 ! Integer lower bound
@@ -103,6 +109,7 @@
       INTEGER LBND1( NDF__MXDIM )! Lower bounds of input NDF
       INTEGER NDIM1              ! No. of pixel axes in input NDF 
       INTEGER NFRM               ! No. of Frames in input NDF FrameSet
+      INTEGER SM                 ! ShiftMap pointer
       INTEGER SIZE               ! No. of input NDFs
       INTEGER UBND1( NDF__MXDIM )! Upper bounds of input NDF
       REAL RLBND                 ! Lower axis bound
@@ -127,6 +134,7 @@
       DO J = 1, NDIM
          LBND( J ) = VAL__MAXI
          UBND( J ) = VAL__MINI
+	 SHIFT( J ) = -0.5D0
       END DO
       USEVAR = .TRUE.
 
@@ -166,9 +174,20 @@
 
 *  Get the simplified Mapping from input pixel Frame to reference (i.e.
 *  output) pixel Frame.
-         MAPS( I ) = AST_SIMPLIFY( AST_GETMAPPING( IWCS1, IPIX1, 
-     :                                           IPIXR + NFRM, STATUS ), 
-     :                             STATUS )
+         MAPS( I ) = AST_GETMAPPING( IWCS1, IPIX1, 
+     :                               IPIXR + NFRM, STATUS ) 
+         
+*  Create a ShiftMap which shifts pixel coords by 0.5 of a pixel in order
+*  to put integer values at the centre of the pixel (as required by AST_REBINSEQ).
+	 SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
+
+*  Combine this with the above Mapping.
+	 MAPS( I ) = AST_CMPMAP( SM, MAPS( I ), .TRUE., ' ', STATUS )
+	 CALL AST_INVERT( SM, STATUS )
+	 MAPS( I ) = AST_CMPMAP( MAPS( I ), SM, .TRUE., ' ', STATUS )
+
+*  Simplify the total Mapping.	 
+         MAPS( I ) = AST_SIMPLIFY( MAPS( I ), STATUS )
 
 *  Export the AST pointer to the parent AST context.
          CALL AST_EXPORT( MAPS( I ), STATUS )
