@@ -997,7 +997,7 @@ sub solve {
       $self->filter( $filter );
     }
     my $ext = new Starlink::Extractor;
-    $ext->detect_thresh( 2.5 );
+    $ext->detect_thresh( 5 );
     $ext->analysis_thresh( 1.5 );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
@@ -1015,15 +1015,16 @@ sub solve {
   }
 
 # Limit the number of objects in the detected catalogue, if necessary.
+  my $filtered_ndfcat = new Astro::Catalog;
   if( $self->max_image_obj && $ndfcat->sizeof > $self->max_image_obj ) {
     my @ndfstars = $ndfcat->stars;
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
                       map { [ $_, $_->get_magnitude( $filter ) ] } @ndfstars;
     @sortedstars = @sortedstars[0..( $self->max_image_obj - 1 )];
-    my $newndfcat = new Astro::Catalog;
-    $newndfcat->pushstar( @sortedstars );
-    $ndfcat = $newndfcat;
+    $filtered_ndfcat->pushstar( @sortedstars );
+  } else {
+    $filtered_ndfcat = $ndfcat;
   }
 
 # Check to see if we have a catalogue to read in instead of querying
@@ -1131,19 +1132,20 @@ sub solve {
       push @filteredstars, $star;
     }
   }
+  my $filtered_querycat = new Astro::Catalog;
   if( $take_brightest ) {
     @filteredstars = map { $_->[0] }
                      sort { $a->[1] <=> $b->[1] }
                      map { [ $_, $_->get_magnitude( $ret_filter ) ] } @filteredstars;
     my @newstars = @filteredstars[0..( $self->maxobj - 1 )];
-    my $newquerycat = new Astro::Catalog;
-    $newquerycat->pushstar( @newstars );
-    $querycat = $newquerycat;
+    $filtered_querycat->pushstar( @newstars );
+  } else {
+    $filtered_querycat = $querycat;
   }
 
 # Perform the correlation.
-  my $corr = new Astro::Correlate( catalog1 => $ndfcat,
-                                   catalog2 => $querycat,
+  my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
+                                   catalog2 => $filtered_querycat,
                                    keeptemps => $self->keeptemps,
                                    method => 'FINDOFF',
                                    temp => $self->temp,
