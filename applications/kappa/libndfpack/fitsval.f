@@ -13,36 +13,38 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL FITSMOD( STATUS )
+*     CALL FITSVAL( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     This application reports the value of keyword in the FITS
-*     extension (`airlock') of an NDF file.
+*     This application reports the value of a keyword in the FITS
+*     extension (`airlock') of an NDF file.  The keyword's value and
+*     comment are also stored in output parameters.
 
 *  Usage:
 *     fitsval ndf keyword
 
 *  ADAM Parameters:
 *     COMMENT = LITERAL (Write)
-*        The comment of the keyword tested.
+*        The comment of the keyword.
 *     KEYWORD = LITERAL (Read)
-*        The name of the keyword to be edited in the FITS extension.  A
-*        name may be compound to handle hierarchical keywords, and it
-*        has the form keyword1.keyword2.keyword3 etc.  The maximum
-*        number of keywords per FITS card is 20.  Each keyword must be
-*        no longer than 8 characters, and be a valid FITS keyword
-*        comprising only alphanumeric characters, hyphen, and
-*        underscore.  Any lowercase letters are converted to uppercase
-*        and blanks are removed before insertion, or comparison with the
-*        existing keywords.
+*        The name of an existing keyword in the FITS extension whose
+*        value is to be reported.  A name may be compound to handle
+*        hierarchical keywords, and it has the form
+*        keyword1.keyword2.keyword3 etc.  The maximum number of keywords
+*        per FITS card is 20.  Each keyword must be no longer than 8
+*        characters, and be a valid FITS keyword comprising only 
+*        alphanumeric characters, hyphen, and underscore.  Any 
+*        lowercase letters are converted to uppercase and blanks are
+*        removed before insertion, or comparison with the existing 
+*        keywords.
 *
 *        KEYWORD may have an occurrence specified in brackets [] 
-*        following  the name.  This enables editing of a keyword that is 
-*        not the first occurrence of that keyword, or locate a edited
+*        following  the name.  This enables editing of a keyword that 
+*        is not the first occurrence of that keyword, or locate a edited
 *        keyword not at the first occurrence of the positional keyword.
 *        Note that it is not normal to have multiple occurrences of a
 *        keyword in a FITS header, unless it is blank, COMMENT or 
@@ -51,19 +53,19 @@
 *     NDF = NDF (Read)
 *        The NDF containing the FITS keyword.
 *     VALUE = LITERAL (Write)
-*        The value of the keyword tested.
+*        The value of the keyword.
 
 *  Examples:
 *     fitsval abc bscale
-*        This reports TRUE or FALSE depending on whether or not the
-*        FITS keyword BSCALE exists in the FITS extension of the NDF
-*        called abc.
+*        This reports the value of the FITS keyword BSCALE, which is
+*        located within the FITS extension of the NDF called abc.
 *     fitsval ndf=abc keyword=date[2]
-*        This reports TRUE or FALSE depending on whether or not the
-*        FITS there are at least two occurrences of the keyword DATE.
+*        This reports the value of the second occurrence FITS keyword
+*        DATE, which is located within the FITS extension of the NDF
+*        called abc.
 
 *  Related Applications:
-*     KAPPA: FITSEDIT, FITSEXIST, FITSHEAD, FITSLIST.
+*     KAPPA: FITSEDIT, FITSEXIST, FITSHEAD, FITSLIST, FITSMOD.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
