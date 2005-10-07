@@ -4,7 +4,7 @@
 #include "cupid.h"
 
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       unsigned char *ipq, AstKeyMap *config  ){
+                       unsigned char *ipq, double rms, AstKeyMap *config  ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -15,7 +15,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                           void *ipd, unsigned char *ipq, AstKeyMap *config )
+*                           void *ipd, unsigned char *ipq, double rms,
+*                           AstKeyMap *config )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -56,6 +57,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        contributes to more than one clump, then the quality value 
 *        associated with the pixel will be the index of the last clump
 *        found.
+*     rms
+*        The global RMS error in the data array.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
 
@@ -98,7 +101,6 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iter;            /* Continue finding more clumps? */
    void *res;           /* Pointer to residuals array */
    int imax;            /* Index of element with largest residual */
-   double rms;          /* RMS noise in data */
    double sum;          /* Sum of all residuals */
 
 /* Abort if an error has already occurred. */
@@ -123,10 +125,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    res = cupidStore( NULL, ipd, el, type, "cupidGaussClumps" );
    if( res ) {
 
-/* Get an estimate of the RMS noise in the data. */
-      rms = cupidRms( type, res, ndim, dims, config );
-
-/* Allow the user to override this value. */
+/* Allow the user to override the supplied RMS error value. */
       rms = cupidConfigD( config, "RMS", rms );
 
 /* Initialise the number of clumps found so far. */

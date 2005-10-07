@@ -5,6 +5,7 @@
 #include "kaplibs.h"
 #include "grp.h"
 #include "par.h"
+#include "prm_par.h"
 #include "cupid.h"
 
 void clumps() {
@@ -120,14 +121,10 @@ void clumps() {
 *     or equal to "MinIntegral" times the integrated intensity in the
 *     supplied data array, or when one of the other termination criteria 
 *     is met. [0.01]
-*     - GaussClumps.PsfPix: Specifies the width of the Point Spread Function
-*     within the input data, in pixels. A box filter of this size is used
-*     to smooth each row of data when determining the default value for
-*     the RMS noise in the data. [3.0]
 *     - GaussClumps.RMS: The RMS noise in the data. The default value is
-*     determined by smoothing each row with a box filter of width given by
-*     "PsfPix" and finding the residuals between the original and
-*     smoothed data. []
+*     determined by the Variance component in the input data. If there is
+*     no Variance component, an estimate of the global noise level in the
+*     data is made and used. []
 *     - GaussClumps.Threshold: Specifies a termination criterion for
 *     the GaussClumps algorithm. The algorithm will terminate when the peak
 *     value in the residuals left after subtraction of the fitted clumps 
@@ -155,12 +152,17 @@ void clumps() {
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
+   double *ipv;                 /* Pointer to Variance array */
+   double meanv;                /* Mean of variance values */
+   double rms;                  /* Global rms error in data */
+   double sum;                  /* Sum of variances */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
    int igrp;                    /* GRP identifier for configuration settings */
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
+   int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
    int nsig;                    /* Number of significant pixel axes */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
@@ -168,9 +170,10 @@ void clumps() {
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int type;                    /* Integer identifier for data type */
+   int var;                     /* Does the i/p NDF have a Variance component? */
    void *ipd;                   /* Pointer to Data array */
    void *ipq;                   /* Pointer to Quality array */
-
+   
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
@@ -235,6 +238,32 @@ void clumps() {
 /* Map the Data array. */
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
+/* If there is a vriance array, map it and find the global RMS error. */
+   ndfState( indf, "VARIANCE", &var, status );
+   if( var ) {   
+      ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
+
+      for( i = 0; i < el; i++ ) {
+         if( ipv[ i ] != VAL__BADD ) {
+            sum += ipv[ i ]*ipv[ i ];
+            n++;
+         }
+      }
+
+      if( n > 0 ) {
+         rms = sqrtf( sum/n );
+      } else {
+         *status = SAI__ERROR;
+         errRep( "CLUMPS_ERR1", "The supplied data contains insufficient "
+                 "good values to continue.", status );
+      }         
+
+/* If there is no Variance component, get an estimate of the RMS noise
+   based on the variations of the data values. */
+   } else {
+      rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
+   }
+
 /* Determine which algorithm to use. */
    parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
              15,  status );
@@ -258,7 +287,7 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       cupidGaussClumps( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq, 
-                       keymap ); 
+                       rms, keymap ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       cupidClumpFind( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq,

@@ -23,7 +23,7 @@
    : ( ( *status == SAI__OK ) ? \
        *status = SAI__ERROR, \
        msgSeti( "TYPE", type ), \
-       errRep( "GAUSSCLUMPS_ERR1", fun ": Invalid \"type\" " \
+       errRep( "CUPIDSIZE_ERR1", fun ": Invalid \"type\" " \
                "value (^TYPE) supplied (CUPID programming error).", \
                status ), 0 : 0 ) ) )
 
@@ -52,7 +52,7 @@ extern int *cupid_global_status;
 void clumps();
 void cupidhelp();
 void cupidClumpFind( int, int, int *, int *, void *, unsigned char *, AstKeyMap * );
-void cupidGaussClumps( int, int, int *, int *, void *, unsigned char *, AstKeyMap * );
+void cupidGaussClumps( int, int, int *, int *, void *, unsigned char *, double, AstKeyMap * );
 double cupidConfigD( AstKeyMap *, const char *, double );
 int cupidConfigI( AstKeyMap *, const char *, int );
 

@@ -4,7 +4,7 @@
 #include "prm_par.h"
 
 
-double cupidRms:X:( :Xtype: *array, int ndim, int *dims, AstKeyMap *config ){
+double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
 /*
 *  Name:
 *     cupidRms:X:
@@ -13,31 +13,30 @@ double cupidRms:X:( :Xtype: *array, int ndim, int *dims, AstKeyMap *config ){
 *     Find the RMS noise in the supplied data array.
 
 *  Synopsis:
-*     double cupidRms:X:( :Xtype: *array, int ndim, int *dims, 
-*                         AstKeyMap *config );
+*     double cupidRms:X:( :Xtype: *array, int nel, int rowlen )
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
-*     data array. The algorithm smoothes each row using a 1D box filter,
-*     and finds the residuals between the smoothed and input data. These
-*     residuals will consist mainly of the noise, but will also contain 
-*     some left overs from the lower frequencies of the data. To get rid
-*     of these, the residuals are themselves smoothed, and the residuals
-*     of the residuals are found. This process is repeated "niter" times.
-*     The returned RMS noise estimate is the mean of the final squared
-*     residuals.
+*     data array. The algorithm first applies a 1D Laplace filter to each 
+*     row of the data (this is equivalent to finding the difference between
+*     adjacent pixel values in the row, then finding the difference between 
+*     the adjcent differences). It then estimates the RMS of the the
+*     filtered data, and rejects data values greater than 4*RMS. When a
+*     point is rejected, the 2 neighbouring points on either side are
+*     also rejected. It then forms the RMS of the remaining data, and
+*     does a new clipping iteration. This continues until the clipping
+*     results in no points being rejected. The final RMS is then scaled
+*     to take account of the effects of the Laplace filter and the 4*sigma
+*     clipping.
 
 *  Parameters:
 *     array
 *        Pointer to the data array. The elements should be stored in
 *        Fortran order. 
-*     ndim
-*        The number of pixel axes spanned by the array.
-*     dims
-*        Pointer to an array holding the size of each pixel dimension
-*        spanned by the array.
-*     config
-*        An AST KeyMap holding tuning parameters for the algorithm.
+*     nel
+*        The number of elements in the supplied array. 
+*     rowlen 
+*        The number of elements spanned by the first pixel axis.
 
 *  Returned Value:
 *     The RMS noise estimate
@@ -64,28 +63,18 @@ double cupidRms:X:( :Xtype: *array, int ndim, int *dims, AstKeyMap *config ){
 */      
 
 /* Local Variables: */
-   :Xtype: *in;         /* Pointer to data to be smoothed */
-   :Xtype: *out;        /* Pointer to data to recieve residuals */
-   :Xtype: *pr;         /* Pointer to start of next row of input data */
-   :Xtype: *wa;         /* Pointer to first row buffer */
-   :Xtype: *wb;         /* Pointer to second row buffer */
-   double boxsum;       /* Sum of all good input values in smoothing box */
-   double res;          /* The residual between smoothed and input values */
+   :Xtype: *pr;         /* Pointer to next data value */
+   :Xtype: *w;          /* Pointer to work array */
+   :Xtype: *wr;         /* Pointer to next work value */
    double ret;          /* Returned value */
-   double sqres;        /* Sum of squared residuals for one row */
-   double tsqres;       /* Total of squared residuals over all rows */
-   int hpsf;            /* Half width of PSF in pixels */
-   int i;               /* Loop count */
-   int il;              /* Index of left hand pixel in current smoothing box */
-   int ir;              /* Index of right hand pixel in current smoothing box */
+   double sum;          /* Sum of squared residuals */
+   double thresh;       /* The rejection threshold for residuals */
+   int i;               /* Element count */
+   int ipix;            /* Pixel count */
    int irow;            /* Row counter */
-   int iter;            /* Smoothing iteration count */
-   int nbox;            /* Number of values summed in boxsum */
-   int niter;           /* No. of smoothing iterations to perform */
+   int n;               /* Number of values summed in "sum" */
+   int nrej;            /* Number of rejections on previus loop */
    int nrow;            /* Number of rows in supplied array */
-   int nsqres;          /* Number of values summed in sqres */
-   int ntsqres;         /* Number of values summed in tsqres */
-   int rowlen;          /* Length of each row in pixels */
 
 /* Initialise. */
    ret = VAL__BADD;
@@ -93,123 +82,96 @@ double cupidRms:X:( :Xtype: *array, int ndim, int *dims, AstKeyMap *config ){
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* Get the half PSF size in pixels. */
-   hpsf = cupidConfigD( config, "PSFPIX", 3.0 )/2;
-
-/* Get the number of smoothing iterations to perform. */
-   niter = cupidConfigI( config, "NITER", 3 );
-
-/* How many pixels per row? */
-   rowlen = dims[ 0 ];
-
 /* How many rows in the entire data array? */
-   nrow = 1;
-   for( i = 1; i < ndim; i++ ) nrow *= dims[ i ];
+   nrow = nel/rowlen;
 
-/* Allocate memory for two rows of data */
-   wa = astMalloc( sizeof( :Xtype: )*rowlen );
-   wb = astMalloc( sizeof( :Xtype: )*rowlen );
-   if( wb ) {
+/* Allocate memory for a copy of the data array. */
+   w = astMalloc( sizeof( :Xtype: )*nel );
+   if( w ) {
 
-/* Initialise the total sum of the squared residuals taken over all rows, and 
-   the number of good residuals. */
-      tsqres = 0.0;
-      ntsqres = 0;
-
-/* Loop round all rows in the supplied array. "pr" points to the start of
-   the row. */
+/* Run a 1D Laplace filter (kernel = [-1,2,-1]) over the data, storing
+   the results in the work array. At the same time, find the RMS value of 
+   the filtered data. A Laplace filter picks out the noise, but will also 
+   include spikes due to sharp slopes (such as the edge of star profiles, 
+   etc). */
       pr = array;
-      for( irow = 0; irow < nrow; irow++, pr += rowlen ){
-
-printf("Row %d...\n", irow );
-
-/* Smooth this row using a box filter of width "psfpix" pixels, and put
-   the residuals between the smoothed and unsmoothed data in "wb". */
-         in = pr;
-         out = wa;
-         for( iter = 0; iter < niter; iter++ ) {
-
-/* Initialise the sum of the squared residuals, and the number of good
-   residuals. */
-            sqres = 0.0;
-            nsqres = 0;
-
-/* The box filter starts out centred on pixel "hpsf" and covering the input 
-   filter from pixel 0 to "2*hpsf". Find the total good data value in this
-   range. */
-            il = 0;
-            ir = 2*hpsf;
-            boxsum = 0.0;
-            nbox = 0;
-            for( i = il; i <= ir; i++ ) {
-               if( in[ i ] != :Badval: ) {
-                  boxsum += in[ i ];
-                  nbox++;
-               }
-            }
-
-/* Now run the box along the current input row until the right hand end
-   of the box hits the end of the array. */
-            for( i = hpsf; i < rowlen - hpsf; i++ ) {
-
-/* If the box currently contains 1 or more good values, calculate and
-   store the difference between the mean value in the box and the
-   corresponding central value in the input array. Also update the sum of
-   the squared residuals. */
-               if( nbox > 0 ) {
-                  res = boxsum/nbox - in[ i ];
-                  out[ i ] = res;
-                  sqres += res*res;
-                  nsqres++;
-               } else {
-                  out[ i ] = :Badval:;
-               }
-
-/* If good, remove the left hand input pixel from the box. */
-               if( in[ il ] != :Badval: ) {
-                  boxsum -= in[ il ];
-                  nbox--;
-               }
-
-/* Increment the indices of the left hand and right hand pixels in the
-   box. */
-               il++;
-               ir++;
-
-/* If good, add the new right hand input pixel into the box. */
-               if( in[ ir ] != :Badval: ) {
-                  boxsum += in[ ir ];
-                  nbox++;
-               }
-            }
-
-/* Next time round we will smooth the residuals rather than the original
-   data. */
-            if( out == wa ) {
-               in = wa;
-               out = wb;
+      wr = w;
+      sum = 0.0;
+      n = 0;
+      for( irow = 0; irow < nrow; irow++ ){
+         *(wr++) = :Badval:;
+         pr++;
+         for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
+            if( pr[ -1 ] != :Badval: && 
+                pr[ 0 ] != :Badval: && 
+                pr[ 1 ] != :Badval: ){
+               *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
+               sum += ( *wr )*( *wr );
+               n++;
             } else {
-               in = wb;
-               out = wa;
-            }    
-
-printf("   Iter %d rms = %g\n", iter, sqrtf( sqres/nsqres ) );
-
+               *wr = :Badval:;
+            }
          }
-
-/* Increment the total of the sum of the squared residuals for all rows. */
-         tsqres += sqres;
-         ntsqres += nsqres;
+         *(wr++) = :Badval:;
+         pr++;
       }
 
-/* Find the over-all RMS error.*/
-      if( ntsqres > 0 ) ret = sqrt( tsqres/ntsqres );
+      if( n == 0 ) {
+         *status = SAI__ERROR;
+         errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
+                 "good values to continue.", status );
+         goto L999;
+      } else {
+         ret = sqrt( sum/n );
+      }
+
+/* We now get rid of spikes by doing a 4-sigma clip on the residuals
+   produced by the Laplace filter. In addition, set the two neighbouring
+   pixels on either side of each rejected pixel bad. We continue to do such 
+   clipping until no further residuals are rejected. */
+      nrej = 1;
+      while( nrej ) {
+         sum = 0.0;
+         n = 0;
+         nrej = 0;
+         thresh = 4*ret;
+         wr = w + 2;
+         for( i = 2; i < nel - 2; i++, wr++ ){
+            if( *wr != :Badval: ){
+               if( fabs( *wr ) >  thresh ) {
+                  wr[ -2 ] = :Badval:;
+                  wr[ -1 ] = :Badval:;
+                  wr[ 0 ] = :Badval:;
+                  wr[ 1 ] = :Badval:;
+                  wr[ 2 ] = :Badval:;
+                  nrej++;                                    
+               } else {
+                  sum += ( *wr )*( *wr );
+                  n++;
+               }
+            }
+         }
+
+         if( n == 0 ) {
+            *status = SAI__ERROR;
+            errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
+                    "good values to continue.", status );
+            goto L999;
+         } else {
+            ret = sqrt( sum/n );
+         }
+      }
+
+/* Scale the returned RMS error to take account of the effects of the
+   Laplace filter and the 4 sigma clipping. This assumes the noise is
+   Gaussian. */
+      ret /= 2.46182;
        
    }
 
 /* Free resources. */
-   wa = astFree( wa );
-   wb = astFree( wb );
+L999:;
+   w = astFree( w );
 
 /* Return the result. */
    return ret;  
