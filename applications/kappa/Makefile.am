@@ -122,11 +122,11 @@ picempty picentire picin piclabel piclist picsel pictrans picvis       \
 scatter vecplot
 
 NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexist fitsexp \
-fitsimp fitsin fitslist fitsmod fitstext hiscom hislist hisset native  \
-ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel setnorm \
-setorigin setsky settitle settype setunits setvar wcsadd wcsattrib     \
-wcscopy wcsframe wcsremove wcsshow chain reshape showqual setqual      \
-remqual qualtobad
+fitsimp fitsin fitslist fitsmod fitstext fitsval hiscom hislist hisset \
+native ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel \
+setnorm setorigin setsky settitle settype setunits setvar wcsadd \
+wcsattrib wcscopy wcsframe wcsremove wcsshow chain reshape showqual \
+setqual remqual qualtobad
 
 
 
@@ -223,7 +223,7 @@ kappa.csh kappa.icl kappa.sh
 
 
 BUILT_IFC_FILES = chain.ifc fitsmod.ifc fitstext.ifc hiscom.ifc \
-hislist.ifc hisset.ifc native.ifc ndfcopy.ifc \
+fitsval.ifc hislist.ifc hisset.ifc native.ifc ndfcopy.ifc \
 ndftrace.ifc qualtobad.ifc remqual.ifc reshape.ifc \
 setaxis.ifc setbad.ifc setbb.ifc setbound.ifc \
 setext.ifc setlabel.ifc setnorm.ifc setorigin.ifc \
