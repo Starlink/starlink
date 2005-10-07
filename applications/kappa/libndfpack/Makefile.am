@@ -5,8 +5,8 @@ noinst_DATA = ndfpack.hlp
 libndfpack_la_SOURCES = $(F_ROUTINES)
 
 F_ROUTINES = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexist.f \
-fitsexp.f fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f   \
-hislist.f hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f     \
+fitsexp.f fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f fitsval.f \
+hiscom.f  hislist.f hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f \
 setbb.f setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f   \
 settitle.f settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f \
 wcsframe.f wcsremove.f wcsshow.f chain.f reshape.f showqual.f setqual.f \
