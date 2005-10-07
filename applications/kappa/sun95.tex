@@ -22718,10 +22718,10 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
    Reports the value of a keyword in the FITS extension.
 }{
    \sstdescription{
-      This application reports the value of a keyword in an \NDFref{NDF's} 
-      \htmlref{FITS extension}{se:fitsairlock}.
-
-      It is a synonym for {\tt fitsmod edit=print mode=interface}.
+     This application reports the value of a keyword in the 
+     \htmlref{FITS extension}{se:fitsairlock} (`airlock') of an 
+     \NDFref{NDF} file.  The keyword's value and comment are also
+     stored in output parameters.
    }
    \sstusage{
       fitsval ndf keyword
@@ -22730,15 +22730,17 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
       \sstsubsection{
          KEYWORD = LITERAL (Read)
       }{
-         The name of an existing keyword in the FITS extension whose value
-         is to be reported.  A name may be compound to handle hierarchical
-         keywords, and it has the form keyword1.keyword2.keyword3
-         {\em etc.}\  The maximum number of keywords per \FITSref\ ~card is 20.
-         Each keyword must be no longer than 8 characters, and be a
-         valid FITS keyword comprising only alphanumeric characters,
-         hyphen, and underscore.  Any lowercase letters are converted to
-         uppercase and blanks are removed before comparison with the
-         existing keywords.
+
+         The name of an existing keyword in the FITS extension whose
+	 value is to be reported.  A name may be compound to handle
+	 hierarchical keywords, and it has the form
+	 keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+	 keywords per \FITSref\ ~card is 20.  Each keyword must be no
+	 longer than 8 characters, and be a valid FITS keyword
+	 comprising only alphanumeric characters, hyphen, and
+	 underscore.  Any lowercase letters are converted to uppercase
+	 and blanks are removed before comparison with the existing
+	 keywords.
 
          KEYWORD may have an occurrence specified in brackets {\tt []}
          following the name.  This enables the values to be obtained
@@ -22754,6 +22756,18 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
          NDF = NDF (Read)
       }{
          The NDF containing the FITS keyword.
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         COMMENT = LITERAL (Write)
+      }{
+         The comment of the keyword.
+      }
+      \sstsubsection{
+         VALUE = LITERAL (Write)
+      }{
+         The value of the keyword.
       }
    }
    \sstexamples{
@@ -33471,6 +33485,9 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
       would assign elements of the shell array perval[1], perval[2],
       {\em etc.}\ to the last-computed percentile values of HISTAT.
+
+      Single elements of an parameter array may also be accessed using
+      the array index in parentheses.
    }
    \sstusage{
       parget parname applic
@@ -33498,6 +33515,12 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       }{
          This reports the values of parameter MINCOORD of the current
          application, in this case STATS.
+      }
+      \sstexamplesubsection{
+         parget applic=ndftrace parname=flabel(2)
+      }{
+         This reports the value of the second element of parameter
+         FLABEL for the application NDFTRACE.
       }
    }
    \sstnotes{
@@ -49356,6 +49379,19 @@ The following applications have been modified:
          \item It is now a self-contained application.  It needs only read
          access to an NDF, unlike the former version that was an alias to
          \htmlref{FITSMOD}{FITSMOD}.  It should be faster too.
+      \end{itemize}
+
+   \item [\htmlref{FITSVAL}{FITSVAL}] \mbox{}
+      \begin{itemize}
+         \item It is now a self-contained application for the reasons
+         given in FITSEXIST above.
+      \end{itemize}
+
+   \item [\htmlref{PARGET}{PARGET}] \mbox{}
+      \begin{itemize}
+         \item Now permits single elements of a parameter array to be
+         reported.  One usage is when any values of an array contain embedded
+         spaces.
       \end{itemize}
 
    \item [\htmlref{REGRID}{REGRID} and \htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
