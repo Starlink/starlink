@@ -43,6 +43,9 @@
 *     would assign elements of the shell array perval[1], perval[2],
 *     etc. to the last-computed percentile values of HISTAT.
 *
+*     Single elements of an parameter array may also be accessed using
+*     the array index in parentheses.
+*
 *  Usage:
 *     parget parname applic 
 
@@ -58,6 +61,9 @@
 *     parget mincoord \
 *        This reports the values of parameter MINCOORD of the current
 *        application, in this case STATS.
+*     parget applic=ndftrace parname=flabel(2)
+*        This reports the value of the second element of parameter
+*        FLABEL for the application NDFTRACE.
 
 *  Notes:
 *     -  The parameter file is located in the $ADAM_USER directory, if
@@ -79,11 +85,16 @@
 *        Original version.
 *     5-JUN-1998 (DSB):
 *        Use DAT_SHAPE to determine if the parameter is a scalar instead
-*        of DAT_SIZE. DAT_SIZE does not distinguish between a scalar and 
-*        an array with only one element.
+*        of DAT_SIZE.  DAT_SIZE does not distinguish between a scalar
+*        and an array with only one element.
 *     4-OCT-2004 (TIMJ):
-*        Use ONE_SCRSZ rather than KPG1_SCRSZ
-*     {enter_any_changes_here}
+*        Use ONE_SCRSZ rather than KPG1_SCRSZ.
+*     2005 September 2 (MJC):
+*        Use internal parameter OBJECT to obtain a pointer to the
+*        full path, such that an array index can be appended to
+*        access a single element of an array of parameter values.
+*        Increase the maximum path length.
+*    {enter_any_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -119,6 +130,7 @@
       CHARACTER * ( BUFLEN ) CVALUE ! A value (stored as a string)
       INTEGER DIM( DAT__MXDIM )  ! Object dimensions
       INTEGER EL                 ! Number of elements returned
+      CHARACTER * ( 256 ) FILE   ! Path to the filename
       INTEGER HEIGHT             ! Height of the screen in characters
       INTEGER I                  ! Loop counter
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to the parameter file
@@ -130,7 +142,7 @@
                                  ! string
       INTEGER NDIM               ! No. of dimensions
       CHARACTER * ( DAT__SZNAM ) PARNAM ! Name of parameter
-      CHARACTER * ( 132 ) PATH   ! Path to the object
+      CHARACTER * ( 256 ) PATH   ! Path to the object
       LOGICAL PRIM               ! Object is primitive?
       INTEGER SIZE               ! Number of elements in object
       CHARACTER * ( DAT__SZLOC ) SLICE ! Locator to an element of the
@@ -174,28 +186,35 @@
       CALL PAR_GET0C( 'APPLIC', APPLIC, STATUS )
       CALL PAR_GET0C( 'PARNAME', PARNAM, STATUS )
 
+*  Remove any leading blanks.
+      CALL CHR_LDBLK( APPLIC )
+      CALL CHR_LDBLK( PARNAM )
+
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Generate the full pathname to the file.
          CALL CHR_APPND( '/'//APPLIC, PATH, NC )
+         FILE = PATH
+         CALL CHR_APPND( '.'//PARNAM, PATH, NC )
 
-*  Open the file.
-         CALL HDS_OPEN( PATH, 'READ', LOC, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  DAT_ASSOC copes with the full path to the object, unlike HDS_OPEN. 
+*  So use an internal parameter to store the object name, then get
+*  DAT_ASSOC to access it.  Surely there is a better way, like an
+*  inverse of HDS_TRACE.
+         CALL AIF_PTFNM( 'OBJECT', PATH, STATUS )
 
-*  Find the object.
-         CALL DAT_THERE( LOC, PARNAM, THERE, STATUS )
-         IF ( .NOT. THERE ) THEN
-            STATUS = SAI__ERROR
+*  Obtain a locator to the file.
+         CALL HDS_OPEN( FILE, 'READ', LOC, STATUS )
+
+*  Obtain a locator to the object.
+         CALL DAT_ASSOC( 'OBJECT', 'READ', LOCO, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'PAR', PARNAM )
-            CALL MSG_SETC( 'PATH', PATH )
+            CALL MSG_SETC( 'PATH', FILE )
             CALL ERR_REP( 'PARGET_NOOBJ',
      :        'There is no parameter ^PAR in file ^PATH.', STATUS )
             GOTO 999
          END IF
-
-*  Obtain a locator to the desired value from the primitive object.
-         CALL DAT_FIND( LOC, PARNAM, LOCO, STATUS )
 
 *  Find out if the object is primitive.
          CALL DAT_PRIM( LOCO, PRIM, STATUS )
