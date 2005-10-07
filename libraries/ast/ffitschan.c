@@ -21,6 +21,7 @@
 *     AST_PUTCARDS
 *     AST_PUTFITS
 *     AST_SETFITS<X>
+*     AST_GETFITS<X>
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -42,6 +43,8 @@
 *        by astFindFits.
 *     17-NOV-2004 (DSB):
 *        Added AST_SETFITS<X>
+*     7-OCT-2005 (DSB):
+*        Added AST_GETFITS<X>
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -550,6 +553,111 @@ F77_SUBROUTINE(ast_setfitscn)( INTEGER(THIS),
       (void) astFree( (void *) comment );
    )
 }
+
+#define MAKE_AST_GETFITS(f,F,Ftype,X,Xtype) \
+F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
+                                      CHARACTER(NAME), \
+                                      Ftype(VALUE), \
+                                      INTEGER(STATUS) \
+                                      TRAIL(NAME) ){ \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_CHARACTER(NAME) \
+   GENPTR_##Ftype(VALUE) \
+   GENPTR_INTEGER(STATUS) \
+   F77_LOGICAL_TYPE(RESULT); \
+\
+   char *name; \
+   Xtype *value; \
+\
+   value = (Xtype *) VALUE; \
+\
+   astAt( "AST_GETFITS"#F, NULL, 0 ); \
+   astWatchSTATUS( \
+      name = astString( NAME, NAME_length ); \
+      RESULT = astGetFits##X( astI2P( *THIS ), name, value ) ? \
+               F77_TRUE : F77_FALSE; \
+      (void) astFree( (void *) name ); \
+   ) \
+   return RESULT; \
+}
+
+MAKE_AST_GETFITS(f,F,DOUBLE,F,double)
+MAKE_AST_GETFITS(i,I,INTEGER,I,int)
+MAKE_AST_GETFITS(l,L,LOGICAL,L,int)
+#undef MAKE_AST_GETFITS
+
+
+
+#define MAKE_AST_GETFITS(f,F,Ftype,X,Xtype) \
+F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
+                                      CHARACTER(NAME), \
+                                      Ftype##_ARRAY(VALUE), \
+                                      INTEGER(STATUS) \
+                                      TRAIL(NAME) ){ \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_CHARACTER(NAME) \
+   GENPTR_##Ftype##_ARRAY(VALUE) \
+   GENPTR_INTEGER(STATUS) \
+   F77_LOGICAL_TYPE(RESULT); \
+\
+   char *name; \
+   Xtype value[2]; \
+\
+   astAt( "AST_GETFITS"#F, NULL, 0 ); \
+   astWatchSTATUS( \
+      name = astString( NAME, NAME_length ); \
+      RESULT = astGetFits##X( astI2P( *THIS ), name, value ) ? \
+               F77_TRUE : F77_FALSE; \
+      VALUE[ 0 ] = (F77_DOUBLE_TYPE) value[ 0 ]; \
+      VALUE[ 1 ] = (F77_DOUBLE_TYPE) value[ 1 ]; \
+      (void) astFree( (void *) name ); \
+   ) \
+   return RESULT; \
+}
+
+
+MAKE_AST_GETFITS(cf,CF,DOUBLE,CF,double)
+MAKE_AST_GETFITS(ci,CI,INTEGER,CI,int)
+
+#undef MAKE_AST_GETFITS
+
+#define MAKE_AST_GETFITS(f,F,X) \
+F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
+                                      CHARACTER(NAME), \
+                                      CHARACTER(VALUE), \
+                                      INTEGER(STATUS) \
+                                      TRAIL(NAME) \
+                                      TRAIL(VALUE) ){ \
+   GENPTR_INTEGER(THIS) \
+   GENPTR_CHARACTER(NAME) \
+   GENPTR_CHARACTER(VALUE) \
+   GENPTR_INTEGER(STATUS) \
+   F77_LOGICAL_TYPE(RESULT); \
+\
+   char *name; \
+   int i, len; \
+   char *value; \
+\
+   astAt( "AST_GETFITS"#F, NULL, 0 ); \
+   astWatchSTATUS( \
+      name = astString( NAME, NAME_length ); \
+      RESULT = astGetFits##X( astI2P( *THIS ), name, &value ) ? \
+               F77_TRUE : F77_FALSE; \
+      if ( astOK && RESULT == F77_TRUE ) { \
+         len = (int) strlen( value ); \
+         for( i = 0; i < VALUE_length && i < len; i++ ) VALUE[i] = value[i]; \
+      } \
+      for( ; i < VALUE_length; i++ ) VALUE[i] = ' '; \
+      (void) astFree( (void *) name ); \
+   ) \
+   return RESULT; \
+}
+
+
+MAKE_AST_GETFITS(s,S,S)
+MAKE_AST_GETFITS(cn,CN,CN)
+
+#undef MAKE_AST_GETFITS
 
 
 

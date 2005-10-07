@@ -29,10 +29,12 @@ f     AST_WRITE) will, if the Object is suitable, generate a
 *     card, to which subsequent operations apply. Searches
 c     based on keyword may be performed (using astFindFits), new
 c     cards may be inserted (astPutFits, astPutCards, astSetFits<X>) and 
-c     existing ones may be deleted (astDelFits) or changed (astSetFits<X>).
+c     existing ones may be deleted (astDelFits), extracted (astGetFits<X>),
+c     or changed (astSetFits<X>).
 f     based on keyword may be performed (using AST_FINDFITS), new
 f     cards may be inserted (AST_PUTFITS, AST_PUTCARDS, AST_SETFITS<X>) and 
-f     existing ones may be deleted (AST_DELFITS) or changed (AST_SETFITS<X>).
+f     existing ones may be deleted (AST_DELFITS), extracted
+f     (AST_GETFITS<X>) or changed (AST_SETFITS<X>).
 *
 *     When you create a FitsChan, you have the option of specifying
 *     "source" and "sink" functions which connect it to external data
@@ -118,6 +120,8 @@ c     - astDelFits: Delete the current FITS card in a FitsChan
 f     - AST_DELFITS: Delete the current FITS card in a FitsChan
 c     - astFindFits: Find a FITS card in a FitsChan by keyword
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
+c     - astGetFits<X>: Get a keyword value from a FitsChan
+f     - AST_GETFITS<X>: Get a keyword value from a FitsChan
 c     - astSetFits<X>: Store a new keyword value in a FitsChan
 f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
 c     - astPutFits: Store a FITS header card in a FitsChan
@@ -638,6 +642,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Rationalise the use of the "mapping" pointer in AddVersion.
 *        - WcsCelestial: Modified so that the FITS reference point is
 *        stored as the SkyFrame SkyRef attribute value.
+*     7-OCT-2005 (DSB):
+*        - Make astGetFits<X> public.
 *class--
 */
 
@@ -1086,14 +1092,14 @@ static int FindString( int, const char *[], const char *, const char *, const ch
 static int FitOK( int, double *, double * );
 static int FitsEof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, const char *, const char * );
-static int FitsGetCF( AstFitsChan *, const char *, double * );
-static int FitsGetCI( AstFitsChan *, const char *, int * );
-static int FitsGetCN( AstFitsChan *, const char *, char ** );
+static int GetFitsCF( AstFitsChan *, const char *, double * );
+static int GetFitsCI( AstFitsChan *, const char *, int * );
+static int GetFitsCN( AstFitsChan *, const char *, char ** );
 static int FitsGetCom( AstFitsChan *, const char *, char ** );
-static int FitsGetF( AstFitsChan *, const char *, double * );
-static int FitsGetI( AstFitsChan *, const char *, int * );
-static int FitsGetL( AstFitsChan *, const char *, int * );
-static int FitsGetS( AstFitsChan *, const char *, char ** );
+static int GetFitsF( AstFitsChan *, const char *, double * );
+static int GetFitsI( AstFitsChan *, const char *, int * );
+static int GetFitsL( AstFitsChan *, const char *, int * );
+static int GetFitsS( AstFitsChan *, const char *, char ** );
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int );
 static int FullForm( const char *, const char *, int );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
@@ -11493,19 +11499,21 @@ static int FitsEof( AstFitsChan *this ){
 }
 
 /*
-*+
+*++
 *  Name:
-*     astFitsGet<X>
+c     astGetFits<X>
+f     AST_GETFITS<X>
 
 *  Purpose:
 *     Get a named keyword value from a FitsChan.
 
 *  Type:
-*     Protected virtual function.
+*     Public virtual function.
 
 *  Synopsis:
-*     #include "fitschan.h"
-*     int astFitsGet<X>( AstFitsChan *this, const char *name, <X>type *value )
+c     #include "fitschan.h"
+c     int astGetFits<X>( AstFitsChan *this, const char *name, <X>type *value )
+f     RESULT = AST_GETFITS<X>( THIS, NAME, VALUE, STATUS )
 
 *  Class Membership:
 *     FitsChan method.
@@ -11517,48 +11525,76 @@ static int FitsEof( AstFitsChan *this ){
 *     name by one of the following strings representing the recognised FITS 
 *     data types:
 *
-*     CF - Complex floating point values.
-*     CI - Complex integer values.
-*     F  - Floating point values.
-*     I  - Integer values.
-*     L  - Logical (i.e. boolean) values.
-*     S  - String values.
-*     CN  - CONTINUE values.
+*     The data type of the returned value is selected by replacing <X> in the 
+*     function name by one of the following strings representing the 
+*     recognised FITS data types:
 *
-*     The "value" parameter should be a pointer with a data type depending on 
-*     <X> as follows:
+*     - CF - Complex floating point values.
+*     - CI - Complex integer values.
+*     - F  - Floating point values.
+*     - I  - Integer values.
+*     - L  - Logical (i.e. boolean) values.
+*     - S  - String values.
+*     - CN - A "CONTINUE" value, these are treated like string values, but
+*            are encoded without an equals sign.
 *
-*     CF - "double *" (the pointer should point to a 2 element array to
-*          receive the real and imaginary parts of the complex value).
-*     CI - "int *" (the pointer should point to a 2 element array to
-*          receive the real and imaginary parts of the complex value).
-*     F  - "double *".
-*     I  - "int *".
-*     L  - "int *".
-*     S  - "char **" (a pointer to a static "char" array is returned at the
-*          location given by the "value" parameter, Note, the stored string
-*          may change on subsequent invocations of astFitsGetS so a
-*          permanent copy should be taken of the string if necessary). 
-*     CN - Like "S".
+*     The data type of the "value" 
+c     parameter 
+f     argument
+*     depends on <X> as follows:
+*
+c     - CF - "double *" (a pointer to a 2 element array to hold the real and
+c            imaginary parts of the complex value).
+c     - CI - "int *" (a pointer to a 2 element array to hold the real and
+c            imaginary parts of the complex value).
+c     - F  - "double *".
+c     - I  - "int *".
+c     - L  - "int *".
+c     - S  - "char **" (a pointer to a static "char" array is returned at the
+c            location given by the "value" parameter, Note, the stored string
+c            may change on subsequent invocations of astGetFitsS so a
+c            permanent copy should be taken of the string if necessary). 
+c     - CN - Like"S".
+f     - CF - DOUBLE PRECISION(2) (a 2 element array to hold the real and
+f            imaginary parts of the complex value).
+f     - CI - INTEGER(2) (a 2 element array to hold the real and imaginary 
+f            parts of the complex value).
+f     - F  - DOUBLE PRECISION.
+f     - I  - INTEGER
+f     - L  - LOGICAL
+f     - S  - CHARACTER
+f     - CN - CHARACTER
 
 *  Parameters:
-*     this
+c     this
+f     THIS = INTEGER (Given)
 *        Pointer to the FitsChan.
-*     name
-*        A pointer to a string holding the keyword name. This may be a 
-*        complete FITS header card, in which case the keyword to use is 
-*        extracted from it. No more than 80 characters are read from this 
-*        string.
-*     value
-*        A pointer to a location at which to return the keyword value.
-*        the data type of this parameter depends on <X> as described above.
-*        The supplied value is left unchanged if the keyword is not found.
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated character string
+f        A character string 
+*        containing the FITS keyword name. This may be a complete FITS
+*        header card, in which case the keyword to use is extracted from 
+*        it. No more than 80 characters are read from this string.
+c     value
+f     VALUE = <X>type (Given)
+c        A pointer to a 
+f        A
+*        buffer to receive the keyword value. The data type depends on <X> 
+*        as described above.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Returned Value:
-*     astFitsGet<X>()
-*        A value of zero is returned if the keyword was not found
-*        (no error is reported). 
-*        Otherwise, a value of one is returned. 
+c     astGetFits<X><X>()
+f     AST_GETFITS<X> = LOGICAL
+c        A value of zero 
+f        .FALSE.
+*        is returned if the keyword was not found (no error is reported). 
+*        Otherwise, a value of 
+c        one 
+f        .TRUE.
+*        is returned. 
 
 *  Notes:
 *     -  The card following the current card is checked first. If this is
@@ -11572,17 +11608,18 @@ static int FitsEof( AstFitsChan *this ){
 *     converted into the requested type.
 *     -  An error will be reported if the keyword name does not conform
 *     to FITS requirements.
-*     -  Zero is returned as the function value 
-*     if an error has already occurred, or if this function should fail for 
-*     any reason.
-*-
+c     -  Zero 
+*     -  .FALSE.
+*     is returned as the function value if an error has already occurred, 
+*     or if this function should fail for any reason.
+*--
 */
 
-/* Define a macro which expands to the implementation of the astFitsGet<X>
+/* Define a macro which expands to the implementation of the astGetFits<X>
    routine for a given data type. */
 
 #define MAKE_FGET(code,ctype,ftype) \
-static int FitsGet##code( AstFitsChan *this, const char *name, ctype value ){ \
+static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
 \
 /* Local Variables: */ \
    const char *class;     /* Object class */ \
@@ -11597,7 +11634,7 @@ static int FitsGet##code( AstFitsChan *this, const char *name, ctype value ){ \
    if ( !astOK ) return 0; \
 \
 /* Store the calling method and object class. */ \
-   method = "astFitsGet"#code; \
+   method = "astGetFits"#code; \
    class = astGetClass( this ); \
 \
 /* Initialise the returned value. */ \
@@ -11633,7 +11670,7 @@ static int FitsGet##code( AstFitsChan *this, const char *name, ctype value ){ \
 \
 }
 
-/* Use the above macro to give defintions for the astFitsGet<X> method
+/* Use the above macro to give defintions for the astGetFits<X> method
    for each FITS data type. */
 
 MAKE_FGET(CF,double *,AST__COMPLEXF)
@@ -14066,13 +14103,13 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    vtab->KeyFields = KeyFields;
    vtab->Empty = Empty;
    vtab->FitsEof = FitsEof;
-   vtab->FitsGetCF = FitsGetCF;
-   vtab->FitsGetCI = FitsGetCI;
-   vtab->FitsGetF = FitsGetF;
-   vtab->FitsGetI = FitsGetI;
-   vtab->FitsGetL = FitsGetL;
-   vtab->FitsGetS = FitsGetS;
-   vtab->FitsGetCN = FitsGetCN;
+   vtab->GetFitsCF = GetFitsCF;
+   vtab->GetFitsCI = GetFitsCI;
+   vtab->GetFitsF = GetFitsF;
+   vtab->GetFitsI = GetFitsI;
+   vtab->GetFitsL = GetFitsL;
+   vtab->GetFitsS = GetFitsS;
+   vtab->GetFitsCN = GetFitsCN;
    vtab->FitsGetCom = FitsGetCom;
    vtab->SetFitsCom = SetFitsCom;
    vtab->SetFitsCF = SetFitsCF;
@@ -26703,7 +26740,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 
 /* If the FitsChan contains a value for the NAXIS keyword, note it.
    Otherwise store -1. */
-   if( !astFitsGetI( this, "NAXIS", &naxis ) ) naxis = -1;
+   if( !astGetFitsI( this, "NAXIS", &naxis ) ) naxis = -1;
 
 /* Find the last WCS related card. */
    FindWcs( this, 1, method, class );
@@ -29735,7 +29772,7 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
 
 /* Note the image dimensions, if known. If not, store AST__BAD values. */
             for( i = 0; i < naxis; i++ ){
-               if( !astFitsGetF( this, FormatKey( "NAXIS", i + 1, -1, ' ' ), 
+               if( !astGetFitsF( this, FormatKey( "NAXIS", i + 1, -1, ' ' ), 
                                  dim + i ) ) dim[ i ] = AST__BAD;
             }
 
@@ -33261,39 +33298,39 @@ const char *astGetAllWarnings_( AstFitsChan *this ){
    return (**astMEMBER(this,FitsChan,GetAllWarnings))( this );
 }
 
-int astFitsGetCF_( AstFitsChan *this, const char *name, double *value ){
+int astGetFitsCF_( AstFitsChan *this, const char *name, double *value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetCF))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsCF))( this, name, value );
 }
 
-int astFitsGetCI_( AstFitsChan *this, const char *name, int *value ){
+int astGetFitsCI_( AstFitsChan *this, const char *name, int *value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetCI))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsCI))( this, name, value );
 }
 
-int astFitsGetF_( AstFitsChan *this, const char *name, double *value ){
+int astGetFitsF_( AstFitsChan *this, const char *name, double *value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetF))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsF))( this, name, value );
 }
 
-int astFitsGetI_( AstFitsChan *this, const char *name, int *value ){
+int astGetFitsI_( AstFitsChan *this, const char *name, int *value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetI))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsI))( this, name, value );
 }
 
-int astFitsGetL_( AstFitsChan *this, const char *name, int *value ){
+int astGetFitsL_( AstFitsChan *this, const char *name, int *value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetL))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsL))( this, name, value );
 }
 
-int astFitsGetS_( AstFitsChan *this, const char *name, char **value ){
+int astGetFitsS_( AstFitsChan *this, const char *name, char **value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetS))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsS))( this, name, value );
 }
 
-int astFitsGetCN_( AstFitsChan *this, const char *name, char **value ){
+int astGetFitsCN_( AstFitsChan *this, const char *name, char **value ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,FitsGetCN))( this, name, value );
+   return (**astMEMBER(this,FitsChan,GetFitsCN))( this, name, value );
 }
 
 int astFitsGetCom_( AstFitsChan *this, const char *name, char **comment ){

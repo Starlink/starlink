@@ -232,19 +232,19 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       ras = 0.0;
 
       name = "PLTRAH";
-      if( !astFitsGetF( fits, name, &rah ) && astOK ){
+      if( !astGetFitsF( fits, name, &rah ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                    "FITS keyword '%s'.", method, class, name );
       }
 
       name = "PLTRAM";
-      if( !astFitsGetF( fits, name, &ram ) && astOK ){
+      if( !astGetFitsF( fits, name, &ram ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
       name = "PLTRAS";
-      if( !astFitsGetF( fits, name, &ras ) && astOK ){
+      if( !astGetFitsF( fits, name, &ras ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
@@ -255,7 +255,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 
 /* Plate center Dec */
       name = "PLTDECSN";
-      if( !astFitsGetS( fits, name, &ckeyval ) && astOK ){
+      if( !astGetFitsS( fits, name, &ckeyval ) && astOK ){
          dsign = 1.0;
 
       } else {
@@ -272,19 +272,19 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       decs = 0.0;
 
       name = "PLTDECD";
-      if( !astFitsGetF( fits, name, &decd ) && astOK ){
+      if( !astGetFitsF( fits, name, &decd ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
       name = "PLTDECM";
-      if( !astFitsGetF( fits, name, &decm ) && astOK ){
+      if( !astGetFitsF( fits, name, &decm ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
       name = "PLTDECS";
-      if( !astFitsGetF( fits, name, &decs ) && astOK ){
+      if( !astGetFitsF( fits, name, &decs ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
@@ -294,33 +294,33 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 
 /* Plate Scale arcsec per mm  */
       name = "PLTSCALE";
-      if( !astFitsGetF( fits, name, &ret->plate_scale ) && astOK ){
+      if( !astGetFitsF( fits, name, &ret->plate_scale ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
 /* X and Y corners (in pixels) */
       name = "CNPIX1";
-      if( !astFitsGetF( fits, name, &ret->x_pixel_offset ) && astOK ){
+      if( !astGetFitsF( fits, name, &ret->x_pixel_offset ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
       name = "CNPIX2";
-      if( !astFitsGetF( fits, name, &ret->y_pixel_offset ) && astOK ){
+      if( !astGetFitsF( fits, name, &ret->y_pixel_offset ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
 /* X and Y pixel sizes (microns). */
       name = "XPIXELSZ";
-      if( !astFitsGetF( fits, name, &ret->x_pixel_size ) && astOK ){
+      if( !astGetFitsF( fits, name, &ret->x_pixel_size ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
 
       name = "YPIXELSZ";
-      if( !astFitsGetF( fits, name, &ret->y_pixel_size ) && astOK ){
+      if( !astGetFitsF( fits, name, &ret->y_pixel_size ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
                   "FITS keyword '%s'.", method, class, name );
       }
@@ -331,7 +331,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       name = name_buff;
       for ( i = 0; i < 6; i++ ) {
          sprintf( name_buff, "PPO%d", i + 1 );
-         if( !astFitsGetF( fits, name, &ret->ppo_coeff[i] ) ) {
+         if( !astGetFitsF( fits, name, &ret->ppo_coeff[i] ) ) {
             ret->ppo_coeff[i] = 0.0;
             if( ( i == 2 || i == 5 ) && astOK ) {
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
@@ -348,7 +348,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       name = name_buff;
       for( i = 0; i < 19; i++ ){ 
          sprintf( name_buff, "AMDX%d", i + 1 );
-         if( !astFitsGetF( fits, name, &ret->amd_x_coeff[i] ) ) {
+         if( !astGetFitsF( fits, name, &ret->amd_x_coeff[i] ) ) {
             ret->amd_x_coeff[i] = 0.0;
             if( i < 13 && astOK ){
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
@@ -360,7 +360,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
 
       for( i = 0; i < 19; i++ ){ 
          sprintf( name_buff, "AMDY%d", i + 1 );
-         if( !astFitsGetF( fits, name, &ret->amd_y_coeff[i] ) ){
+         if( !astGetFitsF( fits, name, &ret->amd_y_coeff[i] ) ){
             ret->amd_y_coeff[i] = 0.0;
             if( i < 13 && astOK ){
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
