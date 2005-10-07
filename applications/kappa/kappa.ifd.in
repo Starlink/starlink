@@ -824,6 +824,51 @@ package kappa {
 
       }
 
+      action fitsval {
+         alias {fitsv(al)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter comment {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default FALSE
+            prompt {Object to store comment of FITS keyword}
+            helpkey *
+          }
+
+         parameter keyword {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Keyword whose value is to be reported}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF containing the FITS keyword}
+            helpkey *
+          }
+
+         parameter value {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default FALSE
+            prompt {Object to store value of FITS keyword}
+            helpkey *
+          }
+
+      }
+
       action hiscom {
          alias {hisc(om)}
 
@@ -12556,6 +12601,15 @@ iraf! {
             helpkey *
           }
 
+         parameter object {
+            type UNIV
+            access READ
+            vpath CURRENT
+            ppath CURRENT
+            prompt {Object whose value to return}
+            helpkey *
+         }
+         
       }
 
       action paste {
@@ -16073,15 +16127,6 @@ iraf! {
          taskinherit out
          taskinherit title
          taskparam base=natural
-      }
-   }
-
-   command fitsval {
-      task fitsmod {
-         taskinherit ndf
-         taskinherit keyword
-         taskparam edit=print
-         taskparam mode=interface
       }
    }
 

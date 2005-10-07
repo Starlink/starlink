@@ -52,9 +52,11 @@
 *     16-MAR-2004 (DSB):
 *        Added call to LPG_REPLA.
 *     2005 April 15 (MJC):
-*        Added FITSEXIST, now a spearate A-task.
+*        Added FITSEXIST, now a separate A-task.
 *     29-SEP-2005 (DSB):
 *        Added warnings about unannulled GRP identifiers.
+*     2005 April 15 (MJC):
+*        Added FITSVAL, now a separate A-task.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -187,6 +189,10 @@
 *  Creates an NDF FITS extension from a text file.
          ELSE IF ( NAME .EQ. 'FITSTEXT' ) THEN
             CALL FITSTEXT ( STATUS )
+
+*  Reports the value of a keyword in a FITS extension.
+         ELSE IF ( NAME .EQ. 'FITSVAL' ) THEN
+            CALL FITSVAL ( STATUS )
 
 *  Sets the NDF history update mode.
          ELSE IF ( NAME .EQ. 'HISCOM' ) THEN
