@@ -683,21 +683,21 @@ itcl::class gaia::GaiaNDFCube {
 
 
       #  XXX Checker code for region spectra.
-      if { $ardspectra_ == {} } { 
-         global gaia_dir
-         set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
-      }
-      set arddesc "CIRCLE($ix,$iy,20)"
-      echo "$ardspectra_  runwiths \
-          in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-      $ardspectra_  runwiths \
-         "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+#       if { $ardspectra_ == {} } { 
+#          global gaia_dir
+#          set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
+#       }
+#       set arddesc "CIRCLE($ix,$iy,20)"
+#       echo "$ardspectra_  runwiths \
+#           in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+#       $ardspectra_  runwiths \
+#          "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
       
-      catch {
-         echo "$splat_disp_ runwith GaiaArdSpectrum"
-         $splat_disp_ runwith "GaiaArdSpectrum"
-      } msg
-      puts "msg = $msg"
+#       catch {
+#          echo "$splat_disp_ runwith GaiaArdSpectrum"
+#          $splat_disp_ runwith "GaiaArdSpectrum"
+#       } msg
+#       puts "msg = $msg"
    }
 
    #  Configuration options: (public variables)
