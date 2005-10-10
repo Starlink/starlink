@@ -51,3 +51,8 @@ install-exec-local:
 	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/fgeneric" || :
 
 CLEANFILES = dcv_ttoub.f dcv_ttouw.f DCV_FUN
+
+# Simple test of C generics.
+TESTS = generic_main
+check_PROGRAMS = generic_main
+generic_main_SOURCES = generic_main.c generic_func.cgen

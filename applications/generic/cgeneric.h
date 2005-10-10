@@ -23,7 +23,7 @@
 *
 *          -- CGEN_FUNCTION
 *          -- CGEN_TYPE
-*          -- VAL__BAD
+*          -- CGEN_BAD
 *
 *          You need to use CGEN_FUNCTION as part of the normal function
 *          declaration so that generic forms of the function name can be
@@ -35,7 +35,7 @@
 *          CGEN_CTYPE pointer, called value, would be defined as:
 *
 *             int CGEN_FUNCTION(kpg1_bad) (CGEN_CTYPE *value) {
-*                 if ( value[0] == VAL__BAD ) {
+*                 if ( value[0] == CGEN_BAD ) {
 *                    return 1;
 *                 }
 *                 return 0;
@@ -48,7 +48,7 @@
 *          double, float, int, short int, unsigned short int, char
 *          and unsigned char, as appropriate.
 *
-*          The value of VAL__BAD will be set to one of the PRM constants
+*          The value of CGEN_BAD will be set to one of the PRM constants
 *          VAL__BADD, VAL__BADR etc. as appropriate.
 *
 *        - Create a C file that includes the generic code, once for each of
@@ -118,13 +118,13 @@
  * CGEN_CODE value. */
 #define CGEN_FUNCTION(name) CGEN_JOIN_STRINGS(name,CGEN_CODE)
 
-/* The VAL__BADx value for the current data type, which is the Fortran generic
- * type specified by CGEN_PRM_TYPE. */
-#define VAL__BAD CGEN_JOIN_STRINGS(VAL__BAD,CGEN_PRM_TYPE)
+/* The CGEN_BAD value for the current data type, which is the PRM
+ * type specified by CGEN_PRM_TYPE (VAL__BADD, VAL__BADR etc.). */
+#define CGEN_BAD CGEN_JOIN_STRINGS(VAL__BAD,CGEN_PRM_TYPE)
 
 /* Enumeration of the known types, define CGEN_CODE_TYPE to one of these and
  * include cgeneric_defs.h, note these have to be defines, not enums, for
- * preprocessor switching to work. */
+ * the preprocessor define checks to work. */
 #define CGEN_DOUBLE_TYPE 1
 #define CGEN_FLOAT_TYPE 2
 #define CGEN_INT_TYPE 3
