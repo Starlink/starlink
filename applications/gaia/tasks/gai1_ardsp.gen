@@ -1,0 +1,118 @@
+      SUBROUTINE GAI1_ARDSP<T>( BAD, CUBE, MASK, NX, NY, NZ, SPEC, 
+     :                          STATUS )
+*+
+* Name:
+*     GAI1_ARDSPx
+
+*  Purpose:
+*     Extract a spectrum from a cube using an ARD region.
+
+*  Language:
+*     Starlink Fortran-77
+
+*  Invocation:
+*     CALL GAI1_ARDSPx( BAD, CUBE, MASK, NX, NY, NZ, SPEC, STATUS )
+
+*  Description:
+*     Does some stuff
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether BAD pixels may be present.
+*     CUBE( NX, NY, NZ ) = <TYPE> (Given)
+*        Pointer to the cube data.
+*     MASK( NX, NY ) = INTEGER (Given)
+*        ARD mask for image data sections.
+*     NX = INTEGER (Given)
+*        First dimension of the data array.
+*     NY = INTEGER (Given)
+*        Second dimension of the data array.
+*     NZ = INTEGER (Given)
+*        Third dimension of the data array.
+*     SPEC( NZ ) = <TYPE> (Returned)
+*        Pointer to spectral data.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PWD: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-OCT-2005 (PWD):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE             ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'PRM_PAR'         ! PRIMDAT constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER NX
+      INTEGER NY
+      INTEGER NZ
+      <TYPE> CUBE( NX, NY, NZ )
+      INTEGER MASK( NX, NY )
+
+*  Arguments Returned:
+      <TYPE> SPEC( NZ )
+
+*  Status:
+      INTEGER STATUS            ! Global status
+
+*  Local Variables:
+      INTEGER I                 ! Loop variable
+      INTEGER J                 ! Loop variable
+      INTEGER K                 ! Loop variable
+      DOUBLE PRECISION SUM      ! Sum of values
+      INTEGER COUNT             ! Count of good values.
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'     ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'     ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_CVT'     ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'     ! Define NUM_ arithmetic functions
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( BAD ) THEN 
+         DO K = 1, NZ
+            SUM = 0.0D0
+            COUNT = 0
+            DO J = 1, NY
+               DO I = 1, NX
+                  IF ( MASK( I, J ) .GT. 0 ) THEN
+                     IF ( CUBE( I, J, K ) .NE. VAL__BAD<T> ) THEN
+                        SUM = SUM + CUBE( I, J, K )
+                        COUNT = COUNT + 1
+                     END IF
+                  END IF
+               END DO
+            END DO
+            SPEC( K ) = NUM_DTO<T>( SUM / DBLE( COUNT ) )
+         END DO
+      ELSE
+         DO K = 1, NZ
+            SUM = 0.0D0
+            DO J = 1, NY
+               DO I = 1, NX
+                  IF ( MASK( I, J ) .GT. 0 ) THEN
+                     SUM = SUM + CUBE( I, J, K )
+                  END IF
+               END DO
+            END DO
+            SPEC( K ) = NUM_DTO<T>( SUM / DBLE( NX * NY ) )
+         END DO
+      END IF
+      END

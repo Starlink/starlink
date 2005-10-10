@@ -1,0 +1,39 @@
+interface ARDSPECTRA
+
+   parameter IN
+      position 1
+      type   'NDF'
+      access 'READ'
+      prompt 'Name of input image'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter REGION
+      position 2
+      type   'LITERAL'
+      access 'READ'
+      prompt 'Region of image to process'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter OUT
+      position 3
+      type   'NDF'
+      access 'READ'
+      prompt 'Name of output spectrum'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter FIXORIGIN
+      type   '_LOGICAL'
+      access 'READ'
+      prompt 'Ignore origin information (GAIA)'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT,NOPROMPT'
+      default FALSE
+   endparameter
+
+endinterface

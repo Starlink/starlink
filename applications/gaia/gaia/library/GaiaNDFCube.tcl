@@ -680,6 +680,24 @@ itcl::class gaia::GaiaNDFCube {
                              -show_output 0]
       }
       $splat_disp_ runwith "${ndfname_}${section}" 0
+
+
+      #  XXX Checker code for region spectra.
+      if { $ardspectra_ == {} } { 
+         global gaia_dir
+         set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
+      }
+      set arddesc "CIRCLE($ix,$iy,20)"
+      echo "$ardspectra_  runwiths \
+          in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+      $ardspectra_  runwiths \
+         "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+      
+      catch {
+         echo "$splat_disp_ runwith GaiaArdSpectrum"
+         $splat_disp_ runwith "GaiaArdSpectrum"
+      } msg
+      puts "msg = $msg"
    }
 
    #  Configuration options: (public variables)
@@ -755,6 +773,9 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Task controller for splatdisp command.
    protected variable splat_disp_ {}
+
+   #  Task controller for ardspectra
+   protected variable ardspectra_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -71,6 +71,7 @@ GENERATE_FORTRANCMD( autocropCmd, autocrop )
 GENERATE_FORTRANCMD( cat2tabCmd,  cat2tab )
 GENERATE_FORTRANCMD( tab2ascCmd,  tab2asc )
 GENERATE_FORTRANCMD( tab2catCmd,  tab2cat )
+GENERATE_FORTRANCMD( ardspectraCmd,  ardspectra )
 
 /*  Define TASK subroutine that returns name */
 extern void F77_EXTERNAL_NAME( task_get_name )(
@@ -105,6 +106,7 @@ static struct actionStruct {
     { "cat2tab",  cat2tabCmd  },
     { "tab2asc",  tab2ascCmd  },
     { "tab2cat",  tab2catCmd  },
+    { "ardspectra",  ardspectraCmd  },
 };
 
 /*  ============= */

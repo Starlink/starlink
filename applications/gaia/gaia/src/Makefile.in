@@ -51,11 +51,13 @@ FSRCS =  \
  rtd1_prsh2.f rtd1_repl.f rtd1_setar.f rtd1_sndfh.f rtd1_stint.f \
  rtd1_wcard.f rtd1_wndfh.f rtd1_wrcrd.f \
  rtd_cent.f rtd_rdndf.f rtd_slice.f rtd_wrndf.f tab2asc.f \
- tab2cat.f
+ tab2cat.f \
+ ardspectra.f
 
 GSRCS =  \
  rtd_cpx.gen rtd1_mstx.gen rtd1_sufitx.gen rtd1_dofilx.gen rtd1_statx.gen \
- rtd1_gbndx.gen rtd1_eterpx.gen rtd1_cenx.gen
+ rtd1_gbndx.gen rtd1_eterpx.gen rtd1_cenx.gen \
+ gai1_ardsp.gen
 
 SGSRCS = \
   rtd1_wrftx.gsc rtd1_wkeyx.gsc

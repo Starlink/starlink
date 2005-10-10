@@ -133,13 +133,14 @@ DEMO_TCL = bin/gaia_tcl
 GAIAMON = bin/gaiaMon$(EXEEXT)
 
 #  Tasks in GAIA monolith.
-GAIA_TASKS = ardstat asc2tab autocrop cat2tab tab2asc tab2cat 
+GAIA_TASKS = ardstat asc2tab autocrop cat2tab tab2asc tab2cat ardspectra
 TASK_LINKS = bin/ardstat bin/asc2tab bin/autocrop bin/cat2tab \
-             bin/tab2asc bin/tab2cat 
+             bin/tab2asc bin/tab2cat bin/ardspectra
 
 #  Interface files for individual applications.
 IFL_FILES = src/ardstat.ifl src/asc2tab.ifl src/autocrop.ifl \
-            src/cat2tab.ifl src/tab2asc.ifl src/tab2cat.ifl
+            src/cat2tab.ifl src/tab2asc.ifl src/tab2cat.ifl \
+            src/ardspectra.ifl
 IFC_FILES = $(IFL_FILES:.ifl=)
 
 #  The "imcopy" program used to convert in-line compressed images.
