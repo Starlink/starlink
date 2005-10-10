@@ -1,0 +1,6 @@
+1 GENERIC update
+
+  Simple guidance for generating generic routines from C has been added.
+  See the file cgeneric.h.
+
+  Peter W. Draper 10th October 2005

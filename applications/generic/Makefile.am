@@ -10,6 +10,8 @@ nodist_include_HEADERS = DCV_FUN
 
 dist_staretc_DATA = $(AUX_FILES)
 
+dist_starnews_DATA = generic.news
+
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 #  List of package auxiliary files.  These are text files uesd by GENERIC.
@@ -23,7 +25,6 @@ AUX_FILES = byte byte_asterix \
 	uword uword_asterix \
 	word word_asterix \
 	wrap72
-
 
 dcv_ttoub.f: dcv_ttoub.gen
 	env GENERIC_DIR=. ./generic -t bdirwW dcv_ttoub.gen
