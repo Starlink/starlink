@@ -5,7 +5,7 @@ dist_bin_SCRIPTS = dcv_link dcv_link_adam generic
 lib_LTLIBRARIES = libdcv.la
 nodist_libdcv_la_SOURCES = dcv_ttoub.f dcv_ttouw.f
 EXTRA_libdcv_la_SOURCES = DCV_FUN.F dcv_ttoub.gen dcv_ttouw.gen
-include_HEADERS = DCV_EXT DCV_PAR
+include_HEADERS = DCV_EXT DCV_PAR cgeneric.h cgeneric_defs.h
 nodist_include_HEADERS = DCV_FUN
 
 dist_staretc_DATA = $(AUX_FILES)
@@ -51,6 +51,3 @@ install-exec-local:
 	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/fgeneric" || :
 
 CLEANFILES = dcv_ttoub.f dcv_ttouw.f DCV_FUN
-
-
-
