@@ -29,7 +29,7 @@
 *     There are seven methods for selecting contours.
 
 *  Usage:
-*     turbocont ndf [comp] mode ncont [key] [device] 
+*     turbocont ndf [comp] mode ncont [key] [device]
 *        { firstcnt=? stepcnt=?
 *        { heights=?
 *        { percentiles=?
@@ -69,13 +69,13 @@
 *        The colour of the contour lines on devices that support colour.
 *        The options are described below.
 *
-*          "MAX"          - The maximum colour index in the image 
+*          "MAX"          - The maximum colour index in the image
 *                           display colour lookup table.
-*          "MIN"          - The minimum (non-reserved) colour index in 
+*          "MIN"          - The minimum (non-reserved) colour index in
 *                           the image-display colour lookup table.
 *          An integer     - The actual colour index.  It is constrained
 *                           between 0 and the maximum colour index
-*                           available on the device. 
+*                           available on the device.
 *          A named colour - Uses the named colour from the palette, and
 *                           if it is not present, the nearest colour
 *                           from the palette is selected.
@@ -84,7 +84,7 @@
 *        manipulated choose an integer between 0 and 15, or a named
 *        colour.  This parameter will be ignored if PENROT = TRUE.
 *        [The current value, but equals "1" (the foreground colour) if
-*        there is no current value.] 
+*        there is no current value.]
 *     COSYS = LITERAL (Read)
 *        The co-ordinate system to be used.  This can be either "World"
 *        or "Data".  "World" makes pixel co-ordinates to appear on axes.
@@ -341,7 +341,7 @@
 *           contours in option 2.
 *
 *     Annotation takes precedence over pen rotation, which in turn
-*     overrides colour control through CONCOL. 
+*     overrides colour control through CONCOL.
 *  Algorithm:
 *     -  Find which component to display, obtain an identifier to the
 *     NDF and check that the component is present.  Find the data type
@@ -384,6 +384,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  STARLINK
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -451,6 +452,8 @@
 *        Improved efficiency by using PSX to obtain workspace.
 *        Increased the maximum thickness from 5 to 10.  Rewrote the
 *        Notes on contour colour and line style.
+*     2005 October 11 (PWD):
+*        Use CNF_PVAL in %VAL calls.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -469,6 +472,7 @@
       INCLUDE 'NDF_ERR'        ! NDF_ error definitions
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
       INCLUDE 'GKS_PAR'        ! GKS constants (e.g. GSET)
+      INCLUDE 'CNF_PAR'        ! CNF functions.
 
 *  Status:
       INTEGER STATUS
@@ -490,7 +494,7 @@
      :  NDIM,                  ! Dimensionality of input array
      :  MXCONT,                ! Maximum number of contour heights
      :  MXSBPX                 ! Maximum number of sub-pixels
-      PARAMETER( CELDIM = 512 ) 
+      PARAMETER( CELDIM = 512 )
       PARAMETER( CUNITS = 14 )
       PARAMETER( NDIM = 2 )    ! Default to 2-dimensional
       PARAMETER( MXCONT = 50 )
@@ -635,7 +639,7 @@
                                ! successfully
 
       INTEGER
-     :  PICID,                 ! 
+     :  PICID,                 !
      :  PICID1,                ! Graphics' database identifier on input
      :  PICID2,                ! Graphics' database identifier for
                                ! the frame (contour + key) picture
@@ -833,7 +837,8 @@
                MONOTO = .TRUE.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL ERR_MARK
-                  CALL KPG1_MONOD( .TRUE., AEL, %VAL( AXPNTR( 1 ) ),
+                  CALL KPG1_MONOD( .TRUE., AEL,
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                             MONOTO, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL ERR_ANNUL( STATUS )
@@ -883,7 +888,8 @@
                MONOTO = .TRUE.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL ERR_MARK
-                  CALL KPG1_MONOR( .TRUE., AEL, %VAL( AXPNTR( 1 ) ),
+                  CALL KPG1_MONOR( .TRUE., AEL,
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                             MONOTO, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL ERR_ANNUL( STATUS )
@@ -1105,8 +1111,8 @@
 
       CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
      :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
-     :                 %VAL( PNTRI( 1 ) ), MXCONT, CNTLEV, PERCNT,
-     :                 AREA, NCONT, MODE, STATUS )
+     :                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ), MXCONT, CNTLEV,
+     :                 PERCNT, AREA, NCONT, MODE, STATUS )
 
 *    Sort the contour heights into increasing order.
 
@@ -1319,7 +1325,7 @@
          CALL AGGETF( 'GRID/BOTTOM.', GRID( 3 ) )
          CALL AGGETF( 'GRID/TOP.', GRID( 4 ) )
 
-*       Set the current NCAR grid values. 
+*       Set the current NCAR grid values.
 
          CALL AGSETF( 'GRID/LEFT.', ANCLIP( 1 ) )
          CALL AGSETF( 'GRID/RIGHT.', ANCLIP( 2 ) )
@@ -1338,7 +1344,7 @@
 
 *       The plot of contours will in be in the NCAR grid window.  When
 *       NCAR is not required to draw with annotation the equivalent SGS
-*       zone has to be defined.  If annotation is required the new zone 
+*       zone has to be defined.  If annotation is required the new zone
 *       is not used for plotting, but it is created merely to define
 *       the location of the top of the key.  The NCAR grid window is
 *       defined to lie between world co-ordinates 0--1 along each axis.
@@ -1346,7 +1352,7 @@
          CALL SNX_AGCS
          CALL SGS_ZONE( 0.0, 1.0, 0.0, 1.0, ZONEI, STATUS )
 
-*       Restore the input NCAR grid values. 
+*       Restore the input NCAR grid values.
 
          CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
          CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
@@ -1365,7 +1371,7 @@
          CALL SGS_ZONE( X1, X2, Y1, Y2, ZONEI, STATUS )
 
 *       Define an world co-ordinate system for the image zone.  The unit
-*       square may be needed to compute the position of the top of the 
+*       square may be needed to compute the position of the top of the
 *       key.
 
          CALL SGS_SW( 0.0, 1.0, 0.0, 1.0, STATUS )
@@ -1555,7 +1561,7 @@
 *    positive so, no checking!
 
       IF ( MAXRES ) THEN
-         NLOCUS = 8 * MIN( 2 * CELDIM, DIMS( 1 ) + DIMS( 2 ) ) * 
+         NLOCUS = 8 * MIN( 2 * CELDIM, DIMS( 1 ) + DIMS( 2 ) ) *
      :            MIN( MXSBPX, MAX( INT( 1.0 / DX ), INT( 1.0 / DY ) )
      :            + 1 )
       ELSE
@@ -1587,12 +1593,15 @@
 *    Draw the contour plot itself.
 *    =============================
 
-      CALL KPS1_CNTUR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ), 0, 0,
+      CALL KPS1_CNTUR( DIMS( 1 ), DIMS( 2 ),
+     :                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0, 0,
      :                 DIMS( 1 ), DIMS( 2 ), CELDIM, CELDIM,
      :                 NCONT, CNTLEV, DX, DY, ANNOTA, NOISY, LABFRQ,
-     :                 PENROT, THRESH, MAXRES, NLOCUS, %VAL( XPNTR ),
-     :                 %VAL( YPNTR ), SLIST, %VAL( LLPNTR ),
-     :                 %VAL( CFPNTR ), CNTUSD, STATUS )
+     :                 PENROT, THRESH, MAXRES, NLOCUS,
+     :                 %VAL( CNF_PVAL( XPNTR ) ),
+     :                 %VAL( CNF_PVAL( YPNTR ) ), SLIST,
+     :                 %VAL( CNF_PVAL( LLPNTR ) ),
+     :                 %VAL( CNF_PVAL( CFPNTR ) ), CNTUSD, STATUS )
       CALL SGS_FLUSH
 
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -1634,7 +1643,7 @@
 
 *    Record the data picture in the database.
 *    ========================================
-*    
+*
 *    Switch back to the frame picture.
 
       CALL AGI_SELP( PICID2, STATUS )
@@ -1724,7 +1733,7 @@
  960  CONTINUE
 
 *  Deactivate SGS and close the workstation.  If the workstation was
-*  not activated an error results. >>> THIS IS COMMENTED OUT SINCE 
+*  not activated an error results. >>> THIS IS COMMENTED OUT SINCE
 *  IT CAUSES THE SCREEN TO BE CLEARED! 24/5/01 DSB
 *      CALL AGS_DEACT( STATUS )
 
