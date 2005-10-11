@@ -4,16 +4,16 @@
 #include "prm_par.h"
 
 
-double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
+double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
 /*
 *  Name:
-*     cupidRms:X:
+*     cupidRms<X>
 
 *  Purpose:
 *     Find the RMS noise in the supplied data array.
 
 *  Synopsis:
-*     double cupidRms:X:( :Xtype: *array, int nel, int rowlen )
+*     double cupidRms<X>( CGEN_TYPE *array, int nel, int rowlen )
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
@@ -44,7 +44,7 @@ double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
 *  Notes:
 *     - This function can be invoked using the generic cupidRms macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidRms:X: except that an extra parameter is added to the start 
+*     cupidRms<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
 *     cupidRms... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
@@ -63,9 +63,9 @@ double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
 */      
 
 /* Local Variables: */
-   :Xtype: *pr;         /* Pointer to next data value */
-   :Xtype: *w;          /* Pointer to work array */
-   :Xtype: *wr;         /* Pointer to next work value */
+   CGEN_TYPE *pr;         /* Pointer to next data value */
+   CGEN_TYPE *w;          /* Pointer to work array */
+   CGEN_TYPE *wr;         /* Pointer to next work value */
    double ret;          /* Returned value */
    double sum;          /* Sum of squared residuals */
    double thresh;       /* The rejection threshold for residuals */
@@ -86,7 +86,7 @@ double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
    nrow = nel/rowlen;
 
 /* Allocate memory for a copy of the data array. */
-   w = astMalloc( sizeof( :Xtype: )*nel );
+   w = astMalloc( sizeof( CGEN_TYPE )*nel );
    if( w ) {
 
 /* Run a 1D Laplace filter (kernel = [-1,2,-1]) over the data, storing
@@ -99,20 +99,20 @@ double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
       sum = 0.0;
       n = 0;
       for( irow = 0; irow < nrow; irow++ ){
-         *(wr++) = :Badval:;
+         *(wr++) = CGEN_BAD;
          pr++;
          for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
-            if( pr[ -1 ] != :Badval: && 
-                pr[ 0 ] != :Badval: && 
-                pr[ 1 ] != :Badval: ){
+            if( pr[ -1 ] != CGEN_BAD && 
+                pr[ 0 ] != CGEN_BAD && 
+                pr[ 1 ] != CGEN_BAD ){
                *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
                sum += ( *wr )*( *wr );
                n++;
             } else {
-               *wr = :Badval:;
+               *wr = CGEN_BAD;
             }
          }
-         *(wr++) = :Badval:;
+         *(wr++) = CGEN_BAD;
          pr++;
       }
 
@@ -137,13 +137,13 @@ double cupidRms:X:( :Xtype: *array, int nel, int rowlen ){
          thresh = 4*ret;
          wr = w + 2;
          for( i = 2; i < nel - 2; i++, wr++ ){
-            if( *wr != :Badval: ){
+            if( *wr != CGEN_BAD ){
                if( fabs( *wr ) >  thresh ) {
-                  wr[ -2 ] = :Badval:;
-                  wr[ -1 ] = :Badval:;
-                  wr[ 0 ] = :Badval:;
-                  wr[ 1 ] = :Badval:;
-                  wr[ 2 ] = :Badval:;
+                  wr[ -2 ] = CGEN_BAD;
+                  wr[ -1 ] = CGEN_BAD;
+                  wr[ 0 ] = CGEN_BAD;
+                  wr[ 1 ] = CGEN_BAD;
+                  wr[ 2 ] = CGEN_BAD;
                   nrej++;                                    
                } else {
                   sum += ( *wr )*( *wr );

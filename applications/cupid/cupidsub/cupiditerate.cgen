@@ -3,18 +3,18 @@
 #include "cupid.h"
 #include <limits.h>
 
-void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
+void CGEN_FUNCTION(cupidIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
                       double rms, AstKeyMap *config, int *iter ){
 /*
 *  Name:
-*     cupidIterate:X:
+*     cupidIterate<X>
 
 *  Purpose:
 *     Determine if a gaussian clump should be fitted to the peak around the
 *     pixel with the highest value in the residuals.
 
 *  Synopsis:
-*     void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
+*     void cupidIterate<X>( CGEN_TYPE *array, int imax, double sum, int iclump,
 *                           double rms, AstKeyMap *config, int *iter );
 
 *  Description:
@@ -45,7 +45,7 @@ void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
 *  Notes:
 *     - This function can be invoked using the generic cupidIterate macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidIterate:X: except that an extra parameter is added to the start 
+*     cupidIterate<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
 *     cupidIterate... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
@@ -66,7 +66,7 @@ void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
 /* Local Variables: */
    int i;               /* Loop count */
 
-   static :Xtype: val_thresh;  /* Smallest value to be fitted */
+   static CGEN_TYPE val_thresh;  /* Smallest value to be fitted */
    static double sum_thresh;   /* Target value for the sum of the residuals */
    static int maxclumps;       /* Maximum number of clumps to be fitted */
 
@@ -110,7 +110,7 @@ void cupidIterate:X:( :Xtype: *array, int imax, double sum, int iclump,
 
 /* If all the abovetests were passed, indicate that we should continue to
    fit a Gausian to the supplied peak. */
-               iter = 1;
+               *iter = 1;
 
             }
          }

@@ -1,17 +1,17 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void cupidUpdateArrays:X:( ){
+void CGEN_FUNCTION(cupidUpdateArrays)( ){
 /*
 *  Name:
-*     cupidUpdateArrays:X:
+*     cupidUpdateArrays<X>
 
 *  Purpose:
 *     Remove the fit from the residuals array, and add it onto the total
 *     fit array.
 
 *  Synopsis:
-*     void cupidUpdateArrays:X:( );
+*     void cupidUpdateArrays<X>( );
 
 *  Description:
 *     This function removes the fit from the residuals array, and adds it 
@@ -22,7 +22,7 @@ void cupidUpdateArrays:X:( ){
 *  Notes:
 *     - This function can be invoked using the generic cupidUpdateArrays macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidUpdateArrays:X: except that an extra parameter is added to the start 
+*     cupidUpdateArrays<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
 *     cupidUpdateArrays... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.

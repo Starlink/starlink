@@ -145,7 +145,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          cupidIterate( type, res, imax, sum, iclump, rms, config, &iter );
          if( iter ) {
 
-/* If so, make an initial guess at the Gaussian clump parameters. */
+/* If so, make an initial guess at the Gaussian clump parameters centred
+   on the current peak. */
             cupidSetInit( type );
 
 /* Find the best fitting parameters, starting from the above initial

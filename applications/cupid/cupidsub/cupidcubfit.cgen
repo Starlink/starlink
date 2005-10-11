@@ -1,17 +1,17 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-int cupidCubFit:X:( ){
+int CGEN_FUNCTION(cupidCubFit)( ){
 /*
 *  Name:
-*     cupidCubFit:X:
+*     cupidCubFit<X>
 
 *  Purpose:
 *     Find the best fitting parameters, starting from a given initial
 *     guess.
 
 *  Synopsis:
-*     int cupidCubFit:X:( );
+*     int cupidCubFit<X>( );
 
 *  Description:
 *     This function finds the best fitting parameters, starting from a 
@@ -25,7 +25,7 @@ int cupidCubFit:X:( ){
 *  Notes:
 *     - This function can be invoked using the generic cupidCubFit macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidCubFit:X: except that an extra parameter is added to the start 
+*     cupidCubFit<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
 *     cupidCubFit... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.

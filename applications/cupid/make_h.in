@@ -15,19 +15,18 @@
 
 /* Prototypes and interfaces for generic functions */
 /* ----------------------------------------------- */
-/* Each distributed source file in the cupidsub directory with type ".cupid" 
-   is processed at build time to produce a set of corresponding ".c" files, 
-   one for each supported data type. Each of the generated type-specific 
-   functions is invoked using a generic interface macro which hides the
-   code for selecting the type-specfic function. These lines in this
-   header file are generated at build time by the make_h script. */
+/* Each distributed source file in the cupidsub directory with type ".cgen" 
+   is processed at build time to produce a corresponding ".c" file. Each of 
+   the generated type-specific functions is invoked using a generic interface 
+   macro which hides the code for selecting the type-specfic function. These 
+   lines in this header file are generated at build time by the make_h script. */
 
 EOF
 
-# Loop round all ".cupid" files in the cupidsub directory.
-   while( $file = <cupidsub/*.cupid> ){
+# Loop round all ".cgen" files in the cupidsub directory.
+   while( $file = <cupidsub/*.cgen> ){
 
-# Read through the cupid file, looking for the "Synopsis" section of the 
+# Read through the cgen file, looking for the "Synopsis" section of the 
 # prologue. 
       $total = "";
       $stage = 0;
@@ -56,14 +55,14 @@ EOF
                $total .= $line;
             }
 
-#  When all the lines of the synpsis section have been concatenated, analyse 
+#  When all the lines of the synopsis section have been concatenated, analyse 
 #  it to find the root function name, and parameter list.
          } elsif( $stage == 2 ) {         
-            if( $total =~ /^ *(.*?)(\w+):X: *\( *(.*) *\);? *$/ ) {
+            if( $total =~ /^ *(.*?)(\w+)\<X\> *\( *(.*) *\);? *$/ ) {
                $ftype = $1;
                $base = $2;
                $args = $3;
-               $proto = "$ftype$base:X:( ";
+               $proto = "$ftype$base<X>( ";
                $stage = 3;
             } else {
                last;
@@ -111,13 +110,13 @@ EOF
 #  Now write out the type-specific function prototypes and interface definitions
          } elsif( $stage == 4 ) {         
             $dproto = $proto;
-            $dproto =~ s/:X:/D/g;
-            $dproto =~ s/:Xtype:/double/g;
+            $dproto =~ s/<X>/D/g;
+            $dproto =~ s/CGEN_TYPE/double/g;
             print OUTFILE "$dproto\n";
 
             $fproto = $proto;
-            $fproto =~ s/:X:/F/g;
-            $fproto =~ s/:Xtype:/float/g;
+            $fproto =~ s/<X>/F/g;
+            $fproto =~ s/CGEN_TYPE/float/g;
             print OUTFILE "$fproto\n";
 
             $denames = $enames;
