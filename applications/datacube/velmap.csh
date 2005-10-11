@@ -101,14 +101,16 @@
 #       Major bug in manual refitting routine fixed
 #     18-OCT-2001 (AALLAN):
 #       Modified temporary files to use ${tmpdir}/${user}
-#     2005 September  1 (MJC):
+#     2005 September 1 (MJC):
 #       Replaced COPYAXIS with KAPPA:SETAXIS.
-#     2005 September  2 (MJC):
+#     2005 September 2 (MJC):
 #       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
 #       remove tabs, spelling corrections.  Added section headings in the
 #       code.  Replace explicit wavelength in prompts with the current WCS
 #       Frame's label for the spectral axis, and also used the corresponding
 #       units in the output commentary.  Avoid :r.
+#     2005 September 7 (MJC):
+#       Convert the current WCS System into velocities.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -291,7 +293,7 @@ end
 # new velocity map.
 
 # Grab the spatial position.
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
+set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
 set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
@@ -335,7 +337,8 @@ refit:
 # Plot the ripped spectrum.
 # =========================
 
-linplot "${ripfile} device=${plotdev}" style="Colour(curves)=1" >& /dev/null
+linplot "${ripfile} device=${plotdev}" mode=histogram \
+        style="Colour(curves)=1" >& /dev/null
 
 # Zoom if required.
 if ( ${gotzoom} == "ASK") then
@@ -394,7 +397,7 @@ rezoom:
 # Replot the spectrum.
 # --------------------
    linplot ${ripfile} xleft=${low_z} xright=${upp_z} \
-           device=${plotdev} >& /dev/null
+           mode=histogram device=${plotdev} >& /dev/null
 endif
 
 # Grab the information needed by the FITGAUSS routine.
@@ -417,6 +420,7 @@ end
 
 # Grab the position.
 set pos = `parget lastpos cursor`
+echo "Lower  $pos"
 set low_mask = $pos[1]
 
 # Clean up the CURSOR temporary file.
@@ -741,17 +745,17 @@ while( $y <= ${ubnd[2]} )
             endif  
          else
             echo "       Spectrum ($x,$y): $centre_fit +- $centre_err" 
-            
-# Calculate the velocity.
-            set delta_lambda = \
-                `calc exp="'${centre_fit} - ${line_centre}'" prec=_double`
 
-            set velocity = \
-                `calc exp="'${delta_lambda}/${line_centre}'" prec=_double`
+# Set the rest-frame value.
+            set rest = "${line_centre} ${sunits}" 
+            wcsattrib "ndf=${specfile} mode=set name=RestFreq newval=${rest}"
 
-            set velocity = \
-                `calc exp="'${velocity}*3.0E+08'" prec=_double`
-                
+# Reset the System of the current WCS Frame to optical velocities. 
+            wcsattrib "ndf=${specfile} mode=set name=System newval=vopt"
+
+# Convert the line-centre position to optical velocity.
+            set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} AXIS SPECTRUM"`
+
             if ( ${dovar} == "TRUE" ) then
                echo -n "                         $velocity" 
             else
@@ -768,22 +772,16 @@ while( $y <= ${ubnd[2]} )
                   echo " ms^-1"
                   set vars = "${vars} -9999.99"
                else
-                  set upp_vel = \
-                    `calc exp="'${centre_fit} + ${centre_err} - ${line_centre}'"\
-                    prec=_double`
-                  set upp_vel = \
-                    `calc exp="'${upp_vel}/${line_centre}'" prec=_double`
-                  set upp_vel = \
-                    `calc exp="'${upp_vel}*3.0E+08'" prec=_double`
+
+# Convert the upper error bound position to optical velocity.
+                  set upp_err = \
+                    `calc exp="'${centre_fit} + ${centre_err}'" prec=_double`
+                  set upp_vel = `wcstran "ndf=${specfile} posin=${upp_err} AXIS SPECTRUM"`
                                
-                  set low_vel = \
-                    `calc exp="'${centre_fit} - ${centre_err} - ${line_centre}'"\
-                    prec=_double`
-                  set low_vel = \
-                   `calc exp="'${low_vel}/${line_centre}'" prec=_double`
-                  set low_vel = \
-                    `calc exp="'${low_vel}*3.0E+08'" prec=_double`
-              
+                  set low_err = \
+                    `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
+                  set low_vel = `wcstran "ndf=${specfile} posin=${low_err} AXIS SPECTRUM"`
+
                   set vel_err = \
                     `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`
 #                   `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
@@ -997,7 +995,7 @@ if ( ${forcefit} == "FALSE" ) then
 manual_refit: 
      
 # Plot the ripped spectra.
-         linplot "${ripfile} device=${plotdev}" >& /dev/null
+         linplot "${ripfile} mode=histogram device=${plotdev}" >& /dev/null
 
 # Zoom if required.
          if ( ${gotzoom} == "ASK") then
@@ -1055,9 +1053,9 @@ manual_rezoom:
 
 # Replot the spectrum.
             linplot "${ripfile} xleft=${low_z} xright=${upp_z}"\
-                 "device=${plotdev}" >& /dev/null
+                    mode=histogram "device=${plotdev}" >& /dev/null
          endif
-       
+
 # Grab the information needed by the FITGAUSS routine.
 # ====================================================
 
@@ -1328,14 +1326,9 @@ manual_rezoom:
 
 # Calculate the velocity.
 # =======================
-         set delta_lambda = \
-                `calc exp="'${centre_fit} - ${line_centre}'" prec=_double`
 
-         set velocity = \
-                `calc exp="'${delta_lambda}/${line_centre}'" prec=_double`
-
-         set velocity = \
-                `calc exp="'${velocity}*3.0E+08'" prec=_double`
+# Convert the line-centre position to optical velocity.
+         set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} AXIS SPECTRUM"`
      
          if ( ${dovar} == "TRUE" ) then
             echo  "        (X,Y) Pixel: ${xpix}:${ypix}"
@@ -1366,21 +1359,13 @@ manual_rezoom:
             else
 
 # Derive value's error bars.
-               set upp_vel = \
-                 `calc exp="'${centre_fit} + ${centre_err} - ${line_centre}'"\
-                 prec=_double`
-               set upp_vel = \
-                 `calc exp="'${upp_vel}/${line_centre}'" prec=_double`
-               set upp_vel = \
-                 `calc exp="'${upp_vel}*3.0E+08'" prec=_double`
-
-               set low_vel = \
-                 `calc exp="'${centre_fit} - ${centre_err} - ${line_centre}'"\
-                 prec=_double`
-               set low_vel = \
-                 `calc exp="'${low_vel}/${line_centre}'" prec=_double`
-               set low_vel = \
-                 `calc exp="'${low_vel}*3.0E+08'" prec=_double`              
+               set upp_err = \
+                 `calc exp="'${centre_fit} + ${centre_err}'" prec=_double`
+               set upp_vel = `wcstran "ndf=${specfile} posin=${upp_err} AXIS SPECTRUM"`
+                               
+               set low_err = \
+                 `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
+               set low_vel = `wcstran "ndf=${specfile} posin=${low_err} AXIS SPECTRUM"`
 
                set vel_err = \
                  `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`

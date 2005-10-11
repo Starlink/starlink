@@ -293,7 +293,7 @@ while ( $counter > 0 )
    echo "        Spectrum: ${counter} "
 
    linplot ${outfile} device=${plotdev} style="Colour(curves)=1"\
-           clear=no ybot=0 >& /dev/null
+           mode=histogram clear=no ybot=0 >& /dev/null
 
    @ counter = $counter - 1
 
@@ -368,7 +368,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
       linplot ${outfile} xleft=${low_z} xright=${upp_z}\
               device=${plotdev} style="Colour(curves)=1"\
-              clear=no ybot=0 >& /dev/null
+              mode=histogram clear=no ybot=0 >& /dev/null
 
       @ counter = $counter - 1
 

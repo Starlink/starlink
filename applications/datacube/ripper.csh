@@ -247,7 +247,8 @@ endif
 
 # Check to see if we need to plot the output spectrum.
 if ( ${plotspec} == "true" ) then
-   linplot ${outfile} device=${plotdev} style="Colour(curves)=1" >& /dev/null
+   linplot ${outfile} device=${plotdev} mode=histogram \
+           style="Colour(curves)=1" >& /dev/null
 endif
 
 # Clean up.

@@ -249,7 +249,7 @@ settitle "ndf=${spectral} title='Pixel (${xpix},${ypix})'"
 # ====================================
 
 # Plot the ripped spectrum.
-linplot ${spectral} device=${plotdev} style="Colour(curves)=1" >& /dev/null
+linplot ${spectral} device=${plotdev} mode=histogram style="Colour(curves)=1" >& /dev/null
 stats ndf=${spectral} > ${statsfile}
 
 # Report the results.
@@ -308,7 +308,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    touch ${curfile}
  
 # Replot the spectrum.
-   linplot ${spectral} xleft=${low_z} xright=${upp_z} \
+   linplot ${spectral} xleft=${low_z} xright=${upp_z} mode=histogram \
            device=${plotdev} style="Colour(curves)=1" >& /dev/null
 
 endif

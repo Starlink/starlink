@@ -212,7 +212,7 @@ upp_cont:
    picsel label="specone" device=${plotdev}
 
 # Plot the ripped spectrum.
-   linplot ${specone} device=${plotdev} style="Colour(curves)=2" >& /dev/null
+   linplot ${specone} device=${plotdev} mode=histogram style="Colour(curves)=2" >& /dev/null
 
 # Show statistics of the spectrum.
    stats ndf=${specone} > ${statsfile}
