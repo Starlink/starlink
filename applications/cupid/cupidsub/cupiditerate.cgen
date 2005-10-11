@@ -108,7 +108,7 @@ void CGEN_FUNCTION(cupidIterate)( CGEN_TYPE *array, int imax, double sum, int ic
    number of clumps. */
             if( iclump < maxclumps ) {
 
-/* If all the abovetests were passed, indicate that we should continue to
+/* If all the above tests were passed, indicate that we should continue to
    fit a Gausian to the supplied peak. */
                *iter = 1;
 

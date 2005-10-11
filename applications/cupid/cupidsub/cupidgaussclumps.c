@@ -151,7 +151,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */
-            if( cupidCubFit( type ) ) {
+            if( cupidCubFit( type, res, el, imax ) ) {
                iclump++;
 
 /* Add the clump to the output list. */
@@ -159,9 +159,9 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
-               cupidUpdateArrays( type );
+               cupidUpdateArrays( type, res, el );
 
-            }
+            } 
          }
       }
    }

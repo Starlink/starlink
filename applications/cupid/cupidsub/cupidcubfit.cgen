@@ -1,7 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-int CGEN_FUNCTION(cupidCubFit)( ){
+int CGEN_FUNCTION(cupidCubFit)( CGEN_TYPE *res, int nel, int imax ){
 /*
 *  Name:
 *     cupidCubFit<X>
@@ -11,13 +11,21 @@ int CGEN_FUNCTION(cupidCubFit)( ){
 *     guess.
 
 *  Synopsis:
-*     int cupidCubFit<X>( );
+*     int cupidCubFit<X>( CGEN_TYPE *res, int nel, int imax );
 
 *  Description:
 *     This function finds the best fitting parameters, starting from a 
 *     given initial guess.
 
 *  Parameters:
+*     res
+*        Pointer to the start of the residuals array.
+*     nel
+*        The number of elements in the supplied residuals array. 
+*     imax
+*        The 1D index within the supplied residuals array of the element
+*        which is being fitted. If the fit fails to converge, this
+*        element will be set bad in "res" on exit.
 
 *  Returned Value:
 *     Non-zero if the fit was succesfully completed.
@@ -45,6 +53,7 @@ int CGEN_FUNCTION(cupidCubFit)( ){
 
 /* Local Variables: */
    int ret;          /* Returned value */
+   int i;            /* Loop count */
 
 /* Initialise. */
    ret = 0;
@@ -53,7 +62,15 @@ int CGEN_FUNCTION(cupidCubFit)( ){
    if( *status != SAI__OK ) return ret;
 
 
-/* Return the result. */
+
+/* Return zero for the moment... */
+   for( i = 0; i < nel; i++ ) res[ i ] = CGEN_BAD;
+   ret = 0;
+
+
+/* Return the result, setting the specified element of the residuals
+   array bad if no fit was performed. */
+   if( !ret ) res[ imax ] = CGEN_BAD;
    return ret;  
 }
 
