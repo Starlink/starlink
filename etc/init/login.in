@@ -96,11 +96,14 @@ if ( ${?LD_LIBRARY_PATH} ) then
          case *-osf*:
             setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
          breaksw
+         case x86_64*-linux*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/amd64"
+         breaksw
          case *-linux*:
             setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
          breaksw
          case *-cygwin*:
-            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/x86"
          breaksw
          case *-sun*:
             setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
@@ -123,11 +126,14 @@ else
      case *-osf*:
         setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
      breaksw
+     case x86_64*-linux*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/amd64"
+     breaksw
      case *-linux*:
         setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
      breaksw
      case *-cygwin*:
-        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/x86"
      breaksw
      case *-sun*:
         setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/openwin/lib:@starjavadir@/lib/sparc"
