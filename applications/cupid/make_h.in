@@ -133,7 +133,7 @@ EOF
    ( ( type == CUPID__DOUBLE ) ? \\
       ${base}D( $denames ) : \\
    ( ( type == CUPID__FLOAT ) ? \\
-      ${base}F( $fenames ) : \\
+      ${base}F( $fenames ) : ($ftype) \\
    ( ( *status == SAI__OK ) ? \\
       *status = SAI__ERROR, \\
       msgSeti( "TYPE", type ), \\
