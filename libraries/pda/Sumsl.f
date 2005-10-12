@@ -2,7 +2,7 @@
 
 *+
 *  Name:
-*     mytest
+*     Sumsl
 
 *  Purpose:
 *     Tests the pda_sumsl minimisation routine.
@@ -69,6 +69,7 @@
       x( 4 ) = 4
       x( 5 ) = 5
 
+      nf = 1
       ivec = 0
       do i = 1, dims( 1 )
          do j = 1, dims( 2 )
@@ -109,7 +110,7 @@
       subroutine calcf( n, x, nf, f, dims, array, model )
       implicit none
       integer n, nf, dims(*), i, j, k, ivec
-      double precision x(n), array(*), f,model
+      double precision x(n), array(*), f,model, m, r
       external model
 
       f = 0.0
@@ -118,10 +119,19 @@
          do j = 1, dims( 2 )
             do k = 1, dims( 3 )
                ivec = ivec + 1
-               f = f + ( array( ivec ) - model( 0, i, j, k, x, nf ) )**2
+               m = model( 0, i, j, k, x, nf )
+               r = array( ivec ) - model( 0, i, j, k, x, nf ) 
+               f = f + r**2
+
+      if( nf .eq. 1 ) then
+         write(*,*) i,j,k,ivec,array(ivec),m,r,f
+      end if
+
+
             end do
          end do
       end do
+
 
       end
 
@@ -158,6 +168,8 @@
       g(3) = -2*g(3)
       g(4) = -2*g(4)
       g(5) = -2*g(5)
+
+c      write(*,*) nf, ': ',x,'->', g
 
       end
 

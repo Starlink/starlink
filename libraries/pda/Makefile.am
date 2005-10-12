@@ -7,7 +7,11 @@ lib_LTLIBRARIES = libpda.la
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun194_1.eps
 
 libpda_la_SOURCES = \
-	$(F_ROUTINES)
+        $(PUBLIC_INCLUDES) \
+	$(F_ROUTINES) \
+	$(C_ROUTINES)
+
+include_HEADERS = $(PUBLIC_INCLUDES)
 
 F_ROUTINES = pda_baksld.f pda_db2ink.f pda_dcfti1.f pda_dmpar.f	       \
 pda_dqed.f pda_dscal.f pda_fstats.f pda_lmsad.f pda_passb4.f	       \
@@ -77,6 +81,11 @@ pda_qdrtgh.f pda_sumit.f pda_vvmulp.f pda_gqtst.f pda_lsvmin.f 	       \
 pda_reldst.f pda_sumsl.f pda_wzbfgs.f pda_humit.f pda_ltvmul.f 	       \
 pda_rmdcon.f pda_humsl.f pda_lupdat.f pda_sgrad2.f pda_v2norm.f	       \
 pda_assst.f
+
+C_ROUTINES = pda.c
+
+PUBLIC_INCLUDES = pda.h
+
 
 # Testing
 
