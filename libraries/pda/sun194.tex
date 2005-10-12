@@ -12,13 +12,13 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun194.2}
-\newcommand{\stardocnumber}    {194.2}
+\newcommand{\stardocsource}    {sun194.3}
+\newcommand{\stardocnumber}    {194.3}
 \newcommand{\stardocauthors}   {H.\ Meyerdierks, D.\ Berry, P.\ Draper, G.\ Privett, M.\ Currie }
-\newcommand{\stardocdate}      {14 February 1997}
+\newcommand{\stardocdate}      {12th October 2005}
 \newcommand{\stardoctitle}     {PDA \\ [1ex]
                                 Public Domain Algorithms}
-\newcommand{\stardocversion}   {Version 0.4}
+\newcommand{\stardocversion}   {Version 0.5}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -526,6 +526,7 @@ that a problem was encountered.
 \item {\tt Simann.f} - Tests PDA\_SA.
 \item {\tt Sorttest.f} - Tests the sorting routines.
 \item {\tt Subplex.f} - Tests PDA\_SUBPLX.
+\item {\tt Sumsl.f} - Tests PDA\_SUMSL.
 \item {\tt Sf2dtest.f} - Tests PDA\_DB2INK and PDA\_DB2VAL.
 \item {\tt Sf2dtest2.f} - Tests PDA\_IDBVIP and PDA\_IDSFFT.
 \end{itemize}
@@ -2142,6 +2143,10 @@ of the arguments being the same, albeit in a slightly different order.
    Continuous simulated annealing global optimisation algorithm.
    Simple constraints can be specified.
 
+\item \htmlref{PDA\_SUMSL}{PDA\_SUMSL} (module SUMSL from TOMS)\ \\
+   Minimises a general unconstrained objective function using  
+   analytic gradients and a hessian approximation from secant update.
+
 \item \htmlref{PDA\_SUBPLX}{PDA\_SUBPLX} (module SUBPLEX from OPT/NETLIB)\ \\
    Subplex method to solve unconstrained optimisation problems.  The
    method is well suited for optimising objective functions that are
@@ -2188,7 +2193,8 @@ of the arguments being the same, albeit in a slightly different order.
    whether the fit parameters have to be constrained or not. It appears
    that Starlink applications use mainly unconstrained fits or at most
    simple bounds, i.e.\ hard constant limits on parameters. This library
-   contains only function-only algorithms. The only constrainable
+   contains function-only algorithms, and also the SUMSL algorithm
+   which requires both functions and gradients. The only constrainable
    algorithm is the simulated annealing SIMANN.
 
 \begin{itemize}
@@ -2205,6 +2211,9 @@ of the arguments being the same, albeit in a slightly different order.
    only and can be used for non-smooth functions as well. It should also
    have a fair chance of getting out of local minima and going on to
    find the global minimum.
+\item 
+   SUMSL is a general unconstrained minimisation using function values
+   and gradients. A trusted regions algorithm is used.
 \item 
    SUBPLEX is a generalisation and improvement on the Simplex algorithm.
    It should be very robust with any function to minimise. But it should
@@ -5884,6 +5893,30 @@ C***END PROLOGUE  DB2VAL
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DEFC
 \end{verbatim}
+
+%    --------------------------------------------------------------------------
+
+\sstroutine{
+   PDA\_DEFLT
+}{
+   Set default parameters for use by PDA\_SUMSL.
+}{
+   \sstdescription{c.f. \htmlref{PDA\_SUMSL.}{PDA\_SUMSL}}
+}
+
+\begin{verbatim}
+
+      subroutine pda_deflt(alg, iv, liv, lv, v)
+
+  ***  supply ***sol (version 2.3) default values to iv and v  ***
+
+  ***  alg = 1 means regression constants.
+  ***  alg = 2 means general unconstrained optimization constants.
+
+
+\end{verbatim}
+
+
 
 %    --------------------------------------------------------------------------
 
@@ -11994,6 +12027,450 @@ wsave   a work array which must be dimensioned at least 2*n+15.
 
 
 
+%    --------------------------------------------------------------------------
+
+\sstroutine{
+   PDA\_SUMSL
+}{
+   Unconstrained minimisation of a smooth non-linear function of n
+   variables, function and gradients supplied.
+}{
+   \sstdiytopic{
+   Origin
+   }{
+   Module SUMSL (algorithm 611) from TOMS
+   }
+   \sstdiytopic{
+   Author
+   }{
+     David M. Gay,
+   }
+   \sstdiytopic{
+   Reference
+   }{
+     Dennis, J.E., and Mei, H.H.W. (1979), "Two new unconstrained 
+     optimization algorithms which use function and gradient
+     values", J. Optim. Theory Applic. 28, pp. 453-482.
+   }
+}
+
+\begin{verbatim}
+      subroutine pda_sumsl(n, d, x, calcf, calcg, iv, liv, lv, v,
+     1                  uiparm, urparm, ufparm)
+
+
+ Minimize general unconstrained objective function using analytic 
+ gradient and hessian approx. from secant update.
+
+ --------------------------  parameter usage  --------------------------
+ 
+  n........ (input) the number of variables on which  f  depends, i.e.,
+                   the number of components in  x.
+  d........ (input/output) a scale vector such that  d(i)*x(i),
+                   i = 1,2,...,n,  are all in comparable units.
+                   d can strongly affect the behavior of pda_sumsl.
+                   finding the best choice of d is generally a trial-
+                   and-error process.  choosing d so that d(i)*x(i)
+                   has about the same value for all i often works well.
+                   the defaults provided by subroutine pda_deflt (see iv
+                   below) require the caller to supply d.
+  x........ (input/output) before (initially) calling pda_sumsl, the call-
+                   er should set  x  to an initial guess at  x*.  when
+                   pda_sumsl returns,  x  contains the best point so far
+                   found, i.e., the one that gives the least value so
+                   far seen for  f(x).
+  calcf.... (input) a subroutine that, given x, computes f(x).  calcf
+                   must be declared external in the calling program.
+                   it is invoked by
+                        call calcf(n, x, nf, f, uiparm, urparm, ufparm)
+                   when calcf is called, nf is the invocation
+                   count for calcf.  nf is included for possible use
+                   with calcg.  if x is out of bounds (e.g., if it
+                   would cause overflow in computing f(x)), then calcf
+                   should set nf to 0.  this will cause a shorter step
+                   to be attempted.  (if x is in bounds, then calcf
+                   should not change nf.)  the other parameters are as
+                   described above and below.  calcf should not change
+                   n, p, or x.
+  calcg.... (input) a subroutine that, given x, computes g(x), the gra-
+                   dient of f at x.  calcg must be declared external in
+                   the calling program.  it is invoked by
+                        call calcg(n, x, nf, g, uiparm, urparm, ufaprm)
+                   when calcg is called, nf is the invocation
+                   count for calcf at the time f(x) was evaluated.  the
+                   x passed to calcg is usually the one passed to calcf
+                   on either its most recent invocation or the one
+                   prior to it.  if calcf saves intermediate results
+                   for use by calcg, then it is possible to tell from
+                   nf whether they are valid for the current x (or
+                   which copy is valid if two copies are kept).  if g
+                   cannot be computed at x, then calcg should set nf to
+                   0.  in this case, pda_sumsl will return with iv(1) = 65.
+                   (if g can be computed at x, then calcg should not
+                   changed nf.)  the other parameters to calcg are as
+                   described above and below.  calcg should not change
+                   n or x.
+  iv....... (input/output) an integer value array of length liv (see
+                   below) that helps control the pda_sumsl algorithm and
+                   that is used to store various intermediate quanti-
+                   ties.  of particular interest are the initialization/
+                   return code iv(1) and the entries in iv that control
+                   printing and limit the number of iterations and func-
+                   tion evaluations.  see the section on iv input
+                   values below.
+  liv...... (input) length of iv array.  must be at least 60.  if liv
+                   is too small, then pda_sumsl returns with iv(1) = 15.
+                   when pda_sumsl returns, the smallest allowed value of
+                   liv is stored in iv(lastiv) -- see the section on
+                   iv output values below.  (this is intended for use
+                   with extensions of pda_sumsl that handle constraints.)
+  lv....... (input) length of v array.  must be at least 71+n*(n+15)/2.
+                   (at least 77+n*(n+17)/2 for pda_smsno, at least
+                   78+n*(n+12) for pda_humsl).  if lv is too small, then
+                   pda_sumsl returns with iv(1) = 16.  when pda_sumsl returns,
+                   the smallest allowed value of lv is stored in
+                   iv(lastv) -- see the section on iv output values
+                   below.
+  v........ (input/output) a floating-point value array of length lv
+                   (see below) that helps control the pda_sumsl algorithm
+                   and that is used to store various intermediate
+                   quantities.  of particular interest are the entries
+                   in v that limit the length of the first step
+                   attempted (lmax0) and specify convergence tolerances
+                   (afctol, lmaxs, rfctol, sctol, xctol, xftol).
+  uiparm... (input) user integer parameter array passed without change
+                   to calcf and calcg.
+  urparm... (input) user floating-point parameter array passed without
+                   change to calcf and calcg.
+  ufparm... (input) user external subroutine or function passed without
+                   change to calcf and calcg.
+ 
+   ***  iv input values (from subroutine pda_deflt)  ***
+ 
+  iv(1)...  on input, iv(1) should have a value between 0 and 14......
+              0 and 12 mean this is a fresh start.  0 means that
+                   pda_deflt(2, iv, liv, lv, v)
+              is to be called to provide all default values to iv and
+              v.  12 (the value that pda_deflt assigns to iv(1)) means the
+              caller has already called pda_deflt and has possibly changed
+              some iv and/or v entries to non-default values.
+              13 means pda_deflt has been called and that pda_sumsl (and
+              pda_sumit) should only do their storage allocation.  that is,
+              they should set the output components of iv that tell
+              where various subarrays arrays of v begin, such as iv(g)
+              (and, for pda_humsl and pda_humit only, iv(dtol)), and return.
+              14 means that a storage has been allocated (by a call
+              with iv(1) = 13) and that the algorithm should be
+              started.  when called with iv(1) = 13, pda_sumsl returns
+              iv(1) = 14 unless liv or lv is too small (or n is not
+              positive).  default = 12.
+  iv(inith).... iv(25) tells whether the hessian approximation h should
+              be initialized.  1 (the default) means pda_sumit should
+              initialize h to the diagonal matrix whose i-th diagonal
+              element is d(i)**2.  0 means the caller has supplied a
+              cholesky factor  l  of the initial hessian approximation
+              h = l*(l**t)  in v, starting at v(iv(lmat)) = v(iv(42))
+              (and stored compactly by rows).  note that iv(lmat) may
+              be initialized by calling pda_sumsl with iv(1) = 13 (see
+              the iv(1) discussion above).  default = 1.
+  iv(mxfcal)... iv(17) gives the maximum number of function evaluations
+              (calls on calcf) allowed.  if this number does not suf-
+              fice, then pda_sumsl returns with iv(1) = 9.  default = 200.
+  iv(mxiter)... iv(18) gives the maximum number of iterations allowed.
+              it also indirectly limits the number of gradient evalua-
+              tions (calls on calcg) to iv(mxiter) + 1.  if iv(mxiter)
+              iterations do not suffice, then pda_sumsl returns with
+              iv(1) = 10.  default = 150.
+  iv(outlev)... iv(19) controls the number and length of iteration sum-
+              mary lines printed (by pda_itsum).  iv(outlev) = 0 means do
+              not print any summary lines.  otherwise, print a summary
+              line after each abs(iv(outlev)) iterations.  if iv(outlev)
+              is positive, then summary lines of length 78 (plus carri-
+              age control) are printed, including the following...  the
+              iteration and function evaluation counts, f = the current
+              function value, relative difference in function values
+              achieved by the latest step (i.e., reldf = (f0-v(f))/f01,
+              where f01 is the maximum of abs(v(f)) and abs(v(f0)) and
+              v(f0) is the function value from the previous itera-
+              tion), the relative function reduction predicted for the
+              step just taken (i.e., preldf = v(preduc) / f01, where
+              v(preduc) is described below), the scaled relative change
+              in x (see v(reldx) below), the step parameter for the
+              step just taken (stppar = 0 means a full newton step,
+              between 0 and 1 means a relaxed newton step, between 1
+              and 2 means a double dogleg step, greater than 2 means
+              a scaled down cauchy step -- see subroutine dbldog), the
+              2-norm of the scale vector d times the step just taken
+              (see v(dstnrm) below), and npreldf, i.e.,
+              v(nreduc)/f01, where v(nreduc) is described below -- if
+              npreldf is positive, then it is the relative function
+              reduction predicted for a newton step (one with
+              stppar = 0).  if npreldf is negative, then it is the
+              negative of the relative function reduction predicted
+              for a step computed with step bound v(lmaxs) for use in
+              testing for singular convergence.
+                   if iv(outlev) is negative, then lines of length 50
+              are printed, including only the first 6 items listed
+              above (through reldx).
+              default = 1.
+  iv(parprt)... iv(20) = 1 means print any nondefault v values on a
+              fresh start or any changed v values on a restart.
+              iv(parprt) = 0 means skip this printing.  default = 1.
+  iv(prunit)... iv(21) is the output unit number on which all printing
+              is done.  iv(prunit) = 0 (the default) means suppress all 
+              printing.
+  iv(solprt)... iv(22) = 1 means print out the value of x returned (as
+              well as the gradient and the scale vector d).
+              iv(solprt) = 0 means skip this printing.  default = 1.
+  iv(statpr)... iv(23) = 1 means print summary statistics upon return-
+              ing.  these consist of the function value, the scaled
+              relative change in x caused by the most recent step (see
+              v(reldx) below), the number of function and gradient
+              evaluations (calls on calcf and calcg), and the relative
+              function reductions predicted for the last step taken and
+              for a newton step (or perhaps a step bounded by v(lmaxs)
+              -- see the descriptions of preldf and npreldf under
+              iv(outlev) above).
+              iv(statpr) = 0 means skip this printing.
+              iv(statpr) = -1 means skip this printing as well as that
+              of the one-line termination reason message.  default = 1.
+  iv(x0prt).... iv(24) = 1 means print the initial x and scale vector d
+              (on a fresh start only).  iv(x0prt) = 0 means skip this
+              printing.  default = 1.
+ 
+   ***  (selected) iv output values  ***
+ 
+  iv(1)........ on output, iv(1) is a return code....
+              3 = x-convergence.  the scaled relative difference (see
+                   v(reldx)) between the current parameter vector x and
+                   a locally optimal parameter vector is very likely at
+                   most v(xctol).
+              4 = relative function convergence.  the relative differ-
+                   ence between the current function value and its lo-
+                   cally optimal value is very likely at most v(rfctol).
+              5 = both x- and relative function convergence (i.e., the
+                   conditions for iv(1) = 3 and iv(1) = 4 both hold).
+              6 = absolute function convergence.  the current function
+                   value is at most v(afctol) in absolute value.
+              7 = singular convergence.  the hessian near the current
+                   iterate appears to be singular or nearly so, and a
+                   step of length at most v(lmaxs) is unlikely to yield
+                   a relative function decrease of more than v(sctol).
+              8 = false convergence.  the iterates appear to be converg-
+                   ing to a noncritical point.  this may mean that the
+                   convergence tolerances (v(afctol), v(rfctol),
+                   v(xctol)) are too small for the accuracy to which
+                   the function and gradient are being computed, that
+                   there is an error in computing the gradient, or that
+                   the function or gradient is discontinuous near x.
+              9 = function evaluation limit reached without other con-
+                   vergence (see iv(mxfcal)).
+             10 = iteration limit reached without other convergence
+                   (see iv(mxiter)).
+             11 = pda_stopx returned .true. (external interrupt).  see the
+                   usage notes below.
+             14 = storage has been allocated (after a call with
+                   iv(1) = 13).
+             17 = restart attempted with n changed.
+             18 = d has a negative component and iv(dtype) .le. 0.
+             19...43 = v(iv(1)) is out of range.
+             63 = f(x) cannot be computed at the initial x.
+             64 = bad parameters passed to assess (which should not
+                   occur).
+             65 = the gradient could not be computed at x (see calcg
+                   above).
+             67 = bad first parameter to pda_deflt.
+             80 = iv(1) was out of range.
+             81 = n is not positive.
+  iv(g)........ iv(28) is the starting subscript in v of the current
+              gradient vector (the one corresponding to x).
+  iv(lastiv)... iv(44) is the least acceptable value of liv.  (it is
+              only set if liv is at least 44.)
+  iv(lastv).... iv(45) is the least acceptable value of lv.  (it is
+              only set if liv is large enough, at least iv(lastiv).)
+  iv(nfcall)... iv(6) is the number of calls so far made on calcf (i.e.,
+              function evaluations).
+  iv(ngcall)... iv(30) is the number of gradient evaluations (calls on
+              calcg).
+  iv(niter).... iv(31) is the number of iterations performed.
+ 
+   ***  (selected) v input values (from subroutine pda_deflt)  ***
+ 
+  v(bias)..... v(43) is the bias parameter used in subroutine dbldog --
+              see that subroutine for details.  default = 0.8.
+  v(afctol)... v(31) is the absolute function convergence tolerance.
+              if pda_sumsl finds a point where the function value is less
+              than v(afctol) in absolute value, and if pda_sumsl does not
+              return with iv(1) = 3, 4, or 5, then it returns with
+              iv(1) = 6.  this test can be turned off by setting
+              v(afctol) to zero.  default = max(10**-20, machep**2),
+              where machep is the unit roundoff.
+  v(dinit).... v(38), if nonnegative, is the value to which the scale
+              vector d is initialized.  default = -1.
+  v(lmax0).... v(35) gives the maximum 2-norm allowed for d times the
+              very first step that pda_sumsl attempts.  this parameter can
+              markedly affect the performance of pda_sumsl.
+  v(lmaxs).... v(36) is used in testing for singular convergence -- if
+              the function reduction predicted for a step of length
+              bounded by v(lmaxs) is at most v(sctol) * abs(f0), where
+              f0  is the function value at the start of the current
+              iteration, and if pda_sumsl does not return with iv(1) = 3,
+              4, 5, or 6, then it returns with iv(1) = 7.  default = 1.
+  v(rfctol)... v(32) is the relative function convergence tolerance.
+              if the current model predicts a maximum possible function
+              reduction (see v(nreduc)) of at most v(rfctol)*abs(f0)
+              at the start of the current iteration, where  f0  is the
+              then current function value, and if the last step attempt-
+              ed achieved no more than twice the predicted function
+              decrease, then pda_sumsl returns with iv(1) = 4 (or 5).
+              default = max(10**-10, machep**(2/3)), where machep is
+              the unit roundoff.
+  v(sctol).... v(37) is the singular convergence tolerance -- see the
+              description of v(lmaxs) above.
+  v(tuner1)... v(26) helps decide when to check for false convergence.
+              this is done if the actual function decrease from the
+              current step is no more than v(tuner1) times its predict-
+              ed value.  default = 0.1.
+  v(xctol).... v(33) is the x-convergence tolerance.  if a newton step
+              (see v(nreduc)) is tried that has v(reldx) .le. v(xctol)
+              and if this step yields at most twice the predicted func-
+              tion decrease, then pda_sumsl returns with iv(1) = 3 (or 5).
+              (see the description of v(reldx) below.)
+              default = machep**0.5, where machep is the unit roundoff.
+  v(xftol).... v(34) is the false convergence tolerance.  if a step is
+              tried that gives no more than v(tuner1) times the predict-
+              ed function decrease and that has v(reldx) .le. v(xftol),
+              and if pda_sumsl does not return with iv(1) = 3, 4, 5, 6, or
+              7, then it returns with iv(1) = 8.  (see the description
+              of v(reldx) below.)  default = 100*machep, where
+              machep is the unit roundoff.
+  v(*)........ pda_deflt supplies to v a number of tuning constants, with
+              which it should ordinarily be unnecessary to tinker.  see
+              section 17 of version 2.2 of the nl2sol usage summary
+              (i.e., the appendix to ref. 1) for details on v(i),
+              i = decfac, incfac, phmnfc, phmxfc, rdfcmn, rdfcmx,
+              tuner2, tuner3, tuner4, tuner5.
+ 
+   ***  (selected) v output values  ***
+ 
+  v(dgnorm)... v(1) is the 2-norm of (diag(d)**-1)*g, where g is the
+              most recently computed gradient.
+  v(dstnrm)... v(2) is the 2-norm of diag(d)*step, where step is the
+              current step.
+  v(f)........ v(10) is the current function value.
+  v(f0)....... v(13) is the function value at the start of the current
+              iteration.
+  v(nreduc)... v(6), if positive, is the maximum function reduction
+              possible according to the current model, i.e., the func-
+              tion reduction predicted for a newton step (i.e.,
+              step = -h**-1 * g,  where  g  is the current gradient and
+              h is the current hessian approximation).
+                   if v(nreduc) is negative, then it is the negative of
+              the function reduction predicted for a step computed with
+              a step bound of v(lmaxs) for use in testing for singular
+              convergence.
+  v(preduc)... v(7) is the function reduction predicted (by the current
+              quadratic model) for the current step.  this (divided by
+              v(f0)) is used in testing for relative function
+              convergence.
+  v(reldx).... v(17) is the scaled relative change in x caused by the
+              current step, computed as
+                   max(abs(d(i)*(x(i)-x0(i)), 1 .le. i .le. p) /
+                      max(d(i)*(abs(x(i))+abs(x0(i))), 1 .le. i .le. p),
+              where x = x0 + step.
+ 
+ -------------------------------  notes  -------------------------------
+ 
+   ***  algorithm notes  ***
+ 
+         this routine uses a hessian approximation computed from the
+      bfgs update (see ref 3).  only a cholesky factor of the hessian
+      approximation is stored, and this is updated using ideas from
+      ref. 4.  steps are computed by the double dogleg scheme described
+      in ref. 2.  the steps are assessed as in ref. 1.
+ 
+   ***  usage notes  ***
+ 
+         after a return with iv(1) .le. 11, it is possible to restart,
+      i.e., to change some of the iv and v input values described above
+      and continue the algorithm from the point where it was interrupt-
+      ed.  iv(1) should not be changed, nor should any entries of iv
+      and v other than the input values (those supplied by pda_deflt).
+         those who do not wish to write a calcg which computes the
+      gradient analytically should call pda_smsno rather than pda_sumsl.
+      pda_smsno uses finite differences to compute an approximate gradient.
+         those who would prefer to provide f and g (the function and
+      gradient) by reverse communication rather than by writing subrou-
+      tines calcf and calcg may call on pda_sumit directly.  see the com-
+      ments at the beginning of pda_sumit.
+         those who use pda_sumsl interactively may wish to supply their
+      own pda_stopx function, which should return .true. if the break key
+      has been pressed since pda_stopx was last invoked.  this makes it
+      possible to externally interrupt pda_sumsl (which will return with
+      iv(1) = 11 if pda_stopx returns .true.).
+         storage for g is allocated at the end of v.  thus the caller
+      may make v longer than specified above and may allow calcg to use
+      elements of g beyond the first n as scratch storage.
+ 
+   ***  portability notes  ***
+ 
+         the pda_sumsl distribution tape contains both single- and double-
+      precision versions of the pda_sumsl source code, so it should be un-
+      necessary to change precisions.
+         only the functions pda_imdcon and pda_rmdcon contain machine-dependent
+      constants.  to change from one machine to another, it should
+      suffice to change the (few) relevant lines in these functions.
+         intrinsic functions are explicitly declared.  on certain com-
+      puters (e.g. univac), it may be necessary to comment out these
+      declarations.  so that this may be done automatically by a simple
+      program, such declarations are preceded by a comment having c/+
+      in columns 1-3 and blanks in columns 4-72 and are followed by
+      a comment having c/ in columns 1 and 2 and blanks in columns 3-72.
+         the pda_sumsl source code is expressed in 1966 ansi standard
+      fortran.  it may be converted to fortran 77 by commenting out all
+      lines that fall between a line having c/6 in columns 1-3 and a
+      line having c/7 in columns 1-3 and by removing (i.e., replacing
+      by a blank) the c in column 1 of the lines that follow the c/7
+      line and precede a line having c/ in columns 1-2 and blanks in
+      columns 3-72.  these changes convert some data statements into
+      parameter statements, convert some variables from real to
+      character*4, and make the data statements that initialize these
+      variables use character strings delimited by primes instead
+      of hollerith constants.  (such variables and data statements
+      appear only in modules pda_itsum and pda_parck.  parameter statements
+      appear nearly everywhere.)  these changes also add save state-
+      ments for variables given machine-dependent constants by pda_rmdcon.
+ 
+   ***  references  ***
+ 
+  1.  dennis, j.e., gay, d.m., and welsch, r.e. (1981), algorithm 573 --
+              an adaptive nonlinear least-squares algorithm, acm trans.
+              math. software 7, pp. 369-383.
+ 
+  2.  dennis, j.e., and mei, h.h.w. (1979), two new unconstrained opti-
+              mization algorithms which use function and gradient
+              values, j. optim. theory applic. 28, pp. 453-482.
+ 
+  3.  dennis, j.e., and more, j.j. (1977), quasi-newton methods, motiva-
+              tion and theory, siam rev. 19, pp. 46-89.
+ 
+  4.  goldfarb, d. (1976), factorized variable metric methods for uncon-
+              strained optimization, math. comput. 30, pp. 796-811.
+ 
+   ***  general  ***
+ 
+      coded by david m. gay (winter 1980).  revised summer 1982.
+      this subroutine was written in connection with research
+      supported in part by the national science foundation under
+      grants mcs-7600324, dcr75-10143, 76-14311dss, mcs76-11989,
+      and mcs-7906671.
+
+
+
+\end{verbatim}
+
+
+
 \sstroutine{
    PDA\_SURFIT
 }{
@@ -12739,6 +13216,11 @@ Creation Date : may 1979
 \end{itemize}
 
 \section{\xlabel{changes}Changes}
+
+\subsection{\xlabel{changes_from_version_0.4_to_0.5}Changes from version 0.4 to 0.5}
+A new routine PDA\_SUMSL has been added which performs unconstrained
+minimisation allowing gradients to be supplied in addition to function
+values.
 
 \subsection{\xlabel{changes_from_version_0.3_to_0.4}Changes from version 0.3 to 0.4}
 
