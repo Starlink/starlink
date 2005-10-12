@@ -97,10 +97,10 @@ PUBLIC_INCLUDES = pda.h
 # do we make the test conditional on the presence of these libraries
 
 TESTS = pda_test Covartest Lintest Nonlin2test Normtest \
-	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Sumsl Subplex 
+	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Sumsl SumslC Subplex 
 
 check_PROGRAMS = pda_test Covartest Lintest Nonlin2test Normtest \
-	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Sumsl Subplex 
+	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Sumsl SumslC Subplex 
 
 pda_test_SOURCES = pda_test.f
 Covartest_SOURCES = Covartest.f
@@ -114,6 +114,7 @@ Sf2dtest2_SOURCES = Sf2dtest2.f
 Simann_SOURCES = Simann.f
 Sorttest_SOURCES = Sorttest.f
 Sumsl_SOURCES = Sumsl.f
+SumslC_SOURCES = SumslC.c
 Subplex_SOURCES = Subplex.f
 
 pda_test_LDADD = `$(srcdir)/pda_link`
@@ -128,6 +129,7 @@ Sf2dtest2_LDADD = `$(srcdir)/pda_link`
 Simann_LDADD = `$(srcdir)/pda_link`
 Sorttest_LDADD = `$(srcdir)/pda_link`
 Sumsl_LDADD = `$(srcdir)/pda_link`
+SumslC_LDADD = `$(srcdir)/pda_link`
 Subplex_LDADD = `$(srcdir)/pda_link`
 
 dist_starnews_DATA = pda.news

@@ -84,9 +84,9 @@ int main(){
        fabs( x[2] - 3.074 ) > 0.01 ||
        fabs( x[3] - 4.099 ) > 0.01 ||
        fabs( x[4] - 4.880 ) > 0.01 ) {
-      printf("Sumsl: Test of PDA_SUMSL failed\n");
+      printf("Sumsl: Test of pdaSumsl failed\n");
    } else {
-      printf("Sumsl: Test of PDA_SUMSL passed\n");
+      printf("Sumsl: Test of pdaSumsl passed\n");
    }
 
   return 0;

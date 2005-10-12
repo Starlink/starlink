@@ -18,6 +18,9 @@
 
 *     f( X ) = SUM( ( array - model( X ) )**2 ) over all i,j,k
 
+*  Notes:
+*     - The C interface to PDA_SUMSL is tested by SumslC.c
+
 *-
       implicit none
 
@@ -122,12 +125,6 @@
                m = model( 0, i, j, k, x, nf )
                r = array( ivec ) - model( 0, i, j, k, x, nf ) 
                f = f + r**2
-
-      if( nf .eq. 1 ) then
-         write(*,*) i,j,k,ivec,array(ivec),m,r,f
-      end if
-
-
             end do
          end do
       end do
@@ -168,8 +165,6 @@
       g(3) = -2*g(3)
       g(4) = -2*g(4)
       g(5) = -2*g(5)
-
-c      write(*,*) nf, ': ',x,'->', g
 
       end
 
