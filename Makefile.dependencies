@@ -1377,6 +1377,7 @@ $(MANIFESTS)/pcs: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/pda: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html
 	cd libraries/pda \

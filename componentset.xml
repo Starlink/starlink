@@ -854,63 +854,6 @@ Traces an HDS file
   <bugreports>ussc@starlink.ac.uk</bugreports>
 </component>
 
-<component id="cupid" support="S">
-  <version>0.0-1</version>
-  <path>applications/cupid</path>
-  <description>CUPID - AST applications</description>
-  <abstract><p>
-CUPID is a package of applications which identify and analyse clumps of
-emission within 2- or 3- dimensional data arrays.
-  </p></abstract>
-  <dependencies >
-    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>David S. Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <documentation> sun999</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>2005</year>
-    <name>Joint Astronomy Centre Hawaii</name>
-  </copyright>
-</component>
-
-<component id="kappa" support="S">
-  <version>1.5</version>
-  <path>applications/kappa</path>
-  <description>KAPPA - Kernel Application Package</description>
-  <abstract><p>
-KAPPA is an applications package comprising about 180
-general-purpose commands for image processing, data visualisation, and
-manipulation of the standard Starlink data format---the NDF.  It is
-intended to work in conjunction with Starlink's various specialised
-packages.
-  </p></abstract>
-  <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Malcolm Currie</name>
-      <uname>mjc</uname>
-    </person>
-  </developers>
-  <documentation> sun95 sun221</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="kappa" support="S">
   <version>1.5</version>
   <path>applications/kappa</path>
@@ -1931,44 +1874,6 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ast">
-  <version>3.5-6</version>
-  <path>libraries/ast</path>
-  <description>WCS library</description>
-  <abstract>
-    <p>The AST library provides a comprehensive range of facilities for
-      attaching world coordinate systems to astronomical data, for
-      retrieving and interpreting that information in a variety of formats,
-      including FITS-WCS, and for generating graphical output based on it.</p>
-    <p>This library should be of interest to anyone writing
-      astronomical applications which need to manipulate coordinate system
-      data, especially celestial or spectral coordinate systems. AST
-      is portable and environment-independent.</p>
-  </abstract>
-  <dependencies >
-    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Rodney Warren-Smith</name>
-      <uname>rfws</uname>
-    </person>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun210 sun211</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="cat" support="S">
   <version>8.1</version>
   <path>libraries/cat</path>
@@ -2513,31 +2418,6 @@ independently of KAPPA.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="kaplibs" support="S">
-  <version>2.8-2</version>
-  <path>libraries/kaplibs</path>
-  <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
-  <abstract><p>KAPLIBS is a package of Fortran subroutine 
-libraries which were originally written as part of the KAPPA package (a
-package of general purpose image processing and visualization tools).
-KAPLIBS provides software developers with access to many of the internal
-KAPPA routines, so that KAPPA-like applications can be written and built
-independently of KAPPA.</p></abstract>
-  <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><build>trn</build><link>agi</link><link>ast</link><link>cat</link><link>fio</link><link>grp</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>D.S. Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <documentation> sun238</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="mag" support="U">
   <version>1.1-4</version>
   <path>libraries/mag</path>
@@ -2957,50 +2837,6 @@ Ultrix and for SunOS and may still work for them.
     </p></abstract>
   <dependencies >
     <build>sae</build><build>cnf</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Horst Meyerdierks</name>
-      <uname>hme</uname>
-    </person>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-    </person>
-    <person>
-      <name>Grant Privett</name>
-      <uname>gp</uname>
-    </person>
-    <person>
-      <name>Malcolm J Currie</name>
-      <uname>mjc</uname>
-    </person>
-  </developers>
-  <documentation> sun194</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-    <notes>
-      <p>Most of the code is public domain (that's the point)</p>
-    </notes>
-  </copyright>
-</component>
-
-<component id="pda" support="S">
-  <version>0.5-1</version>
-  <path>libraries/pda</path>
-  <description>Public Domain Algorithms</description>
-  <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
-    </p></abstract>
-  <dependencies >
-    <build>sae</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -3621,47 +3457,5 @@ GKS (SUN/83) should be used.</p></abstract>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="ast" support="S">
-  <version>3.6</version>
-  <path>libraries/ast</path>
-  <description>WCS library</description>
-  <abstract>
-    <p>The AST library provides a comprehensive range of facilities for
-      attaching world coordinate systems to astronomical data, for
-      retrieving and interpreting that information in a variety of formats,
-      including FITS-WCS, and for generating graphical output based on it.</p>
-    <p>This library should be of interest to anyone writing
-      astronomical applications which need to manipulate coordinate system
-      data, especially celestial or spectral coordinate systems. AST
-      is portable and environment-independent.</p>
-  </abstract>
-  <dependencies >
-    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Rodney Warren-Smith</name>
-      <uname>rfws</uname>
-    </person>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun210 sun211</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
 </component>
 </componentset>
