@@ -40206,7 +40206,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          ABS( ) = \_DOUBLE (Read)
       }{
          Absolute shifts in pixels.  The number of values supplied must
-         match the number of pixel axes in the NDF.  Only used if
+         match the number of pixel axes in the NDF.  It is only used if
          STYPE={\tt "Absolute"}.
       }
       \sstsubsection{
@@ -40214,7 +40214,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       }{
          Position of the fiducial point in pixel co-ordinates.  The number
          of values supplied must match the number of pixel axes in the NDF.
-         Only used if STYPE={\tt "Relative"}.
+         It is only used if STYPE={\tt "Relative"}.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -40271,7 +40271,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       }{
          Position of the standard object in pixel co-ordinates.  The number
          of values supplied must match the number of pixel axes in the NDF.
-         Only used if STYPE={\tt "Relative"}.
+         It is only used if STYPE={\tt "Relative"}.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -40318,7 +40318,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstexamplesubsection{
          slide speca specb stype=rel fid=11.2 obj=11.7
       }{
-         The pixels in the NDF speca are shifted by 0.5 (\emph{i.e.} 11.7 - 11.2)
+         The pixels in the NDF speca are shifted by 0.5 (\emph{i.e.} $11.7 - 11.2$)
          pixels and the output NDF is written as specb.
       }
       \sstexamplesubsection{
@@ -40339,12 +40339,26 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLEX}~
       section of the AST\_RESAMPLE documentation.
    }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the NDF is shifted by a whole number of pixels along each
+         axis, this application merely changes the pixel origin in the NDF.
+         It can thus be compared to the \htmlref{SETORIGIN}{SETORIGIN} command.
+
+         \sstitem
+         Resampled axis centres that are beyond the bounds of the
+         input NDF are given extrapolated values from the first (or last)
+         pair of valid centres. 
+      }
+   }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
          The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all 
-         \htmlref{extensions}{apndf:extensions}~ are propagated.  
+    4     \htmlref{extensions}{apndf:extensions}~ are propagated.  
          \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification. 
          The \htmlref{QUALITY}{apndf:quality}~ component is also
@@ -49410,9 +49424,19 @@ The following applications have been modified:
 
          \item The default values for the TOL parameter for REGRID, and the
          ACC parameter for WCSALIGN, have been reduced to 0.05, in order to
-         reduce artifacts when transforming large images with flux conservation.
+         reduce artifacts when transforming large images with flux
+         conservation.
       \end{itemize}
 
+   \item [\htmlref{SLIDE}{SLIDE}] \mbox{}
+      \begin{itemize}
+         \item Hitherto non-integer shifts resulted in a bad value
+         appearing in the first or last element of the AXIS centres
+         causing hazards to other applications.  SLIDE now replaces the
+         bad axis centre with an extrapolated value derived from the
+         increment between the next good interior pair of AXIS centres.
+      \end{itemize}
+   
 \end{description}
 
 \begin{latexonly}
