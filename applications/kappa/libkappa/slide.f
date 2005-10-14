@@ -21,26 +21,27 @@
 
 *  Description:
 *     The pixels of an NDF are shifted by a given number of pixels along
-*     each pixel axis. The shift need not be an integer number of pixels,
-*     and pixel interpolation will be performed if necessary using the
-*     scheme selected by parameter METHOD. The shifts to use are specified 
-*     either by an absolute vector given by the ABS parameter or by the 
-*     difference between a fiducial point and a standard object given by 
-*     the FID and OBJ parameters respectively.  In each case the co-ordinates
-*     are specified in the NDF's pixel co-ordinate Frame.
+*     each pixel axis.  The shift need not be an integer number of 
+*     pixels, and pixel interpolation will be performed if necessary
+*     using the scheme selected by parameter METHOD.  The shifts to use 
+*     are specified either by an absolute vector given by the ABS
+*     parameter or by the difference between a fiducial point and a
+*     standard object given by the FID and OBJ parameters respectively. 
+*     In each case the co-ordinates are specified in the NDF's pixel
+*     co-ordinate Frame.
 
 *  Usage:
 *     slide in out abs method
 
 *  ADAM Parameters:
 *     ABS( ) = _DOUBLE (Read)
-*        Absolute shifts in pixels. The number of values supplied must
-*        match the number of pixel axes in the NDF. Only used if 
+*        Absolute shifts in pixels.  The number of values supplied must
+*        match the number of pixel axes in the NDF.  It is only used if 
 *        STYPE="Absolute".
 *     FID( ) = _DOUBLE (Read)
-*        Position of the fiducial point in pixel co-ordinates. The number 
-*        of values supplied must match the number of pixel axes in the NDF. 
-*        Only used if STYPE="Relative".
+*        Position of the fiducial point in pixel co-ordinates.  The
+*        number of values supplied must match the number of pixel axes
+*        in the NDF.  It is only used if STYPE="Relative".
 *     IN = NDF (Read)
 *        The NDF to be translated.
 *     METHOD = LITERAL (Read)
@@ -72,9 +73,9 @@
 *        given in the "Sub-Pixel Interpolation Schemes" section below.
 *        ["Linear"]
 *     OBJ = LITERAL (Read)
-*        Position of the standard object in pixel co-ordinates. The number 
-*        of values supplied must match the number of pixel axes in the NDF. 
-*        Only used if STYPE="Relative".
+*        Position of the standard object in pixel co-ordinates.  The
+*        number of values supplied must match the number of pixel axes
+*        in the NDF.   It is only used if STYPE="Relative".
 *     OUT = NDF (Write)
 *        The translated NDF.
 *     PARAMS( ) = _DOUBLE (Read)
@@ -86,21 +87,22 @@
 *        The sort of shift to be used.  The choice is "Relative" or
 *        "Absolute". ["Absolute"]
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF. A null (!) value will cause the input
-*        title to be used. [!]
+*        Title for the output NDF.  A null (!) value will cause the
+*        input title to be used. [!]
 
 *  Examples:
 *     slide m31 m31_acc [3.2,2.3]
 *        The pixels in the NDF m31 are shifted by 3.2 pixels in X and 
-*        2.3 pixels in Y, and written to NDF m31_acc. Linear interpolation 
-*        is used to produce the output data (and, if present, variance) array.
+*        2.3 pixels in Y, and written to NDF m31_acc.  Linear
+*        interpolation  is used to produce the output data (and, if
+*        present, variance) array.
 *     slide m31 m31_acc [3.2,2.3] nearest
-*        The same as the previous example except that nearest neighbour
+*        The same as the previous example except that nearest-neighbour
 *        resampling is used.  This will be somewhat faster, but may
 *        result in features shifted by up to half a pixel. 
 *     slide speca specb stype=rel fid=11.2 obj=11.7
-*        The pixels in the NDF speca are shifted by 0.5 (i.e. 11.7 - 11.2)
-*        pixels and the output NDF is written as specb.
+*        The pixels in the NDF speca are shifted by 0.5 (i.e. 
+*        11.7 - 11.2) pixels and the output NDF is written as specb.
 *     slide speca specb stype=abs abs=0.5
 *        This does just the same as the previous example.
 
@@ -117,14 +119,17 @@
 *  Notes:
 *     -  If the NDF is shifted by a whole number of pixels along each
 *     axis, this application merely changes the pixel origin in the NDF.
-*     It can thus be compared with the SETORIGIN command.
+*     It can thus be compared to the SETORIGIN command.
+*     -  Resampled axis centres that are beyond the bounds of the
+*     input NDF are given extrapolated values from the first (or last)
+*     pair of valid centres. 
 
 *  Implementation Status:
-*     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
-*     propagated. TITLE is controlled by the TITLE parameter. DATA,
-*     VARIANCE, AXIS and WCS are propagated after appropriate modification.
-*     QUALITY component is also propagated if Nearest Neighbour
-*     interpolation is being used. 
+*     -  The LABEL, UNITS, and HISTORY components, and all extensions
+*     are propagated. TITLE is controlled by the TITLE parameter.  DATA,
+*     VARIANCE, AXIS and WCS are propagated after appropriate
+*     modification.  QUALITY component is also propagated if
+*     nearest-neighbour interpolation is being used. 
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -136,14 +141,19 @@
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (Starlink)
 
 *  History:
 *     7-JAN-2002 (MBT):
 *        Original version.
 *     15-JAN-2002 (DSB):
 *        Modified so that positions are always obtained in pixel coords.
-*        Added propagation of QUALITY. Also changed code to look more like 
-*        REGRID. Added propagation of the AXIS component.
+*        Added propagation of QUALITY.  Also changed code to look more 
+*        like REGRID.  Added propagation of the AXIS component.
+*     2005 October 13 (MJC):
+*        Replace bad axis centres arising during resampling with
+*        extrapolated values.
+*     {enter_further_changes_here}
 *-
       
 *  Type Definitions:
@@ -161,18 +171,23 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given real
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+                                 ! real
+      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
+                                 ! real
 
 *  Local Variables:
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER METHOD * ( 16 )  ! Name of resampling scheme
       CHARACTER STYPE * ( 16 )   ! Type of shift to be supplied
-      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input array
-      DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial point
+      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input
+                                 ! array
+      DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial 
+                                 ! point
       DOUBLE PRECISION LPO       ! Lower bound in output array
-      DOUBLE PRECISION OBJ( NDF__MXDIM ) ! Co-ordinates of standard object
+      DOUBLE PRECISION OBJ( NDF__MXDIM ) ! Co-ordinates of standard
+                                 ! object
       DOUBLE PRECISION PARAMS( 4 ) ! Additional parameters for resampler
       DOUBLE PRECISION PIA( NDF__MXDIM ) ! First input point
       DOUBLE PRECISION PIB( NDF__MXDIM ) ! Second input point
@@ -183,8 +198,10 @@
       DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
       DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector      
-      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input array
-      DOUBLE PRECISION TOL       ! Tolerance for linear transform approximation
+      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input 
+                                 ! array
+      DOUBLE PRECISION TOL       ! Tolerance for linear transform
+                                 ! approximation
       DOUBLE PRECISION UPO       ! Upper bound in output array
       DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lowest value
       DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of highest value
@@ -201,28 +218,42 @@
       INTEGER IPQUAO             ! Pointer to output Quality array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
-      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel co-ordinates
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel
+                                 ! co-ordinates
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
-      INTEGER MAPA               ! Mapping from i/ axis centre to o/p axis centre
+      INTEGER MAPA               ! Mapping from i/ axis centre to o/p
+                                 ! axis centre
       INTEGER MAPHI              ! Half-pixel shift Mapping at input end
-      INTEGER MAPHIO             ! Mapping with half-pixel shifts at both ends
-      INTEGER MAPHO              ! Half-pixel shift Mapping at output end
+      INTEGER MAPHIO             ! Mapping with half-pixel shifts at
+                                 ! both ends
+      INTEGER MAPHO              ! Half-pixel shift Mapping at output
+                                 ! end
       INTEGER MAPIO              ! Mapping from input to output NDF
-      INTEGER MAXPIX             ! Max size of linear approximation region
+      INTEGER MAXPIX             ! Max size of linear approximation
+                                 ! region
       INTEGER NBAD               ! Number of bad pixels
       INTEGER NDFI               ! NDF identifier of input NDF
       INTEGER NDFO               ! NDF identifier of output NDF
-      INTEGER NDIM               ! Number of dimensions of input and output NDF
-      INTEGER NPARAM             ! Number of parameters required for resampler
-      INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array for PMAP1
-      INTEGER PMAP1              ! A PermMap which selects the current axis
+      INTEGER NDIM               ! Number of dimensions of input and
+                                 ! output NDF
+      INTEGER NPARAM             ! Number of parameters required for
+                                 ! resampler
+      INTEGER NREP               ! Number of bad pixels replaced
+      INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array for
+                                 ! PMAP1
+      INTEGER PMAP1              ! A PermMap which selects the current
+                                 ! axis
       INTEGER PMAP2              ! The inverse of PMAP1
-      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel co-ordinates
+      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel
+                                 ! co-ordinates
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL BAD                ! May there be bad pixels?
-      LOGICAL HASQUA             ! Does the input NDF have Quality component?
-      LOGICAL HASVAR             ! Does the input NDF have Variance component?
-      LOGICAL HASAX              ! Does the input NDF have an AXIS Centre array?
+      LOGICAL HASQUA             ! Does the input NDF have Quality
+                                 ! component?
+      LOGICAL HASVAR             ! Does the input NDF have Variance
+                                 ! component?
+      LOGICAL HASAX              ! Does the input NDF have an AXIS
+                                 ! Centre array?
 *.
 
 *  Check the inherited global status.
@@ -272,7 +303,7 @@
          END DO
       END IF
 
-*  Construct a Mapping from input PIXEL to output PIXEL corresponding to 
+*  Construct a Mapping from input PIXEL to output PIXEL corresponding to
 *  the given shifts. 
       DO I = 1, NDIM
          PIA( I ) = 0D0
@@ -434,7 +465,8 @@
       END DO
       MAPHI = AST_WINMAP( NDIM, PT1I, PT2I, PT1O, PT2O, ' ', STATUS )
 
-*  Then one which transforms plus a half-pixel in every output dimension.
+*  Then one which transforms plus a half-pixel in every output
+*  dimension.
       DO I = 1, NDIM
          PT1I( I ) = 0D0
          PT2I( I ) = 1D0
@@ -556,8 +588,9 @@
 *  Resample any AXIS arrays.
 *  =========================
 
-*  Initialize the output axis permutation array to hold zeros, indicating
-*  that none of the outputs from the PermMap are connected to an input.
+*  Initialize the output axis permutation array to hold zeros,
+*  indicating that none of the outputs from the PermMap are connected to
+*  an input.
       DO I = 1, NDIM
          OUTPRM( I ) = 0
       END DO
@@ -592,39 +625,59 @@
 *  Tell AST_RESAMPLE to recognize bad values.
             FLAGS = AST__USEBAD
 
-*  Perform the resampling according to data type.
+*  Perform the resampling according to data type.  Replace any bad
+*  values introduced at the start and/or end of the axis array,
+*  extrapolating from the next interior pair.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
                NBAD = AST_RESAMPLEB( MAPA, 1, LBNDI( I ), UBNDI( I ),
      :                               %VAL( CNF_PVAL( IPAI ) ), 
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADB, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
-      
+
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEB( LBNDO( I ), UBNDO( I ), 
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
+
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                NBAD = AST_RESAMPLEUB( MAPA, 1, LBNDI( I ), UBNDI( I ),
      :                               %VAL( CNF_PVAL( IPAI ) ), 
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUB, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEUB( LBNDO( I ), UBNDO( I ), 
+     :                              %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                              STATUS )
+               END IF
+
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                NBAD = AST_RESAMPLEW( MAPA, 1, LBNDI( I ), UBNDI( I ),
      :                               %VAL( CNF_PVAL( IPAI ) ), 
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADW, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
+
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEW( LBNDO( I ), UBNDO( I ), 
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
       
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                NBAD = AST_RESAMPLEUW( MAPA, 1, LBNDI( I ), UBNDI( I ),
@@ -632,21 +685,33 @@
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUW, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEUW( LBNDO( I ), UBNDO( I ), 
+     :                              %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                              STATUS )
+               END IF
+
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                NBAD = AST_RESAMPLEI( MAPA, 1, LBNDI( I ), UBNDI( I ),
      :                               %VAL( CNF_PVAL( IPAI ) ), 
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADI, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEI( LBNDO( I ), UBNDO( I ), 
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
+
       
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                NBAD = AST_RESAMPLER( MAPA, 1, LBNDI( I ), UBNDI( I ),
@@ -654,10 +719,16 @@
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADR, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
+
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAER( LBNDO( I ), UBNDO( I ), 
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
       
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                NBAD = AST_RESAMPLED( MAPA, 1, LBNDI( I ), UBNDI( I ),
@@ -665,10 +736,16 @@
      :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADD, 1, LBNDO( I ), 
-     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
      :                               %VAL( CNF_PVAL( IPAO ) ), 
      :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
+
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAED( LBNDO( I ), UBNDO( I ), 
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
             END IF
 
 *  Unmap the Centre arrays.
