@@ -1,0 +1,221 @@
+      SUBROUTINE KPS1_SLAE<T>( LBND, UBND, AXIS, NREP, STATUS )
+*+
+*  Name:
+*     KPS1_SLAEx
+
+*  Purpose:
+*     Extrapolates axis array where the exterior values are bad.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_SLAEx( LBND, UBND, AXIS, NREP, STATUS )
+
+*  Description:
+*     This routine examines the first and last values in the axis
+*     array; if either is bad, its value is replaced by extrapolation.
+*     The extrapolation finds the next interior non-bad pair to derive
+*     an average interval between adjacent elements, which is applied
+*     to the first interior good value to derive the replacement value
+*     for the bad.
+
+*     This is a server routine for SLIDE to allow for non-integer
+*     interpolation, where the resampling leaves bad values at the
+*     ends of axis centres.  It assumes that the array is monotonic and
+*     approximately linear.  This routine may be used for arbitrary
+*     one-dimensional arrays in addition to axes, provided these 
+*     criteria are met.
+*
+*  Arguments:
+*     LBND = INTEGER (Given)
+*        The lower bound of the axis array.
+*     UBND = INTEGER (Given)
+*        The upper bound of the axis array.
+*     AXIS( LBND:UBND ) = ? (Given & Returned)
+*        The axis array.
+*     NREP = INTEGER (Given)
+*        The number of bad values replaced.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     axis array supplied to the routine must have the data type 
+*     specified.
+*     -  An error report is made and bad status returned should the
+*     axis array have too few elements for interpolation.
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2005 October 13 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+
+*  Arguments Given:
+      INTEGER LBND
+      INTEGER UBND
+
+*  Arguments Given and Returned:
+      <TYPE> AXIS( LBND:UBND )
+
+*  Arguments Returned:
+      INTEGER NREP
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      LOGICAL BAD                ! True if an input value is out of
+                                 ! bounds
+      LOGICAL FIRST              ! Extrapolate first element?
+      <LTYPE> FRAC               ! Fractional array index
+      INTEGER I                  ! Loop counter
+      DOUBLE PRECISION INCR      ! Increment between adjacent elements
+      INTEGER J                  ! Loop counter
+      LOGICAL LAST               ! Extrapolate final element?
+      LOGICAL MORE               ! Loop more?
+      INTEGER NBAD               ! Number of bad values to replace
+      INTEGER NF                 ! 1 if first el. is valid, 0 otherwise
+      INTEGER NL                 ! 1 if last el. is valid, 0 otherwise
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise useful variables.
+      NREP = 0
+      NBAD = 0
+      NF = 0
+      NL = 0
+
+      FIRST = AXIS( LBND ) .EQ. VAL__BAD<T>
+      LAST = AXIS( UBND ) .EQ. VAL__BAD<T>
+
+*  Count the number of elements to replace and set numerical flags
+*  neded to set element bounds for later search.
+      IF ( FIRST ) THEN
+         NBAD = NBAD + 1
+         NF = 1
+      END IF
+      
+      IF ( LAST ) THEN
+         NBAD = NBAD + 1
+         NL = 1
+      END IF
+
+*  Check the bounds permit interpolation.
+      IF ( UBND - LBND .LT. 2 + NBAD ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'N', 2 + NBAD )
+         CALL MSG_SETI( 'LBND', LBND )
+         CALL MSG_SETI( 'UBND', UBND )
+
+         CALL ERR_REP( 'KPS1_SLAEx_TOOFEW',
+     :     'The vector contains fewer than the ^N elements needed to '/
+     :     /'extrapolate bad values at its end.  Bounds are ^LBND to '/
+     :     /'^UBND.', STATUS )
+          GOTO 999
+      END IF
+
+*  First pixel needs changing.
+*  ===========================
+      IF ( FIRST ) THEN
+
+*  Find the first valid interior element.
+         I = LBND + 1
+         MORE = .TRUE.
+         DO WHILE ( MORE )
+            IF ( AXIS( I ) .NE. VAL__BAD<T> ) THEN
+               MORE = .FALSE.
+            ELSE
+               I = I + 1
+               MORE = I .LT. UBND - NL
+            END IF
+         END DO
+
+*  Find the next valid element.
+         J = I + 1
+         MORE = .TRUE.
+         DO WHILE ( MORE )
+            IF ( AXIS( J ) .NE. VAL__BAD<T> ) THEN
+               MORE = .FALSE.
+            ELSE
+               J = J + 1
+               MORE = J .LT. UBND - NL
+            END IF
+         END DO
+
+*  Evaluate the increment.
+         INCR = NUM_<T>TOD( AXIS( J ) - AXIS( I ) ) / DBLE( J - I )
+
+*  Derive the new value for the bad first element.
+         AXIS( LBND ) = AXIS( I ) +
+     :                  NUM_DTO<T>( DBLE( I - LBND ) * INCR )
+
+         NREP = NREP +1
+      END IF
+
+*  Last pixel needs changing.
+*  ==========================
+      IF ( LAST ) THEN
+
+*  Find the first valid interior element
+         I = UBND - 1
+         MORE = .TRUE.
+         DO WHILE ( MORE )
+            IF ( AXIS( I ) .NE. VAL__BAD<T> ) THEN
+               MORE = .FALSE.
+            ELSE
+               I = I - 1
+               MORE = I .GT. LBND + NF
+            END IF
+         END DO
+
+*  Find the next valid element.
+         J = I - 1
+         MORE = .TRUE.
+         DO WHILE ( MORE )
+            IF ( AXIS( J ) .NE. VAL__BAD<T> ) THEN
+               MORE = .FALSE.
+            ELSE
+               J = J - 1
+               MORE = J .GT. LBND + NF
+            END IF
+         END DO
+
+*  Evaluate the increment.
+         INCR = NUM_<T>TOD( AXIS( J ) - AXIS( I ) ) / DBLE( J - I )
+
+*  Derive the new value for the bad first element.
+         AXIS( UBND ) = AXIS( I ) +
+     :                  NUM_DTO<T>( DBLE( UBND - I) * INCR )
+
+         NREP = NREP +1
+      END IF
+
+  999 CONTINUE
+  
+      END
