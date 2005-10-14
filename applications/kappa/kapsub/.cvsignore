@@ -7,12 +7,16 @@ kps1_inle.f
 kps1_inli.f
 kps1_inls.f
 kps1_lapl.f
+kps1_lft.f
+kps1_lftq.f
+kps1_lfts.f
 kps1_med.f
 kps1_mmv.f
 kps1_pgft.f
 kps1_prmx.f
 kps1_rs1.f
 kps1_spar.f
+kps1_slae.f
 kps1_stpa.f
 kps1_thgt.f
 *.loT
