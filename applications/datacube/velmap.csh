@@ -12,31 +12,35 @@
 #     C-shell script.
 
 #  Usage:
-#     velmap [-i filename] [-o filename] [-r number] [-f] [-p] [-v] [-z/+z]
+#     velmap [-i filename] [-o filename] [-r number] [-c number] [-f] [-p] [-v] [-z/+z]
 
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
 #     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
 #     and presents you with a white-light image of the cube.  You can
 #     then select and X-Y position using the cursor.  The script will extract
-#     and display this spectra.  You will then be prompted to specify various
+#     and display this spectrum.  You will then be prompted to specify various
 #     fitting parameters, such as the peak position, using the cursor.  The
 #     script will then attempt to fit the emission line.  The fit will be
 #     displayed and you are consulted regarding the goodness of fit.  If
 #     you consider the fit good enough, the script will attempt to perform
-#     similar fits to all cube spectra, building a two-dimensional NDF image
-#     of the velocity of the line.  If you do not force the fit to be
-#     considered "good" by using the -f command line option the script
-#     will offer the opportunity to manually refit data spectra that were
-#     unsucessfully fitted by the automatic proceedure.
+#     similar fits to all spectra within the cube, building a two-dimensional
+#     NDF image of the velocity of the line.
+
+#     If you do not force the fit to be considered "good" by using the -f
+#     command-line option, the script will offer the opportunity to manually
+#     refit the spectral feature for individual pixels, such as those that
+#     were unsucessfully fitted by the automatic procedure.
 
 #  Parameters:
+#     -c number
+#       Number of contours in the white-light image.  [15]
 #     -f
-#       Force the script to accept the first attempt to fit a gaussian to
+#       Force the script to accept the first attempt to fit a Gaussian to
 #       the line. This is a dangerous option, if the fit is poor, or
 #       unobtainable the script may terminate abruptly if it is forced to
 #       accept the fit.  Additionally this will suppress manual re-fitting 
-#       of bad pixels at the end of the run of the script.
+#       of bad pixels at the end of the run of the script. [FALSE] 
 #     -i filename
 #       The script will use this as its input file, the specified file should
 #       be a three-dimensional NDF.  By default the script will prompt for the
@@ -46,20 +50,19 @@
 #     -p
 #       The script will plot the final image map to the current display 
 #       as well as saving it to an NDF file.  Additionally it will over-
-#       plot the white-light image as a contour map for comparison.
+#       plot the white-light image as a contour map for comparison.  [FALSE]
 #     -r number
 #       Rest-frame spectral unit of the line being fitted.
 #     -v
 #       The script will generate a variance array from the line fits and
-#       attach it to the velocity map NDF.
+#       attach it to the velocity map NDF.  [FALSE]
 #     -z 
 #       The script will automatically prompt the user to select a region to
-#       zoom before prompting for the region of interest.
+#       zoom before prompting for the region of interest.  [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
-#       of interest.
+#       of interest.  [FALSE]
 
-#
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
 #     MJC: Malcolm J. Currie (Starlink, RAL)
@@ -111,6 +114,17 @@
 #       units in the output commentary.  Avoid :r.
 #     2005 September 7 (MJC):
 #       Convert the current WCS System into velocities.
+#     2005 October 11 (MJC):
+#       Added PARGET calls to access velocities and sent wcstran output to 
+#       dev/null. Added -c option for contour levels.  Fixed bugs converting
+#       the cursor position into negative pixel indices.  Ensured that the
+#       plots of spectra use the axis co-ordinate system.  Called KAPPA:CALC
+#       for floating-point arithmetic using appropriate precision, and ensure
+#       a digit before a decimal point, unlike bc.  Plot spectra in histogram
+#       mode for clarity.  Added defaults to parameter descriptions.
+#       Appended data unit to reported peak values.  Inserted blank lines to
+#       structure the commentary better.  Correct some output and comments: 
+#       e.g. "spectra" singular to "spectrum".
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -168,6 +182,14 @@ unalias echo
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
+   case -c:    # Number of contours
+      shift args
+      set numcont = $args[1]
+      if ( $numcont < 1 || $numcont > 100 ) then
+         set numcont = 15
+      endif
+      shift args
+      breaksw
    case -f:    # force fit?
       set forcefit = "TRUE"
       shift args
@@ -238,6 +260,7 @@ set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
 set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
+set unit = `parget units ndftrace`
 
 if ( $ndim != 3 ) then
    echo "VELMAP_ERR: ${infile}.sdf is not a datacube."
@@ -254,6 +277,7 @@ echo "        No. of dimensions: ${ndim}"
 echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
+echo " "
 
 # Check to see if the NDF has VARIANCE.
 set variance = `parget variance ndftrace`
@@ -296,10 +320,8 @@ end
 set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-@ xpix = $xpix + 1
-@ ypix = $ypix + 1
+set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Clean up the CURSOR temporary file.
 rm -f ${curfile} >& /dev/null
@@ -325,6 +347,14 @@ if ( ${axis} == "FALSE" ) then
    echo "        Axes: Adding AXIS centres."
 endif
 
+# To compare like with like ensure, that plotting uses the AXIS frame.
+wcsframe "ndf=${ripfile} frame=axis"
+
+# Obtain the precision of the axis centres.
+# Assuming this is only _REAL or _DOUBLE.
+ndftrace ${ripfile} fullaxis >& /dev/null
+set prec = `parget atype ndftrace`
+
 if ( ${variance} == "FALSE" ) then
    echo "        Variances: present."
 else
@@ -334,9 +364,10 @@ endif
 # Label for repeated fitting of the Gaussian.
 refit:
 
-# Plot the ripped spectrum.
-# =========================
+# Obtain the spectral range interactively.
+# ========================================
 
+# Plot the ripped spectrum.
 linplot "${ripfile} device=${plotdev}" mode=histogram \
         style="Colour(curves)=1" >& /dev/null
 
@@ -494,10 +525,11 @@ echo "        First Estimate: ${first_cont}"
 echo "        Second Estimate: ${second_cont}"
 
 # Evaluate the average continuum.
-set cont = `echo "${first_cont}+${second_cont}" | bc`
-set scale = `echo "${cont}/2.0" | bc`
-set remainder = `echo "${cont}%2.0" | bc`
-set cont = `echo "${scale}+${remainder}" | bc`
+set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
+#set cont = `echo "${first_cont}+${second_cont}" | bc`
+#set scale = `echo "${cont}/2.0" | bc`
+#set remainder = `echo "${cont}%2.0" | bc`
+#set cont = `echo "${scale}+${remainder}" | bc`
 
 echo "        Average Value: ${cont}"
 
@@ -524,7 +556,7 @@ set peak = $pos[2]
 echo " "
 echo "      Line Position:"
 echo "        Peak Position: ${position}"
-echo "        Peak Height: ${peak}"
+echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
 rm -f ${curfile} >& /dev/null
@@ -583,28 +615,12 @@ touch ${curfile}
 # Evaluate the fwhm.
 # ------------------
 
-set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+#set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
 echo "        FWHM: ${fwhm}"
 echo " "
-
-# Get the rest-frame spectral unit.
-# ---------------------------------
-
-# Get the spectral label and units.  Obtain the one value in case
-# the strings include blanks.
-set sunits = `parget funit\(3\) ndftrace`
-set slabel = `parget flabel\(3\) ndftrace`
-
-if ( ${gotrest} == "FALSE" ) then
-   echo -n "Rest ${slabel}: "
-   set line_centre = $<
-endif
-
-echo " "
-printf "%15s%s\n" "Rest ${slabel}" ":"
-printf "%24s%s\n" "${slabel}" " : ${line_centre} ${sunits}"
 
 # Fit the line.
 # =============
@@ -652,15 +668,15 @@ set integral_err = $array[9]
 
 # Report the fit to the user.
 echo "        Centre Position: ${centre_fit} +- ${centre_err}"
-echo "        Peak Height: ${peak_height} +- ${peak_err}"
+echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
 echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
-echo "        Line integral: ${integral} +- ${integral_err}"
+echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
-# Fit okay?
+# Fit ok?
 echo " "
 
 if ( ${forcefit} == "FALSE" ) then
-   echo -n "Fit okay (yes/no): "
+   echo -n "Fit ok? (yes/no): "
    set fitgood = $<
    echo " "
 else
@@ -677,6 +693,23 @@ if ( ${fitgood} == "no" || ${fitgood} == "n" ) then
 else
    rm -f ${fitfile} >& /dev/null
 endif
+
+# Get the rest-frame spectral unit.
+# =================================
+
+# Get the spectral label and units.
+set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
+set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+
+if ( ${gotrest} == "FALSE" ) then
+   echo -n "Rest ${slabel}: "
+   set line_centre = $<
+endif
+
+echo " "
+printf "%21s%s\n" "Rest ${slabel}" ":"
+printf "%24s%s\n" "${slabel}" " : ${line_centre} ${sunits}"
+echo " "
 
 # Loop through the entire datacube.
 # =================================
@@ -703,12 +736,13 @@ endif
 date > ${tmpdir}/${user}/vmap_time.dat 
 
 # Fit the cube in a similar fashion.
+echo " "
 echo "      Fitting:"
 while( $y <= ${ubnd[2]} )
    while ( $x <= ${ubnd[1]} )
       
 # Extract the spectrum at the current spatial position.
-      set specfile = "${tmpdir}/${user}/${x}_${y}"
+      set specfile = "${tmpdir}/${user}/${x}_${y}.sdf"
       ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
               "trim=true trimwcs=true"
 
@@ -738,28 +772,31 @@ while( $y <= ${ubnd[2]} )
 # Something has gone wrong.  Store a null value for this fit.
          set condition = `echo "if ($peak_height < 0) 1" | bc`
          if ( $condition == 1 ) then
-            echo "        Spectra ($x,$y)"
+            echo "        Spectrum at ($x,$y)"
             set line = "${line} -9999.99"  
             if ( ${dovar} == "TRUE" ) then
                set vars = "${vars} -9999.99"  
             endif  
          else
-            echo "       Spectrum ($x,$y): $centre_fit +- $centre_err" 
+            echo "       Spectrum at ($x,$y): $centre_fit +- $centre_err" 
 
 # Set the rest-frame value.
-            set rest = "${line_centre} ${sunits}" 
+            set rest = "${line_centre}" 
             wcsattrib "ndf=${specfile} mode=set name=RestFreq newval=${rest}"
 
 # Reset the System of the current WCS Frame to optical velocities. 
             wcsattrib "ndf=${specfile} mode=set name=System newval=vopt"
 
 # Convert the line-centre position to optical velocity.
-            set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} AXIS SPECTRUM"`
+#            set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS frameout=SPECTRUM"`
+            wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS " \
+                    "frameout=SPECTRUM" >& /dev/null
+            set velocity = `parget posout wcstran`
 
             if ( ${dovar} == "TRUE" ) then
                echo -n "                         $velocity" 
             else
-               echo "                         $velocity ms^-1" 
+               echo "                         $velocity kms^-1" 
             endif
 
             set line = "${line} ${velocity}"
@@ -769,18 +806,23 @@ while( $y <= ${ubnd[2]} )
                if ( ${centre_err} == "nan" || ${centre_err} == "INF" ) then
 
 # Set variance to a null value.
-                  echo " ms^-1"
+                  echo " kms^-1"
                   set vars = "${vars} -9999.99"
                else
 
 # Convert the upper error bound position to optical velocity.
                   set upp_err = \
                     `calc exp="'${centre_fit} + ${centre_err}'" prec=_double`
-                  set upp_vel = `wcstran "ndf=${specfile} posin=${upp_err} AXIS SPECTRUM"`
+                  wcstran "ndf=${specfile} posin=${upp_err} framein=AXIS " \
+                          "frameout=SPECTRUM" >& /dev/null
+                  set upp_vel = `parget posout wcstran`
+
                                
                   set low_err = \
                     `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
-                  set low_vel = `wcstran "ndf=${specfile} posin=${low_err} AXIS SPECTRUM"`
+                  wcstran "ndf=${specfile} posin=${low_err}framein=AXIS " \
+                          "frameout=SPECTRUM" >& /dev/null
+                  set low_vel = `parget posout wcstran`
 
                   set vel_err = \
                     `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`
@@ -790,7 +832,7 @@ while( $y <= ${ubnd[2]} )
                      set vel_err = `echo "scale = 15; -($vel_err)" | bc`
                   endif
              
-                  echo " +- ${vel_err} ms^-1"
+                  echo " +- ${vel_err} kms^-1"
                   set vars = "${vars} ${vel_err}"
                endif
             endif  
@@ -798,7 +840,7 @@ while( $y <= ${ubnd[2]} )
       else
 
 # No fit file.  Set dummy values.
-         echo "        Spectra ($x,$y)" 
+         echo "       Spectrum at ($x,$y)" 
          set line = "${line} -9999.99" 
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
@@ -892,11 +934,12 @@ wcscopy "ndf=${outfile} like=${colfile}" >& /dev/null
 
 echo "        Title: Setting title." 
 settitle "ndf=${outfile} title='Velocity Map'"
+echo " "
 
-# Plot the output spectra.
-# ========================
+# Plot the output velocity map.
+# =============================
 
-# Check to see if we need to plot the output spectrum.
+# Check to see if we need to plot the output velocity map.
 if ( ${plotspec} == "TRUE" ) then
    lutcol device=${plotdev}
    echo "      Plotting:"
@@ -905,7 +948,8 @@ if ( ${plotspec} == "TRUE" ) then
            "axes=yes margin=!" >& /dev/null
    echo "        Contour: White-light image with equally spaced contours." 
    contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
-           "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
+           "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
+   echo " "
 endif
 
 # Loop for manual fitting.
@@ -926,7 +970,7 @@ if ( ${forcefit} == "FALSE" ) then
    while ( ${loop_var} == 1 )
       
       echo " "
-      echo -n "Refit points (yes/no): "
+      echo -n "Refit a point (yes/no): "
       set refit = $<
       echo " "
 
@@ -953,10 +997,8 @@ if ( ${forcefit} == "FALSE" ) then
          `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-         @ xpix = $xpix + 1
-         @ ypix = $ypix + 1
+         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
       
 # Clean up the CURSOR temporary file.
          rm -f ${curfile}
@@ -981,6 +1023,9 @@ if ( ${forcefit} == "FALSE" ) then
             echo "        Axes: Adding AXIS centres."
          endif
 
+# To compare like with like ensure, that plotting uses the AXIS frame.
+         wcsframe "ndf=${ripfile} frame=axis"
+
 # Check to see if the NDF has VARIANCE.
          if ( ${variance} == "FALSE" ) then
             echo "        Variances: present."
@@ -994,7 +1039,7 @@ if ( ${forcefit} == "FALSE" ) then
 # Label for repeated fitting of the Gaussian.
 manual_refit: 
      
-# Plot the ripped spectra.
+# Plot the ripped spectrum.
          linplot "${ripfile} mode=histogram device=${plotdev}" >& /dev/null
 
 # Zoom if required.
@@ -1146,10 +1191,11 @@ manual_rezoom:
          echo "        Second Estimate: ${second_cont}"
 
 # Derive the average continuum.
-         set cont = `echo "${first_cont}+${second_cont}" | bc`
-         set scale = `echo "${cont}/2.0" | bc`
-         set remainder = `echo "${cont}%2.0" | bc`
-         set cont = `echo "${scale}+${remainder}" | bc`
+         set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
+#        set cont = `echo "${first_cont}+${second_cont}" | bc`
+#        set scale = `echo "${cont}/2.0" | bc`
+#        set remainder = `echo "${cont}%2.0" | bc`
+#        set cont = `echo "${scale}+${remainder}" | bc`
 
          echo "        Average Value: ${cont}"
 
@@ -1175,7 +1221,7 @@ manual_rezoom:
          echo " "
          echo "      Line Position:"
          echo "        Peak Position: ${position}"
-         echo "        Peak Height: ${peak}"
+         echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
          rm -f ${curfile}
@@ -1231,22 +1277,12 @@ manual_rezoom:
 
 # Evaluate the fwhm.
 # ------------------
-         set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-         set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-         set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+#        set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#        set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#        set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+         set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
          echo "        FWHM: ${fwhm}"
          echo " "
-
-# Get the rest-frame spectral unit.
-# ---------------------------------
-         if ( ${gotrest} == "FALSE" ) then
-            echo -n "Rest ${slabel}: "
-            set line_centre = $<
-         endif
-
-         echo " "
-         echo "      Rest Wavelength:"
-         echo "        Wavelength: ${line_centre}"
 
 # Fit the line.
 # =============
@@ -1295,15 +1331,15 @@ manual_rezoom:
 
 # Show the user the fit.
          echo "        Centre Position: ${centre_fit} +- ${centre_err}"
-         echo "        Peak Height: ${peak_height} +- ${peak_err}"
+         echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
          echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
-         echo "        Line integral: ${integral} +- ${integral_err}"
+         echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
-# Fit okay?
+# Fit ok?
          echo " "
 
          if ( ${forcefit} == "FALSE" ) then
-            echo -n "Fit okay (yes/no/quit): "
+            echo -n "Fit ok? (yes/no/quit): "
             set fitgood = $<
             echo " "
          else
@@ -1324,24 +1360,39 @@ manual_rezoom:
             rm -f ${fitfile}
          endif
 
+# Get the rest-frame spectral unit.
+# =================================
+         if ( ${gotrest} == "FALSE" ) then
+            echo -n "Rest ${slabel}: "
+            set line_centre = $<
+         endif
+
+         echo " "
+         printf "%21s%s\n" "Rest ${slabel}" ":"
+         printf "%24s%s\n" "$slabel" ": ${line_centre} ${sunits}"
+         echo " "
+
 # Calculate the velocity.
 # =======================
 
 # Convert the line-centre position to optical velocity.
-         set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} AXIS SPECTRUM"`
-     
+         wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS " \
+                 "frameout=SPECTRUM" >& /dev/null
+         set velocity = `parget posout wcstran`
+
          if ( ${dovar} == "TRUE" ) then
             echo  "        (X,Y) Pixel: ${xpix}:${ypix}"
             echo -n "        Line Velocity: $velocity" 
          else
             echo "        (X,Y) Pixel: ${xpix},${ypix}"
-            echo "        Line Velocity: $velocity ms^-1" 
+            echo "        Line Velocity: $velocity kms^-1" 
          endif
 
 # Change the pixel value.
          set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
          chpix in=${outfile}_tmp out=${outfile} comp="Data"\
                newval=${velocity} section=\'${pixel}\' 
+
          if ( -e ${outfile}.sdf ) then
             rm -f ${outfile}_tmp.sdf >& /dev/null
          else
@@ -1354,28 +1405,32 @@ manual_rezoom:
             if ( ${centre_err} == "nan" || ${centre_err} == "INF" ) then
 
 # Set the variance to the null value.
-               echo " ms^-1"
+               echo " kms^-1"
                set vel_err = -9999.99     
             else
 
 # Derive value's error bars.
                set upp_err = \
                  `calc exp="'${centre_fit} + ${centre_err}'" prec=_double`
-               set upp_vel = `wcstran "ndf=${specfile} posin=${upp_err} AXIS SPECTRUM"`
+               wcstran "ndf=${specfile} posin=${upp_err} framein=AXIS" \
+                       "frameout=SPECTRUM" >& /dev/null
+               set upp_vel = `parget posout wcstran`
                                
                set low_err = \
                  `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
-               set low_vel = `wcstran "ndf=${specfile} posin=${low_err} AXIS SPECTRUM"`
+               wcstran "ndf=${specfile} posin=${low_err} framein=AXIS " \
+                       "frameout=SPECTRUM" >& /dev/null
+               set low_vel = `parget posout wcstran`
 
                set vel_err = \
                  `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`
 #                 `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`
-                    
+
                if ( `echo "if ( $vel_err < 0.0 ) 1" | bc` ) then
                   set vel_err = `echo "scale = 15; -($vel_err)" | bc`
                endif
 
-               echo " +- ${vel_err} ms^-1"
+               echo " +- ${vel_err} kms^-1"
             endif
 
 # Move the output file to a temporary place holder.
@@ -1385,6 +1440,7 @@ manual_rezoom:
             set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
             chpix in=${outfile}_tmp out=${outfile} comp="Variance" \
                   newval=${vel_err} section=\'${pixel}\'
+
             if ( -e ${outfile}.sdf ) then
                rm -f ${outfile}_tmp.sdf >& /dev/null
             else
@@ -1394,23 +1450,24 @@ manual_rezoom:
         
 # Set the null values to the bad value (VAL__BADR).
             mv -f ${outfile}.sdf ${outfile}_tmp.sdf >& /dev/null
-              setmagic in=${outfile}_tmp out=${outfile} \
-                       comp="Variance" repval=-9999.99 >& /dev/null
-           if ( -e ${outfile}.sdf ) then
-              rm -f ${outfile}_tmp.sdf
-           else
-              echo "WARNING: Setting MAGIC values failed."
-              mv -f ${outfile}_tmp.sdf ${outfile}
-           endif
-        endif
+            setmagic in=${outfile}_tmp out=${outfile} \
+                     comp="Variance" repval=-9999.99 >& /dev/null
+            if ( -e ${outfile}.sdf ) then
+               rm -f ${outfile}_tmp.sdf
+            else
+               echo "WARNING: Setting MAGIC values failed."
+               mv -f ${outfile}_tmp.sdf ${outfile}
+            endif
+         endif
 
 # Plot the new velocity map.
 # ==========================
-        lutcol device=${plotdev}
-        echo "      Plotting:"
-        echo "        Display: Velocity map using percentile scaling." 
-        display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-                "axes=yes margin=!" >& /dev/null
+         lutcol device=${plotdev}
+         echo " "
+         echo "      Plotting:"
+         echo "        Display: Velocity map using percentile scaling." 
+         display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
+                 "axes=yes margin=!" >& /dev/null
 
 # Clean up temporary velmap files, salvage ${outfile}_tmp in the case
 # where there is no existing $outfile (i.e. CHPIX has not run).
