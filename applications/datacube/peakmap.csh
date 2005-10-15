@@ -22,16 +22,17 @@
 #     script will then attempt to fit the emission line.  The fit will be
 #     displayed and you are consulted regarding the goodness of fit.  If you
 #     consider the fit to be good enough, the script will attempt to perform
-#     similar fits to all cube spectra, building a two-dimensional NDF image
-#     of the strength of the line.
+#     similar fits to all spectra within the cube, building a two-dimensional
+#     NDF image of the strength of the line.
 #
-#     After forming the line-strength map the script offers you a
-#     chance to refit the spectral feature individual pixels, and
-#     replacing a good new fit in the line-strength map.
+#     If you do not force the fit to be considered "good" by using the -f
+#     command-line option, the script will offer the opportunity to manually
+#     refit the spectral feature for individual pixels, such as those that
+#     were unsuccessfully fitted by the automatic procedure.
 #
 #  Parameters:
 #     -c number
-#       Number of contours in white-light image.  [15]
+#       Number of contours in the white-light image.  [15]
 #     -f
 #       Force the script to accept the first attempt to fit a Gaussian to
 #       the line.  This is a dangerous option; if the fit is poor, or
@@ -355,7 +356,7 @@ refit:
 # Obtain the spectral range interactively.
 # ========================================
 
-# Plot the ripped spectra.
+# Plot the ripped spectrum.
 linplot "${ripfile} device=${plotdev}" mode=histogram style="Colour(curves)=1" >& /dev/null
 
 # Zoom if required.
@@ -601,8 +602,8 @@ touch ${curfile}
 # Evaluate the fwhm.
 # ------------------
 
-set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
 #set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
 set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
 echo "        FWHM: ${fwhm}"
