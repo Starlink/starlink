@@ -49,6 +49,8 @@
 #        Added definition for setaxis and wcsattrib.  Sorted KAPPA and
 #        script definitions into alphabetical order.  Removed
 #        duplicates.
+#     2005 October 11 (MJC):
+#        Added wcsframe and wcstran definitions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -122,6 +124,8 @@ alias settitle        ${KAPPA_DIR}/settitle
 alias stats           ${KAPPA_DIR}/stats
 alias wcsattrib       ${KAPPA_DIR}/wcsattrib
 alias wcscopy         ${KAPPA_DIR}/wcscopy
+alias wcsframe        ${KAPPA_DIR}/wcsframe
+alias wcstran         ${KAPPA_DIR}/wcstran
 
 alias fitgauss        ${FIG_DIR}/fitgauss
 alias specplot        ${FIG_DIR}/specplot
