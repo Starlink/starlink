@@ -10,7 +10,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     peakmap [-i filename] [-o filename] [-r number] [-f] [-p] [-v] [-z/+z]
+#     peakmap [-i filename] [-o filename] [-c number] [-f] [-p] [-v] [-z/+z]
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA,
@@ -25,33 +25,37 @@
 #     similar fits to all cube spectra, building a two-dimensional NDF image
 #     of the strength of the line.
 #
+#     After forming the line-strength map the script offers you a
+#     chance to refit the spectral feature individual pixels, and
+#     replacing a good new fit in the line-strength map.
+#
 #  Parameters:
+#     -c number
+#       Number of contours in white-light image.  [15]
 #     -f
 #       Force the script to accept the first attempt to fit a Gaussian to
 #       the line.  This is a dangerous option; if the fit is poor, or
 #       unobtainable the script may terminate abruptly if it is forced to
-#       accept the fit.
+#       accept the fit. [FALSE]
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a thre-dimensional NDF, by default the script will prompt for the
+#       be a three-dimensional NDF, by default the script will prompt for the
 #       input file.
 #     -o filename
 #       The filename for the output NDF of the line-strength map.
 #     -p
 #       The script will plot the final image map to the current display 
 #       as well as saving it to an NDF file.  Additionally, it will overplot
-#       the white-light image as a contour map for comparison.
-#     -r number
-#       Rest-frame spectral-unit of the line being fitted.
+#       the white-light image as a contour map for comparison.  [FALSE]
 #     -v
 #       The script will generate a VARIANCE array from the line fits and
-#       attach it to the velocity-map NDF.
+#       attach it to the velocity-map NDF. [FALSE]
 #     -z 
 #       The script will automatically prompt the user to select a region to
-#       zoom before prompting for the region of interest.
+#       zoom before prompting for the region of interest.  [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
-#       of interest.
+#       of interest.  [FALSE]
 
 #
 #  Authors:
@@ -103,6 +107,19 @@
 #       code.  Replace explicit wavelength in prompts with the current WCS
 #       Frame's label for the spectral axis, and also used the corresponding
 #       units in the output commentary.  Avoid :r.
+#     2005 October 11 (MJC):
+#       Replaced unused -r with -c option, and all prompts pertaining
+#       to obtaining a rest value.  Described the option to refit spectral
+#       line for individual spatial pixel.  Fixed bugs converting the cursor
+#       position into negative pixel indices.  Ensured that the plots of
+#       spectra use the axis co-ordinate system.  Called KAPPA:CALC for
+#       floating-point arithmetic using appriopriate precision, and ensure a
+#       digit before a decimal point, unlike bc.  Plot spectra in histogram
+#       mode for clarity.  Added defaults to parameter descriptions.
+#       Appended data unit to reported peak values, or replace spurious fixed
+#       "ms^-1".  Inserted blank lines to structure the commentary better.
+#       Correct some output and comments: e.g. "spectra" singular to
+#       "spectrum".
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -155,6 +172,14 @@ set numcont = 15
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
+   case -c:    # Number of contours
+      shift args
+      set numcont = $args[1]
+      if ( $numcont < 1 || $numcont > 100 ) thn
+         set numcont = 15
+      endif
+      shift args
+      breaksw
    case -f:    # force fit?
       set forcefit = "TRUE"
       shift args
@@ -174,12 +199,6 @@ while ( $#args > 0 )
    case -p:    # plot output spectra?
       set plotspec = "TRUE"
       set plotdev = "${plotdev}"
-      shift args
-      breaksw
-   case -r:    # rest-frame spectral-unit of line
-      shift args
-      set gotrest = "TRUE"
-      set line_centre = $args[1]
       shift args
       breaksw
    case -v:    # generate variances?
@@ -230,6 +249,7 @@ set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
 set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
+set unit = `parget units ndftrace`
 
 if ( $ndim != 3 ) then
    echo "PEAKMAP_ERR: ${infile}.sdf is not a datacube."
@@ -246,6 +266,7 @@ echo "        No. of dimensions: ${ndim}"
 echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
+echo " "
 
 # Check to see if the NDF has VARIANCE.
 set variance = `parget variance ndftrace`
@@ -288,10 +309,8 @@ end
 set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-@ xpix = $xpix + 1
-@ ypix = $ypix + 1
+set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Clean up the cursor temporary file.
 rm -f ${curfile} >& /dev/null
@@ -307,13 +326,21 @@ echo "        (X,Y) pixel: ${xpix},${ypix}"
 ndfcopy "in=${infile}($xpix,$ypix,) out=${ripfile} trim=true trimwcs=true"
 
 # Check to see if the NDF has an AXIS structure.  If one does not exist,
-# create an array of # axis centres, derived from the current WCS Frame,
+# create an array of axis centres, derived from the current WCS Frame,
 # along the axis.
 set axis = `parget axis ndftrace`
 if ( ${axis} == "FALSE" ) then
    setaxis "ndf=${ripfile} dim=1 mode=wcs comp=Centre" >& /dev/null
    echo "        Axes: Adding AXIS centres."
 endif
+
+# To compare like with like ensure, that plotting uses the AXIS frame.
+wcsframe "ndf=${ripfile} frame=axis"
+
+# Obtain the precision of the axis centres.
+# Assuming this is only _REAL or _DOUBLE.
+ndftrace ${ripfile} fullaxis >& /dev/null
+set prec = `parget atype ndftrace`
 
 if ( ${variance} == "FALSE" ) then
    echo "        Variances: present."
@@ -329,7 +356,7 @@ refit:
 # ========================================
 
 # Plot the ripped spectra.
-linplot "${ripfile} device=${plotdev}" style="Colour(curves)=1" >& /dev/null
+linplot "${ripfile} device=${plotdev}" mode=histogram style="Colour(curves)=1" >& /dev/null
 
 # Zoom if required.
 if ( ${gotzoom} == "ASK") then
@@ -388,7 +415,7 @@ rezoom:
 # Replot the spectrum.
 # --------------------
    linplot ${ripfile} xleft=${low_z} xright=${upp_z} \
-           device=${plotdev} >& /dev/null
+           mode=histogram device=${plotdev} >& /dev/null
 endif
 
 # Grab the information needed by the FITGAUSS routine.
@@ -484,10 +511,11 @@ echo "        First Estimate: ${first_cont}"
 echo "        Second Estimate: ${second_cont}"
 
 # Evaluate the average continuum.
-set cont = `echo "${first_cont}+${second_cont}" | bc`
-set scale = `echo "${cont}/2.0" | bc`
-set remainder = `echo "${cont}%2.0" | bc`
-set cont = `echo "${scale}+${remainder}" | bc`
+set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
+#set cont = `echo "${first_cont}+${second_cont}" | bc`
+#set scale = `echo "${cont}/2.0" | bc`
+#set remainder = `echo "${cont}%2.0" | bc`
+#set cont = `echo "${scale}+${remainder}" | bc`
 
 echo "        Average Value: ${cont}"
 
@@ -514,7 +542,7 @@ set peak = $pos[2]
 echo " "
 echo "      Line Position:"
 echo "        Peak Position: ${position}"
-echo "        Peak Height: ${peak}"
+echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
 rm -f ${curfile} >& /dev/null
@@ -575,29 +603,18 @@ touch ${curfile}
 
 set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
 set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+#set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
 echo "        FWHM: ${fwhm}"
 echo " "
 
 # Get the rest-frame spectral unit.
 # ---------------------------------
 
-# Get the spectral label and units.
-set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
-set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
-
 # Inform the user.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-
-if ( ${gotrest} == "FALSE" ) then
-   echo -n "Rest ${slabel}: "
-   set line_centre = $<
-endif
-
 echo " "
-printf "%15s%s\n" "Rest ${slabel}" ":"
-printf "%24s%s\n" "${slabel}" " : ${line_centre} $sunits"
 
 # Fit the line.
 # =============
@@ -646,9 +663,9 @@ set integral_err = $array[9]
 
 # Report the fit to the user.
 echo "        Centre Position: ${centre_fit} +- ${centre_err}"
-echo "        Peak Height: ${peak_height} +- ${peak_err}"
+echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
 echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
-echo "        Line integral: ${integral} +- ${integral_err}"
+echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit okay?
 echo " "
@@ -732,14 +749,14 @@ while( $y <= ${ubnd[2]} )
 # Something has gone wrong.  Store a null value for this fit.
          set condition = `echo "if ($peak_height < 0) 1" | bc`
          if ( $condition == 1 ) then
-            echo "        Spectra ($x,$y)"
+            echo "        Spectrum at ($x,$y)"
             set line = "${line} -9999.99"  
             if ( ${dovar} == "TRUE" ) then
                set vars = "${vars} -9999.99"  
             endif
          else
 
-            echo "        Spectra ($x,$y): $peak_height +- $peak_err" 
+            echo "        Spectrum at ($x,$y): $peak_height +- $peak_err" 
 
             set line = "${line} ${peak_height}"
             if ( ${dovar} == "TRUE" ) then
@@ -758,7 +775,7 @@ while( $y <= ${ubnd[2]} )
 
 # No fit file.  Set dummy values.
       else
-         echo "        Spectra ($x,$y)" 
+         echo "        Spectrum at ($x,$y)" 
          set line = "${line} -9999.99" 
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
@@ -852,11 +869,12 @@ wcscopy "ndf=${outfile} like=${colfile}" >& /dev/null
 
 echo "        Title: Setting title." 
 settitle "ndf=${outfile} title='Line-strength Map'"
+echo " "
 
-# Plot the output spectra.
-# ========================
+# Plot the output line-strength map.
+# ==================================
 
-# Check to see if we need to plot the output spectrum.
+# Check to see if we need to plot the output line-strength map.
 if ( ${plotspec} == "TRUE" ) then
 
 # Change to the coloured lookup table.
@@ -868,6 +886,7 @@ if ( ${plotspec} == "TRUE" ) then
    echo "        Contour: White-light image with equally spaced contours." 
    contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
            "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
+   echo " "
 endif
 
 # Loop for manual fitting.
@@ -888,7 +907,7 @@ if ( ${forcefit} == "FALSE" ) then
    while ( ${loop_var} == 1 )
 
       echo " "
-      echo -n "Refit points (yes/no): "
+      echo -n "Refit a point (yes/no): "
       set refit = $<
       echo " "
 
@@ -915,10 +934,8 @@ if ( ${forcefit} == "FALSE" ) then
            `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-         @ xpix = $xpix + 1
-         @ ypix = $ypix + 1
+         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Clean up the CURSOR temporary file.
          rm -f ${curfile} >& /dev/null
@@ -943,6 +960,9 @@ if ( ${forcefit} == "FALSE" ) then
             echo "        Axes: Adding AXIS centres."
          endif
 
+# To compare like with like ensure, that plotting uses the AXIS frame.
+         wcsframe "ndf=${ripfile} frame=axis"
+
 # Check to see if the NDF has VARIANCE.
          if ( ${variance} == "FALSE" ) then
             echo "        Variances: present."
@@ -956,8 +976,8 @@ if ( ${forcefit} == "FALSE" ) then
 # Label for repeated fitting of the Gaussian.
 manual_refit: 
 
-# Plot the ripped spectra.
-         linplot "${ripfile} device=${plotdev}" >& /dev/null
+# Plot the ripped spectrum.
+         linplot "${ripfile} mode=histogram device=${plotdev}" >& /dev/null
 
 # Zoom if required.
          if ( ${gotzoom} == "ASK") then
@@ -1015,7 +1035,7 @@ manual_rezoom:
 
 # Replot the spectrum.
             linplot "${ripfile} xleft=${low_z} xright=${upp_z}"\
-                    "device=${plotdev}" >& /dev/null
+                    mode=histogram "device=${plotdev}" >& /dev/null
          endif
        
 # Grab the information needed by the FITGAUSS routine.
@@ -1050,7 +1070,7 @@ manual_rezoom:
          cursor showpixel=true style="Colour(curves)=2" plot=vline \
                 maxpos=1 device=${plotdev} >> ${curfile}
 
-# Wait for CURSOR output then get spectral,continuum measurement from 
+# Wait for CURSOR output then get spectral-unit,continuum measurement from 
 # the temporary file created by KAPPA:CURSOR.
          while ( ! -e ${curfile} ) 
             sleep 1
@@ -1108,10 +1128,11 @@ manual_rezoom:
          echo "        Second Estimate: ${second_cont}"
 
 # Derive the average continuum.
-         set cont = `echo "${first_cont}+${second_cont}" | bc`
-         set scale = `echo "${cont}/2.0" | bc`
-         set remainder = `echo "${cont}%2.0" | bc`
-         set cont = `echo "${scale}+${remainder}" | bc`
+         set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
+#        set cont = `echo "${first_cont}+${second_cont}" | bc`
+#        set scale = `echo "${cont}/2.0" | bc`
+#        set remainder = `echo "${cont}%2.0" | bc`
+#        set cont = `echo "${scale}+${remainder}" | bc`
 
          echo "        Average Value: ${cont}"
 
@@ -1136,7 +1157,7 @@ manual_rezoom:
          echo " "
          echo "      Line Position:"
          echo "        Peak Position: ${position}"
-         echo "        Peak Height: ${peak}"
+         echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
          rm -f ${curfile} >& /dev/null
@@ -1192,22 +1213,12 @@ manual_rezoom:
 
 # Evaluate the fwhm.
 # ------------------
-         set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-         set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-         set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+#        set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#        set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
+#        set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
+         set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
          echo "        FWHM: ${fwhm}"
          echo " "
-
-# Get the rest-frame spectral unit.
-# ---------------------------------
-         if ( ${gotrest} == "FALSE" ) then
-            echo -n "Rest ${slabel}: "
-            set line_centre = $<
-         endif
-
-         echo " "
-         printf "%15s%s\n" "Rest ${slabel}" ":"
-         printf "%19s%s\n" "$slabel" ": ${line_centre} $sunits"
 
 # Fit the line.
 # =============
@@ -1255,9 +1266,9 @@ manual_rezoom:
 
 # Show the user the fit.
          echo "        Centre Position: ${centre_fit} +- ${centre_err}"
-         echo "        Peak Height: ${peak_height} +- ${peak_err}"
+         echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
          echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
-         echo "        Line integral: ${integral} +- ${integral_err}"
+         echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit okay?
          echo " "
@@ -1287,16 +1298,18 @@ manual_rezoom:
 # Report the peak_height and peak_err values.
          if ( ${dovar} == "TRUE" ) then
             echo  "        (X,Y) Pixel: ${xpix}:${ypix}"
-            echo -n "        Peak Height: $peak_height" 
+            echo -n "        Peak Height: $peak_height " 
          else
             echo "        (X,Y) Pixel: ${xpix},${ypix}"
-            echo "        Peak Height: $peak_height ms^-1" 
+            echo "        Peak Height: $peak_height ${unit}" 
          endif
+         echo " "
 
 # Change the pixel value.
          set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
          chpix in=${outfile}_tmp out=${outfile} comp="Data"\
-               newval=${peak_height} section=\'${pixel}\' 
+               newval=${peak_height} section=\'${pixel}\'
+
          if ( -e ${outfile}.sdf ) then
             rm -f ${outfile}_tmp.sdf >& /dev/null
          else
@@ -1306,12 +1319,12 @@ manual_rezoom:
 
 # Calculate the error.
          if ( ${dovar} == "TRUE" ) then
-            echo " +- ${peak_err} ms^-1"
+            echo " +- ${peak_err} ${unit}"
 
             if ( ${peak_err} == "nan" || ${peak_err} == "INF" ) then
 
 # Set the variance to the null value.
-               echo " ms^-1"
+               echo " ${unit}"
                set peak_err = "-9999.99"
             endif
 
@@ -1321,7 +1334,8 @@ manual_rezoom:
 # Change the pixel value.
             set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
             chpix in=${outfile}_tmp out=${outfile} comp="Variance" \
-                  newval=${peak_err} section=\'${pixel}\' 
+                  newval=${peak_err} section=\'${pixel}\'
+
             if ( -e ${outfile}.sdf ) then
                rm -f ${outfile}_tmp.sdf >& /dev/null
             else
@@ -1333,6 +1347,7 @@ manual_rezoom:
             mv -f ${outfile}.sdf ${outfile}_tmp.sdf >& /dev/null
             setmagic in=${outfile}_tmp out=${outfile} \
                      comp="Variance" repval=-9999.99 >& /dev/null
+
             if ( -e ${outfile}.sdf ) then
                rm -f ${outfile}_tmp.sdf >& /dev/null
             else
