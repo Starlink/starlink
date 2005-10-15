@@ -53,6 +53,8 @@
 #       Replaced PUTAXIS with KAPPA:SETAXIS in WCS mode.  Some tidying:
 #       remove tabs, spelling corrections.  Added section headings in the code.
 #       Avoid :r.
+#     2005 October 11 (MJC):
+#       Fixed bug converting the cursor position into negative pixel indices.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -199,10 +201,8 @@ end
 set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-@ xpix = $xpix + 1
-@ ypix = $ypix + 1
+set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Check for the exit conditions.
 if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then

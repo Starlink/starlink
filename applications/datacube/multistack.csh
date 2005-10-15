@@ -59,6 +59,8 @@
 #       headings in the code.  Attempt removal of files silently.
 #       Clarify the description.  Ordered the parameters alphabetically.
 #       Avoid :r.
+#     2005 October 11 (MJC):
+#       Fixed bug converting the cursor position into negative pixel indices.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -247,10 +249,8 @@ while ( $grpcount <= $numgrp )
       set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-      set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-      set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-      @ xpix = $xpix + 1
-      @ ypix = $ypix + 1
+      set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+      set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Clean up the CURSOR temporary file.
       rm -f ${curfile} >& /dev/null
