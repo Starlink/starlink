@@ -160,7 +160,6 @@ set dovar = "FALSE"
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
 set gotzoom = "ASK"
-set gotrest = "FALSE"
 set forcefit = "FALSE"
 
 # The SPECDRE extension is used to store the Gaussian fit.
@@ -176,7 +175,7 @@ while ( $#args > 0 )
    case -c:    # Number of contours
       shift args
       set numcont = $args[1]
-      if ( $numcont < 1 || $numcont > 100 ) thn
+      if ( $numcont < 1 || $numcont > 100 ) then
          set numcont = 15
       endif
       shift args
@@ -668,11 +667,11 @@ echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
 echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
 echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
-# Fit okay?
+# Fit ok?
 echo " "
 
 if ( ${forcefit} == "FALSE" ) then
-   echo -n "Fit okay (yes/no): "
+   echo -n "Fit ok? (yes/no): "
    set fitgood = $<
    echo " "
 else
@@ -776,7 +775,7 @@ while( $y <= ${ubnd[2]} )
 
 # No fit file.  Set dummy values.
       else
-         echo "        Spectrum at ($x,$y)" 
+         echo "       Spectrum at ($x,$y)" 
          set line = "${line} -9999.99" 
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
@@ -1271,11 +1270,11 @@ manual_rezoom:
          echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
          echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
-# Fit okay?
+# Fit ok??
          echo " "
 
          if ( ${forcefit} == "FALSE" ) then
-            echo -n "Fit okay (yes/no/quit): "
+            echo -n "Fit ok? (yes/no/quit): "
             set fitgood = $<
             echo " "
          else
@@ -1359,6 +1358,7 @@ manual_rezoom:
 
 # Plot the new peak map.
          lutcol device=${plotdev}
+         echo " "
          echo "      Plotting:"
          echo "        Display: Line strength map using percentile scaling." 
          display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
