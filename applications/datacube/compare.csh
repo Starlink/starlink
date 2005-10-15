@@ -42,6 +42,8 @@
 #     2005 September  5 (MJC):
 #       Some tidying of grammar, punctutation, and spelling.  Added section
 #       headings in the code.  Attempt removal of files silently.  Avoid :r.
+#     2005 October 11 (MJC):
+#       Fixed bugs converting the cursor position into negative pixel indices.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -176,10 +178,8 @@ upp_cont:
    set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-   @ xpix = $xpix + 1
-   @ ypix = $ypix + 1
+   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Check for the exit conditions.
    if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
@@ -247,10 +247,8 @@ low_cont:
    set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.
-   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print a[1]}'`
-   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print a[1]}'`
-   @ xpix = $xpix + 1
-   @ ypix = $ypix + 1
+   set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
+   set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
 
 # Check for exit conditions
    if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
