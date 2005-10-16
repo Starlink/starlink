@@ -9,6 +9,16 @@
 #define CUPID__FLOAT  2
 
 
+/* Type Definitions */
+/* ---------------- */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   needed by service functions. */
+typedef struct CupidGC  {
+   double beam_sq;         /* Square of spatial beam FWHM in pixels */   
+   double velres_sq;       /* Square of velocity resolution in pixels */   
+} CupidGC;
+
+
 /* Function macros */
 /* --------------- */
 
@@ -55,6 +65,5 @@ void cupidClumpFind( int, int, int *, int *, void *, unsigned char *, AstKeyMap 
 void cupidGaussClumps( int, int, int *, int *, void *, unsigned char *, double, AstKeyMap * );
 double cupidConfigD( AstKeyMap *, const char *, double );
 int cupidConfigI( AstKeyMap *, const char *, int );
-
-
+double cupidGaussModel( int, double *, double *, int, int, int );
 
