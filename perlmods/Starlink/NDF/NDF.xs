@@ -1081,37 +1081,47 @@ ndf_loc(indf, mode, loc, status)
   status
 
 void
-ndf_mapql(indf, pntr, el, bad, status)
-  ndfint &indf
-  ndfint &pntr = NO_INIT
-  ndfint &el = NO_INIT
-  Logical &bad = NO_INIT
-  ndfint &status
+ndf_mapql(indf, ivpntr, el, bad, status)
+  ndfint indf
+  IV ivpntr = NO_INIT
+  ndfint el = NO_INIT
+  int bad = NO_INIT
+  ndfint status
  PROTOTYPE: $$$$$
+ PREINIT:
+  int * pntr;
  CODE:
-  ndf_mapql_(&indf, &pntr, &el, &bad, &status);
+  ndfMapql(indf, &pntr, &el, &bad, &status);
+  ivpntr = PTR2IV( pntr ); 
  OUTPUT: 
-  pntr
+  ivpntr
   el
   bad
   status
 
+# This returns a CNF pointer so we use the C interface
+
 void
-ndf_mapz(indf, comp, type, mmod, rpntr, ipntr, el ,status)
-  ndfint &indf
+ndf_mapz(indf, comp, type, mmod, ivrpntr, ivipntr, el ,status)
+  ndfint indf
   char * comp 
   char * type
   char * mmod
-  ndfint &rpntr = NO_INIT
-  ndfint &ipntr = NO_INIT
-  ndfint &el = NO_INIT
-  ndfint &status
+  IV ivrpntr = NO_INIT
+  IV ivipntr = NO_INIT
+  ndfint el = NO_INIT
+  ndfint status
  PROTOTYPE: $$$$$$$$
+ PREINIT:
+  void * rpntr[3];
+  void * ipntr[3];
  CODE:
-  ndf_mapz_(&indf, comp, type, mmod, &rpntr, &ipntr, &el, &status, strlen(comp), strlen(type), strlen(mmod));
+  ndfMapz(indf, comp, type, mmod, rpntr, ipntr, &el, &status);
+  ivrpntr = PTR2IV( rpntr[0] );
+  ivipntr = PTR2IV( ipntr[0] );
  OUTPUT:
-  rpntr
-  ipntr
+  ivrpntr
+  ivipntr
   el
   status
 
@@ -1526,20 +1536,29 @@ ndf_open(loc, name, mode, stat, indf, place, status)
 
 # C7 - Access to component values
 
+# Note that 
+#  1 - we use ndfMap rather than ndf_map because we want a real pointer
+#      and not a CNF pointer.
+#  2 - we did not match the API so this can only return a single
+#      pointer rather than a set
+
 void
-ndf_map(indf, comp, type, mode, pntr, el, status)
-  ndfint &indf
+ndf_map(indf, comp, type, mode, ivpntr, el, status)
+  ndfint indf
   char * comp
   char * type
   char * mode
-  ndfint &pntr = NO_INIT
-  ndfint &el   = NO_INIT
-  ndfint &status
+  IV     ivpntr = NO_INIT
+  ndfint el   = NO_INIT
+  ndfint status
  PROTOTYPE: $$$$$$$
+ PREINIT:
+  void * pntr[3]; /* Max 3 components */
  CODE:
-  ndf_map_(&indf, comp, type, mode, &pntr, &el, &status, strlen(comp), strlen(type), strlen(mode));
+  ndfMap(indf, comp, type, mode, pntr, &el, &status);
+  ivpntr = PTR2IV( pntr[0] ); /* Ouch */
  OUTPUT:
-  pntr
+  ivpntr
   el
   status
 
@@ -2632,110 +2651,133 @@ dat_len(loc, len, status)
   len
   status
 
+# No official C interface so must convert pointers to real C pointers
+
 void
-dat_map(loc, type, mode, ndim, dim, pntr, status)
+dat_map(loc, type, mode, ndim, dim, cpntr, status)
   locator * loc
   char * type
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_map_(loc, type, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(type), strlen(mode));
+  dat_map_(loc, type, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(type), strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapc(loc, mode, ndim, dim, pntr, status)
+dat_mapc(loc, mode, ndim, dim, cpntr, status)
   locator * loc
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapc_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
+  dat_mapc_(loc, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapd(loc, mode, ndim, dim, pntr, status)
+dat_mapd(loc, mode, ndim, dim, cpntr, status)
   locator * loc
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapd_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
+  dat_mapd_(loc, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapi(loc, mode, ndim, dim, pntr, status)
+dat_mapi(loc, mode, ndim, dim, cpntr, status)
   locator * loc
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapi_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
+  dat_mapi_(loc, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapl(loc, mode, ndim, dim, pntr, status)
+dat_mapl(loc, mode, ndim, dim, cpntr, status)
   locator * loc
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapl_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
+  dat_mapl_(loc, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapr(loc, mode, ndim, dim, pntr, status)
+dat_mapr(loc, mode, ndim, dim, cpntr, status)
   locator * loc
   char * mode
   ndfint &ndim
   ndfint * dim
-  ndfint &pntr = NO_INIT
+  IV cpntr = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapr_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
+  dat_mapr_(loc, mode, &ndim, dim, &fpntr, &status, DAT__SZLOC, strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   status
 
 void
-dat_mapv(loc, type, mode, pntr, el, status)
+dat_mapv(loc, type, mode, cpntr, el, status)
   locator * loc
   char * type
   char * mode
-  ndfint &pntr = NO_INIT
+  IV &cpntr = NO_INIT
   ndfint &el   = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$
+ PREINIT:
+  int fpntr;
  CODE:
-  dat_mapv_(loc, type, mode, &pntr, &el, &status, DAT__SZLOC, strlen(type), strlen(mode));
+  dat_mapv_(loc, type, mode, &fpntr, &el, &status, DAT__SZLOC, strlen(type), strlen(mode));
+  cpntr = PTR2IV( cnfCptr( fpntr ) );
  OUTPUT:
-  pntr
+  cpntr
   el
   status
 
@@ -4776,12 +4818,15 @@ errTune(param, value, status)
 
 void
 mem2string(address,nbytes,dest_string)
-  ndfint address
-  ndfint nbytes
-  char * dest_string = NO_INIT
+  IV address
+  size_t nbytes
+  SV * dest_string
  PROTOTYPE: $$$
+ PREINIT:
+  char * ptr;
  CODE:
-  sv_setpvn((SV*)ST(2), (char *)address, nbytes);
+  ptr = INT2PTR(char*, address);
+  sv_setpvn(dest_string, ptr, nbytes);
 
 # This routine copies a (usually packed) perl string into a 
 # memory location
@@ -4790,11 +4835,12 @@ void
 string2mem(input_string, nbytes, address)
   char * input_string
   size_t nbytes
-  ndfint &address
+  IV address
  PROTOTYPE: $$$
- CODE:
+ PREINIT:
   char * dest;
-  dest = (void *) address;
+ CODE:
+  dest = INT2PTR( char*, address );
   memmove(dest, input_string, nbytes);
 
 # This routines copies a perl array (or PDL) into a pointer

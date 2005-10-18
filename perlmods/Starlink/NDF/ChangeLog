@@ -1,3 +1,7 @@
+2005-10-15  Tim Jenness  <tjenness@cpan.org>
+
+	* NDF.xs: Fix up for 64 bit architecture.
+
 2005-02-04  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: Add support for ndfGtwcs and ndfPtwcs
