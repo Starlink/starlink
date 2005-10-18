@@ -7,6 +7,8 @@
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
+#include <math.h>
+#include <string.h>
 
 void clumps() {
 /*

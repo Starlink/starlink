@@ -2,6 +2,7 @@
 #include "cupid.h"
 #include "prm_par.h"
 #include "mers.h"
+#include <math.h>
 
 /* Global Variables: */
 /* ================= */
@@ -46,8 +47,11 @@ double cupidGaussModel( int ndim, double *x, double *par, int what,
 *     par
 *        Pointer to an array holding the parameters which define the
 *        model to be evaluated. It is assumed that the supplied values
-*        are usable (e.g. width parameters are not zero, etc). All axis 
-*        values are represented in GRID pixels: 
+*        are usable (e.g. width parameters are not zero, etc). How many of 
+*        these are used depends on the value of "ndim": if "ndim" is 1 only 
+*        elements 0 to 3 are used, if "ndim" is 2 only elements 0 to 6 are 
+*        used, if "ndim" is 3 all elements are used. All axis values are 
+*        represented in GRID pixels: 
 *
 *           par[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
 *           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
@@ -61,9 +65,9 @@ double cupidGaussModel( int ndim, double *x, double *par, int what,
 *           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
 *                                                     Gusten)
 *           par[9]: Axis 0 of internal velocity gradient vector ("alpha_1" 
-*                                                       in Stutski & Gusten)
+*                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *           par[10]: Axis 0 of internal velocity gradient vector ("alpha_1" 
-*                                                       in Stutski & Gusten)
+*                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *
 *     what
 *        If negative, then the function value at "x" is returned.
@@ -273,8 +277,6 @@ double cupidGaussModel( int ndim, double *x, double *par, int what,
             } else if( what == 10 ) {
                demdp = -2*vt_off*x1_off/dv_sq;
 
-            } else {
-               demdp = VAL__BADD;
             }
          }
       } 
@@ -286,8 +288,9 @@ double cupidGaussModel( int ndim, double *x, double *par, int what,
          ret = -par[ 0 ]*expv*K*demdp;
       } else {
          *status = SAI__ERROR;
-         errMsg( "cupidGaussModel_err1", "cupidGaussModel: Illegal value "
-                 "(%d) supplied for \"what\" (internal CUPID programming "
+         msgSeti( "W", what );
+         errRep( "cupidGaussModel_err1", "cupidGaussModel: Illegal value "
+                 "(^W) supplied for \"what\" (internal CUPID programming "
                  "error).", status );
       }
    } 

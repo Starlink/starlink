@@ -1,4 +1,5 @@
 #include "sae_par.h"
+#include "prm_par.h"
 #include "cupid.h"
 
 /* Global Variables: */
@@ -8,7 +9,7 @@
 extern CupidGC cupidGC;
 
 
-double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
+double cupidGaussChiSq( int ndim, double *par, int what, int newp ){
 /*
 *  Name:
 *     cupidGaussChiSq
@@ -17,8 +18,7 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
 *     The merit function to be minimised by the GaussClumps algorithm.
 
 *  Synopsis:
-*     double cupidGaussChiSq( int ndim, int npar, double *par, int what, 
-*                             int newp )
+*     double cupidGaussChiSq( int ndim, double *par, int what, int newp )
 
 *  Description:
 *     This function evaluates the modified chi squared used to estimate
@@ -29,12 +29,13 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
 *  Parameters:
 *     ndim
 *        The number of axes in the data array being fitted.
-*     npar
-*        The number of parameters defining the model clump.
 *     par
 *        Pointer to an array holding the parameters which define the
-*        model to be measured against the data. All axis values are 
-*        represented in GRID pixels: 
+*        model to be measured against the data. How many of these are used
+*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to 
+*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim" 
+*        is 3 all elements are used. All axis values are represented in GRID 
+*        pixels: 
 *
 *           par[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
 *           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
@@ -48,9 +49,9 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
 *           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
 *                                                     Gusten)
 *           par[9]: Axis 0 of internal velocity gradient vector ("alpha_1" 
-*                                                       in Stutski & Gusten)
+*                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *           par[10]: Axis 0 of internal velocity gradient vector ("alpha_1" 
-*                                                       in Stutski & Gusten)
+*                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *     what
 *        If negative, then the chi-squared value is returned. Otherwise, the 
 *        partial derivative of the chi-squared value with respect to the 
@@ -78,23 +79,23 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
 */      
 
 /* Local Variables: */
-   double demdp;           /* Rate of change of "em" wrt par[what] */
+   double *pr;             /* Pointer for storing next scaled residual */
+   double *pw;             /* Pointer to next weight value to use */
+   double *py;             /* Pointer to next data value to use */
+   double g;               /* Rat eof change of model value */
+   double res;             /* Difference between data and model value */
    double ret;             /* Returned value */
-
-   static double X0;       /* Rotated spatial axis 0 offset */
-   static double X1;       /* Rotated spatial axis 1 offset */
-   static double cosv;     /* Cos of spatial rotation angle */
-   static double dv_sq;    /* Total FWHM in pixels on vel axis, squared */
-   static double dx0_sq;   /* Total FWHM in pixels on axis 0, squared */
-   static double dx1_sq;   /* Total FWHM in pixels on axis 1, squared */
-   static double em;       /* Scalar argument to exp function  */
-   static double expv;     /* Value of exp function */
-   static double m;        /* Finalmodel value */
-   static double sinv;     /* Sin of spatial rotation angle */
-   static double v_off;    /* Offset on vel axis from "x" to model peak */
-   static double vt_off;   /* Total offset on vel axis from "x" to model peak */
-   static double x0_off;   /* Offset on axis 0 from "x" to model peak */
-   static double x1_off;   /* Offset on axis 1 from "x" to model peak */
+   double rr;              /* A factor for the residual to suppress -ve residuals */
+   double t;               /* Temporary storage */
+   double x[ 3 ];          /* Next pixel position at which to get model value */ 
+   int iax;                /* Axis index */
+   int iel;                /* Index of pixel within section currently being fitted */ 
+ 
+   static double chisq;    /* Total modified chi squared */  
+   static double pdiff;    /* Difference between model and data peak values */
+   static double v_off;    /* Offset on vel axis from data to model peak */
+   static double x0_off;   /* Offset on axis 0 from data to model peak */
+   static double x1_off;   /* Offset on axis 1 from data to model peak */
 
 /* Initialise */
    ret = VAL__BADD;
@@ -110,29 +111,28 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
 
 /* The offset from the model centre to the data peak */
       x0_off = par[ 2 ] - cupidGC.x0_max;
-      if( dim > 1 ) x1_off = par[ 4 ] - cupidGC.x1_max;
-      if( dim > 2 ) v_off = par[ 7 ] - cupidGC.v_max;
+      if( ndim > 1 ) x1_off = par[ 4 ] - cupidGC.x1_max;
+      if( ndim > 2 ) v_off = par[ 7 ] - cupidGC.v_max;
 
 /* Initialise the total chi squared value */
       chisq = 0.0;
 
 /* Initialise pointers to the next element to be used in the arrays
-   defining the data to be fitted. */
+   defining the data to be fitted. Note, the elements in these arays have
+   fortran ordering (i.e. axis 0 varies most rapidly). */
       py = cupidGC.data;
       pw = cupidGC.weight;
-      pm = cupidGC.model;
-      for( iax = 0; i < ndim; iax++ ) px[ iax ] = cupidGC.grid[ iax ];
+      pr = cupidGC.res;
+      for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
 /* Loop round every element in the section of the data array which is
    currently being fitted. */
       for( iel = 0; iel < cupidGC.nel; iel++ ){
 
-/* Get the Gaussian model value at the centre of the current pixel. */
-         *pm = cupidGaussModel( ndim, x, par, -1, 1, ( iel == 0 ) );
-
-/* Store the residual between the Gaussian model at the centre of the current
+/* Get the Gaussian model value at the centre of the current pixel. Store 
+   the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
-         res = *py - *pm;
+         res = *py - cupidGaussModel( ndim, x, par, -1, 1, ( iel == 0 ) );
 
 /* Determine a scale factor which encourages the fitted intensity to stay
    below the observed intensity. This does the same job as the 
@@ -143,194 +143,115 @@ double cupidGaussChiSq( int ndim, int npar, double *par, int what, int newp ){
    implementation was based. */
          rr = ( res > 0.0 ) ? 1.0 : cupidGC.s0p1;
 
-/* Increment the running sum of chi-squared. */
-         chisq += *pw*res*res*rr;
+/* Increment the running sum of chi-squared. We save the scaled residuals
+   in a work array (pr) so that we do not need to calculate them again if 
+   this function is called subsequently to find the gradient for the same
+   set of parameer values. */
+         *pr = *pw*res*rr;         
+         chisq += *pr*res;
 
 /* Move the pointers on to the next pixel in the section of the data
    array being fitted. */
          py++;
          pw++;
-         pm++;
-         for( iax = 0; i < ndim; iax++ ) px[ iax ]++;
+         pr++;
+
+/* Get the grid coords (within the full size original data array) of the
+   next pixel in the section currently being fitted. This assumes fortran
+   ordering of the elements in the arrays.*/
+         iax = 0;
+         x[ iax ] += 1.0;
+         while( x[ iax ] > cupidGC.ubnd[ iax ] ) {
+            x[ iax ] = cupidGC.lbnd[ iax ];
+            if( ++iax == ndim ) break;
+            x[ iax ] += 1.0;
+         }
+
       }
 
 /* Divide by the number of degrees of freedom (the sum of the weights
    minus the number of parameters being fitted). */
       chisq /= cupidGC.ndf;
 
+/* Modify this basic chi-squared value as described in the Stutski &
+   Gusten paper. */
 
-
-
-
-
-
-
-
-
-
-/* The rest are only calculated for 2 or 3 dimensions */
-      if( ndim > 1 ) {
-
-/* The total FWHM in pixels on axis 1, squared. */
-         dx1_sq = cupidGC.beam_sq + par[ 5 ]*par[ 5 ];
-
-/* Trig functions */
-         cosv = cos( par[ 6 ] );
-         sinv = sin( par[ 6 ] );
-
-/* The rest is only calculated for 3 dimensions */
-         if( ndim > 2 ) {
-
-/* The total FWHM in pixels on the velocity axis, squared. */
-            dv_sq = cupidGC.velres_sq + par[ 8 ]*par[ 8 ];
-         }     
-      }
-   }
-
-/* If neccessary, re-calculate cached items which depend both on "x" and
-   "par" values. */
-   if( newp || newx ) {
-
-/* Offset in pixels on axis 0 of the supplied position from the peak. */
-      x0_off = x[ 0 ] - par[ 2 ];
-
-/* The 1D scalar value passed to the exp() function (excluding a factor of
-   -4.ln(2) ) */
       if( ndim == 1 ) {
-         em = x0_off*x0_off/dx0_sq;
-
-/* The rest are only calculated for 2 or 3 dimensions */
-      } else {
-
-/* Offset in pixels on axis 1 of the supplied position from the peak. */
-         x1_off = x[ 1 ] - par[ 4 ];
-
-/* The offsets along the principle (rotated) axes of the 2D spatial
-   ellipse */
-         X0 = x0_off*cosv + x1_off*sinv;
-         X1 = -x0_off*sinv + x1_off*cosv;
-
-/* The scalar value passed to the exp() function (excluding a factor of
-   -4.ln(2) ) */
-         em = ( X0*X0/dx0_sq ) + ( X1*X1/dx1_sq );
-
-/* The rest is only calculated for 3 dimensions */
-         if( ndim > 2) {
-
-/* Offset in pixels on the velocity axis of the supplied position from the 
-   peak. */
-            v_off = x[ 2 ] - par[ 7 ];
-
-/* The total offset in pixels on the velocity axis, including velocity
-   gradient. */
-            vt_off = v_off - par[ 9 ]*x0_off - par[ 10 ]*x1_off;
-
-/* The scalar value passed to the exp() function (excluding a factor of
-   -4.ln(2) ) */
-            em += vt_off*vt_off/dv_sq;
-     
-         }     
+         t = ( cupidGC.beam_sq > 0.0 ) ? x0_off*x0_off/cupidGC.beam_sq : 0.0;
+      } else { 
+         t = ( cupidGC.beam_sq > 0.0 ) ? 
+               ( x0_off*x0_off + x1_off*x1_off )/cupidGC.beam_sq : 0.0;
+         if( ndim == 3 && cupidGC.velres_sq > 0.0 ) t += v_off*v_off/cupidGC.velres_sq;
       }
-
-/* The Gaussian term in the model. */
-      expv = exp( -K*em );
-
-/* The total model value. */
-      m = par[ 0 ]*expv + par[ 1 ];
-
+      chisq += cupidGC.sa*pdiff*pdiff + cupidGC.sc4*t;
    }
 
-/* If the function value is requested, return it. */
+/* Select or calculate the required return value.  If the chi squared
+   value itself is required, just return the value found above. */
    if( what < 0 ) {
-      ret = m;
+      ret = chisq;
 
-/* Need to calculate the gradient if a gradient is required. */
-   } else if( what == 0 ) {
-      ret = expv;
-
-   } else if( what == 1 ) {
-      ret = 1.0;
-
-/* For all others, we evaluated the rate of change of "em" with respect to 
-   the required parameter, and then finally convert this to the rate of
-   change of the model value with respect to the required parameter. */
+/* If the rate of change of the chi squared with respect to one of the
+   model parameters is required, we have more work. */
    } else {
+    
+/* Initialise pointer to the next element to be used in the array
+   holding the scaled residuals at each pixel. */
+      pr = cupidGC.res;
 
-/* Handle 1D pronblems */
-      if( ndim == 1 ) {
-         if( what == 2 ) {
-            demdp = -2*x0_off/dx0_sq;
-         } else if( what == 3 ) {
-            demdp = x0_off/dx0_sq;
-         } else {
-            demdp = VAL__BADD;
+/* Initialise the grid coords (within the complete data array) of the
+   first pixel in the section of the data array being fitted. */
+      for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
+
+/* Loop over all pixels in the section of the data array which is being
+   fitted, accumulating the contribution to the required value caused by the 
+   rate of change of the model itself with respect to the required
+   parameter. */
+      ret = 0.0;
+      for( iel = 0; iel < cupidGC.nel; iel++ ){
+
+/* Get the rate of change of the Gaussian model value with respect to the
+   required parameter, at the centre of the current pixel. */
+         g = cupidGaussModel( ndim, x, par, what, 1, 0 );
+
+/* Increment the running sum of the returned value. */
+         ret += *pr*g;
+
+/* Move the pointer on to the next pixel in the section of the data
+   array being fitted. */
+         pr++;
+
+/* Get the grid coords (within the full size original data array) of the
+   next pixel in the section currently being fitted. */
+         iax = 0;
+         x[ iax ] += 1.0;
+         while( x[ iax ] > cupidGC.ubnd[ iax ] ) {
+            x[ iax ] = cupidGC.lbnd[ iax ];
+            if( ++iax == ndim ) break;
+            x[ iax ] += 1.0;
          }
-
-/* Handle 2 and 3D pronblems */
-      } else {
-
-/* Establish the contribution to "demdp" from the 2 spatial axes. */
-         if( what == 2 ) {
-            demdp = -2*( X0*cosv/dx0_sq - X1*sinv/dx1_sq );
-
-         } else if( what == 3 ) {
-            demdp = X0/dx0_sq;
-            demdp = -2*demdp*demdp*par[ 3 ];
-
-         } else if( what == 4 ) {
-            demdp = -2*( X0*sinv/dx0_sq + X1*cosv/dx1_sq );
-
-         } else if( what == 5 ) {
-            demdp = X1/dx1_sq;
-            demdp = -2*demdp*demdp*par[ 5 ];
-
-         } else if( what == 6 ) {
-            demdp = -2*( X0*( x0_off*sinv - x1_off*cosv )/dx0_sq +
-                         X1*( x0_off*cosv + x1_off*sinv )/dx1_sq );
-         } else {
-            demdp = VAL__BADD;
-         }
-
-/* If there is a velocity axis, modify the 2D "demdp" value (if any) 
-   appropriately. */
-         if( ndim > 2 ) {
-            if( what == 2 ) {
-               demdp += 2*par[ 9 ]*vt_off/dv_sq;
-      
-            } else if( what == 4 ) {
-               demdp += 2*par[ 10 ]*vt_off/dv_sq;
-      
-            } else if( what == 7 ) {
-               demdp = -2*vt_off/dv_sq;
-      
-            } else if( what == 8 ) {
-               demdp = vt_off/dv_sq;
-               demdp = -2*demdp*demdp*par[ 8 ];
-
-            } else if( what == 9 ) {
-               demdp = -2*vt_off*x0_off/dv_sq;
-
-            } else if( what == 10 ) {
-               demdp = -2*vt_off*x1_off/dv_sq;
-
-            } else {
-               demdp = VAL__BADD;
-            }
-         }
-      } 
-
-/* If we have a value for the rate of change of "em" with respect to the 
-   required parameter, convert it to the rate of change of the model value 
-   with respect to the required parameter, or report an error. */
-      if( demdp != VAL__BADD ) {
-         ret = -par[ 0 ]*expv*K*demdp;
-      } else {
-         *status = SAI__ERROR;
-         errMsg( "cupidGaussChiSq_err1", "cupidGaussChiSq: Illegal value "
-                 "(%d) supplied for \"what\" (internal CUPID programming "
-                 "error).", status );
       }
-   } 
+
+/* Scale the returned value to relate to a normalised chi-squared. */
+      ret *= -2.0/cupidGC.ndf;
+
+/* If the parameter for which we are finding the gradient is involved in
+   the extra terms added to chi squared by the Stutski & Gusten paper,
+   then we have extra terms to add to the gradient found above. */
+      if( what == 0 || what == 1 ) {
+         ret += 2*cupidGC.sa*pdiff;
+
+      } else if( what == 2 ) {
+         if( cupidGC.beam_sq > 0.0 ) ret += 2*cupidGC.sc4*x0_off/cupidGC.beam_sq;
+
+      } else if( what == 4 ) {
+         if( cupidGC.beam_sq > 0.0 ) ret += 2*cupidGC.sc4*x1_off/cupidGC.beam_sq;
+
+      } else if( what == 7 ) {
+         if( cupidGC.velres_sq > 0.0 ) ret += 2*cupidGC.sc4*v_off/cupidGC.velres_sq;
+      }
+
+   }
 
 /* Return the required value */
    return ret;   
