@@ -56,7 +56,13 @@ grgra2.f grimg0.f grsyds.f grsymk.f grsyxd.f grsy00.f grinit.f
 
 F_ROUTINES = $(PG_ROUTINES) $(PG_OBSOLETE) $(GR_ROUTINES)
 
-BUILT_SOURCES = PGP_ERR
+BUILT_SOURCES = PGP_ERR pgplot.html
+
+# Create the HTML page for the PGPLOT documentation.
+pgplot.html : $(PG_ROUTINES) makehtml
+	$(mkdir_p) $(srcdir)/sun15.htx
+	$(srcdir)/makehtml $(PG_ROUTINES) > $(srcdir)/pgplot.html
+	cp -p pgplot.html $(srcdir)/sun15.htx/pgplot.html
 
 # Need to build the font database. Do not want to install this file.
 # Really should be using libtool
@@ -76,7 +82,8 @@ check_PROGRAMS = pgp_test
 pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = libpgp.la `$(srcdir)/pgp_link`
 
-EXTRA_DIST = pgp_err.msg pgplot.inc grecom.inc grfont.txt pack.f PGP_ERR_ext
+EXTRA_DIST = pgp_err.msg pgplot.inc grecom.inc grfont.txt pack.f PGP_ERR_ext \
+	pgplot.html
 
 noinst_INCLUDES = pgplot.inc grecom.inc
 

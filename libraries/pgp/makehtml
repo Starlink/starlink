@@ -1,6 +1,7 @@
-#!/bin/sh --     # perl
-eval 'exec `which perl` -S $0 ${1+"$@"}'
-  if 0;
+: # *-*-perl-*-*
+  eval 'exec perl -S $0 "$@"'
+  if $running_under_some_shell;
+#!/usr/bin/perl
 
 $, = ' ';		# set output field separator
 $\ = "\n";		# set output record separator
