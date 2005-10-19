@@ -1,0 +1,485 @@
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{adassconf}
+
+% If you have the old LaTeX 2.09, and not the current LaTeX2e, comment
+% out the \documentclass and \usepackage lines above and uncomment
+% the following:
+
+%\documentstyle[11pt,twoside,adassconf]{article}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your
+% paper is the session number associated with your presentation as
+% published in the official conference proceedings.  You can           
+% find this number locating your abstract in the printed proceedings
+% that you received at the meeting or on-line at the conference web
+% site; the ID code is the letter/number sequence proceeding the title 
+% of your presentation. 
+%
+% This will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+%
+% EXAMPLE: \paperID{O4-1}
+% EXAMPLE: \paperID{P7-7}
+%
+
+\paperID{P.3}
+
+%-----------------------------------------------------------------------
+%		            Paper Title 
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+% 
+% If your title is so long as to fill the page header when you print it,
+% then please supply a short form as a \titlemark.
+%
+% EXAMPLE: 
+%  \title{Rapid Development for Distributed Computing, with Implications
+%         for the Virtual Observatory}
+%  \titlemark{Rapid Development for Distributed Computing}
+%
+
+\title{STILTS - A Package for Command-Line Processing of Tabular Data}
+%\titlemark{ }
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary (see example
+% below).  List each author by giving the first name or initials first
+% followed by the last name.  Authors with the same affiliations
+% should grouped together. 
+%
+% EXAMPLE: \author{Raymond Plante, Doug Roberts, 
+%                  R.\ M.\ Crutcher\altaffilmark{1}}
+%          \affil{National Center for Supercomputing Applications, 
+%                 University of Illinois Urbana-Champaign, Urbana, IL
+%                 61801}
+%          \author{Tom Troland}
+%          \affil{University of Kentucky}
+%
+%          \altaffiltext{1}{Astronomy Department, UIUC}
+%
+% In this example, the first three authors, "Plante", "Roberts", and
+% "Crutcher" are affiliated with "NCSA".  "Crutcher" has an alternate 
+% affiliation with the "Astronomy Department".  The fourth author,
+% "Troland", is affiliated with "University of Kentucky"
+
+\author{Mark B.\ Taylor}
+\affil{H H Wills Physics Laboratory,
+       Tyndall Avenue,
+       Bristol University,
+       Bristol, UK}
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+% 
+% EXAMPLE:  \contact{Dennis Crabtree}
+%           \email{crabtree@cfht.hawaii.edu}
+%
+
+\contact{Mark Taylor}
+\email{m.b.taylor@bristol.ac.uk}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The 
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following
+% syntax: 
+%
+% SYNTAX:  \aindex{Lastname, F. M.}
+% 
+% where F is the first initial and M is the second initial (if
+% used).  This guarantees that authors that appear in multiple papers
+% will appear only once in the author index.  
+%
+% EXAMPLE: \paindex{Crabtree, D.}
+%          \aindex{Manset, N.}        
+%          \aindex{Veillet, C.}        
+%
+% NOTE: this information is also used to build the author list that
+% appears in the table of contents.  Authors will be listed in the order
+% of the \paindex and \aindex commmands.
+%
+
+\paindex{Taylor, M. B.}
+%\aindex{ }     % Remove this line if there is only one author
+
+%-----------------------------------------------------------------------
+%		      Author list for page header	
+%-----------------------------------------------------------------------
+% Please supply a list of author last names for the page header. in
+% one of these formats:
+%
+% EXAMPLES:
+% \authormark{Lastname}
+% \authormark{Lastname1 \& Lastname2}
+% \authormark{Lastname1, Lastname2, ... \& LastnameN}
+% \authormark{Lastname et al.}
+%
+% Use the "et al." form in the case of seven or more authors, or if
+% the preferred form is too long to fit in the header.
+
+\authormark{Taylor}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter a comma separated list of up to 6 keywords describing your
+% paper.  These will NOT be printed as part of your paper; however,
+% they will be used to generate the subject index for the proceedings.
+% There is no standard list; however, you can consult the indices
+% for past proceedings (http://adass.org/adass/proceedings/).
+%
+% EXAMPLE:  \keywords{visualization, astronomy: radio, parallel
+%                     computing, AIPS++, Galactic Center}
+%
+% In this example, the author noticed that "radio astronomy" appeared
+% in the ADASS VII Index as "astronomy" being the major keyword and
+% "radio" as the minor keyword.  The colon is used to introduce another
+% level into the index.
+
+\keywords{table, catalogue, VOTable, virtual observatory, 
+          software: applications}
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting 
+% special symbols). Do not leave a blank line between \begin{abstract} 
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+STILTS, the STIL Tool Set, is a set of non-interactive tools for
+manipulation of tables such as astronomical object catalogues.
+It can read and write data in many formats, including VOTable, FITS,
+relational databases and ASCII.
+Facilities provided include 
+table format conversion,
+row selection and sorting,
+column creation and rearrangement,
+coordinate conversion,
+metadata manipulation and display,
+flexible cross-matching,
+per-row and statistical calculations and
+VOTable validation.
+STILTS is based on the Starlink Tables Infrastructure Library,
+which also underlies the interactive table-analysis tool TOPCAT,
+and can be considered its non-interactive counterpart,
+providing many of the same features in a form which is 
+suitable for headless, batch or scripted environments.
+Uses include data manipulation from the desktop
+or as part of server-based workflows or query operations.
+The package is portable (Java), open source, fully documented,
+efficient and scalable; in particular it is designed for use with
+large, and for many purposes arbitrarily large, tables.
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically. 
+%
+% EXAMPLE:  \section{Introduction}
+%           ...
+%           \subsection{Our View of the World}
+%           ...
+%           \section{A New Approach}
+%
+% It is recommended that you look at the sample papers, sample1.tex
+% and sample2.tex, for examples for formatting references, footnotes,
+% figures, equations, html links, lists, and other special features.  
+
+\section{Introduction}
+
+Tabular data, especially in the form of object catalogues, 
+are common in astronomy, and much of the data and processing 
+in the virtual observatory in particular is dedicated to tables
+in various forms.  The IVOA-endorsed VOTable standard is important
+in this context as defining a metadata-rich transport and storage 
+format for tables; however it has not and will not displace
+FITS files on the one hand, and relational databases on the
+other as a repository for catalogues and other tables,
+not to mention a host of other formats including many ad-hoc
+ASCII-based ones such as the venerable comma-separated values.
+
+\htmladdnormallinkfoot{STILTS}{http://www.starlink.ac.uk/stilts/} 
+is a new package of command-line tools for performing versatile
+and powerful manipulations on tables in various formats.
+It provides some tools for generic (format-independent) table
+processing, and some specific to the VOTable format.
+
+The package is based on the Starlink Tables Infrastructure Library 
+(\htmladdnormallinkfoot{STIL}{http://www.starlink.ac.uk/stil/})
+a table I/O and processing library whose first public release was
+early in 2004.  Among the features of STIL are fully compliant 
+VOTable parsing (it was the first parser to cope with 
+{\sc binary} and {\sc fits} as well
+as {\sc tabledata}-format VOTables),
+a streaming model which supports efficient 
+processing of arbitrary length tables
+in a small amount of memory
+and a pluggable data handling architecture which is easily adapted for 
+reading or writing new table formats.
+STILTS benefits from these features.
+
+STIL was originally developed as the table handling engine for
+\htmladdnormallinkfoot{TOPCAT}{http://www.starlink.ac.uk/topcat/},
+which is an interactive graphical viewing and analysis package
+for tabular data.  TOPCAT is becoming widely used both within
+and without the context of the Virtual Observatory, and is
+good for interactive investigation of the properties of
+one or more tables, providing facilities for data visualisation, 
+row selection, column and statistical calculations, 
+column rearrangements, data and metadata 
+manipulation, sorting, cross-matching, joining and so on.
+However it is not scriptable or otherwise controllable except 
+from within a GUI, and so STILTS has been developed primarily 
+as a non-graphical counterpart to TOPCAT.  
+Usage scenarios in which such non-GUI tools are required include
+the case in which an astronomer has many tables requiring the same
+operation to be performed on them without user intervention,
+and the case of operations on a headless server, either as part of
+a user-specified batch-type workflow or as a component of the
+processing which produces data to be returned to
+the client of a web service.
+
+STILTS, like STIL and TOPCAT, is written in pure Java and available
+under the GNU General Public License.
+
+\section{Generic Table Processing Tools}
+
+STILTS provides four commands for generic table processing.
+Each of these conceptually takes one or more tables as input and
+produces a table as output.
+The input tables can be in any of the supported formats.
+The table generated as output can either be written to disk or 
+to a stream in one of the supported formats, or 
+can be operated on in some other way, such as having statistics
+calculated on it or sending it for display in TOPCAT.
+
+The input/output tables can be operated on using `filter'-like 
+operations such as sorting, various kinds of row selection and sampling,
+column calculations, metadata manipulation and so on.
+These filters operate analogously to the filters in a Unix pipeline, 
+except that what is flowing from one to the next is a
+stream of table data and metadata rather than a sequence of bytes.
+The way it is implemented means that the table at each stage is 
+`virtual', so that usually data not required for the 
+output are never actually obtained from the input.  This means that
+operation can be very efficient, and in particular much better
+than writing the results of each intermediate processing stages to disk.
+
+The individual commands are described in the following subsections.
+
+\subsection{tpipe}
+
+{\tt tpipe} performs general purpose table-processing pipeline operations.
+Processing steps (`filters'), which can be combined freely,
+include coordinate conversion, row selection, data sampling,
+metadata display and editing, column calculations, row sorting
+and blank value substitution amongst others.
+A powerful but intuitive expression language
+(based on Java) is provided for specifying algebraic expressions.
+
+Here is an example which performs bad value substitution 
+(999$\rightarrow${\sc null}) in some of the columns, 
+selects only those rows in a given range of proper motions
+and with a given value in one column, adds a new
+column calculated from two existing ones, and sorts the
+result according to redshift.
+\begin{verbatim}
+   stilts tpipe in=data.cat.gz ifmt=ascii out=data.fits \
+      cmd='badval 999 *MAG' \
+      cmd='select OBJ_CLASS==3 && PMRA*PMRA+PMDEC*PMDEC<0.5' \
+      cmd='addcol I_V IMAG-VMAG' \
+      cmd='sort -down Z_ABS'
+\end{verbatim}
+
+
+\subsection{tcopy}
+
+{\tt tcopy} is used to convert between table formats.
+This doesn't actually require any specialist processing beyond
+the normal I/O facilities of STILTS, and in fact {\tt tcopy}
+is just a simplified form of {\tt tpipe}, provided for
+convenience.  Supported I/O formats
+include FITS, VOTable, relational databases (via SQL queries),
+plain ASCII, and comma-separated values.
+Input can be from a disk file, a URL or a stream, 
+and data compression (gzip, bip2, Unix compress)
+is detected and handled automatically.
+
+An example invocation might look like this:
+\begin{verbatim}
+   stilts tcopy ifmt=votable ofmt=fits in=cat.vot.gz out=cat.fit 
+\end{verbatim}
+
+
+\subsection{tmatch2}
+
+{\tt tmatch2} is a crossmatching tool for finding rows which match
+between two tables
+(single-table and multi-table crossmatchers will be introduced 
+in the future).
+The algorithm is generic and extensible 
+and can perform proximity or equality 
+matches in various different physical or notional parameter spaces
+of arbitrary dimensionality.  The most common case for astronomers 
+is matching on sky position with a global or per-row error tolerance,
+but there are other possibilities for the matching criteria,
+for instance proximity in two- or three-dimensional Cartesian space,
+or requiring proximity in flux value as well as sky position.
+All matches or only the best match can be retained, and the
+form of the joined table to be output is configurable.
+Calculation time scales as approximately $O(N \ln N)$, where $N$ is
+the sum of number of rows in both tables, making it
+suitable for medium-sized data sets
+(e.g.\ a sky match of two $10^5$-row tables takes of the order of one
+minute on a current laptop).
+
+The following locates all matches within 3 arcsec and 0.5 blue
+magnitudes, returning only matched pairs:
+\begin{verbatim}
+   stilts tmatch2 in1=mgc.fits in2=6dfgs.xml out=matched.fits \
+      join=1and2 find=all matcher='sky+1d' params='3 0.5' \
+      values1='ra dec bmag' values2='RA2000 DE2000 B_MAG' 
+\end{verbatim}
+
+\subsection{tcat}
+
+{\tt tcat} simply joins multiple input tables top to bottom, giving
+one output table with a row count equal to the sum of the input table
+row counts.
+The input column types have to be compatible with each other;
+if they're not you can introduce preprocessing 
+filters in the command to make them so.
+
+This example modifies two input tables so that they contain only 
+identifier and galactic longitude and latitude columns 
+before concatenating them:
+\begin{verbatim}
+   stilts tcat in1=t1.fits in2=t2.fits out=t.fits \
+      cmd1='addskycoords fk5 galactic RA DEC GLON GLAT' \
+      cmd1='keepcols "ID GLON GLAT"' \
+      cmd2='keepcols "index gal_long gal_lat"'
+\end{verbatim}
+
+\section{VOTable-Specific Tools}
+
+Although the generic table tools listed in the previous section
+can operate on VOTables as well as other formats, 
+some of the detailed structure permitted in VOTable documents 
+may be lost as a consequence of interpreting them in terms of
+STIL's abstract model of what a table is (some per-table metadata,
+some per-column metadata, and a sequence of rows).
+The two tools listed below deal with VOTable document structures
+directly.
+
+\subsection{votcopy}
+
+The VOTable standard defines three encodings in which the
+data content of each table element can be represented:
+{\sc tabledata}, {\sc binary} and {\sc fits}.
+Much existing VOTable software is able to produce/consume only the
+first of these, although being text-based it is not very efficient 
+for transmission or processing.
+{\tt votcopy} can take a VOTable document and convert the data
+encodings freely between these formats, leaving the rest of
+the XML structure untouched.
+
+\subsection{votlint}
+
+It is easy to make mistakes when writing VOTable documents
+and often hard to spot them except by seeing that software 
+behaves unexpectedly;
+many, perhaps most, VOTable documents at large
+exhibit errors of varying degrees of seriousness.
+{\tt votlint} is a VOTable validator designed to be used
+by authors and users of VOTable-producing software to 
+identify such errors and thereby to ensure that the documents they
+publish conform to the relevant standards.
+The tool simply examines a VOTable document and emits 
+warnings about erroneous or questionable usages,
+which it's then up to the user to address.
+It provides much more rigorous tests than simply validating
+against a DTD or schema can offer.
+
+\acknowledgements
+
+The bulk of the work for STILTS was performed under the now-terminated
+Starlink Project.  Development and support is continuing,
+funded by the UK Particle Physics and Astronomy Research Council.
+
+
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  Observe the following order when listing
+% bibliographical information for each reference:  author name(s),
+% publication year, journal name, volume, and page number for
+% articles.  Note that many journal names are available as macros; see
+% the User Guide listing "macro-ized" journals.   
+%
+% EXAMPLE:  \reference Hagiwara, K., \& Zeppenfeld, D.\  1986, 
+%                Nucl.Phys., 274, 1
+%           \reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
+%           \reference King, I.\ R.\  1966, \aj, 71, 276
+%           \reference King, I.\ R.\  1975, in Dynamics of Stellar 
+%                Systems, ed.\ A.\ Hayli (Dordrecht: Reidel), 99
+%           \reference Tody, D.\  1998, \adassvii, 146
+%           \reference Zacharias, N.\ \& Zacharias, M.\ 2003,
+%                \adassxii, \paperref{P7.6}
+% 
+% Note the following tricks used in the example above:
+%
+%   o  \& is used to format an ampersand symbol (&).
+%   o  \'e puts an accent agu over the letter e.  See the User Guide
+%      and the sample files for details on formatting special
+%      characters.  
+%   o  "\ " after a period prevents LaTeX from interpreting the period 
+%      as an end of a sentence.
+%   o  \aj is a macro that expands to "Astron. J."  See the User Guide
+%      for a full list of journal macros
+%   o  \adassvii is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS VII conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through XI.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the 
+%      note in the "Paper ID Code" section above for details on how to 
+%      determine the paper ID code for the paper you reference.  
+%
+\begin{references}
+\reference Taylor, M.\ B. 2005, \adassxiv, \paperref{FM-3}
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
