@@ -13,16 +13,16 @@
 extern CupidGC cupidGC;
 
 
-int cupidGCfit( double *x ){
+int CGEN_FUNCTION(cupidGCfit)( double *x ){
 /*
 *  Name:
-*     cupidGCfit
+*     cupidGCfit<X>
 
 *  Purpose:
 *     Fit a Gaussian to a supplied peak in a supplied array.
 
 *  Synopsis:
-*     int cupidGCfit( double x );
+*     int cupidGCfit<X>( double *x );
 
 *  Description:
 *     This function fits a Gaussian to a peak in the supplied residuals
@@ -36,6 +36,14 @@ int cupidGCfit( double *x ){
 
 *  Returned Value:
 *     Non-zero if the fit was succesfully completed.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidGCfit macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidGCfit<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidGCfit... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:
 *     DSB: David S. Berry
