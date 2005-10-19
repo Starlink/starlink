@@ -220,26 +220,26 @@ in various forms.  The IVOA-endorsed VOTable standard is important
 in this context as defining a metadata-rich transport and storage 
 format for tables; however it has not and will not displace
 FITS files on the one hand, and relational databases on the
-other as a repository for catalogues and other tables,
-not to mention a host of other formats including many ad-hoc
-ASCII-based ones such as the venerable comma-separated values.
+other, not to mention a host of ad-hoc ASCII-based formats,
+as a repository for catalogues and other tables.
 
 \htmladdnormallinkfoot{STILTS}{http://www.starlink.ac.uk/stilts/} 
 is a new package of command-line tools for performing versatile
-and powerful manipulations on tables in various formats.
+and powerful manipulations on tables in a number of formats including
+those mentioned above.
 It provides some tools for generic (format-independent) table
-processing, and some specific to the VOTable format.
+processing, and some specific to VOTables.
 
 The package is based on the Starlink Tables Infrastructure Library 
 (\htmladdnormallinkfoot{STIL}{http://www.starlink.ac.uk/stil/})
 a table I/O and processing library whose first public release was
 early in 2004.  Among the features of STIL are fully compliant 
-VOTable parsing (it was the first parser to cope with 
+VOTable parsing (it was the first parser to handle
 {\sc binary} and {\sc fits} as well
 as {\sc tabledata}-format VOTables),
 a streaming model which supports efficient 
 processing of arbitrary length tables
-in a small amount of memory
+in limited memory
 and a pluggable data handling architecture which is easily adapted for 
 reading or writing new table formats.
 STILTS benefits from these features.
@@ -253,17 +253,16 @@ good for interactive investigation of the properties of
 one or more tables, providing facilities for data visualisation, 
 row selection, column and statistical calculations, 
 column rearrangements, data and metadata 
-manipulation, sorting, cross-matching, joining and so on.
+manipulation, sorting, cross-matching, joining and so on
+(Taylor 2005).
 However it is not scriptable or otherwise controllable except 
 from within a GUI, and so STILTS has been developed primarily 
 as a non-graphical counterpart to TOPCAT.  
 Usage scenarios in which such non-GUI tools are required include
-the case in which an astronomer has many tables requiring the same
-operation to be performed on them without user intervention,
-and the case of operations on a headless server, either as part of
-a user-specified batch-type workflow or as a component of the
-processing which produces data to be returned to
-the client of a web service.
+performing the same operation on multiple tables without user intervention,
+and processing on a headless server, either as part of
+a user-specified batch-type workflow or to produce data 
+for delivery to the client of a web service.
 
 STILTS, like STIL and TOPCAT, is written in pure Java and available
 under the GNU General Public License.
@@ -274,8 +273,8 @@ STILTS provides four commands for generic table processing.
 Each of these conceptually takes one or more tables as input and
 produces a table as output.
 The input tables can be in any of the supported formats.
-The table generated as output can either be written to disk or 
-to a stream in one of the supported formats, or 
+The table generated as output can either be written
+to a stream or to disk in one of the supported formats, or 
 can be operated on in some other way, such as having statistics
 calculated on it or sending it for display in TOPCAT.
 
@@ -344,14 +343,15 @@ between two tables
 (single-table and multi-table crossmatchers will be introduced 
 in the future).
 The algorithm is generic and extensible 
-and can perform proximity or equality 
+and can perform approximate or exact
 matches in various different physical or notional parameter spaces
 of arbitrary dimensionality.  The most common case for astronomers 
-is matching on sky position with a global or per-row error tolerance,
+is matching on sky position with a global or per-row maximum angular
+separation,
 but there are other possibilities for the matching criteria,
 for instance proximity in two- or three-dimensional Cartesian space,
 or requiring proximity in flux value as well as sky position.
-All matches or only the best match can be retained, and the
+Either all matches or only the best match can be retained, and the
 form of the joined table to be output is configurable.
 Calculation time scales as approximately $O(N \ln N)$, where $N$ is
 the sum of number of rows in both tables, making it
@@ -378,7 +378,7 @@ filters in the command to make them so.
 
 This example modifies two input tables so that they contain only 
 identifier and galactic longitude and latitude columns 
-before concatenating them:
+before concatenating them to give a three-column output:
 \begin{verbatim}
    stilts tcat in1=t1.fits in2=t2.fits out=t.fits \
       cmd1='addskycoords fk5 galactic RA DEC GLON GLAT' \
@@ -403,7 +403,8 @@ The VOTable standard defines three encodings in which the
 data content of each table element can be represented:
 {\sc tabledata}, {\sc binary} and {\sc fits}.
 Much existing VOTable software is able to produce/consume only the
-first of these, although being text-based it is not very efficient 
+first of these, although being text-based it is less efficient 
+than the others
 for transmission or processing.
 {\tt votcopy} can take a VOTable document and convert the data
 encodings freely between these formats, leaving the rest of
