@@ -83,7 +83,7 @@ pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = libpgp.la `$(srcdir)/pgp_link`
 
 EXTRA_DIST = pgp_err.msg pgplot.inc grecom.inc grfont.txt pack.f PGP_ERR_ext \
-	pgplot.html
+	makehtml pgplot.html
 
 noinst_INCLUDES = pgplot.inc grecom.inc
 
