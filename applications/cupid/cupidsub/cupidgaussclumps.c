@@ -102,6 +102,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    void *res;           /* Pointer to residuals array */
    int imax;            /* Index of element with largest residual */
    double sum;          /* Sum of all residuals */
+   double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -136,8 +137,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       iter = 1;
       while( iter ) {
 
-/* Find the element with the largest value in the residuals array. Also 
-   find the total data sum in the residuals array. */
+/* Find the 1D vector index of the element with the largest value in the 
+   residuals array. Also find the total data sum in the residuals array. */
          cupidFindMax( type, res, el, &imax, &sum );
 
 /* Determine if a gaussian clump should be fitted to the peak around the 
@@ -147,15 +148,16 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* If so, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
-            cupidSetInit( type );
+            cupidSetInit( type, res, ndim, dims, imax, rms, config,
+                          iclump, x );
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */
-            if( cupidCubFit( type, res, el, imax ) ) {
+            if( cupidGCfit( type, x ) ) {
                iclump++;
 
 /* Add the clump to the output list. */
-               cupidListClump( );
+               cupidListClump( x );
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */

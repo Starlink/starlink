@@ -112,6 +112,14 @@ void clumps() {
 *     name, followed by a dot, followed by the parameter name. Default
 *     values are shown in square brackets:
 *
+*     - GaussClumps.Fbeam: An initial guess at the ratio of the typical 
+*     observed clump size to the instrument beam width. This is used to
+*     determine the starting point for the algorithm which finds the best
+*     fitting Gaussian for each clump. If no value is supplied, the
+*     initial guess at the clump size is based on the local profile
+*     around the pixel with peak value. []
+*     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
+*     pixels. [3.0]
 *     - GaussClumps.MaxClumps: Specifies a termination criterion for
 *     the GaussClumps algorithm. The algorithm will terminate when
 *     "MaxClumps" clumps have been identified, or when one of the other 
@@ -127,11 +135,25 @@ void clumps() {
 *     determined by the Variance component in the input data. If there is
 *     no Variance component, an estimate of the global noise level in the
 *     data is made and used. []
+*     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
+*     encourages the peak amplitude of each fitted gaussian to be below 
+*     the corresponding maximum value in the observed data (see the Stutski 
+*     & Gusten paper). [0.0]
+*     - GaussClumps.Sa: The Chi-square stiffness parameter "Sa" which 
+*     encourages the peak amplitude of each fitted gaussian to be close to 
+*     the corresponding maximum value in the observed data (see the Stutski 
+*     & Gusten paper). [0.0]
+*     - GaussClumps.Sc: The Chi-square stiffness parameter "Sc" which 
+*     encourages the peak position of each fitted gaussian to be close to 
+*     the corresponding peak position in the observed data (see the Stutski 
+*     & Gusten paper). [0.0]
 *     - GaussClumps.Threshold: Specifies a termination criterion for
 *     the GaussClumps algorithm. The algorithm will terminate when the peak
 *     value in the residuals left after subtraction of the fitted clumps 
 *     is less than "Threshold" times the RMS noise in the original data,
 *     or when one of the other termination criteria is met. [2.0]
+*     - GaussClumps.VeloRes: The FWHM of the instrument beam, in
+*     pixels. [3.0]
 
 *  Authors:
 *     DSB: David S. Berry

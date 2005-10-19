@@ -1,0 +1,99 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "pda.h"
+
+/* Local constants: */
+#define LV 71+CUPID__GCNP3*(CUPID__GCNP3+15)/2
+#define LIV 60
+
+/* Global Variables: */
+/* ================= */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   needed by this function. These are set by function cupidGaussClumps. */
+extern CupidGC cupidGC;
+
+
+int cupidGCfit( double *x ){
+/*
+*  Name:
+*     cupidGCfit
+
+*  Purpose:
+*     Fit a Gaussian to a supplied peak in a supplied array.
+
+*  Synopsis:
+*     int cupidGCfit( double x );
+
+*  Description:
+*     This function fits a Gaussian to a peak in the supplied residuals
+*     array.
+
+*  Parameters:
+*     x 
+*        A pointer to an array containing the initial guess at the
+*        Gaussian parameters. The array is returned holding the best fit
+*        parameter values.
+
+*  Returned Value:
+*     Non-zero if the fit was succesfully completed.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     18-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   double d[ CUPID__GCNP3 ]; /* Scale factors for each parameter */
+   int n;                    /* Number of free parameters */
+   int ret;                  /* Returned value */
+   int i;                    /* Loop count */
+   int iv[ LIV ];            /* Flags controlling pdsSumsl */
+   double v[ LV ];           /* Work array and control values for pdaSumsl */
+
+/* Initialise. */
+   ret = 0;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return ret;
+
+/* Set the number of parameters for the Gaussian, depending on the
+   dimensionality of the data. Also, set up an array of scale values 
+   for each parameter being fitted. */
+   if( cupidGC.ndim == 1 ) {
+      n = CUPID__GCNP1;
+
+   } else if( cupidGC.ndim == 2 ) {
+      n = CUPID__GCNP2;
+
+   } else {
+      n = CUPID__GCNP3;
+   }
+
+/* Initialise an array of scale values for each parameter being fitted. */
+   for( i = 0; i < n; i++ ) d[ i ] = 1.0;
+
+/* Indicate we are starting a fresh call to pdaSumsl. This causes default
+   values to be calculated and stored for various things. */
+   iv[ 0 ] = 0;
+
+/* Call the minimisation function. */
+   pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );
+
+/* See if convergence was achieved. */
+   ret = ( iv[ 0 ] < 7 );
+
+/* Return the result, setting the specified element of the residuals
+   array bad if no fit was performed. This prevents the any subsequent 
+   attempt to fit a Gaussian to the same peak value.*/
+   if( !ret ) res[ imax ] = CGEN_BAD;
+   return ret;  
+}
+

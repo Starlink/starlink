@@ -8,6 +8,9 @@
 #define CUPID__DOUBLE 1
 #define CUPID__FLOAT  2
 
+#define CUPID__GCNP1  4 /* No. of free parameters in a 1D GaussClump clump */
+#define CUPID__GCNP2  7 /* No. of free parameters in a 2D GaussClump clump */
+#define CUPID__GCNP3 11 /* No. of free parameters in a 3D GaussClump clump */
 
 /* Type Definitions */
 /* ---------------- */
@@ -31,6 +34,8 @@ typedef struct CupidGC  {
    double sa;              /* Chi-square stiffness parameter sa */
    double s0p1;            /* Chi-square stiffness parameter s0, minus 1.0 */
    double sc4;             /* Four times chi-square stiffness parameter sc */
+   int nf;                 /* The invocation count from calcf */
+   int ndim;               /* Number of pixel axes in the data array */
 } CupidGC;
 
 
