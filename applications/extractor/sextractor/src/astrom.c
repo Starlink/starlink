@@ -9,7 +9,7 @@
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	26/11/2003
+*	Last modify:	24/08/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -80,7 +80,9 @@ void	initastrom(picstruct *field)
 
 /*---- Compute Pole coordinates in J2000 and/or B1950 for THETAs */
     if (FLAG(obj2.theta2000) || FLAG(obj2.theta1950)
-	|| FLAG(obj2.poserr_theta2000) || FLAG(obj2.poserr_theta1950))
+	|| FLAG(obj2.poserr_theta2000) || FLAG(obj2.poserr_theta1950)
+	|| FLAG(obj2.win_theta2000) || FLAG(obj2.win_theta1950)
+	|| FLAG(obj2.winposerr_theta2000) || FLAG(obj2.winposerr_theta1950))
       {
       if (fabs(as->equinox-2000.0)>0.003)
         precess(as->equinox, 0.0, 90.0, 2000.0, &as->ap2000, &as->dp2000);
@@ -133,65 +135,105 @@ void	computeastrom(picstruct *field, objstruct *obj)
   lm = as->linmat;
 
 /* If working with WCS, compute WORLD coordinates and local matrix */
-  if (as->wcs_flag)
+  if (FLAG(obj2.mxw))
     {
-    wcspos = compute_wcs(field, obj2->posx, obj2->posy);
-    obj2->alphas = obj2->mxw = wcspos[0];
-    obj2->deltas = obj2->myw = wcspos[1];
-    if (FLAG(obj2.alpha2000))
+    if (as->wcs_flag)
       {
-      if (fabs(as->equinox-2000.0)>0.003)
-        precess(as->equinox, wcspos[0], wcspos[1],
+      wcspos = compute_wcs(field, obj2->posx, obj2->posy);
+      obj2->alphas = obj2->mxw = wcspos[0];
+      obj2->deltas = obj2->myw = wcspos[1];
+      if (FLAG(obj2.alpha2000))
+        {
+        if (fabs(as->equinox-2000.0)>0.003)
+          precess(as->equinox, wcspos[0], wcspos[1],
 		2000.0, &obj2->alpha2000, &obj2->delta2000);
-      else
-        {
-        obj2->alpha2000 = obj2->mxw;
-        obj2->delta2000 = obj2->myw;
-        }
-      if (FLAG(obj2.alpha1950))
-        j2b(as->equinox, obj2->alpha2000, obj2->delta2000,
+        else
+          {
+          obj2->alpha2000 = obj2->mxw;
+          obj2->delta2000 = obj2->myw;
+          }
+        if (FLAG(obj2.alpha1950))
+          j2b(as->equinox, obj2->alpha2000, obj2->delta2000,
 		&obj2->alpha1950, &obj2->delta1950);
-      }
-    }
-  else if (FLAG(obj2.mxw))
-    {
-     double	dx,dy;
-
-    dx = obj2->posx - as->crpix[0];
-    dy = obj2->posy - as->crpix[1];
-    obj2->mxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
-    obj2->myw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
-    }
-
-/* Iden for peak-flux positions */
-  if (as->wcs_flag)
-    {
-    wcspos = compute_wcs(field, (double)obj->peakx, (double)obj->peaky);
-    obj2->peakalphas = obj2->peakxw = wcspos[0];
-    obj2->peakdeltas = obj2->peakyw = wcspos[1];
-    if (FLAG(obj2.peakalpha2000))
-      {
-      if (fabs(as->equinox-2000.0)>0.003)
-        precess(as->equinox, wcspos[0], wcspos[1],
-		2000.0, &obj2->peakalpha2000, &obj2->peakdelta2000);
-      else
-        {
-        obj2->peakalpha2000 = obj2->peakxw;
-        obj2->peakdelta2000 = obj2->peakyw;
         }
-      if (FLAG(obj2.peakalpha1950))
-        j2b(as->equinox, obj2->peakalpha2000, obj2->peakdelta2000,
-		&obj2->peakalpha1950, &obj2->peakdelta1950);
+      }
+    else
+      {
+       double	dx,dy;
+
+      dx = obj2->posx - as->crpix[0];
+      dy = obj2->posy - as->crpix[1];
+      obj2->mxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
+      obj2->myw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
       }
     }
-  else if (FLAG(obj2.peakxw))
-    {
-     double	dx,dy;
 
-    dx = obj->peakx - as->crpix[0];
-    dy = obj->peaky - as->crpix[1];
-    obj2->peakxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
-    obj2->peakyw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
+/* Idem for peak-flux positions */
+  if (FLAG(obj2.peakxw))
+    {
+    if (as->wcs_flag)
+      {
+      wcspos = compute_wcs(field, (double)obj->peakx, (double)obj->peaky);
+      obj2->peakalphas = obj2->peakxw = wcspos[0];
+      obj2->peakdeltas = obj2->peakyw = wcspos[1];
+      if (FLAG(obj2.peakalpha2000))
+        {
+        if (fabs(as->equinox-2000.0)>0.003)
+          precess(as->equinox, wcspos[0], wcspos[1],
+		2000.0, &obj2->peakalpha2000, &obj2->peakdelta2000);
+        else
+          {
+          obj2->peakalpha2000 = obj2->peakxw;
+          obj2->peakdelta2000 = obj2->peakyw;
+          }
+        if (FLAG(obj2.peakalpha1950))
+          j2b(as->equinox, obj2->peakalpha2000, obj2->peakdelta2000,
+		&obj2->peakalpha1950, &obj2->peakdelta1950);
+        }
+      }
+    else 
+      {
+       double	dx,dy;
+
+      dx = obj->peakx - as->crpix[0];
+      dy = obj->peaky - as->crpix[1];
+      obj2->peakxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
+      obj2->peakyw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
+      }
+    }
+
+/* Idem for Windowed positions */
+  if (FLAG(obj2.winpos_xw))
+    {
+    if (as->wcs_flag)
+      {
+      wcspos = compute_wcs(field, obj2->winpos_x, obj2->winpos_y);
+      obj2->winpos_alphas = obj2->winpos_xw = wcspos[0];
+      obj2->winpos_deltas = obj2->winpos_yw = wcspos[1];
+      if (FLAG(obj2.winpos_alpha2000))
+        {
+        if (fabs(as->equinox-2000.0)>0.003)
+          precess(as->equinox, wcspos[0], wcspos[1],
+		2000.0, &obj2->winpos_alpha2000, &obj2->winpos_delta2000);
+        else
+          {
+          obj2->winpos_alpha2000 = obj2->winpos_xw;
+          obj2->winpos_delta2000 = obj2->winpos_yw;
+          }
+        if (FLAG(obj2.winpos_alpha1950))
+          j2b(as->equinox, obj2->winpos_alpha2000, obj2->winpos_delta2000,
+		&obj2->winpos_alpha1950, &obj2->winpos_delta1950);
+        }
+      }
+    else
+      {
+       double	dx,dy;
+
+      dx = obj2->winpos_x - as->crpix[0];
+      dy = obj2->winpos_y - as->crpix[1];
+      obj2->winpos_xw = as->crval[0]+ lm[0]*dx + lm[1]*dy;/* CDELT included! */
+      obj2->winpos_yw = as->crval[1]+ lm[2]*dx + lm[3]*dy;/* CDELT included! */
+      }
     }
 
 /* Custom coordinate system for the MAMA machine */
@@ -209,10 +251,14 @@ void	computeastrom(picstruct *field, objstruct *obj)
 /* Express shape parameters in WORLD frame */
   if (FLAG(obj2.mx2w))
     astrom_shapeparam(field, obj);
+  if (FLAG(obj2.win_mx2w))
+    astrom_winshapeparam(field, obj);
 
 /* Express position error parameters in WORLD frame */
   if (FLAG(obj2.poserr_mx2w))
     astrom_errparam(field, obj);
+  if (FLAG(obj2.winposerr_mx2w))
+    astrom_winerrparam(field, obj);
 
   if (FLAG(obj2.npixw))
     obj2->npixw = obj->npix*as->pixscale*as->pixscale;
@@ -361,9 +407,94 @@ void	astrom_shapeparam(picstruct *field, objstruct *obj)
     pm2 = 0.5*(xm2+ym2);
     obj2->aw = (float)sqrt(pm2+temp);
     obj2->bw = (float)sqrt(pm2-temp);
+    obj2->polarw = temp / pm2;
     }
 
   if (FLAG(obj2.cxxw))
+    {
+/*-- Handle large, fully correlated profiles (can cause a singularity...) */
+    if ((temp=xm2*ym2-xym*xym)<1e-6)
+      {
+      temp = 1e-6;
+      xym *= 0.99999;
+      }
+    obj2->cxxw = (float)(ym2/temp);
+    obj2->cyyw = (float)(xm2/temp);
+    obj2->cxyw = (float)(-2*xym/temp);
+    }
+
+  return;
+  }
+
+
+/**************************** astrom_winshapeparam ***************************/
+/*
+Compute shape parameters in WORLD and SKY coordinates.
+*/
+void	astrom_winshapeparam(picstruct *field, objstruct *obj)
+  {
+   astromstruct	*as;
+   double	*lm,
+		dx2,dy2,dxy, xm2,ym2,xym, temp,pm2;
+
+  as = field->astrom;
+  lm = as->linmat;
+
+/* All WORLD params based on 2nd order moments have to pass through here */
+  dx2 = obj2->win_mx2;
+  dy2 = obj2->win_my2;
+  dxy = obj2->win_mxy;
+  obj2->win_mx2w = xm2 = lm[0]*lm[0]*dx2 + lm[1]*lm[1]*dy2 + lm[0]*lm[1]*dxy;
+  obj2->win_my2w = ym2 = lm[2]*lm[2]*dx2 + lm[3]*lm[3]*dy2 + lm[2]*lm[3]*dxy;
+  obj2->win_mxyw = xym = lm[0]*lm[2]*dx2 + lm[1]*lm[3]*dy2
+			+ (lm[0]*lm[3]+lm[1]*lm[2])*dxy;
+  temp=xm2-ym2;
+  if (FLAG(obj2.win_thetaw))
+    {
+    obj2->win_thetaw = (temp == 0.0)? (45.0) : (0.5*atan2(2.0*xym,temp)/DEG);
+    if (as->wcs_flag && FLAG(obj2.win_thetas))
+      obj2->win_thetas = obj2->win_thetaw +
+	(obj2->win_thetaw>0.0?-90:90.0);
+
+/*-- Compute position angles in J2000 or B1950 reference frame */
+    if (as->wcs_flag)
+      {
+       double	da,dd;
+
+      if (FLAG(obj2.win_theta2000))
+        {
+        da = as->ap2000 - obj2->winpos_alpha2000;
+        dd = (sin(as->dp2000*DEG)
+		-sin(obj2->winpos_delta2000*DEG)*sin(obj2->winpos_deltas*DEG))
+		/(cos(obj2->winpos_delta2000*DEG)*cos(obj2->winpos_deltas*DEG));
+        dd = dd<1.0? (dd>-1.0?acos(dd)/DEG:180.0) : 0.0;
+        obj2->win_theta2000 = obj2->win_thetas
+		+ (((da>0.0 && da<180.0) || da<-180.0)?-dd:dd);
+        }
+
+      if (FLAG(obj2.win_theta1950))
+        {
+        da = as->ap1950 - obj2->winpos_alpha1950;
+        dd = (sin(as->dp1950*DEG)
+		-sin(obj2->winpos_delta1950*DEG)*sin(obj2->winpos_deltas*DEG))
+		/(cos(obj2->winpos_delta1950*DEG)*cos(obj2->winpos_deltas*DEG));
+        dd = dd<1.0? (dd>-1.0?acos(dd)/DEG:180.0) : 0.0;
+        obj2->win_theta1950 = obj2->win_thetas
+		+ (((da>0.0 && da<180.0) || da<-180.0)?-dd:dd);
+        }
+      }
+    }
+
+  if (FLAG(obj2.win_aw))
+    {
+    temp = sqrt(0.25*temp*temp+xym*xym);
+    pm2 = 0.5*(xm2+ym2);
+    obj2->aw = (float)sqrt(pm2+temp);
+    obj2->bw = (float)sqrt(pm2-temp);
+    obj2->win_polarw = temp / pm2;
+    }
+
+  if (FLAG(obj2.win_cxxw))
     {
 /*-- Handle large, fully correlated profiles (can cause a singularity...) */
     if ((temp=xm2*ym2-xym*xym)<1e-6)
@@ -457,6 +588,89 @@ void	astrom_errparam(picstruct *field, objstruct *obj)
     obj2->poserr_cxxw = (float)(ym2/temp);
     obj2->poserr_cyyw = (float)(xm2/temp);
     obj2->poserr_cxyw = (float)(-2*xym/temp);
+    }
+
+  return;
+  }
+
+
+/***************************** astrom_winerrparam ***************************/
+/*
+Compute error ellipse parameters in WORLD and SKY coordinates.
+*/
+void	astrom_winerrparam(picstruct *field, objstruct *obj)
+  {
+   astromstruct	*as;
+   double	*lm,
+		dx2,dy2,dxy, xm2,ym2,xym, temp,pm2;
+
+  as = field->astrom;
+  lm = as->linmat;
+
+/* All WORLD params based on 2nd order moments have to pass through here */
+  dx2 = obj2->winposerr_mx2;
+  dy2 = obj2->winposerr_my2;
+  dxy = obj2->winposerr_mxy;
+  obj2->winposerr_mx2w = xm2 = lm[0]*lm[0]*dx2+lm[1]*lm[1]*dy2+lm[0]*lm[1]*dxy;
+  obj2->winposerr_my2w = ym2 = lm[2]*lm[2]*dx2+lm[3]*lm[3]*dy2+lm[2]*lm[3]*dxy;
+  obj2->winposerr_mxyw = xym = lm[0]*lm[2]*dx2+lm[1]*lm[3]*dy2
+				+ (lm[0]*lm[3]+lm[1]*lm[2])*dxy;
+  temp=xm2-ym2;
+  if (FLAG(obj2.winposerr_thetaw))
+    {
+    obj2->winposerr_thetaw = (temp==0.0)? (45.0):(0.5*atan2(2.0*xym,temp)/DEG);
+    if (as->wcs_flag && FLAG(obj2.winposerr_thetas))
+      obj2->winposerr_thetas = obj2->winposerr_thetaw
+				+ (obj2->winposerr_thetaw>0.0? -90:90.0);
+
+/*-- Compute position angles in J2000 or B1950 reference frame */
+    if (as->wcs_flag)
+      {
+       double	da,dd;
+
+      if (FLAG(obj2.winposerr_theta2000))
+        {
+        da = as->ap2000 - obj2->winpos_alpha2000;
+        dd = (sin(as->dp2000*DEG)
+		-sin(obj2->winpos_delta2000*DEG)*sin(obj2->winpos_deltas*DEG))
+		/(cos(obj2->winpos_delta2000*DEG)*cos(obj2->winpos_deltas*DEG));
+        dd = dd<1.0? (dd>-1.0?acos(dd)/DEG:180.0) : 0.0;
+        obj2->winposerr_theta2000 = obj2->winposerr_thetas
+		+ (((da>0.0 && da<180.0) || da<-180.0)?-dd:dd);
+        }
+
+      if (FLAG(obj2.winposerr_theta1950))
+        {
+        da = as->ap1950 - obj2->winpos_alpha1950;
+        dd = (sin(as->dp1950*DEG)
+		-sin(obj2->winpos_delta1950*DEG)*sin(obj2->winpos_deltas*DEG))
+		/(cos(obj2->winpos_delta1950*DEG)*cos(obj2->winpos_deltas*DEG));
+        dd = dd<1.0? (dd>-1.0?acos(dd)/DEG:180.0) : 0.0;
+        obj2->winposerr_theta1950 = obj2->winposerr_thetas
+		+ (((da>0.0 && da<180.0) || da<-180.0)?-dd:dd);
+        }
+      }
+    }
+
+  if (FLAG(obj2.winposerr_aw))
+    {
+    temp = sqrt(0.25*temp*temp+xym*xym);
+    pm2 = 0.5*(xm2+ym2);
+    obj2->winposerr_aw = (float)sqrt(pm2+temp);
+    obj2->winposerr_bw = (float)sqrt(pm2-temp);
+    }
+
+  if (FLAG(obj2.winposerr_cxxw))
+    {
+/*-- Handle large, fully correlated profiles (can cause a singularity...) */
+    if ((temp=xm2*ym2-xym*xym)<1e-6)
+      {
+      temp = 1e-6;
+      xym *= 0.99999;
+      }
+    obj2->winposerr_cxxw = (float)(ym2/temp);
+    obj2->winposerr_cyyw = (float)(xm2/temp);
+    obj2->winposerr_cxyw = (float)(-2*xym/temp);
     }
 
   return;

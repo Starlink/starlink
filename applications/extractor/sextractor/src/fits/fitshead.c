@@ -9,7 +9,7 @@
 *
 *	Contents:	general functions for handling FITS file headers.
 *
-*	Last modify:	09/11/2003
+*	Last modify:	25/09/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -81,36 +81,35 @@ int	get_head(tabstruct *tab)
   }
 
 
-/****** read_fitsbasic ********************************************************
+/****** readbasic_head ********************************************************
 PROTO	void readbasic_head(tabstruct *tab)
 PURPOSE	Read the current FITS header basic keywords.
 INPUT	pointer to catstruct.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP)
-VERSION	09/11/2003
+VERSION	25/09/2004
  ***/
 void	readbasic_head(tabstruct *tab)
 
   {
-   static char	str[80];
-   catstruct	*cat;
-   char		key[12];
+   char		str[88];
+   char		key[12], name[16],
+		*filename;
    int		i;
    KINGSIZE_T	tabsize;
 
-  if (!(cat = tab->cat))
-    error(EXIT_FAILURE, "*Internal Error*: Table has no parent catalog","!");
+  filename = (tab->cat? tab->cat->filename : strcpy(name, "internal header"));
 
   if (fitsread(tab->headbuf, "BITPIX  ", &tab->bitpix, H_INT, T_LONG)
 	==RETURN_ERROR)
-    error(EXIT_FAILURE, "*Error*: Corrupted FITS header in ", cat->filename);
+    error(EXIT_FAILURE, "*Error*: Corrupted FITS header in ", filename);
 
   tab->bytepix = tab->bitpix>0?(tab->bitpix/8):(-tab->bitpix/8);
 
   if (fitsread(tab->headbuf, "NAXIS   ", &tab->naxis, H_INT, T_LONG)
 	==RETURN_ERROR)
-    error(EXIT_FAILURE, "*Error*: Corrupted FITS header in ", cat->filename);
+    error(EXIT_FAILURE, "*Error*: Corrupted FITS header in ", filename);
 
   tabsize = 0;
   if (tab->naxis>0)
@@ -124,8 +123,7 @@ void	readbasic_head(tabstruct *tab)
       sprintf(key,"NAXIS%-3d", i+1);
       if (fitsread(tab->headbuf, key, &tab->naxisn[i], H_INT, T_LONG)
 		==RETURN_ERROR)
-        error(EXIT_FAILURE, "*Error*: incoherent FITS header in ",
-				cat->filename);
+        error(EXIT_FAILURE, "*Error*: incoherent FITS header in ", filename);
       tabsize *= tab->naxisn[i];
       }
     }
@@ -189,16 +187,16 @@ OUTPUT	RETURN_OK if a binary table was found and mapped, RETURN_ERROR
 	otherwise.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	30/04/97
+VERSION	25/09/2004
  ***/
 int	readbintabparam_head(tabstruct *tab)
 
   {
    catstruct	*cat;
    keystruct	*key, *prevkey;
-   static char	strf[82], strk[12];
+   char		strf[88], strk[16];
    char		*str;
-   static int	naxisn[32];
+   int		naxisn[32];
    int		i,j, larray, nfields,narray, pos;
 
   if (!(cat = tab->cat))
@@ -247,7 +245,7 @@ int	readbintabparam_head(tabstruct *tab)
     sprintf(strk, "TDISP%-3d", i+1);
     fitsread(tab->headbuf, strk, key->printf, H_STRING, T_STRING);
     if (*key->printf)
-      strcpy(key->printf,tdisptoprintf(key->printf));
+      tdisptoprintf(key->printf, key->printf);
 
     sprintf(strk, "TFORM%-3d", i+1);
     if (fitsread(tab->headbuf, strk, strf, H_STRING, T_STRING) != RETURN_OK) {
@@ -317,7 +315,7 @@ INPUT	Table structure.
 OUTPUT	RETURN_OK if tab is a binary table, or RETURN_ERROR otherwise.
 NOTES	The headbuf pointer in the tabstruct might be reallocated.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/08/2003
+VERSION	25/09/2004
  ***/
 int	update_head(tabstruct *tab)
 
@@ -325,7 +323,7 @@ int	update_head(tabstruct *tab)
    keystruct	*key;
    tabstruct	*ctab;
    int		i,j,n,naxis1;
-   static char	strk[82], str[82];
+   char		strk[88], str[88];
    char		*buf;
 
 /*Update EXTNAME, the table name */
@@ -429,8 +427,8 @@ int	update_head(tabstruct *tab)
       {
       sprintf(strk, "TDISP%-3d", i+1);
       addkeywordto_head(tab, strk, "");
-      fitswrite(tab->headbuf, strk, printftotdisp(key->printf),
-	H_STRING, T_STRING);
+      fitswrite(tab->headbuf, strk, printftotdisp(key->printf, str),
+		H_STRING, T_STRING);
       }
     key = key->nextkey;
     }
@@ -670,19 +668,20 @@ t_type	ttypeof(char *str)
 
 
 /****** tdisptoprintf *********************************************************
-PROTO	char	*tdisptoprintf(char *tdisp)
+PROTO	char	*tdisptoprintf(char *tdisp, char *str)
 PURPOSE	Convert the ``TDISP'' FITS format to the printf() format.
-INPUT	TDISP format string (see the FITS documentation).
+INPUT	TDISP format string (see the FITS documentation),
+	output string (allocated pointer).
 OUTPUT	printf() format string (see e.g.  K&R).
 NOTES	The present conversion does not handle binary or engineer notations.
 	A NULL vector is returned if the conversion was unsuccessful.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/08/97
+VERSION	25/09/2004
  ***/
-char	*tdisptoprintf(char *tdisp)
+char	*tdisptoprintf(char *tdisp, char *str)
 
   {
-   static char	str[16], control[4];
+   char		control[4];
    int		w,d, n;
 
   w = d = 0;
@@ -747,19 +746,20 @@ char	*tdisptoprintf(char *tdisp)
 
 
 /****** printftotdisp *********************************************************
-PROTO	char	*printftotdisp(char *tdisp)
+PROTO	char	*printftotdisp(char *tdisp, char *str)
 PURPOSE	Convert the printf() format to the ``TDISP'' FITS format.
-INPUT	printf() format string (see e.g.  K&R).
+INPUT	printf() format string (see e.g.  K&R),
+	output string (allocated pointer).
 OUTPUT	TDISP format string (see the FITS documentation).
 NOTES	The handling of C string formatting does not include the precision.
 	NULL is returned in case of unsucessful conversion.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/08/97
+VERSION	25/09/2004
  ***/
-char	*printftotdisp(char *cprintf)
+char	*printftotdisp(char *cprintf, char *str)
 
   {
-   static char	str[16], *control;
+   char		*control;
    int		w,d,n;
 
   *str = 0;

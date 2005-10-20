@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified version of the LDACTools: internal defs
 *
-*	Last modify:	04/11/2003
+*	Last modify:	16/08/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,7 +34,7 @@ extern int	bswapflag;		/* != 0 if bytes are swapped/IEEE */
 
 /*----------------------------- Internal constants --------------------------*/
 
-#define	OUTPUT		stderr		/* where all msgs are sent */
+#define	OUTPUT		stdout		/* where all msgs are sent */
 #define	KBYTE		1024		/* 1 kbyte! */
 #define	MBYTE		(1024*KBYTE)	/* 1 Mbyte! */
 #define	GBYTE		(1024*MBYTE)	/* 1 Gbyte! */

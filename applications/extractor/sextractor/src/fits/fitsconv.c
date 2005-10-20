@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for converting LDAC FITS catalogs.
 *
-*	Last modify:	13/03/99
+*	Last modify:	25/09/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,7 +34,7 @@ OUTPUT	RETURN_OK if the ASCII table was transformed, and RETURN_ERROR
 NOTES	This function can be used to stick the binary translation of
         similar ASCII tables.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/03/99
+VERSION	25/09/2004
  ***/
 tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
 		char *taboutname)
@@ -43,7 +43,7 @@ tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
    catstruct	*tabcat;
    keystruct	*key;
    tabstruct	*tabin,*tabout;
-   static char	comment[82], keyword[16], ptr[82];
+   char		comment[82], keyword[16], ptr[82];
    h_type	htype;
    t_type	ttype;
    char		*buf, *lptr;
@@ -118,70 +118,75 @@ tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
 
 
 /****** ttypeconv ************************************************************
-PROTO	void    *ttypeconv(void *ptr, t_type ttypein, t_type ttypeout)
+PROTO	void    ttypeconv(void *ptrin, void *ptrout,
+		t_type ttypein, t_type ttypeout)
 PURPOSE	Convert data from one type to another.
 INPUT	Pointer to element to convert,
+	destination pointer to the converted element,
 	t_type of the element to convert,
 	t_type of the converted element.
-OUTPUT	Pointer to the converted element.
+OUTPUT	-.
 NOTES	ttypeconv does not yet handle arrays.
-        A NULL vector is returned if the conversion was unsuccessful.
-AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 15/01/98
+AUTHOR  E. Bertin (IAP)
+VERSION 25/09/2004
  ***/
 
-void	*ttypeconv(void *ptr, t_type ttypein, t_type ttypeout)
+void	ttypeconv(void *ptrin, void *ptrout, t_type ttypein, t_type ttypeout)
 
   {
-   static union {char tbyte; short tshort; int tlong; float tfloat;
-		 double tdouble; char tstring;} ival, oval;
+   union	{char tbyte; short tshort; int tlong; float tfloat;
+		 double tdouble; char tstring;} ival;
 
-#define		OUTCONV(x, y)		\
-      switch(y)				\
-         {				\
-         case T_BYTE:			\
-         case T_STRING:			\
-           oval.tbyte = (char)x;	\
-         case T_SHORT:			\
-           oval.tshort = (short)x;	\
-           return (void *)&oval;	\
-         case T_LONG:			\
-           oval.tlong = (int)x;		\
-           return (void *)&oval;	\
-         case T_FLOAT:			\
-           oval.tfloat = (float)x;	\
-           return (void *)&oval;	\
-         case T_DOUBLE:			\
-           oval.tdouble = (double)x;	\
-           return (void *)&oval;	\
-         default:			\
-           return NULL;			\
+#define		OUTCONV(x, y)			\
+      switch(y)					\
+         {					\
+         case T_BYTE:				\
+         case T_STRING:				\
+	   *((char *)ptrout) = (char)x;		\
+           break;				\
+         case T_SHORT:				\
+           *((short *)ptrout) = (short)x;	\
+           break;				\
+         case T_LONG:				\
+           *((int *)ptrout) = (int)x;		\
+           break;				\
+         case T_FLOAT:				\
+           *((float *)ptrout) = (float)x;	\
+           break;				\
+         case T_DOUBLE:				\
+           *((double *)ptrout) = (double)x;	\
+           break;				\
+         default:				\
+	   break;				\
          }
-
-  if (ttypein == ttypeout)
-    return ptr;
 
   switch(ttypein)
     {
     case T_BYTE:
     case T_STRING:
-      ival.tbyte = *(char *)ptr;
+      ival.tbyte = *(char *)ptrin;
       OUTCONV(ival.tbyte, ttypeout);
+      break;
     case T_SHORT:
-      ival.tshort = *(short *)ptr;
+      ival.tshort = *(short *)ptrin;
       OUTCONV(ival.tshort, ttypeout);
+      break;
     case T_LONG:
-      ival.tlong = *(int *)ptr;
+      ival.tlong = *(int *)ptrin;
       OUTCONV(ival.tlong, ttypeout);
+      break;
     case T_FLOAT:
-      ival.tfloat = *(float *)ptr;
+      ival.tfloat = *(float *)ptrin;
       OUTCONV(ival.tfloat, ttypeout);
+      break;
     case T_DOUBLE:
-      ival.tdouble = *(double *)ptr;
+      ival.tdouble = *(double *)ptrin;
       OUTCONV(ival.tdouble, ttypeout);
+      break;
     default:
-      return NULL;
+      break;
     }
 
+  return;
   }
 

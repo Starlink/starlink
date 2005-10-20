@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	15/08/2003
+*	Last modify:	25/09/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -96,13 +96,13 @@ INPUT	A pointer to catalog structure, and the character string to insert.
 OUTPUT	RETURN_OK if everything went as expected, RETURN_ERROR otherwise.
 NOTES	The pointer to the primary header might be reallocated if necessary.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/08/2003
+VERSION	25/09/2004
  ***/
 int	addhistoryto_cat(catstruct *cat, char *str)
 
   {
-   static time_t	thetime;
-   static char		str2[82];
+   time_t		thetime;
+   char			str2[82];
    tabstruct		*tab;
    int			n, headpos;
 

@@ -9,10 +9,13 @@
 *
 *	Contents:	Include for poly.c
 *
-*	Last modify:	05/04/99
+*	Last modify:	03/03/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifndef _POLY_H_
+#define _POLY_H_
 
 /*--------------------------------- constants -------------------------------*/
 
@@ -40,8 +43,16 @@ extern polystruct	*poly_init(int *group,int ndim,int *degree,int ngroup);
 
 extern double			poly_func(polystruct *poly, double *pos);
 
-extern void		cholsolve(double *a, double *b, int n),
+extern int		cholsolve(double *a, double *b, int n),
+			*poly_powers(polystruct *poly);
+
+extern void		poly_addcste(polystruct *poly, double *cste),
 			poly_end(polystruct *poly),
 			poly_fit(polystruct *poly, double *x, double *y,
-				double *w, int ndata, double *extbasis);
+				double *w, int ndata, double *extbasis),
+			poly_solve(double *a, double *b, int n),
+			svdsolve(double *a, double *b, int m, int n,
+				double *vmat, double *wmat);
+
+#endif
 

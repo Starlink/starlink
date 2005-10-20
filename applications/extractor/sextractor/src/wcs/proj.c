@@ -191,7 +191,7 @@
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
 *   IRAF's TNX added by E.Bertin 2000/08/23
-*   $Id: proj.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
+*   $Id: proj.c,v 1.1.1.1 2004/01/04 21:33:26 bertin Exp $
 *===========================================================================*/
 
 #ifdef HAVE_CONFIG_H
@@ -364,10 +364,7 @@ struct prjprm *prj;
 
    for (k = 99; k >= 0 && prj->p[k] == 0.0 && prj->p[k+100] == 0.0; k--);
    if (k < 0)
-     {
-     k = 2;
-     prj->p[1] = prj->p[101] = 1.0;
-     }
+     k = 0;
 
    prj->n = k;
 
@@ -420,7 +417,13 @@ double *phi, *theta;
       if (tanset(prj)) return 1;
    }
 
-   raw_to_pv(prj, x,y, &xp, &yp);
+   if (prj->n)
+     raw_to_pv(prj, x,y, &xp, &yp);
+   else
+     {
+     xp = x;
+     yp = y;
+     }
    rp = sqrt(xp*xp+yp*yp);
    if (rp == 0.0) {
       *phi = 0.0;
@@ -3711,8 +3714,8 @@ int raw_to_pv(struct prjprm *prj, double x, double y, double *xo, double *yo)
    xp += *(a++)*(r3=r*r*r);
    yp += *(b++)*r3;
    if (!--k) goto poly_end;
-   xp += *(a++)*(x4=x*x);
-   yp += *(b++)*(y4=y*y);
+   xp += *(a++)*(x4=x2*x2);
+   yp += *(b++)*(y4=y2*y2);
    if (!--k) goto poly_end;
    xp += *(a++)*x3*y;
    yp += *(b++)*y3*x;

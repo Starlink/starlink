@@ -9,7 +9,7 @@
 *
 *	Contents:	general functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	03/12/2003
+*	Last modify:	15/08/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -95,18 +95,39 @@ NOTES	Only 1-segment tables are accepted. To copy multi-segment tables,
 	If a table with the same name and basic attributes already exists in
 	the destination catalog, then the new table is appended to it.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	03/12/2003
+VERSION	15/08/2003
  ***/
 int	add_tab(tabstruct *tab, catstruct *cat, int pos)
 
   {
-   tabstruct	*prevtab;
+   tabstruct	*outtab, *prevtab;
+   int		i;
 
-  if ((prevtab = pos_to_tab(cat, pos, 0)))
-    prevtab = prevtab->prevtab;
+/*Check if a similar table doesn't already exist in the dest. cat */
+  if ((outtab = name_to_tab(cat, tab->extname, 0)))
+    {
+    if ((outtab->naxis != 2)
+	|| (outtab->bitpix!=8)
+	|| strcmp(outtab->xtension,tab->xtension)
+	|| (outtab->tfields != tab->tfields)
+        || (outtab->naxisn[0] != tab->naxisn[0]))
+      return RETURN_ERROR;
+
+    prevtab = outtab;
+    for (i=outtab->nseg-1; i--;)
+      prevtab = prevtab->nexttab;
+    tab->seg = prevtab->seg+1;
+    tab->nseg = 0;
+    outtab->nseg++;
+    }
   else
-    tab->nexttab = tab->prevtab = prevtab = tab;
-  cat->ntab++;
+    {
+    if ((prevtab = pos_to_tab(cat, pos, 0)))
+      prevtab = prevtab->prevtab;
+    else
+      tab->nexttab = tab->prevtab = prevtab = tab;
+    cat->ntab++;
+    }
 
   (tab->nexttab = (tab->prevtab = prevtab)->nexttab)->prevtab = tab;
   prevtab->nexttab = tab;

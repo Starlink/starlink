@@ -9,7 +9,7 @@
 *
 *	Contents:	Fit the PSF to a detection.
 *
-*	Last modify:	27/11/2003
+*	Last modify:	15/12/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -792,9 +792,10 @@ void	psf_build(psfstruct *psf)
 /* Grab the context vector */
   ndim = psf->poly->ndim;
   for (i=0; i<ndim; i++)
-    pos[i] = (*(double *)ttypeconv(psf->context[i],psf->contexttyp[i],T_DOUBLE)
-	- psf->contextoffset[i]) / psf->contextscale[i];
-
+    {
+    ttypeconv(psf->context[i], &pos[i], psf->contexttyp[i],T_DOUBLE);
+    pos[i] = (pos[i] - psf->contextoffset[i]) / psf->contextscale[i];
+    }
   poly_func(psf->poly, pos);
 
   basis = psf->poly->basis;

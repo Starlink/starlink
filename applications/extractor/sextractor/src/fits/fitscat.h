@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified versin of the LDACTools: main include file
 *
-*	Last modify:	04/11/2003
+*	Last modify:	26/09/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -179,7 +179,7 @@ extern catstruct	*new_cat(int ncat),
 
 extern tabstruct	*asc2bin_tab(catstruct *catin, char *tabinname, 
 				catstruct *catout, char *taboutname),
-			*init_readobj(tabstruct *tab),
+			*init_readobj(tabstruct *tab, char **pbuf),
 			*name_to_tab(catstruct *cat, char *tabname, int seg),
 			*new_tab(char *tabname),
 			*pos_to_tab(catstruct *cat, int pos, int seg);
@@ -193,15 +193,15 @@ extern void	add_cleanupfilename(char *filename),
 		cleanup_files(void),
 		copy_tab_fromptr(tabstruct *tabin, catstruct *catout, int pos),
 		encode_checksum(unsigned int sum, char *str),
-		end_readobj(tabstruct *keytab, tabstruct *tab),
-		end_writeobj(catstruct *cat, tabstruct *tab),
+		end_readobj(tabstruct *keytab, tabstruct *tab, char *buf),
+		end_writeobj(catstruct *cat, tabstruct *tab, char *buf),
 		error(int, char *, char *),
 		fixexponent(char *s),
 		free_body(tabstruct *tab),
 		free_cat(catstruct **cat, int ncat),
 		free_key(keystruct *key),
 		free_tab(tabstruct *tab),
-		init_writeobj(catstruct *cat, tabstruct *tab),
+		init_writeobj(catstruct *cat, tabstruct *tab, char **pbuf),
 		install_cleanup(void (*func)(void)),
 		print_obj(FILE *stream, tabstruct *tab),
 		read_keys(tabstruct *tab, char **keynames, keystruct **keys,
@@ -217,13 +217,14 @@ extern void	add_cleanupfilename(char *filename),
 			int strflag,int banflag, int leadflag,
                         output_type o_type),
 		swapbytes(void *, int, int),
-		*ttypeconv(void *ptr, t_type ttypein, t_type ttypeout),
+		ttypeconv(void *ptrin, void *ptrout,
+			t_type ttypein, t_type ttypeout),
 		warning(char *, char *),
 		write_body(tabstruct *tab, PIXTYPE *ptr, size_t size),
 		write_checksum(tabstruct *tab);
 
-extern char	*tdisptoprintf(char *tdisp),
-		*printftotdisp(char *cprintf),
+extern char	*tdisptoprintf(char *tdisp, char *str),
+		*printftotdisp(char *cprintf, char *str),
 		*fitsnfind(char *fitsbuf, char *str, int nblock),
 		**tabs_list(catstruct *cat, int *n),
 		**keys_list(tabstruct *tab, int *n);
@@ -270,8 +271,9 @@ extern int	about_cat(catstruct *cat, FILE *stream),
 		readbintabparam_head(tabstruct *tab),
 		read_field(tabstruct *tab, char **keynames, keystruct **keys,
 			int nkeys, int field, tabstruct *ftab),
-		read_obj(tabstruct *keytab, tabstruct *tab),
-		read_obj_at(tabstruct *keytab, tabstruct *tab, long pos),
+		read_obj(tabstruct *keytab, tabstruct *tab, char *buf),
+		read_obj_at(tabstruct *keytab, tabstruct *tab, char *buf,
+				long pos),
 		remove_key(tabstruct *tab, char *keyname),
 		remove_keys(tabstruct *tab),
 		remove_tab(catstruct *cat, char *tabname, int seg),
@@ -286,7 +288,7 @@ extern int	about_cat(catstruct *cat, FILE *stream),
 		update_head(tabstruct *tab),
 		update_tab(tabstruct *tab),
 		verify_checksum(tabstruct *tab),
-		write_obj(tabstruct *tab),
+		write_obj(tabstruct *tab, char *buf),
 		wstrncmp(char *, char *, int);
 
 extern PIXTYPE	*alloc_body(tabstruct *tab,

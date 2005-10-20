@@ -9,7 +9,7 @@
 *
 *	Contents:	Compute magnitudes and other photometrical parameters.
 *
-*	Last modify:	27/11/2003
+*	Last modify:	24/08/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -191,6 +191,307 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
     obj2->mag_aper[i] = tv>0.0? -2.5*log10(tv) + prefs.mag_zeropoint : 99.0;
   if (i<prefs.magerr_apersize)
     obj2->magerr_aper[i] = tv>0.0? 1.086*sqrt(sigtv)/tv:99.0;
+
+  return;
+  }
+
+
+/***************************** computepetroflux ******************************/
+/*
+Compute the total flux within an automatic elliptical aperture.
+*/
+void  computepetroflux(picstruct *field, picstruct *dfield, picstruct *wfield,
+	picstruct *dwfield, objstruct *obj)
+
+  {
+   double		sigtv, tv, r1, v1,var,gain,backnoise2, muden,munum;
+   float		bkg, ngamma, mx,my, dx,dy, cx2,cy2,cxy, r2,
+			klim, klim2,kmin,kmin2,kmax,kmax2,kstep,kmea,kmea2,
+			dxlim, dylim;
+   int			area,areab, areaden, areanum,
+			x,y, x2,y2, xmin,xmax,ymin,ymax,
+			fymin,fymax, w,h,
+			pflag, corrflag, gainflag, pos;
+   PIXTYPE		*strip,*stript, *dstrip,*dstript, *wstrip,*wstript,
+			*dwstrip,*dwstript,
+			pix, wthresh=0.0, dwthresh=0.0;
+
+
+/* Let's initialize some variables */
+  if (!dfield)
+    dfield = field;
+  if (dwfield)
+    dwthresh = dwfield->weight_thresh;
+  wstrip = dwstrip = NULL;
+  if (wfield)
+    wthresh = wfield->weight_thresh;
+  wstript = dwstript = NULL;
+  w = field->width;
+  h = field->stripheight;
+  fymin = field->ymin;
+  fymax = field->ymax;
+  ngamma = field->ngamma;
+  bkg = (double)obj->dbkg;
+  mx = obj->mx;
+  my = obj->my;
+  var = backnoise2 = field->backsig*field->backsig;
+  gain = prefs.gain;
+  pflag = (prefs.detect_type==PHOTO)? 1:0;
+  corrflag = (prefs.mask_type==MASK_CORRECT);
+  gainflag = wfield && prefs.weightgain_flag;
+
+/* First step: find the extent of the ellipse (the Petrosian factor) */
+/* Clip boundaries in x and y */
+/* We first check that the search ellipse is large enough... */
+  if (PETRO_NSIG*sqrt(obj->a*obj->b)>prefs.autoaper[0]/2.0)
+    {
+    cx2 = obj->cxx;
+    cy2 = obj->cyy;
+    cxy = obj->cxy;
+    dxlim = cx2 - cxy*cxy/(4.0*cy2);
+    dxlim = dxlim>0.0 ? PETRO_NSIG/sqrt(dxlim) : 0.0;
+    dylim = cy2 - cxy*cxy/(4.0*cx2);
+    dylim = dylim > 0.0 ? PETRO_NSIG/sqrt(dylim) : 0.0;
+    klim2 = PETRO_NSIG*PETRO_NSIG;
+    }
+  else
+/*-- ...if not, use the circular aperture provided by the user */
+    {
+    cx2 = cy2 = 1.0;
+    cxy = 0.0;
+    dxlim = dylim = prefs.autoaper[0]/2.0;
+    klim2 =  dxlim*dxlim;
+    }
+
+  if ((xmin = RINT(mx-dxlim)) < 0)
+    {
+    xmin = 0;
+    obj->flag |= OBJ_APERT_PB;
+    }
+  if ((xmax = RINT(mx+dxlim)+1) > w)
+    {
+    xmax = w;
+    obj->flag |= OBJ_APERT_PB;
+    }
+  if ((ymin = RINT(my-dylim)) < field->ymin)
+    {
+    ymin = field->ymin;
+    obj->flag |= OBJ_APERT_PB;
+    }
+  if ((ymax = RINT(my+dylim)+1) > field->ymax)
+    {
+    ymax = field->ymax;
+    obj->flag |= OBJ_APERT_PB;
+    }
+
+  dstrip = dfield->strip;
+  if (dwfield)
+    dwstrip = dwfield->strip;
+  klim = sqrt(klim2);
+  kstep = klim/20.0;
+  area = areab = areanum = areaden = 0;
+  munum = muden = 0.0;
+  kmea = 0.0;
+  for (kmin=kstep; (kmax=kmin*1.2)<klim; kmin += kstep)
+    {
+    kmea = (kmin+kmax)/2.0;
+    kmea2 = kmea*kmea;
+    kmin2 = kmin*kmin;
+    kmax2 = kmax*kmax;
+    v1 = r1 = 0.0;
+    area = areab = areanum = areaden = 0;
+    munum = muden = 0.0;
+    for (y=ymin; y<ymax; y++)
+      {
+      dstript = dstrip + (pos = xmin + (y%h)*w);
+      if (dwfield)
+        dwstript = dwstrip + pos;
+      for (x=xmin; x<xmax; x++, dstript++, dwstript++)
+      {
+      dx = x - mx;
+      dy = y - my;
+      if ((r2=cx2*dx*dx + cy2*dy*dy + cxy*dx*dy) <= kmax2)
+        {
+        if ((pix=*dstript)>-BIG && (!dwfield || (dwfield&&*dwstript<dwthresh)))
+          {
+          area++;
+          if (r2>=kmin2)
+	    {
+            munum += pix;
+            areanum++;
+            }
+          if (r2<kmea2)
+	    {
+            muden += pix;
+            areaden++;
+            }
+          }
+        else
+          areab++;
+        }
+      }
+    }
+  if (areanum && areaden)
+    {
+    munum /= (double)areanum;
+    muden /= (double)areaden;
+    if (munum<muden*0.2)
+      break;
+    }
+  }
+
+  area += areab;
+  if (area)
+    {
+/*-- Go further only if some pixels are available !! */
+    if (areanum && areaden && munum && muden)
+      {
+      obj2->petrofactor = prefs.petroparam[0]*kmea;
+      if (obj2->petrofactor < prefs.petroparam[1])
+        obj2->petrofactor = prefs.petroparam[1];
+      }
+    else
+      obj2->petrofactor = prefs.petroparam[1];
+
+/*-- Flag if the Petrosian photometry can be strongly affected by neighhours */
+    if ((float)areab/area > CROWD_THRESHOLD)
+      obj->flag |= OBJ_CROWDED;
+
+/*-- Second step: integrate within the ellipse */
+/*-- Clip boundaries in x and y (bis) */
+/*-- We first check that the derived ellipse is large enough... */
+    if (obj2->petrofactor*sqrt(obj->a*obj->b)>prefs.autoaper[1]/2.0)
+      {
+      cx2 = obj->cxx;
+      cy2 = obj->cyy;
+      cxy = obj->cxy;
+      dxlim = cx2 - cxy*cxy/(4.0*cy2);
+      dxlim = dxlim>0.0 ? obj2->petrofactor/sqrt(dxlim) : 0.0;
+      dylim = cy2 - cxy*cxy/(4.0*cx2);
+      dylim = dylim > 0.0 ? obj2->petrofactor/sqrt(dylim) : 0.0;
+      klim2 = obj2->petrofactor*obj2->petrofactor;
+      }
+    else
+/*---- ...if not, use the circular aperture provided by the user */
+      {
+      cx2 = cy2 = 1.0;
+      cxy = 0.0;
+      dxlim = dylim = prefs.autoaper[1]/2.0;
+      klim2 =  dxlim*dxlim;
+      obj2->petrofactor = 0.0;
+      }
+
+    if ((xmin = RINT(mx-dxlim)) < 0)
+      {
+      xmin = 0;
+      obj->flag |= OBJ_APERT_PB;
+      }
+    if ((xmax = RINT(mx+dxlim)+1) > w)
+      {
+      xmax = w;
+      obj->flag |= OBJ_APERT_PB;
+      }
+    if ((ymin = RINT(my-dylim)) < field->ymin)
+      {
+      ymin = field->ymin;
+      obj->flag |= OBJ_APERT_PB;
+      }
+    if ((ymax = RINT(my+dylim)+1) > field->ymax)
+      {
+      ymax = field->ymax;
+      obj->flag |= OBJ_APERT_PB;
+      }
+
+    area = areab = 0;
+    tv = sigtv = 0.0;
+    strip = field->strip;
+    if (wfield)
+      wstrip = wfield->strip;
+    for (y=ymin; y<ymax; y++)
+      {
+      stript = strip + (pos = xmin + (y%h)*w);
+      if (wfield)
+        wstript = wstrip + pos;
+      for (x=xmin; x<xmax; x++, stript++, wstript++)
+        {
+        dx = x - mx;
+        dy = y - my;
+        if ((cx2*dx*dx + cy2*dy*dy + cxy*dx*dy) <= klim2)
+          {
+          area++;
+/*-------- Here begin tests for pixel and/or weight overflows. Things are a */
+/*-------- bit intricated to have it running as fast as possible in the most */
+/*-------- common cases */
+          if ((pix=*stript)<=-BIG || (wfield && (var=*wstript)>=wthresh))
+            {
+            areab++;
+            if (corrflag
+		&& (x2=(int)(2*mx+0.49999-x))>=0 && x2<w
+		&& (y2=(int)(2*my+0.49999-y))>=fymin && y2<fymax
+		&& (pix=*(strip + (pos = (y2%h)*w + x2)))>-BIG)
+              {
+              if (wfield)
+                {
+                var = *(wstrip + pos);
+                if (var>=wthresh)
+                  pix = var = 0.0;
+                }
+              }
+            else
+              {
+              pix = 0.0;
+              if (wfield)
+                var = 0.0;
+              }
+            }
+          if (pflag)
+            {
+            pix = exp(pix/ngamma);
+            sigtv += var*pix*pix;
+            }
+          else
+            sigtv += var;
+          tv += pix;
+          if (gainflag && pix>0.0 && gain>0.0)
+            sigtv += pix/gain*var/backnoise2;
+          }
+        }
+      }
+
+/*-- Flag if the Petrosian photometry can be strongly affected by neighhours */
+    if ((float)areab > CROWD_THRESHOLD*area)
+      obj->flag |= OBJ_CROWDED;
+
+    if (pflag)
+      {
+      tv = ngamma*(tv-area*exp(bkg/ngamma));
+      sigtv /= ngamma*ngamma;
+      }
+    else
+      {
+      tv -= area*bkg;
+      if (!gainflag && gain > 0.0 && tv>0.0)
+        sigtv += tv/gain;
+      }
+    }
+  else
+/*-- No available pixels: set the flux to zero */
+    tv = sigtv = 0.0;
+
+
+  obj2->flux_petro = tv;
+  obj2->fluxerr_petro = sqrt(sigtv);
+
+  if (FLAG(obj2.mag_petro))
+    obj2->mag_petro = obj2->flux_petro>0.0?
+			 -2.5*log10(obj2->flux_petro) + prefs.mag_zeropoint
+			:99.0;
+  if (FLAG(obj2.magerr_petro))
+    obj2->magerr_petro = obj2->flux_petro>0.0?
+			 1.086*obj2->fluxerr_petro/obj2->flux_petro
+			:99.0;
+  if (tv<=0.0)
+    obj2->petrofactor = 0.0;
 
   return;
   }
@@ -574,6 +875,15 @@ void  computemags(picstruct *field, objstruct *obj)
 			 1.086*obj2->fluxerr_prof/obj2->flux_prof
 			:99.0;
 
+/* Mag. WINdowed */
+  if (FLAG(obj2.mag_win))
+    obj2->mag_win = obj2->flux_win>0.0?
+			 -2.5*log10(obj2->flux_win) + prefs.mag_zeropoint
+			:99.0;
+  if (FLAG(obj2.magerr_win))
+    obj2->magerr_win = obj2->flux_win>0.0?
+			 1.086*obj2->fluxerr_win/obj2->flux_win
+			:99.0;
 /* Mag. GALFIT */
   if (FLAG(obj2.mag_galfit))
     obj2->mag_galfit = obj2->flux_galfit>0.0?

@@ -1,3 +1,7 @@
+Aug 05: 2.4
+        - New windowed measurement parameters
+        - Better FITS compliancy of output files
+
 May 03: 2.3
 	- Autoconf'ed package.
 	- Dumpable internal config file

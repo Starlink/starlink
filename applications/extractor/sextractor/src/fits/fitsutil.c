@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for handling FITS keywords.
 *
-*	Last modify:	13/06/2002
+*	Last modify:	17/11/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -39,7 +39,7 @@ NOTES	For all keywords except commentary ones (like COMMENT, HISTORY or
 	Enough memory should be provided for the FITS header to contain one
 	more line of 80 char.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/04/2002
+VERSION	13/06/2004
  ***/
 int	fitsadd(char *fitsbuf, char *keyword, char *comment)
 
@@ -82,9 +82,12 @@ int	fitsadd(char *fitsbuf, char *keyword, char *comment)
     if (commentflag)
       sprintf(str, "%-8.8s %-71.71s",
 	keyword, comment?comment:" ");
-    else
+    else if (comment && *comment)      
       sprintf(str, "%-8.8s=                      / %-47.47s",
-	keyword, comment?comment:" ");
+	keyword, comment);
+    else
+      sprintf(str, "%-8.8s=                        %-47.47s",
+	      keyword, " ");
 
     memcpy(key_ptr, str, 80);
     }
@@ -157,17 +160,16 @@ INPUT	pointer to the current line of FITS buffer,
 	pointer to a char * (where to put the comment).
 OUTPUT	RETURN_OK if something was found, RETURN_ERROR otherwise.
 NOTES	-.
-AUTHOR	E. Bertin (IAP & Leiden observatory),
-	E.R. Deul
+AUTHOR	E. Bertin (IAP),
         E.R. Deul - Handling of NaN
-VERSION	21/04/2003
+VERSION	04/08/2004
  ***/
 int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 		t_type *ttype, char *comment)
 
   {
    char *fptr, *cptr, c, *lastspace;
-   int	i, toggle;
+   int	i,j, toggle;
 
   *((char *)ptr) = 0;
 /*First, get the keyword*/
@@ -189,11 +191,17 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
     return RETURN_OK;
     }
   
-/*Handle character strings*/
-  if ((int)fitsline[10] == '\'')
+  for (j=10; j<80 && fitsline[j] == (char)' '; j++);
+  if (j==80 || fitsline[j] == '/')
+    {
+    *htype = H_COMMENT;
+    *ttype = T_STRING;
+    return RETURN_ERROR;
+    }
+  if ((int)fitsline[j] == '\'')
     {
     cptr = ptr;
-    for (fptr = fitsline + (i=11); i<80; i++)
+    for (fptr = fitsline + (i=j+1); i<80; i++)
       {
       if (*fptr==(char)'\'')
         {
@@ -209,39 +217,39 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
     *htype = (cptr != ptr && *(cptr-1)==' ') ? H_STRINGS: H_STRING;
     *ttype = T_STRING;
     }
-/*Handle booleans*/
-  else if (fitsline[29] == (char)'T' || fitsline[29] == (char)'F')
+  else if (fitsline[j] == (char)'T' || fitsline[j] == (char)'F')
     {
-    *((BYTE *)ptr) = fitsline[29]==(char)'T'?1:0;
+    *((BYTE *)ptr) = fitsline[j]==(char)'T'?1:0;
     *htype = H_BOOL;
     *ttype = T_BYTE;
     }
+  else if (!strncmp(fitsline+j, "NaN", 3))
+    {
+    *((double *)ptr) = BIG;
+    *htype = H_EXPO;
+    *ttype = T_DOUBLE;
+    }
   else
     {
-    for (fptr = fitsline + (i=10); i<30 && *(fptr++)!=(char)'.'; i++);
-/*Handle floats*/
-    if (i<30
-	|| !strncmp(keyword, "CRVAL",5)
-	|| !strncmp(keyword, "2MULST",6)
-	|| !strncmp(keyword, "2MUUTIME",8)
-	|| !strncmp(keyword, "2MUAZIMU",8)
-        || strncmp(fitsline+11, "NaN", 3) == 0) 
-			/* ^--- He!! temporary fix EB 20/03/96*/
-			/* ^--- He!! temporary fix ED 24/12/96*/
+    for (i=j; i<80 && fitsline[i]!=(char)'/' && fitsline[i]!=(char)'.'; i++);
+/*-- Handle floats*/
+    if (i==80)
       {
-      if (strncmp(fitsline+11, "NaN", 3) == 0) {
-         *((double *)ptr) = -1.e-100;
-      } else {
-         fixexponent(fitsline);
-         *((double *)ptr) = atof(fitsline+10);
+      *((int *)ptr) = 0;
+      *htype = H_INT;
+      *ttype = T_LONG;
       }
+    else if (fitsline[i]==(char)'.') 
+      {
+      fixexponent(fitsline+j);
+      *((double *)ptr) = atof(fitsline+j);
       *htype = H_EXPO;
       *ttype = T_DOUBLE;
       }
     else
-/*Handle ints*/
+/*---- Handle ints*/
       {
-      *((int *)ptr) = atoi(fitsline+10);
+      *((int *)ptr) = atoi(fitsline+j);
       *htype = H_INT;
       *ttype = T_LONG;
       }
@@ -250,7 +258,7 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 /*Store comment if it is found*/
   toggle = 0;
   lastspace = NULL;
-  for (fptr = fitsline + (i=10); i<80; i++)
+  for (fptr = fitsline + (i=j); i<80; i++)
     {
     if (*fptr == (char)'\'')
       toggle^=toggle;
@@ -289,7 +297,7 @@ INPUT	pointer to the FITS buffer,
 OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	08/06/99
+VERSION	04/08/2004
  ***/
 int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
@@ -322,7 +330,12 @@ int	fitsread(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 			break;
 
     case H_BOOL:	sscanf(str+10, "%1s", s);
-			*(int *)ptr = ((int)s[0] == 'T') ? 1 : 0;
+                        if (ttype == T_BYTE)
+			  *(BYTE *)ptr = ((int)s[0] == 'T') ? 1 : 0;
+                        else if (ttype == T_SHORT)
+			  *(short *)ptr = ((int)s[0] == 'T') ? 1 : 0;
+                        else
+			  *(LONG *)ptr = ((int)s[0] == 'T') ? 1 : 0;
 			break;
 
     case H_STRING:	st = ptr;
@@ -413,7 +426,7 @@ OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 	The keyword must already exist in the buffer (use fitsadd()).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	21/04/2003
+VERSION	17/11/2004
  ***/
 int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
@@ -440,11 +453,11 @@ int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 				*(double *)ptr: *(float *)ptr);
 			break;
 
-    case H_EXPO:	sprintf(str, "    %16.9e", (ttype==T_DOUBLE)?
+    case H_EXPO:	sprintf(str, "    %16.9E", (ttype==T_DOUBLE)?
 				*(double *)ptr: *(float *)ptr);
 			break;
 
-    case H_BOOL:	if (*(int *)ptr)
+    case H_BOOL:	if (((ttype==T_SHORT)? *(short *)ptr : *(LONG *)ptr))
 			  sprintf(str, "                   T");
 			else
 			  sprintf(str, "                   F");

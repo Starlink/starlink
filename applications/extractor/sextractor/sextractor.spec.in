@@ -20,9 +20,13 @@ SExtractor stands for ``Source Extractor'': a software for making catalog of sou
 %setup -q
 
 %build
-./configure --prefix=$RPM_BUILD_ROOT/usr/local/ --mandir=$RPM_BUILD_ROOT/usr/local/man/ --enable-static
-
+if test "$GCCFLAGS"; then
+./configure --enable-static --prefix=$RPM_BUILD_ROOT/usr/local/ --mandir=$RPM_BUILD_ROOT/usr/local/man/
+make CFLAGS="$GCCFLAGS"
+else
+./configure --prefix=$RPM_BUILD_ROOT/usr/local/ --mandir=$RPM_BUILD_ROOT/usr/local/man/
 make
+fi
 
 %install
 make install
@@ -35,7 +39,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/bin/sex
 /usr/local/man/man1/sex.1
 /usr/local/man/manx/sex.x
-%doc AUTHORS BUGS ChangeLog COPYING HISTORY INSTALL README THANKS doc/README.DOC doc/sextractor.ps
+%doc AUTHORS BUGS ChangeLog COPYING HISTORY INSTALL README THANKS doc/README.DOC doc/sextractor.pdf
 
 %changelog
 * @DATE2@ @PACKAGER@ <@PACKAGE_BUGREPORT@>

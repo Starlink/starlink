@@ -9,7 +9,7 @@
 *
 *	Contents:	header structure and templates for catalog data.
 *
-*	Last modify:	16/12/2002
+*	Last modify:	13/12/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -82,6 +82,10 @@ keystruct	headkey[] = {
   {"SEXAUTP1", "Parameter #1 used for automatic magnitudes",
 	&prefs.autoparam[0], H_FLOAT, T_DOUBLE, "%4.1f"},
   {"SEXAUTP2", "Parameter #2 used for automatic magnitudes",
+	&prefs.autoparam[1], H_FLOAT, T_DOUBLE, "%4.1f"},
+  {"SEXPETP1", "Parameter #1 used for Petronsian magnitudes",
+	&prefs.autoparam[0], H_FLOAT, T_DOUBLE, "%4.1f"},
+  {"SEXPETP2", "Parameter #2 used for Petrosian magnitudes",
 	&prefs.autoparam[1], H_FLOAT, T_DOUBLE, "%4.1f"},
   {"SEXSATLV", "Saturation level used for flagging (ADU)",
 	&prefs.satur_level, H_EXPO, T_DOUBLE, "%-13G"},

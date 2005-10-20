@@ -9,7 +9,7 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	26/11/2003
+*	Last modify:	15/06/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -186,7 +186,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
    int		i, ival;
    size_t	padsize;
    double	dval;
-   USHORT	*ptri;
+   ULONG	*ptri;
    PIXTYPE	*ptrf;
 
 /* Inherit the field FITS header */
@@ -255,12 +255,12 @@ void	reinitcheck(picstruct *field, checkstruct *check)
       break;
 
     case CHECK_SEGMENTATION:
-      ival = 16;
+      ival = 32;
       fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
       check->width = field->width;
       check->height = field->height;
       check->npix = field->npix;
-      QCALLOC(ptri, USHORT, check->npix);
+      QCALLOC(ptri, ULONG, check->npix);
       check->pix = (void *)ptri;
       QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
       free(check->fitshead);
@@ -435,11 +435,11 @@ void	reendcheck(picstruct *field, checkstruct *check)
 
     case CHECK_SEGMENTATION:
       if (bswapflag)
-        swapbytes(check->pix, sizeof(USHORT), (int)check->npix);
-      QFWRITE(check->pix,check->npix*sizeof(USHORT),
+        swapbytes(check->pix, sizeof(ULONG), (int)check->npix);
+      QFWRITE(check->pix,check->npix*sizeof(ULONG),
 		check->file,check->filename);
       free(check->pix);
-      padsize = (FBSIZE -((check->npix*sizeof(USHORT))%FBSIZE)) % FBSIZE;
+      padsize = (FBSIZE -((check->npix*sizeof(ULONG))%FBSIZE)) % FBSIZE;
       break;
 
     case CHECK_SUBOBJECTS:

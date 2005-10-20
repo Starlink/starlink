@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for reading LDAC FITS catalogs.
 *
-*	Last modify:	15/08/2003
+*	Last modify:	26/09/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,8 +25,7 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*linein_buf, padbuf[FBSIZE];
-int	linein_size, nlinein;
+char	padbuf[FBSIZE];
 
 /****** read_cat ***************************************************************
 PROTO	catstruct read_cat(char *filename)
@@ -96,15 +95,16 @@ catstruct	*read_cats(char **filenames, int ncat)
 
 
 /****** init_readobj **********************************************************
-PROTO	tabstruct *init_readobj(tabstruct *tab)
+PROTO	tabstruct *init_readobj(tabstruct *tab, char **pbuf)
 PURPOSE	Prepare the reading of individual sources in a FITS table
-INPUT	Table structure.
+INPUT	Table structure,
+	pointer to an array pointer to be used as a temporary buffer.
 OUTPUT	Pointer to the table structure from which the data will be read.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/08/2003
+VERSION	26/09/2004
  ***/
-tabstruct	*init_readobj(tabstruct *tab)
+tabstruct	*init_readobj(tabstruct *tab, char **pbuf)
 
   {
    catstruct	*tabcat;
@@ -134,38 +134,25 @@ tabstruct	*init_readobj(tabstruct *tab)
     error(EXIT_FAILURE, "*Error*: Cannot access ", tabcat->filename);
   QFSEEK(tabcat->file, keytab->bodypos, SEEK_SET, tabcat->filename);
 
-/* Allocate memory for the input buffer (or increase it if done already) */
-  if (linein_buf)
-    {
-    if (linein_size < tab->naxisn[0])
-      {
-      QREALLOC(linein_buf, char, tab->naxisn[0]);
-      linein_size = tab->naxisn[0];
-      }
-    }
-  else
-    {
-    QMALLOC(linein_buf, char, tab->naxisn[0]);
-    linein_size = tab->naxisn[0];
-    }
-
-  nlinein++;
+/* Allocate memory for the input buffer */
+  QMALLOC(*pbuf, char, tab->naxisn[0]);
 
   return keytab;
   }
 
 
 /****** read_obj **************************************************************
-PROTO	int read_obj(tabstruct *keytab, tabstruct *tab)
+PROTO	int read_obj(tabstruct *keytab, tabstruct *tab, char *buf)
 PURPOSE	Read one individual source at the current position in a FITS table.
 INPUT	Table which will be accessed from disk (provided by init_readobj()),
-	Table containing the keys that will be read.
+	table containing the keys that will be read,
+	pointer to the temporary buffer.
 OUTPUT	The number of table lines that remain to be read.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	18/02/2000
+VERSION	26/09/2004
  ***/
-int	read_obj(tabstruct *keytab, tabstruct *tab)
+int	read_obj(tabstruct *keytab, tabstruct *tab, char *buf)
 
   {
    keystruct	*key;
@@ -173,12 +160,12 @@ int	read_obj(tabstruct *keytab, tabstruct *tab)
    int		b,k;
    int		esize;
 
-  QFREAD(linein_buf,keytab->naxisn[0],keytab->cat->file,keytab->cat->filename);
+  QFREAD(buf,keytab->naxisn[0],keytab->cat->file,keytab->cat->filename);
   key = tab->key;
   for (k=tab->nkey; k--; key = key->nextkey)
     if (key->pos>=0)
       {
-      pin = linein_buf+key->pos;
+      pin = buf+key->pos;
       pout = key->ptr;
       if (bswapflag)
         {
@@ -194,17 +181,18 @@ int	read_obj(tabstruct *keytab, tabstruct *tab)
 
 
 /****** read_obj_at ***********************************************************
-PROTO	int read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
+PROTO	int read_obj_at(tabstruct *keytab, tabstruct *tab, char *buf, long pos)
 PURPOSE Get one source at a specific position in a FITS table.
 INPUT	Table which will be accessed from disk (provided by init_readobj()),
-	Table containing the keys that will be read.
-	Position number in table.
+	table containing the keys that will be read.
+	pointer to the temporary buffer,
+	position number in table.
 OUTPUT	RETURN_OK if the object has been accessed, RETURN_ERROR otherwise.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	28/02/2000
+VERSION	26/09/2004
  ***/
-int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
+int	read_obj_at(tabstruct *keytab, tabstruct *tab, char *buf, long pos)
 
   {
    keystruct	*key;
@@ -216,12 +204,12 @@ int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
   if ((n=keytab->naxisn[0]*pos) >= keytab->tabsize)
     return RETURN_ERROR;
   QFSEEK(keytab->cat->file,keytab->bodypos+n, SEEK_SET, keytab->cat->filename);
-  QFREAD(linein_buf,keytab->naxisn[0],keytab->cat->file,keytab->cat->filename);
+  QFREAD(buf,keytab->naxisn[0],keytab->cat->file,keytab->cat->filename);
   key = tab->key;
   for (k=tab->nkey; k--; key = key->nextkey)
     if (key->pos>=0)
       {
-      pin = linein_buf+key->pos;
+      pin = buf+key->pos;
       pout = key->ptr;
       if (bswapflag)
         {
@@ -237,16 +225,17 @@ int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
 
 
 /****** end_readobj **********************************************************
-PROTO	void end_readobj(tabstruct *keytab, tabstruct *tab)
+PROTO	void end_readobj(tabstruct *keytab, tabstruct *tab, char *buf)
 PURPOSE	End the writing of individual sources in a FITS table
 INPUT	Table which will be accessed from disk (provided by init_readobj()),
-	Table containing the keys that have been read.
+	table containing the keys that have been read,
+	pointer to the temporary buffer.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/11/97
+VERSION	26/09/2004
  ***/
-void	end_readobj(tabstruct *keytab, tabstruct *tab)
+void	end_readobj(tabstruct *keytab, tabstruct *tab, char *buf)
 
   {
 
@@ -255,12 +244,7 @@ void	end_readobj(tabstruct *keytab, tabstruct *tab)
 
 /* Recover the original state of the original table */
   update_tab(keytab);
-  if (!(--nlinein))
-    {
-    free(linein_buf);
-    linein_buf = NULL;
-    linein_size = 0;
-    }
+  free(buf);
 
   return;
   }

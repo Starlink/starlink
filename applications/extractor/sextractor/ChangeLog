@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    03/12/2003
+*       Last modify:    27/09/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -398,3 +398,52 @@ EB      28/11/2003      -               Fixed gcc -Wall warnings
 EB      03/12/2003      add_tab()       Removed confusing seg section, fixing
                                         the SEXNDET header bug with MEFs.
                         save_head()     Add saving of headpos file position.
+
+EB      15/06/2004      analyse.c
+                        check.c
+                        clean.c         Mv SEGMENTATION map from 16 to 32 bits.
+
+EB      13/12/2004      computepetroflux()
+                                        Added Petrosian "total" magnitudes
+                        winpos.c        Added *WIN_* position measurements.
+
+EB      14/12/2004      key.h           Keyword max length changed to 31 chars
+
+EB      15/12/2004      -               New RPM build system
+                        -               Updated the fits and wcs libraries
+                                        to the latest versions.
+
+EB      15/02/2005      compute_winpos()
+                                        Added 1.0 to computed coordinates and
+                                        fixed error singularities. New
+                                        iterative procedure (more accurate).
+
+EB      17/07/2005      compute_winpos()
+                                        Added computation of "windowed moments".
+                        astrom.c        Added support for WORLD "windowed
+                                        parameters".
+
+EB      18/07/2005      dumpprefs()     Added support for "deep dump".
+                        Makefile.am     added the -g option to gcc CFLAGS.
+                        param.h         Fixed non-FORTRAN compliant format
+                                        in TDISP output.
+
+EB      22/08/2005      compute_winpos()
+                                        Fixed issues for sources with flux<0.
+
+EB      23/08/2005      param.h         Removed duplicated lines.
+
+EB      24/08/2005      compute_winpos()
+                                        Added Kaiser's POLARizations (POLAR and
+                                        POLARWIN) and FLAGS_WIN.
+
+EB      25/08/2005      compute_winpos()
+                                        Added NITER_WIN giving the number of
+                                        WIN iterations.
+
+EB      22/09/2005      compute_winpos()
+                                        Fixed a trigger bug with ERR*WIN_IMAGE.
+
+EB      23/09/2005      define.h        Corrected SExtractor URL
+
+EB      27/09/2005      examineiso()    Fixed NaN in computing ISO thresholds.
