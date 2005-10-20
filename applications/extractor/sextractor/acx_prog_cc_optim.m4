@@ -1,24 +1,18 @@
-dnl @synopsis VL_PROG_CC_WARNINGS([ANSI])
+dnl @synopsis ACX_PROG_CC_OPTIM
 dnl
-dnl Enables a reasonable set of warnings for the C compiler.  Optionally,
-dnl if the first argument is nonempty, turns on flags which enforce and/or
-dnl enable proper ANSI C if such are known with the compiler used.
+dnl Enables a reasonable set of optimization flags for the C compiler. 
 dnl
 dnl Currently this macro knows about GCC, Solaris C compiler,
 dnl Digital Unix C compiler, C for AIX Compiler, HP-UX C compiler,
 dnl IRIX C compiler, NEC SX-5 (Super-UX 10) C compiler, and Cray J90
 dnl (Unicos 10.0.0.8) C compiler.
 dnl
-dnl @version 1.1
-dnl @author Ville Laurikari <vl@iki.fi>
+dnl This macro is a modification of Ville Laurikari's VL_PROG_CC_WARNINGS
+dnl @version 1.0 (2002-04-15)
+dnl @authors Emmanuel Bertin <bertin@iap.fr> Ville Laurikari <vl@iki.fi>
 dnl
 AC_DEFUN([ACX_PROG_CC_OPTIM], [
-  ansi=$1
-  if test -z "$ansi"; then
-    msg="for C compiler warning flags"
-  else
-    msg="for C compiler warning and ANSI conformance flags"
-  fi
+  msg="for C compiler optimization flags"
   AC_CACHE_CHECK($msg, prog_cc_optim_flags, [
     if test -n "$CC"; then
       cat > conftest.c <<EOF
@@ -27,11 +21,7 @@ EOF
 
       dnl GCC
       if test "$GCC" = "yes"; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O -ansi"
-        fi
+        prog_cc_optim_flags="-O3 -funroll-loops -fomit-frame-pointer -Wall"
 
       dnl Most compilers print some kind of a version string with some command
       dnl line options (often "-V").  The version string should be checked
@@ -44,73 +34,46 @@ EOF
 
       dnl Solaris C compiler
       elif $CC -V 2>&1 | grep -i "WorkShop" > /dev/null 2>&1 &&
-           $CC -c -v -Xc conftest.c > /dev/null 2>&1 &&
+           $CC -c -O conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="-O"
 
-      dnl Digital Unix C compiler
-      elif $CC -V 2>&1 | grep -i "Digital UNIX Compiler" > /dev/null 2>&1 &&
-           $CC -c -verbose -w0 -warnprotos -std1 conftest.c > /dev/null 2>&1 &&
+      dnl Digital Unix/Compaq C compiler
+      elif ($CC -V 2>&1 | grep -i "Digital UNIX Compiler"> /dev/null 2>&1 ||
+	   $CC -V 2>&1 | grep -i "Compaq C"> /dev/null 2>&1) &&
+           $CC -c -fast conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+         prog_cc_optim_flags="-fast"
 
       dnl C for AIX Compiler
       elif $CC 2>&1 | grep -i "C for AIX Compiler" > /dev/null 2>&1 &&
-           $CC -c -qlanglvl=ansi -qinfo=all conftest.c > /dev/null 2>&1 &&
+           $CC -c -qinfo=all -O2 conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="-O2"
 
       dnl IRIX C compiler
       elif $CC -version 2>&1 | grep -i "MIPSpro Compilers" > /dev/null 2>&1 &&
-           $CC -c -fullwarn -ansi -ansiE conftest.c > /dev/null 2>&1 &&
+           $CC -c -fullwarn -O3 conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="-O3"
 
       dnl HP-UX C compiler
       elif what $CC 2>&1 | grep -i "HP C Compiler" > /dev/null 2>&1 &&
-           $CC -c -Aa +w1 conftest.c > /dev/null 2>&1 &&
+           $CC -c -Aa +O3 conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="+O3"
 
       dnl The NEC SX-5 (Super-UX 10) C compiler
       elif $CC -V 2>&1 | grep "/SX" > /dev/null 2>&1 &&
-           $CC -c -pvctl[,]fullmsg -Xc conftest.c > /dev/null 2>&1 &&
+           $CC -c -Xc -O conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="-O"
 
       dnl The Cray C compiler (Unicos)
       elif $CC -V 2>&1 | grep -i "Cray" > /dev/null 2>&1 &&
-           $CC -c -h msglevel 2 conftest.c > /dev/null 2>&1 &&
+           $CC -c -h conform -O3 conftest.c > /dev/null 2>&1 &&
            test -f conftest.o; then
-        if test -z "$ansi"; then
-          prog_cc_optim_flags="-O"
-        else
-          prog_cc_optim_flags="-O"
-        fi
+        prog_cc_optim_flags="-O3"
 
       fi
       rm -f conftest.*
