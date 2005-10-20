@@ -76,6 +76,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/pgp \
 	$(MANIFESTS)/photom \
 	$(MANIFESTS)/pisa \
+	$(MANIFESTS)/pongo \
 	$(MANIFESTS)/polpack \
 	$(MANIFESTS)/prm \
 	$(MANIFESTS)/psmerge \
@@ -248,7 +249,7 @@ include Makefile.dependencies
 $(MANIFESTS)/starconf: buildsupport/starconf/configure
 
 buildsupport/starconf/configure: $(MANIFESTS)/automake $(MANIFESTS)/autoconf
-	cd buildsupport/starconf && autoreconf --install --symlink
+	cd buildsupport/starconf && autoreconf --install --symlink --verbose
 
 # Disable `make install' from this directory
 install install-manifest:
