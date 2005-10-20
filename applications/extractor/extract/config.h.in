@@ -135,6 +135,9 @@
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef gid_t
 
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
 /* Define to `long' if <sys/types.h> does not define. */
 #undef off_t
 

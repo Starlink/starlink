@@ -88,7 +88,7 @@ void initastrom( picstruct *field ) {
      compute_wcs( field, (field->width+1)/2.0, (field->height+1)/2.0 );
 
      /*---- Compute Pole coordinates in J2000 and/or B1950 for THETAs */
-     if (FLAG(obj2.theta2000) || FLAG(obj2.theta1950) ||
+     if (FLAG(obj2.theta2000) || FLAG(obj2.theta1950)
 	|| FLAG(obj2.poserr_theta2000) || FLAG(obj2.poserr_theta1950)
 	|| FLAG(obj2.win_theta2000) || FLAG(obj2.win_theta1950)
         || FLAG(obj2.winposerr_theta2000) || FLAG(obj2.winposerr_theta1950))
@@ -159,8 +159,8 @@ void computeastrom(picstruct *field, objstruct *obj) {
       {
        /*  Request for world coordinates, but no WCS.*/
        double	dx,dy;
-       dx = obj2->posx - as->crpix[0];
-       dy = obj2->posy - as->crpix[1];
+       dx = obj2->posx;
+       dy = obj2->posy;
        obj2->mxw = lm[0]*dx + lm[1]*dy;	/* CDELT included! */
        obj2->myw = lm[2]*dx + lm[3]*dy;	/* CDELT included! */
       }
@@ -187,8 +187,8 @@ void computeastrom(picstruct *field, objstruct *obj) {
        {
         /* Need WCS positions, but no WCS available. */
         double	dx,dy;
-        dx = obj->peakx - as->crpix[0];
-        dy = obj->peaky - as->crpix[1];
+        dx = obj->peakx;
+        dy = obj->peaky;
         obj2->peakxw = lm[0]*dx + lm[1]*dy;	/* CDELT included! */
         obj2->peakyw = lm[2]*dx + lm[3]*dy;	/* CDELT included! */
        }
@@ -221,10 +221,10 @@ void computeastrom(picstruct *field, objstruct *obj) {
       {
        double	dx,dy;
 
-      dx = obj2->winpos_x - as->crpix[0];
-      dy = obj2->winpos_y - as->crpix[1];
-      obj2->winpos_xw = as->crval[0]+ lm[0]*dx + lm[1]*dy;/* CDELT included! */
-      obj2->winpos_yw = as->crval[1]+ lm[2]*dx + lm[3]*dy;/* CDELT included! */
+      dx = obj2->winpos_x;
+      dy = obj2->winpos_y;
+      obj2->winpos_xw = lm[0]*dx + lm[1]*dy;/* CDELT included! */
+      obj2->winpos_yw = lm[2]*dx + lm[3]*dy;/* CDELT included! */
       }
     }
 
