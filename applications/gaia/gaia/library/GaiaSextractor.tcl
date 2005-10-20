@@ -2191,14 +2191,23 @@ itcl::class gaia::GaiaSextractor {
                   #  command fails).
                   file delete [get_catname_]
 
+                  #  Generate file names, include MEF extension if given.
+                  set hdunum [$itk_option(-rtdimage) hdu]
+                  puts "hdunum = $hdunum"
+                  if { $hdunum > 1 } {
+                     set fitsname "$diskimage\[$hdunum\]"
+                  } else {
+                     set fitsname $diskimage
+                  }
+
                   #  Run program, monitoring output...
                   if { $detect == "" } {
                      catch {$foreign_sex_ runwith \
-                               -c $values_(conpar) $diskimage } msg
+                               -c $values_(conpar) $fitsname } msg
                   } else {
                      catch {$foreign_sex_ runwith \
                                -c $values_(conpar) \
-                               $diskdetect,$diskimage } msg
+                               $diskdetect,$fitsname } msg
                   }
 
                   #  Now display the catalogue overlaid on the image.
@@ -2263,11 +2272,11 @@ itcl::class gaia::GaiaSextractor {
 
    #  Determine if the native version SExtractor could process the
    #  current image. This means that the file must be fits (not a
-   #  compressed form) and must be the primary HDU.
+   #  compressed form) and must be a numbered HDU.
    protected method native_ok_ {} {
       set ext [string tolower [$namer_ type]]
       set hdunum [$itk_option(-rtdimage) hdu]
-      if { ( $ext == ".fit" || $ext == ".fits" ) && $hdunum <= 1 } {
+      if { ( $ext == ".fit" || $ext == ".fits" ) && $hdunum > 0 } {
          return 1
       } else {
          return 0
