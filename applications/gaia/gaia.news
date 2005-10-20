@@ -22,7 +22,7 @@
       has been fixed.
 
     - The object detection toolbox has been updated to work with SExtractor
-      version 2.4.2. This include Petrosian magnitudes and some windowed
+      version 2.4.3. This include Petrosian magnitudes and some windowed
       parameters.
 
   Internally GAIA has undergone major changes in the way that it is built and
