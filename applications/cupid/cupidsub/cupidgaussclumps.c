@@ -3,6 +3,16 @@
 #include "ast.h"
 #include "cupid.h"
 
+
+/* Global Variables: */
+/* ================= */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   used to communicate with the service functions cupidGCcalcf and
+   cupidGCcalcg called by the PDA minimisation function. The contents of
+   this structure are initialised in cupidSetInit. */
+CupidGC cupidGC;
+
+
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
                        unsigned char *ipq, double rms, AstKeyMap *config  ){
 /*
@@ -153,7 +163,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */
-            if( cupidGCfit( type, x ) ) {
+            if( cupidGCfit( type, res, imax, x ) ) {
                iclump++;
 
 /* Add the clump to the output list. */

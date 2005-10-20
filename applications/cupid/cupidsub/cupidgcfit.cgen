@@ -13,7 +13,7 @@
 extern CupidGC cupidGC;
 
 
-int CGEN_FUNCTION(cupidGCfit)( double *x ){
+int CGEN_FUNCTION(cupidGCfit)( CGEN_TYPE *res, int imax, double *x ){
 /*
 *  Name:
 *     cupidGCfit<X>
@@ -22,13 +22,19 @@ int CGEN_FUNCTION(cupidGCfit)( double *x ){
 *     Fit a Gaussian to a supplied peak in a supplied array.
 
 *  Synopsis:
-*     int cupidGCfit<X>( double *x );
+*     int cupidGCfit<X>( CGEN_TYPE *res, int imax, double *x );
 
 *  Description:
 *     This function fits a Gaussian to a peak in the supplied residuals
 *     array.
 
 *  Parameters:
+*     res
+*        Pointer to the start of the 1D array containing the current
+*        residuals. 
+*     imax
+*        The index within the supplied array of the element with the largest 
+*        value. 
 *     x 
 *        A pointer to an array containing the initial guess at the
 *        Gaussian parameters. The array is returned holding the best fit

@@ -2,6 +2,12 @@
 #include "ast.h"
 #include "cupid.h"
 
+/* Global Variables: */
+/* ================= */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   needed by this function. These are set by function cupidGaussClumps. */
+extern CupidGC cupidGC;
+
 void CGEN_FUNCTION(cupidSetInit)( CGEN_TYPE *array, int ndim, int *dims, 
                                   int imax, double rms, AstKeyMap *config, 
                                   int iclump, double *x ){
@@ -65,6 +71,9 @@ void CGEN_FUNCTION(cupidSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 */      
 
 /* Local Variables: */
+   int i;               /* Loop count */
+   int offset;          /* Pixel offset from peak centre */
+   double *profile;     /* Pointer to array containing 1D radial profile */
    double val;          /* User supplied value for a configuration parameter */
    static double fbeam; /* Ratio of observed clump size ot beam width */
 
@@ -119,7 +128,7 @@ void CGEN_FUNCTION(cupidSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 /* We now move out away from the peak pixel along the current axis. We do
    both positive and negative directions at the same time. We loop until
    we have found a significant minimum in the profile. */
-      offset = 1
+      offset = 1;
 
 
 

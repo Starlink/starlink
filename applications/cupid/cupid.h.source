@@ -87,4 +87,6 @@ double cupidConfigD( AstKeyMap *, const char *, double );
 int cupidConfigI( AstKeyMap *, const char *, int );
 double cupidGaussModel( int, double *, double *, int, int, int );
 double cupidGaussChiSq( int, double *, int, int );
+void cupidGCcalcf( int, double *, int *, double * );
+void cupidGCcalcg( int, double *, int *, double * );
 
