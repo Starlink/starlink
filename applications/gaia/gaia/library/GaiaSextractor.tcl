@@ -1191,6 +1191,51 @@ itcl::class gaia::GaiaSextractor {
       add_short_help $itk_component(kronmin) \
          {Minimum applicable radius for Kron magnitudes}
 
+
+      #  Petrosian photometry. Get the Petrosian factor and the minimum radius
+      #  for objects analysed this way.
+      itk_component add petrofact {
+         LabelEntryScale $childsite.petrofact \
+            -text "Petrosian factor:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -increment 0.1  \
+            -resolution 0.1 \
+            -anchor w \
+            -show_arrows 1 \
+            -show_scale 1 \
+            -from 1.0 \
+            -to 5.0 \
+            -fix_range 1 \
+            -validate real \
+            -value $values_(petrofact) \
+            -textvariable [scope values_(petrofact)] \
+            -command [code $this set_values_ petrofact]
+      }
+      pack $itk_component(petrofact) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(petrofact) {Petrosian magnitudes factor}
+
+      itk_component add petromin {
+         LabelEntryScale $childsite.petromin \
+            -text "Petrosian min radius:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -increment 0.1  \
+            -resolution 0.1 \
+            -anchor w \
+            -show_arrows 1 \
+            -show_scale 1 \
+            -from 1.0 \
+            -to 20.0 \
+            -validate real \
+            -value $values_(petromin) \
+            -textvariable [scope values_(petromin)] \
+            -command [code $this set_values_ petromin]
+      }
+      pack $itk_component(petromin) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(petromin) \
+         {Minimum applicable radius for Petrosian magnitudes}
+
       #  Type of MASKing used on photometry neighbours.
       itk_component add photmask {
          LabelMenu $childsite.detmask \
@@ -1273,6 +1318,28 @@ itcl::class gaia::GaiaSextractor {
       }
    }
 
+   #  Method to translate SExtractor native Petrosian options to local
+   #  ones. The difference here is that we map one parameter into two
+   #  widgets.
+   protected method set_petromags_ {flag args} {
+      switch -exact $flag {
+         from {
+            #  Parse args into one or two values.
+            set value1 [ctoken args {, }]
+            set value2 [ctoken args {, }]
+            if { $value1 != {} } {
+               set values_(petrofact) $value1
+            }
+            if { $value2 != {} } {
+               set values_(petromin) $value2
+            }
+         }
+         to {
+            return "PHOT_PETROPARAMS  $values_(petrofact),$values_(petromin)"
+         }
+      }
+   }
+
    #  Reset photometry parameters page to builtin defaults.
    protected method reset_photometry_ {} {
       $itk_component(photzero) configure -value $defaults_(photzero)
@@ -1281,6 +1348,8 @@ itcl::class gaia::GaiaSextractor {
       eval $itk_component(photapps) setvals $defaults_(photapps)
       $itk_component(kronfact) configure -value $defaults_(kronfact)
       $itk_component(kronmin) configure -value $defaults_(kronmin)
+      $itk_component(petrofact) configure -value $defaults_(petrofact)
+      $itk_component(petromin) configure -value $defaults_(petromin)
       $itk_component(photmask) configure -value $defaults_(photmask)
 
    }
@@ -1918,6 +1987,14 @@ itcl::class gaia::GaiaSextractor {
       set to_(kronmin) special
       set special_(kronmin) {do_nothing_}
 
+      #  Same for Petrosians
+      set from_(PHOT_PETROPARAMS) special
+      set special_(PHOT_PETROPARAMS) {set_petromags_ from}
+      set to_(petrofact) special
+      set special_(petrofact) {set_petromags_ to}
+      set to_(petromin) special
+      set special_(petromin) {do_nothing_}
+
       #  CCD saturation level.
       set from_(SATUR_LEVEL) photsat
       set to_(photsat) SATUR_LEVEL
@@ -2032,6 +2109,8 @@ itcl::class gaia::GaiaSextractor {
       set values_(photapps) 5.0
       set values_(kronfact) 2.5
       set values_(kronmin) 3.5
+      set values_(petrofact) 2.0
+      set values_(petromin) 3.5
       set values_(photmask) "NONE"
       set values_(dettype) "CCD"
       set values_(imagescale) 1.0
@@ -2067,10 +2146,10 @@ itcl::class gaia::GaiaSextractor {
       set valuenames_ {
          catname catpar cattype minsize threshtype detthresh
          analthresh detfilter debthresh debcontrast detclean deteffic
-         photzero photnum photapps kronfact kronmin photmask dettype
-         imagescale photsat photgain photgamma fwhm nettable backmesh
-         backfilter backtype backvalue backphot backthick checktype
-         checkimage memory_objstack memory_pixstack memory_bufsize
+         photzero photnum photapps kronfact kronmin petrofact petromin 
+         photmask dettype imagescale photsat photgain photgamma fwhm 
+         nettable backmesh backfilter backtype backvalue backphot backthick
+         checktype checkimage memory_objstack memory_pixstack memory_bufsize
          verbose_type radtype radthresh
       }
 
@@ -2743,8 +2822,12 @@ itcl::class gaia::GaiaSextractor {
       {NUMBER} {Running object number}
       {X_WORLD} {Barycenter position along world x axis}
       {Y_WORLD} {Barycenter position along world y axis}
+      {XWIN_WORLD} {Windowed position along world x axis}
+      {YWIN_WORLD} {Windowed position along world y axis}
       {X_IMAGE} {Object position along x (FITS coords)}
       {Y_IMAGE} {Object position along y (FITS coords)}
+      {XWIN_IMAGE} {Windowed position estimate along x}
+      {YWIN_IMAGE} {Windowed position estimate along y}
       {X_PIXEL} {Object position along x (NDF pixel coordinates)}
       {Y_PIXEL} {Object position along y (NDF pixel coordinates)}
       {FLUX_ISO} {Isophotal flux}
@@ -2763,11 +2846,20 @@ itcl::class gaia::GaiaSextractor {
       {FLUXERR_AUTO} {RMS error for AUTO flux}
       {MAG_AUTO} {Kron-like elliptical aperture magnitude}
       {MAGERR_AUTO} {RMS error for AUTO magnitude}
+      {FLUX_PETRO} {Flux within a Petrosian-like elliptical aperture}
+      {FLUXERR_PETRO} {RMS error for PETRO flux}
+      {MAG_PETRO} {Petrosian-like elliptical aperture magnitude}
+      {MAGERR_PETRO} {RMS error for PETRO magnitude}
       {FLUX_BEST} {Best of FLUX_AUTO and FLUX_ISOCOR}
       {FLUXERR_BEST} {RMS error for BEST flux}
       {MAG_BEST} {Best of MAG_AUTO and MAG_ISOCOR}
       {MAGERR_BEST} {RMS error for MAG_BEST}
+      {FLUX_WIN} {Gaussian-weighted flux}
+      {FLUXERR_WIN} {RMS error for WIN flux}
+      {MAG_WIN}  {Gaussian-weighted magnitude}
+      {MAGERR_WIN} {RMS error for MAG_WIN}
       {KRON_RADIUS} {Kron apertures in units of A or B}
+      {PETRO_RADIUS} {Petrosian apertures in units of A or B}
       {BACKGROUND} {Background at centroid position}
       {THRESHOLD} {Detection threshold above background}
       {FLUX_MAX} {Peak flux above background}
@@ -2824,6 +2916,18 @@ itcl::class gaia::GaiaSextractor {
       {ERRTHETA_SKY} {Native error ellipse pos. angle (east of north)}
       {ERRTHETA_J2000} {J2000 error ellipse pos. angle (east of north)}
       {ERRTHETA_B1950} {B1950 error ellipse pos. angle (east of north)}
+      {ERRAWIN_IMAGE} {RMS windowed position error along major axis}
+      {ERRBWIN_IMAGE} {RMS windowed position error along minor axis}
+      {ERRTHETAWIN_IMAGE} {Windowed error ellipse position angle (CCW/x)}
+      {AWIN_IMAGE} {Windowed profile RMS along major axis}
+      {BWIN_IMAGE} {Windowed profile RMS along minor axis}
+      {THETA_WINIMAGE} {Windowed position angle (CCW/x)}
+      {X2WIN_IMAGE} {Windowed variance along x}
+      {Y2WIN_IMAGE} {Windowed variance along y}
+      {XYWIN_IMAGE} {Windowed covariance between x and y}
+      {CXXWIN_IMAGE} {Windowed Cxx object ellipse parameter}
+      {CYYWIN_IMAGE} {Windowed Cyy object ellipse parameter}
+      {CXYWIN_IMAGE} {Windowed Cxy object ellipse parameter}
       {MU_THRESHOLD} {Detection threshold above background}
       {MU_MAX} {Peak surface brightness above background}
       {ISOAREA_WORLD} {Isophotal area above Analysis threshold}
