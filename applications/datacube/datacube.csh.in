@@ -32,13 +32,13 @@
 #     09-FEB-1999 (AALLAN):
 #        Added optional -quiet parameter.
 #     15-NOV-1999 (AALLAN):
-#        -quiet parameter broke some scripts, removed
+#        Removed the -quiet parameter that broke some scripts.
 #     05-JUN-2000 (AALLAN):
 #        Modified for use by DATACUBE.
 #     19-SEP-2000 (AALLAN):
 #        Tweaked
 #     09-NOV-2000 (AALLAN):
-#        Added links to KAPPA, FIGARO and CONVERT external appliactions.
+#        Added links to KAPPA, FIGARO and CONVERT external applications.
 #     20-NOV-2000 (AALLAN):
 #        Incorporated changes made to source at ADASS.
 #     29-DEC-2000 (AALLAN):
@@ -51,6 +51,9 @@
 #        duplicates.
 #     2005 October 11 (MJC):
 #        Added wcsframe and wcstran definitions.
+#     2005 October 19 (MJC):
+#        Removed DATACUBE applications, having been replaced by KAPPA
+#        equivalents.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -80,16 +83,6 @@ alias dat_velmap      source ${DATACUBE_DIR}/velmap.csh
 
 #  Define aliases for scripts dependant on XDialog an GTK+
 alias xcompare        source ${DATACUBE_DIR}/compare_x.csh
-
-#  Define aliases for the applications.
-alias copyaxis        ${DATACUBE_DIR}/copyaxis
-alias dat_copyaxis    ${DATACUBE_DIR}/copyaxis
-alias getbound        ${DATACUBE_DIR}/getbound
-alias dat_getbound    ${DATACUBE_DIR}/getbound
-alias putaxis         ${DATACUBE_DIR}/putaxis
-alias dat_putaxis     ${DATACUBE_DIR}/putaxis
-alias putsky          ${DATACUBE_DIR}/putsky
-alias dat_putsky      ${DATACUBE_DIR}/putsky
 
 #  Define alias for the DATACUBE test script.
 alias datacube_demo   source ${DATACUBE_DIR}/datacube_demo.csh
