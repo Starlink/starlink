@@ -1,0 +1,13 @@
+#  Import commands used for SExtractor releases.
+#
+#  Unpack tar ball and cd into top-directory...
+
+#  Import for "sextractor" component.
+cvs import -ko -I! -m "SExtractor_2_4_3" applications/extractor/sextractor SEXTRACTOR v2_4_3
+
+#  Import for "extract" component. Note only "src" part is tracked by
+#  thirdparty. The "extract" directory is maintained by hand.
+cd src
+cvs import -ko -I! -m "SExtractor_2_4_3" applications/extractor/extract/src SEXTRACTOR v2_4_3
+
+#  Perform merge...
