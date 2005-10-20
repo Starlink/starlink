@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.9}
+\newcommand{\stardocnumber}    {226.10}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {22nd December 2004}
+\newcommand{\stardocdate}      {10th October 2005}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -28,7 +28,7 @@ popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 
-\newcommand{\sexversion}{2.3.2}
+\newcommand{\sexversion}{2.4.3}
 
 % -----------------------------------------------------------------------------
 
@@ -1077,8 +1077,9 @@ A minor update to \EXTRACTOR\ with the following changes:
 
  \EXTRACTOR\ has been updated to work with \SExtractor\ 2.3.2. 
  This updates the native \SExtractor\ command to include Large File Support
- and full support for MEFs. The MEF support differs to that previously
- available in that it now scans a complete MEF file in a single pass.
+ and full support for MEFs. The native MEF support differs to that previously
+ available in that it scans a complete MEF file in a single pass, so this
+ behaviour has been changed so that a extension may be specified.
 
  An error previously limited \EXTRACTOR\ input file names to 20 characters,
  this has now been corrected.
@@ -1092,6 +1093,11 @@ A minor update to \EXTRACTOR\ with the following changes:
  (previously it would only work with RA,Dec systems, but these could have
  any orientation and could therefore appear as Dec,RA).
 
+\subsection{Version 2.4.3}
+
+ \EXTRACTOR\ has been updated to use \SExtractor\ version 2.4.3. The main
+ changes are the introduction of Petrosian magnitudes and windowed
+ measurements.
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
