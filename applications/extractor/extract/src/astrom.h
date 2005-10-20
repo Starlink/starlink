@@ -17,6 +17,7 @@
 *                          Added cvt component for precession AstFrameSet.
 *	Last modify:	24/01/2003
 *                          (EB): 2.3.
+*	Last modify:	15/07/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -48,7 +49,9 @@ typedef struct structastrom
 
 /*------------------------------- functions ---------------------------------*/
 extern void		astrom_errparam(picstruct *, objstruct *),
+			astrom_winerrparam(picstruct *, objstruct *),
 			astrom_shapeparam(picstruct *, objstruct *),
+			astrom_winshapeparam(picstruct *, objstruct *),
 			computeastrom(picstruct *, objstruct *),
 			copyastrom(picstruct *infield, picstruct *outfield),
 			endastrom(picstruct *),

@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for writing LDAC FITS catalogs.
 *
-*	Last modify:	03/12/2003
+*	Last modify:	16/12/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -26,8 +26,6 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*lineout_buf;
-int	lineout_size, nlineout;
 
 /****** save_cat **************************************************************
 PROTO	void save_cat(catstruct *cat, char *filename)
@@ -214,7 +212,7 @@ INPUT	catalog structure,
 OUTPUT	RETURN_OK if tab is a binary table, or RETURN_ERROR otherwise.
 NOTES	-.
 AUTHOR	E. Bertin (IAP)
-VERSION	03/12/2003
+VERSION	16/12/2004
  ***/
 int	save_head(catstruct *cat, tabstruct *tab)
 
@@ -240,7 +238,7 @@ INPUT	A pointer to the cat structure,
 OUTPUT	RETURN_OK if padding necessary, RETURN_ERROR otherwise.
 NOTES	.
 AUTHOR	E. Bertin (IAP)
-VERSION	03/12/2003
+VERSION	23/01/2003
  ***/
 int pad_tab(catstruct *cat, KINGSIZE_T size)
   {
@@ -259,16 +257,17 @@ int pad_tab(catstruct *cat, KINGSIZE_T size)
 
 
 /****** init_writeobj *********************************************************
-PROTO	void init_writeobj(catstruct *cat, tabstruct *tab)
+PROTO	void init_writeobj(catstruct *cat, tabstruct *tab, char **pbuf)
 PURPOSE	Prepare the writing of individual sources in a FITS table
 INPUT	catalog structure,
-	table structure.
+	table structure,
+	pointer to an array pointer to be used as a temporary buffer.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	09/09/2003
+VERSION	26/09/2004
  ***/
-void	init_writeobj(catstruct *cat, tabstruct *tab)
+void	init_writeobj(catstruct *cat, tabstruct *tab, char **pbuf)
 
   {
    keystruct	*key;
@@ -283,22 +282,8 @@ void	init_writeobj(catstruct *cat, tabstruct *tab)
 /* Store the current position */
   QFTELL(cat->file, tab->bodypos, cat->filename);
 
-/* Allocate memory for the output buffer  (or increase it if done already) */
-  if (lineout_buf)
-    {
-    if (lineout_size < tab->naxisn[0])
-      {
-      QREALLOC(lineout_buf, char, tab->naxisn[0]);
-      lineout_size = tab->naxisn[0];
-      }
-    }
-  else
-    {
-    QMALLOC(lineout_buf, char, tab->naxisn[0]);
-    lineout_size = tab->naxisn[0];
-    }
-
-  nlineout++;
+/* Allocate memory for the output buffer */
+  QMALLOC(*pbuf, char, tab->naxisn[0]);
 
 /* Scan keys to check that memory has been allocated */
   key = tab->key;
@@ -314,16 +299,16 @@ void	init_writeobj(catstruct *cat, tabstruct *tab)
 
 
 /****** write_obj *************************************************************
-PROTO	int write_obj(tabstruct *tab)
+PROTO	int write_obj(tabstruct *tab, char *buf)
 PURPOSE	Write one individual source in a FITS table
-INPUT	Destination catalog
-	Table structure.
+INPUT	Table structure,
+	pointer to the temporary buffer.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	18/02/2000
+VERSION	26/09/2004
  ***/
-int	write_obj(tabstruct *tab)
+int	write_obj(tabstruct *tab, char *buf)
 
   {
    keystruct	*key;
@@ -332,7 +317,7 @@ int	write_obj(tabstruct *tab)
    int		esize;
 
   key = tab->key;
-  pout = lineout_buf;
+  pout = buf;
   for (k=tab->nkey; k--; key = key->nextkey)
     {
     pin = key->ptr;
@@ -345,23 +330,24 @@ int	write_obj(tabstruct *tab)
       *(pout++) = *(pin++);
     }
 
-  QFWRITE(lineout_buf, *tab->naxisn, tab->cat->file, tab->cat->filename);
+  QFWRITE(buf, *tab->naxisn, tab->cat->file, tab->cat->filename);
 
   return ++tab->naxisn[1];
   }
 
 
 /****** end_writeobj **********************************************************
-PROTO	void end_writeobj(catstruct *cat, tabstruct *tab)
+PROTO	void end_writeobj(catstruct *cat, tabstruct *tab, char *buf)
 PURPOSE	End the writing of individual sources in a FITS table
 INPUT	catalog structure,
-	table structure.
+	table structure,
+	pointer to the temporary buffer.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	09/09/2003
+VERSION	26/09/2004
  ***/
-void	end_writeobj(catstruct *cat, tabstruct *tab)
+void	end_writeobj(catstruct *cat, tabstruct *tab, char *buf)
 
   {
    keystruct	*key;
@@ -385,12 +371,7 @@ void	end_writeobj(catstruct *cat, tabstruct *tab)
   QFWRITE(tab->headbuf, FBSIZE*tab->headnblock, cat->file, cat->filename);
   QFSEEK(cat->file, pos, SEEK_SET, cat->filename);
 
-  if (!(--nlineout))
-    {
-    free(lineout_buf);
-    lineout_buf = NULL;
-    lineout_size = 0;
-    }
+  free(buf);
 
   return;
   }

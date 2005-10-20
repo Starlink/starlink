@@ -19,6 +19,7 @@
 *	Last modify:	15/12/2002
 *                          (EB): 2.3
 *	Last modify:	26/11/2003
+*	Last modify:	15/06/2004
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -232,7 +233,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
      ubnd[0] = check->width = field->width;
      ubnd[1] = check->height = field->height;
      check->npix = field->npix;
-     ndfNew( "_WORD", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
+     ndfNew( "_INTEGER", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
      break;
   case CHECK_MINIBACKGROUND:
   case CHECK_MINIBACKRMS:
@@ -290,7 +291,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
         *(pntrf++) = -10.0;
      break;
   case CHECK_SEGMENTATION:
-     ndfMap( check->ndf, "DATA", "_WORD", "WRITE/ZERO", 
+     ndfMap( check->ndf, "DATA", "_INTEGER", "WRITE/ZERO", 
              pntr, &check->nel, &status );
      check->pix = check->map = pntr[0];
      break;

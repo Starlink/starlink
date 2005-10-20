@@ -29,7 +29,7 @@
 *                          (PWD): added NDFQFSEEK and NDFQFTELL. QFSEEK
 *                                 and QFTELL are used by catalogue handling
 *                                 now, so we need to differentiate.
-*                                 
+*	Last modify:	23/09/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -46,7 +46,7 @@
 #define         EXECUTABLE      "sex"
 #define		MYVERSION	VERSION
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
-#define		WEBSITE		"http://terapix.iap.fr/sextractor"
+#define		WEBSITE		"http://terapix.iap.fr/soft/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"
 #define	       	MAILINGLISTREQ	"sextractor-request@iap.fr"
 #define		INSTITUTE	"TERAPIX team at IAP  http://terapix.iap.fr"

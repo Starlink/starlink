@@ -14,6 +14,7 @@
 *                          - 15/02/00 (PWD):
 *                            Added rad_type and rad members.
 *                                  
+*	Last modify:	18/07/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -77,7 +78,7 @@ typedef struct
   int		weightgain_flag;			/* weight gain? */
 /*----- photometry */
   enum	{CAT_NONE, ASCII, ASCII_HEAD, ASCII_SKYCAT,
-	FITS_LDAC, FITS_BINIMHEAD, FITS_NOIMHEAD, FITS_10}
+	FITS_LDAC, FITS_TPX, FITS_10}
 		cat_type;				/* type of catalog */
   enum	{PNONE, FIXED, AUTO}		apert_type;	/* type of aperture */
   double	apert[MAXNAPER];			/* apert size (pix) */
@@ -86,6 +87,8 @@ typedef struct
   int		mag_apersize, magerr_apersize;		/* requested apert. */
   double	autoparam[2];				/* Kron parameters */
   int		nautoparam;				/* nb of Kron params */
+  double	petroparam[2];				/* Kron parameters */
+  int		npetroparam;				/* nb of Kron params */
   double	autoaper[2];				/* minimum apertures */
   int		nautoaper;				/* nb of min. aperts */
   double	mag_zeropoint;				/* magnitude offsets */
@@ -206,7 +209,7 @@ typedef struct
 /*-------------------------------- protos -----------------------------------*/
 extern int	cistrcmp(char *cs, char *ct, int mode);
 
-extern void	dumpprefs(void),
+extern void	dumpprefs(int state),
 		readprefs(char *filename,char **argkey,char **argval,int narg),
 		useprefs(void);
 #endif

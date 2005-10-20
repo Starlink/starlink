@@ -10,7 +10,7 @@
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	26/11/2003
+*	Last modify:	15/02/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -236,12 +236,12 @@ void	mergeobject(objstruct *objslave,objstruct *objmaster)
 
   if ((check = prefs.check[CHECK_SEGMENTATION]))
     {
-     USHORT	*pix;
-     USHORT	colorslave = (USHORT)objslave->number,
-		colormaster = (USHORT)objmaster->number;
+     ULONG	*pix;
+     ULONG	colorslave = objslave->number,
+		colormaster = objmaster->number;
      int	dx,dx0,dy,dpix;
 
-    pix = (USHORT *)check->pix+check->width*objslave->ymin + objslave->xmin;
+    pix = (ULONG *)check->pix+check->width*objslave->ymin + objslave->xmin;
     dx0 = objslave->xmax-objslave->xmin+1;
     dpix = check->width-dx0;
     for (dy=objslave->ymax-objslave->ymin+1; dy--; pix += dpix)
@@ -308,7 +308,8 @@ void	subcleanobj(int objnb)
 
   if (--cleanobjlist->nobj)
     {
-    cleanobjlist->obj[objnb] = cleanobjlist->obj[cleanobjlist->nobj];
+    if (cleanobjlist->nobj != objnb)
+      cleanobjlist->obj[objnb] = cleanobjlist->obj[cleanobjlist->nobj];
     if (!(cleanobjlist->obj = (objstruct *)realloc(cleanobjlist->obj,
 		    cleanobjlist->nobj * sizeof(objstruct))))
       error(EXIT_FAILURE, "Not enough memory for ", "CLEANing");
