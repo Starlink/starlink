@@ -21,6 +21,10 @@
     - A rarely seen problem with foreign-file conversion deleting the input files
       has been fixed.
 
+    - The object detection toolbox has been updated to work with SExtractor
+      version 2.4.2. This include Petrosian magnitudes and some windowed
+      parameters.
+
   Internally GAIA has undergone major changes in the way that it is built and
   distributed. One immediate consequence of this is that GAIA no longer
   distributes any files for IRAF support. AUTOASTROM does not exist at present
