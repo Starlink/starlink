@@ -2,7 +2,7 @@
 
 bin_SCRIPTS = datacube.csh datacube.icl
 
-dist_bin_SCRIPTS = compare.csh compare_x.csh datacube_link_adam \
+dist_bin_SCRIPTS = compare.csh compare_x.csh \
                    multistack.csh passband.csh peakmap.csh \
                    ripper.csh squash.csh stacker.csh step.csh \
                    velmap.csh
