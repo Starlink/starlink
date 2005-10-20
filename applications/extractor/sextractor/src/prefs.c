@@ -9,7 +9,7 @@
 *
 *	Contents:	Functions to handle the configuration file.
 *
-*	Last modify:	28/11/2003
+*	Last modify:	18/07/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -35,7 +35,7 @@
 /*
 Print the default preference parameters.
 */
-void    dumpprefs(void)
+void    dumpprefs(int state)
   {
    char **dp;
 
@@ -43,6 +43,8 @@ void    dumpprefs(void)
   while (**dp)
     if (**dp != '*')
       printf("%s\n",*(dp++));
+    else if (state)
+      printf("%s\n",*(dp++)+1);
     else
       dp++;
   return;
@@ -329,7 +331,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
 /*
  find an item within a list of keywords, SExtractor version.
 */
-int	findkeys(char *str, char keyw[][16], int mode)
+int	findkeys(char *str, char keyw[][32], int mode)
 
   {
   int i;
@@ -401,7 +403,11 @@ void	useprefs()
 
 /*-------------------------------- Astrometry ------------------------------*/
   prefs.world_flag = FLAG(obj2.mxw) || FLAG(obj2.mamaposx)
-		|| FLAG(obj2.peakxw);
+		|| FLAG(obj2.peakxw) || FLAG(obj2.winpos_xw)
+		|| FLAG(obj2.mx2w) || FLAG(obj2.win_mx2w)
+		|| FLAG(obj2.poserr_mx2w) || FLAG(obj2.winposerr_mx2w)
+		|| FLAG(obj2.npixw) || FLAG(obj2.fdnpixw)
+		|| FLAG(obj2.fwhmw);
 
 /*-------------------------------- Photometry ------------------------------*/
 
@@ -444,11 +450,12 @@ void	useprefs()
   if (FLAG(obj2.flux_growth)
 	|| FLAG(obj2.mag_growth)
 	|| FLAG(obj2.flux_radius)
+	|| FLAG(obj2.hl_radius)
 	|| FLAG(obj2.flux_growthstep)
 	|| FLAG(obj2.mag_growthstep))
     prefs.growth_flag = 1;
 
-  if (FLAG(obj2.flux_radius))
+  if (FLAG(obj2.flux_radius) && prefs.flux_radiussize)
     if (prefs.nflux_frac>prefs.flux_radiussize)
       prefs.nflux_frac = prefs.flux_radiussize;
 

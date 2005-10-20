@@ -9,7 +9,7 @@
 *
 *	Contents:	Make growth curves.
 *
-*	Last modify:	28/11/2003
+*	Last modify:	15/02/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -42,6 +42,11 @@ void	initgrowth()
   {
 
   QMALLOC(growth, double, GROWTH_NSTEP);
+/* Quick (and dirty) fix to allow FLUX_RADIUS support */
+  if (FLAG(obj2.flux_radius) && !prefs.flux_radiussize)
+    {
+    QCALLOC(obj2->flux_radius, float, 1);
+    }
 
   return;
   }  
@@ -54,6 +59,8 @@ Free memory occupied by growth curve stuff.
 void	endgrowth()
   {
   free(growth);	
+  if (FLAG(obj2.flux_radius) && !prefs.flux_radiussize)
+    free(obj2->flux_radius);
 
   return;
   }
@@ -330,6 +337,19 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
 			: i)
 		: (*growth !=0.0 ?tv/(*growth) : 0.0));
       }
+    }
+
+/* Specific to Half-light radius used by other parameters */
+  if (FLAG(obj2.hl_radius))
+    {
+    n = ngrowth-1;
+    tv = 0.5*obj2->flux_auto;
+    growtht = growth-1;
+    for (i=0; i<n && *(++growtht)<tv; i++);
+    obj2->hl_radius = step*(i? ((dg=*growtht - *(growtht-1)) != 0.0 ?
+		  	i + (tv - *(growtht-1))/dg
+			: i)
+		: (*growth !=0.0 ?tv/(*growth) : 0.0));
     }
 
   return;

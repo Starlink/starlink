@@ -22,6 +22,7 @@
 *	Last modify:	16/12/2002
 *                                 (EB) for 2.3.
 *	Last modify:	26/11/2003
+*	Last modify:	25/08/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -46,6 +47,7 @@
 catstruct	*fitscat;
 tabstruct	*objtab;
 FILE		*ascfile;
+char		*buf;
 
 /******************************* readcatparams *******************************/
 /*
@@ -140,6 +142,58 @@ void	updateparamflags()
    int	i;
 
 /*------------------------------ Astrometry ---------------------------------*/
+  FLAG(obj2.win_aw) |= FLAG(obj2.win_bw) | FLAG(obj2.win_polarw);
+  FLAG(obj2.win_cxxw) |= FLAG(obj2.win_cyyw) | FLAG(obj2.win_cxyw);
+  FLAG(obj2.win_thetas) |= FLAG(obj2.win_theta1950)
+			| FLAG(obj2.win_theta2000);
+  FLAG(obj2.win_thetaw) |= FLAG(obj2.win_thetas);
+
+  FLAG(obj2.win_mx2w) |= FLAG(obj2.win_my2w)
+			| FLAG(obj2.win_mxyw)
+			| FLAG(obj2.win_thetaw) | FLAG(obj2.win_aw)
+			| FLAG(obj2.win_cxxw);
+
+  FLAG(obj2.win_a) |= FLAG(obj2.win_b) | FLAG(obj2.win_theta)
+			| FLAG(obj2.win_polar);
+  FLAG(obj2.win_cxx) |= FLAG(obj2.win_cyy)
+			| FLAG(obj2.win_cxy);
+  FLAG(obj2.win_mx2) |= FLAG(obj2.win_my2)
+			| FLAG(obj2.win_mxy)
+			| FLAG(obj2.win_a) | FLAG(obj2.win_cxx)
+			| FLAG(obj2.win_mx2w);
+
+  FLAG(obj2.winposerr_aw) |= FLAG(obj2.winposerr_bw);
+  FLAG(obj2.winposerr_cxxw) |= FLAG(obj2.winposerr_cyyw)
+			| FLAG(obj2.winposerr_cxyw);
+  FLAG(obj2.winposerr_thetas) |= FLAG(obj2.winposerr_theta1950)
+			| FLAG(obj2.winposerr_theta2000);
+  FLAG(obj2.winposerr_thetaw) |= FLAG(obj2.winposerr_thetas);
+
+  FLAG(obj2.winposerr_mx2w) |= FLAG(obj2.winposerr_my2w)
+			| FLAG(obj2.winposerr_mxyw)
+			| FLAG(obj2.winposerr_thetaw) | FLAG(obj2.winposerr_aw)
+			| FLAG(obj2.winposerr_cxxw);
+
+  FLAG(obj2.winposerr_a) |= FLAG(obj2.winposerr_b) | FLAG(obj2.winposerr_theta);
+  FLAG(obj2.winposerr_cxx) |= FLAG(obj2.winposerr_cyy)
+			| FLAG(obj2.winposerr_cxy);
+  FLAG(obj2.winposerr_mx2) |= FLAG(obj2.winposerr_my2)
+			| FLAG(obj2.winposerr_mxy)
+			| FLAG(obj2.winposerr_a) | FLAG(obj2.winposerr_cxx)
+			| FLAG(obj2.winposerr_mx2w);
+
+  FLAG(obj2.winpos_alpha1950) |= FLAG(obj2.winpos_delta1950)
+			| FLAG(obj2.win_theta1950)
+			| FLAG(obj2.winposerr_theta1950);
+  FLAG(obj2.winpos_alpha2000) |= FLAG(obj2.winpos_delta2000)
+			| FLAG(obj2.winpos_alpha1950)
+			| FLAG(obj2.win_theta2000)
+			| FLAG(obj2.winposerr_theta2000);
+  FLAG(obj2.winpos_alphas) |= FLAG(obj2.winpos_deltas)
+			| FLAG(obj2.winpos_alpha2000);
+  FLAG(obj2.winpos_xw) |= FLAG(obj2.winpos_yw)
+			| FLAG(obj2.winpos_alphas);
+
   FLAG(obj2.poserr_aw) |= FLAG(obj2.poserr_bw);
   FLAG(obj2.poserr_cxxw) |= FLAG(obj2.poserr_cyyw) | FLAG(obj2.poserr_cxyw);
   FLAG(obj2.poserr_thetas) |= FLAG(obj2.poserr_theta1950)
@@ -154,7 +208,7 @@ void	updateparamflags()
   FLAG(obj2.poserr_cxx) |= FLAG(obj2.poserr_cyy) | FLAG(obj2.poserr_cxy);
   FLAG(obj.poserr_mx2) |= FLAG(obj.poserr_my2) | FLAG(obj.poserr_mxy)
 			| FLAG(obj2.poserr_a) | FLAG(obj2.poserr_cxx)
-			| FLAG(obj2.poserr_mx2w);
+			| FLAG(obj2.poserr_mx2w) | FLAG(obj2.winposerr_mx2w);
 
   FLAG(obj2.peakalpha1950) |= FLAG(obj2.peakdelta1950);
   FLAG(obj2.alpha1950) |= FLAG(obj2.delta1950) |  FLAG(obj2.theta1950)
@@ -168,7 +222,7 @@ void	updateparamflags()
   FLAG(obj2.alphas) |= FLAG(obj2.deltas) | FLAG(obj2.alpha2000);
   FLAG(obj2.thetas) |= FLAG(obj2.theta1950) | FLAG(obj2.theta2000);
   FLAG(obj2.thetaw) |= FLAG(obj2.thetas);
-  FLAG(obj2.aw) |= FLAG(obj2.bw);
+  FLAG(obj2.aw) |= FLAG(obj2.bw) | FLAG(obj2.polarw);
   FLAG(obj2.cxxw) |= FLAG(obj2.cyyw) | FLAG(obj2.cxyw);
 
   FLAG(obj2.mx2w) |= FLAG(obj2.my2w) | FLAG(obj2.mxyw)
@@ -182,6 +236,12 @@ void	updateparamflags()
   FLAG(obj2.mxw) |= FLAG(obj2.myw) | FLAG(obj2.mx2w) | FLAG(obj2.alphas)
 		| FLAG(obj2.poserr_mx2w);
   FLAG(obj2.mamaposx) |= FLAG(obj2.mamaposy);
+  FLAG(obj2.flux_win) |= FLAG(obj2.mag_win)|FLAG(obj2.magerr_win)
+			    | FLAG(obj2.flux_win) | FLAG(obj2.fluxerr_win);
+  FLAG(obj2.winpos_x) |= FLAG(obj2.winpos_y)
+			| FLAG(obj2.winposerr_mx2) | FLAG(obj2.win_mx2)
+			| FLAG(obj2.winpos_xw) | FLAG(obj2.win_flag)
+			| FLAG(obj2.flux_win) |FLAG(obj2.winpos_niter);
 
 /*------------------------------ Photometry ---------------------------------*/
 
@@ -189,11 +249,17 @@ void	updateparamflags()
 
   FLAG(obj2.flux_best) |= FLAG(obj2.mag_best) | FLAG(obj2.fluxerr_best);
 
+  FLAG(obj2.hl_radius) |= FLAG(obj2.winpos_x);
+
   FLAG(obj2.flux_auto)  |= FLAG(obj2.mag_auto) | FLAG(obj2.magerr_auto)
 			| FLAG(obj2.fluxerr_auto)
 			| FLAG(obj2.kronfactor)
 			| FLAG(obj2.flux_best)
-			| FLAG(obj2.flux_radius);
+			| FLAG(obj2.flux_radius)
+			| FLAG(obj2.hl_radius);
+  FLAG(obj2.flux_petro) |= FLAG(obj2.mag_petro) | FLAG(obj2.magerr_petro)
+			| FLAG(obj2.fluxerr_petro)
+			| FLAG(obj2.petrofactor);
 
   FLAG(obj2.fluxerr_isocor) |= FLAG(obj2.magerr_isocor)
 				| FLAG(obj2.fluxerr_best);
@@ -340,10 +406,9 @@ void	initcat(void)
     switch(prefs.cat_type)
       {
       case FITS_LDAC:
+      case FITS_TPX:
 /*------ Save a "pure" primary HDU */
         save_tab(fitscat, fitscat->tab);
-      case FITS_BINIMHEAD:
-      case FITS_NOIMHEAD:
         break;
 
       case FITS_10:
@@ -409,8 +474,31 @@ void	reinitcat(picstruct *field)
         strcpy(objtab->extname, "LDAC_OBJECTS");
         break;
 
-      case FITS_BINIMHEAD:
-      case FITS_NOIMHEAD:
+      case FITS_TPX:
+/*------ We create a dummy table (only used through its header) */
+        QCALLOC(asctab, tabstruct, 1);
+        asctab->headnblock = field->fitsheadsize/FBSIZE;
+        QMALLOC(asctab->headbuf, char, asctab->headnblock*FBSIZE);
+        memcpy(asctab->headbuf, field->fitshead, asctab->headnblock*FBSIZE);
+        key = headkey;
+        while (*key->name)
+          addkeyto_head(asctab, key++);
+        tab = new_tab("TPX_IMHEAD");
+        add_tab(tab, fitscat, 0);
+        key = new_key("Field Header Card");
+        key->ptr = asctab->headbuf;
+        asctab->headbuf = NULL;
+        free_tab(asctab);
+        key->htype = H_STRING;
+        key->ttype = T_STRING;
+        key->nobj = fitsfind(key->ptr, "END     ")+1;
+        key->nbytes = 80;
+        key->naxis = 1;
+        QMALLOC(key->naxisn, int, key->naxis);
+        key->naxisn[0] = 80;
+        add_key(key, tab, 0);
+        save_tab(fitscat, tab);
+        strcpy(objtab->extname, "TPX_OBJECTS");
         break;
 
       case FITS_10:
@@ -429,7 +517,7 @@ void	reinitcat(picstruct *field)
       }
 
     objtab->cat = fitscat;
-    init_writeobj(fitscat, objtab);
+    init_writeobj(fitscat, objtab, &buf);
     }
 
   return;
@@ -448,7 +536,8 @@ void	writecat(int n, objliststruct *objlist)
     {
     case FITS_10:
     case FITS_LDAC:
-      write_obj(objtab);
+    case FITS_TPX:
+      write_obj(objtab, buf);
       break;
 
     case ASCII:
@@ -492,6 +581,7 @@ void	endcat()
       break;
 
     case FITS_LDAC:
+    case FITS_TPX:
     case FITS_10:
       free_cat(&fitscat,1);
       break;
@@ -536,7 +626,8 @@ void	reendcat()
       break;
 
     case FITS_LDAC:
-      end_writeobj(fitscat, objtab);
+    case FITS_TPX:
+      end_writeobj(fitscat, objtab, buf);
       key = NULL;
       if (!(tab=fitscat->tab->prevtab)
 	|| !(key=name_to_key(tab, "Field Header Card")))
@@ -554,7 +645,7 @@ void	reendcat()
       break;
 
     case FITS_10:
-      end_writeobj(fitscat, objtab);
+      end_writeobj(fitscat, objtab, buf);
       fitswrite(fitscat->tab->headbuf,"SEXNDET ",&thecat.ndetect,H_INT,T_LONG);
       fitswrite(fitscat->tab->headbuf,"SEXNFIN ",&thecat.ntotal, H_INT,T_LONG);
       QFTELL(fitscat->file, pos, fitscat->filename);

@@ -14,6 +14,7 @@
 *                       20/03/00 (PWD): Added userradii function.
 *                       20/02/02 (PWD): Added X_PIXEL and Y_PIXEL calcs.
 *	Last modify:	28/11/2003
+*	Last modify:	27/09/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -42,6 +43,7 @@
 #include	"photom.h"
 #include	"psf.h"
 #include	"retina.h"
+#include	"winpos.h"
 
 #include        "userradii.h"
 
@@ -314,10 +316,9 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
         threshs[i] = obj->thresh + (obj->peak-obj->thresh)*i/NISO;
     else
       {
-      if (obj->peak>0.0)
+      if (obj->peak>0.0 && obj->thresh>0.0)
         for (i=0; i<NISO; i++)
-          threshs[i] = obj->thresh*pow(obj->peak/obj->thresh,
-		(double)i/NISO);
+          threshs[i] = obj->thresh*pow(obj->peak/obj->thresh, (double)i/NISO);
       else
         for (i=0; i<NISO; i++)
           threshs[i] = 0.0;
@@ -332,8 +333,8 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
 
   if ((check = prefs.check[CHECK_SEGMENTATION]))
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
-      ((USHORT *)check->pix)[check->width*PLIST(pixt,y)+PLIST(pixt,x)]
-		= (USHORT)obj->number;
+      ((ULONG *)check->pix)[check->width*PLIST(pixt,y)+PLIST(pixt,x)]
+		= (ULONG)obj->number;
 
   if ((check = prefs.check[CHECK_OBJECTS]))
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
@@ -443,53 +444,7 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 		obj->subx, obj->suby);
       }
 
-
-/*------------------------------- Photometry -------------------------------*/
-
-/*-- Convert the father of photom. error estimates from variance to RMS */
-    obj2->flux_iso = obj->flux;
-    obj2->fluxerr_iso = sqrt(obj->fluxerr);
-    if (FLAG(obj.flux_prof))
-      {
-      obj2->flux_prof = obj->flux_prof;
-      obj2->fluxerr_prof = sqrt(obj->fluxerr_prof);
-      }
-
-    if (FLAG(obj2.flux_isocor))
-      computeisocorflux(field, obj);
-
-    if (FLAG(obj2.flux_aper))
-      for (i=0; i<prefs.naper; i++)
-        computeaperflux(field, wfield, obj, i);
-
-    if (FLAG(obj2.flux_auto))
-      computeautoflux(field, dfield, wfield, dwfield, obj);
-
-/*-- Growth curve */
-    if (prefs.growth_flag)
-      makeavergrowth(field, wfield, obj);
-
-/*-- What about the peak of the profile? */
-    if (obj->peak+obj->bkg >= prefs.satur_level)
-      obj->flag |= OBJ_SATUR;
-
-/*-- Check-image CHECK_APERTURES option */
-
-    if ((check = prefs.check[CHECK_APERTURES]))
-      {
-      if (FLAG(obj2.flux_aper))
-        for (i=0; i<prefs.naper; i++)
-          sexcircle(check->pix, check->width, check->height,
-		obj->mx, obj->my, prefs.apert[i]/2.0, check->overlay);
-
-      if (FLAG(obj2.flux_auto))
-        sexellips(check->pix, check->width, check->height,
-	obj->mx, obj->my, obj->a*obj2->kronfactor,
-	obj->b*obj2->kronfactor, obj->theta,
-	check->overlay, obj->flag&OBJ_CROWDED);
-      }
-
-/*-- Error ellipse parameters */
+/*------------------------- Error ellipse parameters ------------------------*/
     if (FLAG(obj2.poserr_a))
       {
        double	pmx2,pmy2,temp,theta;
@@ -528,6 +483,68 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 
     if (FLAG(obj2.ellip))
       obj2->ellip = 1-obj->b/obj->a;
+
+    if (FLAG(obj2.polar))
+      obj2->polar = (obj->a*obj->a - obj->b*obj->b)
+		/ (obj->a*obj->a + obj->b*obj->b);
+
+/*------------------------------- Photometry -------------------------------*/
+
+/*-- Convert the father of photom. error estimates from variance to RMS */
+    obj2->flux_iso = obj->flux;
+    obj2->fluxerr_iso = sqrt(obj->fluxerr);
+    if (FLAG(obj.flux_prof))
+      {
+      obj2->flux_prof = obj->flux_prof;
+      obj2->fluxerr_prof = sqrt(obj->fluxerr_prof);
+      }
+
+    if (FLAG(obj2.flux_isocor))
+      computeisocorflux(field, obj);
+
+    if (FLAG(obj2.flux_aper))
+      for (i=0; i<prefs.naper; i++)
+        computeaperflux(field, wfield, obj, i);
+
+    if (FLAG(obj2.flux_auto))
+      computeautoflux(field, dfield, wfield, dwfield, obj);
+
+    if (FLAG(obj2.flux_petro))
+      computepetroflux(field, dfield, wfield, dwfield, obj);
+
+/*-- Growth curve */
+    if (prefs.growth_flag)
+      makeavergrowth(field, wfield, obj);
+
+/*--------------------------- Windowed barycenter --------------------------*/
+    if (FLAG(obj2.winpos_x))
+      compute_winpos(field, wfield, obj);
+
+/*-- What about the peak of the profile? */
+    if (obj->peak+obj->bkg >= prefs.satur_level)
+      obj->flag |= OBJ_SATUR;
+
+/*-- Check-image CHECK_APERTURES option */
+
+    if ((check = prefs.check[CHECK_APERTURES]))
+      {
+      if (FLAG(obj2.flux_aper))
+        for (i=0; i<prefs.naper; i++)
+          sexcircle(check->pix, check->width, check->height,
+		obj->mx, obj->my, prefs.apert[i]/2.0, check->overlay);
+
+      if (FLAG(obj2.flux_auto))
+        sexellips(check->pix, check->width, check->height,
+	obj->mx, obj->my, obj->a*obj2->kronfactor,
+	obj->b*obj2->kronfactor, obj->theta,
+	check->overlay, obj->flag&OBJ_CROWDED);
+
+      if (FLAG(obj2.flux_petro))
+        sexellips(check->pix, check->width, check->height,
+	obj->mx, obj->my, obj->a*obj2->petrofactor,
+	obj->b*obj2->petrofactor, obj->theta,
+	check->overlay, obj->flag&OBJ_CROWDED);
+      }
 
 /* ---- Star/Galaxy classification */
 
@@ -573,12 +590,12 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*-- update segmentation map */
     if ((check=prefs.check[CHECK_SEGMENTATION]))
       {
-       USHORT	*pix;
-       USHORT	newsnumber = newnumber,
+       ULONG	*pix;
+       ULONG	newsnumber = newnumber,
 		oldsnumber = obj->number;
        int	dx,dx0,dy,dpix;
 
-      pix = (USHORT *)check->pix + check->width*obj->ymin + obj->xmin;
+      pix = (ULONG *)check->pix + check->width*obj->ymin + obj->xmin;
       dx0 = obj->xmax-obj->xmin+1;
       dpix = check->width-dx0;
       for (dy=obj->ymax-obj->ymin+1; dy--; pix += dpix)

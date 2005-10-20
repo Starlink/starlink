@@ -17,6 +17,7 @@
 *                                       members.
 *	Last modify:	16/12/2002
 *                                (EB): 2.3.
+*	Last modify:	25/08/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -133,6 +134,11 @@ typedef struct
   float		fluxerr_auto;			/* RMS error on AUTO flux */
   float		mag_auto;			/* AUTO mag */
   float		magerr_auto;			/* AUTO mag uncertainty */
+  float		petrofactor;			/* kron parameter */
+  float		flux_petro;			/* AUTO integrated flux */
+  float		fluxerr_petro;			/* RMS error on AUTO flux */
+  float		mag_petro;			/* AUTO mag */
+  float		magerr_petro;			/* AUTO mag uncertainty */
   float		flux_best;			/* BEST integrated flux */
   float		fluxerr_best;			/* RMS error on BEST flux */
   float		mag_best;			/* BEST mag */
@@ -145,6 +151,10 @@ typedef struct
   float		fluxerr_prof;			/* PROFILE flux error */
   float		mag_prof;			/* PROFILE magnitude */
   float		magerr_prof;			/* PROFILE magnitude error */
+  float		flux_win;			/* WINdowed flux*/
+  float		fluxerr_win;			/* WINdowed flux error */
+  float		mag_win;			/* WINdowed magnitude */
+  float		magerr_win;			/* WINdowed magnitude error */
 /* ---- astrometric data */
   double	posx,posy;			/* "FITS" pos. in pixels */
   double	mamaposx,mamaposy;		/* "MAMA" pos. in pixels */
@@ -184,13 +194,57 @@ typedef struct
   float		maxmu;				/* max. surface brightnees */
   float		elong;				/* elongation */
   float		ellip;				/* ellipticity */
+  float		polar;				/* Kaiser's "polarization" */
+  float		polarw;				/* WORLD "polarization" */
   float		sprob;				/* Stellarity index */
   float		fwhmw;				/* WORLD FWHM */
   float		*assoc;				/* ASSOCiated data */
   int		assoc_number;			/* nb of ASSOCiated objects */
   float		*vignet;			/* Pixel data */
   float		*vigshift;			/* (Shifted) pixel data */
-/* ---- SOM fitting */
+
+/* Windowed measurements */
+  double	winpos_x,winpos_y;		/* Windowed barycenter */
+  double	winposerr_mx2, winposerr_my2,
+		winposerr_mxy;			/* Error ellips moments */
+  float		winposerr_a, winposerr_b,
+		winposerr_theta;		/* Error ellips parameters */
+  float		winposerr_cxx, winposerr_cyy,
+		winposerr_cxy;			/* pos. error ellipse */
+  double	winposerr_mx2w, winposerr_my2w,
+		winposerr_mxyw;			/* WORLD error moments */
+  float		winposerr_aw, winposerr_bw,
+		winposerr_thetaw;		/* WORLD error parameters */
+  float		winposerr_thetas;		/* native error pos. angle */
+  float		winposerr_theta2000;		/* J2000 error pos. angle */
+  float		winposerr_theta1950;		/* B1950 error pos. angle */
+  float		winposerr_cxxw, winposerr_cyyw,
+		winposerr_cxyw;			/* WORLD error ellipse */
+  double	win_mx2, win_my2,
+		win_mxy;			/* Windowed moments */
+  float		win_a, win_b,
+		win_theta;			/* Windowed ellipse parameters*/
+  float		win_polar;			/* Windowed "polarization" */
+  float		win_cxx, win_cyy,
+		win_cxy;			/* Windowed ellipse parameters*/
+  double	win_mx2w, win_my2w,
+		win_mxyw;			/* WORLD windowed moments */
+  float		win_aw, win_bw,
+		win_thetaw;			/* WORLD ellipse parameters */
+  float		win_polarw;			/* WORLD WIN "polarization" */
+  float		win_thetas;		/* native error pos. angle */
+  float		win_theta2000;		/* J2000 error pos. angle */
+  float		win_theta1950;		/* B1950 error pos. angle */
+  float		win_cxxw, win_cyyw,
+		win_cxyw;			/* WORLD ellipse parameters */
+  double	winpos_xw, winpos_yw;		/* WORLD coordinates */
+  double	winpos_alphas, winpos_deltas;	/* native alpha, delta */
+  double	winpos_alpha2000, winpos_delta2000;	/* J2000 alpha, delta */
+  double	winpos_alpha1950, winpos_delta1950;	/* B1950 alpha, delta */
+  short		winpos_niter;			/* Number of WIN iterations */
+  short		win_flag;			/* 1:x2<0 2:xy=x2 4:flux<0 */
+
+ /* ---- SOM fitting */
   float		flux_somfit;			/* Fitted amplitude */
   float		fluxerr_somfit;			/* RMS error on SOM flux */
   float		mag_somfit;			/* Magnitude from SOM fit */
@@ -203,6 +257,7 @@ typedef struct
   float		*mag_growth;			/* Cumulated growth_curve */
   float		mag_growthstep;			/* Growth-curve step */
   float		*flux_radius;			/* f-light-radii */
+  float		hl_radius;			/* Scalar half-light radius */
 /* ---- PSF-fitting */
   float		*flux_psf;			/* Flux from PSF-fitting */
   float		*fluxerr_psf;			/* RMS error on PSF flux */

@@ -15,6 +15,7 @@
 *                       20/03/2000 (PWD): Added NRAD define.
 *	Last modify:	13/12/2002
 *                                  (EB) 2.3.
+*	Last modify:	23/09/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,7 +32,7 @@
 #define         EXECUTABLE      "sex"
 #define		MYVERSION	VERSION
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
-#define		WEBSITE		"http://terapix.iap.fr/sextractor"
+#define		WEBSITE		"http://terapix.iap.fr/soft/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"
 #define	       	MAILINGLISTREQ	"sextractor-request@iap.fr"
 #define		INSTITUTE	"TERAPIX team at IAP  http://terapix.iap.fr"

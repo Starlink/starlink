@@ -1,12 +1,12 @@
 # configure.in for SExtractor
-# (C) E.Bertin 2002,2003
+# (C) E.Bertin 2002-2005
 # Process this file with autoconf to produce a configure script.
 # First, disable the annoying config.cache
 define([AC_CACHE_LOAD],)
 define([AC_CACHE_SAVE],)
 
 # This is your standard Bertin source code...
-AC_INIT(sextractor, 2.3.2, [bertin@iap.fr])
+AC_INIT(sextractor, 2.4.3, [bertin@iap.fr])
 AC_CONFIG_SRCDIR(src/makeit.c)
 AC_CONFIG_AUX_DIR(autoconf)
 AM_CONFIG_HEADER(config.h)
@@ -20,7 +20,7 @@ AC_SUBST(DATE2, "$date2")
 AC_SUBST(DATE3, "$date3")
 
 # Include macros
-#sinclude(acx_prog_cc_optim.m4)
+sinclude(acx_prog_cc_optim.m4)
 
 # Display pakage and version number
 AC_MSG_RESULT([*********** Configuring:  $PACKAGE $VERSION ($date) **********])
@@ -129,9 +129,7 @@ AC_TYPE_UID_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-dnl  Do not check for malloc, this actually checks for GNU compatible one
-dnl  which can produce some surprises.
-#AC_FUNC_MALLOC
+AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
@@ -170,7 +168,7 @@ if test "$use_gprof" = "yes"; then
   if test "$use_icc" = "yes"; then
     CFLAGS="$CFLAGS -pq"
   else
-    CFLAGS="$CFLAGS -pg"
+    CFLAGS="-O3 -pg"
   fi
   use_static="no"
 fi
