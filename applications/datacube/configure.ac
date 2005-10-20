@@ -12,7 +12,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([datacube_mon.f])
+AC_CONFIG_SRCDIR([velmap.csh])
 
 dnl    Include defaults for Starlink configurations
 dnl    Need to find out whether we need this
@@ -23,7 +23,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
-STAR_CHECK_PROGS([hlib fgeneric])
+STAR_CHECK_PROGS([hlib])
 
 dnl    Conditional compile for missing symbols on Mac OSX. Using this in
 dnl    an odd way, essentially to check whether we're on a Mac. If we are
@@ -37,7 +37,6 @@ AC_CHECK_LIB(cc_dynamic, restFP)
 dnl    Dependences on starlink packages: depends on kappa, figaro and
 dnl    convert for the scripts in the package to work, so these must
 dnl    be declared as `use' dependencies.
-STAR_DECLARE_DEPENDENCIES(build, [generic ndf par sae shl mers pcs], [link])
 STAR_DECLARE_DEPENDENCIES(use,   [kappa figaro convert])
 
 dnl    Should investigate whether we really need this for a non-starlink
@@ -49,9 +48,7 @@ STAR_LATEX_DOCUMENTATION(sun237/ sc16/)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml datacube.csh datacube.icl
-    help/Makefile subs/Makefile tasks/Makefile
-    sun237/Makefile sc16/Makefile
-    demo/Makefile])
+    help/Makefile sun237/Makefile sc16/Makefile demo/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
