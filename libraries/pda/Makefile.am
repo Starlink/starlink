@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+cincludedir = $(includedir)/star
+
 dist_bin_SCRIPTS = pda_link pda_link_adam
 
 lib_LTLIBRARIES = libpda.la
@@ -11,7 +13,8 @@ libpda_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = $(PUBLIC_F_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
 F_ROUTINES = pda_baksld.f pda_db2ink.f pda_dcfti1.f pda_dmpar.f	       \
 pda_dqed.f pda_dscal.f pda_fstats.f pda_lmsad.f pda_passb4.f	       \
@@ -84,8 +87,10 @@ pda_assst.f
 
 C_ROUTINES = pda.c
 
-PUBLIC_INCLUDES = pda.h
 
+PUBLIC_F_INCLUDES = 
+PUBLIC_C_INCLUDES = pda.h
+PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
 # Testing
 
