@@ -2,7 +2,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "ast.h"
-#include "grp.h"
+#include "star/grp.h"
 #include "kaplibs_private.h"
 
 void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
