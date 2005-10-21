@@ -28,7 +28,7 @@
 #       Lower spectral-axis bound of the region of interest.
 #     -p 
 #       The script will plot the extracted images to the current display 
-#       as well as saving it to an NDF file.
+#       as well as saving it to an NDF file. [FALSE]
 #     -s number
 #       Spectral-axis step size for each passband chunk.
 #     -u number
