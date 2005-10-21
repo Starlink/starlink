@@ -57,6 +57,9 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    MinGW doesn't have this one.
 AC_CHECK_HEADERS(sys/wait.h)
 
+dnl    Used for dynamic header files
+AC_CHECK_HEADERS( time.h )
+
 dnl    Or file locking.
 AC_CHECK_FUNCS(fcntl)
 
