@@ -500,7 +500,7 @@
 
 *  Related Applications:
 *     KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
-*     SPECDRE: SPECGRID.
+*     SPECDRE: SPECGRID. SPLAT: SPLAT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
