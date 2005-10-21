@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+cincludedir = $(includedir)/star
+
 lib_LTLIBRARIES = libkpg.la libkpg_adam.la libkpg_grf.la libkpg_grf_adam.la
 
 libkpg_la_SOURCES = \
@@ -19,9 +21,13 @@ libkpg_grf_adam_la_SOURCES = \
 libkpg_grf_la_SOURCES = \
 	$(GRAPHIC_F_ROUTINES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = $(PUBLIC_F_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
-PUBLIC_INCLUDES = CTM_PAR kaplibs.h
+PUBLIC_C_INCLUDES = kaplibs.h
+PUBLIC_F_INCLUDES = CTM_PAR 
+PUBLIC_INCLUDES = $(PUBLIC_C_INCLUDES) $(PUBLIC_F_INCLUDES)
+
 PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM kaplibs_private.h
 BLOCK_DATA_FILES = ctm_xcols.f
 
