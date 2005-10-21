@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+cincludedir = $(includedir)/star
+
 lib_LTLIBRARIES = libgrp.la libgrp_adam.la
 dist_bin_SCRIPTS = grp_link grp_link_adam
 
@@ -15,7 +17,8 @@ libgrp_adam_la_SOURCES = \
         $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES) $(BLOCKDATA)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = $(PUBLIC_F_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 include_MESSAGES = GRP_ERR
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -28,7 +31,9 @@ check_PROGRAMS = test1
 test1_SOURCES = grp_test.f
 test1_LDADD = libgrp.la `$(srcdir)/grp_link`
 
-PUBLIC_INCLUDES = GRP_PAR grp.h
+PUBLIC_F_INCLUDES = GRP_PAR 
+PUBLIC_C_INCLUDES = grp.h
+PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 PRIVATE_INCLUDES = GRP_CONST GRP_COM
 
 BASIC_C_ROUTINES = grp.c
