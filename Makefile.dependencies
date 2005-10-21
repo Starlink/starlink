@@ -440,24 +440,15 @@ $(MANIFESTS)/daophot: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/datacube: \
-		$(MANIFESTS)/ary \
-		$(MANIFESTS)/ast \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
-		$(MANIFESTS)/fio \
-		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
-		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
-		$(MANIFESTS)/shl \
 		$(MANIFESTS)/star2html
 	cd applications/datacube \
 	  && $(MAKE_CPT)
