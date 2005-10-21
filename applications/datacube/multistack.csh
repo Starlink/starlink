@@ -11,7 +11,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     multistack [-i filename] [-g number] [-n number] [-o number] [-z/+z] 
+#     multistack [-g number] [-i filename] [-n number] [-o number] [-z/+z] 
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
@@ -19,8 +19,8 @@
 #     and presents you with a white-light image of the cube.   You can
 #     then select a number of X-Y positions using the cursor.  The script
 #     will then group these spectra creating an average spectrum for each
-#     group.  It then displays the average spectra in a "stack", where each
-#     group spectrum plotted offset vertically from the prevous one in the
+#     group.  It then displays the average spectra in a `stack', where each
+#     group spectrum plotted offset vertically from the previous one in the
 #     stack.
 #
 #  Parameters:
@@ -35,11 +35,11 @@
 #     -o number
 #       Offset between the spectra in the stack.
 #     -z 
-#       The script will automatically prompt the user to select a region to
-#       zoom before prompting for the region of interest.
+#       The script will automatically prompt to select a region to zoom
+#       before prompting for the region of interest.  [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
-#       of interest.
+#       of interest. [FALSE]
 
 #
 #  Authors:
