@@ -14,7 +14,8 @@ CupidGC cupidGC;
 
 
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       unsigned char *ipq, double rms, AstKeyMap *config  ){
+                       unsigned char *ipq, double rms, AstKeyMap *config,
+                       int velax ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -26,7 +27,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
 *                           void *ipd, unsigned char *ipq, double rms,
-*                           AstKeyMap *config )
+*                           AstKeyMap *config, int velax )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -71,6 +72,9 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        The global RMS error in the data array.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
+*     velax
+*        The index of the velocity axis in the data array (if any). Only
+*        used if "ndim" is 3. 
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -149,29 +153,29 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the 1D vector index of the element with the largest value in the 
    residuals array. Also find the total data sum in the residuals array. */
-         cupidFindMax( type, res, el, &imax, &sum );
+         cupidGCFindMax( type, res, el, &imax, &sum );
 
 /* Determine if a gaussian clump should be fitted to the peak around the 
    pixel found above.*/
-         cupidIterate( type, res, imax, sum, iclump, rms, config, &iter );
+         cupidGCIterate( type, res, imax, sum, iclump, rms, config, &iter );
          if( iter ) {
 
 /* If so, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
-            cupidSetInit( type, res, ndim, dims, imax, rms, config,
-                          iclump, x );
+            cupidGCSetInit( type, res, ndim, dims, imax, rms, config,
+                          iclump, velax, x );
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */
-            if( cupidGCfit( type, res, imax, x ) ) {
+            if( cupidGCFit( type, res, imax, x ) ) {
                iclump++;
 
 /* Add the clump to the output list. */
-               cupidListClump( x );
+               cupidGCListClump( x );
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
-               cupidUpdateArrays( type, res, el );
+               cupidGCUpdateArrays( type, res, el );
 
             } 
          }

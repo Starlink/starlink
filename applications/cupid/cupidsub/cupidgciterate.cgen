@@ -3,18 +3,18 @@
 #include "cupid.h"
 #include <limits.h>
 
-void CGEN_FUNCTION(cupidIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
+void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
                       double rms, AstKeyMap *config, int *iter ){
 /*
 *  Name:
-*     cupidIterate<X>
+*     cupidGCIterate<X>
 
 *  Purpose:
 *     Determine if a gaussian clump should be fitted to the peak around the
 *     pixel with the highest value in the residuals.
 
 *  Synopsis:
-*     void cupidIterate<X>( CGEN_TYPE *array, int imax, double sum, int iclump,
+*     void cupidGCIterate<X>( CGEN_TYPE *array, int imax, double sum, int iclump,
 *                           double rms, AstKeyMap *config, int *iter );
 
 *  Description:
@@ -43,11 +43,11 @@ void CGEN_FUNCTION(cupidIterate)( CGEN_TYPE *array, int imax, double sum, int ic
 *        a Gaussian should be fitted to the supplied peak.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidIterate macro 
+*     - This function can be invoked using the generic cupidGCIterate macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidIterate<X> except that an extra parameter is added to the start 
+*     cupidGCIterate<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidIterate... function to be invoked. This extra parameter should
+*     cupidGCIterate... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:

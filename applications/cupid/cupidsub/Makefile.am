@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
 
-CGENERIC_ROUTINES = cupidfindmax.cgen cupiditerate.cgen cupidrms.cgen \
-cupidsetinit.cgen cupidupdatearrays.cgen cupidgcfit.cgen
+CGENERIC_ROUTINES = cupidgcfindmax.cgen cupidgciterate.cgen cupidrms.cgen \
+cupidgcsetinit.cgen cupidgcupdatearrays.cgen cupidgcfit.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -13,7 +13,7 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 # includes the type-specific files which are created from the above
 # generic .cgen files.
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
-cupidconfigI.c cupidlistclump.c cupidgaussmodel.c cupidgausschisq.c \
+cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
 cupidgccalcf.c cupidgccalcg.c \
 $(BUILT_C_ROUTINES)
 

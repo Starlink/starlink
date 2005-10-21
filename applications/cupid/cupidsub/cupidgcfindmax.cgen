@@ -5,17 +5,17 @@
 #include "prm_par.h"
 
 
-void CGEN_FUNCTION(cupidFindMax)( CGEN_TYPE *array, int nel, int *imax, double *sum ){
+void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double *sum ){
 /*
 *  Name:
-*     cupidFindMax<X>
+*     cupidGCFindMax<X>
 
 *  Purpose:
 *     Find the element with the largest value, and the total data sum,
 *     in the supplied array. 
 
 *  Synopsis:
-*     void cupidFindMax<X>( CGEN_TYPE *array, int nel, int *imax, double *sum );
+*     void cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax, double *sum );
 
 *  Description:
 *     This functions finds the element with the largest value in the supplied 
@@ -36,11 +36,11 @@ void CGEN_FUNCTION(cupidFindMax)( CGEN_TYPE *array, int nel, int *imax, double *
 *        there are no good values in the supplied array.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidFindMax macro 
+*     - This function can be invoked using the generic cupidGCFindMax macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidFindMax<X> except that an extra parameter is added to the start 
+*     cupidGCFindMax<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidFindMax... function to be invoked. This extra parameter should
+*     cupidGCFindMax... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:

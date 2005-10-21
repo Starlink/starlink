@@ -4,7 +4,8 @@
 #include "ast.h"
 
 void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-                    void *ipd, unsigned char *ipq, AstKeyMap *config ){
+                     void *ipd, unsigned char *ipq, AstKeyMap *config,
+                     int velax ){
 /*
 *  Name:
 *     cupidClumpFind
@@ -15,7 +16,8 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 
 *  Synopsis:
 *     void cupidClumpFind( type, int ndim, int *slbnd, int *subnd, 
-*                         void *ipd, unsigned char *ipq, AstKeyMap *config  )
+*                          void *ipd, unsigned char *ipq, AstKeyMap *config, 
+*                          int velax )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -53,6 +55,9 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 *        subsequent clumps are not included in the mask.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
+*     velax
+*        The index of the velocity axis in the data array (if any). Only
+*        used if "ndim" is 3. 
 
 *  Authors:
 *     DSB: David S. Berry

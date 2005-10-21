@@ -1,16 +1,16 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void cupidListClump( ){
+void cupidGCListClump( ){
 /*
 *  Name:
-*     cupidListClump
+*     cupidGCListClump
 
 *  Purpose:
 *     Add a clump to the output list. 
 
 *  Synopsis:
-*     void cupidListClump( );
+*     void cupidGCListClump( );
 
 *  Description:
 *     This function adds a clump to the output list. 

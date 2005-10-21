@@ -1,6 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
-#include "pda.h"
+#include "star/pda.h"
 
 /* Local constants: */
 #define LV 71+CUPID__GCNP3*(CUPID__GCNP3+15)/2
@@ -13,16 +13,16 @@
 extern CupidGC cupidGC;
 
 
-int CGEN_FUNCTION(cupidGCfit)( CGEN_TYPE *res, int imax, double *x ){
+int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
 /*
 *  Name:
-*     cupidGCfit<X>
+*     cupidGCFit<X>
 
 *  Purpose:
 *     Fit a Gaussian to a supplied peak in a supplied array.
 
 *  Synopsis:
-*     int cupidGCfit<X>( CGEN_TYPE *res, int imax, double *x );
+*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x );
 
 *  Description:
 *     This function fits a Gaussian to a peak in the supplied residuals
@@ -44,11 +44,11 @@ int CGEN_FUNCTION(cupidGCfit)( CGEN_TYPE *res, int imax, double *x ){
 *     Non-zero if the fit was succesfully completed.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidGCfit macro 
+*     - This function can be invoked using the generic cupidGCFit macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCfit<X> except that an extra parameter is added to the start 
+*     cupidGCFit<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidGCfit... function to be invoked. This extra parameter should
+*     cupidGCFit... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:

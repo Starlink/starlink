@@ -1,17 +1,17 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void CGEN_FUNCTION(cupidUpdateArrays)( CGEN_TYPE *res, int nel ){
+void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel ){
 /*
 *  Name:
-*     cupidUpdateArrays<X>
+*     cupidGCUpdateArrays<X>
 
 *  Purpose:
 *     Remove the fit from the residuals array, and add it onto the total
 *     fit array.
 
 *  Synopsis:
-*     void cupidUpdateArrays<X>( CGEN_TYPE *res, int nel );
+*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel );
 
 *  Description:
 *     This function removes the fit from the residuals array, and adds it 
@@ -24,11 +24,11 @@ void CGEN_FUNCTION(cupidUpdateArrays)( CGEN_TYPE *res, int nel ){
 *        The number of elements in the supplied array. 
 
 *  Notes:
-*     - This function can be invoked using the generic cupidUpdateArrays macro 
+*     - This function can be invoked using the generic cupidGCUpdateArrays macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidUpdateArrays<X> except that an extra parameter is added to the start 
+*     cupidGCUpdateArrays<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidUpdateArrays... function to be invoked. This extra parameter should
+*     cupidGCUpdateArrays... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:

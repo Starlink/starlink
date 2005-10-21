@@ -17,17 +17,17 @@ extern CupidGC cupidGC;
 
 
 
-double cupidGaussModel( int ndim, double *x, double *par, int what, 
+double cupidGCModel( int ndim, double *x, double *par, int what, 
                         int newx, int newp ){
 /*
 *  Name:
-*     cupidGaussModel
+*     cupidGCModel
 
 *  Purpose:
 *     Evaluate a Gaussian model value or gradient at a given position.
 
 *  Synopsis:
-*     double cupidGaussModel( int ndim, double *x, double *par, int what, 
+*     double cupidGCModel( int ndim, double *x, double *par, int what, 
 *                             int newx, int newp )
 
 *  Description:
@@ -289,7 +289,7 @@ double cupidGaussModel( int ndim, double *x, double *par, int what,
       } else {
          *status = SAI__ERROR;
          msgSeti( "W", what );
-         errRep( "cupidGaussModel_err1", "cupidGaussModel: Illegal value "
+         errRep( "cupidGCModel_err1", "cupidGCModel: Illegal value "
                  "(^W) supplied for \"what\" (internal CUPID programming "
                  "error).", status );
       }

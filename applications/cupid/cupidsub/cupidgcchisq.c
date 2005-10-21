@@ -9,16 +9,16 @@
 extern CupidGC cupidGC;
 
 
-double cupidGaussChiSq( int ndim, double *par, int what, int newp ){
+double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 /*
 *  Name:
-*     cupidGaussChiSq
+*     cupidGCChiSq
 
 *  Purpose:
 *     The merit function to be minimised by the GaussClumps algorithm.
 
 *  Synopsis:
-*     double cupidGaussChiSq( int ndim, double *par, int what, int newp )
+*     double cupidGCChiSq( int ndim, double *par, int what, int newp )
 
 *  Description:
 *     This function evaluates the modified chi squared used to estimate
@@ -110,9 +110,9 @@ double cupidGaussChiSq( int ndim, double *par, int what, int newp ){
       pdiff = par[ 0 ] + par[ 1 ] - cupidGC.ymax;
 
 /* The offset from the model centre to the data peak */
-      x0_off = par[ 2 ] - cupidGC.x0_max;
-      if( ndim > 1 ) x1_off = par[ 4 ] - cupidGC.x1_max;
-      if( ndim > 2 ) v_off = par[ 7 ] - cupidGC.v_max;
+      x0_off = par[ 2 ] - cupidGC.x_max[ 0 ];
+      if( ndim > 1 ) x1_off = par[ 4 ] - cupidGC.x_max[ 1 ];
+      if( ndim > 2 ) v_off = par[ 7 ] - cupidGC.x_max[ 2 ];
 
 /* Initialise the total chi squared value */
       chisq = 0.0;

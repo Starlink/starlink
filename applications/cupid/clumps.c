@@ -2,13 +2,14 @@
 #include "mers.h"
 #include "ndf.h"
 #include "ast.h"
-#include "kaplibs.h"
-#include "grp.h"
+#include "star/kaplibs.h"
+#include "star/grp.h"
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 void clumps() {
 /*
@@ -17,7 +18,7 @@ void clumps() {
 *     CLUMPS
 
 *  Purpose:
-*     Identify clumps of emission within a 2 or 3 dimensional NDF.
+*     Identify clumps of emission within a 1, 2 or 3 dimensional NDF.
 
 *  Language:
 *     C
@@ -29,7 +30,7 @@ void clumps() {
 *     void clumps();
 
 *  Description:
-*     This application identifies clumps within a 2 or 3 dimensional NDF,
+*     This application identifies clumps within a 1, 2 or 3 dimensional NDF,
 *     and creates an output catalogue containing the clump parameters.
 *     The algorithm used to identify the clumps can be chosen from a
 *     list of supported algorithms.
@@ -112,7 +113,19 @@ void clumps() {
 *     name, followed by a dot, followed by the parameter name. Default
 *     values are shown in square brackets:
 *
-*     - GaussClumps.Fbeam: An initial guess at the ratio of the typical 
+*     - GaussClumps.ApertureLmts: Determines the radius at which the Gaussian
+*     weighting function (see GaussClumps.ApertureFWHM) is truncated to zero. 
+*     The supplied parameter value defines another Gaussian equal to the 
+*     initial guess at the Gaussian clump shape, scaled by a factor of 
+*     "sqrt(ApertureLmts)" on each pixel axis. Pixels for which this second
+*     Gaussian has a value less than 0.5 are assigned zero weight.
+*     - GaussClumps.ApertureFWHM: Determines the width of the Gaussian
+*     weighting function used to weight the data around each clump 
+*     during the fitting process. The weighting function is equal to the 
+*     initial guess at the Gaussian clump shape, scaled by a factor of
+*     "sqrt(ApertureFWHM)" on each pixel axis, and truncated to zero at a
+*     point determined by GaussClumps.ApertureLmts. [9.0]
+*     - GaussClumps.FwhmStart: An initial guess at the ratio of the typical 
 *     observed clump size to the instrument beam width. This is used to
 *     determine the starting point for the algorithm which finds the best
 *     fitting Gaussian for each clump. If no value is supplied, the
@@ -152,8 +165,14 @@ void clumps() {
 *     value in the residuals left after subtraction of the fitted clumps 
 *     is less than "Threshold" times the RMS noise in the original data,
 *     or when one of the other termination criteria is met. [2.0]
-*     - GaussClumps.VeloRes: The FWHM of the instrument beam, in
-*     pixels. [3.0]
+*     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
+*     channels. [3.0]
+*     - GaussClumps.VeloStart: An initial guess at the ratio of the typical 
+*     observed clump velocity width to the velocity resolution. This is used to
+*     determine the starting point for the algorithm which finds the best
+*     fitting Gaussian for each clump. If no value is supplied, the
+*     initial guess at the clump velocity width is based on the local profile
+*     around the pixel with peak value. []
 
 *  Authors:
 *     DSB: David S. Berry
@@ -173,11 +192,14 @@ void clumps() {
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
    AstKeyMap *keymap;           /* Pointer to KeyMap holding config settings */
+   AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
+   AstMapping *tmap;            /* Unused Mapping */
+   char attr[ 30 ];             /* AST attribute name */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
+   const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
-   double meanv;                /* Mean of variance values */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
@@ -195,6 +217,8 @@ void clumps() {
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int type;                    /* Integer identifier for data type */
    int var;                     /* Does the i/p NDF have a Variance component? */
+   int vax;                     /* Index of the velocity WCS axis (if any) */
+   int velax;                   /* Index of the velocity pixel axis (if any) */
    void *ipd;                   /* Pointer to Data array */
    void *ipq;                   /* Pointer to Quality array */
    
@@ -228,20 +252,15 @@ void clumps() {
       if( dim[ i ] > 1 ) nsig++;
    }
 
-/* Abort if the NDF is not 2- or 3- dimensional. */
-   if( nsig < 2 || nsig > 3 ) {
+/* Abort if the NDF is not 1-, 2- or 3- dimensional. */
+   if( nsig > 3 ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          ndfMsg( "NDF", indf );
-         if( nsig != 1 ) {
-            msgSeti( "NSIG", nsig );
-            errRep( "CLUMPS_ERR2", "\"^NDF\" has ^NSIG significant "
-                    "pixel axes", status );
-         } else {
-            errRep( "CLUMPS_ERR3", "\"^NDF\" has 1 significant pixel "
-                    "axis", status );
-         }
-         errRep( "CLUMPS_ERR4", "This application requires 2 or 3 "
+         msgSeti( "NSIG", nsig );
+         errRep( "CLUMPS_ERR2", "\"^NDF\" has ^NSIG significant "
+                 "pixel axes", status );
+         errRep( "CLUMPS_ERR4", "This application requires 1, 2 or 3 "
                  "significant pixel axes", status );
       }
       goto L999;
@@ -249,6 +268,49 @@ void clumps() {
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
+
+/* If the NDF has 3 pixel axes, identify the velocity axis. */
+   if( nsig == 3 && astGetI( iwcs, "Naxes" ) == 3 ) {
+
+/* Check the AST System attribute associated with each axis of the
+   current WCS Frame, looking for an axis with a known velocity system. 
+   Note the one-based index of the axis when and if found. */
+      vax = 0;
+      for( i = 1; i <= 3; i++ ) {
+         sprintf(attr, "System(%d)", i );
+         sys = astGetC( iwcs, attr );
+         if( sys ) {
+            if( !strcmp( "VRAD", sys ) || 
+                !strcmp( "VOPT", sys ) ||
+                !strcmp( "VELO", sys ) ) {
+               vax = i;
+               break;
+            }
+         }
+      }
+
+/* Identify the pixel axis corresponding to the velocity WCS axis.
+   astMapSplit uses one-based axis indices, so we need to convert to and
+   from zero -based for further use. */
+      velax = -1;
+      if( vax != 0 ) {
+         map = astGetMapping( iwcs, AST__CURRENT, AST__BASE );
+         astMapSplit( map, 1, &vax, &velax, &tmap );
+         if( tmap ) {
+            velax--;
+         } else {
+            velax = -1;
+         }         
+      }
+
+/* Report an error if no velocity axis was found. */
+      if( velax == -1 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( "CLUMPS_ERR1", "The supplied NDF does not contain a "
+                 "suitable velocity axis.", status );
+         goto L999;
+      }
+   }         
 
 /* Choose the data type to use when mapping the NDF Data array. */
    ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
@@ -311,11 +373,11 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       cupidGaussClumps( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq, 
-                       rms, keymap ); 
+                       rms, keymap, velax ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       cupidClumpFind( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq,
-                     keymap ); 
+                     keymap, velax ); 
 
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
