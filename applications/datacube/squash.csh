@@ -11,7 +11,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     squash  [-i filename] [-o filename] [-l number] [-u number] [-p]
+#     squash  [-i filename] [-l number] [-o filename] [-p] [-u number] 
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
@@ -31,7 +31,7 @@
 #       the script will prompt for the name of the output file.
 #     -p 
 #       The script will plot the extracted image to the current display 
-#       as well as saving it to an NDF file.
+#       as well as saving it to an NDF file.  [FALSE]
 #     -u number
 #       Upper spectral-axis bound of the region of interest.  
 #
