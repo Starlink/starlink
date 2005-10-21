@@ -11,7 +11,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     step [-i filename] [-l number] [-u number] [-s number] [-p] 
+#     step [-i filename] [-l number] [-p] [-s number] [-u number] 
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
@@ -26,13 +26,13 @@
 #       input file.
 #     -l number
 #       Lower spectral-axis bound of the region of interest.
-#     -u number
-#       Upper spectral-axis bound of the region of interest.  
-#     -s number
-#       Spectral-axis step size for each passband chunk.
 #     -p 
 #       The script will plot the extracted images to the current display 
 #       as well as saving it to an NDF file.
+#     -s number
+#       Spectral-axis step size for each passband chunk.
+#     -u number
+#       Upper spectral-axis bound of the region of interest.  
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
