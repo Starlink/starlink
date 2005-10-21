@@ -13,11 +13,11 @@
 #     stacker [-i filename] [-n number] [-o number] [-z/+z] 
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA,
+#     This shell script sits onto of a collection of A-tasks from the KAPPA
 #     and FIGARO packages.  It reads a three-dimensional IFU NDF datacube
 #     as input and presents you with a white-light image of the cube.  You
 #     can then select a number of X-Y position using the cursor.  The script 
-#     will then extract and display these spectra in a "stack" with each
+#     will then extract and display these spectra in a `stack' with each
 #     spectrum plotted offset vertically from the previous one in the stack.
 #
 #  Parameters:
@@ -31,11 +31,10 @@
 #       Offset between the spectra in the stack.
 #     -z 
 #       The script will automatically prompt the user to select a region to
-#       zoom before prompting for the region of interest.
+#       zoom before prompting for the region of interest.  [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
-#       of interest.
-
+#       of interest.  [FALSE]
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
