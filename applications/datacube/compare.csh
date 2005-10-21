@@ -14,12 +14,12 @@
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA,
-#     and FIGARO packages. It reads a three-dimensional IFU NDF as input
+#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
 #     and presents you with a white light image of the cube.  You can then
 #     select an X-Y position using the cursor.  The script will extract and
 #     display this spectrum next to the white-light image.  You can then
 #     select another X-Y position using the cursor, and the script will
-#     display this spectrum as well, allowing s comparison of the two.
+#     display this spectrum as well, allowing a comparison of the two.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
