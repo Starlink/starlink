@@ -3,7 +3,9 @@
 dist_bin_SCRIPTS = shl_link shl_link_adam
 
 bin_PROGRAMS = browsehlp
-include_HEADERS = shl.h
+
+cincludedir = $(includedir)/star
+cinclude_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = libshl.la `err_link` `one_link` `hlp_link` `fio_link`\
