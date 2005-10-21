@@ -43,6 +43,7 @@
 #include	"psf.h"
 #include	"som.h"
 #include	"weight.h"
+#include        "adam_defs.h"
 
 /******************************** makeit *************************************/
 /*
@@ -54,7 +55,7 @@ void	makeit()
    checkstruct		*check;
    picstruct		*dfield, *field,*pffield[MAXFLAG], *wfield,*dwfield;
    static time_t        thetime1, thetime2;
-   int			i, nok, ntab, next;
+   int			i, nok, next = 0;
 
    nok = 1;
 

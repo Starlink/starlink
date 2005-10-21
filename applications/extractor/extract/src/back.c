@@ -34,6 +34,7 @@
 #include	"back.h"
 #include	"field.h"
 #include	"weight.h"
+#include        "adam_defs.h"
 
 /******************************** makeback ***********************************/
 /*
@@ -44,15 +45,15 @@ void	makeback(picstruct *field, picstruct *wfield)
 
   {
    backstruct	*backmesh,*wbackmesh, *bm,*wbm;
-   PIXTYPE	*buf,*wbuf, *buft,*wbuft, *bufpos;
+   PIXTYPE	*buf,*wbuf, *buft,*wbuft;
    OFF_T	fcurpos,wfcurpos, wfcurpos2,fcurpos2, bufshift, jumpsize;
    size_t	bufsize, bufsize2,
 		size,meshsize;
-   int		i,j,k,m,n, bin, step, nlines,
-		lastbite, w,bw,bwx, bh, nx,ny,nb, x,y,h, offset, nlevels,
+   int		i,j,k,m,n, step, nlines,
+                w,bw, bh, nx,ny,nb,
 		lflag, nr;
    float	*ratio,*ratiop, *weight, *sigma,
-		qscale, cste, sratio;
+		sratio;
 
 /* If the weight-map is not an external one, no stats are needed for it */
   if (wfield && wfield->flags&(INTERP_FIELD|BACKRMS_FIELD))
@@ -381,7 +382,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
 {
    backstruct	*bm, *wbm;
    double	pix,wpix, sig, mean,wmean, sigma,wsigma, step;
-   PIXTYPE	*buft,*wbuft, *bufpos, lcut,wlcut, hcut,whcut;
+   PIXTYPE	*buft,*wbuft, lcut,wlcut, hcut,whcut;
    int		m,h,x,y, npix,wnpix, offset, lastbite, ngood;
 
    h = bufsize/w;

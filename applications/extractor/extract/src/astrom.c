@@ -67,7 +67,6 @@ static void fk4( picstruct *field, double inalp, double indec,
 void initastrom( picstruct *field ) {
    astromstruct	*as;
    double	*lm;
-   int		l;
    AstSkyFrame  *current, *blank;
 
    as = field->astrom;
@@ -288,8 +287,6 @@ double  *compute_wcs(picstruct *field, double mx, double my)
   static double	wcspos[2], wcspos0[2];
   double        xin[1], yin[1], xout[1], yout[1];
   double	*lm, al, da, de, cde;
-  int		rcode;
-  double point[2];
 
   as = field->astrom;
   lm = as->linmat;

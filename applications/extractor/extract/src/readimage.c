@@ -284,10 +284,7 @@ extract some data from the FITS-file header
 void	readimagehead(picstruct *field)
   {
    int          status = SAI__OK;
-   int		i,j,l, n;
    int          ndims, dims[NDF__MXDIM];
-   int          there;
-   char		*buf, st[80], str[80], *point;
    char         type[20];
    void         *pntr[3];
    int          nel;

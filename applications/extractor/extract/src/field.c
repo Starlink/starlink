@@ -45,6 +45,7 @@
 #include	"field.h"
 #include	"filter.h"
 #include	"interpolate.h"
+#include        "adam_defs.h"
 
 /********************************* newfield **********************************/
 /*

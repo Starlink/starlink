@@ -83,7 +83,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
    in name, code copied from below */
    name = filename;
 #ifndef	NO_ENVVAR
-   if ( dolpos = strchr( filename, '$' ) ) {
+   if ( ( dolpos = strchr( filename, '$' ) ) ) {
      int        nc;
      char       *valuet,*value2t, *envval;
    

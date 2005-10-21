@@ -19,6 +19,7 @@
 
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
+#include        "adam_defs.h"
 
 /****** asc2bin_tab ***********************************************************
 PROTO	tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, 

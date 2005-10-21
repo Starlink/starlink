@@ -34,6 +34,7 @@
 #include	"filter.h"
 #include	"image.h"
 #include	"plist.h"
+#include        "adam_defs.h"
 
 /****************************** scanimage ************************************
 PROTO   void scanimage(picstruct *field, picstruct *dfield, picstruct *ffield,

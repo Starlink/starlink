@@ -39,12 +39,13 @@ void adamprint( FILE *file, char *fmt, ... )
     vsprintf( string, fmtcpy, args );
     va_end( args );
     free( fmtcpy );
-    
+
     /* Write out the string via the message system */
     msgOut( " ", string, &status );
 }
 
-static void old_adamprint( FILE *file, char *fmt, ... ) 
+#if 0
+static void old_adamprint( FILE *file, char *fmt, ... )
 {
     char *fmtcpy;
     char *i;
@@ -98,7 +99,7 @@ static void old_adamprint( FILE *file, char *fmt, ... )
 
         /* Now process the trailing format statement. Extract it by
          * skipping over string until a non-numeric character is
-         * located, or we get to the end of the format string.  
+         * located, or we get to the end of the format string.
          */
         pstart = p;
         for ( ; *p; p++ ) {
@@ -148,11 +149,11 @@ static void old_adamprint( FILE *file, char *fmt, ... )
                 break;
         }
 
-        /* Add the format value to the destination string 
+        /* Add the format value to the destination string
          */
         strcat( string, tok );
 
-        /* Start again from end of current format specifier 
+        /* Start again from end of current format specifier
          */
         pstart = p + 1;
     }
@@ -181,3 +182,4 @@ static void old_adamprint( FILE *file, char *fmt, ... )
     free( fmtcpy );
     va_end( ap );
 }
+#endif

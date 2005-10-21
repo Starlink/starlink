@@ -137,7 +137,9 @@
 #include        "sae_par.h"
 #include        "par.h"
 #include        "ndf.h"
+#include        "merswrap.h"
 #include        "prefs.h"
+#include        "adam_defs.h"
 
 /* Maximum number of NAME/VALUE pairs */
 #define MAXARGS 20
@@ -157,7 +159,6 @@ void real_extractor( int *status ) {
   char *argval[MAXARGS];   /*  Pointers to parameter values */
   char argstr[MAXARGS*VALUELEN]; /*  Storage space for name & values */
   int narg;                /*  Number of parameters */
-  int i;
   int nim;                 /*  Number of images given (max=2) */
   char *str;
   char *ptr;

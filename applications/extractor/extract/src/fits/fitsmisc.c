@@ -35,6 +35,7 @@
 
 #include        "merswrap.h"
 #include        "sae_par.h"
+#include        "adam_defs.h"
 
 extern jmp_buf          env;
 

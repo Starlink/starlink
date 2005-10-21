@@ -49,6 +49,8 @@
 #include	"psf.h"
 #include	"retina.h"
 #include	"winpos.h"
+#include        "userradii.h"
+#include        "adam_defs.h"
 
 static obj2struct	*obj2 = &outobj2;
 
@@ -105,7 +107,6 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
    float		*heap,*heapt,*heapj,*heapk, swap;
    PIXTYPE		pix, cdpix, tpix, peak,cdpeak, thresh,dthresh;
    static PIXTYPE	threshs[NISO];
-   static PIXTYPE	threshr[NRAD];
 
 
   if (!dfield)

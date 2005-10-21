@@ -27,6 +27,7 @@
 #include	"globals.h"
 #include	"prefs.h"
 #include	"assoc.h"
+#include        "adam_defs.h"
 
 /********************************* comp_assoc ********************************/
 /*
