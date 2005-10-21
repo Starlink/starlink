@@ -10,7 +10,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     peakmap [-i filename] [-o filename] [-c number] [-f] [-p] [-v] [-z/+z]
+#     peakmap [-c number] [-f] [-i filename] [-o filename] [-p] [-v] [-z/+z]
 #
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA,
@@ -40,7 +40,7 @@
 #       accept the fit. [FALSE]
 #     -i filename
 #       The script will use this as its input file, the specified file should
-#       be a three-dimensional NDF, by default the script will prompt for the
+#       be a three-dimensional NDF.  By default the script will prompt for the
 #       input file.
 #     -o filename
 #       The filename for the output NDF of the line-strength map.
