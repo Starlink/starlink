@@ -132,7 +132,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 /* Get the Gaussian model value at the centre of the current pixel. Store 
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
-         res = *py - cupidGaussModel( ndim, x, par, -1, 1, ( iel == 0 ) );
+         res = *py - cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ) );
 
 /* Determine a scale factor which encourages the fitted intensity to stay
    below the observed intensity. This does the same job as the 
@@ -212,7 +212,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 
 /* Get the rate of change of the Gaussian model value with respect to the
    required parameter, at the centre of the current pixel. */
-         g = cupidGaussModel( ndim, x, par, what, 1, 0 );
+         g = cupidGCModel( ndim, x, par, what, 1, 0 );
 
 /* Increment the running sum of the returned value. */
          ret += *pr*g;
