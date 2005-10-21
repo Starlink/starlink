@@ -46,7 +46,7 @@ ech_scrn2d_LDADD = libechomop.la \
 	kaplibs_link_adam ast_link`
 
 echhelp_SOURCES = helpm.c
-echhelp_LDADD = `shl_link` @FCLIBS@
+echhelp_LDADD = `shl_link` `cnfrtl_link` @FCLIBS@
 
 # Help files
 echomop.shl: echomop.hlp
