@@ -29,7 +29,7 @@
 #       prompt for the name of the output file.
 #     -p
 #       The script will plot the extracted spectrum to the current display 
-#       as well as saving it to an NDF file.
+#       as well as saving it to an NDF file. [FALSE] 
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
