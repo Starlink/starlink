@@ -160,6 +160,7 @@ checkstruct	*initcheck(char *filename, checkenum check_type, int next)
   checkstruct	*check;
 
   QCALLOC(check, checkstruct, 1);
+  next = 1; /* Keep compilers happy */
 
   strcpy(check->filename, filename);
   check->type = check_type;
