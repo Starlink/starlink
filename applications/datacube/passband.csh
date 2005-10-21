@@ -28,13 +28,13 @@
 #       input file.
 #     -o filename
 #       An output two-dimensional NDF of the passband image.  By default the
-#       output will be displayed only.
+#       output will only be displayed.
 #     -z 
 #       The script will automatically prompt to select a region to
-#       zoom before prompting for the region of interest.
+#       zoom before prompting for the region of interest. [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
-#       of interest.
+#       of interest.  [FALSE]
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
