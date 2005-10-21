@@ -198,11 +198,12 @@ while ( ! -e ${tmpfile} )
 end
 
 # Grab the position.
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
+set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
+# Get the pixel co-ordinates and convert to grid indices.  The
+# exterior NINT replaces the bug/feature -0 result with the desired 0.
+set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
+set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
 
 # Check for the exit conditions.
 if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then

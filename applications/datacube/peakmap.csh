@@ -308,9 +308,10 @@ end
 # Grab the spatial position.
 set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
+# Get the pixel co-ordinates and convert to grid indices.  The
+# exterior NINT replaces the bug/feature -0 result with the desired 0.
+set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
+set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
 
 # Clean up the cursor temporary file.
 rm -f ${curfile} >& /dev/null
@@ -719,7 +720,7 @@ while( $y <= ${ubnd[2]} )
    while ( $x <= ${ubnd[1]} )
 
 # Extract the spectrum at the current spatial position.
-      set specfile = "${tmpdir}/${user}/${x}_${y}.sdf"
+      set specfile = "${tmpdir}/${user}/s${x}_${y}"
       ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
               "trim=true trimwcs=true"
 
@@ -775,7 +776,7 @@ while( $y <= ${ubnd[2]} )
 
 # No fit file.  Set dummy values.
       else
-         echo "       Spectrum at ($x,$y)" 
+         echo "        Spectrum at ($x,$y)" 
          set line = "${line} -9999.99" 
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
@@ -784,7 +785,7 @@ while( $y <= ${ubnd[2]} )
 
 # Remove temporary files for the current pixel.
       rm -f ${fitfile} >& /dev/null
-      rm -f ${specfile}
+      rm -f ${specfile}.sdf >& /dev/null
 
 # Move to the next pixel.
       @ x = ${x} + 1
@@ -933,9 +934,10 @@ if ( ${forcefit} == "FALSE" ) then
          set pos = \
            `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# Get the pixel co-ordinates and convert to grid indices.
-         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
-         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
+# Get the pixel co-ordinates and convert to grid indices.  The
+# exterior NINT replaces the bug/feature -0 result with the desired 0.
+         set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
+         set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
 
 # Clean up the CURSOR temporary file.
          rm -f ${curfile} >& /dev/null
