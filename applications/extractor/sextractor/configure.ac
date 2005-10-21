@@ -129,7 +129,7 @@ AC_TYPE_UID_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
+dnl AC_FUNC_MALLOC # Do not do this, we do not have a replacement malloc.
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
