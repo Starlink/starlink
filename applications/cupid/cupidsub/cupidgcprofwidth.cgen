@@ -1,0 +1,80 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "math.h"
+
+double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
+                                   int imax, int ax, double rms, double *off ){
+/*
+*  Name:
+*     cupidGCProfWidth<X>
+
+*  Purpose:
+*     Find the width of a clump from its radial profile.
+
+*  Synopsis:
+*     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
+*                                 int imax, int ax, double rms, double *off )
+
+*  Description:
+*     This functions forms a radial profile of a clump in the supplied
+*     data array, measured along a specified pixel axis. It then looks
+*     for the first significant minimum in the profile, and estimates the 
+*     FWHM of the clump from the position of this minimum. It also adds
+*     the minimum data value in the profile onto a supplied value and
+*     returns the sum.
+
+*  Parameters:
+*     array
+*        The array containing the data to be fitted. The elements should
+*        be ordered according to Fortran order (first axis varying most 
+*        rapidly). 
+*     ndim
+*        The number of pixel axes in the array.
+*     dims
+*        The number of pixels on each pixel axis of the array.
+*     imax
+*        The 1D vectorised index of the pixel with the highest value in
+*        the array. This is used as the start position for the
+*        radial profile.
+*     ax
+*        The zero-based index of the pixel axis along which the profile
+*        is to be taken.
+*     rms
+*        The RMS noise level in the array.
+*     off
+*        Address of a location containing a double value to which to add
+*        the estimate of the background data value (i.e. the minimum value 
+*        in the profile).
+
+*  Returned Value:
+*     The FWHM of the profile, in pixels.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidGCProfWidth macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidGCProfWidth<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidGCProfWidth... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+
+}
+
