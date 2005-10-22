@@ -259,7 +259,7 @@
 % San serif doesn't work by default.  Also without the \rm the
 % san serif continues after \att hyperlinks.  Not sure why.  Why
 % this was fixed by say having extra braces, the \sstattribute 
-% then used roman fount for itas headings.  The current lash up
+% then used roman fount for its headings.  The current lash up
 % appears to work, but needs further investigation or a TeX wizard.
 \newcommand{\att}[1]{\sf #1}
 \begin{htmlonly}
@@ -7603,14 +7603,14 @@ Frame of NDF {\tt fred}.  These attributes are described
 \hyperref{here}{in Section~}{}{se:frmatt}.  The inclusion of {\tt "remap=no"}
 is important: it tells the command to change the Frame attribute
 \emph{ without} changing the \xref{Mappings}{sun210}{Mapping}~ between
-Frames accordingly.  If the default value of {\tt "remap=yes"} was
+Frames accordingly.  If the default value of {\tt "remap=yes"} were
 used, the Mappings which connect the
 \xref{SpecFrame}{sun210}{SpecFrame}~
 to the other Frames within the WCS \xref{FrameSet}{sun210}{FrameSet}~
 would be modified in order to ensure that the position of each pixel
 is unchanged.  The default mode ({\tt "remap=yes"}) should be used if
 you already have a fully and correctly specified SpecFrame within the
-WCS component which you want to change to desribe a different system.
+WCS component which you want to change to describe a different system.
 For instance, if you have a SpecFrame describing frequency at each
 pixel, and you want to change it so that it describes the
 corresponding wavelength at each pixel, then doing:
@@ -8677,7 +8677,7 @@ attribute of the sky Frame, we could say:
             {\tt "VOPT"} or {\tt "VOPTICAL"}: Optical velocity (m/s)
 
             \sstitem
-            {\tt "ZOPT"} or {\tt "REDSHIFT"}: Reshift (dimensionless)
+            {\tt "ZOPT"} or {\tt "REDSHIFT"}: Redshift (dimensionless)
 
             \sstitem
             {\tt "BETA"}: Beta factor (dimensionless)
@@ -8765,7 +8765,7 @@ attribute of the sky Frame, we could say:
 
       In general, the syntax of the {\att Unit} attribute should follow the
       recommendations made in the FITS standard (see the paper
-      ``Representation of world co-ordinates in FITS'' by Greisen \&
+      ``Representation of world coordinates in FITS'' by Greisen \&
       Calabretta (available at 
 \htmladdnormallink{{\tt http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}} 
 {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
@@ -26421,8 +26421,9 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
 \xref{FIGARO}{sun86}{}: \xref{ESPLOT}{sun86}{ESPLOT},
 \xref{IPLOTS}{sun86}{IPLOTS},
 \xref{MSPLOT}{sun86}{MSPLOT},
-\xref{SPLOT}{sun86}{SPLOT};
-\xref{SPECGRID}{sun86}{SPECGRID}.
+\xref{SPLOT}{sun86}{SPLOT},
+\xref{SPECGRID}{sun86}{SPECGRID};
+\xref{SPLAT}{sun243}{}.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -31380,7 +31381,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT};
 \xref{IPLOTS}{sun86}{IPLOTS},
 \xref{MSPLOT}{sun86}{MSPLOT},
 \xref{SPLOT}{sun86}{SPLOT},
-\xref{SPECGRID}{sun86}{SPECGRID}.
+\xref{SPECGRID}{sun86}{SPECGRID};
+\xref{SPLAT}{sun243}{}.
    }
    \sstimplementationstatus{
       \sstitemlist{
