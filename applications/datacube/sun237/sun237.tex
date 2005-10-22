@@ -15,14 +15,14 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {237.1}
-\newcommand{\stardocauthors}   {A.~Allan}
-\newcommand{\stardocdate}      {2nd January 2001}
+\newcommand{\stardocnumber}    {237.2}
+\newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
+\newcommand{\stardocdate}      {2005 October 20}
 \newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
-\newcommand{\stardocversion}   {version 1.0}
+\newcommand{\stardocversion}   {version 1.1}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {  
-\htmlref{DATACUBE}{DATACUBE} is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), a small number of applications used for AXIS and WCS manipulation, and a collection of example shell and IDL scripts for IFS data cube manipulation.
+\htmlref{DATACUBE}{DATACUBE} is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), and a collection of example shell scripts for IFS data cube manipulation.
 }
 
 % ? End of document identification
@@ -285,11 +285,12 @@
    \item 9th November 2000; Version 0.1 Original version (AA) 
    \item 30th December 2000; Version 0.2 Auto-generated code prologs (AA)
    \item 2nd January 2001; Version 1.0 Release version (AA)
+   \item 2005 October 20; Version 1.1 Removed applications, and improved scripts (MJC)
 
  \end{enumerate}
 
  \vspace{10cm}
- \copyright \underline{1999-2001} Starlink, CCLRC
+ \copyright \underline{1999-2005} Starlink, CCLRC
 
  \cleardoublepage
  \begin{latexonly}
@@ -316,21 +317,52 @@
 
 \section{\xlabel{sun237_intro}The Datacube Package\label{sun237_intro}}
 
-The backbone of the Datacube Package is the \xref{IFU Data Product Cookbook}{sc16}{} (SC/16). Accompanying this book is a collection of {\tt csh} scripts layered ontop of various pieces of the Starlink Software Collection (SSC), along with a couple of ADAM applications to manipulate WCS and AXIS extensions.
+The backbone of the Datacube Package is the \xref{IFU Data Product
+Cookbook}{sc16}{} (SC/16).  Accompanying this book is a collection of
+{\tt csh} scripts layered ontop of various pieces of the Starlink
+Software Collection (SSC), along with a couple of ADAM applications to
+manipulate WCS and AXIS extensions.
 
-The C-Shell approach was a deliberate design decision which was made for two main reasons: Firstly, due to the still developing nature of the field it is difficult to pin down exactly visualisation tasks will be necessary, and the choice of {\tt csh} means that the existing scripts can be easily modified by the end user to do exactly the job required; Secondly, after examining the Starlink Software Collection (SSC) it was realised that a great deal of the functionality required to analyse IFU data already existed and it would be wasteful to re-invent the wheel by re-coding large chunks of software.
+The C-Shell approach was a deliberate design decision which was made
+for two main reasons: first, due to the still developing nature of
+the field it is difficult to pin down exactly visualisation tasks will
+be necessary, and the choice of {\tt csh} means that the existing
+scripts can be easily modified by the end user to do exactly the job
+required; second, after examining the Starlink Software Collection
+(SSC) it was realised that a great deal of the functionality required
+to analyse IFU data already existed and it would be wasteful to
+re-invent the wheel by re-coding large chunks of software.
 
-Some tasks once mature can, and should, be re-coded in FORTRAN or C, mainly for the speed and memory advantages that this will bring. For instance the \htmlref{{\tt velmap}}{velmap} script as implemented is rather slow and memory intensive, it seems likely that this will be the first candidate to be re-coded in a lower level language.
+Some tasks once mature can, and should, be re-coded in FORTRAN or C,
+mainly for the speed and memory advantages that this will bring. For
+instance the \htmlref{{\bf velmap}}{velmap} script as implemented is
+rather slow and memory intensive, it seems likely that this will be
+the first candidate to be re-coded in a lower-level language.
 
-Hopefully, while I haven't managed to think of everything, there is enough ground work here so that the approach to solving your data visualisation or data cube manipulation problem is obvious, even if the package doesn't have a script or application to do exactly what you require. 
+Hopefully, while I haven't managed to think of everything, there is
+enough ground work here so that the approach to solving your data
+visualisation or data cube manipulation problem is obvious, even if
+the package doesn't have a script or application to do exactly what
+you require.
 
-While this document contains the detailed descriptions of the A-tasks and shell scripts included with the package, the ``how to'' information  detailing their use can be found in \xref{SC/16}{sc16}{}.
+While this document contains the detailed descriptions of the shell
+scripts included with the package, the ``how to'' information
+detailing their use can be found in \xref{SC/16}{sc16}{}.
 
-I would welcome comments, criticisms, contributions and corrections to the package once people start to figure out what they want to do with this sort of data.  Comments can be sent either to me at \htmladdnormallink{aa@astro.ex.ac.uk}{mailto:aa@astro.ex.ac.uk} or to the Starlink software librarian \htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}. 
+I would welcome comments, criticisms, contributions and corrections to
+the package once people start to figure out what they want to do with
+this sort of data.  Comments can be sent either to the authors at
+\htmladdnormallink{aa@astro.ex.ac.uk}{mailto:aa@astro.ex.ac.uk} or
+\htmladdnormallink{mjc@star.rl.ac.uk}{mailto:mjc@star.rl.ac.uk} or
+to the Starlink software librarian
+\htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}.
 
 \section{\xlabel{sun237_starting}Setting up the applications\label{sun237_starting}}
 
-After sourcing the Starlink {\tt /star/etc/login} and {\tt /star/etc/cshrc} files the {\tt datacube} dcommand will make the datacube package commands and scripts available to you, the following message (or one much like it!) should appear
+After sourcing the Starlink {\tt /star/etc/login} and {\tt
+/star/etc/cshrc} files the {\tt datacube} command will make the
+datacube package scripts available to you, the following
+message (or one much like it!) should appear
 
 \small\begin{verbatim}
    % datacube
@@ -345,20 +377,26 @@ After sourcing the Starlink {\tt /star/etc/login} and {\tt /star/etc/cshrc} file
    %
 \end{verbatim}\normalsize
 
-at this point you can test whether the datacube package has been correctly installed by typing
+at this point you can test whether the datacube package has been
+correctly installed by typing
 
 \small\begin{verbatim}
    % datacube_test
 \end{verbatim}\normalsize
 
-which will run the test script for the package. If the script does not run correctly you should consult your Starlink system administrator.
+which will run the test script for the package. If the script does not
+run correctly you should consult your Starlink system administrator.
 
-It should be noted that there are a great many useful applications available in other Starlink packages that will assist you in dealing with your IFU data (see \xref{SC/16}{sc16}{} for details), so you may, at the very minimum, wish to setup the \xref{KAPPA}{sun95}{} applications with the {\tt kappa} command
+It should be noted that there are a great many useful applications
+available in other Starlink packages that will assist you in dealing
+with your IFU data (see \xref{SC/16}{sc16}{} for details), so you may,
+at the very minimum, wish to setup the \xref{KAPPA}{sun95}{}
+applications with the {\tt kappa} command
 
 \small\begin{verbatim}
    % kappa
  
-        KAPPA commands are now available -- (Version 0.15-9)
+        KAPPA commands are now available -- (Version 1.5)
 
         Type kaphelp for help on KAPPA commands.
         Type 'showme sun95' to browse the hypertext documentation.
@@ -371,11 +409,18 @@ It should be noted that there are a great many useful applications available in 
 
 \section*{\xlabel{sun237_acks}Acknowledgments\label{sun237_acks}}
 
-In compiling this document I have again depended heavily on the help of many people in the IFS community. However, special thanks should go to \htmladdnormallink{Rachel Johnston}{http://www.ast.cam.ac.uk/~raj/}, \htmladdnormallink{Jeremy Allington-Smith}{http://star-www.dur.ac.uk:80/~jra/}, \htmladdnormallink{James Turner}{mailto:J.E.H.Turner@durham.ac.uk} and \htmladdnormallink{Frank Valdes}{http://www.noao.edu/noao/scistaff/valdes.html} for their co-operation and contributions.
+In compiling this document I have again depended heavily on the help
+of many people in the IFS community. However, special thanks should go
+to \htmladdnormallink{Rachel
+Johnston}{http://www.ast.cam.ac.uk/~raj/}, \htmladdnormallink{Jeremy
+Allington-Smith}{http://star-www.dur.ac.uk:80/~jra/},
+\htmladdnormallink{James Turner}{mailto:J.E.H.Turner@durham.ac.uk} and
+\htmladdnormallink{Frank Valdes}{http://www.noao.edu/noao/scistaff/valdes.html} for their
+co-operation and contributions.
 
 \newpage
 \appendix
-\section{DESCRIPTIONS OF INDIVIDUAL APPLICATIONS}
+\section{Descriptions of Individual Applications}
 \label{sun237_appendix_descriptions}
 
 % +
@@ -475,6 +520,7 @@ In compiling this document I have again depended heavily on the help of many peo
    \end{description}
 }
 
+
 %  Format the returned value section (for a function).
 \newcommand{\sstreturnedvalue}[1]{
    \item[Returned Value:] \mbox{} \\
@@ -522,6 +568,17 @@ In compiling this document I have again depended heavily on the help of many peo
 %  Format the bugs section.
 \newcommand{\sstbugs}[1]{\item[Bugs:] #1}
 
+%  Format a list of items while in paragraph mode, and where there
+%  is a heading, thus the negative vertical space is not needed.
+\newcommand{\ssthitemlist}[1]{
+  \latexonly{
+  \mbox{} \\
+  \vspace{-8.0ex}
+  }
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
 %  Format a list of items while in paragraph mode.
 \newcommand{\sstitemlist}[1]{
   \mbox{} \\
@@ -644,610 +701,507 @@ In compiling this document I have again depended heavily on the help of many peo
 \sstroutine{
    compare
 }{
-   Comparison of multiple extracted spectra from a 3D IFU NDF
+   Compares multiple extracted spectra from a three-dimensional IFU NDF
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select and x,y position using the cursor. The script will
-      extract and display this spectra next to the white light image. The
-      user can then select another x,y position using the cursor and the
-      script will display this spectra as well, allowing comparison of the two.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{}, and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF as input and presents you with
+      a white light image of the cube.  You can then select an $X$-$Y$
+      position using the cursor.  The script will extract and display
+      this spectrum next to the white-light image.  You can then
+      select another $X$-$Y$ position using the cursor, and the script
+      will display this spectrum as well, allowing s comparison of the
+      two.
    }
    \sstusage{
       compare
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
-}
-\newpage
-\sstroutine{
-   COPYAXIS
-}{
-   Copies an AXIS extension into an NDF from the information present in
-   another NDF
-}{
-   \sstdescription{
-      Simple application designed to be run from inside a user written
-      script or from the command line, it will build an AXIS extension
-      for a specified NDF from the information present in an NDF of identical
-      dimensionality and bounds.
-   }
-   \sstusage{
-      copyaxis in=file like=template
-   }
-   \sstparameters{
-      \sstsubsection{
-         IN = \_NDF (Read \& Write)
-      }{
-         The NDF to be modified
-      }
-      \sstsubsection{
-         LIKE = \_NDF (Read)
-      }{
-         The template NDF.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         copyaxis in=smirfp0 like=smirfsp1
-      }{
-         Copies the AXIS structure from the file smirfsp1 to smirfsp0
-      }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
-}
-\newpage
-\sstroutine{
-   GETBOUND
-}{
-   Reports the minimum and maximum bounds of a N-dimensional NDF in the
-   current WCS Frame
-}{
-   \sstdescription{
-      Simple application designed to be run from inside a user written
-      script or from the command line, it will report the extent of the
-      axes of the datacube in the current AST frameset. The result will be
-      output to the screen and stored in the parameter system.
-   }
-   \sstusage{
-      getbound in=file
-   }
-   \sstparameters{
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         A IFU 3D NDF datacube.
-      }
-      \sstsubsection{
-         NDIM = \_INTEGER (Write)
-      }{
-         The number of dimensions of the NDF.
-      }
-      \sstsubsection{
-         LBOUND( ) = \_INTEGER (Write)
-      }{
-         The lower bounds of the NDF.
-      }
-      \sstsubsection{
-         UBOUND( ) = \_INTEGER (Write)
-      }{
-         The upper bounds of the NDF.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         getbound in=smirfsp0
-      }{
-         Returns the minimum and maximum bounds in the current WCS
-         frame set of the file smirfsp0 on all axes via the parameter
-         system and to the console.
-      }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
-}
-\newpage
-\sstroutine{
-   passband
-}{
-   Display of multiple passband image from a 3D IFU NDF
-}{
-   \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select and x,y position using the cursor. The script will
-      extract and display this spectra next to the white light image. The
-      user can then select a wavelength range using the cursor and the
-      script will display a passband image of the cube in that wavelength
-      range.
-   }
-   \sstusage{
-      passband [-i filename] [-o filename] [-z/$+$z]
-   }
-   \sstdiytopic{
-      Command Line Arguements
-   }{
-      \sstitemlist{
-
-         \sstitem
-         -i {\em filename}\\
-           The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
-
-         \sstitem
-         -o {\em filename}\\
-           The script will generate output 2D NDF of passband image, by default
-           the output will be displayed only.
-
-         \sstitem
-         -z\\
-           The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest.
-         $+$z\\
-           The program will not prompt for a zoom before requesting the region
-           of interest.
-      }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
-}
-\newpage
-\sstroutine{
-   peakmap
-}{
-   Builds a map of emission line emission line strength from a 3D IFU NDF
-}{
-   \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select and x,y position using the cursor. The script will
-      extract and display this spectra. The user will then be prompted to
-      specify various fitting parameters, eg peak position, using the cursor.
-      The script will then attempt to fit the emission line. The fit will be
-      displayed and the user consulted to the goodness of fit. If the fit is
-      considered good enough by the user the script will attempt to perform
-      similar fits to all cube spectra, building a 2D NDF image of strength
-      of the line.
-   }
-   \sstusage{
-      peakmap [-i filename] [-o filename] [-r number] [-f] [-p] [-v] [-z/$+$z]
-   }
-   \sstdiytopic{
-      Command Line Arguements
-   }{
-      \sstitemlist{
-
-         \sstitem
-         -i {\em filename}\\
-           The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
-
-         \sstitem
-         -o {\em filename}\\
-           The filename for the output NDF of the line strengh map.
-
-         \sstitem
-         -r {\em number}\\
-           Rest wavelength of the line being fitted
-
-         \sstitem
-         -f\\
-           Force the script to accept the first attempt to fit a gaussian to
-           the line. This is a dangerous option, if the fit is poor, or
-           unobtainable the script may terminate abruptly if it is forced to
-           accept the fit.
-
-         \sstitem
-         -p\\
-           The script will plot the final image map to the current display
-           as well as saving it to an NDF file. Additionally it will over-
-           plot the white light image as a contour map for comparison.
-
-         \sstitem
-         -v\\
-           The script will generate a variance array from the line fits and
-           attach it to the velocity map NDF.
-
-         \sstitem
-         -z\\
-           The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest.
-         $+$z\\
-           The program will not prompt for a zoom before requesting the region
-           of interest.
-      }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
-}
-\newpage
-\sstroutine{
-   PUTAXIS
-}{
-   Builds an AXIS extension in an NDF from the information present in
-   a WCS extension so that the file can be used inside FIGARO and other
-   non-WCS aware applications
-}{
-   \sstdescription{
-      Simple application designed to be run from inside a user written
-      script or from the command line, it will build an AXIS extension
-      for a specified NDF from the WCS information already present in the
-      NDF. It can cope with N-dimensional NDFs.
-   }
-   \sstusage{
-      putaxis in=file spectral=num
-   }
-   \sstparameters{
-      \sstsubsection{
-         IN = \_NDF (Read)
-      }{
-         A IFU 3D NDF datacube.
-      }
-      \sstsubsection{
-         SPECTRAL = \_INTEGER (Read)
-      }{
-         The axis number of the spectral dispersion axis. [3]
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         putaxis in=smirfsp0 spectral=3
-      }{
-         Builds an NDF AXIS extension in the file smirfsp0 from the existing
-         WCS extension. The 3rd axis is specified as the LAMBDA axis and
-         will be labelled accordingly
-      }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
    }
 }
 \newpage
 \sstroutine{
    multistack
 }{
-   Averages groups of spectra extracted from a 3D IFU NDF and then
+   Averages groups of spectra extracted from a three-dimensional IFU NDF and then
    plots these averaged spectra in a stack
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select a number of x,y position using the cursor. The script
-      will then group these spectra creating an average spectra and display
-      the average spedtra in a {\tt "}stack{\tt "} with each spectra plotted
-      offset vertically from the prevous one in the stack.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF as input and presents you with
+      a white-light image of the cube.  You can then select a number
+      of $X$-$Y$ positions using the cursor.  The script will then
+      group these spectra creating an average spectrum for each group.
+      It then displays the average spectra in a `stack', where each
+      group spectrum plotted offset vertically from the previous one
+      in the stack.
    }
    \sstusage{
-      multistack [-i filename] [-g number] [-n number] [-o number] [-z/$+$z]
+      multistack [-g number] [-i filename] [-n number] [-o number] [-z/+z]
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
-
+      \ssthitemlist{
          \sstitem
-         -i {\em filename}\\
-           The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
-
-         \sstitem
-         -g {\em number}\\
+         {\bf{\tt{-g}}} {\em number}\\
            The number of spectra in a group.
 
          \sstitem
-         -n {\em number}\\
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file should
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
+
+         \sstitem
+         {\bf{\tt{-n}}} {\em number}\\
            The number of groups to extract.
 
          \sstitem
-         -o {\em number}\\
+         {\bf{\tt{-o}}} {\em number}\\
            Offset between the spectra in the stack.
 
          \sstitem
-         -z\\
-           The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest.
-         $+$z\\
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt to select a region to zoom
+           before prompting for the region of interest.  {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest.
+           of interest. {\tt [FALSE]}
       }
    }
+}
+\newpage
+\sstroutine{
+   passband
+}{
+   Displays multiple passband images from a three-dimensional IFU NDF.
+}{
+   \sstdescription{
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF as input and presents you with
+      a white-light image of the cube.  You can then select and
+      $X$-$Y$ position using the cursor.  The script will extract and
+      display this spectrum next to the white-light image.  You can
+      then select a spectral range using the cursor and the script
+      will display a passband image of the cube in that spectral
+      range.
+   }
+   \sstusage{
+      passband [-i filename] [-o filename] [-z/+z]
+   }
    \sstdiytopic{
-      Copyright
+      Command-line Arguments
    }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file should
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
+
+         \sstitem
+         {\bf{\tt{-o}}} {\em filename}\\
+           An output two-dimensional NDF of the passband image.  By default the
+           output will be displayed only.
+
+         \sstitem
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt to select a region to
+           zoom before prompting for the region of interest.  {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
+           The program will not prompt for a zoom before requesting the region
+           of interest. {\tt [FALSE]}
+      }
+   }
+}
+\newpage
+\sstroutine{
+   peakmap
+}{
+   Builds a map of emission-line strength from a three-dimensional IFU NDF.
+}{
+   \sstdescription{
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF as input and presents the user
+      with a white-light image of the cube.  You can then select and
+      $X$-$Y$ position using the cursor.  The script will extract and
+      display this spectrum.  You will then be prompted to specify
+      various fitting parameters, \emph{e.g.} peak position, using the
+      cursor.  The script will then attempt to fit the emission line.
+      The fit will be displayed and you are consulted regarding the
+      goodness of fit.  If you consider the fit to be good enough, the
+      script will attempt to perform similar fits to all spectra
+      within the cube, building a two-dimensional NDF image of the
+      strength of the line.
+
+      If you do not force the fit to be considered ``good'' by using the -f
+      command-line option, the script will offer the opportunity to manually
+      refit the spectral feature for individual pixels, such as those that
+      were unsuccessfully fitted by the automatic procedure.
+   }
+   \sstusage{
+      peakmap [-f] [-i filename] [-o filename] [-c number] [-p] [-v] [-z/+z]
+   }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-c}}} {\em number}\\
+           Number of contours in the white-light image.  {\tt [15]}
+
+         \sstitem
+         {\bf{\tt{-f}}}\\
+           Force the script to accept the first attempt to fit a Gaussian to
+           the line.  This is a dangerous option; if the fit is poor, or
+           unobtainable the script may terminate abruptly if it is forced to
+           accept the fit.  {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file should
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
+
+         \sstitem
+         {\bf{\tt{-o}}} {\em filename}\\
+           The filename for the output NDF of the line-strength map.
+
+         \sstitem
+         {\bf{\tt{-p}}}\\
+           The script will plot the final image map to the current display 
+           as well as saving it to an NDF file.  Additionally, it will overplot
+           the white-light image as a contour map for comparison. {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-v}}}\\
+           The script will generate a VARIANCE array from the line fits and
+           attach it to the velocity-map NDF. {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt the user to select a region to
+           zoom before prompting for the region of interest.  {\tt TRUE]}\\
+         {\bf{\tt{+z}}}\\
+           The program will not prompt for a zoom before requesting the region
+           of interest. {\tt[ FALSE]}
+      }
    }
 }
 \newpage
 \sstroutine{
    ripper
 }{
-   Extract a 1D spectra from a 3D IFU NDF datacube
+   Extracts a one-dimensional spectrum from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      package. It reads a 3D IFU NDF datacube as input, presents the user
-      with a white light image of the cube and allows the user to select an
-      x,y position using the cursor. It then extracts (and optionally displays)
-      the spectra for that X,Y position.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      NDF datacube as input, presents you with a white-light image of
+      the cube and allows you to select an $X$-$Y$ position using the
+      cursor.  It then extracts (and optionally displays) the spectrum
+      for that $X$-$Y$ position.
    }
    \sstusage{
       ripper [-i filename] [-o filename] [-p]
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
 
          \sstitem
-         -i {\em filename}\\
-           The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
-
-         \sstitem
-         -o {\em filename}\\
-           The filename for the output spectra, by default the script will
+         {\bf{\tt{-o}}} {\em filename}\\
+           The filename for the output spectrum.  By default the script will 
            prompt for the name of the output file.
 
          \sstitem
-         -p\\
-           The script will plot the extracted spectra to the current display
-           as well as saving it to an NDF file.
+         {\bf{\tt{-p}}}\\
+           The script will plot the extracted spectrum to the current display
+           as well as saving it to an NDF file. {\tt [FALSE]}
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
    }
 }
 \newpage
 \sstroutine{
    squash
 }{
-   Extract a 2D white light image from a 3D IFU NDF datacube
+   Extracts a two-dimensional white-light image from a three-dimensional 
+   IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      package. It reads a 3D IFU NDF datacube as input and allows the user
-      to extract a specific wavelength range from the cube to form a white
-      light image.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      NDF as input and allows you to extract a specific spectral range
+      from the cube to form a white-light image.
    }
    \sstusage{
-      squash  [-i filename] [-o filename] [-l number] [-u number] [-p]
+      squash  [-i filename] [-l number] [-o filename] [-p] [-u number] 
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
-
+      \ssthitemlist{
          \sstitem
-         -i {\em filename}\\
+         {\bf{\tt{-i}}} {\em filename}\\
            The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
+           be a three-dimensional NDF, by default the script will prompt for the
+           input file.
 
          \sstitem
-         -o {\em filename}\\
-           The filename for the output white light or passband image, by default
-           the script will  prompt for the name of the output file.
+         {\bf{\tt{-l}}} {\em number}\\
+           Lower spectral-axis bound of the region of interest.
 
          \sstitem
-         -l {\em number}\\
-           Lower lambda bound of the region of interest.
+         {\bf{\tt{-o}}} {\em filename}\\
+           The filename for the output white-light or passband image.  By default
+           the script will prompt for the name of the output file.
 
          \sstitem
-         -u {\em number}\\
-           Upper lambda bound of the region of interest.
-
-         \sstitem
-         -p\\
+         {\bf{\tt{-p}}}\\
            The script will plot the extracted image to the current display
-           as well as saving it to an NDF file.
+           as well as saving it to an NDF file. {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-u}}} {\em number}\\
+           Upper spectral-axis bound of the region of interest.  
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
    }
 }
 \newpage
 \sstroutine{
    stacker
 }{
-   Plots a stack of spectra extracted from a 3D IFU NDF
+   Plots a stack of spectra extracted from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select a number of x,y position using the cursor. The script
-      will then extract and display these spectra in a {\tt "}stack{\tt "} with each
-      spectra plotted offset vertically from the previous one in the stack.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF datacube as input and presents
+      you with a white-light image of the cube.  You can then select a
+      number of $X$-$Y$ position using the cursor.  The script will
+      then extract and display these spectra in a `stack' with each
+      spectrum plotted offset vertically from the previous one in the
+      stack.
    }
    \sstusage{
-      stacker [-i filename] [-n number] [-o number] [-z/$+$z]
+      stacker [-i filename] [-n number] [-o number] [-z/+z]
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
-
+      \ssthitemlist{
          \sstitem
-         -i {\em filename}\\
+         {\bf{\tt{-i}}} {\em filename}\\
            The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
+           be a three-dimensional NDF.   By default the script will prompt for
+           the input file.
 
          \sstitem
-         -n {\em number}\\
+         {\bf{\tt{-n}}} {\em number}\\
            Number of spectra to extract.
 
          \sstitem
-         -o {\em number}\\
+         {\bf{\tt{-o}}} {\em number}\\
            Offset between the spectra in the stack.
 
          \sstitem
-         -z\\
+         {\bf{\tt{-z}}}\\
            The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest.
-         $+$z\\
+           zoom before prompting for the region of interest. {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest.
+           of interest. {\tt [FALSE]}
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
    }
 }
 \newpage
 \sstroutine{
    step
 }{
-   Steps through the each X-Y plane of a 3D IFU NDF datacube in the
-   spectral direction using KAPPA display to display the output
+   Steps through the each $X$-$Y$ plane of a three-dimensional IFU NDF
+   in the spectral direction using \xref{KAPPA:DISPLAY}{sun95}{DISPLAY} to display the output.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      package. It reads a 3D IFU NDF datacube as input and allows the user
-      to step through the datacube in the spectral direction, output goes to
-      file an (optionally) to the screen.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      NDF as input and allows you to step through the datacube in the
+      spectral direction in slices. The output goes to files and
+      (optionally) to the screen.
    }
    \sstusage{
-      step [-i filename] [-l number] [-u number] [-s number] [-p]
+      step [-i filename] [-l number] [-p] [-s number] [-u number] 
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
-
+      \ssthitemlist{
          \sstitem
-         -i {\em filename}\\
+         {\bf{\tt{-i}}} {\em filename}\\
            The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
+           be a three-dimensional NDF.  By default the script will prompt for the
+          input file.
 
          \sstitem
-         -l {\em number}\\
-           Lower lambda bound of the region of interest.
+         {\bf{\tt{-l}}} {\em number}\\
+           Lower spectral-axis bound of the region of interest.
 
          \sstitem
-         -u {\em number}\\
-           Upper lambda bound of the region of interest.
-
-         \sstitem
-         -s {\em number}\\
-           Lambda step size for each passband chunk.
-
-         \sstitem
-         -p\\
+         {\bf{\tt{-p}}}\\
            The script will plot the extracted images to the current display
-           as well as saving it to an NDF file.
+           as well as saving it to an NDF file. {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-s}}} {\em number}\\
+           Spectral-axis step size for each passband chunk.
+
+         \sstitem
+         {\bf{\tt{-u}}} {\em number}\\
+           Upper spectral-axis bound of the region of interest.  
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
    }
 }
 \newpage
 \sstroutine{
    velmap
 }{
-   Builds a velocity map of an emission line from a 3D IFU NDF
+   Builds a velocity map of an emission line from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the KAPPA
-      FIGARO and DATACUBE packages. It reads a 3D IFU NDF datacube as input
-      and presents the user with a white light image of the cube. The user
-      can then select and x,y position using the cursor. The script will
-      extract and display this spectra. The user will then be prompted to
-      specify various fitting parameters, eg peak position, using the cursor.
-      The script will then attempt to fit the emission line. The fit will be
-      displayed and the user consulted to the goodness of fit. If the fit is
-      considered good enough by the user the script will attempt to perform
-      similar fits to all cube spectra, building a 2D NDF image of the velocity
-      of the line. If the user does not force the fit to be considered {\tt "}good{\tt "}
-      by using the -f command line option the script will offer the opportunity
-      to manually refit data spectra that were unsucessfully fitted by the
-      automatic proceedure.
+      This shell script sits onto of a collection of A-tasks from the
+      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      reads a three-dimensional IFU NDF as input and presents you with
+      a white-light image of the cube.  You can then select and $X$-$Y$
+      position using the cursor.  The script will extract and display
+      this spectrum.  You will then be prompted to specify various
+      fitting parameters, such as the peak position, using the cursor.
+      The script will then attempt to fit the emission line.  The fit
+      will be displayed and you are consulted regarding the goodness
+      of fit.  If you consider the fit good enough, the script will
+      attempt to perform similar fits to all spectra within the cube,
+      building a two-dimensional NDF image of the velocity of the
+      line.
+
+      If you do not force the fit to be considered ``good'' by using the -f
+      command-line option, the script will offer the opportunity to manually
+      refit the spectral feature for individual pixels, such as those that
+      were not fitted by the automatic procedure.
    }
    \sstusage{
-      velmap [-i filename] [-o filename] [-r number] [-f] [-p] [-v] [-z/$+$z]
+      velmap [-c number] [-f] [-i filename] [-o filename] [-p] [-r number] 
+             \goodbreak [-s system] [-v] [-z/+z]
    }
    \sstdiytopic{
-      Command Line Arguements
+      Command-line Arguments
    }{
-      \sstitemlist{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-c}}} {\em number}\\
+           Number of contours in the white-light image.  {\tt [15]}
 
          \sstitem
-         -i {\em filename}\\
+         {\bf{\tt{-f}}}\\
+           Force the script to accept the first attempt to fit a gaussian to
+           the line.  This is a dangerous option, if the fit is poor, or
+           unobtainable the script may terminate abruptly if it is forced to
+           accept the fit.  Additionally this will supress manual re-fitting
+           of bad pixels at the end of the run of the script.  {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
            The script will use this as its input file, the specified file should
-           be a 3D NDF, by default the script will prompt for the input file.
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
 
          \sstitem
-         -o {\em filename}\\
+         {\bf{\tt{-o}}} {\em filename}\\
            The filename for the output NDF of the velocity map.
 
          \sstitem
-         -r {\em number}\\
-           Rest wavelength of the line being fitted
-
-         \sstitem
-         -f\\
-           Force the script to accept the first attempt to fit a gaussian to
-           the line. This is a dangerous option, if the fit is poor, or
-           unobtainable the script may terminate abruptly if it is forced to
-           accept the fit. Additionally this will supress manual re-fitting
-           of bad pixels at the end of the run of the script.
-
-         \sstitem
-         -p\\
+         {\bf{\tt{-p}}}\\
            The script will plot the final image map to the current display
-           as well as saving it to an NDF file. Additionally it will over-
-           plot the white light image as a contour map for comparison.
+           as well as saving it to an NDF file.  Additionally it will over-
+           plot the white-light image as a contour map for comparison.
+           {\tt [FALSE]}
 
          \sstitem
-         -v\\
+         {\bf{\tt{-r}}} {\em number}\\
+           Rest-frame spectral unit of the line being fitted.
+
+         \sstitem
+         {\bf{\tt{-s}}} {\em system}
+           The co-ordinate system for velocities.  Allowed values are:\\
+           \begin{description}
+           \item[{\tt "VRAD"}] -- radio velocity;
+           \item[{\tt "VOPT"}] -- optical velocity;
+           \item[{\tt "ZOPT"}] -- redshift; and
+           \item[{\tt "VELO"}] -- relativistic velocity.
+           \end{description}
+           If you supply any other value, the default is used.  {\tt ["VOPT"]}
+
+         \sstitem
+         {\bf{\tt{-v}}}\\
            The script will generate a variance array from the line fits and
-           attach it to the velocity map NDF.
+           attach it to the velocity-map NDF.  {\tt [FALSE]}
 
          \sstitem
-         -z\\
-           The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest.
-         $+$z\\
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt to select a region to
+           zoom before prompting for the region of interest. {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest.
+           of interest. {\tt [FALSE]}
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2000 Central Laboratory of the Research Councils
-   }
 }
+
+\newpage
+\section{\xlabel{se_changes}Release Notes---V1.1\label{se:changes}}
+\begin{itemize}
+
+\item The package applications COPYAXIS, GETBOUND, and PUTAXIS have
+been withdrawn.  The scripts that invoked these now call 
+\xref{KAPPA:SETAXIS}{sun95}{SETAXIS} ({\tt setaxis ndf=?~like=?})
+\xref{KAPPA:NDFTRACE}{sun95}{NDFTRACE} (access FLBND and FUBND output
+parameters), and \xref{SETAXIS in WCS mode}{sun95}{SETAXIS}
+({\tt setaxis ndf=?~dim=?~mode=wcs comp=Centre} for each dimension)
+respectively.
+
+\item The scripts have been generalised to other spectral co-ordinate
+systems.  Units are reported too.
+
+\item A bug displacing by $+1$ pixel negative pixel indices determined
+by the cursor has been fixed.  It was present in most of the scripts.
+
+\item Spectrum plots now use the histogram style for greater clarity.
+
+\item Additional -c option to specify the number of contours added
+to \htmlref{{\bf peakmap}}{peakmap} and \htmlref{{\bf velmap}}{velmap}.
+
+\item Tidied the scripts.  Changes included the silent removal and
+creation of files, alphabetical ordering of the options, documentation
+of default values of options, corrections to grammar and punctuation,
+avoidance of :r, aligned output, and tab removal.
+
+\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings in NDFCOPY.
+Ensured that the plots of spectra use the axis co-ordinate system.
+Removed unused -r option.
+
+\item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
+measured line displacements from the rest-frame co-ordinate in the
+current spectral system into one of four velocity measurements using
+WCSTRAN.  Added the -s option to define the co-ordinate system of the
+derived velocities.  Ensured that the plots of spectra use the axis
+co-ordinate system.  The script inquires the WCS for the rest-frame
+frequency to avoid unnecessary prompting.
+
+\end{itemize}
+
 \end{document}
