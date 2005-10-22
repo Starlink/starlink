@@ -4,6 +4,7 @@
 
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "hds1.h"                /* Global definitions for HDS              */
+#include "hds2.h"                /* Private public prototypes               */
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */

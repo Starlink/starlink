@@ -5,9 +5,12 @@
 #include "f77.h"              /* F77 <-> C interface macros                  */
 #include "cnf.h"              /* F77 <-> C string handling functions         */
 #include "str.h"              /* String constants                            */
-#include "dat_par.h"          /* DAT__ constant definitions                  */
-#include "hds.h"              /* HDS C interface			     */
+#include "hds1_types.h"
+#include "hds_types.h"
 #include "hds1.h"
+#include "hds2.h"             /* for datWhere                                */
+#include "hds.h"              /* HDS C interface			     */
+#include "dat_par.h"          /* DAT__ constant definitions                  */
 #define TRUE 1
 #define FALSE 0
 #define SAI__OK 0
@@ -33,7 +36,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -44,7 +47,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
 
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -163,7 +166,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
 /* Local variables.     */
    char locator1_c[DAT__SZLOC];
    char locator2_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG subs64[DAT__MXDIM];
    int i;
 #endif
@@ -173,7 +176,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
 /* Import the input locator string                  */
    cnfImpch( locator1, DAT__SZLOC, locator1_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       subs64[i] = subs[i];
@@ -431,7 +434,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char type_c[DAT__SZTYP+1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -455,7 +458,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 /* Import the locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -483,7 +486,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -493,7 +496,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -519,7 +522,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -529,7 +532,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -555,7 +558,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -565,7 +568,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -591,7 +594,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -601,7 +604,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -627,7 +630,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -637,7 +640,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -720,7 +723,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -734,7 +737,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -767,7 +770,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -780,7 +783,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -813,7 +816,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
    double *cpntr = NULL; /* initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -826,7 +829,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -859,7 +862,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -872,7 +875,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -905,7 +908,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -918,7 +921,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -951,7 +954,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char mode_c[DAT__SZMOD+1];
    float *cpntr = NULL; /* initialise in case of bad return status */
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -964,7 +967,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -991,7 +994,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1001,7 +1004,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1117,7 +1120,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
    char locator_c[DAT__SZLOC];
    char name_c[DAT__SZNAM+1];
    char type_c[DAT__SZTYP+1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1131,7 +1134,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1160,7 +1163,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
 /* Local variables */
    char locator_c[DAT__SZLOC];
    char name_c[DAT__SZNAM+1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1173,7 +1176,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
 /* Import "name" to C string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1301,7 +1304,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1311,7 +1314,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1338,7 +1341,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1348,7 +1351,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1374,7 +1377,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1384,7 +1387,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1410,7 +1413,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1420,7 +1423,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1446,7 +1449,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1456,7 +1459,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1487,7 +1490,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char type_c[DAT__SZTYP+1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1512,7 +1515,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
 
 
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -1634,7 +1637,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1644,7 +1647,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 /* Import the input locator string                  */
    cnfImpch( locator, DAT__SZLOC, locator_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Call pure C routine                                       */
    datShape( locator_c, *ndimx, dims64, ndim, status );
 
@@ -1696,7 +1699,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
 /* Local variables.     */
    char locator1_c[DAT__SZLOC];
    char locator2_c[DAT__SZLOC];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG diml64[DAT__MXDIM];
    INT_BIG dimu64[DAT__MXDIM];
    int i;
@@ -1707,7 +1710,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
 /* Import the input locator string                  */
    cnfImpch( locator1, DAT__SZLOC, locator1_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ ) {
       diml64[i] = diml[i];
@@ -1798,7 +1801,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
 /* Local variables.     */
    char locator_c[DAT__SZLOC];
    char type_c[DAT__SZTYP+1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -1808,7 +1811,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
 /* Import "type" to C string  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];
@@ -2221,7 +2224,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    char *file_c;
    char name_c[DAT__SZNAM + 1];
    char type_c[DAT__SZTYP + 1];
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
 #endif
@@ -2235,7 +2238,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
-#if defined(HDS_64)
+#if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
    for( i = 0; i<DAT__MXDIM; i++ )
       dims64[i] = dims[i];

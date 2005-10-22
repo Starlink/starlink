@@ -96,47 +96,24 @@
 /* Arithmetic data types:						    */
 /* =====================						    */
 
-/* Define a "normal integer". Typically use the "int" type, but ensure it   */
-/* has at least 4 bytes of precision.					    */
-#if ( ( INT_MIN <= -2147483647L ) && ( INT_MAX >= 2147483647L ) )
-typedef int INT;
-#else
-typedef long int INT;
-#endif
+#include "hds1_types.h"
+#include "hds_types.h"
 
-/* Definitions for 64-bits integers                                        */ 
-/* Use 'long' if it is 8 bytes, else use 'long long'                       */
-#if SIZEOF_LONG == 8
-typedef long int INT_BIG;
-typedef unsigned long int UINT_BIG;
-#define INT_BIG_S "ld"
-#define INT_BIG_U "lu"
-#elif SIZEOF_LONG_LONG == 8
-typedef long long int INT_BIG;
-typedef unsigned long long int UINT_BIG;
-#define INT_BIG_S "lld"
-#define INT_BIG_U "llu"
-#else
-error unable to find an 8 byte integer type
-#endif
+/* Historically, internally we call the 32bit int an INT.
+   Should make this more namespaced but for now just typedef */
+typedef hds_int32 INT;
 
-/* The Fortran interface can be compiled as either 32 or 64 bits depending */
-/* on a switch definition                                                  */
-#if !defined(HDS_F_64)
-#define FORTRAN_INDEX_TYPE F77_INTEGER_TYPE
-#else
-#define FORTRAN_INDEX_TYPE INT_BIG
-#endif
+/* Historically the 64bit int type was called INT_BIG */
+typedef hds_int64 INT_BIG;
+typedef hds_uint64 UINT_BIG;
+#define INT_BIG_S HDS_INT_BIG_S
+#define INT_BIG_U HDS_INT_BIG_U
 
-/* The internal size of array dimensions within HDS can be either 32 or 64  */
-/* bits. Note that 64 bits is untested and WILL change the file format!!!   */
-#if !defined(HDS_64)
-typedef int HDS_PTYPE;
-#define HDS_PTYPE_FORMAT "d"
-#else
-typedef INT_BIG HDS_PTYPE;
-#define HDS_PTYPE_FORMAT INT_BIG_S
-#endif
+/* Fortran index type is defined now in hds1_types.h */
+
+/* Currently the internal interface uses HDS_PTYPE rather than hdsdim */
+typedef hdsdim HDS_PTYPE;
+#define HDS_PTYPE_FORMAT HDS_DIM_FORMAT
 
 /* Global Structure Definitions:					    */
 /* ============================						    */

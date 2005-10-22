@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = hds_link hds_link_adam
-noinst_PROGRAMS = hds_machine dat_par_h dat_par_f
+noinst_PROGRAMS = hds_machine dat_par_h dat_par_f make-hds-types
 starhelp_DATA = hds_machine.txt
 
 lib_LTLIBRARIES = libhds.la
@@ -11,6 +11,7 @@ check_PROGRAMS = hds_test hds_test_prm
 
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(PUBLIC_CINCLUDES) \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES) \
@@ -29,6 +30,7 @@ hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
 
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c
+make_hds_types_SOURCES = make-hds-types.c
 
 hds_test_SOURCES = hds_test.f
 hds_test_LDADD = libhds.la `ems_link` `chr_link`
@@ -36,16 +38,21 @@ hds_test_LDADD = libhds.la `ems_link` `chr_link`
 hds_test_prm_SOURCES = hds_test_prm.c
 hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
 
+cincludedir = $(includedir)/star
+cinclude_HEADERS = $(PUBLIC_CINCLUDES)
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = CMP_ERR DAT_ERR
 noinst_MESSAGES = dat_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-PUBLIC_INCLUDES = DAT_PAR dat_par.h hds.h
+# dat_par.h was previously released so must go in the root include dir
+PUBLIC_CINCLUDES = hds.h
+PUBLIC_INCLUDES = DAT_PAR dat_par.h hds_types.h
+
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
-	dat1.h hds1.h \
+	dat1.h hds1.h hds2.h hds1_types.h \
 	rec.h rec1.h str.h \
         win_fixups.h \
 	$(noinst_MESSAGES)
@@ -117,14 +124,22 @@ dat_par.h: dat_par_h$(EXEEXT)
 DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR
 
+hds_types.h: make-hds-types$(EXEEXT)
+	./make-hds-types
+
+hds1_types.h: make-hds-types$(EXEEXT)
+	./make-hds-types
+
 hds_machine.txt: hds_machine$(EXEEXT)
 	echo "Machine characteristics, as determined by HDS" >$@
 	echo "" >>$@
 	./hds_machine >>$@
 
-BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h
+BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h \
+	hds_types.h hds1_types.h
 
-CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h
+CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
+	hds_types.h hds1_types.h
 
 dist_starnews_DATA = hds.news
 

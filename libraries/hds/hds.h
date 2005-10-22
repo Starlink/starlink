@@ -1,4 +1,5 @@
-#include "hds1.h"
+#include "dat_par.h"
+#include "hds_types.h"
 
 
 /*=================================*/
@@ -8,7 +9,7 @@
 int
 datAlter(char      locator_str[DAT__SZLOC],
          int       ndim,
-         HDS_PTYPE dims[],
+         hdsdim    dims[],
          int       *status);
 
 /*==========================*/
@@ -17,7 +18,7 @@ datAlter(char      locator_str[DAT__SZLOC],
 
 int
 datAnnul(char locator_str[DAT__SZLOC],
-          int *status);
+         int  *status);
 
 /*==============================================*/
 /* datBasic - Map data (in basic machine units) */
@@ -48,7 +49,7 @@ datCcopy(char locator1[DAT__SZLOC],
 int
 datCell( char     loc1_str[DAT__SZLOC],
          int      ndim,
-         HDS_PTYPE subs[],
+         hdsdim   subs[],
          char     loc2_str[DAT__SZLOC],
          int      *status);
 
@@ -137,7 +138,7 @@ int
 datGet(char       locator_str[DAT__SZLOC],
        char       *type_str,
        int        ndim,
-       HDS_PTYPE  dims[],
+       hdsdim  dims[],
        unsigned   char *values,
        int        *status);
 
@@ -148,7 +149,7 @@ datGet(char       locator_str[DAT__SZLOC],
 int
 datGetC(char      locator_str[DAT__SZLOC],
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         char      values[],
         int       char_len,
         int       *status);
@@ -160,7 +161,7 @@ datGetC(char      locator_str[DAT__SZLOC],
 int
 datGetD(char      locator_str[DAT__SZLOC],
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         double    values[],
         int       *status);
 
@@ -171,7 +172,7 @@ datGetD(char      locator_str[DAT__SZLOC],
 int
 datGetI(char      locator_str[DAT__SZLOC],
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       values[],
         int       *status);
 
@@ -182,7 +183,7 @@ datGetI(char      locator_str[DAT__SZLOC],
 int
 datGetL(char      locator_str[DAT__SZLOC],
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       values[],
         int       *status);
 
@@ -193,7 +194,7 @@ datGetL(char      locator_str[DAT__SZLOC],
 int
 datGetR(char      locator_str[DAT__SZLOC],
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         float     values[],
         int       *status);
 
@@ -225,7 +226,7 @@ datMap(char      locator_str[DAT__SZLOC],
        char      *type_str,
        char      *mode_str,
        int       ndim,
-       HDS_PTYPE dims[],
+       hdsdim dims[],
        unsigned char **pntr,
        int       *status);
 
@@ -237,7 +238,7 @@ int
 datMapC(char      locator_str[DAT__SZLOC],
         char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         unsigned char **pntr,
         int       *status );
 
@@ -249,7 +250,7 @@ int
 datMapD(char      locator_str[DAT__SZLOC],
         char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         double    **pntr,
         int       *status );
 
@@ -261,7 +262,7 @@ int
 datMapI(char      locator_str[DAT__SZLOC],
         char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       **pntr,
         int       *status );
 
@@ -273,7 +274,7 @@ int
 datMapL(char      locator_str[DAT__SZLOC],
         char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       **pntr,
         int       *status );
         
@@ -285,7 +286,7 @@ int
 datMapR(char      locator_str[DAT__SZLOC],
         char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         float     **pntr,
         int       *status );
         
@@ -296,7 +297,7 @@ datMapR(char      locator_str[DAT__SZLOC],
 int
 datMould(char       locator_str[DAT__SZLOC],
           int       ndim,
-          HDS_PTYPE dims[],
+          hdsdim dims[],
           int       *status);
 
 /*=======================*/
@@ -336,7 +337,7 @@ datNew( char      locator_str[DAT__SZLOC],
         char      *name_str,
         char      *type_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       *status);
 
 /*============================================*/
@@ -348,7 +349,7 @@ datNewC(char      locator_str[DAT__SZLOC],
         char      *name_str,
         int       len,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         int       *status);
 
 /*====================================*/
@@ -386,7 +387,7 @@ datPrmry(int set,
 int
 datPutC( char      locator_str[DAT__SZLOC],
          int       ndim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          char      *string,
          int       string_length,
          int       *status);
@@ -398,7 +399,7 @@ datPutC( char      locator_str[DAT__SZLOC],
 int
 datPutD( char      locator_str[DAT__SZLOC],
          int       ndim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          double    *values,
          int       *status);
 
@@ -409,7 +410,7 @@ datPutD( char      locator_str[DAT__SZLOC],
 int
 datPutI( char    locator_str[DAT__SZLOC],
          int     ndim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          int     *values,
          int     *status);
 
@@ -420,7 +421,7 @@ datPutI( char    locator_str[DAT__SZLOC],
 int
 datPutR( char      locator_str[DAT__SZLOC],
          int       ndim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          float     *values,
          int       *status);
 
@@ -431,7 +432,7 @@ datPutR( char      locator_str[DAT__SZLOC],
 int
 datPutL( char      locator_str[DAT__SZLOC],
          int       ndim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          int       *values,
          int       *status);
 
@@ -443,7 +444,7 @@ int
 datPut( char     locator_str[DAT__SZLOC],
         char     *type_str,
         int      ndim,
-        HDS_PTYPE  dims[],
+        hdsdim  dims[],
         unsigned char *values,
         int      *status);
 
@@ -489,7 +490,7 @@ datRetyp(char locator_str[DAT__SZLOC],
 int
 datShape(char      locator_str[DAT__SZLOC],
          int       maxdim,
-         HDS_PTYPE dims[],
+         hdsdim dims[],
          int       *actdim,
          int       *status);
 
@@ -509,8 +510,8 @@ datSize(char locator_str[DAT__SZLOC],
 int
 datSlice(char     locator1_str[DAT__SZLOC],
          int      ndim,
-         HDS_PTYPE  lower[],
-         HDS_PTYPE  upper[],
+         hdsdim  lower[],
+         hdsdim  upper[],
          char     locator2_str[DAT__SZLOC],
          int      *status );
 
@@ -539,7 +540,7 @@ datStruc(char locator_str[DAT__SZLOC],
 int
 datTemp(char      *type_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        hdsdim dims[],
         char      locator_str[DAT__SZLOC],
         int       *status);
 
@@ -590,13 +591,9 @@ datVec(char locator1_str[DAT__SZLOC],
 
 /*================================================*/
 /* datWhere - Find primitive position in HDS file */
+/*            Currently not part of the public    */
+/*            C API                               */
 /*================================================*/
-
-int
-datWhere(char locator_str[DAT__SZLOC],
-         INT_BIG *block,
-         int *offset,
-         int *status);
 
 /*==================================================*/
 /* hdsCopy - Copy an object to a new container file */
@@ -684,7 +681,7 @@ hdsNew(char *file_str,
        char *name_str,
        char *type_str,
        int  ndim,
-       HDS_PTYPE  dims[],
+       hdsdim  dims[],
        char locator_str[DAT__SZLOC],
        int *status);
 
