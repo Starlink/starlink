@@ -18,6 +18,9 @@ libhds_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES)
 
+# Make sure that hds_types.h is built early
+hds1.h: hds_types.h
+
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
