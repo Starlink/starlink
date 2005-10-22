@@ -231,13 +231,15 @@ int main (int argc, char ** argv ) {
   fprintf( OutputFile,
 	   "/* Public type for specifying HDS dimensions */\n"
 	   "typedef %s hdsdim;\n"
-	   "#define HDS_DIM_FORMAT \"%s\"\n",
+	   "#define HDS_DIM_FORMAT \"%s\"\n\n",
 	   DIM_TYPE, DIM_FORMAT);
 
   fprintf( POutputFile,
-	   "/* Private types relating to dimensions */\n"
-	   "typedef %s FORTRAN_INDEX_TYPE;\n\n",
-	   FORTRAN_HDS_INDEX_TYPE);
+	   "/* Private types and sizes relating to dimensions */\n"
+	   "typedef %s FORTRAN_INDEX_TYPE;\n"
+	   "#define SIZEOF_HDSDIM %ld\n\n",
+	   FORTRAN_HDS_INDEX_TYPE,
+	   (long)sizeof(DIM_TYPE));
 
 
   /* Need to decide whether fortran dims need to be copied to
