@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -x
 #+
 
 #  Name:
@@ -12,7 +12,8 @@
 #     C-shell script.
 
 #  Usage:
-#     velmap [-i filename] [-o filename] [-r number] [-c number] [-f] [-p] [-v] [-z/+z]
+#     velmap [-c number] [-f] [-i filename] [-o filename] [-p] [-r number] 
+#            [-s system] [-v] [-z/+z]
 
 #  Description:
 #     This shell script sits onto of a collection of A-tasks from the KAPPA
@@ -30,7 +31,7 @@
 #     If you do not force the fit to be considered "good" by using the -f
 #     command-line option, the script will offer the opportunity to manually
 #     refit the spectral feature for individual pixels, such as those that
-#     were unsucessfully fitted by the automatic procedure.
+#     were not fitted by the automatic procedure.
 
 #  Parameters:
 #     -c number
@@ -53,12 +54,19 @@
 #       plot the white-light image as a contour map for comparison.  [FALSE]
 #     -r number
 #       Rest-frame spectral unit of the line being fitted.
+#     -s system
+#       The co-ordinate system for velocities.  Allowed values are:
+#          "VRAD" -- radio velocity;
+#          "VOPT" -- optical velocity;
+#          "ZOPT" -- redshift; and
+#          "VELO" -- relativistic velocity.
+#       If you supply any other value, the default is used.  ["VOPT"]
 #     -v
 #       The script will generate a variance array from the line fits and
-#       attach it to the velocity map NDF.  [FALSE]
+#       attach it to the velocity-map NDF.  [FALSE]
 #     -z 
-#       The script will automatically prompt the user to select a region to
-#       zoom before prompting for the region of interest.  [TRUE]
+#       The script will automatically prompt to select a region to zoom
+#       before prompting for the region of interest.  [TRUE]
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
@@ -125,6 +133,14 @@
 #       Appended data unit to reported peak values.  Inserted blank lines to
 #       structure the commentary better.  Correct some output and comments: 
 #       e.g. "spectra" singular to "spectrum".
+#     2005 October 21 (MJC):
+#       Test for existence of RestFreq, and use it where available instead
+#       of prompting the user.  Remove second prompt for Rest-frame 
+#       co-ordinate.  Ensure that the output velocities are in km/s.  
+#       Added -s option.  Align some commentary.  WCSTRAN calls for fixing
+#       individual pixels now uses the correct NDF.  Bug deriving the 
+#       velocity of refitted point corrected, by resetting the WCS Frame,
+#       System and Unit before transforming.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -157,9 +173,8 @@ set varfile = "${tmpdir}/${user}/vmap_var.dat"
 
 touch ${curfile}
 
+# Set options access flags.
 set plotspec = "FALSE"
-set plotdev = "xwin"
-set fitgood = "yes"
 set dovar = "FALSE"
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
@@ -172,6 +187,12 @@ set component = 1
 
 # Specify the number of contours used to display the white-light image.
 set numcont = 15
+
+# Other defaults.
+set plotdev = "xwin"
+set fitgood = "yes"
+set velsys = "VOPT"
+set vunits = "km/s"
 
 # Invoke the package setup.
 alias echo 'echo > /dev/null'
@@ -214,7 +235,14 @@ while ( $#args > 0 )
    case -r:    # rest-frame spectral-unit of line
       shift args
       set gotrest = "TRUE"
-      set line_centre = $args[1]
+      set rest_coord = $args[1]
+      shift args
+      breaksw
+   case -s:    # velocity co-ordinate system
+      shift args
+      set velsys = `echo $args[1] | awk '{print toupper($0)}'`
+      if ( $velsys != "VOPT" && $velsys != "VRAD" && \
+           $velsys != "ZOPT" && $velsys != "VELO" ) set velsys = "VOPT"
       shift args
       breaksw
    case -v:    # generate variances?
@@ -319,9 +347,10 @@ end
 # Grab the spatial position.
 set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# Get the pixel co-ordinates and convert to grid indices.
-set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
-set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
+# Get the pixel co-ordinates and convert to grid indices.  The
+# exterior NINT replaces the bug/feature -0 result with the desired 0.
+set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
+set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
 
 # Clean up the CURSOR temporary file.
 rm -f ${curfile} >& /dev/null
@@ -451,7 +480,6 @@ end
 
 # Grab the position.
 set pos = `parget lastpos cursor`
-echo "Lower  $pos"
 set low_mask = $pos[1]
 
 # Clean up the CURSOR temporary file.
@@ -697,18 +725,36 @@ endif
 # Get the rest-frame spectral unit.
 # =================================
 
-# Get the spectral label and units.
+# Get the spectral label, units, and system.
 set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
 set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+set rest_known = "FALSE"
 
 if ( ${gotrest} == "FALSE" ) then
-   echo -n "Rest ${slabel}: "
-   set line_centre = $<
+
+# Get the rest-frame value.  There is at the time of writing no
+# clean way to test whether or not this was successful.  So search the
+# possible error message.
+   set astat = `wcsattrib "ndf=${infile} mode=get name=RestFreq"`
+   set found = `echo $astat | awk '{if (index( $0, "bad attribute")>0 ) print "Bad"}'`
+   if ( $found == "Bad" ) then
+      echo -n "Rest ${slabel}: "
+      set rest_coord = $<
+      echo " "
+   else
+
+# Obtain the rest frequency in Ghz.  Note that the value is already
+# stored in the WCS attributes.
+      set rest_coord = `parget value wcsattrib`
+      set slabel = "Frequency"
+      set sunits = "GHz"
+      set rest_known = "TRUE"
+   endif
+
 endif
 
-echo " "
-printf "%21s%s\n" "Rest ${slabel}" ":"
-printf "%24s%s\n" "${slabel}" " : ${line_centre} ${sunits}"
+echo "      Rest ${slabel}" ":"
+echo "        ${slabel}" " : ${rest_coord} ${sunits}"
 echo " "
 
 # Loop through the entire datacube.
@@ -731,18 +777,18 @@ set vars = ""
 if ( ${gotoutfile} == "FALSE" ) then
    echo -n "NDF output file: "
    set outfile = $<
+   echo " "
 endif
 
 date > ${tmpdir}/${user}/vmap_time.dat 
 
 # Fit the cube in a similar fashion.
-echo " "
 echo "      Fitting:"
 while( $y <= ${ubnd[2]} )
    while ( $x <= ${ubnd[1]} )
       
 # Extract the spectrum at the current spatial position.
-      set specfile = "${tmpdir}/${user}/${x}_${y}.sdf"
+      set specfile = "${tmpdir}/${user}/s${x}_${y}"
       ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
               "trim=true trimwcs=true"
 
@@ -778,17 +824,21 @@ while( $y <= ${ubnd[2]} )
                set vars = "${vars} -9999.99"  
             endif  
          else
-            echo "       Spectrum at ($x,$y): $centre_fit +- $centre_err" 
+            echo "        Spectrum at ($x,$y): $centre_fit +- $centre_err" 
 
-# Set the rest-frame value.
-            set rest = "${line_centre}" 
-            wcsattrib "ndf=${specfile} mode=set name=RestFreq newval=${rest}"
+# Set the rest-frame value, if it's not already stored in the WCS
+# attributes.
+            if ( ${rest_known} == "FALSE" ) then
+               wcsattrib "ndf=${specfile} mode=set name=RestFreq "\
+                         "newval=${rest_coord}"
+            endif
 
-# Reset the System of the current WCS Frame to optical velocities. 
-            wcsattrib "ndf=${specfile} mode=set name=System newval=vopt"
+# Reset the System of the current WCS Frame to velocities in the desired 
+# system and units.
+            wcsattrib "ndf=${specfile} mode=set name=System newval=${velsys}"
+            wcsattrib "ndf=${specfile} mode=set name=Unit newval=${vunits}"
 
 # Convert the line-centre position to optical velocity.
-#            set velocity = `wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS frameout=SPECTRUM"`
             wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS " \
                     "frameout=SPECTRUM" >& /dev/null
             set velocity = `parget posout wcstran`
@@ -796,11 +846,11 @@ while( $y <= ${ubnd[2]} )
             if ( ${dovar} == "TRUE" ) then
                echo -n "                         $velocity" 
             else
-               echo "                         $velocity kms^-1" 
+               echo "                         $velocity $vunits" 
             endif
 
             set line = "${line} ${velocity}"
-            
+
 # Calculate the error.
             if ( ${dovar} == "TRUE" ) then
                if ( ${centre_err} == "nan" || ${centre_err} == "INF" ) then
@@ -840,7 +890,7 @@ while( $y <= ${ubnd[2]} )
       else
 
 # No fit file.  Set dummy values.
-         echo "       Spectrum at ($x,$y)" 
+         echo "        Spectrum at ($x,$y)" 
          set line = "${line} -9999.99" 
          if ( ${dovar} == "TRUE" ) then
             set vars = "${vars} -9999.99"
@@ -996,10 +1046,11 @@ if ( ${forcefit} == "FALSE" ) then
          set pos = \
          `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
-# Get the pixel co-ordinates and convert to grid indices.
-         set xpix = `echo $pos[1] | awk '{split($0,a,"."); print int(a[1])}'`
-         set ypix = `echo $pos[2] | awk '{split($0,a,"."); print int(a[1])}'`
-      
+# Get the pixel co-ordinates and convert to grid indices.  The
+# exterior NINT replaces the bug/feature -0 result with the desired 0.
+         set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
+         set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
+
 # Clean up the CURSOR temporary file.
          rm -f ${curfile}
          touch ${curfile}
@@ -1023,7 +1074,10 @@ if ( ${forcefit} == "FALSE" ) then
             echo "        Axes: Adding AXIS centres."
          endif
 
-# To compare like with like ensure, that plotting uses the AXIS frame.
+# To compare like with like ensure, that plotting uses the AXIS frame,
+# but first record the index to the current Frame.
+         ndftrace "ndf=${ripfile}" >& /dev/null
+         set inframe = `parget current ndftrace`
          wcsframe "ndf=${ripfile} frame=axis"
 
 # Check to see if the NDF has VARIANCE.
@@ -1360,28 +1414,25 @@ manual_rezoom:
             rm -f ${fitfile}
          endif
 
-# Get the rest-frame spectral unit.
-# =================================
-         if ( ${gotrest} == "FALSE" ) then
-            echo -n "Rest ${slabel}: "
-            set line_centre = $<
-         endif
-
-         echo " "
-         printf "%21s%s\n" "Rest ${slabel}" ":"
-         printf "%24s%s\n" "$slabel" ": ${line_centre} ${sunits}"
-         echo " "
-
 # Calculate the velocity.
 # =======================
 
+# Reset the WCS Frame to its original value, now we've finished
+# plotting and fitting.
+         wcsframe "ndf=${ripfile} frame=${inframe}"
+
+# Reset the System of the current WCS Frame to velocities in the desired 
+# system and units.
+         wcsattrib "ndf=${ripfile} mode=set name=System newval=${velsys}"
+         wcsattrib "ndf=${ripfile} mode=set name=Unit newval=${vunits}"
+
 # Convert the line-centre position to optical velocity.
-         wcstran "ndf=${specfile} posin=${centre_fit} framein=AXIS " \
+         wcstran "ndf=${ripfile} posin=${centre_fit} framein=AXIS " \
                  "frameout=SPECTRUM" >& /dev/null
          set velocity = `parget posout wcstran`
 
          if ( ${dovar} == "TRUE" ) then
-            echo  "        (X,Y) Pixel: ${xpix}:${ypix}"
+            echo "        (X,Y) Pixel: ${xpix}:${ypix}"
             echo -n "        Line Velocity: $velocity" 
          else
             echo "        (X,Y) Pixel: ${xpix},${ypix}"
@@ -1412,13 +1463,13 @@ manual_rezoom:
 # Derive value's error bars.
                set upp_err = \
                  `calc exp="'${centre_fit} + ${centre_err}'" prec=_double`
-               wcstran "ndf=${specfile} posin=${upp_err} framein=AXIS" \
+               wcstran "ndf=${ripfile} posin=${upp_err} framein=AXIS" \
                        "frameout=SPECTRUM" >& /dev/null
                set upp_vel = `parget posout wcstran`
                                
                set low_err = \
                  `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
-               wcstran "ndf=${specfile} posin=${low_err} framein=AXIS " \
+               wcstran "ndf=${ripfile} posin=${low_err} framein=AXIS " \
                        "frameout=SPECTRUM" >& /dev/null
                set low_vel = `parget posout wcstran`
 
