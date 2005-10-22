@@ -15,7 +15,7 @@
 *
 *  Adapted from original C code by P.T.Wallace.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink and P.T.Wallace.  All rights reserved.
 *
@@ -130,15 +130,16 @@
       CALL T_VECMAT ( STATUS )
       CALL T_ZD ( STATUS )
 
-*  Report any errors and set up an appropriate exit status.
-*  Set the EXITSTATUS to 0 on success, 1 on any error -- Unix-style.
-*  The EXIT intrinsic is non-standard but common (which is portable enough
+*  Report any errors and set up an appropriate exit status.  Set the
+*  EXITSTATUS to 0 on success, 1 on any error -- Unix-style.  The
+*  EXIT intrinsic is non-standard but common (which is portable enough
 *  for a regression test).
+
       IF ( STATUS ) THEN
-         WRITE (*,'(1X,''SLALIB validation OK !'')')
+         WRITE (*,'(1X,''SLALIB validation OK!'')')
          EXITSTATUS = 0
       ELSE
-         WRITE (*,'(1X,''SLALIB validation failed !'')')
+         WRITE (*,'(1X,''SLALIB validation failed!'')')
          EXITSTATUS = 1
       ENDIF
 
@@ -560,7 +561,7 @@
 *
 *  Called: VVD, sla_AIRMAS.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -588,7 +589,6 @@
 
       DOUBLE PRECISION sla_AIRMAS
 
-      EXTERNAL sla_AIRMAS
 
       CALL VVD ( sla_AIRMAS ( 1.2354D0 ), 3.015698990074724D0,
      :           1D-12, 'sla_AIRMAS', ' ', STATUS )
@@ -912,7 +912,7 @@
 *  Called:  VVD, sla_BEAR, sla_DBEAR,
 *           sla_DCS2C, sla_PAV, sla_DPAV.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -945,7 +945,6 @@
       DOUBLE PRECISION A1, B1, A2, B2
       DOUBLE PRECISION sla_DBEAR, sla_DPAV
 
-      EXTERNAL sla_BEAR, sla_DBEAR, sla_PAV, sla_DPAV
 
       A1 = 1.234D0
       B1 = -0.123D0
@@ -1688,7 +1687,7 @@
 *
 *  Called:  sla_DAT, sla_DTT, sla_DT, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -1716,7 +1715,6 @@
 
       DOUBLE PRECISION sla_DAT, sla_DTT, sla_DT
 
-      EXTERNAL sla_DAT, sla_DTT, sla_DT
 
       CALL VVD ( sla_DAT ( 43900D0 ), 18D0, 0D0, 'sla_DAT',
      :           ' ', STATUS )
@@ -2312,7 +2310,7 @@
 *
 *  Called:  sla_EPB, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2340,7 +2338,6 @@
 
       DOUBLE PRECISION sla_EPB
 
-      EXTERNAL sla_EPB
 
       CALL VVD ( sla_EPB ( 45123D0 ), 1982.419793168669D0, 1D-8,
      :           'sla_EPB', ' ', STATUS )
@@ -2360,7 +2357,7 @@
 *
 *  Called:  sla_EPB2D, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2388,7 +2385,6 @@
 
       DOUBLE PRECISION sla_EPB2D
 
-      EXTERNAL sla_EPB2D
 
       CALL VVD ( sla_EPB2D ( 1975.5D0 ), 42595.5995279655D0, 1D-7,
      :           'sla_EPB2D', ' ', STATUS )
@@ -2408,7 +2404,7 @@
 *
 *  Called:  sla_EPCO, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2436,7 +2432,6 @@
 
       DOUBLE PRECISION sla_EPCO
 
-      EXTERNAL sla_EPCO
 
       CALL VVD ( sla_EPCO ( 'B', 'J', 2000D0 ), 2000.001277513665D0,
      :           1D-7, 'sla_EPCO', 'BJ', STATUS )
@@ -2460,7 +2455,7 @@
 *
 *  Called:  sla_EPJ, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2488,7 +2483,6 @@
 
       DOUBLE PRECISION sla_EPJ
 
-      EXTERNAL sla_EPJ
 
       CALL VVD ( sla_EPJ ( 42999D0 ), 1976.603696098563D0,
      :           1D-7, 'sla_EPJ', ' ', STATUS )
@@ -2508,7 +2502,7 @@
 *
 *  Called:  sla_EPJ2D, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2536,7 +2530,6 @@
 
       DOUBLE PRECISION sla_EPJ2D
 
-      EXTERNAL sla_EPJ2D
 
       CALL VVD ( sla_EPJ2D ( 2010.077D0 ), 55225.124250D0,
      :           1D-6, 'sla_EPJ2D', ' ', STATUS )
@@ -2606,7 +2599,7 @@
 *
 *  Called:  sla_EQEQX, VVD.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -2634,7 +2627,6 @@
 
       DOUBLE PRECISION sla_EQEQX
 
-      EXTERNAL sla_EQEQX
 
       CALL VVD ( sla_EQEQX ( 41234D0 ), 5.376047445838358596D-5,
      :           1D-17, 'sla_EQEQX', ' ', STATUS )
@@ -3602,7 +3594,7 @@
 *
 *  Called:  sla_GMST, VVD.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -3630,7 +3622,6 @@
 
       DOUBLE PRECISION sla_GMST, sla_GMSTA
 
-      EXTERNAL sla_GMST, sla_GMSTA
 
       CALL VVD ( sla_GMST ( 43999.999D0 ), 3.9074971356487318D0,
      :           1D-9, 'sla_GMST', ' ', STATUS )
@@ -3726,7 +3717,7 @@
 *
 *  Called:  sla_KBJ, VCS, VIV.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -4138,7 +4129,7 @@
 *
 *  Called:  sla_PA, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -4166,7 +4157,6 @@
 
       DOUBLE PRECISION sla_PA
 
-      EXTERNAL sla_PA
 
       CALL VVD ( sla_PA ( -1.567D0, 1.5123D0, 0.987D0 ),
      :           -1.486288540423851D0, 1D-12, 'sla_PA', ' ', STATUS )
@@ -4421,7 +4411,7 @@
 *           sla_PLANTE, sla_PLANTU, sla_PV2EL, sla_PV2UE, sla_RDPLAN,
 *           sla_UE2EL, sla_UE2PV, VIV, VVD.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *
@@ -4454,27 +4444,27 @@
 
       CALL sla_EL2UE ( 50000D0, 1, 49000D0, 0.1D0, 2D0, 0.2D0,
      :                 3D0, 0.05D0, 3D0, 0.003312D0, U, J )
-      CALL VVD ( U(1), 1.000878908362435D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(1), 1.000878908362435284D0, 1D-12, 'sla_EL2UE',
      :           'U(1)', STATUS )
-      CALL VVD ( U(2), -0.3336263027874777D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(2), -0.3336263027874777288D0, 1D-12, 'sla_EL2UE',
      :           'U(2)', STATUS )
       CALL VVD ( U(3), 50000D0, 1D-12, 'sla_EL2UE',
      :           'U(3)', STATUS )
-      CALL VVD ( U(4), 2.840425801310305D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(4), 2.840425801310305210D0, 1D-12, 'sla_EL2UE',
      :           'U(4)', STATUS )
       CALL VVD ( U(5), 0.1264380368035014224D0, 1D-12, 'sla_EL2UE',
      :           'U(5)', STATUS )
-      CALL VVD ( U(6), -0.2287711835229231D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(6), -0.2287711835229143197D0, 1D-12, 'sla_EL2UE',
      :           'U(6)', STATUS )
-      CALL VVD ( U(7), -0.01301062595105583D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(7), -0.01301062595106185195D0, 1D-12, 'sla_EL2UE',
      :           'U(7)', STATUS )
-      CALL VVD ( U(8), 0.5657102158104654D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(8), 0.5657102158104651697D0, 1D-12, 'sla_EL2UE',
      :           'U(8)', STATUS )
-      CALL VVD ( U(9), 0.2189745287281790D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(9), 0.2189745287281794885D0, 1D-12, 'sla_EL2UE',
      :           'U(9)', STATUS )
-      CALL VVD ( U(10), 2.852427310959998D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(10), 2.852427310959998500D0, 1D-12, 'sla_EL2UE',
      :           'U(10)', STATUS )
-      CALL VVD ( U(11), -0.01552349065434892D0, 1D-12, 'sla_EL2UE',
+      CALL VVD ( U(11), -0.01552349065435120900D0, 1D-12, 'sla_EL2UE',
      :           'U(11)', STATUS )
       CALL VVD ( U(12), 50000D0, 1D-12, 'sla_EL2UE',
      :           'U(12)', STATUS )
@@ -4485,44 +4475,44 @@
       CALL sla_PERTEL ( 2, 43000D0, 43200D0, 43000D0,
      :                  0.2D0, 3D0, 4D0, 5D0, 0.02D0, 6D0,
      :                  EPOCH, ORBINC, ANODE, PERIH, AORQ, E, AORL, J )
-      CALL VVD ( EPOCH, 43200D0, 1D-10, 'sla_PV2EL',
+      CALL VVD ( EPOCH, 43200D0, 1D-10, 'sla_PERTEL',
      :           'EPOCH', STATUS )
-      CALL VVD ( ORBINC, 0.1995661466546013575D0, 1D-7, 'sla_PERTEL',
+      CALL VVD ( ORBINC, 0.1995661466545422381D0, 1D-7, 'sla_PERTEL',
      :           'ORBINC', STATUS )
-      CALL VVD ( ANODE, 2.998052737821694877D0, 1D-7, 'sla_PERTEL',
+      CALL VVD ( ANODE, 2.998052737821591215D0, 1D-7, 'sla_PERTEL',
      :           'ANODE', STATUS )
-      CALL VVD ( PERIH, 4.009516448643039361D0, 1D-6, 'sla_PERTEL',
+      CALL VVD ( PERIH, 4.009516448441143636D0, 1D-6, 'sla_PERTEL',
      :           'PERIH', STATUS )
-      CALL VVD ( AORQ, 5.014216294791473624D0, 1D-7, 'sla_PERTEL',
+      CALL VVD ( AORQ, 5.014216294790922323D0, 1D-7, 'sla_PERTEL',
      :           'AORQ', STATUS )
-      CALL VVD ( E, 0.02281386258317314549D0, 1D-7, 'sla_PERTEL',
+      CALL VVD ( E, 0.02281386258309823607D0, 1D-7, 'sla_PERTEL',
      :           'E', STATUS )
-      CALL VVD ( AORL, 0.01735248629471643756D0, 1D-6, 'sla_PERTEL',
+      CALL VVD ( AORL, 0.01735248648779583748D0, 1D-6, 'sla_PERTEL',
      :           'AORL', STATUS )
       CALL VIV ( J, 0, 'sla_PERTEL', 'J', STATUS )
 
       CALL sla_PERTUE ( 50100D0, U, J )
       CALL VVD ( U(1), 1.000000000000000D0, 1D-12, 'sla_PERTUE',
      :           'U(1)', STATUS )
-      CALL VVD ( U(2), -0.3329769415573415389D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(2), -0.3329769417028020949D0, 1D-11, 'sla_PERTUE',
      :           'U(2)', STATUS )
       CALL VVD ( U(3), 50100D0, 1D-12, 'sla_PERTUE',
      :           'U(3)', STATUS )
-      CALL VVD ( U(4), 2.638884303598740998D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(4), 2.638884303608524597D0, 1D-11, 'sla_PERTUE',
      :           'U(4)', STATUS )
-      CALL VVD ( U(5), 1.070994304659720293D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(5), 1.070994304747824305D0, 1D-11, 'sla_PERTUE',
      :           'U(5)', STATUS )
-      CALL VVD ( U(6), 0.1544112079778320601D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(6), 0.1544112080167568589D0, 1D-11, 'sla_PERTUE',
      :           'U(6)', STATUS )
-      CALL VVD ( U(7), -0.2188240630369517705D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(7), -0.2188240619161439344D0, 1D-11, 'sla_PERTUE',
      :           'U(7)', STATUS )
-      CALL VVD ( U(8), 0.5207557450302104158D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(8), 0.5207557453451906385D0, 1D-11, 'sla_PERTUE',
      :           'U(8)', STATUS )
-      CALL VVD ( U(9), 0.2217782439137116270D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(9), 0.2217782439275216936D0, 1D-11, 'sla_PERTUE',
      :           'U(9)', STATUS )
-      CALL VVD ( U(10), 2.852118859644973374D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(10), 2.852118859689216658D0, 1D-11, 'sla_PERTUE',
      :           'U(10)', STATUS )
-      CALL VVD ( U(11), 0.01452009839418981531D0, 1D-11, 'sla_PERTUE',
+      CALL VVD ( U(11), 0.01452010174371893229D0, 1D-11, 'sla_PERTUE',
      :           'U(11)', STATUS )
       CALL VVD ( U(12), 50100D0, 1D-12, 'sla_PERTUE',
      :           'U(12)', STATUS )
@@ -4532,7 +4522,7 @@
 
       CALL sla_PLANEL ( 50600D0, 2, 50500D0, 0.1D0, 3D0, 5D0,
      :                  2D0, 0.3D0, 4D0, 0D0, PV, J )
-      CALL VVD ( PV(1), 1.947628959288906D0, 1D-12, 'sla_PLANEL',
+      CALL VVD ( PV(1), 1.947628959288897677D0, 1D-12, 'sla_PLANEL',
      :           'PV(1)', STATUS )
       CALL VVD ( PV(2), -1.013736058752235271D0, 1D-12, 'sla_PLANEL',
      :           'PV(2)', STATUS )
@@ -4575,16 +4565,16 @@
      :           'PV(4) 3', STATUS )
       CALL VVD ( PV(5), 1.699734557528650689D-7, 1D-17, 'sla_PLANET',
      :           'PV(5) 3', STATUS )
-      CALL VVD ( PV(6), 7.415505123000807D-8, 1D-17, 'sla_PLANET',
+      CALL VVD ( PV(6), 7.415505123001430864D-8, 1D-17, 'sla_PLANET',
      :           'PV(6) 3', STATUS )
       CALL VIV ( J, 1, 'sla_PLANET', 'J 3', STATUS )
 
       CALL sla_PLANET ( 43999.9D0, 1, PV, J )
-      CALL VVD ( PV(1), 0.2945293959257864D0, 1D-11, 'sla_PLANET',
+      CALL VVD ( PV(1), 0.2945293959257422246D0, 1D-11, 'sla_PLANET',
      :           'PV(1) 4', STATUS )
-      CALL VVD ( PV(2), -0.2452204176600444D0, 1D-11, 'sla_PLANET',
+      CALL VVD ( PV(2), -0.2452204176601052181D0, 1D-11, 'sla_PLANET',
      :           'PV(2) 4', STATUS )
-      CALL VVD ( PV(3), -0.1615427700571700D0, 1D-11, 'sla_PLANET',
+      CALL VVD ( PV(3), -0.1615427700571978643D0, 1D-11, 'sla_PLANET',
      :           'PV(3) 4', STATUS )
       CALL VVD ( PV(4), 1.636421147459047057D-7, 1D-18, 'sla_PLANET',
      :           'PV(4) 4', STATUS )
@@ -4597,11 +4587,11 @@
       CALL sla_PLANTE ( 50600D0, -1.23D0, 0.456D0, 2, 50500D0,
      :                  0.1D0, 3D0, 5D0, 2D0, 0.3D0, 4D0,
      :                  0D0, RA, DEC, R, J )
-      CALL VVD ( RA, 6.222958101333311731D0, 1D-10, 'sla_PLANTE',
+      CALL VVD ( RA, 6.222958101333794007D0, 1D-10, 'sla_PLANTE',
      :           'RA', STATUS )
-      CALL VVD ( DEC, 0.01142220305727391187D0, 1D-10, 'sla_PLANTE',
+      CALL VVD ( DEC, 0.01142220305739771601D0, 1D-10, 'sla_PLANTE',
      :           'DEC', STATUS )
-      CALL VVD ( R, 2.288902494078663974D0, 1D-8, 'sla_PLANTE',
+      CALL VVD ( R, 2.288902494080167624D0, 1D-8, 'sla_PLANTE',
      :           'R', STATUS )
       CALL VIV ( J, 0, 'sla_PLANTE', 'J', STATUS )
 
@@ -4620,11 +4610,11 @@
       U(13) = 0D0
 
       CALL sla_PLANTU ( 55001D0, -1.23D0, 0.456D0, U, RA, DEC, R, J )
-      CALL VVD ( RA, 0.3531814831241686381D0, 1D-9, 'sla_PLANTU',
+      CALL VVD ( RA, 0.3531814831241686647D0, 1D-9, 'sla_PLANTU',
      :           'RA', STATUS )
-      CALL VVD ( DEC, 0.06940344580567135713D0, 1D-9, 'sla_PLANTU',
+      CALL VVD ( DEC, 0.06940344580567131328D0, 1D-9, 'sla_PLANTU',
      :           'DEC', STATUS )
-      CALL VVD ( R, 3.031687170873276216D0, 1D-8, 'sla_PLANTU',
+      CALL VVD ( R, 3.031687170873274464D0, 1D-8, 'sla_PLANTU',
      :           'R', STATUS )
       CALL VIV ( J, 0, 'sla_PLANTU', 'J', STATUS )
 
@@ -4690,70 +4680,70 @@
      :           'RA 0', STATUS )
       CALL VVD ( DEC, -0.2089207338795416192D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 0', STATUS )
-      CALL VVD ( DIAM, 9.415338935229712D-3, 1D-14, 'sla_RDPLAN',
+      CALL VVD ( DIAM, 9.415338935229717875D-3, 1D-14, 'sla_RDPLAN',
      :           'DIAM 0', STATUS )
       CALL sla_RDPLAN ( 41999.9D0, 1, 1.1D0, -0.9D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 3.866363420052745D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 3.866363420052936653D0, 1D-7, 'sla_RDPLAN',
      :           'RA 1', STATUS )
-      CALL VVD ( DEC, -0.2594430577549303D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.2594430577550113130D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 1', STATUS )
       CALL VVD ( DIAM, 4.638468996795023071D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 1', STATUS )
       CALL sla_RDPLAN ( 42999.9D0, 2, 2.1D0, 0.9D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 2.695383203184066D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 2.695383203184077378D0, 1D-7, 'sla_RDPLAN',
      :           'RA 2', STATUS )
-      CALL VVD ( DEC, 0.2124044506294852D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, 0.2124044506294805126D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 2', STATUS )
       CALL VVD ( DIAM, 4.892222838681000389D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 2', STATUS )
       CALL sla_RDPLAN ( 43999.9D0, 3, 3.1D0, 0.9D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 2.908326678461974D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 2.908326678461540165D0, 1D-7, 'sla_RDPLAN',
      :           'RA 3', STATUS )
-      CALL VVD ( DEC, 0.08729783126907663D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, 0.08729783126905579385D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 3', STATUS )
       CALL VVD ( DIAM, 8.581305866034962476D-3, 1D-14, 'sla_RDPLAN',
      :           'DIAM 3', STATUS )
       CALL sla_RDPLAN ( 44999.9D0, 4, -0.1D0, 1.1D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 3.429840787472673176D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 3.429840787472851721D0, 1D-7, 'sla_RDPLAN',
      :           'RA 4', STATUS )
-      CALL VVD ( DEC, -0.06979851055252721372D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.06979851055261161013D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 4', STATUS )
       CALL VVD ( DIAM, 4.540536678439300199D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 4', STATUS )
       CALL sla_RDPLAN ( 45999.9D0, 5, -1.1D0, 0.1D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 4.864669466449428D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 4.864669466449422548D0, 1D-7, 'sla_RDPLAN',
      :           'RA 5', STATUS )
-      CALL VVD ( DEC, -0.407771449790895D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.4077714497908953354D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 5', STATUS )
       CALL VVD ( DIAM, 1.727945579027815576D-4, 1D-14, 'sla_RDPLAN',
      :           'DIAM 5', STATUS )
       CALL sla_RDPLAN ( 46999.9D0, 6, -2.1D0, -0.1D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 4.432929829176694D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 4.432929829176388766D0, 1D-7, 'sla_RDPLAN',
      :           'RA 6', STATUS )
-      CALL VVD ( DEC, -0.3682820877855141D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.3682820877854730530D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 6', STATUS )
-      CALL VVD ( DIAM, 8.670829016098516D-5, 1D-14, 'sla_RDPLAN',
+      CALL VVD ( DIAM, 8.670829016099083311D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 6', STATUS )
       CALL sla_RDPLAN ( 47999.9D0, 7, -3.1D0, -1.1D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 4.894972492286819D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 4.894972492286818487D0, 1D-7, 'sla_RDPLAN',
      :           'RA 7', STATUS )
-      CALL VVD ( DEC, -0.4084068901053652D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.4084068901053653125D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 7', STATUS )
-      CALL VVD ( DIAM, 1.793916783976053D-5, 1D-14, 'sla_RDPLAN',
+      CALL VVD ( DIAM, 1.793916783975974163D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 7', STATUS )
       CALL sla_RDPLAN ( 48999.9D0, 8, 0D0, 0D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 5.066050284760061D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 5.066050284760144000D0, 1D-7, 'sla_RDPLAN',
      :           'RA 8', STATUS )
-      CALL VVD ( DEC, -0.3744690779683935D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.3744690779683850609D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 8', STATUS )
-      CALL VVD ( DIAM, 1.062210086082802D-5, 1D-14, 'sla_RDPLAN',
+      CALL VVD ( DIAM, 1.062210086082700563D-5, 1D-14, 'sla_RDPLAN',
      :           'DIAM 8', STATUS )
       CALL sla_RDPLAN ( 49999.9D0, 9, 0D0, 0D0, RA, DEC, DIAM )
-      CALL VVD ( RA, 4.179543143097202D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( RA, 4.179543143097200945D0, 1D-7, 'sla_RDPLAN',
      :           'RA 9', STATUS )
-      CALL VVD ( DEC, -0.1258021632894040D0, 1D-7, 'sla_RDPLAN',
+      CALL VVD ( DEC, -0.1258021632894033300D0, 1D-7, 'sla_RDPLAN',
      :           'DEC 9', STATUS )
-      CALL VVD ( DIAM, 5.034057475666013D-7, 1D-14, 'sla_RDPLAN',
+      CALL VVD ( DIAM, 5.034057475664904352D-7, 1D-14, 'sla_RDPLAN',
      :           'DIAM 9', STATUS )
 
       CALL sla_UE2EL ( U, 1, JFORM, EPOCH, ORBINC, ANODE, PERIH,
@@ -4778,7 +4768,7 @@
       CALL sla_UE2PV ( 50010D0, U, PV, J )
       CALL VVD ( U(1), 1.00006D0, 1D-12, 'sla_UE2PV',
      :           'U(1)', STATUS )
-      CALL VVD ( U(2), -4.856142884511782D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(2), -4.856142884511782111D0, 1D-12, 'sla_UE2PV',
      :           'U(2)', STATUS )
       CALL VVD ( U(3), 50000D0, 1D-12, 'sla_UE2PV',
      :           'U(3)', STATUS )
@@ -4788,31 +4778,31 @@
      :           'U(5)', STATUS )
       CALL VVD ( U(6), 0.1D0, 1D-12, 'sla_UE2PV',
      :           'U(6)', STATUS )
-      CALL VVD ( U(7), -0.4520378601821727D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(7), -0.4520378601821727110D0, 1D-12, 'sla_UE2PV',
      :           'U(7)', STATUS )
-      CALL VVD ( U(8), 0.4018114312730424D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(8), 0.4018114312730424097D0, 1D-12, 'sla_UE2PV',
      :           'U(8)', STATUS )
-      CALL VVD ( U(9), -0.3515850023639121D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(9), -0.3515850023639121085D0, 1D-12, 'sla_UE2PV',
      :           'U(9)', STATUS )
-      CALL VVD ( U(10), 0.3741657386773941D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(10), 0.3741657386773941386D0, 1D-12, 'sla_UE2PV',
      :           'U(10)', STATUS )
-      CALL VVD ( U(11),-.2511321445456515D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(11), -0.2511321445456515061D0, 1D-12, 'sla_UE2PV',
      :           'U(11)', STATUS )
       CALL VVD ( U(12), 50010.00000000000D0, 1D-12, 'sla_UE2PV',
      :           'U(12)', STATUS )
-      CALL VVD ( U(13), 0.7194308220038889D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( U(13), 0.7194308220038886856D0, 1D-12, 'sla_UE2PV',
      :           'U(13)', STATUS )
-      CALL VVD ( PV(1), 0.07944764084631670D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( PV(1), 0.07944764084631667011D0, 1D-12, 'sla_UE2PV',
      :           'PV(1)', STATUS )
-      CALL VVD ( PV(2), -0.04118141077419017D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( PV(2), -0.04118141077419014775D0, 1D-12, 'sla_UE2PV',
      :           'PV(2)', STATUS )
-      CALL VVD ( PV(3), 0.002915180702063631D0, 1D-12, 'sla_UE2PV',
+      CALL VVD ( PV(3), 0.002915180702063625400D0, 1D-12, 'sla_UE2PV',
      :           'PV(3)', STATUS )
-      CALL VVD ( PV(4), -0.6890132370721106D-6, 1D-18,'sla_UE2PV',
+      CALL VVD ( PV(4), -0.6890132370721108608D-6, 1D-18,'sla_UE2PV',
      :           'PV(4)', STATUS )
-      CALL VVD ( PV(5), 0.4326690733487621D-6, 1D-18, 'sla_UE2PV',
+      CALL VVD ( PV(5), 0.4326690733487621457D-6, 1D-18, 'sla_UE2PV',
      :           'PV(5)', STATUS )
-      CALL VVD ( PV(6), -0.1763249096254134D-6, 1D-18, 'sla_UE2PV',
+      CALL VVD ( PV(6), -0.1763249096254134306D-6, 1D-18, 'sla_UE2PV',
      :           'PV(6)', STATUS )
       CALL VIV ( J, 0, 'sla_UE2PV', 'J', STATUS )
 
@@ -5264,7 +5254,7 @@
 *
 *  Called:  sla_RANGE, VVD, sla_DRANGE.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -5293,7 +5283,6 @@
       REAL sla_RANGE
       DOUBLE PRECISION sla_DRANGE
 
-      EXTERNAL sla_RANGE, sla_DRANGE
 
       CALL VVD ( DBLE( sla_RANGE ( -4.0 ) ), 2.283185307179586D0,
      :           1D-6, 'sla_RANGE', ' ', STATUS )
@@ -5315,7 +5304,7 @@
 *
 *  Called:  sla_RANORM, VVD, sla_DRANRM.
 *
-*  Last revision:   21 October 2006
+*  Last revision:   22 October 2006
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -5344,7 +5333,6 @@
       REAL sla_RANORM
       DOUBLE PRECISION sla_DRANRM
 
-      EXTERNAL sla_RANORM, sla_DRANRM
 
       CALL VVD ( DBLE( sla_RANORM ( -0.1E0 ) ), 6.183185307179587D0,
      :           1D-5, 'sla_RANORM', '1', STATUS )
@@ -5366,7 +5354,7 @@
 *
 *  Called:  sla_RCC, VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -5394,15 +5382,10 @@
 
       DOUBLE PRECISION sla_RCC
 
-      DOUBLE PRECISION TT
 
-      EXTERNAL sla_RCC
-
-      TT = sla_RCC ( 48939.123D0, 0.76543D0, 5.0123D0,
-     :               5525.242D0, 3190D0 )
       CALL VVD ( sla_RCC ( 48939.123D0, 0.76543D0, 5.0123D0,
-     :           5525.242D0, 3190D0 ), -1.280131613589158D-3,
-     :           1D-15, 'sla_RCC', ' ', STATUS )
+     :                     5525.242D0, 3190D0 ),
+     :           -1.280131613589158D-3, 1D-15, 'sla_RCC', ' ', STATUS )
 
       END
 
@@ -5532,7 +5515,7 @@
 *
 *  Called: VVD, sla_RVEROT, sla_RVGALC, sla_RVLG, sla_RVLSRD, sla_RVLSRK.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -5560,7 +5543,6 @@
 
       REAL sla_RVEROT, sla_RVGALC, sla_RVLG, sla_RVLSRD, sla_RVLSRK
 
-      EXTERNAL sla_RVEROT, sla_RVGALC, sla_RVLG, sla_RVLSRD, sla_RVLSRK
 
       CALL VVD ( DBLE( sla_RVEROT ( -0.777E0, 5.67E0, -0.3E0,
      :           3.19E0 ) ), -0.1948098355075913D0, 1D-6,
@@ -5589,7 +5571,7 @@
 *
 *  Called:  sla_DSEP, sla_SEP, VVD.
 *
-*  Last revision:   21 October 2005
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -5621,7 +5603,6 @@
       DOUBLE PRECISION sla_DSEP, sla_DSEPV
       DOUBLE PRECISION D1(3), D2(3), AD1, BD1, AD2, BD2
 
-      EXTERNAL sla_SEP, sla_SEPV, sla_DSEP, sla_DSEPV
 
       R1(1) = 1.0
       R1(2) = 0.1
@@ -6246,7 +6227,7 @@
 *
 *  Called:  all the above, plus VVD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -6281,7 +6262,6 @@
      :                 DV1(3), DV2(3), DV3(3), DV4(3), DV5(3),
      :                 DVM, DV6(3), DV7(3)
 
-      EXTERNAL sla_VDV, sla_DVDV
 
 *  Make a rotation matrix.
       AV(1) = -0.123E0
@@ -6552,7 +6532,7 @@
 *
 *  Called: VVD, sla_ZD.
 *
-*  Last revision:   10 July 2000
+*  Last revision:   22 October 2005
 *
 *  Copyright CLRC/Starlink.  All rights reserved.
 *
@@ -6580,7 +6560,6 @@
 
       DOUBLE PRECISION sla_ZD
 
-      EXTERNAL sla_ZD
 
       CALL VVD ( sla_ZD ( -1.023D0, -0.876D0, -0.432D0 ),
      :           0.8963914139430839D0, 1D-12, 'sla_ZD', ' ', STATUS )
