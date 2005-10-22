@@ -114,6 +114,35 @@
 *-\n\
 */\n\
 \n\
+/* Remove earlier definitions if clash with private dat1.h version */\n\
+#ifdef DAT__MXDIM\n\
+#undef DAT__MXDIM\n\
+#endif\n\
+#ifdef DAT__NOLOC\n\
+#undef DAT__NOLOC\n\
+#endif\n\
+#ifdef DAT__NOWLD\n\
+#undef DAT__NOWLD\n\
+#endif\n\
+#ifdef DAT__ROOT\n\
+#undef DAT__ROOT\n\
+#endif\n\
+#ifdef DAT__SZGRP\n\
+#undef DAT__SZGRP\n\
+#endif\n\
+#ifdef DAT__SZLOC\n\
+#undef DAT__SZLOC\n\
+#endif\n\
+#ifdef DAT__SZMOD\n\
+#undef DAT__SZMOD\n\
+#endif\n\
+#ifdef DAT__SZNAM\n\
+#undef DAT__SZNAM\n\
+#endif\n\
+#ifdef DAT__SZTYP\n\
+#undef DAT__SZTYP\n\
+#endif\n\
+\n\
 /* Global Constants: */\n\
 \n\
 #define DAT__MXDIM %d            /* Maximum number of object dimensions  */\n\
