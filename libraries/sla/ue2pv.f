@@ -1,4 +1,4 @@
-      SUBROUTINE sla_UE2PV (DATE, U, PV, JSTAT)
+      SUBROUTINE sla_UE2PV ( DATE, U, PV, JSTAT )
 *+
 *     - - - - - -
 *      U E 2 P V
@@ -75,7 +75,7 @@
 *
 *  Reference:  Everhart, E. & Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
 *
-*  P.T.Wallace   Starlink   3 September 2005
+*  P.T.Wallace   Starlink   22 October 2005
 *
 *  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
@@ -121,8 +121,6 @@
      :                 TOL,PSJ,PSJ2,BETA,S0,S1,S2,S3,
      :                 FF,R,FLAST,PLAST,F,G,FD,GD
 
-*  Keep the compiler happy
-      DATA S0, S1, S2, S3, R, FLAST, PLAST / 7*0.0D0 /
 
 
 *  Unpack the parameters.
@@ -145,7 +143,7 @@
 *  day is 58.1324409... days, defined as 1/GCON).
       DT = (DATE-T0)*GCON
 
-*  Solve for the universal eccentric anomaly, psi.
+*  Refine the universal eccentric anomaly, psi.
       NIT = 1
       W = 1D0
       TOL = 0D0
@@ -191,8 +189,9 @@
             N = N-1
          END DO
 
-*     Value of function F corresponding to the current value of psi.
+*     Values of F and F' corresponding to the current value of psi.
          FF = R0*S1+SIGMA0*S2+CM*S3-DT
+         R = R0*S0+SIGMA0*S1+CM*S2
 
 *     If first iteration, create dummy "last F".
          IF ( NIT.EQ.1) FLAST = FF
@@ -205,7 +204,6 @@
          ELSE
 
 *        No sign change:  use Newton-Raphson method instead.
-            R = R0*S0+SIGMA0*S1+CM*S2
             IF (R.EQ.0D0) GO TO 9010
             W = FF/R
          END IF
