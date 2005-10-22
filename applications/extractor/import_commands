@@ -2,6 +2,9 @@
 #
 #  Unpack tar ball and cd into top-directory...
 
+#  SExtractor 2.4.3
+#  ----------------
+
 #  Import for "sextractor" component.
 cvs import -ko -I! -m "SExtractor_2_4_3" applications/extractor/sextractor SEXTRACTOR v2_4_3
 
@@ -10,4 +13,13 @@ cvs import -ko -I! -m "SExtractor_2_4_3" applications/extractor/sextractor SEXTR
 cd src
 cvs import -ko -I! -m "SExtractor_2_4_3" applications/extractor/extract/src SEXTRACTOR v2_4_3
 
-#  Perform merge...
+#  SExtractor 2.4.4
+#  ----------------
+
+#  Import for "sextractor" component.
+cvs import -ko -I! -m "SExtractor_2_4_4" applications/extractor/sextractor SEXTRACTOR v2_4_4
+
+#  Import for "extract" component. Note only "src" part is tracked by
+#  thirdparty. The "extract" directory is maintained by hand.
+cd src
+cvs import -ko -I! -m "SExtractor_2_4_4" applications/extractor/extract/src SEXTRACTOR v2_4_4

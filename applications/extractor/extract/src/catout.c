@@ -32,6 +32,7 @@
 *                          (EB): 2.3
 *	Last modify:	26/11/2003
 *	Last modify:	25/08/2005
+*	Last modify:	19/10/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -177,9 +178,9 @@ void	updateparamflags()
 			| FLAG(obj2.win_cxxw);
 
   FLAG(obj2.win_a) |= FLAG(obj2.win_b) | FLAG(obj2.win_theta)
-			| FLAG(obj2.win_polar);
+			| FLAG(obj2.win_polar) | FLAG(obj2.win_aw);
   FLAG(obj2.win_cxx) |= FLAG(obj2.win_cyy)
-			| FLAG(obj2.win_cxy);
+			| FLAG(obj2.win_cxy) | FLAG(obj2.win_cxxw);
   FLAG(obj2.win_mx2) |= FLAG(obj2.win_my2)
 			| FLAG(obj2.win_mxy)
 			| FLAG(obj2.win_a) | FLAG(obj2.win_cxx)
@@ -227,11 +228,12 @@ void	updateparamflags()
 			| FLAG(obj2.poserr_thetaw) | FLAG(obj2.poserr_aw)
 			| FLAG(obj2.poserr_cxxw);
 
-  FLAG(obj2.poserr_a) |= FLAG(obj2.poserr_b) | FLAG(obj2.poserr_theta);
+  FLAG(obj2.poserr_a) |= FLAG(obj2.poserr_b) | FLAG(obj2.poserr_theta)
+			| FLAG(obj2.winposerr_a);
   FLAG(obj2.poserr_cxx) |= FLAG(obj2.poserr_cyy) | FLAG(obj2.poserr_cxy);
   FLAG(obj.poserr_mx2) |= FLAG(obj.poserr_my2) | FLAG(obj.poserr_mxy)
 			| FLAG(obj2.poserr_a) | FLAG(obj2.poserr_cxx)
-			| FLAG(obj2.poserr_mx2w) | FLAG(obj2.winposerr_mx2w);
+			| FLAG(obj2.poserr_mx2w) | FLAG(obj2.winposerr_mx2);
 
   FLAG(obj2.peakalpha1950) |= FLAG(obj2.peakdelta1950);
   FLAG(obj2.alpha1950) |= FLAG(obj2.delta1950) |  FLAG(obj2.theta1950)

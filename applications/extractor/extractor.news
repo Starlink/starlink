@@ -1,8 +1,8 @@
 1 Update to EXTRACTOR
 
- Changes in release 2.4.3.
+ Changes in release 2.4.4.
 
-    EXTRACTOR has been updated to use SExtractor version 2.4.3. The main
+    EXTRACTOR has been updated to use SExtractor version 2.4.4. The main
     changes are the introduction of Petrosian magnitudes and windowed
     measurements.
 
