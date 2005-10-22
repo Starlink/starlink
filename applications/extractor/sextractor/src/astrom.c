@@ -9,7 +9,7 @@
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	24/08/2005
+*	Last modify:	19/10/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -489,8 +489,8 @@ void	astrom_winshapeparam(picstruct *field, objstruct *obj)
     {
     temp = sqrt(0.25*temp*temp+xym*xym);
     pm2 = 0.5*(xm2+ym2);
-    obj2->aw = (float)sqrt(pm2+temp);
-    obj2->bw = (float)sqrt(pm2-temp);
+    obj2->win_aw = (float)sqrt(pm2+temp);
+    obj2->win_bw = (float)sqrt(pm2-temp);
     obj2->win_polarw = temp / pm2;
     }
 
@@ -502,9 +502,9 @@ void	astrom_winshapeparam(picstruct *field, objstruct *obj)
       temp = 1e-6;
       xym *= 0.99999;
       }
-    obj2->cxxw = (float)(ym2/temp);
-    obj2->cyyw = (float)(xm2/temp);
-    obj2->cxyw = (float)(-2*xym/temp);
+    obj2->win_cxxw = (float)(ym2/temp);
+    obj2->win_cyyw = (float)(xm2/temp);
+    obj2->win_cxyw = (float)(-2*xym/temp);
     }
 
   return;

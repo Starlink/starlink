@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    27/09/2005
+*       Last modify:    19/10/2005
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -444,6 +444,12 @@ EB      25/08/2005      compute_winpos()
 EB      22/09/2005      compute_winpos()
                                         Fixed a trigger bug with ERR*WIN_IMAGE.
 
-EB      23/09/2005      define.h        Corrected SExtractor URL
+EB      23/09/2005      define.h        Corrected SExtractor URL.
 
 EB      27/09/2005      examineiso()    Fixed NaN in computing ISO thresholds.
+
+EB      19/10/2005      updateparamflags()
+                                        Fixed a trigger bug with ERR*WIN_IMAGE.
+                        astrom_winshapeparam()
+                                        Fixed null *WIN_WORLDs.
+                        preflist.h      Improved display of advanced parameters.

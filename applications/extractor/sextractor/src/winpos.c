@@ -343,6 +343,7 @@ void	compute_winpos(picstruct *field, picstruct *wfield, objstruct *obj)
         obj2->winposerr_cxy = (float)(-2*emxy/temp);
         }
       }
+
     if (momentflag)
       {
 /*-- Handle fully correlated profiles (which cause a singularity...) */
