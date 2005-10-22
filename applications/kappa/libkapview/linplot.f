@@ -499,8 +499,8 @@
 *     database picture for the chosen device reverts to the input picture.
 
 *  Related Applications:
-*     KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
-*     SPECDRE: SPECGRID. SPLAT: SPLAT.
+*     KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT,
+*     SPECGRID; SPLAT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
