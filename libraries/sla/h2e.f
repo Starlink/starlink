@@ -1,4 +1,4 @@
-      SUBROUTINE sla_H2E (AZ, EL, PHI, HA, DEC)
+      SUBROUTINE sla_H2E ( AZ, EL, PHI, HA, DEC )
 *+
 *     - - - - -
 *      D E 2 H
@@ -46,9 +46,9 @@
 *      use inline code, having previously computed fixed terms such
 *      as sine and cosine of latitude.
 *
-*  P.T.Wallace   Starlink   21 February 1996
+*  P.T.Wallace   Starlink   11 September 2005
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -70,31 +70,31 @@
 
       IMPLICIT NONE
 
-      REAL AZ,EL,PHI,HA,DEC
+      REAL AZ, EL, PHI, HA, DEC
 
-      DOUBLE PRECISION SA,CA,SE,CE,SP,CP,X,Y,Z,R
+      DOUBLE PRECISION SA, CA, SE, CE, SP, CP, X, Y, Z, R
 
 
-*  Useful trig functions
-      SA=SIN(AZ)
-      CA=COS(AZ)
-      SE=SIN(EL)
-      CE=COS(EL)
-      SP=SIN(PHI)
-      CP=COS(PHI)
+*  Useful trig functions.
+      SA = SIN(AZ)
+      CA = COS(AZ)
+      SE = SIN(EL)
+      CE = COS(EL)
+      SP = SIN(PHI)
+      CP = COS(PHI)
 
-*  HA,Dec as x,y,z
-      X=-CA*CE*SP+SE*CP
-      Y=-SA*CE
-      Z=CA*CE*CP+SE*SP
+*  HA,Dec as x,y,z.
+      X = -CA*CE*SP+SE*CP
+      Y = -SA*CE
+      Z = CA*CE*CP+SE*SP
 
-*  To HA,Dec
-      R=SQRT(X*X+Y*Y)
+*  To HA,Dec.
+      R = SQRT(X*X+Y*Y)
       IF (R.EQ.0.0) THEN
-         HA=0.0
+         HA = 0.0
       ELSE
-         HA=ATAN2(Y,X)
+         HA = REAL(ATAN2(Y,X))
       END IF
-      DEC=ATAN2(Z,R)
+      DEC = REAL(ATAN2(Z,R))
 
       END

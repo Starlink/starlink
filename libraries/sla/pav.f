@@ -28,9 +28,9 @@
 *
 *  Called:  sla_DPAV
 *
-*  Patrick Wallace   Starlink   23 May 1997
+*  Patrick Wallace   Starlink   11 September 2005
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright (C) 2005 Rutherford Appleton Laboratory
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -52,19 +52,19 @@
 
       IMPLICIT NONE
 
-      REAL V1(3),V2(3)
+      REAL V1(3), V2(3)
 
       INTEGER I
-      DOUBLE PRECISION D1(3),D2(3)
+      DOUBLE PRECISION D1(3), D2(3)
 
       DOUBLE PRECISION sla_DPAV
 
 
-*  Call the double precision version
+*  Call the double precision version.
       DO I=1,3
-         D1(I)=V1(I)
-         D2(I)=V2(I)
+         D1(I) = V1(I)
+         D2(I) = V2(I)
       END DO
-      sla_PAV=sla_DPAV(D1,D2)
+      sla_PAV = REAL(sla_DPAV(D1,D2))
 
       END
