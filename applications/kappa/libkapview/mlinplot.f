@@ -420,8 +420,8 @@
 *     MARGIN. 
 
 *  Related Applications:
-*     KAPPA: LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT, SPECGRID.
-*     SPLAT: SPLAT
+*     KAPPA: LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT, SPECGRID;
+*     SPLAT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
