@@ -150,10 +150,10 @@
       void rec1_clear_cbm( unsigned char cbm[ 2 ], int nchip, int pos );
       int rec1_close_file( int slot, char mode );
       int rec1_close_slot( int slot );
-      void rec1_create_file( int expand, const char *file, int file_len,
-			     int size, int *slot, int *alq );
+      void rec1_create_file( int expand, const char *file, INT file_len,
+			     INT size, INT *slot, INT *alq );
       int rec1_deall_frame( int slot, INT_BIG size, INT_BIG bloc );
-      int rec1_extend_file( int slot, INT_BIG size, INT_BIG *actsize );
+      INT rec1_extend_file( INT slot, INT_BIG size, INT_BIG *actsize );
       int rec1_extend_frame( int slot, INT_BIG size, INT_BIG extra,
                              INT_BIG *bloc );
 #if defined( vms )
@@ -180,8 +180,8 @@
       int rec1_lock_slot( int slot );
       int rec1_map_frame( int slot, INT_BIG bloc, INT_BIG length,
                           INT_BIG offset, char mode, unsigned char **pntr );
-      void rec1_open_file( int expand, const char *file, int file_len,
-			   char mode, int *slot, int *newslot );
+      void rec1_open_file( int expand, const char *file, INT file_len,
+			   char mode, INT *slot, int *newslot );
       int rec1_pack_chain( INT_BIG chain, unsigned char pchain[ 8 ] );
       int rec1_pack_hcb( const struct HCB *hcb,
                          unsigned char phcb[ REC__SZBLK ] );

@@ -61,7 +61,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       int rec_adopt_record( const struct HAN *han, const struct HAN *par );
       int rec_alloc_mem( int size, void **pntr );
       int rec_alloc_xmem( int size, void **pntr );
-      void rec_attach_file( int expand, const char *file, int file_len,
+      void rec_attach_file( int expand, const char *file, INT file_len,
 			    char state, char mode, struct RCL *rcl,
 			    struct HAN *han );
       void rec_close_file( const struct HAN *han );
