@@ -18,9 +18,6 @@ libhds_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES)
 
-# Make sure that hds_types.h is built early
-hds1.h: hds_types.h
-
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
@@ -34,6 +31,11 @@ hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c
 make_hds_types_SOURCES = make-hds-types.c
+
+# Try to make sure that hds_types.h is built early
+# This does not seem to work right in conjunction with BUILT_SOURCES
+dat_par_h_DEPENDENCIES = hds_types.h hds1_types.h
+dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h
 
 hds_test_SOURCES = hds_test.f
 hds_test_LDADD = libhds.la `ems_link` `chr_link`
@@ -138,8 +140,10 @@ hds_machine.txt: hds_machine$(EXEEXT)
 	echo "" >>$@
 	./hds_machine >>$@
 
-BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h \
-	hds_types.h hds1_types.h
+# Have to make sure that hds_types appears before DAT_PAR so that
+# the include file generation routines are built in the correct order
+BUILT_SOURCES = hds_types.h hds1_types.h \
+	$(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h
 
 CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
 	hds_types.h hds1_types.h
