@@ -81,7 +81,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
 *     ilevel
-*        Amount of scren information to display (in range zero to 3).
+*        Amount of screen information to display (in range zero to 3).
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -116,6 +116,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
+   double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double sum;          /* Sum of all residuals */
    double urms;         /* User-supplied RMS noise level */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
@@ -192,15 +193,15 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */
-            if( cupidGCFit( type, res, imax, x ) ) {
+            if( cupidGCFit( type, res, imax, x, &chisq ) ) {
                iclump++;
 
 /* Add the clump to the output list. */
-               cupidGCListClump( x );
+               cupidGCListClump( iclump, ndim, x, chisq );
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
-               cupidGCUpdateArrays( type, res, el );
+               cupidGCUpdateArrays( type, res, el, ndim, dims, velax, x );
 
             } 
          }

@@ -123,7 +123,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
    static double velres;  /* User supplied velocity resolution in pixels */
    static double wmin;    /* Minimum weight value to use */
    static int dax[ 3 ];   /* The external axis indices */
-   static int fax[ 3 ];   /* The internal axis indices */
    static int npar;       /* Number of parameters in fit */
 
 /* Abort if an error has already occurred. */
@@ -192,9 +191,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
       }
 
 /* The "fax" array is the inverse of the "dax" array. */
-      fax[ dax[ 0 ] ] = 0; 
-      fax[ dax[ 1 ] ] = 1; 
-      fax[ dax[ 2 ] ] = 2; 
+      cupidGC.fax[ dax[ 0 ] ] = 0; 
+      cupidGC.fax[ dax[ 1 ] ] = 1; 
+      cupidGC.fax[ dax[ 2 ] ] = 2; 
 
 /* Get the ratio of the weighting function FWHM to the observed FWHM. */
       alpha = cupidConfigD( config, "ALPHA", 2.0 );
@@ -362,9 +361,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
 /* Get the corresponding N-dimensional indices in the input array. This
    allows for any permutation of the pixels axes necessary to make the
    velocity axis the third axis. */
-      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ fax[ iax ] ];
+      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ cupidGC.fax[ iax ] ];
 
-/* Get the corresponding N-dimensional indices in the input array. */
+/* Get the corresponding 1-dimensional index into the input array. */
       j = yy[ ndim - 1 ];
       for( iax = ndim - 2; iax >= 0; iax-- ) {
          j = yy[ iax ] + j*dims[ iax ];
@@ -410,11 +409,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
       py++;
       pw++;
 
-/* Get the grid coords (within the full size data array) of the next 
-   pixel in the section currently being fitted. This assumes fortran
-   ordering of the elements in the arrays, and assumes the velocity axis
-   (if any) is axis 3. Re-calculate the weight factor for any axis which 
-   is changed. */
+/* Get the grid coords of the next pixel in the section currently being 
+   fitted. This assumes fortran ordering of the elements in the arrays, and 
+   assumes the velocity axis (if any) is axis 3. */
       iax = 0;
       xx[ iax ] += 1.0;
       while( xx[ iax ] > cupidGC.ubnd[ iax ] ) {

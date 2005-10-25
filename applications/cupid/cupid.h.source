@@ -26,6 +26,7 @@ typedef struct CupidGC  {
    double *res;            /* Pointer to array to receive scale residuals */
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
    double ubnd[ 3 ];       /* Upper grid bounds of section being fitted */
+   int fax[ 3 ];           /* Algorithm axis no. indexed by external axis no. */
    int ndf;                /* Number of degrees of freedom */
    int nel;                /* Number of pixels in section being fitted */
    double sa;              /* Chi-square stiffness parameter sa */
@@ -82,7 +83,7 @@ double cupidGCModel( int, double *, double *, int, int, int );
 int cupidConfigI( AstKeyMap *, const char *, int );
 void clumps();
 void cupidClumpFind( int, int, int *, int *, void *, void *, unsigned char *, AstKeyMap *, int, int );
-void cupidGCListClump();
+void cupidGCListClump( int, int, double *, double );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidGaussClumps( int, int, int *, int *, void *, void *, unsigned char *, double, AstKeyMap *, int, int );

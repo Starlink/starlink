@@ -1,7 +1,17 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel ){
+/* Global Variables: */
+/* ================= */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   needed by the service functions cupidGCcalcf and cupidGCcalcg called
+   by the PDA minimisation function. This structure is declared in
+   cupidGaussClumps, and its contents are initialised by this function. */
+extern CupidGC cupidGC;
+
+void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
+                                         int *dims, int velax, double *par ){
+
 /*
 *  Name:
 *     cupidGCUpdateArrays<X>
@@ -11,17 +21,27 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel ){
 *     fit array.
 
 *  Synopsis:
-*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel );
+*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
+*                                  int *dims, int velax, double *par )
 
 *  Description:
-*     This function removes the fit from the residuals array, and adds it 
-*     onto the total fit array.
+*     This function removes the supplied Gaussian from the residuals array.
 
 *  Parameters:
 *     res
 *        Pointer to the start of the residuals array.
 *     nel
 *        The number of elements in the supplied array. 
+*     ndim
+*        The number of pixel axes in the array.
+*     dims
+*        The number of pixels on each pixel axis of the array, using
+*        external axis ordering (i.e. the axis ordering within the data file).
+*     velax
+*        The index of the velocity axis. Only used if "ndim" is 3.
+*     par
+*        Pointer to an array holding the parameters describing thw Gaussian 
+         clump to be removed from the residuals array.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -45,9 +65,52 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel ){
 */      
 
 /* Local Variables: */
+   double xx[ 3 ];        /* Internal coords of current pixel */
+   double yy[ 3 ];        /* External coords of current pixel */
+   int i;                 /* Vector index within work array */
+   int iax;               /* Axis index */
+   int j;                 /* Vector index within input array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Loop round each axis. This is the "internal" axis index in which the 
+   velocity  axis (if any) is the third axis. Store the index within the 
+   complete array of the first pixel in the work arrays to be filled. */
+   for( iax = 0; iax < ndim; iax++ ) xx[ iax ] = cupidGC.lbnd[ iax ];
+
+/* Loop over all pixels in the fitted section. */
+   for( i = 0; i < cupidGC.nel; i++ ) {
+
+/* Get the corresponding N-dimensional indices in the input array. This
+   allows for any permutation of the pixels axes necessary to make the
+   velocity axis the third axis. */
+      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ cupidGC.fax[ iax ] ];
+
+/* Get the corresponding 1-dimensional index into the input array. */
+      j = yy[ ndim - 1 ];
+      for( iax = ndim - 2; iax >= 0; iax-- ) {
+         j = yy[ iax ] + j*dims[ iax ];
+      }         
+
+/* If the input data value is bad, pass on. Otherwise, calculate the model 
+   value at the current position, and subtract it from the supplied 
+   residuals. */
+      if( res[ j ] != CGEN_BAD ) {
+         res[ j ] -= (CGEN_TYPE) cupidGCModel( ndim, xx, par, -1, 1, 
+                                                            ( i == 0 ) );
+      }      
+
+/* Get the grid coords of the next pixel in the section currently being 
+   fitted. This assumes fortran ordering of the elements in the arrays, and 
+   assumes the velocity axis (if any) is axis 3. */
+      iax = 0;
+      xx[ iax ] += 1.0;
+      while( xx[ iax ] > cupidGC.ubnd[ iax ] ) {
+         xx[ iax ] = cupidGC.lbnd[ iax ];
+         if( ++iax == ndim ) break;
+         xx[ iax ] += 1.0;
+      }
+   }
 }
 

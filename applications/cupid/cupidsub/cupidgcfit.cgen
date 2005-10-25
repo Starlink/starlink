@@ -13,7 +13,8 @@
 extern CupidGC cupidGC;
 
 
-int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
+int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
+                               double *chisq ){
 /*
 *  Name:
 *     cupidGCFit<X>
@@ -22,7 +23,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
 *     Fit a Gaussian to a supplied peak in a supplied array.
 
 *  Synopsis:
-*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x );
+*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x, double *chisq );
 
 *  Description:
 *     This function fits a Gaussian to a peak in the supplied residuals
@@ -39,6 +40,9 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
 *        A pointer to an array containing the initial guess at the
 *        Gaussian parameters. The array is returned holding the best fit
 *        parameter values.
+*     chisq
+*        A pointer to a location at which to return the chi-squared
+*        associated with the returned fit.
 
 *  Returned Value:
 *     Non-zero if the fit was succesfully completed.
@@ -104,10 +108,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
 
-
-   cupidGCDump();
-
-
+/* Return the final chi-squared value */
+   *chisq = v[ 9 ];
 
 /* Return the result, setting the specified element of the residuals
    array bad if no fit was performed. This prevents the any subsequent 
