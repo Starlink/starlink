@@ -1,0 +1,102 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "dat_par.h"
+#include "cupid.h"
+#include <stdio.h>
+
+/* Global Variables: */
+/* ================= */
+/* A structure holding the global parameters of the GaussClump algorithm 
+   needed by this function. These are set by function cupidGaussClumps. */
+extern CupidGC cupidGC;
+
+
+void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
+/*
+*  Name:
+*     cupidGCDump<X>
+
+*  Purpose:
+*     Dump the contents of the cupidGC structure.
+
+*  Synopsis:
+*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims )
+
+*  Description:
+*     This function is a diagnostic function which dumps the supplied
+*     array, or the contents of the cupidGC structure.
+
+*  Parameters:
+*     array
+*        Pointer to the array to be dumped. If NULL, then the contents of
+*        the cupidGC structure is dumped.
+*     ndim
+*        The number of pixel axes.
+*     dims
+*        Pointer to the size of each pixel axis.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     21-OCT-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   CGEN_TYPE *adata;
+   int indf, place, i, el, lbnd[3], ubnd[3];
+   double *data;
+   static int ii = 0;
+   char name[ 100 ];
+
+
+   if( data ) {
+
+      for( i = 0; i < cupidGC.ndim; i++ ) {
+         lbnd[ i ] = 1;
+         ubnd[ i ] = dims[ i ];
+      }
+
+      sprintf( name, "array%d", ++ii );
+      printf("Dumping %s\n", name );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( CGEN_HDS_TYPE, ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", CGEN_HDS_TYPE, "WRITE", (void *) &adata, &el, status );
+      for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];
+      ndfAnnul( &indf, status );
+
+
+   } else {
+   
+      for( i = 0; i < cupidGC.ndim; i++ ) {
+         lbnd[ i ] = cupidGC.lbnd[ i ];
+         ubnd[ i ] = cupidGC.ubnd[ i ];
+      }
+   
+   
+      sprintf( name, "data%d", ++ii );
+      printf("Dumping %s\n", name );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.data[ i ];
+      ndfAnnul( &indf, status );
+   
+      sprintf( name, "res%d", ii );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.res[ i ];
+      ndfAnnul( &indf, status );
+   }
+
+}
+
+

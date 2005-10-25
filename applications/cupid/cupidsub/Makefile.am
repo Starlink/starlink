@@ -3,7 +3,7 @@
 
 CGENERIC_ROUTINES = cupidgcfindmax.cgen cupidgciterate.cgen cupidrms.cgen \
 cupidgcsetinit.cgen cupidgcupdatearrays.cgen cupidgcfit.cgen \
-cupidgcprofwidth.cgen
+cupidgcprofwidth.cgen cupidgcdump.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
