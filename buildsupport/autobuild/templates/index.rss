@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+  xmlns:ab="http://xmlns.autobuild.org/2004/05/17-rss-rdf"
+  xmlns="http://purl.org/rss/1.0/">
+  <channel rdf:about="http://[%hostname%][%httppath%]/index.rss">
+    <title>[%title%]</title>
+    <link>http://[%hostname%][%httppath%]/</link>
+    <description>
+    Status [%status%]; Completed on [%date%], at [%gmtime%]; Cycle time was [% cycleTime %]; Build counter is [% buildCounter %]
+    </description>
+    <items>
+      <rdf:Seq>
+        [% FOREACH modules %]
+          <rdf:li resource="http://[%hostname%][%httppath%]/module-[%name%]"/>
+        [% END %]
+      </rdf:Seq>
+    </items>
+    <ab:repositories>
+      <rdf:Seq>
+        [% FOREACH repositories %]
+          <rdf:li resource="http://[%hostname%][%httppath%]/repository-[%name%]"/>
+        [% END %]
+      </rdf:Seq>
+    </ab:repositories>
+    <ab:groups>
+      <rdf:Seq>
+        [% FOREACH groups %]
+          <rdf:li resource="http://[%hostname%][%httppath%]/group-[%name%]"/>
+        [% END %]
+      </rdf:Seq>
+    </ab:groups>
+  </channel>
+  [% FOREACH modules %]
+    <item rdf:about="http://[%hostname%][%httppath%]/module-[%name%]">
+      <title>[%label%]</title>
+      <link>http://[%hostname%][%httppath%]/module-[%name%].html</link>
+      <description>
+        Status [% status %]; [% packages.size() %] package(s) built
+      </description>
+      <ab:status>[% status %]</ab:status>
+      <ab:packages>
+        <rdf:Seq>
+          [% FOREACH packages %]
+            <rdf:li resource="http://[%hostname%][%httppath%]/dist/[%filename%]"/>
+          [% END %]
+        </rdf:Seq>
+      </ab:packages>
+    </item>
+  [% END %]
+</rdf:RDF>

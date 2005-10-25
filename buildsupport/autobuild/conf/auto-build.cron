@@ -1,0 +1,4 @@
+# attempt to start autobuilder every 5 minutes
+USER=builder
+PATH=/bin:/usr/bin:/usr/local/bin
+*/5 * * * * builder /usr/bin/auto-build.pl --config /etc/auto-build.d/auto-build.conf

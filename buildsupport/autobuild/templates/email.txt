@@ -1,0 +1,10 @@
+To: [% recipient %]
+From: [% sender %]
+Subject: Auto Build Alert
+
+[% FOREACH modules %]
+Module: [% label %]
+Status: [% status %]
+URL: [% url %]
+Build Log: [% build_log %]
+[% END %]
