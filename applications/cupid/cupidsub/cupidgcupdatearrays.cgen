@@ -112,5 +112,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
          xx[ iax ] += 1.0;
       }
    }
+
+   CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );
+
+
 }
 
