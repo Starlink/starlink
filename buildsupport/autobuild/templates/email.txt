@@ -1,9 +1,13 @@
 To: [% recipient %]
 From: [% sender %]
-Subject: Starlink Nightly Build On System:
+Subject: Starlink Nightly Build On System: SYSTEM_NAME
+
+Main URL: URL_TO_BUILD_INDEX
 
 [% FOREACH modules %]
+[% IF status == 'failed' %]
 Module: [% label %]
 Status: [% status %]
 Build Log: [% URL %]/logs/[% logFilename %]
+[% END %]
 [% END %]

@@ -63,66 +63,68 @@ starlink        = $(PREFIX)/starlink
 myprefix        = $(PREFIX)
 
 install ::
+	./install-sh -d -m 0755 $(sysconfdir)
+	./install-sh -d -m 0755 $(pkgsysconfdir)
 	if [ -f $(pkgsysconfdir)/auto-build.conf ]; then \
-	  install -c -D -m 0644 conf/auto-build.conf $(pkgsysconfdir)/auto-build.conf-example; \
+	  ./install-sh -c -m 0644 conf/auto-build.conf $(pkgsysconfdir)/auto-build.conf-example; \
 	  echo "Not overwriting existing config file $(pkgsysconfdir)/auto-build.conf" ;\
 	else \
-	  install -c -D -m 0644 conf/auto-build.conf $(pkgsysconfdir)/auto-build.conf; \
+	  ./install-sh -c -m 0644 conf/auto-build.conf $(pkgsysconfdir)/auto-build.conf; \
 	fi
 	sed -e \'s#BUILDDIR#$(starlink_build)#g\' starlink/build.sh > starlink/build.sh-tmp
 	sed -e \'s#BUILDDIR#$(starlink_build)#g\' starlink/buildsupport.sh > starlink/buildsupport.sh-tmp
 	sed -e \'s#BUILDDIR#$(starlink_build)#g\' starlink/buildworld.sh > starlink/buildworld.sh-tmp
 	sed -e \'s#PREFIX#$(myprefix)#g\' starlink/cronbuild.sh > starlink/cronbuild.sh-tmp
 	sed -e \'s#BUILDDIR#$(starlink_build)#;s#TEMPLATES#$(pkgsysconfdir)/templates#;s#PREFIX#$(myprefix)#g\' starlink/autobuild.xslt > starlink/autobuild.xslt-tmp
-	install -d -m 0755 $(starlink)
-	install -d -m 0755 $(starlink_build)
-	install -d -m 0755 $(starlink_build)/temp
-	install -d -m 0755 $(starlink_build)/build-home
-	install -d -m 0755 $(starlink_build)/build-root
-	install -d -m 0755 $(starlink_build)/build-cache
-	install -d -m 0755 $(starlink_build)/public_html
-	install -d -m 0755 $(starlink_build)/public_html/isos
-	install -d -m 0755 $(starlink_build)/public_html/dist
-	install -d -m 0755 $(starlink_build)/public_html/logs
-	install -d -m 0755 $(starlink_build)/public_ftp
-	install -d -m 0755 $(starlink_build)/packages
-	install -d -m 0755 $(starlink_build)/packages/rpm
-	install -d -m 0755 $(starlink_build)/packages/rpm/BUILD
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/noarch
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i386
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i486
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i586
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i686
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i786
-	install -d -m 0755 $(starlink_build)/packages/rpm/RPMS/sparc
-	install -d -m 0755 $(starlink_build)/packages/rpm/SPECS
-	install -d -m 0755 $(starlink_build)/packages/rpm/SOURCES
-	install -d -m 0755 $(starlink_build)/packages/rpm/SRPMS
-	install -d -m 0755 $(starlink_build)/packages/zips
-	install -d -m 0755 $(starlink_build)/packages/tars
-	install -d -m 0755 $(starlink_build)/packages/debian
-	install -d -m 0755 $(starlink_build)/packages/pkg
-	install -d -m 0755 $(starlink_build)/install
-	install -c -m 0755 starlink/build.sh-tmp $(starlink)/build.sh
-	install -c -m 0755 starlink/buildsupport.sh-tmp $(starlink)/buildsupport.sh
-	install -c -m 0755 starlink/buildworld.sh-tmp $(starlink)/buildworld.sh
-	install -c -m 0755 starlink/cronbuild.sh-tmp $(starlink)/cronbuild.sh        
-	install -c -m 0644 starlink/autobuild.xslt-tmp $(starlink)/autobuild.xslt
+	./install-sh -d -m 0755 $(starlink)
+	./install-sh -d -m 0755 $(starlink_build)
+	./install-sh -d -m 0755 $(starlink_build)/temp
+	./install-sh -d -m 0755 $(starlink_build)/build-home
+	./install-sh -d -m 0755 $(starlink_build)/build-root
+	./install-sh -d -m 0755 $(starlink_build)/build-cache
+	./install-sh -d -m 0755 $(starlink_build)/public_html
+	./install-sh -d -m 0755 $(starlink_build)/public_html/isos
+	./install-sh -d -m 0755 $(starlink_build)/public_html/dist
+	./install-sh -d -m 0755 $(starlink_build)/public_html/logs
+	./install-sh -d -m 0755 $(starlink_build)/public_ftp
+	./install-sh -d -m 0755 $(starlink_build)/packages
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/BUILD
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/noarch
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i386
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i486
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i586
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i686
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/i786
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/RPMS/sparc
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/SPECS
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/SOURCES
+	./install-sh -d -m 0755 $(starlink_build)/packages/rpm/SRPMS
+	./install-sh -d -m 0755 $(starlink_build)/packages/zips
+	./install-sh -d -m 0755 $(starlink_build)/packages/tars
+	./install-sh -d -m 0755 $(starlink_build)/packages/debian
+	./install-sh -d -m 0755 $(starlink_build)/packages/pkg
+	./install-sh -d -m 0755 $(starlink_build)/install
+	./install-sh -c -m 0755 starlink/build.sh-tmp $(starlink)/build.sh
+	./install-sh -c -m 0755 starlink/buildsupport.sh-tmp $(starlink)/buildsupport.sh
+	./install-sh -c -m 0755 starlink/buildworld.sh-tmp $(starlink)/buildworld.sh
+	./install-sh -c -m 0755 starlink/cronbuild.sh-tmp $(starlink)/cronbuild.sh        
+	./install-sh -c -m 0644 starlink/autobuild.xslt-tmp $(starlink)/autobuild.xslt
 	rm -f starlink/build.sh-tmp
 	rm -f starlink/buildsupport.sh-tmp
 	rm -f starlink/buildworld.sh-tmp
 	rm -f starlink/autobuild.xslt-tmp
 	rm -f starlink/cronbuild.sh-tmp
 	sed -e \'s#PREFIX#$(myprefix)#g\' conf/auto-build.cron > conf/auto-build.cron-tmp
-	install -c -D -m 0644 conf/auto-build.cron-tmp $(pkgsysconfdir)/auto-build.cron;
+	./install-sh -c -m 0644 conf/auto-build.cron-tmp $(pkgsysconfdir)/auto-build.cron;
 	rm -f conf/auto-build.cron-tmp
-	install -d -m 0755 $(pkgsysconfdir)/templates
-	install -c -m 0644 templates/*.txt $(pkgsysconfdir)/templates/
-	install -c -m 0644 templates/*.html $(pkgsysconfdir)/templates/
-	install -c -m 0644 templates/*.tt $(pkgsysconfdir)/templates/
-	install -c -m 0644 templates/*.css $(pkgsysconfdir)/templates/
-	install -c -m 0644 templates/*.rss $(pkgsysconfdir)/templates/
+	./install-sh -d -m 0755 $(pkgsysconfdir)/templates
+	./install-sh -c -m 0644 templates/*.txt $(pkgsysconfdir)/templates/
+	./install-sh -c -m 0644 templates/*.html $(pkgsysconfdir)/templates/
+	./install-sh -c -m 0644 templates/*.tt $(pkgsysconfdir)/templates/
+	./install-sh -c -m 0644 templates/*.css $(pkgsysconfdir)/templates/
+	./install-sh -c -m 0644 templates/*.rss $(pkgsysconfdir)/templates/
 ';
   }
 
