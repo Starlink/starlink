@@ -1,0 +1,29 @@
+#!/bin/tcsh
+
+mkdir build-home
+mkdir build-root
+mkdir build-cache
+mkdir public_html
+mkdir public_ftp
+mkdir packages
+mkdir packages/rpm
+mkdir packages/rpm/BUILD
+mkdir packages/rpm/RPMS
+mkdir packages/rpm/RPMS/noarch
+mkdir packages/rpm/RPMS/i386
+mkdir packages/rpm/RPMS/i486
+mkdir packages/rpm/RPMS/i586
+mkdir packages/rpm/RPMS/i686
+mkdir packages/rpm/RPMS/i786
+mkdir packages/rpm/RPMS/sparc
+mkdir packages/rpm/SPECS
+mkdir packages/rpm/SOURCES
+mkdir packages/rpm/SRPMS
+mkdir packages/zips
+mkdir packages/tars
+mkdir packages/debian
+mkdir packages/pkg
+
+
+
+
