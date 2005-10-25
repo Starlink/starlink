@@ -85,7 +85,7 @@ sub export {
 	$path = $1;
     }
         
-    my $output = $self->_run("cvs checkout -d $name -r $branch -P $path");
+    my $output = $self->_run("cvs checkout -d $name $path");
     
     # Crude change checking - any line which doesn't
     # look like a directrory traversal message treated

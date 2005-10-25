@@ -9,9 +9,9 @@ set -e
 set -v
 # Make env for build.
 
-BUILD_SYSTEM=/home/vmwareshare/rhel30linux_i386
+BUILD_SYSTEM=BUILDDIR
 export BUILD_SYSTEM
-MY_CVS_ROOT=/home/vmwareshare/cvs
+MY_CVS_ROOT=$CVSROOT
 export MY_CVS_ROOT
 BUILD_HOME=$BUILD_SYSTEM/build-home
 export BUILD_HOME

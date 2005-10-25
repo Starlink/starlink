@@ -11,10 +11,6 @@
        title = "List by repository"
        url = "index-repository.html"
      }
-     {
-       title = "List by ISO"
-       url = "index-iso.html"
-     }
    ] %]
 <html>
   <head>

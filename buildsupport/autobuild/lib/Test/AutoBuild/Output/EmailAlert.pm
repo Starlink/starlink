@@ -111,6 +111,7 @@ sub process {
             'label' => $modules->{$name}->label(),
             'status' => $modules->{$name}->build_status(),
             'buildLog' => $modules->{$name}->build_log(),
+            'logFilename' => $modules->{$name}->build_log_filename(),
             'URL' => $this_url
             };
 

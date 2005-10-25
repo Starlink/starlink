@@ -1,10 +1,9 @@
 To: [% recipient %]
 From: [% sender %]
-Subject: Starlink Nightly Build Alert - [% label %] [% status %]
+Subject: Starlink Nightly Build On System:
 
 [% FOREACH modules %]
 Module: [% label %]
 Status: [% status %]
-URL: [% url %]
-Build Log: [% build_log %]
+Build Log: [% URL %]/logs/[% logFilename %]
 [% END %]

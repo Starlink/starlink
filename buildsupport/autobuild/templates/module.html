@@ -65,7 +65,7 @@
   [% ELSE %]
     [% IF status == 'failed' %]
       <p class="failed">Build failed on this module</p>
-    [% ELSIF status %] eq 'skipped')$
+    [% ELSIF status == 'skipped' %]
       <p class="skipped">Module skipped because dependency failed during build</p>
     [% ELSE %]
       <p>Module not built. Status: [% status %]</p>

@@ -5,8 +5,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 debug = 0
 checkout-source = 1
 nice-level = 0
-#control-file = build.sh
-control-file = /home/vmwareshare/build.sh
+control-file = PREFIX/build.sh
 # Force abortion of build when a module fails
 # Not usually needed since builder is clever
 # enough to skip a module if a dependency fails
@@ -15,22 +14,22 @@ abort-on-fail = 0
 # Hostname, if different from that returned by 'hostname' command
 # hostname = builder.example.com
 
-tmp-dir = /home/vmwareshare/temp
+tmp-dir = BUILDDIR/temp
 
 lock = {
-  file = /home/vmwareshare/rhel30linux_i386/.build.mutex
+  file = BUILDDIR/.build.mutex
   use-flock = 1
 }
 
 build = {
   # This is where we check out the source to (for CVS anyway).
-  home = /home/vmwareshare/rhel30linux_i386/build-home
+  home = BUILDDIR/build-home
 
   # ./configure --prefix=$AUTO_BUILD_ROOT/usr
-  root = /home/vmwareshare/rhel30linux_i386/build-root
+  root = BUILDDIR/build-root
   
   # Cache packages which don't change
-  cache-dir = /home/vmwareshare/rhel30linux_i386/build-cache
+  cache-dir = BUILDDIR/build-cache
   cache = 1
   cache-timestamp = 1
 }
@@ -58,13 +57,16 @@ groups = {
   Java = {
       label = Java
   }
+  World = {
+      label = World
+  }
 }
 
 # Global environment variables
 env = {
   USER = vmware
-  STARCONF_DEFAULT_STARLINK = /home/vmwareshare/rhel30linux_i386/build-root
-  STARCONF_DEFAULT_PREFIX = /home/vmwareshare/rhel30linux_i386/build-root
+#  STARCONF_DEFAULT_STARLINK = BUILDDIR/build-root
+#  STARCONF_DEFAULT_PREFIX = BUILDDIR/build-root
 #  PATH = ${STARCONF_DEFAULT_PREFIX}/bin:${PATH}
 #  PATH = ${STARCONF_DEFAULT_PREFIX}/buildsupport/bin:${PATH}
 }
@@ -75,7 +77,7 @@ repositories = {
     label = Starlink Anonymous CVS Server
     module = Test::AutoBuild::Repository::CVS
     env = {
-      CVSROOT = /home/vmwareshare/cvs
+      CVSROOT = MY_CVS_ROOT
     }
   }
 }
@@ -84,39 +86,55 @@ repositories = {
 package-types = {
 #  rpm = {
 #    label = Linux RPMs
-#    spool = /home/vmwareshare/rhel30linux_i386/packages/rpm
+#    spool = BUILDDIR/packages/rpm
 #    extension = .rpm
 #  }
 #  pkg = {
 #    label = Solaris packages
-#    spool = /home/vmwareshare/rhel30linux_i386/packages/pkg
+#    spool = BUILDDIR/packages/pkg
 #    extension = .pkg
 #  }
 #  zip = {
 #    label = ZIP packages
-#    spool = /home/vmwareshare/rhel30linux_i386/packages/zips
+#    spool = BUILDDIR/packages/zips
 #    extension = .zip
 #  }
   tgz = {
     label = Tar+GZip packages
-    spool = /home/vmwareshare/rhel30linux_i386/packages/tars
+    spool = BUILDDIR/packages/tars
     extension = .tar.gz
   }
 #  deb = {
 #    label = Debian Packages
-#    spool = /home/vmwareshare/rhel30linux_i386/packages/debian
+#    spool = BUILDDIR/packages/debian
 #    extension = .deb
 #  }
 }
 
 publishers = {
   copy = {
-    label = ussc@star.rl.ac.uk
+    label = MYEMAIL
     module = Test::AutoBuild::Publisher::Copy
   }
 }
 
   modules = {
+    MakeWorld = {
+      label = MakeWorld
+      paths = (
+       .
+      )
+      repository = cvs
+      group = World
+      links = (
+       {
+         href = MYWWW
+         label = MYHOMEPAGE
+       }
+      )
+      buildroot = BUILDDIR/install
+     controlfile = PREFIX/starlink/buildworld.sh
+    }      
     buildsupport = {
       label = buildsupport
       paths = (
@@ -126,11 +144,14 @@ publishers = {
       group = Buildsupport
       links = (
        {
-         href = http://www.starlink.ac.uk
-         label = Starlink Homepage
+         href = MYWWW
+         label = MYHOMEPAGE
        }
       )
-     controlfile = /home/vmwareshare/buildsupport.sh
+      depends = (
+       MakeWorld
+      )
+     controlfile = PREFIX/starlink/buildsupport.sh
     }
     <xsl:for-each select="componentset/component">
     <xsl:if test="@id != 'starconf' and @id != 'automake'
@@ -163,8 +184,8 @@ publishers = {
       </xsl:if>                        
       links = (
         {
-         href = http://www.starlink.ac.uk
-         label = Starlink Homepage
+         href = MYWWW
+         label = MYHOMEPAGE
         }
       )
       depends = (
@@ -184,7 +205,7 @@ publishers = {
         </xsl:for-each>
         buildsupport
       )
-      controlfile = /home/vmwareshare/build.sh
+      controlfile = PREFIX/starlink/build.sh
     }
     </xsl:if>
     </xsl:for-each>
@@ -198,11 +219,11 @@ output = {
     module = Test::AutoBuild::Output::EmailAlert
     label = Starlink Classic CVS Build
     options = {
-      template-dir = /usr/etc/auto-build.d/templates
-      url = http://dev.starlink.ac.uk/build
-      addresses = stardev@jiscmail.ac.uk
-      smtp_server = outbox.rl.ac.uk
-      sender = ussc@star.rl.ac.uk
+      template-dir = TEMPLATES
+      url = MYBUILDURL
+      addresses = TOADDRESS
+      smtp_server = SMTPSERVER
+      sender = MYEMAIL
       send-on-success = true
     }
   }
@@ -211,7 +232,7 @@ output = {
     module = Test::AutoBuild::Output::PackageCopier
     label = FTP Site
     options = {
-      directory = /home/vmwareshare/rhel30linux_i386/public_ftp
+      directory = BUILDDIR/public_ftp
     }
   }
   # Copy files to a HTTP site
@@ -219,7 +240,7 @@ output = {
     module = Test::AutoBuild::Output::PackageCopier
     label = Starlink Development Web
     options = {
-      directory = /home/vmwareshare/rhel30linux_i386/public_html/dist
+      directory = BUILDDIR/public_html/dist
     }
   }
   # Copy logs to HTTP site
@@ -227,7 +248,7 @@ output = {
     module = Test::AutoBuild::Output::LogCopier
     label = Build Log Files
     options = {
-      directory = /home/vmwareshare/rhel30linux_i386/public_html/logs
+      directory = BUILDDIR/public_html/logs
     }
   }
   # Copy artifacts to HTTP site
@@ -235,7 +256,7 @@ output = {
 #    module = Test::AutoBuild::Output::ArtifactCopier
 #    label = Build Artifacts
 #    options = {
-#      directory = /home/vmwareshare/rhel30linux_i386/public_html/artifacts/%m
+#      directory = BUILDDIR/public_html/artifacts/%m
 #    }
 #  }
   # Create an ISO image containing several modules
@@ -244,16 +265,16 @@ output = {
 #    label = CD ISO image builder
 #    options = {
 #      variables = {
-#        httppath = /~builder
+#        httppath = BUILDDIR/public_html
 #        defaultCSS = bluecurve.css
-#        adminEmail = admin@builder.example.com
+#        adminEmail = MYEMAIL
 #        adminName = Build Administrator
 #        title = Continuous Automatic Builder
 #      }
-#      scratch-dir = /var/tmp
-#      iso-dest-dir = /home/vmwareshare/rhel30linux_i386/public_html/isos
-#      template-dest-dir = /home/vmwareshare/rhel30linux_i386/public_html
-#      template-src-dir = /usr/etc/auto-build.d/templates
+#      scratch-dir = BUILDDIR/temp
+#      iso-dest-dir = BUILDDIR/public_html/isos
+#      template-dest-dir = BUILDDIR/public_html
+#      template-src-dir = TEMPLATES
 #      files = (
 #          index-iso.html
 #      )
@@ -279,14 +300,14 @@ output = {
     label = Classic CVS Nightly Build Status
     options = {
       variables = {
-        httppath = /classic
+        httppath = BUILDDIR/public_html
         defaultCSS = bluecurve.css
-        adminEmail = ussc@star.rl.ac.uk
+        adminEmail = MYEMAIL
         adminName = Starlink Software
         title = Starlink Continuous Automatic Nightly Build
       }
-      template-src-dir = /usr/etc/auto-build.d/templates
-      template-dest-dir = /home/vmwareshare/rhel30linux_i386/public_html
+      template-src-dir = TEMPLATES
+      template-dest-dir = BUILDDIR/public_html
 # Placeholders in file names are:
 #  %m -> module name
 #  %g -> group
