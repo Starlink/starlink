@@ -109,6 +109,8 @@
 *        Added facilities for creating an 1D output NDF holding the profile.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     25-OCT-2005 (DSB):
+*        Free resources allocated by KPG1_ASPSY.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -340,6 +342,9 @@
 *  Annul the Plot, and shut down the graphics workstation, and database.
          CALL AST_ANNUL( IPLOT, STATUS )
          CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+
+*  Free resources. 
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
       END IF
 
