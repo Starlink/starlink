@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
 # Auto Builder v1.0
 #
 # By Daniel P. Berrange <dan@berrange.com>
