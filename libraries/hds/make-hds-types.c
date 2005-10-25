@@ -60,6 +60,8 @@
 # include <time.h>
 #endif
 
+#include <limits.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "f77.h"
@@ -79,7 +81,9 @@
 #endif
 
 /* Definitions for 64-bits integers                                        */ 
+/* Use the standard int64_t if available                                   */
 /* Use 'long' if it is 8 bytes, else use 'long long'                       */
+
 #if SIZEOF_LONG == 8
 #define INT_BIG "long int"
 #define UINT_BIG "unsigned long int"
