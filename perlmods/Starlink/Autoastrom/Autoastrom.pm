@@ -78,8 +78,10 @@ sub new {
   $auto->_configure( \%args );
 
 # Set up default options.
+  $auto->aperture( 5.0 ) if ( ! defined( $auto->aperture ) );
   $auto->catalogue( 'USNO@ESO' ) if( ! defined( $auto->catalogue ) );
   $auto->defects( 'warn' ) if ( ! defined( $auto->defects ) );
+  $auto->detection_threshold( 5.0 ) if ( ! defined( $auto->detection_threshold ) );
   $auto->insert( 1 ) if ( ! defined( $auto->insert ) );
   $auto->keeptemps( 0 ) if ( ! defined( $auto->keeptemps ) );
   $auto->match( 'FINDOFF' ) if ( ! defined( $auto->match ) );
@@ -102,12 +104,32 @@ sub new {
 
 =over 4
 
+=item B<aperture>
+
+Aperture size to use for aperture photometry.
+
+  my $aperture = $auto->aperture;
+  $auto->aperture( 10.0 );
+
+The value is the aperture diameters in pixels. Defaults to 5.0.
+
+=cut
+
+sub aperture {
+  my $self = shift;
+  if( @_ ) {
+    my $aperture = shift;
+    $self->{APERTURE} = $aperture;
+  }
+  return $self->{APERTURE};
+}
+
 =item B<bestfitlog>
 
 Retrieve or set the filename to write information about the best fit
 to.
 
-  my $bestfitlog = $auto->bestfitlog
+  my $bestfitlog = $auto->bestfitlog;
   $auto->bestfitlog( 'bestfit.log' );
 
 Will write the file to the current working directory. If undefined,
@@ -270,6 +292,28 @@ sub detected_catalogue {
     $self->{DETECTED_CATALOGUE} = $detected_catalogue;
   }
   return $self->{DETECTED_CATALOGUE};
+}
+
+=item B<detection_threshold>
+
+The detection threshold above which objects will be detected. This is
+equivalent to the DETECT_THRESH parameter to SExtractor.
+
+  my $detection_threshold = $auto->detection_threshold;
+  $auto->detection_threshold( 2.5 );
+
+Setting a lower detection will slow down automated astrometry. The
+default is 5.0.
+
+=cut
+
+sub detection_threshold {
+  my $self = shift;
+  if( @_ ) {
+    my $thresh = shift;
+    $self->{DETECTION_THRESHOLD} = $thresh;
+  }
+  return $self->{DETECTION_THRESHOLD};
 }
 
 =item B<filter>
@@ -997,8 +1041,8 @@ sub solve {
       $self->filter( $filter );
     }
     my $ext = new Starlink::Extractor;
-    $ext->detect_thresh( 5 );
-    $ext->analysis_thresh( 1.5 );
+    $ext->detect_thresh( $self->detection_threshold );
+    $ext->phot_apertures( $self->aperture );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
