@@ -45,7 +45,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel ){
 */      
 
 /* Local Variables: */
-   int i;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

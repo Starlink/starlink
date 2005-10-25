@@ -4,8 +4,8 @@
 #include "ast.h"
 
 void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-                     void *ipd, unsigned char *ipq, AstKeyMap *config,
-                     int velax ){
+                     void *ipd, void *ipv, unsigned char *ipq, 
+                     AstKeyMap *config, int velax, int ilevel ){
 /*
 *  Name:
 *     cupidClumpFind
@@ -16,8 +16,8 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 
 *  Synopsis:
 *     void cupidClumpFind( type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, unsigned char *ipq, AstKeyMap *config, 
-*                          int velax )
+*                          void *ipd, void *ipv, unsigned char *ipq, 
+*                          AstKeyMap *config, int velax, int ilevel )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -44,6 +44,10 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 *     ipd
 *        Pointer to the data array. The elements should be stored in
 *        Fortran order. The data type of this array is given by "itype".
+*     ipv
+*        Pointer to the input Variance array, or NULL if there is no Variance
+*        array. The elements should be stored in Fortran order. The data 
+*        type of this array is given by "itype".
 *     ipq
 *        Pointer to the Quality array. The elements should be stored in
 *        Fortran order. If this is not NULL, a mask is written to the
@@ -58,6 +62,8 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
+*     ilevel
+*        Amount of scren information to display (in range zero to 3).
 
 *  Authors:
 *     DSB: David S. Berry

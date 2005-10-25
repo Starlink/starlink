@@ -17,9 +17,10 @@ extern CupidGC cupidGC;
 #define K 2.772588722239781
 
 
-void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims, 
-                                  int imax, double rms, AstKeyMap *config, 
-                                  int iclump, int velax, double *par ){
+void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
+                                    int *dims, int imax, double rms, 
+                                    AstKeyMap *config, int iclump, int velax, 
+                                    double *par ){
 /*
 *  Name:
 *     cupidGCSetInit<X>
@@ -28,9 +29,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 *     Make an initial guess at the Gaussian clump parameters.
 
 *  Synopsis:
-*     void cupidGCSetInit<X>( CGEN_TYPE *array, int ndim, int *dims, 
-*                           int imax, double rms, AstKeyMap *config, 
-*                           int iclump, int velax, double *par );
+*     void cupidGCSetInit<X>( CGEN_TYPE *array, CGEN_TYPE *var, int ndim, 
+*                             int *dims, int imax, double rms, 
+*                             AstKeyMap *config, int iclump, int velax, 
+*                             double *par )
 
 *  Description:
 *     This functions makes an initial guess at the Gaussian clump
@@ -45,10 +47,14 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 *        be ordered according to Fortran order (first axis varying most 
 *        rapidly). The index of the velocity axis (if any) is given by 
 *        "velax" and need not be "2".
+*     var
+*        An array containing the variances from the original input data, or 
+*        NULL if variances are not available. 
 *     ndim
 *        The number of pixel axes in the array.
 *     dims
-*        The number of pixels on each pixel axis of the array.
+*        The number of pixels on each pixel axis of the array, using
+*        external axis ordering (i.e. the axis ordering within the data file).
 *     imax
 *        The 1D vectorised index of the pixel with the highest value in
 *        the array.
@@ -86,14 +92,18 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 */      
 
 /* Local Variables: */
+   double *pv;            /* Pointer to next input weight value in work array */
    double *pw;            /* Pointer to next weight value in work array */
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
    double d;              /* 1D offset from clumpt centre */
+   double f;              /* Factor for scaling weights */
    double fbeam_used;     /* Used value for "fbeam" */
    double fvel_used;      /* Used value for "fvel" */
    double fwhm_obs[ 3 ];  /* Observed FWHM on each pixel axis */
    double off;            /* Base line offset for the data value */
+   double sv;             /* Sum of variance reciprocals */
+   double v;              /* Variance reciprocal */
    double wsum;           /* The sum of the weights */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
@@ -102,6 +112,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
    int iax;               /* Axis index */
    int j;                 /* Vector index within input array */
    int lbnd[ 3 ];         /* Externally ordered lower bounds */
+   int nv;                /* Number of variances summed in "sv" */
    int rem;               /* Remaining count of pixels */
    int ubnd[ 3 ];         /* Externally ordered upper bounds */
 
@@ -187,11 +198,11 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
       fax[ dax[ 2 ] ] = 2; 
 
 /* Get the ratio of the weighting function FWHM to the observed FWHM. */
-      alpha = cupidConfigD( config, "ALPHA", 3.0 );
+      alpha = cupidConfigD( config, "ALPHA", 2.0 );
 
 /* Get the factor which scales the observed FWHM on each axis to
    the half-width of the section of the data array to be be fitted.*/
-      wmin = cupidConfigD( config, "WMIN", 0.02 );
+      wmin = cupidConfigD( config, "WMIN", 0.05 );
       if( wmin < 1.0E-8 ) wmin = 1.0E-8;
       beta = 0.5*alpha*sqrt( -log( wmin )/ log( 2.0 ) );
 
@@ -238,10 +249,20 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* Get a guess at the observed clump fwhm by forming a radial profile and 
    finding the distance to the first significant minimum. This also increments 
-   "off" by the minimum (i.e. base line) data value in the profile. */
+   "off" by the minimum (i.e. base line) data value in the profile. DO
+   this for both spatial axes, and then take the mean (i.e. we assume the
+   clump is circular as an initial guess). */
    off = 0.0;
    fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                    dax[ 0 ], rms, &off );
+                                                 ax_max, dax[ 0 ], rms, &off );
+   fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
+                                                 ax_max, dax[ 1 ], rms, &off );
+
+/* Ensure the observed fwhm on both spatial axes are equal to the mean of
+   the values found above. */
+   fwhm_obs[ 0 ] += fwhm_obs[ 1 ];
+   fwhm_obs[ 0 ] *= 0.5;
+   fwhm_obs[ 1 ] = fwhm_obs[ 0 ];
 
 /* If a value for "fbeam" was supplied by the user, use it. Otherwise,
    divide the observed FWHM by the beam FWHM to get a default value for 
@@ -260,8 +281,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
    of the elliptical clump shape. */
    if( ndim > 1 ) {
       par[ 4 ] = cupidGC.x_max[ 1 ];
-      fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
-                                                       dax[ 1 ], rms, &off );
       if( fbeam != VAL__BADD ) {
          fbeam_used = fbeam;
       } else {
@@ -276,7 +295,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
    if( ndim > 2 ) {
       par[ 7 ] = cupidGC.x_max[ 2 ];
       fwhm_obs[ 2 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
-                                                       dax[ 2 ], rms, &off );
+                                                 ax_max, dax[ 2 ], rms, &off );
       if( fvel != VAL__BADD ) {
          fvel_used = fvel;
       } else {
@@ -297,6 +316,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
    for( i = 0; i < ndim; i++ ) {
       lbnd[ i ] = ax_max[ i ] - beta*fwhm_obs[ i ];
       ubnd[ i ] = ax_max[ i ] + beta*fwhm_obs[ i ];
+
+      if( lbnd[ i ] < 0 ) lbnd[ i ] = 0;
+      if( ubnd[ i ] >= dims[ i ] ) ubnd[ i ] = dims[ i ] - 1;
 
 /* Find the total number of elements in the section. */
       cupidGC.nel *= ( ubnd[ i ] - lbnd[ i ] + 1 );
@@ -321,6 +343,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
    axis (if any) as axis 3. */
    py = cupidGC.data;
    pw = cupidGC.weight;
+   pv = var;
 
 /* Loop round each axis. This is the "internal" axis index in which the 
    velocity  axis (if any) is the third axis. Store the index within the 
@@ -329,6 +352,11 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* Initialise the sum of the weights.*/
    wsum = 0.0;
+
+/* Initialise the number of variance values used, and the sum of the
+   variance reciprocals. */
+   nv = 0;
+   sv = 0;
 
 /* Loop over all pixels in the section to be fitted. */
    for( i = 0; i < cupidGC.nel; i++ ) {
@@ -352,8 +380,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* Otherwise, store the data, converted to "double" and normalised to the
    RMS noise level. Also calculate and store the Gaussian weight for the 
-   pixel. Truncate weights to zero which are below the weight limit
-   supplied by the user. Increment the sum of the weights.  */
+   pixel. If Variances are available, factor in the
+   reciprocal of the variance associated with the input data value. 
+   Increment the sum of the weights.  */
       } else {
          *py = ((double) array[ j ] )/rms;
 
@@ -364,17 +393,25 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
          }
          *pw = exp( -d2*K );
 
-         if( *pw <= wmin ) {
-            *pw = 0.0;
-         } else {
-            wsum += *pw;
+         if( var ) {
+            v = var[ j ];
+            if( v != 0.0 && v != CGEN_BAD ) {
+               v = 1.0/v;
+               *pw *= (double) v;
+               sv += (double) v;
+               nv++;
+            } else {
+               *pw = 0.0;
+            }
          }
+         wsum += *pw;
       }
 
 /* Move the pointers on to the next pixel in the section of the data
    array being fitted. */
       py++;
       pw++;
+      if( pv ) pv++;
 
 /* Get the grid coords (within the full size data array) of the next 
    pixel in the section currently being fitted. This assumes fortran
@@ -390,8 +427,23 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, int ndim, int *dims,
       }
    }
 
+/* Normalise the weights, to take out the effect of the variances, and
+   set to zero any weights which are lower than the user supplied lower
+   limit. */
+   f = var ? sv/nv : 1.0;
+   wsum /= f;
+
+   pw = cupidGC.weight;
+   for( i = 0; i < cupidGC.nel; i++, pw++ ) {
+      *pw /= f;
+      if( *pw < wmin ) *pw = 0.0;
+   }
+
 /* Store the number of degrees of freedom. */  
    cupidGC.ndf = wsum - npar;
+
+/* Store the number of invocations oc cupidGCcalcf so far. */  
+   cupidGC.nf = -1;
 
 /* Normalise all other data values in the CupidGC structure and in the "par"
    array to the RMS noise level. */

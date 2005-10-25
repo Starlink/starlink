@@ -2,6 +2,7 @@
 #include "f77.h"                 
 #include "mers.h"
 #include "cupid.h"
+#include <string.h>
 
 /* A pointer to the global status variable.*/
 int *cupid_global_status;

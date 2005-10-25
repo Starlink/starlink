@@ -76,14 +76,15 @@ extern int *cupid_global_status;
 
 /* Function prototypes */
 /* ------------------  */
-void clumps();
-void cupidhelp();
-void cupidClumpFind( int, int, int *, int *, void *, unsigned char *, AstKeyMap *, int );
-void cupidGaussClumps( int, int, int *, int *, void *, unsigned char *, double, AstKeyMap *, int );
 double cupidConfigD( AstKeyMap *, const char *, double );
+double cupidGCChiSq( int, double *, int, int );
+double cupidGCModel( int, double *, double *, int, int, int );
 int cupidConfigI( AstKeyMap *, const char *, int );
-double cupidGCmodel( int, double *, double *, int, int, int );
-double cupidGCchisq( int, double *, int, int );
+void clumps();
+void cupidClumpFind( int, int, int *, int *, void *, void *, unsigned char *, AstKeyMap *, int, int );
+void cupidGCListClump();
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
+void cupidGaussClumps( int, int, int *, int *, void *, void *, unsigned char *, double, AstKeyMap *, int, int );
+void cupidhelp();
 

@@ -17,6 +17,16 @@ package cupid {
             default !
          }
 
+         parameter ilevel {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Information level (0->3)}
+            default 1
+            helpkey *
+          }
+
          parameter in {
             position 1
             type NDF

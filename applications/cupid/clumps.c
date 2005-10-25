@@ -62,6 +62,11 @@ void clumps() {
 *        parameter to be set. The parameters available for each algorithm
 *        are listed in the "Configuration Parameters" section below. Default 
 *        values will be used for any unspecified parameters. [current value]
+*     ILEVEL = _INTEGER (Read)
+*        Controls the amount of information displayed on the screen. It
+*        should be in the range 0 to 3. A value of zero will suppress all 
+*        screen output. Larger values give more information (the precise 
+*        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
 *        The 2 or 3 dimensional NDF to be analysed. The Quality component
 *        of this NDF will be updated if the parameter MASK is set true.
@@ -99,7 +104,9 @@ void clumps() {
 *     residuals. This continues until the total value in the fitted ellipses 
 *     equals the total value in the original data. Each fitted ellipse is 
 *     taken to be a single clump and is added to the output catalogue. In
-*     this algorithm, clumps may overlap. 
+*     this algorithm, clumps may overlap. Any input variance component is
+*     used to scale the weight associated with each pixel value when
+*     performing the Gaussian fit.
 *     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
 *     algorithm works by first contouring the data at a multiple of the
 *     noise, then searches for peaks of emission which locate the clumps,
@@ -206,6 +213,7 @@ void clumps() {
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
    int igrp;                    /* GRP identifier for configuration settings */
+   int ilevel;                  /* Interaction level */
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
@@ -265,6 +273,9 @@ void clumps() {
       }
       goto L999;
    }          
+
+/* Get the interaction level. */
+   parGdr0i( "ILEVEL", 1, 0, 3, 1, &ilevel, status );
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
@@ -338,6 +349,10 @@ void clumps() {
 
       if( n > 0 ) {
          rms = sqrtf( sum/n );
+         if( ilevel > 1 ) {
+            msgSetd( "N", rms );
+            msgOut( "", "RMS noise from Variance component: ^N", status );
+         }
       } else {
          *status = SAI__ERROR;
          errRep( "CLUMPS_ERR1", "The supplied data contains insufficient "
@@ -347,7 +362,12 @@ void clumps() {
 /* If there is no Variance component, get an estimate of the RMS noise
    based on the variations of the data values. */
    } else {
+      ipv = NULL;
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
+      if( ilevel > 1 ) {
+         msgSetd( "N", rms );
+         msgOut( "", "RMS noise from Data component: ^N", status );
+      }
    }
 
 /* Determine which algorithm to use. */
@@ -372,12 +392,12 @@ void clumps() {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      cupidGaussClumps( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq, 
-                       rms, keymap, velax ); 
+      cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq, 
+                       rms, keymap, velax, ilevel ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
-      cupidClumpFind( type, nsig, slbnd, subnd, ipd, (unsigned char *) ipq,
-                     keymap, velax ); 
+      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq,
+                     keymap, velax, ilevel ); 
 
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );

@@ -2,6 +2,8 @@
 #include "ast.h"
 #include "cupid.h"
 #include "prm_par.h"
+#include "mers.h"
+#include <math.h>
 
 
 double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
@@ -67,6 +69,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
    CGEN_TYPE *w;          /* Pointer to work array */
    CGEN_TYPE *wr;         /* Pointer to next work value */
    double ret;          /* Returned value */
+   double maxv;         /* Largest data value in supplied array */
+   double minv;         /* Smallest data value in supplied array */
    double sum;          /* Sum of squared residuals */
    double thresh;       /* The rejection threshold for residuals */
    int i;               /* Element count */
@@ -107,6 +111,13 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
                 pr[ 1 ] != CGEN_BAD ){
                *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
                sum += ( *wr )*( *wr );
+               if( n == 0 ) {
+                  maxv = *pr;
+                  minv = *pr;
+               } else {
+                  if( *pr > maxv ) maxv = *pr;
+                  if( *pr < minv ) minv = *pr;
+               }
                n++;
             } else {
                *wr = CGEN_BAD;
@@ -121,6 +132,13 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
          errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
                  "good values to continue.", status );
          goto L999;
+
+      } else if( maxv == minv ) {
+         *status = SAI__ERROR;
+         errRep( "CUPIDRMS_ERR2", "All pixel values in the supplied data "
+                 "are equal.", status );
+         goto L999;
+
       } else {
          ret = sqrt( sum/n );
       }
@@ -154,7 +172,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
 
          if( n == 0 ) {
             *status = SAI__ERROR;
-            errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
+            errRep( "CUPIDRMS_ERR3", "The supplied data contains insufficient "
                     "good values to continue.", status );
             goto L999;
          } else {
@@ -166,7 +184,11 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
    Laplace filter and the 4 sigma clipping. This assumes the noise is
    Gaussian. */
       ret /= 2.46182;
-       
+
+/* Do not allow a value of zero to be returned- use 0.001 of the data
+   range instead. */
+      if( ret == 0.0 ) ret = 0.001*( maxv - minv );       
+
    }
 
 /* Free resources. */

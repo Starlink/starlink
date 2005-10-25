@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "mers.h"
+#include "prm_par.h"
 #include "ast.h"
 #include "cupid.h"
 
@@ -14,8 +15,8 @@ CupidGC cupidGC;
 
 
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       unsigned char *ipq, double rms, AstKeyMap *config,
-                       int velax ){
+                       void *ipv, unsigned char *ipq, double rms, 
+                       AstKeyMap *config, int velax, int ilevel ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -26,8 +27,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                           void *ipd, unsigned char *ipq, double rms,
-*                           AstKeyMap *config, int velax )
+*                            void *ipd, void *ipv, unsigned char *ipq, 
+*                            double rms, AstKeyMap *config, int velax )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -56,6 +57,10 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     ipd
 *        Pointer to the data array. The elements should be stored in
 *        Fortran order. The data type of this array is given by "itype".
+*     ipv
+*        Pointer to the input Variance array, or NULL if there is no Variance
+*        array. The elements should be stored in Fortran order. The data 
+*        type of this array is given by "itype".
 *     ipq
 *        Pointer to the Quality array. The elements should be stored in
 *        Fortran order. If this is not NULL, a mask is written to the
@@ -75,6 +80,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
+*     ilevel
+*        Amount of scren information to display (in range zero to 3).
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -108,18 +115,24 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */      
 
 /* Local Variables: */
+   AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
+   double sum;          /* Sum of all residuals */
+   double urms;         /* User-supplied RMS noise level */
+   double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
    int iclump;          /* Number of clumps found so far */
+   int imax;            /* Index of element with largest residual */
    int iter;            /* Continue finding more clumps? */
    void *res;           /* Pointer to residuals array */
-   int imax;            /* Index of element with largest residual */
-   double sum;          /* Sum of all residuals */
-   double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
+
+/* Get the AST KeyMap holding the configuration parameters for this
+   algorithm. */
+   if( !astMapGet0A( config, "GAUSSCLUMPS", &gcconfig ) ) gcconfig = astKeyMap( "" );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array. We use the memory management functions of the 
@@ -141,7 +154,19 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( res ) {
 
 /* Allow the user to override the supplied RMS error value. */
-      rms = cupidConfigD( config, "RMS", rms );
+      urms = cupidConfigD( gcconfig, "RMS", VAL__BADD );
+      if( urms != VAL__BADD ) {
+         rms = urms;
+         if( ilevel > 1 ) {
+            msgSetd( "N", rms );
+            msgOut( "", "User-supplied RMS noise: ^N", status );
+         }
+      }
+
+      if( ilevel > 1 ) {
+         msgSetd( "N", rms );
+         msgOut( "", "RMS noise level actually used: ^N", status );
+      }
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
@@ -157,13 +182,13 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Determine if a gaussian clump should be fitted to the peak around the 
    pixel found above.*/
-         cupidGCIterate( type, res, imax, sum, iclump, rms, config, &iter );
+         cupidGCIterate( type, res, imax, sum, iclump, rms, gcconfig, &iter );
          if( iter ) {
 
 /* If so, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
-            cupidGCSetInit( type, res, ndim, dims, imax, rms, config,
-                          iclump, velax, x );
+            cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
+                            iclump, velax, x );
 
 /* Find the best fitting parameters, starting from the above initial
    guess. If succesful, increment the number of clumps found. */

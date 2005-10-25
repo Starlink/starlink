@@ -104,6 +104,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x ){
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
 
+
+   cupidGCDump();
+
+
+
 /* Return the result, setting the specified element of the residuals
    array bad if no fit was performed. This prevents the any subsequent 
    attempt to fit a Gaussian to the same peak value.*/

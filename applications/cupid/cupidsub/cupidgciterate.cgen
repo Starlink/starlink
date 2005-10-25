@@ -64,9 +64,7 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 */      
 
 /* Local Variables: */
-   int i;               /* Loop count */
-
-   static CGEN_TYPE val_thresh;  /* Smallest value to be fitted */
+   static CGEN_TYPE val_thresh;/* Smallest value to be fitted */
    static double sum_thresh;   /* Target value for the sum of the residuals */
    static int maxclumps;       /* Maximum number of clumps to be fitted */
 

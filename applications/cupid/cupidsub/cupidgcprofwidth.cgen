@@ -3,7 +3,8 @@
 #include "math.h"
 
 double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
-                                   int imax, int ax, double rms, double *off ){
+                                        int imax, int *ax_max, int ax, 
+                                        double rms, double *off ){
 /*
 *  Name:
 *     cupidGCProfWidth<X>
@@ -13,7 +14,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
 *  Synopsis:
 *     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
-*                                 int imax, int ax, double rms, double *off )
+*                                 int imax, int *ax_max, int ax, double rms, 
+*                                 double *off )
 
 *  Description:
 *     This functions forms a radial profile of a clump in the supplied
@@ -36,6 +38,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        The 1D vectorised index of the pixel with the highest value in
 *        the array. This is used as the start position for the
 *        radial profile.
+*     ax_max
+*        The N-d axis coordinates corresponding to "imax".
 *     ax
 *        The zero-based index of the pixel axis along which the profile
 *        is to be taken.
@@ -71,10 +75,134 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 */      
 
 /* Local Variables: */
+   double *profile;      /* Pointer to the profile array */
+   double ret;           /* Sum of weighted axis values */
+   double rlow;          /* Radius at lowest pixel */
+   double target;        /* The half-max profile value */
+   double v1;            /* Value at lower of two profile points */
+   double v2;            /* Value at upper of two profile points */
+   double v;             /* Mean value at two profile points */
+   double vlow;          /* Lowest data value found so far */
+   int i1;               /* Vector index at lower of two profile points */
+   int i2;               /* Vector index at upper of two profile points */
+   int j1;               /* Axis value at lower of two profile points */
+   int j2;               /* Axis value at upper of two profile points */
+   int nv;               /* Number of good values summed in "v" */
+   int pel;              /* Index of last profile element to be written to */
+   int step;             /* Vector step between adjacent pixels on an axis */
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return 10;
 
+/* Allocate space for the profile making it the largest it could possibly
+   need to be. */
+   profile = astMalloc( sizeof( double )*dims[ ax ] );
+
+/* Put the maximum data value in the first element of the profile, and 
+   initialise the index of the last element written to. */
+   profile[ 0 ] = (double) array[ imax ];
+   pel = 0;
+
+/* Initialise the lowest value found so far in the profile. */
+   vlow = profile[ 0 ];
+   rlow = 0;
+
+/* Initialise the axis values of the two pixels which are equi-distant
+   from the profile centre along the specified axis.*/
+   j1 = ax_max[ ax ];
+   j2 = j1;
+
+/* Initialise the vector indicies of the two pixels which are equi-distant
+   from the profile centre along the specified axis.*/
+   i1 = imax;
+   i2 = i1;
+
+/* Save the 1D vector step between adjacent pixels on the axis. */
+   if( ax == 0) {
+      step = 1;
+
+   } else if( ax == 1 ) {
+      step = dims[ 0 ];
+
+   } else {
+      step = dims[ 0 ]*dims[ 1 ];
+
+   }
+
+/* Loop round extending the profile to larger radii until the first 
+   significant minimum is found in the profile. */
+   while( j1 >= 0 || j2 < dims[ ax ] ) {
+
+/* Increment the axis value of the two pixels which are equi-distant from
+   the profile centre. */
+      j1--;
+      j2++;
+
+/* Increment the vector index of the two pixels which are equi-distant from
+   the profile centre. */
+      i1 -= step;
+      i2 += step;
+
+/* Get the two pixel values. */
+      v1 = ( j1 >= 0 ) ? array[ i1 ] : CGEN_BAD;
+      v2 = ( j2 < dims[ ax ] ) ? array[ i2 ] : CGEN_BAD;
+
+/* Find the mean of the two values, and store it in the profile. */
+      if( v1 != CGEN_BAD ) {
+         v = (double) v1;
+         nv = 1;
+      } else {
+         v = 0.0;
+         nv = 0;
+      }
+      
+      if( v2 != CGEN_BAD ) {
+         v += (double) v2;
+         nv++;
+      } 
+      
+      v = ( nv > 0 ) ? v/nv : VAL__BADD;
+      profile[ ++pel ] = v;
+
+/* If this value is lower than the previous lowest value, remember it. */
+      if( v == VAL__BADD ) {
+
+      } else if( v < vlow ) {
+         vlow = v;
+         rlow = pel;
+
+/* Otherwise, if this value is more than 3 times the RMS noise higher
+   than the lowest value found so far, we assume that the lowest value
+   found so far is the minimum point in the profile. */
+      } else if( v > vlow + 3*rms ){
+         break;
+
+/* Otherwise, if the lowest pixel has not changed for the past 10 pixels, 
+   assume we have reached the flat bit of the profile. */
+      } else if( pel - rlow > 10 ) {
+         break;
+      }
+   }
+
+/* Find the radius at half the maximum value. */
+   target = 0.5*( profile[ 0 ] - vlow ) + vlow;
+   for( i2 = 0; i2 <= rlow; i2++ ) {
+      if( profile[ i2 ] != VAL__BADD ) {
+         if( profile[ i2 ] < target ) {
+            ret = 2*i2;
+            break;
+         }
+      }
+   }
+
+/* Increment the supplied offset value.*/
+   *off += vlow;
+
+/* Free resources */
+   profile = astFree( profile );
+
+/* Return the result. */
+   return ret;
 
 }
 
