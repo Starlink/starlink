@@ -92,7 +92,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
 */      
 
 /* Local Variables: */
-   double *pv;            /* Pointer to next input weight value in work array */
    double *pw;            /* Pointer to next weight value in work array */
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
@@ -343,7 +342,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
    axis (if any) as axis 3. */
    py = cupidGC.data;
    pw = cupidGC.weight;
-   pv = var;
 
 /* Loop round each axis. This is the "internal" axis index in which the 
    velocity  axis (if any) is the third axis. Store the index within the 
@@ -411,7 +409,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
    array being fitted. */
       py++;
       pw++;
-      if( pv ) pv++;
 
 /* Get the grid coords (within the full size data array) of the next 
    pixel in the section currently being fitted. This assumes fortran
