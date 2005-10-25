@@ -416,6 +416,9 @@
                CALL AST_ANNUL( IPLOT, STATUS )
                CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
+*  Free resources.
+               CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
             END IF
 
          END IF

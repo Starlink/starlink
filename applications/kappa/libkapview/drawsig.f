@@ -494,6 +494,9 @@
             CALL MSG_OUT( 'RESULTS', BUFFER, STATUS )
          END IF
 
+*  Free resources
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
       END DO
 
 *  Tidy up.

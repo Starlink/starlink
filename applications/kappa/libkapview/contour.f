@@ -1023,6 +1023,9 @@
      :                    'plotting the key.', STATUS )
          END IF
 
+*  Free resources
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
       END IF
 
 *  Report the heights actually used as they are not always clearly

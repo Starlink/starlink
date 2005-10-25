@@ -672,6 +672,9 @@
 *  Arrive here if an error occurs.
  999  CONTINUE
 
+*  Free resources
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
 *  Shutdown PGPLOT and the graphics database.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 

@@ -1051,6 +1051,9 @@ c         IMODE = 4
      :                    'plotting the key.', STATUS )
          END IF
 
+*  Free resources.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
       END IF
 
 *  Shutdown procedure.

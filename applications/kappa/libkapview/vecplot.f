@@ -833,6 +833,9 @@
          CALL KPS1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, KEYOFF,
      :                    ABS( TYPDAT ), UNITS1, JUST, HGT, STATUS )
 
+*  Free resources.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
       END IF
 
 *  Arrive here if an error occurs.
