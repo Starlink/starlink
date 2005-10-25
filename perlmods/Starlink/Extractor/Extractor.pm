@@ -330,7 +330,6 @@ sub defaults {
   if( ! defined( $self->mag_gamma ) ) { $self->mag_gamma( 4.0 ); }
   if( ! defined( $self->filter ) ) { $self->filter( 'N' ); }
   if( ! defined( $self->verbose_type ) ) { $self->verbose_type( 'QUIET' ); }
-
 }
 
 =item B<temp_dir>
@@ -426,25 +425,50 @@ sub _write_param_temp_file {
 
   print $fh "NUMBER\n";
   print $fh "X_IMAGE\n";
+  print $fh "ERRX2_IMAGE\n";
+  print $fh "XWIN_IMAGE\n";
+  print $fh "ERRX2WIN_IMAGE\n";
   print $fh "Y_IMAGE\n";
+  print $fh "ERRY2_IMAGE\n";
+  print $fh "YWIN_IMAGE\n";
+  print $fh "ERRY2WIN_IMAGE\n";
   print $fh "ALPHA_J2000\n";
   print $fh "DELTA_J2000\n";
+  print $fh "FLUX_ISO\n";
+  print $fh "FLUXERR_ISO\n";
+  print $fh "MAG_ISO\n";
+  print $fh "MAGERR_ISO\n";
+  print $fh "FLUX_APER\n";
+  print $fh "FLUXERR_APER\n";
+  print $fh "MAG_APER\n";
+  print $fh "MAGERR_APER\n";
   print $fh "FLUX_ISOCOR\n";
   print $fh "FLUXERR_ISOCOR\n";
   print $fh "MAG_ISOCOR\n";
   print $fh "MAGERR_ISOCOR\n";
-  print $fh "X2_IMAGE\n";
-  print $fh "Y2_IMAGE\n";
-  print $fh "ERRX2_IMAGE\n";
-  print $fh "ERRY2_IMAGE\n";
+  print $fh "FLUX_AUTO\n";
+  print $fh "FLUXERR_AUTO\n";
+  print $fh "MAG_AUTO\n";
+  print $fh "MAGERR_AUTO\n";
+  print $fh "FLUX_BEST\n";
+  print $fh "FLUXERR_BEST\n";
+  print $fh "MAG_BEST\n";
+  print $fh "MAGERR_BEST\n";
   print $fh "ELLIPTICITY\n";
   print $fh "THETA_IMAGE\n";
-  print $fh "THETA_J2000\n";
+  print $fh "ERRTHETA_IMAGE\n";
+  print $fh "THETA_SKY\n";
+  print $fh "ERRTHETA_SKY\n";
   print $fh "A_IMAGE\n";
+  print $fh "ERRA_IMAGE\n";
   print $fh "B_IMAGE\n";
+  print $fh "ERRB_IMAGE\n";
   print $fh "A_WORLD\n";
+  print $fh "ERRA_WORLD\n";
   print $fh "B_WORLD\n";
+  print $fh "ERRB_WORLD\n";
   print $fh "ISOAREA_IMAGE\n";
+  print $fh "FLAGS\n";
 
   close $fh;
 }
