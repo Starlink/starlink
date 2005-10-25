@@ -6,6 +6,10 @@
 
   <table id="summary">
     <tr>
+      <th>Module Build Status:</th>
+      <td>[% status %]</td>
+    </tr>
+    <tr>
       <th>Log file:</th>
       <td class="logfile"><a href="logs/[% logFilename %]">[% logFilename %]</a></td>
     </tr>
@@ -13,16 +17,15 @@
       <th>Build time:</th>
       <td>[% buildTime %]</td>
     </tr>
-    [% IF status == 'success' or status == 'cache' %]
-      [% IF links.size > 0 %]
+    [% IF links.size > 0 %]
       [% FOREACH links %]
       <tr>
         <th>[%IF loop.index() == 0 %]Links[%END%]</th>
         <td><a href="[% href %]">[% label %]</a></td>
       </tr>
       [% END %]
-      [% END %]
-
+    [% END %]
+    [% IF status == 'success' or status == 'cache' %]
       [% IF artifacts.size > 0 %]
       [% FOREACH artifacts %]
       <tr>

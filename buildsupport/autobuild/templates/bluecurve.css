@@ -149,6 +149,7 @@ table.modules {
 table.modules th {
   width: 100%;
   text-align: left;
+  border: 1px solid #000000;
 }
 
 table.modules td {

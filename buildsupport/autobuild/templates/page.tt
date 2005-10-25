@@ -33,7 +33,7 @@
 
     <table id="status">
       <tr>
-        <th>Status:</th><td class="[% status %]">[%IF status == 'success' %]Good[% ELSE %]Bad[% END %]</td>
+        <th>Overall Build Status:</th><td class="[% status %]">[%IF status == 'success' %]Good[% ELSE %]Bad[% END %]</td>
       </tr>
       <tr>
         <th>Date:</th><td>[% date %]</td>

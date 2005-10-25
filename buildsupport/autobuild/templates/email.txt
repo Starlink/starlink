@@ -1,6 +1,6 @@
 To: [% recipient %]
 From: [% sender %]
-Subject: Auto Build Alert
+Subject: Starlink Nightly Build Alert - [% label %] [% status %]
 
 [% FOREACH modules %]
 Module: [% label %]

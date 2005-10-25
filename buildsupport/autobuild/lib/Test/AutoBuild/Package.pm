@@ -108,11 +108,30 @@ sub md5sum {
 }
 
 
+#sub _stat {
+#    my $self = shift;
+#
+#    my $sb = stat $self->{name};
+#
+#    $self->{last_modified} = $sb->mtime;
+#    $self->{size} = $sb->size;
+#}
+
+# Fix for mtime bug found when building PISA, supplied by
+# Dennis dgregor@redhat.com, Autobuild maintainer.
+
 sub _stat {
     my $self = shift;
-
-    my $sb = stat $self->{name};
-
+                                                                           
+    my $sb;
+    if (-l $self->{name}) {
+        $sb = lstat $self->{name};
+    } else {
+        $sb = stat $self->{name};
+    }
+    if (! defined $sb) {
+        die "could not stat $self->{name}";
+    }
     $self->{last_modified} = $sb->mtime;
     $self->{size} = $sb->size;
 }
