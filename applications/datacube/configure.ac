@@ -34,6 +34,9 @@ dnl    XXX This is very probably redundant.  This check is also now done
 dnl    within STAR_DEFAULTS
 AC_CHECK_LIB(cc_dynamic, restFP)
 
+dnl    The help routine requires SHL
+STAR_DECLARE_DEPENDENCIES([build], [shl pcs], [link])
+
 dnl    Dependences on starlink packages: depends on kappa, figaro and
 dnl    convert for the scripts in the package to work, so these must
 dnl    be declared as `use' dependencies.
