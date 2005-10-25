@@ -81,7 +81,7 @@
 /* Definitions for 64-bits integers                                        */ 
 /* Use 'long' if it is 8 bytes, else use 'long long'                       */
 #if SIZEOF_LONG == 8
-#define INT_BIG "long int";
+#define INT_BIG "long int"
 #define UINT_BIG "unsigned long int"
 #define INT_BIG_S "ld"
 #define INT_BIG_U "lu"
