@@ -57,7 +57,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
    char name[ 100 ];
 
 
-   if( data ) {
+   if( array ) {
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
          lbnd[ i ] = 1;
@@ -94,6 +94,13 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
       for( i = 0; i < el; i++ ) data[ i ] = cupidGC.res[ i ];
+      ndfAnnul( &indf, status );
+
+      sprintf( name, "wgt%d", ii );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.weight[ i ];
       ndfAnnul( &indf, status );
    }
 

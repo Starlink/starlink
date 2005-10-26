@@ -30,11 +30,21 @@ package cupid {
          parameter in {
             position 1
             type NDF
-            access READ
+            access UPDATE
             vpath PROMPT
             ppath GLOBAL
             association <->GLOBAL.DATA_ARRAY
             prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter out {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Output NDF}
+            default !
             helpkey *
           }
 

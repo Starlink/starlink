@@ -15,8 +15,8 @@ CupidGC cupidGC;
 
 
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       void *ipv, unsigned char *ipq, double rms, 
-                       AstKeyMap *config, int velax, int ilevel ){
+                       double *ipv, unsigned char *ipq, double rms, 
+                       AstKeyMap *config, int velax, int ilevel, void *ipo ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -27,8 +27,9 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                            void *ipd, void *ipv, unsigned char *ipq, 
-*                            double rms, AstKeyMap *config, int velax )
+*                            void *ipd, double *ipv, unsigned char *ipq, 
+*                            double rms, AstKeyMap *config, int velax,
+*                            void *ipo )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -60,7 +61,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     ipv
 *        Pointer to the input Variance array, or NULL if there is no Variance
 *        array. The elements should be stored in Fortran order. The data 
-*        type of this array is given by "itype".
+*        type of this array is "double".
 *     ipq
 *        Pointer to the Quality array. The elements should be stored in
 *        Fortran order. If this is not NULL, a mask is written to the
@@ -82,6 +83,11 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display (in range zero to 3).
+*     ipo
+*        Pointer to the output data array, or NULL. The elements should be 
+*        stored in Fortran order. The data type of this array is given by 
+*        "itype". If supplied, it is assumed that the array has been
+*        initialised to hold zero at every pixel.
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -201,8 +207,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
-               cupidGCUpdateArrays( type, res, el, ndim, dims, velax, x );
-
+               cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
+                                    iclump, gcconfig, ipo );
             } 
          }
       }

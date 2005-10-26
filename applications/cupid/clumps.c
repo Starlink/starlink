@@ -93,6 +93,14 @@ void clumps() {
 *
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
+*     OUT = NDF (Write)
+*        Only used if METHOD is GaussClumps. It is an optional output NDF in 
+*        which to store the fitted Gaussian clumps. No output NDF will be 
+*        produced if a null (!) value is supplied. Otherwise, the output NDF 
+*        will be the same shape and size as the input NDF, and will inherit 
+*        its AXIS, WCS and QUALITY components (plus any extensions). The Data 
+*        array will be filled with the sum of the fitted Gaussian models for 
+*        all the clumps which have been found. [!]
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
 
@@ -120,26 +128,14 @@ void clumps() {
 *     name, followed by a dot, followed by the parameter name. Default
 *     values are shown in square brackets:
 *
-*     - GaussClumps.ApertureLmts: Determines the radius at which the Gaussian
-*     weighting function (see GaussClumps.ApertureFWHM) is truncated to zero. 
-*     The supplied parameter value defines another Gaussian equal to the 
-*     initial guess at the Gaussian clump shape, scaled by a factor of 
-*     "sqrt(ApertureLmts)" on each pixel axis. Pixels for which this second
-*     Gaussian has a value less than 0.5 are assigned zero weight.
-*     - GaussClumps.ApertureFWHM: Determines the width of the Gaussian
-*     weighting function used to weight the data around each clump 
-*     during the fitting process. The weighting function is equal to the 
-*     initial guess at the Gaussian clump shape, scaled by a factor of
-*     "sqrt(ApertureFWHM)" on each pixel axis, and truncated to zero at a
-*     point determined by GaussClumps.ApertureLmts. [9.0]
+*     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
+*     pixels. [3.0]
 *     - GaussClumps.FwhmStart: An initial guess at the ratio of the typical 
 *     observed clump size to the instrument beam width. This is used to
 *     determine the starting point for the algorithm which finds the best
 *     fitting Gaussian for each clump. If no value is supplied, the
 *     initial guess at the clump size is based on the local profile
 *     around the pixel with peak value. []
-*     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
-*     pixels. [3.0]
 *     - GaussClumps.MaxClumps: Specifies a termination criterion for
 *     the GaussClumps algorithm. The algorithm will terminate when
 *     "MaxClumps" clumps have been identified, or when one of the other 
@@ -151,6 +147,9 @@ void clumps() {
 *     or equal to "MinIntegral" times the integrated intensity in the
 *     supplied data array, or when one of the other termination criteria 
 *     is met. [0.01]
+*     - GaussClumps.ModelLim: Determines the value at which each Gaussian
+*     model is truncated to zero. Model values below ModelLim times the RMS
+*     noise are treated as zero. [0.5]
 *     - GaussClumps.RMS: The RMS noise in the data. The default value is
 *     determined by the Variance component in the input data. If there is
 *     no Variance component, an estimate of the global noise level in the
@@ -180,6 +179,20 @@ void clumps() {
 *     fitting Gaussian for each clump. If no value is supplied, the
 *     initial guess at the clump velocity width is based on the local profile
 *     around the pixel with peak value. []
+*     - GaussClumps.Wmin: This parameter, together with GaussClumps.Wwidth, 
+*     determines which input data values are used when fitting a Gaussian to 
+*     a given peak in the data array. It specifies the minimum weight
+*     which is to be used (normalised to a maximum weight value of 1.0). 
+*     Pixels with weight smaller than this value are not included in the 
+*     fitting process. [0.05]
+*     - GaussClumps.Wwidth: This parameter, together with GaussClumps.Wmin, 
+*     determines which input data values are used when fitting a Gaussian to 
+*     a given peak in the data array. It is the ratio of the width of the
+*     Gaussian weighting function (used to weight the data around each clump 
+*     during the fitting process), to the width of the initial guess Guassian 
+*     used as the starting point for the Gaussian fitting process. The
+*     Gaussian weighting function has the same centre as the initial guess 
+*     Gaussian. [2.0]
 
 *  Authors:
 *     DSB: David S. Berry
@@ -215,6 +228,7 @@ void clumps() {
    int igrp;                    /* GRP identifier for configuration settings */
    int ilevel;                  /* Interaction level */
    int indf;                    /* Identifier for input NDF */
+   int indf2;                   /* Identifier for output NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
@@ -228,6 +242,7 @@ void clumps() {
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
    void *ipd;                   /* Pointer to Data array */
+   void *ipo;                   /* Pointer to output Data array */
    void *ipq;                   /* Pointer to Quality array */
    
 /* Abort if an error has already occurred. */
@@ -243,13 +258,44 @@ void clumps() {
    parGet0l( "MASK", &mask, status );
 
 /* Get an identifier for the input NDF, opening it with the minimum
-   required access. If required map the quality array. */
+   required access. */
    if( mask ) {
       ndfAssoc( "IN", "UPDATE", &indf, status );
+   } else {
+      ndfAssoc( "IN", "READ", &indf, status );
+   }
+
+/* Choose the data type to use when mapping the NDF Data array. */
+   ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
+             status );
+   if( !strcmp( itype, "_DOUBLE" ) ) {
+      type = CUPID__DOUBLE;
+   } else {
+      type = CUPID__FLOAT;
+   }
+
+/* Determine which algorithm to use. */
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
+             15,  status );
+
+/* GaussClumps can produce an optional output NDF holding the fitted 
+   Gaussians. See if this is necessary. If not, annull the error. If so,
+   map the data array, filling it with zeros. */
+   ipo = NULL;
+   if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
+      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else {
+         ndfMap( indf2, "DATA", itype, "WRITE/ZERO", &ipo, &el, status );
+      }
+   }
+
+/* If required map the input NDFs quality array. */
+   if( mask ) {
       ndfMap( indf, "Quality", "_UBYTE", "WRITE/ZERO", &ipq, &el, 
               status );
    } else {
-      ndfAssoc( "IN", "READ", &indf, status );
       ipq = NULL;
    }
 
@@ -323,21 +369,12 @@ void clumps() {
       }
    }         
 
-/* Choose the data type to use when mapping the NDF Data array. */
-   ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
-             status );
-   if( !strcmp( itype, "_DOUBLE" ) ) {
-      type = CUPID__DOUBLE;
-   } else {
-      type = CUPID__FLOAT;
-   }
-
 /* Map the Data array. */
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
 /* If there is a vriance array, map it and find the global RMS error. */
    ndfState( indf, "VARIANCE", &var, status );
-   if( var ) {   
+   if( var && *status == SAI__OK ) {   
       ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
       for( i = 0; i < el; i++ ) {
@@ -370,9 +407,8 @@ void clumps() {
       }
    }
 
-/* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
-             15,  status );
+/* Abort if an error has occurred. */
+   if( *status != SAI__OK ) goto L999;
 
 /* Read a group of configuration setting. */
    igrp = GRP__NOID;
@@ -393,7 +429,7 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq, 
-                       rms, keymap, velax, ilevel ); 
+                       rms, keymap, velax, ilevel, ipo ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq,

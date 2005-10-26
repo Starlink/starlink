@@ -105,6 +105,9 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 /* Call the minimisation function. */
    pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );
 
+
+   CGEN_FUNCTION(cupidGCDump)( NULL, 0, NULL );
+
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
 

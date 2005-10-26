@@ -115,14 +115,14 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    int rem;               /* Remaining count of pixels */
    int ubnd[ 3 ];         /* Externally ordered upper bounds */
 
-   static double alpha;   /* Ratio of weight function FWHM to observed FWHM */
+   static double wwidth;  /* Ratio of weight function FWHM to observed FWHM */
    static double beamfwhm;/* User supplied beam width in pixels */
    static double beta;    /* Scale factor for used section */
    static double fbeam;   /* Ratio of observed clump size to beam width */
    static double fvel;    /* Ratio of observed clump velocity width to vel res */
    static double velres;  /* User supplied velocity resolution in pixels */
    static double wmin;    /* Minimum weight value to use */
-   static int dax[ 3 ];   /* The external axis indices */
+   static int fax[ 3 ];   /* The internal axis indices */
    static int npar;       /* Number of parameters in fit */
 
 /* Abort if an error has already occurred. */
@@ -170,39 +170,39 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    Set up an array which holds the axis index within the supplied array,
    indexed by the axis numbers used by the fitting algorithm. */
       if( ndim < 3 ) {
-         dax[ 0 ] = 0;
-         dax[ 1 ] = 1;
-         dax[ 2 ] = 2;
+         cupidGC.dax[ 0 ] = 0;
+         cupidGC.dax[ 1 ] = 1;
+         cupidGC.dax[ 2 ] = 2;
 
       } else if( velax == 0 ) {
-         dax[ 0 ] = 1;
-         dax[ 1 ] = 2;
-         dax[ 2 ] = 0;
+         cupidGC.dax[ 0 ] = 1;
+         cupidGC.dax[ 1 ] = 2;
+         cupidGC.dax[ 2 ] = 0;
    
       } else if( velax == 1 ) {
-         dax[ 0 ] = 0;
-         dax[ 1 ] = 2;
-         dax[ 2 ] = 1;
+         cupidGC.dax[ 0 ] = 0;
+         cupidGC.dax[ 1 ] = 2;
+         cupidGC.dax[ 2 ] = 1;
    
       } else {
-         dax[ 0 ] = 0;
-         dax[ 1 ] = 1;
-         dax[ 2 ] = 2;
+         cupidGC.dax[ 0 ] = 0;
+         cupidGC.dax[ 1 ] = 1;
+         cupidGC.dax[ 2 ] = 2;
       }
 
 /* The "fax" array is the inverse of the "dax" array. */
-      cupidGC.fax[ dax[ 0 ] ] = 0; 
-      cupidGC.fax[ dax[ 1 ] ] = 1; 
-      cupidGC.fax[ dax[ 2 ] ] = 2; 
+      fax[ cupidGC.dax[ 0 ] ] = 0; 
+      fax[ cupidGC.dax[ 1 ] ] = 1; 
+      fax[ cupidGC.dax[ 2 ] ] = 2; 
 
 /* Get the ratio of the weighting function FWHM to the observed FWHM. */
-      alpha = cupidConfigD( config, "ALPHA", 2.0 );
+      wwidth = cupidConfigD( config, "WWIDTH", 2.0 );
 
 /* Get the factor which scales the observed FWHM on each axis to
    the half-width of the section of the data array to be be fitted.*/
       wmin = cupidConfigD( config, "WMIN", 0.05 );
       if( wmin < 1.0E-8 ) wmin = 1.0E-8;
-      beta = 0.5*alpha*sqrt( -log( wmin )/ log( 2.0 ) );
+      beta = 0.5*wwidth*sqrt( -log( wmin )/ log( 2.0 ) );
 
 /* The number of free parameters in the fit. */
       npar = ( ndim == 1 ) ? CUPID__GCNP1 : 
@@ -237,9 +237,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Assign these values to the correct elements of cupidGC, taking account
    of the index of the velocity axis in the supplied array (the fitting 
    algorithm assumes that the 3rd axis is the velocity axis). */
-   cupidGC.x_max[ 0 ] = ax_max[ dax[ 0 ] ];
-   cupidGC.x_max[ 1 ] = ax_max[ dax[ 1 ] ];
-   cupidGC.x_max[ 2 ] = ax_max[ dax[ 2 ] ];
+   cupidGC.x_max[ 0 ] = ax_max[ cupidGC.dax[ 0 ] ];
+   cupidGC.x_max[ 1 ] = ax_max[ cupidGC.dax[ 1 ] ];
+   cupidGC.x_max[ 2 ] = ax_max[ cupidGC.dax[ 2 ] ];
 
 /* Store the model centre on internal axis 0 (i.e. axis 0 as used within
    the fitting algorithm). */
@@ -252,9 +252,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    clump is circular as an initial guess). */
    off = 0.0;
    fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                 ax_max, dax[ 0 ], rms, &off );
+                                                 ax_max, cupidGC.dax[ 0 ], rms, &off );
    fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                 ax_max, dax[ 1 ], rms, &off );
+                                                 ax_max, cupidGC.dax[ 1 ], rms, &off );
 
 /* Ensure the observed fwhm on both spatial axes are equal to the mean of
    the values found above. */
@@ -293,7 +293,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    if( ndim > 2 ) {
       par[ 7 ] = cupidGC.x_max[ 2 ];
       fwhm_obs[ 2 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
-                                                 ax_max, dax[ 2 ], rms, &off );
+                                                 ax_max, cupidGC.dax[ 2 ], rms, &off );
       if( fvel != VAL__BADD ) {
          fvel_used = fvel;
       } else {
@@ -325,8 +325,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* Re-order the axes. */
    for( i = 0; i < ndim; i++ ) {
-      cupidGC.lbnd[ i ] = lbnd[ dax[ i ] ];   
-      cupidGC.ubnd[ i ] = ubnd[ dax[ i ] ];   
+      cupidGC.lbnd[ i ] = lbnd[ cupidGC.dax[ i ] ];   
+      cupidGC.ubnd[ i ] = ubnd[ cupidGC.dax[ i ] ];   
    }
    
 /* Ensure we have enough room in the work arrays for the section being
@@ -361,7 +361,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Get the corresponding N-dimensional indices in the input array. This
    allows for any permutation of the pixels axes necessary to make the
    velocity axis the third axis. */
-      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ cupidGC.fax[ iax ] ];
+      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ fax[ iax ] ];
 
 /* Get the corresponding 1-dimensional index into the input array. */
       j = yy[ ndim - 1 ];
@@ -385,7 +385,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
          d2 = 0.0;
          for( iax = 0; iax < ndim; iax++ ) {
-            d = ( xx[ iax ] - cupidGC.x_max[ iax ] )/( fwhm_obs[ dax[ iax ] ]*alpha );
+            d = ( xx[ iax ] - cupidGC.x_max[ iax ] )/( fwhm_obs[ cupidGC.dax[ iax ] ]*wwidth );
             d2 += d*d;
          }
          *pw = exp( -d2*K );
