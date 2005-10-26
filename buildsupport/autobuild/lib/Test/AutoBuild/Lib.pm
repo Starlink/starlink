@@ -539,10 +539,19 @@ sub run {
 
     $output = `$command`;
 
-    if (! defined ($output) || $?) {
-        die "error running '$command': $!\n";
-    }
+# We do not want to exit if a cvs checkout
+# command fails. If a cvs command fails
+# then the build of a module will fail
+# anyway. We may need to exit if other 
+# commands fail though. (S. Rankin, Starlink)
 
+    my @commandarray = split(/ /, $command);
+    
+    if (!($commandarray[0] eq "cvs")){
+     if (! defined ($output) || $?) {
+        die "error running '$command': $!\n";
+     }
+    }
     # print "output: $output\n";
 
     return $output;
@@ -568,7 +577,7 @@ sub _copy {
     }
     foreach (@source) {
         $_ = File::Spec->canonpath($_);
-	if (!-e) {
+	if (!-e && !-l) {
 	    confess "Source file $_ to copy does not exist\n";
 	}
 
