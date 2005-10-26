@@ -172,8 +172,6 @@ paldef device=${plotdev}
 lutgrey device=${plotdev}
 display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
 
-exit
-
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================
 
@@ -223,12 +221,14 @@ endif
 echo " "	 
 echo "      Extracting:"
 echo "        (X,Y) pixel: ${xpix},${ypix}"
+echo " "
 
 # Get the output filename.
 if ( ${gotoutfile} == "FALSE" ) then
    echo -n "NDF output file: "
    set outfile = $<
    set outfile = ${outfile:r}
+   echo " "
 endif
 
 # Extract the spectrum from the cube.
