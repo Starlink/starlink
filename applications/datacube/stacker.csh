@@ -54,10 +54,10 @@
 #       Avoid :r.
 #     2005 October 11 (MJC):
 #       Fixed bug converting the cursor position into negative pixel indices.
-#     {enter_further_changes_here}
 #     2005 October 26 (MJC):
 #       Use STATS to obtain the minimum value of the first spectrum to
 #       define the lower y bound of the plot rather than fix at zero.
+#     {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils

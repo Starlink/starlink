@@ -61,6 +61,9 @@
 #       Avoid :r.
 #     2005 October 11 (MJC):
 #       Fixed bug converting the cursor position into negative pixel indices.
+#     2005 October 26 (MJC):
+#       Use STATS to obtain the minimum value of the first spectrum to
+#       define the lower y bound of the plot rather than fix at zero.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -81,7 +84,7 @@ set tmpdir = "/tmp"
 rm -f ${tmpdir}/${user}/mstk* >& /dev/null
 
 # Do variable initialisation.
-mkdir ${tmpdir}/${user}
+mkdir ${tmpdir}/${user} >& /dev/null
 set curfile = "${tmpdir}/${user}/mstk_cursor.tmp"
 set colfile = "${tmpdir}/${user}/mstk_col"
 touch ${curfile}
@@ -293,6 +296,12 @@ while ( $grpcount <= $numgrp )
    cdiv in="${grpfile}_tmp" out=${grpfile} scalar=${numgrp}
    rm -f ${grpfile}_tmp.sdf >& /dev/null
 
+# Find the minimum in the first spectrum.
+   if ( $grpcount == 1 ) then
+     stats "${grpfile}" >& /dev/null
+     set ybot = `parget minimum stats`
+   endif
+
 # Increment the group counter.
    @ grpcount = $grpcount + 1
 
@@ -349,7 +358,7 @@ while ( $grpcount > 0 )
    echo "        Group: ${grpcount} "
 
    linplot ${outfile} device=${plotdev} style="Colour(curves)=1"\
-           mode=histogram clear=no ybot=0 >& /dev/null
+           mode=histogram clear=no ybot=${ybot} >& /dev/null
 
    @ grpcount = $grpcount - 1
 
@@ -424,7 +433,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
       linplot ${outfile} xleft=${low_z} xright=${upp_z} \
               device=${plotdev} style="Colour(curves)=1" \
-              mode=histogram clear=no ybot=0 >& /dev/null
+              mode=histogram clear=no ybot=${ybot} >& /dev/null
 
       @ grpcount = $grpcount - 1
 
