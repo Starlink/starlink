@@ -77,26 +77,33 @@ sub export {
 
     # Don't support using multiple paths yet
     my $path = $module->paths->[0];	# Path (from the configuration file).
-    
-    my $branch = "HEAD";
 
-    if ($path =~ /(.*):((?:\w|-)+)$/) {
+    if ($path ne ''){
+    
+     my $branch = "HEAD";
+
+     if ($path =~ /(.*):((?:\w|-)+)$/) {
 	$branch = $2;
 	$path = $1;
-    }
+     }
         
-    my $output = $self->_run("cvs checkout -d $name $path");
+     my $output = $self->_run("cvs checkout -d $name $path");
     
-    # Crude change checking - any line which doesn't
-    # look like a directrory traversal message treated
-    # as indicating a change
-    my $changed = 0;
-    foreach (split /\n/, $output) {
+     # Crude change checking - any line which doesn't
+     # look like a directrory traversal message treated
+     # as indicating a change
+     my $changed = 0;
+     foreach (split /\n/, $output) {
 	next if /^cvs server:/;
 	$changed = 1;
-    }
+     }
 
+     return $changed;
+   }
+   else {
+    my $changed = 0;
     return $changed;
+   }
 }
 
 
