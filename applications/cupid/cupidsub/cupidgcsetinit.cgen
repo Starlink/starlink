@@ -17,7 +17,7 @@ extern CupidGC cupidGC;
 #define K 2.772588722239781
 
 
-void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
+void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                                     int *dims, int imax, double rms, 
                                     AstKeyMap *config, int iclump, int velax, 
                                     double *par ){
@@ -29,7 +29,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
 *     Make an initial guess at the Gaussian clump parameters.
 
 *  Synopsis:
-*     void cupidGCSetInit<X>( CGEN_TYPE *array, CGEN_TYPE *var, int ndim, 
+*     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim, 
 *                             int *dims, int imax, double rms, 
 *                             AstKeyMap *config, int iclump, int velax, 
 *                             double *par )
@@ -392,10 +392,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, CGEN_TYPE *var, int ndim,
 
          if( var ) {
             v = var[ j ];
-            if( v != 0.0 && v != CGEN_BAD ) {
+            if( v != 0.0 && v != VAL__BADD ) {
                v = 1.0/v;
-               *pw *= (double) v;
-               sv += (double) v;
+               *pw *= v;
+               sv += v;
                nv++;
             } else {
                *pw = 0.0;
