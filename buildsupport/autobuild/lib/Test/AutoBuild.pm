@@ -547,19 +547,23 @@ sub run
     # Export code from source repository
 
     $0 = "Exporting code from source repositories";
-
+    my $continue_on = 0;
     if ($checkout) {
         foreach my $name (keys %{$modules}) {
             my $module = $modules->{$name};
+            my $my_paths = $module->paths();
+            if ($my_paths ne ''){
+             my $repository = $repositories->{$module->repository()};
+             die "cannot find repository definition for module " . $module->label
+                 unless defined $repository;
 
-            my $repository = $repositories->{$module->repository()};
-            die "cannot find repository definition for module " . $module->label
-                unless defined $repository;
-
-            print "Adding module $name to repository " . $repository->label() . "\n" if $debug;
-            $repository->module($name, $module);
+             print "Adding module $name to repository " . $repository->label() . "\n" if $debug;
+             $repository->module($name, $module);
+            }
+            else {
+              print "Skipping checkout of source code, no checkout path defined for " . $module->label . "\n";
+            }
         }
-
         foreach my $name (keys %{$repositories}) {
             my $repo = $repositories->{$name};
             print "Initializing repository " . $repo->label() . "\n" if $debug;
@@ -568,20 +572,22 @@ sub run
 
         foreach my $name (sort keys %{$modules}) {
             my $module = $modules->{$name};
-
-            if ($debug) {
+            my $my_paths = $module->paths();
+            if ($my_paths ne ''){
+             if ($debug) {
                 print "Checking out $name\n";
-            }
+             }
 
-            my $repository = $repositories->{$module->repository()};
-            die "cannot find repository definition for module " . $module->label
-                unless defined $repository;
+             my $repository = $repositories->{$module->repository()};
+             die "cannot find repository definition for module " . $module->label
+                 unless defined $repository;
 
-            my $changed = $repository->export ($name, $module, $groups);
-	    if ($changed) {
+             my $changed = $repository->export ($name, $module, $groups);
+	     if ($changed) {
 		print "Module " . $module->name() . " changed, so clearing cache\n" if $debug;
-		$cache->clear($module->name());
-	    }
+	        $cache->clear($module->name());
+	     }
+            }
         }
     } else {
         if ($debug) {
