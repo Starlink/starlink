@@ -104,8 +104,10 @@ sub new {
 
     $self->{name} = exists $params{name} ? $params{name} : confess "name parameter is required";
     $self->{label} = exists $params{label} ? $params{label} : confess "label parameter is required";
-    $self->{paths} = exists $params{paths} ? $params{paths} : confess "paths parameter is required";
-    $self->{repository} = exists $params{repository} ? $params{repository} : confess "repository parameter is required";
+    #$self->{paths} = exists $params{paths} ? $params{paths} : confess "paths parameter is required";
+    $self->{paths} = exists $params{paths} ? $params{paths} : '';
+    #$self->{repository} = exists $params{repository} ? $params{repository} : confess "repository parameter is required";
+    $self->{repository} = exists $params{repository} ? $params{repository} : '';
     $self->{links} = exists $params{links} ? $params{links} : [];
     $self->{artifacts} = exists $params{artifacts} ? $params{artifacts} : [];
     $self->{packages} = {};
