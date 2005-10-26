@@ -594,7 +594,7 @@ touch ${curfile}
 # -----------------------
 
 echo " " 
-echo "  Left click on the left hand edge of the FWHM."
+echo "  Left click on the left-hand edge of the FWHM."
 
 cursor showpixel=true style="Colour(marker)=3" plot=mark \
        maxpos=1 marker=2 device=${plotdev} >> ${curfile}
@@ -616,7 +616,7 @@ touch ${curfile}
 # Get the fwhm right side.
 # ------------------------
 
-echo "  Left click on the right hand edge of the FWHM."
+echo "  Left click on the right-hand edge of the FWHM."
 echo " "
 
 cursor showpixel=true style="Colour(marker)=3" plot=mark \
@@ -643,9 +643,6 @@ touch ${curfile}
 # Evaluate the fwhm.
 # ------------------
 
-#set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
 set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
 echo "        FWHM: ${fwhm}"
 echo " "
@@ -844,9 +841,9 @@ while( $y <= ${ubnd[2]} )
             set velocity = `parget posout wcstran`
 
             if ( ${dovar} == "TRUE" ) then
-               echo -n "                         $velocity" 
+               echo -n "                           $velocity" 
             else
-               echo "                         $velocity $vunits" 
+               echo "                           $velocity $vunits" 
             endif
 
             set line = "${line} ${velocity}"
@@ -856,7 +853,7 @@ while( $y <= ${ubnd[2]} )
                if ( ${centre_err} == "nan" || ${centre_err} == "INF" ) then
 
 # Set variance to a null value.
-                  echo " kms^-1"
+                  echo " ${vunits}"
                   set vars = "${vars} -9999.99"
                else
 
@@ -870,19 +867,18 @@ while( $y <= ${ubnd[2]} )
                                
                   set low_err = \
                     `calc exp="'${centre_fit} - ${centre_err}'" prec=_double`
-                  wcstran "ndf=${specfile} posin=${low_err}framein=AXIS " \
+                  wcstran "ndf=${specfile} posin=${low_err} framein=AXIS " \
                           "frameout=SPECTRUM" >& /dev/null
                   set low_vel = `parget posout wcstran`
 
                   set vel_err = \
-                    `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`
-#                   `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
+                    `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
 
                   if ( `echo "if ( $vel_err < 0.0 ) 1" | bc` ) then
-                     set vel_err = `echo "scale = 15; -($vel_err)" | bc`
+                     set vel_err = `calc exp="'-($vel_err)'"`
                   endif
              
-                  echo " +- ${vel_err} kms^-1"
+                  echo " +- ${vel_err} ${vunits}"
                   set vars = "${vars} ${vel_err}"
                endif
             endif  
@@ -1331,9 +1327,6 @@ manual_rezoom:
 
 # Evaluate the fwhm.
 # ------------------
-#        set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#        set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#        set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
          set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
          echo "        FWHM: ${fwhm}"
          echo " "
@@ -1436,7 +1429,7 @@ manual_rezoom:
             echo -n "        Line Velocity: $velocity" 
          else
             echo "        (X,Y) Pixel: ${xpix},${ypix}"
-            echo "        Line Velocity: $velocity kms^-1" 
+            echo "        Line Velocity: $velocity ${vunits}" 
          endif
 
 # Change the pixel value.
@@ -1456,7 +1449,7 @@ manual_rezoom:
             if ( ${centre_err} == "nan" || ${centre_err} == "INF" ) then
 
 # Set the variance to the null value.
-               echo " kms^-1"
+               echo " ${vunits}"
                set vel_err = -9999.99     
             else
 
@@ -1474,14 +1467,13 @@ manual_rezoom:
                set low_vel = `parget posout wcstran`
 
                set vel_err = \
-                 `echo "scale = 15; ((${upp_vel}) - (${low_vel}))/2.0" | bc`
-#                 `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`
+                 `calc exp="'(${upp_vel}-${low_vel})/2.0E+00'" prec=_double`  
 
                if ( `echo "if ( $vel_err < 0.0 ) 1" | bc` ) then
-                  set vel_err = `echo "scale = 15; -($vel_err)" | bc`
-               endif
+                  set vel_err = `calc exp="'-($vel_err)'"`
+                endif
 
-               echo " +- ${vel_err} kms^-1"
+               echo " +- ${vel_err} ${vunits}"
             endif
 
 # Move the output file to a temporary place holder.
