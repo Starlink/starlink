@@ -55,6 +55,9 @@
 #     2005 October 11 (MJC):
 #       Fixed bug converting the cursor position into negative pixel indices.
 #     {enter_further_changes_here}
+#     2005 October 26 (MJC):
+#       Use STATS to obtain the minimum value of the first spectrum to
+#       define the lower y bound of the plot rather than fix at zero.
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
@@ -238,6 +241,12 @@ while ( $counter <= $numspec )
 # Extract the spectrum from the cube.
    ndfcopy "in=${infile}($xpix,$ypix,) out=${specfile} trim=true trimwcs=true"
 
+# Find the minimum in the first spectrum.
+   if ( $counter == 1 ) then
+     stats "${specfile}" >& /dev/null
+     set ybot = `parget minimum stats`
+   endif
+
 # Increment spectrum counter
    @ counter = $counter + 1
 
@@ -293,7 +302,7 @@ while ( $counter > 0 )
    echo "        Spectrum: ${counter} "
 
    linplot ${outfile} device=${plotdev} style="Colour(curves)=1"\
-           mode=histogram clear=no ybot=0 >& /dev/null
+           mode=histogram clear=no ybot=${ybot} >& /dev/null
 
    @ counter = $counter - 1
 
