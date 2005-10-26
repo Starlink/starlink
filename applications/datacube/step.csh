@@ -187,7 +187,8 @@ set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
 set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
 # Inform the user.
-printf "%24s%s\n" "${slabel} bounds" ": ${wlbnd[3]}:${wubnd[3]} ${sunits}"
+echo "        ${slabel} bounds : ${wlbnd[3]}:${wubnd[3]} ${sunits}"
+echo " "
 
 # Obtain step limits and interval.
 # ================================
@@ -207,10 +208,12 @@ if ( ${gotstep} == "FALSE" ) then
    echo -n "${slabel} step size: "
    set chunk = $<
 endif
+echo " "
 
 echo "      Stepping:"
 echo "        Range: ${lower}--${upper} ${sunits}"
 echo "        Step : ${chunk}"
+echo " "
 
 # Setup the current chunk.
 set curr_low = $lower
@@ -224,7 +227,7 @@ set counter = 1
 while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
    echo "      Collapsing:"
    echo "        White-light image: ${dims[1]} x ${dims[2]}"
-   printf "%25s%s\n" "${slabel} bounds" ": ${curr_low}--${curr_upp} ${sunits}"
+   echo "        ${slabel} bounds" ": ${curr_low}--${curr_upp} ${sunits}"
 
 # Collapse the white-light image.
    collapse "in=${infile} out=${colfile} " \
@@ -232,7 +235,6 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
 
 # Check to see whether or not to output the chunk.
    set outfile = "chunk_${counter}"
-   echo " "
    echo "      Output NDF:"
    echo "        File: ${outfile}.sdf"
 
@@ -246,8 +248,9 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
       setaxis "ndf=${outfile} dim=2 mode=wcs comp=Centre" >& /dev/null
       echo "        Axes: Adding AXIS centres."
    endif 
-   settitle "ndf=${outfile} title='${curr_low}--${curr_upp}'" 
-   echo "        Title: Setting to ${curr_low}--${curr_upp}"
+   settitle "ndf=${outfile} title='${curr_low}--${curr_upp} ${sunits}'" 
+   echo "        Title: Setting to ${curr_low}--${curr_upp} ${sunits}"
+   echo " "
 
 # Pause and increment the chunk variables.
    sleep 2

@@ -1,4 +1,4 @@
-4#!/bin/csh
+#!/bin/csh
 #+
 #  Name:
 #     passband.csh
@@ -176,7 +176,7 @@ echo "        Total pixels     : $pixnum"
 
 # Collapse the white-light image.
 echo "      Collapsing:"
-echo "        White light image: ${dims[1]} x ${dims[2]}"
+echo "        White-light image: ${dims[1]} x ${dims[2]}"
 collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
 settitle "ndf=${colfile} title='White-light Image'"
 
@@ -366,7 +366,7 @@ set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 # Inform the user.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-printf "%25s%s\n" "${slabel}" ": ${low}--${upp} $sunits"
+echo "        ${slabel} : ${low}--${upp} $sunits"
 
 # Collapse the white-light image.
 collapse "in=${infile} out=${pasfile} " \
@@ -395,7 +395,7 @@ picsel label="left" device=${plotdev}
 display ${colfile} device=${plotdev} mode=SCALE \
         low='!' high='!' >&/dev/null 
 
-echo "        Right: Passband image (${low} - ${upp})" 
+echo "        Right: Passband image (${low}--${upp} ${sunits})" 
 picsel label="right" device=${plotdev}
 display ${pasfile} device=${plotdev} mode=SCALE \
         low='!' high='!' >&/dev/null 

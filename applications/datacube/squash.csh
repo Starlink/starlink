@@ -171,6 +171,7 @@ echo "        No. of dimensions: ${ndim}"
 echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
 echo "        Pixel bounds     : ${bnd}"
 echo "        Total pixels     : $pixnum"
+echo " "
 
 # Get the spectral range.
 set wlbnd = `parget flbnd ndftrace`
@@ -181,7 +182,7 @@ set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
 set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
 # Inform the user.
-printf "%24s%s\n" "${slabel} bounds" ": ${wlbnd[3]}:${wubnd[3]} ${sunits}"
+echo "        ${slabel} bounds : ${wlbnd[3]}:${wubnd[3]} ${sunits}"
 
 # Get the upper and lower bounds and chunk size.
 if ( ${gotlower} == "FALSE" ) then
@@ -194,9 +195,11 @@ if ( ${gotupper} == "FALSE" ) then
    set upper = $<
 endif
 
+echo " "
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-printf "%25s%s\n" "${slabel} range" ": ${lower}--${upper} ${sunits}"
+echo "        ${slabel} range : ${lower}--${upper} ${sunits}"
+echo " "
 
 # Form and display the collapsed image.
 # =====================================
@@ -222,6 +225,7 @@ if ( ${gotoutfile} == "FALSE" ) then
    echo -n "NDF output file: "
    set outfile = $<
    set outfile =  ${outfile:r}
+   echo " "
 endif
 
 # Output the chunk.
