@@ -1064,7 +1064,7 @@ sub solve {
     my @ndfstars = $ndfcat->stars;
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
-                      map { [ $_, $_->get_magnitude( $filter ) ] } @ndfstars;
+                      map { [ $_, $_->get_flux_quantity(waveband => $filter, type => 'MAG_ISO') ] } @ndfstars;
     @sortedstars = @sortedstars[0..( $self->max_image_obj - 1 )];
     $filtered_ndfcat->pushstar( @sortedstars );
   } else {
@@ -1156,7 +1156,10 @@ sub solve {
   my $ret_filter = $ret_filters[0]; #${${$querycat->stars}->[0]->get_filters}->[0];
   my @filteredstars;
   my $querystars = $querycat->stars;
+
   foreach my $star ( @$querystars ) {
+
+    next if ! defined( $star );
 
     # Hack to get around not being able to write 'undef' values
     # in Cluster format catalogues. We're making an assumption
@@ -1172,7 +1175,11 @@ sub solve {
     # And update the object's WCS.
     $star->wcs( $frameset );
 
-    if( $take_brightest && $star->get_magnitude( $ret_filter ) =~ /^[\d\.]+/ ) {
+    my $flux_quantity = $star->get_flux_quantity( waveband => $ret_filter, type => 'MAG' );
+
+    if( $take_brightest &&
+        defined( $flux_quantity ) &&
+        $flux_quantity =~ /^[\d\.]+/ ) {
       push @filteredstars, $star;
     }
   }
@@ -1180,7 +1187,7 @@ sub solve {
   if( $take_brightest ) {
     @filteredstars = map { $_->[0] }
                      sort { $a->[1] <=> $b->[1] }
-                     map { [ $_, $_->get_magnitude( $ret_filter ) ] } @filteredstars;
+                     map { [ $_, $_->get_flux_quantity( waveband => $ret_filter, type => 'MAG' ) ] } @filteredstars;
     my @newstars = @filteredstars[0..( $self->maxobj - 1 )];
     $filtered_querycat->pushstar( @newstars );
   } else {
@@ -1296,8 +1303,8 @@ sub solve {
 
 # Write the detected object catalogue, if requested.
   if( defined( $self->detected_catalogue ) ) {
-    $ndfcat->write_catalog( Format => 'Cluster',
-                            File => $self->detected_catalogue );
+#    $ndfcat->write_catalog( Format => 'Cluster',
+#                            File => $self->detected_catalogue );
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
