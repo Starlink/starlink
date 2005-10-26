@@ -162,7 +162,7 @@ upp_cont:
 
 # Grab an X-Y position.
    echo " "
-   echo "  Left click to extract spectrum."
+   echo "  Left click to extract a spectrum."
    echo "  Right click to exit program."
   
    cursor showpixel=true style="Colour(marker)=2" plot=mark \
@@ -232,7 +232,7 @@ low_cont:
 
 # Grab an X-Y position.
    echo " "
-   echo "  Left click on to extra spectrum."
+   echo "  Left click to extract a spectrum."
    echo "  Right click to exit program."
 
    cursor showpixel=true style="Colour(marker)=3" plot=mark \
