@@ -377,7 +377,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
       linplot ${outfile} xleft=${low_z} xright=${upp_z}\
               device=${plotdev} style="Colour(curves)=1"\
-              mode=histogram clear=no ybot=0 >& /dev/null
+              mode=histogram clear=no ybot=${ybot} >& /dev/null
 
       @ counter = $counter - 1
 
