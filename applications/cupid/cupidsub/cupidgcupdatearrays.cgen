@@ -44,7 +44,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        external axis ordering (i.e. the axis ordering within the data file).
 *     par
 *        Pointer to an array holding the parameters describing thw Gaussian 
-*         clump to be removed from the residuals array.
+*        clump to be removed from the residuals array. 
 *     rms
 *        The RMS noise level.
 *     iclump
@@ -77,6 +77,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 */      
 
 /* Local Variables: */
+   double bg;             /* Background for model */
    double m;              /* Model value */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
@@ -107,6 +108,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       mlim = cupidConfigD( config, "MODELLIM", 0.5 );
 
    }
+
+/* Temporaily set the backgound of hte model clump to zero. */
+   bg = par[ 1 ];
+   par[ 1 ] = 0.0;
 
 /* Initialise the bounds of the box over which the model Gaussian is to
    be evaluated so that it covers only the pixel containing the peak of
@@ -200,8 +205,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                      if( res[ j ] == CGEN_BAD ) {
                         if( out ) out[ j ] = CGEN_BAD;
 
-/* If the supplied residual is not bad, find the Gaussian model value at the
-   current pixel. */
+/* If the supplied residual is not bad, find the Gaussian model value at
+   the current pixel. This excludes any background level because the
+   background value in "par" was set to zero before entring this loop. */
                      } else {
                         m = cupidGCModel( ndim, xx, par, -1, 1, first );
                         first = 0;
@@ -244,6 +250,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    }
 
    CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );
+
+
+/* Re-instate the original backgound value. */
+   par[ 1 ] = bg;
 
 }
 
