@@ -56,6 +56,40 @@
               <td class="md5sum">[% md5sum %]</td>
             </tr>
           [% END %]
+	  [% IF name == 'starjava' %]
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart/lib/splat.jnlp">Webstart launch SPLAT spectral data analysis tool</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart/lib/treeview.jnlp">Webstart launch TREEVIEW hierarchical data viewer</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart/lib/sog.jnlp">Webstart launch SoG - Son of GAIA</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart/lib/topcat.jnlp">Webstart launch TOPCAT - tools for operations on catalogues and tables</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart/lib/frog.jnlp">Webstart launch FROG - display and analysis of time series data</a></td>
+            </tr>
+	  [% END %]
+	  [% IF name == 'starjava15' %]
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart15/lib/splat.jnlp">Webstart launch SPLAT spectral data analysis tool</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart15/lib/treeview.jnlp">Webstart launch TREEVIEW hierarchical data viewer</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart15/lib/sog.jnlp">Webstart launch SoG - Son of GAIA</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart15/lib/topcat.jnlp">Webstart launch TOPCAT - tools for operations on catalogues and tables</a></td>
+            </tr>
+	    <tr class="[% IF loop.index() % 2 == 0 %]odd[%ELSE%]even[%END%]">
+              <td class="filename"><a href="URL_TO_BUILD_INDEX/webstart15/lib/frog.jnlp">Webstart launch FROG - display and analysis of time series data</a></td>
+            </tr>
+	  [% END %]
         </tbody>
       </table>
     [% ELSE %]

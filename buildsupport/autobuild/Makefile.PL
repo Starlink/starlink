@@ -76,6 +76,7 @@ install ::
 	sed -e \'s#BUILDDIR#$(starlink_build)#g\' starlink/buildworld.sh > starlink/buildworld.sh-tmp
 	sed -e \'s#PREFIX#$(myprefix)#g\' starlink/cronbuild.sh > starlink/cronbuild.sh-tmp
 	sed -e \'s#BUILDDIR#$(starlink_build)#;s#TEMPLATES#$(pkgsysconfdir)/templates#;s#PREFIX#$(myprefix)#g\' starlink/autobuild.xslt > starlink/autobuild.xslt-tmp
+	sed -e \'s#BUILDDIR#$(starlink_build)#g\' templates/email.txt > templates/email.txt-tmp
 	./install-sh -d -m 0755 $(starlink)
 	./install-sh -d -m 0755 $(starlink_build)
 	./install-sh -d -m 0755 $(starlink_build)/temp
@@ -120,11 +121,12 @@ install ::
 	./install-sh -c -m 0644 conf/auto-build.cron-tmp $(pkgsysconfdir)/auto-build.cron;
 	rm -f conf/auto-build.cron-tmp
 	./install-sh -d -m 0755 $(pkgsysconfdir)/templates
-	./install-sh -c -m 0644 templates/*.txt $(pkgsysconfdir)/templates/
+	./install-sh -c -m 0644 templates/email.txt-tmp $(pkgsysconfdir)/templates/email.txt
 	./install-sh -c -m 0644 templates/*.html $(pkgsysconfdir)/templates/
 	./install-sh -c -m 0644 templates/*.tt $(pkgsysconfdir)/templates/
 	./install-sh -c -m 0644 templates/*.css $(pkgsysconfdir)/templates/
 	./install-sh -c -m 0644 templates/*.rss $(pkgsysconfdir)/templates/
+	rm -f templates/email.txt-tmp
 ';
   }
 
