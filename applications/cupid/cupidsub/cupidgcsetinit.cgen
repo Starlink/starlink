@@ -270,6 +270,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    } else {
       fbeam_used = fwhm_obs[ 0 ]/beamfwhm;
    }
+   if( fbeam_used < 1.2 ) fbeam_used = 1.2;
 
 /* Find the initial guess at the intrinsic FWHM (i.e. the FWHM of the
    clump before being blurred by the instrument beam). */
@@ -279,12 +280,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    of the elliptical clump shape. */
    if( ndim > 1 ) {
       par[ 4 ] = cupidGC.x_max[ 1 ];
-      if( fbeam != VAL__BADD ) {
-         fbeam_used = fbeam;
-      } else {
-         fbeam_used = fwhm_obs[ 1 ]/beamfwhm;
-      }
-      par[ 5 ] = sqrt( fbeam_used*fbeam_used - 1.0 )*beamfwhm;
+      par[ 5 ] = par[ 3 ];
       par[ 6 ] = 0.0;
    }
 
@@ -299,6 +295,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       } else {
          fvel_used = fwhm_obs[ 2 ]/velres;
       }
+      if( fvel_used < 1.1 ) fvel_used = 1.1;
       par[ 8 ] = sqrt( fvel_used*fvel_used - 1.0 )*velres;
       par[ 9 ] = 0.0;
       par[ 10 ] = 0.0;
