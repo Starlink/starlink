@@ -106,7 +106,8 @@ sub process {
 
         my $this_url = $url;
         $this_url =~ s/\%m/$name/;
-
+        
+     if ($modules->{$name}->build_status() eq 'failed') {
         my $mod = {
             'label' => $modules->{$name}->label(),
             'status' => $modules->{$name}->build_status(),
@@ -123,6 +124,7 @@ sub process {
             # A module failed
             $success = 0;
         }
+     }
     }
 
     if ( ($success == 0) ||
