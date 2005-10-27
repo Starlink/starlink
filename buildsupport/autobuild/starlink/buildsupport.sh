@@ -1,5 +1,8 @@
 #!/bin/sh
- 
+
+#HOSTNAME
+hostname -f
+
 NAME="Starlink CVS"
  
 # Exit immediately if command fails
