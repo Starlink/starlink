@@ -443,12 +443,16 @@ $(MANIFESTS)/datacube: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
+		$(MANIFESTS)/shl \
 		$(MANIFESTS)/star2html
 	cd applications/datacube \
 	  && $(MAKE_CPT)
