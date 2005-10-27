@@ -69,3 +69,7 @@ make configure-deps
 make world
 
 
+#Do Packaging
+
+TOP_OF_BUILD/starlink/stardev-dist.sh
+
