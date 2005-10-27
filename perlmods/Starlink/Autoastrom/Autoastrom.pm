@@ -1047,7 +1047,6 @@ sub solve {
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
 
-    my @ndfstars = $ndfcat->stars;
     print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
     print "done.\n" if $self->verbose;
   }
@@ -1299,12 +1298,13 @@ sub solve {
                                   );
     $item->coords( $coords );
     $item->wcs( $newwcs );
+    $item->preferred_magnitude_type( 'MAG_APER1' );
   }
 
 # Write the detected object catalogue, if requested.
   if( defined( $self->detected_catalogue ) ) {
-#    $ndfcat->write_catalog( Format => 'Cluster',
-#                            File => $self->detected_catalogue );
+    $ndfcat->write_catalog( Format => 'Cluster',
+                            File => $self->detected_catalogue );
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
