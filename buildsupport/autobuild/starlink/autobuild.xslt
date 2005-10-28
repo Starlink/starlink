@@ -1,8 +1,22 @@
 <xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="text"/>
+  <!-- $flatdeps is the name of the XML file containing the flattened
+       dependency set.  Defaults to file "flatdeps.xml" in the current
+       directory. -->
+  <xsl:param name="flatdeps">flatdeps.xml</xsl:param>
+  
+  <!-- $platform is the name of the platform we're processing.
+       The default is 'UNKNOWN', which isn't very useful. -->
+  <xsl:param name="platform">UNKNOWN</xsl:param>
 
-<xsl:template match="/">
-debug = 0
+  <!-- $vmwareshare is for temporary files.  The default is
+       probably OK -->
+  <xsl:param name="vmwareshare">/home/vmwareshare</xsl:param>
+  
+  <xsl:template match="/">
+  
+debug = 1
 checkout-source = 1
 nice-level = 0
 control-file = PREFIX/build.sh
@@ -14,22 +28,22 @@ abort-on-fail = 0
 # Hostname, if different from that returned by 'hostname' command
 # hostname = builder.example.com
 
-tmp-dir = BUILDDIR/temp
+tmp-dir = PREFIX/build/temp
 
 lock = {
-  file = BUILDDIR/.build.mutex
+  file = PREFIX/build/.build.mutex
   use-flock = 1
 }
 
 build = {
   # This is where we check out the source to (for CVS anyway).
-  home = BUILDDIR/build-home
+  home = PREFIX/build/build-home
 
   # ./configure --prefix=$AUTO_BUILD_ROOT/usr
-  root = BUILDDIR/build-root
+  root = PREFIX/build/build-root
   
   # Cache packages which don't change
-  cache-dir = BUILDDIR/build-cache
+  cache-dir = PREFIX/build/build-cache
   cache = 1
   cache-timestamp = 1
 }
@@ -60,13 +74,37 @@ groups = {
   World = {
       label = World
   }
+  Componentset = {
+      label = Componentset
+  }
+  STARJAVA = {
+      label = STARJAVA
+  }  
+  Applications-test = {
+      label = Applications-test
+  }
+  Libraries-test = {
+      label = Libraries-test
+  }
+  Thirdparty-test = {
+      label = Thirdparty-test
+  }
+  etc-test = {
+      label = etc-test
+  }
+  Java-test = {
+      label = Java-test
+  }  
+  Packaging = {
+      label = Packaging
+  }
 }
 
 # Global environment variables
 env = {
-  USER = vmware
-#  STARCONF_DEFAULT_STARLINK = BUILDDIR/build-root
-#  STARCONF_DEFAULT_PREFIX = BUILDDIR/build-root
+  USER = BUILD_USER
+#  STARCONF_DEFAULT_STARLINK = PREFIX/build/build-root
+#  STARCONF_DEFAULT_PREFIX = PREFIX/build/build-root
 #  PATH = ${STARCONF_DEFAULT_PREFIX}/bin:${PATH}
 #  PATH = ${STARCONF_DEFAULT_PREFIX}/buildsupport/bin:${PATH}
 }
@@ -77,48 +115,69 @@ repositories = {
     label = Starlink Anonymous CVS Server
     module = Test::AutoBuild::Repository::CVS
     env = {
-      CVSROOT = MY_CVS_ROOT
+      CVSROOT = $CVSROOT
     }
   }
 }
 
 # The various package types to distribute
 package-types = {
-#  rpm = {
-#    label = Linux RPMs
-#    spool = BUILDDIR/packages/rpm
-#    extension = .rpm
-#  }
+  rpm = {
+    label = Linux RPMs
+    spool = PREFIX/build/packages/rpm
+    extension = .rpm
+  }
 #  pkg = {
 #    label = Solaris packages
-#    spool = BUILDDIR/packages/pkg
+#    spool = PREFIX/build/packages/pkg
 #    extension = .pkg
 #  }
 #  zip = {
 #    label = ZIP packages
-#    spool = BUILDDIR/packages/zips
+#    spool = PREFIX/build/packages/zips
 #    extension = .zip
 #  }
   tgz = {
     label = Tar+GZip packages
-    spool = BUILDDIR/packages/tars
+    spool = PREFIX/build/packages/tars
     extension = .tar.gz
+  }  
+  tbz2 = {
+    label = Tar+bz2 packages
+    spool = PREFIX/build/packages/tars
+    extension = .tar.bz2
   }
 #  deb = {
 #    label = Debian Packages
-#    spool = BUILDDIR/packages/debian
+#    spool = PREFIX/build/packages/debian
 #    extension = .deb
 #  }
 }
 
 publishers = {
   copy = {
-    label = MYEMAIL
+    label = ussc@star.rl.ac.uk
     module = Test::AutoBuild::Publisher::Copy
   }
 }
 
   modules = {
+    componentset = {
+      label = componentset
+      paths = (
+       .
+      )
+      repository = cvs
+      group = Componentset
+      links = (
+       {
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
+       }
+      )
+      buildroot = PREFIX/build/install-comp
+     controlfile = PREFIX/starlink/buildcomponentset.sh
+    }      
     MakeWorld = {
       label = MakeWorld
       paths = (
@@ -128,11 +187,12 @@ publishers = {
       group = World
       links = (
        {
-         href = MYWWW
-         label = MYHOMEPAGE
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
        }
       )
-      buildroot = BUILDDIR/install
+      buildroot = PREFIX/build/install
+#       buildroot = /stardev
      controlfile = PREFIX/starlink/buildworld.sh
     }      
     buildsupport = {
@@ -144,196 +204,295 @@ publishers = {
       group = Buildsupport
       links = (
        {
-         href = MYWWW
-         label = MYHOMEPAGE
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
        }
-      )
-      depends = (
-       MakeWorld
       )
      controlfile = PREFIX/starlink/buildsupport.sh
     }
-    <xsl:for-each select="componentset/component">
-    <xsl:if test="@id != 'starconf' and @id != 'automake'
-                  and @id != 'autoconf' and @id != 'm4'
-                  and @id != 'libtool' and @id != 'ssn78'
-                  and @status != 'obsolete'">
-      <xsl:value-of select="@id"/> = {
-      label = <xsl:value-of select="@id"/>
+    starjava = {
+      label = starjava
       paths = (
-       <xsl:value-of select="path"/>
+       java
       )
       repository = cvs
-      <xsl:if test="starts-with(path,'applications')">
-      group = Applications
-      </xsl:if>
-      <xsl:if test="starts-with(path,'etc')">
-      group = etc
-      </xsl:if>
-      <xsl:if test="starts-with(path,'libraries')">
-      group = Libraries
-      </xsl:if> 
-      <xsl:if test="starts-with(path,'docs')">
-      group = Docs
-      </xsl:if> 
-      <xsl:if test="starts-with(path,'thirdparty')">
-      group = Thirdparty
-      </xsl:if>
-      <xsl:if test="starts-with(path,'java')">
-      group = Java
-      </xsl:if>                        
+      
+      group = STARJAVA
+                              
       links = (
         {
-         href = MYWWW
-         label = MYHOMEPAGE
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
         }
       )
       depends = (
-        <xsl:for-each select="dependencies/build">
-          <xsl:sort order="ascending"/>
-          <xsl:if test="not(following-sibling::build = .)">
-          <xsl:text>&#10;        </xsl:text>
-          <xsl:value-of select="."/>
-          </xsl:if>
-        </xsl:for-each>
-       <xsl:for-each select="dependencies/sourceset">
-          <xsl:sort order="ascending"/>
-          <xsl:if test="not(following-sibling::sourceset = .)">
-          <xsl:text>&#10;        </xsl:text>
-          <xsl:value-of select="."/>
-          </xsl:if>
-        </xsl:for-each>
-        buildsupport
+        
+         ary
+         ast
+         buildsupport
+         chr
+         cnf
+         ems
+         fio
+         hds
+         hlp
+         htx
+         mers
+         messgen
+         ndf
+         one
+         par
+         pcs
+         prm
+         psx
+         sae
+         sla
+         sst
+         star2html
       )
-      controlfile = PREFIX/starlink/build.sh
+      controlfile = PREFIX/starlink/starjavabuild.sh
     }
+    starjava15 = {
+      label = starjava15
+      paths = (
+       starjava
+      )
+      repository = cvs
+      
+      group = STARJAVA
+                              
+      links = (
+        {
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
+        }
+      )
+      depends = (
+        
+         ary
+         ast
+         buildsupport
+         chr
+         cnf
+         ems
+         fio
+         hds
+         hlp
+         htx
+         mers
+         messgen
+         ndf
+         one
+         par
+         pcs
+         prm
+         psx
+         sae
+         sla
+         sst
+         star2html
+      )
+      controlfile = PREFIX/starlink/starjavabuild15.sh
+    }    
+    rpmspecs = {
+      label = rpmspecs
+      paths = (
+       buildsupport/osx/package
+      )
+      repository = cvs
+      
+      group = Packaging
+                              
+      links = (
+        {
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
+        }
+      )
+      depends = (
+        
+      buildsupport
+      star2html
+      cnf
+      news
+      hlp
+      init
+      scb
+      ifd
+      starx
+      cfitsio
+      htx
+      sla
+      astrom
+      coco
+      rv
+      spt
+      xdisplay
+      jpl
+      psmerge
+      messgen
+      sae
+      prm
+      generic
+      gsd
+      chr
+      ems
+      hds
+      ref
+      ary
+      gwm
+      gks
+      ncar
+      pgp
+      nbs
+      one
+      psx
+      gns
+      sgs
+      snx
+      mers
+      pcs
+      par
+      idi
+      agi
+      mag
+      graphpar
+      grp
+      fio
+      hdstrace
+      sst
+      ast
+      cat
+      ndf
+      img
+      extractor
+      ndg
+      ard
+      extreme
+      shl
+      datacube
+      hdstools
+      icl
+      pgplot
+      echwind
+      trn
+      daophot
+      photom
+      kaplibs
+      pda
+      pisa
+      dipso
+      echomop
+      atools
+      kaprh
+      cursa
+      findcoords
+      pongo
+      figaro
+      convert
+      tsp
+      gaia
+      esp
+      dvi2bitmap
+      sgmlkit
+      info
+      docfind
+      tcl
+      tk
+      kappa
+      itcl
+      polpack
+      jpeg
+      startcl
+      ccdpack
+      MakeWorld
+      )
+      controlfile = PREFIX/starlink/buildpackage.sh
+    }
+    rpms = {
+      label = rpms
+      paths = (
+       buildsupport/osx/package
+      )
+      repository = cvs
+      
+      group = Packaging
+                              
+      links = (
+        {
+         href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
+        }
+      )
+      depends = (
+        
+      rpmspecs
+      )
+      controlfile = PREFIX/starlink/buildrpms.sh
+    }
+    <xsl:for-each select="componentset/component">
+
+    <xsl:variable name="cpt" select="@id"/>
+    <xsl:if test="@id != 'starconf' and @id != 'automake'
+                  and @id != 'autoconf' and @id != 'm4'
+                  and @id != 'libtool' and @status != 'obsolete'">
+    <xsl:value-of select="@id"/> = {
+        label = <xsl:value-of select="@id"/>
+        paths = (
+        <xsl:apply-templates select="path"/>
+        )
+        repository = cvs
+       <xsl:choose>
+      <xsl:when test="starts-with(path,'applications')">
+        group = Applications
+      </xsl:when>
+      <xsl:when test="starts-with(path,'etc')">
+        group = etc
+      </xsl:when>
+      <xsl:when test="starts-with(path,'libraries')">
+        group = Libraries
+      </xsl:when>
+      <xsl:when test="starts-with(path,'docs')">
+        group = Docs
+      </xsl:when>
+      <xsl:when test="starts-with(path,'thirdparty')">
+        group = Thirdparty
+      </xsl:when>
+      <xsl:when test="starts-with(path,'java')">
+        group = Java
+      </xsl:when>
+    </xsl:choose>
+        links = (
+          {
+           href = WEBSITE_HOME_PAGE
+         label = WEBSITE_HOME_PAGE_NAME
+         }
+        )
+       depends = (
+       buildsupport
+       <xsl:if test="document($flatdeps)//component[@id=$cpt]">
+       <xsl:for-each select="document($flatdeps)//component[@id=$cpt]/dependencies/build">
+        <xsl:sort order="ascending"/>
+         <xsl:if test="not(following-sibling::build = .)">
+          <xsl:value-of select="."/><xsl:text>&#10;       </xsl:text>
+         </xsl:if>
+       </xsl:for-each>
+       </xsl:if>
+       )
+      controlfile = PREFIX/starlink/build.sh
+    }            
     </xsl:if>
     </xsl:for-each>
-   
-  }
-  
-# What to do when we finish a run
-output = {
-  # Send an email alert on failure
-  email = {
-    module = Test::AutoBuild::Output::EmailAlert
-    label = Starlink Classic CVS Build
-    options = {
-      template-dir = TEMPLATES
-      url = MYBUILDURL
-      addresses = TOADDRESS
-      smtp_server = SMTPSERVER
-      sender = MYEMAIL
-      send-on-success = true
-    }
-  }
-  # Copy files to a ftp site
-  ftp = {
-    module = Test::AutoBuild::Output::PackageCopier
-    label = FTP Site
-    options = {
-      directory = BUILDDIR/public_ftp
-    }
-  }
-  # Copy files to a HTTP site
-  http = {
-    module = Test::AutoBuild::Output::PackageCopier
-    label = Starlink Development Web
-    options = {
-      directory = BUILDDIR/public_html/dist
-    }
-  }
-  # Copy logs to HTTP site
-  log = {
-    module = Test::AutoBuild::Output::LogCopier
-    label = Build Log Files
-    options = {
-      directory = BUILDDIR/public_html/logs
-    }
-  }
-  # Copy artifacts to HTTP site
-#  artifacts = {
-#    module = Test::AutoBuild::Output::ArtifactCopier
-#    label = Build Artifacts
-#    options = {
-#      directory = BUILDDIR/public_html/artifacts/%m
-#    }
-#  }
-  # Create an ISO image containing several modules
-#  iso = {
-#    module = Test::AutoBuild::Output::ISOBuilder
-#    label = CD ISO image builder
-#    options = {
-#      variables = {
-#        httppath = BUILDDIR/public_html
-#        defaultCSS = bluecurve.css
-#        adminEmail = MYEMAIL
-#        adminName = Build Administrator
-#        title = Continuous Automatic Builder
-#      }
-#      scratch-dir = BUILDDIR/temp
-#      iso-dest-dir = BUILDDIR/public_html/isos
-#      template-dest-dir = BUILDDIR/public_html
-#      template-src-dir = TEMPLATES
-#      files = (
-#          index-iso.html
-#      )
-#      images = {
-#        autobuild-unstable = {
-#          name = autobuild-unstable.iso
-#          label = Test-AutoBuild Unstable
-#          package-types = (
-#            rpm
-#            zip
-#          )
-#          modules = (
-#            autobuild-dev
-#          )
-#        }
-#      }
-#    }
-#  }
-  
-  # Generate HTML status pages
-  status = {
-    module = Test::AutoBuild::Output::HTMLStatus
-    label = Classic CVS Nightly Build Status
-    options = {
-      variables = {
-        httppath = BUILDDIR/public_html
-        defaultCSS = bluecurve.css
-        adminEmail = MYEMAIL
-        adminName = Starlink Software
-        title = Starlink Continuous Automatic Nightly Build
-      }
-      template-src-dir = TEMPLATES
-      template-dest-dir = BUILDDIR/public_html
-# Placeholders in file names are:
-#  %m -> module name
-#  %g -> group
-#  %r -> repository
-#  %p -> package type
-      files = (
-         {
-           src = index-group.html
-           dst = index.html
-         }
-         index-module.html
-         index-repository.html
-         {
-           src = module.html
-           dst = module-%m.html
-         }
-         index.rss
-         bluecurve.css
-         redhat.css
-      )
-    }
-  }
-}
+  </xsl:template>
+ 
+<!--   <xsl:template match="build">
+    <xsl:apply-templates/>
+    <xsl:text>
+</xsl:text>
+  </xsl:template>
 
-# End of file
-
-</xsl:template>
+  <xsl:template match="path">
+    <xsl:apply-templates/>
+  </xsl:template>-->
 
 </xsl:stylesheet>
