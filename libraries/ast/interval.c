@@ -1650,7 +1650,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        Pointer to the Region.
 *     lbnd
 *        Pointer to an array in which to return the lower axis bounds
-*        covered by the Region in the base Frame of the encpauslated
+*        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
 *     ubnd
