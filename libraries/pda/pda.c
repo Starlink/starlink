@@ -24,6 +24,8 @@
 *  History:
 *     12-OCT-2005 (DSB):
 *        Original version.
+*     31-OCT-2005 (DSB):
+*        Added pdaRand and pdaRnnor.
 *     {enter_further_changes_here}
 */
 
@@ -171,4 +173,29 @@ void pdaSumsl( int n, double *d, double *x,
 
    return;
 }
+
+
+
+
+F77_REAL_FUNCTION(pda_rand)( REAL(X) );
+
+float pdaRand(){
+   DECLARE_REAL(X);
+   X = 0;
+   return F77_CALL(pda_rand)( REAL_ARG(&X) );
+}
+
+
+
+F77_REAL_FUNCTION(pda_rnnor)( REAL(MEAN), REAL(SIGMA) );
+
+float pdaRnnor( float mean, float sigma ){
+   DECLARE_REAL(MEAN);
+   DECLARE_REAL(SIGMA);
+   MEAN = mean;
+   SIGMA = sigma;
+   return F77_CALL(pda_rnnor)( REAL_ARG(&MEAN), REAL_ARG(&SIGMA) );
+}
+
+
 

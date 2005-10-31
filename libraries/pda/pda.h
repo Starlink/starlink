@@ -25,6 +25,8 @@
 *  History:
 *     12-OCT-2005 (DSB):
 *        Original version.
+*     31-OCT-2005 (DSB):
+*        Added pdaRand and pdaRnnor.
 */
 
 void pdaSumsl( int, double *, double *, 
@@ -32,5 +34,8 @@ void pdaSumsl( int, double *, double *,
                void (*)( int, double *, int *, double * ),
                int *, int, int, double * );
 
+
+float pdaRand();
+float pdaRnnor( float, float );
 
 #endif
