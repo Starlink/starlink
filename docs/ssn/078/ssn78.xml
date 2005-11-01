@@ -4698,6 +4698,10 @@ SUBDIRS = docs/sun-cxxiii
 The <code>datacube</code> component uses this mechanism to build its
 documentation.</p>
 
+<p>If you need to add extra files to the <code>.htx</code> tarball,
+you can do so via the <code>.extras</code> file described in <ref
+id="macro-latex-documentation"/>.</p>
+
         <p>Sometimes you need to do more elaborate things to build
           your documentation -- the <code>ast</code> component is a
           good example, here.  In this case, you can give a non-null
@@ -6780,9 +6784,7 @@ request that extra files should be added to the
 <code>starnnn.htx_tar</code> archive, you should create a file
 <code>starnnn.htx_tar.extras</code><index>documentation!extra HTX
 files</index> listing the filenames which should be included,
-separated by whitespace (spaces, tabs or newlines).  Though this
-works, it is an unsightly mechanism, which we hope will disappear in
-future.</p>
+separated by whitespace (spaces, tabs or newlines).</p>
 
         </subsect>
 
