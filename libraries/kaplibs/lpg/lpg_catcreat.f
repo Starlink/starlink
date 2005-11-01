@@ -55,6 +55,10 @@
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     1-NOV-2005 (DSB):
+*        Use CTG_CREA1 instead of CAT_CREAT if looping is disabled (CTG
+*        silently deletes any pre-existing output catalogue, but CAT
+*        aborts if it find a pre-existing catalogue).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,9 +133,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If looping is currently disabled, just call CAT_CREAT and exit.
+*  If looping is currently disabled, just call CTG_CREA1 and exit.
       IF( DISAB ) THEN
-         CALL CAT_CREAT( PARAM, CI, STATUS )
+         CALL CTG_CREA1( PARAM, CI, NAME, STATUS )
          GO TO 999
       END IF
 
