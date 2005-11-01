@@ -715,7 +715,7 @@
          END IF
       END IF
 
-*  Subtract the result from the NDF data or write the evaluate the fit.
+*  Subtract the result from the NDF data or write the evaluated fit.
 *  If evaluating, then we need to map in the data component, may as
 *  well release the input one to save VM.
       IF ( .NOT. SUBTRA ) THEN
