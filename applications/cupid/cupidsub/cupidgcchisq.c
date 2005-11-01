@@ -48,9 +48,9 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 *           par[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
 *           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
 *                                                     Gusten)
-*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_1" 
+*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           par[10]: Axis 0 of internal velocity gradient vector ("alpha_1" 
+*           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *     what
 *        If negative, then the chi-squared value is returned. Otherwise, the 
@@ -79,15 +79,20 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 */      
 
 /* Local Variables: */
+   double *pim;            /* Pointer for next initial model value */
+   double *pm;             /* Pointer for storing next model value */
    double *pr;             /* Pointer for storing next scaled residual */
+   double *prs;            /* Pointer for storing next absolute residual */
    double *pw;             /* Pointer to next weight value to use */
    double *py;             /* Pointer to next data value to use */
    double g;               /* Rat eof change of model value */
+   double m;               /* Model value */
    double res;             /* Difference between data and model value */
    double ret;             /* Returned value */
    double rr;              /* A factor for the residual to suppress -ve residuals */
    double t;               /* Temporary storage */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
+   int i;                  /* Parameter index */
    int iax;                /* Axis index */
    int iel;                /* Index of pixel within section currently being fitted */ 
  
@@ -123,6 +128,9 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       py = cupidGC.data;
       pw = cupidGC.weight;
       pr = cupidGC.res;
+      pm = cupidGC.model;
+      prs = cupidGC.resids;
+
       for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
 /* Loop round every element in the section of the data array which is
@@ -132,7 +140,10 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 /* Get the Gaussian model value at the centre of the current pixel. Store 
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
-         res = *py - cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ) );
+         m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ) );
+         *pm = m;
+         res = *py - m;
+         *prs = res;
 
 /* Determine a scale factor which encourages the fitted intensity to stay
    below the observed intensity. This does the same job as the 
@@ -155,6 +166,8 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
          py++;
          pw++;
          pr++;
+         pm++;
+         prs++;
 
 /* Get the grid coords (within the full size original data array) of the
    next pixel in the section currently being fitted. This assumes fortran
@@ -175,7 +188,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 
 /* Modify this basic chi-squared value as described in the Stutski &
    Gusten paper. */
-
       if( ndim == 1 ) {
          t = ( cupidGC.beam_sq > 0.0 ) ? x0_off*x0_off/cupidGC.beam_sq : 0.0;
       } else { 
@@ -184,6 +196,21 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
          if( ndim == 3 && cupidGC.velres_sq > 0.0 ) t += v_off*v_off/cupidGC.velres_sq;
       }
       chisq += cupidGC.sa*pdiff*pdiff + cupidGC.sc4*t;
+
+/* Store diagnostic info */
+      if( cupidGC.nf == 1 ) {
+         for( i = 0; i < 11; i++ ) cupidGC.initpars[ i ] = par[ i ];
+
+         pim = cupidGC.initmodel;
+         pm = cupidGC.model;
+         for( iel = 0; iel < cupidGC.nel; iel++ ) *(pim++) = *(pm++);
+
+      } else {
+         for( i = 0; i < 11; i++ ) cupidGC.pars[ i ] = par[ i ];
+
+      }
+      cupidGC.chisq = chisq;
+
    }
 
 /* Select or calculate the required return value.  If the chi squared
@@ -252,6 +279,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       }
 
    }
+
 
 /* Return the required value */
    return ret;   

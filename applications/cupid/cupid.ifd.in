@@ -130,6 +130,196 @@ package cupid {
 
       }
 
+      action makeclumps {
+
+         helplib {$CUPID_HELP}
+
+         parameter angle {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of spatial position angles in degs}
+            default 0.0 180.0
+            helpkey *
+          }
+
+         parameter back {
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Constant background value}
+            default 1.0 
+            helpkey *
+          }
+
+         parameter beamfwhm {
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Spatial FWHM of instrument beam in pixels}
+            default 2.0 
+            helpkey *
+          }
+
+         parameter fwhm1 {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of FWHMs on pixel axis 1 in pixels}
+            default 10.0 2.0
+            helpkey *
+          }
+
+         parameter fwhm2 {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of FWHMs on pixel axis 2 in pixels}
+            default 10.0 2.0
+            helpkey *
+          }
+
+         parameter fwhm3 {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of FWHMs on pixel axis 3 in pixels}
+            default 10.0 2.0
+            helpkey *
+          }
+
+         parameter lbnd {
+            size *
+            type _INTEGER
+            access READ
+            ppath CURRENT,DEFAULT
+            prompt {Lower pixel bounds of output array}
+            default 1 1
+            helpkey *
+          }
+
+         parameter nclump {
+            type _INTEGER
+            access READ
+            ppath CURRENT,DEFAULT
+            prompt {Number of clumps to create}
+            default 50
+            helpkey *
+          }
+
+         parameter out {
+            type NDF
+            position 1
+            access WRITE
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+
+         parameter outcat {
+            position 2
+            type LITERAL
+            access WRITE
+            prompt {Output catalogue}
+            association ->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter pardist {
+            type LITERAL
+            access READ
+            prompt {Parameter distribution}
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            default Normal
+            helpkey *
+          }
+
+         parameter peak {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of clump peak values}
+            default 20.0 3.0
+            helpkey *
+          }
+
+         parameter rms {
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {RMS noise to add to data}
+            default 0.2 
+            helpkey *
+          }
+
+         parameter trunc {
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Truncation level for clumps}
+            default 0.2 
+            helpkey *
+          }
+
+         parameter ubnd {
+            size *
+            type _INTEGER
+            access READ
+            ppath CURRENT,DEFAULT
+            prompt {Upper pixel bounds of output array}
+            default 200 200
+            helpkey *
+          }
+
+         parameter velfwhm {
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {FWHM of velocity resolution in pixels}
+            default 1.0 
+            helpkey *
+          }
+
+         parameter vgrad1 {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of vel. gradient on axis 1}
+            default 0.0 0.1
+            helpkey *
+          }
+
+         parameter vgrad2 {
+            size 2
+            type _REAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Mean and width of vel. gradient on axis 2}
+            default 0.0 0.1
+            helpkey *
+          }
+
+      }
+
    }
 
    icl {defhelp cupid $CUPID_HELP 0}

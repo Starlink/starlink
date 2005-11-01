@@ -15,7 +15,7 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 # generic .cgen files.
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
 cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
-cupidgccalcf.c cupidgccalcg.c cupidgcdump.c \
+cupidgccalcf.c cupidgccalcg.c cupidgcdump.c cupidranval.c \
 $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la

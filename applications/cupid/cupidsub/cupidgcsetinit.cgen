@@ -212,15 +212,20 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       cupidGC.data = NULL;
       cupidGC.weight = NULL;
       cupidGC.res = NULL;
+
+      cupidGC.model = NULL;
+      cupidGC.initmodel = NULL;
+      cupidGC.resids = NULL;
    }
 
 /* Note the maximum pixel value. */
    cupidGC.ymax = array[ imax ];
 
-/* Note the N-D pixel coords of the maximum pixel value. */
+/* Note the N-D grid coords of the maximum pixel value. */
    if( ndim > 2 ) {
       ax_max[ 2 ] = imax/( dims[ 1 ]*dims[ 0 ] );
       rem = imax - ax_max[ 2 ]*dims[ 1 ]*dims[ 0 ];
+      ax_max[ 2 ]++;
    } else {
       ax_max[ 2 ] = 1;
       rem = imax;
@@ -228,33 +233,31 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
    if( ndim > 1 ) {
       ax_max[ 1 ] = rem/dims[ 0 ];
-      ax_max[ 0 ] = rem - ax_max[ 1 ]*dims[ 0 ];
+      ax_max[ 0 ] = rem - ax_max[ 1 ]*dims[ 0 ] + 1;
+      ax_max[ 1 ]++;
    } else {
-      ax_max[ 1 ] = 0;
-      ax_max[ 0 ] = imax;
+      ax_max[ 1 ] = 1;
+      ax_max[ 0 ] = imax + 1;
    }
-
-/* Assign these values to the correct elements of cupidGC, taking account
-   of the index of the velocity axis in the supplied array (the fitting 
-   algorithm assumes that the 3rd axis is the velocity axis). */
-   cupidGC.x_max[ 0 ] = ax_max[ cupidGC.dax[ 0 ] ];
-   cupidGC.x_max[ 1 ] = ax_max[ cupidGC.dax[ 1 ] ];
-   cupidGC.x_max[ 2 ] = ax_max[ cupidGC.dax[ 2 ] ];
-
-/* Store the model centre on internal axis 0 (i.e. axis 0 as used within
-   the fitting algorithm). */
-   par[ 2 ] = cupidGC.x_max[ 0 ];
 
 /* Get a guess at the observed clump fwhm by forming a radial profile and 
    finding the distance to the first significant minimum. This also increments 
-   "off" by the minimum (i.e. base line) data value in the profile. DO
+   "off" by the minimum (i.e. base line) data value in the profile. Do
    this for both spatial axes, and then take the mean (i.e. we assume the
-   clump is circular as an initial guess). */
+   clump is circular as an initial guess), and assigns the centroid of
+   the profile to cupidGC.x_max[ iax ] (GRID coords). */
    off = 0.0;
    fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                 ax_max, cupidGC.dax[ 0 ], rms, &off );
+                                                ax_max, cupidGC.dax[ 0 ], 
+                                                rms, &off, cupidGC.x_max );
+
    fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                 ax_max, cupidGC.dax[ 1 ], rms, &off );
+                                                ax_max, cupidGC.dax[ 1 ], 
+                                                rms, &off, cupidGC.x_max + 1 );
+
+/* Store the model centroid on internal axis 0 (i.e. axis 0 as used within
+   the fitting algorithm). */
+   par[ 2 ] = cupidGC.x_max[ 0 ];
 
 /* Ensure the observed fwhm on both spatial axes are equal to the mean of
    the values found above. */
@@ -287,9 +290,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Now do the same for the third (velocity) axis if necessary. Assume
    zero velocity gradient. */
    if( ndim > 2 ) {
-      par[ 7 ] = cupidGC.x_max[ 2 ];
       fwhm_obs[ 2 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
-                                                 ax_max, cupidGC.dax[ 2 ], rms, &off );
+                                                 ax_max, cupidGC.dax[ 2], rms, 
+                                                 &off, cupidGC.x_max + 2  );
+      par[ 7 ] = cupidGC.x_max[ 2 ];
       if( fvel != VAL__BADD ) {
          fvel_used = fvel;
       } else {
@@ -312,8 +316,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       lbnd[ i ] = ax_max[ i ] - beta*fwhm_obs[ i ];
       ubnd[ i ] = ax_max[ i ] + beta*fwhm_obs[ i ];
 
-      if( lbnd[ i ] < 0 ) lbnd[ i ] = 0;
-      if( ubnd[ i ] >= dims[ i ] ) ubnd[ i ] = dims[ i ] - 1;
+      if( lbnd[ i ] < 1 ) lbnd[ i ] = 1;
+      if( ubnd[ i ] > dims[ i ] ) ubnd[ i ] = dims[ i ];
 
 /* Find the total number of elements in the section. */
       cupidGC.nel *= ( ubnd[ i ] - lbnd[ i ] + 1 );
@@ -351,14 +355,18 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    variance reciprocals. */
    nv = 0;
    sv = 0;
+   
+/* Initialise the largest weight used so far to zero. */
+   f = 0.0;
 
 /* Loop over all pixels in the section to be fitted. */
    for( i = 0; i < cupidGC.nel; i++ ) {
 
 /* Get the corresponding N-dimensional indices in the input array. This
    allows for any permutation of the pixels axes necessary to make the
-   velocity axis the third axis. */
-      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ fax[ iax ] ];
+   velocity axis the third axis. The centre ofhte first pixel has
+   yy=[0,0,0] not [1,1,1]. */
+      for( iax = 0; iax < ndim; iax++ ) yy[ iax ] = xx[ fax[ iax ] ] - 1;
 
 /* Get the corresponding 1-dimensional index into the input array. */
       j = yy[ ndim - 1 ];
@@ -398,7 +406,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                *pw = 0.0;
             }
          }
+
+/* Record the largest weight value. */
+         if( *pw > f ) f = *pw;
+
+/* Increment the sum of the weights.*/
          wsum += *pw;
+
       }
 
 /* Move the pointers on to the next pixel in the section of the data
@@ -418,12 +432,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
    }
 
-/* Normalise the weights, to take out the effect of the variances, and
-   set to zero any weights which are lower than the user supplied lower
+/* Set to zero any weights which are lower than the user supplied lower
    limit. */
-   f = var ? sv/nv : 1.0;
-   wsum /= f;
-
    pw = cupidGC.weight;
    for( i = 0; i < cupidGC.nel; i++, pw++ ) {
       *pw /= f;
@@ -431,7 +441,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    }
 
 /* Store the number of degrees of freedom. */  
-   cupidGC.ndf = wsum - npar;
+   cupidGC.ndf = wsum/f - npar;
+   if( cupidGC.ndf < 2 ) cupidGC.ndf = 2.0;
 
 /* Store the number of invocations oc cupidGCcalcf so far. */  
    cupidGC.nf = -1;
@@ -442,5 +453,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    par[ 1 ] /= rms;
    par[ 0 ] /= rms;
 
-}
+/* Set up extra diagnostic info. */
+   cupidGC.initmodel = astGrow( cupidGC.initmodel, cupidGC.nel, sizeof( double ) );
+   cupidGC.model = astGrow( cupidGC.model, cupidGC.nel, sizeof( double ) );
+   cupidGC.resids = astGrow( cupidGC.resids, cupidGC.nel, sizeof( double ) );
 
+}

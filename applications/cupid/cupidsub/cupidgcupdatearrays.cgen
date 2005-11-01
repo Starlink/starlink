@@ -1,6 +1,5 @@
 #include "sae_par.h"
 #include "cupid.h"
-#include "ast.h"
 
 /* Global Variables: */
 /* ================= */
@@ -12,7 +11,7 @@ extern CupidGC cupidGC;
 
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                                          int *dims, double *par, double rms,
-                                         int iclump, AstKeyMap *config, 
+                                         double mlim, int imax, 
                                          CGEN_TYPE *out ){
 
 /*
@@ -26,15 +25,14 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *  Synopsis:
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
 *                                  int *dims, double *par, double rms,
-*                                  int iclump, AstKeyMap *config, 
-*                                  CGEN_TYPE *out )
+*                                  double mlim, int imax, CGEN_TYPE *out )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array.
 
 *  Parameters:
 *     res
-*        Pointer to the start of the residuals array.
+*        Pointer to the start of the residuals array. May be NULL.
 *     nel
 *        The number of elements in the supplied array. 
 *     ndim
@@ -47,12 +45,14 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        clump to be removed from the residuals array. 
 *     rms
 *        The RMS noise level.
-*     iclump
-*        The number of clumps found so far.
-*     config
-*        An AST KeyMap holding tuning parameters for the algorithm.
+*     mlim
+*        The lowest value (normalised to the RMS noise level) at which
+*        model Gaussian should be evaluated.
+*     imax
+*        Index within "res" of highest value (only used if "res" is not
+*        NULL).
 *     out
-*        Pointerto the output array to receive the sum of the Gaussian
+*        Pointer to the output array to receive the sum of the Gaussian
 *        models, or NULL if no output is required.
 
 *  Notes:
@@ -79,6 +79,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Local Variables: */
    double bg;             /* Background for model */
    double m;              /* Model value */
+   CGEN_TYPE r0;          /* Supplied residual at initial peak */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
@@ -92,28 +93,21 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    int lface[ 3 ];        /* Lower bounds of face being evaluated */
    int more;              /* Does the evaluation box need to be extended? */
    int ok;                /* Is the pixel within the bounds of the NDF? */
+   int peakok;            /* Is some of the peak usable? */
    int ubox[ 3 ];         /* Upper bounds of model evaluation box */
    int uface[ 3 ];        /* Upper bounds of face being evaluated */
-
-   static double mlim;    /* Limit to which model should be evaluated */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* Do some initialisation if this is the first clump to be found. */
-   if( iclump == 1 ) {
+/* Note the original value at the initial peak position. */
+   r0 = res ? res[ imax ] : 1.0;
 
-/* Get the lowest value (normalised to the RMS noise level) at which
-   model Gaussian should be evaluated. */
-      mlim = cupidConfigD( config, "MODELLIM", 0.5 );
-
-   }
-
-/* Temporaily set the backgound of hte model clump to zero. */
+/* Temporaily set the backgound of the model clump to zero. */
    bg = par[ 1 ];
    par[ 1 ] = 0.0;
 
-/* Initialise the bounds of the box over which the model Gaussian is to
+/* Initialise the GRID bounds of the box over which the model Gaussian is to
    be evaluated so that it covers only the pixel containing the peak of
    the model. */
    ubox[ 0 ] = lbox[ 0 ] = (int)( par[ 2 ] + 0.5 );
@@ -143,6 +137,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    the model Gaussian does not exceed the user-supplied limit. */   
    more = 1;
    first = 1;
+   peakok = 0;
    while( more ){
       more = 0;
 
@@ -164,10 +159,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
                extend[ iax ][ iedge ] = 0;
 
-/* Set up the pixel bounds of the section representing this face. Also set
-   the pixel cords of the first point to test. Also, get the corresponding 
-   N-dimensional indices in the input array. This allows for any permutation 
-   of the pixels axes necessary to make the velocity axis the third axis. */
+/* Set up the GRID bounds of the section representing this face. Also set
+   the GRID coords of the first point to test. Also, get the corresponding 
+   N-dimensional GRID indices in the input array. This allows for any 
+   permutation of the pixels axes necessary to make the velocity axis the 
+   third axis. */
                for( jax = 0; jax < ndim; jax++ ) {
                   yy[ cupidGC.dax[ jax ] ] = xx[ jax ] = lface[ jax ] = lbox[ jax ];
                   uface[ jax ] = ubox[ jax ];
@@ -188,11 +184,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                   ok = 1;
                   j = 0;
                   for( jax = ndim - 1; jax >= 0; jax-- ) {
-                     if( yy[ jax ] < 0 || yy[ jax ] >= dims[ jax ] ) {
+                     if( yy[ jax ] < 1 || yy[ jax ] > dims[ jax ] ) {
                         ok = 0;
                         break;
                      } else {
-                        j = yy[ jax ] + j*dims[ jax ];
+                        j = yy[ jax ] + j*dims[ jax ] - 1;
                      }
                   }         
 
@@ -202,7 +198,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If the supplied residual is bad at this point, we leave it unchanged
    and set the corresponding output pixel (if any) bad. */
-                     if( res[ j ] == CGEN_BAD ) {
+                     if( res && res[ j ] == CGEN_BAD ) {
                         if( out ) out[ j ] = CGEN_BAD;
 
 /* If the supplied residual is not bad, find the Gaussian model value at
@@ -213,14 +209,18 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                         first = 0;
 
 /* If the model value is higher than the supplied limit, indicate that the
-   face needs to be extended further. */
-                        if( m > mlim ) extend[ iax ][ iedge ] = 1;
+   face needs to be extended further. Indicate that some of the peak at
+   least is above the threshold and on the image. */
+                        if( m > mlim ) {
+                           extend[ iax ][ iedge ] = 1;
+                           peakok = 1;
+                        }
 
 /* Scale the model using the RMS noise so that it has the same
    normalisation as the residuals and input data, and then subtract it
    from the residuals and add it to the output (if any). */
                         m *= rms;
-                        res[ j ] -= (CGEN_TYPE) m;
+                        if( res ) res[ j ] -= (CGEN_TYPE) m;
                         if( out ) out[ j ] += (CGEN_TYPE) m;
                      }
                   }
@@ -249,8 +249,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       }
    }
 
-   CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );
-
+/* Set the specified element of the residuals array bad if the fit was
+   unusable.  This prevents the any subsequent attempt to fit a Gaussian 
+   to the same peak value.*/
+   if( res && ( !peakok || res[ imax ] == r0  ) ) res[ imax ] = CGEN_BAD;
 
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;

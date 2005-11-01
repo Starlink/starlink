@@ -64,9 +64,9 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *           par[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
 *           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
 *                                                     Gusten)
-*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_1" 
+*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           par[10]: Axis 0 of internal velocity gradient vector ("alpha_1" 
+*           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *
 *     what

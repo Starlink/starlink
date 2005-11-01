@@ -71,6 +71,10 @@
 *     9-AUG-2005 (DSB):
 *        Add warning about differing dimensionalities if no alignment is
 *        possible.
+*     1-NOV-2005 (DSB):
+*        Do not issue warning about multiple PIXEL Domains if alignment
+*        is performed in the PIXEL Domain (there is usally an extra PIXEL
+*        Frame in the Plot because KPG1_GDGET adds one).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -248,34 +252,36 @@
          CALL MSG_BLANK( STATUS )
 
 *  Issue a warning if either FrameSet contains another Frame with the
-*  same Domain.
-         WARNED = .FALSE.
-         DO I = 1, AST_GETI( IWCS1, 'NFRAME', STATUS )
-            IF( I .NE. IMAT1 .AND. .NOT. WARNED ) THEN
-               IF( AST_GETC( AST_GETFRAME( IWCS1, I, STATUS ),
-     :                       'Domain', STATUS ) .EQ. DOM ) THEN
-                  CALL MSG_OUT( 'KPG1_ASMRG_2', 'WARNING: More than '//
-     :               'one Frame with this Domain was found in the '//
-     :               'data and so alignment is ambiguous and may be '//
-     :               'incorrect.', STATUS )
-                  WARNED = .TRUE.
+*  same Domain (except for PIXEL, since KPG1_GDGET adds an extra PIXEL
+*  Frame into the Plot).
+         IF( DOM .NE. 'PIXEL' ) THEN
+            WARNED = .FALSE.
+            DO I = 1, AST_GETI( IWCS1, 'NFRAME', STATUS )
+               IF( I .NE. IMAT1 .AND. .NOT. WARNED ) THEN
+                  IF( AST_GETC( AST_GETFRAME( IWCS1, I, STATUS ),
+     :                          'Domain', STATUS ) .EQ. DOM ) THEN
+                     CALL MSG_OUT( 'KPG1_ASMRG_2', 'WARNING: More '//
+     :                  'than one Frame with this Domain was found '//
+     :                  'in the data and so alignment is ambiguous '//
+     :                  'and may be incorrect.', STATUS )
+                     WARNED = .TRUE.
+                  END IF
                END IF
-            END IF
-         END DO
-
-         DO I = 1, AST_GETI( IWCS2, 'NFRAME', STATUS )
-            IF( I .NE. IMAT2 .AND. .NOT. WARNED ) THEN
-               IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ),
-     :                       'Domain', STATUS ) .EQ. DOM ) THEN
-                  CALL MSG_OUT( 'KPG1_ASMRG_3', 'WARNING: More than '//
-     :               'one Frame with this Domain was found in the '//
-     :               'data and so alignment is ambiguous and may be '//
-     :               'incorrect.', STATUS )
-                  WARNED = .TRUE.
+            END DO
+	    
+            DO I = 1, AST_GETI( IWCS2, 'NFRAME', STATUS )
+               IF( I .NE. IMAT2 .AND. .NOT. WARNED ) THEN
+                  IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ),
+     :                          'Domain', STATUS ) .EQ. DOM ) THEN
+                     CALL MSG_OUT( 'KPG1_ASMRG_3', 'WARNING: More '//
+     :                  'than one Frame with this Domain was found '//
+     :                  'in the data and so alignment is ambiguous '//
+     :                  'and may be incorrect.', STATUS )
+                     WARNED = .TRUE.
+                  END IF
                END IF
-            END IF
-         END DO
-
+            END DO
+         END IF
       END IF
 
 *  Get a simplified Mapping connecting the two Frames.

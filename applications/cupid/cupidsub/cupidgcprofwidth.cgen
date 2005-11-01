@@ -4,7 +4,7 @@
 
 double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
                                         int imax, int *ax_max, int ax, 
-                                        double rms, double *off ){
+                                        double rms, double *off, double *cen ){
 /*
 *  Name:
 *     cupidGCProfWidth<X>
@@ -15,7 +15,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *  Synopsis:
 *     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
 *                                 int imax, int *ax_max, int ax, double rms, 
-*                                 double *off )
+*                                 double *off, double *cen )
 
 *  Description:
 *     This functions forms a radial profile of a clump in the supplied
@@ -39,7 +39,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        the array. This is used as the start position for the
 *        radial profile.
 *     ax_max
-*        The N-d axis coordinates corresponding to "imax".
+*        The N-d GRID coordinates corresponding to "imax".
 *     ax
 *        The zero-based index of the pixel axis along which the profile
 *        is to be taken.
@@ -49,6 +49,9 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        Address of a location containing a double value to which to add
 *        the estimate of the background data value (i.e. the minimum value 
 *        in the profile).
+*     cen
+*        A location at which to return an improved estimate of the 
+*        GRID coordinate of the profile peak, on axis "ax".
 
 *  Returned Value:
 *     The FWHM of the profile, in pixels.
@@ -76,6 +79,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* Local Variables: */
    double *profile;      /* Pointer to the profile array */
+   double cs1;           /* Sum of products of pixel index and value */
+   double cs2;           /* Sum of pixel values */
    double ret;           /* Sum of weighted axis values */
    double rlow;          /* Radius at lowest pixel */
    double target;        /* The half-max profile value */
@@ -103,11 +108,15 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    profile[ 0 ] = (double) array[ imax ];
    pel = 0;
 
+/* Initialise the sums needed to estimate the centroid of the peak */
+   cs1 = ax_max[ ax ]*profile[ 0 ];
+   cs2 = profile[ 0 ];
+
 /* Initialise the lowest value found so far in the profile. */
    vlow = profile[ 0 ];
    rlow = 0;
 
-/* Initialise the axis values of the two pixels which are equi-distant
+/* Initialise the GRID axis values of the two pixels which are equi-distant
    from the profile centre along the specified axis.*/
    j1 = ax_max[ ax ];
    j2 = j1;
@@ -133,7 +142,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    significant minimum is found in the profile. */
    while( j1 >= 0 || j2 < dims[ ax ] ) {
 
-/* Increment the axis value of the two pixels which are equi-distant from
+/* Increment the GRID axis value of the two pixels which are equi-distant from
    the profile centre. */
       j1--;
       j2++;
@@ -144,13 +153,14 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       i2 += step;
 
 /* Get the two pixel values. */
-      v1 = ( j1 >= 0 ) ? array[ i1 ] : CGEN_BAD;
-      v2 = ( j2 < dims[ ax ] ) ? array[ i2 ] : CGEN_BAD;
+      v1 = ( j1 > 0 ) ? array[ i1 ] : CGEN_BAD;
+      v2 = ( j2 <= dims[ ax ] ) ? array[ i2 ] : CGEN_BAD;
 
 /* Find the mean of the two values, and store it in the profile. */
       if( v1 != CGEN_BAD ) {
          v = (double) v1;
          nv = 1;
+
       } else {
          v = 0.0;
          nv = 0;
@@ -163,6 +173,14 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       
       v = ( nv > 0 ) ? v/nv : VAL__BADD;
       profile[ ++pel ] = v;
+
+/* If both values are good, increment the sums needed to estimate the
+   centroid of the peak (we require both values to be good in order to
+   keep the centroid unbiased). */
+      if( nv == 2 ) {
+         cs1 += j1*v1 + j2*v2;
+         cs2 += v1 + v2;
+      }
 
 /* If this value is lower than the previous lowest value, remember it. */
       if( v == VAL__BADD ) {
@@ -195,8 +213,11 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       }
    }
 
-/* Increment the supplied offset value.*/
+/* Increment the supplied offset value. */
    *off += vlow;
+
+/* Return the centroid position. */
+   *cen = cs1/cs2;
 
 /* Free resources */
    profile = astFree( profile );

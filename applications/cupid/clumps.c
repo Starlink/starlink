@@ -218,6 +218,7 @@ void clumps() {
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
+   const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
    double rms;                  /* Global rms error in data */
@@ -225,13 +226,15 @@ void clumps() {
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
+   int ifr;                     /* Index of Frame within WCS FrameSet */
    int igrp;                    /* GRP identifier for configuration settings */
    int ilevel;                  /* Interaction level */
-   int indf;                    /* Identifier for input NDF */
    int indf2;                   /* Identifier for output NDF */
+   int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
+   int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
    int size;                    /* Size of the "igrp" group */
@@ -329,26 +332,45 @@ void clumps() {
 /* If the NDF has 3 pixel axes, identify the velocity axis. */
    if( nsig == 3 && astGetI( iwcs, "Naxes" ) == 3 ) {
 
+/* Search all Frames in the FrameSet, starting with the current Frame. */
+      vax = 0;
+      nfr = astGetI( iwcs, "Nframe" );
+      for( ifr = 0; ifr <= nfr && vax == 0; ifr++ ) {
+         if( ifr > 0 ) astSetI( iwcs, "Current", ifr );
+
 /* Check the AST System attribute associated with each axis of the
    current WCS Frame, looking for an axis with a known velocity system. 
    Note the one-based index of the axis when and if found. */
-      vax = 0;
-      for( i = 1; i <= 3; i++ ) {
-         sprintf(attr, "System(%d)", i );
-         sys = astGetC( iwcs, attr );
-         if( sys ) {
-            if( !strcmp( "VRAD", sys ) || 
-                !strcmp( "VOPT", sys ) ||
-                !strcmp( "VELO", sys ) ) {
-               vax = i;
-               break;
+         for( i = 1; i <= 3; i++ ) {
+            sprintf(attr, "System(%d)", i );
+            sys = astGetC( iwcs, attr );
+            if( sys ) {
+               if( !strcmp( "VRAD", sys ) || 
+                   !strcmp( "VOPT", sys ) ||
+                   !strcmp( "VELO", sys ) ) {
+                  vax = i;
+                  break;
+               }
+            }
+         }
+
+/* If no SpecFrame was found, look for an axis labelcontaining a letter
+   "V". */
+         if( vax == 0 ) {
+            for( i = 1; i <= 3; i++ ) {
+               sprintf(attr, "Label(%d)", i );
+               lab = astGetC( iwcs, attr );
+               if( lab && strpbrk( lab, "Vv" ) ){
+                  vax = i;
+                  break;
+               }
             }
          }
       }
 
 /* Identify the pixel axis corresponding to the velocity WCS axis.
    astMapSplit uses one-based axis indices, so we need to convert to and
-   from zero -based for further use. */
+   from zero-based for further use. */
       velax = -1;
       if( vax != 0 ) {
          map = astGetMapping( iwcs, AST__CURRENT, AST__BASE );
@@ -360,11 +382,12 @@ void clumps() {
          }         
       }
 
-/* Report an error if no velocity axis was found. */
-      if( velax == -1 && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRep( "CLUMPS_ERR1", "The supplied NDF does not contain a "
-                 "suitable velocity axis.", status );
+/* Issue a warnining if no velocity axis was found, and use pixel axis 3. */
+      if( velax == -1 ) {
+         velax = 2;
+         msgOut( "", "WARNING: Cannot identify a velocity axis within the "
+                 "supplied NDF. Assuming pixel axis 3 is the velocity axis.", 
+                 status );
          goto L999;
       }
    }         

@@ -123,6 +123,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
+   double mlim;         /* Truncation level for Gaussians */
    double sum;          /* Sum of all residuals */
    double urms;         /* User-supplied RMS noise level */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
@@ -175,6 +176,10 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          msgOut( "", "RMS noise level actually used: ^N", status );
       }
 
+/* Get the lowest value (normalised to the RMS noise level) at which
+   model Gaussian should be evaluated. */
+      mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5 );
+
 /* Initialise the number of clumps found so far. */
       iclump = 0;
 
@@ -208,7 +213,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                    iclump, gcconfig, ipo );
+                                    mlim, imax, ipo );
             } 
          }
       }

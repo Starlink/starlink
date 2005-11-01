@@ -90,6 +90,10 @@ void cupid_mon( int *adam_status ) {
    } else if( !strcmp( name, "CUPIDHELP" ) ) {
       cupidhelp();
 
+/* Create simulated data containing clumps and noise. */
+   } else if( !strcmp( name, "MAKECLUMPS" ) ) {
+      makeclumps();
+
 
 
 

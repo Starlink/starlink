@@ -57,7 +57,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
    }
 
 /* List them */
-   printf( "Clump %d:  chi_sq: %g  pars: ", iclump, chisq );
+   printf( "\nClump %d:  chi_sq: %g  pars: ", iclump, chisq );
    for( i = 0; i < np; i++ ) printf( "%g ", par[ i ] );
    printf("\n");
 

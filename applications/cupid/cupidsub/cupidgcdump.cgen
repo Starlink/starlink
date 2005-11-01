@@ -51,7 +51,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 
 /* Local Variables: */
    CGEN_TYPE *adata;
-   int indf, place, i, el, lbnd[3], ubnd[3];
+   int indf, place, i, el, lbnd[3], ubnd[3], np;
    double *data;
    static int ii = 0;
    char name[ 100 ];
@@ -74,15 +74,26 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 
 
    } else {
-   
+
+      printf("%d: chisq: %g\n", ++ii, cupidGC.chisq );
+
+      np = (cupidGC.ndim==1) ? CUPID__GCNP1 : 
+           ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 ); 
+
+      printf(" Init. pars: " );
+      for( i = 0; i < np; i++ ) printf( "%g ", cupidGC.initpars[ i ] );
+      printf("\n" );
+
+      printf(" Final pars: " );
+      for( i = 0; i < np; i++ ) printf( "%g ", cupidGC.pars[ i ] );
+      printf("\n" );
+
       for( i = 0; i < cupidGC.ndim; i++ ) {
          lbnd[ i ] = cupidGC.lbnd[ i ];
          ubnd[ i ] = cupidGC.ubnd[ i ];
       }
-   
-   
-      sprintf( name, "data%d", ++ii );
-      printf("Dumping %s\n", name );
+
+      sprintf( name, "data%d", ii );
       ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
@@ -93,7 +104,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
       ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
-      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.res[ i ];
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.resids[ i ];
       ndfAnnul( &indf, status );
 
       sprintf( name, "wgt%d", ii );
@@ -101,6 +112,20 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
       for( i = 0; i < el; i++ ) data[ i ] = cupidGC.weight[ i ];
+      ndfAnnul( &indf, status );
+
+      sprintf( name, "initmodel%d", ii );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.initmodel[ i ];
+      ndfAnnul( &indf, status );
+
+      sprintf( name, "model%d", ii );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.model[ i ];
       ndfAnnul( &indf, status );
    }
 
