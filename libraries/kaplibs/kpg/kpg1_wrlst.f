@@ -27,6 +27,10 @@
 *     otherwise the original Base Frame within the supplied FrameSet. The
 *     positions can be supplied within any of the Frames in the FrameSet
 *     and will be Mapped into the required Frame if necessary.
+*
+*     If the ID atttribute of the FrameSet is set to "FIXED_BASE", then
+*     the user is not allowed to change the base Frame using parameters 
+*     CATFRAME and CATEPOCH.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -81,6 +85,10 @@
 *        properly.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     1-NOV-2005 (DSB):
+*        Allow the calling application to supress the use of the CATEPOCH
+*        and CATFRAME parameters by setting the FrameSet ID attribute to
+*        "FIXED_BASE".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,9 +140,10 @@
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  If the input FrameSet has more than 1 Frame, allow the user to select an alternative 
-*  base Frame. 
-      IF( AST_GETI( IWCS, 'NFRAME', STATUS ) .GT. 1 ) THEN
+*  If the input FrameSet has more than 1 Frame, and its ID attribute is
+*  not "FIXED_BASE", allow the user to select an alternative base Frame. 
+      IF( AST_GETI( IWCS, 'NFRAME', STATUS ) .GT. 1 .AND.
+     :    AST_GETC( IWCS, 'ID', STATUS ) .NE. 'FIXED_BASE' ) THEN
 
 *  Note the original base and current Frames.
          IBASE = AST_GETI( IWCS, 'BASE', STATUS )
@@ -166,7 +175,9 @@
          MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 
      :                                       STATUS ), STATUS )
  
-*  Use a UnitMap if there is only 1 Frame in the FrameSet.
+*  Use a UnitMap if there is only 1 Frame in the FrameSet, or if changing
+*  of the base Frame has been suppressed by setting the FrameSet's ID
+*  attribute to "FIXED_BASE".
       ELSE
          MAP = AST_UNITMAP( AST_GETI( IWCS, 'NIN', STATUS ), ' ',
      :                      STATUS )
