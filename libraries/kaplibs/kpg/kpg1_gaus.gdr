@@ -60,6 +60,8 @@
 *        reduced to reflect the variance-reducing effect of smoothing.
 *     A( NX, NY ) = ? (Given)
 *        Array containing the input image to be smoothed.
+*     B( NX, NY ) = ? (Returned)
+*        Array to receive the smoothed output image.
 *     BADOUT = LOGICAL (Returned)
 *        Whether there are bad pixel values in the output array.
 *     WEIGHT( 2 * IBOX + 1 ) = ? (Returned)

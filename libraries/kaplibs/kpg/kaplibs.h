@@ -29,9 +29,13 @@
 
 #include "ast.h"            
 
-void kpg1Asget( int, int, int, int, int, int *, int *, int *, 
-                AstFrameSet **, int * );
+void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
+void kpg1Fillr( float, int, float *, int * );
+void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
 void kpg1Gtgrp( const char *, int *, int*, int *);
-void kpg1Kymap( int , AstKeyMap **, int * );
+void kpg1Kymap( int, AstKeyMap **, int * );
+void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
+void kpg1Pseed( int * );
+void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 
 #endif
