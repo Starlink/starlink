@@ -46,7 +46,35 @@
 *        NDFs.  If CONFINE is TRUE, the output NDF's dimensions matches
 *        those of the base NDF. [FALSE]
 *     IN = NDF (Read)
-*        The base NDF on to which the other input NDFs will be pasted.
+*        This parameter is either:
+*        a) the base NDF on to which the other input NDFs supplied via
+*        parameters P1 to P25 will be pasted; or
+*        b) a group of input NDFs (of any dimensionality) comprising all
+*        the input NDFs, of which the first is deemed to be the base
+*        NDF, and the remainder are to be pasted in the order supplied.
+*
+*        The group should be given as a comma-separated list, in which 
+*        each list element can be:
+*
+*        - an NDF name, optionally containing wild-cards and/or regular 
+*        expressions ("*", "?", "[a-z]" etc.). 
+*
+*        - the name of a text file, preceded by an up-arrow character
+*        "^".  Each line in the text file should contain a
+*        comma-separated list of elements, each of which can in turn be
+*        an NDF name (with optional wild-cards, etc.), or another file
+*        specification (preceded by an up-arrow).  Comments can be
+*        included in the file by commencing lines with a hash character
+*        "#".
+*
+*        If the value supplied for this parameter ends with a minus
+*        sign "-", then you are re-prompted for further input until
+*        a value is given which does not end with a hyphen.  All the
+*        NDFs given in this way are concatenated into a single group.
+*
+*        For consistency with the old method a), the group can contain
+*        no more than 26 names.
+*
 *     OUT = NDF (Write)
 *        The NDF resulting from pasting of the input NDFs onto the base
 *        NDF.  Its dimensions may be different from the base NDF.  See
@@ -79,17 +107,27 @@
 *     paste aa inset out=bb confine
 *        As the first example except that the bounds of NDF bb match
 *        those of NDF aa.
+*     paste in="aa,inset" out=bb
+*        The same as the first example.
+*     paste in="aa,inset,inset2,inset3" out=bb
+*        The same as the first example, but now two further NDfs
+*        inset2 and inset are also pasted.
 *     paste ccd fudge inset out=ccdc
 *        This pastes the NDF called fudge, followed by NDF inset on to
 *        the arrays in the NDF called ccd to produce the NDF ccdc.  Bad
 *        values are transparent.  The bounds and dimensionality of ccd
 *        may be larger than those of ccdc.
+*     paste in="canvas,^shapes.lis" out=collage confine
+*        This pastes the NDFs listed in the text file shapes.lis in
+*        the order given on the NDF called canvas.  Bad values are
+*        transparent.  The bounds of NDF collage match those of NDF
+*        canvas.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
-*     data structure and propagates all extensions.  Propagation is from
-*     the base NDF.
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an 
+*     NDF data structure and propagates all extensions.  Propagation is 
+*     from the base NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -109,8 +147,11 @@
 *     22-JUN-2004 (DSB):
 *        Correct bounds matching logic for CONFINE=YES case.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2005 November 2 (MJC):
+*        Allowed parameter IN to be a group.  Added examples to
+*        demonstrate this option.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -140,16 +181,19 @@
                                  ! values
       LOGICAL BADVAR             ! Input NDFs' variance may have bad
                                  ! values
-      CHARACTER * ( 2 ) CIN      ! The number of the imnput NDF
-      LOGICAL CONFIN             ! Output NDF is confined to bounds of the
-                                 ! principal input NDF
+      CHARACTER * ( 2 ) CIN      ! The number of the input NDF
+      LOGICAL CONFIN             ! Output NDF is confined to bounds of 
+                                 ! the principal input NDF
       INTEGER DIMSI( NDF__MXDIM, NDFMAX ) ! Dimensions of input NDFs
-      CHARACTER * ( NDF__SZFTP ) DTYPE ! Processing type of the data array
-      CHARACTER * ( NDF__SZFTP ) DTYPEV ! Processing type of the variance array
+      CHARACTER * ( NDF__SZFTP ) DTYPE ! Processing type of the data 
+                                 ! array
+      CHARACTER * ( NDF__SZFTP ) DTYPEV ! Processing type of the 
+                                 ! variance array
       INTEGER ELI                ! Number of elements in an input array
       INTEGER ELO                ! Number of elements in an output array
       LOGICAL EXCLUD( NDFMAX )   ! Input NDF is entirely outside the
                                  ! bounds of the output NDF
+      INTEGER GRPIN              ! GRP id. for group holding input NDFs
       INTEGER I                  ! Loop counter
       INTEGER J                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of an input array
@@ -175,7 +219,8 @@
       CHARACTER * ( 4 ) PNIN     ! Parameter names of each of the input
                                  ! NDFS
       INTEGER PNTRI( 1 )         ! Pointer to input array component
-      INTEGER PNTRO( 1 )         ! Pointer to output data array component
+      INTEGER PNTRO( 1 )         ! Pointer to output data array
+                                 ! component
       INTEGER PNTROQ( 1 )        ! Pointer to output quality component
       INTEGER PNTROV( 1 )        ! Pointer to output variance component
       LOGICAL QUAPRS             ! Variance is present in the NDF
@@ -205,38 +250,62 @@
 *  Obtain the input NDFs.
 *  ======================
 
-*  First the principal NDF.
-      CALL LPG_ASSOC( 'IN', 'READ', NDFI( 1 ), STATUS )
+*  Get a group containing the names of the NDFs to be processed.
+      CALL KPG1_RGNDF( 'IN', NDFMAX, 1, '  Give more NDFs to paste...', 
+     :                 GRPIN, NUMNDF, STATUS )
 
-*  Make a loop to input the NDFs, via parameters IN1, IN2,...  Start an
+*  The options are a) classic method where one principal NDF is supplied
+*  via parameter IN and those to be pasted through parameters P1 to P26.
+*  The modern alternative is to supply a list via GRP, where the first
+*  file is the base and the subsequent frames are pasted in the order
+*  supplied.
+
+*  Classic
+*  -------
+      IF ( NUMNDF .EQ. 1 ) THEN
+
+*  First the principal NDF.
+         CALL NDG_NDFAS( GRPIN, 1, 'READ', NDFI( 1 ), STATUS )
+
+*  Make a loop to input the NDFs, via parameters P1, IP2,...  Start an
 *  error context because a null is used to end the list of NDFs.  Since
 *  the order and bounds given after the NDF name are important, IRG
 *  cannot be used safely.
-      CALL ERR_MARK
-      I = 0
-      DO WHILE ( STATUS .EQ. SAI__OK .AND. I .LT. NDFMAX - 1 )
-         I = I + 1
-         CALL CHR_ITOC( I, CIN, NC )
-         PNIN = 'P'//CIN( :NC )
-         CALL LPG_ASSOC( PNIN, 'READ', NDFI( I + 1 ), STATUS )
-      END DO
+         CALL ERR_MARK
+         I = 0
+         DO WHILE ( STATUS .EQ. SAI__OK .AND. I .LT. NDFMAX - 1 )
+            I = I + 1
+            CALL CHR_ITOC( I, CIN, NC )
+            PNIN = 'P'//CIN( :NC )
+            CALL LPG_ASSOC( PNIN, 'READ', NDFI( I + 1 ), STATUS )
+         END DO
 
 *  Look for the expected null.  Note the first pasted NDF may not be
 *  null as there must be at least one pasted NDF.
-      IF ( STATUS .EQ. PAR__NULL .AND. I .GT. 1 ) THEN
-         CALL ERR_ANNUL( STATUS )
-      END IF
-      CALL ERR_RLSE
+         IF ( STATUS .EQ. PAR__NULL .AND. I .GT. 1 ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
+         CALL ERR_RLSE
        
 *  Record the number of input NDFs.  Make it at least one to prevent
 *  problems exiting.  The number is I, not I-1 because the subtraction
 *  for the extra loop is counteracted by plus one for the principal
 *  NDF, except for the last input NDF as the loop is not entered after
 *  it has been obtained.
-      IF ( I .GE. NDFMAX - 1 ) THEN
-         NUMNDF = NDFMAX
+         IF ( I .GE. NDFMAX - 1 ) THEN
+            NUMNDF = NDFMAX
+         ELSE
+            NUMNDF = MAX( 1, I )
+         END IF
+
+*  Modern
+*  ------
       ELSE
-         NUMNDF = MAX( 1, I )
+         DO I = 1, NUMNDF
+
+*  Obtain identifiers for each NDF.
+            CALL NDG_NDFAS( GRPIN, I, 'READ', NDFI( I ), STATUS )
+         END DO
       END IF
 
 *  Determine the bounds of the output NDF.
@@ -245,8 +314,8 @@
 *  Match the bounds of the input NDFs.  If the output NDF's bounds are
 *  confined to be within the principal NDF's, we first match bounds by
 *  trimming the second and later NDFs with those of the principal NDF.
-*  The principal NDF identifier must be cloned each time because the call
-*  to NDF_MBND will modify its bounds.
+*  The principal NDF identifier must be cloned each time because the 
+*  call to NDF_MBND will modify its bounds.
       IF ( CONFIN ) THEN
          IF ( STATUS .EQ. SAI__OK ) THEN
             DO I = 2, NUMNDF
@@ -554,6 +623,9 @@
 *  Release the input NDF identifier.
          CALL NDF_ANNUL( NDFI( I ), STATUS )
       END DO
+
+*  Delete the group.
+      CALL GRP_DELET( GRPIN, STATUS )
 
 *  Tidy the NDF system.
       CALL NDF_END( STATUS )
