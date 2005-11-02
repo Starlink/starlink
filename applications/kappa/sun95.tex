@@ -1338,7 +1338,7 @@ string.
 
 If you have just created the window, the image will not look much like
 the comet, because the existing colour table is poor.  If we replace
-the table with a greyscale ramp from white to black,
+the table with a grey-scale ramp from white to black,
 
 \small
 \begin{verbatim}
@@ -1355,7 +1355,7 @@ ubiquitous Comet West on the screen.  If, on the other hand, your graphics
 system is set to 16-bit or 24-bit graphics, then the effects of the
 LUTNEG command will only become visible when you next display an image.
 In this case, re-invoking the above DISPLAY command will make the image
-appear correctly with the requested grey scale colour table.
+appear correctly with the requested grey-scale colour table.
 
 
 The \htmlref{ACCEPT keyword}{se:parspeckey} is a very useful feature.
@@ -1586,7 +1586,7 @@ value used in the previous invocation until changed).
 \end{verbatim}
 \normalsize
 
-The relief looks best with a greyscale colour table.  Note that this
+The relief looks best with a grey-scale colour table.  Note that this
 does not affect the colour of the border.  \htmlref{LUTGREY}{LUTGREY}
 is a procedure which calls a more-general application.  Since it is
 the first procedure we've invoked there is a short pause while all the
@@ -8951,7 +8951,7 @@ is used to draw images.  This has the disadvantage that if you want to
 annotate images with captions or axes, plot coloured borders about
 images, plot graphs \emph{etc}, yet simultaneously display images with
 certain colour tables, there may be conflict of interests.  For instance,
-a linear greyscale colour table's first few pens will be almost
+a linear grey-scale colour table's first few pens will be almost
 black.  By default, these same pens, particularly pen 1, are used by
 the graphics system for line graphics, thus any plots will be invisible.
 If you reset colour pen 1 to white, the appearance of your image
@@ -9255,7 +9255,7 @@ If you are dealing with two-dimensional data, \KAPPA\ offers an
 interactive graphical tool for generating ARD files.  To use
 \htmlref{ARDGEN}{ARDGEN} you must first display your data on a device
 with a cursor, such as an X-terminal.  \htmlref{DISPLAY}{DISPLAY} with
-a greyscale lookup table is probably best for doing that. The grey
+a grey-scale lookup table is probably best for doing that.  The grey
 lets you see the coloured overlays clearly.  The following example
 assumes that the current \htmlref{co-ordinate Frame}{se:domains}~ in
 the NDF is PIXEL (\emph{i.e.} pixel co-ordinates).  Consequently all
@@ -11932,13 +11932,13 @@ picture.}
 \menuitem{LUTFC}{
  Loads the standard false-colour lookup table.}
 \menuitem{LUTGREY}{
- Loads the standard greyscale lookup table.}
+ Loads the standard grey-scale lookup table.}
 \menuitem{LUTHEAT}{
  Loads the {\it heat} lookup table.}
 \menuitem{LUTIKON}{
  Loads the default {\it Ikon} lookup table.}
 \menuitem{LUTNEG}{
- Loads the standard negative greyscale lookup table.}
+ Loads the standard negative grey-scale lookup table.}
 \menuitem{LUTRAMPS}{
  Loads the coloured-ramps lookup table.}
 \menuitem{LUTREAD}{
@@ -12293,13 +12293,13 @@ functions as follows.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTGREY}
- Loads the standard greyscale lookup table.
+ Loads the standard grey-scale lookup table.
 \classitem{LUTHEAT}
  Loads the {\it heat\/} lookup table.
 \classitem{LUTIKON}
  Loads the default {\it Ikon\/} lookup table.
 \classitem{LUTNEG}
- Loads the standard negative greyscale lookup table.
+ Loads the standard negative grey-scale lookup table.
 \classitem{LUTRAMPS}
  Loads the coloured-ramps lookup table.
 \classitem{LUTREAD}
@@ -15703,7 +15703,7 @@ KAPPA: \htmlref{ADD}{ADD},
          determine the number of available colours.  No graphics output
          is created by this application.  This parameter is not accessed
          if a null ({\tt{!}}) value is supplied for parameter OUT.  The device
-         must have at least 24 colour indices or greyscale intensities.
+         must have at least 24 colour indices or grey-scale intensities.
          {\tt [}current graphics device{\tt{]}}
       }
       \sstsubsection{
@@ -18477,7 +18477,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The name of the graphics device used to display the image.
-         The device must have at least 24 colour indices or greyscale
+         The device must have at least 24 colour indices or grey-scale
          intensities.  {\tt [}current graphics device{\tt{]}}
       }
       \sstsubsection{
@@ -18516,7 +18516,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          can be controlled using parameter KEYSTYLE, and its horizontal
          position can be controlled using parameter KEYPOS.  If the key is
          required in a different location, set KEY=NO and use application
-         LUTVIEW after displaying the image.  {\tt [TRUE]}
+         \htmlref{LUTVIEW}{LUTVIEW} after displaying the image.  {\tt [TRUE]}
       }
       \sstsubsection{
          KEYPOS = \_REAL (Read)
@@ -28228,7 +28228,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       \sstexamplesubsection{
          lutable hi gr ndf=nebula shade=0 percentiles=[5,90]
       }{
-         This maps the greyscale lookup table via histogram
+         This maps the grey-scale lookup table via histogram
          equalisation between the 5 and 90 percentiles of an NDF called
          nebula to the colour table on the current graphics device
          device.  There is no bias or shading to white or black.
@@ -28476,10 +28476,10 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 \sstroutine{
    LUTGREY
 }{
-   Loads the standard greyscale lookup table
+   Loads the standard grey-scale lookup table
 }{
    \sstdescription{
-      Procedure for loading the standard greyscale \htmlref{lookup table}{se:lookuptables}~ into
+      Procedure for loading the standard grey-scale \htmlref{lookup table}{se:lookuptables}~ into
       the \htmlref{current graphics device}{se:devglobal}~ with linear scaling.
    }
    \sstusage{
@@ -28565,10 +28565,10 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
 \sstroutine{
    LUTNEG
 }{
-   Loads the standard negative greyscale lookup table
+   Loads the standard negative grey-scale lookup table
 }{
    \sstdescription{
-      Procedure for loading the standard greyscale \htmlref{lookup table}{se:lookuptables}~ into
+      Procedure for loading the standard grey-scale \htmlref{lookup table}{se:lookuptables}~ into
       the \htmlref{current graphics device}{se:devglobal}~ with negative linear scaling.
    }
    \sstusage{
@@ -33582,7 +33582,38 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The base NDF on to which the other input NDFs will be pasted.
+         This parameter is either: \\
+         a) the base NDF on to which the other input NDFs supplied via
+         parameters P1 to P25 will be pasted; or \\
+         b) a group of input NDFs (of any dimensionality) comprising all
+         the input NDFs, of which the first is deemed to be the base
+         NDF, and the remainder are to be pasted in the order supplied.
+
+         The group should be given as a comma-separated list, in which 
+         each list element can be:
+
+         \ssthitemlist{
+
+            \sstitem
+            an NDF name, optionally containing wild-cards and/or regular
+            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
+
+            \sstitem
+            the name of a text file, preceded by an up-arrow character {\tt "$\wedge$"}.
+            Each line in the text file should contain a comma-separated list
+            of elements, each of which can in turn be an NDF name (with
+            optional wild-cards, \emph{etc.}), or another file specification
+            (preceded by an up-arrow).  Comments can be included in the file
+            by commencing lines with a hash character {\tt "\#"}.
+
+         }
+         If the value supplied for this parameter ends with a hyphen
+         {\tt "-"}, then you are re-prompted for further input until
+         a value is given which does not end with a hyphen.  All the
+         NDFs given in this way are concatenated into a single group.
+
+         For consistency with the old method a), the group can contain
+         no more than 26 names.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -33600,6 +33631,9 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          as well.  A null value ({\tt{!}}) indicates that there is no NDF.
          NDFs P2 to P25 are defaulted to {\tt{!}}.  At least one NDF must be
          pasted, therefore P1 may not be null.
+
+         P1 to P25 are ignored if the group specified through parameter IN
+         comprises more than one NDF.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -33638,12 +33672,31 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          those of NDF aa.
       }
       \sstexamplesubsection{
+         paste in="aa,inset" out=bb
+      }{
+         The same as the first example.
+      }
+      \sstexamplesubsection{
+         paste in="aa,inset,inset2,inset3" out=bb
+      }{
+         Similar to first example, but now two further NDFs
+         inset2 and inset3 are also pasted.
+      }
+      \sstexamplesubsection{
          paste ccd fudge inset out=ccdc
       }{
          This pastes the NDF called fudge, followed by NDF inset on to
          the arrays in the NDF called ccd to produce the NDF ccdc.  Bad
          values are transparent.  The bounds and dimensionality of ccd
          may be larger than those of ccdc.
+      }
+      \sstexamplesubsection{
+         paste in="canvas,$\wedge$shapes.lis" out=collage confine
+      }{
+         This pastes the NDFs listed in the text file {\tt shapes.lis} in
+         the order given on the NDF called canvas.  Bad values are
+         transparent.  The bounds of NDF collage match those of NDF
+         canvas.
       }
    }
    \sstimplementationstatus{
@@ -49410,6 +49463,16 @@ The following applications have been modified:
          spaces.
       \end{itemize}
 
+   \item [\htmlref{PASTE}{PASTE}] \mbox{}
+      \begin{itemize}
+         \item A list of the input NDFs may now be given as a group
+         through parameter IN, permitting indirection through a text
+	 file.  The first NDF is the base, and subsequent NDFs are
+	 pasted in the order supplied.  The former method, where IN
+	 solely defines the base NDF and the pasted NDFs are specified
+	 through parameters P1 to P25, is still available. 
+      \end{itemize}
+
    \item [\htmlref{REGRID}{REGRID} and \htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
       \begin{itemize}
          \item These applications now have options for using a rebinning
@@ -49596,13 +49659,13 @@ functions as follows.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTGREY}
- Loads the standard greyscale lookup table.
+ Loads the standard grey-scale lookup table.
 \classitem{LUTHEAT}
  Loads the {\it heat\/} lookup table.
 \classitem{LUTIKON}
  Loads the default {\it Ikon\/} lookup table.
 \classitem{LUTNEG}
- Loads the standard negative greyscale lookup table.
+ Loads the standard negative grey-scale lookup table.
 \classitem{LUTRAMPS}
  Loads the coloured-ramps lookup table.
 \classitem{LUTREAD}
