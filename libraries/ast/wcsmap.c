@@ -4649,15 +4649,15 @@ f     AST_WCSMAP = INTEGER
 *        A pointer to the new WcsMap.
 
 *  Examples:
-c     wcsmap = astWcsMap( AST__MER, 2, 1, 2, "" );
-f     WCSMAP = AST_WCSMAP( AST__MER, 2, 1, 2, ' ', STATUS )
+c     wcsmap = astWcsMap( 2, AST__MER, 1, 2, "" );
+f     WCSMAP = AST_WCSMAP( 2, AST__MER, 1, 2, ' ', STATUS )
 *        Creates a WcsMap that implements a FITS-WCS Mercator
 *        projection on pairs of coordinates, with coordinates 1 and 2
 *        representing the longitude and latitude respectively. Note
 *        that the FITS-WCS Mercator projection does not require any
 *        projection parameters.
-c     wcsmap = astWcsMap( AST__COE, 3, 2, 3, "PV3_1=40.0" );
-f     WCSMAP = AST_WCSMAP( AST__COE, 3, 2, 3, 'PV3_1=40.0', STATUS )
+c     wcsmap = astWcsMap( 3, AST__COE, 2, 3, "PV3_1=40.0" );
+f     WCSMAP = AST_WCSMAP( 3, AST__COE, 2, 3, 'PV3_1=40.0', STATUS )
 *        Creates a WcsMap that implements a FITS-WCS conical equal
 *        area projection. The WcsMap acts on points in a 3-dimensional
 *        space; coordinates 2 and 3 represent longitude and latitude
