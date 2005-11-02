@@ -67,14 +67,13 @@
 *        included in the file by commencing lines with a hash character
 *        "#".
 *
-*        If the value supplied for this parameter ends with a minus
-*        sign "-", then you are re-prompted for further input until
-*        a value is given which does not end with a hyphen.  All the
-*        NDFs given in this way are concatenated into a single group.
+*        If the value supplied for this parameter ends with a hyphen
+*        "-", then you are re-prompted for further input until a value
+*        is given which does not end with a hyphen.  All the NDFs
+*        given in this way are concatenated into a single group.
 *
 *        For consistency with the old method a), the group can contain
 *        no more than 26 names.
-*
 *     OUT = NDF (Write)
 *        The NDF resulting from pasting of the input NDFs onto the base
 *        NDF.  Its dimensions may be different from the base NDF.  See
@@ -86,6 +85,9 @@
 *        as well.  A null value (!) indicates that there is no NDF.
 *        NDFs P2 to P25 are defaulted to !.  At least one NDF must be
 *        pasted, therefore P1 may not be null.
+*
+*        P1 to P25 are ignored if the group specified through parameter IN
+*        comprises more than one NDF.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the base NDF to the output NDF. [!]
@@ -110,8 +112,8 @@
 *     paste in="aa,inset" out=bb
 *        The same as the first example.
 *     paste in="aa,inset,inset2,inset3" out=bb
-*        The same as the first example, but now two further NDfs
-*        inset2 and inset are also pasted.
+*        Similar to first example, but now two further NDFs inset2 and
+*        inset3 are also pasted.
 *     paste ccd fudge inset out=ccdc
 *        This pastes the NDF called fudge, followed by NDF inset on to
 *        the arrays in the NDF called ccd to produce the NDF ccdc.  Bad
