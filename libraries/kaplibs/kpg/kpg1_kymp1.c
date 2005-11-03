@@ -5,7 +5,7 @@
 #include "star/grp.h"
 #include "kaplibs_private.h"
 
-void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
+void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 /*
 *  Name:
 *     kpg1Kymp1
@@ -18,7 +18,7 @@ void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status ){
 *     C.
 
 *  Synopsis:
-*     void kpg1Kymp1( int igrp, AstKeyMap **keymap, int *status )
+*     void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status )
 
 *  Description:
 *     This function checks each non-comment, non-blank line in the supplied 

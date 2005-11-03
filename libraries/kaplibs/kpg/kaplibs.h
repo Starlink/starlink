@@ -21,19 +21,23 @@
 
 *  Authors:
 *     DSB: David .S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     29-SEP-2005 (DSB):
 *        Original version.
+*     03-NOV-2005 (TIMJ):
+*        GRP interface now uses struct
 */
 
-#include "ast.h"            
+#include "ast.h"
+#include "star/grp.h"
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Fillr( float, int, float *, int * );
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
-void kpg1Gtgrp( const char *, int *, int*, int *);
-void kpg1Kymap( int, AstKeyMap **, int * );
+void kpg1Gtgrp( const char *, Grp **, int*, int *);
+void kpg1Kymap( Grp*, AstKeyMap **, int * );
 void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
 void kpg1Pseed( int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );

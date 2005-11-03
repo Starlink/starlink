@@ -1,5 +1,6 @@
 #include "f77.h"
 #include "ast.h"
+#include "star/grp.h"
 #include "kaplibs_private.h"
 
 F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
@@ -82,14 +83,16 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
    GENPTR_INTEGER(KEYMAP)
    GENPTR_INTEGER(STATUS)
 
-   int igrp;
+   Grp igrp;
    AstKeyMap *keymap;
    int cstatus;
 
-   F77_IMPORT_INTEGER( *IGRP, igrp );
    F77_IMPORT_INTEGER( *STATUS, cstatus );
 
-   kpg1Kymp1( igrp, &keymap, &cstatus );
+   /* Copy grp id into blank Grp struct */
+   grp1Setid( &igrp, *IGRP, &cstatus );
+
+   kpg1Kymp1( &igrp, &keymap, &cstatus );
 
    F77_EXPORT_INTEGER( astP2I( keymap ), *KEYMAP );
    F77_EXPORT_INTEGER( cstatus, *STATUS );

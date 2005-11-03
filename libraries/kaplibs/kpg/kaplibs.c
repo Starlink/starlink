@@ -20,17 +20,21 @@
 
 *  Authors:
 *     DSB: David S Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     29-SEP-2005 (DSB):
 *        Original version.
+*     03-NOV-2005 (TIMJ):
+*        Update GRP interface
 *     {enter_further_changes_here}
 */
 
 /* Header files. */
 /* ============= */
 #include "f77.h"                 
+#include "star/grp.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
 
@@ -158,8 +162,8 @@ void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
 
 /* ------------------------------- */
 
-void kpg1Kymap( int igrp, AstKeyMap **keymap, int *status ){
-   kpg1Kymp1( igrp, keymap, status );
+void kpg1Kymap( Grp *igrp, AstKeyMap **keymap, int *status ){
+  kpg1Kymp1( igrp, keymap, status );
 }
 
 /* ------------------------------- */

@@ -19,18 +19,23 @@
 
 *  Authors:
 *     DSB: David S Berry
+*     TIMJ: Tim Jenness
 *     {enter_new_authors_here}
 
 *  History:
 *     29-SEP-2005 (DSB):
 *        Original version.
+*     03-NOV-2005 (TIMJ):
+*        Update GRP interface
 *     {enter_further_changes_here}
 */
 
 /* Header files. */
 /* ============= */
-#include "ast.h"                 
+#include "sae_par.h"
+#include "ast.h"
 #include "f77.h"                 
+#include "star/grp.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
 #include <string.h>
@@ -106,15 +111,22 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
 F77_SUBROUTINE(kpg1_gtgrp)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(SIZE),
                             INTEGER(STATUS) TRAIL(PARAM) );
 
-void kpg1Gtgrp( const char *param, int *igrp, int *size, int *status ){
+void kpg1Gtgrp( const char *param, Grp **igrp, int *size, int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
 
    F77_CREATE_CHARACTER(PARAM,strlen( param ));
+
+   /* if *igrp is null we are creating the group from scratch */
+   if (*igrp == NULL) {
+     *igrp = grpInit( status );
+   }
+   IGRP = grp1Getid( *igrp, status );
+   if ( *status != SAI__OK ) return;
+
    F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
-   F77_EXPORT_INTEGER(*igrp,IGRP);
    F77_EXPORT_INTEGER(*status,STATUS);
 
    F77_CALL(kpg1_gtgrp)( CHARACTER_ARG(PARAM),
@@ -124,8 +136,11 @@ void kpg1Gtgrp( const char *param, int *igrp, int *size, int *status ){
                          TRAIL_ARG(PARAM) );
 
    F77_FREE_CHARACTER(PARAM);
-   F77_IMPORT_INTEGER( IGRP, *igrp );
    F77_IMPORT_INTEGER( STATUS, *status );
+
+   /* make sure status is imported before we call a C routine
+      capable of setting status */
+   grp1Setid( *igrp, IGRP, status );
 
    return;
 }
