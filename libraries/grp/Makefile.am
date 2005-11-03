@@ -19,11 +19,11 @@ libgrp_adam_la_SOURCES = \
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
-include_MESSAGES = GRP_ERR
+include_MESSAGES = GRP_ERR grp_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-BUILT_SOURCES = GRP_ERR
+BUILT_SOURCES = GRP_ERR grp_err.h
 
 #  Define test programs.
 TESTS = test1 
