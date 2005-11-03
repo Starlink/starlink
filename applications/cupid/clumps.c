@@ -446,7 +446,7 @@ void clumps() {
    configuration setting, indexed using its name, then delete the GRP group. */
    } else {
       kpg1Kymap( igrp, &keymap, status );
-      grpDelet( igrp, status );      
+      grpDelet( &igrp, status );      
    }
 
 /* Switch for each method */
