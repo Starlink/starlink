@@ -63,7 +63,7 @@ void grpDelet( int *igrp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(STATUS);
 
-   F77_EXPORT_INTEGER( igrp, IGRP );
+   F77_EXPORT_INTEGER( *igrp, IGRP );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
