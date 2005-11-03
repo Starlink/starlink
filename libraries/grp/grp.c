@@ -72,7 +72,7 @@ void grpFree ( Grp ** igrp, int * status ) {
 
 /* Note that it takes a fortran integer as arg */
 void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
-  if ( *status == SAI__OK ) return;
+  if ( *status != SAI__OK ) return;
   if ( igrp == NULL ) {
     *status = GRP__INTER;
     errRep( "GRP1_SETID_ERR", "Grp struct pointer was null in setid",
@@ -83,7 +83,7 @@ void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
 
 /* Note that it takes a fortran integer as arg */
 F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
-  if ( *status == SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
+  if ( *status != SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
   if ( igrp == NULL ) {
     *status = GRP__INTER;
     errRep( "GRP1_GETID_ERR", "Grp struct pointer was null in getid",
