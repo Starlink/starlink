@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
-#include "math.h"
+#include "mers.h"
+#include <math.h>
 
 double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
                                         int imax, int *ax_max, int ax, 
@@ -81,6 +82,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    double *profile;      /* Pointer to the profile array */
    double cs1;           /* Sum of products of pixel index and value */
    double cs2;           /* Sum of pixel values */
+   double cs3;           /* Sum of pixel indicies */
+   double cs4;           /* Number of values summed in cs1, 2 and 3 */
    double ret;           /* Sum of weighted axis values */
    double rlow;          /* Radius at lowest pixel */
    double target;        /* The half-max profile value */
@@ -99,22 +102,15 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return 10;
 
-/* Allocate space for the profile making it the largest it could possibly
-   need to be. */
+/* Allocate space for a copy of teh data row or lumn containing the
+   maximum pixel value. */
    profile = astMalloc( sizeof( double )*dims[ ax ] );
 
-/* Put the maximum data value in the first element of the profile, and 
-   initialise the index of the last element written to. */
-   profile[ 0 ] = (double) array[ imax ];
-   pel = 0;
-
-/* Initialise the sums needed to estimate the centroid of the peak */
-   cs1 = ax_max[ ax ]*profile[ 0 ];
-   cs2 = profile[ 0 ];
-
 /* Initialise the lowest value found so far in the profile. */
-   vlow = profile[ 0 ];
-   rlow = 0;
+   vlow1 = profile[ 0 ];
+   rlow1 = 0;
+   vlow2 = profile[ 0 ];
+   rlow2 = 0;
 
 /* Initialise the GRID axis values of the two pixels which are equi-distant
    from the profile centre along the specified axis.*/
@@ -126,8 +122,11 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    i1 = imax;
    i2 = i1;
 
+/* Put the maximum data value into the profile array. */
+   profile[ j1 ] = (double) array[ imax ];
+
 /* Save the 1D vector step between adjacent pixels on the axis. */
-   if( ax == 0) {
+   if( ax == 0 ) {
       step = 1;
 
    } else if( ax == 1 ) {
@@ -152,35 +151,51 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       i1 -= step;
       i2 += step;
 
-/* Get the two pixel values. */
-      v1 = ( j1 > 0 ) ? array[ i1 ] : CGEN_BAD;
-      v2 = ( j2 <= dims[ ax ] ) ? array[ i2 ] : CGEN_BAD;
+/* If the lower of the two equi-distant points is still within the GRID
+   bounds of the array... */
+      if( j1 > 0 ) {
 
-/* Find the mean of the two values, and store it in the profile. */
-      if( v1 != CGEN_BAD ) {
-         v = (double) v1;
-         nv = 1;
+/* Store the value in the profile. */
+         v1 = array[ i1 ];
+         profile[ j1 ] = v1;
+
+/* If this value is less than any other value found on this side of the
+   peak, then remember it. */
+         if( v1 < vlow1 ) {
+            vlow1 = v1;
+            rlow1 = j1;
+
+/* Otherwise, if this value is more than 3 times the RMS noise higher
+   than the lowest value found so far, we assume that the lowest value
+   found so far is the minimum point in the profile. */
+      } else if( v1 > vlow1 + 3*rms ){
+         j1 = -1;
+
+/* Otherwise, if the lowest pixel has not changed for the past 10 pixels, 
+   assume we have reached the flat bit of the profile. */
+      } else if( rlow1 - j1 > 10 ) {
+         j1 = -1;
+      }
+
+
+
 
       } else {
-         v = 0.0;
-         nv = 0;
+         v1 = CGEN_BAD;
       }
-      
-      if( v2 != CGEN_BAD ) {
-         v += (double) v2;
-         nv++;
-      } 
-      
-      v = ( nv > 0 ) ? v/nv : VAL__BADD;
-      profile[ ++pel ] = v;
 
-/* If both values are good, increment the sums needed to estimate the
-   centroid of the peak (we require both values to be good in order to
-   keep the centroid unbiased). */
-      if( nv == 2 ) {
-         cs1 += j1*v1 + j2*v2;
-         cs2 += v1 + v2;
+      if( j2 <= dims[ ax ] ) {
+         v2 = array[ i2 ];
+         profile[ j2 ] = v2;
+         if( v1 < vlow1 ) {
+            vlow1 = v1;
+            rlow1 = j1;
+         }
+
+      } else {
+         v2 = CGEN_BAD;
       }
+
 
 /* If this value is lower than the previous lowest value, remember it. */
       if( v == VAL__BADD ) {
@@ -202,6 +217,25 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       }
    }
 
+
+
+
+
+
+
+
+/* If both values are good, increment the sums needed to estimate the
+   centroid of the peak (we require both values to be good in order to
+   keep the centroid unbiased). */
+      if( nv == 2 ) {
+         cs1 += j1*v1 + j2*v2;
+         cs2 += v1 + v2;
+         cs3 += j1 + j2;
+         cs4 += 2.0;
+      }
+
+
+
 /* Find the radius at half the maximum value. */
    target = 0.5*( profile[ 0 ] - vlow ) + vlow;
    for( i2 = 0; i2 <= rlow; i2++ ) {
@@ -213,11 +247,40 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       }
    }
 
+
+
+
+
+/* Initialise the sums needed to estimate the centroid of the peak */
+   cs1 = ax_max[ ax ]*profile[ 0 ];
+   cs2 = profile[ 0 ];
+   cs3 = ax_max[ ax ];
+   cs4 = 1.0;
+
+
+
+
+
 /* Increment the supplied offset value. */
    *off += vlow;
 
 /* Return the centroid position. */
-   *cen = cs1/cs2;
+   if( cs2 != cs4*vlow ) {   
+      *cen = ( cs1 - vlow*cs3 )/( cs2 - cs4*vlow );
+
+      if( fabs( *cen - ax_max[ ax ] ) > 5 ) {
+         *status = SAI__ERROR;
+         msgSeti( "AX", ax );
+         msgSeti( "AXM", ax_max[ ax ] );
+         msgSetd( "C", *cen );
+         errRep( "", "cupidGCProfWidth: Peak has drifted from ^AXM to ^C"
+                 " on axis ^AX.", status );
+      }
+
+   } else {
+      *status = SAI__ERROR;
+      errRep( "", "cupidGCProfWidth: No peak found", status );
+   }
 
 /* Free resources */
    profile = astFree( profile );

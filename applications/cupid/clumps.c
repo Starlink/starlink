@@ -438,8 +438,8 @@ void clumps() {
    kpg1Gtgrp( "CONFIG", &igrp, &size, status );
 
 /* If no group was supplied, annul the error and create an empty KeyMap. */
-   if( *status == PAR__NULL ) {
-      errAnnul( status );
+   if( *status == PAR__NULL || size == 0 ) {
+      if( *status != SAI__OK ) errAnnul( status );
       keymap = astKeyMap( "" );
 
 /* If a group was supplied, create an AST KeyMap holding the value for each 

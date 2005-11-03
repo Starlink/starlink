@@ -257,5 +257,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;
 
+   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );
+
 }
 
