@@ -7,22 +7,29 @@ libndg_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(PUBLIC_INCLUDES) \
 	$(BASIC_C_ROUTINES) \
-        $(BASIC_F_ROUTINES) 
+        $(BASIC_F_ROUTINES) \
+        $(BASIC_C_WRAPPER)
 
 libndg_adam_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(PUBLIC_INCLUDES) \
+        $(PUBLIC_C_INCLUDES) \
 	$(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) \
-        $(ADAM_F_ROUTINES) 
+        $(BASIC_C_WRAPPER) \
+        $(ADAM_F_ROUTINES) \
+        $(ADAM_C_WRAPPER)
 
+cincludedir = $(includedir)/star
 include_HEADERS = $(PUBLIC_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 PRIVATE_INCLUDES = NDG_CONST
 
 PUBLIC_INCLUDES = NDG_ERR
+PUBLIC_C_INCLUDES = ndg.h
 
 BASIC_C_ROUTINES = ndg1_regsb.c ndg1_match.c
 
@@ -33,8 +40,12 @@ ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f ndg_ndfco.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f ndg1_forxt.f
 
+BASIC_C_WRAPPER = ndg.c
+
 ADAM_F_ROUTINES = ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
 ndg_crep1.f ndg_prop1.f
+
+ADAM_C_WRAPPER = ndg_adam.c
 
 #  Define test programs.
 TESTS = test1 
