@@ -20,12 +20,21 @@
 *     not already included.
 
 *  Authors:
-*     DSB: David .S. Berry
+*     DSB: David .S. Berry (UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     30-SEP-2005 (DSB):
 *        Original version.
+*     03-NOV-2005 (TIMJ):
+*        Use enum for constants rather than #define.
+*        Use an opaque struct for the C interface rather than the bare
+*        int.
 */
+
+/* We need CNF to define Fortran */
+
+#include <f77.h>
 
 /* Public Constants */
 /* ---------------- */
@@ -33,26 +42,39 @@
 /* An illegal GRP_ identifier value. This value can sometimes be
    specified by an application in place of a GRP_ identifier in order
    to supress some operation. */
-#define GRP__NOID 0 
+enum { GRP__NOID  = 0 };
 
 /* Maximum length of a group expression. */
-#define GRP__SZGEX 255 
+enum { GRP__SZGEX  = 255 };
 
 /* Length of a name within a group. */
-#define GRP__SZNAM 255
+enum { GRP__SZNAM  = 255 };
 
 /* Max. length of a group type */
-#define GRP__SZTYP 80 
+enum { GRP__SZTYP  = 80 };
 
 /* Max. length of a file name. */
-#define GRP__SZFNM 256 
+enum { GRP__SZFNM  = 256 };
+
+/* Type definitions for GRP C interface */
+/* ------------------------------------ */
+
+/* The contents of this struct are not public */
+typedef struct Grp {
+   F77_INTEGER_TYPE igrp; /* Currently refers to the Fortran GRP ID */  
+} Grp;
 
 
 /* Public function prototypes */
 /* -------------------------- */
-void grpGrpsz( int, int *, int * );
-void grpGet( int, int, int, char *const *, int, int * );
-void grpDelet( int *, int * );
+Grp *grpInit( int * );
+void grpFree( Grp **, int * );
 
+void grpGrpsz( Grp *, int *, int * );
+void grpGet( Grp *, int, int, char *const *, int, int * );
+void grpDelet( Grp **, int * );
+
+void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
+F77_INTEGER_TYPE grp1Getid( Grp *, int * );
 
 #endif

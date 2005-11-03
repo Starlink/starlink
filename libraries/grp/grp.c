@@ -31,19 +31,79 @@
 /* ============= */
 #include "f77.h"                 
 #include "grp.h"
+#include "grp_err.h"
+#include "sae_par.h"
+#include "merswrap.h"
 
 /* Wrapper function implementations. */
 /* ================================= */
 
+/* We need a function to allocate the memory for the struct
+   and intialise it. It will be freed using grpDelet.
+   Alternatively use grpFree.
+   Probably should put this
+   in its own file with documentation. */
+
+Grp * grpInit( int *status ) {
+  Grp * newgrp;
+
+  if ( *status != SAI__OK ) return NULL;
+  newgrp = malloc( sizeof(Grp) );
+  if (newgrp != NULL) {
+    newgrp->igrp = GRP__NOID;
+  } else {
+    *status = GRP__NOMEM;
+    errRep( "GRP_INIT_ERR", "Unable to allocate memory for Grp object",
+	    status );
+  }
+  return newgrp;
+}
+
+void grpFree ( Grp ** igrp, int * status ) {
+  if ( *igrp != NULL ) free( *igrp );
+}
+
+/* We need private (yet public) functions that are available to
+   other libraries that are wrapping fortran access to GRP, that 
+   allows them to store the fortran Grp identifier without having
+   to look inside the struct. This function is not part of the
+   public API for anything except wrapping fortran (eg kaplibs
+   and NDG) */
+
+/* Note that it takes a fortran integer as arg */
+void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
+  if ( *status == SAI__OK ) return;
+  if ( igrp == NULL ) {
+    *status = GRP__INTER;
+    errRep( "GRP1_SETID_ERR", "Grp struct pointer was null in setid",
+	    status);
+  }
+  igrp->igrp = IGRP;
+}
+
+/* Note that it takes a fortran integer as arg */
+F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
+  if ( *status == SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
+  if ( igrp == NULL ) {
+    *status = GRP__INTER;
+    errRep( "GRP1_GETID_ERR", "Grp struct pointer was null in getid",
+	    status);
+  }
+  return igrp->igrp;
+}
+
+
+
+/* Now start wrapping fortran routines */
 
 F77_SUBROUTINE(grp_grpsz)( INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) );
 
-void grpGrpsz( int igrp, int *size, int *status ){
+void grpGrpsz( Grp *igrp, int *size, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
 
-   F77_EXPORT_INTEGER( igrp, IGRP );
+   IGRP = grp1Getid( igrp, status );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_grpsz)( INTEGER_ARG(&IGRP),
@@ -59,18 +119,20 @@ void grpGrpsz( int igrp, int *size, int *status ){
 
 F77_SUBROUTINE(grp_delet)( INTEGER(IGRP), INTEGER(STATUS) );
 
-void grpDelet( int *igrp, int *status ){
+void grpDelet( Grp **igrp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(STATUS);
 
-   F77_EXPORT_INTEGER( *igrp, IGRP );
+   IGRP = grp1Getid( *igrp, status );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&STATUS) );
 
-   F77_IMPORT_INTEGER( IGRP, *igrp );
    F77_IMPORT_INTEGER( STATUS, *status );
+
+   /* Just free the memory associated with the struct */
+   grpFree( igrp, status );
 
    return;
 }
@@ -86,7 +148,7 @@ F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE),
    string for which a pointer has been supplied in "names". This length
    should include room for the trailing null. */
 
-void grpGet( int igrp, int index, int size, char *const *names, int len, 
+void grpGet( Grp *igrp, int index, int size, char *const *names, int len, 
              int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
@@ -94,10 +156,10 @@ void grpGet( int igrp, int index, int size, char *const *names, int len,
    DECLARE_CHARACTER_ARRAY_DYN(NAMES);
    DECLARE_INTEGER(STATUS);
 
-   F77_EXPORT_INTEGER( igrp, IGRP );
    F77_EXPORT_INTEGER( index, INDEX );
    F77_EXPORT_INTEGER( size, SIZE );
    F77_CREATE_CHARACTER_ARRAY(NAMES,len-1,size);
+   IGRP = grp1Getid( igrp, status );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_get)( INTEGER_ARG(&IGRP),
