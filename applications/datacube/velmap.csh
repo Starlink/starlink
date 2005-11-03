@@ -149,6 +149,9 @@
 #       if SPECTRUM is not already the current WCS Frame.  Assign Angstrom to
 #       the spectral unit, if this is is not specified.  The prompt for the
 #       rest-frame co-ordinate now includes the unit.
+#     2005 November 2 (MJC):
+#       Added a labelled velocity-map key to the right of the list of contour
+#       heights.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -330,7 +333,7 @@ collapse "in=${infile} out=${colfile} axis=3" >& /dev/null
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2] reset" >&/dev/null 
 
 # Determine if we need to create or select a SPECTRUM-domain WCS Frame.
 # =====================================================================
@@ -1065,8 +1068,21 @@ echo "        Title: Setting title."
 settitle "ndf=${outfile} title='Velocity Map'"
 echo " "
 
+
 # Plot the output velocity map.
 # =============================
+
+# Determine the gap size for the axis label.  In order to get it to
+# the right of the plot---placing left shrinks the key---we need to
+# know the approximate width of the values.  Here since we know valid
+# values are from minus a few hundreds up to c, we can get an
+# approximate length using the extreme values and allowing for a sign.
+   stats ndf=${outfile}  >& /dev/null
+   set minvel = `parget minimum stats`
+   set maxvel = `parget maximum stats`
+   set minc = `calc exp="'nint(log10(abs(${minvel}))+0.5)+max(0,-1*sign(1,${minvel}))'"`
+   set maxc = `calc exp="'nint(log10(abs(${maxvel}))+0.5)+max(0,-1*sign(1,${maxvel}))'"`
+   set gap = `calc exp="'-2.29-max(${minc},${maxc})*0.14'"`
 
 # Check to see if we need to plot the output velocity map.
 if ( ${plotspec} == "TRUE" ) then
@@ -1074,15 +1090,17 @@ if ( ${plotspec} == "TRUE" ) then
    echo "      Plotting:"
    echo "        Display: Velocity map using percentile scaling." 
    display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-           "axes=yes margin=!" >& /dev/null
+           "axes=yes margin=! key keypos=0.12 " \
+            keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
    echo "        Contour: White-light image with equally spaced contours." 
    contour "ndf=${colfile} device=${plotdev} clear=no mode=equi" \
+           "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
            "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
    echo " "
 endif
 
 # Loop for manual fitting.
-# ------------------------
+# ========================
 
 set loop_var = 1
 if ( ${forcefit} == "FALSE" ) then
@@ -1091,9 +1109,11 @@ if ( ${forcefit} == "FALSE" ) then
       echo "      Plotting:"
       echo "        Display: Velocity map using percentile scaling." 
       display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-              "axes=yes margin=!" >& /dev/null
+              "axes=yes margin=! key keypos=0.12 " \
+              keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
       echo "        Contour: White-light image with equally spaced contours." 
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
+              "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
               "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
    endif   
    while ( ${loop_var} == 1 )
@@ -1618,9 +1638,11 @@ manual_rezoom:
          echo "      Plotting:"
          echo "        Display: Velocity map using percentile scaling." 
          display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-                 "axes=yes margin=!" >& /dev/null
+                 "axes=yes margin=! key keypos=0.12 " \
+                  keystyle="'TextLab(1)=1,TextLabGap(1)=${gap},Label(1)=Velocity in ${vunits}'" >& /dev/null
          echo "        Contour: White-light image with equally spaced contours." 
          contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
+                 "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
                  "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
          echo " "
 
