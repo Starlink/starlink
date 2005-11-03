@@ -141,6 +141,14 @@
 #       individual pixels now uses the correct NDF.  Bug deriving the 
 #       velocity of refitted point corrected, by resetting the WCS Frame,
 #       System and Unit before transforming.
+#     2005 November 1 (MJC):
+#       Allow for UK data-cube format by creating a SPECTRUM Frame
+#       with a Wavelength system and Angstrom units in the extracted
+#       spectra; reset unclear labels to Wavelength.  For other cubes, search
+#       for the SPECTRUM-domain Frame and select it in the extracted spectra,
+#       if SPECTRUM is not already the current WCS Frame.  Assign Angstrom to
+#       the spectral unit, if this is is not specified.  The prompt for the
+#       rest-frame co-ordinate now includes the unit.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -324,6 +332,65 @@ paldef device=${plotdev}
 lutgrey device=${plotdev}
 display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
 
+# Determine if we need to create or select a SPECTRUM-domain WCS Frame.
+# =====================================================================
+
+# Get the spectral label and units.
+set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
+set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+
+# Check that the current frame is SPECTRUM or SKY-SPECTRUM.   We can re-use
+# the last trace of the ripped spectrum.
+set change_frame = "FALSE"
+set curframe = `parget current ndftrace`
+set domain = `parget fdomain"($curframe)" ndftrace`
+if ( "$domain" != "SPECTRUM" && "$domain" != "SKY-SPECTRUM" ) then
+   set change_frame = "TRUE"
+endif
+
+# Next question: is there a SPECTRUM frame to switch to in order to
+# permit velocity calculations?  Loop through all the WCS Frames, looking
+# for a SPECTRUM (or composite SKY-SPECTRUM).
+set create_specframe = "FALSE"
+if ( $change_frame == "TRUE" ) then
+   set create_specframe = "TRUE"
+   set nframe = `parget nframe ndftrace`
+   set i = 1
+   while ( $i <= $nframe && $create_specframe == "TRUE" )
+      set domain = `parget fdomain"($i)" ndftrace`
+      if ( "$domain" == "SPECTRUM" || "$domain" == "SKY-SPECTRUM" ) then
+         set $create_specframe = "FALSE"
+      endif
+      @ i++
+   end
+
+# We need to create a WCS SPECTRUM domain, and hence not change frame.
+   if ( "$create_specframe" == "TRUE" ) then
+      set $change_frame = "FALSE"
+
+# Check for the old-fashioned UK data-cube format that predates the
+# SpecFrame.  Test for non-null units if there is no SpecFrame.  Set the
+# label to something clearer than LAMBDA or Axis 3.
+      if ( "${slabel}" == "LAMBDA" || "${slabel}" == "Axis 3" ) then
+         set slabel = "Wavelength"
+         if ( "$sunits" == "" ) then
+            set sunits = "Angstrom"
+         endif
+      else
+         echo " "
+         echo "The input NDF does not have an SPECTRUM WCS Domain or it is not "
+         echo "in the UK data-cube format.  Will convert the current frame to a "
+         echo "SPECTRUM of type wavelength to calculate velocities."      
+         echo " "
+
+         if ( "$sunits" == "" ) then
+            echo "Assuming that the undefined unit is Angstrom."
+            set sunits = "Angstrom"
+         endif
+      endif
+   endif
+endif
+
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================
 
@@ -378,6 +445,9 @@ endif
 
 # To compare like with like ensure, that plotting uses the AXIS frame.
 wcsframe "ndf=${ripfile} frame=axis"
+
+# Specify the units, in case these weren't know originally.
+axunits "ndf=${ripfile} units=${sunits}" >& /dev/null
 
 # Obtain the precision of the axis centres.
 # Assuming this is only _REAL or _DOUBLE.
@@ -583,7 +653,7 @@ set peak = $pos[2]
 
 echo " "
 echo "      Line Position:"
-echo "        Peak Position: ${position}"
+echo "        Peak Position: ${position} ${sunits}"
 echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
@@ -692,9 +762,9 @@ set integral = $array[8]
 set integral_err = $array[9]
 
 # Report the fit to the user.
-echo "        Centre Position: ${centre_fit} +- ${centre_err}"
+echo "        Centre Position: ${centre_fit} +- ${centre_err} ${sunits}"
 echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
-echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
+echo "        FWHM: ${fwhm_fit} +- ${fwhm_err} ${sunits}"
 echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit ok?
@@ -719,14 +789,9 @@ else
    rm -f ${fitfile} >& /dev/null
 endif
 
-# Get the rest-frame spectral unit.
-# =================================
-
-# Get the spectral label, units, and system.
-set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
-set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+# Obtain the rest-frame co-ordinate.
+# ==================================
 set rest_known = "FALSE"
-
 if ( ${gotrest} == "FALSE" ) then
 
 # Get the rest-frame value.  There is at the time of writing no
@@ -735,7 +800,7 @@ if ( ${gotrest} == "FALSE" ) then
    set astat = `wcsattrib "ndf=${infile} mode=get name=RestFreq"`
    set found = `echo $astat | awk '{if (index( $0, "bad attribute")>0 ) print "Bad"}'`
    if ( $found == "Bad" ) then
-      echo -n "Rest ${slabel}: "
+      echo -n "Rest ${slabel} ($sunits): "
       set rest_coord = $<
       echo " "
    else
@@ -789,6 +854,23 @@ while( $y <= ${ubnd[2]} )
       ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
               "trim=true trimwcs=true"
 
+# Create a SpecFrame if one is not present, and make it the current
+# frame.  At present the earlier test for a missing SpecFrame only
+# occurs for a UK data-cube format with LAMBDA as the label, so the
+# system is wavelength and units Angstrom.
+      if ( $create_specframe == "TRUE" ) then
+         wcsadd ndf=${specfile} frame=axis maptype=unit frmtype=spec \
+                domain=SPECTRUM attrs="'System=wave,Unit=Angstrom'" >& /dev/null
+
+# The spectrum has a SPECTRUM domain WCS Frame, so select it for
+# velocity calculations.
+      else if ( $change_frame == "TRUE" ) then
+         wcsframe "ndf=${specfile} frame=SPECTRUM" >& /dev/null
+      endif
+
+# Specify the units, in case these weren't know originally.
+      axunits "ndf=${ripfile} units=${sunits}" >& /dev/null
+
 # Fit the Gaussian to the spectrum.
       fitgauss \
         "in=${specfile} mask1=${low_mask} mask2=${upp_mask} "\
@@ -821,13 +903,14 @@ while( $y <= ${ubnd[2]} )
                set vars = "${vars} -9999.99"  
             endif  
          else
-            echo "        Spectrum at ($x,$y): $centre_fit +- $centre_err" 
+            echo "        Spectrum at ($x,$y): $centre_fit +- $centre_err ${sunits}" 
 
 # Set the rest-frame value, if it's not already stored in the WCS
-# attributes.
+# attributes.  For this to work the current WCS Frame must be a
+# SpecFrame.  At present there is no test.
             if ( ${rest_known} == "FALSE" ) then
                wcsattrib "ndf=${specfile} mode=set name=RestFreq "\
-                         "newval=${rest_coord}"
+                         "newval='${rest_coord} ${sunits}'" >& /dev/null
             endif
 
 # Reset the System of the current WCS Frame to velocities in the desired 
@@ -993,7 +1076,7 @@ if ( ${plotspec} == "TRUE" ) then
    display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
            "axes=yes margin=!" >& /dev/null
    echo "        Contour: White-light image with equally spaced contours." 
-   contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
+   contour "ndf=${colfile} device=${plotdev} clear=no mode=equi" \
            "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
    echo " "
 endif
@@ -1088,7 +1171,10 @@ if ( ${forcefit} == "FALSE" ) then
 
 # Label for repeated fitting of the Gaussian.
 manual_refit: 
-     
+
+# Specify the units, in case these weren't know originally.
+         axunits "ndf=${ripfile} units=${sunits}" >& /dev/null
+
 # Plot the ripped spectrum.
          linplot "${ripfile} mode=histogram device=${plotdev}" >& /dev/null
 
@@ -1270,7 +1356,7 @@ manual_rezoom:
 
          echo " "
          echo "      Line Position:"
-         echo "        Peak Position: ${position}"
+         echo "        Peak Position: ${position} ${sunits}"
          echo "        Peak Height: ${peak} ${unit}"
 
 # Clean up the CURSOR temporary file.
@@ -1334,6 +1420,24 @@ manual_rezoom:
 # Fit the line.
 # =============
 
+# Reset the WCS Frame to its original value, now we've finished
+# plotting and fitting.
+         wcsframe "ndf=${ripfile} frame=${inframe}"
+
+# Create a SpecFrame if one is not present, and make it the current
+# frame.  At present the earlier test for a missing SpecFrame only
+# occurs for a UK data-cube format with LAMBDA as the label, so the
+# system is wavelength and units Angstrom.
+         if ( $create_specframe == "TRUE" ) then
+            wcsadd ndf=${ripfile} frame=axis maptype=unit frmtype=spec \
+                  domain=SPECTRUM attrs="'System=wave,Unit=Angstrom'" >& /dev/null
+
+# The spectrum has a SPECTRUM domain WCS Frame, so select it for
+# velocity calculations.
+         else if ( $change_frame == "TRUE" ) then
+            wcsframe "ndf=${ripfile} frame=SPECTRUM" >& /dev/null
+         endif
+
          echo "      Fitting:"
 
          fitgauss \
@@ -1377,9 +1481,9 @@ manual_rezoom:
          set integral_err = $array[9]
 
 # Show the user the fit.
-         echo "        Centre Position: ${centre_fit} +- ${centre_err}"
+         echo "        Centre Position: ${centre_fit} +- ${centre_err} ${sunits}"
          echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
-         echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
+         echo "        FWHM: ${fwhm_fit} +- ${fwhm_err} ${sunits}"
          echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit ok?
@@ -1410,9 +1514,13 @@ manual_rezoom:
 # Calculate the velocity.
 # =======================
 
-# Reset the WCS Frame to its original value, now we've finished
-# plotting and fitting.
-         wcsframe "ndf=${ripfile} frame=${inframe}"
+# Set the rest-frame value, if it's not already stored in the WCS
+# attributes.  For this to work the current WCS Frame must be a
+# SpecFrame.  At present there is no test.
+         if ( ${rest_known} == "FALSE" ) then
+            wcsattrib "ndf=${ripfile} mode=set name=RestFreq "\
+                      "newval='${rest_coord} ${sunits}'" >& /dev/null
+         endif
 
 # Reset the System of the current WCS Frame to velocities in the desired 
 # system and units.
@@ -1511,6 +1619,10 @@ manual_rezoom:
          echo "        Display: Velocity map using percentile scaling." 
          display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
                  "axes=yes margin=!" >& /dev/null
+         echo "        Contour: White-light image with equally spaced contours." 
+         contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
+                 "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
+         echo " "
 
 # Clean up temporary velmap files, salvage ${outfile}_tmp in the case
 # where there is no existing $outfile (i.e. CHPIX has not run).
