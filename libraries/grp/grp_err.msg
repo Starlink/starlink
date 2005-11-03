@@ -21,5 +21,6 @@ BADIT       <Bad item of information requested>
 SHORT       <Supplied character variable is too short>
 OWNER       <Group already owns another group>
 INVEL       <Invalid element syntax given>
+NOMEM       <Unable to allocate sufficient memory>
 
 .END
