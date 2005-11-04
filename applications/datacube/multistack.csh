@@ -64,6 +64,8 @@
 #     2005 October 26 (MJC):
 #       Use STATS to obtain the minimum value of the first spectrum to
 #       define the lower y bound of the plot rather than fix at zero.
+#     2005 November 3 (MJC):
+#       Add options waste disposal.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -131,6 +133,9 @@ while ( $#args > 0 )
       set gotzoom = "FALSE"
       shift args
       breaksw                            
+   case *:     # rubbish disposal
+      shift args
+      breaksw
    endsw  
 end
 

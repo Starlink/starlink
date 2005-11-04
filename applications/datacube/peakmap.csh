@@ -121,6 +121,8 @@
 #       "ms^-1".  Inserted blank lines to structure the commentary better.
 #       Correct some output and comments: e.g. "spectra" singular to
 #       "spectrum".
+#     2005 November 3 (MJC):
+#       Add options waste disposal.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -213,6 +215,9 @@ while ( $#args > 0 )
       set gotzoom = "FALSE"
       shift args
       breaksw 
+   case *:     # rubbish disposal
+      shift args
+      breaksw
    endsw  
 end
 

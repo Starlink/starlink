@@ -62,6 +62,8 @@
 #       explicit wavelength in prompts with the current WCS Frame's label for
 #       the spectral axis, and also used the corresponding units in the 
 #       output commentary.
+#     2005 November 3 (MJC):
+#       Add options waste disposal.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -126,6 +128,9 @@ while ( $#args > 0 )
       set upper = $args[1]
       shift args
       breaksw  
+   case *:     # rubbish disposal
+      shift args
+      breaksw
    endsw   
 end
 

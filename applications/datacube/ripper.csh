@@ -55,6 +55,8 @@
 #       Avoid :r.
 #     2005 October 11 (MJC):
 #       Fixed bug converting the cursor position into negative pixel indices.
+#     2005 November 3 (MJC):
+#       Add options waste disposal.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -103,6 +105,9 @@ while ( $#args > 0 )
       breaksw
    case -p:    # plot output spectrum
       set plotspec = "true"
+      shift args
+      breaksw
+   case *:     # rubbish disposal
       shift args
       breaksw
    endsw   
@@ -187,16 +192,10 @@ echo " "
 echo "  Left click to extract spectrum."
 
 cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${tmpfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${tmpfile} ) 
-   sleep 1
-end
+       maxpos=1 marker=2 device=${plotdev} frame="PIXEL"
 
 # Grab the position.
-set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
+set pos = `parget lastpos cursor`
 
 # Get the pixel co-ordinates and convert to grid indices.  The
 # exterior NINT replaces the bug/feature -0 result with the desired 0.

@@ -1,4 +1,4 @@
-#!/bin/csh -x
+#!/bin/csh
 #+
 
 #  Name:
@@ -152,6 +152,8 @@
 #     2005 November 2 (MJC):
 #       Added a labelled velocity-map key to the right of the list of contour
 #       heights.
+#     2005 November 3 (MJC):
+#       Add options waste disposal.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -268,7 +270,10 @@ while ( $#args > 0 )
       set gotzoom = "FALSE"
       shift args
       breaksw 
-   endsw  
+   case *:     # rubbish disposal
+      shift args
+      breaksw
+   endsw
 end
 
 # Obtain details of the input cube.
