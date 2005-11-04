@@ -5,22 +5,24 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) CrtImgType.3 1.9 97/08/08 15:43:15
+'\" RCS: @(#) $Id: CrtImgType.3,v 1.6.2.1 2003/12/10 09:40:43 dkf Exp $
 '\" 
 .so man.macros
-.TH Tk_CreateImageType 3 8.0 Tk "Tk Library Procedures"
+.TH Tk_CreateImageType 3 8.3 Tk "Tk Library Procedures"
 .BS
 .SH NAME
-Tk_CreateImageType, Tk_GetImageMasterData \- define new kind of image
+Tk_CreateImageType, Tk_GetImageMasterData, Tk_InitImageArgs \- define new kind of image
 .SH SYNOPSIS
 .nf
 \fB#include <tk.h>\fR
 .sp
 \fBTk_CreateImageType\fR(\fItypePtr\fR)
-ClientData
 .sp
 .VS
+ClientData
 \fBTk_GetImageMasterData\fR(\fIinterp, name, typePtrPtr\fR)
+.sp
+\fBTk_InitImageArgs\fR(\fIinterp, argc, argvPtr\fR)
 .SH ARGUMENTS
 .AS Tk_ImageType *typePtrPtr
 .AP Tk_ImageType *typePtr in
@@ -29,11 +31,15 @@ Must be static: a
 pointer to this structure is retained by the image code.
 .AP Tcl_Interp *interp in
 Interpreter in which image was created.
-.AP char *name in
+.AP "CONST char" *name in
 Name of existing image.
 .AP Tk_ImageType **typePtrPtr out
 Points to word in which to store a pointer to type information for
 the given image, if it exists.
+.AP int argc in
+Number of arguments
+.AP char ***argvPtr in/out
+Pointer to argument list
 .VE
 .BE
 
@@ -100,6 +106,16 @@ type.
 If there already existed an image type by this name then
 the new image type replaces the old one.
 
+.SH PORTABILITY
+.PP
+In Tk 8.2 and earlier, the createProc below had a different
+signature. If you want to compile an image type using the
+old interface which should still run on all Tcl/Tk versions,
+compile it with the flag -DUSE_OLD_IMAGE. Further on, if
+you are using Stubs, you need to call the function
+Tk_InitImageArgs(interp, argc, &argv) first in your
+createProc. See below for a description of this function.
+
 .SH CREATEPROC
 \fItypePtr->createProc\fR provides the address of a procedure for
 Tk to call whenever \fBimage create\fR is invoked to create
@@ -109,8 +125,8 @@ an image of the new type.
 typedef int Tk_ImageCreateProc(
 	Tcl_Interp *\fIinterp\fR,
 	char *\fIname\fR,
-	int \fIargc\fR,
-	char **\fIargv\fR,
+	int \fIobjc\fR,
+	Tcl_Obj *CONST \fIobjv\fR[],
 	Tk_ImageType *\fItypePtr\fR,
 	Tk_ImageMaster \fImaster\fR,
 	ClientData *\fImasterDataPtr\fR);
@@ -119,13 +135,13 @@ The \fIinterp\fR argument is the interpreter in which the \fBimage\fR
 command was invoked, and \fIname\fR is the name for the new image,
 which was either specified explicitly in the \fBimage\fR command
 or generated automatically by the \fBimage\fR command.
-The \fIargc\fR and \fIargv\fR arguments describe all the configuration
+The \fIobjc\fR and \fIobjv\fR arguments describe all the configuration
 options for the new image (everything after the name argument to
 \fBimage\fR).
 The \fImaster\fR argument is a token that refers to Tk's information
 about this image;  the image manager must return this token to
 Tk when invoking the \fBTk_ImageChanged\fR procedure.
-Typically \fIcreateProc\fR will parse \fIargc\fR and \fIargv\fR
+Typically \fIcreateProc\fR will parse \fIobjc\fR and \fIobjv\fR
 and create an image master data structure for the new image.
 \fIcreateProc\fR may store an arbitrary one-word value at
 *\fImasterDataPtr\fR, which will be passed back to the
@@ -247,6 +263,18 @@ and the return value is the ClientData value returned by the
 pointer to the image master data structure).  If no such image exists
 then NULL is returned and NULL is stored at \fI*typePtrPtr\fR.
 .VE
+
+.SH TK_INITIMAGEARGS
+.VS
+.PP
+The function \fBTk_InitImageArgs\fR converts the arguments of the
+\fBcreateProc\fR from objects to strings when necessary. When
+not using stubs, not using the old interface, or running
+under an older (pre-8.3) Tk version, this function has no
+effect. This function makes porting older image handlers to
+the new interface a lot easier: After running this function,
+the arguments are guaranteed to be in string format, no
+matter how Tk deliverd them.
 
 .SH "SEE ALSO"
 Tk_ImageChanged, Tk_GetImage, Tk_FreeImage, Tk_RedrawImage, Tk_SizeOfImage

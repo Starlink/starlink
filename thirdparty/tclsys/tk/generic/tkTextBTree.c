@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkTextBTree.c 1.37 97/04/25 16:52:00
+ * RCS: @(#) $Id: tkTextBTree.c,v 1.6 2002/08/05 04:30:40 dgp Exp $
  */
 
 #include "tkInt.h"
@@ -393,7 +393,7 @@ TkBTreeInsertChars(indexPtr, string)
 					 * index is no longer valid because
 					 * of changes to the segment
 					 * structure. */
-    char *string;			/* Pointer to bytes to insert (may
+    CONST char *string;			/* Pointer to bytes to insert (may
 					 * contain newlines, must be null-
 					 * terminated). */
 {
@@ -410,7 +410,7 @@ TkBTreeInsertChars(indexPtr, string)
     register TkTextSegment *segPtr;
     TkTextLine *newLinePtr;
     int chunkSize;			/* # characters in current chunk. */
-    register char *eol;			/* Pointer to character just after last
+    register CONST char *eol;		/* Pointer to character just after last
 					 * one in current chunk. */
     int changeToLineCount;		/* Counts change to total number of
 					 * lines in file. */
@@ -535,7 +535,7 @@ SplitSeg(indexPtr)
     TkTextSegment *prevPtr, *segPtr;
     int count;
 
-    for (count = indexPtr->charIndex, prevPtr = NULL,
+    for (count = indexPtr->byteIndex, prevPtr = NULL,
 	    segPtr = indexPtr->linePtr->segPtr; segPtr != NULL;
 	    count -= segPtr->size, prevPtr = segPtr, segPtr = segPtr->nextPtr) {
 	if (segPtr->size > count) {
@@ -1530,7 +1530,7 @@ FindTagStart(tree, tagPtr, indexPtr)
 		 */
 		indexPtr->tree = tree;
 		indexPtr->linePtr = linePtr;
-		indexPtr->charIndex = offset;
+		indexPtr->byteIndex = offset;
 		return segPtr;
 	    }
 	}
@@ -1619,7 +1619,7 @@ FindTagEnd(tree, tagPtr, indexPtr)
     }
     indexPtr->tree = tree;
     indexPtr->linePtr = lastLinePtr;
-    indexPtr->charIndex = lastoffset2;
+    indexPtr->byteIndex = lastoffset2;
     return last2SegPtr;
 }
 
@@ -1694,7 +1694,7 @@ TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, searchPtr)
 	searchPtr->curIndex = *index1Ptr;
 	searchPtr->segPtr = NULL;
 	searchPtr->nextPtr = TkTextIndexToSeg(index1Ptr, &offset);
-	searchPtr->curIndex.charIndex -= offset;
+	searchPtr->curIndex.byteIndex -= offset;
     }
     searchPtr->lastPtr = TkTextIndexToSeg(index2Ptr, (int *) NULL);
     searchPtr->tagPtr = tagPtr;
@@ -1709,9 +1709,9 @@ TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, searchPtr)
 	 * the range, unless the range is artificially moved up to index0.
 	 */
 	if (((index1Ptr == &index0) && 
-		(index1Ptr->charIndex > index2Ptr->charIndex)) ||
+		(index1Ptr->byteIndex > index2Ptr->byteIndex)) ||
 	    ((index1Ptr != &index0) && 
-		(index1Ptr->charIndex >= index2Ptr->charIndex))) {
+		(index1Ptr->byteIndex >= index2Ptr->byteIndex))) {
 		searchPtr->linesLeft = 0;
 	}
     }
@@ -1793,7 +1793,7 @@ TkBTreeStartSearchBack(index1Ptr, index2Ptr, tagPtr, searchPtr)
     }
     searchPtr->segPtr = NULL;
     searchPtr->nextPtr = TkTextIndexToSeg(&searchPtr->curIndex, &offset);
-    searchPtr->curIndex.charIndex -= offset;
+    searchPtr->curIndex.byteIndex -= offset;
 
     /*
      * Adjust the end of the search so it does find toggles that are right
@@ -1801,7 +1801,7 @@ TkBTreeStartSearchBack(index1Ptr, index2Ptr, tagPtr, searchPtr)
      */
 
     if ((TkBTreeLineIndex(index2Ptr->linePtr) == 0) &&
-	    (index2Ptr->charIndex == 0)) {
+	    (index2Ptr->byteIndex == 0)) {
 	backOne = *index2Ptr;
 	searchPtr->lastPtr = NULL;	/* Signals special case for 1.0 */
     } else {
@@ -1819,7 +1819,7 @@ TkBTreeStartSearchBack(index1Ptr, index2Ptr, tagPtr, searchPtr)
 	 * first.
 	 */
 
-	if (index1Ptr->charIndex <= backOne.charIndex) {
+	if (index1Ptr->byteIndex <= backOne.byteIndex) {
 	    searchPtr->linesLeft = 0;
 	}
     }
@@ -1889,7 +1889,7 @@ TkBTreeNextTag(searchPtr)
 		searchPtr->tagPtr = segPtr->body.toggle.tagPtr;
 		return 1;
 	    }
-	    searchPtr->curIndex.charIndex += segPtr->size;
+	    searchPtr->curIndex.byteIndex += segPtr->size;
 	}
     
 	/*
@@ -1906,7 +1906,7 @@ TkBTreeNextTag(searchPtr)
 	}
 	if (searchPtr->curIndex.linePtr != NULL) {
 	    segPtr = searchPtr->curIndex.linePtr->segPtr;
-	    searchPtr->curIndex.charIndex = 0;
+	    searchPtr->curIndex.byteIndex = 0;
 	    continue;
 	}
 	if (nodePtr == searchPtr->tagPtr->tagRootPtr) {
@@ -1972,7 +1972,7 @@ TkBTreeNextTag(searchPtr)
 	 */
 
 	searchPtr->curIndex.linePtr = nodePtr->children.linePtr;
-	searchPtr->curIndex.charIndex = 0;
+	searchPtr->curIndex.byteIndex = 0;
 	segPtr = searchPtr->curIndex.linePtr->segPtr;
 	if (searchPtr->linesLeft <= 0) {
 	    goto searchOver;
@@ -2022,7 +2022,7 @@ TkBTreePrevTag(searchPtr)
     register TkTextLine *linePtr, *prevLinePtr;
     register Node *nodePtr, *node2Ptr, *prevNodePtr;
     register Summary *summaryPtr;
-    int charIndex;
+    int byteIndex;
     int pastLast;			/* Saw last marker during scan */
     int linesSkipped;
 
@@ -2041,7 +2041,7 @@ TkBTreePrevTag(searchPtr)
 	/*
 	 * Check for the last toggle before the current segment on this line.
 	 */
-	charIndex = 0;
+	byteIndex = 0;
 	if (searchPtr->lastPtr == NULL) {
 	    /* 
 	     * Search back to the very beginning, so pastLast is irrelevent.
@@ -2058,13 +2058,13 @@ TkBTreePrevTag(searchPtr)
 		    && (searchPtr->allTags
 		    || (segPtr->body.toggle.tagPtr == searchPtr->tagPtr))) {
 		prevPtr = segPtr;
-		searchPtr->curIndex.charIndex = charIndex;
+		searchPtr->curIndex.byteIndex = byteIndex;
 	    }
 	    if (segPtr == searchPtr->lastPtr) {
 	        prevPtr = NULL;   /* Segments earlier than last don't count */
 		pastLast = 1;
 	    }
-	    charIndex += segPtr->size;
+	    byteIndex += segPtr->size;
 	}
 	if (prevPtr != NULL) {
 	    if (searchPtr->linesLeft == 1 && !pastLast) {
@@ -2191,7 +2191,7 @@ TkBTreePrevTag(searchPtr)
 	    /* empty loop body */ ;
 	}
 	searchPtr->curIndex.linePtr = prevLinePtr;
-	searchPtr->curIndex.charIndex = 0;
+	searchPtr->curIndex.byteIndex = 0;
 	if (searchPtr->linesLeft <= 0) {
 	    goto searchOver;
 	}
@@ -2241,7 +2241,7 @@ TkBTreeCharTagged(indexPtr, tagPtr)
 
     toggleSegPtr = NULL;
     for (index = 0, segPtr = indexPtr->linePtr->segPtr;
-	    (index + segPtr->size) <= indexPtr->charIndex;
+	    (index + segPtr->size) <= indexPtr->byteIndex;
 	    index += segPtr->size, segPtr = segPtr->nextPtr) {
 	if (((segPtr->typePtr == &tkTextToggleOnType)
 		|| (segPtr->typePtr == &tkTextToggleOffType))
@@ -2360,7 +2360,7 @@ TkBTreeGetTags(indexPtr, numTagsPtr)
      */
 
     for (index = 0, segPtr = indexPtr->linePtr->segPtr;
-	    (index + segPtr->size) <= indexPtr->charIndex;
+	    (index + segPtr->size) <= indexPtr->byteIndex;
 	    index += segPtr->size, segPtr = segPtr->nextPtr) {
 	if ((segPtr->typePtr == &tkTextToggleOnType)
 		|| (segPtr->typePtr == &tkTextToggleOffType)) {
@@ -2426,6 +2426,148 @@ TkBTreeGetTags(indexPtr, numTagsPtr)
 	return NULL;
     }
     return tagInfo.tagPtrs;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextIsElided --
+ *
+ *	Special case to just return information about elided attribute.
+ *	Specialized from TkBTreeGetTags(indexPtr, numTagsPtr)
+ *	and GetStyle(textPtr, indexPtr).
+ *	Just need to keep track of invisibility settings for each priority,
+ *	pick highest one active at end
+ *
+ * Results:
+ *	Returns whether this text should be elided or not.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+	/* ARGSUSED */
+int
+TkTextIsElided(textPtr, indexPtr)
+    TkText *textPtr;		/* Overall information about text widget. */
+    TkTextIndex *indexPtr;	/* The character in the text for which
+				 * display information is wanted. */
+{
+#define LOTSA_TAGS 1000
+    int elide = 0;		/* if nobody says otherwise, it's visible */
+
+    int deftagCnts[LOTSA_TAGS];
+    int *tagCnts = deftagCnts;
+    TkTextTag *deftagPtrs[LOTSA_TAGS];
+    TkTextTag **tagPtrs = deftagPtrs;
+    int numTags = textPtr->numTags;
+    register Node *nodePtr;
+    register TkTextLine *siblingLinePtr;
+    register TkTextSegment *segPtr;
+    register TkTextTag *tagPtr;
+    register int i, index;
+
+	/* almost always avoid malloc, so stay out of system calls */
+    if (LOTSA_TAGS < numTags) {
+	tagCnts = (int *)ckalloc((unsigned)sizeof(int) * numTags);
+	tagPtrs = (TkTextTag **)ckalloc((unsigned)sizeof(TkTextTag *) * numTags);
+    }
+ 
+    for (i=0; i<numTags; i++) {
+	tagCnts[i] = 0;
+    }
+
+    /*
+     * Record tag toggles within the line of indexPtr but preceding
+     * indexPtr.
+     */
+
+    for (index = 0, segPtr = indexPtr->linePtr->segPtr;
+	 (index + segPtr->size) <= indexPtr->byteIndex;
+	 index += segPtr->size, segPtr = segPtr->nextPtr) {
+	if ((segPtr->typePtr == &tkTextToggleOnType)
+		|| (segPtr->typePtr == &tkTextToggleOffType)) {
+	    tagPtr = segPtr->body.toggle.tagPtr;
+	    if (tagPtr->elideString != NULL) {
+		tagPtrs[tagPtr->priority] = tagPtr;
+		tagCnts[tagPtr->priority]++;
+	    }
+	}
+    }
+
+    /*
+     * Record toggles for tags in lines that are predecessors of
+     * indexPtr->linePtr but under the same level-0 node.
+     */
+
+    for (siblingLinePtr = indexPtr->linePtr->parentPtr->children.linePtr;
+	 siblingLinePtr != indexPtr->linePtr;
+	 siblingLinePtr = siblingLinePtr->nextPtr) {
+	for (segPtr = siblingLinePtr->segPtr; segPtr != NULL;
+	     segPtr = segPtr->nextPtr) {
+	    if ((segPtr->typePtr == &tkTextToggleOnType)
+		    || (segPtr->typePtr == &tkTextToggleOffType)) {
+		tagPtr = segPtr->body.toggle.tagPtr;
+		if (tagPtr->elideString != NULL) {
+		    tagPtrs[tagPtr->priority] = tagPtr;
+		    tagCnts[tagPtr->priority]++;
+		}
+	    }
+	}
+    }
+
+    /*
+     * For each node in the ancestry of this line, record tag toggles
+     * for all siblings that precede that node.
+     */
+
+    for (nodePtr = indexPtr->linePtr->parentPtr; nodePtr->parentPtr != NULL;
+	 nodePtr = nodePtr->parentPtr) {
+	register Node *siblingPtr;
+	register Summary *summaryPtr;
+
+	for (siblingPtr = nodePtr->parentPtr->children.nodePtr; 
+	     siblingPtr != nodePtr; siblingPtr = siblingPtr->nextPtr) {
+	    for (summaryPtr = siblingPtr->summaryPtr; summaryPtr != NULL;
+		 summaryPtr = summaryPtr->nextPtr) {
+		if (summaryPtr->toggleCount & 1) {
+		    tagPtr = summaryPtr->tagPtr;
+		    if (tagPtr->elideString != NULL) {
+			tagPtrs[tagPtr->priority] = tagPtr;
+			tagCnts[tagPtr->priority] += summaryPtr->toggleCount;
+		    }
+		}
+	    }
+	}
+    }
+
+    /*
+     * Now traverse from highest priority to lowest, 
+     * take elided value from first odd count (= on)
+     */
+
+    for (i = numTags-1; i >=0; i--) {
+	if (tagCnts[i] & 1) {
+#ifndef ALWAYS_SHOW_SELECTION
+	    /* who would make the selection elided? */
+	    if ((tagPtr == textPtr->selTagPtr)
+		    && !(textPtr->flags & GOT_FOCUS)) {
+		continue;
+	    }
+#endif
+	    elide = tagPtrs[i]->elide;
+	    break;
+	}
+    }
+
+    if (LOTSA_TAGS < numTags) {
+	ckfree((char *) tagCnts);
+	ckfree((char *) tagPtrs);
+    }
+
+    return elide;
 }
 
 /*
@@ -3580,6 +3722,25 @@ ToggleCheckProc(segPtr, linePtr)
 
 int
 TkBTreeCharsInLine(linePtr)
+    TkTextLine *linePtr;		/* Line whose characters should be
+					 * counted. */
+{
+    TkTextSegment *segPtr;
+    int count;
+
+    count = 0;
+    for (segPtr = linePtr->segPtr; segPtr != NULL; segPtr = segPtr->nextPtr) {
+	if (segPtr->typePtr == &tkTextCharType) {
+	    count += Tcl_NumUtfChars(segPtr->body.chars, segPtr->size);
+	} else {
+	    count += segPtr->size;
+	}
+    }
+    return count;
+}
+
+int
+TkBTreeBytesInLine(linePtr)
     TkTextLine *linePtr;		/* Line whose characters should be
 					 * counted. */
 {

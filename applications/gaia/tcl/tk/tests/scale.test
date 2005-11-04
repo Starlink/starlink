@@ -3,21 +3,17 @@
 #
 # Copyright (c) 1994 The Regents of the University of California.
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
-# SCCS: @(#) scale.test 1.28 97/07/31 10:20:43
+# RCS: @(#) $Id: scale.test,v 1.12.2.1 2003/08/13 10:59:33 patthoyts Exp $
 
-if {[info procs test] != "test"} {
-    source defs
-}
-
-foreach i [winfo children .] {
-    destroy $i
-}
-wm geometry . {}
-raise .
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 # Create entries in the option database to be sure that geometry options
 # like border width have predictable values.
@@ -56,19 +52,19 @@ foreach test {
     {-label "Some text" {Some text} {} {}}
     {-length 130 130 badValue {bad screen distance "badValue"}}
     {-orient horizontal horizontal badValue
-	    {bad orientation "badValue": must be vertical or horizontal}}
+	    {bad orient "badValue": must be horizontal or vertical}}
     {-orient horizontal horizontal {} {}}
-    {-relief ridge ridge badValue {bad relief type "badValue": must be flat, groove, raised, ridge, solid, or sunken}}
+    {-relief ridge ridge badValue {bad relief "badValue": must be flat, groove, raised, ridge, solid, or sunken}}
     {-repeatdelay 14 14 bogus {expected integer but got "bogus"}}
     {-repeatinterval 14 14 bogus {expected integer but got "bogus"}}
     {-resolution 2.0 2.0 badValue
 	    {expected floating-point number but got "badValue"}}
     {-showvalue 0 0 badValue {expected boolean value but got "badValue"}}
     {-sliderlength 86 86 badValue {bad screen distance "badValue"}}
-    {-sliderrelief raised raised badValue {bad relief type "badValue": must be flat, groove, raised, ridge, solid, or sunken}}
-    {-state disabled disabled badValue
-	    {bad state value "badValue": must be normal, active, or disabled}}
-    {-state normal normal {} {}}
+    {-sliderrelief raised raised badValue {bad relief "badValue": must be flat, groove, raised, ridge, solid, or sunken}}
+    {-state d disabled badValue
+	    {bad state "badValue": must be active, disabled, or normal}}
+    {-state n normal {} {}}
     {-takefocus "any string" "any string" {} {}}
     {-tickinterval 4.3 4.0 badValue
 	    {expected floating-point number but got "badValue"}}
@@ -93,8 +89,8 @@ foreach test {
     .s configure $name [lindex [.s configure $name] 3]
     incr i
 }
-
 destroy .s
+
 test scale-2.1 {Tk_ScaleCmd procedure} {
     list [catch {scale} msg] $msg
 } {1 {wrong # args: should be "scale pathName ?options?"}}
@@ -124,8 +120,8 @@ test scale-3.5 {ScaleWidgetCmd procedure, cget option} {
     .s cget -highlightthickness
 } {2}
 test scale-3.6 {ScaleWidgetCmd procedure, configure option} {
-    list [llength [.s configure]] [lindex [.s configure] 5]
-} {33 {-borderwidth borderWidth BorderWidth 2 2}}
+    list [llength [.s configure]] [lindex [.s configure] 6]
+} {33 {-command command Command {} {}}}
 test scale-3.7 {ScaleWidgetCmd procedure, configure option} {
     list [catch {.s configure -foo} msg] $msg
 } {1 {unknown option "-foo"}}
@@ -212,10 +208,10 @@ test scale-3.29 {ScaleWidgetCmd procedure} {
 } {1 {bad option "dumb": must be cget, configure, coords, get, identify, or set}}
 test scale-3.30 {ScaleWidgetCmd procedure} {
     list [catch {.s c} msg] $msg
-} {1 {bad option "c": must be cget, configure, coords, get, identify, or set}}
+} {1 {ambiguous option "c": must be cget, configure, coords, get, identify, or set}}
 test scale-3.31 {ScaleWidgetCmd procedure} {
     list [catch {.s co} msg] $msg
-} {1 {bad option "co": must be cget, configure, coords, get, identify, or set}}
+} {1 {ambiguous option "co": must be cget, configure, coords, get, identify, or set}}
 test scale-3.32 {ScaleWidgetCmd procedure, Tk_Preserve} {
     proc kill args {
 	destroy .s
@@ -270,7 +266,7 @@ test scale-5.4 {ConfigureScale procedure} {
     catch {destroy .s}
     scale .s -from 0 -to 100
     list [catch {.s configure -orient dumb} msg] $msg
-} {1 {bad orientation "dumb": must be vertical or horizontal}}
+} {1 {bad orient "dumb": must be horizontal or vertical}}
 test scale-5.5 {ConfigureScale procedure} {
     catch {destroy .s}
     scale .s -from 1.11 -to 1.89 -resolution .1 -tickinterval .76
@@ -288,7 +284,7 @@ test scale-5.6 {ConfigureScale procedure} {
 test scale-5.7 {ConfigureScale procedure} {
     catch {destroy .s}
     list [catch {scale .s -from 0 -to 100 -state bogus} msg] $msg
-} {1 {bad state value "bogus": must be normal, active, or disabled}}
+} {1 {bad state "bogus": must be active, disabled, or normal}}
 
 catch {destroy .s}
 scale .s -orient horizontal -length 200
@@ -329,8 +325,8 @@ test scale-6.6 {ComputeFormat procedure} {nonPortable} {
 test scale-6.7 {ComputeFormat procedure} {
     .s configure -from 1000000000 -to 10000000000 -resolution 1000000000
     .s set 4930000000
-    .s get
-} {5.0e+09}
+    expr {[.s get] == 5.0e+09}
+} 1
 test scale-6.8 {ComputeFormat procedure} {
     .s configure -from .1 -to 1 -resolution .1
     .s set .6
@@ -359,8 +355,8 @@ test scale-6.12 {ComputeFormat procedure} {
 test scale-6.13 {ComputeFormat procedure} {
     .s configure -from .000001 -to .00001 -resolution .000001
     .s set .000006
-    .s get
-} {6.0e-06}
+    expr {[.s get] == 6.0e-06}
+} {1}
 test scale-6.14 {ComputeFormat procedure} {
     .s configure -to .00001 -from .0001 -resolution .00001
     .s set .00006
@@ -369,13 +365,13 @@ test scale-6.14 {ComputeFormat procedure} {
 test scale-6.15 {ComputeFormat procedure} {
     .s configure -to .000001 -from .00001 -resolution .000001
     .s set .000006
-    .s get
-} {6.0e-06}
+    expr {[.s get] == 6.0e-06}
+} {1}
 test scale-6.16 {ComputeFormat procedure} {
     .s configure -from .00001 -to .0001 -resolution .00001 -digits 1
     .s set .00006
-    .s get
-} {6e-05}
+    expr {[.s get] == 6e-05}
+} {1}
 test scale-6.17 {ComputeFormat procedure} {
     .s configure -from 10000000 -to 100000000 -resolution 10000000 -digits 3
     .s set 49300000
@@ -397,7 +393,7 @@ test scale-6.20 {ComputeFormat procedure} {
     .s get
 } {1001.235}
 
-test scale-7.1 {ComputeScaleGeometry procedure} {fonts} {
+test scale-7.1 {ComputeScaleGeometry procedure} {nonPortable fonts} {
     catch {destroy .s}
     scale .s -from 0 -to 10 -label "Short" -orient vertical -length 5i
     pack .s
@@ -427,7 +423,7 @@ test scale-7.4 {ComputeScaleGeometry procedure} {fonts} {
     update
     list [winfo reqwidth .s] [winfo reqheight .s]
 } {39 114}
-test scale-7.5 {ComputeScaleGeometry procedure} {fonts} {
+test scale-7.5 {ComputeScaleGeometry procedure} {nonPortable fonts} {
     catch {destroy .s}
     scale .s -from 0 -to 10 -label "Short" -orient horizontal -length 5i
     pack .s
@@ -619,7 +615,7 @@ test scale-11.1 {ScaleEventProc procedure} {
     set x
 } {initial 1 0 {}}
 test scale-11.2 {ScaleEventProc procedure} {
-    eval destroy [winfo children .]
+    deleteWindows
     scale .s1 -bg #543210
     rename .s1 .s2
     set x {}
@@ -630,7 +626,7 @@ test scale-11.2 {ScaleEventProc procedure} {
 } {.s1 #543210 {} {}}
 
 test scale-12.1 {ScaleCmdDeletedProc procedure} {
-    eval destroy [winfo children .]
+    deleteWindows
     scale .s1
     rename .s1 {}
     list [info command .s*] [winfo children .]
@@ -787,7 +783,7 @@ test scale-15.6 {ScaleVarProc procedure, don't call -command} {
 } {untouched 60}
 
 set l [interp hidden]
-eval destroy [winfo children .]
+deleteWindows
 
 test scale-16.1 {scale widget vs hidden commands} {
     catch {destroy .s}
@@ -797,5 +793,83 @@ test scale-16.1 {scale widget vs hidden commands} {
     list [winfo children .] [interp hidden]
 } [list {} $l]
 
+test scale-17.1 {bug fix 1786} {
+    # Perhaps x is set to {}, depending on what other tests have run.
+    # If x is unset, or set to something not convertable to a double,
+    # then the scale try to initialize its value with the contents
+    # of uninitialized memory.  Sometimes that causes an FPE.
+
+    set x {}
+    scale .s -from 100 -to 300
+    pack .s
+    update
+    .s configure -variable x   ;# CRASH! -> Floating point exception
+
+    # Bug 4833 changed the result to realize that x should pick up
+    # a value from the scale.  In an FPE occurs, it is due to the
+    # lack of errno being set to 0 by some libc's. (see bug 4942)
+    set x
+} {100}
+
+test scale-18.1 {DestroyScale, -cursor option [Bug: 3897]} {
+    catch {destroy .s}
+    scale .s -cursor trek
+    destroy .s
+} {}
+
+test scale-18.2 {Scale button 1 events [Bug 787065]} \
+    -setup {
+        catch {destroy .s}
+        set y 5
+        scale .s -from 0 -to 10 -variable y -orient horizontal -length 150
+        pack .s
+        tkwait visibility .s
+        set ::error {}
+        proc bgerror {args} {set ::error $args}
+    } \
+    -body {
+        list [catch {
+            event generate .s <1> -x 0 -y 0
+            event generate .s <ButtonRelease-1> -x 0 -y 0
+            update
+            set ::error
+        } msg] $msg
+    } \
+    -cleanup {
+        unset ::error
+        rename bgerror {}
+        catch {destroy .s}
+    } \
+    -result {0 {}}
+
+test scale-18.3 {Scale button 2 events [Bug 787065]} \
+    -setup {
+        catch {destroy .s}
+        set y 5
+        scale .s -from 0 -to 10 -variable y -orient horizontal -length 150
+        pack .s
+        tkwait visibility .s
+        set ::error {}
+        proc bgerror {args} {set ::error $args}
+    } \
+    -body {
+        list [catch {
+            event generate .s <2> -x 0 -y 0
+            event generate .s <ButtonRelease-2> -x 0 -y 0
+            update
+            set ::error
+        } msg] $msg
+    } \
+    -cleanup {
+        unset ::error
+        rename bgerror {}
+        catch {destroy .s}
+    } \
+    -result {0 {}}
+
 catch {destroy .s}
 option clear
+
+# cleanup
+::tcltest::cleanupTests
+return

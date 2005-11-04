@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) button.n 1.40 97/10/31 12:58:48
+'\" RCS: @(#) $Id: button.n,v 1.6.8.1 2004/10/28 10:19:29 dkf Exp $
 '\" 
 .so man.macros
 .TH button n 4.4 Tk "Tk Built-In Commands"
@@ -16,12 +16,15 @@ button \- Create and manipulate button widgets
 .SH SYNOPSIS
 \fBbutton\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-cursor	\-highlightthickness	\-takefocus
-\-activeforeground	\-disabledforeground	\-image	\-text
-\-anchor	\-font	\-justify	\-textvariable
-\-background	\-foreground	\-padx	\-underline
-\-bitmap	\-highlightbackground	\-pady	\-wraplength
-\-borderwidth	\-highlightcolor	\-relief
+\-activebackground	\-font	\-relief
+\-activeforeground	\-foreground	\-repeatdelay
+\-anchor	\-highlightbackground	\-repeatinterval
+\-background	\-highlightcolor	\-takefocus
+\-bitmap	\-highlightthickness	\-text
+\-borderwidth	\-image	\-textvariable
+\-compound	\-justify	\-underline
+\-cursor	\-padx	\-wraplength
+\-disabledforeground	\-pady
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-command command Command
@@ -40,7 +43,6 @@ the same size.  In disabled state, the button is drawn with the
 non-default button appearance without leaving space for the default
 appearance.  The disabled state may result in a smaller button than
 the active state.
-ring.
 .VE
 .OP \-height height Height
 Specifies a desired height for the button.
@@ -49,6 +51,15 @@ screen units (i.e. any of the forms acceptable to \fBTk_GetPixels\fR);
 for text it is in lines of text.
 If this option isn't specified, the button's desired height is computed
 from the size of the image or bitmap or text being displayed in it.
+.VS 8.4
+.OP \-overrelief overRelief OverRelief
+Specifies an alternative relief for the button, to be used when the
+mouse cursor is over the widget.  This option can be used to make
+toolbar buttons, by configuring \fB\-relief flat \-overrelief
+raised\fR.  If the value of this option is the empty string, then no
+alternative relief is used when the mouse cursor is over the button.
+The empty string is the default value.
+.VE 8.4
 .OP \-state state State
 Specifies one of three states for the button:  \fBnormal\fR, \fBactive\fR,
 or \fBdisabled\fR.  In normal state the button is displayed using the

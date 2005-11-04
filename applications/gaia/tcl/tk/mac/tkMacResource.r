@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacResource.r 1.35 97/11/03 17:16:34
+ * RCS: @(#) $Id: tkMacResource.r,v 1.10 2002/09/12 17:34:16 das Exp $
  */
 
 /*
@@ -28,38 +28,9 @@
  * the version string for Tcl.
  */
 
-#define RESOURCE_INCLUDED
+#define RC_INVOKED
 #include "tcl.h"
 #include "tk.h"
-
-#if (TK_RELEASE_LEVEL == 0)
-#   define RELEASE_LEVEL alpha
-#elif (TK_RELEASE_LEVEL == 1)
-#   define RELEASE_LEVEL beta
-#elif (TK_RELEASE_LEVEL == 2)
-#   define RELEASE_LEVEL final
-#endif
-
-#if (TK_RELEASE_LEVEL == 2)
-#   define MINOR_VERSION (TK_MINOR_VERSION * 16) + TK_RELEASE_SERIAL
-#else
-#   define MINOR_VERSION TK_MINOR_VERSION * 16
-#endif
-
-resource 'vers' (1) {
-	TK_MAJOR_VERSION, MINOR_VERSION,
-	RELEASE_LEVEL, 0x00, verUS,
-	TK_PATCH_LEVEL,
-	TK_PATCH_LEVEL ", by Ray Johnson © 1993-1996" "\n" "Sun Microsystems Labratories"
-};
-
-resource 'vers' (2) {
-	TK_MAJOR_VERSION, MINOR_VERSION,
-	RELEASE_LEVEL, 0x00, verUS,
-	TK_PATCH_LEVEL,
-	"Wish " TK_PATCH_LEVEL " © 1993-1996"
-};
-
 
 /* 
  * The mechanisim below loads Tcl source into the resource fork of the
@@ -73,50 +44,9 @@ resource 'vers' (2) {
  * will load the TEXT resource named "Init".
  */
 
-read 'TEXT' (0, "Init", purgeable, preload) 
-	":::tcl" TCL_VERSION ":library:init.tcl";
-read 'TEXT' (1, "History", purgeable, preload) 
-	":::tcl" TCL_VERSION ":library:history.tcl";
-read 'TEXT' (2, "Word", purgeable,preload) 
-	":::tcl" TCL_VERSION ":library:word.tcl";
-
-read 'TEXT' (10, "tk", purgeable, preload) "::library:tk.tcl";
-read 'TEXT' (11, "button", purgeable, preload) "::library:button.tcl";
-read 'TEXT' (12, "dialog", purgeable, preload) "::library:dialog.tcl";
-read 'TEXT' (13, "entry", purgeable, preload) "::library:entry.tcl";
-read 'TEXT' (14, "focus", purgeable, preload) "::library:focus.tcl";
-read 'TEXT' (15, "listbox", purgeable, preload) "::library:listbox.tcl";
-read 'TEXT' (16, "menu", purgeable, preload) "::library:menu.tcl";
-read 'TEXT' (17, "optionMenu", purgeable, preload) "::library:optMenu.tcl";
-read 'TEXT' (18, "palette", purgeable, preload) "::library:palette.tcl";
-read 'TEXT' (19, "scale", purgeable, preload) "::library:scale.tcl";
-read 'TEXT' (20, "scrollbar", purgeable, preload) "::library:scrlbar.tcl";
-read 'TEXT' (21, "tearoff", purgeable, preload) "::library:tearoff.tcl";
-read 'TEXT' (22, "text", purgeable, preload) "::library:text.tcl";
-read 'TEXT' (23, "tkerror", purgeable, preload) "::library:bgerror.tcl";
-read 'TEXT' (24, "Console", purgeable, preload) "::library:console.tcl";
-read 'TEXT' (25, "msgbox", purgeable, preload) "::library:msgbox.tcl";
-read 'TEXT' (26, "comdlg", purgeable, preload) "::library:comdlg.tcl";
-
-/*
- * The following resource is used when creating the 'env' variable in
- * the Macintosh environment.  The creation mechanisim looks for the
- * 'STR#' resource named "Tcl Environment Variables" rather than a
- * specific resource number.  (In other words, feel free to change the
- * resource id if it conflicts with your application.)  Each string in
- * the resource must be of the form "KEYWORD=SOME STRING".  See Tcl
- * documentation for futher information about the env variable.
- */
- 
-/* A good example of something you may want to set is:
- * "TCL_LIBRARY=My disk:etc." 
- */
-		
-resource 'STR#' (128, "Tcl Environment Variables") {
-	{	"SCHEDULE_NAME=Agent Controller Schedule",
-		"SCHEDULE_PATH=Lozoya:System Folder:Tcl Lib:Tcl-Scheduler"
-	};
-};
+#ifndef TCLTK_NO_LIBRARY_TEXT_RESOURCES
+#include "tkMacTclCode.r"
+#endif
 
 /*
  * The following two resources define the default "About Box" for Mac Tk.
@@ -128,18 +58,20 @@ resource 'STR#' (128, "Tcl Environment Variables") {
  */
  
 resource 'DLOG' (128, "Default About Box", purgeable) {
-    {85, 107, 243, 406}, dBoxProc, visible, goAway, 0,
+    {85, 107, 260, 412}, dBoxProc, visible, goAway, 0,
      128, "", centerMainScreen
 };
 
 resource 'DITL' (128, "About Box", purgeable) {
     {
-	{128, 128, 148, 186}, Button	    {enabled, "Ok"},
-	{ 14, 108, 117, 310}, StaticText    {disabled, 
+	{143, 147, 167, 201}, Button	    {enabled, "Ok"},
+	{ 14, 108, 137, 314}, StaticText    {disabled, 
 	    "Wish - Windowing Shell" "\n" "based on Tcl " 
-	    TCL_PATCH_LEVEL " & Tk " TK_PATCH_LEVEL "\n\n" "Ray Johnson" "\n"
-	    "Sun Microsystems Labs" "\n" "ray.johnson@eng.sun.com"},	    
-        { 11,  24, 111,  92}, Picture  {enabled, 128}
+	    TCL_PATCH_LEVEL " & Tk " TK_PATCH_LEVEL "\n\n" 
+            "Jim Ingham & Ray Johnson" "\n"
+	    "© 2001 Tcl Core Team" "\n"
+            "jingham@apple.com"},	    
+        { 19,  24, 119,  92}, Picture  {enabled, 128}
     }
 };
 

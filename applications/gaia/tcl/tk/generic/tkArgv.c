@@ -5,12 +5,12 @@
  *	argv-argc parsing.
  *
  * Copyright (c) 1990-1994 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkArgv.c 1.21 97/04/25 16:50:27
+ * RCS: @(#) $Id: tkArgv.c,v 1.4 2002/01/25 21:09:36 dgp Exp $
  */
 
 #include "tkPort.h"
@@ -45,7 +45,7 @@ static void	PrintUsage _ANSI_ARGS_((Tcl_Interp *interp,
  *
  * Results:
  *	The return value is a standard Tcl return value.  If an
- *	error occurs then an error message is left in interp->result.
+ *	error occurs then an error message is left in the interp's result.
  *	Under normal conditions, both *argcPtr and *argv are modified
  *	to return the arguments that couldn't be processed here (they
  *	didn't match the option table, or followed an TK_ARGV_REST
@@ -67,7 +67,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 				 * NULL means ignore Tk option specs. */
     int *argcPtr;		/* Number of arguments in argv.  Modified
 				 * to hold # args left in argv at end. */
-    char **argv;		/* Array of arguments.  Modified to hold
+    CONST char **argv;		/* Array of arguments.  Modified to hold
 				 * those that couldn't be processed here. */
     Tk_ArgvInfo *argTable;	/* Array of option descriptions */
     int flags;			/* Or'ed combination of various flag bits,
@@ -77,7 +77,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 				/* Pointer to the current entry in the
 				 * table of argument descriptions. */
     Tk_ArgvInfo *matchPtr;	/* Descriptor that matches current argument. */
-    char *curArg;		/* Current argument */
+    CONST char *curArg;		/* Current argument */
     register char c;		/* Second character of current arg (used for
 				 * quick check for matching;  use 2nd char.
 				 * because first char. will almost always
@@ -202,7 +202,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 		if (argc == 0) {
 		    goto missingArg;
 		} else {
-		    *((char **)infoPtr->dst) = argv[srcIndex];
+		    *((CONST char **)infoPtr->dst) = argv[srcIndex];
 		    srcIndex++;
 		    argc--;
 		}
@@ -239,7 +239,8 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 		}
 		break;
 	    case TK_ARGV_FUNC: {
-		typedef int (ArgvFunc)_ANSI_ARGS_((char *, char *, char *));
+		typedef int (ArgvFunc) _ANSI_ARGS_ ((char *, char *,
+			CONST char *));
 		ArgvFunc *handlerProc;
 
 		handlerProc = (ArgvFunc *) infoPtr->src;
@@ -252,7 +253,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 	    }
 	    case TK_ARGV_GENFUNC: {
 		typedef int (ArgvGenFunc)_ANSI_ARGS_((char *, Tcl_Interp *, 
-			char *, int, char **));
+			char *, int, CONST char **));
 		ArgvGenFunc *handlerProc;
 
 		handlerProc = (ArgvGenFunc *) infoPtr->src;
@@ -291,10 +292,14 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 		srcIndex += 2;
 		argc -= 2;
 		break;
-	    default:
-		sprintf(interp->result, "bad argument type %d in Tk_ArgvInfo",
+	    default: {
+		char buf[64 + TCL_INTEGER_SPACE];
+		
+		sprintf(buf, "bad argument type %d in Tk_ArgvInfo",
 			infoPtr->type);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 		return TCL_ERROR;
+	    }
 	}
     }
 
@@ -328,7 +333,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
  *	Generate a help string describing command-line options.
  *
  * Results:
- *	Interp->result will be modified to hold a help string
+ *	The interp's result will be modified to hold a help string
  *	describing all the options in argTable, plus all those
  *	in the default table unless TK_ARGV_NO_DEFAULTS is
  *	specified in flags.
@@ -353,7 +358,7 @@ PrintUsage(interp, argTable, flags)
     int width, i, numSpaces;
 #define NUM_SPACES 20
     static char spaces[] = "                    ";
-    char tmp[30];
+    char tmp[TCL_DOUBLE_SPACE];
 
     /*
      * First, compute the width of the widest option key, so that we

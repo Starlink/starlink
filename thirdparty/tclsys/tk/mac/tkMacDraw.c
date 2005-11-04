@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacDraw.c 1.55 97/11/20 18:28:56
+ * RCS: @(#) $Id: tkMacDraw.c,v 1.9 2002/04/08 09:04:43 das Exp $
  */
 
 #include "tkInt.h"
@@ -23,6 +23,7 @@
 #include <Fonts.h>
 #include <QDOffscreen.h>
 #include "tkMacInt.h"
+#include "tkPort.h"
 
 #ifndef PI
 #    define PI 3.14159265358979323846
@@ -369,6 +370,9 @@ TkPutImage(
 	pixmap.pmTable = NULL;
 	pixmap.pmReserved = 0;
 	pixmap.baseAddr = image->data;
+    if (image->bytes_per_line >= 0x4000) {
+    	panic("TkImage too wide!");
+    }
 	pixmap.rowBytes = image->bytes_per_line | 0x8000;
 	
 	CopyBits((BitMap *) &pixmap, &((GrafPtr) destPort)->portBits, 
@@ -974,6 +978,26 @@ TkMacSetUpGraphicsPort(
     if (gc->line_width > 1) {
 	PenSize(gc->line_width, gc->line_width);
     }
+    if (gc->line_style != LineSolid) {
+	unsigned char *p = (unsigned char *) &(gc->dashes);
+	/*
+	 * Here the dash pattern should be set in the drawing,
+	 * environment, but I don't know how to do that for the Mac.
+	 *
+	 * p[] is an array of unsigned chars containing the dash list.
+	 * A '\0' indicates the end of this list.
+	 *
+	 * Someone knows how to implement this? If you have a more
+	 * complete implementation of SetUpGraphicsPort() for
+	 * the Mac (or for Windows), please let me know.
+	 *
+	 *	Jan Nijtmans
+	 *	CMG Arnhem, B.V.
+	 *	email: j.nijtmans@chello.nl (private)
+	 *	       jan.nijtmans@cmg.nl (work)
+	 *	url:   http://purl.oclc.org/net/nijtmans/
+	 */
+    }
 }
 
 /*
@@ -1127,4 +1151,46 @@ InvertByte(
         mask = mask << 1;
     }
     return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkpDrawpHighlightBorder --
+ *
+ *	This procedure draws a rectangular ring around the outside of
+ *	a widget to indicate that it has received the input focus.
+ *
+ *      On the Macintosh, this puts a 1 pixel border in the bgGC color
+ *      between the widget and the focus ring, except in the case where 
+ *      highlightWidth is 1, in which case the border is left out.
+ *
+ *      For proper Mac L&F, use highlightWidth of 3.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	A rectangle "width" pixels wide is drawn in "drawable",
+ *	corresponding to the outer area of "tkwin".
+ *
+ *----------------------------------------------------------------------
+ */
+
+void 
+TkpDrawHighlightBorder (
+        Tk_Window tkwin, 
+        GC fgGC, 
+        GC bgGC, 
+        int highlightWidth,
+        Drawable drawable)
+{
+    if (highlightWidth == 1) {
+        TkDrawInsetFocusHighlight (tkwin, fgGC, highlightWidth, drawable, 0);
+    } else {
+        TkDrawInsetFocusHighlight (tkwin, bgGC, highlightWidth, drawable, 0);
+        if (fgGC != bgGC) {
+            TkDrawInsetFocusHighlight (tkwin, fgGC, highlightWidth - 1, drawable, 0);
+        }
+    }
 }

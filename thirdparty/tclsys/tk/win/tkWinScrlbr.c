@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkWinScrlbr.c 1.19 97/08/13 17:37:49
+ * RCS: @(#) $Id: tkWinScrlbr.c,v 1.9 2003/02/21 02:07:50 hobbs Exp $
  */
 
 #include "tkWinInt.h"
@@ -57,12 +57,14 @@ static int initialized = 0;
 static int hArrowWidth, hThumb; /* Horizontal control metrics. */
 static int vArrowWidth, vArrowHeight, vThumb; /* Vertical control metrics. */
 
+TCL_DECLARE_MUTEX(winScrlbrMutex)
+
 /*
  * This variable holds the default width for a scrollbar in string
  * form for use in a Tk_ConfigSpec.
  */
 
-static char defWidth[8];
+static char defWidth[TCL_INTEGER_SPACE];
 
 /*
  * Declarations for functions defined in this file.
@@ -85,9 +87,10 @@ static void		UpdateScrollbarMetrics _ANSI_ARGS_((void));
  * The class procedure table for the scrollbar widget.
  */
 
-TkClassProcs tkpScrollbarProcs = {
+Tk_ClassProcs tkpScrollbarProcs = {
+    sizeof(Tk_ClassProcs),	/* size */
+    NULL,			/* worldChangedProc */
     CreateProc,			/* createProc */
-    NULL,			/* geometryProc */
     ModalLoopProc,		/* modalProc */
 };
 
@@ -116,8 +119,10 @@ TkpCreateScrollbar(tkwin)
     TkWindow *winPtr = (TkWindow *)tkwin;
     
     if (!initialized) {
+        Tcl_MutexLock(&winScrlbrMutex);
 	UpdateScrollbarMetrics();
 	initialized = 1;
+	Tcl_MutexUnlock(&winScrlbrMutex);
     }
 
     scrollPtr = (WinScrollbar *) ckalloc(sizeof(WinScrollbar));
@@ -173,17 +178,19 @@ UpdateScrollbar(scrollPtr)
     scrollInfo.nMin = 0;
     scrollInfo.nMax = MAX_SCROLL;
     thumbSize = (scrollPtr->info.lastFraction - scrollPtr->info.firstFraction);
-    if (tkpIsWin32s) {
-	scrollInfo.nPage = 0;
-    } else {
-	scrollInfo.nPage = ((UINT) (thumbSize * (double) MAX_SCROLL)) + 1;
-    } 
+    scrollInfo.nPage = ((UINT) (thumbSize * (double) MAX_SCROLL)) + 1;
     if (thumbSize < 1.0) {
 	scrollInfo.nPos = (int)
 	    ((scrollPtr->info.firstFraction / (1.0-thumbSize))
 		    * (MAX_SCROLL - (scrollInfo.nPage - 1)));
     } else {
 	scrollInfo.nPos = 0;
+	/*
+	 * Disable the scrollbar when there is nothing to scroll.
+	 * This is standard Windows style (see eg Notepad).
+	 * Also prevents possible crash on XP+ systems [Bug #624116].
+	 */
+	scrollInfo.fMask |= SIF_DISABLENOSCROLL;
     }
     SetScrollInfo(scrollPtr->hwnd, SB_CTL, &scrollInfo, TRUE);
 }
@@ -241,7 +248,7 @@ CreateProc(tkwin, parentWin, instanceData)
 
     for (winPtr = ((TkWindow*)tkwin)->nextPtr; winPtr != NULL;
 	 winPtr = winPtr->nextPtr) {
-	if ((winPtr->window != None) && !(winPtr->flags & TK_TOP_LEVEL)) {
+	if ((winPtr->window != None) && !(winPtr->flags & TK_TOP_HIERARCHY)) {
 	    TkWinSetWindowPos(scrollPtr->hwnd, Tk_GetHWND(winPtr->window),
 		    Below);
 	    break;
@@ -249,8 +256,13 @@ CreateProc(tkwin, parentWin, instanceData)
     }
 
     scrollPtr->lastVertical = scrollPtr->info.vertical;
+#ifdef _WIN64
+    scrollPtr->oldProc = (WNDPROC)SetWindowLongPtr(scrollPtr->hwnd,
+	    GWLP_WNDPROC, (LONG_PTR) ScrollbarProc);
+#else
     scrollPtr->oldProc = (WNDPROC)SetWindowLong(scrollPtr->hwnd, GWL_WNDPROC,
 	    (DWORD) ScrollbarProc);
+#endif
     window = Tk_AttachHWND(tkwin, scrollPtr->hwnd);
 
     UpdateScrollbar(scrollPtr);
@@ -295,7 +307,11 @@ TkpDisplayScrollbar(clientData)
     if (scrollPtr->lastVertical != scrollPtr->info.vertical) {
 	HWND hwnd = Tk_GetHWND(Tk_WindowId(tkwin));
 
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR) scrollPtr->oldProc);
+#else
 	SetWindowLong(hwnd, GWL_WNDPROC, (DWORD) scrollPtr->oldProc);
+#endif
 	DestroyWindow(hwnd);
 
 	CreateProc(tkwin, Tk_WindowId(Tk_Parent(tkwin)),
@@ -328,7 +344,11 @@ TkpDestroyScrollbar(scrollPtr)
     WinScrollbar *winScrollPtr = (WinScrollbar *)scrollPtr;
     HWND hwnd = winScrollPtr->hwnd;
     if (hwnd) {
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR) winScrollPtr->oldProc);
+#else
 	SetWindowLong(hwnd, GWL_WNDPROC, (DWORD) winScrollPtr->oldProc);
+#endif
 	if (winScrollPtr->winFlags & IN_MODAL_LOOP) {
 	    ((TkWindow *)scrollPtr->tkwin)->flags |= TK_DONT_DESTROY_WINDOW;
 	    SetParent(hwnd, NULL);
@@ -668,16 +688,18 @@ ModalLoopProc(tkwin, eventPtr)
     WinScrollbar *scrollPtr = (WinScrollbar *) winPtr->instanceData;
     int oldMode;
 
-    Tcl_Preserve((ClientData)scrollPtr);
-    scrollPtr->winFlags |= IN_MODAL_LOOP;
-    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
-    TkWinResendEvent(scrollPtr->oldProc, scrollPtr->hwnd, eventPtr);
-    (void) Tcl_SetServiceMode(oldMode);
-    scrollPtr->winFlags &= ~IN_MODAL_LOOP;
-    if (scrollPtr->hwnd && scrollPtr->winFlags & ALREADY_DEAD) {
-	DestroyWindow(scrollPtr->hwnd);
+    if (scrollPtr->hwnd) {
+	Tcl_Preserve((ClientData)scrollPtr);
+	scrollPtr->winFlags |= IN_MODAL_LOOP;
+	oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+	TkWinResendEvent(scrollPtr->oldProc, scrollPtr->hwnd, eventPtr);
+	(void) Tcl_SetServiceMode(oldMode);
+	scrollPtr->winFlags &= ~IN_MODAL_LOOP;
+	if (scrollPtr->hwnd && scrollPtr->winFlags & ALREADY_DEAD) {
+	    DestroyWindow(scrollPtr->hwnd);
+	}
+	Tcl_Release((ClientData)scrollPtr);
     }
-    Tcl_Release((ClientData)scrollPtr);
 }
 
 /*

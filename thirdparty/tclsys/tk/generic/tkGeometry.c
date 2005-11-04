@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkGeometry.c 1.31 96/02/15 18:53:32
+ * RCS: @(#) $Id: tkGeometry.c,v 1.5 2001/09/26 20:25:17 pspjuth Exp $
  */
 
 #include "tkPort.h"
@@ -51,19 +51,6 @@ typedef struct MaintainMaster {
     MaintainSlave *slavePtr;	/* First in list of all slaves associated
 				 * with this master. */
 } MaintainMaster;
-
-/*
- * Hash table that maps from a master's Tk_Window token to a list of
- * Maintains for that master:
- */
-
-static Tcl_HashTable maintainHashTable;
-
-/*
- * Has maintainHashTable been initialized yet?
- */
-
-static int initialized = 0;
 
 /*
  * Prototypes for static procedures in this file:
@@ -178,6 +165,79 @@ Tk_GeometryRequest(tkwin, reqWidth, reqHeight)
 /*
  *----------------------------------------------------------------------
  *
+ * Tk_SetInternalBorderEx --
+ *
+ *	Notify relevant geometry managers that a window has an internal
+ *	border of a given width and that child windows should not be
+ *	placed on that border.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The border widths are recorded for the window, and all geometry
+ *	managers of all children are notified so that can re-layout, if
+ *	necessary.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+Tk_SetInternalBorderEx(tkwin, left, right, top, bottom)
+    Tk_Window tkwin;		/* Window that will have internal border. */
+    int left, right;		/* Width of internal border, in pixels. */
+    int top, bottom;
+{
+    register TkWindow *winPtr = (TkWindow *) tkwin;
+    register int changed = 0;
+
+    if (left < 0) {
+	left = 0;
+    }
+    if (left != winPtr->internalBorderLeft) {
+	winPtr->internalBorderLeft = left;
+	changed = 1;
+    }
+
+    if (right < 0) {
+	right = 0;
+    }
+    if (right != winPtr->internalBorderRight) {
+	winPtr->internalBorderRight = right;
+	changed = 1;
+    }
+
+    if (top < 0) {
+	top = 0;
+    }
+    if (top != winPtr->internalBorderTop) {
+	winPtr->internalBorderTop = top;
+	changed = 1;
+    }
+
+    if (bottom < 0) {
+	bottom = 0;
+    }
+    if (bottom != winPtr->internalBorderBottom) {
+	winPtr->internalBorderBottom = bottom;
+	changed = 1;
+    }
+
+    /*
+     * All the slaves for which this is the master window must now be
+     * repositioned to take account of the new internal border width.
+     * To signal all the geometry managers to do this, just resize the
+     * window to its current size.  The ConfigureNotify event will
+     * cause geometry managers to recompute everything.
+     */
+
+    if (changed) {
+	Tk_ResizeWindow(tkwin, Tk_Width(tkwin), Tk_Height(tkwin));
+    }
+}
+/*
+ *----------------------------------------------------------------------
+ *
  * Tk_SetInternalBorder --
  *
  *	Notify relevant geometry managers that a window has an internal
@@ -200,19 +260,45 @@ Tk_SetInternalBorder(tkwin, width)
     Tk_Window tkwin;		/* Window that will have internal border. */
     int width;			/* Width of internal border, in pixels. */
 {
+    Tk_SetInternalBorderEx(tkwin, width, width, width, width);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_SetMinimumRequestSize --
+ *
+ *	Notify relevant geometry managers that a window has a minimum
+ *	request size.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The minimum request size is recorded for the window, and 
+ *      a new size is requested for the window, if necessary.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+Tk_SetMinimumRequestSize(tkwin, minWidth, minHeight)
+    Tk_Window tkwin;		/* Window that will have internal border. */
+    int minWidth, minHeight;	/* Minimum requested size, in pixels. */
+{
     register TkWindow *winPtr = (TkWindow *) tkwin;
 
-    if (width == winPtr->internalBorderWidth) {
+    if ((winPtr->minReqWidth == minWidth) &&
+	    (winPtr->minReqHeight == minHeight)) {
 	return;
     }
-    if (width < 0) {
-	width = 0;
-    }
-    winPtr->internalBorderWidth = width;
+
+    winPtr->minReqWidth = minWidth;
+    winPtr->minReqHeight = minHeight;
 
     /*
-     * All the slaves for which this is the master window must now be
-     * repositioned to take account of the new internal border width.
+     * The changed min size may cause geometry managers to get a
+     * different result, so make them recompute.
      * To signal all the geometry managers to do this, just resize the
      * window to its current size.  The ConfigureNotify event will
      * cause geometry managers to recompute everything.
@@ -261,10 +347,31 @@ Tk_MaintainGeometry(slave, master, x, y, width, height)
     register MaintainSlave *slavePtr;
     int new, map;
     Tk_Window ancestor, parent;
+    TkDisplay *dispPtr = ((TkWindow *) master)->dispPtr;
 
-    if (!initialized) {
-	initialized = 1;
-	Tcl_InitHashTable(&maintainHashTable, TCL_ONE_WORD_KEYS);
+    if (master == Tk_Parent(slave)) {
+	/*
+	 * If the slave is a direct descendant of the master, don't bother
+	 * setting up the extra infrastructure for management, just make a
+	 * call to Tk_MoveResizeWindow; the parent/child relationship will
+	 * take care of the rest.
+	 */
+	Tk_MoveResizeWindow(slave, x, y, width, height);
+
+	/*
+	 * Map the slave if the master is already mapped; otherwise, wait
+	 * until the master is mapped later (in which case mapping the slave
+	 * is taken care of elsewhere).
+	 */
+	if (Tk_IsMapped(master)) {
+	    Tk_MapWindow(slave);
+	}
+	return;
+    }
+
+    if (!dispPtr->geomInit) {
+	dispPtr->geomInit = 1;
+	Tcl_InitHashTable(&dispPtr->maintainHashTable, TCL_ONE_WORD_KEYS);
     }
 
     /*
@@ -273,7 +380,8 @@ Tk_MaintainGeometry(slave, master, x, y, width, height)
      */
 
     parent = Tk_Parent(slave);
-    hPtr = Tcl_CreateHashEntry(&maintainHashTable, (char *) master, &new);
+    hPtr = Tcl_CreateHashEntry(&dispPtr->maintainHashTable, 
+            (char *) master, &new);
     if (!new) {
 	masterPtr = (MaintainMaster *) Tcl_GetHashValue(hPtr);
     } else {
@@ -383,16 +491,26 @@ Tk_UnmaintainGeometry(slave, master)
     MaintainMaster *masterPtr;
     register MaintainSlave *slavePtr, *prevPtr;
     Tk_Window ancestor;
+    TkDisplay *dispPtr = ((TkWindow *) slave)->dispPtr;
 
-    if (!initialized) {
-	initialized = 1;
-	Tcl_InitHashTable(&maintainHashTable, TCL_ONE_WORD_KEYS);
+    if (master == Tk_Parent(slave)) {
+	/*
+	 * If the slave is a direct descendant of the master,
+	 * Tk_MaintainGeometry will not have set up any of the extra
+	 * infrastructure.  Don't even bother to look for it, just return.
+	 */
+	return;
+    }
+    
+    if (!dispPtr->geomInit) {
+	dispPtr->geomInit = 1;
+	Tcl_InitHashTable(&dispPtr->maintainHashTable, TCL_ONE_WORD_KEYS);
     }
 
     if (!(((TkWindow *) slave)->flags & TK_ALREADY_DEAD)) {
 	Tk_UnmapWindow(slave);
     }
-    hPtr = Tcl_FindHashEntry(&maintainHashTable, (char *) master);
+    hPtr = Tcl_FindHashEntry(&dispPtr->maintainHashTable, (char *) master);
     if (hPtr == NULL) {
 	return;
     }

@@ -8,10 +8,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacRegion.c 1.9 96/12/03 11:46:50
+ * RCS: @(#) $Id: tkMacRegion.c,v 1.4 2002/06/14 13:35:49 dkf Exp $
  */
 
 #include "tkInt.h"
+#include "tkMacInt.h"
 #include "X.h"
 #include "Xlib.h"
 
@@ -214,4 +215,34 @@ TkClipBox(
     rect_return->y = (**rgn).rgnBBox.top;
     rect_return->width = (**rgn).rgnBBox.right - (**rgn).rgnBBox.left;
     rect_return->height = (**rgn).rgnBBox.bottom - (**rgn).rgnBBox.top;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkSubtractRegion --
+ *
+ *	Implements the equivilent of the X window function
+ *	XSubtractRegion.  See X window documentation for more details.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void 
+TkSubtractRegion(
+    TkRegion sra,
+    TkRegion srb,
+    TkRegion dr_return)
+{
+    RgnHandle srcRgnA = (RgnHandle) sra;
+    RgnHandle srcRgnB = (RgnHandle) srb;
+    RgnHandle destRgn = (RgnHandle) dr_return;
+
+    DiffRgn(srcRgnA, srcRgnB, destRgn);
 }

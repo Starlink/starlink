@@ -9,17 +9,17 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacMenubutton.c 1.4 97/01/03 13:55:19
+ * RCS: @(#) $Id: tkMacMenubutton.c,v 1.9.4.1 2003/11/17 23:29:36 hobbs Exp $
  */
 
 #include "tkMenubutton.h"
 #include "tkMacInt.h"
 #include <Controls.h>
 
-#define kShadowOffset				(3)	/* amount to offset shadow from frame */
-#define kTriangleWidth				(11)	/* width of the triangle */
-#define kTriangleHeight				(6)	/* height of the triangle */
-#define kTriangleMargin				(5)	/* margin around triangle */
+#define kShadowOffset	(3)	/* amount to offset shadow from frame */
+#define kTriangleWidth	(11)	/* width of the triangle */
+#define kTriangleHeight	(6)	/* height of the triangle */
+#define kTriangleMargin	(5)	/* margin around triangle */
 
 /*
  * Declaration of Unix specific button structure.
@@ -34,10 +34,9 @@ typedef struct MacMenuButton {
  * procedures that can be invoked from generic window code.
  */
 
-TkClassProcs tkpMenubuttonClass = {
-    NULL,			/* createProc. */
-    TkMenuButtonWorldChanged,	/* geometryProc. */
-    NULL			/* modalProc. */
+Tk_ClassProcs tkpMenubuttonClass = {
+    sizeof(Tk_ClassProcs),	/* size */
+    TkMenuButtonWorldChanged,	/* worldChangedProc */
 };
 
 /*
@@ -93,7 +92,10 @@ TkpDisplayMenuButton(
 				 * compiler warning. */
     int y;
     Tk_Window tkwin = mbPtr->tkwin;
-    int width, height;
+    int width, height, fullWidth, fullHeight;
+    int imageWidth, imageHeight;
+    int imageXOffset, imageYOffset, textXOffset, textYOffset;
+    int haveImage = 0, haveText = 0;
     MacMenuButton * macMBPtr = (MacMenuButton *) mbPtr;
     GWorldPtr destPort;
     CGrafPtr saveWorld;
@@ -110,14 +112,27 @@ TkpDisplayMenuButton(
     SetGWorld(destPort, NULL);
     macDraw = (MacDrawable *) Tk_WindowId(tkwin);
 
-    if ((mbPtr->state == tkDisabledUid) && (mbPtr->disabledFg != NULL)) {
+    if ((mbPtr->state == STATE_DISABLED) && (mbPtr->disabledFg != NULL)) {
 	gc = mbPtr->disabledGC;
-    } else if ((mbPtr->state == tkActiveUid) && !Tk_StrictMotif(mbPtr->tkwin)) {
+    } else if ((mbPtr->state == STATE_ACTIVE)
+	    && !Tk_StrictMotif(mbPtr->tkwin)) {
 	gc = mbPtr->activeTextGC;
     } else {
 	gc = mbPtr->normalTextGC;
     }
     border = mbPtr->normalBorder;
+
+    if (mbPtr->image != None) {
+        Tk_SizeOfImage(mbPtr->image, &width, &height);
+        haveImage = 1;
+    } else if (mbPtr->bitmap != None) {
+        Tk_SizeOfBitmap(mbPtr->display, mbPtr->bitmap, &width, &height);
+        haveImage = 1;
+    }
+    imageWidth  = width;
+    imageHeight = height;
+
+    haveText = (mbPtr->textWidth != 0 && mbPtr->textHeight != 0);
 
     /*
      * In order to avoid screen flashes, this procedure redraws
@@ -129,6 +144,106 @@ TkpDisplayMenuButton(
     Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), border, 0, 0,
 	    Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
 
+    imageXOffset = 0;
+    imageYOffset = 0;
+    textXOffset = 0;
+    textYOffset = 0;
+    fullWidth = 0;
+    fullHeight = 0;
+
+    if (mbPtr->compound != COMPOUND_NONE && haveImage && haveText) {
+        switch ((enum compound) mbPtr->compound) {
+            case COMPOUND_TOP:
+            case COMPOUND_BOTTOM: {
+                /* Image is above or below text */
+                if (mbPtr->compound == COMPOUND_TOP) {
+                    textYOffset = height + mbPtr->padY;
+                } else {
+                    imageYOffset = mbPtr->textHeight + mbPtr->padY;
+                }
+                fullHeight = height + mbPtr->textHeight + mbPtr->padY;
+                fullWidth = (width > mbPtr->textWidth ? width :
+                        mbPtr->textWidth);
+                textXOffset = (fullWidth - mbPtr->textWidth)/2;
+                imageXOffset = (fullWidth - width)/2;
+                break;
+            }
+            case COMPOUND_LEFT:
+            case COMPOUND_RIGHT: {
+                /* Image is left or right of text */
+                if (mbPtr->compound == COMPOUND_LEFT) {
+                    textXOffset = width + mbPtr->padX;
+                } else {
+                    imageXOffset = mbPtr->textWidth + mbPtr->padX;
+                }
+                fullWidth = mbPtr->textWidth + mbPtr->padX + width;
+                fullHeight = (height > mbPtr->textHeight ? height :
+                        mbPtr->textHeight);
+                textYOffset = (fullHeight - mbPtr->textHeight)/2;
+                imageYOffset = (fullHeight - height)/2;
+                break;
+            }
+            case COMPOUND_CENTER: {
+                /* Image and text are superimposed */
+                fullWidth = (width > mbPtr->textWidth ? width :
+                        mbPtr->textWidth);
+                fullHeight = (height > mbPtr->textHeight ? height :
+                        mbPtr->textHeight);
+                textXOffset = (fullWidth - mbPtr->textWidth)/2;
+                imageXOffset = (fullWidth - width)/2;
+                textYOffset = (fullHeight - mbPtr->textHeight)/2;
+                imageYOffset = (fullHeight - height)/2;
+                break;
+            }
+            case COMPOUND_NONE: {break;}
+        }
+
+
+        TkComputeAnchor(mbPtr->anchor, tkwin, 0, 0,
+                mbPtr->indicatorWidth + fullWidth, fullHeight,
+                &x, &y);
+
+	imageXOffset += x;
+	imageYOffset += y;
+        if (mbPtr->image != NULL) {
+            Tk_RedrawImage(mbPtr->image, 0, 0, width, height, Tk_WindowId(tkwin),
+                    imageXOffset, imageYOffset);
+        } else if (mbPtr->bitmap != None) {
+            XCopyPlane(mbPtr->display, mbPtr->bitmap, Tk_WindowId(tkwin),
+                    gc, 0, 0, (unsigned) width, (unsigned) height,
+                    imageXOffset, imageYOffset, 1);
+        }
+
+	Tk_DrawTextLayout(mbPtr->display, Tk_WindowId(tkwin), gc,
+		mbPtr->textLayout, x + textXOffset, y + textYOffset, 0, -1);
+	Tk_UnderlineTextLayout(mbPtr->display, Tk_WindowId(tkwin), gc,
+		mbPtr->textLayout, x + textXOffset, y + textYOffset,
+		mbPtr->underline);
+    } else if (haveImage) {
+	TkComputeAnchor(mbPtr->anchor, tkwin, 0, 0,
+		width + mbPtr->indicatorWidth, height, &x, &y);
+	imageXOffset += x;
+	imageYOffset += y;
+	if (mbPtr->image != NULL) {
+	    Tk_RedrawImage(mbPtr->image, 0, 0, width, height, Tk_WindowId(tkwin),
+		    imageXOffset, imageYOffset);
+	} else if (mbPtr->bitmap != None) {
+	    XCopyPlane(mbPtr->display, mbPtr->bitmap, Tk_WindowId(tkwin),
+		    gc, 0, 0, (unsigned) width, (unsigned) height, 
+		    x, y, 1);
+	}
+    } else {
+	TkComputeAnchor(mbPtr->anchor, tkwin, mbPtr->padX, mbPtr->padY,
+		mbPtr->textWidth + mbPtr->indicatorWidth,
+		mbPtr->textHeight, &x, &y);
+	Tk_DrawTextLayout(mbPtr->display, Tk_WindowId(tkwin), gc,
+		mbPtr->textLayout, x + textXOffset, y + textYOffset, 0, -1);
+	Tk_UnderlineTextLayout(mbPtr->display, Tk_WindowId(tkwin), gc,
+		mbPtr->textLayout, x + textXOffset, y + textYOffset,
+		mbPtr->underline);
+    }
+
+#if 0		/* this is the original code */
     /*
      * Display image or bitmap or text for button.
      */
@@ -156,18 +271,29 @@ TkpDisplayMenuButton(
 	Tk_DrawTextLayout(mbPtr->display, Tk_WindowId(tkwin), gc,
 		mbPtr->textLayout, x, y, 0, -1);
     }
+#endif
 
     /*
      * If the menu button is disabled with a stipple rather than a special
      * foreground color, generate the stippled effect.
      */
 
-    if ((mbPtr->state == tkDisabledUid)
-	    && ((mbPtr->disabledFg == NULL) || (mbPtr->image != NULL))) {
-	XFillRectangle(mbPtr->display, Tk_WindowId(tkwin), mbPtr->disabledGC,
-		mbPtr->inset, mbPtr->inset,
-		(unsigned) (Tk_Width(tkwin) - 2*mbPtr->inset),
-		(unsigned) (Tk_Height(tkwin) - 2*mbPtr->inset));
+    if ((mbPtr->state == STATE_DISABLED)
+	    && ((mbPtr->disabledFg != NULL) || (mbPtr->image != NULL))) {
+	/*
+	 * Stipple the whole button if no disabledFg was specified,
+	 * otherwise restrict stippling only to displayed image
+	 */
+	if (mbPtr->disabledFg == NULL) {
+	    XFillRectangle(mbPtr->display, Tk_WindowId(tkwin),
+		    mbPtr->stippleGC, mbPtr->inset, mbPtr->inset,
+		    (unsigned) (Tk_Width(tkwin) - 2*mbPtr->inset),
+		    (unsigned) (Tk_Height(tkwin) - 2*mbPtr->inset));
+	} else {
+	    XFillRectangle(mbPtr->display, Tk_WindowId(tkwin),
+		    mbPtr->stippleGC, imageXOffset, imageYOffset,
+		    (unsigned) imageWidth, (unsigned) imageHeight);
+	}
     }
 
     /*
@@ -221,19 +347,18 @@ TkpDisplayMenuButton(
 	LineTo(r.left + kShadowOffset, r.bottom);
     }
     
-	if (mbPtr->state == tkDisabledUid) {
-	}
-    
     if (mbPtr->highlightWidth != 0) {
-	GC gc;
+	GC fgGC, bgGC;
 
+	bgGC = Tk_GCForColor(mbPtr->highlightBgColorPtr, Tk_WindowId(tkwin));
 	if (mbPtr->flags & GOT_FOCUS) {
-	    gc = Tk_GCForColor(mbPtr->highlightColorPtr, Tk_WindowId(tkwin));
+	    fgGC = Tk_GCForColor(mbPtr->highlightColorPtr, Tk_WindowId(tkwin));
+	    TkpDrawHighlightBorder(tkwin, fgGC, bgGC, mbPtr->highlightWidth,
+		    Tk_WindowId(tkwin));
 	} else {
-	    gc = Tk_GCForColor(mbPtr->highlightBgColorPtr, Tk_WindowId(tkwin));
+	    TkpDrawHighlightBorder(tkwin, bgGC, bgGC, mbPtr->highlightWidth,
+		    Tk_WindowId(tkwin));
 	}
-	Tk_DrawFocusHighlight(tkwin, gc, mbPtr->highlightWidth,
-		Tk_WindowId(tkwin));
     }
 
     SetGWorld(saveWorld, saveDevice);
@@ -283,7 +408,7 @@ void
 TkpComputeMenuButtonGeometry(mbPtr)
     register TkMenuButton *mbPtr;		/* Widget record for menu button. */
 {
-    int width, height, mm, pixels;
+    int width=0, height=0, textwidth=0, textheight=0, mm, pixels, noimage=0;
 
     mbPtr->inset = mbPtr->highlightWidth + mbPtr->borderWidth;
     if (mbPtr->image != None) {
@@ -303,23 +428,54 @@ TkpComputeMenuButtonGeometry(mbPtr)
 	    height = mbPtr->height;
 	}
     } else {
+    noimage=1;
+    }
+    
+    if ( noimage || mbPtr->compound != COMPOUND_NONE ) {
 	Tk_FreeTextLayout(mbPtr->textLayout);
 	mbPtr->textLayout = Tk_ComputeTextLayout(mbPtr->tkfont, mbPtr->text,
 		-1, mbPtr->wrapLength, mbPtr->justify, 0, &mbPtr->textWidth,
 		&mbPtr->textHeight);
-	width = mbPtr->textWidth;
-	height = mbPtr->textHeight;
+	textwidth = mbPtr->textWidth;
+	textheight = mbPtr->textHeight;
 	if (mbPtr->width > 0) {
-	    width = mbPtr->width * Tk_TextWidth(mbPtr->tkfont, "0", 1);
+	    textwidth = mbPtr->width * Tk_TextWidth(mbPtr->tkfont, "0", 1);
 	}
 	if (mbPtr->height > 0) {
 	    Tk_FontMetrics fm;
 
 	    Tk_GetFontMetrics(mbPtr->tkfont, &fm);
-	    height = mbPtr->height * fm.linespace;
+	    textheight = mbPtr->height * fm.linespace;
 	}
-	width += 2*mbPtr->padX;
-	height += 2*mbPtr->padY;
+	textwidth += 2*mbPtr->padX;
+	textheight +=  2*mbPtr->padY;
+    }
+    
+	switch ((enum compound) mbPtr->compound) {
+	  case COMPOUND_TOP:
+	  case COMPOUND_BOTTOM: {
+	      height += textheight + mbPtr->padY;
+	      width = (width > textwidth ? width : textwidth);
+	      break;
+	  }
+	  case COMPOUND_LEFT:
+	  case COMPOUND_RIGHT: {
+	      height = (height > textheight ? height : textheight);
+	      width += textwidth + mbPtr->padX;
+	      break;
+	  }
+	  case COMPOUND_CENTER: {
+	      height = (height > textheight ? height : textheight);
+	      width = (width > textwidth ? width : textwidth);
+	      break;
+	  }
+	  case COMPOUND_NONE: {
+	     if (noimage) {
+	     	height = textheight;
+	     	width = textwidth;
+	     }
+	     break;
+	}
     }
 
     if (mbPtr->indicatorOn) {

@@ -10,11 +10,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkGC.c 1.18 96/02/15 18:53:32
+ * RCS: @(#) $Id: tkGC.c,v 1.4 2002/04/12 10:02:40 hobbs Exp $
  */
 
 #include "tkPort.h"
-#include "tk.h"
+#include "tkInt.h"
 
 /*
  * One of the following data structures exists for each GC that is
@@ -31,12 +31,6 @@ typedef struct {
 				 * this structure). */
 } TkGC;
 
-/*
- * Hash table to map from a GC's values to a TkGC structure describing
- * a GC with those values (used by Tk_GetGC).
- */
-
-static Tcl_HashTable valueTable;
 typedef struct {
     XGCValues values;		/* Desired values for GC. */
     Display *display;		/* Display for which GC is valid. */
@@ -45,24 +39,10 @@ typedef struct {
 } ValueKey;
 
 /*
- * Hash table for <display + GC> -> TkGC mapping. This table is used by
- * Tk_FreeGC.
- */
-
-static Tcl_HashTable idTable;
-typedef struct {
-    Display *display;		/* Display for which GC was allocated. */
-    GC gc;			/* X's identifier for GC. */
-} IdKey;
-
-static int initialized = 0;	/* 0 means static structures haven't been
-				 * initialized yet. */
-
-/*
  * Forward declarations for procedures defined in this file:
  */
 
-static void		GCInit _ANSI_ARGS_((void));
+static void		GCInit _ANSI_ARGS_((TkDisplay *dispPtr));
 
 /*
  *----------------------------------------------------------------------
@@ -98,14 +78,14 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
 				 * in valueMask. */
 {
     ValueKey valueKey;
-    IdKey idKey;
     Tcl_HashEntry *valueHashPtr, *idHashPtr;
     register TkGC *gcPtr;
     int new;
     Drawable d, freeDrawable;
+    TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (!initialized) {
-	GCInit();
+    if (dispPtr->gcInit <= 0) {
+	GCInit(dispPtr);
     }
 
     /*
@@ -238,7 +218,8 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     valueKey.display = Tk_Display(tkwin);
     valueKey.screenNum = Tk_ScreenNumber(tkwin);
     valueKey.depth = Tk_Depth(tkwin);
-    valueHashPtr = Tcl_CreateHashEntry(&valueTable, (char *) &valueKey, &new);
+    valueHashPtr = Tcl_CreateHashEntry(&dispPtr->gcValueTable, 
+            (char *) &valueKey, &new);
     if (!new) {
 	gcPtr = (TkGC *) Tcl_GetHashValue(valueHashPtr);
 	gcPtr->refCount++;
@@ -275,9 +256,8 @@ Tk_GetGC(tkwin, valueMask, valuePtr)
     gcPtr->display = valueKey.display;
     gcPtr->refCount = 1;
     gcPtr->valueHashPtr = valueHashPtr;
-    idKey.display = valueKey.display;
-    idKey.gc = gcPtr->gc;
-    idHashPtr = Tcl_CreateHashEntry(&idTable, (char *) &idKey, &new);
+    idHashPtr = Tcl_CreateHashEntry(&dispPtr->gcIdTable, 
+            (char *) gcPtr->gc, &new);
     if (!new) {
 	panic("GC already registered in Tk_GetGC");
     }
@@ -313,17 +293,23 @@ Tk_FreeGC(display, gc)
     Display *display;		/* Display for which gc was allocated. */
     GC gc;			/* Graphics context to be released. */
 {
-    IdKey idKey;
     Tcl_HashEntry *idHashPtr;
     register TkGC *gcPtr;
+    TkDisplay *dispPtr = TkGetDisplay(display);
 
-    if (!initialized) {
+    if (!dispPtr->gcInit) {
 	panic("Tk_FreeGC called before Tk_GetGC");
     }
+    if (dispPtr->gcInit < 0) {
+	/*
+	 * The GCCleanup has been called, and remaining GCs have been
+	 * freed.  This may still get called by other things shutting
+	 * down, but the GCs should no longer be in use.
+	 */
+	return;
+    }
 
-    idKey.display = display;
-    idKey.gc = gc;
-    idHashPtr = Tcl_FindHashEntry(&idTable, (char *) &idKey);
+    idHashPtr = Tcl_FindHashEntry(&dispPtr->gcIdTable, (char *) gc);
     if (idHashPtr == NULL) {
 	panic("Tk_FreeGC received unknown gc argument");
     }
@@ -336,6 +322,51 @@ Tk_FreeGC(display, gc)
 	Tcl_DeleteHashEntry(idHashPtr);
 	ckfree((char *) gcPtr);
     }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkGCCleanup --
+ *
+ *	Frees the structures used for GC management.
+ *	We need to have it called near the end, when other cleanup that
+ *	calls Tk_FreeGC is all done.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	GC resources are freed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkGCCleanup(dispPtr)
+    TkDisplay *dispPtr;	/* display to clean up resources in */
+{
+    Tcl_HashEntry *entryPtr;
+    Tcl_HashSearch search;
+    TkGC *gcPtr;
+
+    for (entryPtr = Tcl_FirstHashEntry(&dispPtr->gcIdTable, &search);
+	 entryPtr != NULL;
+	 entryPtr = Tcl_NextHashEntry(&search)) {
+	gcPtr = (TkGC *) Tcl_GetHashValue(entryPtr);
+	/*
+	 * This call is not needed, as it is only used on Unix to restore
+	 * the Id to the stack pool, and we don't want to use them anymore.
+	 *   Tk_FreeXId(gcPtr->display, (XID) XGContextFromGC(gcPtr->gc));
+	 */
+	XFreeGC(gcPtr->display, gcPtr->gc);
+	Tcl_DeleteHashEntry(gcPtr->valueHashPtr);
+	Tcl_DeleteHashEntry(entryPtr);
+	ckfree((char *) gcPtr);
+    }
+    Tcl_DeleteHashTable(&dispPtr->gcValueTable);
+    Tcl_DeleteHashTable(&dispPtr->gcIdTable);
+    dispPtr->gcInit = -1;
 }
 
 /*
@@ -355,9 +386,13 @@ Tk_FreeGC(display, gc)
  */
 
 static void
-GCInit()
+GCInit(dispPtr)
+    TkDisplay *dispPtr;
 {
-    initialized = 1;
-    Tcl_InitHashTable(&valueTable, sizeof(ValueKey)/sizeof(int));
-    Tcl_InitHashTable(&idTable, sizeof(IdKey)/sizeof(int));
+    if (dispPtr->gcInit < 0) {
+	panic("called GCInit after GCCleanup");
+    }
+    dispPtr->gcInit = 1;
+    Tcl_InitHashTable(&dispPtr->gcValueTable, sizeof(ValueKey)/sizeof(int));
+    Tcl_InitHashTable(&dispPtr->gcIdTable, TCL_ONE_WORD_KEYS);
 }

@@ -29,7 +29,7 @@ SOFTWARE.
 
 /* You must include <X11/Xlib.h> before including this file */
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) || defined(MAC_OSX_TK)
 #   define Region XRegion
 #endif
 
@@ -448,14 +448,6 @@ extern Status XGetTextProperty(
 #endif
 );
 
-extern XVisualInfo *XGetVisualInfo(
-#if NeedFunctionPrototypes
-    Display*		/* display */,
-    long		/* vinfo_mask */,
-    XVisualInfo*	/* vinfo_template */,
-    int*		/* nitems_return */
-#endif
-);
 
 extern Status XGetWMClientMachine(
 #if NeedFunctionPrototypes
@@ -652,14 +644,6 @@ extern void XSetTextProperty(
 #endif
 );
 
-extern void XSetWMClientMachine(
-#if NeedFunctionPrototypes
-    Display*		/* display */,
-    Window		/* w */,
-    XTextProperty*	/* text_prop */
-#endif
-);
-
 extern void XSetWMHints(
 #if NeedFunctionPrototypes
     Display*		/* display */,
@@ -759,14 +743,6 @@ extern void XShrinkRegion(
     Region		/* r */,
     int			/* dx */,
     int			/* dy */
-#endif
-);
-
-extern Status XStringListToTextProperty(
-#if NeedFunctionPrototypes
-    char**		/* list */,
-    int			/* count */,
-    XTextProperty*	/* text_prop_return */
 #endif
 );
 
@@ -872,7 +848,7 @@ extern void XXorRegion(
 
 _XFUNCPROTOEND
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) || defined(MAC_OSX_TK)
 #   undef Region
 #endif
 

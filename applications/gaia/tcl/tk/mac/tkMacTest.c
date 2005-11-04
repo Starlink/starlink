@@ -9,10 +9,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacTest.c 1.2 96/12/15 14:34:00
+ * RCS: @(#) $Id: tkMacTest.c,v 1.4 2002/10/09 11:56:57 das Exp $
  */
 
 #include <Types.h>
+#include <tcl.h>
 
 /*
  * Forward declarations of procedures defined later in this file:
@@ -20,7 +21,7 @@
 
 int			TkplatformtestInit _ANSI_ARGS_((Tcl_Interp *interp));
 static int		DebuggerCmd _ANSI_ARGS_((ClientData dummy,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 
 /*
  *----------------------------------------------------------------------
@@ -74,7 +75,7 @@ DebuggerCmd(
     ClientData clientData,		/* Not used. */
     Tcl_Interp *interp,			/* Not used. */
     int argc,				/* Not used. */
-    char **argv)			/* Not used. */
+    CONST char **argv)			/* Not used. */
 {
     Debugger();
     return TCL_OK;

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkWinDefault.h 1.34 97/10/09 17:45:20
+ * RCS: @(#) $Id: tkWinDefault.h,v 1.16 2002/06/21 23:09:54 hobbs Exp $
  */
 
 #ifndef _TKWINDEFAULT
@@ -32,14 +32,14 @@
 #define NORMAL_BG	"SystemButtonFace"
 #define NORMAL_FG	"SystemButtonText"
 #define ACTIVE_BG	NORMAL_BG
-#define TEXT_FG	"SystemWindowText"
+#define TEXT_FG		"SystemWindowText"
 #define SELECT_BG	"SystemHighlight"
 #define SELECT_FG	"SystemHighlightText"
 #define TROUGH		"SystemScrollbar"
 #define INDICATOR	"SystemWindow"
 #define DISABLED	"SystemDisabledText"
-#define MENU_BG	"SystemMenu"
-#define MENU_FG	"SystemMenuText"
+#define MENU_BG		"SystemMenu"
+#define MENU_FG		"SystemMenuText"
 #define HIGHLIGHT	"SystemWindowFrame"
 
 /*
@@ -58,6 +58,7 @@
 #define DEF_BUTTON_BORDER_WIDTH	"2"
 #define DEF_BUTTON_CURSOR		""
 #define DEF_BUTTON_COMMAND		""
+#define DEF_BUTTON_COMPOUND		"none"
 #define DEF_BUTTON_DEFAULT		"disabled"
 #define DEF_BUTTON_DISABLED_FG_COLOR	DISABLED
 #define DEF_BUTTON_DISABLED_FG_MONO	""
@@ -65,7 +66,8 @@
 #define DEF_CHKRAD_FG			TEXT_FG
 #define DEF_BUTTON_FONT		CTL_FONT
 #define DEF_BUTTON_HEIGHT		"0"
-#define DEF_BUTTON_HIGHLIGHT_BG	NORMAL_BG
+#define DEF_BUTTON_HIGHLIGHT_BG_COLOR	DEF_BUTTON_BG_COLOR
+#define DEF_BUTTON_HIGHLIGHT_BG_MONO	DEF_BUTTON_BG_MONO
 #define DEF_BUTTON_HIGHLIGHT		HIGHLIGHT
 #define DEF_LABEL_HIGHLIGHT_WIDTH	"0"
 #define DEF_BUTTON_HIGHLIGHT_WIDTH	"1"
@@ -74,13 +76,16 @@
 #define DEF_BUTTON_JUSTIFY		"center"
 #define DEF_BUTTON_OFF_VALUE		"0"
 #define DEF_BUTTON_ON_VALUE		"1"
-#define DEF_BUTTON_PADX		"1"
+#define DEF_BUTTON_OVER_RELIEF		""
+#define DEF_BUTTON_PADX			"1"
 #define DEF_LABCHKRAD_PADX		"1"
-#define DEF_BUTTON_PADY		"1"
+#define DEF_BUTTON_PADY			"1"
 #define DEF_LABCHKRAD_PADY		"1"
 #define DEF_BUTTON_RELIEF		"raised"
 #define DEF_LABCHKRAD_RELIEF		"flat"
-#define DEF_BUTTON_SELECT_COLOR	INDICATOR
+#define DEF_BUTTON_REPEAT_DELAY		"0"
+#define DEF_BUTTON_REPEAT_INTERVAL	"0"
+#define DEF_BUTTON_SELECT_COLOR		INDICATOR
 #define DEF_BUTTON_SELECT_MONO		BLACK
 #define DEF_BUTTON_SELECT_IMAGE		(char *) NULL
 #define DEF_BUTTON_STATE		"normal"
@@ -138,6 +143,9 @@
 #define DEF_ENTRY_BG_MONO		WHITE
 #define DEF_ENTRY_BORDER_WIDTH		"2"
 #define DEF_ENTRY_CURSOR		"xterm"
+#define DEF_ENTRY_DISABLED_BG_COLOR	"SystemButtonFace"
+#define DEF_ENTRY_DISABLED_BG_MONO	WHITE
+#define DEF_ENTRY_DISABLED_FG		DISABLED
 #define DEF_ENTRY_EXPORT_SELECTION	"1"
 #define DEF_ENTRY_FONT			CTL_FONT
 #define DEF_ENTRY_FG			TEXT_FG
@@ -151,6 +159,8 @@
 #define DEF_ENTRY_INSERT_ON_TIME	"600"
 #define DEF_ENTRY_INSERT_WIDTH		"2"
 #define DEF_ENTRY_JUSTIFY		"left"
+#define DEF_ENTRY_READONLY_BG_COLOR	"SystemButtonFace"
+#define DEF_ENTRY_READONLY_BG_MONO	WHITE
 #define DEF_ENTRY_RELIEF		"sunken"
 #define DEF_ENTRY_SCROLL_COMMAND	""
 #define DEF_ENTRY_SELECT_COLOR		SELECT_BG
@@ -180,20 +190,35 @@
 #define DEF_FRAME_HIGHLIGHT_BG		NORMAL_BG
 #define DEF_FRAME_HIGHLIGHT		HIGHLIGHT
 #define DEF_FRAME_HIGHLIGHT_WIDTH	"0"
+#define DEF_FRAME_PADX			"0"
+#define DEF_FRAME_PADY			"0"
 #define DEF_FRAME_RELIEF		"flat"
 #define DEF_FRAME_TAKE_FOCUS		"0"
-#define DEF_FRAME_USE			""
 #define DEF_FRAME_VISUAL		""
 #define DEF_FRAME_WIDTH			"0"
+
+/*
+ * Defaults for labelframes:
+ */
+
+#define DEF_LABELFRAME_BORDER_WIDTH	"2"
+#define DEF_LABELFRAME_CLASS		"Labelframe"
+#define DEF_LABELFRAME_RELIEF		"groove"
+#define DEF_LABELFRAME_FG		NORMAL_FG
+#define DEF_LABELFRAME_FONT		CTL_FONT
+#define DEF_LABELFRAME_TEXT		""
+#define DEF_LABELFRAME_LABELANCHOR	"nw"
 
 /*
  * Defaults for listboxes:
  */
 
-#define DEF_LISTBOX_BG_COLOR		NORMAL_BG
+#define DEF_LISTBOX_ACTIVE_STYLE	"underline"
+#define DEF_LISTBOX_BG_COLOR		"SystemWindow"
 #define DEF_LISTBOX_BG_MONO		WHITE
 #define DEF_LISTBOX_BORDER_WIDTH	"2"
 #define DEF_LISTBOX_CURSOR		""
+#define DEF_LISTBOX_DISABLED_FG		DISABLED
 #define DEF_LISTBOX_EXPORT_SELECTION	"1"
 #define DEF_LISTBOX_FONT		CTL_FONT
 #define DEF_LISTBOX_FG			NORMAL_FG
@@ -203,13 +228,15 @@
 #define DEF_LISTBOX_HIGHLIGHT_WIDTH	"1"
 #define DEF_LISTBOX_RELIEF		"sunken"
 #define DEF_LISTBOX_SCROLL_COMMAND	""
+#define DEF_LISTBOX_LIST_VARIABLE	""
 #define DEF_LISTBOX_SELECT_COLOR	SELECT_BG
 #define DEF_LISTBOX_SELECT_MONO		BLACK
-#define DEF_LISTBOX_SELECT_BD		"1"
+#define DEF_LISTBOX_SELECT_BD		"0"
 #define DEF_LISTBOX_SELECT_FG_COLOR	SELECT_FG
 #define DEF_LISTBOX_SELECT_FG_MONO	WHITE
 #define DEF_LISTBOX_SELECT_MODE		"browse"
 #define DEF_LISTBOX_SET_GRID		"0"
+#define DEF_LISTBOX_STATE		"normal"
 #define DEF_LISTBOX_TAKE_FOCUS		(char *) NULL
 #define DEF_LISTBOX_WIDTH		"20"
 
@@ -224,6 +251,7 @@
 #define DEF_MENU_ENTRY_BITMAP		None
 #define DEF_MENU_ENTRY_COLUMN_BREAK	"0"
 #define DEF_MENU_ENTRY_COMMAND		(char *) NULL
+#define DEF_MENU_ENTRY_COMPOUND 	"none"
 #define DEF_MENU_ENTRY_FG		(char *) NULL
 #define DEF_MENU_ENTRY_FONT		(char *) NULL
 #define DEF_MENU_ENTRY_HIDE_MARGIN	"0"
@@ -288,7 +316,8 @@
 #define DEF_MENUBUTTON_FONT		CTL_FONT
 #define DEF_MENUBUTTON_FG		NORMAL_FG
 #define DEF_MENUBUTTON_HEIGHT		"0"
-#define DEF_MENUBUTTON_HIGHLIGHT_BG	NORMAL_BG
+#define DEF_MENUBUTTON_HIGHLIGHT_BG_COLOR DEF_MENUBUTTON_BG_COLOR
+#define DEF_MENUBUTTON_HIGHLIGHT_BG_MONO  DEF_MENUBUTTON_BG_MONO
 #define DEF_MENUBUTTON_HIGHLIGHT	HIGHLIGHT
 #define DEF_MENUBUTTON_HIGHLIGHT_WIDTH	"0"
 #define DEF_MENUBUTTON_IMAGE		(char *) NULL
@@ -331,6 +360,40 @@
 #define DEF_MESSAGE_WIDTH		"0"
 
 /*
+ * Defaults for panedwindows
+ */
+
+#define DEF_PANEDWINDOW_BG_COLOR	NORMAL_BG
+#define DEF_PANEDWINDOW_BG_MONO		WHITE
+#define DEF_PANEDWINDOW_BORDERWIDTH	"2"
+#define DEF_PANEDWINDOW_CURSOR		""
+#define DEF_PANEDWINDOW_HANDLEPAD	"8"
+#define DEF_PANEDWINDOW_HANDLESIZE	"8"
+#define DEF_PANEDWINDOW_HEIGHT		""
+#define DEF_PANEDWINDOW_OPAQUERESIZE	"0"
+#define DEF_PANEDWINDOW_ORIENT		"horizontal"
+#define DEF_PANEDWINDOW_RELIEF		"flat"
+#define DEF_PANEDWINDOW_SASHCURSOR	""
+#define DEF_PANEDWINDOW_SASHPAD		"2"
+#define DEF_PANEDWINDOW_SASHRELIEF	"raised"
+#define DEF_PANEDWINDOW_SASHWIDTH	"2"
+#define DEF_PANEDWINDOW_SHOWHANDLE	"0"
+#define DEF_PANEDWINDOW_WIDTH		""
+
+/*
+ * Defaults for panedwindow panes
+ */
+
+#define DEF_PANEDWINDOW_PANE_AFTER	""
+#define DEF_PANEDWINDOW_PANE_BEFORE	""
+#define DEF_PANEDWINDOW_PANE_HEIGHT	""
+#define DEF_PANEDWINDOW_PANE_MINSIZE	"0"
+#define DEF_PANEDWINDOW_PANE_PADX	"0"
+#define DEF_PANEDWINDOW_PANE_PADY	"0"
+#define DEF_PANEDWINDOW_PANE_STICKY	"nsew"
+#define DEF_PANEDWINDOW_PANE_WIDTH	""
+
+/*
  * Defaults for scales:
  */
 
@@ -347,7 +410,8 @@
 #define DEF_SCALE_FG_COLOR		NORMAL_FG
 #define DEF_SCALE_FG_MONO		BLACK
 #define DEF_SCALE_FROM			"0"
-#define DEF_SCALE_HIGHLIGHT_BG		NORMAL_BG
+#define DEF_SCALE_HIGHLIGHT_BG_COLOR	DEF_SCALE_BG_COLOR
+#define DEF_SCALE_HIGHLIGHT_BG_MONO	DEF_SCALE_BG_MONO
 #define DEF_SCALE_HIGHLIGHT		HIGHLIGHT
 #define DEF_SCALE_HIGHLIGHT_WIDTH	"2"
 #define DEF_SCALE_LABEL			""
@@ -399,6 +463,7 @@
  * Defaults for texts:
  */
 
+#define DEF_TEXT_AUTO_SEPARATORS	"1"
 #define DEF_TEXT_BG_COLOR		"SystemWindow"
 #define DEF_TEXT_BG_MONO		WHITE
 #define DEF_TEXT_BORDER_WIDTH		"2"
@@ -416,6 +481,7 @@
 #define DEF_TEXT_INSERT_OFF_TIME	"300"
 #define DEF_TEXT_INSERT_ON_TIME		"600"
 #define DEF_TEXT_INSERT_WIDTH		"2"
+#define DEF_TEXT_MAX_UNDO    	"0"
 #define DEF_TEXT_PADX			"1"
 #define DEF_TEXT_PADY			"1"
 #define DEF_TEXT_RELIEF			"sunken"
@@ -433,6 +499,7 @@
 #define DEF_TEXT_STATE			"normal"
 #define DEF_TEXT_TABS			""
 #define DEF_TEXT_TAKE_FOCUS		(char *) NULL
+#define DEF_TEXT_UNDO    		"0"
 #define DEF_TEXT_WIDTH			"80"
 #define DEF_TEXT_WRAP			"char"
 #define DEF_TEXT_XSCROLL_COMMAND	""
@@ -452,5 +519,6 @@
 #define DEF_TOPLEVEL_CLASS		"Toplevel"
 #define DEF_TOPLEVEL_MENU		""
 #define DEF_TOPLEVEL_SCREEN		""
+#define DEF_TOPLEVEL_USE		""
 
 #endif /* _TKWINDEFAULT */

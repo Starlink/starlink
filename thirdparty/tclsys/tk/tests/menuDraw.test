@@ -2,42 +2,17 @@
 # organized in the standard fashion for Tcl tests.
 #
 # Copyright (c) 1996-1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
-# SCCS: @(#) menuDraw.test 1.11 97/06/24 13:50:34
+# RCS: @(#) $Id: menuDraw.test,v 1.5 2002/07/13 20:28:35 dgp Exp $
 
-if {[lsearch [image types] test] < 0} {
-    puts "This application hasn't been compiled with the \"test\" image"
-    puts "type, so I can't run this test.  Are you sure you're using"
-    puts "tktest instead of wish?"
-    return
-}
-
-if {[info procs test] != "test"} {
-    source defs
-}
-
-proc deleteWindows {} {
-    foreach i [winfo children .] {
-    	catch [destroy $i]
-    }
-}
-
-deleteWindows
-wm geometry . {}
-raise .
-
-if {$tcl_platform(platform) == "windows" && ![info exists INTERACTIVE]} {
-    puts " Some tests were skipped because they could not be performed"
-    puts " automatically on this platform. If you wish to execute them"
-    puts " interactively, set the TCL variable INTERACTIVE and re-run"
-    puts " the test."
-    set testConfig(menuInteractive) 0
-} else {
-    set testConfig(menuInteractive) 1
-}
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 test menuDraw-1.1 {TkMenuInitializeDrawingFields} {
     catch {destroy .m1}
@@ -118,7 +93,7 @@ test menuDraw-6.6 {TkMenuConfigureEntryDrawOptions - bad state} {
     menu .m1
     .m1 add command -label "foo"
     list [catch {.m1 entryconfigure 1 -state foo} msg] $msg [destroy .m1]
-} {1 {bad state value "foo": must be normal, active, or disabled} {}}
+} {1 {bad state "foo": must be active, normal, or disabled} {}}
 test menuDraw-6.7 {TkMenuConfigureEntryDrawOptions - tkfont specified} {
     catch {destroy .m1}
     menu .m1
@@ -178,7 +153,7 @@ test menuDraw-7.1 {TkEventuallyRecomputeMenu} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "This is a long label"
-    set tearoff [tkTearOffMenu .m1]
+    set tearoff [tk::TearOffMenu .m1]
     update idletasks
     list [.m1 entryconfigure 1 -label "foo"] [destroy .m1]
 } {{} {}}
@@ -186,12 +161,12 @@ test menuDraw-7.2 {TkEventuallyRecomputeMenu - update pending} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "This is a long label"
-    set tearoff [tkTearOffMenu .m1]
+    set tearoff [tk::TearOffMenu .m1]
     list [.m1 entryconfigure 1 -label "foo"] [destroy .m1]
 } {{} {}}
 
 
-test menuDraw-8.1 {TkRecomputeMenu} {menuInteractive} {
+test menuDraw-8.1 {TkRecomputeMenu} {pcOnly userInteraction} {
     catch {destroy .m1}
     menu .m1
     .m1 configure -postcommand [.m1 add command -label foo]
@@ -206,14 +181,14 @@ test menuDraw-9.1 {TkEventuallyRedrawMenu - entry test} {
     menu .m1
     set foo 0
     .m1 add radiobutton -variable foo -label test
-    tkTearOffMenu .m1
+    tk::TearOffMenu .m1
     update idletasks
     list [set foo test] [destroy .m1] [unset foo]
 } {test {} {}}
 test menuDraw-9.2 {TkEventuallyRedrawMenu - whole menu} {
     catch {destroy .m1}
     menu .m1
-    list [catch {tkTearOffMenu .m1}] [destroy .m1]
+    list [catch {tk::TearOffMenu .m1}] [destroy .m1]
 } {0 {}}
 
 # Don't know how to test when window has been deleted and ComputeMenuGeometry
@@ -246,7 +221,7 @@ test menuDraw-10.4 {ComputeMenuGeometry - resize not necessary} {
     list [update idletasks] [destroy .m1]
 } {{} {}}
 
-test menuDraw-11.1 {TkMenuSelectImageProc - entry selected; redraw not pending} {
+test menuDraw-11.1 {TkMenuSelectImageProc - entry selected; redraw not pending} testImageType {
     catch {destroy .m1}
     catch {eval image delete [image names]}
     image create test image1
@@ -254,11 +229,11 @@ test menuDraw-11.1 {TkMenuSelectImageProc - entry selected; redraw not pending} 
     menu .m1
     .m1 add checkbutton -image image1 -selectimage image2
     .m1 invoke 1
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     update idletasks
     list [image delete image2] [destroy .m1] [eval image delete [image names]]
 } {{} {} {}}
-test menuDraw-11.2 {TkMenuSelectImageProc - entry selected; redraw pending} {
+test menuDraw-11.2 {TkMenuSelectImageProc - entry selected; redraw pending} testImageType {
     catch {destroy .m1}
     catch {eval image delete [image names]}
     image create test image1
@@ -266,17 +241,17 @@ test menuDraw-11.2 {TkMenuSelectImageProc - entry selected; redraw pending} {
     menu .m1
     .m1 add checkbutton -image image1 -selectimage image2
     .m1 invoke 1
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [image delete image2] [destroy .m1] [eval image delete [image names]]
 } {{} {} {}}
-test menuDraw-11.3 {TkMenuSelectImageProc - entry not selected} {
+test menuDraw-11.3 {TkMenuSelectImageProc - entry not selected} testImageType {
     catch {destroy .m1}
     catch {eval image delete [image names]}
     image create test image1
     image create test image2
     menu .m1
     .m1 add checkbutton -image image1 -selectimage image2
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     update idletasks
     list [image delete image2] [destroy .m1] [eval image delete [image names]]
 } {{} {} {}}
@@ -292,14 +267,14 @@ test menuDraw-12.1 {DisplayMenu - menubar background} {unixOnly} {
 test menuDraw-12.2 {Display menu - no entries} {
     catch {destroy .m1}
     menu .m1
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw-12.3 {DisplayMenu - one entry} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label foo
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw-12.4 {DisplayMenu - two entries} {
@@ -307,7 +282,7 @@ test menuDraw-12.4 {DisplayMenu - two entries} {
     menu .m1
     .m1 add command -label "one"
     .m1 add command -label "two"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw.12.5 {DisplayMenu - two columns - first bigger} {
@@ -316,7 +291,7 @@ test menuDraw.12.5 {DisplayMenu - two columns - first bigger} {
     .m1 add command -label "one"
     .m1 add command -label "two"
     .m1 add command -label "three" -columnbreak 1
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw-12.5 {DisplayMenu - two column - second  bigger} {
@@ -325,7 +300,7 @@ test menuDraw-12.5 {DisplayMenu - two column - second  bigger} {
     .m1 add command -label "one"
     .m1 add command -label "two" -columnbreak 1
     .m1 add command -label "three"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw.12.7 {DisplayMenu - three columns} {
@@ -337,7 +312,7 @@ test menuDraw.12.7 {DisplayMenu - three columns} {
     .m1 add command -label "four"
     .m1 add command -label "five"
     .m1 add command -label "six"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [update] [destroy .m1]
 } {{} {}}
 test menuDraw-12.6 {Display menu - testing for extra space and menubars} {unixOnly} {
@@ -351,7 +326,7 @@ test menuDraw-12.7 {Display menu - extra space at end of menu} {
     catch {destroy .m1}
     menu .m1
     .m1 add cascade -label foo
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     wm geometry $tearoff 200x100
     list [update] [destroy .m1]
 } {{} {}}
@@ -363,15 +338,15 @@ test menuDraw-13.1 {TkMenuEventProc - Expose} {
     .m1 add command -label "one"
     menu .m2
     .m2 add command -label "two"
-    set tearoff1 [tkTearOffMenu .m1 40 40]
-    set tearoff2 [tkTearOffMenu .m2 40 40]
+    set tearoff1 [tk::TearOffMenu .m1 40 40]
+    set tearoff2 [tk::TearOffMenu .m2 40 40]
     list [raise $tearoff2] [update] [destroy .m1] [destroy .m2]
 } {{} {} {} {}}
 test menuDraw-13.2 {TkMenuEventProc - ConfigureNotify} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "foo"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [wm geometry $tearoff 200x100] [update] [destroy .m1]
 } {{} {} {}}
 test menuDraw-13.3 {TkMenuEventProc - ActivateNotify} {macOnly} {
@@ -379,7 +354,7 @@ test menuDraw-13.3 {TkMenuEventProc - ActivateNotify} {macOnly} {
     toplevel .t2 -menu .t2.m1
     menu .t2.m1
     .t2.m1 add command -label foo
-    tkTearOffMenu .t2.m1 40 40
+    tk::TearOffMenu .t2.m1 40 40
     list [catch {update} msg] $msg [destroy .t2]
 } {0 {} {}}
 # Testing deletes is hard, and I am going to do my best. Don't know how
@@ -398,7 +373,7 @@ test menuDraw-13.5 {TkMenuEventProc - nothing pending} {
     list [destroy .m1]
 } {{}}
 
-test menuDraw-14.1 {TkMenuImageProc} {
+test menuDraw-14.1 {TkMenuImageProc} testImageType {
     catch {destroy .m1}
     catch {image delete image1}
     menu .m1
@@ -407,7 +382,7 @@ test menuDraw-14.1 {TkMenuImageProc} {
     update idletasks
     list [image delete image1] [destroy .m1]
 } {{} {}}
-test menuDraw-14.2 {TkMenuImageProc} {
+test menuDraw-14.2 {TkMenuImageProc} testImageType {
     catch {destroy .m1}
     catch {image delete image1}
     menu .m1
@@ -420,13 +395,13 @@ test menuDraw-15.1 {TkPostTearoffMenu - Basic posting} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "foo"
-    list [catch {tkTearOffMenu .m1 40 40}] [destroy .m1]
+    list [catch {tk::TearOffMenu .m1 40 40}] [destroy .m1]
 } {0 {}}
 test menuDraw-15.2 {TkPostTearoffMenu - Deactivation} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "foo" -state active
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [$tearoff index active] [destroy .m1]
 } {none {}}
 test menuDraw-15.3 {TkPostTearoffMenu - post command} {
@@ -434,27 +409,27 @@ test menuDraw-15.3 {TkPostTearoffMenu - post command} {
     catch {unset foo}
     menu .m1 -postcommand "set foo .m1"
     .m1 add command -label "foo"
-    list [catch {tkTearOffMenu .m1 40 40}] [set foo] [unset foo] [destroy .m1]
+    list [catch {tk::TearOffMenu .m1 40 40}] [set foo] [unset foo] [destroy .m1]
 } {0 .m1 {} {}}
 test menuDraw-15.4 {TkPostTearoffMenu - post command deleting the menu} {
     catch {destroy .m1}
     menu .m1 -postcommand "destroy .m1"
     .m1 add command -label "foo"
-    list [catch {tkTearOffMenu .m1 40 40} msg] $msg [winfo exists .m1]
+    list [catch {tk::TearOffMenu .m1 40 40} msg] $msg [winfo exists .m1]
 } {0 {} 0}
 test menuDraw-15.5 {TkPostTearoffMenu - tearoff at edge of screen} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "foo"
     set height [winfo screenheight .m1]
-    list [catch {tkTearOffMenu .m1 40 $height}] [destroy .m1]
+    list [catch {tk::TearOffMenu .m1 40 $height}] [destroy .m1]
 } {0 {}}
 test menuDraw-15.6 {TkPostTearoffMenu - tearoff off right} {
     catch {destroy .m1}
     menu .m1
     .m1 add command -label "foo"
     set width [winfo screenwidth .m1]
-    list [catch {tkTearOffMenu .m1 $width 40}] [destroy .m1]
+    list [catch {tk::TearOffMenu .m1 $width 40}] [destroy .m1]
 } {0 {}}
 
 
@@ -465,7 +440,7 @@ test menuDraw-16.1 {TkPostSubmenu} {unixOnly} {
     .m1 add cascade -label test -menu .m2
     menu .m2
     .m2 add command -label "Hit ESCAPE to make this menu go away."
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     $tearoff postcascade 0
     list [$tearoff postcascade 0] [destroy .m1] [destroy .m2]
 } {{} {} {}}
@@ -480,7 +455,7 @@ test menuDraw-16.2 {TkPostSubMenu} {unixOnly} {
     .m2 add command -label "two"
     menu .m3
     .m3 add command -label "three"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     $tearoff postcascade 0
     list [$tearoff postcascade 1] [destroy .m1] [destroy .m2] [destroy .m3]
 } {{} {} {} {}}
@@ -494,7 +469,7 @@ test menuDraw-16.4 {TkPostSubMenu} {
     catch {destroy .m1}
     menu .m1
     .m1 add cascade -label test
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [$tearoff postcascade 0] [destroy .m1]
 } {{} {}}
 test menuDraw-16.5 {TkPostSubMenu} {unixOnly} {
@@ -503,17 +478,17 @@ test menuDraw-16.5 {TkPostSubMenu} {unixOnly} {
     menu .m1
     .m1 add cascade -label test -menu .m2
     menu .m2 -postcommand "glorp"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [catch {$tearoff postcascade test} msg] $msg [destroy .m1] [destroy .m2]
 } {1 {invalid command name "glorp"} {} {}}
-test menuDraw-16.6 {TkPostSubMenu} {menuInteractive} {
+test menuDraw-16.6 {TkPostSubMenu} {pcOnly userInteraction} {
     catch {destroy .m1}
     catch {destroy .m2}
     menu .m1
     .m1 add cascade -label test -menu .m2
     menu .m2
     .m2 add command -label "Hit ESCAPE to get rid of this menu"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [$tearoff postcascade 0] [destroy .m1] [destroy .m2]
 } {{} {} {}}
 
@@ -532,15 +507,31 @@ test menuDraw-17.1 {AdjustMenuCoords - menubar} {unixOnly} {
     }
     list [$w postcascade 0] [. configure -menu ""] [destroy .m1] [destroy .m2]
 } {{} {} {} {}}
-test menuDraw-17.2 {AdjustMenuCoords - menu} {menuInteractive} {
+test menuDraw-17.2 {AdjustMenuCoords - menu} {pcOnly userInteraction} {
     catch {destroy .m1}
     catch {destroy .m2}
     menu .m1
     .m1 add cascade -label test -menu .m2
     menu .m2
     .m2 add command -label "Hit ESCAPE to make this menu go away"
-    set tearoff [tkTearOffMenu .m1 40 40]
+    set tearoff [tk::TearOffMenu .m1 40 40]
     list [$tearoff postcascade 0] [destroy .m1] [destroy .m2]
 } {{} {} {}}
 
+# cleanup
 deleteWindows
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

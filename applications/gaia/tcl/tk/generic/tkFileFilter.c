@@ -9,8 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkFileFilter.c 1.6 97/04/30 15:55:35
- *
+ * RCS: @(#) $Id: tkFileFilter.c,v 1.5 2002/01/27 11:10:50 das Exp $
  */
 
 #include "tkInt.h"
@@ -18,7 +17,7 @@
 
 static int		AddClause _ANSI_ARGS_((
 			    Tcl_Interp * interp, FileFilter * filterPtr,
-			    char * patternsStr, char * ostypesStr,
+			    CONST char * patternsStr, CONST char * ostypesStr,
 			    int isWindows));
 static void		FreeClauses _ANSI_ARGS_((FileFilter * filterPtr));
 static void		FreeGlobPatterns _ANSI_ARGS_((
@@ -26,7 +25,7 @@ static void		FreeGlobPatterns _ANSI_ARGS_((
 static void		FreeMacFileTypes _ANSI_ARGS_((
 			    FileFilterClause * clausePtr));
 static FileFilter *	GetFilter _ANSI_ARGS_((FileFilterList * flistPtr,
-			    char * name));
+			    CONST char * name));
 
 /*
  *----------------------------------------------------------------------
@@ -87,8 +86,8 @@ TkGetFileFilters(interp, flistPtr, string, isWindows)
     int isWindows;		/* True if we are running on Windows. */
 {
     int listArgc;
-    char ** listArgv = NULL;
-    char ** typeInfo = NULL;
+    CONST char ** listArgv = NULL;
+    CONST char ** typeInfo = NULL;
     int code = TCL_OK;
     int i;
 
@@ -207,16 +206,16 @@ TkFreeFileFilters(flistPtr)
 static int AddClause(interp, filterPtr, patternsStr, ostypesStr, isWindows)
     Tcl_Interp * interp;	/* Interpreter to use for error reporting. */
     FileFilter * filterPtr;	/* Stores the new filter clause */
-    char * patternsStr;		/* A TCL list of glob patterns. */
-    char * ostypesStr;		/* A TCL list of Mac OSType strings. */
+    CONST char * patternsStr;		/* A TCL list of glob patterns. */
+    CONST char * ostypesStr;		/* A TCL list of Mac OSType strings. */
     int isWindows;		/* True if we are running on Windows; False
 				 * if we are running on the Mac; Glob
 				 * patterns need to be processed differently
 				 * on these two platforms */
 {
-    char ** globList = NULL;
+    CONST char ** globList = NULL;
     int globCount;
-    char ** ostypeList = NULL;
+    CONST char ** ostypeList = NULL;
     int ostypeCount;
     FileFilterClause * clausePtr;
     int i;
@@ -271,7 +270,7 @@ static int AddClause(interp, filterPtr, patternsStr, ostypesStr, isWindows)
 		/*
 		 * Prepend a "*" to patterns that do not have a leading "*"
 		 */
-		globPtr->pattern = (char*)ckalloc(len+1);
+		globPtr->pattern = (char*)ckalloc((unsigned int) len+1);
 		globPtr->pattern[0] = '*';
 		strcpy(globPtr->pattern+1, globList[i]);
 	    }
@@ -290,11 +289,11 @@ static int AddClause(interp, filterPtr, patternsStr, ostypesStr, isWindows)
 		    strcpy(globPtr->pattern, "*.");
 		}
 		else {
-		    globPtr->pattern = (char*)ckalloc(len);
+		    globPtr->pattern = (char*)ckalloc((unsigned int) len);
 		    strcpy(globPtr->pattern, globList[i]);
 		}
 	    } else {
-		globPtr->pattern = (char*)ckalloc(len);
+		globPtr->pattern = (char*)ckalloc((unsigned int) len);
 		strcpy(globPtr->pattern, globList[i]);
 	    }
 
@@ -359,7 +358,7 @@ static int AddClause(interp, filterPtr, patternsStr, ostypesStr, isWindows)
 static FileFilter * GetFilter(flistPtr, name)
     FileFilterList * flistPtr;	/* The FileFilterList that contains the
 				 * newly created filter */
-    char * name;		/* Name of the filter. It is usually displayed
+    CONST char * name;		/* Name of the filter. It is usually displayed
 				 * in the "File Types" listbox in the file
 				 * dialogs. */
 {

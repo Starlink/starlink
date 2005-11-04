@@ -6,11 +6,12 @@
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1998 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkCanvas.h 1.41 96/02/15 18:51:28
+ * RCS: @(#) $Id: tkCanvas.h,v 1.7 2003/01/08 23:02:33 drh Exp $
  */
 
 #ifndef _TKCANVAS
@@ -19,6 +20,20 @@
 #ifndef _TK
 #include "tk.h"
 #endif
+
+#ifndef USE_OLD_TAG_SEARCH
+typedef struct TagSearchExpr_s TagSearchExpr;
+
+struct TagSearchExpr_s {
+    TagSearchExpr *next;        /* for linked lists of expressions - used in bindings */
+    Tk_Uid uid;                 /* the uid of the whole expression */
+    Tk_Uid *uids;               /* expresion compiled to an array of uids */
+    int allocated;              /* available space for array of uids */
+    int length;                 /* length of expression */
+    int index;                  /* current position in expression evaluation */
+    int match;                  /* this expression matches event's item's tags*/
+};
+#endif /* not USE_OLD_TAG_SEARCH */
 
 /*
  * The record below describes a canvas widget.  It is made available
@@ -203,11 +218,23 @@ typedef struct TkCanvas {
 				 * definitions. */
     int nextId;			/* Number to use as id for next item
 				 * created in widget. */
-    struct TkPostscriptInfo *psInfoPtr;
+    Tk_PostscriptInfo psInfo;
 				/* Pointer to information used for generating
 				 * Postscript for the canvas.  NULL means
 				 * no Postscript is currently being
 				 * generated. */
+    Tcl_HashTable idTable;	/* Table of integer indices. */
+    /*
+     * Additional information, added by the 'dash'-patch
+     */
+    VOID *reserved1;
+    Tk_State canvas_state;	/* state of canvas */
+    VOID *reserved2;
+    VOID *reserved3;
+    Tk_TSOffset tsoffset;
+#ifndef USE_OLD_TAG_SEARCH
+    TagSearchExpr *bindTagExprs; /* linked list of tag expressions used in bindings */
+#endif
 } TkCanvas;
 
 /*
@@ -235,6 +262,8 @@ typedef struct TkCanvas {
  * REPICK_IN_PROGRESS -		1 means PickCurrentItem is currently
  *				executing.  If it should be called recursively,
  *				it should simply return immediately.
+ * BBOX_NOT_EMPTY -		1 means that the bounding box of the area
+ *				that should be redrawn is not empty.
  */
 
 #define REDRAW_PENDING		1
@@ -245,6 +274,18 @@ typedef struct TkCanvas {
 #define UPDATE_SCROLLBARS	0x20
 #define LEFT_GRABBED_ITEM	0x40
 #define REPICK_IN_PROGRESS	0x100
+#define BBOX_NOT_EMPTY		0x200
+
+/*
+ * Flag bits for canvas items (redraw_flags):
+ *
+ * FORCE_REDRAW -		1 means that the new coordinates of some
+ *				item are not yet registered using
+ *				Tk_CanvasEventuallyRedraw(). It should still
+ *				be done by the general canvas code.
+ */
+
+#define FORCE_REDRAW		8
 
 /*
  * Canvas-related procedures that are shared among Tk modules but not
@@ -252,6 +293,15 @@ typedef struct TkCanvas {
  */
 
 extern int		TkCanvPostscriptCmd _ANSI_ARGS_((TkCanvas *canvasPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
+
+/*
+ * Other procedures that are shared among Tk canvas modules but not exported
+ * to the outside world:
+ */
+extern int 		TkCanvTranslatePath _ANSI_ARGS_((TkCanvas *canvPtr,
+			    int numVertex, double *coordPtr, int closed,
+			    XPoint *outPtr));
+
 
 #endif /* _TKCANVAS */

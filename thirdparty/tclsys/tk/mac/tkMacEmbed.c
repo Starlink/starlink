@@ -8,12 +8,12 @@
  *	Currently only Toplevel embedding within the same Tk application is
  *      allowed on the Macintosh.
  *
- * Copyright (c) 1996-97 Sun Microsystems, Inc.
+ * Copyright (c) 1996-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- *  SCCS: @(#) tkMacEmbed.c 1.6 97/10/31 17:20:22
+ *  RCS: @(#) $Id: tkMacEmbed.c,v 1.6 2002/10/09 11:56:39 das Exp $
  */
 
 #include "tkInt.h"
@@ -217,7 +217,7 @@ TkpMakeWindow(
  * Results:
  *	The return value is normally TCL_OK.  If an error occurs (such
  *	as string not being a valid window spec), then the return value
- *	is TCL_ERROR and an error message is left in interp->result if
+ *	is TCL_ERROR and an error message is left in the interp's result if
  *	interp is non-NULL.
  *
  * Side effects:
@@ -232,10 +232,11 @@ TkpUseWindow(
 				 * if string is bogus. */
     Tk_Window tkwin,		/* Tk window that does not yet have an
 				 * associated X window. */
-    char *string)		/* String identifying an X window to use
+    CONST char *string)		/* String identifying an X window to use
 				 * for tkwin;  must be an integer value. */
 {
     TkWindow *winPtr = (TkWindow *) tkwin;
+    TkWindow *usePtr;
     MacDrawable *parent, *macWin;
     Container *containerPtr;
     XEvent event;
@@ -257,6 +258,20 @@ TkpUseWindow(
      
     if (Tcl_GetInt(interp, string, &result) != TCL_OK) {
 	return TCL_ERROR;
+    }
+
+    usePtr = (TkWindow *) Tk_IdToWindow(winPtr->display, (Window) result);
+
+    if (usePtr == NULL) {
+        Tcl_AppendResult(interp, "Tk window does not correspond to id \"",
+                string, "\"", (char *) NULL);
+        return TCL_ERROR;
+    } else {
+        if (!(usePtr->flags & TK_CONTAINER)) {
+	    Tcl_AppendResult(interp, "window \"", usePtr->pathName,
+                    "\" doesn't have -container option set", (char *) NULL);
+	    return TCL_ERROR;
+        }
     }
 
     parent = (MacDrawable *) result;
@@ -620,7 +635,7 @@ TkpTestembedCmd(
     ClientData clientData,		/* Main window for application. */
     Tcl_Interp *interp,			/* Current interpreter. */
     int argc,				/* Number of arguments. */
-    char **argv)			/* Argument strings. */
+    CONST char **argv)			/* Argument strings. */
 {
     int all;
     Container *containerPtr;

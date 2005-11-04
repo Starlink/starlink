@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMenubutton.h 1.3 97/04/11 11:24:15
+ * RCS: @(#) $Id: tkMenubutton.h,v 1.8.4.1 2003/11/17 23:29:36 hobbs Exp $
  */
 
 #ifndef _TKMENUBUTTON
@@ -19,10 +19,31 @@
 #include "tkInt.h"
 #endif
 
+#ifndef _TKMENU
+#include "tkMenu.h"
+#endif
+
 #ifdef BUILD_tk
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
 #endif
+
+/*
+ * Legal values for the "orient" field of TkMenubutton records.
+ */
+
+enum direction {
+    DIRECTION_ABOVE, DIRECTION_BELOW, DIRECTION_FLUSH, 
+    DIRECTION_LEFT, DIRECTION_RIGHT
+};
+
+/*
+ * Legal values for the "state" field of TkMenubutton records.
+ */
+
+enum state {
+    STATE_ACTIVE, STATE_DISABLED, STATE_NORMAL
+};
 
 /*
  * A data structure of the following type is kept for each
@@ -39,6 +60,8 @@ typedef struct {
 				 * freed up even after tkwin has gone away. */
     Tcl_Interp *interp;		/* Interpreter associated with menubutton. */
     Tcl_Command widgetCmd;	/* Token for menubutton's widget command. */
+    Tk_OptionTable optionTable;	/* Table that defines configuration options
+				 * available for this widget. */
     char *menuName;		/* Name of menu associated with widget.
 				 * Malloc-ed. */
 
@@ -65,7 +88,7 @@ typedef struct {
      * Information used when displaying widget:
      */
 
-    Tk_Uid state;		/* State of button for display purposes:
+    enum state state;          	/* State of button for display purposes:
 				 * normal, active, or disabled. */
     Tk_3DBorder normalBorder;	/* Structure used to draw 3-D
 				 * border and background when window
@@ -101,12 +124,9 @@ typedef struct {
 				 * means use normalTextGC). */
     Pixmap gray;		/* Pixmap for displaying disabled text/icon if
 				 * disabledFg is NULL. */
-    GC disabledGC;		/* Used to produce disabled effect.  If
-				 * disabledFg isn't NULL, this GC is used to
-				 * draw button text or icon.  Otherwise
-				 * text or icon is drawn with normalGC and
-				 * this GC is used to stipple background
-				 * across it. */
+    GC disabledGC;		/* Used to produce disabled effect for text. */
+    GC stippleGC;		/* Used to produce disabled stipple effect
+				 * for images when disabled. */
     int leftBearing;		/* Distance from text origin to leftmost drawn
 				 * pixel (positive means to right). */
     int rightBearing;		/* Amount text sticks right from its origin. */
@@ -143,7 +163,11 @@ typedef struct {
      * Miscellaneous information:
      */
 
-    Tk_Uid direction;		/* Direction for where to pop the menu.
+    int compound;               /* Value of -compound option; specifies whether
+                                 * the menubutton should show both an image and
+                                 * text, and, if so, how. */
+
+    enum direction direction;	/* Direction for where to pop the menu.
     				 * Valid directions are "above", "below",
     				 * "left", "right", and "flush". "flush"
     				 * means that the upper left corner of the
@@ -192,7 +216,7 @@ typedef struct {
  * Declaration of variables shared between the files in the button module.
  */
 
-extern TkClassProcs tkpMenubuttonClass;
+extern Tk_ClassProcs tkpMenubuttonClass;
 
 /*
  * Declaration of procedures used in the implementation of the button

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkUnixEvent.c 1.17 97/09/11 12:51:04
+ * RCS: @(#) $Id: tkUnixEvent.c,v 1.11.2.3 2004/10/27 00:37:38 davygrvy Exp $
  */
 
 #include "tkInt.h"
@@ -17,10 +17,25 @@
 #include <signal.h>
 
 /*
- * The following static indicates whether this module has been initialized.
+ * The following static indicates whether this module has been initialized
+ * in the current thread.
  */
 
-static int initialized = 0;
+typedef struct ThreadSpecificData {
+    int initialized;
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
+
+#if defined(TK_USE_INPUT_METHODS) && defined(PEEK_XCLOSEIM)
+/*
+ * Structure used to peek into internal XIM data structure.
+ * This is only known to work with XFree86.
+ */
+struct XIMPeek {
+    void *junk1, *junk2;
+    XIC  ic_chain;
+};
+#endif
 
 /*
  * Prototypes for procedures that are referenced only in this file:
@@ -34,6 +49,11 @@ static void		DisplayFileProc _ANSI_ARGS_((ClientData clientData,
 			    int flags));
 static void		DisplaySetupProc _ANSI_ARGS_((ClientData clientData,
 			    int flags));
+static void		TransferXEventsToTcl _ANSI_ARGS_((Display *display));
+#ifdef TK_USE_INPUT_METHODS
+static void		OpenIM _ANSI_ARGS_((TkDisplay *dispPtr));
+#endif
+
 
 /*
  *----------------------------------------------------------------------
@@ -55,10 +75,13 @@ static void		DisplaySetupProc _ANSI_ARGS_((ClientData clientData,
 void
 TkCreateXEventSource()
 {
-    if (!initialized) {
-	initialized = 1;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    if (!tsdPtr->initialized) {
+	tsdPtr->initialized = 1;
 	Tcl_CreateEventSource(DisplaySetupProc, DisplayCheckProc, NULL);
-	Tcl_CreateExitHandler(DisplayExitHandler, NULL);
+	TkCreateExitHandler(DisplayExitHandler, NULL);
     }
 }
 
@@ -83,8 +106,11 @@ static void
 DisplayExitHandler(clientData)
     ClientData clientData;	/* Not used. */
 {
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
     Tcl_DeleteEventSource(DisplaySetupProc, DisplayCheckProc, NULL);
-    initialized = 0;
+    tsdPtr->initialized = 0;
 }
 
 /*
@@ -106,7 +132,7 @@ DisplayExitHandler(clientData)
 
 TkDisplay *
 TkpOpenDisplay(display_name)
-    char *display_name;
+    CONST char *display_name;
 {
     TkDisplay *dispPtr;
     Display *display = XOpenDisplay(display_name);
@@ -115,7 +141,11 @@ TkpOpenDisplay(display_name)
 	return NULL;
     }
     dispPtr = (TkDisplay *) ckalloc(sizeof(TkDisplay));
+    memset(dispPtr, 0, sizeof(TkDisplay));
     dispPtr->display = display;
+#ifdef TK_USE_INPUT_METHODS
+    OpenIM(dispPtr);
+#endif
     Tcl_CreateFileHandler(ConnectionNumber(display), TCL_READABLE,
 	    DisplayFileProc, (ClientData) dispPtr);
     return dispPtr;
@@ -132,25 +162,116 @@ TkpOpenDisplay(display_name)
  *	None.
  *
  * Side effects:
- *	Deallocates the displayPtr.
+ *	Deallocates the displayPtr and unix-specific resources.
  *
  *----------------------------------------------------------------------
  */
 
 void
-TkpCloseDisplay(displayPtr)
-    TkDisplay *displayPtr;
+TkpCloseDisplay(dispPtr)
+    TkDisplay *dispPtr;
 {
-    TkDisplay *dispPtr = (TkDisplay *) displayPtr;
+    TkSendCleanup(dispPtr);
+
+    TkFreeXId(dispPtr);
+
+    TkWmCleanup(dispPtr);
+
+#ifdef TK_USE_INPUT_METHODS
+#if TK_XIM_SPOT
+    if (dispPtr->inputXfs) {
+	XFreeFontSet(dispPtr->display, dispPtr->inputXfs);
+    }
+#endif
+    if (dispPtr->inputMethod) {
+	/*
+	 * Calling XCloseIM with an input context that has not
+	 * been freed can cause a crash. This crash has been
+	 * reproduced under Linux systems with XFree86 3.3
+	 * and may have also been seen under Solaris 2.3.
+	 * The crash is caused by a double free of memory
+	 * inside the X library. Memory that was already
+	 * deallocated may be accessed again inside XCloseIM.
+	 * This bug can be avoided by making sure that a
+	 * call to XDestroyIC is made for each XCreateIC call.
+	 * This bug has been fixed in XFree86 4.2.99.2.
+	 * The internal layout of the XIM structure changed
+	 * in the XFree86 4.2 release so the test should
+	 * not be run for with these new releases.
+	 */
+
+#if defined(TK_USE_INPUT_METHODS) && defined(PEEK_XCLOSEIM)
+	int do_peek = 0;
+	struct XIMPeek *peek;
+
+	if (strstr(ServerVendor(dispPtr->display), "XFree86")) {
+	    int vendrel = VendorRelease(dispPtr->display);
+	    if (vendrel < 336) {
+	        /* 3.3.4 and 3.3.5 */
+	        do_peek = 1;
+	    } else if (vendrel < 3900) {
+	        /* Other 3.3.x versions */
+	        do_peek = 1;
+	    } else if (vendrel < 40000000) {
+	        /* 4.0.x versions */
+	        do_peek = 1;
+	    } else {
+	        /* Newer than 4.0 */
+	        do_peek = 0;
+	    }
+	}
+
+	if (do_peek) {
+	    peek = (struct XIMPeek *) dispPtr->inputMethod;
+	    if (peek->ic_chain != NULL)
+	        panic("input contexts not freed before XCloseIM");
+	}
+#endif
+	XCloseIM(dispPtr->inputMethod);
+    }
+#endif
 
     if (dispPtr->display != 0) {
-        Tcl_DeleteFileHandler(ConnectionNumber(dispPtr->display));
-	
-        (void) XSync(dispPtr->display, False);
-        (void) XCloseDisplay(dispPtr->display);
+	Tcl_DeleteFileHandler(ConnectionNumber(dispPtr->display));
+	(void) XSync(dispPtr->display, False);
+	(void) XCloseDisplay(dispPtr->display);
     }
-    
-    ckfree((char *) dispPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkClipCleanup --
+ *
+ *	This procedure is called to cleanup resources associated with
+ *	claiming clipboard ownership and for receiving selection get
+ *	results.  This function is called in tkWindow.c.  This has to be
+ *	called by the display cleanup function because we still need the
+ *	access display elements.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Resources are freed - the clipboard may no longer be used.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkClipCleanup(dispPtr)
+    TkDisplay *dispPtr;	/* display associated with clipboard */
+{
+    if (dispPtr->clipWindow != NULL) {
+	Tk_DeleteSelHandler(dispPtr->clipWindow, dispPtr->clipboardAtom,
+		dispPtr->applicationAtom);
+	Tk_DeleteSelHandler(dispPtr->clipWindow, dispPtr->clipboardAtom,
+		dispPtr->windowAtom);
+
+	Tk_DestroyWindow(dispPtr->clipWindow);
+	Tcl_Release((ClientData) dispPtr->clipWindow);
+	dispPtr->clipWindow = NULL;
+    }
 }
 
 /*
@@ -185,7 +306,7 @@ DisplaySetupProc(clientData, flags)
 	return;
     }
 
-    for (dispPtr = tkDisplayList; dispPtr != NULL;
+    for (dispPtr = TkGetDisplayList(); dispPtr != NULL;
 	 dispPtr = dispPtr->nextPtr) {
 
 	/*
@@ -196,9 +317,45 @@ DisplaySetupProc(clientData, flags)
 	 */
 
 	XFlush(dispPtr->display);
-	if (XQLength(dispPtr->display) > 0) {
+	if (QLength(dispPtr->display) > 0) {
 	    Tcl_SetMaxBlockTime(&blockTime);
 	}
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ *  TransferXEventsToTcl
+ *
+ *      Transfer events from the X event queue to the Tk event queue.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Moves queued X events onto the Tcl event queue.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+TransferXEventsToTcl(display)
+    Display *display;
+{
+    int numFound;
+    XEvent event;
+
+    numFound = QLength(display);
+
+    /*
+     * Transfer events from the X event queue to the Tk event queue.
+     */
+
+    while (numFound > 0) {
+	XNextEvent(display, &event);
+	Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
+	numFound--;
     }
 }
 
@@ -225,27 +382,15 @@ DisplayCheckProc(clientData, flags)
     int flags;
 {
     TkDisplay *dispPtr;
-    XEvent event;
-    int numFound;
 
     if (!(flags & TCL_WINDOW_EVENTS)) {
 	return;
     }
 
-    for (dispPtr = tkDisplayList; dispPtr != NULL;
+    for (dispPtr = TkGetDisplayList(); dispPtr != NULL;
 	 dispPtr = dispPtr->nextPtr) {
 	XFlush(dispPtr->display);
-	numFound = XQLength(dispPtr->display);
-
-	/*
-	 * Transfer events from the X event queue to the Tk event queue.
-	 */
-
-	while (numFound > 0) {
-	    XNextEvent(dispPtr->display, &event);
-	    Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
-	    numFound--;
-	}
+	TransferXEventsToTcl(dispPtr->display);
     }
 }
 
@@ -273,7 +418,6 @@ DisplayFileProc(clientData, flags)
 {
     TkDisplay *dispPtr = (TkDisplay *) clientData;
     Display *display = dispPtr->display;
-    XEvent event;
     int numFound;
 
     XFlush(display);
@@ -311,15 +455,7 @@ DisplayFileProc(clientData, flags)
 	(void) signal(SIGPIPE, oldHandler);
     }
     
-    /*
-     * Transfer events from the X event queue to the Tk event queue.
-     */
-
-    while (numFound > 0) {
-	XNextEvent(display, &event);
-	Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
-	numFound--;
-    }
+    TransferXEventsToTcl(display);
 }
 
 /*
@@ -394,10 +530,10 @@ TkUnixDoOneXEvent(timePtr)
      */
 
     memset((VOID *) readMask, 0, MASK_SIZE*sizeof(fd_mask));
-    for (dispPtr = tkDisplayList; dispPtr != NULL;
+    for (dispPtr = TkGetDisplayList(); dispPtr != NULL;
 	 dispPtr = dispPtr->nextPtr) {
 	XFlush(dispPtr->display);
-	if (XQLength(dispPtr->display) > 0) {
+	if (QLength(dispPtr->display) > 0) {
 	    blockTime.tv_sec = 0;
 	    blockTime.tv_usec = 0;
 	}
@@ -425,12 +561,12 @@ TkUnixDoOneXEvent(timePtr)
      * Process any new events on the display connections.
      */
 
-    for (dispPtr = tkDisplayList; dispPtr != NULL;
+    for (dispPtr = TkGetDisplayList(); dispPtr != NULL;
 	 dispPtr = dispPtr->nextPtr) {
 	fd = ConnectionNumber(dispPtr->display);
 	index = fd/(NBBY*sizeof(fd_mask));
 	bit = 1 << (fd%(NBBY*sizeof(fd_mask)));
-	if ((readMask[index] & bit) || (XQLength(dispPtr->display) > 0)) {
+	if ((readMask[index] & bit) || (QLength(dispPtr->display) > 0)) {
 	    DisplayFileProc((ClientData)dispPtr, TCL_READABLE);
 	}
     }
@@ -480,19 +616,86 @@ void
 TkpSync(display)
     Display *display;		/* Display to sync. */
 {
-    int numFound = 0;
-    XEvent event;
-
     XSync(display, False);
 
     /*
      * Transfer events from the X event queue to the Tk event queue.
      */
+    TransferXEventsToTcl(display);
+}
+#ifdef TK_USE_INPUT_METHODS
+
+/* 
+ *--------------------------------------------------------------
+ *
+ * OpenIM --
+ *
+ *	Tries to open an X input method, associated with the
+ *	given display.  Right now we can only deal with a bare-bones
+ *	input style:  no preedit, and no status.
+ *
+ * Results:
+ *	Stores the input method in dispPtr->inputMethod;  if there isn't
+ *	a suitable input method, then NULL is stored in dispPtr->inputMethod.
+ *
+ * Side effects:
+ *	An input method gets opened.
+ *
+ *--------------------------------------------------------------
+ */
 
-    numFound = XQLength(display);
-    while (numFound > 0) {
-	XNextEvent(display, &event);
-	Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
-	numFound--;
+static void
+OpenIM(dispPtr)
+    TkDisplay *dispPtr;		/* Tk's structure for the display. */
+{
+    unsigned short i;
+    XIMStyles *stylePtr;
+
+    if (XSetLocaleModifiers("") == NULL) {
+	goto error;
+    }
+
+    dispPtr->inputMethod = XOpenIM(dispPtr->display, NULL, NULL, NULL);
+    if (dispPtr->inputMethod == NULL) {
+	return;
+    }
+
+    if ((XGetIMValues(dispPtr->inputMethod, XNQueryInputStyle, &stylePtr,
+	    NULL) != NULL) || (stylePtr == NULL)) {
+	goto error;
+    }
+#if TK_XIM_SPOT
+    /*
+     * If we want to do over-the-spot XIM, we have to check that this
+     * mode is supported.  If not we will fall-through to the check below.
+     */
+    for (i = 0; i < stylePtr->count_styles; i++) {
+	if (stylePtr->supported_styles[i]
+		== (XIMPreeditPosition | XIMStatusNothing)) {
+	    dispPtr->flags |= TK_DISPLAY_XIM_SPOT;
+	    XFree(stylePtr);
+	    return;
+	}
+    }
+#endif
+    for (i = 0; i < stylePtr->count_styles; i++) {
+	if (stylePtr->supported_styles[i]
+		== (XIMPreeditNothing | XIMStatusNothing)) {
+	    XFree(stylePtr);
+	    return;
+	}
+    }
+    XFree(stylePtr);
+
+    error:
+
+    if (dispPtr->inputMethod) {
+	/*
+	 * This call should not suffer from any core dumping problems
+	 * since we have not allocated any input contexts.
+	 */
+	XCloseIM(dispPtr->inputMethod);
+	dispPtr->inputMethod = NULL;
     }
 }
+#endif /* TK_USE_INPUT_METHODS */

@@ -9,12 +9,13 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacButton.c 1.18 97/11/20 18:27:21
+ * RCS: @(#) $Id: tkMacButton.c,v 1.17.2.3 2004/10/27 00:37:38 davygrvy Exp $
  */
 
 #include "tkButton.h"
 #include "tkMacInt.h"
 #include <Controls.h>
+#include <ControlDefinitions.h>
 #include <LowMem.h>
 #include <Appearance.h>
 
@@ -28,7 +29,7 @@
 #define DRAW_LABEL	0		/* Labels are treated genericly. */
 #define DRAW_CONTROL	1		/* Draw using the Native control. */
 #define DRAW_CUSTOM	2		/* Make our own button drawing. */
-#define DRAW_BEVEL      3
+#define DRAW_BEVEL	3
 
 /*
  * The following structures are used to draw our controls.  Rather than
@@ -84,28 +85,29 @@ static pascal void UserPaneBackgroundProc(ControlHandle,
  * Forward declarations for procedures defined later in this file:
  */
 
+static void		ButtonEventProc _ANSI_ARGS_((
+			    ClientData clientData, XEvent *eventPtr));
 static int	UpdateControlColors _ANSI_ARGS_((TkButton *butPtr,
-			    ControlRef controlHandle, CCTabHandle ccTabHandle,
-			    RGBColor *saveColorPtr));
+	ControlRef controlHandle, CCTabHandle ccTabHandle,
+	RGBColor *saveColorPtr));
 static void	DrawBufferedControl _ANSI_ARGS_((TkButton *butPtr,
-		    GWorldPtr destPort, GC gc, Pixmap pixmap));
+	GWorldPtr destPort, GC gc, Pixmap pixmap));
 static void	InitSampleControls();
 static void	SetupBevelButton _ANSI_ARGS_((TkButton *butPtr,
-		    ControlRef controlHandle, 
-		    GWorldPtr destPort, GC gc, Pixmap pixmap));
+	ControlRef controlHandle, 
+	GWorldPtr destPort, GC gc, Pixmap pixmap));
 static void	ChangeBackgroundWindowColor _ANSI_ARGS_((
-			    WindowRef macintoshWindow, RGBColor rgbColor,
-			    RGBColor *oldColor));
+    WindowRef macintoshWindow, RGBColor rgbColor,
+    RGBColor *oldColor));
 static void	ButtonExitProc _ANSI_ARGS_((ClientData clientData));
 
 /*
  * The class procedure table for the button widgets.
  */
 
-TkClassProcs tkpButtonProcs = { 
-    NULL,			/* createProc. */
-    TkButtonWorldChanged,	/* geometryProc. */
-    NULL			/* modalProc. */
+Tk_ClassProcs tkpButtonProcs = { 
+    sizeof(Tk_ClassProcs),	/* size */
+    TkButtonWorldChanged,	/* worldChangedProc */
 };
 
 /*
@@ -128,7 +130,11 @@ TkButton *
 TkpCreateButton(
     Tk_Window tkwin)
 {
-    return (TkButton *) ckalloc(sizeof(TkButton));
+    TkButton *buttonPtr;
+    buttonPtr = (TkButton *) ckalloc(sizeof(TkButton));
+    Tk_CreateEventHandler(tkwin, ActivateMask,
+	    ButtonEventProc, (ClientData) buttonPtr);
+    return buttonPtr;
 }
 
 /*
@@ -161,7 +167,9 @@ TkpDisplayButton(
 				 * compiler warning. */
     int y, relief;
     register Tk_Window tkwin = butPtr->tkwin;
-    int width, height;
+    int width, height, fullWidth, fullHeight;
+    int textXOffset, textYOffset;
+    int haveImage = 0, haveText = 0;
     int offset;			/* 0 means this is a normal widget.  1 means
 				 * it is an image button, so we offset the
 				 * image to make the button appear to move
@@ -171,7 +179,11 @@ TkpDisplayButton(
     GDHandle saveDevice;
     GWorldPtr destPort;
     int drawType, borderWidth;
-    
+    int imageWidth, imageHeight;
+    int imageXOffset = 0, imageYOffset = 0; /* image information that will
+					     * be used to restrict disabled
+					     * pixmap as well */
+
     GetGWorld(&saveWorld, &saveDevice);
 
     butPtr->flags &= ~REDRAW_PENDING;
@@ -193,17 +205,17 @@ TkpDisplayButton(
     offset = (butPtr->type == TYPE_BUTTON) && hasImageOrBitmap;
 
     border = butPtr->normalBorder;
-    if ((butPtr->state == tkDisabledUid) && (butPtr->disabledFg != NULL)) {
+    if ((butPtr->state == STATE_DISABLED) && (butPtr->disabledFg != NULL)) {
 	gc = butPtr->disabledGC;
     } else if ((butPtr->type == TYPE_BUTTON)
-	    && (butPtr->state == tkActiveUid)) {
+	    && (butPtr->state == STATE_ACTIVE)) {
 	gc = butPtr->activeTextGC;
 	border = butPtr->activeBorder;
     } else {
 	gc = butPtr->normalTextGC;
     }
     
-    if ((butPtr->flags & SELECTED) && (butPtr->state != tkActiveUid)
+    if ((butPtr->flags & SELECTED) && (butPtr->state != STATE_ACTIVE)
 	    && (butPtr->selectBorder != NULL) && !butPtr->indicatorOn) {
 	border = butPtr->selectBorder;
     }
@@ -218,10 +230,13 @@ TkpDisplayButton(
     relief = butPtr->relief;
 
     if ((butPtr->type >= TYPE_CHECK_BUTTON) && !butPtr->indicatorOn) { 
-        if (!TkMacHaveAppearance() || !hasImageOrBitmap) {
-	    relief = (butPtr->flags & SELECTED) ? TK_RELIEF_SUNKEN
-		    : TK_RELIEF_RAISED;
-        }
+	if (!TkMacHaveAppearance() || !hasImageOrBitmap) {
+	    if (butPtr->flags & SELECTED) {
+		relief = TK_RELIEF_SUNKEN;
+	    } else if (butPtr->overRelief != relief) {
+		relief = butPtr->offRelief;
+	    }
+	}
     }
 
     /*
@@ -230,11 +245,11 @@ TkpDisplayButton(
      */
      
     if (butPtr->type == TYPE_BUTTON) {
-        Tk_Fill3DRectangle(tkwin, pixmap, butPtr->highlightBorder, 0, 0,
-	        Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
+	Tk_Fill3DRectangle(tkwin, pixmap, butPtr->highlightBorder, 0, 0,
+		Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
     } else {
-    Tk_Fill3DRectangle(tkwin, pixmap, butPtr->normalBorder, 0, 0,
-	    Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
+	Tk_Fill3DRectangle(tkwin, pixmap, butPtr->normalBorder, 0, 0,
+		Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
     }
    
     if (butPtr->type == TYPE_LABEL) {
@@ -251,21 +266,21 @@ TkpDisplayButton(
 	     * does not record this call, and so we can't use the
 	     * Appearance bevel button here.  The only case that would
 	     * exercise this is if you use a bitmap, with
-	     * -data & -mask specified.  We should probably draw the 
+	     * -data & -mask specified.	 We should probably draw the 
 	     * appearance button and overprint the image in this case.
 	     * This just punts and draws the old-style, ugly, button.
 	     */
 	     
 	    if (gc->clip_mask == 0) {
-	        drawType = DRAW_BEVEL;
+		drawType = DRAW_BEVEL;
 	    } else {
-	        TkpClipMask *clipPtr = (TkpClipMask*) gc->clip_mask;
-	        if ((clipPtr->type == TKP_CLIP_PIXMAP) &&
-	            (clipPtr->value.pixmap != butPtr->bitmap)) {
-	            drawType = DRAW_CUSTOM;
-	        } else {
-	            drawType = DRAW_BEVEL;
-	        }
+		TkpClipMask *clipPtr = (TkpClipMask*) gc->clip_mask;
+		if ((clipPtr->type == TKP_CLIP_PIXMAP) &&
+			(clipPtr->value.pixmap != butPtr->bitmap)) {
+		    drawType = DRAW_CUSTOM;
+		} else {
+		    drawType = DRAW_BEVEL;
+		}
 	    }
 	}
     } else {
@@ -273,15 +288,15 @@ TkpDisplayButton(
 	    drawType = DRAW_CONTROL;
 	} else if (hasImageOrBitmap) {
 	    if (gc->clip_mask == 0) {
-	        drawType = DRAW_BEVEL;
+		drawType = DRAW_BEVEL;
 	    } else {
-	        TkpClipMask *clipPtr = (TkpClipMask*) gc->clip_mask;
-	        if ((clipPtr->type == TKP_CLIP_PIXMAP) &&
-	            (clipPtr->value.pixmap != butPtr->bitmap)) {
-	            drawType = DRAW_CUSTOM;
-	        } else {
-	            drawType = DRAW_BEVEL;
-	        }
+		TkpClipMask *clipPtr = (TkpClipMask*) gc->clip_mask;
+		if ((clipPtr->type == TKP_CLIP_PIXMAP) &&
+			(clipPtr->value.pixmap != butPtr->bitmap)) {
+		    drawType = DRAW_CUSTOM;
+		} else {
+		    drawType = DRAW_BEVEL;
+		}
 	    }
 	} else {
 	    drawType = DRAW_CUSTOM;
@@ -289,13 +304,13 @@ TkpDisplayButton(
     }
 
     /*
-     * Draw the native portion of the buttons.  Start by creating the control
+     * Draw the native portion of the buttons.	Start by creating the control
      * if it doesn't already exist.  Then configure the Macintosh control from
      * the Tk info.  Finally, we call Draw1Control to draw to the screen.
      */
 
     if ((drawType == DRAW_CONTROL) || 
-            ((drawType == DRAW_BEVEL) && TkMacHaveAppearance())) {
+	    ((drawType == DRAW_BEVEL) && TkMacHaveAppearance())) {
 	borderWidth = 0;
 	
 	/*
@@ -319,75 +334,189 @@ TkpDisplayButton(
      */
 
     if ((drawType == DRAW_BEVEL) && TkMacHaveAppearance()) {
-        /* Empty Body */
-    } else if (butPtr->image != None) {
-	Tk_SizeOfImage(butPtr->image, &width, &height);
+	/* Empty Body */
+    } else {
+	if (butPtr->image != None) {
+	    Tk_SizeOfImage(butPtr->image, &width, &height);
+	    haveImage = 1;
+	} else if (butPtr->bitmap != None) {
+	    Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
+	    haveImage = 1;
+	}
+	imageWidth  = width;
+	imageHeight = height;
 
-	imageOrBitmap:
-	TkComputeAnchor(butPtr->anchor, tkwin, 0, 0,
-		butPtr->indicatorSpace + width, height, &x, &y);
-	x += butPtr->indicatorSpace;
-
-	x += offset;
-	y += offset;
-	if (relief == TK_RELIEF_RAISED) {
-	    x -= offset;
-	    y -= offset;
-	} else if (relief == TK_RELIEF_SUNKEN) {
+	haveText = (butPtr->textWidth != 0 && butPtr->textHeight != 0);
+	if (butPtr->compound != COMPOUND_NONE && haveImage && haveText) {
+	    textXOffset = 0;
+	    textYOffset = 0;
+	    fullWidth = 0;
+	    fullHeight = 0;
+	    
+	    switch ((enum compound) butPtr->compound) {
+		case COMPOUND_TOP: 
+		case COMPOUND_BOTTOM: {
+		    /* Image is above or below text */
+		    if (butPtr->compound == COMPOUND_TOP) {
+			textYOffset = height + butPtr->padY;
+		    } else {
+			imageYOffset = butPtr->textHeight + butPtr->padY;
+		    }
+		    fullHeight = height + butPtr->textHeight + butPtr->padY;
+		    fullWidth = (width > butPtr->textWidth ? width :
+			    butPtr->textWidth);
+		    textXOffset = (fullWidth - butPtr->textWidth)/2;
+		    imageXOffset = (fullWidth - width)/2;
+		    break;
+		}
+		case COMPOUND_LEFT:
+		case COMPOUND_RIGHT: {
+		    /* Image is left or right of text */
+		    if (butPtr->compound == COMPOUND_LEFT) {
+			textXOffset = width + butPtr->padX;
+		    } else {
+			imageXOffset = butPtr->textWidth + butPtr->padX;
+		    }
+		    fullWidth = butPtr->textWidth + butPtr->padX + width;
+		    fullHeight = (height > butPtr->textHeight ? height :
+			    butPtr->textHeight);
+		    textYOffset = (fullHeight - butPtr->textHeight)/2;
+		    imageYOffset = (fullHeight - height)/2;
+		    break;
+		}
+		case COMPOUND_CENTER: {
+		    /* Image and text are superimposed */
+		    fullWidth = (width > butPtr->textWidth ? width :
+			    butPtr->textWidth);
+		    fullHeight = (height > butPtr->textHeight ? height :
+			    butPtr->textHeight);
+		    textXOffset = (fullWidth - butPtr->textWidth)/2;
+		    imageXOffset = (fullWidth - width)/2;
+		    textYOffset = (fullHeight - butPtr->textHeight)/2;
+		    imageYOffset = (fullHeight - height)/2;
+		    break;
+		}
+		case COMPOUND_NONE: {break;}
+	    }
+	    
+	    TkComputeAnchor(butPtr->anchor, tkwin, butPtr->padX, butPtr->padY,
+		    butPtr->indicatorSpace + fullWidth, fullHeight, &x, &y);
+	    
+	    x += butPtr->indicatorSpace;
+	    
 	    x += offset;
 	    y += offset;
-	}
-	if (butPtr->image != NULL) {
-	    if ((butPtr->selectImage != NULL) && (butPtr->flags & SELECTED)) {
-		Tk_RedrawImage(butPtr->selectImage, 0, 0, width, height,
-			pixmap, x, y);
-	    } else {
-		Tk_RedrawImage(butPtr->image, 0, 0, width, height, pixmap,
-			x, y);
+	    if (relief == TK_RELIEF_RAISED) {
+		x -= offset;
+		y -= offset;
+	    } else if (relief == TK_RELIEF_SUNKEN) {
+		x += offset;
+		y += offset;
 	    }
+	    imageXOffset += x;
+	    imageYOffset += y;
+	    if (butPtr->image != NULL) {
+		if ((butPtr->selectImage != NULL) &&
+			(butPtr->flags & SELECTED)) {
+		    Tk_RedrawImage(butPtr->selectImage, 0, 0,
+			    width, height, pixmap, imageXOffset, imageYOffset);
+		} else {
+		    Tk_RedrawImage(butPtr->image, 0, 0, width,
+			    height, pixmap, imageXOffset, imageYOffset);
+		}
+	    } else {
+		XSetClipOrigin(butPtr->display, gc,
+			imageXOffset, imageYOffset);
+		XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc,
+			0, 0, (unsigned int) width, (unsigned int) height,
+			imageXOffset, imageYOffset, 1);
+		XSetClipOrigin(butPtr->display, gc, 0, 0);
+	    }
+	    
+	    Tk_DrawTextLayout(butPtr->display, pixmap, gc, butPtr->textLayout,
+		    x + textXOffset, y + textYOffset, 0, -1);
+	    Tk_UnderlineTextLayout(butPtr->display, pixmap, gc,
+		    butPtr->textLayout, x + textXOffset, y + textYOffset,
+		    butPtr->underline);
+	    y += fullHeight/2;
 	} else {
-	    XSetClipOrigin(butPtr->display, gc, x, y);
-	    XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc, 0, 0,
-		    (unsigned int) width, (unsigned int) height, x, y, 1);
-	    XSetClipOrigin(butPtr->display, gc, 0, 0);
+	    if (haveImage) {
+		TkComputeAnchor(butPtr->anchor, tkwin, 0, 0,
+			butPtr->indicatorSpace + width, height, &x, &y);
+		x += butPtr->indicatorSpace;
+		
+		x += offset;
+		y += offset;
+		if (relief == TK_RELIEF_RAISED) {
+		    x -= offset;
+		    y -= offset;
+		} else if (relief == TK_RELIEF_SUNKEN) {
+		    x += offset;
+		    y += offset;
+		}
+		imageXOffset += x;
+		imageYOffset += y;
+		if (butPtr->image != NULL) {
+		    if ((butPtr->selectImage != NULL) &&
+			    (butPtr->flags & SELECTED)) {
+			Tk_RedrawImage(butPtr->selectImage, 0, 0, width,
+				height,	pixmap, imageXOffset, imageYOffset);
+		    } else {
+			Tk_RedrawImage(butPtr->image, 0, 0, width, height,
+				pixmap, imageXOffset, imageYOffset);
+		    }
+		} else {
+		    XSetClipOrigin(butPtr->display, gc, x, y);
+		    XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc,
+			    0, 0, (unsigned int) width,
+			    (unsigned int) height, x, y, 1);
+		    XSetClipOrigin(butPtr->display, gc, 0, 0);
+		}
+		y += height/2;
+	    } else {
+		TkComputeAnchor(butPtr->anchor, tkwin, butPtr->padX,
+			butPtr->padY,
+			butPtr->indicatorSpace + butPtr->textWidth,
+			butPtr->textHeight, &x, &y);
+		
+		x += butPtr->indicatorSpace;
+		
+		Tk_DrawTextLayout(butPtr->display, pixmap, gc,
+			butPtr->textLayout, x, y, 0, -1);
+		y += butPtr->textHeight/2;
+	    }
 	}
-	y += height/2;
-    } else if (butPtr->bitmap != None) {
-	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
-	goto imageOrBitmap;
-    } else {
-	TkComputeAnchor(butPtr->anchor, tkwin, butPtr->padX, butPtr->padY,
-		butPtr->indicatorSpace + butPtr->textWidth, butPtr->textHeight,
-		&x, &y);
-
-	x += butPtr->indicatorSpace;
-
-	Tk_DrawTextLayout(butPtr->display, pixmap, gc, butPtr->textLayout,
-		x, y, 0, -1);
-	y += butPtr->textHeight/2;
     }
 
     /*
      * If the button is disabled with a stipple rather than a special
-     * foreground color, generate the stippled effect.  If the widget
+     * foreground color, generate the stippled effect.	If the widget
      * is selected and we use a different background color when selected,
-     * must temporarily modify the GC.
+     * must temporarily modify the GC so the stippling is the right color.
      */
 
-    if ((butPtr->state == tkDisabledUid)
+    if ((butPtr->state == STATE_DISABLED)
 	    && ((butPtr->disabledFg == NULL) || (butPtr->image != NULL))) {
 	if ((butPtr->flags & SELECTED) && !butPtr->indicatorOn
 		&& (butPtr->selectBorder != NULL)) {
-	    XSetForeground(butPtr->display, butPtr->disabledGC,
+	    XSetForeground(butPtr->display, butPtr->stippleGC,
 		    Tk_3DBorderColor(butPtr->selectBorder)->pixel);
 	}
-	XFillRectangle(butPtr->display, pixmap, butPtr->disabledGC,
-		butPtr->inset, butPtr->inset,
-		(unsigned) (Tk_Width(tkwin) - 2*butPtr->inset),
-		(unsigned) (Tk_Height(tkwin) - 2*butPtr->inset));
+	/*
+	 * Stipple the whole button if no disabledFg was specified,
+	 * otherwise restrict stippling only to displayed image
+	 */
+	if (butPtr->disabledFg == NULL) {
+	    XFillRectangle(butPtr->display, pixmap, butPtr->stippleGC, 0, 0,
+		    (unsigned) Tk_Width(tkwin), (unsigned) Tk_Height(tkwin));
+	} else {
+	    XFillRectangle(butPtr->display, pixmap, butPtr->stippleGC,
+		    imageXOffset, imageYOffset,
+		    (unsigned) imageWidth, (unsigned) imageHeight);
+	}
 	if ((butPtr->flags & SELECTED) && !butPtr->indicatorOn
 		&& (butPtr->selectBorder != NULL)) {
-	    XSetForeground(butPtr->display, butPtr->disabledGC,
+	    XSetForeground(butPtr->display, butPtr->stippleGC,
 		    Tk_3DBorderColor(butPtr->normalBorder)->pixel);
 	}
     }
@@ -439,9 +568,15 @@ void
 TkpComputeButtonGeometry(
     TkButton *butPtr)	/* Button whose geometry may have changed. */
 {
-    int width, height, avgWidth;
+    int width, height, avgWidth, haveImage = 0, haveText = 0;
+    int txtWidth, txtHeight;
     Tk_FontMetrics fm;
 
+    width = 0;
+    height = 0;
+    txtWidth = 0;
+    txtHeight = 0;
+    avgWidth = 0;
 
     /*
      * First figure out the size of the contents of the button.
@@ -450,13 +585,63 @@ TkpComputeButtonGeometry(
     butPtr->indicatorSpace = 0;
     if (butPtr->image != NULL) {
 	Tk_SizeOfImage(butPtr->image, &width, &height);
-	imageOrBitmap:
+	haveImage = 1;
+    } else if (butPtr->bitmap != None) {
+	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
+	haveImage = 1;
+    }
+
+    if (haveImage == 0 || butPtr->compound != COMPOUND_NONE) {
+	Tk_FreeTextLayout(butPtr->textLayout);
+	butPtr->textLayout = Tk_ComputeTextLayout(butPtr->tkfont,
+		Tcl_GetString(butPtr->textPtr), -1, butPtr->wrapLength,
+		butPtr->justify, 0, &butPtr->textWidth, &butPtr->textHeight);
+
+	txtWidth = butPtr->textWidth;
+	txtHeight = butPtr->textHeight;
+	avgWidth = Tk_TextWidth(butPtr->tkfont, "0", 1);
+	Tk_GetFontMetrics(butPtr->tkfont, &fm);
+	haveText = (txtWidth != 0 && txtHeight != 0);
+    }
+
+    /*
+     * If the button is compound (ie, it shows both an image and text),
+     * the new geometry is a combination of the image and text geometry.
+     * We only honor the compound bit if the button has both text and an
+     * image, because otherwise it is not really a compound button.
+     */
+
+    if (butPtr->compound != COMPOUND_NONE && haveImage && haveText) {
+	switch ((enum compound) butPtr->compound) {
+	    case COMPOUND_TOP:
+	    case COMPOUND_BOTTOM: {
+		/* Image is above or below text */
+		height += txtHeight + butPtr->padY;
+		width = (width > txtWidth ? width : txtWidth);
+		break;
+	    }
+	    case COMPOUND_LEFT:
+	    case COMPOUND_RIGHT: {
+		/* Image is left or right of text */
+		width += txtWidth + butPtr->padX;
+		height = (height > txtHeight ? height : txtHeight);
+		break;
+	    }
+	    case COMPOUND_CENTER: {
+		/* Image and text are superimposed */
+		width = (width > txtWidth ? width : txtWidth);
+		height = (height > txtHeight ? height : txtHeight);
+		break;
+	    }
+	    case COMPOUND_NONE: {break;}
+	}
 	if (butPtr->width > 0) {
 	    width = butPtr->width;
 	}
 	if (butPtr->height > 0) {
 	    height = butPtr->height;
 	}
+
 	if ((butPtr->type >= TYPE_CHECK_BUTTON) && butPtr->indicatorOn) {
 	    butPtr->indicatorSpace = height;
 	    if (butPtr->type == TYPE_CHECK_BUTTON) {
@@ -465,32 +650,43 @@ TkpComputeButtonGeometry(
 		butPtr->indicatorDiameter = (75*height)/100;
 	    }
 	}
-    } else if (butPtr->bitmap != None) {
-	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, &width, &height);
-	goto imageOrBitmap;
+
+	width += 2*butPtr->padX;
+	height += 2*butPtr->padY;
+
     } else {
-	Tk_FreeTextLayout(butPtr->textLayout);
-	butPtr->textLayout = Tk_ComputeTextLayout(butPtr->tkfont,
-		butPtr->text, -1, butPtr->wrapLength,
-		butPtr->justify, 0, &butPtr->textWidth, &butPtr->textHeight);
-
-	width = butPtr->textWidth;
-	height = butPtr->textHeight;
-	avgWidth = Tk_TextWidth(butPtr->tkfont, "0", 1);
-	Tk_GetFontMetrics(butPtr->tkfont, &fm);
-
-	if (butPtr->width > 0) {
-	    width = butPtr->width * avgWidth;
-	}
-	if (butPtr->height > 0) {
-	    height = butPtr->height * fm.linespace;
-	}
-	if ((butPtr->type >= TYPE_CHECK_BUTTON) && butPtr->indicatorOn) {
-	    butPtr->indicatorDiameter = fm.linespace;
-	    if (butPtr->type == TYPE_CHECK_BUTTON) {
-		butPtr->indicatorDiameter = (80*butPtr->indicatorDiameter)/100;
+	if (haveImage) {
+	    if (butPtr->width > 0) {
+		width = butPtr->width;
 	    }
-	    butPtr->indicatorSpace = butPtr->indicatorDiameter + avgWidth;
+	    if (butPtr->height > 0) {
+		height = butPtr->height;
+	    }
+	    if ((butPtr->type >= TYPE_CHECK_BUTTON) && butPtr->indicatorOn) {
+		butPtr->indicatorSpace = height;
+		if (butPtr->type == TYPE_CHECK_BUTTON) {
+		    butPtr->indicatorDiameter = (65*height)/100;
+		} else {
+		    butPtr->indicatorDiameter = (75*height)/100;
+		}
+	    }
+	} else {
+	    width = txtWidth;
+	    height = txtHeight;
+	    if (butPtr->width > 0) {
+		width = butPtr->width * avgWidth;
+	    }
+	    if (butPtr->height > 0) {
+		height = butPtr->height * fm.linespace;
+	    }
+	    if ((butPtr->type >= TYPE_CHECK_BUTTON) && butPtr->indicatorOn) {
+		butPtr->indicatorDiameter = fm.linespace;
+		if (butPtr->type == TYPE_CHECK_BUTTON) {
+		    butPtr->indicatorDiameter =
+			(80*butPtr->indicatorDiameter)/100;
+		}
+		butPtr->indicatorSpace = butPtr->indicatorDiameter + avgWidth;
+	    }
 	}
     }
 
@@ -504,7 +700,7 @@ TkpComputeButtonGeometry(
     
     /*
      * The width and height calculation for Appearance buttons with images & 
-     * non-Appearance buttons with images is different.  In the latter case, 
+     * non-Appearance buttons with images is different.	 In the latter case, 
      * we add the borderwidth to the inset, since we are going to stamp a
      * 3-D border over the image.  In the former, we add it to the height,
      * directly, since Appearance will draw the border as part of our control.
@@ -516,7 +712,7 @@ TkpComputeButtonGeometry(
      *
      * The highlight width corresponds to the default ring on the Macintosh.
      * As such, the highlight width is only added if the button is the default
-     * button.  The actual width of the default ring is one less than the
+     * button.	The actual width of the default ring is one less than the
      * highlight width as there is also one pixel of spacing.
      * Appearance buttons with images do not have a highlight ring, because the 
      * Bevel button type does not support one.
@@ -528,48 +724,48 @@ TkpComputeButtonGeometry(
     }
     
     if ((butPtr->type == TYPE_BUTTON)) {
-        if ((butPtr->image == None) && (butPtr->bitmap == None)) {
+	if ((butPtr->image == None) && (butPtr->bitmap == None)) {
 	    butPtr->inset = 0;
-            if (butPtr->defaultState != tkDisabledUid) {
-                butPtr->inset += butPtr->highlightWidth;
-            }
-        } else if (TkMacHaveAppearance()) {
-                butPtr->inset = 0;
-                width += (2 * butPtr->borderWidth + 4);
-                height += (2 * butPtr->borderWidth + 4);
+	    if (butPtr->defaultState != STATE_DISABLED) {
+		butPtr->inset += butPtr->highlightWidth;
+	    }
+	} else if (TkMacHaveAppearance()) {
+	    butPtr->inset = 0;
+	    width += (2 * butPtr->borderWidth + 4);
+	    height += (2 * butPtr->borderWidth + 4);
 	} else {
-            butPtr->inset = butPtr->borderWidth;
-	width += 2;
-	height += 2;
-            if (butPtr->defaultState != tkDisabledUid) {
-                butPtr->inset += butPtr->highlightWidth;
-            }
-        }
+	    butPtr->inset = butPtr->borderWidth;
+	    width += 2;
+	    height += 2;
+	    if (butPtr->defaultState != STATE_DISABLED) {
+		butPtr->inset += butPtr->highlightWidth;
+	    }
+	}
     } else if ((butPtr->type != TYPE_LABEL)) {
-        if (butPtr->indicatorOn) {
+	if (butPtr->indicatorOn) {
 	    butPtr->inset = 0;
 	} else {
-	/*
-	 * Under Appearance, the Checkbutton or radiobutton with an image
-	 * is represented by a BevelButton with the Sticky defProc...  
-	 * So we must set its height in the same way as the Button 
-	 * with an image or bitmap.
-	 */
-            if (((butPtr->image != None) || (butPtr->bitmap != None))
-                    && TkMacHaveAppearance()) {
-                int border;
-                butPtr->inset = 0;
-                if ( butPtr->borderWidth <= 2 ) {
-                    border = 6;
-                }  else {
-                    border = 2 * butPtr->borderWidth + 2;
-                }              
-                width += border;
-                height += border;
-            } else {
- 	        butPtr->inset = butPtr->borderWidth;
-            }   
-        }	
+	    /*
+	     * Under Appearance, the Checkbutton or radiobutton with an image
+	     * is represented by a BevelButton with the Sticky defProc...  
+	     * So we must set its height in the same way as the Button 
+	     * with an image or bitmap.
+	     */
+	    if (((butPtr->image != None) || (butPtr->bitmap != None))
+		    && TkMacHaveAppearance()) {
+		int border;
+		butPtr->inset = 0;
+		if ( butPtr->borderWidth <= 2 ) {
+		    border = 6;
+		}  else {
+		    border = 2 * butPtr->borderWidth + 2;
+		}	       
+		width += border;
+		height += border;
+	    } else {
+		butPtr->inset = butPtr->borderWidth;
+	    }	
+	}	
     } else {
 	butPtr->inset = butPtr->borderWidth;
     }
@@ -629,9 +825,9 @@ DrawBufferedControl(
     TkButton *butPtr,		/* Tk button. */
     GWorldPtr destPort,		/* Off screen GWorld. */
     GC gc,			/* The GC we are drawing into - needed for
-    				 * the bevel button */
+				 * the bevel button */
     Pixmap pixmap		/* The pixmap we are drawing into - needed
-                                   for the bevel button */
+				   for the bevel button */
     )		
 {
     ControlRef controlHandle;
@@ -639,21 +835,21 @@ DrawBufferedControl(
     int windowColorChanged = false;
     RGBColor saveBackColor;
     int isBevel = 0;
-    
+   
     if (windowRef == NULL) {
-        InitSampleControls();
+	InitSampleControls();
     }
     
     /*
      * Now swap in the passed in GWorld for the portBits of our fake
-     * window.  We also adjust various fields in the WindowRecord to make
+     * window.	We also adjust various fields in the WindowRecord to make
      * the system think this is a normal window.
      * Note, we can use DrawControlInCurrentPort under Appearance, so we don't
      * need to swap pixmaps.
      */
     
     if (!TkMacHaveAppearance()) {
-        ((CWindowPeek) windowRef)->port.portPixMap = destPort->portPixMap;
+	((CWindowPeek) windowRef)->port.portPixMap = destPort->portPixMap;
     }
     
     ((CWindowPeek) windowRef)->port.portRect = destPort->portRect;
@@ -665,90 +861,90 @@ DrawBufferedControl(
     
     /*
      * Set up control in hidden window to match what we need
-     * to draw in the buffered window.  
+     * to draw in the buffered window.	
      */
      
     isBevel = 0;   
     switch (butPtr->type) {
 	case TYPE_BUTTON:
-            if (TkMacHaveAppearance()) {
-	        if ((butPtr->image == None) && (butPtr->bitmap == None)) {
-	            controlHandle = buttonHandle;
-	            ccTabHandle = buttonTabHandle;
-	        } else {
-	            if (butPtr->borderWidth <= 2) {
-                        controlHandle = smallBevelHandle;
-                    } else if (butPtr->borderWidth == 3) {
-                        controlHandle = medBevelHandle;
-                    } else {
-                        controlHandle = largeBevelHandle;
-                    }
-                    ccTabHandle = buttonTabHandle;
-                    SetupBevelButton(butPtr, controlHandle, destPort, 
-                            gc, pixmap);
-	            isBevel = 1;	        
-	        }
+	    if (TkMacHaveAppearance()) {
+		if ((butPtr->image == None) && (butPtr->bitmap == None)) {
+		    controlHandle = buttonHandle;
+		    ccTabHandle = buttonTabHandle;
+		} else {
+		    if (butPtr->borderWidth <= 2) {
+			controlHandle = smallBevelHandle;
+		    } else if (butPtr->borderWidth == 3) {
+			controlHandle = medBevelHandle;
+		    } else {
+			controlHandle = largeBevelHandle;
+		    }
+		    ccTabHandle = buttonTabHandle;
+		    SetupBevelButton(butPtr, controlHandle, destPort, 
+			    gc, pixmap);
+		    isBevel = 1;		
+		}
 	    } else {
-	        controlHandle = buttonHandle;
-	        ccTabHandle = buttonTabHandle;
+		controlHandle = buttonHandle;
+		ccTabHandle = buttonTabHandle;
 	    }
 	    break;
 	case TYPE_RADIO_BUTTON:
 	    if (TkMacHaveAppearance()) {
-	        if (((butPtr->image == None) && (butPtr->bitmap == None))
-	                || (butPtr->indicatorOn)) {
-	            controlHandle = radioHandle;
-	            ccTabHandle = radioTabHandle;
-	        } else {
-	            if (butPtr->borderWidth <= 2) {
-                        controlHandle = smallStickyBevelHandle;
-                    } else if (butPtr->borderWidth == 3) {
-                        controlHandle = medStickyBevelHandle;
-                    } else {
-                        controlHandle = largeStickyBevelHandle;
-                    }
-	            ccTabHandle = radioTabHandle;
-                    SetupBevelButton(butPtr, controlHandle, destPort, 
-                            gc, pixmap);
-	            isBevel = 1;	        
-	        }
+		if (((butPtr->image == None) && (butPtr->bitmap == None))
+			|| (butPtr->indicatorOn)) {
+		    controlHandle = radioHandle;
+		    ccTabHandle = radioTabHandle;
+		} else {
+		    if (butPtr->borderWidth <= 2) {
+			controlHandle = smallStickyBevelHandle;
+		    } else if (butPtr->borderWidth == 3) {
+			controlHandle = medStickyBevelHandle;
+		    } else {
+			controlHandle = largeStickyBevelHandle;
+		    }
+		    ccTabHandle = radioTabHandle;
+		    SetupBevelButton(butPtr, controlHandle, destPort, 
+			    gc, pixmap);
+		    isBevel = 1;		
+		}
 	    } else {
-	        controlHandle = radioHandle;
-	        ccTabHandle = radioTabHandle;
-            }	       
+		controlHandle = radioHandle;
+		ccTabHandle = radioTabHandle;
+	    }	       
 	    break;
 	case TYPE_CHECK_BUTTON:
 	    if (TkMacHaveAppearance()) {
-	        if (((butPtr->image == None) && (butPtr->bitmap == None))
-	                || (butPtr->indicatorOn)) {
-	            controlHandle = checkHandle;
-	            ccTabHandle = checkTabHandle;
-	        } else {
-	            if (butPtr->borderWidth <= 2) {
-                        controlHandle = smallStickyBevelHandle;
-                    } else if (butPtr->borderWidth == 3) {
-                        controlHandle = medStickyBevelHandle;
-                    } else {
-                        controlHandle = largeStickyBevelHandle;
-                    }
-	            ccTabHandle = checkTabHandle;
-                    SetupBevelButton(butPtr, controlHandle, destPort, 
-                            gc, pixmap);
-	            isBevel = 1;	        
-	        }
+		if (((butPtr->image == None) && (butPtr->bitmap == None))
+			|| (butPtr->indicatorOn)) {
+		    controlHandle = checkHandle;
+		    ccTabHandle = checkTabHandle;
+		} else {
+		    if (butPtr->borderWidth <= 2) {
+			controlHandle = smallStickyBevelHandle;
+		    } else if (butPtr->borderWidth == 3) {
+			controlHandle = medStickyBevelHandle;
+		    } else {
+			controlHandle = largeStickyBevelHandle;
+		    }
+		    ccTabHandle = checkTabHandle;
+		    SetupBevelButton(butPtr, controlHandle, destPort, 
+			    gc, pixmap);
+		    isBevel = 1;		
+		}
 	    } else {
-	        controlHandle = checkHandle;
-	        ccTabHandle = checkTabHandle;
-            }	       
+		controlHandle = checkHandle;
+		ccTabHandle = checkTabHandle;
+	    }	       
 	    break;
     }
     
     (**controlHandle).contrlRect.left = butPtr->inset;
     (**controlHandle).contrlRect.top = butPtr->inset;
     (**controlHandle).contrlRect.right = Tk_Width(butPtr->tkwin) 
-	    - butPtr->inset;
+	- butPtr->inset;
     (**controlHandle).contrlRect.bottom = Tk_Height(butPtr->tkwin) 
-	    - butPtr->inset;
+	- butPtr->inset;
 	    
     /*
      * Setting the control visibility by hand does not 
@@ -756,16 +952,16 @@ DrawBufferedControl(
      */
      
     if (TkMacHaveAppearance()) {
-        SetControlVisibility(controlHandle, true, false);      
-        (**userPaneHandle).contrlRect.left = 0;
-        (**userPaneHandle).contrlRect.top = 0;
-        (**userPaneHandle).contrlRect.right = Tk_Width(butPtr->tkwin);
-        (**userPaneHandle).contrlRect.bottom = Tk_Height(butPtr->tkwin);
-    } else {      
-        (**controlHandle).contrlVis = 255;
-    }     
+	SetControlVisibility(controlHandle, true, false);      
+	(**userPaneHandle).contrlRect.left = 0;
+	(**userPaneHandle).contrlRect.top = 0;
+	(**userPaneHandle).contrlRect.right = Tk_Width(butPtr->tkwin);
+	(**userPaneHandle).contrlRect.bottom = Tk_Height(butPtr->tkwin);
+    } else {	  
+	(**controlHandle).contrlVis = 255;
+    }	  
     
-	        
+		
     
     if (butPtr->flags & SELECTED) {
 	(**controlHandle).contrlValue = 1;
@@ -773,37 +969,38 @@ DrawBufferedControl(
 	(**controlHandle).contrlValue = 0;
     }
     
-    if (butPtr->state == tkActiveUid) {
-        if (isBevel) {
-            (**controlHandle).contrlHilite = kControlButtonPart;
-        } else {
+    if (!tkMacAppInFront || butPtr->state == STATE_DISABLED) {
+	(**controlHandle).contrlHilite = kControlInactivePart;
+    } else if (butPtr->state == STATE_ACTIVE) {
+	if (isBevel) {
+	    (**controlHandle).contrlHilite = kControlButtonPart;
+	} else {
 	    switch (butPtr->type) {
-	        case TYPE_BUTTON:
+		case TYPE_BUTTON:
 		    (**controlHandle).contrlHilite = kControlButtonPart;
 		    break;
-	        case TYPE_RADIO_BUTTON:
+		case TYPE_RADIO_BUTTON:
 		    (**controlHandle).contrlHilite = kControlRadioButtonPart;
 		    break;
-	        case TYPE_CHECK_BUTTON:
+		case TYPE_CHECK_BUTTON:
 		    (**controlHandle).contrlHilite = kControlCheckBoxPart;
 		    break;
 	    }
 	}
-    } else if (butPtr->state == tkDisabledUid) {
-	(**controlHandle).contrlHilite = kControlInactivePart;
     } else {
 	(**controlHandle).contrlHilite = kControlNoPart;
     }
-
     /*
      * Before we draw the control we must add the hidden window back to the
      * main window list.  Otherwise, radiobuttons and checkbuttons will draw
      * incorrectly.  I don't really know why - but clearly the control draw
-     * proc needs to have the controls window in the window list.
+     * proc needs to have the controls window in the window list.  This is not
+     * necessary under Appearance, and will have to go when we Carbonize Tk...
      */
-
-    ((CWindowPeek) windowRef)->nextWindow = (CWindowPeek) LMGetWindowList();
-    LMSetWindowList(windowRef);
+    if (!TkMacHaveAppearance()) {
+        ((CWindowPeek) windowRef)->nextWindow = (CWindowPeek) LMGetWindowList();
+        LMSetWindowList(windowRef);
+    }
 
     /*
      * Now we can set the port to our doctered up window.  We next need
@@ -815,36 +1012,36 @@ DrawBufferedControl(
      */
 
     if (TkMacHaveAppearance()) {
-        SetPort((GrafPort *) destPort);
+	SetPort((GrafPort *) destPort);
     } else {
-        SetPort(windowRef);
+	SetPort(windowRef);
     }
-    
+
     windowColorChanged = UpdateControlColors(butPtr, controlHandle, 
-	ccTabHandle, &saveBackColor);
+	    ccTabHandle, &saveBackColor);
 	
     if ((butPtr->type == TYPE_BUTTON) && TkMacHaveAppearance()) {
-        Boolean isDefault;
-        
-        if (butPtr->defaultState == tkActiveUid) {
+	Boolean isDefault;
+	
+	if (butPtr->defaultState == STATE_ACTIVE) {
 	    isDefault = true;
 	} else {
 	    isDefault = false;
 	}
 	SetControlData(controlHandle, kControlNoPart, 
-	        kControlPushButtonDefaultTag,
-	        sizeof(isDefault), (Ptr) &isDefault);	            	
+		kControlPushButtonDefaultTag,
+		sizeof(isDefault), (Ptr) &isDefault);			
     }
 
     if (TkMacHaveAppearance()) {
-        DrawControlInCurrentPort(userPaneHandle);
+	DrawControlInCurrentPort(userPaneHandle);
     } else {
-        Draw1Control(controlHandle);
+	Draw1Control(controlHandle);
     }
 
     if (!TkMacHaveAppearance() &&
-            (butPtr->type == TYPE_BUTTON) && 
-	    (butPtr->defaultState == tkActiveUid)) {
+	    (butPtr->type == TYPE_BUTTON) && 
+	    (butPtr->defaultState == STATE_ACTIVE)) {
 	Rect box = (**controlHandle).contrlRect;
 	RGBColor rgbColor;
 
@@ -866,14 +1063,16 @@ DrawBufferedControl(
      */
 
     if (TkMacHaveAppearance()) {
-        SetControlVisibility(controlHandle, false, false);
-        if (isBevel) {
-            KillPicture(bevelButtonContent.u.picture);
-        }     
-    } else {      
-        (**controlHandle).contrlVis = 0;
-    }     
-    LMSetWindowList((WindowRef) ((CWindowPeek) windowRef)->nextWindow);
+	SetControlVisibility(controlHandle, false, false);
+	if (isBevel) {
+	    KillPicture(bevelButtonContent.u.picture);
+	}     
+    } else {	  
+	(**controlHandle).contrlVis = 0;
+    }	  
+    if (!TkMacHaveAppearance()) {    
+        LMSetWindowList((WindowRef) ((CWindowPeek) windowRef)->nextWindow);
+    }
 }
 
 /*
@@ -882,8 +1081,8 @@ DrawBufferedControl(
  * InitSampleControls --
  *
  *	This function initializes a dummy Macintosh window and
- *      sample controls to allow drawing Mac controls to any GWorld 
- *      (including off-screen bitmaps).  
+ *	sample controls to allow drawing Mac controls to any GWorld 
+ *	(including off-screen bitmaps).	 
  *
  * Results:
  *	None.
@@ -897,108 +1096,134 @@ DrawBufferedControl(
 static void
 InitSampleControls()
 {
-	Rect geometry = {0, 0, 10, 10};
-	CWindowPeek windowList;
+    Rect geometry = {0, 0, 10, 10};
+    CWindowPeek windowList;
+    GWorldPtr frontWin = NULL;
+    TkMacWindowList *winListPtr;
 
-	/*
-	 * Create a dummy window that we can draw to.  We will
-	 * actually replace this window's bitmap with the one
-	 * we want to draw to at a later time.  This window and
-	 * the data structures attached to it are only deallocated
-	 * on exit of the application.
-	 */
+    /*
+     * Create a dummy window that we can draw to.  We will
+     * actually replace this window's bitmap with the one
+     * we want to draw to at a later time.  This window and
+     * the data structures attached to it are only deallocated
+     * on exit of the application.
+     */
+
+    /* 
+     * This is a bit of a hack...  The problem is that under appearance,
+     * taking a window out of the window list causes instability, so we can't 
+     * do that.  OTOH, we need to make sure that this window is NEVER the front
+     * window, or we may inadvertently send keystrokes to it...
+     * So we put it BEHIND ".", and then we won't ever be able to destroy
+     * ALL the windows that are above it.
+     */
+      
+    for (winListPtr = tkMacWindowListPtr; winListPtr != NULL; 
+            winListPtr = winListPtr->nextPtr) {
+        frontWin = ((MacDrawable *) tkMacWindowListPtr->winPtr->privatePtr)->portPtr;
+        if (strcmp(tkMacWindowListPtr->winPtr->pathName, ".") == 0) {
+            break;
+        }
+    }
+    
+    windowRef = NewCWindow(NULL, &geometry, "\pempty", false, 
+	    zoomDocProc, (WindowRef) frontWin, true, 0);
+    if (windowRef == NULL) {
+	panic("Can't allocate buffer window.");
+    }
 	
-	windowRef = NewCWindow(NULL, &geometry, "\pempty", false, 
-	    zoomDocProc, (WindowRef) -1, true, 0);
-	if (windowRef == NULL) {
-	    panic("Can't allocate buffer window.");
-	}
+    /*
+     * Now add the three standard controls to hidden window.  We
+     * only create one of each and reuse them for every widget in
+     * Tk.
+     * Under Appearance, we have to embed the controls in a UserPane
+     * control, so that we can color the background text in 
+     * radiobuttons and checkbuttons.
+     */
 	
-	/*
-	 * Now add the three standard controls to hidden window.  We
-	 * only create one of each and reuse them for every widget in
-	 * Tk.
-	 * Under Appearance, we have to embed the controls in a UserPane
-	 * control, so that we can color the background text in 
-	 * radiobuttons and checkbuttons.
-	 */
+    SetPort(windowRef);
 	
-	SetPort(windowRef);
-	
-        if (TkMacHaveAppearance()) {
-            
- 	    OSErr err;
- 	    ControlRef dontCare;
- 	    
- 	    /* Adding UserPaneBackgroundProcs to the root control does
- 	     * not seem to work, so we have to add another UserPane to 
- 	     * the root control.
- 	     */
- 	     
-	    err = CreateRootControl(windowRef, &dontCare);
-	    if (err != noErr) {
-	        panic("Can't create root control in DrawBufferedControl");
-	    }
+    if (TkMacHaveAppearance()) {
 	    
-	    userPaneHandle = NewControl(windowRef, &geometry, "\p",
+	OSErr err;
+	ControlRef dontCare;
+	    
+ 	/* 
+ 	 * Adding UserPaneBackgroundProcs to the root control does
+	 * not seem to work, so we have to add another UserPane to 
+	 * the root control.
+	 */
+	     
+	err = CreateRootControl(windowRef, &dontCare);
+	if (err != noErr) {
+	    panic("Can't create root control in DrawBufferedControl");
+	}
+	    
+	userPaneHandle = NewControl(windowRef, &geometry, "\p",
 		true, kControlSupportsEmbedding|kControlHasSpecialBackground, 
-	        0, 1, kControlUserPaneProc, (SInt32) 0);
-	    SetUserPaneSetUpSpecialBackgroundProc(userPaneHandle,
-		    UserPaneBackgroundProc);
-	    SetUserPaneDrawProc(userPaneHandle, UserPaneDraw);
+		0, 1, kControlUserPaneProc, (SInt32) 0);
+	SetUserPaneSetUpSpecialBackgroundProc(userPaneHandle,
+		UserPaneBackgroundProc);
+	SetUserPaneDrawProc(userPaneHandle, UserPaneDraw);
 
-	    buttonHandle = NewControl(windowRef, &geometry, "\p",
-	        false, 1, 0, 1, kControlPushButtonProc, (SInt32) 0);
-	    EmbedControl(buttonHandle, userPaneHandle);
-	    checkHandle = NewControl(windowRef, &geometry, "\p",
-	    false, 1, 0, 1, kControlCheckBoxProc, (SInt32) 0);
-	    EmbedControl(checkHandle, userPaneHandle);
-	    radioHandle = NewControl(windowRef, &geometry, "\p",
-	        false, 1, 0, 1, kControlRadioButtonProc, (SInt32) 0);
-	    EmbedControl(radioHandle, userPaneHandle);
-        smallBevelHandle = NewControl(windowRef, &geometry, "\p",
-                false, 0, 0, 
-	        kControlBehaviorOffsetContents << 16 | kControlContentPictHandle, 
-	        kControlBevelButtonSmallBevelProc, (SInt32) 0);
-        EmbedControl(smallBevelHandle, userPaneHandle);
-        medBevelHandle = NewControl(windowRef, &geometry, "\p",
-                false, 0, 0, 
-	        kControlBehaviorOffsetContents << 16 | kControlContentPictHandle, 
-	        kControlBevelButtonNormalBevelProc, (SInt32) 0);
-        EmbedControl(medBevelHandle, userPaneHandle);
-        largeBevelHandle = NewControl(windowRef, &geometry, "\p",
-                false, 0, 0, 
-	        kControlBehaviorOffsetContents << 16 | kControlContentPictHandle, 
-	        kControlBevelButtonLargeBevelProc, (SInt32) 0);
-        EmbedControl(largeBevelHandle, userPaneHandle);
-        bevelButtonContent.contentType = kControlContentPictHandle;
-        smallStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
-	        false, 0, 0, 
-	        (kControlBehaviorOffsetContents | kControlBehaviorSticky) << 16 
-	        | kControlContentPictHandle, 
-	        kControlBevelButtonSmallBevelProc, (SInt32) 0);
-        EmbedControl(smallStickyBevelHandle, userPaneHandle);
-        medStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
-	        false, 0, 0, 
-	        (kControlBehaviorOffsetContents | kControlBehaviorSticky) << 16 
-	        | kControlContentPictHandle, 
-	        kControlBevelButtonNormalBevelProc, (SInt32) 0);
-        EmbedControl(medStickyBevelHandle, userPaneHandle);
-        largeStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
-	        false, 0, 0, 
-	        (kControlBehaviorOffsetContents | kControlBehaviorSticky) << 16 
-	        | kControlContentPictHandle, 
-	        kControlBevelButtonLargeBevelProc, (SInt32) 0);
-        EmbedControl(largeStickyBevelHandle, userPaneHandle);
+	buttonHandle = NewControl(windowRef, &geometry, "\p",
+		false, 1, 0, 1, kControlPushButtonProc, (SInt32) 0);
+	EmbedControl(buttonHandle, userPaneHandle);
+	checkHandle = NewControl(windowRef, &geometry, "\p",
+		false, 1, 0, 1, kControlCheckBoxProc, (SInt32) 0);
+	EmbedControl(checkHandle, userPaneHandle);
+	radioHandle = NewControl(windowRef, &geometry, "\p",
+		false, 1, 0, 1, kControlRadioButtonProc, (SInt32) 0);
+	EmbedControl(radioHandle, userPaneHandle);
+	smallBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		kControlBehaviorOffsetContents << 16
+		| kControlContentPictHandle, 
+		kControlBevelButtonSmallBevelProc, (SInt32) 0);
+	EmbedControl(smallBevelHandle, userPaneHandle);
+	medBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		kControlBehaviorOffsetContents << 16
+		| kControlContentPictHandle, 
+		kControlBevelButtonNormalBevelProc, (SInt32) 0);
+	EmbedControl(medBevelHandle, userPaneHandle);
+	largeBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		kControlBehaviorOffsetContents << 16
+		| kControlContentPictHandle, 
+		kControlBevelButtonLargeBevelProc, (SInt32) 0);
+	EmbedControl(largeBevelHandle, userPaneHandle);
+	bevelButtonContent.contentType = kControlContentPictHandle;
+	smallStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		(kControlBehaviorOffsetContents
+			| kControlBehaviorSticky) << 16 
+		| kControlContentPictHandle, 
+		kControlBevelButtonSmallBevelProc, (SInt32) 0);
+	EmbedControl(smallStickyBevelHandle, userPaneHandle);
+	medStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		(kControlBehaviorOffsetContents
+			| kControlBehaviorSticky) << 16 
+		| kControlContentPictHandle, 
+		kControlBevelButtonNormalBevelProc, (SInt32) 0);
+	EmbedControl(medStickyBevelHandle, userPaneHandle);
+	largeStickyBevelHandle = NewControl(windowRef, &geometry, "\p",
+		false, 0, 0, 
+		(kControlBehaviorOffsetContents
+			| kControlBehaviorSticky) << 16 
+		| kControlContentPictHandle, 
+		kControlBevelButtonLargeBevelProc, (SInt32) 0);
+	EmbedControl(largeStickyBevelHandle, userPaneHandle);
     
-        picParams.version = -2;
-        picParams.hRes = 0x00480000;
-        picParams.vRes = 0x00480000;
-        picParams.srcRect.top = 0;
-        picParams.srcRect.left = 0;
+	picParams.version = -2;
+	picParams.hRes = 0x00480000;
+	picParams.vRes = 0x00480000;
+	picParams.srcRect.top = 0;
+	picParams.srcRect.left = 0;
     
-	    ((CWindowPeek) windowRef)->visible = true;
-        } else {
+	((CWindowPeek) windowRef)->visible = true;
+    } else {
 	buttonHandle = NewControl(windowRef, &geometry, "\p",
 		false, 1, 0, 1, pushButProc, (SInt32) 0);
 	checkHandle = NewControl(windowRef, &geometry, "\p",
@@ -1010,39 +1235,45 @@ InitSampleControls()
 	buttonTabHandle = (CCTabHandle) NewHandle(sizeof(CtlCTab));
 	checkTabHandle = (CCTabHandle) NewHandle(sizeof(CtlCTab));
 	radioTabHandle = (CCTabHandle) NewHandle(sizeof(CtlCTab));
-        }
+    }
 
-	/*
-	 * Remove our window from the window list.  This way our
-	 * applications and others will not be confused that this
-	 * window exists - but no one knows about it.
-	 */
+    /*
+     * Remove our window from the window list.	This way our
+     * applications and others will not be confused that this
+     * window exists - but no one knows about it.
+     * I actually don't see the point of doing this, and it causes Floating
+     * Window support to crash under Appearance, so I just leave it out.
+     * Note that we have to do without this under Carbon, since you can't
+     * go poking at the window list...
+     */
 
-	windowList = (CWindowPeek) LMGetWindowList();
-	if (windowList == (CWindowPeek) windowRef) {
+    if (!TkMacHaveAppearance()) {
+        windowList = (CWindowPeek) LMGetWindowList();
+        if (windowList == (CWindowPeek) windowRef) {
 	    LMSetWindowList((WindowRef) windowList->nextWindow);
-	} else {
+        } else {
 	    while ((windowList != NULL) 
 		    && (windowList->nextWindow != (CWindowPeek) windowRef)) {
-		windowList = windowList->nextWindow;
+	        windowList = windowList->nextWindow;
 	    }
 	    if (windowList != NULL) {
-		windowList->nextWindow = windowList->nextWindow->nextWindow;
+	        windowList->nextWindow = windowList->nextWindow->nextWindow;
 	    }
-	}
-	((CWindowPeek) windowRef)->nextWindow = NULL;
+        }
+        ((CWindowPeek) windowRef)->nextWindow = NULL;
+    }
 
-	/* 
-	 * Create an exit handler to clean up this mess if we our
-	 * unloaded etc.  We need to remember the windows portPixMap
-	 * so it isn't leaked.
-	 *
-	 * TODO: The ButtonExitProc doesn't currently work and the
-	 * code it includes will crash the Mac on exit from Tk.
+    /* 
+     * Create an exit handler to clean up this mess if we our
+     * unloaded etc.  We need to remember the windows portPixMap
+     * so it isn't leaked.
+     *
+     * TODO: The ButtonExitProc doesn't currently work and the
+     * code it includes will crash the Mac on exit from Tk.
 	 
-	 oldPixPtr = ((CWindowPeek) windowRef)->port.portPixMap;
-	 Tcl_CreateExitHandler(ButtonExitProc, (ClientData) NULL);
-	 */
+     oldPixPtr = ((CWindowPeek) windowRef)->port.portPixMap;
+     TkCreateExitHandler(ButtonExitProc, (ClientData) NULL);
+    */
 
 }
 
@@ -1065,12 +1296,12 @@ InitSampleControls()
 void
 SetupBevelButton(
     TkButton *butPtr,		/* Tk button. */
-    ControlRef controlHandle,    /* The control to set this picture to */
+    ControlRef controlHandle,	 /* The control to set this picture to */
     GWorldPtr destPort,		/* Off screen GWorld. */
     GC gc,			/* The GC we are drawing into - needed for
-    				 * the bevel button */
+				 * the bevel button */
     Pixmap pixmap		/* The pixmap we are drawing into - needed
-                                   for the bevel button */
+				   for the bevel button */
     )
 {
     int height, width;
@@ -1079,13 +1310,13 @@ SetupBevelButton(
     SetPort((GrafPtr) destPort);
 
     if (butPtr->image != None) {
-        Tk_SizeOfImage(butPtr->image, 
-                &width, &height);
+	Tk_SizeOfImage(butPtr->image, 
+		&width, &height);
     } else {
-        Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, 
-                &width, &height);
+	Tk_SizeOfBitmap(butPtr->display, butPtr->bitmap, 
+		&width, &height);
     }
-            
+	    
     if ((butPtr->width > 0) && (butPtr->width < width)) {
 	width = butPtr->width;
     }
@@ -1105,48 +1336,48 @@ SetupBevelButton(
      */
      
     if ((butPtr->selectImage != NULL) && (butPtr->flags & SELECTED)) {
-        Tk_RedrawImage(butPtr->selectImage, 0, 0, width, height,
-	        pixmap, 0, 0);
+	Tk_RedrawImage(butPtr->selectImage, 0, 0, width, height,
+		pixmap, 0, 0);
     } else if (butPtr->image != NULL) {
-        Tk_RedrawImage(butPtr->image, 0, 0, width, 
-            height, pixmap, 0, 0);
-    } else {	                
-        XSetClipOrigin(butPtr->display, gc, 0, 0);
-        XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc, 0, 0,
-                (unsigned int) width, (unsigned int) height, 0, 0, 1);
+	Tk_RedrawImage(butPtr->image, 0, 0, width, 
+		height, pixmap, 0, 0);
+    } else {			
+	XSetClipOrigin(butPtr->display, gc, 0, 0);
+	XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc, 0, 0,
+		(unsigned int) width, (unsigned int) height, 0, 0, 1);
     }
     
     ClosePicture();
     
     SetControlData(controlHandle, kControlButtonPart,
-            kControlBevelButtonContentTag,
-            sizeof(ControlButtonContentInfo),
-            (char *) &bevelButtonContent);
-            
+	    kControlBevelButtonContentTag,
+	    sizeof(ControlButtonContentInfo),
+	    (char *) &bevelButtonContent);
+	    
     if (butPtr->anchor == TK_ANCHOR_N) {
-            theAlignment = kControlBevelButtonAlignTop;
-     } else if (butPtr->anchor == TK_ANCHOR_NE) { 
-            theAlignment = kControlBevelButtonAlignTopRight;
-     } else if (butPtr->anchor == TK_ANCHOR_E) { 
-            theAlignment = kControlBevelButtonAlignRight;
-     } else if (butPtr->anchor == TK_ANCHOR_SE) {
-            theAlignment = kControlBevelButtonAlignBottomRight;
-     } else if (butPtr->anchor == TK_ANCHOR_S) {
-            theAlignment = kControlBevelButtonAlignBottom;
-     } else if (butPtr->anchor == TK_ANCHOR_SW) {
-            theAlignment = kControlBevelButtonAlignBottomLeft;
-     } else if (butPtr->anchor == TK_ANCHOR_W) {
-            theAlignment = kControlBevelButtonAlignLeft;
-     } else if (butPtr->anchor == TK_ANCHOR_NW) {
-            theAlignment = kControlBevelButtonAlignTopLeft;
-     } else if (butPtr->anchor == TK_ANCHOR_CENTER) {
-            theAlignment = kControlBevelButtonAlignCenter;
+	theAlignment = kControlBevelButtonAlignTop;
+    } else if (butPtr->anchor == TK_ANCHOR_NE) { 
+	theAlignment = kControlBevelButtonAlignTopRight;
+    } else if (butPtr->anchor == TK_ANCHOR_E) { 
+	theAlignment = kControlBevelButtonAlignRight;
+    } else if (butPtr->anchor == TK_ANCHOR_SE) {
+	theAlignment = kControlBevelButtonAlignBottomRight;
+    } else if (butPtr->anchor == TK_ANCHOR_S) {
+	theAlignment = kControlBevelButtonAlignBottom;
+    } else if (butPtr->anchor == TK_ANCHOR_SW) {
+	theAlignment = kControlBevelButtonAlignBottomLeft;
+    } else if (butPtr->anchor == TK_ANCHOR_W) {
+	theAlignment = kControlBevelButtonAlignLeft;
+    } else if (butPtr->anchor == TK_ANCHOR_NW) {
+	theAlignment = kControlBevelButtonAlignTopLeft;
+    } else if (butPtr->anchor == TK_ANCHOR_CENTER) {
+	theAlignment = kControlBevelButtonAlignCenter;
     }
 
     SetControlData(controlHandle, kControlButtonPart,
-            kControlBevelButtonGraphicAlignTag,
-            sizeof(ControlButtonGraphicAlignment),
-            (char *) &theAlignment);
+	    kControlBevelButtonGraphicAlignTag,
+	    sizeof(ControlButtonGraphicAlignment),
+	    (char *) &theAlignment);
 
 }
 
@@ -1156,8 +1387,8 @@ SetupBevelButton(
  * SetUserPaneDrawProc --
  *
  *	Utility function to add a UserPaneDrawProc
- *      to a userPane control.  From MoreControls code
- *      from Apple DTS.
+ *	to a userPane control.	From MoreControls code
+ *	from Apple DTS.
  *
  * Results:
  *	MacOS system error.
@@ -1168,15 +1399,15 @@ SetupBevelButton(
  *--------------------------------------------------------------
  */
 pascal OSErr SetUserPaneDrawProc (
-        ControlRef control,
-        ControlUserPaneDrawProcPtr upp)
+    ControlRef control,
+    ControlUserPaneDrawProcPtr upp)
 {
     ControlUserPaneDrawUPP myControlUserPaneDrawUPP;
     myControlUserPaneDrawUPP = NewControlUserPaneDrawProc(upp);	
     return SetControlData (control, 
-	        kControlNoPart, kControlUserPaneDrawProcTag, 
-	        sizeof(myControlUserPaneDrawUPP), 
-	        (Ptr) &myControlUserPaneDrawUPP);
+	    kControlNoPart, kControlUserPaneDrawProcTag, 
+	    sizeof(myControlUserPaneDrawUPP), 
+	    (Ptr) &myControlUserPaneDrawUPP);
 }
 
 /*
@@ -1185,7 +1416,7 @@ pascal OSErr SetUserPaneDrawProc (
  * SetUserPaneSetUpSpecialBackgroundProc --
  *
  *	Utility function to add a UserPaneBackgroundProc
- *      to a userPane control
+ *	to a userPane control
  *
  * Results:
  *	MacOS system error.
@@ -1203,9 +1434,9 @@ SetUserPaneSetUpSpecialBackgroundProc(
     ControlUserPaneBackgroundUPP myControlUserPaneBackgroundUPP;
     myControlUserPaneBackgroundUPP = NewControlUserPaneBackgroundProc(upp);
     return SetControlData (control, kControlNoPart, 
-                kControlUserPaneBackgroundProcTag, 
-	        sizeof(myControlUserPaneBackgroundUPP), 
-	        (Ptr) &myControlUserPaneBackgroundUPP);
+	    kControlUserPaneBackgroundProcTag, 
+	    sizeof(myControlUserPaneBackgroundUPP), 
+	    (Ptr) &myControlUserPaneBackgroundUPP);
 }
 
 /*
@@ -1214,7 +1445,7 @@ SetUserPaneSetUpSpecialBackgroundProc(
  * UserPaneDraw --
  *
  *	This function draws the background of the user pane that will 
- *      lie under checkboxes and radiobuttons.
+ *	lie under checkboxes and radiobuttons.
  *
  * Results:
  *	None.
@@ -1229,9 +1460,9 @@ UserPaneDraw(
     ControlRef control,
     ControlPartCode cpc)
 {
-	Rect contrlRect = (**control).contrlRect;
-	RGBBackColor (&gUserPaneBackground);
-	EraseRect (&contrlRect);
+    Rect contrlRect = (**control).contrlRect;
+    RGBBackColor (&gUserPaneBackground);
+    EraseRect (&contrlRect);
 }
 
 /*
@@ -1240,7 +1471,7 @@ UserPaneDraw(
  * UserPaneBackgroundProc --
  *
  *	This function sets up the background of the user pane that will 
- *      lie under checkboxes and radiobuttons.
+ *	lie under checkboxes and radiobuttons.
  *
  * Results:
  *	None.
@@ -1257,7 +1488,7 @@ UserPaneBackgroundProc(
     ControlBackgroundPtr info)
 {
     if (info->colorDevice) {
-        RGBBackColor (&gUserPaneBackground);
+	RGBBackColor (&gUserPaneBackground);
     }
 }
 
@@ -1271,8 +1502,8 @@ UserPaneBackgroundProc(
  *	used we create a custom palette for the button, populate
  *	with the colors for the button and install the palette.
  *
- *      Under Appearance, we just set the pointer that will be
- *      used by the UserPaneDrawProc.
+ *	Under Appearance, we just set the pointer that will be
+ *	used by the UserPaneDrawProc.
  *
  * Results:
  *	None.
@@ -1295,7 +1526,7 @@ UpdateControlColors(
     /*
      * Under Appearance we cannot change the background of the
      * button itself.  However, the color we are setting is the color
-     *  of the containing userPane.  This will be the color that peeks 
+     *	of the containing userPane.  This will be the color that peeks 
      * around the rounded corners of the button.  
      * We make this the highlightbackground rather than the background,
      * because if you color the background of a frame containing a
@@ -1304,37 +1535,38 @@ UpdateControlColors(
      */
       
     if (TkMacHaveAppearance() && (butPtr->type == TYPE_BUTTON)) {
-        xcolor = Tk_3DBorderColor(butPtr->highlightBorder);
+	xcolor = Tk_3DBorderColor(butPtr->highlightBorder);
     } else {
-    xcolor = Tk_3DBorderColor(butPtr->normalBorder);
+	xcolor = Tk_3DBorderColor(butPtr->normalBorder);
     }
     if (TkMacHaveAppearance()) {
-         TkSetMacColor(xcolor->pixel, &gUserPaneBackground);
-     } else {
-    (**ccTabHandle).ccSeed = 0;
-    (**ccTabHandle).ccRider = 0;
-    (**ccTabHandle).ctSize = 3;
-    (**ccTabHandle).ctTable[0].value = cBodyColor;
-    TkSetMacColor(xcolor->pixel,
-	&(**ccTabHandle).ctTable[0].rgb);
-    (**ccTabHandle).ctTable[1].value = cTextColor;
-    TkSetMacColor(butPtr->normalFg->pixel,
-	&(**ccTabHandle).ctTable[1].rgb);
-    (**ccTabHandle).ctTable[2].value = cFrameColor;
-    TkSetMacColor(butPtr->highlightColorPtr->pixel,
-	&(**ccTabHandle).ctTable[2].rgb);
-    SetControlColor(controlHandle, ccTabHandle);
-        
-    if (((xcolor->pixel >> 24) != CONTROL_BODY_PIXEL) && 
-	    ((butPtr->type == TYPE_CHECK_BUTTON) ||
-		    (butPtr->type == TYPE_RADIO_BUTTON))) {
-	RGBColor newColor;
+	TkSetMacColor(xcolor->pixel, &gUserPaneBackground);
+    } else {
+	(**ccTabHandle).ccSeed = 0;
+	(**ccTabHandle).ccRider = 0;
+	(**ccTabHandle).ctSize = 3;
+	(**ccTabHandle).ctTable[0].value = cBodyColor;
+	TkSetMacColor(xcolor->pixel,
+		&(**ccTabHandle).ctTable[0].rgb);
+	(**ccTabHandle).ctTable[1].value = cTextColor;
+	TkSetMacColor(butPtr->normalFg->pixel,
+		&(**ccTabHandle).ctTable[1].rgb);
+	(**ccTabHandle).ctTable[2].value = cFrameColor;
+	TkSetMacColor(butPtr->highlightColorPtr->pixel,
+		&(**ccTabHandle).ctTable[2].rgb);
+	SetControlColor(controlHandle, ccTabHandle);
 	
-	TkSetMacColor(xcolor->pixel, &newColor);
-	ChangeBackgroundWindowColor((**controlHandle).contrlOwner,
-		newColor, saveColorPtr);
-	return true;
-    }
+	if (((xcolor->pixel >> 24) != CONTROL_BODY_PIXEL) && 
+		((butPtr->type == TYPE_CHECK_BUTTON) ||
+			(butPtr->type == TYPE_RADIO_BUTTON))) {
+	    RGBColor newColor;
+	
+	    if (TkSetMacColor(xcolor->pixel, &newColor)) {
+	    ChangeBackgroundWindowColor((**controlHandle).contrlOwner,
+		    newColor, saveColorPtr);
+            }
+	    return true;
+	}
     }
     
     return false;
@@ -1347,7 +1579,7 @@ UpdateControlColors(
  *
  *	This procedure will change the background color entry
  *	in the Window's colortable.  The system isn't notified
- *	of the change.  This call should only be used to fool
+ *	of the change.	This call should only be used to fool
  *	the drawing routines for checkboxes and radiobuttons.
  *	Any change should be temporary and be reverted after
  *	the widget is drawn.
@@ -1396,6 +1628,42 @@ ChangeBackgroundWindowColor(
 }
 
 /*
+ *--------------------------------------------------------------
+ *
+ * ButtonEventProc --
+ *
+ *	This procedure is invoked by the Tk dispatcher for various
+ *	events on buttons.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *      When it gets exposed, it is redisplayed.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+ButtonEventProc(
+    ClientData clientData,	/* Information about window. */
+    XEvent *eventPtr)		/* Information about event. */
+{
+    TkButton *buttonPtr = (TkButton *) clientData;
+
+    if (eventPtr->type == ActivateNotify
+            || eventPtr->type == DeactivateNotify) {
+        if ((buttonPtr->tkwin == NULL) || (!Tk_IsMapped(buttonPtr->tkwin))) {
+	    return;
+        }
+        if ((buttonPtr->flags & REDRAW_PENDING) == 0) {
+	    Tcl_DoWhenIdle(TkpDisplayButton, (ClientData) buttonPtr);
+	    buttonPtr->flags |= REDRAW_PENDING;
+        }
+    }
+}
+
+/*
  *----------------------------------------------------------------------
  *
  * ButtonExitProc --
@@ -1421,7 +1689,7 @@ ButtonExitProc(clientData)
 
     /*
      * Restore our dummy window to it's origional state by putting it
-     * back in the window list and restoring it's bits.  The destroy
+     * back in the window list and restoring it's bits.	 The destroy
      * the controls and window.
      */
  

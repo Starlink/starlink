@@ -4,10 +4,10 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) grid.n 1.15 96/12/13 16:46:35
+'\" RCS: @(#) $Id: grid.n,v 1.5.4.3 2004/10/29 07:52:08 dkf Exp $
 '\" 
 .so man.macros
-.TH grid n 4.1 Tk "Tk Built-In Commands"
+.TH grid n 8.4 Tk "Tk Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -25,9 +25,11 @@ The \fBgrid\fR command can have any of several forms, depending
 on the \fIoption\fR argument:
 .TP
 \fBgrid \fIslave \fR?\fIslave ...\fR? ?\fIoptions\fR?
-If the first argument to \fBgrid\fR is a window name (any value
-starting with ``.''), then the command is processed in the same
-way as \fBgrid configure\fR.
+If the first argument to \fBgrid\fR is suitable as the first slave
+argument to \fBgrid configure\fR, either a window name (any value
+starting with \fB.\fP) or one of the characters \fBx\fP or \fB^\fP 
+(see the \fBRELATIVE PLACEMENT\fR section below), then the command is
+processed in the same way as \fBgrid configure\fR.
 .TP
 \fBgrid bbox \fImaster\fR ?\fIcolumn row\fR? ?\fIcolumn2 row2\fR?
 With no arguments, 
@@ -44,11 +46,12 @@ indicated is returned.
 \fBgrid columnconfigure \fImaster index \fR?\fI\-option value...\fR?
 Query or set the column properties of the \fIindex\fP column of the 
 geometry master, \fImaster\fP.
-The valid options are \fB\-minsize\fP, \fB\-weight\fP and \fB-pad\fP.
-.VS
+.VS 8.4
+The valid options are \fB\-minsize\fP, \fB\-weight\fP, \fB\-uniform\fP
+and \fB-pad\fP.
+.VE 8.4
 If one or more options are provided, then \fIindex\fP may be given as 
-a list of column indeces to which the configuration options will operate on.
-.VE
+a list of column indices to which the configuration options will operate on.
 The \fB\-minsize\fP option sets the minimum size, in screen units,
 that will be permitted for this column.
 The \fB\-weight\fP option (an integer value)
@@ -58,13 +61,21 @@ columns.
 A weight of zero (0) indicates the column will not deviate from its requested
 size.  A column whose weight is two will grow at twice the rate as a column
 of weight one when extra space is allocated to the layout.
+.VS 8.4
+The \fB-uniform\fP option, when a non-empty value is supplied, places
+the column in a \fIuniform group\fP with other columns that have the
+same value for \fB-uniform\fP.  The space for columns belonging to a
+uniform group is allocated so that their sizes are always in strict
+proportion to their \fB-weight\fP values.  See
+\fBTHE GRID ALGORITHM\fR below for further details.
+.VE 8.4
 The \fB-pad\fP option specifies the number of screen units that will be
 added to the largest window contained completely in that column when the
 grid geometry manager requests a size from the containing window.
 If only an option is specified, with no value,
 the current value of that option is returned.
 If only the master window and index is specified, all the current settings
-are returned in an list of "-option value" pairs.
+are returned in a list of "-option value" pairs.
 .TP
 \fBgrid configure \fIslave \fR?\fIslave ...\fR? ?\fIoptions\fR?
 The arguments consist of the names of one or more slave windows
@@ -72,7 +83,7 @@ followed by pairs of arguments that specify how
 to manage the slaves.
 The characters \fB\-\fP,  \fBx\fP and \fB^\fP, 
 can be specified instead of a window name to alter the default
-location of a \fIslave\fP, as described in the ``RELATIVE PLACEMENT''
+location of a \fIslave\fP, as described in the \fBRELATIVE PLACEMENT\fR
 section, below.
 The following options are supported:
 .RS
@@ -106,19 +117,23 @@ It defaults to 0.
 .TP
 \fB\-ipady \fIamount\fR
 The \fIamount\fR specifies how much vertical internal padding to
-leave on on the top and bottom of the slave(s).
+leave on the top and bottom of the slave(s).
 This space is added inside the slave(s) border.
 The \fIamount\fR  defaults to 0.
 .TP
 \fB\-padx \fIamount\fR
 The \fIamount\fR specifies how much horizontal external padding to
 leave on each side of the slave(s), in screen units.
+\fIAmount\fR may be a list
+of two values to specify padding for left and right separately.
 The \fIamount\fR defaults to 0.
 This space is added outside the slave(s) border.
 .TP
 \fB\-pady \fIamount\fR
 The \fIamount\fR specifies how much vertical external padding to
 leave on the top and bottom of the slave(s), in screen units.
+\fIAmount\fR may be a list
+of two values to specify padding for top and bottom separately.
 The \fIamount\fR defaults to 0.
 This space is added outside the slave(s) border.
 .TP
@@ -177,7 +192,7 @@ For locations that are above or to the left of the grid, \fB-1\fP is returned.
 \fBgrid propagate \fImaster\fR ?\fIboolean\fR?
 If \fIboolean\fR has a true boolean value such as \fB1\fR or \fBon\fR
 then propagation is enabled for \fImaster\fR, which must be a window
-name (see ``GEOMETRY PROPAGATION'' below).
+name (see \fBGEOMETRY PROPAGATION\fR below).
 If \fIboolean\fR has a false boolean value then propagation is
 disabled for \fImaster\fR.
 In either of these cases an empty string is returned.
@@ -189,11 +204,12 @@ Propagation is enabled by default.
 \fBgrid rowconfigure \fImaster index \fR?\fI\-option value...\fR?
 Query or set the row properties of the \fIindex\fP row of the 
 geometry master, \fImaster\fP.
-The valid options are \fB\-minsize\fP, \fB\-weight\fP and \fB-pad\fP.
-.VS
+.VS 8.4
+The valid options are \fB\-minsize\fP, \fB\-weight\fP, \fB\-uniform\fP
+and \fB-pad\fP.
+.VE 8.4
 If one or more options are provided, then \fIindex\fP may be given as 
-a list of row indeces to which the configuration options will operate on.
-.VE
+a list of row indices to which the configuration options will operate on.
 The \fB\-minsize\fP option sets the minimum size, in screen units,
 that will be permitted for this row.
 The \fB\-weight\fP option (an integer value)
@@ -203,13 +219,21 @@ rows.
 A weight of zero (0) indicates the row will not deviate from its requested
 size.  A row whose weight is two will grow at twice the rate as a row
 of weight one when extra space is allocated to the layout.
+.VS 8.4
+The \fB-uniform\fP option, when a non-empty value is supplied, places
+the row in a \fIuniform group\fP with other rows that have the
+same value for \fB-uniform\fP.  The space for rows belonging to a
+uniform group is allocated so that their sizes are always in strict
+proportion to their \fB-weight\fP values.  See
+\fBTHE GRID ALGORITHM\fR below for further details.
+.VE 8.4
 The \fB-pad\fP option specifies the number of screen units that will be
 added to the largest window contained completely in that row when the
 grid geometry manager requests a size from the containing window.
 If only an option is specified, with no value,
 the current value of that option is returned.
 If only the master window and index is specified, all the current settings
-are returned in an list of "-option value" pairs.
+are returned in a list of "-option value" pairs.
 .TP
 \fBgrid remove \fIslave \fR?\fIslave ...\fR?
 Removes each of the \fIslave\fRs from grid for its
@@ -245,14 +269,15 @@ default values are chosen for
 at the time the \fIslave\fP is managed. The values are chosen
 based upon the current layout of the grid, the position of the \fIslave\fP
 relative to other \fIslave\fPs in the same grid command, and the presence
-of the characters \fB\-\fP, \fB^\fP, and \fB^\fP in \fBgrid\fP
+of the characters \fB\-\fP, \fBx\fP, and \fB^\fP in \fBgrid\fP
 command where \fIslave\fP names are normally expected.
 .RS
 .TP
 \fB\-\fP
 This increases the columnspan of the \fIslave\fP to the left.  Several
 \fB\-\fP's in a row will successively increase the columnspan. A \fB\-\fP
-may not follow a \fB^\fP or a \fBx\fP.
+may not follow a \fB^\fP or a \fBx\fP, nor may it be the first \fIslave\fP
+argument to \fBgrid configure\fR.
 .TP
 \fBx\fP
 This leaves an empty column between the \fIslave\fP on the left and
@@ -279,13 +304,30 @@ To compute the minimum size of a layout, the grid geometry manager
 first looks at all slaves whose columnspan and rowspan values are one,
 and computes the nominal size of each row or column to be either the
 \fIminsize\fP for that row or column, or the sum of the \fIpad\fPding
-plus the size of the largest slave, whichever is greater.  Then the
-slaves whose rowspans or columnspans are greater than one are
+plus the size of the largest slave, whichever is greater.  After that
+the rows or columns in each uniform group adapt to each other.  Then
+the slaves whose rowspans or columnspans are greater than one are
 examined.  If a group of rows or columns need to be increased in size
 in order to accommodate these slaves, then extra space is added to each
 row or column in the group according to its \fIweight\fP.  For each
 group whose weights are all zero, the additional space is apportioned
 equally.
+.PP
+When multiple rows or columns belong to a uniform group, the space
+allocated to them is always in proportion to their weights. (A weight
+of zero is considered to be 1.)  In other words, a row or column
+configured with \fB-weight 1 -uniform a\fP will have exactly the same
+size as any other row or column configured with \fB-weight 1 -uniform
+a\fP.  A row or column configured with \fB-weight 2 -uniform b\fR will 
+be exactly twice as large as one that is configured with \fB-weight 1
+-uniform b\fP.  
+.PP
+More technically, each row or column in the group will have a size
+equal to \fIk*weight\fP for some constant \fIk\fP.  The constant
+\fIk\fP is chosen so that no row or column becomes smaller than its
+minimum size.  For example, if all rows or columns in a group have the
+same weight, then each row or column will have the same size as the
+largest row or column in the group.
 .PP
 For masters whose size is larger than the requested layout, the additional
 space is apportioned according to the row and column weights.  If all of
@@ -294,7 +336,7 @@ For masters whose size is smaller than the requested layout, space is taken
 away from columns and rows according to their weights.  However, once a 
 column or row shrinks to its minsize, its weight is taken to be zero.
 If more space needs to be removed from a layout than would be permitted, as
-when all the rows or columns are at there minimum sizes, the layout is
+when all the rows or columns are at their minimum sizes, the layout is
 clipped on the bottom and right.
 .SH "GEOMETRY PROPAGATION"
 .PP
@@ -310,7 +352,6 @@ If propagation is disabled then grid will not set
 the requested width and height of the master window.
 This may be useful if, for example, you wish for a master
 window to have a fixed size that you specify.
-
 .SH "RESTRICTIONS ON MASTER WINDOWS"
 .PP
 The master for each slave must either be the slave's parent
@@ -333,5 +374,33 @@ will be highest in the stacking order.
 The \fBgrid\fP command is based on ideas taken from the \fIGridBag\fP
 geometry manager written by Doug. Stein, and the \fBblt_table\fR geometry
 manager, written by George Howlett.
+.SH EXAMPLES
+A toplevel window containing a text widget and two scrollbars:
+.CS
+# Make the widgets
+toplevel .t
+text .t.txt \-wrap none \-xscroll {.t.h set} \-yscroll {.t.v set}
+scrollbar .t.v \-orient vertical   \-command {.t.txt xview}
+scrollbar .t.h \-orient horizontal \-command {.t.txt xview}
+# Lay them out
+\fBgrid\fR .t.txt .t.v \-sticky nsew
+\fBgrid\fR .t.h        \-sticky nsew
+# Tell the text widget to take all the extra room
+\fBgrid rowconfigure\fR    .t 0 \-weight 1
+\fBgrid columnconfigure\fR .t 0 \-weight 1
+.CE
+.PP
+Three widgets of equal width, despite their different "natural" widths:
+.CS
+button .b \-text "Foo"
+entry .e \-variable foo
+label .l \-text "This is a fairly long piece of text"
+\fBgrid\fR .b .e .l \-sticky ew
+\fBgrid columnconfigure\fR . {0 1 2} \-uniform allTheSame
+.CE
+
+.SH "SEE ALSO"
+pack(n), place(n)
+
 .SH KEYWORDS
 geometry manager, location, grid, cell, propagation, size, pack

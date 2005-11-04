@@ -2,7 +2,7 @@
 #
 # This demonstration script shows an example with a vertical scale.
 #
-# SCCS: @(#) vscale.tcl 1.4 97/03/02 16:28:34
+# RCS: @(#) $Id: vscale.tcl,v 1.3 2001/06/14 10:56:58 dkf Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -39,7 +39,7 @@ $w.frame.scale set 75
 
 proc setHeight {w height} {
     incr height 21
-    set y2 [expr $height - 30]
+    set y2 [expr {$height - 30}]
     if {$y2 < 21} {
 	set y2 21
     }

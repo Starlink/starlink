@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkMacAppInit.c 1.35 97/07/28 11:18:55
+ * RCS: @(#) $Id: tkMacAppInit.c,v 1.15 2002/10/18 03:01:33 das Exp $
  */
 
 #include <Gestalt.h>
@@ -23,16 +23,13 @@
 #include "tk.h"
 #include "tkInt.h"
 #include "tkMacInt.h"
+#include "tclInt.h"
 #include "tclMac.h"
+#include "tclMacInt.h"
 
 #ifdef TK_TEST
-EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TK_TEST */
-
-#ifdef TCL_TEST
-EXTERN int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-#endif /* TCL_TEST */
 
 Tcl_Interp *gStdoutInterp = NULL;
 
@@ -46,22 +43,21 @@ void			RemoveConsole _ANSI_ARGS_((void));
 long			WriteCharsToConsole _ANSI_ARGS_((char *buff, long n));
 long			ReadCharsFromConsole _ANSI_ARGS_((char *buff, long n));
 extern char *		__ttyname _ANSI_ARGS_((long fildes));
+int				kbhit _ANSI_ARGS_((void));
+int				getch _ANSI_ARGS_((void));
+void			clrscr _ANSI_ARGS_((void));
 short			SIOUXHandleOneEvent _ANSI_ARGS_((EventRecord *event));
 
-/*
- * Prototypes for functions from the tkConsole.c file.
- */
- 
-EXTERN void		TkConsoleCreate _ANSI_ARGS_((void));
-EXTERN int		TkConsoleInit _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN void		TkConsolePrint _ANSI_ARGS_((Tcl_Interp *interp,
-			    int devId, char *buffer, long size));
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
 static int		MacintoshInit _ANSI_ARGS_((void));
 static int		SetupMainInterp _ANSI_ARGS_((Tcl_Interp *interp));
+static void		SetupSIOUX _ANSI_ARGS_((void));
+
+static int inMacExit = 0;
+static pascal void NoMoreOutput() { inMacExit = 1; }
 
 /*
  *----------------------------------------------------------------------
@@ -95,6 +91,15 @@ main(
     argc = 1;
     newArgv[0] = "Wish";
     newArgv[1] = NULL;
+    
+    /* Tk_Main is actually #defined to 
+     *     Tk_MainEx(argc, argv, Tcl_AppInit, Tcl_CreateInterp())
+     * Unfortunately, you also HAVE to call Tcl_FindExecutable
+     * BEFORE creating the first interp, or the tcl_library will not
+     * get set properly.  So we call it by hand here...
+     */
+    
+    Tcl_FindExecutable(newArgv[0]);
     Tk_Main(argc, newArgv, Tcl_AppInit);
 }
 
@@ -109,7 +114,7 @@ main(
  *
  * Results:
  *	Returns a standard Tcl completion code, and leaves an error
- *	message in interp->result if an error occurs.
+ *	message in the interp's result if an error occurs.
  *
  * Side effects:
  *	Depends on the startup script.
@@ -139,17 +144,6 @@ Tcl_AppInit(
      *
      * where "Mod" is the name of the module.
      */
-
-#ifdef TCL_TEST
-    if (Tcltest_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
-            (Tcl_PackageInitProc *) NULL);
-    if (TclObjTest_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-#endif /* TCL_TEST */
 
 #ifdef TK_TEST
     if (Tktest_Init(interp) == TCL_ERROR) {
@@ -235,7 +229,11 @@ MacintoshInit()
 
     InitGraf(&tcl_macQdPtr->thePort);
     InitFonts();
+    if (TkMacHaveAppearance() >= 0x110) {
+        InitFloatingWindows();
+    } else {
     InitWindows();
+    }
     InitMenus();
     InitDialogs((long) NULL);		
     InitCursor();
@@ -267,8 +265,6 @@ MacintoshInit()
 
 
     Tcl_MacSetEventProc(TkMacConvertEvent);
-    TkConsoleCreate();
-
     return TCL_OK;
 }
 
@@ -305,9 +301,11 @@ SetupMainInterp(
 
     if (strcmp(Tcl_GetVar(interp, "tcl_interactive", TCL_GLOBAL_ONLY), "1")
 	    == 0) {
-	if (TkConsoleInit(interp) == TCL_ERROR) {
+	if (Tk_CreateConsoleWindow(interp) == TCL_ERROR) {
 	    goto error;
 	}
+	SetupSIOUX();
+	TclMacInstallExitToShellPatch(NoMoreOutput);
     }
 
     /*
@@ -319,7 +317,7 @@ SetupMainInterp(
     return TCL_OK;
 
 error:
-    panic(interp->result);
+    panic(Tcl_GetStringResult(interp));
     return TCL_ERROR;
 }
 
@@ -357,8 +355,15 @@ RemoveConsole(void)
 long 
 WriteCharsToConsole(char *buffer, long n)
 {
-    TkConsolePrint(gStdoutInterp, TCL_STDOUT, buffer, n);
-    return n;
+    if (!inMacExit) {
+    	Tcl_DString	ds;
+    	Tcl_ExternalToUtfDString(NULL, buffer, n, &ds);
+	    TkConsolePrint(gStdoutInterp, TCL_STDOUT, Tcl_DStringValue(&ds), Tcl_DStringLength(&ds));
+	    Tcl_DStringFree(&ds);
+	    return n;
+    } else {
+    	return 0;
+    }
 }
 
 long 
@@ -379,8 +384,37 @@ __ttyname(long fildes)
     return (0L);
 }
 
+int kbhit(void)
+{
+    return 0; 
+}
+
+int getch(void)
+{
+    return 0; 
+}
+
+void clrscr(void)
+{
+    return;
+}
+
 short
 SIOUXHandleOneEvent(EventRecord *event)
 {
     return 0;
+}
+static void SetupSIOUX(void) {
+#ifndef STATIC_BUILD
+	extern DLLIMPORT void SetupConsolePlugins(void*, void*, void*, void*,
+									void*, void*, void*, void*);
+	SetupConsolePlugins(	&InstallConsole,
+							&RemoveConsole,
+							&WriteCharsToConsole,
+							&ReadCharsFromConsole,
+							&__ttyname,
+							&kbhit,
+							&getch,
+							&clrscr);
+#endif
 }

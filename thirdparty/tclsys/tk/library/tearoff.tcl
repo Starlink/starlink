@@ -2,7 +2,7 @@
 #
 # This file contains procedures that implement tear-off menus.
 #
-# SCCS: @(#) tearoff.tcl 1.20 97/08/21 14:49:27
+# RCS: @(#) $Id: tearoff.tcl,v 1.7 2001/08/01 16:21:11 dgp Exp $
 #
 # Copyright (c) 1994 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
@@ -11,7 +11,7 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 
-# tkTearoffMenu --
+# ::tk::TearoffMenu --
 # Given the name of a menu, this procedure creates a torn-off menu
 # that is identical to the given menu (including nested submenus).
 # The new torn-off menu exists as a toplevel window managed by the
@@ -23,7 +23,7 @@
 # x -			x coordinate where window is created
 # y -			y coordinate where window is created
 
-proc tkTearOffMenu {w {x 0} {y 0}} {
+proc ::tk::TearOffMenu {w {x 0} {y 0}} {
     # Find a unique name to use for the torn-off menu.  Find the first
     # ancestor of w that is a toplevel but not a menu, and use this as
     # the parent of the new menu.  This guarantees that the torn off
@@ -40,11 +40,11 @@ proc tkTearOffMenu {w {x 0} {y 0}} {
     }
 
     set parent [winfo parent $w]
-    while {([winfo toplevel $parent] != $parent)
-	    || ([winfo class $parent] == "Menu")} {
+    while {[string compare [winfo toplevel $parent] $parent] \
+	    || [string equal [winfo class $parent] "Menu"]} {
 	set parent [winfo parent $parent]
     }
-    if {$parent == "."} {
+    if {[string equal $parent "."]} {
 	set parent ""
     }
     for {set i 1} 1 {incr i} {
@@ -61,7 +61,7 @@ proc tkTearOffMenu {w {x 0} {y 0}} {
     # entry.  If it's a menubutton then use its text.
 
     set parent [winfo parent $w]
-    if {[$menu cget -title] != ""} {
+    if {[string compare [$menu cget -title] ""]} {
     	wm title $menu [$menu cget -title]
     } else {
     	switch [winfo class $parent] {
@@ -80,25 +80,25 @@ proc tkTearOffMenu {w {x 0} {y 0}} {
 	return ""
     }
 
-    # Set tkPriv(focus) on entry:  otherwise the focus will get lost
+    # Set tk::Priv(focus) on entry:  otherwise the focus will get lost
     # after keyboard invocation of a sub-menu (it will stay on the
     # submenu).
 
     bind $menu <Enter> {
-	set tkPriv(focus) %W
+	set tk::Priv(focus) %W
     }
 
     # If there is a -tearoffcommand option for the menu, invoke it
     # now.
 
     set cmd [$w cget -tearoffcommand]
-    if {$cmd != ""} {
-	uplevel #0 $cmd $w $menu
+    if {[string compare $cmd ""]} {
+	uplevel #0 $cmd [list $w $menu]
     }
     return $menu
 }
 
-# tkMenuDup --
+# ::tk::MenuDup --
 # Given a menu (hierarchy), create a duplicate menu (hierarchy)
 # in a given window.
 #
@@ -108,20 +108,20 @@ proc tkTearOffMenu {w {x 0} {y 0}} {
 # dst -			Name to use for topmost menu in duplicate
 #			hierarchy.
 
-proc tkMenuDup {src dst type} {
+proc ::tk::MenuDup {src dst type} {
     set cmd [list menu $dst -type $type]
     foreach option [$src configure] {
 	if {[llength $option] == 2} {
 	    continue
 	}
-	if {[string compare [lindex $option 0] "-type"] == 0} {
+	if {[string equal [lindex $option 0] "-type"]} {
 	    continue
 	}
 	lappend cmd [lindex $option 0] [lindex $option 4]
     }
     eval $cmd
     set last [$src index last]
-    if {$last == "none"} {
+    if {[string equal $last "none"]} {
 	return
     }
     for {set i [$src cget -tearoff]} {$i <= $last} {incr i} {
@@ -134,12 +134,33 @@ proc tkMenuDup {src dst type} {
 
     # Duplicate the binding tags and bindings from the source menu.
 
-    regsub -all . $src {\\&} quotedSrc
-    regsub -all . $dst {\\&} quotedDst
-    regsub -all $quotedSrc [bindtags $src] $dst x
+    set tags [bindtags $src]
+    set srcLen [string length $src]
+ 
+    # Copy tags to x, replacing each substring of src with dst.
+
+    while {[set index [string first $src $tags]] != -1} {
+	append x [string range $tags 0 [expr {$index - 1}]]$dst
+	set tags [string range $tags [expr {$index + $srcLen}] end]
+    }
+    append x $tags
+
     bindtags $dst $x
+
     foreach event [bind $src] {
-	regsub -all $quotedSrc [bind $src $event] $dst x
+	unset x
+	set script [bind $src $event]
+	set eventLen [string length $event]
+
+	# Copy script to x, replacing each substring of event with dst.
+
+	while {[set index [string first $event $script]] != -1} {
+	    append x [string range $script 0 [expr {$index - 1}]]
+	    append x $dst
+	    set script [string range $script [expr {$index + $eventLen}] end]
+	}
+	append x $script
+
 	bind $dst $event $x
     }
 }

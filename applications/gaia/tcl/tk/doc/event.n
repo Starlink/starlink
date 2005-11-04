@@ -1,13 +1,14 @@
 '\"
 '\" Copyright (c) 1996 Sun Microsystems, Inc.
+'\" Copyright (c) 1998-2000 Ajuba Solutions.
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) event.n 1.6 97/10/31 12:58:54
+'\" RCS: @(#) $Id: event.n,v 1.6.8.1 2004/10/28 10:19:29 dkf Exp $
 '\" 
 .so man.macros
-.TH event n 4.4 Tk "Tk Built-In Commands"
+.TH event n 8.3 Tk "Tk Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -50,12 +51,14 @@ trigger anymore.
 Generates a window event and arranges for it to be processed just as if
 it had come from the window system.
 \fIWindow\fR gives the path name of the window for which the event
-.VS
+.VS 8.3
 will be generated; it may also be an identifier (such as returned by
 \fBwinfo id\fR) as long as it is for a window in the current application.
 .VE
 \fIEvent\fR provides a basic description of
 the event, such as \fB<Shift-Button-2>\fR or \fB<<Paste>>\fR.
+If \fIWindow\fR is empty the whole screen is meant, and coordinates
+are relative to the screen.
 \fIEvent\fR may have any of the forms allowed for the \fIsequence\fR
 argument of the \fBbind\fR command except that it must consist
 of a single event pattern, not a sequence.
@@ -65,7 +68,8 @@ EVENT FIELDS below.  If the \fB\-when\fR option is not specified, the
 event is processed immediately:  all of the handlers for the event
 will complete before the \fBevent generate\fR command returns.
 If the \fB\-when\fR option is specified then it determines when the
-event is processed.
+event is processed.  Certain events, such as key events, require
+that the window has focus to receive the event properly.
 .TP
 \fBevent info \fR?<<\fIvirtual\fB>>\fR?
 Returns information about virtual events.
@@ -75,7 +79,6 @@ If \fB<<\fIvirtual\fB>>\fR is specified then the return value is
 a list whose elements are the physical event sequences currently
 defined for the given virtual event;  if the virtual event is
 not defined then an empty string is returned.
-
 .SH "EVENT FIELDS"
 .PP
 The following options are supported for the \fBevent generate\fR
@@ -104,6 +107,17 @@ Corresponds to the \fB%b\fR substitution for binding scripts.
 \fINumber\fR must be an integer;  it specifies the \fIcount\fR field
 for the event.  Valid for \fBExpose\fR events.
 Corresponds to the \fB%c\fR substitution for binding scripts.
+.TP
+\fB\-delta\fI number\fR
+\fINumber\fR must be an integer;  it specifies the \fIdelta\fR field
+for the \fBMouseWheel\fR event.  The \fIdelta\fR refers to the
+direction and magnitude the mouse wheel was rotated.  Note the value
+is not a screen distance but are units of motion in the mouse wheel.
+Typically these values are multiples of 120.  For example, 120 should
+scroll the text widget up 4 lines and -240 would scroll the text
+widget down 8 lines.  Of course, other widgets may define different
+behaviors for mouse wheel motion.  This field corresponds to the
+\fB%D\fR substitution for binding scripts.
 .TP
 \fB\-detail\fI detail\fR
 \fIDetail\fR specifies the \fIdetail\fR field for the event
@@ -182,7 +196,7 @@ Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
 events.  Corresponds to the \fB%X\fR substitution for binding scripts.
 .TP
 \fB\-rooty\fI coord\fR
-\fICoord\fR must be a screen distance;  it specifies th \fIy_root\fR
+\fICoord\fR must be a screen distance;  it specifies the \fIy_root\fR
 field for the event.
 Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
 \fBButtonRelease\fR, \fBEnter\fR, \fBLeave\fR, and \fBMotion\fR
@@ -190,7 +204,7 @@ events.
 Corresponds to the \fB%Y\fR substitution for binding scripts.
 .TP
 \fB\-sendevent\fI boolean\fR
-\fBBoolean\fR must be a boolean value;  it specifies the \fIsend_event\fR
+\fIBoolean\fR must be a boolean value;  it specifies the \fIsend_event\fR
 field for the event.  Valid for all events.  Corresponds to the
 \fB%E\fR substitution for binding scripts.
 .TP
@@ -225,6 +239,13 @@ Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
 and \fBProperty\fR events.
 Corresponds to the \fB%t\fR substitution for binding scripts.
 .TP
+\fB\-warp\fI boolean\fR
+\fIboolean\fR must be a boolean value;  it specifies whether
+the screen pointer should be warped as well.
+Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
+\fBButtonRelease\fR, and \fBMotion\fR events.  The pointer will
+only warp to a window if it is mapped.
+.TP
 \fB\-width\fI size\fR
 \fISize\fR must be a screen distance;  it specifies the \fIwidth\fR field
 for the event.
@@ -258,7 +279,10 @@ Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
 \fBButtonRelease\fR, \fBMotion\fR, \fBEnter\fR, \fBLeave\fR,
 \fBExpose\fR, \fBConfigure\fR, \fBGravity\fR, and \fBReparent\fR
 events.
-Corresponds to the the \fB%x\fR substitution for binding scripts.
+Corresponds to the \fB%x\fR substitution for binding scripts.
+If \fIWindow\fR is empty the coordinate is relative to the
+screen, and this option corresponds to the \fB%X\fR substitution
+for binding scripts.
 .TP
 \fB\-y\fI coord\fR
 \fICoord\fR must be a screen distance;  it specifies the \fIy\fR
@@ -267,12 +291,14 @@ Valid for \fBKeyPress\fR, \fBKeyRelease\fR, \fBButtonPress\fR,
 \fBButtonRelease\fR, \fBMotion\fR, \fBEnter\fR, \fBLeave\fR,
 \fBExpose\fR, \fBConfigure\fR, \fBGravity\fR, and \fBReparent\fR
 events.
-Corresponds to the the \fB%y\fR substitution for binding scripts.
+Corresponds to the \fB%y\fR substitution for binding scripts.
+If \fIWindow\fR is empty the coordinate is relative to the
+screen, and this option corresponds to the \fB%Y\fR substitution
+for binding scripts.
 .PP
 Any options that are not specified when generating an event are filled 
 with the value 0, except for \fIserial\fR, which is filled with the 
 next X event serial number.  
-
 .SH "VIRTUAL EVENT EXAMPLES"
 .PP
 In order for a virtual event binding to trigger, two things must
@@ -332,7 +358,7 @@ but instead invoke the virtual event \fB<<Paste>>\fR.  Second,
 pressing the F6 key will now also invoke the \fB<<Paste>>\fR binding.
 
 .SH "SEE ALSO"
-bind
+bind(n)
 
 .SH KEYWORDS
 event, binding, define, handle, virtual event

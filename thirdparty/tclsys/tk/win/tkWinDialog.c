@@ -8,10 +8,10 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkWinDialog.c 1.10 97/10/21 11:29:18
+ * RCS: @(#) $Id: tkWinDialog.c,v 1.30.2.4 2004/08/20 01:14:20 hobbs Exp $
  *
  */
- 
+
 #include "tkWinInt.h"
 #include "tkFileFilter.h"
 
@@ -19,138 +19,244 @@
 #include <dlgs.h>       /* includes common dialog template defines */
 #include <cderr.h>      /* includes the common dialog error codes */
 
-#if ((TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION <= 2))
 /*
- * The following function is implemented on tk4.3 and after only 
+ * This controls the use of the new style tk_chooseDirectory dialog.
  */
-#define Tk_GetHWND TkWinGetHWND
+#define USE_NEW_CHOOSEDIR 1
+#ifdef USE_NEW_CHOOSEDIR
+#include <shlobj.h>     /* includes SHBrowseForFolder */
+
+/* These needed for compilation with VC++ 5.2 */
+#ifndef BIF_EDITBOX
+#define BIF_EDITBOX 0x10
+#endif
+#ifndef BIF_VALIDATE
+#define BIF_VALIDATE 0x0020
+#endif
+#ifndef BFFM_VALIDATEFAILED
+#ifdef UNICODE
+#define BFFM_VALIDATEFAILED 4
+#else
+#define BFFM_VALIDATEFAILED 3
+#endif
+#endif 
+
+/*
+ * The following structure is used by the new Tk_ChooseDirectoryObjCmd
+ * to pass data between it and its callback. Unqiue to Winodws platform.
+ */
+typedef struct ChooseDirData {
+   TCHAR utfInitDir[MAX_PATH];       /* Initial folder to use */
+   TCHAR utfRetDir[MAX_PATH];        /* Returned folder to use */
+   Tcl_Interp *interp;
+   int mustExist;                    /* true if file must exist to return from
+				      * callback */
+} CHOOSEDIRDATA;
 #endif
 
-#define SAVE_FILE 0
-#define OPEN_FILE 1
+typedef struct ThreadSpecificData { 
+    int debugFlag;            /* Flags whether we should output debugging 
+			       * information while displaying a builtin 
+			       * dialog. */
+    Tcl_Interp *debugInterp;  /* Interpreter to used for debugging. */
+    UINT WM_LBSELCHANGED;     /* Holds a registered windows event used for
+			       * communicating between the Directory
+			       * Chooser dialog and its hook proc. */
+    HHOOK hMsgBoxHook;        /* Hook proc for tk_messageBox and the */
+    HICON hSmallIcon;         /* icons used by a parent to be used in */
+    HICON hBigIcon;           /* the message box */
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
 
-/*----------------------------------------------------------------------
- * MsgTypeInfo --
- *
- *	This structure stores the type of available message box in an
- *	easy-to-process format. Used by th Tk_MessageBox() function
- *----------------------------------------------------------------------
+/*
+ * The following structures are used by Tk_MessageBoxCmd() to parse 
+ * arguments and return results.
  */
-typedef struct MsgTypeInfo {
-    char * name;
-    int type;
-    int numButtons;
-    char * btnNames[3];
-} MsgTypeInfo;
 
-#define NUM_TYPES 6
-
-static MsgTypeInfo 
-msgTypeInfo[NUM_TYPES] = {
-    {"abortretryignore", MB_ABORTRETRYIGNORE, 3, {"abort", "retry", "ignore"}},
-    {"ok", 		 MB_OK, 	      1, {"ok"                      }},
-    {"okcancel",	 MB_OKCANCEL,	      2, {"ok",    "cancel"         }},
-    {"retrycancel",	 MB_RETRYCANCEL,      2, {"retry", "cancel"         }},
-    {"yesno",		 MB_YESNO,	      2, {"yes",   "no"             }},
-    {"yesnocancel",	 MB_YESNOCANCEL,      3, {"yes",   "no",    "cancel"}}
+static const TkStateMap iconMap[] = {
+    {MB_ICONERROR,		"error"},
+    {MB_ICONINFORMATION,	"info"},
+    {MB_ICONQUESTION,		"question"},
+    {MB_ICONWARNING,		"warning"},
+    {-1,			NULL}
+};
+	  
+static const TkStateMap typeMap[] = {
+    {MB_ABORTRETRYIGNORE,	"abortretryignore"},
+    {MB_OK, 			"ok"},
+    {MB_OKCANCEL,		"okcancel"},
+    {MB_RETRYCANCEL,		"retrycancel"},
+    {MB_YESNO,			"yesno"},
+    {MB_YESNOCANCEL,		"yesnocancel"},
+    {-1,			NULL}
 };
 
+static const TkStateMap buttonMap[] = {
+    {IDABORT,			"abort"},
+    {IDRETRY,			"retry"},
+    {IDIGNORE,			"ignore"},
+    {IDOK,			"ok"},
+    {IDCANCEL,			"cancel"},
+    {IDNO,			"no"},
+    {IDYES,			"yes"},
+    {-1,			NULL}
+};
+
+static const int buttonFlagMap[] = {
+    MB_DEFBUTTON1, MB_DEFBUTTON2, MB_DEFBUTTON3, MB_DEFBUTTON4
+};
+
+static const struct {int type; int btnIds[3];} allowedTypes[] = {
+    {MB_ABORTRETRYIGNORE,	{IDABORT, IDRETRY,  IDIGNORE}},
+    {MB_OK, 			{IDOK,    -1,       -1      }},
+    {MB_OKCANCEL,		{IDOK,    IDCANCEL, -1      }},
+    {MB_RETRYCANCEL,		{IDRETRY, IDCANCEL, -1      }},
+    {MB_YESNO,			{IDYES,   IDNO,     -1      }},
+    {MB_YESNOCANCEL,		{IDYES,   IDNO,     IDCANCEL}}
+};
+
+#define NUM_TYPES (sizeof(allowedTypes) / sizeof(allowedTypes[0]))
+
 /*
- * The following structure is used in the GetOpenFileName() and
- * GetSaveFileName() calls.
+ * The value of TK_MULTI_MAX_PATH dictactes how many files can
+ * be retrieved with tk_get*File -multiple 1.  It must be allocated
+ * on the stack, so make it large enough but not too large.  -- hobbs
+ * The data is stored as <dir>\0<file1>\0<file2>\0...<fileN>\0\0.
+ * MAX_PATH == 260 on Win2K/NT, so *40 is ~10K.
  */
-typedef struct _OpenFileData {
-    Tcl_Interp * interp;
-    TCHAR szFile[MAX_PATH+1];
-} OpenFileData;
+
+#define TK_MULTI_MAX_PATH	(MAX_PATH*40)
 
 /*
- * The following structure is used in the ChooseColor() call.
+ * The following structure is used to pass information between the directory
+ * chooser procedure, Tk_ChooseDirectoryObjCmd(), and its dialog hook proc.
  */
-typedef struct _ChooseColorData {
-    Tcl_Interp * interp;
-    char * title;			/* Title of the color dialog */
-} ChooseColorData;
 
-
-static int 		GetFileName _ANSI_ARGS_((ClientData clientData,
-    			    Tcl_Interp *interp, int argc, char **argv,
-    			    int isOpen));
-static UINT CALLBACK	ColorDlgHookProc _ANSI_ARGS_((HWND hDlg, UINT uMsg,
-			    WPARAM wParam, LPARAM lParam));
-static int 		MakeFilter _ANSI_ARGS_((Tcl_Interp *interp,
-    			    OPENFILENAME *ofnPtr, char * string));
-static int		ParseFileDlgArgs _ANSI_ARGS_((Tcl_Interp * interp,
-    			    OPENFILENAME *ofnPtr, int argc, char ** argv,
-			    int isOpen));
-static int 		ProcessCDError _ANSI_ARGS_((Tcl_Interp * interp,
-			    DWORD dwErrorCode, HWND hWnd));
+typedef struct ChooseDir {
+    Tcl_Interp *interp;		/* Interp, used only if debug is turned on, 
+				 * for setting the "tk_dialog" variable. */
+    int lastCtrl;		/* Used by hook proc to keep track of last
+				 * control that had input focus, so when OK
+				 * is pressed we know whether to browse a
+				 * new directory or return. */
+    int lastIdx;		/* Last item that was selected in directory 
+				 * browser listbox. */
+    TCHAR path[MAX_PATH];	/* On return from choose directory dialog, 
+				 * holds the selected path.  Cannot return 
+				 * selected path in ofnPtr->lpstrFile because
+				 * the default dialog proc stores a '\0' in 
+				 * it, since, of course, no _file_ was 
+				 * selected. */
+    OPENFILENAME *ofnPtr;	/* pointer to the OFN structure */
+} ChooseDir;
 
 /*
- *----------------------------------------------------------------------
+ * Definitions of procedures used only in this file.
+ */
+
+#ifdef USE_NEW_CHOOSEDIR
+static UINT APIENTRY	ChooseDirectoryValidateProc(HWND hdlg, UINT uMsg,
+			    LPARAM wParam, LPARAM lParam);
+#else
+static UINT APIENTRY	ChooseDirectoryHookProc(HWND hdlg, UINT uMsg, 
+			    WPARAM wParam, LPARAM lParam);
+#endif
+static UINT CALLBACK	ColorDlgHookProc(HWND hDlg, UINT uMsg, WPARAM wParam,
+			    LPARAM lParam);
+static int 		GetFileNameA(ClientData clientData, 
+			    Tcl_Interp *interp, int objc, 
+			    Tcl_Obj *CONST objv[], int isOpen);
+static int 		GetFileNameW(ClientData clientData, 
+			    Tcl_Interp *interp, int objc, 
+			    Tcl_Obj *CONST objv[], int isOpen);
+static int 		MakeFilter(Tcl_Interp *interp, char *string, 
+			    Tcl_DString *dsPtr);
+static UINT APIENTRY	OFNHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, 
+			    LPARAM lParam);
+static UINT APIENTRY	OFNHookProcW(HWND hdlg, UINT uMsg, WPARAM wParam, 
+			    LPARAM lParam);
+static LRESULT CALLBACK MsgBoxCBTProc(int nCode, WPARAM wParam, LPARAM lParam);
+static void		SetTkDialog(ClientData clientData);
+
+/*
+ *-------------------------------------------------------------------------
  *
- * EvalArgv --
+ * EatSpuriousMessageBugFix --
  *
- *	Invokes the Tcl procedure with the arguments. argv[0] is set by
- *	the caller of this function. It may be different than cmdName.
- *	The TCL command will see argv[0], not cmdName, as its name if it
- *	invokes [lindex [info level 0] 0]
+ *	In the file open/save dialog, double clicking on a list item
+ *	causes the dialog box to close, but an unwanted WM_LBUTTONUP
+ * 	message is sent to the window underneath. If the window underneath
+ * 	happens to be a windows control (eg a button) then it will be
+ * 	activated by accident.
+ *
+ * 	This problem does not occur in dialog boxes, because windows
+ * 	must do some special processing to solve the problem. (separate
+ * 	message processing functions are used to cope with keyboard
+ * 	navigation of controls.)
+ *
+ * 	Here is one solution. After returning, we poll the message queue
+ * 	for 200ms looking for WM_LBUTTON up messages. If we see one it's
+ * 	consumed. If we get a WM_LBUTTONDOWN message, then we exit early,
+ * 	since the user must be doing something new. This fix only works
+ * 	for the current application, so the problem will still occur if
+ * 	the open dialog happens to be over another applications button.
+ * 	However this is a fairly rare occurrance.
  *
  * Results:
- *	TCL_ERROR if the command does not exist and cannot be autoloaded.
- *	Otherwise, return the result of the evaluation of the command.
+ *	None.
  *
  * Side effects:
- *	The command may be autoloaded.
+ *	Consumes an unwanted BUTTON messages.
  *
- *----------------------------------------------------------------------
+ *-------------------------------------------------------------------------
  */
 
-static int 
-EvalArgv(interp, cmdName, argc, argv)
-    Tcl_Interp *interp;		/* Current interpreter. */
-    char * cmdName;		/* Name of the TCL command to call */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+static void
+EatSpuriousMessageBugFix(void)
 {
-    Tcl_CmdInfo cmdInfo;
-
-    if (!Tcl_GetCommandInfo(interp, cmdName, &cmdInfo)) {
-	char * cmdArgv[2];
-
-	/*
-	 * This comand is not in the interpreter yet -- looks like we
-	 * have to auto-load it
-	 */
-	if (!Tcl_GetCommandInfo(interp, "auto_load", &cmdInfo)) {
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, "cannot execute command \"auto_load\"",
-		NULL);
-	    return TCL_ERROR;
+    MSG msg;
+    DWORD nTime = GetTickCount() + 200;
+    while (GetTickCount() < nTime) {
+	if (PeekMessage(&msg,0,WM_LBUTTONDOWN,WM_LBUTTONDOWN,PM_NOREMOVE)) {
+	    break;
 	}
-
-	cmdArgv[0] = "auto_load";
-	cmdArgv[1] = cmdName;
-
-	if ((*cmdInfo.proc)(cmdInfo.clientData, interp, 2, cmdArgv)!= TCL_OK){ 
-	    return TCL_ERROR;
-	}
-
-	if (!Tcl_GetCommandInfo(interp, cmdName, &cmdInfo)) {
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, "cannot auto-load command \"",
-		cmdName, "\"",NULL);
-	    return TCL_ERROR;
-	}
+	PeekMessage(&msg,0,WM_LBUTTONUP,WM_LBUTTONUP,PM_REMOVE);
     }
-
-    return (*cmdInfo.proc)(cmdInfo.clientData, interp, argc, argv);
 }
 
 /*
- *----------------------------------------------------------------------
+ *-------------------------------------------------------------------------
  *
- * Tk_ChooseColorCmd --
+ * TkWinDialogDebug --
+ *
+ *	Function to turn on/off debugging support for common dialogs under
+ *	windows.  The variable "tk_debug" is set to the identifier of the
+ *	dialog window when the modal dialog window pops up and it is safe to 
+ *	send messages to the dialog.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	This variable only makes sense if just one dialog is up at a time.
+ *
+ *-------------------------------------------------------------------------
+ */
+
+void	    	
+TkWinDialogDebug(
+    int debug)
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    tsdPtr->debugFlag = debug;
+}
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * Tk_ChooseColorObjCmd --
  *
  *	This procedure implements the color dialog box for the Windows
  *	platform. See the user documentation for details on what it
@@ -164,109 +270,119 @@ EvalArgv(interp, cmdName, argc, argv)
  *	This window is not destroyed and will be reused the next time the
  *	application invokes the "tk_chooseColor" command.
  *
- *----------------------------------------------------------------------
+ *-------------------------------------------------------------------------
  */
 
 int
-Tk_ChooseColorCmd(clientData, interp, argc, argv)
+Tk_ChooseColorObjCmd(clientData, interp, objc, objv)
     ClientData clientData;	/* Main window associated with interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    Tk_Window parent = Tk_MainWindow(interp);
-    ChooseColorData custData;
-    int oldMode;
+    Tk_Window tkwin, parent;
+    HWND hWnd;
+    int i, oldMode, winCode, result;
     CHOOSECOLOR chooseColor;
-    char * colorStr = NULL;
-    int i;
-    int winCode, tclCode;
-    XColor * colorPtr = NULL;
-    static inited = 0;
-    static long dwCustColors[16];
+    static int inited = 0;
+    static COLORREF dwCustColors[16];
     static long oldColor;		/* the color selected last time */
+    static CONST char *optionStrings[] = {
+	"-initialcolor", "-parent", "-title", NULL
+    };
+    enum options {
+	COLOR_INITIAL, COLOR_PARENT, COLOR_TITLE
+    };
 
-    custData.title     = NULL;
-
-    if (!inited) {
+    result = TCL_OK;
+    if (inited == 0) {
 	/*
 	 * dwCustColors stores the custom color which the user can
-	 * modify. We store these colors in a fixed array so that the next
+	 * modify. We store these colors in a static array so that the next
 	 * time the color dialog pops up, the same set of custom colors
 	 * remain in the dialog.
 	 */
-	for (i=0; i<16; i++) {
-	    dwCustColors[i] = (RGB(255-i*10, i, i*10)) ;
+	for (i = 0; i < 16; i++) {
+	    dwCustColors[i] = RGB(255-i * 10, i, i * 10);
 	}
-	oldColor = RGB(0xa0,0xa0,0xa0);
+	oldColor = RGB(0xa0, 0xa0, 0xa0);
 	inited = 1;
     }
 
-    /*
-     * 1. Parse the arguments
-     */
+    tkwin = (Tk_Window) clientData;
 
-    chooseColor.lStructSize  = sizeof(CHOOSECOLOR) ;
-    chooseColor.hwndOwner    = 0;			/* filled in below */
-    chooseColor.hInstance    = 0;
-    chooseColor.rgbResult    = oldColor;
-    chooseColor.lpCustColors = (LPDWORD) dwCustColors ;
-    chooseColor.Flags        = CC_RGBINIT | CC_FULLOPEN | CC_ENABLEHOOK;
-    chooseColor.lCustData    = (LPARAM)&custData;
-    chooseColor.lpfnHook     = ColorDlgHookProc;
-    chooseColor.lpTemplateName = NULL;
+    parent			= tkwin;
+    chooseColor.lStructSize	= sizeof(CHOOSECOLOR);
+    chooseColor.hwndOwner	= NULL;			
+    chooseColor.hInstance	= NULL;
+    chooseColor.rgbResult	= oldColor;
+    chooseColor.lpCustColors	= dwCustColors;
+    chooseColor.Flags		= CC_RGBINIT | CC_FULLOPEN | CC_ENABLEHOOK;
+    chooseColor.lCustData	= (LPARAM) NULL;
+    chooseColor.lpfnHook	= (LPOFNHOOKPROC) ColorDlgHookProc;
+    chooseColor.lpTemplateName	= (LPTSTR) interp;
 
-    for (i=1; i<argc; i+=2) {
-        int v = i+1;
-	int len = strlen(argv[i]);
+    for (i = 1; i < objc; i += 2) {
+	int index;
+	char *string;
+	Tcl_Obj *optionPtr, *valuePtr;
 
-	if (strncmp(argv[i], "-initialcolor", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	optionPtr = objv[i];
+	valuePtr = objv[i + 1];
 
-	    colorStr = argv[v];
-	}
-	else if (strncmp(argv[i], "-parent", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    parent=Tk_NameToWindow(interp, argv[v], Tk_MainWindow(interp));
-	    if (parent == NULL) {
-		return TCL_ERROR;
-	    }
-	}
-	else if (strncmp(argv[i], "-title", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    custData.title = argv[v];
-	}
-	else {
-    	    Tcl_AppendResult(interp, "unknown option \"", 
-		argv[i], "\", must be -initialcolor, -parent or -title",
-		NULL);
-		return TCL_ERROR;
-	}
-    }
-
-    if (Tk_WindowId(parent) == None) {
-	Tk_MakeWindowExist(parent);
-    }
-    chooseColor.hwndOwner = Tk_GetHWND(Tk_WindowId(parent));
-
-    if (colorStr != NULL) {
-	colorPtr = Tk_GetColor(interp, Tk_MainWindow(interp), colorStr);
-	if (!colorPtr) {
+	if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings, "option",
+		TCL_EXACT, &index) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	chooseColor.rgbResult = RGB((colorPtr->red/0x100), 
-	    (colorPtr->green/0x100), (colorPtr->blue/0x100));
-    }	
+	if (i + 1 == objc) {
+	    string = Tcl_GetStringFromObj(optionPtr, NULL);
+	    Tcl_AppendResult(interp, "value for \"", string, "\" missing", 
+		    (char *) NULL);
+	    return TCL_ERROR;
+	}
 
-    /*
-     * 2. Popup the dialog
-     */
+	string = Tcl_GetStringFromObj(valuePtr, NULL);
+	switch ((enum options) index) {
+	    case COLOR_INITIAL: {
+		XColor *colorPtr;
 
+		colorPtr = Tk_GetColor(interp, tkwin, string);
+		if (colorPtr == NULL) {
+		    return TCL_ERROR;
+		}
+		chooseColor.rgbResult = RGB(colorPtr->red / 0x100, 
+			colorPtr->green / 0x100, colorPtr->blue / 0x100);
+		break;
+	    }
+	    case COLOR_PARENT: {
+		parent = Tk_NameToWindow(interp, string, tkwin);
+		if (parent == NULL) {
+		    return TCL_ERROR;
+		}
+		break;
+	    }
+	    case COLOR_TITLE: {
+		chooseColor.lCustData = (LPARAM) string;
+		break;
+	    }
+	}
+    }
+
+    Tk_MakeWindowExist(parent);
+    chooseColor.hwndOwner = NULL;
+    hWnd = Tk_GetHWND(Tk_WindowId(parent));
+    chooseColor.hwndOwner = hWnd;
+    
     oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
     winCode = ChooseColor(&chooseColor);
     (void) Tcl_SetServiceMode(oldMode);
+
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
 
     /*
      * Clear the interp result since anything may have happened during the
@@ -278,82 +394,77 @@ Tk_ChooseColorCmd(clientData, interp, argc, argv)
     /*
      * 3. Process the result of the dialog
      */
+
     if (winCode) {
 	/*
 	 * User has selected a color
 	 */
-	char result[100];
+	char color[100];
 
-	sprintf(result, "#%02x%02x%02x",
-	    GetRValue(chooseColor.rgbResult), 
-	    GetGValue(chooseColor.rgbResult), 
-	    GetBValue(chooseColor.rgbResult));
-        Tcl_AppendResult(interp, result, NULL);
-	tclCode = TCL_OK;
-
+	sprintf(color, "#%02x%02x%02x",
+		GetRValue(chooseColor.rgbResult), 
+	        GetGValue(chooseColor.rgbResult), 
+		GetBValue(chooseColor.rgbResult));
+        Tcl_AppendResult(interp, color, NULL);
 	oldColor = chooseColor.rgbResult;
-    } else {
-	/*
-	 * User probably pressed Cancel, or an error occurred
-	 */
-	tclCode = ProcessCDError(interp, CommDlgExtendedError(), 
-	     chooseColor.hwndOwner);
+	result = TCL_OK;
     }
 
-    if (colorPtr) {
-	Tk_FreeColor(colorPtr);
-    }
-
-    return tclCode;
-
-  arg_missing:
-    Tcl_AppendResult(interp, "value for \"", argv[argc-1], "\" missing",
-	NULL);
-    return TCL_ERROR;
+    return result;
 }
 
 /*
- *----------------------------------------------------------------------
+ *-------------------------------------------------------------------------
  *
  * ColorDlgHookProc --
  *
- *	Gets called during the execution of the color dialog. It processes
- *	the "interesting" messages that Windows send to the dialog.
+ *	Provides special handling of messages for the Color common dialog
+ *	box.  Used to set the title when the dialog first appears.
  *
  * Results:
- *	TRUE if the message has been processed, FALSE otherwise.
+ *	The return value is 0 if the default dialog box procedure should
+ *	handle the message, non-zero otherwise. 
  *
  * Side effects:
- *	Changes the title of the dialog window when it is popped up.
+ *	Changes the title of the dialog window.
  *
  *----------------------------------------------------------------------
  */
 
-static UINT
-CALLBACK ColorDlgHookProc(hDlg, uMsg, wParam, lParam)
-    HWND hDlg;			/* Handle to the color dialog */
-    UINT uMsg;			/* Type of message */
-    WPARAM wParam;		/* word param, interpretation depends on uMsg*/
-    LPARAM lParam;		/* long param, interpretation depends on uMsg*/
+static UINT CALLBACK 
+ColorDlgHookProc(hDlg, uMsg, wParam, lParam)
+    HWND hDlg;			/* Handle to the color dialog. */
+    UINT uMsg;			/* Type of message. */
+    WPARAM wParam;		/* First message parameter. */
+    LPARAM lParam;		/* Second message parameter. */
 {
-    CHOOSECOLOR * ccPtr;
-    ChooseColorData * pCustData;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
     switch (uMsg) {
-      case WM_INITDIALOG:
-	/* Save the pointer to CHOOSECOLOR so that we can use it later */
-	SetWindowLong(hDlg, DWL_USER, lParam);
+	case WM_INITDIALOG: {
+	    const char *title;
+	    CHOOSECOLOR *ccPtr;
+	    Tcl_DString ds;
 
-	/* Set the title string of the dialog */
-	ccPtr = (CHOOSECOLOR*)lParam;
-	pCustData = (ChooseColorData*)(ccPtr->lCustData);
-	if (pCustData->title && *(pCustData->title)) {
- 	    SetWindowText(hDlg, (LPCSTR)pCustData->title);
+	    /* 
+	     * Set the title string of the dialog.
+	     */
+
+	    ccPtr = (CHOOSECOLOR *) lParam;
+	    title = (const char *) ccPtr->lCustData;
+	    if ((title != NULL) && (title[0] != '\0')) {
+		(*tkWinProcs->setWindowText)(hDlg,
+			Tcl_WinUtfToTChar(title, -1, &ds));
+		Tcl_DStringFree(&ds);
+	    }
+	    if (tsdPtr->debugFlag) {
+		tsdPtr->debugInterp = (Tcl_Interp *) ccPtr->lpTemplateName;
+		Tcl_DoWhenIdle(SetTkDialog, (ClientData) hDlg);
+	    }
+	    return TRUE;
 	}
-
-	return TRUE;
     }
-
     return FALSE;
 }
 
@@ -371,21 +482,22 @@ CALLBACK ColorDlgHookProc(hDlg, uMsg, wParam, lParam)
  *
  * Side effects:
  *	A dialog window is created the first this procedure is called.
- *	This window is not destroyed and will be reused the next time
- *	the application invokes the "tk_getOpenFile" or
- *	"tk_getSaveFile" command.
  *
  *----------------------------------------------------------------------
  */
 
 int
-Tk_GetOpenFileCmd(clientData, interp, argc, argv)
+Tk_GetOpenFileObjCmd(clientData, interp, objc, objv)
     ClientData clientData;	/* Main window associated with interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    return GetFileName(clientData, interp, argc, argv, OPEN_FILE);
+    if (TkWinGetPlatformId() == VER_PLATFORM_WIN32_NT) {
+	return GetFileNameW(clientData, interp, objc, objv, 1);
+    } else {
+	return GetFileNameA(clientData, interp, objc, objv, 1);
+    }
 }
 
 /*
@@ -406,19 +518,23 @@ Tk_GetOpenFileCmd(clientData, interp, argc, argv)
  */
 
 int
-Tk_GetSaveFileCmd(clientData, interp, argc, argv)
+Tk_GetSaveFileObjCmd(clientData, interp, objc, objv)
     ClientData clientData;	/* Main window associated with interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    return GetFileName(clientData, interp, argc, argv, SAVE_FILE);
+    if (TkWinGetPlatformId() == VER_PLATFORM_WIN32_NT) {
+	return GetFileNameW(clientData, interp, objc, objv, 0);
+    } else {
+	return GetFileNameA(clientData, interp, objc, objv, 0);
+    }
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * GetFileName --
+ * GetFileNameW --
  *
  *	Calls GetOpenFileName() or GetSaveFileName().
  *
@@ -432,41 +548,249 @@ Tk_GetSaveFileCmd(clientData, interp, argc, argv)
  */
 
 static int 
-GetFileName(clientData, interp, argc, argv, isOpen)
+GetFileNameW(clientData, interp, objc, objv, open)
     ClientData clientData;	/* Main window associated with interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
-    int isOpen;			/* true if we should call GetOpenFileName(),
-				 * false if we should call GetSaveFileName() */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+    int open;			/* 1 to call GetOpenFileName(), 0 to 
+				 * call GetSaveFileName(). */
 {
-    OPENFILENAME openFileName, *ofnPtr;
-    int tclCode, winCode, oldMode;
-    OpenFileData *custData;
-    char buffer[MAX_PATH+1];
-    
-    ofnPtr = &openFileName;
+    OPENFILENAMEW ofn;
+    WCHAR file[TK_MULTI_MAX_PATH];
+    int result, winCode, oldMode, i, multi = 0;
+    char *extension, *filter, *title;
+    Tk_Window tkwin;
+    HWND hWnd;
+    Tcl_DString utfFilterString, utfDirString;
+    Tcl_DString extString, filterString, dirString, titleString;
+    Tcl_Encoding unicodeEncoding = TkWinGetUnicodeEncoding();
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    static CONST char *saveOptionStrings[] = {
+	"-defaultextension", "-filetypes", "-initialdir", "-initialfile",
+	"-parent", "-title", NULL
+    };
+    static CONST char *openOptionStrings[] = {
+	"-defaultextension", "-filetypes", "-initialdir", "-initialfile",
+	"-multiple", "-parent", "-title", NULL
+    };
+    CONST char **optionStrings;
+
+    enum options {
+	FILE_DEFAULT,	FILE_TYPES,	FILE_INITDIR,	FILE_INITFILE,
+	FILE_MULTIPLE,	FILE_PARENT,	FILE_TITLE
+    };
+
+    result = TCL_ERROR;
+    file[0] = '\0';
 
     /*
-     * 1. Parse the arguments.
+     * Parse the arguments.
      */
-    if (ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    custData = (OpenFileData*) ofnPtr->lCustData;
 
-    /*
-     * 2. Call the common dialog function.
-     */
-    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
-    GetCurrentDirectory(MAX_PATH+1, buffer);
-    if (isOpen) {
-	winCode = GetOpenFileName(ofnPtr);
+    extension = NULL;
+    filter = NULL;
+    Tcl_DStringInit(&utfFilterString);
+    Tcl_DStringInit(&utfDirString);
+    tkwin = (Tk_Window) clientData;
+    title = NULL;
+
+    if (open) {
+	optionStrings = openOptionStrings;
     } else {
-	winCode = GetSaveFileName(ofnPtr);
+	optionStrings = saveOptionStrings;
     }
-    SetCurrentDirectory(buffer);
-    (void) Tcl_SetServiceMode(oldMode);
+
+    for (i = 1; i < objc; i += 2) {
+	int index;
+	char *string;
+	Tcl_Obj *optionPtr, *valuePtr;
+
+	optionPtr = objv[i];
+	valuePtr = objv[i + 1];
+
+	if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings,
+		"option", 0, &index) != TCL_OK) {
+	    goto end;
+	}
+	/*
+	 * We want to maximize code sharing between the open and save file
+	 * dialog implementations; in particular, the switch statement below.
+	 * We use different sets of option strings from the GetIndexFromObj
+	 * call above, but a single enumeration for both.  The save file
+	 * dialog doesn't support -multiple, but it falls in the middle of
+	 * the enumeration.  Ultimately, this means that when the index found
+	 * by GetIndexFromObj is >= FILE_MULTIPLE, when doing a save file
+	 * dialog, we have to increment the index, so that it matches the
+	 * open file dialog enumeration.
+	 */
+	if (!open && index >= FILE_MULTIPLE) {
+	    index++;
+	}
+	if (i + 1 == objc) {
+	    string = Tcl_GetStringFromObj(optionPtr, NULL);
+	    Tcl_AppendResult(interp, "value for \"", string, "\" missing", 
+		    (char *) NULL);
+	    goto end;
+	}
+
+	string = Tcl_GetStringFromObj(valuePtr, NULL);
+	switch ((enum options) index) {
+	    case FILE_DEFAULT: {
+		if (string[0] == '.') {
+		    string++;
+		}
+		extension = string;
+		break;
+	    }
+	    case FILE_TYPES: {
+		Tcl_DStringFree(&utfFilterString);
+		if (MakeFilter(interp, string, &utfFilterString) != TCL_OK) {
+		    goto end;
+		}
+		filter = Tcl_DStringValue(&utfFilterString);
+		break;
+	    }
+	    case FILE_INITDIR: {
+		Tcl_DStringFree(&utfDirString);
+		if (Tcl_TranslateFileName(interp, string,
+			&utfDirString) == NULL) {
+		    goto end;
+		}
+		break;
+	    }
+	    case FILE_INITFILE: {
+		Tcl_DString ds;
+
+		if (Tcl_TranslateFileName(interp, string, &ds) == NULL) {
+		    goto end;
+		}
+		Tcl_UtfToExternal(NULL, unicodeEncoding, Tcl_DStringValue(&ds),
+			Tcl_DStringLength(&ds), 0, NULL, (char *) file,
+			sizeof(file), NULL, NULL, NULL);
+		break;
+	    }
+	    case FILE_MULTIPLE: {
+		if (Tcl_GetBooleanFromObj(interp, valuePtr,
+			&multi) != TCL_OK) {
+		    return TCL_ERROR;
+		}
+		break;
+	    }
+	    case FILE_PARENT: {
+		tkwin = Tk_NameToWindow(interp, string, tkwin);
+		if (tkwin == NULL) {
+		    goto end;
+		}
+		break;
+	    }
+	    case FILE_TITLE: {
+		title = string;
+		break;
+	    }
+	}
+    }
+
+    if (filter == NULL) {
+	if (MakeFilter(interp, "", &utfFilterString) != TCL_OK) {
+	    goto end;
+	}
+    }
+
+    Tk_MakeWindowExist(tkwin);
+    hWnd = Tk_GetHWND(Tk_WindowId(tkwin));
+
+    ZeroMemory(&ofn, sizeof(OPENFILENAMEW));
+    ofn.lStructSize		= sizeof(OPENFILENAMEW);
+    ofn.hwndOwner		= hWnd;
+#ifdef _WIN64
+    ofn.hInstance		= (HINSTANCE) GetWindowLongPtr(ofn.hwndOwner, 
+					GWLP_HINSTANCE);
+#else
+    ofn.hInstance		= (HINSTANCE) GetWindowLong(ofn.hwndOwner, 
+					GWL_HINSTANCE);
+#endif
+    ofn.lpstrFile		= (WCHAR *) file;
+    ofn.nMaxFile		= TK_MULTI_MAX_PATH;
+    ofn.Flags			= OFN_HIDEREADONLY | OFN_PATHMUSTEXIST 
+				  | OFN_NOCHANGEDIR | OFN_EXPLORER;
+    ofn.lpfnHook		= (LPOFNHOOKPROC) OFNHookProcW;
+    ofn.lCustData		= (LPARAM) interp;
+
+    if (open != 0) {
+	ofn.Flags |= OFN_FILEMUSTEXIST;
+    } else {
+	ofn.Flags |= OFN_OVERWRITEPROMPT;
+    }
+
+    if (tsdPtr->debugFlag != 0) {
+	ofn.Flags |= OFN_ENABLEHOOK;
+    }
+
+    if (multi != 0) {
+	ofn.Flags |= OFN_ALLOWMULTISELECT;
+    }
+
+    if (extension != NULL) {
+	Tcl_UtfToExternalDString(unicodeEncoding, extension, -1, &extString);
+	ofn.lpstrDefExt = (WCHAR *) Tcl_DStringValue(&extString);
+    }
+
+    Tcl_UtfToExternalDString(unicodeEncoding,
+	    Tcl_DStringValue(&utfFilterString),
+	    Tcl_DStringLength(&utfFilterString), &filterString);
+    ofn.lpstrFilter = (WCHAR *) Tcl_DStringValue(&filterString);
+
+    if (Tcl_DStringValue(&utfDirString)[0] != '\0') {
+	Tcl_UtfToExternalDString(unicodeEncoding,
+		Tcl_DStringValue(&utfDirString),
+		Tcl_DStringLength(&utfDirString), &dirString);
+    } else {
+	/*
+	 * NT 5.0 changed the meaning of lpstrInitialDir, so we have
+	 * to ensure that we set the [pwd] if the user didn't specify
+	 * anything else.
+	 */
+	Tcl_DString cwd;
+
+	Tcl_DStringFree(&utfDirString);
+	if ((Tcl_GetCwd(interp, &utfDirString) == (char *) NULL) ||
+		(Tcl_TranslateFileName(interp,
+			Tcl_DStringValue(&utfDirString), &cwd) == NULL)) {
+	    Tcl_ResetResult(interp);
+	} else {
+	    Tcl_UtfToExternalDString(unicodeEncoding, Tcl_DStringValue(&cwd),
+		    Tcl_DStringLength(&cwd), &dirString);
+	}
+	Tcl_DStringFree(&cwd);
+    }
+    ofn.lpstrInitialDir = (WCHAR *) Tcl_DStringValue(&dirString);
+
+    if (title != NULL) {
+	Tcl_UtfToExternalDString(unicodeEncoding, title, -1, &titleString);
+	ofn.lpstrTitle = (WCHAR *) Tcl_DStringValue(&titleString);
+    }
+
+    /*
+     * Popup the dialog.
+     */
+
+    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+    if (open != 0) {
+	winCode = GetOpenFileNameW(&ofn);
+    } else {
+	winCode = GetSaveFileNameW(&ofn);
+    }
+    Tcl_SetServiceMode(oldMode);
+    EatSpuriousMessageBugFix();
+
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
 
     /*
      * Clear the interp result since anything may have happened during the
@@ -475,197 +799,699 @@ GetFileName(clientData, interp, argc, argv, isOpen)
 
     Tcl_ResetResult(interp);
 
-    if (ofnPtr->lpstrInitialDir != NULL) {
-	ckfree((char*) ofnPtr->lpstrInitialDir);
-    }
-
     /*
-     * 3. Process the results.
+     * Process the results.
      */
-    if (winCode) {
-	char *p;
-	Tcl_ResetResult(interp);
 
-	for (p = custData->szFile; p && *p; p++) {
-	    /*
-	     * Change the pathname to the Tcl "normalized" pathname, where
-	     * back slashes are used instead of forward slashes
+    if (winCode != 0) {
+	if (ofn.Flags & OFN_ALLOWMULTISELECT) {
+            /*
+	     * The result in custData->szFile contains many items,
+	     * separated with null characters.  It is terminated with
+	     * two nulls in a row.  The first element is the directory
+	     * path.
 	     */
-	    if (*p == '\\') {
-		*p = '/';
+	    char *dir;
+	    char *p;
+	    char *file;
+	    WCHAR *files;
+	    Tcl_DString ds;
+	    Tcl_DString fullname, filename;
+	    Tcl_Obj *returnList;
+	    int count = 0;
+
+	    returnList = Tcl_NewObj();
+	    Tcl_IncrRefCount(returnList);
+
+	    files = ofn.lpstrFile;
+	    Tcl_ExternalToUtfDString(unicodeEncoding, (char *) files, -1, &ds);
+
+	    /* Get directory */
+	    dir = Tcl_DStringValue(&ds);
+	    for (p = dir; p && *p; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname, where
+		 * back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
 	    }
+
+	    while (*files != '\0') {
+		while (*files != '\0') {
+		    files++;
+		}
+		files++;
+		if (*files != '\0') {
+		    count++;
+		    Tcl_ExternalToUtfDString(unicodeEncoding,
+			    (char *)files, -1, &filename);
+		    file = Tcl_DStringValue(&filename);
+		    for (p = file; *p != '\0'; p++) {
+			if (*p == '\\') {
+			    *p = '/';
+			}
+		    }
+		    Tcl_DStringInit(&fullname);
+		    Tcl_DStringAppend(&fullname, dir, -1);
+		    Tcl_DStringAppend(&fullname, "/", -1);
+		    Tcl_DStringAppend(&fullname, file, -1);
+		    Tcl_ListObjAppendElement(interp, returnList,
+			    Tcl_NewStringObj(Tcl_DStringValue(&fullname), -1));
+		    Tcl_DStringFree(&fullname);
+		    Tcl_DStringFree(&filename);
+		}
+	    }
+	    if (count == 0) {
+		/*
+		 * Only one file was returned.
+		 */
+		Tcl_ListObjAppendElement(interp, returnList,
+			Tcl_NewStringObj(dir, -1));
+	    }
+	    Tcl_SetObjResult(interp, returnList);
+	    Tcl_DecrRefCount(returnList);
+	    Tcl_DStringFree(&ds);
+	} else {
+	    char *p;
+	    Tcl_DString ds;
+	    
+	    Tcl_ExternalToUtfDString(unicodeEncoding,
+		    (char *) ofn.lpstrFile, -1, &ds);
+	    for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname, where
+		 * back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
+	    }
+	    Tcl_AppendResult(interp, Tcl_DStringValue(&ds), NULL);
+	    Tcl_DStringFree(&ds);
 	}
-	Tcl_AppendResult(interp, custData->szFile, NULL);
-	tclCode = TCL_OK;
+	result = TCL_OK;
     } else {
-	tclCode = ProcessCDError(interp, CommDlgExtendedError(),
-		ofnPtr->hwndOwner);
+	/*
+	 * Use the CommDlgExtendedError() function to retrieve the error code.
+	 * This function can return one of about two dozen codes; most of
+	 * these indicate some sort of gross system failure (insufficient
+	 * memory, bad window handles, etc.).  Most of the error codes will be
+	 * ignored; as we find we want more specific error messages for
+	 * particular errors, we can extend the code as needed.
+	 *
+	 * We could also check for FNERR_BUFFERTOOSMALL, but we can't
+	 * really do anything about it when it happens.
+	 */
+
+	if (CommDlgExtendedError() == FNERR_INVALIDFILENAME) {
+	    char *p;
+	    Tcl_DString ds;
+	    
+	    Tcl_ExternalToUtfDString(unicodeEncoding,
+		    (char *) ofn.lpstrFile, -1, &ds);
+	    for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname,
+		 * where back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
+	    }
+	    Tcl_SetResult(interp, "invalid filename \"", TCL_STATIC);
+	    Tcl_AppendResult(interp, Tcl_DStringValue(&ds), "\"", NULL);
+	    Tcl_DStringFree(&ds);
+	} else {
+	    result = TCL_OK;
+	}
+    }
+    
+    if (ofn.lpstrTitle != NULL) {
+	Tcl_DStringFree(&titleString);
+    }
+    if (ofn.lpstrInitialDir != NULL) {
+	Tcl_DStringFree(&dirString);
+    }
+    Tcl_DStringFree(&filterString);
+    if (ofn.lpstrDefExt != NULL) {
+	Tcl_DStringFree(&extString);
     }
 
-    if (custData) {
-	ckfree((char*)custData);
-    }
-    if (ofnPtr->lpstrFilter) {
-	ckfree((char*)ofnPtr->lpstrFilter);
-    }
+    end:
+    Tcl_DStringFree(&utfDirString);
+    Tcl_DStringFree(&utfFilterString);
 
-    return tclCode;
+    return result;
+}
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * OFNHookProcW --
+ *
+ *	Hook procedure called only if debugging is turned on.  Sets
+ *	the "tk_dialog" variable when the dialog is ready to receive
+ *	messages.
+ *
+ * Results:
+ *	Returns 0 to allow default processing of messages to occur.
+ *
+ * Side effects:
+ *	None.
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static UINT APIENTRY 
+OFNHookProcW(
+    HWND hdlg,		// handle to child dialog window
+    UINT uMsg,		// message identifier
+    WPARAM wParam,	// message parameter
+    LPARAM lParam) 	// message parameter
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    OPENFILENAMEW *ofnPtr;
+
+    if (uMsg == WM_INITDIALOG) {
+#ifdef _WIN64
+	SetWindowLongPtr(hdlg, GWLP_USERDATA, lParam);
+#else
+	SetWindowLong(hdlg, GWL_USERDATA, lParam);
+#endif
+    } else if (uMsg == WM_WINDOWPOSCHANGED) {
+	/*
+	 * This message is delivered at the right time to enable Tk
+	 * to set the debug information.  Unhooks itself so it 
+	 * won't set the debug information every time it gets a 
+	 * WM_WINDOWPOSCHANGED message.
+	 */
+
+#ifdef _WIN64
+        ofnPtr = (OPENFILENAMEW *) GetWindowLongPtr(hdlg, GWLP_USERDATA);
+#else
+        ofnPtr = (OPENFILENAMEW *) GetWindowLong(hdlg, GWL_USERDATA);
+#endif
+	if (ofnPtr != NULL) {
+	    hdlg = GetParent(hdlg);
+	    tsdPtr->debugInterp = (Tcl_Interp *) ofnPtr->lCustData;
+	    Tcl_DoWhenIdle(SetTkDialog, (ClientData) hdlg);
+#ifdef _WIN64
+	    SetWindowLongPtr(hdlg, GWLP_USERDATA, (LPARAM) NULL);
+#else
+	    SetWindowLong(hdlg, GWL_USERDATA, (LPARAM) NULL);
+#endif
+	}
+    }
+    return 0;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ParseFileDlgArgs --
+ * GetFileNameA --
  *
- *	Parses the arguments passed to tk_getOpenFile and tk_getSaveFile.
+ *	Calls GetOpenFileName() or GetSaveFileName().
  *
  * Results:
- *	A standard TCL return value.
+ *	See user documentation.
  *
  * Side effects:
- *	The OPENFILENAME structure is initialized and modified according
- *	to the arguments.
+ *	See user documentation.
  *
  *----------------------------------------------------------------------
  */
 
 static int 
-ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
-    Tcl_Interp * interp;	/* Current interpreter. */
-    OPENFILENAME *ofnPtr;	/* Info about the file dialog */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
-    int isOpen;			/* true if we should call GetOpenFileName(),
-				 * false if we should call GetSaveFileName() */
+GetFileNameA(clientData, interp, objc, objv, open)
+    ClientData clientData;	/* Main window associated with interpreter. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+    int open;			/* 1 to call GetOpenFileName(), 0 to 
+				 * call GetSaveFileName(). */
 {
-    OpenFileData * custData;
-    int i;
-    Tk_Window parent = Tk_MainWindow(interp);
-    int doneFilter = 0;
-    int windowsMajorVersion;
-    Tcl_DString buffer;
+    OPENFILENAME ofn;
+    TCHAR file[TK_MULTI_MAX_PATH], savePath[MAX_PATH];
+    int result, winCode, oldMode, i, multi = 0;
+    char *extension, *filter, *title;
+    Tk_Window tkwin;
+    HWND hWnd;
+    Tcl_DString utfFilterString, utfDirString;
+    Tcl_DString extString, filterString, dirString, titleString;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    static CONST char *saveOptionStrings[] = {
+	"-defaultextension", "-filetypes", "-initialdir", "-initialfile",
+	"-parent", "-title", NULL
+    };
+    static CONST char *openOptionStrings[] = {
+	"-defaultextension", "-filetypes", "-initialdir", "-initialfile",
+	"-multiple", "-parent", "-title", NULL
+    };
+    CONST char **optionStrings;
 
-    custData = (OpenFileData*)ckalloc(sizeof(OpenFileData));
-    custData->interp = interp;
-    strcpy(custData->szFile, "");
+    enum options {
+	FILE_DEFAULT,	FILE_TYPES,	FILE_INITDIR,	FILE_INITFILE,
+	FILE_MULTIPLE,	FILE_PARENT,	FILE_TITLE
+    };
 
-    /* Fill in the OPENFILENAME structure to */
-    ofnPtr->lStructSize       = sizeof(OPENFILENAME);
-    ofnPtr->hwndOwner         = 0;			/* filled in below */
-    ofnPtr->lpstrFilter       = NULL;
-    ofnPtr->lpstrCustomFilter = NULL;
-    ofnPtr->nMaxCustFilter    = 0;
-    ofnPtr->nFilterIndex      = 0;
-    ofnPtr->lpstrFile         = custData->szFile;
-    ofnPtr->nMaxFile          = sizeof(custData->szFile);
-    ofnPtr->lpstrFileTitle    = NULL;
-    ofnPtr->nMaxFileTitle     = 0;
-    ofnPtr->lpstrInitialDir   = NULL;
-    ofnPtr->lpstrTitle        = NULL;
-    ofnPtr->nFileOffset       = 0;
-    ofnPtr->nFileExtension    = 0;
-    ofnPtr->lpstrDefExt       = NULL;
-    ofnPtr->lpfnHook 	      = NULL; 
-    ofnPtr->lCustData         = (DWORD)custData;
-    ofnPtr->lpTemplateName    = NULL;
-    ofnPtr->Flags             = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
+    result = TCL_ERROR;
+    file[0] = '\0';
 
-    windowsMajorVersion = LOBYTE(LOWORD(GetVersion()));
-    if (windowsMajorVersion >= 4) {
-	/*
-	 * Use the "explorer" style file selection box on platforms that
-	 * support it (Win95 and NT4.0, both have a major version number
-	 * of 4)
-	 */
-	ofnPtr->Flags |= OFN_EXPLORER;
-    }
+    /*
+     * Parse the arguments.
+     */
 
+    extension = NULL;
+    filter = NULL;
+    Tcl_DStringInit(&utfFilterString);
+    Tcl_DStringInit(&utfDirString);
+    tkwin = (Tk_Window) clientData;
+    title = NULL;
 
-    if (isOpen) {
-	ofnPtr->Flags |= OFN_FILEMUSTEXIST;
+    if (open) {
+	optionStrings = openOptionStrings;
     } else {
-	ofnPtr->Flags |= OFN_OVERWRITEPROMPT;
+	optionStrings = saveOptionStrings;
     }
 
-    for (i=1; i<argc; i+=2) {
-        int v = i+1;
-	int len = strlen(argv[i]);
+    for (i = 1; i < objc; i += 2) {
+	int index;
+	char *string;
+	Tcl_Obj *optionPtr, *valuePtr;
 
-	if (strncmp(argv[i], "-defaultextension", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	optionPtr = objv[i];
+	valuePtr = objv[i + 1];
 
-	    ofnPtr->lpstrDefExt = argv[v];
-	    if (ofnPtr->lpstrDefExt[0] == '.') {
-		/* Windows will insert the dot for us */
-		ofnPtr->lpstrDefExt ++;
+	if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings,
+		"option", 0, &index) != TCL_OK) {
+	    goto end;
+	}
+	/*
+	 * We want to maximize code sharing between the open and save file
+	 * dialog implementations; in particular, the switch statement below.
+	 * We use different sets of option strings from the GetIndexFromObj
+	 * call above, but a single enumeration for both.  The save file
+	 * dialog doesn't support -multiple, but it falls in the middle of
+	 * the enumeration.  Ultimately, this means that when the index found
+	 * by GetIndexFromObj is >= FILE_MULTIPLE, when doing a save file
+	 * dialog, we have to increment the index, so that it matches the
+	 * open file dialog enumeration.
+	 */
+	if (!open && index >= FILE_MULTIPLE) {
+	    index++;
+	}
+	if (i + 1 == objc) {
+	    string = Tcl_GetStringFromObj(optionPtr, NULL);
+	    Tcl_AppendResult(interp, "value for \"", string, "\" missing", 
+		    (char *) NULL);
+	    goto end;
+	}
+
+	string = Tcl_GetStringFromObj(valuePtr, NULL);
+	switch ((enum options) index) {
+	    case FILE_DEFAULT: {
+		if (string[0] == '.') {
+		    string++;
+		}
+		extension = string;
+		break;
 	    }
-	}
-	else if (strncmp(argv[i], "-filetypes", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    if (MakeFilter(interp, ofnPtr, argv[v]) != TCL_OK) {
-		return TCL_ERROR;
+	    case FILE_TYPES: {
+		Tcl_DStringFree(&utfFilterString);
+		if (MakeFilter(interp, string, &utfFilterString) != TCL_OK) {
+		    goto end;
+		}
+		filter = Tcl_DStringValue(&utfFilterString);
+		break;
 	    }
-	    doneFilter = 1;
-	}
-	else if (strncmp(argv[i], "-initialdir", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    if (Tcl_TranslateFileName(interp, argv[v], &buffer) == NULL) {
-		return TCL_ERROR;
+	    case FILE_INITDIR: {
+		Tcl_DStringFree(&utfDirString);
+		if (Tcl_TranslateFileName(interp, string,
+			&utfDirString) == NULL) {
+		    goto end;
+		}
+		break;
 	    }
-	    ofnPtr->lpstrInitialDir = ckalloc(Tcl_DStringLength(&buffer)+1);
-	    strcpy((char*)ofnPtr->lpstrInitialDir, Tcl_DStringValue(&buffer));
-	    Tcl_DStringFree(&buffer);
-	}
-	else if (strncmp(argv[i], "-initialfile", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	    case FILE_INITFILE: {
+		Tcl_DString ds;
 
-	    if (Tcl_TranslateFileName(interp, argv[v], &buffer) == NULL) {
-		return TCL_ERROR;
+		if (Tcl_TranslateFileName(interp, string, &ds) == NULL) {
+		    goto end;
+		}
+		Tcl_UtfToExternal(NULL, NULL, Tcl_DStringValue(&ds), 
+			Tcl_DStringLength(&ds), 0, NULL, (char *) file, 
+			sizeof(file), NULL, NULL, NULL);
+		break;
 	    }
-	    strcpy(ofnPtr->lpstrFile, Tcl_DStringValue(&buffer));
-	    Tcl_DStringFree(&buffer);
-	}
-	else if (strncmp(argv[i], "-parent", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    parent=Tk_NameToWindow(interp, argv[v], Tk_MainWindow(interp));
-	    if (parent == NULL) {
-		return TCL_ERROR;
+	    case FILE_MULTIPLE: {
+		if (Tcl_GetBooleanFromObj(interp, valuePtr,
+			&multi) != TCL_OK) {
+		    return TCL_ERROR;
+		}
+		break;
 	    }
-	}
-	else if (strncmp(argv[i], "-title", len)==0) {
-	    if (v==argc) {goto arg_missing;}
-
-	    ofnPtr->lpstrTitle = argv[v];
-	}
-	else {
-    	    Tcl_AppendResult(interp, "unknown option \"", 
-		argv[i], "\", must be -defaultextension, ",
-		"-filetypes, -initialdir, -initialfile, -parent or -title",
-		NULL);
-	    return TCL_ERROR;
+	    case FILE_PARENT: {
+		tkwin = Tk_NameToWindow(interp, string, tkwin);
+		if (tkwin == NULL) {
+		    goto end;
+		}
+		break;
+	    }
+	    case FILE_TITLE: {
+		title = string;
+		break;
+	    }
 	}
     }
 
-    if (!doneFilter) {
-	if (MakeFilter(interp, ofnPtr, "") != TCL_OK) {
-	    return TCL_ERROR;
+    if (filter == NULL) {
+	if (MakeFilter(interp, "", &utfFilterString) != TCL_OK) {
+	    goto end;
 	}
     }
 
-    if (Tk_WindowId(parent) == None) {
-	Tk_MakeWindowExist(parent);
+    Tk_MakeWindowExist(tkwin);
+    hWnd = Tk_GetHWND(Tk_WindowId(tkwin));
+
+    ofn.lStructSize		= sizeof(ofn);
+    ofn.hwndOwner		= hWnd;
+#ifdef _WIN64
+    ofn.hInstance		= (HINSTANCE) GetWindowLongPtr(ofn.hwndOwner, 
+					GWLP_HINSTANCE);
+#else
+    ofn.hInstance		= (HINSTANCE) GetWindowLong(ofn.hwndOwner, 
+					GWL_HINSTANCE);
+#endif
+    ofn.lpstrFilter		= NULL;
+    ofn.lpstrCustomFilter	= NULL;
+    ofn.nMaxCustFilter		= 0;
+    ofn.nFilterIndex		= 0;
+    ofn.lpstrFile		= (LPTSTR) file;
+    ofn.nMaxFile		= TK_MULTI_MAX_PATH;
+    ofn.lpstrFileTitle		= NULL;
+    ofn.nMaxFileTitle		= 0;
+    ofn.lpstrInitialDir		= NULL;
+    ofn.lpstrTitle		= NULL;
+    ofn.Flags			= OFN_HIDEREADONLY | OFN_PATHMUSTEXIST 
+				  | OFN_NOCHANGEDIR | OFN_EXPLORER;
+    ofn.nFileOffset		= 0;
+    ofn.nFileExtension		= 0;
+    ofn.lpstrDefExt		= NULL;
+    ofn.lpfnHook		= (LPOFNHOOKPROC) OFNHookProc;
+    ofn.lCustData		= (LPARAM) interp;
+    ofn.lpTemplateName		= NULL;
+
+    if (open != 0) {
+	ofn.Flags |= OFN_FILEMUSTEXIST;
+    } else {
+	ofn.Flags |= OFN_OVERWRITEPROMPT;
     }
-    ofnPtr->hwndOwner = Tk_GetHWND(Tk_WindowId(parent));
 
-    return TCL_OK;
+    if (tsdPtr->debugFlag != 0) {
+	ofn.Flags |= OFN_ENABLEHOOK;
+    }
 
-  arg_missing:
-    Tcl_AppendResult(interp, "value for \"", argv[argc-1], "\" missing",
-	NULL);
-    return TCL_ERROR;
+    if (multi != 0) {
+	ofn.Flags |= OFN_ALLOWMULTISELECT;
+    }
+
+    if (extension != NULL) {
+	Tcl_UtfToExternalDString(NULL, extension, -1, &extString);
+	ofn.lpstrDefExt = (LPTSTR) Tcl_DStringValue(&extString);
+    }
+    Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&utfFilterString),
+	    Tcl_DStringLength(&utfFilterString), &filterString);
+    ofn.lpstrFilter = (LPTSTR) Tcl_DStringValue(&filterString);
+
+    if (Tcl_DStringValue(&utfDirString)[0] != '\0') {
+	Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&utfDirString),
+		Tcl_DStringLength(&utfDirString), &dirString);
+    } else {
+	/*
+	 * NT 5.0 changed the meaning of lpstrInitialDir, so we have
+	 * to ensure that we set the [pwd] if the user didn't specify
+	 * anything else.
+	 */
+	Tcl_DString cwd;
+
+	Tcl_DStringFree(&utfDirString);
+	if ((Tcl_GetCwd(interp, &utfDirString) == (char *) NULL) ||
+		(Tcl_TranslateFileName(interp,
+			Tcl_DStringValue(&utfDirString), &cwd) == NULL)) {
+	    Tcl_ResetResult(interp);
+	} else {
+	    Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&cwd),
+		    Tcl_DStringLength(&cwd), &dirString);
+	}
+	Tcl_DStringFree(&cwd);
+    }
+    ofn.lpstrInitialDir = (LPTSTR) Tcl_DStringValue(&dirString);
+
+    if (title != NULL) {
+	Tcl_UtfToExternalDString(NULL, title, -1, &titleString);
+	ofn.lpstrTitle = (LPTSTR) Tcl_DStringValue(&titleString);
+    }
+
+    /*
+     * Popup the dialog.
+     */
+
+    GetCurrentDirectory(MAX_PATH, savePath);
+    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+    if (open != 0) {
+	winCode = GetOpenFileName(&ofn);
+    } else {
+	winCode = GetSaveFileName(&ofn);
+    }
+    Tcl_SetServiceMode(oldMode);
+    EatSpuriousMessageBugFix();
+    SetCurrentDirectory(savePath);
+
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
+
+    /*
+     * Clear the interp result since anything may have happened during the
+     * modal loop.
+     */
+
+    Tcl_ResetResult(interp);
+
+    /*
+     * Process the results.
+     */
+
+    if (winCode != 0) {
+	if (ofn.Flags & OFN_ALLOWMULTISELECT) {
+            /*
+	     * The result in custData->szFile contains many items,
+	     * separated with null characters.  It is terminated with
+	     * two nulls in a row.  The first element is the directory
+	     * path.
+	     */
+	    char *dir;
+	    char *p;
+	    char *file;
+	    char *files;
+	    Tcl_DString ds;
+	    Tcl_DString fullname, filename;
+	    Tcl_Obj *returnList;
+	    int count = 0;
+
+	    returnList = Tcl_NewObj();
+	    Tcl_IncrRefCount(returnList);
+
+	    files = ofn.lpstrFile;
+	    Tcl_ExternalToUtfDString(NULL, (char *) files, -1, &ds);
+
+	    /* Get directory */
+	    dir = Tcl_DStringValue(&ds);
+	    for (p = dir; p && *p; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname, where
+		 * back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
+	    }
+
+	    while (*files != '\0') {
+		while (*files != '\0') {
+		    files++;
+		}
+		files++;
+		if (*files != '\0') {
+		    count++;
+		    Tcl_ExternalToUtfDString(NULL,
+			    (char *)files, -1, &filename);
+		    file = Tcl_DStringValue(&filename);
+		    for (p = file; *p != '\0'; p++) {
+			if (*p == '\\') {
+			    *p = '/';
+			}
+		    }
+		    Tcl_DStringInit(&fullname);
+		    Tcl_DStringAppend(&fullname, dir, -1);
+		    Tcl_DStringAppend(&fullname, "/", -1);
+		    Tcl_DStringAppend(&fullname, file, -1);
+		    Tcl_ListObjAppendElement(interp, returnList,
+			    Tcl_NewStringObj(Tcl_DStringValue(&fullname), -1));
+		    Tcl_DStringFree(&fullname);
+		    Tcl_DStringFree(&filename);
+		}
+	    }
+	    if (count == 0) {
+		/*
+		 * Only one file was returned.
+		 */
+		Tcl_ListObjAppendElement(interp, returnList,
+			Tcl_NewStringObj(dir, -1));
+	    }
+	    Tcl_SetObjResult(interp, returnList);
+	    Tcl_DecrRefCount(returnList);
+	    Tcl_DStringFree(&ds);
+	} else {
+	    char *p;
+	    Tcl_DString ds;
+
+	    Tcl_ExternalToUtfDString(NULL, (char *) ofn.lpstrFile, -1, &ds);
+	    for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname, where
+		 * back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
+	    }
+	    Tcl_AppendResult(interp, Tcl_DStringValue(&ds), NULL);
+	    Tcl_DStringFree(&ds);
+	}
+	result = TCL_OK;
+    } else {
+	/*
+	 * Use the CommDlgExtendedError() function to retrieve the error code.
+	 * This function can return one of about two dozen codes; most of
+	 * these indicate some sort of gross system failure (insufficient
+	 * memory, bad window handles, etc.).  Most of the error codes will be
+	 * ignored;; as we find we want specific error messages for particular
+	 * errors, we can extend the code as needed.
+	 *
+	 * We could also check for FNERR_BUFFERTOOSMALL, but we can't
+	 * really do anything about it when it happens.
+	 */
+	if (CommDlgExtendedError() == FNERR_INVALIDFILENAME) {
+	    char *p;
+	    Tcl_DString ds;
+
+	    Tcl_ExternalToUtfDString(NULL, (char *) ofn.lpstrFile, -1, &ds);
+	    for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+		/*
+		 * Change the pathname to the Tcl "normalized" pathname,
+		 * where back slashes are used instead of forward slashes
+		 */
+		if (*p == '\\') {
+		    *p = '/';
+		}
+	    }
+	    Tcl_SetResult(interp, "invalid filename \"", TCL_STATIC);
+	    Tcl_AppendResult(interp, Tcl_DStringValue(&ds), "\"", NULL);
+	    Tcl_DStringFree(&ds);
+	} else {
+	    result = TCL_OK;
+	}
+    }
+
+    if (ofn.lpstrTitle != NULL) {
+	Tcl_DStringFree(&titleString);
+    }
+    if (ofn.lpstrInitialDir != NULL) {
+	Tcl_DStringFree(&dirString);
+    }
+    Tcl_DStringFree(&filterString);
+    if (ofn.lpstrDefExt != NULL) {
+	Tcl_DStringFree(&extString);
+    }
+
+    end:
+    Tcl_DStringFree(&utfDirString);
+    Tcl_DStringFree(&utfFilterString);
+
+    return result;
+}
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * OFNHookProc --
+ *
+ *	Hook procedure called only if debugging is turned on.  Sets
+ *	the "tk_dialog" variable when the dialog is ready to receive
+ *	messages.
+ *
+ * Results:
+ *	Returns 0 to allow default processing of messages to occur.
+ *
+ * Side effects:
+ *	None.
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static UINT APIENTRY 
+OFNHookProc(
+    HWND hdlg,		// handle to child dialog window
+    UINT uMsg,		// message identifier
+    WPARAM wParam,	// message parameter
+    LPARAM lParam) 	// message parameter
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    OPENFILENAME *ofnPtr;
+
+    if (uMsg == WM_INITDIALOG) {
+#ifdef _WIN64
+	SetWindowLongPtr(hdlg, GWLP_USERDATA, lParam);
+#else
+	SetWindowLong(hdlg, GWL_USERDATA, lParam);
+#endif
+    } else if (uMsg == WM_WINDOWPOSCHANGED) {
+	/*
+	 * This message is delivered at the right time to both 
+	 * old-style and explorer-style hook procs to enable Tk
+	 * to set the debug information.  Unhooks itself so it 
+	 * won't set the debug information every time it gets a 
+	 * WM_WINDOWPOSCHANGED message.
+	 */
+
+#ifdef _WIN64
+        ofnPtr = (OPENFILENAME *) GetWindowLongPtr(hdlg, GWLP_USERDATA);
+#else
+        ofnPtr = (OPENFILENAME *) GetWindowLong(hdlg, GWL_USERDATA);
+#endif
+	if (ofnPtr != NULL) {
+	    if (ofnPtr->Flags & OFN_EXPLORER) {
+		hdlg = GetParent(hdlg);
+	    }
+	    tsdPtr->debugInterp = (Tcl_Interp *) ofnPtr->lCustData;
+	    Tcl_DoWhenIdle(SetTkDialog, (ClientData) hdlg);
+#ifdef _WIN64
+	    SetWindowLongPtr(hdlg, GWLP_USERDATA, (LPARAM) NULL);
+#else
+	    SetWindowLong(hdlg, GWL_USERDATA, (LPARAM) NULL);
+#endif
+	}
+    }
+    return 0;
 }
 
 /*
@@ -684,10 +1510,11 @@ ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
  *
  *----------------------------------------------------------------------
  */
-static int MakeFilter(interp, ofnPtr, string) 
+static int 
+MakeFilter(interp, string, dsPtr) 
     Tcl_Interp *interp;		/* Current interpreter. */
-    OPENFILENAME *ofnPtr;	/* Info about the file dialog */
     char *string;		/* String value of the -filetypes option */
+    Tcl_DString *dsPtr;		/* Filled with windows filter string. */
 {
     char *filterStr;
     char *p;
@@ -702,7 +1529,7 @@ static int MakeFilter(interp, ofnPtr, string)
 
     if (flist.filters == NULL) {
 	/*
-	 * Use "All Files (*.*) as the default filter is none is specified
+	 * Use "All Files (*.*) as the default filter if none is specified
 	 */
 	char *defaultFilter = "All Files (*.*)";
 
@@ -732,7 +1559,7 @@ static int MakeFilter(interp, ofnPtr, string)
 	 * Since we may only add asterisks (*) to the filter, we need at most
 	 * twice the size of the string to format the filter
 	 */
-	filterStr = ckalloc(strlen(string) * 3);
+	filterStr = ckalloc((unsigned int) strlen(string) * 3);
 
 	for (filterPtr = flist.filters, p = filterStr; filterPtr;
 	        filterPtr = filterPtr->next) {
@@ -790,19 +1617,890 @@ static int MakeFilter(interp, ofnPtr, string)
 	*p = '\0';
     }
 
-    if (ofnPtr->lpstrFilter != NULL) {
-	ckfree((char*)ofnPtr->lpstrFilter);
-    }
-    ofnPtr->lpstrFilter = filterStr;
+    Tcl_DStringAppend(dsPtr, filterStr, (int) (p - filterStr));
+    ckfree((char *) filterStr);
 
     TkFreeFileFilters(&flist);
     return TCL_OK;
 }
 
+#ifdef USE_NEW_CHOOSEDIR
 /*
  *----------------------------------------------------------------------
  *
- * Tk_MessageBoxCmd --
+ * Tk_ChooseDirectoryObjCmd --
+ *
+ * This procedure implements the "tk_chooseDirectory" dialog box
+ * for the Windows platform. See the user documentation for details
+ * on what it does. Uses the newer SHBrowseForFolder explorer type
+ * interface.
+ *
+ * Results:
+ * See user documentation.
+ *
+ * Side effects:
+ * A modal dialog window is created.  Tcl_SetServiceMode() is
+ * called to allow background events to be processed
+ *
+ *----------------------------------------------------------------------
+
+The procedure tk_chooseDirectory pops up a dialog box for the user to
+select a directory.  The following option-value pairs are possible as
+command line arguments:
+
+-initialdir dirname
+
+Specifies that the directories in directory should be displayed when the
+dialog pops up.  If this parameter is not specified, then the directories
+in the current working directory are displayed.  If the parameter specifies
+a relative path, the return value will convert the relative path to an
+absolute path.  This option may not always work on the Macintosh.  This is
+not a bug.  Rather, the General Controls control panel on the Mac allows
+the end user to override the application default directory.
+
+-parent window
+
+Makes window the logical parent of the dialog.  The dialog is displayed on
+top of its parent window.
+
+-title titleString
+
+Specifies a string to display as the title of the dialog box.  If this
+option is not specified, then a default title will be displayed.
+
+-mustexist boolean
+
+Specifies whether the user may specify non-existant directories.  If this
+parameter is true, then the user may only select directories that already
+exist.  The default value is false.
+
+New Behaviour:
+
+- If mustexist = 0 and a user entered folder does not exist, a prompt will
+  pop-up asking if the user wants another chance to change it. The old
+  dialog just returned the bogus entry. On mustexist = 1, the entries MUST
+  exist before exiting the box with OK.
+
+  Bugs:
+
+- If valid abs directory name is entered into the entry box and Enter
+  pressed, the box will close returning the name. This is inconsistent when
+  entering relative names or names with forward slashes, which are
+  invalidated then corrected in the callback. After correction, the box is
+  held open to allow further modification by the user.
+
+- Not sure how to implement localization of message prompts.
+
+- -title is really -message.
+ToDo:
+- Fix bugs.
+- test to see what platforms this really works on.  May require v4.71
+  of shell32.dll everywhere (what is standard?).
+ *
+ */
+int
+Tk_ChooseDirectoryObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;      /* Main window associated with interpreter. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+    char path[MAX_PATH];
+    int oldMode, result, i;
+    LPCITEMIDLIST pidl;		/* Returned by browser */
+    BROWSEINFO bInfo;		/* Used by browser */
+    CHOOSEDIRDATA cdCBData;	/* Structure to pass back and forth */
+    LPMALLOC pMalloc;		/* Used by shell */
+
+    Tk_Window tkwin;
+    HWND hWnd;
+    char *utfTitle;		/* Title for window */
+    TCHAR saveDir[MAX_PATH];
+    Tcl_DString titleString;	/* UTF Title */
+    Tcl_DString initDirString;	/* Initial directory */
+    static CONST char *optionStrings[] = {
+        "-initialdir", "-mustexist",  "-parent",  "-title", (char *) NULL
+    };
+    enum options {
+        DIR_INITIAL,   DIR_EXIST,  DIR_PARENT, FILE_TITLE
+    };
+
+    /*
+     * Initialize
+     */
+    result		= TCL_ERROR;
+    path[0]		= '\0';
+    utfTitle		= NULL;
+
+    ZeroMemory(&cdCBData, sizeof(CHOOSEDIRDATA));
+    cdCBData.interp	= interp;
+
+    tkwin = (Tk_Window) clientData;
+    /*
+     * Process the command line options
+     */
+    for (i = 1; i < objc; i += 2) {
+        int index;
+        char *string;
+        Tcl_Obj *optionPtr, *valuePtr;
+
+        optionPtr = objv[i];
+        valuePtr = objv[i + 1];
+
+        if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings, "option",
+                0, &index) != TCL_OK) {
+            goto cleanup;
+        }
+        if (i + 1 == objc) {
+            string = Tcl_GetStringFromObj(optionPtr, NULL);
+            Tcl_AppendResult(interp, "value for \"", string, "\" missing",
+                    (char *) NULL);
+            goto cleanup;
+        }
+
+	string = Tcl_GetString(valuePtr);
+        switch ((enum options) index) {
+            case DIR_INITIAL: {
+                if (Tcl_TranslateFileName(interp, string,
+			&initDirString) == NULL) {
+		    goto cleanup;
+		}
+                string = Tcl_DStringValue(&initDirString);
+                /*
+                 * Convert possible relative path to full path to keep
+                 * dialog happy
+                 */
+                GetFullPathName(string, MAX_PATH, saveDir, NULL);
+                lstrcpyn(cdCBData.utfInitDir, saveDir, MAX_PATH);
+                Tcl_DStringFree(&initDirString);
+                break;
+            }
+            case DIR_EXIST: {
+                if (Tcl_GetBooleanFromObj(interp, valuePtr,
+                        &cdCBData.mustExist) != TCL_OK) {
+                    goto cleanup;
+                }
+                break;
+            }
+            case DIR_PARENT: {
+                tkwin = Tk_NameToWindow(interp, string, tkwin);
+                if (tkwin == NULL) {
+                    goto cleanup;
+                }
+                break;
+            }
+            case FILE_TITLE: {
+                utfTitle = string;
+                break;
+            }
+        }
+    }
+
+    /*
+     * Get ready to call the browser
+     */
+
+    Tk_MakeWindowExist(tkwin);
+    hWnd = Tk_GetHWND(Tk_WindowId(tkwin));
+
+    /*
+     * Setup the parameters used by SHBrowseForFolder
+     */
+
+    bInfo.hwndOwner      = hWnd;
+    bInfo.pszDisplayName = path;
+    bInfo.pidlRoot       = NULL;
+    if (lstrlen(cdCBData.utfInitDir) == 0) {
+        GetCurrentDirectory(MAX_PATH, cdCBData.utfInitDir);
+    }
+    bInfo.lParam = (LPARAM) &cdCBData;
+
+    if (utfTitle != NULL) {
+        Tcl_UtfToExternalDString(NULL, utfTitle, -1, &titleString);
+        bInfo.lpszTitle = (LPTSTR) Tcl_DStringValue(&titleString);
+    } else {
+        bInfo.lpszTitle = "Please choose a directory, then select OK.";
+    }
+
+    /*
+     * Set flags to add edit box (needs 4.71 Shell DLLs), status text line,
+     * validate edit box and
+     */
+    bInfo.ulFlags  =  BIF_EDITBOX | BIF_STATUSTEXT | BIF_RETURNFSANCESTORS
+        | BIF_VALIDATE;
+
+    /*
+     * Callback to handle events
+     */
+    bInfo.lpfn     = (BFFCALLBACK) ChooseDirectoryValidateProc;
+
+    /*
+     * Display dialog in background and process result.
+     * We look to give the user a chance to change their mind
+     * on an invalid folder if mustexist is 0;
+     */
+
+    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+    GetCurrentDirectory(MAX_PATH, saveDir);
+    if (SHGetMalloc(&pMalloc) == NOERROR) {
+	pidl = SHBrowseForFolder(&bInfo);
+	/* Null for cancel button or invalid dir, otherwise valid*/
+	if (pidl != NULL) {
+	    if (!SHGetPathFromIDList(pidl, path)) {
+		Tcl_SetResult(interp, "Error: Not a file system folder\n",
+			TCL_VOLATILE);
+	    };
+	    pMalloc->lpVtbl->Free(pMalloc, (void *) pidl);
+	} else if (lstrlen(cdCBData.utfRetDir) > 0) {
+	    lstrcpy(path, cdCBData.utfRetDir);
+	}
+	pMalloc->lpVtbl->Release(pMalloc);
+    }
+    SetCurrentDirectory(saveDir);
+    Tcl_SetServiceMode(oldMode);
+
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
+
+    /*
+     * Change the pathname to the Tcl "normalized" pathname, where
+     * back slashes are used instead of forward slashes
+     */
+    Tcl_ResetResult(interp);
+    if (*path) {
+        char *p;
+        Tcl_DString ds;
+
+        Tcl_ExternalToUtfDString(NULL, (char *) path, -1, &ds);
+        for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+            if (*p == '\\') {
+                *p = '/';
+            }
+        }
+        Tcl_AppendResult(interp, Tcl_DStringValue(&ds), NULL);
+        Tcl_DStringFree(&ds);
+    }
+
+    result = TCL_OK;
+
+    if (utfTitle != NULL) {
+        Tcl_DStringFree(&titleString);
+    }
+
+    cleanup:
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ChooseDirectoryValidateProc --
+ *
+ * Hook procedure called by the explorer ChooseDirectory dialog when events
+ * occur.  It is used to validate the text entry the user may have entered.
+ *
+ * Results:
+ * Returns 0 to allow default processing of message, or 1 to
+ * tell default dialog procedure not to close.
+ *
+ *----------------------------------------------------------------------
+ */
+static UINT APIENTRY
+ChooseDirectoryValidateProc (
+    HWND hwnd,
+    UINT message,
+    LPARAM lParam,
+    LPARAM lpData)
+{
+    TCHAR selDir[MAX_PATH];
+    CHOOSEDIRDATA *chooseDirSharedData;
+    Tcl_DString initDirString;
+    char string[MAX_PATH];
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *)
+        Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    chooseDirSharedData = (CHOOSEDIRDATA *)lpData;
+
+#ifdef _WIN64
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, lpData);
+#else
+    SetWindowLong(hwnd, GWL_USERDATA, lpData);
+#endif
+
+    if (tsdPtr->debugFlag) {
+        tsdPtr->debugInterp = (Tcl_Interp *) chooseDirSharedData->interp;
+        Tcl_DoWhenIdle(SetTkDialog, (ClientData) hwnd);
+    }
+    chooseDirSharedData->utfRetDir[0] = '\0';
+    switch (message) {
+        case BFFM_VALIDATEFAILED:
+            /*
+             * First save and check to see if it is a valid path name, if
+             * so then make that path the one shown in the
+             * window. Otherwise, it failed the check and should be treated
+             * as such. Use Set/GetCurrentDirectory which allows relative
+             * path names and names with forward slashes. Use
+             * Tcl_TranslateFileName to make sure names like ~ are
+             * converted correctly.
+             */
+            Tcl_TranslateFileName(chooseDirSharedData->interp,
+                    (char *)lParam, &initDirString);
+            lstrcpyn (string, Tcl_DStringValue(&initDirString), MAX_PATH);
+            Tcl_DStringFree(&initDirString);
+
+            if (SetCurrentDirectory((char *)string) == 0) {
+                LPTSTR lpFilePart[MAX_PATH];
+                /*
+                 * Get the full path name to the user entry,
+                 * at this point it doesn't exist so see if
+                 * it is supposed to. Otherwise just return it.
+                 */
+                GetFullPathName(string, MAX_PATH,
+			chooseDirSharedData->utfRetDir, /*unused*/ lpFilePart);
+                if (chooseDirSharedData->mustExist) {
+                    /*
+                     * User HAS to select a valid directory.
+                     */
+                    wsprintf(selDir, TEXT("Directory '%.200s' does not exist,\nplease select or enter an existing directory."), chooseDirSharedData->utfRetDir);
+                    MessageBox(NULL, selDir, NULL, MB_ICONEXCLAMATION|MB_OK);
+                    return 1;
+                }
+            } else {
+                /*
+                 * Changed to new folder OK, return immediatly with the
+                 * current directory in utfRetDir.
+                 */
+                GetCurrentDirectory(MAX_PATH, chooseDirSharedData->utfRetDir);
+                return 0;
+            }
+            return 0;
+
+        case BFFM_SELCHANGED:
+            /*
+             * Set the status window to the currently selected path.
+             * And enable the OK button if a file system folder, otherwise
+             * disable the OK button for things like server names.
+             * perhaps a new switch -enablenonfolders can be used to allow
+             * non folders to be selected.
+             *
+             * Not called when user changes edit box directly.
+             */
+
+            if (SHGetPathFromIDList((LPITEMIDLIST) lParam, selDir)) {
+                SendMessage(hwnd, BFFM_SETSTATUSTEXT, 0, (LPARAM) selDir);
+                // enable the OK button
+                SendMessage(hwnd, BFFM_ENABLEOK, 0, (LPARAM) 1);
+                SetCurrentDirectory(selDir);
+            } else {
+                // disable the OK button
+                SendMessage(hwnd, BFFM_ENABLEOK, 0, (LPARAM) 0);
+            }
+            UpdateWindow(hwnd);
+            return 1;
+
+        case BFFM_INITIALIZED: {
+            /*
+             * Directory browser intializing - tell it where to start from,
+             * user specified parameter.
+             */
+	    char *initDir = chooseDirSharedData->utfInitDir;
+
+	    SetCurrentDirectory(initDir);
+	    if (*initDir == '\\') {
+		/*
+		 * BFFM_SETSELECTION only understands UNC paths as pidls,
+		 * so convert path to pidl using IShellFolder interface.
+		 */
+		LPMALLOC pMalloc;
+		LPSHELLFOLDER psfFolder;
+
+		if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
+		    if (SUCCEEDED(SHGetDesktopFolder(&psfFolder))) {
+			LPITEMIDLIST pidlMain;
+			ULONG ulCount, ulAttr;
+			Tcl_DString ds;
+
+			Tcl_UtfToExternalDString(TkWinGetUnicodeEncoding(),
+				initDir, -1, &ds);
+			if (SUCCEEDED(psfFolder->lpVtbl->ParseDisplayName(
+					  psfFolder, hwnd, NULL,
+					  (WCHAR *) Tcl_DStringValue(&ds),
+					  &ulCount, &pidlMain, &ulAttr))
+				&& (pidlMain != NULL)) {
+			    SendMessage(hwnd, BFFM_SETSELECTION, FALSE,
+				    (LPARAM)pidlMain);
+			    pMalloc->lpVtbl->Free(pMalloc, pidlMain);
+			}
+			psfFolder->lpVtbl->Release(psfFolder);
+			Tcl_DStringFree(&ds);
+		    }
+		    pMalloc->lpVtbl->Release(pMalloc);
+		}
+	    } else {
+		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)initDir);
+	    }
+	    SendMessage(hwnd, BFFM_ENABLEOK, 0, (LPARAM) 1);
+            break;
+	}
+
+    }
+    return 0;
+}
+#else
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_ChooseDirectoryObjCmd --
+ *
+ *	This procedure implements the "tk_chooseDirectory" dialog box 
+ *	for the Windows platform. See the user documentation for details 
+ *	on what it does.
+ *
+ * Results:
+ *	See user documentation.
+ *
+ * Side effects:
+ *	A modal dialog window is created.  Tcl_SetServiceMode() is
+ *	called to allow background events to be processed
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tk_ChooseDirectoryObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;	/* Main window associated with interpreter. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+    OPENFILENAME ofn;
+    TCHAR path[MAX_PATH], savePath[MAX_PATH];
+    ChooseDir cd;
+    int result, mustExist, code, mode, i;
+    Tk_Window tkwin;
+    HWND hWnd;
+    char *utfTitle;
+    Tcl_DString utfDirString;
+    Tcl_DString titleString, dirString;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    static CONST char *optionStrings[] = {
+	"-initialdir",	"-mustexist",	"-parent",	"-title",
+	NULL
+    };
+    enum options {
+	DIR_INITIAL,	DIR_EXIST,	DIR_PARENT,	FILE_TITLE
+    };
+
+    if (tsdPtr->WM_LBSELCHANGED == 0) {
+        tsdPtr->WM_LBSELCHANGED = RegisterWindowMessage(LBSELCHSTRING);
+    }
+   
+    result = TCL_ERROR;
+    path[0] = '\0';
+
+    Tcl_DStringInit(&utfDirString);
+    mustExist = 0;
+    tkwin = (Tk_Window) clientData;
+    utfTitle = NULL;
+
+    for (i = 1; i < objc; i += 2) {
+	int index;
+	char *string;
+	Tcl_Obj *optionPtr, *valuePtr;
+
+	optionPtr = objv[i];
+	valuePtr = objv[i + 1];
+
+	if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings, "option",
+		0, &index) != TCL_OK) {
+	    goto cleanup;
+	}
+	if (i + 1 == objc) {
+	    string = Tcl_GetStringFromObj(optionPtr, NULL);
+	    Tcl_AppendResult(interp, "value for \"", string, "\" missing", 
+		    (char *) NULL);
+	    goto cleanup;
+	}
+
+	string = Tcl_GetStringFromObj(valuePtr, NULL);
+	switch ((enum options) index) {
+	    case DIR_INITIAL: {
+		Tcl_DStringFree(&utfDirString);
+		if (Tcl_TranslateFileName(interp, string, 
+			&utfDirString) == NULL) {
+		    goto cleanup;
+		}
+		break;
+	    }
+	    case DIR_EXIST: {
+		if (Tcl_GetBooleanFromObj(interp, valuePtr, &mustExist) != TCL_OK) {
+		    goto cleanup;
+		}
+		break;
+	    }
+	    case DIR_PARENT: {
+		tkwin = Tk_NameToWindow(interp, string, tkwin);
+		if (tkwin == NULL) {
+		    goto cleanup;
+		}
+		break;
+	    }
+	    case FILE_TITLE: {
+		utfTitle = string;
+		break;
+	    }
+	}
+    }
+
+    Tk_MakeWindowExist(tkwin);
+    hWnd = Tk_GetHWND(Tk_WindowId(tkwin));
+
+    cd.interp = interp;
+    cd.ofnPtr = &ofn;
+
+    ofn.lStructSize		= sizeof(ofn);
+    ofn.hwndOwner		= hWnd;
+#ifdef _WIN64
+    ofn.hInstance		= (HINSTANCE) GetWindowLongPtr(ofn.hwndOwner, 
+					GWLP_HINSTANCE);
+#else
+    ofn.hInstance		= (HINSTANCE) GetWindowLong(ofn.hwndOwner, 
+					GWL_HINSTANCE);
+#endif
+    ofn.lpstrFilter		= NULL;
+    ofn.lpstrCustomFilter	= NULL;
+    ofn.nMaxCustFilter		= 0;
+    ofn.nFilterIndex		= 0;
+    ofn.lpstrFile		= NULL; //(TCHAR *) path;
+    ofn.nMaxFile		= MAX_PATH;
+    ofn.lpstrFileTitle		= NULL;
+    ofn.nMaxFileTitle		= 0;
+    ofn.lpstrInitialDir		= NULL;
+    ofn.lpstrTitle		= NULL;
+    ofn.Flags			= OFN_HIDEREADONLY
+				  | OFN_ENABLEHOOK | OFN_ENABLETEMPLATE;
+    ofn.nFileOffset		= 0;
+    ofn.nFileExtension		= 0;
+    ofn.lpstrDefExt		= NULL;
+    ofn.lCustData		= (LPARAM) &cd;
+    ofn.lpfnHook		= (LPOFNHOOKPROC) ChooseDirectoryHookProc;
+    ofn.lpTemplateName		= MAKEINTRESOURCE(FILEOPENORD);
+
+    if (Tcl_DStringValue(&utfDirString)[0] != '\0') {
+	Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&utfDirString), 
+		Tcl_DStringLength(&utfDirString), &dirString);
+    } else {
+	/*
+	 * NT 5.0 changed the meaning of lpstrInitialDir, so we have
+	 * to ensure that we set the [pwd] if the user didn't specify
+	 * anything else.
+	 */
+	Tcl_DString cwd;
+
+	Tcl_DStringFree(&utfDirString);
+	if ((Tcl_GetCwd(interp, &utfDirString) == (char *) NULL) ||
+		(Tcl_TranslateFileName(interp,
+			Tcl_DStringValue(&utfDirString), &cwd) == NULL)) {
+	    Tcl_ResetResult(interp);
+	} else {
+	    Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&cwd),
+		    Tcl_DStringLength(&cwd), &dirString);
+	}
+	Tcl_DStringFree(&cwd);
+    }
+    ofn.lpstrInitialDir = (LPTSTR) Tcl_DStringValue(&dirString);
+
+    if (mustExist) {
+	ofn.Flags |= OFN_PATHMUSTEXIST;
+    }
+    if (utfTitle != NULL) {
+	Tcl_UtfToExternalDString(NULL, utfTitle, -1, &titleString);
+	ofn.lpstrTitle = (LPTSTR) Tcl_DStringValue(&titleString);
+    }
+
+    /*
+     * Display dialog.  The choose directory dialog doesn't preserve the
+     * current directory, so it must be saved and restored here.
+     */
+    
+    GetCurrentDirectory(MAX_PATH, savePath);
+    mode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
+    code = GetOpenFileName(&ofn);
+    Tcl_SetServiceMode(mode);
+    SetCurrentDirectory(savePath);
+
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
+
+    Tcl_ResetResult(interp);
+    if (code != 0) {
+	/*
+	 * Change the pathname to the Tcl "normalized" pathname, where
+	 * back slashes are used instead of forward slashes
+	 */
+
+	char *p;
+	Tcl_DString ds;
+
+	Tcl_ExternalToUtfDString(NULL, (char *) cd.path, -1, &ds);
+	for (p = Tcl_DStringValue(&ds); *p != '\0'; p++) {
+	    if (*p == '\\') {
+		*p = '/';
+	    }
+	}
+	Tcl_AppendResult(interp, Tcl_DStringValue(&ds), NULL);
+	Tcl_DStringFree(&ds);
+    }
+
+    if (ofn.lpstrTitle != NULL) {
+	Tcl_DStringFree(&titleString);
+    }
+    if (ofn.lpstrInitialDir != NULL) {
+	Tcl_DStringFree(&dirString);
+    }
+    result = TCL_OK;
+
+    cleanup:
+    Tcl_DStringFree(&utfDirString);
+
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ChooseDirectoryHookProc --
+ *
+ *	Hook procedure called by the ChooseDirectory dialog to modify
+ *	its default behavior.  The ChooseDirectory dialog is really an
+ *	OpenFile dialog with certain controls rearranged and certain
+ *	behaviors changed.  For instance, typing a name in the 
+ *	ChooseDirectory dialog selects a directory, rather than 
+ *	selecting a file.
+ *
+ * Results:
+ *	Returns 0 to allow default processing of message, or 1 to 
+ *	tell default dialog procedure not to process the message.
+ *
+ * Side effects:
+ *	A dialog window is created the first this procedure is called.
+ *	This window is not destroyed and will be reused the next time
+ *	the application invokes the "tk_getOpenFile" or
+ *	"tk_getSaveFile" command.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static UINT APIENTRY 
+ChooseDirectoryHookProc(
+    HWND hwnd,
+    UINT message,
+    WPARAM wParam,
+    LPARAM lParam)
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    OPENFILENAME *ofnPtr;
+    ChooseDir *cdPtr;
+
+    if (message == WM_INITDIALOG) {
+	ofnPtr = (OPENFILENAME *) lParam;
+	cdPtr = (ChooseDir *) ofnPtr->lCustData;
+	cdPtr->lastCtrl = 0;
+	cdPtr->lastIdx = 1000;
+	cdPtr->path[0] = '\0';
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) cdPtr);
+#else
+	SetWindowLong(hwnd, GWL_USERDATA, (LONG) cdPtr);
+#endif
+
+	if (ofnPtr->lpstrInitialDir == NULL) {
+	    GetCurrentDirectory(MAX_PATH, cdPtr->path);
+	} else {
+	    lstrcpy(cdPtr->path, ofnPtr->lpstrInitialDir);
+	}
+	SetDlgItemText(hwnd, edt10, cdPtr->path);
+	SendDlgItemMessage(hwnd, edt10, EM_SETSEL, 0, -1);
+	if (tsdPtr->debugFlag) {
+	    tsdPtr->debugInterp = cdPtr->interp;
+	    Tcl_DoWhenIdle(SetTkDialog, (ClientData) hwnd);
+	}
+	return 0;
+    }
+
+    /*
+     * GWL_USERDATA keeps track of cdPtr.
+     */
+    
+#ifdef _WIN64
+    cdPtr = (ChooseDir *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#else
+    cdPtr = (ChooseDir *) GetWindowLong(hwnd, GWL_USERDATA);
+#endif
+    if (cdPtr == NULL) {
+	return 0;
+    }
+    ofnPtr = cdPtr->ofnPtr;
+
+    if (message == tsdPtr->WM_LBSELCHANGED) {
+	/*
+	 * Called when double-clicking on directory.
+	 * If directory wasn't already open, browse that directory.
+	 * If directory was already open, return selected directory.
+	 */
+
+	int idCtrl, thisItem;
+
+	idCtrl = (int) wParam;
+        thisItem = LOWORD(lParam);
+
+	GetCurrentDirectory(MAX_PATH, cdPtr->path);
+	if (idCtrl == lst2) {
+	    if (cdPtr->lastIdx == thisItem) {
+		EndDialog(hwnd, IDOK);
+		return 1;
+	    }
+	    cdPtr->lastIdx = thisItem;
+	}
+	SetDlgItemText(hwnd, edt10, cdPtr->path);
+	SendDlgItemMessage(hwnd, edt10, EM_SETSEL, 0, -1);
+    } else if (message == WM_COMMAND) {
+	int idCtrl, notifyCode;
+
+	idCtrl = LOWORD(wParam);
+	notifyCode = HIWORD(wParam);
+
+	if ((idCtrl != IDOK) || (notifyCode != BN_CLICKED)) {
+	    /*
+	     * OK Button wasn't clicked.  Do the default.
+	     */
+
+	    if ((idCtrl == lst2) || (idCtrl == edt10)) {
+		cdPtr->lastCtrl = idCtrl;
+	    }
+	    return 0;
+	}
+
+	/*
+	 * Dialogs also get the message that OK was clicked when Enter 
+	 * is pressed in some other control.  Find out what window
+	 * we were really in when we got the supposed "OK", because the 
+	 * behavior is different.
+	 */
+
+	if (cdPtr->lastCtrl == edt10) {
+	    /*
+	     * Hit Enter or clicked OK while typing a directory name in the 
+	     * edit control.
+	     * If it's a new name, try to go to that directory.
+	     * If the name hasn't changed since last time, return selected 
+	     * directory.
+	     */
+
+	    int changed;
+	    TCHAR tmp[MAX_PATH];
+
+	    if (GetDlgItemText(hwnd, edt10, tmp, MAX_PATH) == 0) {
+		return 0;
+	    }
+
+	    changed = lstrcmp(cdPtr->path, tmp);
+	    lstrcpy(cdPtr->path, tmp);
+
+	    if (SetCurrentDirectory(cdPtr->path) == 0) {
+		/*
+		 * Non-existent directory.
+		 */
+
+		if (ofnPtr->Flags & OFN_PATHMUSTEXIST) {
+		    /*
+		     * Directory must exist.  Complain, then rehighlight text.
+		     */
+
+		    wsprintf(tmp, _T("Cannot change directory to \"%.200s\"."),
+			    cdPtr->path);
+		    MessageBox(hwnd, tmp, NULL, MB_OK);
+		    SendDlgItemMessage(hwnd, edt10, EM_SETSEL, 0, -1);
+		    return 0;
+		} 
+		if (changed) {
+		    /*
+		     * Directory was invalid, but we want to keep displaying
+		     * this name.  Don't update the listbox that displays the 
+		     * current directory heirarchy, or it'll erase the name.
+		     */
+		    
+		    SendDlgItemMessage(hwnd, edt10, EM_SETSEL, 0, -1);
+		    return 0;
+		}
+	    }
+	    if (changed == 0) {
+		/*
+		 * Name hasn't changed since the last time we hit return
+		 * or double-clicked on a directory, so return this.
+		 */
+
+		EndDialog(hwnd, IDOK);
+		return 1;
+	    }
+	    
+	    cdPtr->lastCtrl = IDOK;
+
+	    /*
+	     * The following is the magic code, determined by running 
+	     * Spy++ on some other directory chooser, that it takes to 
+	     * get this dialog to update the listbox to display the 
+	     * current directory.
+	     */
+
+	    SetDlgItemText(hwnd, edt1, cdPtr->path);
+	    SendMessage(hwnd, WM_COMMAND, (WPARAM) MAKELONG(cmb2, 0x8003), 
+		    (LPARAM) GetDlgItem(hwnd, cmb2));
+	    return 0;
+	} else if (idCtrl == lst2) {
+	    /*
+	     * Enter key was pressed while in listbox.  
+	     * If it's a new directory, allow default behavior to open dir.
+	     * If the directory hasn't changed, return selected directory.
+	     */
+
+	    int thisItem;
+
+	    thisItem = (int) SendDlgItemMessage(hwnd, lst2, LB_GETCURSEL, 0, 0);
+	    if (cdPtr->lastIdx == thisItem) {
+		GetCurrentDirectory(MAX_PATH, cdPtr->path);
+		EndDialog(hwnd, IDOK);
+		return 1;
+	    }
+	} else if (idCtrl == IDOK) {
+	    /* 
+	     * The OK button was clicked. Return the value currently selected
+             * in the entry.
+	     */
+
+	    GetCurrentDirectory(MAX_PATH, cdPtr->path);
+	    EndDialog(hwnd, IDOK);
+	    return 1;
+	}
+    }
+    return 0;
+}
+#endif
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_MessageBoxObjCmd --
  *
  *	This procedure implements the MessageBox window for the
  *	Windows platform. See the user documentation for details on what
@@ -819,232 +2517,207 @@ static int MakeFilter(interp, ofnPtr, string)
  */
 
 int
-Tk_MessageBoxCmd(clientData, interp, argc, argv)
+Tk_MessageBoxObjCmd(clientData, interp, objc, objv)
     ClientData clientData;	/* Main window associated with interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    int flags;
-    Tk_Window parent = Tk_MainWindow(interp);
+    Tk_Window tkwin, parent;
     HWND hWnd;
-    char *message = "";
-    char *title = "";
-    int icon = MB_ICONINFORMATION;
-    int type = MB_OK;
-    int i, j;
-    char *result;
-    int code, oldMode;
-    char *defaultBtn = NULL;
-    int defaultBtnIdx = -1;
+    char *message, *title;
+    int defaultBtn, icon, type;
+    int i, oldMode, winCode;
+    UINT flags;
+    Tcl_DString messageString, titleString;
+    Tcl_Encoding unicodeEncoding = TkWinGetUnicodeEncoding();
+    static CONST char *optionStrings[] = {
+	"-default",	"-icon",	"-message",	"-parent",
+	"-title",	"-type",	NULL
+    };
+    enum options {
+	MSG_DEFAULT,	MSG_ICON,	MSG_MESSAGE,	MSG_PARENT,
+	MSG_TITLE,	MSG_TYPE
+    };
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    for (i=1; i<argc; i+=2) {
-	int v = i+1;
-	int len = strlen(argv[i]);
+    tkwin = (Tk_Window) clientData;
 
-	if (strncmp(argv[i], "-default", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+    defaultBtn	= -1;
+    icon	= MB_ICONINFORMATION;
+    message	= NULL;
+    parent	= tkwin;
+    title	= NULL;
+    type	= MB_OK;
 
-	    defaultBtn = argv[v];
+    for (i = 1; i < objc; i += 2) {
+	int index;
+	char *string;
+	Tcl_Obj *optionPtr, *valuePtr;
+
+	optionPtr = objv[i];
+	valuePtr = objv[i + 1];
+
+	if (Tcl_GetIndexFromObj(interp, optionPtr, optionStrings, "option",
+		TCL_EXACT, &index) != TCL_OK) {
+	    return TCL_ERROR;
 	}
-	else if (strncmp(argv[i], "-icon", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	if (i + 1 == objc) {
+	    string = Tcl_GetStringFromObj(optionPtr, NULL);
+	    Tcl_AppendResult(interp, "value for \"", string, "\" missing", 
+		    (char *) NULL);
+	    return TCL_ERROR;
+	}
 
-	    if (strcmp(argv[v], "error") == 0) {
-		icon = MB_ICONERROR;
-	    }
-	    else if (strcmp(argv[v], "info") == 0) {
-		icon = MB_ICONINFORMATION;
-	    }
-	    else if (strcmp(argv[v], "question") == 0) {
-		icon = MB_ICONQUESTION;
-	    }
-	    else if (strcmp(argv[v], "warning") == 0) {
-		icon = MB_ICONWARNING;
-	    }
-	    else {
-	        Tcl_AppendResult(interp, "invalid icon \"", argv[v],
-		    "\", must be error, info, question or warning", NULL);
+        string = Tcl_GetStringFromObj(valuePtr, NULL);
+	switch ((enum options) index) {
+        case MSG_DEFAULT:
+	    defaultBtn = TkFindStateNumObj(interp, optionPtr, buttonMap, 
+		    valuePtr);
+	    if (defaultBtn < 0) {
 		return TCL_ERROR;
 	    }
-	}
-	else if (strncmp(argv[i], "-message", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	    break;
 
-	    message = argv[v];
-	}
-	else if (strncmp(argv[i], "-parent", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	case MSG_ICON:
+	    icon = TkFindStateNumObj(interp, optionPtr, iconMap, valuePtr);
+	    if (icon < 0) {
+		return TCL_ERROR;
+	    }
+	    break;
 
-	    parent=Tk_NameToWindow(interp, argv[v], Tk_MainWindow(interp));
+	case MSG_MESSAGE:
+	    message = string;
+	    break;
+
+	case MSG_PARENT: 
+	    parent = Tk_NameToWindow(interp, string, tkwin);
 	    if (parent == NULL) {
 		return TCL_ERROR;
 	    }
-	}
-	else if (strncmp(argv[i], "-title", len)==0) {
-	    if (v==argc) {goto arg_missing;}
+	    break;
 
-	    title = argv[v];
-	}
-	else if (strncmp(argv[i], "-type", len)==0) {
-	    int found = 0;
+	case MSG_TITLE:
+	    title = string;
+	    break;
 
-	    if (v==argc) {goto arg_missing;}
-
-	    for (j=0; j<NUM_TYPES; j++) {
-		if (strcmp(argv[v], msgTypeInfo[j].name) == 0) {
-		    type = msgTypeInfo[j].type;
-		    found = 1;
-		    break;
-		}
-	    }
-	    if (!found) {
-		Tcl_AppendResult(interp, "invalid message box type \"", 
-		    argv[v], "\", must be abortretryignore, ok, ",
-		    "okcancel, retrycancel, yesno or yesnocancel", NULL);
+	case MSG_TYPE:
+	    type = TkFindStateNumObj(interp, optionPtr, typeMap, valuePtr);
+	    if (type < 0) {
 		return TCL_ERROR;
 	    }
-	}
-	else {
-    	    Tcl_AppendResult(interp, "unknown option \"", 
-		argv[i], "\", must be -default, -icon, ",
-		"-message, -parent, -title or -type", NULL);
-		return TCL_ERROR;
+	    break;
+
 	}
     }
 
-    /* Make sure we have a valid hWnd to act as the parent of this message box
-     */
-    if (Tk_WindowId(parent) == None) {
-	Tk_MakeWindowExist(parent);
-    }
+    Tk_MakeWindowExist(parent);
     hWnd = Tk_GetHWND(Tk_WindowId(parent));
+    
+    flags = 0;
+    if (defaultBtn >= 0) {
+	int defaultBtnIdx;
 
-    if (defaultBtn != NULL) {
-	for (i=0; i<NUM_TYPES; i++) {
-	    if (type == msgTypeInfo[i].type) {
-		for (j=0; j<msgTypeInfo[i].numButtons; j++) {
-		    if (strcmp(defaultBtn, msgTypeInfo[i].btnNames[j])==0) {
-		        defaultBtnIdx = j;
+	defaultBtnIdx = -1;
+	for (i = 0; i < NUM_TYPES; i++) {
+	    if (type == allowedTypes[i].type) {
+		int j;
+
+		for (j = 0; j < 3; j++) {
+		    if (allowedTypes[i].btnIds[j] == defaultBtn) {
+			defaultBtnIdx = j;
 			break;
 		    }
 		}
 		if (defaultBtnIdx < 0) {
 		    Tcl_AppendResult(interp, "invalid default button \"",
-			defaultBtn, "\"", NULL);
+			    TkFindStateString(buttonMap, defaultBtn), 
+			    "\"", NULL);
 		    return TCL_ERROR;
 		}
 		break;
 	    }
 	}
-
-	switch (defaultBtnIdx) {
-	  case 0: flags = MB_DEFBUTTON1; break;
-	  case 1: flags = MB_DEFBUTTON2; break;
-	  case 2: flags = MB_DEFBUTTON3; break;
-	  case 3: flags = MB_DEFBUTTON4; break;
-	}
-    } else {
-	flags = 0;
+	flags = buttonFlagMap[defaultBtnIdx];
     }
-    
-    flags |= icon | type;
+
+    flags |= icon | type | MB_SYSTEMMODAL;
+
+    Tcl_UtfToExternalDString(unicodeEncoding, message, -1, &messageString);
+    Tcl_UtfToExternalDString(unicodeEncoding, title, -1, &titleString);
+
     oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
-    code = MessageBox(hWnd, message, title, flags|MB_SYSTEMMODAL);
+
+    /*
+     * MessageBoxW exists for all platforms.  Use it to allow unicode
+     * error message to be displayed correctly where possible by the OS.
+     *
+     * In order to have the parent window icon reflected in a MessageBox,
+     * we have to create a hook that will trigger when the MessageBox is
+     * being created.
+     */
+    tsdPtr->hSmallIcon = TkWinGetIcon(parent, ICON_SMALL);
+    tsdPtr->hBigIcon   = TkWinGetIcon(parent, ICON_BIG);
+    tsdPtr->hMsgBoxHook = SetWindowsHookEx(WH_CBT, MsgBoxCBTProc, NULL,
+	    GetCurrentThreadId());
+    winCode = MessageBoxW(hWnd, (WCHAR *) Tcl_DStringValue(&messageString),
+		(WCHAR *) Tcl_DStringValue(&titleString), flags);
+    UnhookWindowsHookEx(tsdPtr->hMsgBoxHook);
     (void) Tcl_SetServiceMode(oldMode);
 
-    switch (code) {
-      case IDABORT:	result = "abort";  break;
-      case IDCANCEL:	result = "cancel"; break;
-      case IDIGNORE:	result = "ignore"; break;
-      case IDNO:	result = "no";     break;
-      case IDOK:	result = "ok";     break;
-      case IDRETRY:	result = "retry";  break;
-      case IDYES:	result = "yes";    break;
-      default:		result = "";
+    /*
+     * Ensure that hWnd is enabled, because it can happen that we
+     * have updated the wrapper of the parent, which causes us to
+     * leave this child disabled (Windows loses sync).
+     */
+    EnableWindow(hWnd, 1);
+
+    Tcl_DStringFree(&messageString);
+    Tcl_DStringFree(&titleString);
+
+    Tcl_SetResult(interp, TkFindStateString(buttonMap, winCode), TCL_STATIC);
+    return TCL_OK;
+}
+
+static LRESULT CALLBACK
+MsgBoxCBTProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    if (nCode == HCBT_CREATEWND) {
+	/*
+	 * Window owned by our task is being created.  Since the hook is
+	 * installed just before the MessageBox call and removed after the
+	 * MessageBox call, the window being created is either the message
+	 * box or one of its controls.  Check that the class is WC_DIALOG
+	 * to ensure that it's the one we want.
+	 */
+	LPCBT_CREATEWND lpcbtcreate = (LPCBT_CREATEWND)lParam;
+
+	if (WC_DIALOG == lpcbtcreate->lpcs->lpszClass) {
+	    HWND hwnd = (HWND) wParam;
+	    SendMessage(hwnd, WM_SETICON, ICON_SMALL,
+		    (LPARAM) tsdPtr->hSmallIcon);
+	    SendMessage(hwnd, WM_SETICON, ICON_BIG,
+		    (LPARAM) tsdPtr->hBigIcon);
+	}
     }
 
     /*
-     * When we come to here interp->result may have been changed by some
-     * background scripts. Call Tcl_SetResult() to make sure that any stuff
-     * lingering in interp->result will not appear in the result of
-     * this command.
+     * Call the next hook proc, if there is one
      */
-
-    Tcl_SetResult(interp, result, TCL_STATIC);
-    return TCL_OK;
-
-  arg_missing:
-    Tcl_AppendResult(interp, "value for \"", argv[argc-1], "\" missing",
-	NULL);
-    return TCL_ERROR;
+    return CallNextHookEx(tsdPtr->hMsgBoxHook, nCode, wParam, lParam);
 }
-
-/*
- *----------------------------------------------------------------------
- *
- * ProcessCDError --
- *
- *	This procedure gets called if a Windows-specific error message
- *	has occurred during the execution of a common dialog or the
- *	user has pressed the CANCEL button.
- *
- * Results:
- *	If an error has indeed happened, returns a standard TCL result
- *	that reports the error code in string format. If the user has
- *	pressed the CANCEL button (dwErrorCode == 0), resets
- *	interp->result to the empty string.
- *
- * Side effects:
- *	interp->result is changed.
- *
- *----------------------------------------------------------------------
- */
-static int ProcessCDError(interp, dwErrorCode, hWnd)
-    Tcl_Interp * interp;		/* Current interpreter. */
-    DWORD dwErrorCode;			/* The Windows-specific error code */
-    HWND hWnd;				/* window in which the error happened*/
+
+static void 
+SetTkDialog(ClientData clientData)
 {
-    char *string;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    char buf[32];
 
-    Tcl_ResetResult(interp);
-
-    switch(dwErrorCode) {
-      case 0:	  /* User has hit CANCEL */
-	return TCL_OK;
-
-      case CDERR_DIALOGFAILURE:   string="CDERR_DIALOGFAILURE";  	break;
-      case CDERR_STRUCTSIZE:      string="CDERR_STRUCTSIZE";   		break;
-      case CDERR_INITIALIZATION:  string="CDERR_INITIALIZATION";   	break;
-      case CDERR_NOTEMPLATE:      string="CDERR_NOTEMPLATE";   		break;
-      case CDERR_NOHINSTANCE:     string="CDERR_NOHINSTANCE";   	break;
-      case CDERR_LOADSTRFAILURE:  string="CDERR_LOADSTRFAILURE";   	break;
-      case CDERR_FINDRESFAILURE:  string="CDERR_FINDRESFAILURE";   	break;
-      case CDERR_LOADRESFAILURE:  string="CDERR_LOADRESFAILURE";   	break;
-      case CDERR_LOCKRESFAILURE:  string="CDERR_LOCKRESFAILURE";   	break;
-      case CDERR_MEMALLOCFAILURE: string="CDERR_MEMALLOCFAILURE";   	break;
-      case CDERR_MEMLOCKFAILURE:  string="CDERR_MEMLOCKFAILURE";   	break;
-      case CDERR_NOHOOK:          string="CDERR_NOHOOK";   	 	break;
-      case PDERR_SETUPFAILURE:    string="PDERR_SETUPFAILURE";   	break;
-      case PDERR_PARSEFAILURE:    string="PDERR_PARSEFAILURE";   	break;
-      case PDERR_RETDEFFAILURE:   string="PDERR_RETDEFFAILURE";   	break;
-      case PDERR_LOADDRVFAILURE:  string="PDERR_LOADDRVFAILURE";   	break;
-      case PDERR_GETDEVMODEFAIL:  string="PDERR_GETDEVMODEFAIL";   	break;
-      case PDERR_INITFAILURE:     string="PDERR_INITFAILURE";   	break;
-      case PDERR_NODEVICES:       string="PDERR_NODEVICES";   		break;
-      case PDERR_NODEFAULTPRN:    string="PDERR_NODEFAULTPRN";   	break;
-      case PDERR_DNDMMISMATCH:    string="PDERR_DNDMMISMATCH";   	break;
-      case PDERR_CREATEICFAILURE: string="PDERR_CREATEICFAILURE";   	break;
-      case PDERR_PRINTERNOTFOUND: string="PDERR_PRINTERNOTFOUND";   	break;
-      case CFERR_NOFONTS:         string="CFERR_NOFONTS";   	 	break;
-      case FNERR_SUBCLASSFAILURE: string="FNERR_SUBCLASSFAILURE";   	break;
-      case FNERR_INVALIDFILENAME: string="FNERR_INVALIDFILENAME";   	break;
-      case FNERR_BUFFERTOOSMALL:  string="FNERR_BUFFERTOOSMALL";   	break;
-	
-      default:
-	string="unknown error";
-    }
-
-    Tcl_AppendResult(interp, "Win32 internal error: ", string, NULL); 
-    return TCL_ERROR;
+    sprintf(buf, "0x%p", (HWND) clientData);
+    Tcl_SetVar(tsdPtr->debugInterp, "tk_dialog", buf, TCL_GLOBAL_ONLY);
 }

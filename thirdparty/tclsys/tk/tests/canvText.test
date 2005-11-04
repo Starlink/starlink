@@ -3,21 +3,17 @@
 # fashion for Tcl tests.
 #
 # Copyright (c) 1996-1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
-# SCCS: @(#) canvText.test 1.8 97/06/24 13:34:16
+# RCS: @(#) $Id: canvText.test,v 1.12.2.1 2004/08/09 23:48:11 mdejong Exp $
 
-if {"[info procs test]" != "test"} {
-    source defs
-}
-
-foreach i [winfo children .] {
-    destroy $i
-}
-wm geometry . {}
-raise .
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 canvas .c -width 400 -height 300 -bd 2 -relief sunken
 pack .c
@@ -34,6 +30,7 @@ set ax [font measure $font 0]
 foreach test {
     {-anchor nw nw xyz {bad anchor position "xyz": must be n, ne, e, se, s, sw, w, nw, or center}}
     {-fill #ff0000 #ff0000 xyz {unknown color name "xyz"}}
+    {-fill {} {} {} {}}
     {-font {Times 40} {Times 40} {} {font "" doesn't exist}}
     {-justify left left xyz {bad justification "xyz": must be left, right, or center}}
     {-stipple gray50 gray50 xyz {bitmap "xyz" not defined}}
@@ -64,7 +61,7 @@ test canvText-1.$i {configuration options} {
 
 test canvText-2.1 {CreateText procedure: args} {
     list [catch {.c create text} msg] $msg
-} {1 {wrong # args: should be ".c create text x y ?options?"}}
+} {1 {wrong # args: should be ".c create text coords ?arg arg ...?"}}
 test canvText-2.2 {CreateText procedure: args} {
     list [catch {.c create text xyz 0} msg] $msg
 } {1 {bad screen distance "xyz"}}
@@ -105,7 +102,7 @@ test canvText-3.4 {TextCoords procedure} {
 } {10.0 10.0}
 test canvText-3.5 {TextCoords procedure} {
     list [catch {.c coords test 10} msg] $msg
-} {1 {wrong # coordinates: expected 0 or 2, got 1}}
+} {1 {wrong # coordinates: expected 2, got 1}}
 test canvText-3.6 {TextCoords procedure} {
     list [catch {.c coords test 10 10 10} msg] $msg
 } {1 {wrong # coordinates: expected 0 or 2, got 3}}
@@ -173,7 +170,7 @@ test canvText-5.1 {ConfigureText procedure: adjust cursor} {
     .c delete x
 } {}
 
-test canvText-6.1 {ComputeTextBbox procedure} {fonts} {
+test canvText-6.1 {ComputeTextBbox procedure} {fonts nonPortable} {
     .c itemconfig test -font $font -text 0
     .c coords test 0 0
     set x {}
@@ -199,7 +196,7 @@ test canvText-6.1 {ComputeTextBbox procedure} {fonts} {
 focus .c
 .c focus test
 .c itemconfig test -text "abcd\nefghi\njklmnopq"
-test canvText-7.1 {DisplayText procedure: stippling} {
+test canvText-7.0 {DisplayText procedure: stippling} {
     .c itemconfig test -stipple gray50
     update
     .c itemconfig test -stipple {}
@@ -238,6 +235,20 @@ test canvText-7.7 {DisplayText procedure: selected text different color} {
 } {}
 test canvText-7.8 {DisplayText procedure: not selected} {
     .c select clear
+    update
+} {}
+test canvText-7.9 {DisplayText procedure: select end} {
+    catch {destroy .t}
+    toplevel .t
+    wm geometry .t +0+0
+    canvas .t.c
+    pack .t.c
+    set id [.t.c create text 0 0 -text Dummy -anchor nw]
+    update
+    .t.c select from $id 0
+    .t.c select to $id end
+    update
+    #catch {destroy .t}
     update
 } {}
 
@@ -479,9 +490,9 @@ test canvText-17.1 {TextToPostscript procedure} {
 } "/Courier-Oblique findfont [font actual $font -size] scalefont ISOEncode setfont
 0.000 0.000 0.000 setrgbcolor AdjustColor
 100 200 \[
-(000)
-(000)
-(00)
+\[(000)\]
+\[(000)\]
+\[(00)\]
 ] $ay -0.5 0 0 false DrawText
 grestore
 restore showpage
@@ -490,3 +501,89 @@ restore showpage
 end
 %%EOF
 "
+
+test canvText-18.1 {bug fix 2525, find enclosed on text with newlines} {
+    catch {destroy .c}
+    canvas .c
+    pack .c
+    .c delete all
+    .c create text 100 100 -text Hello\n -anchor nw
+    set bbox [.c bbox 1]
+    set x2 [lindex $bbox 2]
+    set y2 [lindex $bbox 3]
+    incr y2
+    update
+    .c find enclosed 99 99 [expr $x2 + $i] [expr $y2 + 1]
+} 1
+
+test canvText-19.1 {patch 1006286, leading space caused wrap under Win32} {
+    catch {destroy .c}
+    set c [canvas .c -bg black -width 964]
+    pack $c
+    $c delete all
+    after 1000 "set done 1" ; vwait done
+
+    set f {Arial 28 bold}
+
+    set s1 {    Yeah-ah-ah-ah-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-oh-Yow}
+    set s2 {    Yeah ah ah ah oh oh oh oh oh oh oh oh oh oh oh oh oh oh oh oh Yow}
+
+    $c create text 21 18 \
+        -font $f \
+        -text $s1 \
+        -fill white \
+        -width 922 \
+        -anchor nw \
+        -tags tbox1
+    eval {$c create rect} [$c bbox tbox1] -outline red
+
+    $c create text 21 160 \
+        -font $f \
+        -text $s2 \
+        -fill white \
+        -width 922 \
+        -anchor nw \
+        -tags tbox2
+    eval {$c create rect} [$c bbox tbox2] -outline red
+
+    after 1000 "set done 1" ; vwait done
+
+    set results [list]
+
+    $c select from tbox2 4
+    $c select to tbox2 8
+    lappend results [selection get]
+
+    $c select from tbox1 4
+    $c select to tbox1 8
+    lappend results [selection get]
+
+    array set metrics [font metrics $f]
+    set x [expr {21 + [font measure $f "    "] \
+        + ([font measure {Arial 28 bold} "Y"] / 2)}]
+    set y1 [expr {18 + ($metrics(-linespace) / 2)}]
+    set y2 [expr {160 + ($metrics(-linespace) / 2)}]
+    
+    lappend results [$c index tbox1 @$x,$y1]
+    lappend results [$c index tbox2 @$x,$y2]
+
+    set results
+} {{Yeah } Yeah- 4 4}
+
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

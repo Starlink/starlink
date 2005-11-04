@@ -3,21 +3,17 @@
 # in the standard fashion for Tcl tests.
 #
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
-# SCCS: @(#) canvRect.test 1.18 97/08/06 15:33:39
+# RCS: @(#) $Id: canvRect.test,v 1.6 2003/02/09 07:48:22 hobbs Exp $
 
-if {[info procs test] != "test"} {
-    source defs
-}
-
-foreach i [winfo children .] {
-    destroy $i
-}
-wm geometry . {}
-raise .
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 canvas .c -width 400 -height 300 -bd 2 -relief sunken
 pack .c
@@ -33,7 +29,7 @@ foreach test {
     {-outline #123456 #123456 bad_color {unknown color name "bad_color"}}
     {-stipple gray50 gray50 bogus {bitmap "bogus" not defined}}
     {-tags {test a b c} {test a b c} {} {}}
-    {-width 6 6 abc {bad screen distance "abc"}}
+    {-width 6.0 6.0 abc {bad screen distance "abc"}}
 } {
     set name [lindex $test 0]
     test canvRect-1.$i {configuration options} {
@@ -55,10 +51,10 @@ test canvRect-1.$i {configuration options} {
 
 test canvRect-2.1 {CreateRectOval procedure} {
     list [catch {.c create rect} msg] $msg
-} {1 {wrong # args: should be ".c create rectangle x1 y1 x2 y2 ?options?"}}
+} {1 {wrong # args: should be ".c create rect coords ?arg arg ...?"}}
 test canvRect-2.2 {CreateRectOval procedure} {
     list [catch {.c create oval x y z} msg] $msg
-} {1 {wrong # args: should be ".c create oval x1 y1 x2 y2 ?options?"}}
+} {1 {wrong # coordinates: expected 0 or 4, got 3}}
 test canvRect-2.3 {CreateRectOval procedure} {
     list [catch {.c create rectangle x 2 3 4} msg] $msg
 } {1 {bad screen distance "x"}}
@@ -118,11 +114,10 @@ test canvRect-3.7 {RectOvalCoords procedure} {
 test canvRect-4.1 {ConfigureRectOval procedure} {
     list [catch {.c itemconfigure x -width abc} msg] $msg \
 	    [.c itemcget x -width]
-} {1 {bad screen distance "abc"} 1}
+} {1 {bad screen distance "abc"} 1.0}
 test canvRect-4.2 {ConfigureRectOval procedure} {
-    .c itemconfigure x -width -5
-    .c itemcget x -width
-} {1}
+    list [catch {.c itemconfigure x -width -5} msg] $msg
+} {1 {bad screen distance "-5"}}
 test canvRect-4.3 {ConfigureRectOval procedure} {nonPortable} {
     # Non-portable due to rounding differences.
     .c itemconfigure x -width 10
@@ -294,7 +289,7 @@ test canvRect-10.1 {TranslateRectOval procedure} {
 # This test is non-portable because different color information
 # will get generated on different displays (e.g. mono displays
 # vs. color).
-test canvRect-11.1 {RectOvalToPostscript procedure} {nonPortable win32sCrash macCrash} {
+test canvRect-11.1 {RectOvalToPostscript procedure} {nonPortable macCrash} {
     # Crashes on Mac because the XGetImage() call isn't implemented, causing a
     # dereference of NULL.
     
@@ -327,3 +322,20 @@ restore showpage
 end
 %%EOF
 }
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

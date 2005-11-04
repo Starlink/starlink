@@ -3,7 +3,7 @@
 # This demonstration script creates a 15-puzzle game using a collection
 # of buttons.
 #
-# SCCS: @(#) puzzle.tcl 1.5 97/03/02 16:26:32
+# RCS: @(#) $Id: puzzle.tcl,v 1.4 2002/08/31 06:12:28 das Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -54,16 +54,27 @@ pack $w.buttons.dismiss $w.buttons.code -side left -expand 1
 # scrollbar widget and using its trough color.
 
 scrollbar $w.s
-frame $w.frame -width 120 -height 120 -borderwidth 2 -relief sunken \
-	-bg [$w.s cget -troughcolor]
+
+# The button metrics are a bit bigger in Aqua, and since we are
+# using place which doesn't autosize, then we need to have a 
+# slightly larger frame here...
+
+if {[string equal [tk windowingsystem] aqua]} {
+    set frameSize 160
+} else {
+    set frameSize 120
+}
+
+frame $w.frame -width $frameSize -height $frameSize -borderwidth 2\
+	-relief sunken -bg [$w.s cget -troughcolor]
 pack $w.frame -side top -pady 1c -padx 1c
 destroy $w.s
 
 set order {3 1 6 2 5 7 15 13 4 11 8 9 14 10 12}
-for {set i 0} {$i < 15} {set i [expr $i+1]} {
+for {set i 0} {$i < 15} {set i [expr {$i+1}]} {
     set num [lindex $order $i]
-    set xpos($num) [expr ($i%4)*.25]
-    set ypos($num) [expr ($i/4)*.25]
+    set xpos($num) [expr {($i%4)*.25}]
+    set ypos($num) [expr {($i/4)*.25}]
     button $w.frame.$num -relief raised -text $num -highlightthickness 0 \
 	    -command "puzzleSwitch $w $num"
     place $w.frame.$num -relx $xpos($num) -rely $ypos($num) \

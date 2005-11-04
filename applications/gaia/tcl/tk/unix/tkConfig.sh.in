@@ -11,7 +11,7 @@
 #
 # The information in this file is specific to a single platform.
 #
-# SCCS: @(#) tkConfig.sh.in 1.11 97/10/30 13:29:13
+# RCS: @(#) $Id: tkConfig.sh.in,v 1.8 2002/07/28 03:23:08 mdejong Exp $
 
 # Tk's version number.
 TK_VERSION='@TK_VERSION@'
@@ -69,6 +69,25 @@ TK_SRC_DIR='@TK_SRC_DIR@'
 
 # Needed if you want to make a 'fat' shared library library
 # containing tk objects or link a different wish.
-TK_CC_SEARCH_FLAGS='@TK_CC_SEARCH_FLAGS@'
-TK_LD_SEARCH_FLAGS='@TK_LD_SEARCH_FLAGS@'
+TK_CC_SEARCH_FLAGS='@CC_SEARCH_FLAGS@'
+TK_LD_SEARCH_FLAGS='@LD_SEARCH_FLAGS@'
 
+# The name of the Tk stub library (.a):
+TK_STUB_LIB_FILE='@TK_STUB_LIB_FILE@'
+
+# -l flag to pass to the linker to pick up the Tk stub library
+TK_STUB_LIB_FLAG='@TK_STUB_LIB_FLAG@'
+
+# String to pass to linker to pick up the Tk stub library from its
+# build directory.
+TK_BUILD_STUB_LIB_SPEC='@TK_BUILD_STUB_LIB_SPEC@'
+
+# String to pass to linker to pick up the Tk stub library from its
+# installed directory.
+TK_STUB_LIB_SPEC='@TK_STUB_LIB_SPEC@'
+
+# Path to the Tk stub library in the build directory.
+TK_BUILD_STUB_LIB_PATH='@TK_BUILD_STUB_LIB_PATH@'
+
+# Path to the Tk stub library in the install directory.
+TK_STUB_LIB_PATH='@TK_STUB_LIB_PATH@'

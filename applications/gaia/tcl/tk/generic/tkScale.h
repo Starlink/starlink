@@ -5,11 +5,12 @@
  *	the scale widget.
  *
  * Copyright (c) 1996 by Sun Microsystems, Inc.
+ * Copyright (c) 1999-2000 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkScale.h 1.5 96/07/08 12:56:56
+ * RCS: @(#) $Id: tkScale.h,v 1.8 2000/04/14 08:33:16 hobbs Exp $
  */
 
 #ifndef _TKSCALE
@@ -23,6 +24,22 @@
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
 #endif
+
+/*
+ * Legal values for the "orient" field of TkScale records.
+ */
+
+enum orient {
+    ORIENT_HORIZONTAL, ORIENT_VERTICAL
+};
+
+/*
+ * Legal values for the "state" field of TkScale records.
+ */
+
+enum state {
+    STATE_ACTIVE, STATE_DISABLED, STATE_NORMAL
+};
 
 /*
  * A data structure of the following type is kept for each scale
@@ -39,16 +56,16 @@ typedef struct TkScale {
 				 * freed even after tkwin has gone away. */
     Tcl_Interp *interp;		/* Interpreter associated with scale. */
     Tcl_Command widgetCmd;	/* Token for scale's widget command. */
-    Tk_Uid orientUid;		/* Orientation for window ("vertical" or
-				 * "horizontal"). */
-    int vertical;		/* Non-zero means vertical orientation,
-				 * zero means horizontal. */
+    Tk_OptionTable optionTable;	/* Table that defines configuration options
+				 * available for this widget. */
+    enum orient orient;		/* Orientation for window (vertical or
+				 * horizontal). */
     int width;			/* Desired narrow dimension of scale,
 				 * in pixels. */
     int length;			/* Desired long dimension of scale,
 				 * in pixels. */
     double value;		/* Current value of scale. */
-    char *varName;		/* Name of variable (malloc'ed) or NULL.
+    Tcl_Obj *varNamePtr;	/* Name of variable or NULL.
 				 * If non-NULL, scale's value tracks
 				 * the contents of this variable and
 				 * vice versa. */
@@ -56,8 +73,8 @@ typedef struct TkScale {
 				 * scale. */
     double toValue;		/* Value corresponding to right or bottom
 				 * of scale. */
-    double tickInterval;	/* Distance between tick marks;  0 means
-				 * don't display any tick marks. */
+    double tickInterval;	/* Distance between tick marks;
+				 * 0 means don't display any tick marks. */
     double resolution;		/* If > 0, all values are rounded to an
 				 * even multiple of this value. */
     int digits;			/* Number of significant digits to print
@@ -67,20 +84,19 @@ typedef struct TkScale {
     char format[10];		/* Sprintf conversion specifier computed from
 				 * digits and other information. */
     double bigIncrement;	/* Amount to use for large increments to
-				 * scale value.  (0 means we pick a value). */
+				 * scale value.	 (0 means we pick a value). */
     char *command;		/* Command prefix to use when invoking Tcl
 				 * commands because the scale value changed.
-				 * NULL means don't invoke commands.
-				 * Malloc'ed. */
+				 * NULL means don't invoke commands. */
     int repeatDelay;		/* How long to wait before auto-repeating
 				 * on scrolling actions (in ms). */
     int repeatInterval;		/* Interval between autorepeats (in ms). */
     char *label;		/* Label to display above or to right of
-				 * scale;  NULL means don't display a
-				 * label.  Malloc'ed. */
+				 * scale;  NULL means don't display a label. */
     int labelLength;		/* Number of non-NULL chars. in label. */
-    Tk_Uid state;		/* Normal or disabled.  Value cannot be
-				 * changed when scale is disabled. */
+    enum state state;		/* Values are active, normal, or disabled.
+				 * Value of scale cannot be changed when 
+				 * disabled. */
 
     /*
      * Information used when displaying widget:
@@ -90,7 +106,8 @@ typedef struct TkScale {
     Tk_3DBorder bgBorder;	/* Used for drawing slider and other
 				 * background areas. */
     Tk_3DBorder activeBorder;	/* For drawing the slider when active. */
-    int sliderRelief;		/* Is slider to be drawn raised, sunken, etc. */
+    int sliderRelief;		/* Is slider to be drawn raised, sunken, 
+				 * etc. */
     XColor *troughColorPtr;	/* Color for drawing trough. */
     GC troughGC;		/* For drawing trough. */
     GC copyGC;			/* Used for copying from pixmap onto screen. */
@@ -102,9 +119,10 @@ typedef struct TkScale {
     int highlightWidth;		/* Width in pixels of highlight to draw
 				 * around widget when it has the focus.
 				 * <= 0 means don't draw a highlight. */
-    XColor *highlightBgColorPtr;
-				/* Color for drawing traversal highlight
-				 * area when highlight is off. */
+    Tk_3DBorder highlightBorder;/* Value of -highlightbackground option:
+				 * specifies background with which to draw 3-D
+				 * default ring and focus highlight area when
+				 * highlight is off. */
     XColor *highlightColorPtr;	/* Color for drawing traversal highlight. */
     int inset;			/* Total width of all borders, including
 				 * traversal highlight and 3-D border.
@@ -114,7 +132,7 @@ typedef struct TkScale {
     int sliderLength;		/* Length of slider, measured in pixels along
 				 * long dimension of scale. */
     int showValue;		/* Non-zero means to display the scale value
-				 * below or to the left of the slider;  zero
+				 * below or to the left of the slider;	zero
 				 * means don't display the value. */
 
     /*
@@ -140,10 +158,11 @@ typedef struct TkScale {
      * Miscellaneous information:
      */
 
+    int fontHeight;		/* Height of scale font. */
     Tk_Cursor cursor;		/* Current cursor for window, or None. */
-    char *takeFocus;		/* Value of -takefocus option;  not used in
+    Tcl_Obj *takeFocusPtr;	/* Value of -takefocus option;	not used in
 				 * the C code, but used by keyboard traversal
-				 * scripts.  Malloc'ed, but may be NULL. */
+				 * scripts.  May be NULL. */
     int flags;			/* Various flags;  see below for
 				 * definitions. */
 } TkScale;
@@ -156,6 +175,7 @@ typedef struct TkScale {
  * REDRAW_OTHER -		1 means other stuff besides slider and value
  *				need to be redrawn.
  * REDRAW_ALL -			1 means the entire widget needs to be redrawn.
+ * REDRAW_PENDING -		1 means any sort of redraw is pending
  * ACTIVE -			1 means the widget is active (the mouse is
  *				in its window).
  * INVOKE_COMMAND -		1 means the scale's command needs to be
@@ -171,16 +191,19 @@ typedef struct TkScale {
  *				doesn't appear to have changed).
  * GOT_FOCUS -			1 means that the focus is currently in
  *				this widget.
+ * SCALE_DELETED -		1 means the scale widget is being deleted
  */
 
-#define REDRAW_SLIDER		1
-#define REDRAW_OTHER		2
-#define REDRAW_ALL		3
-#define ACTIVE			4
-#define INVOKE_COMMAND		0x10
-#define SETTING_VAR		0x20
-#define NEVER_SET		0x40
-#define GOT_FOCUS		0x80
+#define REDRAW_SLIDER		(1<<0)
+#define REDRAW_OTHER		(1<<1)
+#define REDRAW_ALL		(REDRAW_OTHER|REDRAW_SLIDER)
+#define REDRAW_PENDING		(1<<2)
+#define ACTIVE			(1<<3)
+#define INVOKE_COMMAND		(1<<4)
+#define SETTING_VAR		(1<<5)
+#define NEVER_SET		(1<<6)
+#define GOT_FOCUS		(1<<7)
+#define SCALE_DELETED		(1<<8)
 
 /*
  * Symbolic values for the active parts of a slider.  These are
@@ -207,7 +230,7 @@ typedef struct TkScale {
 #define PRINT_CHARS 150
 
 /*
- * Declaration of procedures used in the implementation of the scrollbar
+ * Declaration of procedures used in the implementation of the scale
  * widget. 
  */
 
@@ -218,13 +241,13 @@ EXTERN double		TkRoundToResolution _ANSI_ARGS_((TkScale *scalePtr,
 EXTERN TkScale *	TkpCreateScale _ANSI_ARGS_((Tk_Window tkwin));
 EXTERN void		TkpDestroyScale _ANSI_ARGS_((TkScale *scalePtr));
 EXTERN void		TkpDisplayScale _ANSI_ARGS_((ClientData clientData));
-EXTERN double		TkpPixelToValue _ANSI_ARGS_((TkScale *scalePtr, 
-			    int x, int y));
 EXTERN int		TkpScaleElement _ANSI_ARGS_((TkScale *scalePtr,
 			     int x, int y));
-EXTERN void		TkpSetScaleValue _ANSI_ARGS_((TkScale *scalePtr,
+EXTERN void		TkScaleSetValue _ANSI_ARGS_((TkScale *scalePtr,
 			    double value, int setVar, int invokeCommand));
-EXTERN int		TkpValueToPixel _ANSI_ARGS_((TkScale *scalePtr,
+EXTERN double		TkScalePixelToValue _ANSI_ARGS_((TkScale *scalePtr, 
+			    int x, int y));
+EXTERN int		TkScaleValueToPixel _ANSI_ARGS_((TkScale *scalePtr,
 			    double value));
 
 # undef TCL_STORAGE_CLASS

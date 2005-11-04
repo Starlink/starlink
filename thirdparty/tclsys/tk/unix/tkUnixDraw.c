@@ -8,11 +8,15 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkUnixDraw.c 1.9 97/03/21 11:16:18
+ * RCS: @(#) $Id: tkUnixDraw.c,v 1.6 2000/07/20 21:38:28 ericm Exp $
  */
 
 #include "tkPort.h"
 #include "tkInt.h"
+
+#if !defined(__WIN32__) && !defined(MAC_TCL)
+#include "tkUnixInt.h"
+#endif
 
 /*
  * The following structure is used to pass information to
@@ -90,7 +94,11 @@ TkScrollWindow(tkwin, gc, x, y, width, height, dx, dy, damageRgn)
     }
     Tk_RestrictEvents(oldProc, oldArg, &dummy);
 
-    return XEmptyRegion((Region) damageRgn) ? 0 : 1;
+    if (XEmptyRegion((Region) damageRgn)) {
+	return 0;
+    } else {
+	return 1;
+    }
 }
 
 /*
@@ -168,4 +176,36 @@ ScrollRestrictProc(arg, eventPtr)
     }
     return TK_DISCARD_EVENT;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkpDrawHighlightBorder --
+ *
+ *	This procedure draws a rectangular ring around the outside of
+ *	a widget to indicate that it has received the input focus.
+ *
+ *      On Unix, we just draw the simple inset ring.  On other sytems,
+ *      e.g. the Mac, the focus ring is a little more complicated, so we
+ *      need this abstraction.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	A rectangle "width" pixels wide is drawn in "drawable",
+ *	corresponding to the outer area of "tkwin".
+ *
+ *----------------------------------------------------------------------
+ */
 
+void 
+TkpDrawHighlightBorder(tkwin, fgGC, bgGC, highlightWidth, drawable)
+    Tk_Window tkwin;
+    GC fgGC;
+    GC bgGC;
+    int highlightWidth;
+    Drawable drawable;
+{
+    TkDrawInsetFocusHighlight(tkwin, fgGC, highlightWidth, drawable, 0);
+}

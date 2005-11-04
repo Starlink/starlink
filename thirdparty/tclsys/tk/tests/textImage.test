@@ -1,25 +1,23 @@
-# SCCS: @(#) textImage.test 1.8 97/07/01 18:11:54
+# textImage.test -- test images embedded in text widgets
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) $Id: textImage.test,v 1.5 2002/07/13 20:28:35 dgp Exp $
 
-if {[string compare test [info procs test]] == 1} then \
-  {source ../tests/defs}
-
-# Test Arguments:
-# name -                Name of test, in the form foo-1.2.
-# description -         Short textual description of the test, to
-#                       help humans understand what it does.
-# constraints -         A list of one or more keywords, each of
-#                       which must be the name of an element in
-#                       the array "testConfig".  If any of these
-#                       elements is zero, the test is skipped.
-#                       This argument may be omitted.
-# script -              Script to run to carry out the test.  It must
-#                       return a result that can be checked for
-#                       correctness.
-# answer -              Expected result from script.
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 # One time setup.  Create a font to insure the tests are font metric invariant.
 
-wm geometry . {}
 catch {destroy .t}
 font create test_font -family courier -size 14
 text .t -font test_font
@@ -351,3 +349,20 @@ test textImage-4.3 {alignment and padding checking} {fonts} {
 catch {destroy .t}
 foreach image [image names] {image delete $image}
 font delete test_font
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

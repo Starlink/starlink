@@ -7,12 +7,12 @@
  *	used by canvases.
  *
  * Copyright (c) 1992-1994 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkTrig.c 1.27 97/03/07 11:34:35
+ * RCS: @(#) $Id: tkTrig.c,v 1.4 1999/12/14 06:52:33 hobbs Exp $
  */
 
 #include <stdio.h>
@@ -1066,6 +1066,14 @@ TkMakeBezierCurve(canvas, pointPtr, numPoints, numSteps, xPoints, dblPoints)
      * just put the first point into the output.
      */
 
+    if (!pointPtr) {
+	/* Of pointPtr == NULL, this function returns an upper limit.
+	 * of the array size to store the coordinates. This can be
+	 * used to allocate storage, before the actual coordinates
+	 * are calculated. */
+	return 1 + numPoints * numSteps;
+    }
+
     outputPoints = 0;
     if ((pointPtr[0] == pointPtr[numCoords-2])
 	    && (pointPtr[1] == pointPtr[numCoords-1])) {
@@ -1195,7 +1203,7 @@ TkMakeBezierCurve(canvas, pointPtr, numPoints, numSteps, xPoints, dblPoints)
  *
  * Results:
  *	None.  Postscript commands to generate the path are appended
- *	to interp->result.
+ *	to the interp's result.
  *
  * Side effects:
  *	None.

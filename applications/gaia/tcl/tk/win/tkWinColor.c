@@ -9,11 +9,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkWinColor.c 1.20 97/10/27 16:39:23
+ * RCS: @(#) $Id: tkWinColor.c,v 1.6 2000/07/06 03:17:44 mo Exp $
  */
 
-#include <tkColor.h>
-#include <tkWinInt.h>
+#include "tkWinInt.h"
+#include "tkColor.h"
 
 /*
  * The following structure is used to keep track of each color that is
@@ -25,12 +25,6 @@ typedef struct WinColor {
     int index;			/* Index for GetSysColor(), -1 if color
 				 * is not a "live" system color. */
 } WinColor;
-
-/*
- * colorTable is a hash table used to look up X colors by name.
- */
-
-static Tcl_HashTable colorTable;
 
 /*
  * The sysColors array contains the names and index values for the
@@ -75,7 +69,10 @@ static SystemColorEntry sysColors[] = {
     NULL,			0
 };
 
-static int ncolors = 0;
+typedef struct ThreadSpecificData { 
+    int ncolors;
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
 
 /*
  * Forward declarations for functions defined later in this file.
@@ -83,8 +80,6 @@ static int ncolors = 0;
 
 static int	FindSystemColor _ANSI_ARGS_((const char *name,
 		    XColor *colorPtr, int *indexPtr));
-static int	GetColorByName _ANSI_ARGS_((char *name, XColor *color));
-static int	GetColorByValue _ANSI_ARGS_((char *value, XColor *color));
 
 /*
  *----------------------------------------------------------------------
@@ -111,13 +106,15 @@ FindSystemColor(name, colorPtr, indexPtr)
     int *indexPtr;		/* Out parameter to store color index. */
 {
     int l, u, r, i;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
     /*
      * Count the number of elements in the color array if we haven't
      * done so yet.
      */
 
-    if (ncolors == 0) {
+    if (tsdPtr->ncolors == 0) {
 	SystemColorEntry *ePtr;
 	int version;
 
@@ -130,7 +127,7 @@ FindSystemColor(name, colorPtr, indexPtr)
 		    ePtr->index = COLOR_BTNHIGHLIGHT;
 		}
 	    }
-	    ncolors++;
+	    tsdPtr->ncolors++;
 	}
     }
 
@@ -139,7 +136,7 @@ FindSystemColor(name, colorPtr, indexPtr)
      */
 
     l = 0;
-    u = ncolors - 1;
+    u = tsdPtr->ncolors - 1;
     while (l <= u) {
 	i = (l + u) / 2;
 	r = strcasecmp(name, sysColors[i].name);
@@ -157,9 +154,13 @@ FindSystemColor(name, colorPtr, indexPtr)
 
     *indexPtr = sysColors[i].index;
     colorPtr->pixel = GetSysColor(sysColors[i].index);
-    colorPtr->red = GetRValue(colorPtr->pixel) << 8;
-    colorPtr->green = GetGValue(colorPtr->pixel) << 8;
-    colorPtr->blue = GetBValue(colorPtr->pixel) << 8;
+    /*
+     * x257 is (value<<8 + value) to get the properly bit shifted
+     * and padded value.  [Bug: 4919]
+     */
+    colorPtr->red = GetRValue(colorPtr->pixel) * 257;
+    colorPtr->green = GetGValue(colorPtr->pixel) * 257;
+    colorPtr->blue = GetBValue(colorPtr->pixel) * 257;
     colorPtr->flags = DoRed|DoGreen|DoBlue;
     colorPtr->pad = 0;
     return 1;
@@ -339,7 +340,7 @@ XAllocColor(display, colormap, color)
     TkWinColormap *cmap = (TkWinColormap *) colormap;
     PALETTEENTRY entry, closeEntry;
     HDC dc = GetDC(NULL);
-    
+
     entry.peRed = (color->red) >> 8;
     entry.peGreen = (color->green) >> 8;
     entry.peBlue = (color->blue) >> 8;
@@ -374,9 +375,9 @@ XAllocColor(display, colormap, color)
 	
 	if ((index >= cmap->size) || (newPixel != closePixel)) {
 	    if (cmap->size == sizePalette) {
-		color->red = closeEntry.peRed << 8;
-		color->green = closeEntry.peGreen << 8;
-		color->blue = closeEntry.peBlue << 8;
+		color->red   = closeEntry.peRed * 257;
+		color->green = closeEntry.peGreen * 257;
+		color->blue  = closeEntry.peBlue * 257;
 		entry = closeEntry;
 		if (index >= cmap->size) {
 		    OutputDebugString("XAllocColor: Colormap is bigger than we thought");
@@ -405,9 +406,9 @@ XAllocColor(display, colormap, color)
 	
 	color->pixel = GetNearestColor(dc,
 		RGB(entry.peRed, entry.peGreen, entry.peBlue));
-	color->red = (GetRValue(color->pixel) << 8);
-	color->green = (GetGValue(color->pixel) << 8);
-	color->blue = (GetBValue(color->pixel) << 8);
+	color->red    = GetRValue(color->pixel) * 257;
+	color->green  = GetGValue(color->pixel) * 257;
+	color->blue   = GetBValue(color->pixel) * 257;
     }
 
     ReleaseDC(NULL, dc);

@@ -1,23 +1,31 @@
 /* 
  * tkFrame.c --
  *
- *	This module implements "frame"  and "toplevel" widgets for
- *	the Tk toolkit.  Frames are windows with a background color
+ *	This module implements "frame", "labelframe" and "toplevel" widgets
+ *      for the Tk toolkit.  Frames are windows with a background color
  *	and possibly a 3-D effect, but not much else in the way of
  *	attributes.
  *
  * Copyright (c) 1990-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tkFrame.c 1.82 97/08/08 17:26:26
+ * RCS: @(#) $Id: tkFrame.c,v 1.15.2.1 2003/07/16 23:17:38 pspjuth Exp $
  */
 
 #include "default.h"
 #include "tkPort.h"
 #include "tkInt.h"
+
+/*
+ * The following enum is used to define the type of the frame.
+ */
+
+enum FrameType {
+    TYPE_FRAME, TYPE_TOPLEVEL, TYPE_LABELFRAME
+};
 
 /*
  * A data structure of the following type is kept for each
@@ -35,11 +43,11 @@ typedef struct {
     Tcl_Interp *interp;		/* Interpreter associated with widget.  Used
 				 * to delete widget command. */
     Tcl_Command widgetCmd;	/* Token for frame's widget command. */
+    Tk_OptionTable optionTable;	/* Table that defines configuration options
+				 * available for this widget. */
     char *className;		/* Class name for widget (from configuration
 				 * option).  Malloc-ed. */
-    int mask;			/* Either FRAME or TOPLEVEL;  used to select
-				 * which configuration options are valid for
-				 * widget. */
+    enum FrameType type;	/* Type of widget, such as TYPE_FRAME. */
     char *screenName;		/* Screen on which widget is created.  Non-null
 				 * only for top-levels.  Malloc-ed, may be
 				 * NULL. */
@@ -82,7 +90,61 @@ typedef struct {
 				 * windows this is NULL. */
     int flags;			/* Various flags;  see below for
 				 * definitions. */
+    Tcl_Obj *padXPtr;		/* Value of -padx option: specifies how many
+				 * pixels of extra space to leave on left and
+				 * right of child area. */
+    int padX;			/* Integer value corresponding to padXPtr. */
+    Tcl_Obj *padYPtr;		/* Value of -padx option: specifies how many
+				 * pixels of extra space to leave above and
+				 * below child area. */
+    int padY;			/* Integer value corresponding to padYPtr. */
 } Frame;
+
+/*
+ * A data structure of the following type is kept for each labelframe
+ * widget managed by this file:
+ */
+
+typedef struct {
+    Frame frame;		/* A pointer to the generic frame structure.
+				 * This must be the first element of the
+				 * Labelframe. */
+
+    /*
+     * Labelframe specific configuration settings.
+     */
+
+    Tcl_Obj *textPtr;		/* Value of -text option: specifies text to
+				 * display in button. */
+    Tk_Font tkfont;		/* Value of -font option: specifies font
+				 * to use for display text. */
+    XColor *textColorPtr;	/* Value of -fg option: specifies foreground
+				 * color in normal mode. */
+    int labelAnchor;		/* Value of -labelanchor option: specifies
+				 * where to place the label. */
+    Tk_Window labelWin;		/* Value of -labelwidget option: Window to
+                                 * use as label for the frame. */
+
+    /*
+     * Labelframe specific fields for use with configuration settings above.
+     */
+
+    GC textGC;			/* GC for drawing text in normal mode. */
+    Tk_TextLayout textLayout;	/* Stored text layout information. */
+    XRectangle labelBox;	/* The label's actual size and position. */
+    int labelReqWidth;		/* The label's requested width. */
+    int labelReqHeight;		/* The label's requested height. */
+    int labelTextX, labelTextY;	/* Position of the text to be drawn. */
+
+} Labelframe;
+
+/*
+ * The following macros define how many extra pixels to leave
+ * around a label's text.
+ */
+
+#define LABELSPACING 1
+#define LABELMARGIN 4
 
 /*
  * Flag bits for frames:
@@ -98,137 +160,275 @@ typedef struct {
 #define GOT_FOCUS		4
 
 /*
- * The following flag bits are used so that there can be separate
- * defaults for some configuration options for frames and toplevels.
+ * The following enum is used to define a type for the -labelanchor option
+ * of the Labelframe widget.  These values are used as indices into the 
+ * string table below.
  */
 
-#define FRAME		TK_CONFIG_USER_BIT
-#define TOPLEVEL	(TK_CONFIG_USER_BIT << 1)
-#define BOTH		(FRAME | TOPLEVEL)
+enum labelanchor {
+    LABELANCHOR_E, LABELANCHOR_EN, LABELANCHOR_ES,
+    LABELANCHOR_N, LABELANCHOR_NE, LABELANCHOR_NW,
+    LABELANCHOR_S, LABELANCHOR_SE, LABELANCHOR_SW,
+    LABELANCHOR_W, LABELANCHOR_WN, LABELANCHOR_WS
+};
 
-static Tk_ConfigSpec configSpecs[] = {
-    {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_FRAME_BG_COLOR, Tk_Offset(Frame, border),
-	BOTH|TK_CONFIG_COLOR_ONLY|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_FRAME_BG_MONO, Tk_Offset(Frame, border),
-	BOTH|TK_CONFIG_MONO_ONLY|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_SYNONYM, "-bd", "borderWidth", (char *) NULL,
-	(char *) NULL, 0, BOTH},
-    {TK_CONFIG_SYNONYM, "-bg", "background", (char *) NULL,
-	(char *) NULL, 0, BOTH},
-    {TK_CONFIG_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
-	DEF_FRAME_BORDER_WIDTH, Tk_Offset(Frame, borderWidth), BOTH},
-    {TK_CONFIG_STRING, "-class", "class", "Class",
-	DEF_FRAME_CLASS, Tk_Offset(Frame, className), FRAME},
-    {TK_CONFIG_STRING, "-class", "class", "Class",
-	DEF_TOPLEVEL_CLASS, Tk_Offset(Frame, className), TOPLEVEL},
-    {TK_CONFIG_STRING, "-colormap", "colormap", "Colormap",
-	DEF_FRAME_COLORMAP, Tk_Offset(Frame, colormapName),
-	BOTH|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_BOOLEAN, "-container", "container", "Container",
-	DEF_FRAME_CONTAINER, Tk_Offset(Frame, isContainer), BOTH},
-    {TK_CONFIG_ACTIVE_CURSOR, "-cursor", "cursor", "Cursor",
-	DEF_FRAME_CURSOR, Tk_Offset(Frame, cursor), BOTH|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_PIXELS, "-height", "height", "Height",
-	DEF_FRAME_HEIGHT, Tk_Offset(Frame, height), BOTH},
-    {TK_CONFIG_COLOR, "-highlightbackground", "highlightBackground",
-	"HighlightBackground", DEF_FRAME_HIGHLIGHT_BG,
-	Tk_Offset(Frame, highlightBgColorPtr), BOTH},
-    {TK_CONFIG_COLOR, "-highlightcolor", "highlightColor", "HighlightColor",
-	DEF_FRAME_HIGHLIGHT, Tk_Offset(Frame, highlightColorPtr), BOTH},
-    {TK_CONFIG_PIXELS, "-highlightthickness", "highlightThickness",
-	"HighlightThickness",
-	DEF_FRAME_HIGHLIGHT_WIDTH, Tk_Offset(Frame, highlightWidth), BOTH},
-    {TK_CONFIG_STRING, "-menu", "menu", "Menu",
-	DEF_TOPLEVEL_MENU, Tk_Offset(Frame, menuName),
-	TOPLEVEL|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_RELIEF, "-relief", "relief", "Relief",
-	DEF_FRAME_RELIEF, Tk_Offset(Frame, relief), BOTH},
-    {TK_CONFIG_STRING, "-screen", "screen", "Screen",
-	DEF_TOPLEVEL_SCREEN, Tk_Offset(Frame, screenName),
-	TOPLEVEL|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
-	DEF_FRAME_TAKE_FOCUS, Tk_Offset(Frame, takeFocus),
-	BOTH|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_STRING, "-use", "use", "Use",
-	DEF_FRAME_USE, Tk_Offset(Frame, useThis), TOPLEVEL|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_STRING, "-visual", "visual", "Visual",
-	DEF_FRAME_VISUAL, Tk_Offset(Frame, visualName),
-	BOTH|TK_CONFIG_NULL_OK},
-    {TK_CONFIG_PIXELS, "-width", "width", "Width",
-	DEF_FRAME_WIDTH, Tk_Offset(Frame, width), BOTH},
-    {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
-	(char *) NULL, 0, 0}
+static char *labelAnchorStrings[] = {
+    "e", "en", "es", "n", "ne", "nw", "s", "se", "sw", "w", "wn", "ws",
+    (char *) NULL
+};
+
+/*
+ * Information used for parsing configuration options.  There are
+ * one common table used by all and one table for each widget class.
+ */
+
+static Tk_OptionSpec commonOptSpec[] = {
+    {TK_OPTION_BORDER, "-background", "background", "Background",
+	DEF_FRAME_BG_COLOR, -1, Tk_Offset(Frame, border),
+	TK_OPTION_NULL_OK, (ClientData) DEF_FRAME_BG_MONO, 0},
+    {TK_OPTION_SYNONYM, "-bg", (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, -1, 0, (ClientData) "-background", 0},
+    {TK_OPTION_STRING, "-colormap", "colormap", "Colormap",
+	DEF_FRAME_COLORMAP, -1, Tk_Offset(Frame, colormapName),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_BOOLEAN, "-container", "container", "Container",
+	DEF_FRAME_CONTAINER, -1, Tk_Offset(Frame, isContainer),
+	0, 0, 0},
+    {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor",
+	DEF_FRAME_CURSOR, -1, Tk_Offset(Frame, cursor),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_PIXELS, "-height", "height", "Height",
+	DEF_FRAME_HEIGHT, -1, Tk_Offset(Frame, height),
+	0, 0, 0},
+    {TK_OPTION_COLOR, "-highlightbackground", "highlightBackground",
+	"HighlightBackground", DEF_FRAME_HIGHLIGHT_BG, -1,
+	Tk_Offset(Frame, highlightBgColorPtr), 0, 0, 0},
+    {TK_OPTION_COLOR, "-highlightcolor", "highlightColor", "HighlightColor",
+	DEF_FRAME_HIGHLIGHT, -1, Tk_Offset(Frame, highlightColorPtr),
+	0, 0, 0},
+    {TK_OPTION_PIXELS, "-highlightthickness", "highlightThickness",
+	"HighlightThickness", DEF_FRAME_HIGHLIGHT_WIDTH, -1,
+	Tk_Offset(Frame, highlightWidth), 0, 0, 0},
+    {TK_OPTION_PIXELS, "-padx", "padX", "Pad",
+	DEF_FRAME_PADX, Tk_Offset(Frame, padXPtr),
+	Tk_Offset(Frame, padX), 0, 0, 0},
+    {TK_OPTION_PIXELS, "-pady", "padY", "Pad",
+	DEF_FRAME_PADY, Tk_Offset(Frame, padYPtr),
+	Tk_Offset(Frame, padY), 0, 0, 0},
+    {TK_OPTION_STRING, "-takefocus", "takeFocus", "TakeFocus",
+	DEF_FRAME_TAKE_FOCUS, -1, Tk_Offset(Frame, takeFocus),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_STRING, "-visual", "visual", "Visual",
+	DEF_FRAME_VISUAL, -1, Tk_Offset(Frame, visualName),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_PIXELS, "-width", "width", "Width",
+	DEF_FRAME_WIDTH, -1, Tk_Offset(Frame, width),
+	0, 0, 0},
+    {TK_OPTION_END, (char *) NULL, (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, 0, 0, 0, 0}
+};
+
+static Tk_OptionSpec frameOptSpec[] = {
+    {TK_OPTION_SYNONYM, "-bd", (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, -1, 0, (ClientData) "-borderwidth", 0},
+    {TK_OPTION_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
+	DEF_FRAME_BORDER_WIDTH, -1, Tk_Offset(Frame, borderWidth),
+        0, 0, 0},
+    {TK_OPTION_STRING, "-class", "class", "Class",
+	DEF_FRAME_CLASS, -1, Tk_Offset(Frame, className),
+	0, 0, 0},
+    {TK_OPTION_RELIEF, "-relief", "relief", "Relief",
+	DEF_FRAME_RELIEF, -1, Tk_Offset(Frame, relief),
+	0, 0, 0},
+    {TK_OPTION_END, (char *) NULL, (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, 0, 0, (ClientData) commonOptSpec, 0}
+};
+
+static Tk_OptionSpec toplevelOptSpec[] = {
+    {TK_OPTION_SYNONYM, "-bd", (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, -1, 0, (ClientData) "-borderwidth", 0},
+    {TK_OPTION_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
+	DEF_FRAME_BORDER_WIDTH, -1, Tk_Offset(Frame, borderWidth),
+        0, 0, 0},
+    {TK_OPTION_STRING, "-class", "class", "Class",
+	DEF_TOPLEVEL_CLASS, -1, Tk_Offset(Frame, className),
+	0, 0, 0},
+    {TK_OPTION_STRING, "-menu", "menu", "Menu",
+	DEF_TOPLEVEL_MENU, -1, Tk_Offset(Frame, menuName),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_RELIEF, "-relief", "relief", "Relief",
+	DEF_FRAME_RELIEF, -1, Tk_Offset(Frame, relief),
+	0, 0, 0},
+    {TK_OPTION_STRING, "-screen", "screen", "Screen",
+	DEF_TOPLEVEL_SCREEN, -1, Tk_Offset(Frame, screenName),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_STRING, "-use", "use", "Use",
+	DEF_TOPLEVEL_USE, -1, Tk_Offset(Frame, useThis),
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_END, (char *) NULL, (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, 0, 0, (ClientData) commonOptSpec, 0}
+};
+
+static Tk_OptionSpec labelframeOptSpec[] = {
+    {TK_OPTION_SYNONYM, "-bd", (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, -1, 0, (ClientData) "-borderwidth", 0},
+    {TK_OPTION_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
+	DEF_LABELFRAME_BORDER_WIDTH, -1, Tk_Offset(Frame, borderWidth),
+        0, 0, 0},
+    {TK_OPTION_STRING, "-class", "class", "Class",
+	DEF_LABELFRAME_CLASS, -1, Tk_Offset(Frame, className),
+	0, 0, 0},
+    {TK_OPTION_SYNONYM, "-fg", "foreground", (char *) NULL,
+	(char *) NULL, 0, -1, 0, (ClientData) "-foreground", 0},
+    {TK_OPTION_FONT, "-font", "font", "Font",
+	DEF_LABELFRAME_FONT, -1, Tk_Offset(Labelframe, tkfont), 0, 0, 0},
+    {TK_OPTION_COLOR, "-foreground", "foreground", "Foreground",
+	DEF_LABELFRAME_FG, -1, Tk_Offset(Labelframe, textColorPtr), 0, 0, 0},
+    {TK_OPTION_STRING_TABLE, "-labelanchor", "labelAnchor", "LabelAnchor",
+	DEF_LABELFRAME_LABELANCHOR, -1, Tk_Offset(Labelframe, labelAnchor),
+        0, (ClientData) labelAnchorStrings, 0},
+    {TK_OPTION_WINDOW, "-labelwidget", "labelWidget", "LabelWidget",
+        (char *) NULL, -1, Tk_Offset(Labelframe, labelWin),
+        TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_RELIEF, "-relief", "relief", "Relief",
+	DEF_LABELFRAME_RELIEF, -1, Tk_Offset(Frame, relief),
+	0, 0, 0},
+    {TK_OPTION_STRING, "-text", "text", "Text",
+	DEF_LABELFRAME_TEXT, Tk_Offset(Labelframe, textPtr), -1,
+	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_END, (char *) NULL, (char *) NULL, (char *) NULL,
+	(char *) NULL, 0, 0, 0, (ClientData) commonOptSpec, 0}
+};
+
+/*
+ * Class names for widgets, indexed by FrameType.
+ */
+
+static char *classNames[] = {"Frame", "Toplevel", "Labelframe"};
+
+/*
+ * The following table maps from FrameType to the option template for
+ * that class of widgets.
+ */
+
+static Tk_OptionSpec *optionSpecs[] = {
+    frameOptSpec,
+    toplevelOptSpec,
+    labelframeOptSpec,
 };
 
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
+static void		ComputeFrameGeometry _ANSI_ARGS_((Frame *framePtr));
 static int		ConfigureFrame _ANSI_ARGS_((Tcl_Interp *interp,
-			    Frame *framePtr, int argc, char **argv,
-			    int flags));
+			    Frame *framePtr, int objc, Tcl_Obj *CONST objv[]));
+static int		CreateFrame _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, int objc, Tcl_Obj *CONST argv[],
+			    enum FrameType type, char *appName));
 static void		DestroyFrame _ANSI_ARGS_((char *memPtr));
+static void		DestroyFramePartly _ANSI_ARGS_((Frame *framePtr));
 static void		DisplayFrame _ANSI_ARGS_((ClientData clientData));
 static void		FrameCmdDeletedProc _ANSI_ARGS_((
 			    ClientData clientData));
 static void		FrameEventProc _ANSI_ARGS_((ClientData clientData,
 			    XEvent *eventPtr));
-static int		FrameWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
+static void		FrameLostSlaveProc _ANSI_ARGS_((
+			    ClientData clientData, Tk_Window tkwin));
+static void		FrameRequestProc _ANSI_ARGS_((ClientData clientData,
+			    Tk_Window tkwin));
+static void		FrameStructureProc _ANSI_ARGS_((
+			    ClientData clientData, XEvent *eventPtr));
+static int		FrameWidgetObjCmd _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
+static void		FrameWorldChanged _ANSI_ARGS_((
+			    ClientData instanceData));
 static void		MapFrame _ANSI_ARGS_((ClientData clientData));
+
+/*
+ * The structure below defines frame class behavior by means of procedures
+ * that can be invoked from generic window code.
+ */
+
+static Tk_ClassProcs frameClass = {
+    sizeof(Tk_ClassProcs),	/* size */
+    FrameWorldChanged		/* worldChangedProc */
+};
+
+/*
+ * The structure below defines the official type record for the
+ * labelframe's geometry manager:
+ */
+
+static Tk_GeomMgr frameGeomType = {
+    "labelframe",			/* name */
+    FrameRequestProc,			/* requestProc */
+    FrameLostSlaveProc			/* lostSlaveProc */
+};
+
 
 /*
  *--------------------------------------------------------------
  *
- * Tk_FrameCmd, Tk_ToplevelCmd --
+ * Tk_FrameObjCmd, Tk_ToplevelObjCmd, Tk_LabelframeObjCmd --
  *
- *	These procedures are invoked to process the "frame" and
- *	"toplevel" Tcl commands.  See the user documentation for
- *	details on what they do.
+ *	These procedures are invoked to process the "frame",
+ *      "toplevel" and "labelframe" Tcl commands.  See the user
+ *      documentation for details on what they do.
  *
  * Results:
  *	A standard Tcl result.
  *
  * Side effects:
  *	See the user documentation.  These procedures are just wrappers;
- *	they call ButtonCreate to do all of the real work.
+ *	they call CreateFrame to do all of the real work.
  *
  *--------------------------------------------------------------
  */
 
 int
-Tk_FrameCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
-				 * interpreter. */
+Tk_FrameObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;	/* Either NULL or pointer to option table. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    return TkCreateFrame(clientData, interp, argc, argv, 0, (char *) NULL);
+    return CreateFrame(clientData, interp, objc, objv, TYPE_FRAME,
+	    (char *) NULL);
 }
 
 int
-Tk_ToplevelCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with
-				 * interpreter. */
+Tk_ToplevelObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;	/* Either NULL or pointer to option table. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    return TkCreateFrame(clientData, interp, argc, argv, 1, (char *) NULL);
+    return CreateFrame(clientData, interp, objc, objv, TYPE_TOPLEVEL,
+	    (char *) NULL);
+}
+
+int
+Tk_LabelframeObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;	/* Either NULL or pointer to option table. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+    return CreateFrame(clientData, interp, objc, objv, TYPE_LABELFRAME,
+	    (char *) NULL);
 }
 
 /*
  *--------------------------------------------------------------
  *
- * TkFrameCreate --
+ * TkCreateFrame --
  *
- *	This procedure is invoked to process the "frame" and "toplevel"
- *	Tcl commands;  it is also invoked directly by Tk_Init to create
- *	a new main window.  See the user documentation for the "frame"
- *	and "toplevel" commands for details on what it does.
+ *	This procedure is the old command procedure for the "frame"
+ *      and "toplevel" commands.  Now it is used directly by Tk_Init to
+ *      create a new main window.  See the user documentation for the
+ *      "frame" and "toplevel" commands for details on what it does.
  *
  * Results:
  *	A standard Tcl result.
@@ -241,32 +441,67 @@ Tk_ToplevelCmd(clientData, interp, argc, argv)
 
 int
 TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
-    ClientData clientData;	/* Main window associated with interpreter.
-				 * If we're called by Tk_Init to create a
-				 * new application, then this is NULL. */
+    ClientData clientData;	/* Either NULL or pointer to option table. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
     int toplevel;		/* Non-zero means create a toplevel window,
 				 * zero means create a frame. */
-    char *appName;		/* Should only be non-NULL if clientData is
-				 * NULL:  gives the base name to use for the
+    char *appName;		/* Should only be non-NULL if there is no main
+				 * window associated with the interpreter.
+				 * Gives the base name to use for the
 				 * new application. */
 {
-    Tk_Window tkwin = (Tk_Window) clientData;
+    int result, i;
+    Tcl_Obj **objv = (Tcl_Obj **) ckalloc((argc+1) * sizeof(Tcl_Obj **));
+    for (i=0; i<argc; i++) {
+	objv[i] = Tcl_NewStringObj(argv[i], -1);
+	Tcl_IncrRefCount(objv[i]);
+    }
+    objv[argc] = NULL;
+    result = CreateFrame(clientData, interp, argc, objv,
+	    toplevel ? TYPE_TOPLEVEL : TYPE_FRAME, appName);
+    for (i=0; i<argc; i++) {
+	Tcl_DecrRefCount(objv[i]);
+    }
+    ckfree((char *) objv);
+    return result;
+}
+
+static int
+CreateFrame(clientData, interp, objc, objv, type, appName)
+    ClientData clientData;	/* NULL. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+    enum FrameType type;	/* What widget type to create. */
+    char *appName;		/* Should only be non-NULL if there are no
+				 * Main window associated with the interpreter.
+				 * Gives the base name to use for the
+				 * new application. */
+{
+    Tk_Window tkwin;
     Frame *framePtr;
+    Tk_OptionTable optionTable;
     Tk_Window new;
-    char *className, *screenName, *visualName, *colormapName, *arg, *useOption;
-    int i, c, length, depth;
+    CONST char *className, *screenName, *visualName, *colormapName, *arg, *useOption;
+    int i, c, depth;
+    size_t length;
     unsigned int mask;
     Colormap colormap;
     Visual *visual;
 
-    if (argc < 2) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"",
-		argv[0], " pathName ?options?\"", (char *) NULL);
+    if (objc < 2) {
+	Tcl_WrongNumArgs(interp, 1, objv, "pathName ?options?");
 	return TCL_ERROR;
     }
+
+    /*
+     * Create the option table for this widget class.  If it has already
+     * been created, the cached pointer will be returned.
+     */
+
+    optionTable = Tk_CreateOptionTable(interp, optionSpecs[type]);
 
     /*
      * Pre-process the argument list.  Scan through it to find any
@@ -277,28 +512,27 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
 
     className = colormapName = screenName = visualName = useOption = NULL;
     colormap = None;
-    for (i = 2; i < argc; i += 2) {
-	arg = argv[i];
-	length = strlen(arg);
+    for (i = 2; i < objc; i += 2) {
+	arg = Tcl_GetStringFromObj(objv[i], (int *) &length);
 	if (length < 2) {
 	    continue;
 	}
 	c = arg[1];
-	if ((c == 'c') && (strncmp(arg, "-class", strlen(arg)) == 0)
+	if ((c == 'c') && (strncmp(arg, "-class", length) == 0)
 		&& (length >= 3)) {
-	    className = argv[i+1];
+	    className = Tcl_GetString(objv[i+1]);
 	} else if ((c == 'c')
-		&& (strncmp(arg, "-colormap", strlen(arg)) == 0)) {
-	    colormapName = argv[i+1];
-	} else if ((c == 's') && toplevel
-		&& (strncmp(arg, "-screen", strlen(arg)) == 0)) {
-	    screenName = argv[i+1];
-	} else if ((c == 'u') && toplevel
-		&& (strncmp(arg, "-use", strlen(arg)) == 0)) {
-	    useOption = argv[i+1];
+		&& (strncmp(arg, "-colormap", length) == 0)) {
+	    colormapName = Tcl_GetString(objv[i+1]);
+	} else if ((c == 's') && (type == TYPE_TOPLEVEL)
+		&& (strncmp(arg, "-screen", length) == 0)) {
+	    screenName = Tcl_GetString(objv[i+1]);
+	} else if ((c == 'u') && (type == TYPE_TOPLEVEL)
+		&& (strncmp(arg, "-use", length) == 0)) {
+	    useOption = Tcl_GetString(objv[i+1]);
 	} else if ((c == 'v')
-		&& (strncmp(arg, "-visual", strlen(arg)) == 0)) {
-	    visualName = argv[i+1];
+		&& (strncmp(arg, "-visual", length) == 0)) {
+	    visualName = Tcl_GetString(objv[i+1]);
 	}
     }
 
@@ -318,18 +552,33 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
      */
 
     if (screenName == NULL) {
-	screenName = (toplevel) ? "" : NULL;
+	screenName = (type == TYPE_TOPLEVEL) ? "" : NULL;
     }
+
+    /*
+     * Main window associated with interpreter.
+     * If we're called by Tk_Init to create a
+     * new application, then this is NULL.
+     */
+
+    tkwin = Tk_MainWindow(interp);
     if (tkwin != NULL) {
-	new = Tk_CreateWindowFromPath(interp, tkwin, argv[1], screenName);
+	new = Tk_CreateWindowFromPath(interp, tkwin, Tcl_GetString(objv[1]),
+		screenName);
+    } else if (appName == NULL) {
+	/*
+	 * This occurs when someone tried to create a frame/toplevel
+	 * while we are being destroyed.  Let an error be thrown.
+	 */
+
+	Tcl_AppendResult(interp, "unable to create widget \"",
+		Tcl_GetString(objv[1]), "\"", (char *) NULL);
+	new = NULL;
     } else {
 	/*
 	 * We were called from Tk_Init;  create a new application.
 	 */
 
-	if (appName == NULL) {
-	    panic("TkCreateFrame didn't get application name");
-	}
 	new = TkCreateMainWindow(interp, screenName, appName);
     }
     if (new == NULL) {
@@ -338,14 +587,14 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     if (className == NULL) {
 	className = Tk_GetOption(new, "class", "Class");
 	if (className == NULL) {
-	    className = (toplevel) ? "Toplevel" : "Frame";
+	    className = classNames[type];
 	}
     }
     Tk_SetClass(new, className);
     if (useOption == NULL) {
 	useOption = Tk_GetOption(new, "use", "Use");
     }
-    if (useOption != NULL) {
+    if ((useOption != NULL) && (*useOption != 0)) {
 	if (TkpUseWindow(interp, new, useOption) != TCL_OK) {
 	    goto error;
 	}
@@ -355,6 +604,9 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     }
     if (colormapName == NULL) {
 	colormapName = Tk_GetOption(new, "colormap", "Colormap");
+    }
+    if ((colormapName != NULL) && (*colormapName == 0)) {
+	colormapName = NULL;
     }
     if (visualName != NULL) {
 	visual = Tk_GetVisual(interp, new, visualName, &depth,
@@ -378,7 +630,7 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
      * doesn't request a size for itself.
      */
 
-    if (toplevel) {
+    if (type == TYPE_TOPLEVEL) {
 	Tk_GeometryRequest(new, 200, 200);
     }
 
@@ -388,60 +640,59 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
      * in the widget record from the special options.
      */
 
-    framePtr = (Frame *) ckalloc(sizeof(Frame));
-    framePtr->tkwin = new;
-    framePtr->display = Tk_Display(new);
-    framePtr->interp = interp;
-    framePtr->widgetCmd = Tcl_CreateCommand(interp,
-	    Tk_PathName(new), FrameWidgetCmd,
+    if (type == TYPE_LABELFRAME) {
+	framePtr = (Frame *) ckalloc(sizeof(Labelframe));
+	memset((void *) framePtr, 0, (sizeof(Labelframe)));
+    } else {
+	framePtr = (Frame *) ckalloc(sizeof(Frame));
+	memset((void *) framePtr, 0, (sizeof(Frame)));
+    }
+    framePtr->tkwin		= new;
+    framePtr->display		= Tk_Display(new);
+    framePtr->interp		= interp;
+    framePtr->widgetCmd		= Tcl_CreateObjCommand(interp,
+	    Tk_PathName(new), FrameWidgetObjCmd,
 	    (ClientData) framePtr, FrameCmdDeletedProc);
-    framePtr->className = NULL;
-    framePtr->mask = (toplevel) ? TOPLEVEL : FRAME;
-    framePtr->screenName = NULL;
-    framePtr->visualName = NULL;
-    framePtr->colormapName = NULL;
+    framePtr->optionTable = optionTable;
+    framePtr->type = type;
     framePtr->colormap = colormap;
-    framePtr->border = NULL;
-    framePtr->borderWidth = 0;
     framePtr->relief = TK_RELIEF_FLAT;
-    framePtr->highlightWidth = 0;
-    framePtr->highlightBgColorPtr = NULL;
-    framePtr->highlightColorPtr = NULL;
-    framePtr->width = 0;
-    framePtr->height = 0;
     framePtr->cursor = None;
-    framePtr->takeFocus = NULL;
-    framePtr->isContainer = 0;
-    framePtr->useThis = NULL;
-    framePtr->flags = 0;
-    framePtr->menuName = NULL;
+
+    if (framePtr->type == TYPE_LABELFRAME) {
+	Labelframe *labelframePtr = (Labelframe *) framePtr;
+	labelframePtr->labelAnchor = LABELANCHOR_NW;
+	labelframePtr->textGC = None;
+    }
 
     /*
      * Store backreference to frame widget in window structure.
      */
-    TkSetClassProcs(new, NULL, (ClientData) framePtr);
+    Tk_SetClassProcs(new, &frameClass, (ClientData) framePtr);
 
     mask = ExposureMask | StructureNotifyMask | FocusChangeMask;
-    if (toplevel) {
+    if (type == TYPE_TOPLEVEL) {
         mask |= ActivateMask;
     }
     Tk_CreateEventHandler(new, mask, FrameEventProc, (ClientData) framePtr);
-    if (ConfigureFrame(interp, framePtr, argc-2, argv+2, 0) != TCL_OK) {
+    if ((Tk_InitOptions(interp, (char *) framePtr, optionTable, new)
+	    != TCL_OK) ||
+	    (ConfigureFrame(interp, framePtr, objc-2, objv+2) != TCL_OK)) {
 	goto error;
     }
     if ((framePtr->isContainer)) {
 	if (framePtr->useThis == NULL) {
 	    TkpMakeContainer(framePtr->tkwin);
 	} else {
-	    Tcl_AppendResult(interp,"A window cannot have both the -use ",
-		    "and the -container option set.");
-	    return TCL_ERROR;
+	    Tcl_AppendResult(interp, "A window cannot have both the -use ",
+		    "and the -container option set.", (char *) NULL);
+	    goto error;
 	}
     }
-    if (toplevel) {
+    if (type == TYPE_TOPLEVEL) {
 	Tcl_DoWhenIdle(MapFrame, (ClientData) framePtr);
     }
-    interp->result = Tk_PathName(new);
+    Tcl_SetResult(interp, Tk_PathName(new), TCL_STATIC);
     return TCL_OK;
 
     error:
@@ -454,7 +705,7 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
 /*
  *--------------------------------------------------------------
  *
- * FrameWidgetCmd --
+ * FrameWidgetObjCmd --
  *
  *	This procedure is invoked to process the Tcl command
  *	that corresponds to a frame widget.  See the user
@@ -470,83 +721,98 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
  */
 
 static int
-FrameWidgetCmd(clientData, interp, argc, argv)
+FrameWidgetObjCmd(clientData, interp, objc, objv)
     ClientData clientData;	/* Information about frame widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
+    static CONST char *frameOptions[] = {
+	"cget", "configure", (char *) NULL
+    };
+    enum options {
+	FRAME_CGET, FRAME_CONFIGURE
+    };
     register Frame *framePtr = (Frame *) clientData;
-    int result;
+    int result = TCL_OK, index;
     size_t length;
     int c, i;
+    Tcl_Obj *objPtr;
 
-    if (argc < 2) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"",
-		argv[0], " option ?arg arg ...?\"", (char *) NULL);
+    if (objc < 2) {
+	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg arg ...?");
+	return TCL_ERROR;
+    }
+    if (Tcl_GetIndexFromObj(interp, objv[1], frameOptions, "option", 0,
+	    &index) != TCL_OK) {
 	return TCL_ERROR;
     }
     Tcl_Preserve((ClientData) framePtr);
-    c = argv[1][0];
-    length = strlen(argv[1]);
-    if ((c == 'c') && (strncmp(argv[1], "cget", length) == 0)
-	    && (length >= 2)) {
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"",
-		    argv[0], " cget option\"",
-		    (char *) NULL);
+    switch ((enum options) index) {
+      case FRAME_CGET: {
+	if (objc != 3) {
+	    Tcl_WrongNumArgs(interp, 2, objv, "option");
 	    result = TCL_ERROR;
 	    goto done;
 	}
-	result = Tk_ConfigureValue(interp, framePtr->tkwin, configSpecs,
-		(char *) framePtr, argv[2], framePtr->mask);
-    } else if ((c == 'c') && (strncmp(argv[1], "configure", length) == 0)
-	    && (length >= 2)) {
-	if (argc == 2) {
-	    result = Tk_ConfigureInfo(interp, framePtr->tkwin, configSpecs,
-		    (char *) framePtr, (char *) NULL, framePtr->mask);
-	} else if (argc == 3) {
-	    result = Tk_ConfigureInfo(interp, framePtr->tkwin, configSpecs,
-		    (char *) framePtr, argv[2], framePtr->mask);
+        objPtr = Tk_GetOptionValue(interp, (char *) framePtr,
+		framePtr->optionTable, objv[2], framePtr->tkwin);
+        if (objPtr == NULL) {
+	    result = TCL_ERROR;
+	    goto done;
+        } else {
+	    Tcl_SetObjResult(interp, objPtr);
+        }
+	break;
+      }
+      case FRAME_CONFIGURE: {
+	if (objc <= 3) {
+	    objPtr = Tk_GetOptionInfo(interp, (char *) framePtr,
+		    framePtr->optionTable,
+		    (objc == 3) ? objv[2] : (Tcl_Obj *) NULL,
+		    framePtr->tkwin);
+	    if (objPtr == NULL) {
+		result = TCL_ERROR;
+		goto done;
+	    } else {
+		Tcl_SetObjResult(interp, objPtr);
+	    }
 	} else {
 	    /*
 	     * Don't allow the options -class, -colormap, -container,
 	     * -newcmap, -screen, -use, or -visual to be changed.
 	     */
 
-	    for (i = 2; i < argc; i++) {
-		length = strlen(argv[i]);
+	    for (i = 2; i < objc; i++) {
+		char *arg = Tcl_GetStringFromObj(objv[i], (int *) &length);
 		if (length < 2) {
 		    continue;
 		}
-		c = argv[i][1];
-		if (((c == 'c') && (strncmp(argv[i], "-class", length) == 0)
+		c = arg[1];
+		if (((c == 'c') && (strncmp(arg, "-class", length) == 0)
 			&& (length >= 2))
-			|| ((c == 'c') && (framePtr->mask == TOPLEVEL)
-			&& (strncmp(argv[i], "-colormap", length) == 0)
+			|| ((c == 'c')
+			&& (strncmp(arg, "-colormap", length) == 0)
 			&& (length >= 3))
 			|| ((c == 'c')
-			&& (strncmp(argv[i], "-container", length) == 0)
+			&& (strncmp(arg, "-container", length) == 0)
 			&& (length >= 3))
-			|| ((c == 's') && (framePtr->mask == TOPLEVEL)
-			&& (strncmp(argv[i], "-screen", length) == 0))
-			|| ((c == 'u') && (framePtr->mask == TOPLEVEL)
-			&& (strncmp(argv[i], "-use", length) == 0))
-			|| ((c == 'v') && (framePtr->mask == TOPLEVEL)
-			&& (strncmp(argv[i], "-visual", length) == 0))) {
-		    Tcl_AppendResult(interp, "can't modify ", argv[i],
+			|| ((c == 's') && (framePtr->type == TYPE_TOPLEVEL)
+			&& (strncmp(arg, "-screen", length) == 0))
+			|| ((c == 'u') && (framePtr->type == TYPE_TOPLEVEL)
+			&& (strncmp(arg, "-use", length) == 0))
+			|| ((c == 'v')
+			&& (strncmp(arg, "-visual", length) == 0))) {
+		    Tcl_AppendResult(interp, "can't modify ", arg,
 			    " option after widget is created", (char *) NULL);
 		    result = TCL_ERROR;
 		    goto done;
 		}
 	    }
-	    result = ConfigureFrame(interp, framePtr, argc-2, argv+2,
-		    TK_CONFIG_ARGV_ONLY);
+	    result = ConfigureFrame(interp, framePtr, objc-2, objv+2);
 	}
-    } else {
-	Tcl_AppendResult(interp, "bad option \"", argv[1],
-		"\": must be cget or configure", (char *) NULL);
-	result = TCL_ERROR;
+	break;
+      }
     }
 
     done:
@@ -577,9 +843,14 @@ DestroyFrame(memPtr)
     char *memPtr;		/* Info about frame widget. */
 {
     register Frame *framePtr = (Frame *) memPtr;
+    register Labelframe *labelframePtr = (Labelframe *) memPtr;
 
-    Tk_FreeOptions(configSpecs, (char *) framePtr, framePtr->display,
-	    framePtr->mask);
+    if (framePtr->type == TYPE_LABELFRAME) {
+	Tk_FreeTextLayout(labelframePtr->textLayout);
+	if (labelframePtr->textGC != None) {
+	    Tk_FreeGC(framePtr->display, labelframePtr->textGC);
+	}
+    }
     if (framePtr->colormap != None) {
 	Tk_FreeColormap(framePtr->display, framePtr->colormap);
     }
@@ -589,15 +860,56 @@ DestroyFrame(memPtr)
 /*
  *----------------------------------------------------------------------
  *
+ * DestroyFramePartly --
+ *
+ *	This procedure is invoked to clean up everything that needs
+ *      tkwin to be defined when deleted.  During the destruction
+ *      process tkwin is always set to NULL and this procedure must
+ *      be called before that happens.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Some things associated with the frame are freed up.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+DestroyFramePartly(framePtr)
+    Frame *framePtr;		/* Info about frame widget. */
+{
+    register Labelframe *labelframePtr = (Labelframe *) framePtr;
+
+    if (framePtr->type == TYPE_LABELFRAME && labelframePtr->labelWin != NULL) {
+	Tk_DeleteEventHandler(labelframePtr->labelWin, StructureNotifyMask,
+		FrameStructureProc, (ClientData) framePtr);
+	Tk_ManageGeometry(labelframePtr->labelWin, (Tk_GeomMgr *) NULL,
+		(ClientData) NULL);
+	if (framePtr->tkwin != Tk_Parent(labelframePtr->labelWin)) {
+	    Tk_UnmaintainGeometry(labelframePtr->labelWin, framePtr->tkwin);
+	}
+	Tk_UnmapWindow(labelframePtr->labelWin);
+	labelframePtr->labelWin = NULL;
+    }
+
+    Tk_FreeConfigOptions((char *) framePtr, framePtr->optionTable,
+            framePtr->tkwin);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * ConfigureFrame --
  *
- *	This procedure is called to process an argv/argc list, plus
+ *	This procedure is called to process an objv/objc list, plus
  *	the Tk option database, in order to configure (or
  *	reconfigure) a frame widget.
  *
  * Results:
  *	The return value is a standard Tcl result.  If TCL_ERROR is
- *	returned, then interp->result contains an error message.
+ *	returned, then the interp's result contains an error message.
  *
  * Side effects:
  *	Configuration information, such as text string, colors, font,
@@ -608,16 +920,18 @@ DestroyFrame(memPtr)
  */
 
 static int
-ConfigureFrame(interp, framePtr, argc, argv, flags)
+ConfigureFrame(interp, framePtr, objc, objv)
     Tcl_Interp *interp;		/* Used for error reporting. */
     register Frame *framePtr;	/* Information about widget;  may or may
 				 * not already have values for some fields. */
-    int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
-    int flags;			/* Flags to pass to Tk_ConfigureWidget. */
+    int objc;			/* Number of valid entries in objv. */
+    Tcl_Obj *CONST objv[];	/* Arguments. */
 {
+    Tk_SavedOptions savedOptions;
     char *oldMenuName;
-    
+    Tk_Window oldWindow = NULL;
+    Labelframe *labelframePtr = (Labelframe *) framePtr;
+
     /*
      * Need the old menubar name for the menu code to delete it.
      */
@@ -628,11 +942,24 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
     	oldMenuName = ckalloc(strlen(framePtr->menuName) + 1);
     	strcpy(oldMenuName, framePtr->menuName);
     }
-    
-    if (Tk_ConfigureWidget(interp, framePtr->tkwin, configSpecs,
-	    argc, argv, (char *) framePtr, flags | framePtr->mask) != TCL_OK) {
-	return TCL_ERROR;
+
+    if (framePtr->type == TYPE_LABELFRAME) {
+	oldWindow = labelframePtr->labelWin;
     }
+    if (Tk_SetOptions(interp, (char *) framePtr,
+	    framePtr->optionTable, objc, objv,
+	    framePtr->tkwin, &savedOptions, (int *) NULL) != TCL_OK) {
+	if (oldMenuName != NULL) {
+	    ckfree(oldMenuName);
+	}
+	return TCL_ERROR;
+    } else {
+	Tk_FreeSavedOptions(&savedOptions);
+    }
+
+    /*
+     * A few of the options require additional processing.
+     */
 
     if (((oldMenuName == NULL) && (framePtr->menuName != NULL))
 	    || ((oldMenuName != NULL) && (framePtr->menuName == NULL))
@@ -641,7 +968,11 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
 	TkSetWindowMenuBar(interp, framePtr->tkwin, oldMenuName,
 		framePtr->menuName);
     }
-    
+
+    if (oldMenuName != NULL) {
+    	ckfree(oldMenuName);
+    }
+
     if (framePtr->border != NULL) {
 	Tk_SetBackgroundFromBorder(framePtr->tkwin, framePtr->border);
     } else {
@@ -651,24 +982,391 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
     if (framePtr->highlightWidth < 0) {
 	framePtr->highlightWidth = 0;
     }
-    Tk_SetInternalBorder(framePtr->tkwin,
-	    framePtr->borderWidth + framePtr->highlightWidth);
+    if (framePtr->padX < 0) {
+	framePtr->padX = 0;
+    }
+    if (framePtr->padY < 0) {
+	framePtr->padY = 0;
+    }
+
+    /*
+     * If a -labelwidget is specified, check that it is valid and set
+     * up geometry management for it.
+     */
+
+    if (framePtr->type == TYPE_LABELFRAME) {
+	if (oldWindow != labelframePtr->labelWin) {
+	    if (oldWindow != NULL) {
+		Tk_DeleteEventHandler(oldWindow, StructureNotifyMask,
+			FrameStructureProc, (ClientData) framePtr);
+		Tk_ManageGeometry(oldWindow, (Tk_GeomMgr *) NULL,
+			(ClientData) NULL);
+		Tk_UnmaintainGeometry(oldWindow, framePtr->tkwin);
+		Tk_UnmapWindow(oldWindow);
+	    }
+	    if (labelframePtr->labelWin != NULL) {
+		Tk_Window ancestor, parent, sibling = NULL;
+
+		/*
+		 * Make sure that the frame is either the parent of the
+		 * window used as label or a descendant of that
+		 * parent.  Also, don't allow a top-level window to be
+		 * managed inside the frame.
+		 */
+
+		parent = Tk_Parent(labelframePtr->labelWin);
+		for (ancestor = framePtr->tkwin; ;
+		     ancestor = Tk_Parent(ancestor)) {
+		    if (ancestor == parent) {
+			break;
+		    }
+		    sibling = ancestor;
+		    if (Tk_IsTopLevel(ancestor)) {
+			badWindow:
+			Tcl_AppendResult(interp, "can't use ",
+				Tk_PathName(labelframePtr->labelWin),
+				" as label in this frame", (char *) NULL);
+			labelframePtr->labelWin = NULL;
+			return TCL_ERROR;
+		    }
+		}
+		if (Tk_IsTopLevel(labelframePtr->labelWin)) {
+		    goto badWindow;
+		}
+		if (labelframePtr->labelWin == framePtr->tkwin) {
+		    goto badWindow;
+		}
+		Tk_CreateEventHandler(labelframePtr->labelWin,
+			StructureNotifyMask, FrameStructureProc,
+			(ClientData) framePtr);
+		Tk_ManageGeometry(labelframePtr->labelWin, &frameGeomType,
+			(ClientData) framePtr);
+
+		/*
+		 * If the frame is not parent to the label, make
+		 * sure the label is above its sibling in the stacking
+		 * order.
+		 */
+
+		if (sibling != NULL) {
+		    Tk_RestackWindow(labelframePtr->labelWin, Above, sibling);
+		}
+	    }
+	}
+    }
+
+    FrameWorldChanged((ClientData) framePtr);
+
+    return TCL_OK;
+}
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * FrameWorldChanged --
+ *
+ *      This procedure is called when the world has changed in some
+ *      way and the widget needs to recompute all its graphics contexts
+ *	and determine its new geometry.
+ *
+ * Results:
+ *      None.
+ *
+ * Side effects:
+ *      Frame will be relayed out and redisplayed.
+ *
+ *---------------------------------------------------------------------------
+ */
+ 
+static void
+FrameWorldChanged(instanceData)
+    ClientData instanceData;	/* Information about widget. */
+{
+    Frame *framePtr = (Frame *) instanceData;
+    Labelframe *labelframePtr = (Labelframe *) framePtr;
+    Tk_Window tkwin = framePtr->tkwin;
+    XGCValues gcValues;
+    GC gc;
+    int anyTextLabel, anyWindowLabel;
+    int bWidthLeft, bWidthRight, bWidthTop, bWidthBottom;
+    char *labelText;
+
+    anyTextLabel = (framePtr->type == TYPE_LABELFRAME) &&
+	    (labelframePtr->textPtr != NULL) &&
+	    (labelframePtr->labelWin == NULL);
+    anyWindowLabel = (framePtr->type == TYPE_LABELFRAME) &&
+	    (labelframePtr->labelWin != NULL);
+
+    if (framePtr->type == TYPE_LABELFRAME) {
+	/*
+	 * The textGC is needed even in the labelWin case, so it's
+	 * always created for a labelframe.
+	 */
+
+	gcValues.font = Tk_FontId(labelframePtr->tkfont);
+	gcValues.foreground = labelframePtr->textColorPtr->pixel;
+	gcValues.graphics_exposures = False;
+	gc = Tk_GetGC(tkwin, GCForeground | GCFont | GCGraphicsExposures,
+		&gcValues);
+	if (labelframePtr->textGC != None) {
+	    Tk_FreeGC(framePtr->display, labelframePtr->textGC);
+	}
+	labelframePtr->textGC = gc;
+
+	/*
+	 * Calculate label size.
+	 */
+	
+	labelframePtr->labelReqWidth = labelframePtr->labelReqHeight = 0;
+
+	if (anyTextLabel) {
+	    labelText = Tcl_GetString(labelframePtr->textPtr);
+	    Tk_FreeTextLayout(labelframePtr->textLayout);
+	    labelframePtr->textLayout = Tk_ComputeTextLayout(labelframePtr->tkfont,
+		    labelText, -1, 0, TK_JUSTIFY_CENTER, 0,
+		    &labelframePtr->labelReqWidth, &labelframePtr->labelReqHeight);
+	    labelframePtr->labelReqWidth += 2 * LABELSPACING;
+	    labelframePtr->labelReqHeight += 2 * LABELSPACING;
+	} else if (anyWindowLabel) {
+	    labelframePtr->labelReqWidth = Tk_ReqWidth(labelframePtr->labelWin);
+	    labelframePtr->labelReqHeight = Tk_ReqHeight(labelframePtr->labelWin);
+	}
+
+	/* 
+	 * Make sure label size is at least as big as the border.
+	 * This simplifies later calculations and gives a better
+	 * appearance with thick borders.
+	 */
+     
+	if ((labelframePtr->labelAnchor >= LABELANCHOR_N) && 
+		(labelframePtr->labelAnchor <= LABELANCHOR_SW)) {
+	    if (labelframePtr->labelReqHeight < framePtr->borderWidth) {
+		labelframePtr->labelReqHeight = framePtr->borderWidth;
+	    }
+	} else {
+	    if (labelframePtr->labelReqWidth < framePtr->borderWidth) {
+		labelframePtr->labelReqWidth = framePtr->borderWidth;
+	    }
+	}
+    }
+
+    /*
+     * Calculate individual border widths.
+     */
+
+    bWidthBottom = bWidthTop = bWidthRight = bWidthLeft = 
+            framePtr->borderWidth + framePtr->highlightWidth;
+
+    bWidthLeft   += framePtr->padX;
+    bWidthRight  += framePtr->padX;
+    bWidthTop    += framePtr->padY;
+    bWidthBottom += framePtr->padY;
+    
+    if (anyTextLabel || anyWindowLabel) {
+	switch (labelframePtr->labelAnchor) {
+	  case LABELANCHOR_E:
+	  case LABELANCHOR_EN:
+	  case LABELANCHOR_ES:
+	    bWidthRight += labelframePtr->labelReqWidth -
+		    framePtr->borderWidth;
+	    break;
+	  case LABELANCHOR_N:
+	  case LABELANCHOR_NE:
+	  case LABELANCHOR_NW:
+	    bWidthTop += labelframePtr->labelReqHeight - framePtr->borderWidth;
+	    break;
+	  case LABELANCHOR_S:
+	  case LABELANCHOR_SE:
+	  case LABELANCHOR_SW:
+	    bWidthBottom += labelframePtr->labelReqHeight -
+		    framePtr->borderWidth;
+	    break;
+	  default:
+	    bWidthLeft += labelframePtr->labelReqWidth - framePtr->borderWidth;
+	    break;
+	}
+    }
+
+    Tk_SetInternalBorderEx(tkwin, bWidthLeft, bWidthRight, bWidthTop,
+	    bWidthBottom);
+
+    ComputeFrameGeometry(framePtr);
+
+    /*
+     * A labelframe should request size for its label.
+     */
+
+    if (framePtr->type == TYPE_LABELFRAME) {
+	int minwidth = labelframePtr->labelReqWidth;
+	int minheight = labelframePtr->labelReqHeight;
+	int padding = framePtr->highlightWidth;
+	if (framePtr->borderWidth > 0) {
+	    padding += framePtr->borderWidth + LABELMARGIN;
+	}
+	padding *= 2;
+	if ((labelframePtr->labelAnchor >= LABELANCHOR_N) && 
+		(labelframePtr->labelAnchor <= LABELANCHOR_SW)) {
+	    minwidth += padding;
+	    minheight += framePtr->borderWidth + framePtr->highlightWidth;
+	} else {
+	    minheight += padding;
+	    minwidth += framePtr->borderWidth + framePtr->highlightWidth;
+	}
+	Tk_SetMinimumRequestSize(tkwin, minwidth, minheight);
+    }
+
     if ((framePtr->width > 0) || (framePtr->height > 0)) {
-	Tk_GeometryRequest(framePtr->tkwin, framePtr->width,
-		framePtr->height);
+	Tk_GeometryRequest(tkwin, framePtr->width, framePtr->height);
     }
 
-    if (oldMenuName != NULL) {
-    	ckfree(oldMenuName);
-    }
-
-    if (Tk_IsMapped(framePtr->tkwin)) {
+    if (Tk_IsMapped(tkwin)) {
 	if (!(framePtr->flags & REDRAW_PENDING)) {
 	    Tcl_DoWhenIdle(DisplayFrame, (ClientData) framePtr);
 	}
 	framePtr->flags |= REDRAW_PENDING;
     }
-    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ComputeFrameGeometry --
+ *
+ *	This procedure is called to compute various geometrical
+ *	information for a frame, such as where various things get
+ *	displayed.  It's called when the window is reconfigured.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Display-related numbers get changed in *framePtr.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+ComputeFrameGeometry(framePtr)
+    register Frame *framePtr;		/* Information about widget. */
+{
+    int otherWidth, otherHeight, otherWidthT, otherHeightT, padding;
+    int maxWidth, maxHeight;
+    Tk_Window tkwin;
+    Labelframe *labelframePtr = (Labelframe *) framePtr;
+
+    /*
+     * We have nothing to do here unless there is a label.
+     */
+
+    if (framePtr->type != TYPE_LABELFRAME) return;
+    if ((labelframePtr->textPtr == NULL) &&
+	    (labelframePtr->labelWin == NULL))  return;
+
+    tkwin = framePtr->tkwin;
+
+    /* 
+     * Calculate the available size for the label
+     */
+
+    labelframePtr->labelBox.width = labelframePtr->labelReqWidth;
+    labelframePtr->labelBox.height = labelframePtr->labelReqHeight;
+
+    padding = framePtr->highlightWidth;
+    if (framePtr->borderWidth > 0) {
+        padding += framePtr->borderWidth + LABELMARGIN;
+    }
+    padding *= 2;
+
+    maxHeight = Tk_Height(tkwin);
+    maxWidth  = Tk_Width(tkwin);
+
+    if ((labelframePtr->labelAnchor >= LABELANCHOR_N) && 
+            (labelframePtr->labelAnchor <= LABELANCHOR_SW)) {
+	maxWidth -= padding;
+	if (maxWidth < 1) maxWidth = 1;
+    } else {
+	maxHeight -= padding;
+	if (maxHeight < 1) maxHeight = 1;
+    }
+    if (labelframePtr->labelBox.width > maxWidth) {
+	labelframePtr->labelBox.width = maxWidth;
+    }
+    if (labelframePtr->labelBox.height > maxHeight) {
+	labelframePtr->labelBox.height = maxHeight;
+    }
+
+    /*
+     * Calculate label and text position.
+     * The text's position is based on the requested size (= the text's
+     * real size) to get proper alignment if the text does not fit.
+     */
+
+    otherWidth   = Tk_Width(tkwin)  - labelframePtr->labelBox.width;
+    otherHeight  = Tk_Height(tkwin) - labelframePtr->labelBox.height;
+    otherWidthT  = Tk_Width(tkwin)  - labelframePtr->labelReqWidth;
+    otherHeightT = Tk_Height(tkwin) - labelframePtr->labelReqHeight;
+    padding = framePtr->highlightWidth;
+
+    switch (labelframePtr->labelAnchor) {
+      case LABELANCHOR_E:
+      case LABELANCHOR_EN:
+      case LABELANCHOR_ES:
+        labelframePtr->labelTextX = otherWidthT - padding;
+        labelframePtr->labelBox.x = otherWidth - padding;
+        break;
+      case LABELANCHOR_N:
+      case LABELANCHOR_NE:
+      case LABELANCHOR_NW:
+        labelframePtr->labelTextY = padding;
+        labelframePtr->labelBox.y = padding;
+        break;
+      case LABELANCHOR_S:
+      case LABELANCHOR_SE:
+      case LABELANCHOR_SW:
+        labelframePtr->labelTextY = otherHeightT - padding;
+        labelframePtr->labelBox.y = otherHeight - padding;
+        break;
+      default:
+        labelframePtr->labelTextX = padding;
+        labelframePtr->labelBox.x = padding;
+        break;
+    }
+
+    if (framePtr->borderWidth > 0) {
+        padding += framePtr->borderWidth + LABELMARGIN;
+    }
+
+    switch (labelframePtr->labelAnchor) {
+      case LABELANCHOR_NW:
+      case LABELANCHOR_SW:
+        labelframePtr->labelTextX = padding;
+        labelframePtr->labelBox.x = padding;
+        break;
+      case LABELANCHOR_N:
+      case LABELANCHOR_S:	
+        labelframePtr->labelTextX = otherWidthT / 2;
+        labelframePtr->labelBox.x = otherWidth / 2;
+        break;
+      case LABELANCHOR_NE:
+      case LABELANCHOR_SE:
+        labelframePtr->labelTextX = otherWidthT - padding;
+        labelframePtr->labelBox.x = otherWidth - padding;
+        break;
+      case LABELANCHOR_EN:
+      case LABELANCHOR_WN:
+        labelframePtr->labelTextY = padding;
+        labelframePtr->labelBox.y = padding;
+        break;
+      case LABELANCHOR_E:
+      case LABELANCHOR_W:
+        labelframePtr->labelTextY = otherHeightT / 2;
+        labelframePtr->labelBox.y = otherHeight / 2;
+        break;
+      default:
+	labelframePtr->labelTextY = otherHeightT - padding;
+	labelframePtr->labelBox.y = otherHeight - padding;
+        break;
+    }
 }
 
 /*
@@ -694,7 +1392,9 @@ DisplayFrame(clientData)
 {
     register Frame *framePtr = (Frame *) clientData;
     register Tk_Window tkwin = framePtr->tkwin;
-    GC gc;
+    int bdX1, bdY1, bdX2, bdY2, hlWidth;
+    Pixmap pixmap;
+    TkRegion clipRegion = NULL;
 
     framePtr->flags &= ~REDRAW_PENDING;
     if ((framePtr->tkwin == NULL) || !Tk_IsMapped(tkwin)
@@ -702,25 +1402,193 @@ DisplayFrame(clientData)
 	return;
     }
 
-    if (framePtr->border != NULL) {
-	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin),
-		framePtr->border, framePtr->highlightWidth,
-		framePtr->highlightWidth,
-		Tk_Width(tkwin) - 2*framePtr->highlightWidth,
-		Tk_Height(tkwin) - 2*framePtr->highlightWidth,
-		framePtr->borderWidth, framePtr->relief);
-    }
-    if (framePtr->highlightWidth != 0) {
+    /*
+     * Highlight shall always be drawn if it exists, so do that first.
+     */
+
+    hlWidth = framePtr->highlightWidth;
+
+    if (hlWidth != 0) {
+        GC fgGC, bgGC;
+        
+	bgGC = Tk_GCForColor(framePtr->highlightBgColorPtr,
+		Tk_WindowId(tkwin));
 	if (framePtr->flags & GOT_FOCUS) {
-	    gc = Tk_GCForColor(framePtr->highlightColorPtr,
+	    fgGC = Tk_GCForColor(framePtr->highlightColorPtr,
+		    Tk_WindowId(tkwin));
+	    TkpDrawHighlightBorder(tkwin, fgGC, bgGC, hlWidth,
 		    Tk_WindowId(tkwin));
 	} else {
-	    gc = Tk_GCForColor(framePtr->highlightBgColorPtr,
+	    TkpDrawHighlightBorder(tkwin, bgGC, bgGC, hlWidth,
 		    Tk_WindowId(tkwin));
 	}
-	Tk_DrawFocusHighlight(tkwin, gc, framePtr->highlightWidth,
-		Tk_WindowId(tkwin));
     }
+
+    /*
+     * If -background is set to "", no interior is drawn.
+     */
+
+    if (framePtr->border == NULL) return;
+
+    if (framePtr->type != TYPE_LABELFRAME) {
+	/*
+	 * There is no label so there is just a simple rectangle to draw.
+	 */
+
+	noLabel:
+	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin),
+		framePtr->border, hlWidth, hlWidth,
+		Tk_Width(tkwin) - 2 * hlWidth,
+		Tk_Height(tkwin) - 2 * hlWidth,
+		framePtr->borderWidth, framePtr->relief);
+    } else {
+	Labelframe *labelframePtr = (Labelframe *) framePtr;
+
+	if ((labelframePtr->textPtr == NULL) &&
+		(labelframePtr->labelWin == NULL)) {
+	    goto noLabel;
+	}
+
+	/*
+	 * In order to avoid screen flashes, this procedure redraws the
+	 * frame into off-screen memory, then copies it back on-screen 
+	 * in a single operation.  This means there's no point in time 
+	 * where the on-screen image has been cleared.
+	 */
+
+	pixmap = Tk_GetPixmap(framePtr->display, Tk_WindowId(tkwin),
+		Tk_Width(tkwin), Tk_Height(tkwin), Tk_Depth(tkwin));
+	
+	/* 
+	 * Clear the pixmap.
+	 */
+
+	Tk_Fill3DRectangle(tkwin, pixmap, framePtr->border, 0, 0,
+		Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
+
+	/*
+	 * Calculate how the label affects the border's position.
+	 */
+
+	bdX1 = bdY1 = hlWidth;
+	bdX2 = Tk_Width(tkwin) - hlWidth;
+	bdY2 = Tk_Height(tkwin) - hlWidth;
+
+	switch (labelframePtr->labelAnchor) {
+	  case LABELANCHOR_E:
+	  case LABELANCHOR_EN:
+	  case LABELANCHOR_ES:
+	    bdX2 -= (labelframePtr->labelBox.width - framePtr->borderWidth)
+		    / 2;
+	    break;
+	  case LABELANCHOR_N:
+	  case LABELANCHOR_NE:
+	  case LABELANCHOR_NW:
+	    /* 
+	     * Since the glyphs of the text tend to be in the lower part
+             * we favor a lower border position by rounding up.
+	     */
+
+	    bdY1 += (labelframePtr->labelBox.height - framePtr->borderWidth +1)
+		    / 2;
+	    break;
+	  case LABELANCHOR_S:
+	  case LABELANCHOR_SE:
+	  case LABELANCHOR_SW:
+	    bdY2 -= (labelframePtr->labelBox.height - framePtr->borderWidth)
+		    / 2;
+	    break;
+	  default:
+	    bdX1 += (labelframePtr->labelBox.width - framePtr->borderWidth)
+		    / 2;
+	    break;
+	}
+
+	/* 
+         * Draw border
+         */
+
+	Tk_Draw3DRectangle(tkwin, pixmap, framePtr->border, bdX1, bdY1,
+		bdX2 - bdX1, bdY2 - bdY1, framePtr->borderWidth,
+		framePtr->relief);
+
+        if (labelframePtr->labelWin == NULL) {
+            /* 
+             * Clear behind the label
+             */
+
+            Tk_Fill3DRectangle(tkwin, pixmap,
+                    framePtr->border, labelframePtr->labelBox.x,
+                    labelframePtr->labelBox.y, labelframePtr->labelBox.width,
+                    labelframePtr->labelBox.height, 0, TK_RELIEF_FLAT);
+
+            /*
+             * Draw label.
+	     * If there is not room for the entire label, use clipping to
+	     * get a nice appearance.
+             */
+	    
+	    if ((labelframePtr->labelBox.width < labelframePtr->labelReqWidth)
+		    || (labelframePtr->labelBox.height < 
+			    labelframePtr->labelReqHeight)) {
+		clipRegion = TkCreateRegion();
+		TkUnionRectWithRegion(&labelframePtr->labelBox, clipRegion,
+			clipRegion);
+		TkSetRegion(framePtr->display, labelframePtr->textGC,
+			clipRegion);
+	    }
+
+            Tk_DrawTextLayout(framePtr->display, pixmap,
+                    labelframePtr->textGC, labelframePtr->textLayout,
+                    labelframePtr->labelTextX + LABELSPACING,
+                    labelframePtr->labelTextY + LABELSPACING, 0, -1);
+
+	    if (clipRegion != NULL) {
+		XSetClipMask(framePtr->display, labelframePtr->textGC, None);
+		TkDestroyRegion(clipRegion);
+	    }
+        } else {
+	    /*
+	     * Reposition and map the window (but in different ways depending
+	     * on whether the frame is the window's parent).
+	     */
+            
+	    if (framePtr->tkwin == Tk_Parent(labelframePtr->labelWin)) {
+		if ((labelframePtr->labelBox.x != Tk_X(labelframePtr->labelWin))
+			|| (labelframePtr->labelBox.y !=
+				Tk_Y(labelframePtr->labelWin))
+			|| (labelframePtr->labelBox.width != 
+				Tk_Width(labelframePtr->labelWin))
+			|| (labelframePtr->labelBox.height != 
+				Tk_Height(labelframePtr->labelWin))) {
+		    Tk_MoveResizeWindow(labelframePtr->labelWin,
+			    labelframePtr->labelBox.x, labelframePtr->labelBox.y, 
+			    labelframePtr->labelBox.width,
+			    labelframePtr->labelBox.height);
+		}
+		Tk_MapWindow(labelframePtr->labelWin);
+	    } else {
+		Tk_MaintainGeometry(labelframePtr->labelWin, framePtr->tkwin, 
+			labelframePtr->labelBox.x, labelframePtr->labelBox.y,
+			labelframePtr->labelBox.width,
+			labelframePtr->labelBox.height);
+	    }
+	}
+
+
+	/*
+	 * Everything's been redisplayed;  now copy the pixmap onto the screen
+	 * and free up the pixmap.
+	 */
+
+	XCopyArea(framePtr->display, pixmap, Tk_WindowId(tkwin),
+		labelframePtr->textGC, hlWidth, hlWidth,
+		(unsigned) (Tk_Width(tkwin) - 2 * hlWidth),
+		(unsigned) (Tk_Height(tkwin) - 2 * hlWidth),
+		hlWidth, hlWidth);
+	Tk_FreePixmap(framePtr->display, pixmap);
+    }
+
 }
 
 /*
@@ -749,8 +1617,10 @@ FrameEventProc(clientData, eventPtr)
 {
     register Frame *framePtr = (Frame *) clientData;
 
-    if (((eventPtr->type == Expose) && (eventPtr->xexpose.count == 0))
-	    || (eventPtr->type == ConfigureNotify)) {
+    if ((eventPtr->type == Expose) && (eventPtr->xexpose.count == 0)) {
+	goto redraw;
+    } else if (eventPtr->type == ConfigureNotify) {
+	ComputeFrameGeometry(framePtr);
 	goto redraw;
     } else if (eventPtr->type == DestroyNotify) {
 	if (framePtr->menuName != NULL) {
@@ -770,7 +1640,14 @@ FrameEventProc(clientData, eventPtr)
 	     * could be gone by then.  To do so, delete the event handler
 	     * explicitly (normally it's done implicitly by Tk_DestroyWindow).
 	     */
-    
+
+	    /*
+	     * Since the tkwin pointer will be gone when we reach
+	     * DestroyFrame, we must free all options now.
+	     */
+
+            DestroyFramePartly(framePtr);
+
 	    Tk_DeleteEventHandler(framePtr->tkwin,
 		    ExposureMask|StructureNotifyMask|FocusChangeMask,
 		    FrameEventProc, (ClientData) framePtr);
@@ -849,6 +1726,13 @@ FrameCmdDeletedProc(clientData)
      */
 
     if (tkwin != NULL) {
+	/* 
+	 * Some options need tkwin to be freed, so we free them here,
+	 * before setting tkwin to NULL.
+	 */
+
+        DestroyFramePartly(framePtr);
+
 	framePtr->tkwin = NULL;
 	Tk_DestroyWindow(tkwin);
     }
@@ -933,7 +1817,164 @@ TkInstallFrameMenu(tkwin)
     if (winPtr->mainPtr != NULL) {
 	Frame *framePtr;
 	framePtr = (Frame*) winPtr->instanceData;
+	if (framePtr == NULL) {
+	    panic("TkInstallFrameMenu couldn't get frame pointer");
+	}
 	TkpMenuNotifyToplevelCreate(winPtr->mainPtr->interp, 
 		framePtr->menuName);
     }
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * FrameStructureProc --
+ *
+ *	This procedure is invoked whenever StructureNotify events
+ *	occur for a window that's managed as label for the frame.
+ *	This procudure's only purpose is to clean up when windows
+ *	are deleted.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The window is disassociated from the frame when it is
+ *	deleted.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+FrameStructureProc(clientData, eventPtr)
+    ClientData clientData;	/* Pointer to record describing frame. */
+    XEvent *eventPtr;		/* Describes what just happened. */
+{
+    Labelframe *labelframePtr = (Labelframe *) clientData;
+
+    if (eventPtr->type == DestroyNotify) {
+	/*
+	 * This should only happen in a labelframe but it doesn't
+	 * hurt to be careful.
+	 */
+
+	if (labelframePtr->frame.type == TYPE_LABELFRAME) {
+	    labelframePtr->labelWin = NULL;
+	    FrameWorldChanged((ClientData) labelframePtr);
+	}
+    }
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * FrameRequestProc --
+ *
+ *	This procedure is invoked whenever a window that's associated
+ *	with a frame changes its requested dimensions.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The size and location on the screen of the window may change.
+ *	depending on the options specified for the frame.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+FrameRequestProc(clientData, tkwin)
+    ClientData clientData;		/* Pointer to record for frame. */
+    Tk_Window tkwin;			/* Window that changed its desired
+					 * size. */
+{
+    Frame *framePtr = (Frame *) clientData;
+
+    FrameWorldChanged((ClientData) framePtr);
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * FrameLostSlaveProc --
+ *
+ *	This procedure is invoked by Tk whenever some other geometry
+ *	claims control over a slave that used to be managed by us.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Forgets all frame-related information about the slave.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+FrameLostSlaveProc(clientData, tkwin)
+    ClientData clientData;	/* Frame structure for slave window that
+				 * was stolen away. */
+    Tk_Window tkwin;		/* Tk's handle for the slave window. */
+{
+    Frame *framePtr = (Frame *) clientData;
+    Labelframe *labelframePtr = (Labelframe *) clientData;
+
+    /*
+     * This should only happen in a labelframe but it doesn't
+     * hurt to be careful.
+     */
+    
+    if (labelframePtr->frame.type == TYPE_LABELFRAME) {
+	Tk_DeleteEventHandler(labelframePtr->labelWin, StructureNotifyMask,
+		FrameStructureProc, (ClientData) labelframePtr);
+	if (framePtr->tkwin != Tk_Parent(labelframePtr->labelWin)) {
+	    Tk_UnmaintainGeometry(labelframePtr->labelWin, framePtr->tkwin);
+	}
+	Tk_UnmapWindow(labelframePtr->labelWin);
+	labelframePtr->labelWin = NULL;
+    }
+    FrameWorldChanged((ClientData) framePtr);
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * TkToplevelWindowFromCommandToken --
+ *
+ *	If the given command name to the command for a toplevel window
+ *	in the given interpreter, return the tkwin for that toplevel
+ *	window.  Note that this lookup can't be done using the
+ *	standard tkwin internal table because the command might have
+ *	been renamed.
+ *
+ * Results:
+ *	A Tk_Window token, or NULL if the name does not refer to a
+ *	toplevel window.
+ *
+ * Side effects:
+ *	None.
+ *
+ *--------------------------------------------------------------
+ */
+
+Tk_Window
+TkToplevelWindowForCommand(interp, cmdName)
+    Tcl_Interp *interp;
+    CONST char *cmdName;
+{
+    Tcl_CmdInfo cmdInfo;
+    Frame *framePtr;
+
+    if (Tcl_GetCommandInfo(interp, cmdName, &cmdInfo) == 0) {
+	return NULL;
+    }
+    if (cmdInfo.objProc != FrameWidgetObjCmd) {
+	return NULL;
+    }
+    framePtr = (Frame *) cmdInfo.objClientData;
+    if (framePtr->type != TYPE_TOPLEVEL) {
+	return NULL;
+    }
+    return framePtr->tkwin;
 }
