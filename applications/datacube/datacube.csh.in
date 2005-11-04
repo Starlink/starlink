@@ -54,6 +54,8 @@
 #     2005 October 19 (MJC):
 #        Removed DATACUBE applications, having been replaced by KAPPA
 #        equivalents.
+#     2005 October 31 (MJC):
+#        Add wcsadd definition.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -115,6 +117,7 @@ alias setorigin       ${KAPPA_DIR}/setorigin
 alias setmagic        ${KAPPA_DIR}/setmagic
 alias settitle        ${KAPPA_DIR}/settitle
 alias stats           ${KAPPA_DIR}/stats
+alias wcsadd          ${KAPPA_DIR}/wcsadd
 alias wcsattrib       ${KAPPA_DIR}/wcsattrib
 alias wcscopy         ${KAPPA_DIR}/wcscopy
 alias wcsframe        ${KAPPA_DIR}/wcsframe
