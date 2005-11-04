@@ -214,6 +214,7 @@ void clumps() {
    AstKeyMap *keymap;           /* Pointer to KeyMap holding config settings */
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
+   Grp *grp;                    /* GRP identifier for configuration settings */
    char attr[ 30 ];             /* AST attribute name */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
@@ -227,7 +228,6 @@ void clumps() {
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
-   int igrp;                    /* GRP identifier for configuration settings */
    int ilevel;                  /* Interaction level */
    int indf2;                   /* Identifier for output NDF */
    int indf;                    /* Identifier for input NDF */
@@ -237,7 +237,7 @@ void clumps() {
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int size;                    /* Size of the "igrp" group */
+   int size;                    /* Size of the "grp" group */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int type;                    /* Integer identifier for data type */
@@ -434,8 +434,8 @@ void clumps() {
    if( *status != SAI__OK ) goto L999;
 
 /* Read a group of configuration setting. */
-   igrp = GRP__NOID;
-   kpg1Gtgrp( "CONFIG", &igrp, &size, status );
+   grp = NULL;
+   kpg1Gtgrp( "CONFIG", &grp, &size, status );
 
 /* If no group was supplied, annul the error and create an empty KeyMap. */
    if( *status == PAR__NULL || size == 0 ) {
@@ -445,8 +445,8 @@ void clumps() {
 /* If a group was supplied, create an AST KeyMap holding the value for each 
    configuration setting, indexed using its name, then delete the GRP group. */
    } else {
-      kpg1Kymap( igrp, &keymap, status );
-      grpDelet( &igrp, status );      
+      kpg1Kymap( grp, &keymap, status );
+      grpDelet( &grp, status );      
    }
 
 /* Switch for each method */
