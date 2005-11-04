@@ -67,7 +67,12 @@
 #       explicit wavelength in prompts with the current WCS Frame's label for
 #       the spectral axis, and also used the corresponding units in the 
 #       output commentary.
-#     {enter_further_changes_here}
+#     2005 November 3 (MJC):
+#       Plot the image slices in an optimally shaped grid rather than
+#       full size in quick succession, and thereby permit comparison.  
+#       Surmised the units for a UK data-cube format NDF.  Add options
+#       waste disposal.
+#    {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
@@ -128,7 +133,10 @@ while ( $#args > 0 )
       set gotupper = "TRUE"
       set upper = $args[1]
       shift args
-      breaksw  
+      breaksw
+   case *:     # rubbish disposal
+      shift args
+      breaksw
    endsw      
 end
 
@@ -186,6 +194,16 @@ set wubnd = `parget fubnd ndftrace`
 set slabel = `wcsattrib ndf=${infile} mode=get name="Label(3)"`
 set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
+# Check for the old-fashioned UK data-cube format that predates the
+# SpecFrame.  Test for non-null units if there is no SpecFrame.  Set the
+# label to something clearer than LAMBDA or Axis 3.
+if ( "${slabel}" == "LAMBDA" || "${slabel}" == "Axis 3" ) then
+   set slabel = "Wavelength"
+   if ( "$sunits" == "" ) then
+      set sunits = "Angstrom"
+   endif
+endif
+
 # Inform the user.
 echo "        ${slabel} bounds : ${wlbnd[3]}:${wubnd[3]} ${sunits}"
 echo " "
@@ -242,7 +260,7 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
 
 # Test for an AXIS structure.  If one does not exist, create an array of
 # axis centres, derived from the current WCS Frame, along each axis.
-    set axis = `parget axis ndftrace`
+   set axis = `parget axis ndftrace`
    if ( ${axis} == "FALSE" ) then
       setaxis "ndf=${outfile} dim=1 mode=wcs comp=Centre" >& /dev/null
       setaxis "ndf=${outfile} dim=2 mode=wcs comp=Centre" >& /dev/null
@@ -253,36 +271,154 @@ while ( `echo "if ( $curr_upp <= $upper) 1" | bc` )
    echo " "
 
 # Pause and increment the chunk variables.
-   sleep 2
-   set curr_low = `calc exp="'${curr_low} + ${chunk}'"`
+   sleep 1
+   set curr_low = $curr_upp
    set curr_upp = `calc exp="'${curr_upp} + ${chunk}'"`
-   @ counter = $counter + 1 
+   @ counter++
 
    rm -f ${colfile}.sdf >& /dev/null
 end
 
-# Plot the collapsed image.
-# =========================
+# Correct to the actual number of chunks.
+@ counter--
+
+# Plot the collapsed images.
+# ==========================
 
 # Setup the plot device.
 set plotdev = "xwin"
 
 # Display the collapsed image, if required.
 if ( ${pltimg} == "TRUE" ) then
-   echo "      Display:" 
+   set margin = 0.15
+
+# Form grid in which to display all the channels.
+# -----------------------------------------------
+
+# Use the whole plotting area.
    gdclear device=${plotdev}
+
+# Get the aspect ratio of the current picture.  x1 and y1 are zero
+# for the base picture.
+   gdstate device=${plotdev} frame=basepic >& /dev/null
+   set xb = `parget x2 gdstate`
+   set yb = `parget y2 gdstate`
+   set pasp = `calc exp="'${xb}/${yb}'"`
+
+# Get the aspect ratio of the image.
+   set iasp = `calc exp="'${dims[1]}/${dims[2]}'"`
+
+# Find the ratio of the aspect ratios.  The idea is match the shape
+# of the images best to the plotting region, and tile accordingly.
+# So if this ratio is near 1.0, the number of tiles in each axis
+# should be the same, i.e. the next enclosing square.  For small than 
+# 1.0 it means that more images will fit across the width of the
+# base picture than will fit the height.
+   set asp = `calc exp="'sqrt(${pasp}/${iasp})'"`
+
+# Now find the number of tiles along the side of for a square grid to
+# accommodate all the channels.
+   set gm = `calc exp="'nint(sqrt(${counter})+0.4999)'"`
+
+# Determine optimum shape of the grid of pictures.
+# ------------------------------------------------
+
+# To determine the best ratio, create various ratios around the square 
+# +/-3 tiles.
+   set grid_range = 3
+
+# The image has larger aspect ratio than the picture.  There will be fewer 
+# tiles along the x direction than the y.
+   if ( `echo "if ( ${asp} <= 1.0 ) 1" | bc` ) then
+      set i = `calc exp="'max(1,${gm}-${grid_range})'"`
+      @ j = $gm
+      set ip = 0
+      set jp = $grid_range
+
+# The image has smaller aspect ratio than the picture.  There will be fewer 
+# tiles along the y direction than the x.
+   else
+      @ i = $gm
+      set j = `calc exp="'max(1,${gm}-${grid_range})'"`
+      set ip = $grid_range
+      set jp = 0
+   endif
+
+   set best = -1
+   set xp = -1
+   set yp = -1
+   set jps = $j
+
+# Loop through the various combinations of pictures along each axis.
+   while ( $i <= $gm + $ip )
+      while ( $j <= $gm + $jp )
+
+# Find the number of tiles in the arrangement.
+         @ kount = $i * $j
+
+# Can reject immediately if the number of grid frames is fewer than
+# the number of images.
+         if ( $kount >= $counter ) then
+
+# We need to determine the fraction of the plotting area that would 
+# contain the channel images.  This is the fraction of used frames
+# in the grid, times the fraction of each frame displaying the image.
+            set used = `calc exp="'${counter}/${kount}'"`
+
+# The formula for area depends on whether the image is limited in x or
+# y.  Find the aspect ratio of a single grid.  If this is greater than
+# the image aspect ratio, means the iamge is y-axis limited.
+            set gasp = `calc exp="'${pasp}*${j}/${i}'"`
+            if ( `echo "if ( ${gasp} >= ${iasp} ) 1" | bc` ) then
+               set area = `calc exp="'((1.0-2.0*${margin})**2)*${iasp}/${gasp}'"`
+             else
+                set area = `calc exp="'((1.0-2.0*${margin})**2)/${iasp}*${gasp}'"`
+             endif
+
+# Determine the efficiency.
+            set effic = `calc exp="'${area}*${used}'"`
+
+# Test whether this gets closer to the desired aspect ratio, while still
+# offering sufficient slots for the number of images.
+            if (  `echo "if ( ${effic} > ${best} ) 1" | bc` ) then
+               set best = $effic
+               set xp = $i
+               set yp = $j
+            endif
+         endif
+         @ j++
+      end
+      set j = $jps
+      @ i++
+   end
+     
+# Set up the display.
+# -------------------
+   echo "      Display:" 
    paldef device=${plotdev}
    lutgrey device=${plotdev}
-   foreach file ( chunk_?.sdf )
-      echo "        ${file}"
-      display "${file:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
+
+# Form the grid of frame pictures within the base picture.
+   picdef device=${plotdev} fraction=1.0 mode=array nooutline prefix="step"\
+          xpic=${xp} ypic=${yp} >& /dev/null
+
+# Display each channel image in successive grid frames.
+# ------------------------------------------------------
+   set i = 1
+   while ( $i <= $counter )
+      set file = "chunk_"${i}
+
+# Select the next picture in Fortran order.
+      picsel device=${plotdev} label=step${i}
+      echo "        ${file}.sdf"
+
+# Display with the spectral range of each image in the title.
+      display "${file} device=${plotdev} mode=SIGMA sigmas=[-3,2] " \
+              "style='DrawTitle,Size(Title)=1.3' margin=${margin} " \
+              "reset" >& /dev/null
+
+      @ i++
    end
-   if ( $counter >= 10 ) then
-      foreach file ( chunk_??.sdf )
-         echo "        ${file}"
-         display "${file:r} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
-      end
-   endif
 endif
 
 # Clean up.
