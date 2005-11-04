@@ -1231,6 +1231,26 @@ sub solve {
                                             WCS => $querystar->wcs,
                                           );
     $merged->pushstar( $newstar );
+
+    # Find the old ID of the NDF star, then take the current query
+    # star's magnitudes and stick it into the old NDF star.
+    my $ndfcomments = $ndfstar->comment;
+    $ndfcomments =~ /^Old ID: (\d+)/;
+    my $oldndfid = $1;
+    my $oldndfstar = $ndfcat->popstarbyid( $oldndfid );
+    $oldndfstar = $oldndfstar->[0];
+    my $queryflux = $querystar->fluxes;
+    my @allfluxes = $queryflux->allfluxes;
+    my $newfluxes = new Astro::Fluxes;
+    foreach my $flux ( @allfluxes ) {
+      my $quantity = $flux->quantity( 'mag' );
+      my $waveband = $flux->waveband;
+      my $type = $flux->type;
+      my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
+      $newfluxes->pushfluxes( $newflux );
+    }
+    $oldndfstar->fluxes( $newfluxes );
+    $ndfcat->pushstar( $oldndfstar );
   }
 
 # Output the merged catalogue to disk, if requested.
