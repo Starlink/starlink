@@ -3,15 +3,17 @@
 SUBDIRS = libsmurf libsmf
 
 # can not use surf_mon_FCFLAGS yet
-AM_FCFLAGS = -Isrc
+AM_FCFLAGS = -Isrc -Isc2da
 
 dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
-smurf_mon_SOURCES = smurf_mon.c
+smurf_mon_SOURCES = smurf_mon.c $(DA_FILES)
 
 # Tasks
-smurf_mon_TASKS = extinction
+smurf_mon_TASKS = extinction flatfield makemap
+
+DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/sc2dat.c sc2da/ers.c
 
 # Linking
 smurf_mon_LDADD = libsmurf/libsmurf.la libsmf/libsmf.la \
