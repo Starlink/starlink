@@ -1,9 +1,9 @@
 /* 
  * tclMacPanic.c --
  *
- *	Source code for the "panic" library procedure used in "Simple Shell";
- *	other Mac applications will probably override this with a more robust
- *	application-specific panic procedure.
+ *	Source code for the "Tcl_Panic" library procedure used in "Simple
+ *	Shell";	other Mac applications will probably call Tcl_SetPanicProc
+ *	to set a more robust application-specific panic procedure.
  *
  * Copyright (c) 1993-1994 Lockheed Missle & Space Company, AI Center
  * Copyright (c) 1995-1996 Sun Microsystems, Inc.
@@ -11,12 +11,13 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclMacPanic.c 1.14 97/11/20 18:41:06
+ * RCS: @(#) $Id: tclMacPanic.c,v 1.6 2001/11/23 01:28:08 das Exp $
  */
 
 
 #include <Events.h>
 #include <Controls.h>
+#include <ControlDefinitions.h>
 #include <Windows.h>
 #include <TextEdit.h>
 #include <Fonts.h>
@@ -28,6 +29,7 @@
 #include <stdlib.h>
 
 #include "tclInt.h"
+#include "tclMacInt.h"
 
 /*
  * constants for panic dialog
@@ -40,56 +42,29 @@
 #define	ENTERCODE  (0x03)
 #define	RETURNCODE (0x0D)
 
-/*
- * The panicProc variable contains a pointer to an application
- * specific panic procedure.
- */
-
-void (*panicProc) _ANSI_ARGS_(TCL_VARARGS(char *,format)) = NULL;
 
 /*
  *----------------------------------------------------------------------
  *
- * Tcl_SetPanicProc --
+ * TclpPanic --
  *
- *	Replace the default panic behavior with the specified functiion.
+ *	Displays panic info, then aborts
  *
  * Results:
  *	None.
  *
  * Side effects:
- *	Sets the panicProc variable.
+ *	The process dies, entering the debugger if possible.
  *
  *----------------------------------------------------------------------
  */
 
+        /* VARARGS ARGSUSED */
 void
-Tcl_SetPanicProc(proc)
-    void (*proc) _ANSI_ARGS_(TCL_VARARGS(char *,format));
+TclpPanic TCL_VARARGS_DEF(CONST char *, format)
 {
-    panicProc = proc;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * MacPanic --
- *
- *	Displays panic info..
- *
- * Results:
- *	None.
- *
- * Side effects:
- *	Sets the panicProc variable.
- *
- *----------------------------------------------------------------------
- */
-
-static void
-MacPanic(
-    char *msg)		/* Text to show in panic dialog. */
-{
+    va_list varg;
+    char msg[256];
     WindowRef macWinPtr, foundWinPtr;
     Rect macRect;
     Rect buttonRect = PANIC_BUTTON_RECT;
@@ -100,7 +75,10 @@ MacPanic(
     Handle stopIconHandle;
     int	part;
     Boolean done = false;
-            
+
+    va_start(varg, format);
+    vsprintf(msg, format, varg);
+    va_end(varg);
 
     /*
      * Put up an alert without using the Resource Manager (there may 
@@ -151,7 +129,7 @@ MacPanic(
 		    	part = FindControl(event.where, macWinPtr,
 				&okButtonHandle);
     	
-			if ((inButton == part) && 
+			if ((kControlButtonPart == part) && 
 				(TrackControl(okButtonHandle,
 					event.where, NULL))) {
 			    done = true;
@@ -175,7 +153,7 @@ MacPanic(
 		    if (stopIconHandle != NULL) {
 			PlotIcon(&iconRect, stopIconHandle);
 		    }
-		    TextBox(msg, strlen(msg), &textRect, teFlushDefault);
+		    TETextBox(msg, strlen(msg), &textRect, teFlushDefault);
 		    DrawControls(macWinPtr);
 		    EndUpdate(macWinPtr);
 	    }
@@ -192,44 +170,3 @@ MacPanic(
 #endif
 }
 
-/*
- *----------------------------------------------------------------------
- *
- * panic --
- *
- *	Print an error message and kill the process.
- *
- * Results:
- *	None.
- *
- * Side effects:
- *	The process dies, entering the debugger if possible.
- *
- *----------------------------------------------------------------------
- */
-
-#pragma ignore_oldstyle on
-void
-panic(char * format, ...)
-{
-    va_list varg;
-    char errorText[256];
-	
-    if (panicProc != NULL) {
-	va_start(varg, format);
-	
-	(void) (*panicProc)(format, varg);
-	
-	va_end(varg);
-    } else {
-	va_start(varg, format);
-	
-	vsprintf(errorText, format, varg);
-	
-	va_end(varg);
-	
-	MacPanic(errorText);
-    }
-
-}
-#pragma ignore_oldstyle reset

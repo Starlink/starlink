@@ -9,8 +9,13 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) strstr.c 1.4 96/02/15 12:08:22
+ * RCS: @(#) $Id: strstr.c,v 1.3.2.1 2005/04/12 18:28:56 kennykb Exp $
  */
+
+#include <tcl.h>
+#ifndef NULL
+#define NULL 0
+#endif
 
 /*
  *----------------------------------------------------------------------
@@ -64,5 +69,5 @@ strstr(string, substring)
 	}
 	b = substring;
     }
-    return (char *) 0;
+    return NULL;
 }

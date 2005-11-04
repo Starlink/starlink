@@ -5,17 +5,42 @@
  *	including the "proc" and "uplevel" commands.
  *
  * Copyright (c) 1987-1993 The Regents of the University of California.
- * Copyright (c) 1994-1996 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1998 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclProc.c 1.14 98/08/07 11:47:46
+ * RCS: @(#) $Id: tclProc.c,v 1.44.2.2 2004/05/02 21:07:16 msofer Exp $
  */
 
 #include "tclInt.h"
 #include "tclCompile.h"
 
+/*
+ * Prototypes for static functions in this file
+ */
+
+static void	ProcBodyDup _ANSI_ARGS_((Tcl_Obj *srcPtr, Tcl_Obj *dupPtr));
+static void	ProcBodyFree _ANSI_ARGS_((Tcl_Obj *objPtr));
+static int	ProcBodySetFromAny _ANSI_ARGS_((Tcl_Interp *interp,
+		Tcl_Obj *objPtr));
+static void	ProcBodyUpdateString _ANSI_ARGS_((Tcl_Obj *objPtr));
+static  int	ProcessProcResultCode _ANSI_ARGS_((Tcl_Interp *interp,
+		    char *procName, int nameLen, int returnCode));
+static int	TclCompileNoOp _ANSI_ARGS_((Tcl_Interp *interp,
+		    Tcl_Parse *parsePtr, struct CompileEnv *envPtr));
+
+/*
+ * The ProcBodyObjType type
+ */
+
+Tcl_ObjType tclProcBodyType = {
+    "procbody",			/* name for this type */
+    ProcBodyFree,		/* FreeInternalRep procedure */
+    ProcBodyDup,		/* DupInternalRep procedure */
+    ProcBodyUpdateString,	/* UpdateString procedure */
+    ProcBodySetFromAny		/* SetFromAny procedure */
+};
 
 /*
  *----------------------------------------------------------------------
@@ -44,11 +69,11 @@ Tcl_ProcObjCmd(dummy, interp, objc, objv)
 {
     register Interp *iPtr = (Interp *) interp;
     Proc *procPtr;
-    char *fullName, *procName;
+    char *fullName;
+    CONST char *procName, *procArgs, *procBody;
     Namespace *nsPtr, *altNsPtr, *cxtNsPtr;
     Tcl_Command cmd;
     Tcl_DString ds;
-    int result;
 
     if (objc != 4) {
 	Tcl_WrongNumArgs(interp, 1, objv, "name args body");
@@ -61,13 +86,10 @@ Tcl_ProcObjCmd(dummy, interp, objc, objv)
      * current namespace.
      */
     
-    fullName = Tcl_GetStringFromObj(objv[1], (int *) NULL);
-    result = TclGetNamespaceForQualName(interp, fullName,
-	    (Namespace *) NULL, TCL_LEAVE_ERR_MSG,
-            &nsPtr, &altNsPtr, &cxtNsPtr, &procName);
-    if (result != TCL_OK) {
-        return result;
-    }
+    fullName = TclGetString(objv[1]);
+    TclGetNamespaceForQualName(interp, fullName, (Namespace *) NULL,
+	    0, &nsPtr, &altNsPtr, &cxtNsPtr, &procName);
+
     if (nsPtr == NULL) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
 		"can't create procedure \"", fullName,
@@ -116,6 +138,7 @@ Tcl_ProcObjCmd(dummy, interp, objc, objv)
     cmd = Tcl_CreateObjCommand(interp, Tcl_DStringValue(&ds),
 	    TclObjInterpProc, (ClientData) procPtr, TclProcDeleteProc);
 
+    Tcl_DStringFree(&ds);
     /*
      * Now initialize the new procedure's cmdPtr field. This will be used
      * later when the procedure is called to determine what namespace the
@@ -124,10 +147,64 @@ Tcl_ProcObjCmd(dummy, interp, objc, objv)
      */
     
     procPtr->cmdPtr = (Command *) cmd;
+
+
+    /*
+     * Optimize for noop procs: if the body is not precompiled (like a TclPro
+     * procbody), and the argument list is just "args" and the body is empty,
+     * define a compileProc to compile a noop.
+     *
+     * Notes: 
+     *   - cannot be done for any argument list without having different
+     *     compiled/not-compiled behaviour in the "wrong argument #" case, 
+     *     or making this code much more complicated. In any case, it doesn't 
+     *     seem to make a lot of sense to verify the number of arguments we 
+     *     are about to ignore ...
+     *   - could be enhanced to handle also non-empty bodies that contain 
+     *     only comments; however, parsing the body will slow down the 
+     *     compilation of all procs whose argument list is just _args_ */
+
+    if (objv[3]->typePtr == &tclProcBodyType) {
+	goto done;
+    }
+
+    procArgs = Tcl_GetString(objv[2]);
+    
+    while (*procArgs == ' ') {
+	procArgs++;
+    }
+    
+    if ((procArgs[0] == 'a') && (strncmp(procArgs, "args", 4) == 0)) {
+	procArgs +=4;
+	while(*procArgs != '\0') {
+	    if (*procArgs != ' ') {
+		goto done;
+	    }
+	    procArgs++;
+	}	
 	
+	/* 
+	 * The argument list is just "args"; check the body
+	 */
+	
+	procBody = Tcl_GetString(objv[3]);
+	while (*procBody != '\0') {
+	    if (!isspace(UCHAR(*procBody))) {
+		goto done;
+	    }
+	    procBody++;
+	}	
+	
+	/* 
+	 * The body is just spaces: link the compileProc
+	 */
+	
+	((Command *) cmd)->compileProc = TclCompileNoOp;
+    }
+
+ done:
     return TCL_OK;
 }
-
 
 /*
  *----------------------------------------------------------------------
@@ -135,6 +212,10 @@ Tcl_ProcObjCmd(dummy, interp, objc, objv)
  * TclCreateProc --
  *
  *	Creates the data associated with a Tcl procedure definition.
+ *	This procedure knows how to handle two types of body objects:
+ *	strings and procbody. Strings are the traditional (and common) value
+ *	for bodies, procbody are values created by extensions that have
+ *	loaded a previously compiled script.
  *
  * Results:
  *	Returns TCL_OK on success, along with a pointer to a Tcl
@@ -152,116 +233,154 @@ int
 TclCreateProc(interp, nsPtr, procName, argsPtr, bodyPtr, procPtrPtr)
     Tcl_Interp *interp;         /* interpreter containing proc */
     Namespace *nsPtr;           /* namespace containing this proc */
-    char *procName;             /* unqualified name of this proc */
+    CONST char *procName;       /* unqualified name of this proc */
     Tcl_Obj *argsPtr;           /* description of arguments */
     Tcl_Obj *bodyPtr;           /* command body */
     Proc **procPtrPtr;          /* returns:  pointer to proc data */
 {
     Interp *iPtr = (Interp*)interp;
-    char **argArray = NULL;
+    CONST char **argArray = NULL;
 
     register Proc *procPtr;
     int i, length, result, numArgs;
-    char *args, *bytes, *p;
-    register CompiledLocal *localPtr;
+    CONST char *args, *bytes, *p;
+    register CompiledLocal *localPtr = NULL;
     Tcl_Obj *defPtr;
-
-    /*
-     * If the procedure's body object is shared because its string value is
-     * identical to, e.g., the body of another procedure, we must create a
-     * private copy for this procedure to use. Such sharing of procedure
-     * bodies is rare but can cause problems. A procedure body is compiled
-     * in a context that includes the number of compiler-allocated "slots"
-     * for local variables. Each formal parameter is given a local variable
-     * slot (the "procPtr->numCompiledLocals = numArgs" assignment
-     * below). This means that the same code can not be shared by two
-     * procedures that have a different number of arguments, even if their
-     * bodies are identical. Note that we don't use Tcl_DuplicateObj since
-     * we would not want any bytecode internal representation.
-     */
-
-    if (Tcl_IsShared(bodyPtr)) {
-        bytes = Tcl_GetStringFromObj(bodyPtr, &length);
-        bodyPtr = Tcl_NewStringObj(bytes, length);
-    }
-
-    /*
-     * Create and initialize a Proc structure for the procedure. Note that
-     * we initialize its cmdPtr field below after we've created the command
-     * for the procedure. We increment the ref count of the procedure's
-     * body object since there will be a reference to it in the Proc
-     * structure.
-     */
+    int precompiled = 0;
     
-    Tcl_IncrRefCount(bodyPtr);
+    if (bodyPtr->typePtr == &tclProcBodyType) {
+        /*
+         * Because the body is a TclProProcBody, the actual body is already
+         * compiled, and it is not shared with anyone else, so it's OK not to
+         * unshare it (as a matter of fact, it is bad to unshare it, because
+         * there may be no source code).
+         *
+         * We don't create and initialize a Proc structure for the procedure;
+         * rather, we use what is in the body object. Note that
+         * we initialize its cmdPtr field below after we've created the command
+         * for the procedure. We increment the ref count of the Proc struct
+         * since the command (soon to be created) will be holding a reference
+         * to it.
+         */
+    
+        procPtr = (Proc *) bodyPtr->internalRep.otherValuePtr;
+        procPtr->iPtr = iPtr;
+        procPtr->refCount++;
+        precompiled = 1;
+    } else {
+        /*
+         * If the procedure's body object is shared because its string value is
+         * identical to, e.g., the body of another procedure, we must create a
+         * private copy for this procedure to use. Such sharing of procedure
+         * bodies is rare but can cause problems. A procedure body is compiled
+         * in a context that includes the number of compiler-allocated "slots"
+         * for local variables. Each formal parameter is given a local variable
+         * slot (the "procPtr->numCompiledLocals = numArgs" assignment
+         * below). This means that the same code can not be shared by two
+         * procedures that have a different number of arguments, even if their
+         * bodies are identical. Note that we don't use Tcl_DuplicateObj since
+         * we would not want any bytecode internal representation.
+         */
 
-    procPtr = (Proc *) ckalloc(sizeof(Proc));
-    procPtr->iPtr = iPtr;
-    procPtr->refCount = 1;
-    procPtr->bodyPtr = bodyPtr;
-    procPtr->numArgs  = 0;	/* actual argument count is set below. */
-    procPtr->numCompiledLocals = 0;
-    procPtr->firstLocalPtr = NULL;
-    procPtr->lastLocalPtr = NULL;
+        if (Tcl_IsShared(bodyPtr)) {
+            bytes = Tcl_GetStringFromObj(bodyPtr, &length);
+            bodyPtr = Tcl_NewStringObj(bytes, length);
+        }
+
+        /*
+         * Create and initialize a Proc structure for the procedure. Note that
+         * we initialize its cmdPtr field below after we've created the command
+         * for the procedure. We increment the ref count of the procedure's
+         * body object since there will be a reference to it in the Proc
+         * structure.
+         */
+    
+        Tcl_IncrRefCount(bodyPtr);
+
+        procPtr = (Proc *) ckalloc(sizeof(Proc));
+        procPtr->iPtr = iPtr;
+        procPtr->refCount = 1;
+        procPtr->bodyPtr = bodyPtr;
+        procPtr->numArgs  = 0;	/* actual argument count is set below. */
+        procPtr->numCompiledLocals = 0;
+        procPtr->firstLocalPtr = NULL;
+        procPtr->lastLocalPtr = NULL;
+    }
     
     /*
      * Break up the argument list into argument specifiers, then process
      * each argument specifier.
+     * If the body is precompiled, processing is limited to checking that
+     * the the parsed argument is consistent with the one stored in the
+     * Proc.
      * THIS FAILS IF THE ARG LIST OBJECT'S STRING REP CONTAINS NULLS.
      */
 
     args = Tcl_GetStringFromObj(argsPtr, &length);
     result = Tcl_SplitList(interp, args, &numArgs, &argArray);
     if (result != TCL_OK) {
-	goto procError;
+        goto procError;
     }
-    
-    procPtr->numArgs = numArgs;
-    procPtr->numCompiledLocals = numArgs;
+
+    if (precompiled) {
+        if (numArgs > procPtr->numArgs) {
+            char buf[64 + TCL_INTEGER_SPACE + TCL_INTEGER_SPACE];
+            sprintf(buf, "\": arg list contains %d entries, precompiled header expects %d",
+                    numArgs, procPtr->numArgs);
+            Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+                    "procedure \"", procName,
+                    buf, (char *) NULL);
+            goto procError;
+        }
+        localPtr = procPtr->firstLocalPtr;
+    } else {
+        procPtr->numArgs = numArgs;
+        procPtr->numCompiledLocals = numArgs;
+    }
     for (i = 0;  i < numArgs;  i++) {
-	int fieldCount, nameLength, valueLength;
-	char **fieldValues;
+        int fieldCount, nameLength, valueLength;
+        CONST char **fieldValues;
 
-	/*
-	 * Now divide the specifier up into name and default.
-	 */
+        /*
+         * Now divide the specifier up into name and default.
+         */
 
-	result = Tcl_SplitList(interp, argArray[i], &fieldCount,
-		&fieldValues);
-	if (result != TCL_OK) {
-	    goto procError;
-	}
-	if (fieldCount > 2) {
-	    ckfree((char *) fieldValues);
-	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		    "too many fields in argument specifier \"",
-		    argArray[i], "\"", (char *) NULL);
-	    goto procError;
-	}
-	if ((fieldCount == 0) || (*fieldValues[0] == 0)) {
-	    ckfree((char *) fieldValues);
-	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		    "procedure \"", procName,
-		    "\" has argument with no name", (char *) NULL);
-	    goto procError;
-	}
+        result = Tcl_SplitList(interp, argArray[i], &fieldCount,
+                &fieldValues);
+        if (result != TCL_OK) {
+            goto procError;
+        }
+        if (fieldCount > 2) {
+            ckfree((char *) fieldValues);
+            Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+                    "too many fields in argument specifier \"",
+                    argArray[i], "\"", (char *) NULL);
+            goto procError;
+        }
+        if ((fieldCount == 0) || (*fieldValues[0] == 0)) {
+            ckfree((char *) fieldValues);
+            Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+                    "procedure \"", procName,
+                    "\" has argument with no name", (char *) NULL);
+            goto procError;
+        }
 	
-	nameLength = strlen(fieldValues[0]);
-	if (fieldCount == 2) {
-	    valueLength = strlen(fieldValues[1]);
-	} else {
-	    valueLength = 0;
-	}
+        nameLength = strlen(fieldValues[0]);
+        if (fieldCount == 2) {
+            valueLength = strlen(fieldValues[1]);
+        } else {
+            valueLength = 0;
+        }
 
-	/*
-	 * Check that the formal parameter name is a scalar.
-	 */
+        /*
+         * Check that the formal parameter name is a scalar.
+         */
 
-	p = fieldValues[0];
-	while (*p != '\0') {
-	    if (*p == '(') {
-		char *q = p;
-		do {
+        p = fieldValues[0];
+        while (*p != '\0') {
+            if (*p == '(') {
+                CONST char *q = p;
+                do {
 		    q++;
 		} while (*q != '\0');
 		q--;
@@ -274,40 +393,100 @@ TclCreateProc(interp, nsPtr, procName, argsPtr, bodyPtr, procPtrPtr)
 		    ckfree((char *) fieldValues);
 		    goto procError;
 		}
+	    } else if ((*p == ':') && (*(p+1) == ':')) {
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+		        "procedure \"", procName,
+		        "\" has formal parameter \"", fieldValues[0],
+			"\" that is not a simple name",
+			(char *) NULL);
+		ckfree((char *) fieldValues);
+		goto procError;
 	    }
 	    p++;
 	}
 
-	/*
-	 * Allocate an entry in the runtime procedure frame's array of local
-	 * variables for the argument. 
-	 */
+	if (precompiled) {
+	    /*
+	     * Compare the parsed argument with the stored one.
+	     * For the flags, we and out VAR_UNDEFINED to support bridging
+	     * precompiled <= 8.3 code in 8.4 where this is now used as an
+	     * optimization indicator.	Yes, this is a hack. -- hobbs
+	     */
 
-	localPtr = (CompiledLocal *) ckalloc((unsigned) 
-	        (sizeof(CompiledLocal) - sizeof(localPtr->name)
-		+ nameLength+1));
-	if (procPtr->firstLocalPtr == NULL) {
-	    procPtr->firstLocalPtr = procPtr->lastLocalPtr = localPtr;
-	} else {
-	    procPtr->lastLocalPtr->nextPtr = localPtr;
-	    procPtr->lastLocalPtr = localPtr;
-	}
-	localPtr->nextPtr = NULL;
-	localPtr->nameLength = nameLength;
-	localPtr->frameIndex = i;
-	localPtr->flags = VAR_SCALAR | VAR_ARGUMENT;
-	localPtr->resolveInfo = NULL;
+	    if ((localPtr->nameLength != nameLength)
+		    || (strcmp(localPtr->name, fieldValues[0]))
+		    || (localPtr->frameIndex != i)
+		    || ((localPtr->flags & ~VAR_UNDEFINED)
+			    != (VAR_SCALAR | VAR_ARGUMENT))
+		    || ((localPtr->defValuePtr == NULL)
+			    && (fieldCount == 2))
+		    || ((localPtr->defValuePtr != NULL)
+			    && (fieldCount != 2))) {
+		char buf[80 + TCL_INTEGER_SPACE];
+		sprintf(buf, "\": formal parameter %d is inconsistent with precompiled body",
+			i);
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			"procedure \"", procName,
+			buf, (char *) NULL);
+		ckfree((char *) fieldValues);
+		goto procError;
+	    }
+
+            /*
+             * compare the default value if any
+             */
+
+            if (localPtr->defValuePtr != NULL) {
+                int tmpLength;
+                char *tmpPtr = Tcl_GetStringFromObj(localPtr->defValuePtr,
+                        &tmpLength);
+                if ((valueLength != tmpLength)
+                        || (strncmp(fieldValues[1], tmpPtr,
+                                (size_t) tmpLength))) {
+                    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+                            "procedure \"", procName,
+                            "\": formal parameter \"",
+                            fieldValues[0],
+                            "\" has default value inconsistent with precompiled body",
+                            (char *) NULL);
+                    ckfree((char *) fieldValues);
+                    goto procError;
+                }
+            }
+
+            localPtr = localPtr->nextPtr;
+        } else {
+            /*
+             * Allocate an entry in the runtime procedure frame's array of
+             * local variables for the argument. 
+             */
+
+            localPtr = (CompiledLocal *) ckalloc((unsigned) 
+                    (sizeof(CompiledLocal) - sizeof(localPtr->name)
+                            + nameLength+1));
+            if (procPtr->firstLocalPtr == NULL) {
+                procPtr->firstLocalPtr = procPtr->lastLocalPtr = localPtr;
+            } else {
+                procPtr->lastLocalPtr->nextPtr = localPtr;
+                procPtr->lastLocalPtr = localPtr;
+            }
+            localPtr->nextPtr = NULL;
+            localPtr->nameLength = nameLength;
+            localPtr->frameIndex = i;
+            localPtr->flags = VAR_SCALAR | VAR_ARGUMENT;
+            localPtr->resolveInfo = NULL;
 	
-	if (fieldCount == 2) {
-	    localPtr->defValuePtr =
+            if (fieldCount == 2) {
+                localPtr->defValuePtr =
 		    Tcl_NewStringObj(fieldValues[1], valueLength);
-	    Tcl_IncrRefCount(localPtr->defValuePtr);
-	} else {
-	    localPtr->defValuePtr = NULL;
+                Tcl_IncrRefCount(localPtr->defValuePtr);
+            } else {
+                localPtr->defValuePtr = NULL;
+            }
+            strcpy(localPtr->name, fieldValues[0]);
 	}
-	strcpy(localPtr->name, fieldValues[0]);
-	
-	ckfree((char *) fieldValues);
+
+        ckfree((char *) fieldValues);
     }
 
     /*
@@ -322,25 +501,28 @@ TclCreateProc(interp, nsPtr, procName, argsPtr, bodyPtr, procPtrPtr)
     return TCL_OK;
 
 procError:
-    Tcl_DecrRefCount(bodyPtr);
-    while (procPtr->firstLocalPtr != NULL) {
-	localPtr = procPtr->firstLocalPtr;
-	procPtr->firstLocalPtr = localPtr->nextPtr;
+    if (precompiled) {
+        procPtr->refCount--;
+    } else {
+        Tcl_DecrRefCount(bodyPtr);
+        while (procPtr->firstLocalPtr != NULL) {
+            localPtr = procPtr->firstLocalPtr;
+            procPtr->firstLocalPtr = localPtr->nextPtr;
 	
-	defPtr = localPtr->defValuePtr;
-	if (defPtr != NULL) {
-	    Tcl_DecrRefCount(defPtr);
-	}
+            defPtr = localPtr->defValuePtr;
+            if (defPtr != NULL) {
+                Tcl_DecrRefCount(defPtr);
+            }
 	
-	ckfree((char *) localPtr);
+            ckfree((char *) localPtr);
+        }
+        ckfree((char *) procPtr);
     }
-    ckfree((char *) procPtr);
     if (argArray != NULL) {
 	ckfree((char *) argArray);
     }
     return TCL_ERROR;
 }
-
 
 /*
  *----------------------------------------------------------------------
@@ -352,8 +534,8 @@ procError:
  *	call frame for the appropriate level of procedure.
  *
  * Results:
- *	The return value is -1 if an error occurred in finding the
- *	frame (in this case an error message is left in interp->result).
+ *	The return value is -1 if an error occurred in finding the frame
+ *	(in this case an error message is left in the interp's result).
  *	1 is returned if string was either a number or a number preceded
  *	by "#" and it specified a valid frame.  0 is returned if string
  *	isn't one of the two things above (in this case, the lookup
@@ -370,7 +552,7 @@ procError:
 int
 TclGetFrame(interp, string, framePtrPtr)
     Tcl_Interp *interp;		/* Interpreter in which to find frame. */
-    char *string;		/* String describing frame. */
+    CONST char *string;		/* String describing frame. */
     CallFrame **framePtrPtr;	/* Store pointer to frame here (or NULL
 				 * if global frame indicated). */
 {
@@ -394,7 +576,7 @@ TclGetFrame(interp, string, framePtrPtr)
 		    (char *) NULL);
 	    return -1;
 	}
-    } else if (isdigit(UCHAR(*string))) {
+    } else if (isdigit(UCHAR(*string))) { /* INTL: digit */
 	if (Tcl_GetInt(interp, string, &level) != TCL_OK) {
 	    return -1;
 	}
@@ -453,7 +635,7 @@ Tcl_UplevelObjCmd(dummy, interp, objc, objv)
 {
     register Interp *iPtr = (Interp *) interp;
     char *optLevel;
-    int length, result;
+    int result;
     CallFrame *savedVarFramePtr, *framePtr;
 
     if (objc < 2) {
@@ -464,10 +646,9 @@ Tcl_UplevelObjCmd(dummy, interp, objc, objv)
 
     /*
      * Find the level to use for executing the command.
-     * THIS FAILS IF THE OBJECT RESULT'S STRING REP CONTAINS A NULL.
      */
 
-    optLevel = Tcl_GetStringFromObj(objv[1], &length);
+    optLevel = TclGetString(objv[1]);
     result = TclGetFrame(interp, optLevel, &framePtr);
     if (result == -1) {
 	return TCL_ERROR;
@@ -490,14 +671,20 @@ Tcl_UplevelObjCmd(dummy, interp, objc, objv)
      */
 
     if (objc == 1) {
-	result = Tcl_EvalObj(interp, objv[0]);
+	result = Tcl_EvalObjEx(interp, objv[0], TCL_EVAL_DIRECT);
     } else {
-	Tcl_Obj *cmdObjPtr = Tcl_ConcatObj(objc, objv);
-	result = Tcl_EvalObj(interp, cmdObjPtr);
-	Tcl_DecrRefCount(cmdObjPtr); /* done with object */
+	/*
+	 * More than one argument: concatenate them together with spaces
+	 * between, then evaluate the result.  Tcl_EvalObjEx will delete
+	 * the object when it decrements its refcount after eval'ing it.
+	 */
+	Tcl_Obj *objPtr;
+
+	objPtr = Tcl_ConcatObj(objc, objv);
+	result = Tcl_EvalObjEx(interp, objPtr, TCL_EVAL_DIRECT);
     }
     if (result == TCL_ERROR) {
-	char msg[60];
+	char msg[32 + TCL_INTEGER_SPACE];
 	sprintf(msg, "\n    (\"uplevel\" body line %d)", interp->errorLine);
 	Tcl_AddObjErrorInfo(interp, msg, -1);
     }
@@ -516,12 +703,17 @@ Tcl_UplevelObjCmd(dummy, interp, objc, objv)
  * TclFindProc --
  *
  *	Given the name of a procedure, return a pointer to the
- *	record describing the procedure.
+ *	record describing the procedure. The procedure will be
+ *	looked up using the usual rules: first in the current
+ *	namespace and then in the global namespace.
  *
  * Results:
  *	NULL is returned if the name doesn't correspond to any
- *	procedure.  Otherwise the return value is a pointer to
- *	the procedure's record.
+ *	procedure. Otherwise, the return value is a pointer to
+ *	the procedure's record. If the name is found but refers
+ *	to an imported command that points to a "real" procedure
+ *	defined in another namespace, a pointer to that "real"
+ *	procedure's structure is returned.
  *
  * Side effects:
  *	None.
@@ -532,7 +724,7 @@ Tcl_UplevelObjCmd(dummy, interp, objc, objv)
 Proc *
 TclFindProc(iPtr, procName)
     Interp *iPtr;		/* Interpreter in which to look. */
-    char *procName;		/* Name of desired procedure. */
+    CONST char *procName;		/* Name of desired procedure. */
 {
     Tcl_Command cmd;
     Tcl_Command origCmd;
@@ -614,7 +806,7 @@ TclProcInterpProc(clientData, interp, argc, argv)
 				 * invoked. */
     int argc;			/* Count of number of arguments to this
 				 * procedure. */
-    register char **argv;	/* Argument values. */
+    register CONST char **argv;	/* Argument values. */
 {
     register Tcl_Obj *objPtr;
     register int i;
@@ -656,11 +848,9 @@ TclProcInterpProc(clientData, interp, argc, argv)
     /*
      * Move the interpreter's object result to the string result, 
      * then reset the object result.
-     * FAILS IF OBJECT RESULT'S STRING REPRESENTATION CONTAINS NULLS.
      */
     
-    Tcl_SetResult(interp,
-	    TclGetStringFromObj(Tcl_GetObjResult(interp), (int *) NULL),
+    Tcl_SetResult(interp, TclGetString(Tcl_GetObjResult(interp)),
 	    TCL_VOLATILE);
 
     /*
@@ -703,23 +893,23 @@ TclProcInterpProc(clientData, interp, argc, argv)
 
 int
 TclObjInterpProc(clientData, interp, objc, objv)
-    ClientData clientData;	/* Record describing procedure to be
-				 * interpreted. */
-    Tcl_Interp *interp;		/* Interpreter in which procedure was
-				 * invoked. */
-    int objc;			/* Count of number of arguments to this
-				 * procedure. */
-    Tcl_Obj *CONST objv[];	/* Argument value objects. */
+    ClientData clientData; 	 /* Record describing procedure to be
+				  * interpreted. */
+    register Tcl_Interp *interp; /* Interpreter in which procedure was
+				  * invoked. */
+    int objc;			 /* Count of number of arguments to this
+				  * procedure. */
+    Tcl_Obj *CONST objv[];	 /* Argument value objects. */
 {
     Interp *iPtr = (Interp *) interp;
-    Proc *procPtr = (Proc *) clientData;
+    register Proc *procPtr = (Proc *) clientData;
     Namespace *nsPtr = procPtr->cmdPtr->nsPtr;
     CallFrame frame;
     register CallFrame *framePtr = &frame;
+    register Var *varPtr;
     register CompiledLocal *localPtr;
-    char *procName, *bytes;
-    int nameLen, localCt, numArgs, argCt, length, i, result;
-    Var *varPtr;
+    char *procName;
+    int nameLen, localCt, numArgs, argCt, i, result;
 
     /*
      * This procedure generates an array "compiledLocals" that holds the
@@ -733,7 +923,6 @@ TclObjInterpProc(clientData, interp, objc, objv)
 
     /*
      * Get the procedure's name.
-     * THIS FAILS IF THE PROC NAME'S STRING REP HAS A NULL.
      */
     
     procName = Tcl_GetStringFromObj(objv[0], &nameLen);
@@ -745,7 +934,7 @@ TclObjInterpProc(clientData, interp, objc, objv)
      * procPtr->numCompiledLocals if new local variables are found
      * while compiling.
      */
-    
+
     result = TclProcCompileProc(interp, procPtr, procPtr->bodyPtr, nsPtr,
 	    "body of proc", procName);
     
@@ -791,7 +980,7 @@ TclObjInterpProc(clientData, interp, objc, objv)
     framePtr->compiledLocals = compiledLocals;
 
     TclInitCompiledLocals(interp, framePtr, nsPtr);
-    
+
     /*
      * Match and assign the call's actual parameters to the procedure's
      * formal arguments. The formal arguments are described by the first
@@ -825,37 +1014,67 @@ TclObjInterpProc(clientData, interp, objc, objv)
 	    Tcl_Obj *listPtr = Tcl_NewListObj(argCt, &(objv[i]));
 	    varPtr->value.objPtr = listPtr;
 	    Tcl_IncrRefCount(listPtr); /* local var is a reference */
-	    varPtr->flags &= ~VAR_UNDEFINED;
+	    TclClearVarUndefined(varPtr);
 	    argCt = 0;
 	    break;		/* done processing args */
 	} else if (argCt > 0) {
 	    Tcl_Obj *objPtr = objv[i];
 	    varPtr->value.objPtr = objPtr;
-	    varPtr->flags &= ~VAR_UNDEFINED;
+	    TclClearVarUndefined(varPtr);
 	    Tcl_IncrRefCount(objPtr);  /* since the local variable now has
 					* another reference to object. */
 	} else if (localPtr->defValuePtr != NULL) {
 	    Tcl_Obj *objPtr = localPtr->defValuePtr;
 	    varPtr->value.objPtr = objPtr;
-	    varPtr->flags &= ~VAR_UNDEFINED;
+	    TclClearVarUndefined(varPtr);
 	    Tcl_IncrRefCount(objPtr);  /* since the local variable now has
 					* another reference to object. */
 	} else {
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		    "no value given for parameter \"", localPtr->name,
-		    "\" to \"", Tcl_GetStringFromObj(objv[0], (int *) NULL),
-		    "\"", (char *) NULL);
-	    result = TCL_ERROR;
-	    goto procDone;
+	    goto incorrectArgs;
 	}
 	varPtr++;
 	localPtr = localPtr->nextPtr;
     }
     if (argCt > 0) {
-	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		"called \"", Tcl_GetStringFromObj(objv[0], (int *) NULL),
-		"\" with too many arguments", (char *) NULL);
+	Tcl_Obj *objResult;
+	int len, flags;
+
+	incorrectArgs:
+	/*
+	 * Build up equivalent to Tcl_WrongNumArgs message for proc
+	 */
+
+	Tcl_ResetResult(interp);
+	objResult = Tcl_GetObjResult(interp);
+	Tcl_AppendToObj(objResult, "wrong # args: should be \"", -1);
+
+	/*
+	 * Quote the proc name if it contains spaces (Bug 942757).
+	 */
+	
+	len = Tcl_ScanCountedElement(procName, nameLen, &flags);
+	if (len != nameLen) {
+	    char *procName1 = ckalloc((unsigned) len);
+	    len = Tcl_ConvertCountedElement(procName, nameLen, procName1, flags);
+	    Tcl_AppendToObj(objResult, procName1, len);
+	    ckfree(procName1);
+	} else {
+	    Tcl_AppendToObj(objResult, procName, len);
+	}
+
+	localPtr = procPtr->firstLocalPtr;
+	for (i = 1;  i <= numArgs;  i++) {
+	    if (localPtr->defValuePtr != NULL) {
+		Tcl_AppendStringsToObj(objResult,
+			" ?", localPtr->name, "?", (char *) NULL);
+	    } else {
+		Tcl_AppendStringsToObj(objResult,
+			" ", localPtr->name, (char *) NULL);
+	    }
+	    localPtr = localPtr->nextPtr;
+	}
+	Tcl_AppendStringsToObj(objResult, "\"", (char *) NULL);
+
 	result = TCL_ERROR;
 	goto procDone;
     }
@@ -864,58 +1083,37 @@ TclObjInterpProc(clientData, interp, objc, objv)
      * Invoke the commands in the procedure's body.
      */
 
+#ifdef TCL_COMPILE_DEBUG
     if (tclTraceExec >= 1) {
 	fprintf(stdout, "Calling proc ");
 	for (i = 0;  i < objc;  i++) {
-	    bytes = Tcl_GetStringFromObj(objv[i], &length);
-	    TclPrintSource(stdout, bytes, TclMin(length, 15));
+	    TclPrintObject(stdout, objv[i], 15);
 	    fprintf(stdout, " ");
 	}
 	fprintf(stdout, "\n");
 	fflush(stdout);
     }
+#endif /*TCL_COMPILE_DEBUG*/
 
     iPtr->returnCode = TCL_OK;
     procPtr->refCount++;
-    result = Tcl_EvalObj(interp, procPtr->bodyPtr);
+    result = TclCompEvalObj(interp, procPtr->bodyPtr);
     procPtr->refCount--;
     if (procPtr->refCount <= 0) {
 	TclProcCleanupProc(procPtr);
     }
 
     if (result != TCL_OK) {
-	if (result == TCL_RETURN) {
-	    result = TclUpdateReturnInfo(iPtr);
-	} else if (result == TCL_ERROR) {
-	    char msg[100];
-	    sprintf(msg, "\n    (procedure \"%.50s\" line %d)",
-		    procName, iPtr->errorLine);
-	    Tcl_AddObjErrorInfo(interp, msg, -1);
-	} else if (result == TCL_BREAK) {
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendToObj(Tcl_GetObjResult(interp),
-	            "invoked \"break\" outside of a loop", -1);
-	    result = TCL_ERROR;
-	} else if (result == TCL_CONTINUE) {
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendToObj(Tcl_GetObjResult(interp),
-		    "invoked \"continue\" outside of a loop", -1);
-	    result = TCL_ERROR;
-	}
+	result = ProcessProcResultCode(interp, procName, nameLen, result);
     }
     
+    /*
+     * Pop and free the call frame for this procedure invocation, then
+     * free the compiledLocals array if malloc'ed storage was used.
+     */
+    
     procDone:
-
-    /*
-     * Pop and free the call frame for this procedure invocation.
-     */
-    
     Tcl_PopCallFrame(interp);
-    
-    /*
-     * Free the compiledLocals array if malloc'ed storage was used.
-     */
-
     if (compiledLocals != localStorage) {
 	ckfree((char *) compiledLocals);
     }
@@ -976,11 +1174,11 @@ TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr, description, procName)
      */
  
     if (bodyPtr->typePtr == &tclByteCodeType) {
- 	if ((codePtr->iPtr != iPtr)
+ 	if (((Interp *) *codePtr->interpHandle != iPtr)
  	        || (codePtr->compileEpoch != iPtr->compileEpoch)
  	        || (codePtr->nsPtr != nsPtr)) {
             if (codePtr->flags & TCL_BYTECODE_PRECOMPILED) {
-                if (codePtr->iPtr != iPtr) {
+                if ((Interp *) *codePtr->interpHandle != iPtr) {
                     Tcl_AppendResult(interp,
                             "a precompiled script jumped interps", NULL);
                     return TCL_ERROR;
@@ -988,16 +1186,16 @@ TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr, description, procName)
 	        codePtr->compileEpoch = iPtr->compileEpoch;
                 codePtr->nsPtr = nsPtr;
             } else {
-                tclByteCodeType.freeIntRepProc(bodyPtr);
+                (*tclByteCodeType.freeIntRepProc)(bodyPtr);
                 bodyPtr->typePtr = (Tcl_ObjType *) NULL;
             }
  	}
     }
     if (bodyPtr->typePtr != &tclByteCodeType) {
- 	char buf[100];
  	int numChars;
  	char *ellipsis;
  	
+#ifdef TCL_COMPILE_DEBUG
  	if (tclTraceCompile >= 1) {
  	    /*
  	     * Display a line summarizing the top level command we
@@ -1013,6 +1211,7 @@ TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr, description, procName)
  	    fprintf(stdout, "Compiling %s \"%.*s%s\"\n",
  		    description, numChars, procName, ellipsis);
  	}
+#endif
  	
  	/*
  	 * Plug the current procPtr into the interpreter and coerce
@@ -1040,12 +1239,22 @@ TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr, description, procName)
  	
  	if (result != TCL_OK) {
  	    if (result == TCL_ERROR) {
- 		numChars = strlen(procName);
+		char buf[100 + TCL_INTEGER_SPACE];
+
+		numChars = strlen(procName);
  		ellipsis = "";
  		if (numChars > 50) {
  		    numChars = 50;
  		    ellipsis = "...";
  		}
+		while ( (procName[numChars] & 0xC0) == 0x80 ) {
+	            /*
+		     * Back up truncation point so that we don't truncate
+		     * in the middle of a multi-byte character (in UTF-8)
+		     */
+		    numChars--;
+		    ellipsis = "...";
+		}
  		sprintf(buf, "\n    (compiling %s \"%.*s%s\", line %d)",
  			description, numChars, procName, ellipsis,
  			interp->errorLine);
@@ -1076,7 +1285,73 @@ TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr, description, procName)
     }
     return TCL_OK;
 }
- 
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ProcessProcResultCode --
+ *
+ *	Procedure called by TclObjInterpProc to process a return code other
+ *	than TCL_OK returned by a Tcl procedure.
+ *
+ * Results:
+ *	Depending on the argument return code, the result returned is
+ *	another return code and the interpreter's result is set to a value
+ *	to supplement that return code.
+ *
+ * Side effects:
+ *	If the result returned is TCL_ERROR, traceback information about
+ *	the procedure just executed is appended to the interpreter's
+ *	"errorInfo" variable.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+ProcessProcResultCode(interp, procName, nameLen, returnCode)
+    Tcl_Interp *interp;		/* The interpreter in which the procedure
+				 * was called and returned returnCode. */
+    char *procName;		/* Name of the procedure. Used for error
+				 * messages and trace information. */
+    int nameLen;		/* Number of bytes in procedure's name. */
+    int returnCode;		/* The unexpected result code. */
+{
+    Interp *iPtr = (Interp *) interp;
+    char msg[100 + TCL_INTEGER_SPACE];
+    char *ellipsis = "";
+
+    if (returnCode == TCL_OK) {
+	return TCL_OK;
+    }
+    if ((returnCode > TCL_CONTINUE) || (returnCode < TCL_OK)) {
+	return returnCode;
+    }
+    if (returnCode == TCL_RETURN) {
+	return TclUpdateReturnInfo(iPtr);
+    } 
+    if (returnCode != TCL_ERROR) {
+	Tcl_ResetResult(interp);
+	Tcl_AppendToObj(Tcl_GetObjResult(interp), ((returnCode == TCL_BREAK) 
+		? "invoked \"break\" outside of a loop"
+		: "invoked \"continue\" outside of a loop"), -1);
+    }
+    if (nameLen > 60) {
+	nameLen = 60;
+	ellipsis = "...";
+    }
+    while ( (procName[nameLen] & 0xC0) == 0x80 ) {
+        /*
+	 * Back up truncation point so that we don't truncate in the
+	 * middle of a multi-byte character (in UTF-8)
+	 */
+	nameLen--;
+	ellipsis = "...";
+    }
+    sprintf(msg, "\n    (procedure \"%.*s%s\" line %d)", nameLen, procName,
+	    ellipsis, iPtr->errorLine);
+    Tcl_AddObjErrorInfo(interp, msg, -1);
+    return TCL_ERROR;
+}
 
 /*
  *----------------------------------------------------------------------
@@ -1188,17 +1463,20 @@ TclUpdateReturnInfo(iPtr)
 				 * exception is being processed. */
 {
     int code;
+    char *errorCode;
 
     code = iPtr->returnCode;
     iPtr->returnCode = TCL_OK;
     if (code == TCL_ERROR) {
-	Tcl_SetVar2((Tcl_Interp *) iPtr, "errorCode", (char *) NULL,
-		(iPtr->errorCode != NULL) ? iPtr->errorCode : "NONE",
+	errorCode = ((iPtr->errorCode != NULL) ? iPtr->errorCode : "NONE");
+	Tcl_ObjSetVar2((Tcl_Interp *) iPtr, iPtr->execEnvPtr->errorCode,
+	        NULL, Tcl_NewStringObj(errorCode, -1),
 		TCL_GLOBAL_ONLY);
 	iPtr->flags |= ERROR_CODE_SET;
 	if (iPtr->errorInfo != NULL) {
-	    Tcl_SetVar2((Tcl_Interp *) iPtr, "errorInfo", (char *) NULL,
-		    iPtr->errorInfo, TCL_GLOBAL_ONLY);
+	    Tcl_ObjSetVar2((Tcl_Interp *) iPtr, iPtr->execEnvPtr->errorInfo,
+	            NULL, Tcl_NewStringObj(iPtr->errorInfo, -1),
+		    TCL_GLOBAL_ONLY);
 	    iPtr->flags |= ERR_IN_PROGRESS;
 	}
     }
@@ -1227,7 +1505,7 @@ TclUpdateReturnInfo(iPtr)
 TclCmdProcType
 TclGetInterpProc()
 {
-    return TclProcInterpProc;
+    return (TclCmdProcType) TclProcInterpProc;
 }
 
 /*
@@ -1241,7 +1519,7 @@ TclGetInterpProc()
  *  by a DLL exist.
  *
  * Results:
- *  Returns the internal address of the TclProcInterpProc procedure.
+ *  Returns the internal address of the TclObjInterpProc procedure.
  *
  * Side effects:
  *  None.
@@ -1252,5 +1530,211 @@ TclGetInterpProc()
 TclObjCmdProcType
 TclGetObjInterpProc()
 {
-    return TclObjInterpProc;
+    return (TclObjCmdProcType) TclObjInterpProc;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclNewProcBodyObj --
+ *
+ *  Creates a new object, of type "procbody", whose internal
+ *  representation is the given Proc struct.
+ *  The newly created object's reference count is 0.
+ *
+ * Results:
+ *  Returns a pointer to a newly allocated Tcl_Obj, 0 on error.
+ *
+ * Side effects:
+ *  The reference count in the ByteCode attached to the Proc is bumped up
+ *  by one, since the internal rep stores a pointer to it.
+ *
+ *----------------------------------------------------------------------
+ */
+
+Tcl_Obj *
+TclNewProcBodyObj(procPtr)
+    Proc *procPtr;	/* the Proc struct to store as the internal
+                         * representation. */
+{
+    Tcl_Obj *objPtr;
+
+    if (!procPtr) {
+        return (Tcl_Obj *) NULL;
+    }
+    
+    objPtr = Tcl_NewStringObj("", 0);
+
+    if (objPtr) {
+        objPtr->typePtr = &tclProcBodyType;
+        objPtr->internalRep.otherValuePtr = (VOID *) procPtr;
+
+        procPtr->refCount++;
+    }
+
+    return objPtr;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ProcBodyDup --
+ *
+ *  Tcl_ObjType's Dup function for the proc body object.
+ *  Bumps the reference count on the Proc stored in the internal
+ *  representation.
+ *
+ * Results:
+ *  None.
+ *
+ * Side effects:
+ *  Sets up the object in dupPtr to be a duplicate of the one in srcPtr.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void ProcBodyDup(srcPtr, dupPtr)
+    Tcl_Obj *srcPtr;		/* object to copy */
+    Tcl_Obj *dupPtr;		/* target object for the duplication */
+{
+    Proc *procPtr = (Proc *) srcPtr->internalRep.otherValuePtr;
+    
+    dupPtr->typePtr = &tclProcBodyType;
+    dupPtr->internalRep.otherValuePtr = (VOID *) procPtr;
+    procPtr->refCount++;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ProcBodyFree --
+ *
+ *  Tcl_ObjType's Free function for the proc body object.
+ *  The reference count on its Proc struct is decreased by 1; if the count
+ *  reaches 0, the proc is freed.
+ *
+ * Results:
+ *  None.
+ *
+ * Side effects:
+ *  If the reference count on the Proc struct reaches 0, the struct is freed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+ProcBodyFree(objPtr)
+    Tcl_Obj *objPtr;		/* the object to clean up */
+{
+    Proc *procPtr = (Proc *) objPtr->internalRep.otherValuePtr;
+    procPtr->refCount--;
+    if (procPtr->refCount <= 0) {
+        TclProcCleanupProc(procPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ProcBodySetFromAny --
+ *
+ *  Tcl_ObjType's SetFromAny function for the proc body object.
+ *  Calls panic.
+ *
+ * Results:
+ *  Theoretically returns a TCL result code.
+ *
+ * Side effects:
+ *  Calls panic, since we can't set the value of the object from a string
+ *  representation (or any other internal ones).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+ProcBodySetFromAny(interp, objPtr)
+    Tcl_Interp *interp;			/* current interpreter */
+    Tcl_Obj *objPtr;			/* object pointer */
+{
+    panic("called ProcBodySetFromAny");
+
+    /*
+     * this to keep compilers happy.
+     */
+    
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ProcBodyUpdateString --
+ *
+ *  Tcl_ObjType's UpdateString function for the proc body object.
+ *  Calls panic.
+ *
+ * Results:
+ *  None.
+ *
+ * Side effects:
+ *  Calls panic, since we this type has no string representation.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+ProcBodyUpdateString(objPtr)
+    Tcl_Obj *objPtr;		/* the object to update */
+{
+    panic("called ProcBodyUpdateString");
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclCompileNoOp --
+ *
+ *	Procedure called to compile noOp's
+ *
+ * Results:
+ *	The return value is TCL_OK, indicating successful compilation.
+ *
+ * Side effects:
+ *	Instructions are added to envPtr to execute a noOp at runtime.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+TclCompileNoOp(interp, parsePtr, envPtr)
+    Tcl_Interp *interp;         /* Used for error reporting. */
+    Tcl_Parse *parsePtr;        /* Points to a parse structure for the
+                                 * command created by Tcl_ParseCommand. */
+    CompileEnv *envPtr;         /* Holds resulting instructions. */
+{
+    Tcl_Token *tokenPtr;
+    int i, code;
+    int savedStackDepth = envPtr->currStackDepth;
+
+    tokenPtr = parsePtr->tokenPtr;
+    for(i = 1; i < parsePtr->numWords; i++) {
+	tokenPtr = tokenPtr + tokenPtr->numComponents + 1;
+	envPtr->currStackDepth = savedStackDepth;
+
+	if (tokenPtr->type != TCL_TOKEN_SIMPLE_WORD) { 
+	    code = TclCompileTokens(interp, tokenPtr+1,
+	            tokenPtr->numComponents, envPtr);
+	    if (code != TCL_OK) {
+		return code;
+	    }
+	    TclEmitOpcode(INST_POP, envPtr);
+	} 
+    }
+    envPtr->currStackDepth = savedStackDepth;
+    TclEmitPush(TclRegisterLiteral(envPtr, "", 0, /*onHeap*/ 0), envPtr);
+    return TCL_OK;
+}
+
+
+

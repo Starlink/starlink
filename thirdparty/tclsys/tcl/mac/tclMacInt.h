@@ -3,35 +3,51 @@
  *
  *	Declarations of Macintosh specific shared variables and procedures.
  *
- * Copyright (c) 1996-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1996-1998 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclMacInt.h 1.24 97/09/09 16:22:01
+ * RCS: @(#) $Id: tclMacInt.h,v 1.7 2001/11/23 01:27:36 das Exp $
  */
 
 #ifndef _TCLMACINT
 #define _TCLMACINT
 
-#ifndef _TCL
-#   include "tcl.h"
+#ifndef _TCLINT
+#include "tclInt.h"
 #endif
-#ifndef _TCLMAC
-#   include "tclMac.h"
+#ifndef _TCLPORT
+#include "tclPort.h"
 #endif
 
 #include <Events.h>
 #include <Files.h>
 
-#pragma export on
-
 /*
- * Defines to control stack behavior
+ * Defines to control stack behavior.
+ *
+ * The Tcl8.2 regexp code is highly recursive for patterns with many
+ * subexpressions.  So we have to increase the stack space to accomodate.
+ * 512 K is good enough for ordinary work, but you need 768 to pass the Tcl
+ * regexp testsuite.
+ *
+ * For the PPC, you need to set the stack space in the Project file.
+ *
  */
 
-#define TCL_MAC_68K_STACK_GROWTH (256*1024)
+#ifdef TCL_TEST
+#	define TCL_MAC_68K_STACK_GROWTH (768*1024)
+#else
+#	define TCL_MAC_68K_STACK_GROWTH (512*1024)
+#endif
+
 #define TCL_MAC_STACK_THRESHOLD 16384
+
+#ifdef BUILD_tcl
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
 
 /*
  * This flag is passed to TclMacRegisterResourceFork
@@ -44,36 +60,18 @@
 /*
  * Typedefs used by Macintosh parts of Tcl.
  */
-typedef pascal void (*ExitToShellProcPtr)(void);
-
-/*
- * Prototypes for functions found in the tclMacUtil.c compatability library.
- */
-
-EXTERN int 	FSpGetDefaultDir _ANSI_ARGS_((FSSpecPtr theSpec));
-EXTERN int 	FSpSetDefaultDir _ANSI_ARGS_((FSSpecPtr theSpec));
-EXTERN OSErr 	FSpFindFolder _ANSI_ARGS_((short vRefNum, OSType folderType,
-		    Boolean createFolder, FSSpec *spec));
-EXTERN void	GetGlobalMouse _ANSI_ARGS_((Point *mouse));
 
 /*
  * Prototypes of Mac only internal functions.
  */
 
-EXTERN void	TclCreateMacEventSource _ANSI_ARGS_((void));
-EXTERN int	TclMacConsoleInit _ANSI_ARGS_((void));
-EXTERN void	TclMacExitHandler _ANSI_ARGS_((void));
-EXTERN void	TclMacInitExitToShell _ANSI_ARGS_((int usePatch));
-EXTERN OSErr	TclMacInstallExitToShellPatch _ANSI_ARGS_((
-		    ExitToShellProcPtr newProc));
-EXTERN int	TclMacOSErrorToPosixError _ANSI_ARGS_((int error));
-EXTERN void	TclMacRemoveTimer _ANSI_ARGS_((void *timerToken));
-EXTERN void *	TclMacStartTimer _ANSI_ARGS_((long ms));
-EXTERN int	TclMacTimerExpired _ANSI_ARGS_((void *timerToken));
-EXTERN int	TclMacRegisterResourceFork _ANSI_ARGS_((short fileRef, Tcl_Obj *tokenPtr,
-                    int insert));	
-EXTERN short	TclMacUnRegisterResourceFork _ANSI_ARGS_((char *tokenPtr, Tcl_Obj *resultPtr));	
-		    
-#pragma export reset
+EXTERN char *	TclMacGetFontEncoding _ANSI_ARGS_((int fontId));
+EXTERN int		TclMacHaveThreads _ANSI_ARGS_((void));
+EXTERN long		TclpGetGMTOffset _ANSI_ARGS_((void));
 
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLIMPORT
+
+#include "tclIntPlatDecls.h"
+    
 #endif /* _TCLMACINT */

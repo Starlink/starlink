@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclMacUtil.c 1.53 97/07/30 16:46:16
+ * RCS: @(#) $Id: tclMacUtil.c,v 1.7 2003/03/03 20:22:44 das Exp $
  */
 
 #include "tcl.h"
@@ -53,7 +53,7 @@
  *----------------------------------------------------------------------
  */
  
-#if defined(THINK_C) || defined(__MWERKS__)
+#if defined(THINK_C)
 double hypotd(double x, double y);
 
 double
@@ -178,6 +178,10 @@ FSpFindFolder(
     err = FSMakeFSSpecCompat(foundVRefNum, foundDirID, "\p", spec);
     return err;
 }
+
+static int
+FSpLocationFromPathAlias _ANSI_ARGS_((int length, CONST char *path,
+	FSSpecPtr fileSpecPtr, Boolean resolveLink));
 
 /*
  *----------------------------------------------------------------------
@@ -201,8 +205,46 @@ FSpFindFolder(
 int
 FSpLocationFromPath(
     int length,			/* Length of path. */
-    char *path,			/* The path to convert. */
+    CONST char *path,		/* The path to convert. */
     FSSpecPtr fileSpecPtr)	/* On return the spec for the path. */
+{
+	return FSpLocationFromPathAlias(length, path, fileSpecPtr, TRUE);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * FSpLLocationFromPath --
+ *
+ *	This function obtains an FSSpec for a given macintosh path.
+ *	Unlike the More Files function FSpLocationFromFullPath, this
+ *	function will also accept partial paths and resolve any aliases
+ *	along the path expect for the last path component.
+ *
+ * Results:
+ *	OSErr code.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+FSpLLocationFromPath(
+    int length,			/* Length of path. */
+    CONST char *path,		/* The path to convert. */
+    FSSpecPtr fileSpecPtr)	/* On return the spec for the path. */
+{
+	return FSpLocationFromPathAlias(length, path, fileSpecPtr, FALSE);
+}
+
+static int
+FSpLocationFromPathAlias(
+    int length,			/* Length of path. */
+    CONST char *path,		/* The path to convert. */
+    FSSpecPtr fileSpecPtr,	/* On return the spec for the path. */
+    Boolean resolveLink)	/* Resolve the last path component? */
 {
     Str255 fileName;
     OSErr err;
@@ -210,7 +252,8 @@ FSpLocationFromPath(
     long dirID;
     int pos, cur;
     Boolean isDirectory;
-    Boolean wasAlias;
+    Boolean wasAlias=FALSE;
+    FSSpec lastFileSpec;
 
     /*
      * Check to see if this is a full path.  If partial
@@ -277,8 +320,13 @@ FSpLocationFromPath(
 	}
 	err = FSMakeFSSpecCompat(vRefNum, dirID, fileName, fileSpecPtr);
 	if (err != noErr) return err;
+	lastFileSpec=*fileSpecPtr;
 	err = ResolveAliasFile(fileSpecPtr, true, &isDirectory, &wasAlias);
-	if (err != noErr) return err;
+	if (err != noErr) {
+	    /* ignore alias resolve errors on last path component */
+	    if (pos < length) return err;
+	    else *fileSpecPtr=lastFileSpec;
+	}
 	FSpGetDirectoryID(fileSpecPtr, &dirID, &isDirectory);
 	vRefNum = fileSpecPtr->vRefNum;
 	cur = pos;
@@ -286,6 +334,9 @@ FSpLocationFromPath(
 	    cur++;
 	}
     }
+    
+    if(!resolveLink && wasAlias)
+    	*fileSpecPtr=lastFileSpec;
     
     return noErr;
 }
@@ -351,13 +402,17 @@ FSpPathFromLocation(
 	     * If the file doesn't currently exist we start over.  If the
 	     * directory exists everything will work just fine.  Otherwise we
 	     * will just fail later.  If the object is a directory, append a
-	     * colon so full pathname ends with colon.
+	     * colon so full pathname ends with colon, but only if the name is
+	     * not empty.  NavServices returns FSSpec's with the parent ID set,
+	     * but the name empty...
 	     */
 	    if (err == fnfErr) {
 		BlockMoveData(spec, &tempSpec, sizeof(FSSpec));
 	    } else if ( (pb.hFileInfo.ioFlAttrib & ioDirMask) != 0 ) {
-		tempSpec.name[0] += 1;
-		tempSpec.name[tempSpec.name[0]] = ':';
+	        if (tempSpec.name[0] > 0) {
+		    tempSpec.name[0] += 1;
+		    tempSpec.name[tempSpec.name[0]] = ':';
+		}
 	    }
 			
 	    /* 
@@ -416,7 +471,7 @@ FSpPathFromLocation(
 /*
  *----------------------------------------------------------------------
  *
- * GetGlobalMouse --
+ * GetGlobalMouseTcl --
  *
  *	This procedure obtains the current mouse position in global
  *	coordinates.
@@ -431,11 +486,29 @@ FSpPathFromLocation(
  */
 
 void
-GetGlobalMouse(
+GetGlobalMouseTcl(
     Point *mouse)		/* Mouse position. */
 {
     EventRecord event;
     
     OSEventAvail(0, &event);
     *mouse = event.where;
+}
+
+pascal OSErr	FSpGetDirectoryIDTcl (CONST FSSpec * spec, 
+				long * theDirID, Boolean * isDirectory)
+{
+	return(FSpGetDirectoryID(spec, theDirID, isDirectory));
+}
+
+pascal short	FSpOpenResFileCompatTcl (CONST FSSpec * spec, SignedByte permission)
+{
+	return(FSpOpenResFileCompat(spec,permission));
+}
+
+pascal void	FSpCreateResFileCompatTcl (
+				CONST FSSpec * spec, OSType creator, 
+				OSType fileType, ScriptCode scriptTag)
+{
+	FSpCreateResFileCompat (spec,creator,fileType,scriptTag);
 }

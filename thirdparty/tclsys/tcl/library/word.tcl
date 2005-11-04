@@ -5,27 +5,24 @@
 # widgets behave properly for different platforms.
 #
 # Copyright (c) 1996 by Sun Microsystems, Inc.
+# Copyright (c) 1998 by Scritpics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
-# SCCS: @(#) word.tcl 1.2 98/06/27 18:11:26
-# 
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
+# RCS: @(#) $Id: word.tcl,v 1.7 2002/11/01 00:28:51 andreas_kupries Exp $
 
 # The following variables are used to determine which characters are
 # interpreted as white space.  
 
-if {$tcl_platform(platform) == "windows"} {
-    # Windows style - any but space, tab, or newline
-    set tcl_wordchars "\[^ \t\n\]"
-    set tcl_nonwordchars "\[ \t\n\]"
+if {[string equal $::tcl_platform(platform) "windows"]} {
+    # Windows style - any but a unicode space char
+    set tcl_wordchars "\\S"
+    set tcl_nonwordchars "\\s"
 } else {
-    # Motif style - any number, letter, or underscore
-    set tcl_wordchars {[a-zA-Z0-9_]}
-    set tcl_nonwordchars {[^a-zA-Z0-9_]}
+    # Motif style - any unicode word char (number, letter, or underscore)
+    set tcl_wordchars "\\w"
+    set tcl_nonwordchars "\\W"
 }
 
 # tcl_wordBreakAfter --
@@ -61,7 +58,7 @@ proc tcl_wordBreakAfter {str start} {
 
 proc tcl_wordBreakBefore {str start} {
     global tcl_nonwordchars tcl_wordchars
-    if {[string compare $start end] == 0} {
+    if {[string equal $start end]} {
 	set start [string length $str]
     }
     if {[regexp -indices "^.*($tcl_wordchars$tcl_nonwordchars|$tcl_nonwordchars$tcl_wordchars)" [string range $str 0 $start] result]} {
@@ -123,7 +120,7 @@ proc tcl_startOfNextWord {str start} {
 
 proc tcl_startOfPreviousWord {str start} {
     global tcl_nonwordchars tcl_wordchars
-    if {[string compare $start end] == 0} {
+    if {[string equal $start end]} {
 	set start [string length $str]
     }
     if {[regexp -indices \

@@ -10,18 +10,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) pkge.c 1.5 96/03/07 09:34:27
+ * RCS: @(#) $Id: pkge.c,v 1.5 2000/04/04 08:06:07 hobbs Exp $
  */
+
 #include "tcl.h"
 
-/*
- * Prototypes for procedures defined later in this file:
- */
-
-static int	Pkgd_SubCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
-static int	Pkgd_UnsafeCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
 
 /*
  *----------------------------------------------------------------------
@@ -45,5 +38,9 @@ Pkge_Init(interp)
     Tcl_Interp *interp;		/* Interpreter in which the package is
 				 * to be made available. */
 {
-    return Tcl_Eval(interp, "if 44 {open non_existent}");
+    static char script[] = "if 44 {open non_existent}";
+    if (Tcl_InitStubs(interp, TCL_VERSION, 1) == NULL) {
+	return TCL_ERROR;
+    }
+    return Tcl_Eval(interp, script);
 }

@@ -5,20 +5,34 @@
 # generates output for errors.  No output means no errors were found.
 #
 # Copyright (c) 1997 by Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) binary.test 1.13 97/09/11 18:50:30
+# RCS: @(#) $Id: binary.test,v 1.11.2.2 2003/12/02 09:31:54 dkf Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+test binary-0.1 {DupByteArrayInternalRep} {
+    set hdr [binary format cc 0 0316]
+    set buf hellomatt
+    
+    set data $hdr
+    append data $buf
+    
+    string length $data
+} 11
 
 test binary-1.1 {Tcl_BinaryObjCmd: bad args} {
     list [catch {binary} msg] $msg
 } {1 {wrong # args: should be "binary option ?arg arg ...?"}}
 test binary-1.2 {Tcl_BinaryObjCmd: bad args} {
     list [catch {binary foo} msg] $msg
-} {1 {bad option "foo": must be format, or scan}}
+} {1 {bad option "foo": must be format or scan}}
 
 test binary-1.3 {Tcl_BinaryObjCmd: format error} {
     list [catch {binary f} msg] $msg
@@ -26,7 +40,6 @@ test binary-1.3 {Tcl_BinaryObjCmd: format error} {
 test binary-1.4 {Tcl_BinaryObjCmd: format} {
     binary format ""
 } {}
-
 
 
 test binary-2.1 {Tcl_BinaryObjCmd: format} {
@@ -593,7 +606,7 @@ test binary-20.4 {Tcl_BinaryObjCmd: scan} {
 } {1 abc}
 test binary-20.5 {Tcl_BinaryObjCmd: scan} {
     catch {unset arg1}
-    list [binary scan abc a5 arg1] [info exist arg1]
+    list [binary scan abc a5 arg1] [info exists arg1]
 } {0 0}
 test binary-20.6 {Tcl_BinaryObjCmd: scan} {
     set arg1 foo
@@ -632,7 +645,7 @@ test binary-21.4 {Tcl_BinaryObjCmd: scan} {
 } {1 abc}
 test binary-21.5 {Tcl_BinaryObjCmd: scan} {
     catch {unset arg1}
-    list [binary scan abc A5 arg1] [info exist arg1]
+    list [binary scan abc A5 arg1] [info exists arg1]
 } {0 0}
 test binary-21.6 {Tcl_BinaryObjCmd: scan} {
     set arg1 foo
@@ -1441,3 +1454,76 @@ test binary-41.8 {ScanNumber: word alignment} {nonPortable pcOnly} {
     catch {unset arg1; unset arg2}
     list [binary scan \x01\x9a\x99\x99\x99\x99\x99\xf9\x3f c1d1 arg1 arg2] $arg1 $arg2
 } {2 1 1.6}
+
+test binary-42.1 {Tcl_BinaryObjCmd: bad arguments} {} {
+    catch {binary ""} result
+    set result
+} {bad option "": must be format or scan}
+
+# Wide int (guaranteed at least 64-bit) handling
+test binary-43.1 {Tcl_BinaryObjCmd: format wide int} {} {
+    binary format w 7810179016327718216
+} HelloTcl
+test binary-43.2 {Tcl_BinaryObjCmd: format wide int} {} {
+    binary format W 7810179016327718216
+} lcTolleH
+
+test binary-44.1 {Tcl_BinaryObjCmd: scan wide int} {} {
+    binary scan HelloTcl W x
+    set x
+} 5216694956358656876
+test binary-44.2 {Tcl_BinaryObjCmd: scan wide int} {} {
+    binary scan lcTolleH w x
+    set x
+} 5216694956358656876
+test binary-44.3 {Tcl_BinaryObjCmd: scan wide int with bit 31 set} {} {
+    binary scan [binary format w [expr {wide(3) << 31}]] w x
+    set x
+} 6442450944
+test binary-44.4 {Tcl_BinaryObjCmd: scan wide int with bit 31 set} {} {
+    binary scan [binary format W [expr {wide(3) << 31}]] W x
+    set x
+} 6442450944
+
+test binary-45.1 {Tcl_BinaryObjCmd: combined wide int handling} {
+    binary scan [binary format sws 16450 -1 19521] c* x
+    set x
+} {66 64 -1 -1 -1 -1 -1 -1 -1 -1 65 76}
+test binary-45.2 {Tcl_BinaryObjCmd: combined wide int handling} {
+    binary scan [binary format sWs 16450 0x7fffffff 19521] c* x
+    set x
+} {66 64 0 0 0 0 127 -1 -1 -1 65 76}
+
+test binary-46.1 {Tcl_BinaryObjCmd: handling of non-ISO8859-1 chars} {
+    binary format a* \u20ac
+} \u00ac
+test binary-46.2 {Tcl_BinaryObjCmd: handling of non-ISO8859-1 chars} {
+    list [binary scan [binary format a* \u20ac\u20bd] s x] $x
+} {1 -16980}
+test binary-46.3 {Tcl_BinaryObjCmd: handling of non-ISO8859-1 chars} {
+    set x {}
+    set y {}
+    set z {}
+    list [binary scan [binary format a* \u20ac\u20bd] aaa x y z] $x $y $z
+} "2 \u00ac \u00bd {}"
+test binary-46.4 {Tcl_BinaryObjCmd: handling of non-ISO8859-1 chars} {
+    set x [encoding convertto iso8859-15 \u20ac]
+    set y [binary format a* $x]
+    list $x $y
+} "\u00a4 \u00a4"
+test binary-46.5 {Tcl_BinaryObjCmd: handling of non-ISO8859-1 chars} {
+    set x [binary scan \u00a4 a* y]
+    list $x $y [encoding convertfrom iso8859-15 $y]
+} "1 \u00a4 \u20ac"
+
+test binary-47.1 {Tcl_BinaryObjCmd: number cache reference count handling} {
+    # This test is only reliable when memory debugging is turned on,
+    # but without even memory debugging it should still generate the
+    # expected answers and might therefore still pick up memory corruption
+    # caused by [Bug 851747].
+    list [binary scan aba ccc x x x] $x
+} {3 97}
+
+# cleanup
+::tcltest::cleanupTests
+return

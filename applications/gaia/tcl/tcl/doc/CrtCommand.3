@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) CrtCommand.3 1.29 97/06/04 17:23:53
+'\" RCS: @(#) $Id: CrtCommand.3,v 1.5.2.1 2004/07/16 20:46:52 andreas_kupries Exp $
 '\" 
 .so man.macros
 .TH Tcl_CreateCommand 3 "" Tcl "Tcl Library Procedures"
@@ -22,7 +22,9 @@ Tcl_Command
 .AS Tcl_CmdDeleteProc **deleteProcPtr
 .AP Tcl_Interp *interp in
 Interpreter in which to create new command.
-.AP char *cmdName in
+.VS 8.4
+.AP "CONST char" *cmdName in
+.VE
 Name of command.
 .AP Tcl_CmdProc *proc in
 Implementation of new command:  \fIproc\fR will be called whenever
@@ -82,7 +84,7 @@ typedef int Tcl_CmdProc(
 	ClientData \fIclientData\fR,
 	Tcl_Interp *\fIinterp\fR,
 	int \fIargc\fR,
-	char *\fIargv\fR[]);
+	CONST char *\fIargv\fR[]);
 .CE
 When \fIproc\fR is invoked the \fIclientData\fR and \fIinterp\fR
 parameters will be copies of the \fIclientData\fR and \fIinterp\fR
@@ -94,7 +96,17 @@ the command, \fIargc\fR giving the number of arguments (including
 the command name) and \fIargv\fR giving the values of the arguments
 as strings.  The \fIargv\fR array will contain \fIargc\fR+1 values;
 the first \fIargc\fR values point to the argument strings, and the
-last value is NULL.
+last value is NULL.  
+.VS
+Note that the argument strings should not be modified as they may
+point to constant strings or may be shared with other parts of the
+interpreter.
+.VE
+.PP
+.VS
+Note that the argument strings are encoded in normalized UTF-8 since
+version 8.1 of Tcl.
+.VE
 .PP
 \fIProc\fR must return an integer code that is either \fBTCL_OK\fR, \fBTCL_ERROR\fR,
 \fBTCL_RETURN\fR, \fBTCL_BREAK\fR, or \fBTCL_CONTINUE\fR.  See the Tcl overview man page

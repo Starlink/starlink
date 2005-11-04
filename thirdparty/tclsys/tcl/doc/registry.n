@@ -1,20 +1,21 @@
 '\"
 '\" Copyright (c) 1997 Sun Microsystems, Inc.
+'\" Copyright (c) 2002 ActiveState Corporation.
 '\"
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" SCCS: @(#) registry.n 1.5 97/08/11 19:33:27
+'\" RCS: @(#) $Id: registry.n,v 1.8.2.2 2004/11/12 09:02:30 das Exp $
 '\" 
 .so man.macros
-.TH registry n 8.0 Tcl "Tcl Built-In Commands"
+.TH registry n 1.1 registry "Tcl Bundled Packages"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
 registry \- Manipulate the Windows registry
 .SH SYNOPSIS
 .sp
-\fBpackage require registry 1.0\fR
+\fBpackage require registry 1.1\fR
 .sp
 \fBregistry \fIoption\fR \fIkeyName\fR ?\fIarg arg ...\fR?
 .BE
@@ -39,20 +40,41 @@ one of the following forms:
 \fIHostname\fR specifies the name of any valid Windows
 host that exports its registry.  The \fIrootname\fR component must be
 one of \fBHKEY_LOCAL_MACHINE\fR, \fBHKEY_USERS\fR,
-\fBHKEY_CLASSES_ROOT\fR, \fBHKEY_CURRENT_USER\fR, or
-\fBHKEY_CURRENT_CONFIG\fR.  The \fIkeypath\fR can be one or more
+.VS
+\fBHKEY_CLASSES_ROOT\fR, \fBHKEY_CURRENT_USER\fR,
+\fBHKEY_CURRENT_CONFIG\fR, \fBHKEY_PERFORMANCE_DATA\fR, or
+\fBHKEY_DYN_DATA\fR.  The \fIkeypath\fR can be one or more
+.VE
 registry key names separated by backslash (\fB\e\fR) characters.
 .PP
 \fIOption\fR indicates what to do with the registry key name.  Any
 unique abbreviation for \fIoption\fR is acceptable.  The valid options
 are:
+.VS 8.4
+.TP
+\fBregistry broadcast \fIkeyName\fR ?\fI-timeout milliseconds\fR?
+.
+Sends a broadcast message to the system and running programs to notify them
+of certain updates.  This is necessary to propagate changes to key registry
+keys like Environment.  The timeout specifies the amount of time, in
+milliseconds, to wait for applications to respond to the broadcast message.
+It defaults to 3000.  The following example demonstrates how to add a path
+to the global Environment and notify applications of the change without
+requiring a logoff/logon step (assumes admin privileges):
+.CS
+set regPath {HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment}
+set curPath [registry get $regPath "Path"]
+registry set $regPath "Path" "$curPath;$addPath"
+registry broadcast "Environment"
+.CE
+.VE 8.4
 .TP
 \fBregistry delete \fIkeyName\fR ?\fIvalueName\fR?
 .
 If the optional \fIvalueName\fR argument is present, the specified
 value under \fIkeyName\fR will be deleted from the registry.  If the
 optional \fIvalueName\fR is omitted, the specified key and any subkeys
-or values beneath it in the registry heirarchy will be deleted.  If
+or values beneath it in the registry hierarchy will be deleted.  If
 the key could not be deleted then an error is generated.  If the key
 did not exist, the command has no effect.
 .TP
@@ -109,7 +131,6 @@ registry command:
 .
 The registry value contains arbitrary binary data.  The data is represented
 exactly in Tcl, including any embedded nulls.
-Tcl 
 .TP
 \fBnone\fR
 .
@@ -158,9 +179,24 @@ In addition to the symbolically named types listed above, unknown
 types are identified using a 32-bit integer that corresponds to the
 type code returned by the system interfaces.  In this case, the data
 is represented exactly in Tcl, including any embedded nulls.
-
 .SH "PORTABILITY ISSUES"
 The registry command is only available on Windows.
+.SH EXAMPLE
+Print out how double-clicking on a Tcl script file will invoke a Tcl
+interpreter:
+.CS
+package require registry
+set ext .tcl
+
+# Read the type name
+set type [\fBregistry get\fR HKEY_CLASSES_ROOT\e\e$ext {}]
+# Work out where to look for the command
+set path HKEY_CLASSES_ROOT\e\e$type\e\eShell\e\eOpen\e\ecommand
+# Read the command!
+set command [\fBregistry get\fR $path {}]
+
+puts "$ext opens with $command"
+.CE
 
 .SH KEYWORDS
 registry

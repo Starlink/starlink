@@ -5,14 +5,15 @@
  *    involving overwritten, double freeing memory and loss of memory.
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
- * Copyright (c) 1994-1996 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1998-1999 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
  * This code contributed by Karl Lehenbauer and Mark Diekhans
  *
- * SCCS: @(#) tclCkalloc.c 1.28 97/04/30 12:09:04
+ * RCS: @(#) $Id: tclCkalloc.c,v 1.19 2003/01/19 07:21:18 hobbs Exp $
  */
 
 #include "tclInt.h"
@@ -53,7 +54,7 @@ struct mem_header {
     struct mem_header *blink;
     MemTag *tagPtr;		/* Tag from "memory tag" command;  may be
 				 * NULL. */
-    char *file;
+    CONST char *file;
     long length;
     int line;
     unsigned char low_guard[LOW_GUARD_SIZE];
@@ -102,14 +103,56 @@ static int  init_malloced_bodies = TRUE;
 #endif
 
 /*
+ * The following variable indicates to TclFinalizeMemorySubsystem() 
+ * that it should dump out the state of memory before exiting.  If the
+ * value is non-NULL, it gives the name of the file in which to
+ * dump memory usage information.
+ */
+
+char *tclMemDumpFileName = NULL;
+
+static char *onExitMemDumpFileName = NULL;
+static char dumpFile[100];	/* Records where to dump memory allocation
+				 * information. */
+
+/*
+ * Mutex to serialize allocations.  This is a low-level mutex that must
+ * be explicitly initialized.  This is necessary because the self
+ * initializing mutexes use ckalloc...
+ */
+static Tcl_Mutex *ckallocMutexPtr;
+static int ckallocInit = 0;
+
+/*
  * Prototypes for procedures defined in this file:
  */
 
+static int		CheckmemCmd _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, int argc, CONST char *argv[]));
 static int		MemoryCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 static void		ValidateMemory _ANSI_ARGS_((
-			    struct mem_header *memHeaderP, char *file,
+			    struct mem_header *memHeaderP, CONST char *file,
 			    int line, int nukeGuards));
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclInitDbCkalloc --
+ *	Initialize the locks used by the allocator.
+ *	This is only appropriate to call in a single threaded environment,
+ *	such as during TclInitSubsystems.
+ *
+ *----------------------------------------------------------------------
+ */
+void
+TclInitDbCkalloc() 
+{
+    if (!ckallocInit) {
+	ckallocInit = 1;
+	ckallocMutexPtr = Tcl_GetAllocMutex();
+    }
+}
 
 /*
  *----------------------------------------------------------------------
@@ -123,34 +166,48 @@ void
 TclDumpMemoryInfo(outFile) 
     FILE *outFile;
 {
-        fprintf(outFile,"total mallocs             %10d\n", 
-                total_mallocs);
-        fprintf(outFile,"total frees               %10d\n", 
-                total_frees);
-        fprintf(outFile,"current packets allocated %10d\n", 
-                current_malloc_packets);
-        fprintf(outFile,"current bytes allocated   %10d\n", 
-                current_bytes_malloced);
-        fprintf(outFile,"maximum packets allocated %10d\n", 
-                maximum_malloc_packets);
-        fprintf(outFile,"maximum bytes allocated   %10d\n", 
-                maximum_bytes_malloced);
+    fprintf(outFile,"total mallocs             %10d\n", 
+	    total_mallocs);
+    fprintf(outFile,"total frees               %10d\n", 
+	    total_frees);
+    fprintf(outFile,"current packets allocated %10d\n", 
+	    current_malloc_packets);
+    fprintf(outFile,"current bytes allocated   %10d\n", 
+	    current_bytes_malloced);
+    fprintf(outFile,"maximum packets allocated %10d\n", 
+	    maximum_malloc_packets);
+    fprintf(outFile,"maximum bytes allocated   %10d\n", 
+	    maximum_bytes_malloced);
 }
+
 
 /*
  *----------------------------------------------------------------------
  *
  * ValidateMemory --
- *     Procedure to validate allocted memory guard zones.
+ *
+ *	Validate memory guard zones for a particular chunk of allocated
+ *	memory.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Prints validation information about the allocated memory to stderr.
  *
  *----------------------------------------------------------------------
  */
+
 static void
 ValidateMemory(memHeaderP, file, line, nukeGuards)
-    struct mem_header *memHeaderP;
-    char              *file;
-    int                line;
-    int                nukeGuards;
+    struct mem_header *memHeaderP;	/* Memory chunk to validate */
+    CONST char        *file;		/* File containing the call to
+					 * Tcl_ValidateAllMemory */
+    int                line;		/* Line number of call to
+					 * Tcl_ValidateAllMemory */
+    int                nukeGuards;	/* If non-zero, indicates that the
+					 * memory guards are to be reset to 0
+					 * after they have been printed */
 {
     unsigned char *hiPtr;
     int   idx;
@@ -164,7 +221,7 @@ ValidateMemory(memHeaderP, file, line, nukeGuards)
             fflush(stdout);
 	    byte &= 0xff;
             fprintf(stderr, "low guard byte %d is 0x%x  \t%c\n", idx, byte,
-		    (isprint(UCHAR(byte)) ? byte : ' '));
+		    (isprint(UCHAR(byte)) ? byte : ' ')); /* INTL: bytes */
         }
     }
     if (guard_failed) {
@@ -185,7 +242,7 @@ ValidateMemory(memHeaderP, file, line, nukeGuards)
             fflush (stdout);
 	    byte &= 0xff;
             fprintf(stderr, "hi guard byte %d is 0x%x  \t%c\n", idx, byte,
-		    (isprint(UCHAR(byte)) ? byte : ' '));
+		    (isprint(UCHAR(byte)) ? byte : ' ')); /* INTL: bytes */
         }
     }
 
@@ -211,45 +268,65 @@ ValidateMemory(memHeaderP, file, line, nukeGuards)
  *----------------------------------------------------------------------
  *
  * Tcl_ValidateAllMemory --
- *     Validates guard regions for all allocated memory.
+ *
+ *	Validate memory guard regions for all allocated memory.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Displays memory validation information to stderr.
  *
  *----------------------------------------------------------------------
  */
 void
 Tcl_ValidateAllMemory (file, line)
-    char  *file;
-    int    line;
+    CONST char  *file;	/* File from which Tcl_ValidateAllMemory was called */
+    int          line;	/* Line number of call to Tcl_ValidateAllMemory */
 {
     struct mem_header *memScanP;
 
-    for (memScanP = allocHead; memScanP != NULL; memScanP = memScanP->flink)
+    if (!ckallocInit) {
+	TclInitDbCkalloc();
+    }
+    Tcl_MutexLock(ckallocMutexPtr);
+    for (memScanP = allocHead; memScanP != NULL; memScanP = memScanP->flink) {
         ValidateMemory(memScanP, file, line, FALSE);
-
+    }
+    Tcl_MutexUnlock(ckallocMutexPtr);
 }
 
 /*
  *----------------------------------------------------------------------
  *
  * Tcl_DumpActiveMemory --
- *     Displays all allocated memory to stderr.
+ *
+ *	Displays all allocated memory to a file; if no filename is given,
+ *	information will be written to stderr.
  *
  * Results:
- *     Return TCL_ERROR if an error accessing the file occures, `errno' 
- *     will have the file error number left in it.
+ *	Return TCL_ERROR if an error accessing the file occurs, `errno' 
+ *	will have the file error number left in it.
  *----------------------------------------------------------------------
  */
 int
 Tcl_DumpActiveMemory (fileName)
-    char *fileName;
+    CONST char *fileName;		/* Name of the file to write info to */
 {
     FILE              *fileP;
     struct mem_header *memScanP;
     char              *address;
 
-    fileP = fopen(fileName, "w");
-    if (fileP == NULL)
-        return TCL_ERROR;
+    if (fileName == NULL) {
+	fileP = stderr;
+    } else {
+	fileP = fopen(fileName, "w");
+	if (fileP == NULL) {
+	    return TCL_ERROR;
+	}
+    }
 
+    Tcl_MutexLock(ckallocMutexPtr);
     for (memScanP = allocHead; memScanP != NULL; memScanP = memScanP->flink) {
         address = &memScanP->body [0];
         fprintf(fileP, "%8lx - %8lx  %7ld @ %s %d %s",
@@ -259,7 +336,11 @@ Tcl_DumpActiveMemory (fileName)
 		 (memScanP->tagPtr == NULL) ? "" : memScanP->tagPtr->string);
 	(void) fputc('\n', fileP);
     }
-    fclose (fileP);
+    Tcl_MutexUnlock(ckallocMutexPtr);
+
+    if (fileP != stderr) {
+	fclose (fileP);
+    }
     return TCL_OK;
 }
 
@@ -284,7 +365,7 @@ Tcl_DumpActiveMemory (fileName)
 char *
 Tcl_DbCkalloc(size, file, line)
     unsigned int size;
-    char        *file;
+    CONST char  *file;
     int          line;
 {
     struct mem_header *result;
@@ -297,8 +378,7 @@ Tcl_DbCkalloc(size, file, line)
     if (result == NULL) {
         fflush(stdout);
         TclDumpMemoryInfo(stderr);
-        panic("unable to alloc %d bytes, %s line %d", size, file, 
-              line);
+        panic("unable to alloc %u bytes, %s line %d", size, file, line);
     }
 
     /*
@@ -313,6 +393,10 @@ Tcl_DbCkalloc(size, file, line)
 	memset ((char *) result->low_guard, GUARD_VALUE, LOW_GUARD_SIZE);
 	memset (result->body + size, GUARD_VALUE, HIGH_GUARD_SIZE);
     }
+    if (!ckallocInit) {
+	TclInitDbCkalloc();
+    }
+    Tcl_MutexLock(ckallocMutexPtr);
     result->length = size;
     result->tagPtr = curTagPtr;
     if (curTagPtr != NULL) {
@@ -322,6 +406,7 @@ Tcl_DbCkalloc(size, file, line)
     result->line = line;
     result->flink = allocHead;
     result->blink = NULL;
+
     if (allocHead != NULL)
         allocHead->blink = result;
     allocHead = result;
@@ -337,7 +422,7 @@ Tcl_DbCkalloc(size, file, line)
     }
 
     if (alloc_tracing)
-        fprintf(stderr,"ckalloc %lx %d %s %d\n",
+        fprintf(stderr,"ckalloc %lx %u %s %d\n",
 		(long unsigned int) result->body, size, file, line);
 
     if (break_on_malloc && (total_mallocs >= break_on_malloc)) {
@@ -357,8 +442,96 @@ Tcl_DbCkalloc(size, file, line)
     if (current_bytes_malloced > maximum_bytes_malloced)
         maximum_bytes_malloced = current_bytes_malloced;
 
+    Tcl_MutexUnlock(ckallocMutexPtr);
+
     return result->body;
 }
+
+char *
+Tcl_AttemptDbCkalloc(size, file, line)
+    unsigned int size;
+    CONST char  *file;
+    int          line;
+{
+    struct mem_header *result;
+
+    if (validate_memory)
+        Tcl_ValidateAllMemory (file, line);
+
+    result = (struct mem_header *) TclpAlloc((unsigned)size + 
+                              sizeof(struct mem_header) + HIGH_GUARD_SIZE);
+    if (result == NULL) {
+        fflush(stdout);
+        TclDumpMemoryInfo(stderr);
+	return NULL;
+    }
+
+    /*
+     * Fill in guard zones and size.  Also initialize the contents of
+     * the block with bogus bytes to detect uses of initialized data.
+     * Link into allocated list.
+     */
+    if (init_malloced_bodies) {
+        memset ((VOID *) result, GUARD_VALUE,
+		size + sizeof(struct mem_header) + HIGH_GUARD_SIZE);
+    } else {
+	memset ((char *) result->low_guard, GUARD_VALUE, LOW_GUARD_SIZE);
+	memset (result->body + size, GUARD_VALUE, HIGH_GUARD_SIZE);
+    }
+    if (!ckallocInit) {
+	TclInitDbCkalloc();
+    }
+    Tcl_MutexLock(ckallocMutexPtr);
+    result->length = size;
+    result->tagPtr = curTagPtr;
+    if (curTagPtr != NULL) {
+	curTagPtr->refCount++;
+    }
+    result->file = file;
+    result->line = line;
+    result->flink = allocHead;
+    result->blink = NULL;
+
+    if (allocHead != NULL)
+        allocHead->blink = result;
+    allocHead = result;
+
+    total_mallocs++;
+    if (trace_on_at_malloc && (total_mallocs >= trace_on_at_malloc)) {
+        (void) fflush(stdout);
+        fprintf(stderr, "reached malloc trace enable point (%d)\n",
+                total_mallocs);
+        fflush(stderr);
+        alloc_tracing = TRUE;
+        trace_on_at_malloc = 0;
+    }
+
+    if (alloc_tracing)
+        fprintf(stderr,"ckalloc %lx %u %s %d\n",
+		(long unsigned int) result->body, size, file, line);
+
+    if (break_on_malloc && (total_mallocs >= break_on_malloc)) {
+        break_on_malloc = 0;
+        (void) fflush(stdout);
+        fprintf(stderr,"reached malloc break limit (%d)\n", 
+                total_mallocs);
+        fprintf(stderr, "program will now enter C debugger\n");
+        (void) fflush(stderr);
+	abort();
+    }
+
+    current_malloc_packets++;
+    if (current_malloc_packets > maximum_malloc_packets)
+        maximum_malloc_packets = current_malloc_packets;
+    current_bytes_malloced += size;
+    if (current_bytes_malloced > maximum_bytes_malloced)
+        maximum_bytes_malloced = current_bytes_malloced;
+
+    Tcl_MutexUnlock(ckallocMutexPtr);
+
+    return result->body;
+}
+
 
 /*
  *----------------------------------------------------------------------
@@ -381,10 +554,16 @@ Tcl_DbCkalloc(size, file, line)
 
 int
 Tcl_DbCkfree(ptr, file, line)
-    char *  ptr;
-    char     *file;
-    int       line;
+    char       *ptr;
+    CONST char *file;
+    int         line;
 {
+    struct mem_header *memp;
+
+    if (ptr == NULL) {
+	return 0;
+    }
+
     /*
      * The following cast is *very* tricky.  Must convert the pointer
      * to an integer before doing arithmetic on it, because otherwise
@@ -393,16 +572,18 @@ Tcl_DbCkfree(ptr, file, line)
      * even though BODY_OFFSET is in words on these machines).
      */
 
-    struct mem_header *memp = (struct mem_header *)
-	    (((unsigned long) ptr) - BODY_OFFSET);
+    memp = (struct mem_header *) (((unsigned long) ptr) - BODY_OFFSET);
 
-    if (alloc_tracing)
+    if (alloc_tracing) {
         fprintf(stderr, "ckfree %lx %ld %s %d\n",
 		(long unsigned int) memp->body, memp->length, file, line);
+    }
 
-    if (validate_memory)
+    if (validate_memory) {
         Tcl_ValidateAllMemory(file, line);
+    }
 
+    Tcl_MutexLock(ckallocMutexPtr);
     ValidateMemory(memp, file, line, TRUE);
     if (init_malloced_bodies) {
 	memset((VOID *) ptr, GUARD_VALUE, (size_t) memp->length);
@@ -429,6 +610,8 @@ Tcl_DbCkfree(ptr, file, line)
     if (allocHead == memp)
         allocHead = memp->flink;
     TclpFree((char *) memp);
+    Tcl_MutexUnlock(ckallocMutexPtr);
+
     return 0;
 }
 
@@ -446,21 +629,25 @@ Tcl_DbCkfree(ptr, file, line)
  */
 char *
 Tcl_DbCkrealloc(ptr, size, file, line)
-    char *ptr;
+    char        *ptr;
     unsigned int size;
-    char *file;
-    int line;
+    CONST char  *file;
+    int          line;
 {
     char *new;
     unsigned int copySize;
+    struct mem_header *memp;
+
+    if (ptr == NULL) {
+	return Tcl_DbCkalloc(size, file, line);
+    }
 
     /*
      * See comment from Tcl_DbCkfree before you change the following
      * line.
      */
 
-    struct mem_header *memp = (struct mem_header *)
-	    (((unsigned long) ptr) - BODY_OFFSET);
+    memp = (struct mem_header *) (((unsigned long) ptr) - BODY_OFFSET);
 
     copySize = size;
     if (copySize > (unsigned int) memp->length) {
@@ -469,7 +656,42 @@ Tcl_DbCkrealloc(ptr, size, file, line)
     new = Tcl_DbCkalloc(size, file, line);
     memcpy((VOID *) new, (VOID *) ptr, (size_t) copySize);
     Tcl_DbCkfree(ptr, file, line);
-    return(new);
+    return new;
+}
+
+char *
+Tcl_AttemptDbCkrealloc(ptr, size, file, line)
+    char        *ptr;
+    unsigned int size;
+    CONST char  *file;
+    int          line;
+{
+    char *new;
+    unsigned int copySize;
+    struct mem_header *memp;
+
+    if (ptr == NULL) {
+	return Tcl_AttemptDbCkalloc(size, file, line);
+    }
+
+    /*
+     * See comment from Tcl_DbCkfree before you change the following
+     * line.
+     */
+
+    memp = (struct mem_header *) (((unsigned long) ptr) - BODY_OFFSET);
+
+    copySize = size;
+    if (copySize > (unsigned int) memp->length) {
+	copySize = memp->length;
+    }
+    new = Tcl_AttemptDbCkalloc(size, file, line);
+    if (new == NULL) {
+	return NULL;
+    }
+    memcpy((VOID *) new, (VOID *) ptr, (size_t) copySize);
+    Tcl_DbCkfree(ptr, file, line);
+    return new;
 }
 
 
@@ -493,12 +715,21 @@ Tcl_DbCkrealloc(ptr, size, file, line)
 #undef Tcl_Alloc
 #undef Tcl_Free
 #undef Tcl_Realloc
+#undef Tcl_AttemptAlloc
+#undef Tcl_AttemptRealloc
 
 char *
 Tcl_Alloc(size)
     unsigned int size;
 {
     return Tcl_DbCkalloc(size, "unknown", 0);
+}
+
+char *
+Tcl_AttemptAlloc(size)
+    unsigned int size;
+{
+    return Tcl_AttemptDbCkalloc(size, "unknown", 0);
 }
 
 void
@@ -515,18 +746,29 @@ Tcl_Realloc(ptr, size)
 {
     return Tcl_DbCkrealloc(ptr, size, "unknown", 0);
 }
+char *
+Tcl_AttemptRealloc(ptr, size)
+    char *ptr;
+    unsigned int size;
+{
+    return Tcl_AttemptDbCkrealloc(ptr, size, "unknown", 0);
+}
 
 /*
  *----------------------------------------------------------------------
  *
  * MemoryCmd --
- *     Implements the TCL memory command:
- *       memory info
- *       memory display
- *       break_on_malloc count
- *       trace_on_at_malloc count
- *       trace on|off
- *       validate on|off
+ *	Implements the Tcl "memory" command, which provides Tcl-level
+ *	control of Tcl memory debugging information.
+ *		memory active $file
+ *		memory break_on_malloc $count
+ *		memory info
+ *		memory init on|off
+ *		memory onexit $file
+ *		memory tag $string
+ *		memory trace on|off
+ *		memory trace_on_at_malloc $count
+ *		memory validate on|off
  *
  * Results:
  *     Standard TCL results.
@@ -539,9 +781,9 @@ MemoryCmd (clientData, interp, argc, argv)
     ClientData  clientData;
     Tcl_Interp *interp;
     int         argc;
-    char      **argv;
+    CONST char  **argv;
 {
-    char *fileName;
+    CONST char *fileName;
     Tcl_DString buffer;
     int result;
 
@@ -551,10 +793,10 @@ MemoryCmd (clientData, interp, argc, argv)
 	return TCL_ERROR;
     }
 
-    if (strcmp(argv[1],"active") == 0) {
+    if ((strcmp(argv[1],"active") == 0) || (strcmp(argv[1],"display") == 0)) {
         if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
-		    argv[0], " active file\"", (char *) NULL);
+		    argv[0], " ", argv[1], " file\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
 	fileName = Tcl_TranslateFileName(interp, argv[2], &buffer);
@@ -580,7 +822,14 @@ MemoryCmd (clientData, interp, argc, argv)
         return TCL_OK;
     }
     if (strcmp(argv[1],"info") == 0) {
-        TclDumpMemoryInfo(stdout);
+	char buf[400];
+	sprintf(buf, "%-25s %10d\n%-25s %10d\n%-25s %10d\n%-25s %10d\n%-25s %10d\n%-25s %10d\n",
+	    "total mallocs", total_mallocs, "total frees", total_frees,
+	    "current packets allocated", current_malloc_packets,
+	    "current bytes allocated", current_bytes_malloced,
+	    "maximum packets allocated", maximum_malloc_packets,
+	    "maximum bytes allocated", maximum_bytes_malloced);
+	Tcl_SetResult(interp, buf, TCL_VOLATILE);
         return TCL_OK;
     }
     if (strcmp(argv[1],"init") == 0) {
@@ -589,6 +838,21 @@ MemoryCmd (clientData, interp, argc, argv)
 	}
         init_malloced_bodies = (strcmp(argv[2],"on") == 0);
         return TCL_OK;
+    }
+    if (strcmp(argv[1],"onexit") == 0) {
+        if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " onexit file\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+	fileName = Tcl_TranslateFileName(interp, argv[2], &buffer);
+	if (fileName == NULL) {
+	    return TCL_ERROR;
+	}
+	onExitMemDumpFileName = dumpFile;
+	strcpy(onExitMemDumpFileName,fileName);
+	Tcl_DStringFree(&buffer);
+	return TCL_OK;
     }
     if (strcmp(argv[1],"tag") == 0) {
 	if (argc != 3) {
@@ -630,7 +894,7 @@ MemoryCmd (clientData, interp, argc, argv)
     }
 
     Tcl_AppendResult(interp, "bad option \"", argv[1],
-	    "\": should be active, break_on_malloc, info, init, ",
+	    "\": should be active, break_on_malloc, info, init, onexit, ",
 	    "tag, trace, trace_on_at_malloc, or validate", (char *) NULL);
     return TCL_ERROR;
 
@@ -648,20 +912,75 @@ bad_suboption:
 /*
  *----------------------------------------------------------------------
  *
- * Tcl_InitMemory --
- *     Initialize the memory command.
+ * CheckmemCmd --
+ *
+ *	This is the command procedure for the "checkmem" command, which
+ *	causes the application to exit after printing information about
+ *	memory usage to the file passed to this command as its first
+ *	argument.
+ *
+ * Results:
+ *	Returns a standard Tcl completion code.
+ *
+ * Side effects:
+ *	None.
  *
  *----------------------------------------------------------------------
  */
+
+static int
+CheckmemCmd(clientData, interp, argc, argv)
+    ClientData clientData;		/* Not used. */
+    Tcl_Interp *interp;			/* Interpreter for evaluation. */
+    int argc;				/* Number of arguments. */
+    CONST char *argv[];			/* String values of arguments. */
+{
+    if (argc != 2) {
+	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+		" fileName\"", (char *) NULL);
+	return TCL_ERROR;
+    }
+    tclMemDumpFileName = dumpFile;
+    strcpy(tclMemDumpFileName, argv[1]);
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_InitMemory --
+ *
+ *	Create the "memory" and "checkmem" commands in the given
+ *	interpreter.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	New commands are added to the interpreter.
+ *
+ *----------------------------------------------------------------------
+ */
+
 void
 Tcl_InitMemory(interp)
-    Tcl_Interp *interp;
+    Tcl_Interp *interp;	/* Interpreter in which commands should be added */
 {
+    TclInitDbCkalloc();
     Tcl_CreateCommand (interp, "memory", MemoryCmd, (ClientData) NULL, 
+	    (Tcl_CmdDeleteProc *) NULL);
+    Tcl_CreateCommand(interp, "checkmem", CheckmemCmd, (ClientData) 0,
 	    (Tcl_CmdDeleteProc *) NULL);
 }
 
-#else
+
+#else	/* TCL_MEM_DEBUG */
+
+/* This is the !TCL_MEM_DEBUG case */
+
+#undef Tcl_InitMemory
+#undef Tcl_DumpActiveMemory
+#undef Tcl_ValidateAllMemory
 
 
 /*
@@ -678,29 +997,70 @@ char *
 Tcl_Alloc (size)
     unsigned int size;
 {
-        char *result;
+    char *result;
 
-        result = TclpAlloc(size);
-        if (result == NULL) 
-                panic("unable to alloc %d bytes", size);
-        return result;
+    result = TclpAlloc(size);
+    /*
+     * Most systems will not alloc(0), instead bumping it to one so
+     * that NULL isn't returned.  Some systems (AIX, Tru64) will alloc(0)
+     * by returning NULL, so we have to check that the NULL we get is
+     * not in response to alloc(0).
+     *
+     * The ANSI spec actually says that systems either return NULL *or*
+     * a special pointer on failure, but we only check for NULL
+     */
+    if ((result == NULL) && size) {
+	panic("unable to alloc %u bytes", size);
+    }
+    return result;
 }
 
 char *
 Tcl_DbCkalloc(size, file, line)
     unsigned int size;
-    char        *file;
+    CONST char  *file;
     int          line;
 {
     char *result;
 
     result = (char *) TclpAlloc(size);
 
-    if (result == NULL) {
+    if ((result == NULL) && size) {
         fflush(stdout);
-        panic("unable to alloc %d bytes, %s line %d", size, file, 
-              line);
+        panic("unable to alloc %u bytes, %s line %d", size, file, line);
     }
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_AttemptAlloc --
+ *     Interface to TclpAlloc when TCL_MEM_DEBUG is disabled.  It does not
+ *     check that memory was actually allocated.
+ *
+ *----------------------------------------------------------------------
+ */
+
+char *
+Tcl_AttemptAlloc (size)
+    unsigned int size;
+{
+    char *result;
+
+    result = TclpAlloc(size);
+    return result;
+}
+
+char *
+Tcl_AttemptDbCkalloc(size, file, line)
+    unsigned int size;
+    CONST char  *file;
+    int          line;
+{
+    char *result;
+
+    result = (char *) TclpAlloc(size);
     return result;
 }
 
@@ -723,27 +1083,62 @@ Tcl_Realloc(ptr, size)
     char *result;
 
     result = TclpRealloc(ptr, size);
-    if (result == NULL) 
-	panic("unable to realloc %d bytes", size);
+
+    if ((result == NULL) && size) {
+	panic("unable to realloc %u bytes", size);
+    }
     return result;
 }
 
 char *
 Tcl_DbCkrealloc(ptr, size, file, line)
-    char *ptr;
+    char        *ptr;
     unsigned int size;
-    char *file;
-    int line;
+    CONST char  *file;
+    int          line;
 {
     char *result;
 
     result = (char *) TclpRealloc(ptr, size);
 
-    if (result == NULL) {
+    if ((result == NULL) && size) {
         fflush(stdout);
-        panic("unable to realloc %d bytes, %s line %d", size, file, 
-              line);
+        panic("unable to realloc %u bytes, %s line %d", size, file, line);
     }
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_AttemptRealloc --
+ *     Interface to TclpRealloc when TCL_MEM_DEBUG is disabled.  It does 
+ *     not check that memory was actually allocated.
+ *
+ *----------------------------------------------------------------------
+ */
+
+char *
+Tcl_AttemptRealloc(ptr, size)
+    char *ptr;
+    unsigned int size;
+{
+    char *result;
+
+    result = TclpRealloc(ptr, size);
+    return result;
+}
+
+char *
+Tcl_AttemptDbCkrealloc(ptr, size, file, line)
+    char        *ptr;
+    unsigned int size;
+    CONST char  *file;
+    int          line;
+{
+    char *result;
+
+    result = (char *) TclpRealloc(ptr, size);
     return result;
 }
 
@@ -762,14 +1157,14 @@ void
 Tcl_Free (ptr)
     char *ptr;
 {
-        TclpFree(ptr);
+    TclpFree(ptr);
 }
 
 int
 Tcl_DbCkfree(ptr, file, line)
-    char *  ptr;
-    char     *file;
-    int       line;
+    char       *ptr;
+    CONST char *file;
+    int         line;
 {
     TclpFree(ptr);
     return 0;
@@ -791,25 +1186,67 @@ Tcl_InitMemory(interp)
 {
 }
 
-#undef Tcl_DumpActiveMemory
-#undef Tcl_ValidateAllMemory
-
-extern int		Tcl_DumpActiveMemory _ANSI_ARGS_((char *fileName));
-extern void		Tcl_ValidateAllMemory _ANSI_ARGS_((char *file,
-			    int line));
-
 int
 Tcl_DumpActiveMemory(fileName)
-    char *fileName;
+    CONST char *fileName;
 {
     return TCL_OK;
 }
 
 void
 Tcl_ValidateAllMemory(file, line)
-    char  *file;
-    int    line;
+    CONST char *file;
+    int         line;
 {
 }
 
+void
+TclDumpMemoryInfo(outFile) 
+    FILE *outFile;
+{
+}
+
+#endif	/* TCL_MEM_DEBUG */
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclFinalizeMemorySubsystem --
+ *
+ *	This procedure is called to finalize all the structures that 
+ *	are used by the memory allocator on a per-process basis.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	This subsystem is self-initializing, since memory can be 
+ *	allocated before Tcl is formally initialized.  After this call,
+ *	this subsystem has been reset to its initial state and is 
+ *	usable again.
+ *
+ *---------------------------------------------------------------------------
+ */
+
+void
+TclFinalizeMemorySubsystem()
+{
+#ifdef TCL_MEM_DEBUG
+    if (tclMemDumpFileName != NULL) {
+	Tcl_DumpActiveMemory(tclMemDumpFileName);
+    } else if (onExitMemDumpFileName != NULL) {
+	Tcl_DumpActiveMemory(onExitMemDumpFileName);
+    }
+    Tcl_MutexLock(ckallocMutexPtr);
+    if (curTagPtr != NULL) {
+	TclpFree((char *) curTagPtr);
+	curTagPtr = NULL;
+    }
+    allocHead = NULL;
+    Tcl_MutexUnlock(ckallocMutexPtr);
 #endif
+
+#if USE_TCLALLOC
+    TclFinalizeAllocSubsystem(); 
+#endif
+}

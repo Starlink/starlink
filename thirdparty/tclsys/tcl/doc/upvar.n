@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) upvar.n 1.16 97/08/13 13:43:34
+'\" RCS: @(#) $Id: upvar.n,v 1.5.18.2 2004/11/12 09:02:30 das Exp $
 '\" 
 .so man.macros
 .TH upvar n "" Tcl "Tcl Built-In Commands"
@@ -46,12 +46,12 @@ procedure calling and also makes it easier to build new control constructs
 as Tcl procedures.
 For example, consider the following procedure:
 .CS
-\fBproc add2 name {
-	upvar $name x
-	set x [expr $x+2]
-}\fR
+proc add2 name {
+   \fBupvar\fR $name x
+   set x [expr $x+2]
+}
 .CE
-\fBAdd2\fR is invoked with an argument giving the name of a variable,
+\fBadd2\fR is invoked with an argument giving the name of a variable,
 and it adds two to the value of that variable.
 Although \fBadd2\fR could have been implemented using \fBuplevel\fR
 instead of \fBupvar\fR, \fBupvar\fR makes it simpler for \fBadd2\fR
@@ -75,8 +75,27 @@ upvar variable.  There is no way to unset an upvar variable except
 by exiting the procedure in which it is defined.  However, it is
 possible to retarget an upvar variable by executing another \fBupvar\fR
 command.
-
-.SH BUGS
+.SH "TRACES AND UPVAR"
+.PP
+Upvar interacts with traces in a straightforward but possibly
+unexpected manner.  If a variable trace is defined on \fIotherVar\fR, that
+trace will be triggered by actions involving \fImyVar\fR.  However,
+the trace procedure will be passed the name of \fImyVar\fR, rather
+than the name of \fIotherVar\fR.  Thus, the output of the following code
+will be \fBlocalVar\fR rather than \fBoriginalVar\fR:
+.CS
+proc \fBtraceproc\fR { name index op } {
+   puts $name
+}
+proc \fBsetByUpvar\fR { name value } {
+   \fBupvar\fR $name localVar
+   set localVar $value
+}
+set originalVar 1
+trace variable originalVar w \fBtraceproc\fR
+\fBsetByUpvar\fR originalVar 2
+}
+.CE
 .PP
 If \fIotherVar\fR refers to an element of an array, then variable
 traces set for the entire array will not be invoked when \fImyVar\fR
@@ -84,9 +103,18 @@ is accessed (but traces on the particular element will still be
 invoked).  In particular, if the array is \fBenv\fR, then changes
 made to \fImyVar\fR will not be passed to subprocesses correctly.
 .VE
+.SH EXAMPLE
+A \fBdecr\fR command that works like \fBincr\fR except it subtracts
+the value from the variable instead of adding it:
+.CS
+proc decr {varName {decrement 1}} {
+    \fBupvar\fR 1 $varName var
+    incr var [expr {-$decrement}]
+}
+.CE
 
 .SH "SEE ALSO"
-namespace(n)
+global(n), namespace(n), uplevel(n), variable(n)
 
 .SH KEYWORDS
 context, frame, global, level, namespace, procedure, variable

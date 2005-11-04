@@ -7,12 +7,12 @@
  *	dld-3.2.7.  This file probably isn't needed anymore, since it
  *	makes more sense to use "dl_open" etc.
  *
- * Copyright (c) 1995 Sun Microsystems, Inc.
+ * Copyright (c) 1995-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclLoadDld.c 1.5 97/05/14 13:24:22
+ * RCS: @(#) $Id: tclLoadDld.c,v 1.12 2002/10/10 12:25:53 vincentdarley Exp $
  */
 
 #include "tclInt.h"
@@ -30,17 +30,14 @@
 /*
  *----------------------------------------------------------------------
  *
- * TclLoadFile --
+ * TclpDlopen --
  *
  *	Dynamically loads a binary code file into memory and returns
- *	the addresses of two procedures within that file, if they
- *	are defined.
+ *	a handle to the new code.
  *
  * Results:
  *	A standard Tcl completion code.  If an error occurs, an error
- *	message is left in interp->result.  *proc1Ptr and *proc2Ptr
- *	are filled in with the addresses of the symbols given by
- *	*sym1 and *sym2, or NULL if those symbols can't be found.
+ *	message is left in the interp's result.
  *
  * Side effects:
  *	New code suddenly appears in memory.
@@ -49,22 +46,26 @@
  */
 
 int
-TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr)
+TclpDlopen(interp, pathPtr, loadHandle, unloadProcPtr)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    char *fileName;		/* Name of the file containing the desired
-				 * code. */
-    char *sym1, *sym2;		/* Names of two procedures to look up in
-				 * the file's symbol table. */
-    Tcl_PackageInitProc **proc1Ptr, **proc2Ptr;
-				/* Where to return the addresses corresponding
-				 * to sym1 and sym2. */
+    Tcl_Obj *pathPtr;		/* Name of the file containing the desired
+				 * code (UTF-8). */
+    Tcl_LoadHandle *loadHandle;	/* Filled with token for dynamically loaded
+				 * file which will be passed back to 
+				 * (*unloadProcPtr)() to unload the file. */
+    Tcl_FSUnloadFileProc **unloadProcPtr;	
+				/* Filled with address of Tcl_FSUnloadFileProc
+				 * function which should be used for
+				 * this file. */
 {
     static int firstTime = 1;
     int returnCode;
-
+    char *fileName;
+    CONST char *native;
+    
     /*
      *  The dld package needs to know the pathname to the tcl binary.
-     *  If that's not know, return an error.
+     *  If that's not known, return an error.
      */
 
     if (firstTime) {
@@ -84,14 +85,89 @@ TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr)
 	firstTime = 0;
     }
 
-    if ((returnCode = dld_link(fileName)) != 0) {
-	Tcl_AppendResult(interp, "couldn't load file \"", fileName,
-	    "\": ", dld_strerror(returnCode), (char *) NULL);
+    fileName = Tcl_GetString(pathPtr);
+
+    /* 
+     * First try the full path the user gave us.  This is particularly
+     * important if the cwd is inside a vfs, and we are trying to load
+     * using a relative path.
+     */
+    native = Tcl_FSGetNativePath(pathPtr);
+    returnCode = dld_link(native);
+    
+    if (returnCode != 0) {
+	Tcl_DString ds;
+	native = Tcl_UtfToExternalDString(NULL, fileName, -1, &ds);
+	returnCode = dld_link(native);
+	Tcl_DStringFree(&ds);
+    }
+
+    if (returnCode != 0) {
+	Tcl_AppendResult(interp, "couldn't load file \"", 
+			 fileName, "\": ", 
+			 dld_strerror(returnCode), (char *) NULL);
 	return TCL_ERROR;
     }
-    *proc1Ptr = (Tcl_PackageInitProc *) dld_get_func(sym1);
-    *proc2Ptr = (Tcl_PackageInitProc *) dld_get_func(sym2);
+    *loadHandle = (Tcl_LoadHandle) strcpy(
+	    (char *) ckalloc((unsigned) (strlen(fileName) + 1)), fileName);
+    *unloadProcPtr = &TclpUnloadFile;
     return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpFindSymbol --
+ *
+ *	Looks up a symbol, by name, through a handle associated with
+ *	a previously loaded piece of code (shared library).
+ *
+ * Results:
+ *	Returns a pointer to the function associated with 'symbol' if
+ *	it is found.  Otherwise returns NULL and may leave an error
+ *	message in the interp's result.
+ *
+ *----------------------------------------------------------------------
+ */
+Tcl_PackageInitProc*
+TclpFindSymbol(interp, loadHandle, symbol) 
+    Tcl_Interp *interp;
+    Tcl_LoadHandle loadHandle;
+    CONST char *symbol;
+{
+    return (Tcl_PackageInitProc *) dld_get_func(symbol);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpUnloadFile --
+ *
+ *	Unloads a dynamically loaded binary code file from memory.
+ *	Code pointers in the formerly loaded file are no longer valid
+ *	after calling this function.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Code removed from memory.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TclpUnloadFile(loadHandle)
+    Tcl_LoadHandle loadHandle;	/* loadHandle returned by a previous call
+				 * to TclpDlopen().  The loadHandle is 
+				 * a token that represents the loaded 
+				 * file. */
+{
+    char *fileName;
+
+    handle = (char *) loadHandle;
+    dld_unlink_by_file(handle, 0);
+    ckfree(handle);
 }
 
 /*
@@ -116,7 +192,7 @@ TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr)
 
 int
 TclGuessPackageName(fileName, bufPtr)
-    char *fileName;		/* Name of file containing package (already
+    CONST char *fileName;	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr;	/* Initialized empty dstring.  Append
 				 * package name to this if possible. */

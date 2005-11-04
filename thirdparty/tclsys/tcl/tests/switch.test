@@ -6,13 +6,17 @@
 #
 # Copyright (c) 1993 The Regents of the University of California.
 # Copyright (c) 1994 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) switch.test 1.7 97/02/10 17:27:13
+# RCS: @(#) $Id: switch.test,v 1.7 2001/11/27 13:30:54 dkf Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 test switch-1.1 {simple patterns} {
     switch a a {format 1} b {format 2} c {format 3} default {format 4}
@@ -56,7 +60,7 @@ test switch-3.1 {-exact vs. -glob vs. -regexp} {
     }
 } exact
 test switch-3.2 {-exact vs. -glob vs. -regexp} {
-    switch -exact -regexp aaaab {
+    switch -regexp aaaab {
 	^a*b$	{concat regexp}
 	*b	{concat glob}
 	aaaab	{concat exact}
@@ -121,7 +125,7 @@ test switch-5.1 {errors in -regexp matching} {
 	aaaab	{concat exact}
 	default	{concat none}
     }} msg] $msg
-} {1 {couldn't compile regular expression pattern: ?+* follows nothing}}
+} {1 {couldn't compile regular expression pattern: quantifier operand invalid}}
 
 test switch-6.1 {backslashes in patterns} {
     switch -exact {\a\$\.\[} {
@@ -158,7 +162,7 @@ test switch-7.2 {"-" bodies} {
 	    c -
 	}
     } msg] $msg
-} {1 {no body specified for pattern "a"}}
+} {1 {no body specified for pattern "c"}}
 test switch-7.3 {"-" bodies} {
     list [catch {
 	switch a {
@@ -167,7 +171,7 @@ test switch-7.3 {"-" bodies} {
 	    c -
 	}
     } msg] $msg
-} {1 {invalid command name "-foo"}}
+} {1 {no body specified for pattern "c"}}
 
 test switch-8.1 {empty body} {
     set msg {}
@@ -177,3 +181,38 @@ test switch-8.1 {empty body} {
         default {set msg 2}
     }
 } {}
+
+test switch-9.1 {empty pattern/body list} {
+    list [catch {switch x} msg] $msg
+} {1 {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"}}
+test switch-9.2 {empty pattern/body list} {
+    list [catch {switch -- x} msg] $msg
+} {1 {wrong # args: should be "switch ?switches? string pattern body ... ?default body?"}}
+test switch-9.3 {empty pattern/body list} {
+    list [catch {switch x {}} msg] $msg
+} {1 {wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"}}
+test switch-9.4 {empty pattern/body list} {
+    list [catch {switch -- x {}} msg] $msg
+} {1 {wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"}}
+test switch-9.5 {unpaired pattern} {
+    list [catch {switch x a {} b} msg] $msg
+} {1 {extra switch pattern with no body}}
+test switch-9.6 {unpaired pattern} {
+    list [catch {switch x {a {} b}} msg] $msg
+} {1 {extra switch pattern with no body}}
+test switch-9.7 {unpaired pattern} {
+    list [catch {switch x a {} # comment b} msg] $msg
+} {1 {extra switch pattern with no body}}
+test switch-9.8 {unpaired pattern} {
+    list [catch {switch x {a {} # comment b}} msg] $msg
+} {1 {extra switch pattern with no body, this may be due to a comment incorrectly placed outside of a switch body - see the "switch" documentation}}
+test switch-9.9 {unpaired pattern} {
+    list [catch {switch x a {} x {} # comment b} msg] $msg
+} {1 {extra switch pattern with no body}}
+test switch-9.10 {unpaired pattern} {
+    list [catch {switch x {a {} x {} # comment b}} msg] $msg
+} {1 {extra switch pattern with no body, this may be due to a comment incorrectly placed outside of a switch body - see the "switch" documentation}}
+
+# cleanup
+::tcltest::cleanupTests
+return

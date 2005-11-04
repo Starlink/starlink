@@ -10,9 +10,12 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) foreach.test 1.8 97/08/12 18:19:27
+# RCS: @(#) $Id: foreach.test,v 1.8.8.1 2003/03/27 13:11:01 dkf Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 catch {unset a}
 catch {unset x}
@@ -154,8 +157,8 @@ test foreach-3.1 {compiled foreach backward jump works correctly} {
         return $l
     }
     array set x {0 zero 1 one 2 two 3 three}
-    foo x
-} {{0 zero} {1 one} {2 two} {3 three}}
+    lsort [foo x]
+} [lsort {{0 zero} {1 one} {2 two} {3 three}}]
 
 test foreach-4.1 {noncompiled foreach and shared variable or value list objects that are converted to another type} {
     catch {unset x}
@@ -168,8 +171,8 @@ test foreach-4.1 {noncompiled foreach and shared variable or value list objects 
 
 # Check "continue".
 
-test foreach-4.1 {continue tests} {catch continue} 4
-test foreach-4.2 {continue tests} {
+test foreach-5.1 {continue tests} {catch continue} 4
+test foreach-5.2 {continue tests} {
     set a {}
     foreach i {a b c d} {
 	if {[string compare $i "b"] == 0} continue
@@ -177,7 +180,7 @@ test foreach-4.2 {continue tests} {
     }
     set a
 } {a c d}
-test foreach-4.3 {continue tests} {
+test foreach-5.3 {continue tests} {
     set a {}
     foreach i {a b c d} {
 	if {[string compare $i "b"] != 0} continue
@@ -185,16 +188,16 @@ test foreach-4.3 {continue tests} {
     }
     set a
 } {b}
-test foreach-4.4 {continue tests} {catch {continue foo} msg} 1
-test foreach-4.5 {continue tests} {
+test foreach-5.4 {continue tests} {catch {continue foo} msg} 1
+test foreach-5.5 {continue tests} {
     catch {continue foo} msg
     set msg
 } {wrong # args: should be "continue"}
 
 # Check "break".
 
-test foreach-5.1 {break tests} {catch break} 3
-test foreach-5.2 {break tests} {
+test foreach-6.1 {break tests} {catch break} 3
+test foreach-6.2 {break tests} {
     set a {}
     foreach i {a b c d} {
 	if {[string compare $i "c"] == 0} break
@@ -202,11 +205,36 @@ test foreach-5.2 {break tests} {
     }
     set a
 } {a b}
-test foreach-5.3 {break tests} {catch {break foo} msg} 1
-test foreach-5.4 {break tests} {
+test foreach-6.3 {break tests} {catch {break foo} msg} 1
+test foreach-6.4 {break tests} {
     catch {break foo} msg
     set msg
 } {wrong # args: should be "break"}
+# Check for bug #406709 
+test foreach-6.5 {break tests} {
+    proc a {} {
+	set a 1
+	foreach b b {list [concat a; break]; incr a}
+	incr a
+    }
+    a
+} {2}
 
+# Test for incorrect "double evaluation" semantics
+
+test foreach-7.1 {delayed substitution of body} {
+    proc foo {} {
+       set a 0
+       foreach a [list 1 2 3] "
+           set x $a
+       "
+       set x
+    }
+    foo
+} {0}
+
+# cleanup
 catch {unset a}
 catch {unset x}
+::tcltest::cleanupTests
+return

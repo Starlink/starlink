@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclMacAppInit.c 1.20 97/07/28 11:03:58
+ * RCS: @(#) $Id: tclMacAppInit.c,v 1.9 2001/11/23 01:27:13 das Exp $
  */
 
 #include "tcl.h"
@@ -22,12 +22,14 @@
 #   include <console.h>
 #elif defined(__MWERKS__)
 #   include <SIOUX.h>
-short InstallConsole _ANSI_ARGS_((short fd));
+EXTERN short InstallConsole _ANSI_ARGS_((short fd));
 #endif
 
 #ifdef TCL_TEST
-EXTERN int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Procbodytest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Procbodytest_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TCL_TEST */
 
 /*
@@ -83,7 +85,7 @@ main(
  *
  * Results:
  *	Returns a standard Tcl completion code, and leaves an error
- *	message in interp->result if an error occurs.
+ *	message in the interp's result if an error occurs.
  *
  * Side effects:
  *	Depends on the startup script.
@@ -108,6 +110,11 @@ Tcl_AppInit(
     if (TclObjTest_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
+    if (Procbodytest_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+    Tcl_StaticPackage(interp, "procbodytest", Procbodytest_Init,
+            Procbodytest_SafeInit);
 #endif /* TCL_TEST */
 
     /*
@@ -182,6 +189,7 @@ MacintoshInit()
     SIOUXSettings.autocloseonquit = true;
     SIOUXSettings.showstatusline = true;
     SIOUXSettings.asktosaveonclose = false;
+    SIOUXSettings.wasteusetempmemory = true;    
     InstallConsole(0);
     SIOUXSetTitle("\pTcl Interpreter");
 		

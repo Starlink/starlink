@@ -3,20 +3,24 @@
 # generates output for errors.  No output means no errors were found.
 #
 # Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) cmdIL.test 1.18 97/09/18 11:42:12
+# RCS: @(#) $Id: cmdIL.test,v 1.14.6.1 2003/07/15 15:44:52 dkf Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 test cmdIL-1.1 {Tcl_LsortObjCmd procedure} {
     list [catch {lsort} msg] $msg
 } {1 {wrong # args: should be "lsort ?options? list"}}
 test cmdIL-1.2 {Tcl_LsortObjCmd procedure} {
     list [catch {lsort -foo {1 3 2 5}} msg] $msg
-} {1 {bad option "-foo": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, or -real}}
+} {1 {bad option "-foo": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -unique}}
 test cmdIL-1.3 {Tcl_LsortObjCmd procedure, default options} {
     lsort {d e c b a \{ d35 d300}
 } {a b c d d300 d35 e \{}
@@ -38,36 +42,68 @@ test cmdIL-1.7 {Tcl_LsortObjCmd procedure, -decreasing option} {
 test cmdIL-1.8 {Tcl_LsortObjCmd procedure, -dictionary option} {
     lsort -dictionary {d e c b a d35 d300}
 } {a b c d d35 d300 e}
-test cmdIL-1.9 {Tcl_LsortObjCmd procedure, -increasing option} {
+test cmdIL-1.9 {Tcl_LsortObjCmd procedure, -dictionary option} {
+    lsort -dictionary {1k 0k 10k}
+} {0k 1k 10k}
+test cmdIL-1.10 {Tcl_LsortObjCmd procedure, -increasing option} {
     lsort -decreasing -increasing {d e c b a d35 d300}
 } {a b c d d300 d35 e}
-test cmdIL-1.10 {Tcl_LsortObjCmd procedure, -index option} {
+test cmdIL-1.11 {Tcl_LsortObjCmd procedure, -index option} {
     list [catch {lsort -index {1 3 2 5}} msg] $msg
 } {1 {"-index" option must be followed by list index}}
-test cmdIL-1.11 {Tcl_LsortObjCmd procedure, -index option} {
-    list [catch {lsort -index foo {1 3 2 5}} msg] $msg
-} {1 {bad index "foo": must be integer or "end"}}
 test cmdIL-1.12 {Tcl_LsortObjCmd procedure, -index option} {
+    list [catch {lsort -index foo {1 3 2 5}} msg] $msg
+} {1 {bad index "foo": must be integer or end?-integer?}}
+test cmdIL-1.13 {Tcl_LsortObjCmd procedure, -index option} {
     lsort -index end -integer {{2 25} {10 20 50 100} {3 16 42} 1}
 } {1 {2 25} {3 16 42} {10 20 50 100}}
-test cmdIL-1.13 {Tcl_LsortObjCmd procedure, -index option} {
+test cmdIL-1.14 {Tcl_LsortObjCmd procedure, -index option} {
     lsort -index 1 -integer {{1 25 100} {3 16 42} {10 20 50}}
 } {{3 16 42} {10 20 50} {1 25 100}}
-test cmdIL-1.14 {Tcl_LsortObjCmd procedure, -integer option} {
+test cmdIL-1.15 {Tcl_LsortObjCmd procedure, -integer option} {
     lsort -integer {24 6 300 18}
 } {6 18 24 300}
-test cmdIL-1.15 {Tcl_LsortObjCmd procedure, -integer option} {
+test cmdIL-1.16 {Tcl_LsortObjCmd procedure, -integer option} {
     list [catch {lsort -integer {1 3 2.4}} msg] $msg
 } {1 {expected integer but got "2.4"}}
-test cmdIL-1.16 {Tcl_LsortObjCmd procedure, -real option} {
+test cmdIL-1.17 {Tcl_LsortObjCmd procedure, -real option} {
     lsort -real {24.2 6e3 150e-1}
 } {150e-1 24.2 6e3}
-test cmdIL-1.17 {Tcl_LsortObjCmd procedure, bogus list} {
+test cmdIL-1.18 {Tcl_LsortObjCmd procedure, bogus list} {
     list [catch {lsort "1 2 3 \{ 4"} msg] $msg
 } {1 {unmatched open brace in list}}
-test cmdIL-1.18 {Tcl_LsortObjCmd procedure, empty list} {
+test cmdIL-1.19 {Tcl_LsortObjCmd procedure, empty list} {
     lsort {}
 } {}
+test cmdIL-1.22 {Tcl_LsortObjCmd procedure, unique sort} {
+    lsort -integer -unique {3 1 2 3 1 4 3}
+} {1 2 3 4}
+test cmdIL-1.23 {Tcl_LsortObjCmd procedure, unique sort with index} {
+    # lsort -unique should return the last unique item
+    lsort -unique -index 0 {{a b} {c b} {a c} {d a}}
+} {{a c} {c b} {d a}}
+test cmdIL-1.24 {Tcl_LsortObjCmd procedure, order of -index and -command} {
+    catch {rename 1 ""}
+    proc testcmp {a b} {return [string compare $a $b]}
+    set l [list [list a b] [list c d]]
+    set result [list [catch {lsort -command testcmp -index 1 $l} msg] $msg]
+    rename testcmp ""
+    set result
+} [list 0 [list [list a b] [list c d]]]
+test cmdIL-1.25 {Tcl_LsortObjCmd procedure, order of -index and -command} {
+    catch {rename 1 ""}
+    proc testcmp {a b} {return [string compare $a $b]}
+    set l [list [list a b] [list c d]]
+    set result [list [catch {lsort -index 1 -command testcmp $l} msg] $msg]
+    rename testcmp ""
+    set result
+} [list 0 [list [list a b] [list c d]]]
+# Note that the required order only exists in the end-1'th element;
+# indexing using the end element or any fixed offset from the start
+# will not work...
+test cmdIL-1.26 {Tcl_LsortObjCmd procedure, offset indexing from end} {
+    lsort -index end-1 {{a 1 e i} {b 2 3 f g} {c 4 5 6 d h}}
+} {{c 4 5 6 d h} {a 1 e i} {b 2 3 f g}}
 
 # Can't think of any good tests for the MergeSort and MergeLists
 # procedures, except a bunch of random lists to sort.
@@ -77,12 +113,12 @@ test cmdIL-2.1 {MergeSort and MergeLists procedures} {
     set r 1435753299
     proc rand {} {
 	global r
-	set r [expr (16807 * $r) % (0x7fffffff)]
+	set r [expr {(16807 * $r) % (0x7fffffff)}]
     }
     for {set i 0} {$i < 150} {incr i} {
 	set x {}
 	for {set j 0} {$j < $i} {incr j} {
-	    lappend x [expr [rand] & 0xfff]
+	    lappend x [expr {[rand] & 0xfff}]
 	}
 	set y [lsort -integer $x]
 	set old -1
@@ -171,10 +207,10 @@ test cmdIL-3.17 {SortCompare procedure, -command option, non-integer result} {
 	return foow
     }
     list [catch {lsort -command cmp {48 6}} msg] $msg
-} {1 {-compare command returned non-numeric result}}
+} {1 {-compare command returned non-integer result}}
 test cmdIL-3.18 {SortCompare procedure, -command option} {
     proc cmp {a b} {
-	expr $b - $a
+	expr {$b - $a}
     }
     lsort -command cmp {48 6 18 22 21 35 36}
 } {48 36 35 22 21 18 6}
@@ -251,7 +287,19 @@ test cmdIL-4.22 {DictionaryCompare procedure, case} {
 test cmdIL-4.23 {DictionaryCompare procedure, case} {
     lsort -dictionary {ABcd AbCd}
 } {ABcd AbCd}
-test cmdIL-4.24 {DefaultCompare procedure, signed characters} {
+test cmdIL-4.24 {DictionaryCompare procedure, international characters} {hasIsoLocale} {
+    ::tcltest::set_iso8859_1_locale
+    set result [lsort -dictionary "a b c A B C \xe3 \xc4"]
+    ::tcltest::restore_locale
+    set result
+} "A a B b C c \xe3 \xc4"
+test cmdIL-4.25 {DictionaryCompare procedure, international characters} {hasIsoLocale} {
+    ::tcltest::set_iso8859_1_locale
+    set result [lsort -dictionary "a23\xe3 a23\xc5 a23\xe4"]
+    ::tcltest::restore_locale
+    set result
+} "a23\xe3 a23\xe4 a23\xc5"
+test cmdIL-4.26 {DefaultCompare procedure, signed characters} {
     set l [lsort [list "abc\200" "abc"]]
     set viewlist {}
     foreach s $l {
@@ -270,7 +318,7 @@ test cmdIL-4.24 {DefaultCompare procedure, signed characters} {
     }
     set viewlist
 } [list "abc" "abc\\200"]
-test cmdIL-4.25 {DictionaryCompare procedure, signed characters} {
+test cmdIL-4.27 {DictionaryCompare procedure, signed characters} {
     set l [lsort -dictionary [list "abc\200" "abc"]]
     set viewlist {}
     foreach s $l {
@@ -289,3 +337,25 @@ test cmdIL-4.25 {DictionaryCompare procedure, signed characters} {
     }
     set viewlist
 } [list "abc" "abc\\200"]
+test cmdIL-4.28 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA ` c CC]
+} [list ` AA c CC]
+test cmdIL-4.29 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA ` c ^ \\ CC \[ \]]
+} [list \[ \\ \] ^ ` AA c CC]
+test cmdIL-4.30 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA ` c ^ _ \\ CC \[ dude \] funky]
+} [list \[ \\ \] ^ _ ` AA c CC dude funky]
+test cmdIL-4.31 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA c ` CC]
+} [list ` AA c CC]
+test cmdIL-4.32 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA c CC `]
+} [list ` AA c CC]
+test cmdIL-4.33 {DictionaryCompare procedure, chars between Z and a in ASCII} {
+    lsort -dictionary [list AA ! c CC `]
+} [list ! ` AA c CC]
+
+# cleanup
+::tcltest::cleanupTests
+return

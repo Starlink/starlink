@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) variable.n 1.4 97/08/13 16:57:57
+'\" RCS: @(#) $Id: variable.n,v 1.4.18.2 2005/02/16 18:53:02 msofer Exp $
 '\" 
 .so man.macros
 .TH variable n 8.0 Tcl "Tcl Built-In Commands"
@@ -36,11 +36,14 @@ Normally, \fIname\fR is unqualified
 (does not include the names of any containing namespaces),
 and the variable is created in the current namespace.
 If \fIname\fR includes any namespace qualifiers,
-the variable is created in the specified namespace.
+the variable is created in the specified namespace.  If the variable
+is not defined, it will be visible to the \fBnamespace which\fR
+command, but not to the \fBinfo exists\fR command.
 .PP
 If the \fBvariable\fR command is executed inside a Tcl procedure,
 it creates local variables
-linked to the corresponding namespace variables.
+linked to the corresponding namespace variables (and therefore these
+variables are listed by \fBinfo vars\fR.)
 In this way the \fBvariable\fR command resembles the \fBglobal\fR command,
 although the \fBglobal\fR command
 only links to variables in the global namespace.
@@ -55,9 +58,42 @@ and the initialization \fIvalue\fR should be left off.
 After the variable has been declared,
 elements within the array can be set using ordinary
 \fBset\fR or \fBarray\fR commands.
+.SH EXAMPLES
+Create a variable in a namespace:
+.CS
+namespace eval foo {
+    \fBvariable\fR bar 12345
+}
+.CE
+.PP
+Create an array in a namespace:
+.CS
+namespace eval someNS {
+    \fBvariable\fR someAry
+    array set someAry {
+        someName  someValue
+        otherName otherValue
+    }
+}
+.CE
+.PP
+Access variables in namespaces from a procedure:
+.CS
+namespace eval foo {
+    proc spong {} {
+        # Variable in this namespace
+        \fBvariable\fR bar
+        puts "bar is $bar"
+
+        # Variable in another namespace
+        \fBvariable\fR ::someNS::someAry
+        parray someAry
+    }
+}
+.CE
 
 .SH "SEE ALSO"
-global(n), namespace(n)
+global(n), namespace(n), upvar(n)
 
 .SH KEYWORDS
 global, namespace, procedure, variable

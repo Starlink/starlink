@@ -4,13 +4,13 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) @(#) CrtObjCmd.3 1.10 97/07/31 14:10:38
+'\" RCS: @(#) $Id: CrtObjCmd.3,v 1.7.2.1 2004/05/05 20:54:47 dkf Exp $
 '\" 
 .so man.macros
 .TH Tcl_CreateObjCommand 3 8.0 Tcl "Tcl Library Procedures"
 .BS
 .SH NAME
-Tcl_CreateObjCommand, Tcl_DeleteCommand, Tcl_DeleteCommandFromToken, Tcl_GetCommandInfo, Tcl_SetCommandInfo, Tcl_GetCommandName \- implement new commands in C
+Tcl_CreateObjCommand, Tcl_DeleteCommand, Tcl_DeleteCommandFromToken, Tcl_GetCommandInfo, Tcl_GetCommandInfoFromToken, Tcl_SetCommandInfo, Tcl_SetCommandInfoFromToken, Tcl_GetCommandName, Tcl_GetCommandFullName, Tcl_GetCommandFromObj \- implement new commands in C
 .SH SYNOPSIS
 .nf
 \fB#include <tcl.h>\fR
@@ -30,13 +30,31 @@ int
 int
 \fBTcl_SetCommandInfo\fR(\fIinterp, cmdName, infoPtr\fR)
 .sp
-char *
+.VS 8.4
+int
+\fBTcl_GetCommandInfoFromToken\fR(\fItoken, infoPtr\fR)
+.sp
+int
+\fBTcl_SetCommandInfoFromToken\fR(\fItoken, infoPtr\fR)
+.VE
+.sp
+.VS 8.4
+CONST char *
+.VE
 \fBTcl_GetCommandName\fR(\fIinterp, token\fR)
+.sp
+void
+\fBTcl_GetCommandFullName\fR(\fIinterp, token, objPtr\fR)
+.sp
+Tcl_Command
+\fBTcl_GetCommandFromObj\fR(\fIinterp, objPtr\fR)
 .SH ARGUMENTS
 .AS Tcl_ObjCmdProc *deleteProc in/out
 .AP Tcl_Interp *interp in
 Interpreter in which to create a new command or that contains a command.
+.VS 8.4
 .AP char *cmdName in
+.VE
 Name of command.
 .AP Tcl_ObjCmdProc *proc in
 Implementation of the new command: \fIproc\fR will be called whenever
@@ -53,17 +71,21 @@ The command must not have been deleted.
 .AP Tcl_CmdInfo *infoPtr in/out
 Pointer to structure containing various information about a
 Tcl command.
+.AP Tcl_Obj *objPtr in
+Object containing the name of a Tcl command.
 .BE
 .SH DESCRIPTION
 .PP
 \fBTcl_CreateObjCommand\fR defines a new command in \fIinterp\fR
 and associates it with procedure \fIproc\fR
 such that whenever \fIname\fR is
-invoked as a Tcl command (e.g., via a call to \fBTcl_EvalObj\fR)
+invoked as a Tcl command (e.g., via a call to \fBTcl_EvalObjEx\fR)
 the Tcl interpreter will call \fIproc\fR to process the command.
 .PP
-\fBTcl_CreateObjCommand\fR will delete any command \fIname\fR
-already associated with the interpreter.
+\fBTcl_CreateObjCommand\fR deletes any existing command
+\fIname\fR already associated with the interpreter
+(however see below for an exception where the existing command
+is not deleted).
 It returns a token that may be used to refer
 to the command in subsequent calls to \fBTcl_GetCommandName\fR.
 If \fIname\fR contains any \fB::\fR namespace qualifiers,
@@ -101,7 +123,7 @@ cause memory to be lost and the runtime stack to be corrupted.  The
 compilers to report any such attempted assignment as an error.  However,
 it is acceptable to modify the internal representation of any individual
 object argument.  For instance, the user may call
-\fBTcl_GetIntFromObject\fR on \fIobjv\fR[\fB2\fR] to obtain the integer
+\fBTcl_GetIntFromObj\fR on \fIobjv\fR[\fB2\fR] to obtain the integer
 representation of that object; that call may change the type of the object
 that \fIobjv\fR[\fB2\fR] points at, but will not change where
 \fIobjv\fR[\fB2\fR] points.
@@ -118,7 +140,7 @@ In the case of a \fBTCL_OK\fR return code this gives the result
 of the command,
 and in the case of \fBTCL_ERROR\fR this gives an error message.
 Before invoking a command procedure,
-\fBTcl_EvalObj\fR sets interpreter's result to
+\fBTcl_EvalObjEx\fR sets interpreter's result to
 point to an object representing an empty string, so simple
 commands can return an empty result by doing nothing at all.
 .PP
@@ -127,6 +149,17 @@ guaranteed to persist once \fIproc\fR returns: \fIproc\fR should
 not modify them.
 Call \fBTcl_SetObjResult\fR if you want
 to return something from the \fIobjv\fR array.
+.PP
+Ordinarily, \fBTcl_CreateObjCommand\fR deletes any existing command
+\fIname\fR already associated with the interpreter.
+However, if the existing command was created by a previous call to
+\fBTcl_CreateCommand\fR,
+\fBTcl_CreateObjCommand\fR does not delete the command
+but instead arranges for the Tcl interpreter to call the
+\fBTcl_ObjCmdProc\fR \fIproc\fR in the future.
+The old string-based \fBTcl_CmdProc\fR associated with the command
+is retained and its address can be obtained by subsequent 
+\fBTcl_GetCommandInfo\fR calls. This is done for backwards compatibility.
 .PP
 \fIDeleteProc\fR will be invoked when (if) \fIname\fR is deleted.
 This can occur through a call to \fBTcl_DeleteCommand\fR,
@@ -213,6 +246,12 @@ to pass to \fIdeleteProc\fR;  it is normally the same as
 The field \fInamespacePtr\fR holds a pointer to the
 Tcl_Namespace that contains the command.
 .PP
+\fBTcl_GetCommandInfoFromToken\fR is identical to
+\fBTcl_GetCommandInfo\fR except that it uses a command token returned
+from \fBTcl_CreateObjCommand\fR in place of the command name.  If the
+\fItoken\fR parameter is NULL, it returns 0; otherwise, it returns 1
+and fills in the structure designated by \fIinfoPtr\fR.
+.PP
 \fBTcl_SetCommandInfo\fR is used to modify the procedures and
 ClientData values associated with a command.
 Its \fIcmdName\fR argument is the name of a command in \fIinterp\fR.
@@ -221,11 +260,22 @@ to identify a command in a particular namespace.
 If this command does not exist then \fBTcl_SetCommandInfo\fR returns 0.
 Otherwise, it copies the information from \fI*infoPtr\fR to
 Tcl's internal structure for the command and returns 1.
-Note that this procedure allows the ClientData for a command's
-deletion procedure to be given a different value than the ClientData
-for its command procedure.
-Note that \fBTcl_SetCmdInfo\fR will not change a command's namespace;
-you must use \fBTcl_RenameCommand\fR to do that.
+.PP
+\fBTcl_SetCommandInfoFromToken\fR is identical to
+\fBTcl_SetCommandInfo\fR except that it takes a command token as
+returned by \fBTcl_CreateObjCommand\fR instead of the command name.
+If the \fItoken\fR parameter is NULL, it returns 0.  Otherwise, it
+copies the information from \fI*infoPtr\fR to Tcl's internal structure
+for the command and returns 1.
+.PP
+Note that \fBTcl_SetCommandInfo\fR and
+\fBTcl_SetCommandInfoFromToken\fR both allow the ClientData for a
+command's deletion procedure to be given a different value than the
+ClientData for its command procedure.
+.PP
+Note that neither \fBTcl_SetCommandInfo\fR nor
+\fBTcl_SetCommandInfoFromToken\fR will change a command's namespace.
+Use \fBTcl_Eval\fR to call the \fBrename\fR command to do that.
 .PP
 \fBTcl_GetCommandName\fR provides a mechanism for tracking commands
 that have been renamed.
@@ -240,7 +290,15 @@ owned by Tcl and is only guaranteed to retain its value as long as the
 command isn't deleted or renamed;  callers should copy the string if
 they need to keep it for a long time.
 .PP
-
+\fBTcl_GetCommandFullName\fR produces the fully-qualified name
+of a command from a command token.  
+The name, including all namespace prefixes,
+is appended to the object specified by \fIobjPtr\fP.
+.PP
+\fBTcl_GetCommandFromObj\fR returns a token for the command
+specified by the name in a \fBTcl_Obj\fP.
+The command name is resolved relative to the current namespace.
+Returns NULL if the command is not found.
 .SH "SEE ALSO"
 Tcl_CreateCommand, Tcl_ResetResult, Tcl_SetObjResult
 

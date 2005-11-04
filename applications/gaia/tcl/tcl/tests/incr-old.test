@@ -8,13 +8,17 @@
 #
 # Copyright (c) 1991-1993 The Regents of the University of California.
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) incr-old.test 1.11 96/11/19 16:56:23
+# RCS: @(#) $Id: incr-old.test,v 1.6.2.1 2003/03/27 13:11:13 dkf Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 catch {unset x}
 
@@ -30,7 +34,7 @@ test incr-old-1.3 {basic incr operation} {
     set x "  -106"
     list [incr x 1] $x
 } {-105 -105}
-test incr-old-1.3 {basic incr operation} {
+test incr-old-1.4 {basic incr operation} {
     set x "  +106"
     list [incr x 1] $x
 } {107 107}
@@ -58,7 +62,8 @@ test incr-old-2.5 {incr errors} {
     set x 123
     list [catch {incr x 1a} msg] $msg $errorInfo
 } {1 {expected integer but got "1a"} {expected integer but got "1a"
-    while executing
+    (reading increment)
+    invoked from within
 "incr x 1a"}}
 test incr-old-2.6 {incr errors} {
     proc readonly args {error "variable is read-only"}
@@ -86,4 +91,6 @@ test incr-old-2.10 {incr errors} {
     list [catch {incr x 1} msg] $msg
 } {1 {expected integer but got "20 x"}}
 
-concat {}
+# cleanup
+::tcltest::cleanupTests
+return

@@ -1,4 +1,4 @@
-# Package covered:  opt0.1/optparse.tcl
+# Package covered:  opt1.0/optparse.tcl
 #
 # This file contains a collection of tests for one or more of the Tcl
 # built-in commands.  Sourcing this file into Tcl runs the tests and
@@ -6,16 +6,20 @@
 #
 # Copyright (c) 1991-1993 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) opt.test 1.2 97/08/20 15:57:18
+# RCS: @(#) $Id: opt.test,v 1.8 2000/07/18 21:30:41 ericm Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 # the package we are going to test
-package require opt 0.1
+package require opt 0.4.1
 
 # we are using implementation specifics to test the package
 
@@ -29,9 +33,11 @@ test opt-1.1 {OptKeyRegister / check that auto allocation is skipping existing k
 } "$n [expr $n+1] [expr $n+2]"
 
 test opt-2.1 {OptKeyDelete} {
-    list [::tcl::OptKeyRegister {} testkey] [::tcl::OptKeyDelete testkey] \
-	    [catch {::tcl::OptKeyDelete testkey} msg] $msg;
-} {testkey {} 1 {can't unset "OptDesc(testkey)": no such element in array}}
+    list [::tcl::OptKeyRegister {} testkey] \
+	    [info exists ::tcl::OptDesc(testkey)] \
+	    [::tcl::OptKeyDelete testkey] \
+	    [info exists ::tcl::OptDesc(testkey)]
+} {testkey 1 {} 0}
 
 
 test opt-3.1 {OptParse / temp key is removed} {
@@ -130,17 +136,6 @@ test opt-8.7 {List utilities} {
     ::tcl::Lvarincr l {1 2} -9
     set l
 } {a {b c -2 e} f}
-
-test opt-8.8 {List utilities} {
-    set l {{b c 7 e} f}
-    ::tcl::Lfirst $l
-} {b c 7 e}
-
-
-test opt-8.9 {List utilities} {
-    set l {a {b c 7 e} f}
-    ::tcl::Lrest $l
-} {{b c 7 e} f}
 
 test opt-8.10 {List utilities} {
     set l {a {b c 7 e} f}
@@ -253,7 +248,6 @@ test opt-10.10 {medium size overall test} {
     list [catch {optTest save tst foo} msg] [lindex [split $msg "\n"] 0]
 } {1 {too many arguments (unexpected argument(s): foo), usage:}}
 
-
 test opt-11.1 {too many args test 2} {
     set key [::tcl::OptKeyRegister {-foo}]
     list [catch {::tcl::OptKeyParse $key {-foo blah}} msg] $msg\
@@ -263,9 +257,6 @@ test opt-11.1 {too many args test 2} {
     ------------ ----     -----   ----
     ( -help                       gives this help )
     -foo         boolflag (false) } {}}
-
-
-
 test opt-11.2 {default value for args} {
     set args {}
     set key [::tcl::OptKeyRegister {{args -list {a b c} "args..."}}]
@@ -273,5 +264,19 @@ test opt-11.2 {default value for args} {
     ::tcl::OptKeyDelete $key
     set args
 } {a b c}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
 
 

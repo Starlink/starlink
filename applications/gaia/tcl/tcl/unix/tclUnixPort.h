@@ -14,12 +14,12 @@
  *	by Karl Lehenbauer, Mark Diekhans and Peter da Silva.
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclUnixPort.h 1.49 97/07/30 14:11:59
+ * RCS: @(#) $Id: tclUnixPort.h,v 1.27.2.5 2005/05/14 20:52:33 das Exp $
  */
 
 #ifndef _TCLUNIXPORT
@@ -28,6 +28,14 @@
 #ifndef _TCLINT
 #   include "tclInt.h"
 #endif
+
+/*
+ *---------------------------------------------------------------------------
+ * The following sets of #includes and #ifdefs are required to get Tcl to
+ * compile under the various flavors of unix.
+ *---------------------------------------------------------------------------
+ */
+
 #include <errno.h>
 #include <fcntl.h>
 #ifdef HAVE_NET_ERRNO_H
@@ -35,17 +43,55 @@
 #endif
 #include <pwd.h>
 #include <signal.h>
-#include <sys/param.h>
+#ifdef HAVE_SYS_PARAM_H
+#   include <sys/param.h>
+#endif
 #include <sys/types.h>
 #ifdef USE_DIRENT2_H
 #   include "../compat/dirent2.h"
 #else
-#   ifdef NO_DIRENT_H
-#	include "../compat/dirent.h"
-#   else
-#	include <dirent.h>
-#   endif
+#ifdef NO_DIRENT_H
+#   include "../compat/dirent.h"
+#else
+#   include <dirent.h>
 #endif
+#endif
+
+#ifdef HAVE_STRUCT_DIRENT64
+typedef struct dirent64	Tcl_DirEntry;
+#   define TclOSreaddir		readdir64
+#   define TclOSreaddir_r	readdir64_r
+#else
+typedef struct dirent	Tcl_DirEntry;
+#   define TclOSreaddir		readdir
+#   define TclOSreaddir_r	readdir_r
+#endif
+
+#ifdef HAVE_TYPE_OFF64_T
+typedef off64_t		Tcl_SeekOffset;
+#   define TclOSseek		lseek64
+#   define TclOSopen		open64
+#else
+typedef off_t		Tcl_SeekOffset;
+#   define TclOSseek		lseek
+#   define TclOSopen		open
+#endif
+
+#ifdef HAVE_STRUCT_STAT64
+#   define TclOSstat		stat64
+#   define TclOSlstat		lstat64
+#else
+#   define TclOSstat		stat
+#   define TclOSlstat		lstat
+#endif
+
+#if !HAVE_STRTOLL && defined(TCL_WIDE_INT_TYPE) && !TCL_WIDE_INT_IS_LONG
+EXTERN Tcl_WideInt	strtoll _ANSI_ARGS_((CONST char *string,
+					     char **endPtr, int base));
+EXTERN Tcl_WideUInt	strtoull _ANSI_ARGS_((CONST char *string,
+					      char **endPtr, int base));
+#endif
+
 #include <sys/file.h>
 #ifdef HAVE_SYS_SELECT_H
 #   include <sys/select.h>
@@ -55,11 +101,11 @@
 #   include <sys/time.h>
 #   include <time.h>
 #else
-#   if HAVE_SYS_TIME_H
-#       include <sys/time.h>
-#   else
-#       include <time.h>
-#   endif
+#if HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#else
+#   include <time.h>
+#endif
 #endif
 #ifndef NO_SYS_WAIT_H
 #   include <sys/wait.h>
@@ -70,7 +116,6 @@
 #   include "../compat/unistd.h"
 #endif
 #ifdef	USE_FIONBIO
-
     /*
      * Not using the Posix fcntl(...,O_NONBLOCK,...) interface, instead
      * we are using ioctl(..,FIONBIO,..).
@@ -84,6 +129,7 @@
 #	include	<sys/ioctl.h>	/* For FIONBIO. */
 #   endif
 #endif	/* USE_FIONBIO */
+#include <utime.h>
 
 /*
  * Socket support stuff: This likely needs more work to parameterize for
@@ -105,11 +151,11 @@
  */
 
 #ifndef NO_FLOAT_H
-#include <float.h>
+#   include <float.h>
 #else
-#   ifndef NO_VALUES_H
-#	include <values.h>
-#   endif
+#ifndef NO_VALUES_H
+#   include <values.h>
+#endif
 #endif
 
 #ifndef FLT_MAX
@@ -146,30 +192,6 @@
 #else
 #  define NBIO_FLAG O_NDELAY
 #endif
-
-/*
- * The following defines denote malloc and free as the system calls
- * used to allocate new memory.  These defines are only used in the
- * file tclCkalloc.c.
- */
-
-#define TclpAlloc(size)		malloc(size)
-#define TclpFree(ptr)		free(ptr)
-#define TclpRealloc(ptr, size)	realloc(ptr, size)
-
-/*
- * The default platform eol translation on Unix is TCL_TRANSLATE_LF:
- */
-
-#define	TCL_PLATFORM_TRANSLATION	TCL_TRANSLATE_LF
-
-/*
- * Not all systems declare the errno variable in errno.h. so this
- * file does it explicitly.  The list of system error messages also
- * isn't generally declared in a header file anywhere.
- */
-
-extern int errno;
 
 /*
  * The type of the status returned by wait varies from UNIX system
@@ -235,21 +257,18 @@ extern int errno;
 #ifndef SEEK_SET
 #   define SEEK_SET 0
 #endif
-
 #ifndef SEEK_CUR
 #   define SEEK_CUR 1
 #endif
-
 #ifndef SEEK_END
 #   define SEEK_END 2
 #endif
 
 /*
- * The stuff below is needed by the "time" command.  If this
- * system has no gettimeofday call, then must use times and the
- * CLK_TCK #define (from sys/param.h) to compute elapsed time.
- * Unfortunately, some systems only have HZ and no CLK_TCK, and
- * some might not even have HZ.
+ * The stuff below is needed by the "time" command.  If this system has no
+ * gettimeofday call, then must use times and the CLK_TCK #define (from
+ * sys/param.h) to compute elapsed time.  Unfortunately, some systems only
+ * have HZ and no CLK_TCK, and some might not even have HZ.
  */
 
 #ifdef NO_GETTOD
@@ -300,21 +319,15 @@ EXTERN int		gettimeofday _ANSI_ARGS_((struct timeval *tp,
 #endif
 
 /*
- * On UNIX, there's no platform specific implementation of "TclpStat(...)"
- * or "TclpAccess(...)".  Simply call "stat(...)' and "access(...)"
- * respectively.
- */
-
-#define TclpStat	stat
-#define TclpAccess	access
-
-/*
  * On systems without symbolic links (i.e. S_IFLNK isn't defined)
  * define "lstat" to use "stat" instead.
  */
 
 #ifndef S_IFLNK
-#   define lstat stat
+#   undef TclOSlstat
+#   define lstat	stat
+#   define lstat64	stat64
+#   define TclOSlstat	TclOSstat
 #endif
 
 /*
@@ -328,52 +341,52 @@ EXTERN int		gettimeofday _ANSI_ARGS_((struct timeval *tp,
 #   else
 #       define S_ISREG(m) 0
 #   endif
-# endif
+#endif /* !S_ISREG */
 #ifndef S_ISDIR
 #   ifdef S_IFDIR
 #       define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #   else
 #       define S_ISDIR(m) 0
 #   endif
-# endif
+#endif /* !S_ISDIR */
 #ifndef S_ISCHR
 #   ifdef S_IFCHR
 #       define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
 #   else
 #       define S_ISCHR(m) 0
 #   endif
-# endif
+#endif /* !S_ISCHR */
 #ifndef S_ISBLK
 #   ifdef S_IFBLK
 #       define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
 #   else
 #       define S_ISBLK(m) 0
 #   endif
-# endif
+#endif /* !S_ISBLK */
 #ifndef S_ISFIFO
 #   ifdef S_IFIFO
 #       define S_ISFIFO(m) (((m) & S_IFMT) == S_IFIFO)
 #   else
 #       define S_ISFIFO(m) 0
 #   endif
-# endif
+#endif /* !S_ISFIFO */
 #ifndef S_ISLNK
 #   ifdef S_IFLNK
 #       define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
 #   else
 #       define S_ISLNK(m) 0
 #   endif
-# endif
+#endif /* !S_ISLNK */
 #ifndef S_ISSOCK
 #   ifdef S_IFSOCK
 #       define S_ISSOCK(m) (((m) & S_IFMT) == S_IFSOCK)
 #   else
 #       define S_ISSOCK(m) 0
 #   endif
-# endif
+#endif /* !S_ISSOCK */
 
 /*
- * Make sure that MAXPATHLEN is defined.
+ * Make sure that MAXPATHLEN and MAXNAMLEN are defined.
  */
 
 #ifndef MAXPATHLEN
@@ -381,6 +394,14 @@ EXTERN int		gettimeofday _ANSI_ARGS_((struct timeval *tp,
 #       define MAXPATHLEN PATH_MAX
 #   else
 #       define MAXPATHLEN 2048
+#   endif
+#endif
+
+#ifndef MAXNAMLEN
+#   ifdef NAME_MAX
+#	define MAXNAMLEN NAME_MAX
+#   else
+#	define MAXNAMLEN 255
 #   endif
 #endif
 
@@ -399,16 +420,16 @@ EXTERN int		gettimeofday _ANSI_ARGS_((struct timeval *tp,
 
 #ifndef NO_FD_SET
 #   define SELECT_MASK fd_set
-#else
+#else /* NO_FD_SET */
 #   ifndef _AIX
 	typedef long fd_mask;
-#   endif
+#   endif /* !AIX */
 #   if defined(_IBMR2)
 #	define SELECT_MASK void
-#   else
+#   else /* !defined(_IBMR2) */
 #	define SELECT_MASK int
-#   endif
-#endif
+#   endif /* defined(_IBMR2) */
+#endif /* !NO_FD_SET */
 
 /*
  * Define "NBBY" (number of bits per byte) if it's not already defined.
@@ -428,33 +449,44 @@ EXTERN int		gettimeofday _ANSI_ARGS_((struct timeval *tp,
 #   else
 #	define FD_SETSIZE 256
 #   endif
-#endif
+#endif /* FD_SETSIZE */
 #if !defined(howmany)
 #   define howmany(x, y) (((x)+((y)-1))/(y))
-#endif
+#endif /* !defined(howmany) */
 #ifndef NFDBITS
 #   define NFDBITS NBBY*sizeof(fd_mask)
-#endif
+#endif /* NFDBITS */
 #define MASK_SIZE howmany(FD_SETSIZE, NFDBITS)
 
 /*
- * The following implements the Unix method for exiting the process.
+ * Not all systems declare the errno variable in errno.h. so this
+ * file does it explicitly.  The list of system error messages also
+ * isn't generally declared in a header file anywhere.
  */
-#define TclPlatformExit(status) exit(status)
+
+#ifdef NO_ERRNO
+extern int errno;
+#endif
 
 /*
- * The following functions always succeeds under Unix.
+ * Not all systems declare all the errors that Tcl uses!  Provide some
+ * work-arounds...
  */
 
-#define TclHasSockets(interp) (TCL_OK)
-#define TclHasPipes() (1)
+#ifndef EOVERFLOW
+#   ifdef EFBIG
+#	define EOVERFLOW EFBIG
+#   else /* !EFBIG */
+#	define EOVERFLOW EINVAL
+#   endif /* EFBIG */
+#endif /* EOVERFLOW */
 
 /*
  * Variables provided by the C library:
  */
 
-#if defined(_sgi) || defined(__sgi)
-#define environ _environ
+#if defined(_sgi) || defined(__sgi) || (defined(__APPLE__) && defined(__DYNAMIC__))
+#   define environ _environ
 #endif
 extern char **environ;
 
@@ -469,27 +501,88 @@ extern char **environ;
 extern double strtod();
 
 /*
- * The following macros define time related functions in terms of
- * standard Unix routines.
+ * There is no platform-specific panic routine for Unix in the Tcl internals.
  */
 
-#define TclpGetDate(t,u) ((u) ? gmtime((t)) : localtime((t)))
-#define TclStrftime(s,m,f,t) (strftime((s),(m),(f),(t)))
-#define TclpGetPid(pid)	    ((unsigned long) (pid))
-
-#define TclpReleaseFile(file)	
+#define TclpPanic ((Tcl_PanicProc *) NULL)
 
 /*
- * TclpFinalize is a noop on Unix systems.
+ *---------------------------------------------------------------------------
+ * The following macros and declarations represent the interface between 
+ * generic and unix-specific parts of Tcl.  Some of the macros may override 
+ * functions declared in tclInt.h.
+ *---------------------------------------------------------------------------
  */
-
-#define TclpFinalize()
 
 /*
- * The following routine is only exported for testing purposes.
+ * The default platform eol translation on Unix is TCL_TRANSLATE_LF.
  */
 
-EXTERN int	TclUnixWaitForFile _ANSI_ARGS_((int fd, int mask,
-		    int timeout));
+#ifdef DJGPP
+#define	TCL_PLATFORM_TRANSLATION	TCL_TRANSLATE_CRLF
+#else
+#define	TCL_PLATFORM_TRANSLATION	TCL_TRANSLATE_LF
+#endif
+
+/*
+ * The following macros have trivial definitions, allowing generic code to 
+ * address platform-specific issues.
+ */
+
+#define TclpGetPid(pid)		((unsigned long) (pid))
+#define TclpReleaseFile(file)	/* Nothing. */
+
+/*
+ * The following defines wrap the system memory allocation routines for
+ * use by tclAlloc.c.  By default off unused on Unix.
+ */
+
+#if USE_TCLALLOC
+#   define TclpSysAlloc(size, isBin)	malloc((size_t)size)
+#   define TclpSysFree(ptr)		free((char*)ptr)
+#   define TclpSysRealloc(ptr, size)	realloc((char*)ptr, (size_t)size)
+#endif
+
+/*
+ * The following macros and declaration wrap the C runtime library
+ * functions.
+ */
+
+#define TclpExit		exit
+
+/*
+ * Platform specific mutex definition used by memory allocators.
+ * These mutexes are statically allocated and explicitly initialized.
+ * Most modules do not use this, but instead use Tcl_Mutex types and
+ * Tcl_MutexLock and Tcl_MutexUnlock that are self-initializing.
+ */
+
+#ifdef TCL_THREADS
+#include <pthread.h>
+typedef pthread_mutex_t TclpMutex;
+EXTERN void	TclpMutexInit _ANSI_ARGS_((TclpMutex *mPtr));
+EXTERN void	TclpMutexLock _ANSI_ARGS_((TclpMutex *mPtr));
+EXTERN void	TclpMutexUnlock _ANSI_ARGS_((TclpMutex *mPtr));
+EXTERN Tcl_DirEntry * 	TclpReaddir(DIR *);
+#ifndef TclpLocaltime
+EXTERN struct tm *     	TclpLocaltime(CONST TclpTime_t);
+#endif
+#ifndef TclpGmtime
+EXTERN struct tm *     	TclpGmtime(CONST TclpTime_t);
+#endif
+EXTERN char *          	TclpInetNtoa(struct in_addr);
+#define readdir(x)	TclpReaddir(x)
+#define inet_ntoa(x)	TclpInetNtoa(x)
+#undef TclOSreaddir
+#define TclOSreaddir(x) TclpReaddir(x)
+#else
+typedef int TclpMutex;
+#define	TclpMutexInit(a)
+#define	TclpMutexLock(a)
+#define	TclpMutexUnlock(a)
+#endif /* TCL_THREADS */
+
+#include "tclPlatDecls.h"
+#include "tclIntPlatDecls.h"
 
 #endif /* _TCLUNIXPORT */

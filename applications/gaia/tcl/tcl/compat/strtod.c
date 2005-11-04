@@ -9,15 +9,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) strtod.c 1.9 96/12/13 15:02:46
+ * RCS: @(#) $Id: strtod.c,v 1.6 2002/02/25 14:26:12 dgp Exp $
  */
 
-#include "tcl.h"
-#ifdef NO_STDLIB_H
-#   include "../compat/stdlib.h"
-#else
-#   include <stdlib.h>
-#endif
+#include "tclInt.h"
+#include "tclPort.h"
 #include <ctype.h>
 
 #ifndef TRUE
@@ -108,7 +104,7 @@ strtod(string, endPtr)
      */
 
     p = string;
-    while (isspace(*p)) {
+    while (isspace(UCHAR(*p))) {
 	p += 1;
     }
     if (*p == '-') {
@@ -206,7 +202,11 @@ strtod(string, endPtr)
 	    }
 	    expSign = FALSE;
 	}
-	while (isdigit(*p)) {
+	if (!isdigit(UCHAR(*p))) {
+	    p = pExp;
+	    goto done;
+	}
+	while (isdigit(UCHAR(*p))) {
 	    exp = exp * 10 + (*p - '0');
 	    p += 1;
 	}
@@ -232,6 +232,7 @@ strtod(string, endPtr)
     }
     if (exp > maxExponent) {
 	exp = maxExponent;
+	errno = ERANGE;
     }
     dblExp = 1.0;
     for (d = powersOf10; exp != 0; exp >>= 1, d += 1) {

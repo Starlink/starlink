@@ -5,13 +5,17 @@
 # generates output for errors.  No output means no errors were found.
 #
 # Copyright (c) 1995-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) get.test 1.7 97/10/31 17:23:00
+# RCS: @(#) $Id: get.test,v 1.8 2002/11/19 02:34:50 hobbs Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 test get-1.1 {Tcl_GetInt procedure} {
     set x 44
@@ -39,39 +43,39 @@ test get-1.6 {Tcl_GetInt procedure} {
 } {1 {expected integer but got "16	 x"}}
 
 # The following tests are non-portable because they depend on
-# word size.  18446744073709551614
+# word size.
 
-if {0x80000000 > 0} {
-    test get-1.7 {Tcl_GetInt procedure} {nonPortable unixOnly} {
+if {wide(0x80000000) > wide(0)} {
+    test get-1.7 {Tcl_GetInt procedure} {
 	set x 44
-	list [catch {incr x 18446744073709551616} msg] $msg $errorCode
+	list [catch {eval incr x 18446744073709551616} msg] $msg $errorCode
     } {1 {integer value too large to represent} {ARITH IOVERFLOW {integer value too large to represent}}}
-    test get-1.8 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.8 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x 18446744073709551614} msg] $msg
     } {0 -2}
-    test get-1.9 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.9 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x +18446744073709551614} msg] $msg
     } {0 -2}
-    test get-1.10 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.10 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x -18446744073709551614} msg] $msg
     } {0 2}
 } else {
-    test get-1.7 {Tcl_GetInt procedure} {nonPortable unixOnly} {
+    test get-1.11 {Tcl_GetInt procedure} {
 	set x 44
 	list [catch {incr x 4294967296} msg] $msg $errorCode
     } {1 {integer value too large to represent} {ARITH IOVERFLOW {integer value too large to represent}}}
-    test get-1.8 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.12 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x 4294967294} msg] $msg
     } {0 -2}
-    test get-1.9 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.13 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x +4294967294} msg] $msg
     } {0 -2}
-    test get-1.10 {Tcl_GetInt procedure} {nonPortable} {
+    test get-1.14 {Tcl_GetInt procedure} {
 	set x 0
 	list [catch {incr x -4294967294} msg] $msg
     } {0 2}
@@ -89,3 +93,37 @@ test get-2.3 {Tcl_GetInt procedure} {
 test get-2.4 {Tcl_GetInt procedure} {nonPortable} {
     list [catch {format %g .000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001} msg] $msg $errorCode
 } {1 {floating-point value too small to represent} {ARITH UNDERFLOW {floating-point value too small to represent}}}
+
+test get-3.1 {Tcl_GetInt(FromObj), bad numbers} {
+    # SF bug #634856
+    set result ""
+    set numbers [list 1 +1 ++1 +-1 -+1 -1 --1 "- +1" "+12345678987654321" "++12345678987654321"]
+    foreach num $numbers {
+	lappend result [catch {format %ld $num} msg] $msg
+    }
+    set result
+} {0 1 0 1 1 {expected integer but got "++1"} 1 {expected integer but got "+-1"} 1 {expected integer but got "-+1"} 0 -1 1 {expected integer but got "--1"} 1 {expected integer but got "- +1"} 0 12345678987654321 1 {expected integer but got "++12345678987654321"}}
+test get-3.2 {Tcl_GetDouble(FromObj), bad numbers} {
+    set result ""
+    set numbers [list 1.0 +1.0 ++1.0 +-1.0 -+1.0 -1.0 --1.0 "- +1.0"]
+    foreach num $numbers {
+	lappend result [catch {format %g $num} msg] $msg
+    }
+    set result
+} {0 1 0 1 1 {expected floating-point number but got "++1.0"} 1 {expected floating-point number but got "+-1.0"} 1 {expected floating-point number but got "-+1.0"} 0 -1 1 {expected floating-point number but got "--1.0"} 1 {expected floating-point number but got "- +1.0"}}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

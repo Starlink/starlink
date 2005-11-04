@@ -5,12 +5,12 @@
  *	works with the "dlopen" and "dlsym" library procedures for
  *	dynamic loading.
  *
- * Copyright (c) 1995 Sun Microsystems, Inc.
+ * Copyright (c) 1995-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclLoadDl.c 1.8 96/12/03 16:57:00
+ * RCS: @(#) $Id: tclLoadDl.c,v 1.13 2002/10/10 12:25:53 vincentdarley Exp $
  */
 
 #include "tclInt.h"
@@ -36,72 +36,147 @@
 #endif
 
 /*
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------------
  *
- * TclLoadFile --
+ * TclpDlopen --
  *
  *	Dynamically loads a binary code file into memory and returns
- *	the addresses of two procedures within that file, if they
- *	are defined.
+ *	a handle to the new code.
  *
  * Results:
  *	A standard Tcl completion code.  If an error occurs, an error
- *	message is left in interp->result.  *proc1Ptr and *proc2Ptr
- *	are filled in with the addresses of the symbols given by
- *	*sym1 and *sym2, or NULL if those symbols can't be found.
+ *	message is left in the interp's result. 
  *
  * Side effects:
  *	New code suddenly appears in memory.
  *
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------------
  */
 
 int
-TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr)
+TclpDlopen(interp, pathPtr, loadHandle, unloadProcPtr)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    char *fileName;		/* Name of the file containing the desired
-				 * code. */
-    char *sym1, *sym2;		/* Names of two procedures to look up in
-				 * the file's symbol table. */
-    Tcl_PackageInitProc **proc1Ptr, **proc2Ptr;
-				/* Where to return the addresses corresponding
-				 * to sym1 and sym2. */
+    Tcl_Obj *pathPtr;		/* Name of the file containing the desired
+				 * code (UTF-8). */
+    Tcl_LoadHandle *loadHandle;	/* Filled with token for dynamically loaded
+				 * file which will be passed back to 
+				 * (*unloadProcPtr)() to unload the file. */
+    Tcl_FSUnloadFileProc **unloadProcPtr;	
+				/* Filled with address of Tcl_FSUnloadFileProc
+				 * function which should be used for
+				 * this file. */
 {
     VOID *handle;
-    Tcl_DString newName;
+    CONST char *native;
 
-    handle = dlopen(fileName, RTLD_NOW | RTLD_GLOBAL);
+    /* 
+     * First try the full path the user gave us.  This is particularly
+     * important if the cwd is inside a vfs, and we are trying to load
+     * using a relative path.
+     */
+    native = Tcl_FSGetNativePath(pathPtr);
+    handle = dlopen(native, RTLD_NOW | RTLD_GLOBAL);
     if (handle == NULL) {
-	Tcl_AppendResult(interp, "couldn't load file \"", fileName,
-		"\": ", dlerror(), (char *) NULL);
+	/* 
+	 * Let the OS loader examine the binary search path for
+	 * whatever string the user gave us which hopefully refers
+	 * to a file on the binary path
+	 */
+	Tcl_DString ds;
+	char *fileName = Tcl_GetString(pathPtr);
+	native = Tcl_UtfToExternalDString(NULL, fileName, -1, &ds);
+	handle = dlopen(native, RTLD_NOW | RTLD_GLOBAL);
+	Tcl_DStringFree(&ds);
+    }
+    
+    if (handle == NULL) {
+	Tcl_AppendResult(interp, "couldn't load file \"", 
+			 Tcl_GetString(pathPtr),
+			 "\": ", dlerror(), (char *) NULL);
 	return TCL_ERROR;
     }
 
+    *unloadProcPtr = &TclpUnloadFile;
+    *loadHandle = (Tcl_LoadHandle)handle;
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpFindSymbol --
+ *
+ *	Looks up a symbol, by name, through a handle associated with
+ *	a previously loaded piece of code (shared library).
+ *
+ * Results:
+ *	Returns a pointer to the function associated with 'symbol' if
+ *	it is found.  Otherwise returns NULL and may leave an error
+ *	message in the interp's result.
+ *
+ *----------------------------------------------------------------------
+ */
+Tcl_PackageInitProc*
+TclpFindSymbol(interp, loadHandle, symbol) 
+    Tcl_Interp *interp;
+    Tcl_LoadHandle loadHandle;
+    CONST char *symbol;
+{
+    CONST char *native;
+    Tcl_DString newName, ds;
+    VOID *handle = (VOID*)loadHandle;
+    Tcl_PackageInitProc *proc;
     /* 
      * Some platforms still add an underscore to the beginning of symbol
      * names.  If we can't find a name without an underscore, try again
      * with the underscore.
      */
 
-    *proc1Ptr = (Tcl_PackageInitProc *) dlsym(handle, (char *) sym1);
-    if (*proc1Ptr == NULL) {
+    native = Tcl_UtfToExternalDString(NULL, symbol, -1, &ds);
+    proc = (Tcl_PackageInitProc *) dlsym(handle,	/* INTL: Native. */
+	    native);	
+    if (proc == NULL) {
 	Tcl_DStringInit(&newName);
 	Tcl_DStringAppend(&newName, "_", 1);
-	Tcl_DStringAppend(&newName, sym1, -1);
-	*proc1Ptr = (Tcl_PackageInitProc *) dlsym(handle,
-		Tcl_DStringValue(&newName));
+	native = Tcl_DStringAppend(&newName, native, -1);
+	proc = (Tcl_PackageInitProc *) dlsym(handle, /* INTL: Native. */
+		native);
 	Tcl_DStringFree(&newName);
     }
-    *proc2Ptr = (Tcl_PackageInitProc *) dlsym(handle, (char *) sym2);
-    if (*proc2Ptr == NULL) {
-	Tcl_DStringInit(&newName);
-	Tcl_DStringAppend(&newName, "_", 1);
-	Tcl_DStringAppend(&newName, sym2, -1);
-	*proc2Ptr = (Tcl_PackageInitProc *) dlsym(handle,
-		Tcl_DStringValue(&newName));
-	Tcl_DStringFree(&newName);
-    }
-    return TCL_OK;
+    Tcl_DStringFree(&ds);
+
+    return proc;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpUnloadFile --
+ *
+ *	Unloads a dynamically loaded binary code file from memory.
+ *	Code pointers in the formerly loaded file are no longer valid
+ *	after calling this function.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Code removed from memory.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TclpUnloadFile(loadHandle)
+    Tcl_LoadHandle loadHandle;	/* loadHandle returned by a previous call
+				 * to TclpDlopen().  The loadHandle is 
+				 * a token that represents the loaded 
+				 * file. */
+{
+    VOID *handle;
+
+    handle = (VOID *) loadHandle;
+    dlclose(handle);
 }
 
 /*
@@ -126,7 +201,7 @@ TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr)
 
 int
 TclGuessPackageName(fileName, bufPtr)
-    char *fileName;		/* Name of file containing package (already
+    CONST char *fileName;	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr;	/* Initialized empty dstring.  Append
 				 * package name to this if possible. */

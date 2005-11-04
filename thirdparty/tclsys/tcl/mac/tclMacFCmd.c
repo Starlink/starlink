@@ -4,12 +4,12 @@
  * Implements the Macintosh specific portions of the file manipulation
  * subcommands of the "file" command.
  *
- * Copyright (c) 1996-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1996-1998 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclMacFCmd.c 1.22 97/05/20 15:44:26
+ * RCS: @(#) $Id: tclMacFCmd.c,v 1.19 2003/02/04 17:06:51 vincentdarley Exp $
  */
 
 #include "tclInt.h"
@@ -25,22 +25,23 @@
 #include <Script.h>
 #include <string.h>
 #include <Finder.h>
+#include <Aliases.h>
 
 /*
  * Callback for the file attributes code.
  */
 
 static int		GetFileFinderAttributes _ANSI_ARGS_((Tcl_Interp *interp,
-			    int objIndex, char *fileName,
+			    int objIndex, Tcl_Obj *fileName,
 			    Tcl_Obj **attributePtrPtr));
 static int		GetFileReadOnly _ANSI_ARGS_((Tcl_Interp *interp,
-			    int objIndex, char *fileName,
+			    int objIndex, Tcl_Obj *fileName,
 			    Tcl_Obj **readOnlyPtrPtr));
 static int		SetFileFinderAttributes _ANSI_ARGS_((Tcl_Interp *interp,
-			    int objIndex, char *fileName,
+			    int objIndex, Tcl_Obj *fileName,
 			    Tcl_Obj *attributePtr));
 static int		SetFileReadOnly _ANSI_ARGS_((Tcl_Interp *interp,
-			    int objIndex, char *fileName,
+			    int objIndex, Tcl_Obj *fileName,
 			    Tcl_Obj *readOnlyPtr));
 
 /*
@@ -56,7 +57,7 @@ static int		SetFileReadOnly _ANSI_ARGS_((Tcl_Interp *interp,
  * Global variables for the file attributes code.
  */
 
-char *tclpFileAttrStrings[] = {"-creator", "-hidden", "-readonly",
+CONST char *tclpFileAttrStrings[] = {"-creator", "-hidden", "-readonly",
 	"-type", (char *) NULL};
 CONST TclFileAttrProcs tclpFileAttrProcs[] = {
 	{GetFileFinderAttributes, SetFileFinderAttributes},
@@ -64,6 +65,11 @@ CONST TclFileAttrProcs tclpFileAttrProcs[] = {
 	{GetFileReadOnly, SetFileReadOnly},
 	{GetFileFinderAttributes, SetFileFinderAttributes}};
 
+/*
+ * File specific static data
+ */
+
+static long startSeed = 248923489;
 
 /*
  * Prototypes for procedure only used in this file
@@ -72,14 +78,22 @@ CONST TclFileAttrProcs tclpFileAttrProcs[] = {
 static pascal Boolean 	CopyErrHandler _ANSI_ARGS_((OSErr error, 
 			    short failedOperation,
 			    short srcVRefNum, long srcDirID,
-			    StringPtr srcName, short dstVRefNum,
-			    long dstDirID,StringPtr dstName));
+			    ConstStr255Param srcName, short dstVRefNum,
+			    long dstDirID,ConstStr255Param dstName));
+static int		DoCopyDirectory _ANSI_ARGS_((CONST char *src,
+			    CONST char *dst, Tcl_DString *errorPtr));
+static int		DoCopyFile _ANSI_ARGS_((CONST char *src, 
+			    CONST char *dst));
+static int		DoCreateDirectory _ANSI_ARGS_((CONST char *path));
+static int		DoRemoveDirectory _ANSI_ARGS_((CONST char *path, 
+			    int recursive, Tcl_DString *errorPtr));
+static int		DoRenameFile _ANSI_ARGS_((CONST char *src,
+			    CONST char *dst));
 OSErr			FSpGetFLockCompat _ANSI_ARGS_((const FSSpec *specPtr, 
 			    Boolean *lockedPtr));
-static OSErr		GenerateUniqueName _ANSI_ARGS_((short vRefNum, 
-			    long dirID1, long dirID2, Str31 uniqueName));
-static OSErr		GetFileSpecs _ANSI_ARGS_((char *path, FSSpec *pathSpecPtr,
-			    FSSpec *dirSpecPtr,	Boolean *pathExistsPtr,	
+static OSErr		GetFileSpecs _ANSI_ARGS_((CONST char *path, 
+			    FSSpec *pathSpecPtr, FSSpec *dirSpecPtr,	
+			    Boolean *pathExistsPtr, 
 			    Boolean *pathIsDirectoryPtr));
 static OSErr		MoveRename _ANSI_ARGS_((const FSSpec *srcSpecPtr, 
 			    const FSSpec *dstSpecPtr, StringPtr copyName));
@@ -89,7 +103,7 @@ static int		Pstrequal _ANSI_ARGS_((ConstStr255Param stringA,
 /*
  *---------------------------------------------------------------------------
  *
- * TclpRenameFile --
+ * TclpObjRenameFile, DoRenameFile --
  *
  *      Changes the name of an existing file or directory, from src to dst.
  *	If src and dst refer to the same file or directory, does nothing
@@ -121,17 +135,28 @@ static int		Pstrequal _ANSI_ARGS_((ConstStr255Param stringA,
  *---------------------------------------------------------------------------
  */
 
-int
-TclpRenameFile( 
-    char *src,    		/* Pathname of file or dir to be renamed. */
-    char *dst)     		/* New pathname for file or directory. */
+int 
+TclpObjRenameFile(srcPathPtr, destPathPtr)
+    Tcl_Obj *srcPathPtr;
+    Tcl_Obj *destPathPtr;
+{
+    return DoRenameFile(Tcl_FSGetNativePath(srcPathPtr),
+			Tcl_FSGetNativePath(destPathPtr));
+}
+
+static int
+DoRenameFile(
+    CONST char *src,		/* Pathname of file or dir to be renamed
+				 * (native). */
+    CONST char *dst)		/* New pathname of file or directory
+				 * (native). */
 {
     FSSpec srcFileSpec, dstFileSpec, dstDirSpec;
     OSErr err; 
     long srcID, dummy;
     Boolean srcIsDirectory, dstIsDirectory, dstExists, dstLocked;
 
-    err = FSpLocationFromPath(strlen(src), src, &srcFileSpec);
+    err = FSpLLocationFromPath(strlen(src), src, &srcFileSpec);
     if (err == noErr) {
 	FSpGetDirectoryID(&srcFileSpec, &srcID, &srcIsDirectory);
     }
@@ -157,7 +182,7 @@ TclpRenameFile(
 		 * fails, it's because it wasn't empty.
 		 */
 		 
-                if (TclpRemoveDirectory(dst, 0, NULL) != TCL_OK) {
+                if (DoRemoveDirectory(dst, 0, NULL) != TCL_OK) {
                     return TCL_ERROR;
                 }
                 
@@ -195,7 +220,7 @@ TclpRenameFile(
 	        Str31 tmpName;
 	        FSSpec tmpFileSpec;
 
-	        err = GenerateUniqueName(dstFileSpec.vRefNum, 
+	        err = GenerateUniqueName(dstFileSpec.vRefNum, &startSeed,
 	        	dstFileSpec.parID, dstFileSpec.parID, tmpName);
 	        if (err == noErr) {
 	            err = FSpRenameCompat(&dstFileSpec, tmpName);
@@ -225,503 +250,6 @@ TclpRenameFile(
     if (err != noErr) {
 	errno = TclMacOSErrorToPosixError(err);
 	return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * TclpCopyFile --
- *
- *      Copy a single file (not a directory).  If dst already exists and
- *	is not a directory, it is removed.
- *
- * Results:
- *	If the file was successfully copied, returns TCL_OK.  Otherwise
- *	the return value is TCL_ERROR and errno is set to indicate the
- *	error.  Some possible values for errno are:
- *
- *	EACCES:     src or dst parent directory can't be read and/or written.
- *	EISDIR:	    src or dst is a directory.
- *	ENOENT:	    src doesn't exist.  src or dst is "".
- *
- * Side effects:
- *      This procedure will also copy symbolic links, block, and
- *      character devices, and fifos.  For symbolic links, the links 
- *      themselves will be copied and not what they point to.  For the
- *	other special file types, the directory entry will be copied and
- *	not the contents of the device that it refers to.
- *
- *---------------------------------------------------------------------------
- */
- 
-int 
-TclpCopyFile(
-    char *src,			/* Pathname of file to be copied. */
-    char *dst)			/* Pathname of file to copy to. */
-{
-    OSErr err, dstErr;
-    Boolean dstExists, dstIsDirectory, dstLocked;
-    FSSpec srcFileSpec, dstFileSpec, dstDirSpec, tmpFileSpec;
-    Str31 tmpName;
-	
-    err = FSpLocationFromPath(strlen(src), src, &srcFileSpec);
-    if (err == noErr) {
-        err = GetFileSpecs(dst, &dstFileSpec, &dstDirSpec, &dstExists,
-        	&dstIsDirectory);
-    }
-    if (dstExists) {
-        if (dstIsDirectory) {
-            errno = EISDIR;
-            return TCL_ERROR;
-        }
-        err = FSpGetFLockCompat(&dstFileSpec, &dstLocked);
-        if (dstLocked) {
-            FSpRstFLockCompat(&dstFileSpec);
-        }
-        
-        /*
-         * Backup dest file.
-         */
-         
-        dstErr = GenerateUniqueName(dstFileSpec.vRefNum, dstFileSpec.parID, 
-    	        dstFileSpec.parID, tmpName);
-        if (dstErr == noErr) {
-            dstErr = FSpRenameCompat(&dstFileSpec, tmpName);
-        }   
-    }
-    if (err == noErr) {
-    	err = FSpFileCopy(&srcFileSpec, &dstDirSpec, 
-    		(StringPtr) dstFileSpec.name, NULL, 0, true);
-    }
-    if ((dstExists != false) && (dstErr == noErr)) {
-        FSMakeFSSpecCompat(dstFileSpec.vRefNum, dstFileSpec.parID,
-        	tmpName, &tmpFileSpec);
-	if (err == noErr) {
-	    /* 
-	     * Delete backup file. 
-	     */
-	     
-	    FSpDeleteCompat(&tmpFileSpec);
-	} else {
-	
-	    /* 
-	     * Restore backup file.
-	     */
-	     
-	    FSpDeleteCompat(&dstFileSpec);
-	    FSpRenameCompat(&tmpFileSpec, dstFileSpec.name);
-	    if (dstLocked) {
-	        FSpSetFLockCompat(&dstFileSpec);
-	    }
-	}
-    }
-    
-    if (err != noErr) {
-	errno = TclMacOSErrorToPosixError(err);
-	return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * TclpDeleteFile --
- *
- *      Removes a single file (not a directory).
- *
- * Results:
- *	If the file was successfully deleted, returns TCL_OK.  Otherwise
- *	the return value is TCL_ERROR and errno is set to indicate the
- *	error.  Some possible values for errno are:
- *
- *	EACCES:     a parent directory can't be read and/or written.
- *	EISDIR:	    path is a directory.
- *	ENOENT:	    path doesn't exist or is "".
- *
- * Side effects:
- *      The file is deleted, even if it is read-only.
- *
- *---------------------------------------------------------------------------
- */
-
-int
-TclpDeleteFile( 
-    char *path)			/* Pathname of file to be removed. */
-{
-    OSErr err;
-    FSSpec fileSpec;
-    Boolean isDirectory;
-    long dirID;
-	
-    err = FSpLocationFromPath(strlen(path), path, &fileSpec);
-    if (err == noErr) {
-	/*
-     	 * Since FSpDeleteCompat will delete an empty directory, make sure
-     	 * that this isn't a directory first.
-         */
-        
-        FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
-	if (isDirectory == true) {
-            errno = EISDIR;
-            return TCL_ERROR;
-        }
-    }
-    err = FSpDeleteCompat(&fileSpec);
-    if (err == fLckdErr) {
-    	FSpRstFLockCompat(&fileSpec);
-    	err = FSpDeleteCompat(&fileSpec);
-    	if (err != noErr) {
-    	    FSpSetFLockCompat(&fileSpec);
-    	}
-    }
-    if (err != noErr) {
-	errno = TclMacOSErrorToPosixError(err);
-	return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * TclpCreateDirectory --
- *
- *      Creates the specified directory.  All parent directories of the
- *	specified directory must already exist.  The directory is
- *	automatically created with permissions so that user can access
- *	the new directory and create new files or subdirectories in it.
- *
- * Results:
- *	If the directory was successfully created, returns TCL_OK.
- *	Otherwise the return value is TCL_ERROR and errno is set to
- *	indicate the error.  Some possible values for errno are:
- *
- *	EACCES:     a parent directory can't be read and/or written.
- *	EEXIST:	    path already exists.
- *	ENOENT:	    a parent directory doesn't exist.
- *
- * Side effects:
- *      A directory is created with the current umask, except that
- *	permission for u+rwx will always be added.
- *
- *---------------------------------------------------------------------------
- */
-
-int
-TclpCreateDirectory(
-    char *path)			/* Pathname of directory to create. */
-{
-    OSErr err;
-    FSSpec dirSpec;
-    long outDirID;
-	
-    err = FSpLocationFromPath(strlen(path), path, &dirSpec);
-    if (err == noErr) {
-        err = dupFNErr;		/* EEXIST. */
-    } else if (err == fnfErr) {
-        err = FSpDirCreateCompat(&dirSpec, smSystemScript, &outDirID);
-    } 
-    
-    if (err != noErr) {
-	errno = TclMacOSErrorToPosixError(err);
-	return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * TclpCopyDirectory --
- *
- *      Recursively copies a directory.  The target directory dst must
- *	not already exist.  Note that this function does not merge two
- *	directory hierarchies, even if the target directory is an an
- *	empty directory.
- *
- * Results:
- *	If the directory was successfully copied, returns TCL_OK.
- *	Otherwise the return value is TCL_ERROR, errno is set to indicate
- *	the error, and the pathname of the file that caused the error
- *	is stored in errorPtr.  See TclpCreateDirectory and TclpCopyFile
- *	for a description of possible values for errno.
- *
- * Side effects:
- *      An exact copy of the directory hierarchy src will be created
- *	with the name dst.  If an error occurs, the error will
- *      be returned immediately, and remaining files will not be
- *	processed.
- *
- *---------------------------------------------------------------------------
- */
-
-int
-TclpCopyDirectory(
-    char *src,			/* Pathname of directory to be copied.  */
-    char *dst,			/* Pathname of target directory. */
-    Tcl_DString *errorPtr)	/* If non-NULL, initialized DString for
-				 * error reporting. */
-{
-    OSErr err, saveErr;
-    long srcID, tmpDirID;
-    FSSpec srcFileSpec, dstFileSpec, dstDirSpec, tmpDirSpec, tmpFileSpec;
-    Boolean srcIsDirectory, srcLocked;
-    Boolean dstIsDirectory, dstExists;
-    Str31 tmpName;
-
-    err = FSpLocationFromPath(strlen(src), src, &srcFileSpec);
-    if (err == noErr) {
-    	err = FSpGetDirectoryID(&srcFileSpec, &srcID, &srcIsDirectory);
-    }
-    if (err == noErr) {
-        if (srcIsDirectory == false) {
-            err = afpObjectTypeErr;	/* ENOTDIR. */
-        }
-    }
-    if (err == noErr) {
-        err = GetFileSpecs(dst, &dstFileSpec, &dstDirSpec, &dstExists,
-        	&dstIsDirectory);
-    }
-    if (dstExists) {
-        if (dstIsDirectory == false) {
-            err = afpObjectTypeErr;	/* ENOTDIR. */
-        } else {
-            err = dupFNErr;		/* EEXIST. */
-        }
-    }
-    if (err != noErr) {
-        goto done;
-    }        
-    if ((srcFileSpec.vRefNum == dstFileSpec.vRefNum) &&
-    	    (srcFileSpec.parID == dstFileSpec.parID) &&
-            (Pstrequal(srcFileSpec.name, dstFileSpec.name) != 0)) {
-        /*
-         * Copying on top of self.  No-op.
-         */
-                    
-        goto done;
-    }
-
-    /*
-     * This algorthm will work making a copy of the source directory in
-     * the current directory with a new name, in a new directory with the
-     * same name, and in a new directory with a new name:
-     *
-     * 1. Make dstDir/tmpDir.
-     * 2. Copy srcDir/src to dstDir/tmpDir/src
-     * 3. Rename dstDir/tmpDir/src to dstDir/tmpDir/dst (if necessary).
-     * 4. CatMove dstDir/tmpDir/dst to dstDir/dst.
-     * 5. Remove dstDir/tmpDir.
-     */
-                
-    err = FSpGetFLockCompat(&srcFileSpec, &srcLocked);
-    if (srcLocked) {
-        FSpRstFLockCompat(&srcFileSpec);
-    }
-    if (err == noErr) {
-        err = GenerateUniqueName(dstFileSpec.vRefNum, dstFileSpec.parID, 
-    	        dstFileSpec.parID, tmpName);
-    }
-    if (err == noErr) {
-        FSMakeFSSpecCompat(dstFileSpec.vRefNum, dstFileSpec.parID,
-        	tmpName, &tmpDirSpec);
-        err = FSpDirCreateCompat(&tmpDirSpec, smSystemScript, &tmpDirID);
-    }
-    if (err == noErr) {
-	err = FSpDirectoryCopy(&srcFileSpec, &tmpDirSpec, NULL, 0, true,
-	    	CopyErrHandler);
-    }
-    
-    /* 
-     * Even if the Copy failed, Rename/Move whatever did get copied to the
-     * appropriate final destination, if possible.  
-     */
-     
-    saveErr = err;
-    err = noErr;
-    if (Pstrequal(srcFileSpec.name, dstFileSpec.name) == 0) {
-        err = FSMakeFSSpecCompat(tmpDirSpec.vRefNum, tmpDirID, 
-        	srcFileSpec.name, &tmpFileSpec);
-        if (err == noErr) {
-            err = FSpRenameCompat(&tmpFileSpec, dstFileSpec.name);
-        }
-    }
-    if (err == noErr) {
-        err = FSMakeFSSpecCompat(tmpDirSpec.vRefNum, tmpDirID,
-        	dstFileSpec.name, &tmpFileSpec);
-    }
-    if (err == noErr) {
-        err = FSpCatMoveCompat(&tmpFileSpec, &dstDirSpec);
-    }
-    if (err == noErr) {
-        if (srcLocked) {
-            FSpSetFLockCompat(&dstFileSpec);
-        }
-    }
-    
-    FSpDeleteCompat(&tmpDirSpec);
-    
-    if (saveErr != noErr) {
-        err = saveErr;
-    }
-    
-    done:
-    if (err != noErr) {
-        errno = TclMacOSErrorToPosixError(err);
-        if (errorPtr != NULL) {
-            Tcl_DStringAppend(errorPtr, dst, -1);
-        }
-        return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * CopyErrHandler --
- *
- *      This procedure is called from the MoreFiles procedure 
- *      FSpDirectoryCopy whenever an error occurs.
- *
- * Results:
- *      False if the condition should not be considered an error, true
- *      otherwise.
- *
- * Side effects:
- *      Since FSpDirectoryCopy() is called only after removing any 
- *      existing target directories, there shouldn't be any errors.
- *      
- *----------------------------------------------------------------------
- */
-
-static pascal Boolean 
-CopyErrHandler(
-    OSErr error,		/* Error that occured */
-    short failedOperation,	/* operation that caused the error */
-    short srcVRefNum,		/* volume ref number of source */
-    long srcDirID,		/* directory id of source */
-    StringPtr srcName,		/* name of source */
-    short dstVRefNum,		/* volume ref number of dst */
-    long dstDirID,		/* directory id of dst */
-    StringPtr dstName)		/* name of dst directory */
-{
-    return true;
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * TclpRemoveDirectory --
- *
- *	Removes directory (and its contents, if the recursive flag is set).
- *
- * Results:
- *	If the directory was successfully removed, returns TCL_OK.
- *	Otherwise the return value is TCL_ERROR, errno is set to indicate
- *	the error, and the pathname of the file that caused the error
- *	is stored in errorPtr.  Some possible values for errno are:
- *
- *	EACCES:     path directory can't be read and/or written.
- *	EEXIST:	    path is a non-empty directory.
- *	EINVAL:	    path is a root directory.
- *	ENOENT:	    path doesn't exist or is "".
- * 	ENOTDIR:    path is not a directory.
- *
- * Side effects:
- *	Directory removed.  If an error occurs, the error will be returned
- *	immediately, and remaining files will not be deleted.
- *
- *---------------------------------------------------------------------------
- */
- 
-int
-TclpRemoveDirectory(
-    char *path,			/* Pathname of directory to be removed. */
-    int recursive,		/* If non-zero, removes directories that
-				 * are nonempty.  Otherwise, will only remove
-				 * empty directories. */
-    Tcl_DString *errorPtr)	/* If non-NULL, initialized DString for
-				 * error reporting. */
-{				 
-    OSErr err;
-    FSSpec fileSpec;
-    long dirID;
-    int locked;
-    Boolean isDirectory;
-    CInfoPBRec pb;
-    Str255 fileName;
-
-    locked = 0;
-    err = FSpLocationFromPath(strlen(path), path, &fileSpec);
-    if (err != noErr) {
-        goto done;
-    }   
-
-    /*
-     * Since FSpDeleteCompat will delete a file, make sure this isn't
-     * a file first.
-     */
-         
-    isDirectory = 1;
-    FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
-    if (isDirectory == 0) {
-        errno = ENOTDIR;
-        return TCL_ERROR;
-    }
-    
-    err = FSpDeleteCompat(&fileSpec);
-    if (err == fLckdErr) {
-        locked = 1;
-    	FSpRstFLockCompat(&fileSpec);
-    	err = FSpDeleteCompat(&fileSpec);
-    }
-    if (err == noErr) {
-	return TCL_OK;
-    }
-    if (err != fBsyErr) {
-        goto done;
-    }
-     
-    if (recursive == 0) {
-	/*
-	 * fBsyErr means one of three things: file busy, directory not empty, 
-	 * or working directory control block open.  Determine if directory
-	 * is empty. If directory is not empty, return EEXIST.
-	 */
-
-	pb.hFileInfo.ioVRefNum = fileSpec.vRefNum;
-	pb.hFileInfo.ioDirID = dirID;
-	pb.hFileInfo.ioNamePtr = (StringPtr) fileName;
-	pb.hFileInfo.ioFDirIndex = 1;
-	if (PBGetCatInfoSync(&pb) == noErr) {
-	    err = dupFNErr;	/* EEXIST */
-	    goto done;
-	}
-    }
-	
-    /*
-     * DeleteDirectory removes a directory and all its contents, including
-     * any locked files.  There is no interface to get the name of the 
-     * file that caused the error, if an error occurs deleting this tree,
-     * unless we rewrite DeleteDirectory ourselves.
-     */
-	 
-    err = DeleteDirectory(fileSpec.vRefNum, dirID, NULL);
-
-    done:
-    if (err != noErr) {
-	if (errorPtr != NULL) {
-	    Tcl_DStringAppend(errorPtr, path, -1);
-	}
-        if (locked) {
-            FSpSetFLockCompat(&fileSpec);
-        }
-    	errno = TclMacOSErrorToPosixError(err);
-    	return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -808,7 +336,7 @@ MoveRename(
          * dest directory, and rename temp to target.
          */
           
-        err = GenerateUniqueName(srcFileSpecPtr->vRefNum, 
+        err = GenerateUniqueName(srcFileSpecPtr->vRefNum, &startSeed,
        		srcFileSpecPtr->parID, dstID, tmpName);
         FSMakeFSSpecCompat(srcFileSpecPtr->vRefNum, srcFileSpecPtr->parID,
          	tmpName, &tmpSrcFileSpec);
@@ -844,70 +372,567 @@ MoveRename(
     }
     return err;
 }     
-			    
+
 /*
  *---------------------------------------------------------------------------
  *
- * GetFileSpecs --
+ * TclpObjCopyFile, DoCopyFile --
  *
- * 	Generate a filename that is not in either of the two specified
- *	directories (on the same volume). 
+ *      Copy a single file (not a directory).  If dst already exists and
+ *	is not a directory, it is removed.
  *
  * Results:
- *	Standard macintosh error.  On success, uniqueName is filled with 
- *	the name of the temporary file.
+ *	If the file was successfully copied, returns TCL_OK.  Otherwise
+ *	the return value is TCL_ERROR and errno is set to indicate the
+ *	error.  Some possible values for errno are:
+ *
+ *	EACCES:     src or dst parent directory can't be read and/or written.
+ *	EISDIR:	    src or dst is a directory.
+ *	ENOENT:	    src doesn't exist.  src or dst is "".
  *
  * Side effects:
- *	None.
+ *      This procedure will also copy symbolic links, block, and
+ *      character devices, and fifos.  For symbolic links, the links 
+ *      themselves will be copied and not what they point to.  For the
+ *	other special file types, the directory entry will be copied and
+ *	not the contents of the device that it refers to.
  *
  *---------------------------------------------------------------------------
- */ 
+ */
  
-static OSErr
-GenerateUniqueName(
-    short vRefNum,		/* Volume on which the following directories
-    				 * are located. */		
-    long dirID1,		/* ID of first directory. */
-    long dirID2,		/* ID of second directory.  May be the same
-    				 * as the first. */
-    Str31 uniqueName)		/* Filled with filename for a file that is
-    				 * not located in either of the above two
-    				 * directories. */
+int 
+TclpObjCopyFile(srcPathPtr, destPathPtr)
+    Tcl_Obj *srcPathPtr;
+    Tcl_Obj *destPathPtr;
+{
+    return DoCopyFile(Tcl_FSGetNativePath(srcPathPtr),
+		      Tcl_FSGetNativePath(destPathPtr));
+}
+
+static int
+DoCopyFile(
+    CONST char *src,		/* Pathname of file to be copied (native). */
+    CONST char *dst)		/* Pathname of file to copy to (native). */
+{
+    OSErr err, dstErr;
+    Boolean dstExists, dstIsDirectory, dstLocked;
+    FSSpec srcFileSpec, dstFileSpec, dstDirSpec, tmpFileSpec;
+    Str31 tmpName;
+	
+    err = FSpLLocationFromPath(strlen(src), src, &srcFileSpec);
+    if (err == noErr) {
+        err = GetFileSpecs(dst, &dstFileSpec, &dstDirSpec, &dstExists,
+        	&dstIsDirectory);
+    }
+    if (dstExists) {
+        if (dstIsDirectory) {
+            errno = EISDIR;
+            return TCL_ERROR;
+        }
+        err = FSpGetFLockCompat(&dstFileSpec, &dstLocked);
+        if (dstLocked) {
+            FSpRstFLockCompat(&dstFileSpec);
+        }
+        
+        /*
+         * Backup dest file.
+         */
+         
+        dstErr = GenerateUniqueName(dstFileSpec.vRefNum, &startSeed, dstFileSpec.parID, 
+    	        dstFileSpec.parID, tmpName);
+        if (dstErr == noErr) {
+            dstErr = FSpRenameCompat(&dstFileSpec, tmpName);
+        }   
+    }
+    if (err == noErr) {
+    	err = FSpFileCopy(&srcFileSpec, &dstDirSpec, 
+    		(StringPtr) dstFileSpec.name, NULL, 0, true);
+    }
+    if ((dstExists != false) && (dstErr == noErr)) {
+        FSMakeFSSpecCompat(dstFileSpec.vRefNum, dstFileSpec.parID,
+        	tmpName, &tmpFileSpec);
+	if (err == noErr) {
+	    /* 
+	     * Delete backup file. 
+	     */
+	     
+	    FSpDeleteCompat(&tmpFileSpec);
+	} else {
+	
+	    /* 
+	     * Restore backup file.
+	     */
+	     
+	    FSpDeleteCompat(&dstFileSpec);
+	    FSpRenameCompat(&tmpFileSpec, dstFileSpec.name);
+	    if (dstLocked) {
+	        FSpSetFLockCompat(&dstFileSpec);
+	    }
+	}
+    }
+    
+    if (err != noErr) {
+	errno = TclMacOSErrorToPosixError(err);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclpObjDeleteFile, TclpDeleteFile --
+ *
+ *      Removes a single file (not a directory).
+ *
+ * Results:
+ *	If the file was successfully deleted, returns TCL_OK.  Otherwise
+ *	the return value is TCL_ERROR and errno is set to indicate the
+ *	error.  Some possible values for errno are:
+ *
+ *	EACCES:     a parent directory can't be read and/or written.
+ *	EISDIR:	    path is a directory.
+ *	ENOENT:	    path doesn't exist or is "".
+ *
+ * Side effects:
+ *      The file is deleted, even if it is read-only.
+ *
+ *---------------------------------------------------------------------------
+ */
+
+int 
+TclpObjDeleteFile(pathPtr)
+    Tcl_Obj *pathPtr;
+{
+    return TclpDeleteFile(Tcl_FSGetNativePath(pathPtr));
+}
+
+int
+TclpDeleteFile(
+    CONST char *path)		/* Pathname of file to be removed (native). */
 {
     OSErr err;
-    long i;
-    CInfoPBRec pb;
-    static unsigned char hexStr[16] = "0123456789ABCDEF";
-    static long startSeed = 248923489;
+    FSSpec fileSpec;
+    Boolean isDirectory;
+    long dirID;
     
-    pb.hFileInfo.ioVRefNum = vRefNum;
-    pb.hFileInfo.ioFDirIndex = 0;
-    pb.hFileInfo.ioNamePtr = uniqueName;
-
-    while (1) {
-        startSeed++;		
-	pb.hFileInfo.ioNamePtr[0] = 8;
-	for (i = 1; i <= 8; i++) {
-	    pb.hFileInfo.ioNamePtr[i] = hexStr[((startSeed >> ((8-i)*4)) & 0xf)];
-	}
-	pb.hFileInfo.ioDirID = dirID1;
-	err = PBGetCatInfoSync(&pb);
-	if (err == fnfErr) {
-	    if (dirID1 != dirID2) {
-		pb.hFileInfo.ioDirID = dirID2;
-		err = PBGetCatInfoSync(&pb);
-	    }
-	    if (err == fnfErr) {
-	        return noErr;
-	    }
-	}
-	if (err == noErr) {
-	    continue;
-	} 
-	return err;
+    err = FSpLLocationFromPath(strlen(path), path, &fileSpec);
+    if (err == noErr) {
+	/*
+     	 * Since FSpDeleteCompat will delete an empty directory, make sure
+     	 * that this isn't a directory first.
+         */
+        
+        FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
+	if (isDirectory == true) {
+            errno = EISDIR;
+            return TCL_ERROR;
+        }
     }
-} 
+    err = FSpDeleteCompat(&fileSpec);
+    if (err == fLckdErr) {
+    	FSpRstFLockCompat(&fileSpec);
+    	err = FSpDeleteCompat(&fileSpec);
+    	if (err != noErr) {
+    	    FSpSetFLockCompat(&fileSpec);
+    	}
+    }
+    if (err != noErr) {
+	errno = TclMacOSErrorToPosixError(err);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
 
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclpObjCreateDirectory, DoCreateDirectory --
+ *
+ *      Creates the specified directory.  All parent directories of the
+ *	specified directory must already exist.  The directory is
+ *	automatically created with permissions so that user can access
+ *	the new directory and create new files or subdirectories in it.
+ *
+ * Results:
+ *	If the directory was successfully created, returns TCL_OK.
+ *	Otherwise the return value is TCL_ERROR and errno is set to
+ *	indicate the error.  Some possible values for errno are:
+ *
+ *	EACCES:     a parent directory can't be read and/or written.
+ *	EEXIST:	    path already exists.
+ *	ENOENT:	    a parent directory doesn't exist.
+ *
+ * Side effects:
+ *      A directory is created with the current umask, except that
+ *	permission for u+rwx will always be added.
+ *
+ *---------------------------------------------------------------------------
+ */
+
+int 
+TclpObjCreateDirectory(pathPtr)
+    Tcl_Obj *pathPtr;
+{
+    return DoCreateDirectory(Tcl_FSGetNativePath(pathPtr));
+}
+
+static int
+DoCreateDirectory(
+    CONST char *path)		/* Pathname of directory to create (native). */
+{
+    OSErr err;
+    FSSpec dirSpec;
+    long outDirID;
+	
+    err = FSpLocationFromPath(strlen(path), path, &dirSpec);
+    if (err == noErr) {
+        err = dupFNErr;		/* EEXIST. */
+    } else if (err == fnfErr) {
+        err = FSpDirCreateCompat(&dirSpec, smSystemScript, &outDirID);
+    } 
+    
+    if (err != noErr) {
+	errno = TclMacOSErrorToPosixError(err);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclpObjCopyDirectory, DoCopyDirectory --
+ *
+ *      Recursively copies a directory.  The target directory dst must
+ *	not already exist.  Note that this function does not merge two
+ *	directory hierarchies, even if the target directory is an an
+ *	empty directory.
+ *
+ * Results:
+ *	If the directory was successfully copied, returns TCL_OK.
+ *	Otherwise the return value is TCL_ERROR, errno is set to indicate
+ *	the error, and the pathname of the file that caused the error
+ *	is stored in errorPtr.  See TclpCreateDirectory and TclpCopyFile
+ *	for a description of possible values for errno.
+ *
+ * Side effects:
+ *      An exact copy of the directory hierarchy src will be created
+ *	with the name dst.  If an error occurs, the error will
+ *      be returned immediately, and remaining files will not be
+ *	processed.
+ *
+ *---------------------------------------------------------------------------
+ */
+
+int 
+TclpObjCopyDirectory(srcPathPtr, destPathPtr, errorPtr)
+    Tcl_Obj *srcPathPtr;
+    Tcl_Obj *destPathPtr;
+    Tcl_Obj **errorPtr;
+{
+    Tcl_DString ds;
+    int ret;
+    ret = DoCopyDirectory(Tcl_FSGetNativePath(srcPathPtr),
+			  Tcl_FSGetNativePath(destPathPtr), &ds);
+    if (ret != TCL_OK) {
+	*errorPtr = Tcl_NewStringObj(Tcl_DStringValue(&ds), -1);
+	Tcl_DStringFree(&ds);
+	Tcl_IncrRefCount(*errorPtr);
+    }
+    return ret;
+}
+
+static int
+DoCopyDirectory(
+    CONST char *src,		/* Pathname of directory to be copied
+				 * (Native). */
+    CONST char *dst,		/* Pathname of target directory (Native). */
+    Tcl_DString *errorPtr)	/* If non-NULL, uninitialized or free
+				 * DString filled with UTF-8 name of file
+				 * causing error. */
+{
+    OSErr err, saveErr;
+    long srcID, tmpDirID;
+    FSSpec srcFileSpec, dstFileSpec, dstDirSpec, tmpDirSpec, tmpFileSpec;
+    Boolean srcIsDirectory, srcLocked;
+    Boolean dstIsDirectory, dstExists;
+    Str31 tmpName;
+
+    err = FSpLocationFromPath(strlen(src), src, &srcFileSpec);
+    if (err == noErr) {
+    	err = FSpGetDirectoryID(&srcFileSpec, &srcID, &srcIsDirectory);
+    }
+    if (err == noErr) {
+        if (srcIsDirectory == false) {
+            err = afpObjectTypeErr;	/* ENOTDIR. */
+        }
+    }
+    if (err == noErr) {
+        err = GetFileSpecs(dst, &dstFileSpec, &dstDirSpec, &dstExists,
+        	&dstIsDirectory);
+    }
+    if (dstExists) {
+        if (dstIsDirectory == false) {
+            err = afpObjectTypeErr;	/* ENOTDIR. */
+        } else {
+            err = dupFNErr;		/* EEXIST. */
+        }
+    }
+    if (err != noErr) {
+        goto done;
+    }        
+    if ((srcFileSpec.vRefNum == dstFileSpec.vRefNum) &&
+    	    (srcFileSpec.parID == dstFileSpec.parID) &&
+            (Pstrequal(srcFileSpec.name, dstFileSpec.name) != 0)) {
+        /*
+         * Copying on top of self.  No-op.
+         */
+                    
+        goto done;
+    }
+
+    /*
+     * This algorthm will work making a copy of the source directory in
+     * the current directory with a new name, in a new directory with the
+     * same name, and in a new directory with a new name:
+     *
+     * 1. Make dstDir/tmpDir.
+     * 2. Copy srcDir/src to dstDir/tmpDir/src
+     * 3. Rename dstDir/tmpDir/src to dstDir/tmpDir/dst (if necessary).
+     * 4. CatMove dstDir/tmpDir/dst to dstDir/dst.
+     * 5. Remove dstDir/tmpDir.
+     */
+                
+    err = FSpGetFLockCompat(&srcFileSpec, &srcLocked);
+    if (srcLocked) {
+        FSpRstFLockCompat(&srcFileSpec);
+    }
+    if (err == noErr) {
+        err = GenerateUniqueName(dstFileSpec.vRefNum, &startSeed, dstFileSpec.parID, 
+    	        dstFileSpec.parID, tmpName);
+    }
+    if (err == noErr) {
+        FSMakeFSSpecCompat(dstFileSpec.vRefNum, dstFileSpec.parID,
+        	tmpName, &tmpDirSpec);
+        err = FSpDirCreateCompat(&tmpDirSpec, smSystemScript, &tmpDirID);
+    }
+    if (err == noErr) {
+	err = FSpDirectoryCopy(&srcFileSpec, &tmpDirSpec, NULL, NULL, 0, true,
+	    	CopyErrHandler);
+    }
+    
+    /* 
+     * Even if the Copy failed, Rename/Move whatever did get copied to the
+     * appropriate final destination, if possible.  
+     */
+     
+    saveErr = err;
+    err = noErr;
+    if (Pstrequal(srcFileSpec.name, dstFileSpec.name) == 0) {
+        err = FSMakeFSSpecCompat(tmpDirSpec.vRefNum, tmpDirID, 
+        	srcFileSpec.name, &tmpFileSpec);
+        if (err == noErr) {
+            err = FSpRenameCompat(&tmpFileSpec, dstFileSpec.name);
+        }
+    }
+    if (err == noErr) {
+        err = FSMakeFSSpecCompat(tmpDirSpec.vRefNum, tmpDirID,
+        	dstFileSpec.name, &tmpFileSpec);
+    }
+    if (err == noErr) {
+        err = FSpCatMoveCompat(&tmpFileSpec, &dstDirSpec);
+    }
+    if (err == noErr) {
+        if (srcLocked) {
+            FSpSetFLockCompat(&dstFileSpec);
+        }
+    }
+    
+    FSpDeleteCompat(&tmpDirSpec);
+    
+    if (saveErr != noErr) {
+        err = saveErr;
+    }
+    
+    done:
+    if (err != noErr) {
+        errno = TclMacOSErrorToPosixError(err);
+        if (errorPtr != NULL) {
+            Tcl_ExternalToUtfDString(NULL, dst, -1, errorPtr);
+        }
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * CopyErrHandler --
+ *
+ *      This procedure is called from the MoreFiles procedure 
+ *      FSpDirectoryCopy whenever an error occurs.
+ *
+ * Results:
+ *      False if the condition should not be considered an error, true
+ *      otherwise.
+ *
+ * Side effects:
+ *      Since FSpDirectoryCopy() is called only after removing any 
+ *      existing target directories, there shouldn't be any errors.
+ *      
+ *----------------------------------------------------------------------
+ */
+
+static pascal Boolean 
+CopyErrHandler(
+    OSErr error,		/* Error that occured */
+    short failedOperation,	/* operation that caused the error */
+    short srcVRefNum,		/* volume ref number of source */
+    long srcDirID,		/* directory id of source */
+    ConstStr255Param srcName,	/* name of source */
+    short dstVRefNum,		/* volume ref number of dst */
+    long dstDirID,		/* directory id of dst */
+    ConstStr255Param dstName)	/* name of dst directory */
+{
+    return true;
+}
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclpObjRemoveDirectory, DoRemoveDirectory --
+ *
+ *	Removes directory (and its contents, if the recursive flag is set).
+ *
+ * Results:
+ *	If the directory was successfully removed, returns TCL_OK.
+ *	Otherwise the return value is TCL_ERROR, errno is set to indicate
+ *	the error, and the pathname of the file that caused the error
+ *	is stored in errorPtr.  Some possible values for errno are:
+ *
+ *	EACCES:     path directory can't be read and/or written.
+ *	EEXIST:	    path is a non-empty directory.
+ *	EINVAL:	    path is a root directory.
+ *	ENOENT:	    path doesn't exist or is "".
+ * 	ENOTDIR:    path is not a directory.
+ *
+ * Side effects:
+ *	Directory removed.  If an error occurs, the error will be returned
+ *	immediately, and remaining files will not be deleted.
+ *
+ *---------------------------------------------------------------------------
+ */
+ 
+int 
+TclpObjRemoveDirectory(pathPtr, recursive, errorPtr)
+    Tcl_Obj *pathPtr;
+    int recursive;
+    Tcl_Obj **errorPtr;
+{
+    Tcl_DString ds;
+    int ret;
+    ret = DoRemoveDirectory(Tcl_FSGetNativePath(pathPtr),recursive, &ds);
+    if (ret != TCL_OK) {
+	*errorPtr = Tcl_NewStringObj(Tcl_DStringValue(&ds), -1);
+	Tcl_DStringFree(&ds);
+	Tcl_IncrRefCount(*errorPtr);
+    }
+    return ret;
+}
+
+static int
+DoRemoveDirectory(
+    CONST char *path,		/* Pathname of directory to be removed
+				 * (native). */
+    int recursive,		/* If non-zero, removes directories that
+				 * are nonempty.  Otherwise, will only remove
+				 * empty directories. */
+    Tcl_DString *errorPtr)	/* If non-NULL, uninitialized or free
+				 * DString filled with UTF-8 name of file
+				 * causing error. */
+{
+    OSErr err;
+    FSSpec fileSpec;
+    long dirID;
+    int locked;
+    Boolean isDirectory;
+    CInfoPBRec pb;
+    Str255 fileName;
+
+
+    locked = 0;
+    err = FSpLocationFromPath(strlen(path), path, &fileSpec);
+    if (err != noErr) {
+        goto done;
+    }   
+
+    /*
+     * Since FSpDeleteCompat will delete a file, make sure this isn't
+     * a file first.
+     */
+         
+    isDirectory = 1;
+    FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
+    if (isDirectory == 0) {
+        errno = ENOTDIR;
+        return TCL_ERROR;
+    }
+    
+    err = FSpDeleteCompat(&fileSpec);
+    if (err == fLckdErr) {
+        locked = 1;
+    	FSpRstFLockCompat(&fileSpec);
+    	err = FSpDeleteCompat(&fileSpec);
+    }
+    if (err == noErr) {
+	return TCL_OK;
+    }
+    if (err != fBsyErr) {
+        goto done;
+    }
+     
+    if (recursive == 0) {
+	/*
+	 * fBsyErr means one of three things: file busy, directory not empty, 
+	 * or working directory control block open.  Determine if directory
+	 * is empty. If directory is not empty, return EEXIST.
+	 */
+
+	pb.hFileInfo.ioVRefNum = fileSpec.vRefNum;
+	pb.hFileInfo.ioDirID = dirID;
+	pb.hFileInfo.ioNamePtr = (StringPtr) fileName;
+	pb.hFileInfo.ioFDirIndex = 1;
+	if (PBGetCatInfoSync(&pb) == noErr) {
+	    err = dupFNErr;	/* EEXIST */
+	    goto done;
+	}
+    }
+	
+    /*
+     * DeleteDirectory removes a directory and all its contents, including
+     * any locked files.  There is no interface to get the name of the 
+     * file that caused the error, if an error occurs deleting this tree,
+     * unless we rewrite DeleteDirectory ourselves.
+     */
+	 
+    err = DeleteDirectory(fileSpec.vRefNum, dirID, NULL);
+
+    done:
+    if (err != noErr) {
+	if (errorPtr != NULL) {
+	    Tcl_UtfToExternalDString(NULL, path, -1, errorPtr);
+	}
+        if (locked) {
+            FSpSetFLockCompat(&fileSpec);
+        }
+    	errno = TclMacOSErrorToPosixError(err);
+    	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+			    
 /*
  *---------------------------------------------------------------------------
  *
@@ -928,7 +953,7 @@ GenerateUniqueName(
 
 static OSErr
 GetFileSpecs(
-    char *path,			/* The path to query. */
+    CONST char *path,		/* The path to query. */
     FSSpec *pathSpecPtr,	/* Filled with information about path. */
     FSSpec *dirSpecPtr,		/* Filled with information about path's
     				 * parent directory. */
@@ -938,10 +963,10 @@ GetFileSpecs(
     Boolean *pathIsDirectoryPtr)/* Set to true if path is itself a directory,
     				 * otherwise false. */
 {
-    char *dirName;
+    CONST char *dirName;
     OSErr err;
     int argc;
-    char **argv;
+    CONST char **argv;
     long d;
     Tcl_DString buffer;
         
@@ -1071,15 +1096,18 @@ static int
 GetFileFinderAttributes(
     Tcl_Interp *interp,		/* The interp to report errors with. */
     int objIndex,		/* The index of the attribute option. */
-    char *fileName,		/* The name of the file. */
+    Tcl_Obj *fileName,	/* The name of the file (UTF-8). */
     Tcl_Obj **attributePtrPtr)	/* A pointer to return the object with. */
 {
     OSErr err;
     FSSpec fileSpec;
     FInfo finfo;
-    
-    err = FSpLocationFromPath(strlen(fileName), fileName, &fileSpec);
-    
+    CONST char *native;
+
+    native=Tcl_FSGetNativePath(fileName);
+    err = FSpLLocationFromPath(strlen(native),
+	    native, &fileSpec);
+
     if (err == noErr) {
     	err = FSpGetFInfo(&fileSpec, &finfo);
     }
@@ -1114,7 +1142,7 @@ GetFileFinderAttributes(
     if (err != noErr) {
     	errno = TclMacOSErrorToPosixError(err);
     	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
-    		"couldn't get attributes for file \"", fileName, "\": ",
+    		"could not read \"", Tcl_GetString(fileName), "\": ",
     		Tcl_PosixError(interp), (char *) NULL);
     	return TCL_ERROR;
     }
@@ -1146,14 +1174,17 @@ static int
 GetFileReadOnly(
     Tcl_Interp *interp,		/* The interp to report errors with. */
     int objIndex,		/* The index of the attribute. */
-    char *fileName,		/* The name of the file. */
+    Tcl_Obj *fileName,	/* The name of the file (UTF-8). */
     Tcl_Obj **readOnlyPtrPtr)	/* A pointer to return the object with. */
 {
     OSErr err;
     FSSpec fileSpec;
     CInfoPBRec paramBlock;
-    
-    err = FSpLocationFromPath(strlen(fileName), fileName, &fileSpec);
+    CONST char *native;
+
+    native=Tcl_FSGetNativePath(fileName);
+    err = FSpLLocationFromPath(strlen(native),
+	    native, &fileSpec);
     
     if (err == noErr) {
     	if (err == noErr) {
@@ -1179,7 +1210,7 @@ GetFileReadOnly(
     if (err != noErr) {
     	errno = TclMacOSErrorToPosixError(err);
     	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
-    		"couldn't get attributes for file \"", fileName, "\": ",
+    		"could not read \"", Tcl_GetString(fileName), "\": ",
     		Tcl_PosixError(interp), (char *) NULL);
     	return TCL_ERROR;
     }
@@ -1207,14 +1238,17 @@ static int
 SetFileFinderAttributes(
     Tcl_Interp *interp,		/* The interp to report errors with. */
     int objIndex,		/* The index of the attribute. */
-    char *fileName,		/* The name of the file. */
+    Tcl_Obj *fileName,	/* The name of the file (UTF-8). */
     Tcl_Obj *attributePtr)	/* The command line object. */
 {
     OSErr err;
     FSSpec fileSpec;
     FInfo finfo;
-    
-    err = FSpLocationFromPath(strlen(fileName), fileName, &fileSpec);
+    CONST char *native;
+
+    native=Tcl_FSGetNativePath(fileName);
+    err = FSpLLocationFromPath(strlen(native),
+	    native, &fileSpec);
     
     if (err == noErr) {
     	err = FSpGetFInfo(&fileSpec, &finfo);
@@ -1259,7 +1293,7 @@ SetFileFinderAttributes(
     	    Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
     	    Tcl_AppendStringsToObj(resultPtr, "cannot set ",
     	    	    tclpFileAttrStrings[objIndex], ": \"",
-    	    	    fileName, "\" is a directory", (char *) NULL);
+    	    	    Tcl_GetString(fileName), "\" is a directory", (char *) NULL);
     	    return TCL_ERROR;
     	}
     }
@@ -1267,7 +1301,7 @@ SetFileFinderAttributes(
     if (err != noErr) {
     	errno = TclMacOSErrorToPosixError(err);
     	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
-    		"couldn't set attributes for file \"", fileName, "\": ",
+    		"could not read \"", Tcl_GetString(fileName), "\": ",
     		Tcl_PosixError(interp), (char *) NULL);
     	return TCL_ERROR;
     }
@@ -1295,15 +1329,18 @@ static int
 SetFileReadOnly(
     Tcl_Interp *interp,		/* The interp to report errors with. */
     int objIndex,		/* The index of the attribute. */
-    char *fileName,		/* The name of the file. */
+    Tcl_Obj *fileName,	/* The name of the file (UTF-8). */
     Tcl_Obj *readOnlyPtr)	/* The command line object. */
 {
     OSErr err;
     FSSpec fileSpec;
     HParamBlockRec paramBlock;
     int hidden;
-    
-    err = FSpLocationFromPath(strlen(fileName), fileName, &fileSpec);
+    CONST char *native;
+
+    native=Tcl_FSGetNativePath(fileName);
+    err = FSpLLocationFromPath(strlen(native),
+	    native, &fileSpec);
     
     if (err == noErr) {
     	if (Tcl_GetBooleanFromObj(interp, readOnlyPtr, &hidden) != TCL_OK) {
@@ -1338,7 +1375,7 @@ SetFileReadOnly(
     if (err != noErr) {
     	errno = TclMacOSErrorToPosixError(err);
     	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp), 
-    		"couldn't set attributes for file \"", fileName, "\": ",
+    		"could not read \"", Tcl_GetString(fileName), "\": ",
     		Tcl_PosixError(interp), (char *) NULL);
     	return TCL_ERROR;
     }
@@ -1348,30 +1385,27 @@ SetFileReadOnly(
 /*
  *---------------------------------------------------------------------------
  *
- * TclpListVolumes --
+ * TclpObjListVolumes --
  *
  *	Lists the currently mounted volumes
  *
  * Results:
- *	A standard Tcl result.  Will always be TCL_OK, since there is no way
- *	that this command can fail.  Also, the interpreter's result is set to 
- *	the list of volumes.
+ *	The list of volumes.
  *
  * Side effects:
  *	None
  *
  *---------------------------------------------------------------------------
  */
-
-int
-TclpListVolumes( 
-		Tcl_Interp *interp)    /* Interpreter to which to pass the volume list */
+Tcl_Obj*
+TclpObjListVolumes(void)
 {
     HParamBlockRec pb;
     Str255 name;
     OSErr theError = noErr;
     Tcl_Obj *resultPtr, *elemPtr;
     short volIndex = 1;
+    Tcl_DString dstr;
 
     resultPtr = Tcl_NewObj();
         
@@ -1386,7 +1420,7 @@ TclpListVolumes(
      */
         
     while ( 1 ) {
-        pb.volumeParam.ioNamePtr = (StringPtr) & name;
+        pb.volumeParam.ioNamePtr = (StringPtr) &name;
         pb.volumeParam.ioVolIndex = volIndex;
                 
         theError = PBHGetVInfoSync(&pb);
@@ -1394,15 +1428,225 @@ TclpListVolumes(
         if ( theError != noErr ) {
             break;
         }
-                
-        elemPtr = Tcl_NewStringObj((char *) name + 1, (int) name[0]);
+        
+        Tcl_ExternalToUtfDString(NULL, (CONST char *)&name[1], name[0], &dstr);
+        elemPtr = Tcl_NewStringObj(Tcl_DStringValue(&dstr),
+		Tcl_DStringLength(&dstr));
         Tcl_AppendToObj(elemPtr, ":", 1);
-        Tcl_ListObjAppendElement(interp, resultPtr, elemPtr);
+        Tcl_ListObjAppendElement(NULL, resultPtr, elemPtr);
+        
+        Tcl_DStringFree(&dstr);
                 
         volIndex++;             
     }
-        
-    Tcl_SetObjResult(interp, resultPtr);
-    return TCL_OK;      
+
+    Tcl_IncrRefCount(resultPtr);
+    return resultPtr;
+}
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * TclpObjNormalizePath --
+ *
+ *	This function scans through a path specification and replaces
+ *	it, in place, with a normalized version.  On MacOS, this means
+ *	resolving all aliases present in the path and replacing the head of
+ *	pathPtr with the absolute case-sensitive path to the last file or
+ *	directory that could be validated in the path.
+ *
+ * Results:
+ *	The new 'nextCheckpoint' value, giving as far as we could
+ *	understand in the path.
+ *
+ * Side effects:
+ *	The pathPtr string, which must contain a valid path, is
+ *	possibly modified in place.
+ *
+ *---------------------------------------------------------------------------
+ */
+
+int
+TclpObjNormalizePath(interp, pathPtr, nextCheckpoint)
+    Tcl_Interp *interp;
+    Tcl_Obj *pathPtr;
+    int nextCheckpoint;
+{
+    #define MAXMACFILENAMELEN 31  /* assumed to be < sizeof(StrFileName) */
+ 
+    StrFileName fileName;
+    StringPtr fileNamePtr;
+    int fileNameLen,newPathLen;
+    Handle newPathHandle;
+    OSErr err;
+    short vRefNum;
+    long dirID;
+    Boolean isDirectory;
+    Boolean wasAlias=FALSE;
+    FSSpec fileSpec, lastFileSpec;
+    
+    Tcl_DString nativeds;
+
+    char cur;
+    int firstCheckpoint=nextCheckpoint, lastCheckpoint;
+    int origPathLen;
+    char *path = Tcl_GetStringFromObj(pathPtr,&origPathLen);
+    
+    {
+	int currDirValid=0;    
+	/*
+	 * check if substring to first ':' after initial
+	 * nextCheckpoint is a valid relative or absolute
+	 * path to a directory, if not we return without
+	 * normalizing anything
+	 */
+	
+	while (1) {
+	    cur = path[nextCheckpoint];
+	    if (cur == ':' || cur == 0) {
+		if (cur == ':') { 
+		    /* jump over separator */
+		    nextCheckpoint++; cur = path[nextCheckpoint]; 
+		} 
+		Tcl_UtfToExternalDString(NULL,path,nextCheckpoint,&nativeds);
+		err = FSpLLocationFromPath(Tcl_DStringLength(&nativeds), 
+					  Tcl_DStringValue(&nativeds), 
+					  &fileSpec);
+		Tcl_DStringFree(&nativeds);
+		if (err == noErr) {
+			lastFileSpec=fileSpec;
+			err = ResolveAliasFile(&fileSpec, true, &isDirectory, 
+				       &wasAlias);
+			if (err == noErr) {
+		    err = FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
+		    currDirValid = ((err == noErr) && isDirectory);
+		    vRefNum = fileSpec.vRefNum;
+		    }
+		}
+		break;
+	    }
+	    nextCheckpoint++;
+	}
+	
+	if(!currDirValid) {
+	    /* can't determine root dir, bail out */
+	    return firstCheckpoint; 
+	}
+    }
+	
+    /*
+     * Now vRefNum and dirID point to a valid
+     * directory, so walk the rest of the path
+     * ( code adapted from FSpLocationFromPath() )
+     */
+
+    lastCheckpoint=nextCheckpoint;
+    while (1) {
+	cur = path[nextCheckpoint];
+	if (cur == ':' || cur == 0) {
+	    fileNameLen=nextCheckpoint-lastCheckpoint;
+	    fileNamePtr=fileName;
+	    if(fileNameLen==0) {
+		if (cur == ':') {
+		    /*
+		     * special case for empty dirname i.e. encountered
+		     * a '::' path component: get parent dir of currDir
+		     */
+		    fileName[0]=2;
+		    strcpy((char *) fileName + 1, "::");
+		    lastCheckpoint--;
+		} else {
+		    /*
+		     * empty filename, i.e. want FSSpec for currDir
+		     */
+		    fileNamePtr=NULL;
+		}
+	    } else {
+		Tcl_UtfToExternalDString(NULL,&path[lastCheckpoint],
+					 fileNameLen,&nativeds);
+		fileNameLen=Tcl_DStringLength(&nativeds);
+		if(fileNameLen > MAXMACFILENAMELEN) { 
+		    err = bdNamErr;
+		} else {
+		fileName[0]=fileNameLen;
+		strncpy((char *) fileName + 1, Tcl_DStringValue(&nativeds), 
+			fileNameLen);
+		}
+		Tcl_DStringFree(&nativeds);
+	    }
+	    if(err == noErr)
+	    err=FSMakeFSSpecCompat(vRefNum, dirID, fileNamePtr, &fileSpec);
+	    if(err != noErr) {
+		if(err != fnfErr) {
+		    /*
+		     * this can occur if trying to get parent of a root
+		     * volume via '::' or when using an illegal
+		     * filename; revert to last checkpoint and stop
+		     * processing path further
+		     */
+		    err=FSMakeFSSpecCompat(vRefNum, dirID, NULL, &fileSpec);
+		    if(err != noErr) {
+			/* should never happen, bail out */
+			return firstCheckpoint; 
+		    }
+		    nextCheckpoint=lastCheckpoint;
+		    cur = path[lastCheckpoint];
+		}
+    		break; /* arrived at nonexistent file or dir */
+	    } else {
+		/* fileSpec could point to an alias, resolve it */
+		lastFileSpec=fileSpec;
+		err = ResolveAliasFile(&fileSpec, true, &isDirectory, 
+				       &wasAlias);
+		if (err != noErr || !isDirectory) {
+		    break; /* fileSpec doesn't point to a dir */
+		}
+	    }
+	    if (cur == 0) break; /* arrived at end of path */
+	    
+	    /* fileSpec points to possibly nonexisting subdirectory; validate */
+	    err = FSpGetDirectoryID(&fileSpec, &dirID, &isDirectory);
+	    if (err != noErr || !isDirectory) {
+	        break; /* fileSpec doesn't point to existing dir */
+	    }
+	    vRefNum = fileSpec.vRefNum;
+    	
+	    /* found a new valid subdir in path, continue processing path */
+	    lastCheckpoint=nextCheckpoint+1;
+	}
+	wasAlias=FALSE;
+	nextCheckpoint++;
+    }
+    
+    if (wasAlias)
+    	fileSpec=lastFileSpec;
+    
+    /*
+     * fileSpec now points to a possibly nonexisting file or dir
+     *  inside a valid dir; get full path name to it
+     */
+    
+    err=FSpPathFromLocation(&fileSpec, &newPathLen, &newPathHandle);
+    if(err != noErr) {
+	return firstCheckpoint; /* should not see any errors here, bail out */
+    }
+    
+    HLock(newPathHandle);
+    Tcl_ExternalToUtfDString(NULL,*newPathHandle,newPathLen,&nativeds);
+    if (cur != 0) {
+	/* not at end, append remaining path */
+    	if ( newPathLen==0 || (*(*newPathHandle+(newPathLen-1))!=':' && path[nextCheckpoint] !=':')) {
+	    Tcl_DStringAppend(&nativeds, ":" , 1);
+	}
+	Tcl_DStringAppend(&nativeds, &path[nextCheckpoint], 
+			  strlen(&path[nextCheckpoint]));
+    }
+    DisposeHandle(newPathHandle);
+    
+    fileNameLen=Tcl_DStringLength(&nativeds);
+    Tcl_SetStringObj(pathPtr,Tcl_DStringValue(&nativeds),fileNameLen);
+    Tcl_DStringFree(&nativeds);
+    
+    return nextCheckpoint+(fileNameLen-origPathLen);
 }
 

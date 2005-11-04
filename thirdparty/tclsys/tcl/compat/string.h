@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) string.h 1.13 96/04/09 22:14:53
+ * RCS: @(#) $Id: string.h,v 1.4.18.1 2005/04/26 00:46:02 das Exp $
  */
 
 #ifndef _STRING
@@ -28,12 +28,20 @@
 #include <sys/types.h>
 #endif
 
+#ifdef __APPLE__
+extern VOID *		memchr _ANSI_ARGS_((CONST VOID *s, int c, size_t n));
+#else
 extern char *		memchr _ANSI_ARGS_((CONST VOID *s, int c, size_t n));
+#endif
 extern int		memcmp _ANSI_ARGS_((CONST VOID *s1, CONST VOID *s2,
 			    size_t n));
 extern char *		memcpy _ANSI_ARGS_((VOID *t, CONST VOID *f, size_t n));
+#ifdef NO_MEMMOVE
+#define memmove(d, s, n) bcopy ((s), (d), (n))
+#else
 extern char *		memmove _ANSI_ARGS_((VOID *t, CONST VOID *f,
 			    size_t n));
+#endif
 extern char *		memset _ANSI_ARGS_((VOID *s, int c, size_t n));
 
 extern int		strcasecmp _ANSI_ARGS_((CONST char *s1,
@@ -55,12 +63,13 @@ extern int		strncmp _ANSI_ARGS_((CONST char *s1, CONST char *s2,
 			    size_t nChars));
 extern char *		strncpy _ANSI_ARGS_((char *dst, CONST char *src,
 			    size_t numChars));
-extern char *		strpbrk _ANSI_ARGS_((CONST char *string, char *chars));
+extern char *		strpbrk _ANSI_ARGS_((CONST char *string,
+			    CONST char *chars));
 extern char *		strrchr _ANSI_ARGS_((CONST char *string, int c));
 extern size_t		strspn _ANSI_ARGS_((CONST char *string,
 			    CONST char *chars));
 extern char *		strstr _ANSI_ARGS_((CONST char *string,
 			    CONST char *substring));
-extern char *		strtok _ANSI_ARGS_((CONST char *s, CONST char *delim));
+extern char *		strtok _ANSI_ARGS_((char *s, CONST char *delim));
 
 #endif /* _STRING */

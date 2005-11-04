@@ -5,10 +5,10 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) format.n 1.11 96/08/26 12:59:57
+'\" RCS: @(#) $Id: format.n,v 1.7.2.1 2004/10/27 12:52:40 dkf Exp $
 '\" 
 .so man.macros
-.TH format n "" Tcl "Tcl Built-In Commands"
+.TH format n 8.1 Tcl "Tcl Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -26,7 +26,6 @@ implementation).
 \fB%\fR conversion specifiers as in \fBsprintf\fR, and the additional
 arguments, if any, provide values to be substituted into the result.
 The return value from \fBformat\fR is the formatted string.
-
 .SH "DETAILS ON FORMATTING"
 .PP
 The command operates by scanning \fIformatString\fR from left to right. 
@@ -131,7 +130,12 @@ which must be \fBh\fR or \fBl\fR.
 If it is \fBh\fR it specifies that the numeric value should be
 truncated to a 16-bit value before converting.
 This option is rarely useful.
-The \fBl\fR modifier is ignored.
+.VS 8.4
+If it is \fBl\fR it specifies that the numeric value should be (at
+least) a 64-bit value.  If neither \fBh\fR nor \fBl\fR are present,
+numeric values are interpreted as being values of the width of the
+native machine word, as described by \fBtcl_platform(wordSize)\fR.
+.VE
 .PP
 The last thing in a conversion specifier is an alphabetic character
 that determines what kind of conversion to perform.
@@ -154,9 +158,11 @@ Convert integer to unsigned octal string.
 \fBx\fR or \fBX\fR
 Convert integer to unsigned hexadecimal string, using digits
 ``0123456789abcdef'' for \fBx\fR and ``0123456789ABCDEF'' for \fBX\fR).
+.VS
 .TP 10
 \fBc\fR
-Convert integer to the 8-bit character it represents.
+Convert integer to the Unicode character it represents.
+.VE
 .TP 10
 \fBs\fR
 No conversion; just insert string.
@@ -189,7 +195,6 @@ For the numerical conversions the argument being converted must
 be an integer or floating-point string; format converts the argument
 to binary and then converts it back to a string according to 
 the conversion specifier.
-
 .SH "DIFFERENCES FROM ANSI SPRINTF"
 .PP
 The behavior of the format command is the same as the
@@ -201,12 +206,66 @@ differences:
 For \fB%c\fR conversions the argument must be a decimal string,
 which will then be converted to the corresponding character value.
 .IP [3]
-The \fBl\fR modifier is ignored;  integer values are always converted
-as if there were no modifier present and real values are always
-converted as if the \fBl\fR modifier were present (i.e. type
-\fBdouble\fR is used for the internal representation).
+The \fBl\fR modifier
+.VS 8.4
+is ignored for real values and on 64-bit platforms, which are always
+converted as if the \fBl\fR modifier were present (i.e. the types
+\fBdouble\fR and \fBlong\fR are used for the internal representation
+of real and integer values, respectively).
+.VE 8.4
 If the \fBh\fR modifier is specified then integer values are truncated
-to \fBshort\fR before conversion.
+to \fBshort\fR before conversion.  Both \fBh\fR and \fBl\fR modifiers
+are ignored on all other conversions.
+.SH EXAMPLES
+Convert the output of \fBtime\fR into seconds to an accuracy of
+hundredths of a second:
+.CS
+set us [lindex [time $someTclCode] 0]
+puts [\fBformat\fR "%.2f seconds to execute" [expr {$us / 1e6}]]
+.CE
+.PP
+Create a packed X11 literal color specification:
+.CS
+# Each color-component should be in range (0..255)
+set color [\fBformat\fR "#%02x%02x%02x" $r $g $b]
+.CE
+.PP
+Use XPG3 format codes to allow reordering of fields (a technique that
+is often used in localized message catalogs; see \fBmsgcat\fR) without
+reordering the data values passed to \fBformat\fR:
+.CS
+set fmt1 "Today, %d shares in %s were bought at $%.2f each"
+puts [\fBformat\fR $fmt1 123 "Global BigCorp" 19.37]
+
+set fmt2 "Bought %2\\$s equity ($%3$.2f x %1\\$d) today"
+puts [\fBformat\fR $fmt2 123 "Global BigCorp" 19.37]
+.CE
+.PP
+Print a small table of powers of three:
+.CS
+# Set up the column widths
+set w1 5
+set w2 10
+
+# Make a nice header (with separator) for the table first
+set sep +-[string repeat - $w1]-+-[string repeat - $w2]-+
+puts $sep
+puts [\fBformat\fR "| %-*s | %-*s |" $w1 "Index" $w2 "Power"]
+puts $sep
+
+# Print the contents of the table
+set p 1
+for {set i 0} {$i<=20} {incr i} {
+   puts [\fBformat\fR "| %*d | %*ld |" $w1 $i $w2 $p]
+   set p [expr {wide($p) * 3}]
+}
+
+# Finish off by printing the separator again
+puts $sep
+.CE
+
+.SH "SEE ALSO"
+scan(n), sprintf(3), string(n)
 
 .SH KEYWORDS
 conversion specifier, format, sprintf, string, substitution

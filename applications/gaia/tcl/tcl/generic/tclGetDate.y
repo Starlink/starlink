@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclGetDate.y 1.34 97/02/03 14:53:54
+ * RCS: @(#) $Id: tclGetDate.y,v 1.18.4.1 2005/03/15 16:29:53 kennykb Exp $
  */
 
 %{
@@ -33,7 +33,7 @@
 #include "tclInt.h"
 #include "tclPort.h"
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) && !defined(TCL_MAC_USE_MSL_EPOCH)
 #   define EPOCH           1904
 #   define START_OF_TIME   1904
 #   define END_OF_TIME     2039
@@ -54,7 +54,7 @@
 
 #define HOUR(x)         ((int) (60 * x))
 #define SECSPERDAY      (24L * 60L * 60L)
-
+#define IsLeapYear(x)   ((x % 4 == 0) && (x % 100 != 0 || x % 400 == 0))
 
 /*
  *  An entry in the lexical lookup table.
@@ -91,8 +91,10 @@ static char     *yyInput;
 static DSTMODE  yyDSTmode;
 static time_t   yyDayOrdinal;
 static time_t   yyDayNumber;
+static time_t   yyMonthOrdinal;
 static int      yyHaveDate;
 static int      yyHaveDay;
+static int      yyHaveOrdinalMonth;
 static int      yyHaveRel;
 static int      yyHaveTime;
 static int      yyHaveZone;
@@ -105,8 +107,9 @@ static time_t   yySeconds;
 static time_t   yyYear;
 static MERIDIAN yyMeridian;
 static time_t   yyRelMonth;
+static time_t   yyRelDay;
 static time_t   yyRelSeconds;
-
+static time_t  *yyRelPointer;
 
 /*
  * Prototypes of internal functions.
@@ -118,9 +121,13 @@ static int	Convert _ANSI_ARGS_((time_t Month, time_t Day, time_t Year,
 		    time_t Hours, time_t Minutes, time_t Seconds,
 		    MERIDIAN Meridia, DSTMODE DSTmode, time_t *TimePtr));
 static time_t	DSTcorrect _ANSI_ARGS_((time_t Start, time_t Future));
-static time_t	RelativeDate _ANSI_ARGS_((time_t Start, time_t DayOrdinal,
+static time_t	NamedDay _ANSI_ARGS_((time_t Start, time_t DayOrdinal,
 		    time_t DayNumber));
+static time_t   NamedMonth _ANSI_ARGS_((time_t Start, time_t MonthOrdinal,
+                    time_t MonthNumber));
 static int	RelativeMonth _ANSI_ARGS_((time_t Start, time_t RelMonth,
+		    time_t *TimePtr));
+static int	RelativeDay _ANSI_ARGS_((time_t Start, time_t RelDay,
 		    time_t *TimePtr));
 static int	LookupWord _ANSI_ARGS_((char *buff));
 static int	yylex _ANSI_ARGS_((void));
@@ -135,10 +142,12 @@ yyparse _ANSI_ARGS_((void));
 }
 
 %token  tAGO tDAY tDAYZONE tID tMERIDIAN tMINUTE_UNIT tMONTH tMONTH_UNIT
-%token  tSEC_UNIT tSNUMBER tUNUMBER tZONE tEPOCH tDST
+%token  tSTARDATE tSEC_UNIT tSNUMBER tUNUMBER tZONE tEPOCH tDST tISOBASE
+%token  tDAY_UNIT tNEXT
 
 %type   <Number>        tDAY tDAYZONE tMINUTE_UNIT tMONTH tMONTH_UNIT tDST
-%type   <Number>        tSEC_UNIT tSNUMBER tUNUMBER tZONE
+%type   <Number>        tSEC_UNIT tSNUMBER tUNUMBER tZONE tISOBASE tDAY_UNIT
+%type   <Number>        unit sign tNEXT tSTARDATE
 %type   <Meridian>      tMERIDIAN o_merid
 
 %%
@@ -156,11 +165,23 @@ item    : time {
         | date {
             yyHaveDate++;
         }
+        | ordMonth {
+            yyHaveOrdinalMonth++;
+        }
         | day {
             yyHaveDay++;
         }
-        | rel {
+        | relspec {
             yyHaveRel++;
+        }
+        | iso {
+	    yyHaveTime++;
+	    yyHaveDate++;
+	}
+        | trek {
+	    yyHaveTime++;
+	    yyHaveDate++;
+	    yyHaveRel++;
         }
         | number
         ;
@@ -177,12 +198,12 @@ time    : tUNUMBER tMERIDIAN {
             yySeconds = 0;
             yyMeridian = $4;
         }
-        | tUNUMBER ':' tUNUMBER tSNUMBER {
+        | tUNUMBER ':' tUNUMBER '-' tUNUMBER {
             yyHour = $1;
             yyMinutes = $3;
             yyMeridian = MER24;
             yyDSTmode = DSToff;
-            yyTimezone = - ($4 % 100 + ($4 / 100) * 60);
+            yyTimezone = ($5 % 100 + ($5 / 100) * 60);
         }
         | tUNUMBER ':' tUNUMBER ':' tUNUMBER o_merid {
             yyHour = $1;
@@ -190,13 +211,13 @@ time    : tUNUMBER tMERIDIAN {
             yySeconds = $5;
             yyMeridian = $6;
         }
-        | tUNUMBER ':' tUNUMBER ':' tUNUMBER tSNUMBER {
+        | tUNUMBER ':' tUNUMBER ':' tUNUMBER '-' tUNUMBER {
             yyHour = $1;
             yyMinutes = $3;
             yySeconds = $5;
             yyMeridian = MER24;
             yyDSTmode = DSToff;
-            yyTimezone = - ($6 % 100 + ($6 / 100) * 60);
+            yyTimezone = ($7 % 100 + ($7 / 100) * 60);
         }
         ;
 
@@ -226,6 +247,14 @@ day     : tDAY {
             yyDayOrdinal = $1;
             yyDayNumber = $2;
         }
+        | sign tUNUMBER tDAY {
+            yyDayOrdinal = $1 * $2;
+            yyDayNumber = $3;
+        }
+        | tNEXT tDAY {
+            yyDayOrdinal = 2;
+            yyDayNumber = $2;
+        }
         ;
 
 date    : tUNUMBER '/' tUNUMBER {
@@ -236,6 +265,21 @@ date    : tUNUMBER '/' tUNUMBER {
             yyMonth = $1;
             yyDay = $3;
             yyYear = $5;
+        }
+        | tISOBASE {
+	    yyYear = $1 / 10000;
+	    yyMonth = ($1 % 10000)/100;
+	    yyDay = $1 % 100;
+	}
+        | tUNUMBER '-' tMONTH '-' tUNUMBER {
+	    yyDay = $1;
+	    yyMonth = $3;
+	    yyYear = $5;
+	}
+        | tUNUMBER '-' tUNUMBER '-' tUNUMBER {
+            yyMonth = $3;
+            yyDay = $5;
+            yyYear = $1;
         }
         | tMONTH tUNUMBER {
             yyMonth = $1;
@@ -250,11 +294,11 @@ date    : tUNUMBER '/' tUNUMBER {
             yyMonth = $2;
             yyDay = $1;
         }
-		  | tEPOCH {
-				yyMonth = 1;
-				yyDay = 1;
-				yyYear = EPOCH;
-		  }
+        | tEPOCH {
+	    yyMonth = 1;
+	    yyDay = 1;
+	    yyYear = EPOCH;
+	}
         | tUNUMBER tMONTH tUNUMBER {
             yyMonth = $2;
             yyDay = $1;
@@ -262,40 +306,76 @@ date    : tUNUMBER '/' tUNUMBER {
         }
         ;
 
-rel     : relunit tAGO {
-            yyRelSeconds = -yyRelSeconds;
-            yyRelMonth = -yyRelMonth;
-        }
-        | relunit
+ordMonth: tNEXT tMONTH {
+	    yyMonthOrdinal = 1;
+	    yyMonth = $2;
+	}
+        | tNEXT tUNUMBER tMONTH {
+	    yyMonthOrdinal = $2;
+	    yyMonth = $3;
+	}
         ;
 
-relunit : tUNUMBER tMINUTE_UNIT {
-            yyRelSeconds += $1 * $2 * 60L;
+iso     : tISOBASE tZONE tISOBASE {
+            if ($2 != HOUR(- 7)) YYABORT;
+	    yyYear = $1 / 10000;
+	    yyMonth = ($1 % 10000)/100;
+	    yyDay = $1 % 100;
+	    yyHour = $3 / 10000;
+	    yyMinutes = ($3 % 10000)/100;
+	    yySeconds = $3 % 100;
         }
-        | tSNUMBER tMINUTE_UNIT {
-            yyRelSeconds += $1 * $2 * 60L;
+        | tISOBASE tZONE tUNUMBER ':' tUNUMBER ':' tUNUMBER {
+            if ($2 != HOUR(- 7)) YYABORT;
+	    yyYear = $1 / 10000;
+	    yyMonth = ($1 % 10000)/100;
+	    yyDay = $1 % 100;
+	    yyHour = $3;
+	    yyMinutes = $5;
+	    yySeconds = $7;
         }
-        | tMINUTE_UNIT {
-            yyRelSeconds += $1 * 60L;
+	| tISOBASE tISOBASE {
+	    yyYear = $1 / 10000;
+	    yyMonth = ($1 % 10000)/100;
+	    yyDay = $1 % 100;
+	    yyHour = $2 / 10000;
+	    yyMinutes = ($2 % 10000)/100;
+	    yySeconds = $2 % 100;
         }
-        | tSNUMBER tSEC_UNIT {
-            yyRelSeconds += $1;
+        ;
+
+trek    : tSTARDATE tUNUMBER '.' tUNUMBER {
+            /*
+	     * Offset computed year by -377 so that the returned years will
+	     * be in a range accessible with a 32 bit clock seconds value
+	     */
+            yyYear = $2/1000 + 2323 - 377;
+            yyDay  = 1;
+	    yyMonth = 1;
+	    yyRelDay += (($2%1000)*(365 + IsLeapYear(yyYear)))/1000;
+	    yyRelSeconds += $4 * 144 * 60;
         }
-        | tUNUMBER tSEC_UNIT {
-            yyRelSeconds += $1;
-        }
-        | tSEC_UNIT {
-            yyRelSeconds++;
-        }
-        | tSNUMBER tMONTH_UNIT {
-            yyRelMonth += $1 * $2;
-        }
-        | tUNUMBER tMONTH_UNIT {
-            yyRelMonth += $1 * $2;
-        }
-        | tMONTH_UNIT {
-            yyRelMonth += $1;
-        }
+        ;
+
+relspec : relunits tAGO {
+	    yyRelSeconds *= -1;
+	    yyRelMonth *= -1;
+	    yyRelDay *= -1;
+	}
+	| relunits
+	;
+relunits : sign tUNUMBER unit  { *yyRelPointer += $1 * $2 * $3; }
+        | tUNUMBER unit        { *yyRelPointer += $1 * $2; }
+        | tNEXT unit           { *yyRelPointer += $2; }
+        | tNEXT tUNUMBER unit  { *yyRelPointer += $2 * $3; }
+        | unit                 { *yyRelPointer += $1; }
+        ;
+sign    : '-'            { $$ = -1; }
+        | '+'            { $$ =  1; }
+        ;
+unit    : tSEC_UNIT      { $$ = $1; yyRelPointer = &yyRelSeconds; }
+        | tDAY_UNIT      { $$ = $1; yyRelPointer = &yyRelDay; }
+        | tMONTH_UNIT    { $$ = $1; yyRelPointer = &yyRelMonth; }
         ;
 
 number  : tUNUMBER
@@ -305,8 +385,8 @@ number  : tUNUMBER
 	} else {
 	    yyHaveTime++;
 	    if ($1 < 100) {
-		yyHour = 0;
-		yyMinutes = $1;
+		yyHour = $1;
+		yyMinutes = 0;
 	    } else {
 		yyHour = $1 / 100;
 		yyMinutes = $1 % 100;
@@ -363,15 +443,15 @@ static TABLE    MonthDayTable[] = {
  */
 static TABLE    UnitsTable[] = {
     { "year",           tMONTH_UNIT,    12 },
-    { "month",          tMONTH_UNIT,    1 },
-    { "fortnight",      tMINUTE_UNIT,   14 * 24 * 60 },
-    { "week",           tMINUTE_UNIT,   7 * 24 * 60 },
-    { "day",            tMINUTE_UNIT,   1 * 24 * 60 },
-    { "hour",           tMINUTE_UNIT,   60 },
-    { "minute",         tMINUTE_UNIT,   1 },
-    { "min",            tMINUTE_UNIT,   1 },
-    { "second",         tSEC_UNIT,      1 },
-    { "sec",            tSEC_UNIT,      1 },
+    { "month",          tMONTH_UNIT,     1 },
+    { "fortnight",      tDAY_UNIT,      14 },
+    { "week",           tDAY_UNIT,       7 },
+    { "day",            tDAY_UNIT,       1 },
+    { "hour",           tSEC_UNIT, 60 * 60 },
+    { "minute",         tSEC_UNIT,      60 },
+    { "min",            tSEC_UNIT,      60 },
+    { "second",         tSEC_UNIT,       1 },
+    { "sec",            tSEC_UNIT,       1 },
     { NULL }
 };
 
@@ -379,16 +459,16 @@ static TABLE    UnitsTable[] = {
  * Assorted relative-time words.
  */
 static TABLE    OtherTable[] = {
-    { "tomorrow",       tMINUTE_UNIT,   1 * 24 * 60 },
-    { "yesterday",      tMINUTE_UNIT,   -1 * 24 * 60 },
-    { "today",          tMINUTE_UNIT,   0 },
-    { "now",            tMINUTE_UNIT,   0 },
-    { "last",           tUNUMBER,       -1 },
-    { "this",           tMINUTE_UNIT,   0 },
-    { "next",           tUNUMBER,       2 },
+    { "tomorrow",       tDAY_UNIT,      1 },
+    { "yesterday",      tDAY_UNIT,     -1 },
+    { "today",          tDAY_UNIT,      0 },
+    { "now",            tSEC_UNIT,      0 },
+    { "last",           tUNUMBER,      -1 },
+    { "this",           tSEC_UNIT,      0 },
+    { "next",           tNEXT,          1 },
 #if 0
     { "first",          tUNUMBER,       1 },
-/*  { "second",         tUNUMBER,       2 }, */
+    { "second",         tUNUMBER,       2 },
     { "third",          tUNUMBER,       3 },
     { "fourth",         tUNUMBER,       4 },
     { "fifth",          tUNUMBER,       5 },
@@ -402,6 +482,7 @@ static TABLE    OtherTable[] = {
 #endif
     { "ago",            tAGO,   1 },
     { "epoch",          tEPOCH,   0 },
+    { "stardate",       tSTARDATE, 0},
     { NULL }
 };
 
@@ -413,7 +494,8 @@ static TABLE    TimezoneTable[] = {
     { "gmt",    tZONE,     HOUR( 0) },      /* Greenwich Mean */
     { "ut",     tZONE,     HOUR( 0) },      /* Universal (Coordinated) */
     { "utc",    tZONE,     HOUR( 0) },
-    { "wet",    tZONE,     HOUR( 0) } ,     /* Western European */
+    { "uct",    tZONE,     HOUR( 0) },      /* Universal Coordinated Time */
+    { "wet",    tZONE,     HOUR( 0) },      /* Western European */
     { "bst",    tDAYZONE,  HOUR( 0) },      /* British Summer */
     { "wat",    tZONE,     HOUR( 1) },      /* West Africa */
     { "at",     tZONE,     HOUR( 2) },      /* Azores */
@@ -445,6 +527,7 @@ static TABLE    TimezoneTable[] = {
     { "nt",     tZONE,     HOUR(11) },      /* Nome */
     { "idlw",   tZONE,     HOUR(12) },      /* International Date Line West */
     { "cet",    tZONE,    -HOUR( 1) },      /* Central European */
+    { "cest",   tDAYZONE, -HOUR( 1) },      /* Central European Summer */
     { "met",    tZONE,    -HOUR( 1) },      /* Middle European */
     { "mewt",   tZONE,    -HOUR( 1) },      /* Middle European Winter */
     { "mest",   tDAYZONE, -HOUR( 1) },      /* Middle European Summer */
@@ -554,7 +637,22 @@ ToSeconds(Hours, Minutes, Seconds, Meridian)
     return -1;  /* Should never be reached */
 }
 
-
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Convert --
+ *
+ *      Convert a {month, day, year, hours, minutes, seconds, meridian, dst}
+ *      tuple into a clock seconds value.
+ *
+ * Results:
+ *      0 or -1 indicating success or failure.
+ *
+ * Side effects:
+ *      Fills TimePtr with the computed value.
+ *
+ *-----------------------------------------------------------------------------
+ */
 static int
 Convert(Month, Day, Year, Hours, Minutes, Seconds, Meridian, DSTmode, TimePtr)
     time_t      Month;
@@ -574,29 +672,44 @@ Convert(Month, Day, Year, Hours, Minutes, Seconds, Meridian, DSTmode, TimePtr)
     time_t Julian;
     int i;
 
-    DaysInMonth[1] = Year % 4 == 0 && (Year % 100 != 0 || Year % 400 == 0)
-                    ? 29 : 28;
+    /* Figure out how many days are in February for the given year.
+     * Every year divisible by 4 is a leap year.
+     * But, every year divisible by 100 is not a leap year.
+     * But, every year divisible by 400 is a leap year after all.
+     */
+    DaysInMonth[1] = IsLeapYear(Year) ? 29 : 28;
+
+    /* Check the inputs for validity */
     if (Month < 1 || Month > 12
-     || Year < START_OF_TIME || Year > END_OF_TIME
-     || Day < 1 || Day > DaysInMonth[(int)--Month])
+	    || Year < START_OF_TIME || Year > END_OF_TIME
+	    || Day < 1 || Day > DaysInMonth[(int)--Month])
         return -1;
 
+    /* Start computing the value.  First determine the number of days
+     * represented by the date, then multiply by the number of seconds/day.
+     */
     for (Julian = Day - 1, i = 0; i < Month; i++)
         Julian += DaysInMonth[i];
     if (Year >= EPOCH) {
         for (i = EPOCH; i < Year; i++)
-            Julian += 365 + (i % 4 == 0);
+            Julian += 365 + IsLeapYear(i);
     } else {
         for (i = Year; i < EPOCH; i++)
-            Julian -= 365 + (i % 4 == 0);
+            Julian -= 365 + IsLeapYear(i);
     }
     Julian *= SECSPERDAY;
+
+    /* Add the timezone offset ?? */
     Julian += yyTimezone * 60L;
+
+    /* Add the number of seconds represented by the time component */
     if ((tod = ToSeconds(Hours, Minutes, Seconds, Meridian)) < 0)
         return -1;
     Julian += tod;
+
+    /* Perform a preliminary DST compensation ?? */
     if (DSTmode == DSTon
-     || (DSTmode == DSTmaybe && TclpGetDate(&Julian, 0)->tm_isdst))
+     || (DSTmode == DSTmaybe && TclpGetDate((TclpTime_t)&Julian, 0)->tm_isdst))
         Julian -= 60 * 60;
     *TimePtr = Julian;
     return 0;
@@ -610,15 +723,14 @@ DSTcorrect(Start, Future)
 {
     time_t      StartDay;
     time_t      FutureDay;
-
-    StartDay = (TclpGetDate(&Start, 0)->tm_hour + 1) % 24;
-    FutureDay = (TclpGetDate(&Future, 0)->tm_hour + 1) % 24;
+    StartDay = (TclpGetDate((TclpTime_t)&Start, 0)->tm_hour + 1) % 24;
+    FutureDay = (TclpGetDate((TclpTime_t)&Future, 0)->tm_hour + 1) % 24;
     return (Future - Start) + (StartDay - FutureDay) * 60L * 60L;
 }
 
 
 static time_t
-RelativeDate(Start, DayOrdinal, DayNumber)
+NamedDay(Start, DayOrdinal, DayNumber)
     time_t      Start;
     time_t      DayOrdinal;
     time_t      DayNumber;
@@ -627,12 +739,41 @@ RelativeDate(Start, DayOrdinal, DayNumber)
     time_t      now;
 
     now = Start;
-    tm = TclpGetDate(&now, 0);
+    tm = TclpGetDate((TclpTime_t)&now, 0);
     now += SECSPERDAY * ((DayNumber - tm->tm_wday + 7) % 7);
     now += 7 * SECSPERDAY * (DayOrdinal <= 0 ? DayOrdinal : DayOrdinal - 1);
     return DSTcorrect(Start, now);
 }
 
+static time_t
+NamedMonth(Start, MonthOrdinal, MonthNumber)
+    time_t Start;
+    time_t MonthOrdinal;
+    time_t MonthNumber;
+{
+    struct tm *tm;
+    time_t now;
+    int result;
+    
+    now = Start;
+    tm = TclpGetDate((TclpTime_t)&now, 0);
+    /* To compute the next n'th month, we use this alg:
+     * add n to year value
+     * if currentMonth < requestedMonth decrement year value by 1 (so that
+     *  doing next february from january gives us february of the current year)
+     * set day to 1, time to 0
+     */
+    tm->tm_year += MonthOrdinal;
+    if (tm->tm_mon < MonthNumber - 1) {
+	tm->tm_year--;
+    }
+    result = Convert(MonthNumber, (time_t) 1, tm->tm_year + TM_YEAR_BASE,
+	    (time_t) 0, (time_t) 0, (time_t) 0, MER24, DSTmaybe, &now);
+    if (result < 0) {
+	return 0;
+    }
+    return DSTcorrect(Start, now);
+}
 
 static int
 RelativeMonth(Start, RelMonth, TimePtr)
@@ -650,13 +791,30 @@ RelativeMonth(Start, RelMonth, TimePtr)
         *TimePtr = 0;
         return 0;
     }
-    tm = TclpGetDate(&Start, 0);
+    tm = TclpGetDate((TclpTime_t)&Start, 0);
     Month = 12 * (tm->tm_year + TM_YEAR_BASE) + tm->tm_mon + RelMonth;
     Year = Month / 12;
     Month = Month % 12 + 1;
     result = Convert(Month, (time_t) tm->tm_mday, Year,
 	    (time_t) tm->tm_hour, (time_t) tm->tm_min, (time_t) tm->tm_sec,
 	    MER24, DSTmaybe, &Julian);
+
+    /*
+     * The Julian time returned above is behind by one day, if "month" 
+     * or "year" is used to specify relative time and the GMT flag is true.
+     * This problem occurs only when the current time is closer to
+     * midnight, the difference being not more than its time difference
+     * with GMT. For example, in US/Pacific time zone, the problem occurs
+     * whenever the current time is between midnight to 8:00am or 7:00amDST.
+     * See Bug# 413397 for more details and sample script.
+     * To resolve this bug, we simply add the number of seconds corresponding
+     * to timezone difference with GMT to Julian time, if GMT flag is true.
+     */
+
+    if (TclDateTimezone == 0) {
+        Julian += TclpGetTimeZone((unsigned long) Start) * 60L;
+    }
+
     /*
      * The following iteration takes into account the case were we jump
      * into a "short month".  Far example, "one month from Jan 31" will
@@ -679,6 +837,36 @@ RelativeMonth(Start, RelMonth, TimePtr)
 }
 
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * RelativeDay --
+ *
+ *      Given a starting time and a number of days before or after, compute the
+ *      DST corrected difference between those dates.
+ *
+ * Results:
+ *     1 or -1 indicating success or failure.
+ *
+ * Side effects:
+ *      Fills TimePtr with the computed value.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static int
+RelativeDay(Start, RelDay, TimePtr)
+    time_t Start;
+    time_t RelDay;
+    time_t *TimePtr;
+{
+    time_t new;
+
+    new = Start + (RelDay * 60 * 60 * 24);
+    *TimePtr = DSTcorrect(Start, new);
+    return 1;
+}
+
 static int
 LookupWord(buff)
     char                *buff;
@@ -692,11 +880,8 @@ LookupWord(buff)
     /*
      * Make it lowercase.
      */
-    for (p = buff; *p; p++) {
-        if (isupper(UCHAR(*p))) {
-            *p = (char) tolower(UCHAR(*p));
-	}
-    }
+
+    Tcl_UtfToLower(buff);
 
     if (strcmp(buff, "am") == 0 || strcmp(buff, "a.m.") == 0) {
         yylval.Meridian = MERam;
@@ -769,7 +954,8 @@ LookupWord(buff)
     /*
      * Military timezones.
      */
-    if (buff[1] == '\0' && isalpha(UCHAR(*buff))) {
+    if (buff[1] == '\0' && !(*buff & 0x80)
+	    && isalpha(UCHAR(*buff))) {	/* INTL: ISO only */
         for (tp = MilitaryTable; tp->name; tp++) {
             if (strcmp(buff, tp->name) == 0) {
                 yylval.Number = tp->value;
@@ -808,36 +994,31 @@ yylex()
     register char       *p;
     char                buff[20];
     int                 Count;
-    int                 sign;
 
     for ( ; ; ) {
-        while (isspace((unsigned char) (*yyInput))) {
+        while (isspace(UCHAR(*yyInput))) {
             yyInput++;
 	}
 
-        if (isdigit(c = *yyInput) || c == '-' || c == '+') {
-            if (c == '-' || c == '+') {
-                sign = c == '-' ? -1 : 1;
-                if (!isdigit(*++yyInput)) {
-                    /*
-		     * skip the '-' sign
-		     */
-                    continue;
-		}
-            } else {
-                sign = 0;
-	    }
-            for (yylval.Number = 0; isdigit(c = *yyInput++); ) {
+        if (isdigit(UCHAR(c = *yyInput))) { /* INTL: digit */
+	    /* convert the string into a number; count the number of digits */
+	    Count = 0;
+            for (yylval.Number = 0;
+		    isdigit(UCHAR(c = *yyInput++)); ) { /* INTL: digit */
                 yylval.Number = 10 * yylval.Number + c - '0';
+		Count++;
 	    }
             yyInput--;
-            if (sign < 0) {
-                yylval.Number = -yylval.Number;
+	    /* A number with 6 or more digits is considered an ISO 8601 base */
+	    if (Count >= 6) {
+		return tISOBASE;
+	    } else {
+		return tUNUMBER;
 	    }
-            return sign ? tSNUMBER : tUNUMBER;
         }
-        if (isalpha(UCHAR(c))) {
-            for (p = buff; isalpha(c = *yyInput++) || c == '.'; ) {
+        if (!(c & 0x80) && isalpha(UCHAR(c))) {	/* INTL: ISO only. */
+            for (p = buff; isalpha(UCHAR(c = *yyInput++)) /* INTL: ISO only. */
+		     || c == '.'; ) {
                 if (p < &buff[sizeof buff - 1]) {
                     *p++ = c;
 		}
@@ -870,9 +1051,9 @@ yylex()
 int
 TclGetDate(p, now, zone, timePtr)
     char *p;
-    unsigned long now;
+    Tcl_WideInt now;
     long zone;
-    unsigned long *timePtr;
+    Tcl_WideInt *timePtr;
 {
     struct tm *tm;
     time_t Start;
@@ -881,7 +1062,9 @@ TclGetDate(p, now, zone, timePtr)
     int thisyear;
 
     yyInput = p;
-    tm = TclpGetDate((time_t *) &now, 0);
+    /* now has to be cast to a time_t for 64bit compliance */
+    Start = (time_t) now;
+    tm = TclpGetDate((TclpTime_t) &Start, (zone == -50000));
     thisyear = tm->tm_year + TM_YEAR_BASE;
     yyYear = thisyear;
     yyMonth = tm->tm_mon + 1;
@@ -899,14 +1082,18 @@ TclGetDate(p, now, zone, timePtr)
     yyMeridian = MER24;
     yyRelSeconds = 0;
     yyRelMonth = 0;
+    yyRelDay = 0;
+    yyRelPointer = NULL;
+
     yyHaveDate = 0;
     yyHaveDay = 0;
+    yyHaveOrdinalMonth = 0;
     yyHaveRel = 0;
     yyHaveTime = 0;
     yyHaveZone = 0;
 
     if (yyparse() || yyHaveTime > 1 || yyHaveZone > 1 || yyHaveDate > 1 ||
-	    yyHaveDay > 1) {
+	    yyHaveDay > 1 || yyHaveOrdinalMonth > 1) {
         return -1;
     }
     
@@ -936,9 +1123,10 @@ TclGetDate(p, now, zone, timePtr)
             return -1;
 	}
     } else {
-        Start = now;
+        Start = (time_t) now;
         if (!yyHaveRel) {
-            Start -= ((tm->tm_hour * 60L) + tm->tm_min * 60L) + tm->tm_sec;
+            Start -= ((tm->tm_hour * 60L * 60L) +
+		    tm->tm_min * 60L) +	tm->tm_sec;
 	}
     }
 
@@ -948,11 +1136,21 @@ TclGetDate(p, now, zone, timePtr)
     }
     Start += Time;
 
+    if (RelativeDay(Start, yyRelDay, &Time) < 0) {
+	return -1;
+    }
+    Start += Time;
+    
     if (yyHaveDay && !yyHaveDate) {
-        tod = RelativeDate(Start, yyDayOrdinal, yyDayNumber);
+        tod = NamedDay(Start, yyDayOrdinal, yyDayNumber);
         Start += tod;
     }
 
+    if (yyHaveOrdinalMonth) {
+	tod = NamedMonth(Start, yyMonthOrdinal, yyMonth);
+	Start += tod;
+    }
+    
     *timePtr = Start;
     return 0;
 }

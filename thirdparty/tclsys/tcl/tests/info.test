@@ -5,14 +5,30 @@
 # generates output for errors.  No output means no errors were found.
 #
 # Copyright (c) 1991-1994 The Regents of the University of California.
-# Copyright (c) 1994-1995 Sun Microsystems, Inc.
+# Copyright (c) 1994-1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# SCCS: @(#) info.test 1.39 97/08/01 11:10:24
+# RCS: @(#) $Id: info.test,v 1.24.2.3 2004/11/24 19:28:13 dgp Exp $
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+# Set up namespaces needed to test operation of "info args", "info body",
+# "info default", and "info procs" with imported procedures.
+
+catch {namespace delete test_ns_info1 test_ns_info2}
+
+namespace eval test_ns_info1 {
+    namespace export *
+    proc p {x} {return "x=$x"}
+    proc q {{y 27} {z {}}} {return "y=$y"}
+}
+
 
 test info-1.1 {info args option} {
     proc t1 {a bbb c} {return foo}
@@ -38,6 +54,13 @@ test info-1.6 {info args option} {
     t1 1 2
     info args t1
 } {a b}
+test info-1.7 {info args option} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+        namespace import ::test_ns_info1::*
+        list [info args p] [info args q]
+    }
+} {x {y z}}
 
 test info-2.1 {info body option} {
     proc t1 {} {body of t1}
@@ -49,17 +72,58 @@ test info-2.2 {info body option} {
 test info-2.3 {info body option} {
     list [catch {info args set 1} msg] $msg
 } {1 {wrong # args: should be "info args procname"}}
+test info-2.4 {info body option} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+        namespace import ::test_ns_info1::*
+        list [info body p] [info body q]
+    }
+} {{return "x=$x"} {return "y=$y"}}
+# Prior to 8.3.0 this would cause a crash because [info body]
+# would return the bytecompiled version of foo, which the catch
+# would then try and eval out of the foo context, accessing
+# compiled local indices
+test info-2.5 {info body option, returning bytecompiled bodies} {
+    catch {unset args}
+    proc foo {args} {
+	foreach v $args {
+	    upvar $v var
+	    return "variable $v existence: [info exists var]"
+	}
+    }
+    foo a
+    list [catch [info body foo] msg] $msg
+} {1 {can't read "args": no such variable}}
+# Fix for problem tested for in info-2.5 caused problems when
+# procedure body had no string rep (i.e. was not yet bytecode)
+# causing an empty string to be returned [Bug #545644]
+test info-2.6 {info body option, returning list bodies} {
+    proc foo args [list subst bar]
+    list [string bytelength [info body foo]] \
+	    [foo; string bytelength [info body foo]]
+} {9 9}
 
-# "info cmdcount" is no longer accurate for compiled commands! The expected
-# result for info-3.1 used to be "3" and is now "1" since the "set"s have
-# been compiled away.
-test info-3.1 {info cmdcount option} {
+# "info cmdcount" is no longer accurate for compiled commands!
+# The expected result for info-3.1 used to be "3" and is now "1"
+# since the "set"s have been compiled away.  info-3.2 was corrected
+# in 8.3 because the eval'ed body won't be compiled.
+proc testinfocmdcount {} {
     set x [info cmdcount]
     set y 12345
     set z [info cm]
     expr $z-$x
+}
+test info-3.1 {info cmdcount compiled} {
+    testinfocmdcount
 } 1
-test info-3.2 {info body option} {
+test info-3.2 {info cmdcount evaled} {
+    set x [info cmdcount]
+    set y 12345
+    set z [info cm]
+    expr $z-$x
+} 3
+test info-3.3 {info cmdcount evaled} [info body testinfocmdcount] 3
+test info-3.4 {info cmdcount option} {
     list [catch {info cmdcount 1} msg] $msg
 } {1 {wrong # args: should be "info cmdcount"}}
 
@@ -93,145 +157,22 @@ test info-4.5 {info commands option} {
 } {1 {wrong # args: should be "info commands ?pattern?"}}
 
 test info-5.1 {info complete option} {
-    info complete ""
-} 1
+    list [catch {info complete} msg] $msg
+} {1 {wrong # args: should be "info complete command"}}
 test info-5.2 {info complete option} {
-    info complete "  \n"
+    info complete abc
 } 1
 test info-5.3 {info complete option} {
-    info complete "abc def"
-} 1
+    info complete "\{abcd "
+} 0
 test info-5.4 {info complete option} {
-    info complete "a b c d e f \t\n"
+    info complete {# Comment should be complete command}
 } 1
 test info-5.5 {info complete option} {
-    info complete {a b c"d}
-} 1
+    info complete {[a [b] }
+} 0
 test info-5.6 {info complete option} {
-    info complete {a b "c d" e}
-} 1
-test info-5.7 {info complete option} {
-    info complete {a b "c d"}
-} 1
-test info-5.8 {info complete option} {
-    info complete {a b "c d"}
-} 1
-test info-5.9 {info complete option} {
-    info complete {a b "c d}
-} 0
-test info-5.10 {info complete option} {
-    info complete {a b "}
-} 0
-test info-5.11 {info complete option} {
-    info complete {a b "cd"xyz}
-} 1
-test info-5.12 {info complete option} {
-    info complete {a b "c $d() d"}
-} 1
-test info-5.13 {info complete option} {
-    info complete {a b "c $dd("}
-} 0
-test info-5.14 {info complete option} {
-    info complete {a b "c \"}
-} 0
-test info-5.15 {info complete option} {
-    info complete {a b "c [d e f]"}
-} 1
-test info-5.16 {info complete option} {
-    info complete {a b "c [d e f] g"}
-} 1
-test info-5.17 {info complete option} {
-    info complete {a b "c [d e f"}
-} 0
-test info-5.18 {info complete option} {
-    info complete {a {b c d} e}
-} 1
-test info-5.19 {info complete option} {
-    info complete {a {b c d}}
-} 1
-test info-5.20 {info complete option} {
-    info complete "a b\{c d"
-} 1
-test info-5.21 {info complete option} {
-    info complete "a b \{c"
-} 0
-test info-5.22 {info complete option} {
-    info complete "a b \{c{ }"
-} 0
-test info-5.23 {info complete option} {
-    info complete "a b {c d e}xxx"
-} 1
-test info-5.24 {info complete option} {
-    info complete "a b {c \\\{d e}xxx"
-} 1
-test info-5.25 {info complete option} {
-    info complete {a b [ab cd ef]}
-} 1
-test info-5.26 {info complete option} {
-    info complete {a b x[ab][cd][ef] gh}
-} 1
-test info-5.27 {info complete option} {
-    info complete {a b x[ab][cd[ef] gh}
-} 0
-test info-5.28 {info complete option} {
-    info complete {a b x[ gh}
-} 0
-test info-5.29 {info complete option} {
-    info complete {[]]]}
-} 1
-test info-5.30 {info complete option} {
-    info complete {abc x$yyy}
-} 1
-test info-5.31 {info complete option} {
-    info complete "abc x\${abc\[\\d} xyz"
-} 1
-test info-5.32 {info complete option} {
-    info complete "abc x\$\{ xyz"
-} 0
-test info-5.33 {info complete option} {
-    info complete {word $a(xyz)}
-} 1
-test info-5.34 {info complete option} {
-    info complete {word $a(}
-} 0
-test info-5.35 {info complete option} {
-    info complete "set a \\\n"
-} 0
-test info-5.36 {info complete option} {
-    info complete "set a \\n "
-} 1
-test info-5.37 {info complete option} {
-    info complete "set a \\"
-} 1
-test info-5.38 {info complete option} {
-    info complete "foo \\\n\{"
-} 0
-test info-5.39 {info complete option} {
-    info complete " # \{"
-} 1
-test info-5.40 {info complete option} {
-    info complete "foo bar;# \{"
-} 1
-test info-5.41 {info complete option} {
-    info complete "a\nb\n# \{\n# \{\nc\n"
-} 1
-test info-5.42 {info complete option} {
-    info complete "#Incomplete comment\\\n"
-} 0
-test info-5.43 {info complete option} {
-    info complete "#Incomplete comment\\\nBut now it's complete.\n"
-} 1
-test info-5.44 {info complete option} {
-    info complete "# Complete comment\\\\\n"
-} 1
-test info-5.45 {info complete option} {
-    info complete "abc\\\n def"
-} 1
-test info-5.46 {info complete option} {
-    info complete "abc\\\n "
-} 1
-test info-5.47 {info complete option} {
-    info complete "abc\\\n"
+    info complete {[a [b]}
 } 0
 
 test info-6.1 {info default option} {
@@ -282,6 +223,13 @@ test info-6.10 {info default option} {
     proc t1 {{a 18} b} {}
     list [catch {info default t1 a a} msg] $msg
 } {1 {couldn't store default value in variable "a"}}
+test info-6.11 {info default option} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+        namespace import ::test_ns_info1::*
+        list [info default p x foo] $foo [info default q y bar] $bar
+    }
+} {0 {} 1 27}
 catch {unset a}
 
 test info-7.1 {info exists option} {
@@ -343,6 +291,10 @@ test info-8.2 {info globals option} {
 test info-8.3 {info globals option} {
     list [catch {info globals 1 2} msg] $msg
 } {1 {wrong # args: should be "info globals ?pattern?"}}
+test info-8.4 {info globals option: may have leading namespace qualifiers} {
+    set x 0
+    list [info globals x] [info globals :x] [info globals ::x] [info globals :::x] [info globals ::::x]
+} {x {} x x x}
 
 test info-9.1 {info level option} {
     info level
@@ -390,6 +342,11 @@ test info-9.9 {info level option} {
     proc t1 {x} {info level $x}
     list [catch {t1 -3} msg] $msg
 } {1 {bad level "-3"}}
+test info-9.10 {info level option, namespaces} {
+    set msg [namespace eval t {info level 0}]
+    namespace delete t
+    set msg
+} {namespace eval t {info level 0}}
 
 set savedLibrary $tcl_library
 test info-10.1 {info library option} {
@@ -410,7 +367,7 @@ test info-11.1 {info loaded option} {
 } {1 {wrong # args: should be "info loaded ?interp?"}}
 test info-11.2 {info loaded option} {
     list [catch {info loaded {}}] [catch {info loaded gorp} msg] $msg
-} {0 1 {couldn't find slave interpreter named "gorp"}}
+} {0 1 {could not find interpreter "gorp"}}
 
 test info-12.1 {info locals option} {
     set a 22
@@ -418,6 +375,8 @@ test info-12.1 {info locals option} {
         set b 13
         set c testing
         global a
+	global aa
+	set aa 23
         return [info locals]
     }
     lsort [t1 23 24]
@@ -493,31 +452,108 @@ catch {rename _tt2 {}}
 test info-15.3 {info procs option} {
     list [catch {info procs 2 3} msg] $msg
 } {1 {wrong # args: should be "info procs ?pattern?"}}
-
-set self info.test
-if {$tcl_platform(os) == "Win32s"} {
-    set self info~1.tes
+test info-15.4 {info procs option} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+        namespace import ::test_ns_info1::*
+        proc r {} {}
+        list [info procs] [info procs p*]
+    }
+} {{p q r} p}
+test info-15.5 {info procs option with a proc in a namespace} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+	proc p1 { arg } {
+	    puts cmd
+	}
+        proc p2 { arg } {
+	    puts cmd
+	}
+    }
+    info procs ::test_ns_info2::p1
+} {::test_ns_info2::p1}
+test info-15.6 {info procs option with a pattern in a namespace} {
+    catch {namespace delete test_ns_info2}
+    namespace eval test_ns_info2 {
+	proc p1 { arg } {
+	    puts cmd
+	}
+        proc p2 { arg } {
+	    puts cmd
+	}
+    }
+    lsort [info procs ::test_ns_info2::p*]
+} [lsort [list ::test_ns_info2::p1 ::test_ns_info2::p2]]
+test info-15.7 {info procs option with a global shadowing proc} {
+    catch {namespace delete test_ns_info2}
+    proc string_cmd { arg } {
+        puts cmd
+    }
+    namespace eval test_ns_info2 {
+	proc string_cmd { arg } {
+	    puts cmd
+	}
+    }
+    info procs test_ns_info2::string*
+} {::test_ns_info2::string_cmd}
+# This regression test is currently commented out because it requires
+# that the implementation of "info procs" looks into the global namespace,
+# which it does not (in contrast to "info commands")
+if {0} {
+test info-15.8 {info procs option with a global shadowing proc} {
+    catch {namespace delete test_ns_info2}
+    proc string_cmd { arg } {
+        puts cmd
+    }
+    proc string_cmd2 { arg } {
+        puts cmd
+    }
+    namespace eval test_ns_info2 {
+	proc string_cmd { arg } {
+	    puts cmd
+	}
+    }
+    namespace eval test_ns_info2 {
+        lsort [info procs string*]
+    }
+} [lsort [list string_cmd string_cmd2]]
 }
 
 test info-16.1 {info script option} {
-    list [catch {info script x} msg] $msg
-} {1 {wrong # args: should be "info script"}}
+    list [catch {info script x x} msg] $msg
+} {1 {wrong # args: should be "info script ?filename?"}}
 test info-16.2 {info script option} {
     file tail [info sc]
-} $self
-removeFile gorp.info
-makeFile "info script\n" gorp.info
+} "info.test"
+set gorpfile [makeFile "info script\n" gorp.info]
 test info-16.3 {info script option} {
-    list [source gorp.info] [file tail [info script]]
-} [list gorp.info $self]
+    list [source $gorpfile] [file tail [info script]]
+} [list $gorpfile info.test]
 test info-16.4 {resetting "info script" after errors} {
     catch {source ~_nobody_/foo}
     file tail [info script]
-} $self
+} "info.test"
 test info-16.5 {resetting "info script" after errors} {
     catch {source _nonexistent_}
     file tail [info script]
-} $self
+} "info.test"
+test info-16.6 {info script option} {
+    set script [info script]
+    list [file tail [info script]] \
+	    [info script newname.txt] \
+	    [file tail [info script $script]]
+} [list info.test newname.txt info.test]
+test info-16.7 {info script option} {
+    set script [info script]
+    info script newname.txt
+    list [source $gorpfile] [file tail [info script]] \
+	    [file tail [info script $script]]
+} [list $gorpfile newname.txt info.test]
+removeFile gorp.info
+set gorpfile [makeFile {list [info script] [info script foo.bar]} gorp.info]
+test info-16.8 {info script option} {
+    list [source $gorpfile] [file tail [info script]]
+} [list [list $gorpfile foo.bar] info.test]
 removeFile gorp.info
 
 test info-17.1 {info sharedlibextension option} {
@@ -572,19 +608,50 @@ test info-19.5 {info vars with temporary variables} {
     }
     t1
 } {a}
+test info-19.6 {info vars: Bug 1072654} -setup {
+    namespace eval :: unset -nocomplain foo
+    catch {namespace delete x}
+} -body {
+    namespace eval x info vars foo
+} -cleanup {
+    namespace delete x
+} -result {}
 
-test info-20.1 {miscellaneous error conditions} {
+# Check whether the extra testing functions are defined...
+if {([catch {expr T1()} msg] == 1) && ($msg == {unknown math function "T1"})} {
+    set functions {abs acos asin atan atan2 ceil cos cosh double exp floor fmod hypot int log log10 pow rand round sin sinh sqrt srand tan tanh wide}
+} else {
+    set functions {T1 T2 T3 abs acos asin atan atan2 ceil cos cosh double exp floor fmod hypot int log log10 pow rand round sin sinh sqrt srand tan tanh wide}
+}
+test info-20.1 {info functions option} {info functions sin} sin
+test info-20.2 {info functions option} {lsort [info functions]} $functions
+test info-20.3 {info functions option} {
+    lsort [info functions a*]
+} {abs acos asin atan atan2}
+test info-20.4 {info functions option} {
+    lsort [info functions *tan*]
+} {atan atan2 tan tanh}
+test info-20.5 {info functions option} {
+    list [catch {info functions raise an error} msg] $msg
+} {1 {wrong # args: should be "info functions ?pattern?"}}
+
+test info-21.1 {miscellaneous error conditions} {
     list [catch {info} msg] $msg
 } {1 {wrong # args: should be "info option ?arg arg ...?"}}
-test info-20.2 {miscellaneous error conditions} {
+test info-21.2 {miscellaneous error conditions} {
     list [catch {info gorp} msg] $msg
-} {1 {bad option "gorp": must be args, body, cmdcount, commands, complete, default, exists, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
-test info-20.3 {miscellaneous error conditions} {
+} {1 {bad option "gorp": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
+test info-21.3 {miscellaneous error conditions} {
     list [catch {info c} msg] $msg
-} {1 {ambiguous option "c": must be args, body, cmdcount, commands, complete, default, exists, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
-test info-20.4 {miscellaneous error conditions} {
+} {1 {ambiguous option "c": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
+test info-21.4 {miscellaneous error conditions} {
     list [catch {info l} msg] $msg
-} {1 {ambiguous option "l": must be args, body, cmdcount, commands, complete, default, exists, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
-test info-20.5 {miscellaneous error conditions} {
+} {1 {ambiguous option "l": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
+test info-21.5 {miscellaneous error conditions} {
     list [catch {info s} msg] $msg
-} {1 {ambiguous option "s": must be args, body, cmdcount, commands, complete, default, exists, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
+} {1 {ambiguous option "s": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars}}
+
+# cleanup
+catch {namespace delete test_ns_info1 test_ns_info2}
+::tcltest::cleanupTests
+return

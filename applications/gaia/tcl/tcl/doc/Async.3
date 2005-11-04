@@ -5,13 +5,13 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) Async.3 1.14 96/08/26 12:59:41
+'\" RCS: @(#) $Id: Async.3,v 1.5.18.1 2004/12/09 09:24:54 dkf Exp $
 '\" 
 .so man.macros
 .TH Tcl_AsyncCreate 3 7.0 Tcl "Tcl Library Procedures"
 .BS
 .SH NAME
-Tcl_AsyncCreate, Tcl_AsyncMark, Tcl_AsyncInvoke, Tcl_AsyncDelete \- handle asynchronous events
+Tcl_AsyncCreate, Tcl_AsyncMark, Tcl_AsyncInvoke, Tcl_AsyncDelete, Tcl_AsyncReady \- handle asynchronous events
 .SH SYNOPSIS
 .nf
 \fB#include <tcl.h>\fR
@@ -60,6 +60,13 @@ The only safe approach is to set a flag indicating that the event
 occurred, then handle the event later when the world has returned
 to a clean state, such as after the current Tcl command completes.
 .PP
+\fBTcl_AsyncCreate\fR, \fBTcl_AsyncDelete\fR, and \fBTcl_AsyncReady\fR
+are thread sensitive.  They access and/or set a thread-specific data
+structure in the event of a core built with \fI\-\-enable\-threads\fR.  The token
+created by \fBTcl_AsyncCreate\fR contains the needed thread information it
+was called from so that calling \fBTcl_AsyncMark\fR(\fItoken\fR) will only yield
+the origin thread into the asynchronous handler.
+.PP
 \fBTcl_AsyncCreate\fR creates an asynchronous handler and returns
 a token for it.
 The asynchronous handler must be created before
@@ -78,9 +85,9 @@ the actions associated with the asynchronous event.
 type \fBTcl_AsyncProc\fR:
 .CS
 typedef int Tcl_AsyncProc(
-	ClientData \fIclientData\fR,
-	Tcl_Interp *\fIinterp\fR,
-	int \fIcode\fR);
+        ClientData \fIclientData\fR,
+        Tcl_Interp *\fIinterp\fR,
+        int \fIcode\fR);
 .CE
 The \fIclientData\fR will be the same as the \fIclientData\fR
 argument passed to \fBTcl_AsyncCreate\fR when the handler was
@@ -90,8 +97,8 @@ execution in an interpreter, then \fIinterp\fR will identify
 the interpreter in which the command was evaluated and
 \fIcode\fR will be the completion code returned by that
 command.
-The command's result will be present in \fIinterp->result\fR.
-When \fIproc\fR returns, whatever it leaves in \fIinterp->result\fR
+The command's result will be present in the interpreter's result.
+When \fIproc\fR returns, whatever it leaves in the interpreter's result
 will be returned as the result of the command and the integer
 value returned by \fIproc\fR will be used as the new completion
 code for the command.
@@ -127,7 +134,7 @@ not be invoked.
 If multiple handlers become active at the same time, the
 handlers are invoked in the order they were created (oldest
 handler first).
-The \fIcode\fR and \fIinterp->result\fR for later handlers
+The \fIcode\fR and the interpreter's result for later handlers
 reflect the values returned by earlier handlers, so that
 the most recently created handler has last say about
 the interpreter's result and completion code.
@@ -139,17 +146,17 @@ this over and over until there are no longer any ready handlers.
 .SH WARNING
 .PP
 It is almost always a bad idea for an asynchronous event
-handler to modify \fIinterp->result\fR or return a code different
+handler to modify the interpreter's result or return a code different
 from its \fIcode\fR argument.
 This sort of behavior can disrupt the execution of scripts in
 subtle ways and result in bugs that are extremely difficult
 to track down.
 If an asynchronous event handler needs to evaluate Tcl scripts
-then it should first save \fIinterp->result\fR plus the values
+then it should first save the interpreter's result plus the values
 of the variables \fBerrorInfo\fR and \fBerrorCode\fR (this can
 be done, for example, by storing them in dynamic strings).
 When the asynchronous handler is finished it should restore
-\fIinterp->result\fR, \fBerrorInfo\fR, and \fBerrorCode\fR,
+the interpreter's result, \fBerrorInfo\fR, and \fBerrorCode\fR,
 and return the \fIcode\fR argument.
 
 .SH KEYWORDS

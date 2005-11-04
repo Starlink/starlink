@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" SCCS: @(#) @(#) ListObj.3 1.10 97/10/08 11:36:58
+'\" RCS: @(#) $Id: ListObj.3,v 1.4 2000/01/26 03:37:30 hobbs Exp $
 '\" 
 .so man.macros
 .TH Tcl_ListObj 3 8.0 Tcl "Tcl Library Procedures"
@@ -74,9 +74,7 @@ and \fBTcl_ListObjReplace\fR will insert into \fIlistPtr\fR.
 For \fBTcl_SetListObj\fR,
 the number of Tcl objects to insert into \fIobjPtr\fR.
 .VS
-.TP 
-Tcl_Obj	*CONST \fIobjv\fR[]	(in)
-.
+.AP Tcl_Obj	"*CONST\ objv[]" in
 An array of pointers to objects.
 \fBTcl_NewListObj\fR will insert these objects into a new list object
 and \fBTcl_ListObjReplace\fR will insert them into an existing \fIlistPtr\fR.
@@ -151,16 +149,16 @@ of the elements in \fIobjc\fR since the list object now refers to them.
 The new list object returned by \fBTcl_NewListObj\fR
 has reference count zero.
 .PP
-\fBTcl_ListObjGetElements\fR returns a count and
-a pointer to an array of the elements in a list object.
-It returns the count by storing it in the address \fIobjcPtr\fR.
-Similarly, it returns the array pointer by storing it
-in the address \fIobjvPtr\fR.
-If \fIlistPtr\fR is not already a list object,
-\fBTcl_ListObjGetElements\fR will attempt to convert it to one;
-if the conversion fails, it returns \fBTCL_ERROR\fR
-and leaves an error message in the interpreter's result object
-if \fIinterp\fR is not NULL.
+\fBTcl_ListObjGetElements\fR returns a count and a pointer to an array of
+the elements in a list object.  It returns the count by storing it in the
+address \fIobjcPtr\fR.  Similarly, it returns the array pointer by storing
+it in the address \fIobjvPtr\fR.
+The memory pointed to is managed by Tcl and should not be freed by the
+caller.
+If \fIlistPtr\fR is not already a list object, \fBTcl_ListObjGetElements\fR
+will attempt to convert it to one; if the conversion fails, it returns
+\fBTCL_ERROR\fR and leaves an error message in the interpreter's result
+object if \fIinterp\fR is not NULL.
 Otherwise it returns \fBTCL_OK\fR after storing the count and array pointer.
 .PP
 \fBTcl_ListObjLength\fR returns the number of elements in the list object
