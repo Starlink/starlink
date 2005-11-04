@@ -1,0 +1,68 @@
+######################################################################
+#  rules.vc --
+#
+#	Simple set of standard rules for the VC++ makefiles.
+#
+######################################################################
+# $Id: rules.vc,v 1.2 2001/04/14 03:03:02 davygrvy Exp $
+######################################################################
+
+######################################################################
+# a bug fix needed for VC++ 6.0's nmake tool.
+#
+# Reset the version *string* back to the integer it's supposed to be.
+# More entries will have to be made here for all subsiquent nmake
+# versions until Microsoft fixes it.
+#
+_NMAKE_VER  = $(_NMAKE_VER:6.00.8168.0=600)
+######################################################################
+
+
+######################################################################
+# Commandline checks and over-rides
+######################################################################
+
+!ifndef HAVE_RULES
+HAVE_RULES	= 1
+
+# Set DEBUG to 1 to compile with symbols.
+#
+!ifndef DEBUG
+DEBUG		= 0
+!endif
+
+# Set STATIC_BUILD to 1 to make a static library rather
+# than a dll.
+#
+!ifndef STATIC_BUILD
+STATIC_BUILD	= 0
+!endif
+
+# Set USE_TCL_STUBS to 0 to disable Stubs support.  Stubs
+# will work fine even with static libraries, but you may
+# disable it if you want to.
+#
+!ifndef USE_TCL_STUBS
+!if $(STATIC_BUILD) == 0
+USE_TCL_STUBS	= 1
+!else
+USE_TCL_STUBS	= 0
+!endif
+!endif
+
+# Set NOMSVCRT to 1 to use libcmt(d).lib instead of the
+# dynamic run-time.
+#
+!ifndef NOMSVCRT
+!if $(STATIC_BUILD)
+NOMSVCRT	= 1
+!else
+NOMSVCRT	= 0
+!endif
+!endif
+
+!if $(STATIC_BUILD) == 0 && $(NOMSVCRT) == 1
+!error "The static runtime in a loadable (dll) extension is a useless configuration that will cause abnormal and unnecessary code bloat."
+!endif
+
+!endif   #!ifndef HAVE_RULES

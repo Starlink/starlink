@@ -1,0 +1,110 @@
+2002-11-01  Karl Lehenbauer  <karl@procplace.com>
+
+	*** 8.3.5 TAGGED FOR RELEASE ***
+
+	* cleanup for 8.3.5
+
+	* got "make buildhelp" working
+
+2002-02-07  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* tcl/generic/tclXgeneral.c (TclX_EchoObjCmd): use encoding aware
+	functions in 8.1+. [Bug #514053]
+
+2002-01-16  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* win/Makefile.in:
+	* win/configure.in:
+	* win/configure: Changed to use TCL_LIBS and TK_LIBS as the source
+	  for the list of Windows libraries to link against. Fixes #501990.
+
+2001-09-11  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tcl/generic/tclXlib.c (MakeAbsFile): Replaced a call to the
+	  internal 'TclpGetCwd' with an access to the public API
+	  'Tcl_GetCwd'. [457266]. Reported by Vincent Darley.
+
+2001-08-01  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* doc/TclX.n: 
+	* tcl/generic/tclXoscmds.c: allowed sleep to accept double values,
+	to match the Expect sleep command.  This prevents conflicts that
+	depended on the order of package requires.  [Patch #444332]
+
+2001-05-24  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* unix/tools/tclmanpages: Added "re_syntax.n" to the list of
+	  processed manpages [#405956].
+
+2001-05-19  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* All of the changes below are there to fix bug [418295].
+
+	* tcl/generic/tclXoscmds.c (TclX_OsCmdsInit): "system" and
+	  "sleep" now use the new command creation procedure.
+
+	* tcl/generic/tclXprocess.c (TclX_ProcessInit): "fork" and
+	  "wait" now use the new command creation procedure.
+
+	* tcl/generic/tclXutil.c (TclX_CreateObjCommand): Added
+	  the implementation of this new procedure.
+
+	* tcl/generic/tclExtdInt.h: Added TclX_CreateObjCommand to
+	  encapsulate the logic for the creation of commands FOO and
+	  tclx_FOO.
+
+2001-05-15  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tcl/generic/tclXlist.c (TclX_LassignObjCmd): Added
+	  TCL_LEAVE_ERR_MSG to call of 'Tcl_SetVar2Ex'. This
+	  fixes the bug [227478].
+
+2001-05-07  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tcl/generic/tclXgeneral.c (TclX_LoopObjCmd): Changed
+	  'Tcl_AppendStringsToObj' into 'Tcl_AddErrorInfo'. 
+
+	  Fixes bug [226388]. Associated patch is [403050]. No need to
+	  extend the testsuite, it already contained a test exercising the
+	  bug.
+
+2000-08-01 Brent Welch <welch@ajubasolutions.com>
+	* tcl/unix/Makefile.in:
+	* tk/unix/Makefile.in:
+	Fixed bogus "test -f" on the new HELP_DIR directory, which should
+	be "test -d".
+
+2000-07-30 Brent Welch <welch@ajubasolutions.com>
+	* win/Makefile.in - fixed because of new definition of
+	TCL_SRC_DIR and TK_SRC_DIR
+
+2000-07-12 Brent Welch <welch@ajubasolutions.com>
+	* Changed the HELP_DIR to be configurable so I could have parallel
+		builds not all trying to create the same help files.
+
+2000-07-12 Brent Welch <welch@ajubasolutions.com>
+	* tcl/win/configure.in, common.bc, common.vc
+	    Fixed version number to 8.3
+	* {tcl,tk}/unix/Makefile.in, tweaks to get references to LIB_RUNTIME_DIR
+	    properly expanded on irix builds.  Also added BUILDHELP macro
+	    that is conditional on nroff being present so we don't try to
+	    build help files on systems with out nroff.
+
+2000-07-10 Brent Welch <welch@ajubasolutions.com>
+	* tcl/win/tclXAppInit.c, tk/generic/tkXshell.c, tk/win/tkXAppInit.c
+	    - turn off USE_TCL_STUBS
+	* win/Makefile.in, win/configure.in: Cleanup use of stubs library.
+
+2000-04-03  Lee Bernhard  <lfb@scriptics.com>
+
+	* tcl/win/tclXwinOS.c (TclXOSkill): Added support for "kill"
+	command on Windows platforms.
+
+1999-08-20  Scott Stanton  <stanton@scriptics.com>
+
+	* win/aclocal.m4: Updated from latest tcl.m4.
+
+	* win/Makefile.in: Various changes to support Windows builds.
+	Fixed to properly generate pkgIndex.tcl for tkx.  Added
+	Makefile/configure rules.
+

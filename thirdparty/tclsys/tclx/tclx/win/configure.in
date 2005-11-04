@@ -1,0 +1,195 @@
+# This file is an input file used by the GNU "autoconf" program to
+# generate the file "configure", which is run during Tcl installation
+# to configure the system for the local environment.
+#
+# RCS: @(#) $Id: configure.in,v 1.10.4.2 2002/11/02 02:48:14 karll Exp $
+
+AC_INIT(../tcl/generic/tclExtend.h)
+
+TCLX_MAJOR_VERSION=8
+TCLX_MINOR_VERSION=3
+TCLX_PATCH_LEVEL=
+TCLX_VERSION=$TCLX_MAJOR_VERSION.$TCLX_MINOR_VERSION
+TCLX_FULL_VERSION=$TCLX_MAJOR_VERSION.$TCLX_MINOR_VERSION.$TCLX_PATCH_LEVEL
+VER=$TCLX_MAJOR_VERSION$TCLX_MINOR_VERSION
+
+#--------------------------------------------------------------------
+# Check whether --enable-gcc or --disable-gcc was given.  Do this 
+# before AC_PROG_CC and AC_CYGWIN are called so the compiler can 
+# be fully tested by built-in autoconf tools.
+#--------------------------------------------------------------------
+ 
+SC_ENABLE_GCC
+
+#--------------------------------------------------------------------
+# Checks to see if the make progeam sets the $MAKE variable.
+#--------------------------------------------------------------------
+
+AC_PROG_MAKE_SET
+
+#--------------------------------------------------------------------
+# These two macros perform additinal compiler test.
+#--------------------------------------------------------------------
+
+AC_CYGWIN
+
+#--------------------------------------------------------------------
+# Determines the correct binary file extension (.o, .obj, .exe etc.)
+#--------------------------------------------------------------------
+
+AC_OBJEXT
+AC_EXEEXT
+
+#--------------------------------------------------------------------
+# Check whether --enable-threads or --disable-threads was given.
+#--------------------------------------------------------------------
+
+SC_ENABLE_THREADS
+
+#--------------------------------------------------------------------
+# The statements below define a collection of symbols related to
+# building libtcl as a shared library instead of a static library.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SHARED
+if test x"${SHARED_BUILD}" = x1 ; then
+    AC_DEFINE(USE_TCL_STUBS)
+    AC_DEFINE(USE_TK_STUBS)
+    STUB_LIBS="\$(TK_STUB_LIB_FILE) \$(TCL_STUB_LIB_FILE)"
+else
+    STUB_LIBS=""
+fi
+AC_SUBST(STUB_LIBS)
+
+#--------------------------------------------------------------------
+# The statements below define a collection of compile flags.  This 
+# macro depends on the value of SHARED_BUILD, and should be called
+# after SC_ENABLE_SHARED checks the configure switches.
+#--------------------------------------------------------------------
+
+SC_CONFIG_CFLAGS
+
+#--------------------------------------------------------------------
+# Set the default compiler switches based on the --enable-symbols 
+# option.  This macro depends on C flags, and should be called
+# after SC_CONFIG_CFLAGS macro is called.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SYMBOLS
+
+TCL_DBGX=${DBGX}
+CFLAGS=${CFLAGS_DEFAULT}
+LDFLAGS=${LDFLAGS_DEFAULT}
+
+#--------------------------------------------------------------------
+# Locate and source the tclConfig.sh and tclConfig.sh files.
+#--------------------------------------------------------------------
+
+SC_PATH_TCLCONFIG($TCLX_PATCH_LEVEL)
+SC_LOAD_TCLCONFIG
+
+SC_PATH_TKCONFIG($TCLX_PATCH_LEVEL)
+SC_LOAD_TKCONFIG
+
+#--------------------------------------------------------------------
+# Generate command for making .dll and .lib files.
+#--------------------------------------------------------------------
+
+SC_MAKE_LIB
+
+SHLIB_LD=${TCL_SHLIB_LD}
+STLIB_LD=${TCL_STLIB_LD}
+SHLIB_CFLAGS=${TCL_SHLIB_CFLAGS}
+
+AC_SUBST(TCL_SHLIB_LD)
+AC_SUBST(TCL_STLIB_LD)
+AC_SUBST(TCL_SHLIB_CFLAGS)
+
+#--------------------------------------------------------------------
+# Perform final evaluations of variables with possible substitutions.
+#--------------------------------------------------------------------
+
+eval "TCLX_SRC_DIR=`cd $srcdir; pwd`"
+eval "TCLX_DLL_FILE=tclx$VER${DLLSUFFIX}"
+eval "TCLX_LIB_FILE=tclx$VER${LIBSUFFIX}"
+eval "TCLX_STUB_LIB_FILE="
+
+eval "TKX_LIB_FILE=tkx$VER${LIBSUFFIX}"
+eval "TKX_DLL_FILE=tkx$VER${DLLSUFFIX}"
+eval "TKX_STUB_LIB_FILE="
+
+#-----
+# dummy --with-help for compatibility with Unix configure
+#-----
+
+AC_ARG_WITH(help, [  --with-help              directory containing generated help files], with_help=${withval})
+if test x"${with_tclconfig}" != x ; then
+    HELP_DIR=${with_tclconfig}
+else
+    HELP_DIR=${srcbasedir}/tcl/help
+fi
+AC_SUBST(HELP_DIR)
+
+AC_SUBST(TCLX_VERSION)
+AC_SUBST(TCLX_FULL_VERSION)
+AC_SUBST(TCLX_MAJOR_VERSION)
+AC_SUBST(TCLX_MINOR_VERSION)
+AC_SUBST(TCLX_PATCH_LEVEL)
+AC_SUBST(TCLX_DBGX)
+AC_SUBST(TCLX_LIB_FILE)
+AC_SUBST(TCLX_DLL_FILE)
+AC_SUBST(TCLX_STUB_LIB_FILE)
+AC_SUBST(TKX_LIB_FILE)
+AC_SUBST(TKX_DLL_FILE)
+
+AC_SUBST(TK_VERSION)
+AC_SUBST(TK_MAJOR_VERSION)
+AC_SUBST(TK_MINOR_VERSION)
+AC_SUBST(TK_PATCH_LEVEL)
+AC_SUBST(TK_DBGX)
+AC_SUBST(TK_LIB_FILE)
+AC_SUBST(TK_DLL_FILE)
+AC_SUBST(TK_STUB_LIB_FILE)
+AC_SUBST(TK_SRC_DIR)
+AC_SUBST(TK_BIN_DIR)
+
+AC_SUBST(TCL_VERSION)
+AC_SUBST(TCL_MAJOR_VERSION)
+AC_SUBST(TCL_MINOR_VERSION)
+AC_SUBST(TCL_PATCH_LEVEL)
+AC_SUBST(TCL_LIB_FILE)
+AC_SUBST(TCL_DLL_FILE)
+AC_SUBST(TCL_STUB_LIB_FILE)
+AC_SUBST(TCL_SRC_DIR)
+AC_SUBST(TCL_BIN_DIR)
+AC_SUBST(TCL_DBGX)
+
+AC_SUBST(PATHTYPE)
+AC_SUBST(CFLAGS_DEBUG)
+AC_SUBST(CFLAGS_OPTIMIZE)
+AC_SUBST(CFLAGS_WARNING)
+AC_SUBST(EXTRA_CFLAGS)
+AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_LD_LIBS)
+AC_SUBST(SHLIB_CFLAGS)
+AC_SUBST(SHLIB_SUFFIX)
+AC_SUBST(CC_OBJNAME)
+AC_SUBST(CC_EXENAME)
+AC_SUBST(LDFLAGS)
+AC_SUBST(LDFLAGS_DEBUG)
+AC_SUBST(LDFLAGS_OPTIMIZE)
+AC_SUBST(LDFLAGS_CONSOLE)
+AC_SUBST(LDFLAGS_WINDOW)
+AC_SUBST(AR)
+AC_SUBST(RC)
+AC_SUBST(DLLSUFFIX)
+AC_SUBST(LIBSUFFIX)
+AC_SUBST(EXESUFFIX)
+AC_SUBST(LIBRARIES)
+AC_SUBST(MAKE_LIB)
+AC_SUBST(MAKE_DLL)
+
+AC_SUBST(TCL_LIBS)
+AC_SUBST(TK_LIBS)
+
+AC_OUTPUT(Makefile)
